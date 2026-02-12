@@ -1142,170 +1142,49 @@
             }
         };
 
-        // ✅ PRODUCCIÓN INDUSTRIAL - 100% DINÁMICO con múltiples fuentes
-const fetchProductionData = async (countryCode) => {
-    const cacheKey = `production_${countryCode}`;
-    const cached = CacheManager.get(cacheKey);
-    if (cached !== null) return cached;
+        // ✅ VERSIÓN DINÁMICA DE PRODUCCIÓN INDUSTRIAL
+        const fetchOECDProductionDynamic = async (countryCode) => {
+            const cacheKey = `oecd_production_${countryCode}`;
+            const cached = CacheManager.get(cacheKey);
+            if (cached !== null) return cached;
 
-    // FUENTE 1: Banco Mundial - Valor agregado industrial (crecimiento anual %)
-    try {
-        const isoCode = ISO_COUNTRY_CODES[countryCode];
-        if (isoCode) {
-            const url = `${API_CONFIG.worldBank.baseUrl}/country/${isoCode}/indicator/NV.IND.TOTL.KD.ZG?format=${API_CONFIG.worldBank.format}&date=2020:2024&per_page=5`;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data?.[1]?.length > 0) {
-                    for (let item of data[1]) {
-                        if (item.value !== null && !isNaN(item.value)) {
-                            const value = parseFloat(item.value);
-                            console.log(`✓ WB Industrial production for ${countryCode}: ${value.toFixed(1)}%`);
-                            CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
-                            return value;
-                        }
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.warn(`WB production failed for ${countryCode}`);
-    }
+            const oecdCodes = { USD: 'USA', EUR: 'EA19', GBP: 'GBR', JPY: 'JPN', AUD: 'AUS', CAD: 'CAN', CHF: 'CHE', NZD: 'NZL' };
+            const code = oecdCodes[countryCode];
+            if (!code) return null;
 
-    // FUENTE 2: FRED (Federal Reserve Economic Data) - API pública sin autenticación para algunos indicadores
-    try {
-        const fredSeries = {
-            USD: 'INDPRO',      // US Industrial Production Index
-            EUR: 'EA19PRINTO01IXOBM', // EA19 Industrial Production
-            GBP: 'GBRPRINTO01IXOBM',  // UK Industrial Production
-            JPY: 'JPNPRINTO01IXOBM',  // Japan Industrial Production
-            CAD: 'CANPRINTO01IXOBM',  // Canada Industrial Production
-            AUD: 'AUSPROINDMISMEI'    // Australia Production
-        };
-        
-        const series = fredSeries[countryCode];
-        if (series) {
-            // FRED permite algunas consultas sin API key en formato básico
-            const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${series}&sort_order=desc&limit=13&file_type=json&api_key=`;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.observations && data.observations.length >= 13) {
-                    const current = parseFloat(data.observations[0].value);
-                    const yearAgo = parseFloat(data.observations[12].value);
+            try {
+                const url = `https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_ARCHIVE/PRINTO01.M.${code}.../OECD?format=compact_v2`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('OECD fetch failed');
+                
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(xmlText, 'text/xml');
+                
+                const observations = xml.querySelectorAll('Obs');
+                if (observations.length > 0) {
+                    const values = Array.from(observations)
+                        .slice(-24)
+                        .map(obs => parseFloat(obs.getAttribute('OBS_VALUE')))
+                        .filter(v => !isNaN(v));
                     
-                    if (!isNaN(current) && !isNaN(yearAgo) && yearAgo !== 0) {
-                        const variation = ((current - yearAgo) / yearAgo * 100);
-                        console.log(`✓ FRED production for ${countryCode}: ${variation.toFixed(1)}%`);
-                        CacheManager.set(cacheKey, variation, CACHE_CONFIG.ECONOMIC_DATA);
-                        return variation;
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.warn(`FRED production failed for ${countryCode}`);
-    }
-
-    // FUENTE 3: Eurostat para EUR (API REST pública)
-    if (countryCode === 'EUR') {
-        try {
-            // Eurostat: Industrial production index
-            const url = `https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/sts_inpr_m?format=JSON&lang=EN&indic_bt=PROD&nace_r2=B-D&s_adj=SCA&unit=I15&geo=EA19`;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-                const data = await response.json();
-                // Procesar respuesta de Eurostat (estructura compleja)
-                if (data.value) {
-                    const values = Object.values(data.value);
-                    if (values.length >= 13) {
-                        const current = parseFloat(values[values.length - 1]);
-                        const yearAgo = parseFloat(values[values.length - 13]);
+                    if (values.length >= 12) {
+                        const current = values[values.length - 1];
+                        const yearAgo = values[values.length - 13];
+                        const variation = ((current - yearAgo) / yearAgo * 100).toFixed(1);
                         
-                        if (!isNaN(current) && !isNaN(yearAgo) && yearAgo !== 0) {
-                            const variation = ((current - yearAgo) / yearAgo * 100);
-                            console.log(`✓ Eurostat production for EUR: ${variation.toFixed(1)}%`);
-                            CacheManager.set(cacheKey, variation, CACHE_CONFIG.ECONOMIC_DATA);
-                            return variation;
-                        }
+                        console.log(`✓ OECD production for ${countryCode}: ${variation}%`);
+                        CacheManager.set(cacheKey, parseFloat(variation), CACHE_CONFIG.ECONOMIC_DATA);
+                        return parseFloat(variation);
                     }
                 }
+                return null;
+            } catch (error) {
+                console.warn(`OECD production failed for ${countryCode}:`, error.message);
+                return null;
             }
-        } catch (error) {
-            console.warn(`Eurostat production failed for EUR`);
-        }
-    }
-
-    // FUENTE 4: Trading Economics API gratuita (endpoint público limitado)
-    try {
-        const teCountries = {
-            USD: 'united-states',
-            EUR: 'euro-area',
-            GBP: 'united-kingdom',
-            JPY: 'japan',
-            AUD: 'australia',
-            CAD: 'canada',
-            CHF: 'switzerland',
-            NZD: 'new-zealand'
         };
-        
-        const country = teCountries[countryCode];
-        if (country) {
-            const url = `https://api.tradingeconomics.com/country/${country}/indicator/industrial-production?format=json`;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    const latest = data[0];
-                    if (latest.Value !== null && !isNaN(latest.Value)) {
-                        const value = parseFloat(latest.Value);
-                        console.log(`✓ Trading Economics production for ${countryCode}: ${value.toFixed(1)}%`);
-                        CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
-                        return value;
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.warn(`Trading Economics production failed for ${countryCode}`);
-    }
 
-    // FUENTE 5: Banco Mundial - Indicador alternativo (manufacturación como % PIB - cambio)
-    try {
-        const isoCode = ISO_COUNTRY_CODES[countryCode];
-        if (isoCode) {
-            const url = `${API_CONFIG.worldBank.baseUrl}/country/${isoCode}/indicator/NV.IND.MANF.ZS?format=${API_CONFIG.worldBank.format}&date=2020:2024&per_page=5`;
-            const response = await fetch(url);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data?.[1]?.length >= 2) {
-                    const recent = data[1].filter(item => item.value !== null);
-                    if (recent.length >= 2) {
-                        const current = parseFloat(recent[0].value);
-                        const previous = parseFloat(recent[1].value);
-                        
-                        if (!isNaN(current) && !isNaN(previous) && previous !== 0) {
-                            const variation = ((current - previous) / previous * 100);
-                            console.log(`✓ WB Manufacturing (alt) for ${countryCode}: ${variation.toFixed(1)}%`);
-                            CacheManager.set(cacheKey, variation, CACHE_CONFIG.ECONOMIC_DATA);
-                            return variation;
-                        }
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.warn(`WB Manufacturing alternative failed for ${countryCode}`);
-    }
-
-    console.warn(`⚠️ No production data available for ${countryCode} from any source`);
-    return null;
-};
         const fetchInterestRate = async (country) => {
             const cacheKey = `interest_rate_${country.code}`;
             const cached = CacheManager.get(cacheKey);
