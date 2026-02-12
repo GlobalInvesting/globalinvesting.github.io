@@ -1275,13 +1275,13 @@
                 else if (data.interestRate < 2.0) score -= 1;
 
                 let outlook;
-                if (score >= 4) outlook = 'Hawkish';
-                else if (score <= -3) outlook = 'Dovish';
-                else outlook = 'Neutral';
+if (score >= 2) outlook = 'Hawkish';      // ← Reducido de 4 a 2
+else if (score <= -2) outlook = 'Dovish';  // ← Reducido de -3 a -2
+else outlook = 'Neutral';
 
-                console.log(`✓ Dynamic outlook for ${countryCode}: ${outlook} (score: ${score})`);
-                CacheManager.set(cacheKey, outlook, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
-                return outlook;
+console.log(`✓ Dynamic outlook for ${countryCode}: ${outlook} (score: ${score})`);
+CacheManager.set(cacheKey, outlook, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
+return outlook;
             } catch (error) {
                 return 'Neutral';
             }
@@ -2170,31 +2170,67 @@ useEffect(() => {
                             </div>
 
                             <div className="metrics-grid">
-                                <div className="metric">
-                                    <div className="metric-label">Crecimiento PIB</div>
-                                    <div className="metric-value">{formatValue(data.gdpGrowth)}%</div>
-                                </div>
-                                <div className="metric">
-                                    <div className="metric-label">Inflación</div>
-                                    <div className="metric-value">{formatValue(data.inflation)}%</div>
-                                </div>
-                                <div className="metric">
-                                    <div className="metric-label">Desempleo</div>
-                                    <div className="metric-value">{formatValue(data.unemployment)}%</div>
-                                </div>
-                                <div className="metric">
-                                    <div className="metric-label">Cuenta Corriente</div>
-                                    <div className="metric-value metric-value-small">{data.currentAccount > 0 ? '+' : ''}{formatValue(data.currentAccount)}%</div>
-                                </div>
-                                <div className="metric">
-                                    <div className="metric-label">Balanza Comercial</div>
-                                    <div className="metric-value metric-value-small">{data.tradeBalance > 0 ? '+' : ''}{formatValue(data.tradeBalance)}B</div>
-                                </div>
-                                <div className="metric">
-                                    <div className="metric-label">Tasa vs USD</div>
-                                    <div className="metric-value metric-value-small">{country.code === 'USD' ? '1.0000' : rate.toFixed(4)}</div>
-                                </div>
-                            </div>
+    <div className="metric">
+        <div className="metric-label">Crecimiento PIB</div>
+        <div className="metric-value" style={{ 
+            color: data.gdpGrowth !== null && data.gdpGrowth > 1.8 ? 'var(--green-strong)' : 
+                   data.gdpGrowth !== null && data.gdpGrowth < 1.0 ? 'var(--red-strong)' : 
+                   'var(--text-primary)' 
+        }}>
+            {formatValue(data.gdpGrowth)}%
+        </div>
+    </div>
+    <div className="metric">
+        <div className="metric-label">Inflación</div>
+        <div className="metric-value" style={{ 
+            color: data.inflation !== null && data.inflation >= 1.8 && data.inflation <= 2.5 ? 'var(--green-strong)' : 
+                   data.inflation !== null && data.inflation > 3.5 ? 'var(--red-strong)' : 
+                   'var(--text-primary)' 
+        }}>
+            {formatValue(data.inflation)}%
+        </div>
+    </div>
+    <div className="metric">
+        <div className="metric-label">Desempleo</div>
+        <div className="metric-value" style={{ 
+            color: data.unemployment !== null && data.unemployment < 3.5 ? 'var(--green-strong)' : 
+                   data.unemployment !== null && data.unemployment > 6 ? 'var(--red-strong)' : 
+                   'var(--text-primary)' 
+        }}>
+            {formatValue(data.unemployment)}%
+        </div>
+    </div>
+    <div className="metric">
+        <div className="metric-label">Cuenta Corriente</div>
+        <div className="metric-value metric-value-small" style={{ 
+            color: data.currentAccount !== null && data.currentAccount > 2 ? 'var(--green-strong)' : 
+                   data.currentAccount !== null && data.currentAccount < -3 ? 'var(--red-strong)' : 
+                   'var(--text-primary)' 
+        }}>
+            {data.currentAccount !== null && data.currentAccount !== undefined 
+                ? `${data.currentAccount > 0 ? '+' : ''}${formatValue(data.currentAccount)}%`
+                : 'N/D'}
+        </div>
+    </div>
+    <div className="metric">
+        <div className="metric-label">Balanza Comercial</div>
+        <div className="metric-value metric-value-small" style={{ 
+            color: data.tradeBalance !== null && data.tradeBalance > 10 ? 'var(--green-strong)' : 
+                   data.tradeBalance !== null && data.tradeBalance < -20 ? 'var(--red-strong)' : 
+                   'var(--text-primary)' 
+        }}>
+            {data.tradeBalance !== null && data.tradeBalance !== undefined 
+                ? `${data.tradeBalance > 0 ? '+' : ''}${formatValue(data.tradeBalance)}B`
+                : 'N/D'}
+        </div>
+    </div>
+    <div className="metric">
+        <div className="metric-label">Tasa vs USD</div>
+        <div className="metric-value metric-value-small">
+            {country.code === 'USD' ? '1.0000' : rate.toFixed(4)}
+        </div>
+    </div>
+</div>
 
                             <div className="analysis-section">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
@@ -2259,7 +2295,7 @@ useEffect(() => {
                 <tbody>
                     {getSortedCountries().map(country => {
                         const data = economicData[country.code] || {};
-                        const strength = calculateStrength(country.code);
+                        const strength = calculateStrength(country.code, data);
                         const sentiment = getSentiment(strength);
                         const overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
                         
