@@ -1,4 +1,4 @@
-name: Update All Economic Data (Fixed Trade Balance)
+name: Update All Economic Data (Enhanced EUR Support)
 on:
   schedule:
     - cron: '0 6 * * *'  # Daily at 6:00 AM UTC
@@ -54,7 +54,7 @@ jobs:
           # World Bank country codes for Trade Balance
           WB_COUNTRY_CODES = {
               'USD': 'USA',
-              'EUR': 'EMU',  # Euro Area
+              'EUR': None,  # Aggregate manually from major EUR countries
               'GBP': 'GBR',
               'JPY': 'JPN',
               'CAD': 'CAN',
@@ -63,12 +63,22 @@ jobs:
               'NZD': 'NZL'
           }
           
+          # Major Eurozone countries for EUR aggregation
+          EUR_AGGREGATE_COUNTRIES = {
+              'DEU': 0.30,  # Germany ~30% of Eurozone GDP
+              'FRA': 0.22,  # France ~22%
+              'ITA': 0.17,  # Italy ~17%
+              'ESP': 0.13,  # Spain ~13%
+              'NLD': 0.09,  # Netherlands ~9%
+              'BEL': 0.05,  # Belgium ~5%
+              'AUT': 0.04   # Austria ~4%
+          }
+          
           def clean_number(text):
               """Extract numeric value from text"""
               if not text:
                   return None
               text = str(text).strip().replace(',', '').replace('%', '')
-              # Handle negative numbers and decimals
               match = re.search(r'(-?\d+\.?\d*)', text)
               if match:
                   try:
@@ -127,6 +137,165 @@ jobs:
                   print(f"  ❌ Error: {str(e)}")
                   return {}
           
+          def fetch_eurozone_trade_balance_aggregate():
+              """
+              Calculate EUR trade balance by aggregating major Eurozone countries
+              Uses World Bank data for individual countries with GDP weights
+              """
+              print(f"\n{'='*70}")
+              print("Calculating EUR Trade Balance (Weighted Aggregate)")
+              print(f"{'='*70}")
+              
+              total_value = 0
+              total_weight = 0
+              country_data = {}
+              
+              for country_code, weight in EUR_AGGREGATE_COUNTRIES.items():
+                  try:
+                      url = f"https://api.worldbank.org/v2/country/{country_code}/indicator/NE.RSB.GNFS.CD?format=json&per_page=5&date=2020:2024"
+                      
+                      response = requests.get(url, timeout=15)
+                      response.raise_for_status()
+                      
+                      data = response.json()
+                      
+                      if len(data) > 1 and data[1]:
+                          for entry in data[1]:
+                              if entry.get('value') is not None:
+                                  value_billions = entry['value'] / 1_000_000_000
+                                  country_data[country_code] = {
+                                      'value': value_billions,
+                                      'year': entry['date'],
+                                      'weight': weight
+                                  }
+                                  
+                                  weighted_value = value_billions * weight
+                                  total_value += weighted_value
+                                  total_weight += weight
+                                  
+                                  country_name = {
+                                      'DEU': 'Germany', 'FRA': 'France', 'ITA': 'Italy',
+                                      'ESP': 'Spain', 'NLD': 'Netherlands', 'BEL': 'Belgium',
+                                      'AUT': 'Austria'
+                                  }.get(country_code, country_code)
+                                  
+                                  print(f"  {country_name:12} ({weight*100:5.1f}%): {value_billions:+8.2f}B → weighted: {weighted_value:+8.2f}B")
+                                  break
+                      
+                      time.sleep(0.3)
+                      
+                  except Exception as e:
+                      print(f"  ⚠️  {country_code} failed: {str(e)}")
+              
+              if total_weight > 0:
+                  # Normalize to 100% if we didn't get all countries
+                  final_value = total_value / total_weight
+                  print(f"\n  ✅ EUR Aggregate: {final_value:+.2f}B USD (coverage: {total_weight*100:.1f}%)")
+                  return round(final_value, 2)
+              
+              return None
+          
+          def scrape_ecb_trade_balance_eur():
+              """
+              Alternative: Try to get EUR trade balance from ECB Statistical Data Warehouse
+              """
+              print(f"\n{'='*70}")
+              print("Trying ECB Statistical Data Warehouse for EUR")
+              print(f"{'='*70}")
+              
+              try:
+                  # ECB Data Portal - Balance of Payments
+                  # BOP.Q.U2.N.CA.F.F._Z._Z._Z.EUR._T._X.N
+                  url = "https://data-api.ecb.europa.eu/service/data/BP6/Q.N.I8.W1.S1.S1.T.B.CA._Z._Z._Z.EUR._T.F.V.N"
+                  
+                  response = requests.get(url, headers={'Accept': 'application/json'}, timeout=15)
+                  
+                  if response.ok:
+                      data = response.json()
+                      # Parse ECB's complex JSON structure
+                      if 'dataSets' in data and data['dataSets']:
+                          observations = data['dataSets'][0].get('series', {})
+                          if observations:
+                              # Get most recent value
+                              first_series = list(observations.values())[0].get('observations', {})
+                              if first_series:
+                                  latest_value = list(first_series.values())[-1][0]
+                                  # ECB reports in millions EUR, convert to billions USD
+                                  # Approximate EUR to USD conversion (1.10)
+                                  value_billions = (latest_value / 1000) * 1.10
+                                  print(f"  ✅ EUR (ECB): {value_billions:+.2f}B USD (estimated)")
+                                  return round(value_billions, 2)
+              
+              except Exception as e:
+                  print(f"  ⚠️  ECB fetch failed: {str(e)}")
+              
+              return None
+          
+          def scrape_trading_economics_eur_fallback():
+              """
+              Last resort: Scrape EUR trade balance from Trading Economics
+              and convert to USD manually
+              """
+              print(f"\n{'='*70}")
+              print("Fallback: Trading Economics EUR Trade Balance")
+              print(f"{'='*70}")
+              
+              try:
+                  url = "https://tradingeconomics.com/euro-area/balance-of-trade"
+                  response = requests.get(url, headers=HEADERS, timeout=15)
+                  
+                  if response.ok:
+                      soup = BeautifulSoup(response.content, 'lxml')
+                      
+                      # Find the current value
+                      value_elem = soup.find('div', {'id': 'ctl00_ContentPlaceHolder1_ctl01_ctl00_Panel1'})
+                      if value_elem:
+                          text = value_elem.get_text(strip=True)
+                          value = clean_number(text)
+                          
+                          if value is not None:
+                              # Trading Economics shows in billions EUR
+                              # Convert to USD (approximate rate 1.10)
+                              value_usd = value * 1.10
+                              print(f"  ✅ EUR (Trading Economics): {value}B EUR → {value_usd:+.2f}B USD")
+                              return round(value_usd, 2)
+              
+              except Exception as e:
+                  print(f"  ⚠️  Trading Economics fallback failed: {str(e)}")
+              
+              return None
+          
+          def get_eur_trade_balance():
+              """
+              Multi-strategy EUR trade balance acquisition
+              Priority: 1) Aggregate WB data, 2) ECB, 3) Trading Economics
+              """
+              print(f"\n{'='*70}")
+              print("SPECIAL HANDLING: EUR TRADE BALANCE")
+              print(f"{'='*70}")
+              
+              # Strategy 1: Weighted aggregate from major countries
+              value = fetch_eurozone_trade_balance_aggregate()
+              if value is not None:
+                  return value
+              
+              print("\n⚠️  Weighted aggregate failed, trying ECB...")
+              
+              # Strategy 2: ECB Statistical Data Warehouse
+              value = scrape_ecb_trade_balance_eur()
+              if value is not None:
+                  return value
+              
+              print("\n⚠️  ECB failed, trying Trading Economics...")
+              
+              # Strategy 3: Trading Economics with manual conversion
+              value = scrape_trading_economics_eur_fallback()
+              if value is not None:
+                  return value
+              
+              print("\n❌ All EUR strategies failed!")
+              return None
+          
           def scrape_world_bank_trade_balance():
               """
               Scrape Trade Balance from World Bank API
@@ -139,12 +308,18 @@ jobs:
               data = {}
               
               # World Bank API endpoint for Trade Balance
-              # Indicator: NE.RSB.GNFS.CD (External balance on goods and services, current US$)
               base_url = "https://api.worldbank.org/v2/country/{}/indicator/NE.RSB.GNFS.CD"
               
               for currency_code, wb_code in WB_COUNTRY_CODES.items():
+                  # Special handling for EUR
+                  if currency_code == 'EUR':
+                      print(f"\n  EUR: Using special aggregate method...")
+                      continue
+                  
+                  if not wb_code:
+                      continue
+                  
                   try:
-                      # Fetch latest available data (most recent 5 years)
                       url = f"{base_url.format(wb_code)}?format=json&per_page=5&date=2020:2024"
                       
                       print(f"  Fetching {currency_code} ({wb_code})...")
@@ -154,78 +329,24 @@ jobs:
                       json_data = response.json()
                       
                       if len(json_data) > 1 and json_data[1]:
-                          # Get most recent non-null value
                           for entry in json_data[1]:
                               if entry.get('value') is not None:
-                                  # Convert from USD to billions USD
                                   value_billions = entry['value'] / 1_000_000_000
                                   data[currency_code] = round(value_billions, 2)
-                                  print(f"  ✓ {currency_code}: {data[currency_code]}B USD ({entry['date']})")
+                                  print(f"  ✓ {currency_code}: {data[currency_code]:+.2f}B USD ({entry['date']})")
                                   break
                       
-                      time.sleep(0.5)  # Be nice to API
+                      time.sleep(0.5)
                       
                   except Exception as e:
                       print(f"  ❌ {currency_code} error: {str(e)}")
               
-              # Fallback: If World Bank fails, try OECD Data Portal
-              if len(data) < len(WB_COUNTRY_CODES):
-                  print("\n  ⚠️  Some data missing, trying OECD fallback...")
-                  data = scrape_oecd_trade_balance_fallback(data)
+              # Now handle EUR with special methods
+              eur_value = get_eur_trade_balance()
+              if eur_value is not None:
+                  data['EUR'] = eur_value
               
               return data
-          
-          def scrape_oecd_trade_balance_fallback(existing_data):
-              """
-              Fallback: Scrape from OECD Data Portal
-              Focus on countries missing from World Bank
-              """
-              print(f"\n{'='*70}")
-              print("Fallback: OECD Trade Balance")
-              print(f"{'='*70}")
-              
-              # OECD country codes
-              oecd_codes = {
-                  'USD': 'USA',
-                  'EUR': 'EA19',  # Euro Area 19
-                  'GBP': 'GBR',
-                  'JPY': 'JPN',
-                  'CAD': 'CAN',
-                  'AUD': 'AUS',
-                  'CHF': 'CHE',
-                  'NZD': 'NZL'
-              }
-              
-              try:
-                  # OECD API for trade balance
-                  # Using quarterly data, current prices, seasonally adjusted
-                  url = "https://stats.oecd.org/sdmx-json/data/DP_LIVE/.TRADEGDP.../OECD?contentType=csv"
-                  
-                  response = requests.get(url, headers=HEADERS, timeout=20)
-                  
-                  if response.ok:
-                      # Parse CSV-style response
-                      lines = response.text.split('\n')
-                      for line in lines[1:]:  # Skip header
-                          parts = line.split(',')
-                          if len(parts) < 3:
-                              continue
-                          
-                          country_code = parts[0].strip('"')
-                          value_str = parts[-2].strip('"')
-                          
-                          for currency_code, oecd_code in oecd_codes.items():
-                              if country_code == oecd_code and currency_code not in existing_data:
-                                  value = clean_number(value_str)
-                                  if value is not None:
-                                      existing_data[currency_code] = value
-                                      print(f"  ✓ {currency_code}: {value}B USD (OECD)")
-                                      break
-              
-              except Exception as e:
-                  print(f"  ❌ OECD fallback error: {str(e)}")
-              
-              return existing_data
           
           # ============================================
           # SCRAPE ALL INDICATORS
@@ -248,17 +369,15 @@ jobs:
           for indicator_key, url in indicators.items():
               indicator_data = scrape_trading_economics(url, indicator_key)
               
-              # Store data
               for currency, value in indicator_data.items():
                   if currency not in all_data:
                       all_data[currency] = {}
                   all_data[currency][indicator_key] = value
               
-              time.sleep(2)  # Be respectful to the server
+              time.sleep(2)
           
           # ============================================
-          # SCRAPE TRADE BALANCE FROM WORLD BANK
-          # (All values standardized to billions USD)
+          # SCRAPE TRADE BALANCE (WITH EUR SPECIAL HANDLING)
           # ============================================
           
           trade_balance_data = scrape_world_bank_trade_balance()
@@ -311,16 +430,18 @@ jobs:
               missing_indicators = [ind for ind in all_indicators if ind not in all_data[currency]]
               if missing_indicators:
                   print(f"⚠️  {currency} missing: {', '.join(missing_indicators)}")
+                  if 'tradeBalance' in missing_indicators:
+                      all_valid = False
               else:
                   print(f"✅ {currency}: Complete ({len(all_data[currency])} indicators)")
               
-              # Specific validation for trade balance
               if 'tradeBalance' in all_data[currency]:
                   tb_value = all_data[currency]['tradeBalance']
                   print(f"   💵 Trade Balance: {tb_value:+.2f}B USD")
           
           if not all_valid:
-              print("\n⚠️  VALIDATION WARNING - Some data incomplete")
+              print("\n⚠️  VALIDATION WARNING - Trade Balance data incomplete")
+              exit(1)
           else:
               print("\n✅ ALL DATA SUCCESSFULLY SCRAPED!")
           
