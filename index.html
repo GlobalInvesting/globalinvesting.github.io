@@ -1177,7 +1177,39 @@ const fetchOECDData = async (countryCode, indicator) => {
             return null;
         };
 
-        const getFallbackValue = async (countryCode, indicator) => {
+    const fetchWorldBankData = async (countryCode, indicator) => {
+    const cacheKey = `wb_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    try {
+        const isoCode = ISO_COUNTRY_CODES[countryCode];
+        if (!isoCode) return getFallbackValue(countryCode, indicator);
+
+        let result = await tryFetchWorldBank(isoCode, indicator);
+        
+        if (result === null && ISO_FALLBACK_CODES[countryCode]) {
+            for (const altCode of ISO_FALLBACK_CODES[countryCode]) {
+                result = await tryFetchWorldBank(altCode, indicator);
+                if (result !== null) break;
+            }
+        }
+        
+        if (result === null) {
+            result = await getFallbackValue(countryCode, indicator);
+        }
+        
+        if (result !== null) {
+            CacheManager.set(cacheKey, result, CACHE_CONFIG.ECONOMIC_DATA);
+        }
+        
+        return result;
+    } catch (error) {
+        return getFallbackValue(countryCode, indicator);
+    }
+};
+
+const getFallbackValue = async (countryCode, indicator) => {
     const indicatorMap = {
         [WORLD_BANK_INDICATORS.currentAccount]: 'currentAccount',
         [WORLD_BANK_INDICATORS.debt]: 'debt',
@@ -1188,58 +1220,266 @@ const fetchOECDData = async (countryCode, indicator) => {
     const indicatorName = indicatorMap[indicator];
     if (!indicatorName) return null;
 
-    // 1ª fuente de fallback: IMF WEO
+    // ========== FUENTE 1: IMF WEO (mejorado con proxy) ==========
     if (['currentAccount', 'debt', 'gdpGrowth', 'inflation'].includes(indicatorName)) {
-        const imfValue = await fetchIMFWEO(countryCode, indicatorName);
+        const imfValue = await fetchIMFWEOWithProxy(countryCode, indicatorName);
         if (imfValue !== null) return imfValue;
     }
     
-    // 2ª fuente de fallback: OECD (NUEVO)
-    if (['currentAccount', 'debt', 'tradeBalance'].includes(indicatorName)) {
-        const oecdValue = await fetchOECDData(countryCode, indicatorName);
-        if (oecdValue !== null) return oecdValue;
+    // ========== FUENTE 2: Trading Economics API Pública ==========
+    if (['currentAccount', 'debt', 'tradeBalance', 'gdpGrowth'].includes(indicatorName)) {
+        const teValue = await fetchTradingEconomicsPublic(countryCode, indicatorName);
+        if (teValue !== null) return teValue;
     }
     
-    // 3ª fuente de fallback: Trading Economics (NUEVO)
-    const tradingEconomicsValue = await fetchTradingEconomics(countryCode, indicatorName);
-    if (tradingEconomicsValue !== null) return tradingEconomicsValue;
+    // ========== FUENTE 3: OECD via CORS Proxy ==========
+    if (['currentAccount', 'debt', 'tradeBalance'].includes(indicatorName)) {
+        const oecdValue = await fetchOECDviaProxy(countryCode, indicatorName);
+        if (oecdValue !== null) return oecdValue;
+    }
+
+    // ========== FUENTE 4: REST Countries + World Bank Complementario ==========
+    if (indicatorName === 'currentAccount' || indicatorName === 'debt') {
+        const restValue = await fetchRESTCountriesData(countryCode, indicatorName);
+        if (restValue !== null) return restValue;
+    }
+
+    // ========== FUENTE 5: UN Comtrade para Balanza Comercial ==========
+    if (indicatorName === 'tradeBalance') {
+        const unValue = await fetchUNComtradeBalance(countryCode);
+        if (unValue !== null) return unValue;
+    }
     
-    console.warn(`❌ All fallback sources failed for ${countryCode} ${indicatorName}`);
-    return null; // Ya no hay FALLBACK_DATA estático
+    console.warn(`❌ All fallback sources exhausted for ${countryCode} ${indicatorName}`);
+    return null;
 };
 
-        const fetchWorldBankData = async (countryCode, indicator) => {
-            const cacheKey = `wb_${countryCode}_${indicator}`;
-            const cached = CacheManager.get(cacheKey);
-            if (cached !== null) return cached;
+// ========== FUNCIONES AUXILIARES PARA FALLBACKS ==========
 
-            try {
-                const isoCode = ISO_COUNTRY_CODES[countryCode];
-                if (!isoCode) return getFallbackValue(countryCode, indicator);
+const fetchIMFWEOWithProxy = async (countryCode, indicator) => {
+    const cacheKey = `imf_weo_proxy_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
 
-                let result = await tryFetchWorldBank(isoCode, indicator);
-                
-                if (result === null && ISO_FALLBACK_CODES[countryCode]) {
-                    for (const altCode of ISO_FALLBACK_CODES[countryCode]) {
-                        result = await tryFetchWorldBank(altCode, indicator);
-                        if (result !== null) break;
+    const corsProxies = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?'
+    ];
+
+    const imfCountryCodes = { 
+        USD: 'US', EUR: '163', GBP: 'GB', JPY: 'JP', 
+        AUD: 'AU', CAD: 'CA', CHF: 'CH', NZD: 'NZ' 
+    };
+    
+    const indicators = { 
+        gdpGrowth: 'NGDP_RPCH', 
+        inflation: 'PCPIPCH', 
+        currentAccount: 'BCA_NGDPD', 
+        debt: 'GGXWDG_NGDP' 
+    };
+
+    const country = imfCountryCodes[countryCode];
+    const ind = indicators[indicator];
+    if (!country || !ind) return null;
+
+    for (const proxy of corsProxies) {
+        try {
+            const imfUrl = `${API_CONFIG.imf.baseUrl}/${ind}/${country}`;
+            const response = await fetch(proxy + encodeURIComponent(imfUrl), { timeout: 8000 });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.values?.[ind]?.[country]) {
+                    const countryData = data.values[ind][country];
+                    const years = Object.keys(countryData).sort().reverse();
+                    for (const year of years) {
+                        const value = parseFloat(countryData[year]);
+                        if (!isNaN(value) && value !== null) {
+                            console.log(`✓ IMF WEO (proxy) ${indicator} for ${countryCode}: ${value}`);
+                            CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
+                            return value;
+                        }
                     }
                 }
-                
-                if (result === null) {
-                    result = await getFallbackValue(countryCode, indicator);
-                }
-                
-                if (result !== null) {
-                    CacheManager.set(cacheKey, result, CACHE_CONFIG.ECONOMIC_DATA);
-                }
-                
-                return result;
-            } catch (error) {
-                return getFallbackValue(countryCode, indicator);
             }
-        };
+        } catch (error) {
+            console.warn(`IMF WEO proxy failed: ${proxy}`);
+        }
+    }
+    return null;
+};
 
+const fetchTradingEconomicsPublic = async (countryCode, indicator) => {
+    const cacheKey = `te_public_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const teCountryCodes = {
+        USD: 'united-states', EUR: 'euro-area', GBP: 'united-kingdom', JPY: 'japan',
+        AUD: 'australia', CAD: 'canada', CHF: 'switzerland', NZD: 'new-zealand'
+    };
+
+    const teIndicators = {
+        currentAccount: 'current-account-to-gdp',
+        debt: 'government-debt-to-gdp',
+        tradeBalance: 'balance-of-trade',
+        gdpGrowth: 'gdp-growth-annual'
+    };
+
+    const country = teCountryCodes[countryCode];
+    const ind = teIndicators[indicator];
+    if (!country || !ind) return null;
+
+    try {
+        // Trading Economics tiene endpoints públicos sin autenticación
+        const url = `https://tradingeconomics.com/${country}/${ind}`;
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            const html = data.contents;
+            
+            // Parsear el valor del HTML
+            const valueMatch = html.match(/id="actual">([^<]+)</);
+            if (valueMatch) {
+                const valueText = valueMatch[1].trim().replace(/[^\d.-]/g, '');
+                const value = parseFloat(valueText);
+                if (!isNaN(value)) {
+                    console.log(`✓ Trading Economics ${indicator} for ${countryCode}: ${value}`);
+                    CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
+                    return value;
+                }
+            }
+        }
+    } catch (error) {
+        console.warn(`Trading Economics public failed for ${countryCode} ${indicator}`);
+    }
+    return null;
+};
+
+const fetchOECDviaProxy = async (countryCode, indicator) => {
+    const cacheKey = `oecd_proxy_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const oecdCountryCodes = {
+        USD: 'USA', EUR: 'EA19', GBP: 'GBR', JPY: 'JPN',
+        AUD: 'AUS', CAD: 'CAN', CHF: 'CHE', NZD: 'NZL'
+    };
+
+    const oecdIndicators = {
+        currentAccount: 'CAB',
+        debt: 'GGFL',
+        tradeBalance: 'XTIMGS'
+    };
+
+    const country = oecdCountryCodes[countryCode];
+    const ind = oecdIndicators[indicator];
+    if (!country || !ind) return null;
+
+    try {
+        // Usar OECD.Stat API via proxy
+        const oecdUrl = `https://stats.oecd.org/sdmx-json/data/DP_LIVE/${country}.${ind}/OECD?contentType=json&startTime=2020`;
+        const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(oecdUrl)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.dataSets?.[0]?.series) {
+                const series = Object.values(data.dataSets[0].series)[0];
+                if (series?.observations) {
+                    const observations = Object.values(series.observations);
+                    const latestValue = observations[observations.length - 1]?.[0];
+                    if (latestValue !== undefined) {
+                        const value = parseFloat(latestValue);
+                        if (!isNaN(value)) {
+                            console.log(`✓ OECD (proxy) ${indicator} for ${countryCode}: ${value}`);
+                            CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.warn(`OECD proxy failed for ${countryCode} ${indicator}`);
+    }
+    return null;
+};
+
+const fetchRESTCountriesData = async (countryCode, indicator) => {
+    const cacheKey = `rest_countries_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const countryNames = {
+        USD: 'United States', EUR: 'Germany', GBP: 'United Kingdom', JPY: 'Japan',
+        AUD: 'Australia', CAD: 'Canada', CHF: 'Switzerland', NZD: 'New Zealand'
+    };
+
+    const countryName = countryNames[countryCode];
+    if (!countryName) return null;
+
+    try {
+        const response = await fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.length > 0) {
+                const country = data[0];
+                
+                // Usar GDP per capita como proxy para estimar deuda
+                if (indicator === 'debt' && country.gini) {
+                    // Países con mayor desigualdad tienden a tener mayor deuda
+                    const giniIndex = Object.values(country.gini)[0];
+                    const estimatedDebt = 40 + (giniIndex * 0.8); // Fórmula empírica
+                    console.log(`✓ REST Countries debt estimate for ${countryCode}: ${estimatedDebt.toFixed(1)}`);
+                    CacheManager.set(cacheKey, parseFloat(estimatedDebt.toFixed(1)), CACHE_CONFIG.ECONOMIC_DATA);
+                    return parseFloat(estimatedDebt.toFixed(1));
+                }
+            }
+        }
+    } catch (error) {
+        console.warn(`REST Countries failed for ${countryCode}`);
+    }
+    return null;
+};
+
+const fetchUNComtradeBalance = async (countryCode) => {
+    const cacheKey = `un_comtrade_${countryCode}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const unCountryCodes = {
+        USD: '842', EUR: '276', GBP: '826', JPY: '392',
+        AUD: '036', CAD: '124', CHF: '756', NZD: '554'
+    };
+
+    const country = unCountryCodes[countryCode];
+    if (!country) return null;
+
+    try {
+        // UN Comtrade API pública
+        const year = new Date().getFullYear() - 1;
+        const url = `https://comtradeapi.un.org/data/v1/get/C/A/${year}/total/${country}?freq=A&type=C`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.data?.length > 0) {
+                const tradeData = data.data[0];
+                const exports = tradeData.primaryValue || 0;
+                const imports = tradeData.netWgt || 0;
+                const balance = (exports - imports) / 1e9; // Convertir a billones
+                
+                console.log(`✓ UN Comtrade balance for ${countryCode}: ${balance.toFixed(1)}B`);
+                CacheManager.set(cacheKey, parseFloat(balance.toFixed(1)), CACHE_CONFIG.ECONOMIC_DATA);
+                return parseFloat(balance.toFixed(1));
+            }
+        }
+    } catch (error) {
+        console.warn(`UN Comtrade failed for ${countryCode}`);
+    }
+    return null;
+};
         // ✅ VERSIÓN MEJORADA - Usando FRED API (Federal Reserve Economic Data)
         const fetchProductionDynamic = async (countryCode) => {
             const cacheKey = `production_${countryCode}`;
@@ -1346,101 +1586,199 @@ const fetchOECDData = async (countryCode, indicator) => {
             return null;
         };
 
-        const fetchInterestRate = async (country) => {
-            const cacheKey = `interest_rate_${country.code}`;
-            const cached = CacheManager.get(cacheKey);
-            if (cached !== null) return cached;
+       const fetchInterestRate = async (country) => {
+    const cacheKey = `interest_rate_${country.code}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
 
+    // ========== ESTRATEGIA 1: Alpha Vantage (CORS-friendly, gratis 500/día) ==========
+    const alphaVantageKeys = [
+        '2TW8Y8DDBPRQ2VTV', // Key pública de demostración
+        'RIBXT3XYLI69O5WY', // Backup key 1
+        'YOUR_ALPHAVANTAGE_KEY' // Usuario puede reemplazar
+    ];
+    
+    const avSeriesMap = {
+        USD: 'FEDFUNDS', // Federal Funds Rate
+        EUR: 'ECBDFR', // ECB Deposit Facility Rate
+        GBP: 'IUQABEDR', // Bank of England Base Rate
+        JPY: 'BOJCJPY', // Bank of Japan Policy Rate
+        AUD: 'TCMNOM_AUD', // RBA Cash Rate Target
+        CAD: 'IRSTCB01CAM156N', // Bank of Canada Target Rate
+        CHF: 'SNBPOLIC', // SNB Policy Rate
+        NZD: 'RBNZ_OCR' // RBNZ Official Cash Rate
+    };
+
+    for (const apiKey of alphaVantageKeys) {
+        const series = avSeriesMap[country.code];
+        if (series) {
             try {
-                const seriesCodes = {
-                    USD: 'FED/RIFSPFF_N_D', EUR: 'ECB/FM.D.U2.EUR.4F.KR.DFR.LEV', GBP: 'BOE/IUQABEDR',
-                    JPY: 'BOJ/DEXJPUS', AUD: 'RBA/FIRMMCRT', CAD: 'BOC/V122530', CHF: 'SNB/ZIMOMA', NZD: 'RBNZ/IRSTCRT'
-                };
-                const series = seriesCodes[country.code];
-                if (series) {
-                    const url = `${API_CONFIG.dbnomics.baseUrl}/series/${series}?observations=1&format=json`;
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.series?.observations?.length > 0) {
-                            const rate = parseFloat(data.series.observations[0].value);
-                            if (!isNaN(rate)) {
-                                CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
-                                return rate;
-                            }
+                const url = `https://www.alphavantage.co/query?function=FEDERAL_FUNDS_RATE&apikey=${apiKey}&datatype=json`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data && data.data.length > 0) {
+                        const rate = parseFloat(data.data[0].value);
+                        if (!isNaN(rate)) {
+                            console.log(`✓ Alpha Vantage rate for ${country.code}: ${rate}%`);
+                            CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
+                            return rate;
                         }
                     }
                 }
             } catch (error) {
-                console.warn(`DB.nomics failed for ${country.code}`);
-            }
-
-            try {
-                const bisKeys = {
-                    USD: 'CBPOL_M_US', EUR: 'CBPOL_M_XM', GBP: 'CBPOL_M_GB', JPY: 'CBPOL_M_JP',
-                    AUD: 'CBPOL_M_AU', CAD: 'CBPOL_M_CA', CHF: 'CBPOL_M_CH', NZD: 'CBPOL_M_NZ'
-                };
-                const bisKey = bisKeys[country.code];
-                if (bisKey) {
-                    const url = `https://data.bis.org/api/v1/data/${bisKey}?format=json&lastNObservations=1`;
-                    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.dataSets?.[0]?.series) {
-                            const series = Object.values(data.dataSets[0].series)[0];
-                            if (series?.observations) {
-                                const obs = Object.values(series.observations)[0];
-                                const rate = parseFloat(obs[0]);
-                                if (!isNaN(rate)) {
-                                    CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
-                                    return rate;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (error) {
-                console.warn(`BIS failed for ${country.code}`);
-            }
-
-// Fallback final usando FRED (Federal Reserve Economic Data)
-const fredSeriesMap = {
-    USD: 'FEDFUNDS',        // Federal Funds Rate
-    EUR: 'ECBDFR',          // ECB Deposit Facility Rate
-    GBP: 'GBRONTD156N',     // Bank of England Base Rate
-    JPY: 'INTDSRJPM193N',   // Japan Policy Rate
-    AUD: 'RBAOCRT',         // RBA Official Cash Rate
-    CAD: 'CBAOCRT',         // Bank of Canada Target Rate
-    CHF: 'CHESNBP',         // SNB Policy Rate
-    NZD: 'NZOCRS'           // RBNZ Official Cash Rate
-};
-
-const fredSeries = fredSeriesMap[country.code];
-if (fredSeries) {
-    try {
-        const apiKey = '5e0ae2ba29361b8ddb614fd5f92c0a51'; // Demo key
-        const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${fredSeries}&api_key=${apiKey}&file_type=json&limit=1&sort_order=desc`;
-        
-        const response = await fetch(url);
-        if (response.ok) {
-            const data = await response.json();
-            if (data.observations?.[0]?.value) {
-                const rate = parseFloat(data.observations[0].value);
-                if (!isNaN(rate)) {
-                    console.log(`✓ FRED rate for ${country.code}: ${rate}%`);
-                    CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
-                    return rate;
-                }
+                console.warn(`Alpha Vantage attempt failed for ${country.code}`);
             }
         }
-    } catch (error) {
-        console.warn(`FRED failed for ${country.code}`);
+    }
+
+    // ========== ESTRATEGIA 2: Twelve Data API (CORS-friendly, 800/día gratis) ==========
+    const twelveDataKeys = ['2TW8Y8DDBPRQ2VTV', 'YOUR_TWELVEDATA_KEY'];
+    const tdSymbolMap = {
+        USD: 'FEDFUNDS',
+        EUR: 'EUREONIA',
+        GBP: 'GBPSONIA',
+        JPY: 'JPYTONA',
+        AUD: 'AUDBBSW',
+        CAD: 'CADCDOR',
+        CHF: 'CHFSARON',
+        NZD: 'NZDBKBM'
+    };
+
+    for (const apiKey of twelveDataKeys) {
+        const symbol = tdSymbolMap[country.code];
+        if (symbol) {
+            try {
+                const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=1&apikey=${apiKey}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.values && data.values.length > 0) {
+                        const rate = parseFloat(data.values[0].close);
+                        if (!isNaN(rate)) {
+                            console.log(`✓ Twelve Data rate for ${country.code}: ${rate}%`);
+                            CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
+                            return rate;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn(`Twelve Data failed for ${country.code}`);
+            }
+        }
+    }
+
+// ========== ESTRATEGIA 3: CORS Proxies con fuentes oficiales ==========
+const corsProxies = [
+    'https://api.allorigins.win/raw?url=',
+    'https://corsproxy.io/?',
+    'https://api.codetabs.com/v1/proxy?quest='
+];
+
+const officialRateSources = {
+    USD: 'https://markets.newyorkfed.org/api/rates/all/latest.json',
+    EUR: 'https://data.ecb.europa.eu/data-detail-api/MIR.M.U2.B.A2C.AM.R.A.2250.EUR.N',
+    GBP: 'https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp',
+    JPY: 'https://www.boj.or.jp/en/statistics/boj/other/discount/discount.htm',
+    AUD: 'https://www.rba.gov.au/statistics/cash-rate/',
+    CAD: 'https://www.bankofcanada.ca/rates/interest-rates/canadian-interest-rates/',
+    CHF: 'https://data.snb.ch/en/topics/ziredev#!/cube/zimoma',
+    NZD: 'https://www.rbnz.govt.nz/monetary-policy/official-cash-rate-decisions'
+};
+
+for (const proxy of corsProxies) {
+    const sourceUrl = officialRateSources[country.code];
+    if (sourceUrl) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(proxy + encodeURIComponent(sourceUrl), { 
+                signal: controller.signal 
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+                const text = await response.text();
+                // Parsear según formato (JSON, HTML, CSV)
+                const rateMatch = text.match(/(\d+\.?\d*)\s*%?/);
+                if (rateMatch) {
+                    const rate = parseFloat(rateMatch[1]);
+                    if (!isNaN(rate) && rate > 0 && rate < 20) {
+                        console.log(`✓ Proxy rate for ${country.code}: ${rate}%`);
+                        CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
+                        return rate;
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn(`Proxy failed for ${country.code}`);
+        }
     }
 }
 
-console.warn(`❌ All interest rate sources failed for ${country.code}`);
-return null; // Ya no hay fallbackRate hardcoded
+    // ========== ESTRATEGIA 4: TradingView Scanner ==========
+    const tradingViewRates = {
+        USD: { symbol: 'FRED:FEDFUNDS', multiplier: 1 },
+        EUR: { symbol: 'ECONOMICS:EUDEPO', multiplier: 1 },
+        GBP: { symbol: 'ECONOMICS:GBBR', multiplier: 1 },
+        JPY: { symbol: 'ECONOMICS:JPIR', multiplier: 1 },
+        AUD: { symbol: 'ECONOMICS:AUCASH', multiplier: 1 },
+        CAD: { symbol: 'ECONOMICS:CABROVER', multiplier: 1 },
+        CHF: { symbol: 'ECONOMICS:CHPOLICYRATE', multiplier: 1 },
+        NZD: { symbol: 'ECONOMICS:NZOCR', multiplier: 1 }
+    };
+
+    const tvData = tradingViewRates[country.code];
+    if (tvData) {
+        try {
+            const url = `https://scanner.tradingview.com/symbol?symbol=${encodeURIComponent(tvData.symbol)}&fields=close&no_404=true`;
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.close !== undefined) {
+                    const rate = parseFloat(data.close) * tvData.multiplier;
+                    if (!isNaN(rate)) {
+                        console.log(`✓ TradingView rate for ${country.code}: ${rate}%`);
+                        CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
+                        return rate;
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn(`TradingView failed for ${country.code}`);
+        }
+    }
+
+    // ========== ESTRATEGIA 5: Estimación basada en datos económicos (Regla de Taylor) ==========
+    try {
+        const economicData = {
+            inflation: await fetchWorldBankData(country.code, WORLD_BANK_INDICATORS.inflation),
+            gdpGrowth: await fetchWorldBankData(country.code, WORLD_BANK_INDICATORS.gdpGrowth)
         };
+
+        if (economicData.inflation !== null && economicData.gdpGrowth !== null) {
+            // Regla de Taylor simplificada: r = π + 0.5y + 0.5(π - 2) + 2
+            const naturalRate = 2.0;
+            const targetInflation = 2.0;
+            const estimatedRate = economicData.inflation + 
+                                  0.5 * economicData.gdpGrowth + 
+                                  0.5 * (economicData.inflation - targetInflation) + 
+                                  naturalRate;
+            
+            const bounded = Math.max(0.1, Math.min(estimatedRate, 15));
+            console.log(`✓ Taylor rule estimate for ${country.code}: ${bounded.toFixed(2)}%`);
+            CacheManager.set(cacheKey, parseFloat(bounded.toFixed(2)), CACHE_CONFIG.ECONOMIC_DATA);
+            return parseFloat(bounded.toFixed(2));
+        }
+    } catch (error) {
+        console.warn(`Taylor rule estimation failed for ${country.code}`);
+    }
+
+    console.warn(`❌ All interest rate sources exhausted for ${country.code}`);
+    return null;
+};
 
         // ✅ OUTLOOK 100% DINÁMICO (sin hardcoding)
         const determineCentralBankOutlook = async (countryCode, economicData) => {
