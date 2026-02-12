@@ -61,7 +61,7 @@ jobs:
               print("="*70)
               
               try:
-                  url = "https://tradingeconomics.com/country-list/interest-rate?continent=world"
+                  url = "https://tradingeconomics.com/country-list/interest-rate"
                   r = requests.get(url, headers=HEADERS, timeout=15)
                   soup = BeautifulSoup(r.content, 'lxml')
                   
@@ -374,5 +374,10 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add rates/
-          git pull --rebase
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 Auto-update rates $(date +'%Y-%m-%d %H:%M UTC') - 100% web scraping" && git push)
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🔄 Auto-update rates $(date +'%Y-%m-%d %H:%M UTC') - 100% web scraping"
+            git pull --rebase origin main || true
+            git push
+          fi
