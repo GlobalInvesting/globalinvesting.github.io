@@ -1884,11 +1884,10 @@ const fetchInterestRate = async (country) => {
 
     // ========== ESTRATEGIA PRINCIPAL: GitHub Pages JSON ==========
     try {
-        // Cambia 'TU-USUARIO' y 'TU-REPO' por tus valores reales
-        const githubUrl = `https://TU-USUARIO.github.io/TU-REPO/rates/${country.code}.json`;
+        const githubUrl = `https://globalinvesting.github.io/rates/${country.code}.json`;
         const response = await fetch(githubUrl, { 
             signal: AbortSignal.timeout(5000),
-            cache: 'no-cache'  // Forzar datos frescos
+            cache: 'no-cache'
         });
         
         if (response.ok) {
