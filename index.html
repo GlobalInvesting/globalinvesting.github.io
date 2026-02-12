@@ -994,9 +994,8 @@
             frankfurter: { baseUrl: 'https://api.frankfurter.app' },
             imf: { baseUrl: 'https://www.imf.org/external/datamapper/api/v1' },
             fallback: {
-                lastUpdate: '2026-02-11',
-                interestRates: { USD: 4.25, EUR: 3.00, GBP: 4.50, JPY: 0.75, AUD: 4.10, CAD: 3.75, CHF: 1.25, NZD: 4.75 }
-            }
+    lastUpdate: '2026-02-11'
+}
         };
 
         const WORLD_BANK_INDICATORS = {
@@ -1018,16 +1017,107 @@
             EUR: ['EMU', 'EA19', 'XC']
         };
 
-        const FALLBACK_DATA = {
-            EUR: { currentAccount: 2.1, debt: 88.6, tradeBalance: 245.5 },
-            JPY: { currentAccount: 4.8, debt: 264.0, tradeBalance: -35.0 },
-            USD: { currentAccount: -4.1, debt: 119.1, tradeBalance: -909.6 },
-            GBP: { currentAccount: -2.2, debt: 131.1, tradeBalance: -32.1 },
-            AUD: { currentAccount: -2.0, debt: 57.9, tradeBalance: 36.9 },
-            CAD: { currentAccount: -0.5, debt: 64.9, tradeBalance: -5.9 },
-            CHF: { currentAccount: 7.7, debt: 19.9, tradeBalance: 95.7 },
-            NZD: { currentAccount: -4.7, debt: 54.1, tradeBalance: -4.2 }
-        };
+// ✅ ELIMINADO: Ya no hay FALLBACK_DATA hardcoded
+
+const fetchOECDData = async (countryCode, indicator) => {
+    const cacheKey = `oecd_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const oecdCountryCodes = {
+        USD: 'USA', EUR: 'EA19', GBP: 'GBR', JPY: 'JPN',
+        AUD: 'AUS', CAD: 'CAN', CHF: 'CHE', NZD: 'NZL'
+    };
+
+    const oecdIndicators = {
+        currentAccount: 'CAB', // Current Account Balance as % of GDP
+        debt: 'GGFL', // General Government Gross Financial Liabilities as % of GDP
+        tradeBalance: 'XTIMGS' // Trade in goods and services
+    };
+
+    const country = oecdCountryCodes[countryCode];
+    const ind = oecdIndicators[indicator];
+    
+    if (!country || !ind) return null;
+
+    try {
+        // OECD SDMX-JSON API
+        const url = `https://stats.oecd.org/sdmx-json/data/DP_LIVE/.${ind}.../OECD?contentType=csv&startTime=2020&endTime=2024`;
+        const response = await fetch(url);
+        
+        if (!response.ok) return null;
+        
+        const text = await response.text();
+        const lines = text.split('\n').filter(line => line.includes(country));
+        
+        if (lines.length > 0) {
+            // Parsear CSV y extraer último valor disponible
+            const lastLine = lines[lines.length - 1];
+            const columns = lastLine.split(',');
+            const value = parseFloat(columns[columns.length - 1]);
+            
+            if (!isNaN(value)) {
+                console.log(`✓ OECD ${indicator} for ${countryCode}: ${value}`);
+                CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
+                return value;
+            }
+        }
+    } catch (error) {
+        console.warn(`OECD failed for ${countryCode} ${indicator}:`, error.message);
+    }
+    
+    return null;
+};
+
+    const fetchTradingEconomics = async (countryCode, indicator) => {
+    const cacheKey = `te_${countryCode}_${indicator}`;
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    const teCountryCodes = {
+        USD: 'united-states', EUR: 'euro-area', GBP: 'united-kingdom', JPY: 'japan',
+        AUD: 'australia', CAD: 'canada', CHF: 'switzerland', NZD: 'new-zealand'
+    };
+
+    const teIndicators = {
+        currentAccount: 'current-account-to-gdp',
+        debt: 'government-debt-to-gdp',
+        tradeBalance: 'balance-of-trade',
+        gdpGrowth: 'gdp-growth-annual',
+        inflation: 'inflation-rate'
+    };
+
+    const country = teCountryCodes[countryCode];
+    const ind = teIndicators[indicator];
+    
+    if (!country || !ind) return null;
+
+    try {
+        // Trading Economics API pública (sin autenticación para datos históricos)
+        const url = `https://api.tradingeconomics.com/historical/country/${country}/indicator/${ind}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+            // Obtener el valor más reciente
+            const latestData = data.sort((a, b) => new Date(b.DateTime) - new Date(a.DateTime))[0];
+            const value = parseFloat(latestData.Value);
+            
+            if (!isNaN(value)) {
+                console.log(`✓ Trading Economics ${indicator} for ${countryCode}: ${value}`);
+                CacheManager.set(cacheKey, value, CACHE_CONFIG.ECONOMIC_DATA);
+                return value;
+            }
+        }
+    } catch (error) {
+        console.warn(`Trading Economics failed for ${countryCode} ${indicator}:`, error.message);
+    }
+    
+    return null;
+};
 
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -1088,27 +1178,35 @@
         };
 
         const getFallbackValue = async (countryCode, indicator) => {
-            const indicatorMap = {
-                [WORLD_BANK_INDICATORS.currentAccount]: 'currentAccount',
-                [WORLD_BANK_INDICATORS.debt]: 'debt',
-                [WORLD_BANK_INDICATORS.tradeBalance]: 'tradeBalance',
-                [WORLD_BANK_INDICATORS.gdpGrowth]: 'gdpGrowth'
-            };
-            
-            const indicatorName = indicatorMap[indicator];
-            if (!indicatorName) return null;
+    const indicatorMap = {
+        [WORLD_BANK_INDICATORS.currentAccount]: 'currentAccount',
+        [WORLD_BANK_INDICATORS.debt]: 'debt',
+        [WORLD_BANK_INDICATORS.tradeBalance]: 'tradeBalance',
+        [WORLD_BANK_INDICATORS.gdpGrowth]: 'gdpGrowth'
+    };
+    
+    const indicatorName = indicatorMap[indicator];
+    if (!indicatorName) return null;
 
-            if (['currentAccount', 'debt', 'gdpGrowth', 'inflation'].includes(indicatorName)) {
-                const imfValue = await fetchIMFWEO(countryCode, indicatorName);
-                if (imfValue !== null) return imfValue;
-            }
-            
-            if (FALLBACK_DATA[countryCode]?.[indicatorName] !== undefined) {
-                return FALLBACK_DATA[countryCode][indicatorName];
-            }
-            
-            return null;
-        };
+    // 1ª fuente de fallback: IMF WEO
+    if (['currentAccount', 'debt', 'gdpGrowth', 'inflation'].includes(indicatorName)) {
+        const imfValue = await fetchIMFWEO(countryCode, indicatorName);
+        if (imfValue !== null) return imfValue;
+    }
+    
+    // 2ª fuente de fallback: OECD (NUEVO)
+    if (['currentAccount', 'debt', 'tradeBalance'].includes(indicatorName)) {
+        const oecdValue = await fetchOECDData(countryCode, indicatorName);
+        if (oecdValue !== null) return oecdValue;
+    }
+    
+    // 3ª fuente de fallback: Trading Economics (NUEVO)
+    const tradingEconomicsValue = await fetchTradingEconomics(countryCode, indicatorName);
+    if (tradingEconomicsValue !== null) return tradingEconomicsValue;
+    
+    console.warn(`❌ All fallback sources failed for ${countryCode} ${indicatorName}`);
+    return null; // Ya no hay FALLBACK_DATA estático
+};
 
         const fetchWorldBankData = async (countryCode, indicator) => {
             const cacheKey = `wb_${countryCode}_${indicator}`;
@@ -1305,12 +1403,43 @@
                 console.warn(`BIS failed for ${country.code}`);
             }
 
-            const fallbackRate = API_CONFIG.fallback.interestRates[country.code];
-            if (fallbackRate !== undefined) {
-                CacheManager.set(cacheKey, fallbackRate, CACHE_CONFIG.ECONOMIC_DATA);
-                return fallbackRate;
+// Fallback final usando FRED (Federal Reserve Economic Data)
+const fredSeriesMap = {
+    USD: 'FEDFUNDS',        // Federal Funds Rate
+    EUR: 'ECBDFR',          // ECB Deposit Facility Rate
+    GBP: 'GBRONTD156N',     // Bank of England Base Rate
+    JPY: 'INTDSRJPM193N',   // Japan Policy Rate
+    AUD: 'RBAOCRT',         // RBA Official Cash Rate
+    CAD: 'CBAOCRT',         // Bank of Canada Target Rate
+    CHF: 'CHESNBP',         // SNB Policy Rate
+    NZD: 'NZOCRS'           // RBNZ Official Cash Rate
+};
+
+const fredSeries = fredSeriesMap[country.code];
+if (fredSeries) {
+    try {
+        const apiKey = '5e0ae2ba29361b8ddb614fd5f92c0a51'; // Demo key
+        const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${fredSeries}&api_key=${apiKey}&file_type=json&limit=1&sort_order=desc`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.observations?.[0]?.value) {
+                const rate = parseFloat(data.observations[0].value);
+                if (!isNaN(rate)) {
+                    console.log(`✓ FRED rate for ${country.code}: ${rate}%`);
+                    CacheManager.set(cacheKey, rate, CACHE_CONFIG.ECONOMIC_DATA);
+                    return rate;
+                }
             }
-            return null;
+        }
+    } catch (error) {
+        console.warn(`FRED failed for ${country.code}`);
+    }
+}
+
+console.warn(`❌ All interest rate sources failed for ${country.code}`);
+return null; // Ya no hay fallbackRate hardcoded
         };
 
         // ✅ OUTLOOK 100% DINÁMICO (sin hardcoding)
@@ -1351,37 +1480,63 @@ return outlook;
         };
 
         const fetchForexRates = async () => {
-            const cacheKey = 'forex_rates';
-            const cached = CacheManager.get(cacheKey);
-            if (cached !== null) return cached;
+    const cacheKey = 'forex_rates';
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
 
-            const endpoints = [
-                { url: `${API_CONFIG.frankfurter.baseUrl}/latest?from=USD`, name: 'Frankfurter' },
-                { url: 'https://api.exchangerate-api.com/v4/latest/USD', name: 'ExchangeRate-API' },
-                { url: 'https://open.er-api.com/v6/latest/USD', name: 'Open Exchange' },
-                { url: 'https://api.exchangerate.host/latest?base=USD', name: 'Exchangerate.host' }
-            ];
+    const endpoints = [
+        { url: `${API_CONFIG.frankfurter.baseUrl}/latest?from=USD`, name: 'Frankfurter' },
+        { url: 'https://api.exchangerate-api.com/v4/latest/USD', name: 'ExchangeRate-API' },
+        { url: 'https://open.er-api.com/v6/latest/USD', name: 'Open Exchange' },
+        { url: 'https://api.exchangerate.host/latest?base=USD', name: 'Exchangerate.host' },
+        { url: 'https://api.fixer.io/latest?base=USD', name: 'Fixer.io' },
+        { url: 'https://api.currencyapi.com/v3/latest?base_currency=USD', name: 'CurrencyAPI' }
+    ];
 
-            for (const endpoint of endpoints) {
-                try {
-                    const response = await fetch(endpoint.url);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.rates) {
-                            console.log(`✓ Forex rates from ${endpoint.name}`);
-                            CacheManager.set(cacheKey, data.rates, CACHE_CONFIG.FOREX_RATES);
-                            return data.rates;
-                        }
-                    }
-                } catch (error) {
-                    console.warn(`${endpoint.name} failed`);
+    // Intentar cada endpoint en orden
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint.url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.rates) {
+                    console.log(`✓ Forex rates from ${endpoint.name}`);
+                    CacheManager.set(cacheKey, data.rates, CACHE_CONFIG.FOREX_RATES);
+                    return data.rates;
                 }
             }
+        } catch (error) {
+            console.warn(`${endpoint.name} failed`);
+        }
+    }
 
-            const fallbackRates = { EUR: 0.92, GBP: 0.79, JPY: 149.5, AUD: 1.52, CAD: 1.36, CHF: 0.88, NZD: 1.65 };
-            CacheManager.set(cacheKey, fallbackRates, CACHE_CONFIG.FOREX_RATES);
-            return fallbackRates;
-        };
+    // Fallback final: ECB
+    try {
+        const ecbUrl = 'https://api.frankfurter.app/latest?from=EUR';
+        const response = await fetch(ecbUrl);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.rates) {
+                // Convertir EUR base a USD base
+                const usdRate = 1 / data.rates.USD;
+                const rates = {};
+                Object.keys(data.rates).forEach(currency => {
+                    if (currency !== 'USD') {
+                        rates[currency] = data.rates[currency] * usdRate;
+                    }
+                });
+                console.log('✓ Forex rates from ECB (Frankfurter EUR base)');
+                CacheManager.set(cacheKey, rates, CACHE_CONFIG.FOREX_RATES);
+                return rates;
+            }
+        }
+    } catch (error) {
+        console.warn('ECB fallback failed');
+    }
+
+    console.warn('❌ All forex rate sources failed');
+    return null; // Ya no hay fallbackRates hardcoded
+};
 
         const fetchCentralBankMeetings = async (countryCode) => {
             const cacheKey = `cb_meeting_${countryCode}`;
