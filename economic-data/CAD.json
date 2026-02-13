@@ -8,11 +8,11 @@
     "debt": "TradingEconomics",
     "currentAccount": "TradingEconomics",
     "production": "TradingEconomics",
-    "tradeBalance": "FRED (Federal Reserve Economic Data)"
+    "tradeBalance": "World Bank (annual data / 12 for monthly estimate)"
   },
   "units": {
     "gdp": "Trillions USD",
-    "tradeBalance": "Millions USD (monthly, from FRED)",
+    "tradeBalance": "Millions USD (monthly estimate from World Bank annual data)",
     "other": "Percentages"
   },
   "data": {
@@ -22,6 +22,7 @@
     "unemployment": 6.5,
     "debt": 111.0,
     "currentAccount": -1.0,
-    "production": -2.19
+    "production": -2.19,
+    "tradeBalance": -490.56
   }
 }
