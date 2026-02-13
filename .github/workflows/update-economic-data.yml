@@ -1,4 +1,4 @@
-name: Update Economic Data - FRED Trade Balance
+name: Update Economic Data - World Bank Trade Balance
 on:
   schedule:
     - cron: '0 6 * * *'
@@ -23,18 +23,15 @@ jobs:
       - name: Create data directory
         run: mkdir -p economic-data
       
-      - name: Scrape data with FRED for Trade Balance
-        env:
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      - name: Scrape data with World Bank for Trade Balance
         run: |
-          cat > scrape_economics_fred.py << 'EOFPYTHON'
+          cat > scrape_economics_worldbank.py << 'EOFPYTHON'
           import requests
           from bs4 import BeautifulSoup
           import json
           import re
           from datetime import date
           import time
-          import os
           
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -53,7 +50,6 @@ jobs:
               'debt': 'https://tradingeconomics.com/country-list/government-debt-to-gdp',
               'currentAccount': 'https://tradingeconomics.com/country-list/current-account-to-gdp?continent=world',
               'production': 'https://tradingeconomics.com/country-list/industrial-production?continent=world',
-              # NO TRADE BALANCE - we'll use FRED instead
           }
           
           COUNTRY_NAMES = {
@@ -67,19 +63,16 @@ jobs:
               'NZD': ['New Zealand']
           }
           
-          # FRED API Configuration
-          FRED_API_KEY = os.getenv('FRED_API_KEY', '5e0ae2ba29361b8ddb614fd5f92c0a51')
-          
-          # FRED Series IDs for Trade Balance (in millions USD)
-          FRED_TRADE_BALANCE = {
-              'USD': 'BOPGSTB',           # US Balance on Goods and Services
-              'JPY': 'XTNTVA01JPM667S',   # Japan Trade Balance
-              'EUR': 'XTNTVA01EZM667S',   # Euro Area Trade Balance
-              'GBP': 'XTNTVA01GBM667S',   # UK Trade Balance
-              'CAD': 'XTNTVA01CAM667S',   # Canada Trade Balance
-              'AUD': 'XTNTVA01AUM667S',   # Australia Trade Balance
-              'CHF': 'XTNTVA01CHM667S',   # Switzerland Trade Balance
-              'NZD': 'XTNTVA01NZM667S',   # New Zealand Trade Balance
+          # World Bank country codes and ISO codes for conversion
+          WORLD_BANK_CODES = {
+              'USD': 'USA',
+              'EUR': 'EMU',  # European Monetary Union
+              'GBP': 'GBR',
+              'JPY': 'JPN',
+              'CAD': 'CAN',
+              'AUD': 'AUS',
+              'CHF': 'CHE',
+              'NZD': 'NZL'
           }
           
           exchange_rates = {}
@@ -128,24 +121,29 @@ jobs:
                   print(f"❌ Error: {e}")
                   return False
           
-          def fetch_fred_trade_balance(currency_code):
+          def fetch_world_bank_trade_balance(currency_code):
               """
-              Fetch trade balance from FRED API
-              Returns: value in millions USD (monthly), or None if not available
+              Fetch trade balance from World Bank API
+              
+              World Bank Indicator: NE.RSB.GNFS.CD (External balance on goods and services, current US$)
+              This is annual data, we'll convert to monthly by dividing by 12
+              
+              Returns: value in millions USD (monthly estimate), or None if not available
               """
-              series_id = FRED_TRADE_BALANCE.get(currency_code)
-              if not series_id:
-                  print(f"  ⚠️  {currency_code}: No FRED series ID configured")
+              wb_code = WORLD_BANK_CODES.get(currency_code)
+              if not wb_code:
+                  print(f"  ⚠️  {currency_code}: No World Bank country code")
                   return None
               
-              url = "https://api.stlouisfed.org/fred/series/observations"
+              # World Bank API endpoint
+              # Format: http://api.worldbank.org/v2/country/{country}/indicator/{indicator}?format=json&per_page=1&date=2020:2024
+              indicator = 'NE.RSB.GNFS.CD'  # External balance on goods and services
+              url = f"http://api.worldbank.org/v2/country/{wb_code}/indicator/{indicator}"
               params = {
-                  'series_id': series_id,
-                  'api_key': FRED_API_KEY,
-                  'file_type': 'json',
-                  'sort_order': 'desc',
-                  'limit': 1,
-                  'units': 'lin'  # Linear units (not change, not % change)
+                  'format': 'json',
+                  'per_page': 1,
+                  'date': '2020:2024',  # Last 5 years to get most recent
+                  'mrnev': 1  # Most recent non-empty value
               }
               
               try:
@@ -153,23 +151,25 @@ jobs:
                   if response.ok:
                       data = response.json()
                       
-                      if 'observations' in data and len(data['observations']) > 0:
-                          obs = data['observations'][0]
-                          value_str = obs.get('value', '.')
-                          date_str = obs.get('date', 'N/A')
+                      # World Bank returns array: [metadata, data_array]
+                      if len(data) >= 2 and data[1]:
+                          record = data[1][0]  # Most recent record
+                          value_annual = record.get('value')
+                          year = record.get('date', 'N/A')
                           
-                          if value_str != '.':
-                              value = float(value_str)
-                              print(f"  ✅ {currency_code}: {value:,.2f}M USD (FRED: {date_str}, Series: {series_id})")
-                              return value
+                          if value_annual is not None:
+                              # Convert annual to monthly and to millions
+                              value_monthly_millions = (value_annual / 12) / 1_000_000
+                              print(f"  ✅ {currency_code}: {value_monthly_millions:,.2f}M USD/mo (World Bank {year}, annual: ${value_annual/1e9:.1f}B)")
+                              return value_monthly_millions
                           else:
-                              print(f"  ⚠️  {currency_code}: No data in FRED series {series_id}")
+                              print(f"  ⚠️  {currency_code}: No value in World Bank data")
                       else:
-                          print(f"  ⚠️  {currency_code}: Empty FRED response for {series_id}")
+                          print(f"  ⚠️  {currency_code}: Empty World Bank response")
                   else:
-                      print(f"  ❌ {currency_code}: FRED API error {response.status_code}")
+                      print(f"  ❌ {currency_code}: World Bank API error {response.status_code}")
               except Exception as e:
-                  print(f"  ❌ {currency_code}: FRED request failed - {e}")
+                  print(f"  ❌ {currency_code}: World Bank request failed - {e}")
               
               return None
           
@@ -221,12 +221,10 @@ jobs:
                                   print(f"  ⚠️  {currency_code}: Could not parse '{last_value_text}'")
                                   break
                               
-                              # All indicators are percentages except GDP
                               if indicator_name == 'gdp':
                                   data[currency_code] = round(raw_value, 2)
                                   print(f"  ✓ {currency_code}: ${raw_value:.2f}T USD")
                               else:
-                                  # gdpGrowth, inflation, unemployment, debt, currentAccount, production
                                   data[currency_code] = round(raw_value, 2)
                                   print(f"  ✓ {currency_code}: {raw_value:.2f}%")
                               
@@ -247,23 +245,23 @@ jobs:
               for currency in CURRENCIES:
                   all_data[currency] = {}
               
-              # Scrape from Trading Economics (everything except trade balance)
+              # Scrape from Trading Economics
               for indicator_key, url in INDICATOR_URLS.items():
                   indicator_data = scrape_trading_economics_table(url, indicator_key)
                   for currency_code, value in indicator_data.items():
                       all_data[currency_code][indicator_key] = value
                   time.sleep(2)
               
-              # Get Trade Balance from FRED API
+              # Get Trade Balance from World Bank API
               print(f"\n{'='*80}")
-              print("FETCHING TRADE BALANCE FROM FRED API")
+              print("FETCHING TRADE BALANCE FROM WORLD BANK API")
               print(f"{'='*80}")
               
               for currency in CURRENCIES:
-                  tb_value = fetch_fred_trade_balance(currency)
+                  tb_value = fetch_world_bank_trade_balance(currency)
                   if tb_value is not None:
                       all_data[currency]['tradeBalance'] = round(tb_value, 2)
-                  time.sleep(0.5)  # Be nice to FRED API
+                  time.sleep(0.5)
               
               return all_data
           
@@ -295,11 +293,11 @@ jobs:
                           'debt': 'TradingEconomics',
                           'currentAccount': 'TradingEconomics',
                           'production': 'TradingEconomics',
-                          'tradeBalance': 'FRED (Federal Reserve Economic Data)'
+                          'tradeBalance': 'World Bank (annual data / 12 for monthly estimate)'
                       },
                       'units': {
                           'gdp': 'Trillions USD',
-                          'tradeBalance': 'Millions USD (monthly, from FRED)',
+                          'tradeBalance': 'Millions USD (monthly estimate from World Bank annual data)',
                           'other': 'Percentages'
                       },
                       'data': data
@@ -310,7 +308,7 @@ jobs:
           
           def print_summary(all_data):
               print(f"\n{'='*80}")
-              print("TRADE BALANCE SUMMARY (FRED API - USD Millions/month)")
+              print("TRADE BALANCE SUMMARY (World Bank API - USD Millions/month)")
               print(f"{'='*80}")
               
               sorted_currencies = sorted(
@@ -331,7 +329,7 @@ jobs:
           
           if __name__ == '__main__':
               print("="*80)
-              print("ECONOMIC DATA SCRAPER - FRED API FOR TRADE BALANCE")
+              print("ECONOMIC DATA SCRAPER - WORLD BANK FOR TRADE BALANCE")
               print("="*80)
               
               if not fetch_exchange_rates():
@@ -345,7 +343,7 @@ jobs:
           
           EOFPYTHON
           
-          python scrape_economics_fred.py
+          python scrape_economics_worldbank.py
       
       - name: Commit and push
         run: |
@@ -355,7 +353,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "📊 Updated economic data (FRED for Trade Balance) $(date +'%Y-%m-%d')"
+            git commit -m "📊 Updated economic data (World Bank for Trade Balance) $(date +'%Y-%m-%d')"
             git pull --rebase origin main || true
             git push
           fi
