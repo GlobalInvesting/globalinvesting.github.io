@@ -3400,6 +3400,21 @@ const sentiment = getSentiment(strength);
         Ponderación Core: Balance Externo (35%) • Diferenciales de Tasas (30%) • Crecimiento & Empleo (20%) • Sentimiento de Mercado (15%)<br/>
         Datos actualizados diariamente desde Trading Economics, FRED y CFTC
     </div>
+
+        <div style={{ 
+        background: 'var(--bg-card)', 
+        padding: '1rem', 
+        borderRadius: '6px', 
+        border: '1px solid var(--border)',
+        marginTop: '1rem',
+        fontSize: '0.8125rem',
+        lineHeight: '1.6'
+    }}>
+        <strong>Disclaimer:</strong><br/>
+        Este dashboard es una herramienta educativa y de análisis. Los scores de fortaleza son cálculos cuantitativos 
+        basados en datos macroeconómicos y no constituyen asesoramiento financiero. El trading de divisas (forex) 
+        conlleva riesgos significativos. Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
+    </div>
     
     <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
         <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
