@@ -1,10 +1,18 @@
 {
   "lastUpdate": "2026-02-13",
-  "source": "TradingEconomics",
-  "methodology": "Smart scale detection based on known country patterns",
+  "sources": {
+    "gdp": "TradingEconomics",
+    "gdpGrowth": "TradingEconomics",
+    "inflation": "TradingEconomics",
+    "unemployment": "TradingEconomics",
+    "debt": "TradingEconomics",
+    "currentAccount": "TradingEconomics",
+    "production": "TradingEconomics",
+    "tradeBalance": "FRED (Federal Reserve Economic Data)"
+  },
   "units": {
     "gdp": "Trillions USD",
-    "tradeBalance": "Millions USD (monthly, converted from local currency)",
+    "tradeBalance": "Millions USD (monthly, from FRED)",
     "other": "Percentages"
   },
   "data": {
@@ -14,7 +22,6 @@
     "unemployment": 6.5,
     "debt": 111.0,
     "currentAccount": -1.0,
-    "production": -2.19,
-    "tradeBalance": -1619.67
+    "production": -2.19
   }
 }
