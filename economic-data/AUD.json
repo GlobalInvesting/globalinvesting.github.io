@@ -8,11 +8,11 @@
     "debt": "TradingEconomics",
     "currentAccount": "TradingEconomics",
     "production": "TradingEconomics",
-    "tradeBalance": "World Bank (annual data / 12 for monthly estimate)"
+    "tradeBalance": "OECD MEI (Monthly Economic Indicators)"
   },
   "units": {
     "gdp": "Trillions USD",
-    "tradeBalance": "Millions USD (monthly estimate from World Bank annual data)",
+    "tradeBalance": "Millions USD (monthly, seasonally adjusted)",
     "other": "Percentages"
   },
   "data": {
@@ -22,7 +22,6 @@
     "unemployment": 4.1,
     "debt": 43.8,
     "currentAccount": -2.3,
-    "production": -0.2,
-    "tradeBalance": 3071.37
+    "production": -0.2
   }
 }
