@@ -1,7 +1,7 @@
 name: Update USD Index COT (CFTC Official)
 on:
   schedule:
-    - cron: '30 20 * * 5'  # Fridays at 8:30 PM UTC (30 min después del otro)
+    - cron: '30 20 * * 5'  # Fridays at 8:30 PM UTC
   workflow_dispatch:
 
 jobs:
@@ -18,13 +18,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml --break-system-packages
+          pip install requests --break-system-packages
       
       - name: Fetch USD Index COT from CFTC
         run: |
           python3 << 'EOFPYTHON'
           import requests
-          from bs4 import BeautifulSoup
           import json
           import re
           from datetime import date
@@ -41,22 +40,25 @@ jobs:
               response = requests.get(CFTC_URL, timeout=30)
               response.raise_for_status()
               
-              # El contenido es plain text, no HTML
               content = response.text
               
               # Buscar la sección del US Dollar Index
-              # Patrón: "U.S. DOLLAR INDEX" seguido de los datos
-              usd_section = re.search(
-                  r'U\.S\. DOLLAR INDEX.*?'  # Header
-                  r'COMMITMENTS\s+'          # Hasta COMMITMENTS
-                  r'(\d+)\s+(\d+)',          # LONG SHORT (primeros dos números)
+              # Patrón corregido: permite espacios y saltos de línea entre elementos
+              usd_pattern = re.search(
+                  r'\(U\.S\. DOLLAR INDEX[^)]*\).*?'   # Header hasta el cierre de paréntesis
+                  r'COMMITMENTS\s+'                     # "COMMITMENTS" seguido de espacios
+                  r'([\d,]+)\s+([\d,]+)',              # LONG y SHORT (permite comas)
                   content,
                   re.DOTALL | re.IGNORECASE
               )
               
-              if usd_section:
-                  long_positions = int(usd_section.group(1))
-                  short_positions = int(usd_section.group(2))
+              if usd_pattern:
+                  # Eliminar comas de los números
+                  long_str = usd_pattern.group(1).replace(',', '')
+                  short_str = usd_pattern.group(2).replace(',', '')
+                  
+                  long_positions = int(long_str)
+                  short_positions = int(short_str)
                   net_position = long_positions - short_positions
                   
                   print(f"\n✅ FOUND USD INDEX DATA:")
@@ -64,7 +66,7 @@ jobs:
                   print(f"   Short: {short_positions:,}")
                   print(f"   Net:   {net_position:+,}")
                   
-                  # Guardar en formato consistente con los otros archivos COT
+                  # Guardar en formato consistente
                   cot_data = {
                       'netPosition': net_position,
                       'longPositions': long_positions,
@@ -74,10 +76,8 @@ jobs:
                       'url': CFTC_URL
                   }
                   
-                  # Crear directorio si no existe
                   os.makedirs('cot-data', exist_ok=True)
                   
-                  # Guardar archivo
                   with open('cot-data/USD.json', 'w') as f:
                       json.dump(cot_data, f, indent=2)
                   
@@ -85,22 +85,63 @@ jobs:
                   print(f"   Net Position: {net_position:+,} contracts")
                   
               else:
-                  print("\n❌ Could not find US Dollar Index section in CFTC report")
-                  print("\nSearching for alternative patterns...")
+                  print("\n❌ Pattern not matched. Trying line-by-line approach...")
                   
-                  # Patrón alternativo más flexible
+                  # Método alternativo: buscar línea por línea
                   lines = content.split('\n')
-                  for i, line in enumerate(lines):
-                      if 'DOLLAR INDEX' in line.upper():
-                          print(f"\nFound 'DOLLAR INDEX' at line {i}")
-                          # Mostrar contexto (10 líneas antes y después)
-                          context_start = max(0, i - 5)
-                          context_end = min(len(lines), i + 15)
-                          print("\nContext:")
-                          print('\n'.join(lines[context_start:context_end]))
-                          break
+                  found_commitments = False
                   
-                  exit(1)
+                  for i, line in enumerate(lines):
+                      if 'U.S. DOLLAR INDEX' in line.upper():
+                          print(f"\nFound 'U.S. DOLLAR INDEX' at line {i}")
+                          
+                          # Buscar "COMMITMENTS" en las próximas 5 líneas
+                          for j in range(i, min(i+10, len(lines))):
+                              if 'COMMITMENTS' in lines[j].upper():
+                                  print(f"Found 'COMMITMENTS' at line {j}")
+                                  
+                                  # La siguiente línea debería tener los datos
+                                  if j+1 < len(lines):
+                                      data_line = lines[j+1].strip()
+                                      print(f"Data line: '{data_line}'")
+                                      
+                                      # Extraer números (acepta con o sin comas)
+                                      numbers = re.findall(r'[\d,]+', data_line)
+                                      
+                                      if len(numbers) >= 2:
+                                          long_positions = int(numbers[0].replace(',', ''))
+                                          short_positions = int(numbers[1].replace(',', ''))
+                                          net_position = long_positions - short_positions
+                                          
+                                          print(f"\n✅ EXTRACTED DATA:")
+                                          print(f"   Long:  {long_positions:,}")
+                                          print(f"   Short: {short_positions:,}")
+                                          print(f"   Net:   {net_position:+,}")
+                                          
+                                          cot_data = {
+                                              'netPosition': net_position,
+                                              'longPositions': long_positions,
+                                              'shortPositions': short_positions,
+                                              'source': 'CFTC (US Dollar Index - ICE Futures)',
+                                              'reportDate': str(date.today()),
+                                              'url': CFTC_URL
+                                          }
+                                          
+                                          os.makedirs('cot-data', exist_ok=True)
+                                          
+                                          with open('cot-data/USD.json', 'w') as f:
+                                              json.dump(cot_data, f, indent=2)
+                                          
+                                          print(f"\n✅ Saved to cot-data/USD.json")
+                                          found_commitments = True
+                                          break
+                          
+                          if found_commitments:
+                              break
+                  
+                  if not found_commitments:
+                      print("\n❌ Could not extract data from CFTC report")
+                      exit(1)
           
           except Exception as e:
               print(f"\n❌ ERROR: {e}")
@@ -141,7 +182,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📊 USD Index COT update $(date +'%Y-%m-%d') - CFTC official data"
+            git commit -m "📊 USD Index COT update $(date +'%Y-%m-%d') - CFTC official"
             git pull --rebase origin main || true
             git push
           fi
