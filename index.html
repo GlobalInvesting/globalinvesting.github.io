@@ -1457,48 +1457,51 @@ const baseStrength = strengthObj.score || 50;  // ✅
             return historical;
         };
 
-        const generateDynamicAlerts = (economicData, forexRates, calendar) => {
-            const cacheKey = 'dynamic_alerts';
-            const cached = CacheManager.get(cacheKey);
-            if (cached !== null) return cached;
+const generateDynamicAlerts = (economicData, forexRates, calendar) => {
+    const cacheKey = 'dynamic_alerts';
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
 
-            const alerts = [];
+    const alerts = [];
 
-            if (calendar?.length > 0) {
-                const highImpactEvents = calendar.filter(e => e.impact === 'high').slice(0, 3);
-                highImpactEvents.forEach(event => {
-                    alerts.push({
-                        type: 'warning',
-                        icon: '⚠️',
-                        title: `Alerta de Volatilidad - ${event.country}`,
-                        message: `${event.event} programado para ${event.date} a las ${event.time}. Alto impacto esperado.`
-                    });
-                });
-            }
-
-            Object.keys(economicData).forEach(currency => {
-                const data = economicData[currency];
-                const strength = parseFloat(calculateStrength(currency, data, forexRates, economicData));
-                
-                if (strength >= 75) {
-                    alerts.push({
-                        type: 'success',
-                        icon: '✓',
-                        title: `Fortaleza Destacada - ${currency}`,
-                        message: `${currency} mantiene fortaleza superior a 75 puntos (${strength}).`
-                    });
-                }
+    if (calendar?.length > 0) {
+        const highImpactEvents = calendar.filter(e => e.impact === 'high').slice(0, 3);
+        highImpactEvents.forEach(event => {
+            alerts.push({
+                type: 'warning',
+                icon: '⚠️',
+                title: `Alerta de Volatilidad - ${event.country}`,
+                message: `${event.event} programado para ${event.date} a las ${event.time}. Alto impacto esperado.`
             });
+        });
+    }
 
-            const sortedAlerts = alerts.sort((a, b) => {
-                const priority = { warning: 3, success: 2, info: 1 };
-                return (priority[b.type] || 0) - (priority[a.type] || 0);
+    Object.keys(economicData).forEach(currency => {
+        const data = economicData[currency];
+        
+        // ✅ CORRECCIÓN: Extraer score del objeto
+        const strengthObj = calculateStrength(currency, data, forexRates, economicData);
+        const strength = strengthObj.score;
+        
+        if (strength >= 75) {
+            alerts.push({
+                type: 'success',
+                icon: '✓',
+                title: `Fortaleza Destacada - ${currency}`,
+                message: `${currency} mantiene fortaleza superior a 75 puntos (${strength}).`
             });
+        }
+    });
 
-            const finalAlerts = sortedAlerts.slice(0, 8);
-            CacheManager.set(cacheKey, finalAlerts, CACHE_CONFIG.ALERTS);
-            return finalAlerts;
-        };
+    const sortedAlerts = alerts.sort((a, b) => {
+        const priority = { warning: 3, success: 2, info: 1 };
+        return (priority[b.type] || 0) - (priority[a.type] || 0);
+    });
+
+    const finalAlerts = sortedAlerts.slice(0, 8);
+    CacheManager.set(cacheKey, finalAlerts, CACHE_CONFIG.ALERTS);
+    return finalAlerts;
+};
 
         const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
             const cacheKey = 'all_economic_data';
@@ -2672,8 +2675,8 @@ const hasCOTData = () => {
                                 <div style={{ color: 'var(--text-secondary)' }}>
                                     <strong>Metodología:</strong> {strengthObj.methodology}<br/>
                                     <strong>Calidad de Datos:</strong> {(strengthObj.dataQuality * 100).toFixed(0)}% 
-                                    ({Object.values(strengthObj.zScores).filter(z => z !== 0).length}/
-                                     {Object.keys(strengthObj.zScores).length} indicadores)<br/>
+                                    ({Object.values(strengthObj.contributions).filter(c => c !== 0).length}/
+                                    {Object.keys(strengthObj.contributions).length} indicadores)<br/>
                                     <strong>Intervalo 95%:</strong> [{strengthObj.confidence.lower}, {strengthObj.confidence.upper}]<br/>
                                     <strong>Top 3 Factores:</strong>
                                     <div style={{ marginTop: '0.5rem', paddingLeft: '0.5rem' }}>
