@@ -2481,16 +2481,23 @@ const hasCOTData = () => {
             <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
             <div className="section-meta">Ordenadas por fortaleza fundamental • Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}</div>
         </div>
-        <div className="currency-grid">
-            {getSortedCountries().map(country => {
-                const data = economicData[country.code] || {};
-                const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
-                const strength = strengthObj.score;
-                const sentiment = getSentiment(strength);
-                const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
+        
+        {/* ✅ VALIDACIÓN: Solo renderizar si hay datos económicos */}
+        {Object.keys(economicData).length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
+                Cargando datos económicos...
+            </div>
+        ) : (
+            <div className="currency-grid">
+                {getSortedCountries().map(country => {
+                    const data = economicData[country.code] || {};
+                    const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
+                    const strength = strengthObj.score;
+                    const sentiment = getSentiment(strength);
+                    const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
 
-                return (
-                    <div key={country.code} className="currency-card">
+                    return (
+                        <div key={country.code} className="currency-card">
                         <div className="card-header">
                             <div className="card-title-section">
                                 <span className="card-flag flag-emoji">{country.flag}</span>
