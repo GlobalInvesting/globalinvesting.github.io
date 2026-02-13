@@ -1400,7 +1400,7 @@
                 const country = countries[countryIndex];
                 const data = currentData[country.code] || {};
                 const baseRate = data.interestRate || 3.0;
-                const baseStrength = parseFloat(calculateStrength(country.code, data, forexRates, economicData));
+                const baseStrength = parseFloat(calculateStrength(country.code, data, {}, currentData));
 
                 if (country.code !== 'USD') {
                     try {
@@ -2379,7 +2379,7 @@
                                                                 {sentiment}
                                                             </div>
                                                         </div>
-                                                        <div className="analysis-text">{generateAnalysis(country.code)}</div>
+                                                        <div className="analysis-text">{generateAnalysis(country.code, forexRates, economicData)}</div>
                                                     </div>
                                                 </div>
                                             </div>
