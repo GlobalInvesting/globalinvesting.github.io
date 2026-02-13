@@ -1,16 +1,6 @@
 {
   "lastUpdate": "2026-02-13",
-  "source": "TradingEconomics + COT",
-  "methodology": "Web scraping with automatic unit conversion",
-  "units": {
-    "gdp": "Trillions USD",
-    "tradeBalance": "Millions USD (monthly)",
-    "retailSales": "% Month-over-Month",
-    "wageGrowth": "% Year-over-Year",
-    "manufacturingPMI": "Index (>50 = expansion)",
-    "cotPositioning": "Net contracts (positive = bullish)",
-    "other": "Percentages"
-  },
+  "source": "TradingEconomics + Investing.com",
   "data": {
     "gdp": 4026.0,
     "gdpGrowth": -0.6,
@@ -19,9 +9,10 @@
     "debt": 237.0,
     "currentAccount": 4.7,
     "production": 2.6,
-    "tradeBalance": 689.61,
+    "tradeBalance": 691.5,
     "retailSales": -2.0,
     "wageGrowth": 2.4,
-    "manufacturingPMI": 51.5
+    "manufacturingPMI": 51.5,
+    "cotPositioning": -19200
   }
 }
