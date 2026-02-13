@@ -1736,42 +1736,92 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     });
     
     // ========== TRADING ADJUSTMENTS ==========
+
+// 0. Determinar régimen de mercado
+const calculateMarketRegime = (allEconomicData) => {
+    const cotValues = Object.values(allEconomicData)
+        .map(d => d.cotPositioning)
+        .filter(v => v !== null && v !== undefined && !isNaN(v));
     
-    // 1. Safe Haven - CONDITIONAL on risk environment (simplified: always moderate)
-    const safeHavenBonus = {
-        'CHF': 6,
-        'JPY': 3,
-        'USD': 2
-    };
-    if (safeHavenBonus[currency]) {
-        totalScore += safeHavenBonus[currency];
-        contributions['safe_haven'] = safeHavenBonus[currency];
-    }
+    if (cotValues.length < 3) return 'neutral';
     
-    // 2. Commodity currencies - vulnerability to global growth
-    const commodityPenalty = {
-        'AUD': -3,
-        'CAD': -2,
-        'NZD': -4
-    };
-    if (commodityPenalty[currency]) {
-        totalScore += commodityPenalty[currency];
-        contributions['commodity_exposure'] = commodityPenalty[currency];
-    }
+    const avgCOT = cotValues.reduce((a, b) => a + b, 0) / cotValues.length;
     
-    // 3. Carry trade premium (rate > 3.5%)
-    if (data.interestRate && data.interestRate > 3.5) {
-        const carryBonus = (data.interestRate - 3.5) * 2;
-        totalScore += carryBonus;
-        contributions['carry_premium'] = carryBonus;
-    }
+    // Posicionamiento promedio muy negativo → pánico → risk-off
+    // Posicionamiento promedio muy positivo → euforia → risk-on
+    if (avgCOT < -5000) return 'risk-off';
+    if (avgCOT > 5000) return 'risk-on';
+    return 'neutral';
+};
+
+const marketRegime = calculateMarketRegime(allEconomicData);
+
+// 1. Safe Haven - DINÁMICO según régimen de mercado
+const safeHavenConfig = {
+    'CHF': { 'risk-off': 20, 'neutral': 12, 'risk-on': 3 },
+    'JPY': { 'risk-off': 15, 'neutral': 6, 'risk-on': -2 },
+    'USD': { 'risk-off': 10, 'neutral': 4, 'risk-on': 1 }
+};
+
+if (safeHavenConfig[currency]) {
+    const bonus = safeHavenConfig[currency][marketRegime];
+    totalScore += bonus;
+    contributions['safe_haven'] = bonus;
+}
+
+// 2. Commodity currencies - DINÁMICO según growth global
+const calculateGlobalGrowth = (allEconomicData) => {
+    const growthRates = Object.values(allEconomicData)
+        .map(d => d.gdpGrowth)
+        .filter(v => v !== null && v !== undefined && !isNaN(v));
     
-    // 4. Growth momentum penalty (very low growth)
-    if (data.gdpGrowth !== null && data.gdpGrowth < 0.5) {
-        const growthPenalty = (0.5 - data.gdpGrowth) * -3;
-        totalScore += growthPenalty;
-        contributions['growth_penalty'] = growthPenalty;
+    if (growthRates.length < 3) return 1.5; // Neutral default
+    return growthRates.reduce((a, b) => a + b, 0) / growthRates.length;
+};
+
+const globalGrowth = calculateGlobalGrowth(allEconomicData);
+
+const commodityConfig = {
+    'AUD': { strong: -1, weak: -5 },  // Menos penalización si growth global fuerte
+    'CAD': { strong: 0, weak: -4 },
+    'NZD': { strong: -2, weak: -6 }
+};
+
+if (commodityConfig[currency]) {
+    const penalty = globalGrowth > 2.0 ? commodityConfig[currency].strong : commodityConfig[currency].weak;
+    totalScore += penalty;
+    contributions['commodity_exposure'] = penalty;
+}
+
+// 3. Carry trade premium (rate > 4.0%)
+if (data.interestRate && data.interestRate > 4.0) {
+    const carryBonus = (data.interestRate - 4.0) * 1.5;
+    totalScore += carryBonus;
+    contributions['carry_premium'] = carryBonus;
+}
+
+// 4. Growth momentum penalty (very low growth)
+if (data.gdpGrowth !== null && data.gdpGrowth < 0.5) {
+    const growthPenalty = (0.5 - data.gdpGrowth) * -4;  // Aumentar penalización de -3 → -4
+    totalScore += growthPenalty;
+    contributions['growth_penalty'] = growthPenalty;
+}
+
+// 5. Twin deficits penalty (US-specific)
+if (currency === 'USD') {
+    if (data.currentAccount < -3 && data.tradeBalance < -50000) {
+        const twinDeficitPenalty = -6;
+        totalScore += twinDeficitPenalty;
+        contributions['twin_deficits'] = twinDeficitPenalty;
     }
+}
+
+// 6. Extreme debt penalty (Japan-specific)
+if (currency === 'JPY' && data.debt > 200) {
+    const debtPenalty = -3;
+    totalScore += debtPenalty;
+    contributions['extreme_debt'] = debtPenalty;
+}
     
     // ========== NORMALIZATION ==========
     const normalizedScore = 50 + (totalScore / 2.5);
