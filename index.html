@@ -1400,7 +1400,7 @@
                 const country = countries[countryIndex];
                 const data = currentData[country.code] || {};
                 const baseRate = data.interestRate || 3.0;
-                const baseStrength = parseFloat(calculateStrength(country.code, data));
+                const baseStrength = parseFloat(calculateStrength(country.code, data, forexRates, economicData));
 
                 if (country.code !== 'USD') {
                     try {
@@ -2100,7 +2100,7 @@
                 if (!economicData[currency]) return 'Cargando datos...';
                 const data = economicData[currency];
                 const country = countries.find(c => c.code === currency);
-                const strength = calculateStrength(currency, data);
+                const strength = calculateStrength(currency, data, forexRates, economicData);
                 const sentiment = getSentiment(strength);
 
                 let analysis = [];
@@ -2121,8 +2121,8 @@
                 return [...countries].sort((a, b) => {
                     const dataA = economicData[a.code] || {};
                     const dataB = economicData[b.code] || {};
-                    const strengthA = parseFloat(calculateStrength(a.code, dataA));
-                    const strengthB = parseFloat(calculateStrength(b.code, dataB));
+                    const strengthA = parseFloat(calculateStrength(a.code, dataA, forexRates, economicData));
+                    const strengthB = parseFloat(calculateStrength(b.code, dataB, forexRates, economicData));
                     return strengthB - strengthA;
                 });
             };
@@ -2434,7 +2434,7 @@
                                         <tbody>
                                             {getSortedCountries().map(country => {
                                                 const data = economicData[country.code] || {};
-                                                const strength = calculateStrength(country.code, data);
+                                                const strength = calculateStrength(country.code, data, forexRates, economicData);
                                                 const sentiment = getSentiment(strength);
                                                 const overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
                                                 
