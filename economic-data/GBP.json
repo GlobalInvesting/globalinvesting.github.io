@@ -1,18 +1,10 @@
 {
   "lastUpdate": "2026-02-13",
-  "sources": {
-    "gdp": "TradingEconomics",
-    "gdpGrowth": "TradingEconomics",
-    "inflation": "TradingEconomics",
-    "unemployment": "TradingEconomics",
-    "debt": "TradingEconomics",
-    "currentAccount": "TradingEconomics",
-    "production": "TradingEconomics",
-    "tradeBalance": "OECD MEI (Monthly Economic Indicators)"
-  },
+  "source": "TradingEconomics",
+  "methodology": "Automatic unit detection and conversion from Trading Economics",
   "units": {
     "gdp": "Trillions USD",
-    "tradeBalance": "Millions USD (monthly, seasonally adjusted)",
+    "tradeBalance": "Millions USD (monthly, auto-converted from source unit)",
     "other": "Percentages"
   },
   "data": {
@@ -22,6 +14,7 @@
     "unemployment": 5.1,
     "debt": 93.6,
     "currentAccount": -8.1,
-    "production": 0.5
+    "production": 0.5,
+    "tradeBalance": -5915.87
   }
 }
