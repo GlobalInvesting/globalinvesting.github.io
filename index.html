@@ -2096,36 +2096,36 @@
                 return 'neutral';
             };
 
-            const generateAnalysis = (currency) => {
-                if (!economicData[currency]) return 'Cargando datos...';
-                const data = economicData[currency];
-                const country = countries.find(c => c.code === currency);
-                const strength = calculateStrength(currency, data, forexRates, economicData);
-                const sentiment = getSentiment(strength);
+            const generateAnalysis = (currency, forexRates, economicData) => {
+    if (!economicData[currency]) return 'Cargando datos...';
+    const data = economicData[currency];
+    const country = countries.find(c => c.code === currency);
+    const strength = calculateStrength(currency, data, forexRates, economicData);
+    const sentiment = getSentiment(strength);
 
-                let analysis = [];
-                if (sentiment === 'alcista') analysis.push(`${currency} muestra fortaleza fundamental respaldada por datos sólidos.`);
-                else if (sentiment === 'bajista') analysis.push(`${currency} enfrenta vientos en contra con fundamentos débiles.`);
-                else analysis.push(`${currency} presenta panorama mixto con factores balanceados.`);
+    let analysis = [];
+    if (sentiment === 'alcista') analysis.push(`${currency} muestra fortaleza fundamental respaldada por datos sólidos.`);
+    else if (sentiment === 'bajista') analysis.push(`${currency} enfrenta vientos en contra con fundamentos débiles.`);
+    else analysis.push(`${currency} presenta panorama mixto con factores balanceados.`);
 
-                if (currency === 'USD' && data.interestRate && data.tradeBalance) {
-                    analysis.push(`Fed mantiene política restrictiva (${data.interestRate.toFixed(2)}%) pero DXY muestra debilidad estructural.`);
-                } else if (country && data.interestRate) {
-                    analysis.push(`${country.centralBank} en modo ${country.outlook.toLowerCase()} con tasa en ${data.interestRate.toFixed(2)}%.`);
-                }
+    if (currency === 'USD' && data.interestRate && data.tradeBalance) {
+        analysis.push(`Fed mantiene política restrictiva (${data.interestRate.toFixed(2)}%) pero DXY muestra debilidad estructural.`);
+    } else if (country && data.interestRate) {
+        analysis.push(`${country.centralBank} en modo ${country.outlook.toLowerCase()} con tasa en ${data.interestRate.toFixed(2)}%.`);
+    }
 
-                return analysis.join(' ');
-            };
+    return analysis.join(' ');
+};
 
             const getSortedCountries = () => {
-                return [...countries].sort((a, b) => {
-                    const dataA = economicData[a.code] || {};
-                    const dataB = economicData[b.code] || {};
-                    const strengthA = parseFloat(calculateStrength(a.code, dataA, forexRates, economicData));
-                    const strengthB = parseFloat(calculateStrength(b.code, dataB, forexRates, economicData));
-                    return strengthB - strengthA;
-                });
-            };
+    return [...countries].sort((a, b) => {
+        const dataA = economicData[a.code] || {};
+        const dataB = economicData[b.code] || {};
+        const strengthA = parseFloat(calculateStrength(a.code, dataA, forexRates, economicData));
+        const strengthB = parseFloat(calculateStrength(b.code, dataB, forexRates, economicData));
+        return strengthB - strengthA;
+    });
+};
 
             const formatValue = (value, decimals = 1) => {
                 if (value === null || value === undefined) return 'N/D';
