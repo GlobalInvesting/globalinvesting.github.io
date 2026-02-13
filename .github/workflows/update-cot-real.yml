@@ -1,4 +1,4 @@
-name: Update COT Data (Investing.com Fixed)
+name: Update COT Data (Fixed - Actual Column)
 on:
   schedule:
     - cron: '0 20 * * 5'  # Fridays at 8:00 PM UTC
@@ -23,28 +23,21 @@ jobs:
       - name: Create cot-data directory
         run: mkdir -p cot-data
       
-      - name: Fetch COT data from Investing.com
+      - name: Fetch COT data (Actual column)
         run: |
-          cat > fetch_cot_investing.py << 'EOFPYTHON'
+          python3 << 'EOFPYTHON'
           import requests
           from bs4 import BeautifulSoup
           import json
           import re
           from datetime import date
           import time
-          
+
           HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Accept-Encoding': 'gzip, deflate, br',  # Accept compression
-              'DNT': '1',
-              'Connection': 'keep-alive',
-              'Upgrade-Insecure-Requests': '1',
-              'Cache-Control': 'max-age=0'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           }
-          
-          # Investing.com URLs for each currency
+
           COT_URLS = {
               'EUR': 'https://www.investing.com/economic-calendar/cftc-eur-speculative-positions-1611',
               'GBP': 'https://www.investing.com/economic-calendar/cftc-gbp-speculative-positions-1612',
@@ -54,222 +47,108 @@ jobs:
               'CHF': 'https://www.investing.com/economic-calendar/cftc-chf-speculative-positions-1617',
               'NZD': 'https://www.investing.com/economic-calendar/cftc-nzd-speculative-positions-1616'
           }
-          
+
           def clean_number(text):
-              """
-              Extract numeric value from text like '-34.3K' or '+45.2K'
-              Returns value in thousands (e.g., -34.3K -> -34300)
-              """
               if not text or text.strip() == '':
                   return None
-              
-              # Remove whitespace
               text = text.strip()
-              
-              # Look for pattern like -34.3K or +45.2K
               match = re.search(r'([+-]?\d+\.?\d*)\s*K', text, re.IGNORECASE)
-              
               if match:
                   value = float(match.group(1))
-                  # Convert K to actual number
                   return int(value * 1000)
-              
-              # Try without K suffix (plain number)
               match = re.search(r'([+-]?\d+\.?\d*)', text)
               if match:
                   try:
                       return int(float(match.group(1)))
                   except:
                       pass
-              
               return None
-          
+
           def fetch_cot_from_investing(currency, url):
-              """
-              Scrape COT positioning from Investing.com
-              Target: 'Previous' column in the first data row
-              """
-              print(f"\n{'='*80}")
-              print(f"FETCHING {currency} from Investing.com")
-              print(f"{'='*80}")
-              
+              print(f"\nFETCHING {currency}...")
               try:
-                  # Make request (requests library automatically handles gzip)
                   response = requests.get(url, headers=HEADERS, timeout=20)
-                  
                   if not response.ok:
-                      print(f"  ❌ HTTP {response.status_code}")
-                      return None
-                  
-                  # Check if content is valid
-                  if len(response.content) < 1000:
-                      print(f"  ⚠️  Response too small ({len(response.content)} bytes)")
+                      print(f"  HTTP {response.status_code}")
                       return None
                   
                   soup = BeautifulSoup(response.content, 'lxml')
                   
-                  # Debug: Check if we got valid HTML
-                  title = soup.find('title')
-                  if title:
-                      print(f"  ℹ️  Page title: {title.get_text()[:60]}")
+                  # METHOD 1: Find "Actual" in dt/dd pairs
+                  dts = soup.find_all('dt')
+                  dds = soup.find_all('dd')
+                  for i, dt in enumerate(dts):
+                      if 'actual' in dt.get_text(strip=True).lower():
+                          if i < len(dds):
+                              dd_text = dds[i].get_text(strip=True)
+                              net_position = clean_number(dd_text)
+                              if net_position is not None:
+                                  print(f"  ✅ {net_position:+,} contracts (dt/dd)")
+                                  return net_position
                   
-                  # ========================================
-                  # METHOD 1: Find table with "Previous" column
-                  # ========================================
-                  
-                  tables = soup.find_all('table')
-                  print(f"  ℹ️  Found {len(tables)} tables")
-                  
-                  for table_idx, table in enumerate(tables):
-                      # Look for header row
-                      header_row = table.find('tr')
-                      
-                      if not header_row:
-                          continue
-                      
-                      headers = header_row.find_all(['th', 'td'])
-                      header_texts = [h.get_text(strip=True).lower() for h in headers]
-                      
-                      # Check if this table has "Previous" column
-                      if 'previous' in header_texts:
-                          previous_idx = header_texts.index('previous')
-                          print(f"  ✓ Found 'Previous' column at index {previous_idx} in table {table_idx}")
-                          
-                          # Get first data row (skip header)
-                          data_rows = table.find_all('tr')[1:]  # Skip header row
-                          
-                          if len(data_rows) > 0:
-                              first_row = data_rows[0]
-                              cells = first_row.find_all('td')
-                              
-                              if len(cells) > previous_idx:
-                                  previous_value = cells[previous_idx].get_text(strip=True)
-                                  print(f"  ℹ️  Raw 'Previous' value: '{previous_value}'")
-                                  
-                                  net_position = clean_number(previous_value)
-                                  
-                                  if net_position is not None:
-                                      print(f"  ✅ SUCCESS: {net_position:+,} contracts")
-                                      return net_position
-                                  else:
-                                      print(f"  ⚠️  Could not parse '{previous_value}'")
-                      
-                  # ========================================
-                  # METHOD 2: Look for specific data patterns
-                  # ========================================
-                  
-                  # Look for elements with event data
-                  event_data = soup.find_all('td', class_=re.compile('.*'))
-                  
-                  for elem in event_data:
-                      text = elem.get_text(strip=True)
-                      
-                      # Look for K pattern
+                  # METHOD 2: Find elements with "actual" class/context
+                  containers = soup.find_all(['div', 'span', 'td'])
+                  for container in containers:
+                      text = container.get_text(strip=True)
                       if re.search(r'[+-]?\d+\.?\d*K', text, re.IGNORECASE):
                           net_position = clean_number(text)
-                          
-                          if net_position is not None and -200000 <= net_position <= 200000:
-                              print(f"  ✅ Found in element: {net_position:+,} contracts")
-                              return net_position
+                          if net_position and -300000 <= net_position <= 300000:
+                              parent_text = container.parent.get_text(strip=True).lower() if container.parent else ''
+                              if 'actual' in parent_text:
+                                  print(f"  ✅ {net_position:+,} contracts (context)")
+                                  return net_position
                   
-                  print(f"  ❌ Could not extract COT value")
+                  # METHOD 3: All K values as candidates
+                  all_elements = soup.find_all(text=re.compile(r'[+-]?\d+\.?\d*K', re.IGNORECASE))
+                  candidates = []
+                  for element in all_elements:
+                      net_position = clean_number(element.strip())
+                      if net_position and -300000 <= net_position <= 300000:
+                          candidates.append(net_position)
+                  
+                  if candidates:
+                      print(f"  ✅ {candidates[0]:+,} contracts (first match)")
+                      return candidates[0]
+                  
+                  print(f"  ❌ No data found")
                   return None
-                  
               except Exception as e:
                   print(f"  ❌ Error: {e}")
-                  import traceback
-                  traceback.print_exc()
                   return None
-          
-          # ============================================
-          # MAIN EXECUTION
-          # ============================================
-          
-          print("\n" + "="*80)
-          print("COT DATA FETCHER - Investing.com (GZIP-aware)")
-          print("="*80)
-          
+
+          # MAIN
+          print("="*60)
+          print("COT DATA FETCHER - FIXED VERSION")
+          print("="*60)
+
           cot_data = {}
-          
           for currency, url in COT_URLS.items():
               net_position = fetch_cot_from_investing(currency, url)
-              
               if net_position is not None:
                   cot_data[currency] = {
                       'netPosition': net_position,
                       'source': 'Investing.com',
                       'reportDate': str(date.today())
                   }
-              
-              time.sleep(2)  # Be polite
-          
-          # ========== SAVE RESULTS ==========
-          print("\n" + "="*80)
-          print("SAVING COT DATA")
-          print("="*80)
-          
-          if not cot_data:
-              print("\n❌ CRITICAL ERROR: NO COT DATA OBTAINED")
-              print("   Possible issues:")
-              print("   - Investing.com changed their HTML structure")
-              print("   - Rate limiting / blocking")
-              print("\n⚠️  COT data will NOT be available in dashboard")
-              exit(0)
-          
+              time.sleep(2)
+
+          print("\n" + "="*60)
+          print("SAVING RESULTS")
+          print("="*60)
+
+          import os
+          os.makedirs('cot-data', exist_ok=True)
+
           for currency, data in cot_data.items():
-              filename = f'cot-data/{currency}.json'
-              
-              with open(filename, 'w') as f:
+              with open(f'cot-data/{currency}.json', 'w') as f:
                   json.dump(data, f, indent=2)
-              
-              print(f"💾 {currency}: {data['netPosition']:+,} contracts")
-          
-          # ========== VALIDATION ==========
-          print("\n" + "="*80)
-          print("VALIDATION")
-          print("="*80)
-          
-          missing = [c for c in COT_URLS.keys() if c not in cot_data]
-          
-          if missing:
-              print(f"\n⚠️  Missing COT data for: {', '.join(missing)}")
-              print("   These currencies will show 'N/A' in dashboard")
+              print(f"{currency}: {data['netPosition']:+,} contracts")
+
+          if cot_data:
+              print(f"\n✅ Successfully saved {len(cot_data)} currencies")
           else:
-              print("\n✅ COMPLETE: All 7 currencies have COT data")
-          
-          print("\n" + "="*80)
-          print("COT POSITIONING SUMMARY")
-          print("="*80)
-          
-          sorted_currencies = sorted(
-              cot_data.keys(),
-              key=lambda c: cot_data[c]['netPosition'],
-              reverse=True
-          )
-          
-          for currency in sorted_currencies:
-              data = cot_data[currency]
-              net = data['netPosition']
-              
-              if net > 50000:
-                  sentiment = "🟢 Strong Bullish"
-              elif net > 20000:
-                  sentiment = "🟡 Bullish"
-              elif net > -20000:
-                  sentiment = "⚪ Neutral"
-              elif net > -50000:
-                  sentiment = "🟠 Bearish"
-              else:
-                  sentiment = "🔴 Strong Bearish"
-              
-              print(f"{currency}: {net:+10,} contracts  {sentiment}")
-              print(f"       Source: {data['source']} | Date: {data['reportDate']}")
-          
-          print("\n✅ COT UPDATE COMPLETED")
-          
+              print("\n⚠️ No COT data obtained")
           EOFPYTHON
-          
-          python fetch_cot_investing.py
       
       - name: Display COT summary
         run: |
@@ -305,7 +184,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📊 COT update $(date +'%Y-%m-%d') - Investing.com (fixed)"
+            git commit -m "📊 COT update $(date +'%Y-%m-%d') - Fixed Actual column extraction"
             git pull --rebase origin main || true
             git push
           fi
