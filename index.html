@@ -1640,37 +1640,38 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
         dataQuality: 0 
     };
     
-    // ========== PASO 1: PESOS INSTITUCIONALES (IMF/BIS) ==========
-    // Basado en literatura: Cheung et al. (2019), Ca'Zorzi et al. (2020)
-    const INSTITUTIONAL_WEIGHTS = {
-        // Tier 1: Drivers primarios (peso 40%)
-        interestRate: { weight: 0.25, optimal: { min: 2.5, max: 5.0 }, direction: 'higher' },
-        currentAccount: { weight: 0.15, optimal: { min: 0, max: 5 }, direction: 'higher' },
-        
-        // Tier 2: Indicadores macro (peso 30%)
-        gdpGrowth: { weight: 0.12, optimal: { min: 2.0, max: 3.5 }, direction: 'stable' },
+    // ========== TRADING-ORIENTED WEIGHTS ==========
+    const TRADING_WEIGHTS = {
+        // Tier 1: Rate differentials & Carry (40%)
+        interestRate: { weight: 0.30, optimal: { min: 2.5, max: 5.0 }, direction: 'higher' },
         inflation: { weight: 0.10, optimal: { min: 1.8, max: 2.5 }, direction: 'target' },
-        unemployment: { weight: 0.08, optimal: { min: 3.0, max: 5.0 }, direction: 'lower' },
         
-        // Tier 3: Indicadores estructurales (peso 20%)
-        debt: { weight: 0.08, optimal: { min: 0, max: 60 }, direction: 'lower' },
-        tradeBalance: { weight: 0.07, optimal: { min: 0, max: null }, direction: 'higher' },
-        production: { weight: 0.05, optimal: { min: 1.0, max: 3.0 }, direction: 'stable' },
+        // Tier 2: Growth & Employment (25%)
+        gdpGrowth: { weight: 0.15, optimal: { min: 2.0, max: 3.5 }, direction: 'stable' },
+        unemployment: { weight: 0.10, optimal: { min: 3.0, max: 5.0 }, direction: 'lower' },
         
-        // Tier 4: Indicadores complementarios (peso 10%)
-        retailSales: { weight: 0.03, optimal: { min: 0.3, max: 1.0 }, direction: 'stable' },
-        wageGrowth: { weight: 0.03, optimal: { min: 2.5, max: 4.0 }, direction: 'stable' },
-        manufacturingPMI: { weight: 0.03, optimal: { min: 50, max: 55 }, direction: 'expansion' },
-        cotPositioning: { weight: 0.01, optimal: { min: -5000, max: 15000 }, direction: 'neutral' }
+        // Tier 3: External Balance (20%)
+        currentAccount: { weight: 0.12, optimal: { min: 0, max: 5 }, direction: 'higher' },
+        tradeBalance: { weight: 0.08, optimal: { min: 0, max: null }, direction: 'higher' },
+        
+        // Tier 4: Market Sentiment Indicators (15%)
+        cotPositioning: { weight: 0.10, optimal: { min: -5000, max: 15000 }, direction: 'neutral' },
+        manufacturingPMI: { weight: 0.05, optimal: { min: 50, max: 55 }, direction: 'expansion' },
+        
+        // Tier 5: Secondary (not used in trading signals)
+        debt: { weight: 0.00, optimal: { min: 0, max: 60 }, direction: 'lower' },
+        production: { weight: 0.00, optimal: { min: 1.0, max: 3.0 }, direction: 'stable' },
+        retailSales: { weight: 0.00, optimal: { min: 0.3, max: 1.0 }, direction: 'stable' },
+        wageGrowth: { weight: 0.00, optimal: { min: 2.5, max: 4.0 }, direction: 'stable' }
     };
     
-    // ========== PASO 2: NORMALIZACIÓN Z-SCORE CROSS-SECTIONAL ==========
+    // ========== Z-SCORE CALCULATION ==========
     const calculateZScore = (value, indicator) => {
         const allValues = Object.values(allEconomicData)
             .map(d => d[indicator])
             .filter(v => v !== null && v !== undefined && !isNaN(v));
         
-        if (allValues.length < 3) return 0; // Insuficientes datos
+        if (allValues.length < 3) return 0;
         
         const mean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
         const variance = allValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / allValues.length;
@@ -1680,65 +1681,51 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
         return (value - mean) / stdDev;
     };
     
-    // ========== PASO 3: SCORING INSTITUCIONAL ==========
+    // ========== SCORING ==========
     let totalScore = 0;
     let totalWeight = 0;
     const contributions = {};
     let validIndicators = 0;
     
-    Object.keys(INSTITUTIONAL_WEIGHTS).forEach(indicator => {
+    Object.keys(TRADING_WEIGHTS).forEach(indicator => {
         const value = data[indicator];
         if (value === null || value === undefined || isNaN(value)) {
             contributions[indicator] = 0;
             return;
         }
         
-        const config = INSTITUTIONAL_WEIGHTS[indicator];
+        const config = TRADING_WEIGHTS[indicator];
+        if (config.weight === 0) return; // Skip zero-weight indicators
+        
         let score = 0;
         
-        // Scoring según tipo de indicador
         if (config.direction === 'higher') {
-            // Cuanto más alto, mejor (interestRate, currentAccount, tradeBalance)
             const zScore = calculateZScore(value, indicator);
-            score = Math.tanh(zScore * 0.8) * 100; // Sigmoid bounded [-100, 100]
-            
+            score = Math.tanh(zScore * 0.8) * 100;
         } else if (config.direction === 'lower') {
-            // Cuanto más bajo, mejor (unemployment, debt)
             const zScore = calculateZScore(value, indicator);
             score = Math.tanh(-zScore * 0.8) * 100;
-            
         } else if (config.direction === 'target' || config.direction === 'stable') {
-            // Óptimo en rango específico
             const { min, max } = config.optimal;
-            
             if (value >= min && value <= max) {
-                // Dentro del rango óptimo
                 score = 100;
             } else if (value < min) {
-                // Penalización por debajo del rango
                 const deviation = (min - value) / (min || 1);
                 score = 100 * Math.exp(-deviation * 2);
             } else {
-                // Penalización por encima del rango
                 const deviation = (value - max) / (max || 1);
                 score = 100 * Math.exp(-deviation * 2);
             }
-            
         } else if (config.direction === 'expansion') {
-            // PMI: >50 es expansión
             score = value > 50 ? ((value - 50) / 10) * 100 : ((value - 50) / 5) * 100;
             score = Math.max(-100, Math.min(100, score));
-            
         } else if (config.direction === 'neutral') {
-            // COT: Extremos son malos (crowded trades)
+            // COT: Crowded trades are bad
             const absValue = Math.abs(value);
-            if (absValue > 25000) {
-                score = -50; // Muy crowded
-            } else if (absValue > 15000) {
-                score = -20;
-            } else {
-                score = 20; // Posicionamiento moderado es bueno
-            }
+            if (absValue > 30000) score = -60;
+            else if (absValue > 20000) score = -30;
+            else if (absValue > 10000) score = 0;
+            else score = 20;
         }
         
         const weightedScore = score * config.weight;
@@ -1748,81 +1735,64 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
         validIndicators++;
     });
     
-    // ========== PASO 4: AJUSTES ESTRUCTURALES (BIS Framework) ==========
+    // ========== TRADING ADJUSTMENTS ==========
     
-    // Safe Haven Premium (Habib & Stracca, 2012)
-    const safeHavenPremium = {
-        'USD': 8,  // Reserve currency + flight-to-quality
-        'CHF': 10, // Strongest safe haven
-        'JPY': 7,  // Traditional safe haven
-        'EUR': 3,  // Secondary reserve
-        'GBP': 2
+    // 1. Safe Haven - CONDITIONAL on risk environment (simplified: always moderate)
+    const safeHavenBonus = {
+        'CHF': 6,
+        'JPY': 3,
+        'USD': 2
     };
-    if (safeHavenPremium[currency]) {
-        totalScore += safeHavenPremium[currency];
-        contributions['safe_haven_premium'] = safeHavenPremium[currency];
+    if (safeHavenBonus[currency]) {
+        totalScore += safeHavenBonus[currency];
+        contributions['safe_haven'] = safeHavenBonus[currency];
     }
     
-    // Commodity Currency Discount (Chen & Rogoff, 2003)
-    const commodityDiscount = {
-        'AUD': -4,
-        'CAD': -3,
-        'NZD': -5
+    // 2. Commodity currencies - vulnerability to global growth
+    const commodityPenalty = {
+        'AUD': -3,
+        'CAD': -2,
+        'NZD': -4
     };
-    if (commodityDiscount[currency] && data.tradeBalance < -5000) {
-        totalScore += commodityDiscount[currency];
-        contributions['commodity_vulnerability'] = commodityDiscount[currency];
+    if (commodityPenalty[currency]) {
+        totalScore += commodityPenalty[currency];
+        contributions['commodity_exposure'] = commodityPenalty[currency];
     }
     
-    // Carry Trade Adjustment (Brunnermeier et al., 2009)
-    if (data.interestRate && data.interestRate > 4.0) {
-        const carryBonus = (data.interestRate - 4.0) * 1.5;
+    // 3. Carry trade premium (rate > 3.5%)
+    if (data.interestRate && data.interestRate > 3.5) {
+        const carryBonus = (data.interestRate - 3.5) * 2;
         totalScore += carryBonus;
-        contributions['carry_trade_premium'] = carryBonus;
+        contributions['carry_premium'] = carryBonus;
     }
     
-    // Central Bank Credibility (Blinder, 2000)
-    const credibilityBonus = {
-        'USD': 3, 'EUR': 2, 'CHF': 4, 'GBP': 2
-    };
-    if (credibilityBonus[currency] && data.inflation >= 1.8 && data.inflation <= 2.5) {
-        totalScore += credibilityBonus[currency];
-        contributions['cb_credibility'] = credibilityBonus[currency];
+    // 4. Growth momentum penalty (very low growth)
+    if (data.gdpGrowth !== null && data.gdpGrowth < 0.5) {
+        const growthPenalty = (0.5 - data.gdpGrowth) * -3;
+        totalScore += growthPenalty;
+        contributions['growth_penalty'] = growthPenalty;
     }
     
-    // ========== PASO 5: NORMALIZACIÓN A ESCALA 0-100 ==========
+    // ========== NORMALIZATION ==========
+    const normalizedScore = 50 + (totalScore / 2.5);
+    const finalScore = Math.max(20, Math.min(80, normalizedScore));
     
-    // Raw score está en rango aproximado [-150, 150]
-    // Aplicamos transformación sigmoidal institucional
-    const normalizedScore = 50 + (totalScore / 3); // Centrado en 50
-    
-    // Boundeo con límites realistas
-    const finalScore = Math.max(15, Math.min(85, normalizedScore));
-    
-    // ========== PASO 6: INTERVALO DE CONFIANZA (Bootstrap-inspired) ==========
-    
-    const dataQuality = validIndicators / Object.keys(INSTITUTIONAL_WEIGHTS).length;
-    const standardError = (1 - dataQuality * 0.8) * 10; // Menor SE con más datos
+    const dataQuality = validIndicators / Object.keys(TRADING_WEIGHTS).filter(k => TRADING_WEIGHTS[k].weight > 0).length;
+    const standardError = (1 - dataQuality * 0.8) * 8;
     
     const confidenceInterval = {
-        lower: Math.max(15, finalScore - 1.96 * standardError),
-        upper: Math.min(85, finalScore + 1.96 * standardError),
-        level: 0.95
+        lower: Math.max(20, finalScore - 1.96 * standardError),
+        upper: Math.min(80, finalScore + 1.96 * standardError)
     };
     
-    // ========== RETORNO ==========
     return {
         score: parseFloat(finalScore.toFixed(1)),
         confidence: {
             lower: parseFloat(confidenceInterval.lower.toFixed(1)),
-            upper: parseFloat(confidenceInterval.upper.toFixed(1)),
-            level: 0.95
+            upper: parseFloat(confidenceInterval.upper.toFixed(1))
         },
         contributions: contributions,
-        dataQuality: parseFloat(dataQuality.toFixed(2)),
-        methodology: 'BIS REER + IMF EBA framework (institutional-grade)',
-        rawScore: totalScore,
-        totalWeight: totalWeight
+        dataQuality: parseFloat(dataQuality.toFixed(2))
     };
 };
 
@@ -2661,54 +2631,6 @@ const hasCOTData = () => {
                                 </div>
                                 <div className="analysis-text">{generateAnalysis(country.code, forexRates, economicData)}</div>
                             </div>
-
-                            <div style={{
-                                background: 'var(--bg-elevated)',
-                                padding: '1rem',
-                                borderRadius: '4px',
-                                marginTop: '1rem',
-                                border: '1px solid var(--border)',
-                                fontSize: '0.75rem',
-                                lineHeight: '1.6'
-                            }}>
-                                <div style={{ 
-                                    fontWeight: 600, 
-                                    marginBottom: '0.5rem',
-                                    color: 'var(--text-primary)',
-                                    fontSize: '0.8rem'
-                                }}>
-                                    Datos del Modelo
-                                </div>
-                                <div style={{ color: 'var(--text-secondary)' }}>
-                                    <strong>Metodología:</strong> {strengthObj.methodology}<br/>
-                                    <strong>Calidad de Datos:</strong> {(strengthObj.dataQuality * 100).toFixed(0)}% 
-                                    ({Object.values(strengthObj.contributions).filter(c => c !== 0).length}/
-                                    {Object.keys(strengthObj.contributions).length} indicadores)<br/>
-                                    <strong>Intervalo 95%:</strong> [{strengthObj.confidence.lower}, {strengthObj.confidence.upper}]<br/>
-                                    <strong>Top 3 Factores:</strong>
-                                    <div style={{ marginTop: '0.5rem', paddingLeft: '0.5rem' }}>
-                                        {Object.entries(strengthObj.contributions)
-                                            .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-                                            .slice(0, 3)
-                                            .map(([key, val]) => (
-                                                <div key={key} style={{ 
-                                                    display: 'flex', 
-                                                    justifyContent: 'space-between',
-                                                    padding: '0.25rem 0'
-                                                }}>
-                                                    <span>{key}:</span>
-                                                    <span style={{ 
-                                                        color: val > 0 ? 'var(--green-strong)' : 'var(--red-strong)',
-                                                        fontWeight: 600,
-                                                        fontFamily: 'monospace'
-                                                    }}>
-                                                        {val > 0 ? '+' : ''}{val.toFixed(2)}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 );
@@ -2921,11 +2843,11 @@ const sentiment = getSentiment(strength);
                         )}
 
 <div className="footer">
-    <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX</div>
+    <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>DASHBOARD DE ANÁLISIS FOREX - TRADING ORIENTED</div>
     <div style={{ marginBottom: '1rem' }}>
-        Metodología: Z-scores cross-sectional con pesos empíricos (Menkhoff 2012, Rossi 2013)<br/>
-        Inspirado en: BIS REER + IMF EBA framework<br/>
-        Datos actualizados diariamente desde Trading Economics
+        Metodología: Modelo cuantitativo enfocado en señales de trading<br/>
+        Ponderación: Diferenciales de tasas (40%) • Crecimiento & Empleo (25%) • Balance Externo (20%) • Sentimiento de Mercado (15%)<br/>
+        Datos actualizados diariamente desde Trading Economics y FRED
     </div>
     
     <div style={{ 
@@ -2937,21 +2859,37 @@ const sentiment = getSentiment(strength);
         fontSize: '0.8125rem',
         lineHeight: '1.6'
     }}>
-        <strong>Nota sobre datos COT:</strong><br/>
-Los datos de posicionamiento COT (Commitment of Traders) se obtienen de reportes oficiales 
-de la CFTC publicados cada viernes a las 3:30 PM ET vía Investing.com. Para USD utilizamos 
-el <strong>US Dollar Index (DXY)</strong> de ICE Futures directamente del reporte oficial 
-de CFTC. Los datos reflejan la situación de hace ~3 días debido al retraso en la publicación.
+        <strong>Nota sobre scores de fortaleza:</strong><br/>
+        Los scores reflejan <strong>fortaleza relativa de trading</strong> basada en diferenciales de tasas, 
+        momentum económico y posicionamiento de mercado. Scores más altos indican mayor atractivo para 
+        posiciones largas en el par vs USD. El modelo prioriza factores relevantes para horizontes de 
+        trading de semanas a meses, no salud económica de largo plazo.
     </div>
-                            <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                                <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
-                                    padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
-                                    borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
-                                }}>
-                                    Limpiar Caché y Recargar Datos
-                                </button>
-                            </div>
-                        </div>
+    
+    <div style={{ 
+        background: 'var(--bg-card)', 
+        padding: '1rem', 
+        borderRadius: '6px', 
+        border: '1px solid var(--border)',
+        marginTop: '1rem',
+        fontSize: '0.8125rem',
+        lineHeight: '1.6'
+    }}>
+        <strong>Datos COT (Commitment of Traders):</strong><br/>
+        Posicionamiento de traders especulativos según reportes CFTC publicados cada viernes (3:30 PM ET). 
+        Para USD se utiliza el US Dollar Index (DXY) de ICE Futures. Datos reflejan posiciones con ~3 días 
+        de retraso. Extremos (±30K contratos) indican saturación y riesgo de reversión.
+    </div>
+    
+    <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+        <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
+            padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
+            borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
+        }}>
+            Limpiar Caché y Recargar Datos
+        </button>
+    </div>
+</div>
                     </div>
                 </div>
             );
