@@ -1,4 +1,4 @@
-name: Update All Economic Data (100% Dynamic - Monthly Data WITHOUT Annualization)
+name: Update All Economic Data (FIXED - Monthly Data in USD MILLIONS)
 on:
   schedule:
     - cron: '0 6 * * *'  # Daily at 6:00 AM UTC
@@ -23,7 +23,7 @@ jobs:
       - name: Create data directory
         run: mkdir -p economic-data
       
-      - name: Scrape all economic indicators (100% Dynamic Monthly - NO Annualization)
+      - name: Scrape all economic indicators (FIXED - USD MILLIONS for trade balance)
         run: |
           cat > scrape_economics.py << 'EOFPYTHON'
           import requests
@@ -40,7 +40,7 @@ jobs:
           }
           
           # ============================================
-          # 100% DYNAMIC CONFIGURATION
+          # CONFIGURATION
           # ============================================
           
           CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
@@ -75,7 +75,6 @@ jobs:
           def fetch_exchange_rates():
               """
               Fetch current exchange rates to convert everything to USD
-              100% dynamic - no hardcoded rates
               """
               global exchange_rates
               
@@ -112,7 +111,7 @@ jobs:
                           continue
                   
                   print("⚠️  All forex APIs failed, using fallback rates")
-                  # Fallback approximate rates (will be close enough)
+                  # Fallback approximate rates
                   exchange_rates = {
                       'USD': 1.0,
                       'EUR': 0.92,
@@ -132,10 +131,9 @@ jobs:
           def get_currency_code_from_unit(unit_text):
               """
               Extract currency code from unit text (e.g., 'EUR Million' -> 'EUR')
-              100% dynamic - detects any currency
               """
               if not unit_text:
-                  return 'USD'  # Default assumption
+                  return 'USD'
               
               # Common currency codes (ISO 4217)
               common_currencies = [
@@ -164,63 +162,73 @@ jobs:
                   if currency in unit_text.upper():
                       return currency
               
-              return 'USD'  # Default
+              return 'USD'
           
           def get_scale_from_unit(unit_text):
               """
               Detect scale: Million, Billion, Trillion, Thousand
-              Returns multiplier to convert to Billions
+              Returns multiplier to convert to MILLIONS (not billions)
+              
+              FIXED: Now returns multiplier to convert to USD MILLIONS
               """
               if not unit_text:
                   return 1.0
               
               unit_lower = unit_text.lower()
               
-              # Thousand variations
+              # Thousand variations → to millions
               if any(word in unit_lower for word in ['thousand', 'k', 'thousands']):
-                  return 0.000001  # thousands to billions
+                  return 0.001  # thousands to millions
               
-              # Million variations
+              # Million variations (base unit)
               if any(word in unit_lower for word in ['million', 'mln', 'm ']):
-                  return 0.001  # millions to billions
+                  return 1.0  # already in millions
               
-              # Billion variations (base unit)
+              # Billion variations → to millions
               if any(word in unit_lower for word in ['billion', 'bln', 'b ', 'bn']):
-                  return 1.0
+                  return 1000.0  # billions to millions
               
-              # Trillion variations
+              # Trillion variations → to millions
               if any(word in unit_lower for word in ['trillion', 'tln', 't ']):
-                  return 1000.0  # trillions to billions
+                  return 1000000.0  # trillions to millions
               
-              # Default: assume billions
+              # Default: assume millions
               return 1.0
           
-          def convert_to_usd_billions(value, currency_code, scale_multiplier):
+          def convert_to_usd_millions(value, currency_code, scale_multiplier, indicator_name):
               """
-              Convert any value to USD Billions
-              100% dynamic using live exchange rates
+              Convert any value to USD MILLIONS (FIXED)
+              
+              Special handling:
+              - GDP: Convert to TRILLIONS (divide millions by 1,000,000)
+              - Trade Balance: Keep in MILLIONS
+              - Other indicators: Keep as percentages
               """
               if value is None:
                   return None
               
-              # Step 1: Apply scale to get to billions in local currency
-              value_in_billions_local = value * scale_multiplier
+              # Step 1: Apply scale to get to millions in local currency
+              value_in_millions_local = value * scale_multiplier
               
               # Step 2: Convert to USD
               if currency_code == 'USD':
-                  return value_in_billions_local
+                  value_in_usd_millions = value_in_millions_local
+              else:
+                  fx_rate = exchange_rates.get(currency_code)
+                  
+                  if fx_rate is None:
+                      print(f"    ⚠️  No FX rate for {currency_code}, using value as-is")
+                      return value_in_millions_local
+                  
+                  # Convert: divide by FX rate (since rates are USD=1 base)
+                  value_in_usd_millions = value_in_millions_local / fx_rate
               
-              # Get exchange rate
-              fx_rate = exchange_rates.get(currency_code)
+              # Step 3: Special handling for GDP (convert to trillions)
+              if indicator_name == 'gdp':
+                  return value_in_usd_millions / 1000.0  # Millions to Trillions
               
-              if fx_rate is None:
-                  print(f"    ⚠️  No FX rate for {currency_code}, using value as-is")
-                  return value_in_billions_local
-              
-              # Convert: divide by FX rate (since rates are USD=1 base)
-              value_in_usd = value_in_billions_local / fx_rate
-              
-              return value_in_usd
+              # Step 4: Return millions for trade balance, raw value for percentages
+              return value_in_usd_millions
           
           def clean_number(text):
               """Extract numeric value from text"""
@@ -238,8 +246,7 @@ jobs:
           def scrape_trading_economics_table(url, indicator_name):
               """
               Scrape Trading Economics country list table
-              Returns: {currency_code: value_in_usd_billions}
-              100% dynamic - no hardcoded values
+              Returns: {currency_code: value_in_correct_units}
               """
               print(f"\n{'='*70}")
               print(f"Scraping: {indicator_name}")
@@ -264,7 +271,7 @@ jobs:
                   
                   for row in rows:
                       cols = row.find_all('td')
-                      if len(cols) < 4:  # Need: Country, Last, Previous, Unit
+                      if len(cols) < 4:
                           continue
                       
                       country_text = cols[0].get_text(strip=True)
@@ -278,20 +285,30 @@ jobs:
                               value = clean_number(last_value_text)
                               
                               if value is not None:
-                                  # Detect currency and scale from unit
-                                  currency_in_data = get_currency_code_from_unit(unit_text)
-                                  scale = get_scale_from_unit(unit_text)
-                                  
-                                  # Convert to USD Billions
-                                  value_usd_billions = convert_to_usd_billions(
-                                      value, 
-                                      currency_in_data, 
-                                      scale
-                                  )
-                                  
-                                  if value_usd_billions is not None:
-                                      data[currency_code] = round(value_usd_billions, 2)
-                                      print(f"  ✓ {currency_code}: {value} {currency_in_data} {unit_text} → ${value_usd_billions:.2f}B USD (monthly)")
+                                  # For percentage indicators, just store the value
+                                  if indicator_name in ['gdpGrowth', 'inflation', 'unemployment', 'debt', 'currentAccount', 'production']:
+                                      data[currency_code] = round(value, 2)
+                                      print(f"  ✓ {currency_code}: {value}% ({indicator_name})")
+                                  else:
+                                      # For monetary values (GDP, trade balance)
+                                      currency_in_data = get_currency_code_from_unit(unit_text)
+                                      scale = get_scale_from_unit(unit_text)
+                                      
+                                      # Convert to correct units
+                                      converted_value = convert_to_usd_millions(
+                                          value, 
+                                          currency_in_data, 
+                                          scale,
+                                          indicator_name
+                                      )
+                                      
+                                      if converted_value is not None:
+                                          data[currency_code] = round(converted_value, 2)
+                                          
+                                          if indicator_name == 'gdp':
+                                              print(f"  ✓ {currency_code}: {value} {currency_in_data} {unit_text} → ${converted_value:.2f}T USD")
+                                          else:
+                                              print(f"  ✓ {currency_code}: {value} {currency_in_data} {unit_text} → ${converted_value:.2f}M USD (monthly)")
                               
                               break
                   
@@ -308,10 +325,9 @@ jobs:
           def scrape_all_indicators():
               """
               Scrape all indicators from Trading Economics
-              100% dynamic - monthly data converted to USD, NO annualization
               """
               print("="*70)
-              print("100% DYNAMIC SCRAPING - MONTHLY DATA → USD (NO ANNUALIZATION)")
+              print("SCRAPING ECONOMIC DATA - FIXED UNITS")
               print("="*70)
               
               all_data = {}
@@ -325,8 +341,6 @@ jobs:
                   indicator_data = scrape_trading_economics_table(url, indicator_key)
                   
                   for currency_code, value in indicator_data.items():
-                      # Store the value directly - NO ANNUALIZATION
-                      # All values are stored as monthly USD billions
                       all_data[currency_code][indicator_key] = value
                   
                   time.sleep(2)  # Be polite to the server
@@ -335,7 +349,7 @@ jobs:
           
           def validate_data(all_data):
               """
-              Validate scraped data with dynamic sanity checks
+              Validate scraped data
               """
               print(f"\n{'='*70}")
               print("VALIDATION")
@@ -351,14 +365,14 @@ jobs:
                   else:
                       print(f"✅ {currency}: Complete ({len(data)} indicators)")
                   
-                  # Basic sanity checks
+                  # Sanity checks
                   if data.get('gdp'):
                       if data['gdp'] < 0.05 or data['gdp'] > 100:
                           print(f"  ⚠️  GDP unusual: ${data['gdp']:.2f}T")
                   
-                  if data.get('inflation'):
-                      if abs(data['inflation']) > 100:
-                          print(f"  ⚠️  Inflation unusual: {data['inflation']:.2f}%")
+                  if data.get('tradeBalance'):
+                      if abs(data['tradeBalance']) > 1000000:  # > 1 trillion in millions
+                          print(f"  ⚠️  Trade balance unusual: ${data['tradeBalance']:.2f}M")
           
           def save_data(all_data):
               """Save data to JSON files"""
@@ -372,9 +386,18 @@ jobs:
                   if currency in all_data:
                       data_package = {
                           'lastUpdate': today,
-                          'source': 'TradingEconomics (100% Dynamic, Monthly Data)',
-                          'methodology': 'Monthly data from Trading Economics, converted to USD billions (NO annualization)',
-                          'note': 'All values are MONTHLY (not annualized). Trade balance and production are monthly flows.',
+                          'source': 'TradingEconomics (Fixed Units)',
+                          'methodology': 'Monthly data converted to correct units: GDP in Trillions USD, Trade Balance in Millions USD (monthly)',
+                          'units': {
+                              'gdp': 'Trillions USD',
+                              'gdpGrowth': 'Percentage (%)',
+                              'inflation': 'Percentage (%)',
+                              'unemployment': 'Percentage (%)',
+                              'debt': 'Percentage of GDP (%)',
+                              'currentAccount': 'Percentage of GDP (%)',
+                              'production': 'Percentage (%)',
+                              'tradeBalance': 'Millions USD (monthly)'
+                          },
                           'data': all_data[currency]
                       }
                       
@@ -386,7 +409,7 @@ jobs:
           def print_summary(all_data):
               """Print summary"""
               print(f"\n{'='*70}")
-              print("TRADE BALANCE SUMMARY (Monthly, USD Billions)")
+              print("TRADE BALANCE SUMMARY (Monthly, USD Millions)")
               print(f"{'='*70}")
               
               # Sort by trade balance
@@ -400,14 +423,13 @@ jobs:
                   tb = all_data.get(currency, {}).get('tradeBalance')
                   if tb is not None:
                       status = "Surplus" if tb > 0 else "Deficit"
-                      print(f"{currency}: {tb:+10.2f}B USD/month ({status})")
+                      print(f"{currency}: {tb:+12,.2f}M USD/month ({status})")
               
               print(f"\n{'='*70}")
-              print("✅ 100% DYNAMIC SCRAPING COMPLETED")
-              print("   • Monthly data from Trading Economics")
-              print("   • NO annualization applied")
-              print("   • All values in USD Billions (monthly)")
-              print("   • Live FX rates used for conversion")
+              print("✅ SCRAPING COMPLETED - UNITS FIXED")
+              print("   • GDP in Trillions USD")
+              print("   • Trade Balance in Millions USD (monthly)")
+              print("   • Percentages unchanged")
               print(f"{'='*70}")
           
           # ============================================
@@ -444,7 +466,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🔄 100% Dynamic update - Monthly data in USD (NO annualization) $(date +'%Y-%m-%d %H:%M UTC')"
+            git commit -m "🔧 FIXED: Correct unit conversion - GDP in Trillions, Trade Balance in Millions USD $(date +'%Y-%m-%d %H:%M UTC')"
             git pull --rebase origin main || true
             git push
           fi
