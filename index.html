@@ -1610,228 +1610,282 @@
         //
         // ========================================================================
 
-        const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
-            if (!data) return 50;
-            
-            let totalScore = 50; // Base neutral
-            
-            // ====================================================================
-            // CÁLCULO DE PROMEDIOS GLOBALES (para comparación relativa)
-            // ====================================================================
-            
-            const allValues = Object.values(allEconomicData).filter(d => d && typeof d === 'object');
-            
-            const calculateAverage = (key) => {
-                const values = allValues.filter(d => d[key] !== null && d[key] !== undefined).map(d => d[key]);
-                return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
-            };
-            
-            const avgInflation = calculateAverage('inflation') || 2.0;
-            const avgGdpGrowth = calculateAverage('gdpGrowth') || 1.5;
-            const avgInterestRate = calculateAverage('interestRate') || 3.5;
-            const avgUnemployment = calculateAverage('unemployment') || 5.0;
-            const avgCurrentAccount = calculateAverage('currentAccount') || 0;
-            const avgDebt = calculateAverage('debt') || 100;
-            
-            // ====================================================================
-            // 1. INFLACIÓN RELATIVA (peso: 15 puntos)
-            // ====================================================================
-            // Inflación cerca del 2% objetivo es ideal
-            // Inflación muy alta o muy baja es negativa
-            
-            if (data.inflation !== null && data.inflation !== undefined) {
-                const inflationTarget = 2.0;
-                const inflationDev = Math.abs(data.inflation - inflationTarget);
-                const inflationRelativeDev = data.inflation - avgInflation;
-                
-                if (inflationDev <= 0.5) {
-                    totalScore += 8; // En objetivo perfecto
-                } else if (inflationDev <= 1.0) {
-                    totalScore += 5; // Cercano al objetivo
-                } else if (inflationDev <= 1.5) {
-                    totalScore += 2; // Aceptable
-                } else if (inflationDev <= 2.5) {
-                    totalScore -= 3; // Desviado
-                } else {
-                    totalScore -= 8; // Muy desviado
-                }
-                
-                // Ajuste relativo: inflación baja vs promedio es bueno
-                if (inflationRelativeDev < -1.0) totalScore += 4;
-                else if (inflationRelativeDev < 0) totalScore += 2;
-                else if (inflationRelativeDev > 1.5) totalScore -= 4;
-            }
-            
-            // ====================================================================
-            // 2. CRECIMIENTO GDP (peso: 12 puntos)
-            // ====================================================================
-            
-            if (data.gdpGrowth !== null && data.gdpGrowth !== undefined) {
-                const growthRelative = data.gdpGrowth - avgGdpGrowth;
-                
-                if (data.gdpGrowth >= 3.0) totalScore += 10;
-                else if (data.gdpGrowth >= 2.5) totalScore += 8;
-                else if (data.gdpGrowth >= 2.0) totalScore += 6;
-                else if (data.gdpGrowth >= 1.5) totalScore += 3;
-                else if (data.gdpGrowth >= 1.0) totalScore += 1;
-                else if (data.gdpGrowth >= 0.5) totalScore -= 2;
-                else if (data.gdpGrowth >= 0) totalScore -= 5;
-                else totalScore -= 10; // Recesión
-                
-                // Ajuste relativo
-                if (growthRelative > 1.0) totalScore += 2;
-                else if (growthRelative < -1.0) totalScore -= 2;
-            }
-            
-            // ====================================================================
-            // 3. TASAS DE INTERÉS (peso: 10 puntos)
-            // ====================================================================
-            // Tasas altas atraen capital (carry trade)
-            
-            if (data.interestRate !== null && data.interestRate !== undefined) {
-                const rateDiff = data.interestRate - avgInterestRate;
-                
-                if (rateDiff > 2.0) totalScore += 8;
-                else if (rateDiff > 1.0) totalScore += 5;
-                else if (rateDiff > 0.5) totalScore += 3;
-                else if (rateDiff < -2.0) totalScore -= 8;
-                else if (rateDiff < -1.0) totalScore -= 5;
-                else if (rateDiff < -0.5) totalScore -= 2;
-                
-                // Penalización por tasas extremas
-                if (data.interestRate > 8.0) totalScore -= 3; // Demasiado alto puede indicar problemas
-                if (data.interestRate < 0) totalScore -= 5; // Tasas negativas son señal de debilidad
-            }
-            
-            // ====================================================================
-            // 4. BALANZA COMERCIAL (peso: 15 puntos)
-            // ====================================================================
-            // Superávit = demanda por moneda
-            
-            if (data.tradeBalance !== null && data.tradeBalance !== undefined && data.gdp) {
-                const gdpMonthly = (data.gdp * 1000) / 12;
-                const tbPercent = (data.tradeBalance / gdpMonthly) * 100;
-                
-                if (tbPercent > 3.0) totalScore += 12;
-                else if (tbPercent > 2.0) totalScore += 10;
-                else if (tbPercent > 1.0) totalScore += 7;
-                else if (tbPercent > 0.5) totalScore += 4;
-                else if (tbPercent > 0) totalScore += 2;
-                else if (tbPercent > -1.0) totalScore -= 2;
-                else if (tbPercent > -2.0) totalScore -= 5;
-                else if (tbPercent > -3.0) totalScore -= 9;
-                else totalScore -= 12;
-            }
-            
-            // ====================================================================
-            // 5. CUENTA CORRIENTE (peso: 12 puntos)
-            // ====================================================================
-            
-            if (data.currentAccount !== null && data.currentAccount !== undefined) {
-                const caRelative = data.currentAccount - avgCurrentAccount;
-                
-                if (data.currentAccount > 5) totalScore += 10;
-                else if (data.currentAccount > 3) totalScore += 8;
-                else if (data.currentAccount > 1.5) totalScore += 5;
-                else if (data.currentAccount > 0) totalScore += 2;
-                else if (data.currentAccount > -2) totalScore -= 2;
-                else if (data.currentAccount > -4) totalScore -= 6;
-                else totalScore -= 10;
-                
-                // Ajuste relativo
-                if (caRelative > 2) totalScore += 2;
-                else if (caRelative < -2) totalScore -= 2;
-            }
-            
-            // ====================================================================
-            // 6. DEUDA PÚBLICA (peso: 10 puntos)
-            // ====================================================================
-            
-            if (data.debt !== null && data.debt !== undefined) {
-                const debtRelative = avgDebt - data.debt; // Invertido: menos deuda es mejor
-                
-                if (data.debt < 40) totalScore += 8;
-                else if (data.debt < 60) totalScore += 5;
-                else if (data.debt < 90) totalScore += 2;
-                else if (data.debt < 110) totalScore -= 1;
-                else if (data.debt < 140) totalScore -= 4;
-                else if (data.debt < 180) totalScore -= 8;
-                else totalScore -= 12; // Deuda extrema
-                
-                // Ajuste relativo
-                if (debtRelative > 30) totalScore += 3;
-                else if (debtRelative < -30) totalScore -= 3;
-            }
-            
-            // ====================================================================
-            // 7. DESEMPLEO (peso: 8 puntos)
-            // ====================================================================
-            
-            if (data.unemployment !== null && data.unemployment !== undefined) {
-                const unemploymentRelative = avgUnemployment - data.unemployment;
-                
-                if (data.unemployment < 3.0) totalScore += 7;
-                else if (data.unemployment < 4.0) totalScore += 5;
-                else if (data.unemployment < 5.0) totalScore += 3;
-                else if (data.unemployment < 6.5) totalScore += 1;
-                else if (data.unemployment < 8.0) totalScore -= 2;
-                else if (data.unemployment < 10.0) totalScore -= 5;
-                else totalScore -= 8;
-                
-                // Ajuste relativo
-                if (unemploymentRelative > 1.5) totalScore += 2;
-                else if (unemploymentRelative < -1.5) totalScore -= 2;
-            }
-            
-            // ====================================================================
-            // 8. PRODUCCIÓN INDUSTRIAL (peso: 6 puntos)
-            // ====================================================================
-            
-            if (data.production !== null && data.production !== undefined) {
-                if (data.production > 3.0) totalScore += 5;
-                else if (data.production > 1.5) totalScore += 3;
-                else if (data.production > 0.5) totalScore += 1;
-                else if (data.production > -0.5) totalScore += 0;
-                else if (data.production > -2.0) totalScore -= 2;
-                else totalScore -= 5;
-            }
-            
-            // ====================================================================
-            // 9. FACTORES ESPECIALES
-            // ====================================================================
-            
-            // Safe Haven Premium
-            const safeHavenBonus = {
-                'CHF': 5,  // Neutralidad, estabilidad
-                'JPY': 3,  // Safe haven pero tasas bajas
-                'USD': 4   // Reserve currency
-            };
-            
-            if (safeHavenBonus[currency]) {
-                totalScore += safeHavenBonus[currency];
-            }
-            
-            // Penalización por commodities dependencia en entorno desfavorable
-            const commodityRisk = {
-                'AUD': -2,  // Vulnerable a precios commodities
-                'CAD': -2,
-                'NZD': -1
-            };
-            
-            if (commodityRisk[currency] && data.tradeBalance && data.tradeBalance < 0) {
-                totalScore += commodityRisk[currency];
-            }
-            
-            // ====================================================================
-            // NORMALIZACIÓN FINAL
-            // ====================================================================
-            
-// Limitar a rango realista: 30-75 típico, extremos 20-85
-const finalScore = Math.max(20, Math.min(85, totalScore));
-
-// ✅ FIX CRÍTICO: Retornar NÚMERO, no string
-return parseFloat(finalScore.toFixed(1));
-        };
+const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
+    if (!data) return 50;
+    
+    let totalScore = 50; // Base neutral
+    
+    // ====================================================================
+    // CÁLCULO DE PROMEDIOS GLOBALES
+    // ====================================================================
+    
+    const allValues = Object.values(allEconomicData).filter(d => d && typeof d === 'object');
+    
+    const calculateAverage = (key) => {
+        const values = allValues.filter(d => d[key] !== null && d[key] !== undefined).map(d => d[key]);
+        return values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : null;
+    };
+    
+    const avgInflation = calculateAverage('inflation') || 2.0;
+    const avgGdpGrowth = calculateAverage('gdpGrowth') || 1.5;
+    const avgInterestRate = calculateAverage('interestRate') || 3.5;
+    const avgUnemployment = calculateAverage('unemployment') || 5.0;
+    const avgCurrentAccount = calculateAverage('currentAccount') || 0;
+    const avgDebt = calculateAverage('debt') || 100;
+    const avgRetailSales = calculateAverage('retailSales') || 0.3;
+    const avgWageGrowth = calculateAverage('wageGrowth') || 2.5;
+    const avgPMI = calculateAverage('manufacturingPMI') || 50.0;
+    
+    // ====================================================================
+    // 1. INFLACIÓN RELATIVA (peso: 12 puntos - reducido por nuevos indicadores)
+    // ====================================================================
+    
+    if (data.inflation !== null && data.inflation !== undefined) {
+        const inflationTarget = 2.0;
+        const inflationDev = Math.abs(data.inflation - inflationTarget);
+        const inflationRelativeDev = data.inflation - avgInflation;
+        
+        if (inflationDev <= 0.5) totalScore += 6;
+        else if (inflationDev <= 1.0) totalScore += 4;
+        else if (inflationDev <= 1.5) totalScore += 1;
+        else if (inflationDev <= 2.5) totalScore -= 2;
+        else totalScore -= 6;
+        
+        if (inflationRelativeDev < -1.0) totalScore += 3;
+        else if (inflationRelativeDev < 0) totalScore += 1;
+        else if (inflationRelativeDev > 1.5) totalScore -= 3;
+    }
+    
+    // ====================================================================
+    // 2. CRECIMIENTO GDP (peso: 10 puntos)
+    // ====================================================================
+    
+    if (data.gdpGrowth !== null && data.gdpGrowth !== undefined) {
+        const growthRelative = data.gdpGrowth - avgGdpGrowth;
+        
+        if (data.gdpGrowth >= 3.0) totalScore += 8;
+        else if (data.gdpGrowth >= 2.5) totalScore += 6;
+        else if (data.gdpGrowth >= 2.0) totalScore += 4;
+        else if (data.gdpGrowth >= 1.5) totalScore += 2;
+        else if (data.gdpGrowth >= 1.0) totalScore += 1;
+        else if (data.gdpGrowth >= 0.5) totalScore -= 2;
+        else if (data.gdpGrowth >= 0) totalScore -= 4;
+        else totalScore -= 8;
+        
+        if (growthRelative > 1.0) totalScore += 2;
+        else if (growthRelative < -1.0) totalScore -= 2;
+    }
+    
+    // ====================================================================
+    // 3. TASAS DE INTERÉS (peso: 8 puntos)
+    // ====================================================================
+    
+    if (data.interestRate !== null && data.interestRate !== undefined) {
+        const rateDiff = data.interestRate - avgInterestRate;
+        
+        if (rateDiff > 2.0) totalScore += 6;
+        else if (rateDiff > 1.0) totalScore += 4;
+        else if (rateDiff > 0.5) totalScore += 2;
+        else if (rateDiff < -2.0) totalScore -= 6;
+        else if (rateDiff < -1.0) totalScore -= 4;
+        else if (rateDiff < -0.5) totalScore -= 2;
+        
+        if (data.interestRate > 8.0) totalScore -= 2;
+        if (data.interestRate < 0) totalScore -= 4;
+    }
+    
+    // ====================================================================
+    // 4. BALANZA COMERCIAL (peso: 12 puntos)
+    // ====================================================================
+    
+    if (data.tradeBalance !== null && data.tradeBalance !== undefined && data.gdp) {
+        const gdpMonthly = (data.gdp * 1000) / 12;
+        const tbPercent = (data.tradeBalance / gdpMonthly) * 100;
+        
+        if (tbPercent > 3.0) totalScore += 10;
+        else if (tbPercent > 2.0) totalScore += 8;
+        else if (tbPercent > 1.0) totalScore += 6;
+        else if (tbPercent > 0.5) totalScore += 3;
+        else if (tbPercent > 0) totalScore += 1;
+        else if (tbPercent > -1.0) totalScore -= 2;
+        else if (tbPercent > -2.0) totalScore -= 4;
+        else if (tbPercent > -3.0) totalScore -= 7;
+        else totalScore -= 10;
+    }
+    
+    // ====================================================================
+    // 5. CUENTA CORRIENTE (peso: 10 puntos)
+    // ====================================================================
+    
+    if (data.currentAccount !== null && data.currentAccount !== undefined) {
+        const caRelative = data.currentAccount - avgCurrentAccount;
+        
+        if (data.currentAccount > 5) totalScore += 8;
+        else if (data.currentAccount > 3) totalScore += 6;
+        else if (data.currentAccount > 1.5) totalScore += 4;
+        else if (data.currentAccount > 0) totalScore += 2;
+        else if (data.currentAccount > -2) totalScore -= 2;
+        else if (data.currentAccount > -4) totalScore -= 5;
+        else totalScore -= 8;
+        
+        if (caRelative > 2) totalScore += 2;
+        else if (caRelative < -2) totalScore -= 2;
+    }
+    
+    // ====================================================================
+    // 6. DEUDA PÚBLICA (peso: 8 puntos)
+    // ====================================================================
+    
+    if (data.debt !== null && data.debt !== undefined) {
+        const debtRelative = avgDebt - data.debt;
+        
+        if (data.debt < 40) totalScore += 6;
+        else if (data.debt < 60) totalScore += 4;
+        else if (data.debt < 90) totalScore += 2;
+        else if (data.debt < 110) totalScore -= 1;
+        else if (data.debt < 140) totalScore -= 3;
+        else if (data.debt < 180) totalScore -= 6;
+        else totalScore -= 10;
+        
+        if (debtRelative > 30) totalScore += 2;
+        else if (debtRelative < -30) totalScore -= 2;
+    }
+    
+    // ====================================================================
+    // 7. DESEMPLEO (peso: 7 puntos)
+    // ====================================================================
+    
+    if (data.unemployment !== null && data.unemployment !== undefined) {
+        const unemploymentRelative = avgUnemployment - data.unemployment;
+        
+        if (data.unemployment < 3.0) totalScore += 6;
+        else if (data.unemployment < 4.0) totalScore += 4;
+        else if (data.unemployment < 5.0) totalScore += 2;
+        else if (data.unemployment < 6.5) totalScore += 1;
+        else if (data.unemployment < 8.0) totalScore -= 2;
+        else if (data.unemployment < 10.0) totalScore -= 4;
+        else totalScore -= 6;
+        
+        if (unemploymentRelative > 1.5) totalScore += 1;
+        else if (unemploymentRelative < -1.5) totalScore -= 1;
+    }
+    
+    // ====================================================================
+    // 8. PRODUCCIÓN INDUSTRIAL (peso: 5 puntos)
+    // ====================================================================
+    
+    if (data.production !== null && data.production !== undefined) {
+        if (data.production > 3.0) totalScore += 4;
+        else if (data.production > 1.5) totalScore += 2;
+        else if (data.production > 0.5) totalScore += 1;
+        else if (data.production > -0.5) totalScore += 0;
+        else if (data.production > -2.0) totalScore -= 2;
+        else totalScore -= 4;
+    }
+    
+    // ====================================================================
+    // 9. RETAIL SALES - NUEVO (peso: 6 puntos)
+    // ====================================================================
+    
+    if (data.retailSales !== null && data.retailSales !== undefined) {
+        const rsRelative = data.retailSales - avgRetailSales;
+        
+        if (data.retailSales > 1.0) totalScore += 5;
+        else if (data.retailSales > 0.5) totalScore += 3;
+        else if (data.retailSales > 0.2) totalScore += 1;
+        else if (data.retailSales > -0.2) totalScore += 0;
+        else if (data.retailSales > -0.5) totalScore -= 2;
+        else if (data.retailSales > -1.0) totalScore -= 4;
+        else totalScore -= 5;
+        
+        if (rsRelative > 0.5) totalScore += 1;
+        else if (rsRelative < -0.5) totalScore -= 1;
+    }
+    
+    // ====================================================================
+    // 10. WAGE GROWTH - NUEVO (peso: 6 puntos)
+    // ====================================================================
+    
+    if (data.wageGrowth !== null && data.wageGrowth !== undefined) {
+        const wgRelative = data.wageGrowth - avgWageGrowth;
+        
+        // Wage growth es bueno pero si es muy alto puede presionar inflación
+        if (data.wageGrowth >= 2.5 && data.wageGrowth <= 4.0) totalScore += 5; // Goldilocks zone
+        else if (data.wageGrowth > 4.0 && data.wageGrowth <= 5.0) totalScore += 3; // Alto pero ok
+        else if (data.wageGrowth > 5.0) totalScore += 1; // Muy alto - presión inflacionaria
+        else if (data.wageGrowth >= 1.5) totalScore += 2; // Moderado
+        else if (data.wageGrowth >= 0.5) totalScore -= 1; // Bajo
+        else totalScore -= 4; // Muy bajo - estancamiento
+        
+        if (wgRelative > 1.0) totalScore += 1;
+        else if (wgRelative < -1.0) totalScore -= 1;
+    }
+    
+    // ====================================================================
+    // 11. MANUFACTURING PMI - NUEVO (peso: 8 puntos)
+    // ====================================================================
+    
+    if (data.manufacturingPMI !== null && data.manufacturingPMI !== undefined) {
+        const pmiRelative = data.manufacturingPMI - avgPMI;
+        
+        if (data.manufacturingPMI > 55) totalScore += 7;
+        else if (data.manufacturingPMI > 52) totalScore += 5;
+        else if (data.manufacturingPMI > 50) totalScore += 3;
+        else if (data.manufacturingPMI > 48) totalScore -= 2;
+        else if (data.manufacturingPMI > 45) totalScore -= 5;
+        else totalScore -= 7;
+        
+        if (pmiRelative > 2) totalScore += 1;
+        else if (pmiRelative < -2) totalScore -= 1;
+    }
+    
+    // ====================================================================
+    // 12. COT POSITIONING - NUEVO (peso: 5 puntos)
+    // ====================================================================
+    
+if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
+    // COT usa valores en miles de contratos (ej: 45000, -12000)
+    // Extremos pueden señalar saturación y reversión
+    
+    if (data.cotPositioning > 25000) totalScore += 2; // Extremo bullish (cuidado)
+    else if (data.cotPositioning > 10000) totalScore += 4; // Bullish fuerte
+    else if (data.cotPositioning > 0) totalScore += 3; // Bullish moderado
+    else if (data.cotPositioning > -10000) totalScore -= 3; // Bearish moderado
+    else if (data.cotPositioning > -25000) totalScore -= 4; // Bearish fuerte
+    else totalScore -= 2; // Extremo bearish (posible reversión)
+}
+    
+    // ====================================================================
+    // 13. FACTORES ESPECIALES
+    // ====================================================================
+    
+    const safeHavenBonus = {
+        'CHF': 4,
+        'JPY': 2,
+        'USD': 3
+    };
+    
+    if (safeHavenBonus[currency]) {
+        totalScore += safeHavenBonus[currency];
+    }
+    
+    const commodityRisk = {
+        'AUD': -2,
+        'CAD': -2,
+        'NZD': -1
+    };
+    
+    if (commodityRisk[currency] && data.tradeBalance && data.tradeBalance < 0) {
+        totalScore += commodityRisk[currency];
+    }
+    
+    // ====================================================================
+    // NORMALIZACIÓN FINAL
+    // ====================================================================
+    
+    const finalScore = Math.max(20, Math.min(85, totalScore));
+    return parseFloat(finalScore.toFixed(1));
+};
 
         const clearDashboardCache = () => {
             CacheManager.clearAll();
@@ -1853,17 +1907,23 @@ return parseFloat(finalScore.toFixed(1));
             { code: 'NZD', name: 'Nueva Zelanda', currency: 'Dólar Neozelandés', flag: '🇳🇿', centralBank: 'Banco de la Reserva de Nueva Zelanda', nextMeeting: 'Por definir', outlook: 'Neutral' }
         ];
 
-        const indicatorTooltips = {
-            gdp: "Producto Interno Bruto total en trillones USD.",
-            gdpGrowth: "Tasa de crecimiento anual del PIB. >2% indica economía sana.",
-            interestRate: "Tasa de política monetaria del banco central.",
-            inflation: "Inflación anual medida por IPC. Objetivo: ~2%.",
-            unemployment: "% de fuerza laboral desempleada.",
-            currentAccount: "Balance comercial + flujos de inversión como % del PIB.",
-            debt: "Deuda pública como % del PIB.",
-            tradeBalance: "Exportaciones - Importaciones mensuales en millones USD.",
-            production: "Crecimiento anual producción industrial."
-        };
+const indicatorTooltips = {
+    gdp: "Producto Interno Bruto total en trillones USD.",
+    gdpGrowth: "Tasa de crecimiento anual del PIB. >2% indica economía sana.",
+    interestRate: "Tasa de política monetaria del banco central.",
+    inflation: "Inflación anual medida por IPC. Objetivo: ~2%.",
+    unemployment: "% de fuerza laboral desempleada.",
+    currentAccount: "Balance comercial + flujos de inversión como % del PIB.",
+    debt: "Deuda pública como % del PIB.",
+    tradeBalance: "Exportaciones - Importaciones mensuales en millones USD.",
+    production: "Crecimiento anual producción industrial.",
+    
+    // NUEVOS INDICADORES
+    retailSales: "Cambio mensual en ventas minoristas. >0.5% indica consumo robusto.",
+    wageGrowth: "Crecimiento salarial anual. >3.5% presiona inflación al alza.",
+    manufacturingPMI: "Índice de actividad manufacturera. >50 = expansión, <50 = contracción.",
+    cotPositioning: "Posicionamiento neto de traders especulativos. Positivo = bullish, Negativo = bearish."
+};
 
         // ========== COMPONENTE PRINCIPAL ==========
         const ForexDashboard = () => {
@@ -2071,6 +2131,28 @@ return parseFloat(finalScore.toFixed(1));
                         intensity = Math.min(Math.abs(value) / 3, 1);
                         isPositive = value > 0.5;
                         break;
+                        case 'retailSales':
+    intensity = Math.min(Math.abs(value) / 1.5, 1);
+    isPositive = value > 0.3;
+    break;
+case 'wageGrowth':
+    // 2.5-4% es ideal, muy alto o bajo es malo
+    if (value >= 2.5 && value <= 4.0) {
+        intensity = 0.8;
+        isPositive = true;
+    } else {
+        intensity = Math.min(Math.abs(value - 3.25) / 2, 1);
+        isPositive = value > 1.5;
+    }
+    break;
+case 'manufacturingPMI':
+    intensity = Math.min(Math.abs(value - 50) / 10, 1);
+    isPositive = value > 50;
+    break;
+case 'cotPositioning':
+    intensity = Math.min(Math.abs(value) / 30, 1);
+    isPositive = value > 0;
+    break;
                 }
 
                 if (isPositive) {
@@ -2196,6 +2278,45 @@ const generateAnalysis = (currency, forexRates, economicData) => {
     } else {
         analysis.push(`Evolución dependerá de próximos datos económicos y señales de bancos centrales sobre dirección de política monetaria.`);
     }
+
+    // 7. ANÁLISIS DE CONSUMO Y MOMENTUM
+if (data.retailSales !== null && data.wageGrowth !== null) {
+    if (data.retailSales > 0.5 && data.wageGrowth > 3.0) {
+        analysis.push(`Consumo doméstico robusto con ventas minoristas +${data.retailSales.toFixed(1)}% y salarios creciendo ${data.wageGrowth.toFixed(1)}% anual sostiene demanda agregada.`);
+    } else if (data.retailSales < -0.3) {
+        analysis.push(`Debilidad en consumo con ventas minoristas ${data.retailSales.toFixed(1)}% señala desaceleración en demanda doméstica.`);
+    }
+}
+
+// 8. ANÁLISIS DE ACTIVIDAD MANUFACTURERA
+if (data.manufacturingPMI !== null) {
+    if (data.manufacturingPMI > 55) {
+        analysis.push(`Sector manufacturero en fuerte expansión (PMI ${data.manufacturingPMI.toFixed(1)}) impulsa crecimiento económico.`);
+    } else if (data.manufacturingPMI > 50) {
+        analysis.push(`Manufactura en expansión moderada (PMI ${data.manufacturingPMI.toFixed(1)}) mantiene momentum positivo.`);
+    } else if (data.manufacturingPMI < 45) {
+        analysis.push(`Sector manufacturero en contracción aguda (PMI ${data.manufacturingPMI.toFixed(1)}) presagia debilidad económica.`);
+    } else {
+        analysis.push(`Manufactura en contracción (PMI ${data.manufacturingPMI.toFixed(1)}) reduce perspectivas de crecimiento.`);
+    }
+}
+
+// 9. ANÁLISIS DE POSICIONAMIENTO ESPECULATIVO (OPCIONAL)
+if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
+    if (data.cotPositioning > 20000) {
+        analysis.push(`Posicionamiento especulativo extremadamente alcista (${(data.cotPositioning/1000).toFixed(0)}K contratos netos) sugiere saturación y riesgo de corrección.`);
+    } else if (data.cotPositioning > 10000) {
+        analysis.push(`Traders especulativos fuertemente posicionados al alza (${(data.cotPositioning/1000).toFixed(0)}K contratos) respalda tendencia alcista.`);
+    } else if (data.cotPositioning < -20000) {
+        analysis.push(`Posicionamiento bajista extremo (${(data.cotPositioning/1000).toFixed(0)}K contratos) podría catalizar rebote técnico si fundamentos mejoran.`);
+    } else if (data.cotPositioning < -10000) {
+        analysis.push(`Sentimiento especulativo negativo (${(data.cotPositioning/1000).toFixed(0)}K contratos) amplifica presión vendedora.`);
+    } else if (data.cotPositioning > 0) {
+        analysis.push(`Posicionamiento especulativo moderadamente alcista (${(data.cotPositioning/1000).toFixed(0)}K contratos) alineado con tendencia.`);
+    } else {
+        analysis.push(`Posicionamiento especulativo moderadamente bajista (${(data.cotPositioning/1000).toFixed(0)}K contratos) refleja cautela del mercado.`);
+    }
+}
     
     return analysis.join(' ');
 };
@@ -2215,6 +2336,15 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                 return value.toFixed(decimals);
             };
 
+const hasCOTData = () => {
+    const currencies = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
+    const cotAvailable = currencies.filter(curr => {
+        const data = economicData[curr];
+        return data && data.cotPositioning !== null && data.cotPositioning !== undefined;
+    });
+    return cotAvailable.length >= 4; // At least 4 currencies have COT data
+};
+            
             useEffect(() => {
                 const loadInitialData = async () => {
                     setIsLoading(true);
@@ -2319,11 +2449,33 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                                     <div className="status-live"></div>
                                     <span>Datos en Vivo</span>
                                 </div>
-                                {lastUpdate && (
-                                    <div className="info-item">
-                                        <span>Actualizado: {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-                                )}
+{lastUpdate && (
+    <>
+        <div className="info-item">
+            <span>Actualizado: {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        {/* Indicador COT */}
+        <div className="info-item">
+            {hasCOTData() ? (
+                <>
+                    <div className="status-live"></div>
+                    <span>COT Disponible</span>
+                </>
+            ) : (
+                <>
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        background: 'var(--text-tertiary)',
+                        borderRadius: '50%',
+                        opacity: 0.5
+                    }}></div>
+                    <span style={{ color: 'var(--text-tertiary)' }}>COT: Próx. Viernes</span>
+                </>
+            )}
+        </div>
+    </>
+)}
                             </div>
                         </div>
                     </div>
@@ -2452,6 +2604,55 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                                                                 {country.code === 'USD' ? '1.0000' : rate.toFixed(4)}
                                                             </div>
                                                         </div>
+                                                        <div className="metric">
+    <div className="metric-label">Ventas Minoristas</div>
+    <div className="metric-value metric-value-small" style={{ 
+        color: data.retailSales !== null && data.retailSales > 0.5 ? 'var(--green-strong)' : 
+               data.retailSales !== null && data.retailSales < -0.5 ? 'var(--red-strong)' : 
+               'var(--text-primary)' 
+    }}>
+        {data.retailSales !== null && data.retailSales !== undefined 
+            ? `${data.retailSales > 0 ? '+' : ''}${formatValue(data.retailSales)}%`
+            : 'N/D'}
+    </div>
+</div>
+
+<div className="metric">
+    <div className="metric-label">Crecimiento Salarial</div>
+    <div className="metric-value metric-value-small" style={{ 
+        color: data.wageGrowth !== null && data.wageGrowth >= 2.5 && data.wageGrowth <= 4.5 ? 'var(--green-strong)' : 
+               data.wageGrowth !== null && data.wageGrowth > 5.5 ? 'var(--orange)' : 
+               'var(--text-primary)' 
+    }}>
+        {formatValue(data.wageGrowth)}%
+    </div>
+</div>
+
+<div className="metric">
+    <div className="metric-label">PMI Manufacturero</div>
+    <div className="metric-value metric-value-small" style={{ 
+        color: data.manufacturingPMI !== null && data.manufacturingPMI > 50 ? 'var(--green-strong)' : 
+               data.manufacturingPMI !== null && data.manufacturingPMI < 50 ? 'var(--red-strong)' : 
+               'var(--text-primary)' 
+    }}>
+        {formatValue(data.manufacturingPMI, 1)}
+    </div>
+</div>
+
+<div className="metric">
+<div className="metric">
+    <div className="metric-label">COT Positioning</div>
+    <div className="metric-value metric-value-small" style={{ 
+        color: data.cotPositioning !== null && data.cotPositioning > 10000 ? 'var(--green-strong)' : 
+               data.cotPositioning !== null && data.cotPositioning < -10000 ? 'var(--red-strong)' : 
+               data.cotPositioning !== null ? 'var(--text-primary)' :
+               'var(--text-tertiary)'
+    }}>
+        {data.cotPositioning !== null && data.cotPositioning !== undefined 
+            ? `${data.cotPositioning > 0 ? '+' : ''}${(data.cotPositioning / 1000).toFixed(1)}K`
+            : 'N/A'}
+    </div>
+</div>
                                                     </div>
 
                                                     <div className="analysis-section">
@@ -2512,6 +2713,18 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                                                 <TooltipCell title="Producción Industrial" tooltip={indicatorTooltips.production}>
                                                     Prod. Industrial<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% Anual</span>
                                                 </TooltipCell>
+                                                <TooltipCell title="Ventas Minoristas" tooltip={indicatorTooltips.retailSales}>
+    Ventas Minoristas<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% MoM</span>
+</TooltipCell>
+<TooltipCell title="Crecimiento Salarial" tooltip={indicatorTooltips.wageGrowth}>
+    Crecimiento Salarial<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% YoY</span>
+</TooltipCell>
+<TooltipCell title="PMI Manufacturero" tooltip={indicatorTooltips.manufacturingPMI}>
+    PMI Manufacturero<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice</span>
+</TooltipCell>
+<TooltipCell title="Posicionamiento COT" tooltip={indicatorTooltips.cotPositioning}>
+    COT Positioning<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Net Contratos</span>
+</TooltipCell>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -2566,6 +2779,25 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                                                         <td style={{ background: getHeatmapColor(data.production, 'production') }}>
                                                             <span className="cell-value">{data.production > 0 ? '+' : ''}{formatValue(data.production)}%</span>
                                                         </td>
+                                                        <td style={{ background: getHeatmapColor(data.retailSales, 'retailSales') }}>
+    <span className="cell-value">{data.retailSales > 0 ? '+' : ''}{formatValue(data.retailSales)}%</span>
+</td>
+<td style={{ background: getHeatmapColor(data.wageGrowth, 'wageGrowth') }}>
+    <span className="cell-value">{formatValue(data.wageGrowth)}%</span>
+</td>
+<td style={{ background: getHeatmapColor(data.manufacturingPMI, 'manufacturingPMI') }}>
+    <span className="cell-value">{formatValue(data.manufacturingPMI, 1)}</span>
+</td>
+<td style={{ background: getHeatmapColor(data.cotPositioning, 'cotPositioning') }}>
+    {data.cotPositioning !== null && data.cotPositioning !== undefined ? (
+        <span className="cell-value">
+            {data.cotPositioning > 0 ? '+' : ''}
+            {(data.cotPositioning / 1000).toFixed(1)}K
+        </span>
+    ) : (
+        <span className="cell-value" style={{ color: 'var(--text-tertiary)' }}>N/A</span>
+    )}
+</td>
                                                     </tr>
                                                 );
                                             })}
@@ -2643,13 +2875,30 @@ const generateAnalysis = (currency, forexRates, economicData) => {
                             </div>
                         )}
 
-                        <div className="footer">
-                            <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX</div>
-<div style={{ marginBottom: '1rem' }}>
-    Metodología: Comparación relativa entre divisas basada en BIS REER + IMF EBA<br/>
-    Referencia: Bank for International Settlements (2019)<br/>
-    Datos actualizados diariamente desde Trading Economics
-</div>
+<div className="footer">
+    <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX</div>
+    <div style={{ marginBottom: '1rem' }}>
+        Metodología: Comparación relativa entre divisas basada en BIS REER + IMF EBA<br/>
+        Referencia: Bank for International Settlements (2019)<br/>
+        Datos actualizados diariamente desde Trading Economics
+    </div>
+    
+    <div style={{ 
+        background: 'var(--bg-card)', 
+        padding: '1rem', 
+        borderRadius: '6px', 
+        border: '1px solid var(--border)',
+        marginTop: '1rem',
+        fontSize: '0.8125rem',
+        lineHeight: '1.6'
+    }}>
+        <strong>Nota sobre datos COT:</strong><br/>
+        Los datos de posicionamiento COT (Commitment of Traders) se obtienen de informes oficiales 
+        de la CFTC publicados cada viernes a las 3:30 PM ET. Debido a que reportan datos con una 
+        semana de retraso, el posicionamiento mostrado refleja la situación de hace ~3 días. 
+        Esto es estándar en la industria. Si COT muestra "N/A", el próximo reporte se publicará 
+        el viernes siguiente.
+    </div>
                             <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
                                 <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
                                     padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
