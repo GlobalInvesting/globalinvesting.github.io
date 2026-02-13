@@ -2408,14 +2408,14 @@ const hasCOTData = () => {
                     </div>
 
                     <div className="content">
-                        {activeTab === 'overview' && (
+{activeTab === 'overview' && (
     <div>
         <div className="section-header">
-                                    <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
-                                    <div className="section-meta">Ordenadas por fortaleza fundamental • Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}</div>
-                                </div>
-                                <div className="currency-grid">
-                                    {getSortedCountries().map(country => {
+            <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
+            <div className="section-meta">Ordenadas por fortaleza fundamental • Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}</div>
+        </div>
+        <div className="currency-grid">
+            {getSortedCountries().map(country => {
                                         const data = economicData[country.code] || {};
                                         const strengthObj = calculateStrength(country.code, data, forexRates, economicData);  // ✅
 const strength = strengthObj.score;  // ✅
