@@ -1563,17 +1563,22 @@
                             currentStep++;
                             
                             economicData[country.code].production = data.production || null;
-                            currentStep++;
-                            
-                            economicData[country.code].retailSales = data.retailSales || null;
-                            
-                            economicData[country.code].wageGrowth = data.wageGrowth || null;
-                            
-                            economicData[country.code].manufacturingPMI = data.manufacturingPMI || null;
-                            
-                            economicData[country.code].cotPositioning = data.cotPositioning || null;
-                            
-                            console.log(`✅ Loaded all data for ${country.code}`);
+currentStep++;
+
+// ✅ NUEVOS INDICADORES CON DEBUG
+economicData[country.code].retailSales = data.retailSales !== undefined ? data.retailSales : null;
+console.log(`📊 ${country.code} Retail Sales: ${economicData[country.code].retailSales}`);
+
+economicData[country.code].wageGrowth = data.wageGrowth !== undefined ? data.wageGrowth : null;
+console.log(`💰 ${country.code} Wage Growth: ${economicData[country.code].wageGrowth}`);
+
+economicData[country.code].manufacturingPMI = data.manufacturingPMI !== undefined ? data.manufacturingPMI : null;
+console.log(`🏭 ${country.code} PMI: ${economicData[country.code].manufacturingPMI}`);
+
+// COT se carga desde archivo separado después
+economicData[country.code].cotPositioning = data.cotPositioning !== undefined ? data.cotPositioning : null;
+
+console.log(`✅ Loaded all data for ${country.code}`);
                         } else {
                             console.error(`❌ No data field in scraped file for ${country.code}`);
                         }
@@ -2662,12 +2667,7 @@ const hasCOTData = () => {
                                                                     : 'N/D'}
                                                             </div>
                                                         </div>
-                                                        <div className="metric">
-                                                            <div className="metric-label">Tasa vs USD</div>
-                                                            <div className="metric-value metric-value-small">
-                                                                {country.code === 'USD' ? '1.0000' : rate.toFixed(4)}
-                                                            </div>
-                                                        </div>
+                                                        
 <div className="metric">
                                                             <div className="metric-label">Ventas Minoristas</div>
                                                             <div className="metric-value metric-value-small" style={{ 
