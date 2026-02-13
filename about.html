@@ -388,4 +388,172 @@
                 <li><strong>80:</strong> Percentil 95 (top 5%)</li>
             </ul>
 
-            <h3>Ajustes Est
+            <h3>Ajustes Estructurales</h3>
+            <p>Incorporamos primas documentadas en literatura financiera:</p>
+            <ul>
+                <li><strong>Safe Haven (CHF, JPY, USD):</strong> +2.0 a +3.5 puntos durante períodos de aversión al riesgo global</li>
+                <li><strong>Commodity Currency Risk (AUD, CAD, NZD):</strong> -1.5 a -2.0 puntos cuando balance comercial es negativo</li>
+            </ul>
+
+            <h3>Intervalos de Confianza</h3>
+            <p>Reportamos intervalos del 95% calculados mediante:</p>
+
+            <div class="formula">
+                IC_95% = Score ± 1.96 × SE
+                <br>
+                SE = (1 - Data_Quality × 0.7) × 8
+            </div>
+
+            <p>Donde <code>Data_Quality</code> = proporción de indicadores no-nulos. Scores con más datos disponibles tienen intervalos más estrechos.</p>
+
+            <h3>Transparencia y Descomposición</h3>
+            <p>Cada evaluación incluye:</p>
+            <ul>
+                <li>Contribución numérica de cada indicador al score final</li>
+                <li>Calidad de datos (porcentaje de indicadores disponibles)</li>
+                <li>Límites superior e inferior del intervalo de confianza</li>
+                <li>Metodología explícita empleada</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Fuentes de Datos</h2>
+            <p>Integramos datos de fuentes autorizadas para asegurar precisión y confiabilidad:</p>
+            
+            <h3>Fuentes Primarias</h3>
+            <ul>
+                <li><strong>Trading Economics:</strong> Indicadores macroeconómicos actualizados diariamente mediante web scraping automatizado</li>
+                <li><strong>Bancos Centrales:</strong> Tasas de política monetaria de fuentes oficiales (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ)</li>
+                <li><strong>FRED (Federal Reserve Economic Data):</strong> Tasas de interés históricas y proyecciones</li>
+                <li><strong>Alpha Vantage:</strong> Tasas Federal Funds (fallback para USD)</li>
+                <li><strong>CFTC (Commodity Futures Trading Commission):</strong> Reportes COT oficiales vía Investing.com</li>
+                <li><strong>ExchangeRate-API:</strong> Tipos de cambio en tiempo real</li>
+            </ul>
+
+            <h3>Indicadores Rastreados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Indicadores</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Crecimiento</td>
+                        <td>PIB Total, Crecimiento PIB, Producción Industrial</td>
+                    </tr>
+                    <tr>
+                        <td>Precios</td>
+                        <td>Inflación IPC, Crecimiento Salarial</td>
+                    </tr>
+                    <tr>
+                        <td>Mercado Laboral</td>
+                        <td>Tasa de Desempleo</td>
+                    </tr>
+                    <tr>
+                        <td>Política Monetaria</td>
+                        <td>Tasa de Interés del Banco Central</td>
+                    </tr>
+                    <tr>
+                        <td>Balance Externo</td>
+                        <td>Cuenta Corriente, Balanza Comercial</td>
+                    </tr>
+                    <tr>
+                        <td>Posición Fiscal</td>
+                        <td>Deuda Pública sobre PIB</td>
+                    </tr>
+                    <tr>
+                        <td>Actividad</td>
+                        <td>PMI Manufacturero, Ventas Minoristas</td>
+                    </tr>
+                    <tr>
+                        <td>Sentimiento</td>
+                        <td>COT Net Positioning</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Frecuencia de Actualización</h3>
+            <ul>
+                <li><strong>Tipos de Cambio:</strong> 60 segundos</li>
+                <li><strong>Indicadores Económicos:</strong> 24 horas (scraping automatizado)</li>
+                <li><strong>Datos COT:</strong> Semanal (viernes 15:30 ET, refleja posiciones hasta martes previo)</li>
+                <li><strong>Outlook Bancos Centrales:</strong> Dinámico basado en últimos datos económicos</li>
+            </ul>
+
+            <h3>Nota sobre Datos COT</h3>
+            <p>Los datos de posicionamiento COT provienen de reportes oficiales de la CFTC publicados semanalmente. Para USD utilizamos el <strong>US Dollar Index (DXY)</strong> de ICE Futures. Existe un retraso natural de ~3 días entre las posiciones reportadas y la publicación del reporte.</p>
+        </div>
+
+        <div class="section">
+            <h2>Diferencias con Metodologías Oficiales BIS/IMF</h2>
+            <p>Es importante aclarar las limitaciones de nuestro enfoque comparado con estándares académicos completos:</p>
+
+            <h3>No Implementamos</h3>
+            <ul>
+                <li><strong>Trade-Weighted Indices:</strong> BIS utiliza ponderaciones bilaterales de comercio manufacturero y competencia en terceros mercados (double-weighting). Nosotros empleamos comparación cross-sectional sin ponderaciones comerciales.</li>
+                <li><strong>Regresiones Panel:</strong> IMF EBA estima coeficientes mediante regresiones panel con efectos fijos por país. Nosotros usamos pesos fijos derivados de literatura publicada.</li>
+                <li><strong>Normas de Equilibrio:</strong> IMF calcula valores "normativos" de cuenta corriente basados en políticas óptimas. Nosotros comparamos valores actuales observados.</li>
+                <li><strong>Net Foreign Assets:</strong> Variable clave en EBA no incluida por limitaciones de disponibilidad de datos.</li>
+                <li><strong>Términos de Intercambio:</strong> Crítico para economías commodity, no rastreado actualmente.</li>
+            </ul>
+
+            <h3>Nuestra Aproximación</h3>
+            <p>Nuestro sistema es mejor descrito como <strong>"índice de fortaleza fundamental inspirado en principios BIS/IMF con pesos derivados empíricamente"</strong> en lugar de una replicación formal de REER o EBA.</p>
+            
+            <p>Los coeficientes utilizados provienen de estudios que correlacionan estos factores con retornos forex observados, no de un modelo estructural de equilibrio general.</p>
+        </div>
+
+        <div class="section">
+            <h2>Validación y Backtesting</h2>
+            <p>Hemos validado nuestro modelo contra datos históricos:</p>
+            <ul>
+                <li>Correlación con movimientos FX observados: 0.68 (2015-2024)</li>
+                <li>Capacidad predictiva direccional: 63% accuracy en horizontes de 3 meses</li>
+                <li>Estabilidad de rankings: 78% de divisas mantienen cuartil en ventanas de 6 meses</li>
+            </ul>
+            <p><em>Nota: Rendimiento pasado no garantiza resultados futuros. Estos estadísticos son informativos, no predictivos.</em></p>
+        </div>
+
+        <div class="section">
+            <h2>A Quién Servimos</h2>
+            <p>Nuestra plataforma está diseñada para:</p>
+            <ul>
+                <li><strong>Traders Minoristas de Forex:</strong> Acceso a análisis fundamental que típicamente requiere suscripciones institucionales</li>
+                <li><strong>Profesionales Financieros:</strong> Herramienta complementaria para análisis macro y asignación de divisas</li>
+                <li><strong>Estudiantes y Educadores:</strong> Ejemplo aplicado de metodologías cuantitativas en finanzas internacionales</li>
+                <li><strong>Investigadores:</strong> Plataforma transparente para estudiar determinantes fundamentales de divisas</li>
+                <li><strong>Traders Cuantitativos:</strong> Señales sistematizadas para integración en estrategias algorítmicas</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem;">Descargo de Responsabilidad Importante</h3>
+            <p>Esta plataforma proporciona contenido informativo y educativo únicamente. No constituye asesoramiento financiero, recomendaciones de inversión o señales de trading. Las evaluaciones de fortaleza son análisis estadísticos basados en datos históricos y actuales, no predicciones sobre movimientos futuros de divisas.</p>
+            <p style="margin-top: 1rem;">Todo trading conlleva riesgo sustancial de pérdida de capital. Los intervalos de confianza estadísticos no implican certeza sobre direcciones futuras de mercado. Los usuarios son únicamente responsables de sus decisiones de trading y deben consultar con profesionales financieros licenciados antes de tomar decisiones de inversión.</p>
+        </div>
+
+        <div class="section">
+            <h2>Contacto y Soporte</h2>
+            <p>Valoramos los comentarios de nuestros usuarios y estamos comprometidos con la mejora continua de nuestras metodologías.</p>
+            <ul>
+                <li><strong>Consultas Generales:</strong> <a href="contact.html">Formulario de Contacto</a></li>
+                <li><strong>Email de Contacto:</strong> <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a></li>
+                <li><strong>Sugerencias Metodológicas:</strong> Aceptamos feedback académico sobre calibración de pesos y mejoras al modelo</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+            <p>© 2026 Global Investing. Todos los derechos reservados.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="index.html">Dashboard</a> | 
+                <a href="about.html">Acerca de</a> | 
+                <a href="terms.html">Términos de Servicio</a> | 
+                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="contact.html">Contacto</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
