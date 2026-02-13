@@ -2117,9 +2117,11 @@ const generateAnalysis = (currency, forexRates, economicData) => {
     if (!economicData[currency]) return 'Cargando datos...';
     const data = economicData[currency];
     const country = countries.find(c => c.code === currency);
-    const strengthObj = calculateStrength(currency, data, forexRates, economicData);  // ✅ Objeto
-const strength = strengthObj.score;  // ✅ Extraer número
-const sentiment = getSentiment(strength);
+    
+    // ✅ CORRECCIÓN: Obtener objeto y extraer score
+    const strengthObj = calculateStrength(currency, data, forexRates, economicData);
+    const strength = strengthObj.score;
+    const sentiment = getSentiment(strength);
 
     // ✅ Helper function para formatear valores de forma segura
     const fmt = (val, decimals = 1) => {
@@ -2302,15 +2304,18 @@ const sentiment = getSentiment(strength);
     return analysis.join(' ');
 };
 
-            const getSortedCountries = () => {
+const getSortedCountries = () => {
     return [...countries].sort((a, b) => {
         const dataA = economicData[a.code] || {};
         const dataB = economicData[b.code] || {};
-        const strengthObjA = calculateStrength(a.code, dataA, forexRates, economicData);  // ✅
-const strengthObjB = calculateStrength(b.code, dataB, forexRates, economicData);  // ✅
-const strengthA = strengthObjA.score || 50;  // ✅ Extraer con fallback
-const strengthB = strengthObjB.score || 50;  // ✅
-return strengthB - strengthA;
+        
+        // ✅ CORRECCIÓN: Extraer score del objeto
+        const strengthObjA = calculateStrength(a.code, dataA, forexRates, economicData);
+        const strengthObjB = calculateStrength(b.code, dataB, forexRates, economicData);
+        const strengthA = strengthObjA.score || 50;
+        const strengthB = strengthObjB.score || 50;
+        
+        return strengthB - strengthA;
     });
 };
 
