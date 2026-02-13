@@ -2091,7 +2091,7 @@ const getSentiment = (strength) => {
     return 'neutral';
 };
 
-            const generateAnalysis = (currency, forexRates, economicData) => {
+const generateAnalysis = (currency, forexRates, economicData) => {
     if (!economicData[currency]) return 'Cargando datos...';
     const data = economicData[currency];
     const country = countries.find(c => c.code === currency);
@@ -2099,16 +2099,104 @@ const getSentiment = (strength) => {
     const sentiment = getSentiment(strength);
 
     let analysis = [];
-    if (sentiment === 'alcista') analysis.push(`${currency} muestra fortaleza fundamental respaldada por datos sólidos.`);
-    else if (sentiment === 'bajista') analysis.push(`${currency} enfrenta vientos en contra con fundamentos débiles.`);
-    else analysis.push(`${currency} presenta panorama mixto con factores balanceados.`);
-
-    if (currency === 'USD' && data.interestRate && data.tradeBalance) {
-        analysis.push(`Fed mantiene política restrictiva (${data.interestRate.toFixed(2)}%) pero DXY muestra debilidad estructural.`);
-    } else if (country && data.interestRate) {
-        analysis.push(`${country.centralBank} en modo ${country.outlook.toLowerCase()} con tasa en ${data.interestRate.toFixed(2)}%.`);
+    
+    // 1. INTRODUCCIÓN BASADA EN FORTALEZA Y TENDENCIA
+    if (sentiment === 'alcista') {
+        analysis.push(`${currency} registra fortaleza fundamental sólida (índice ${strength.toFixed(1)}) respaldada por condiciones macroeconómicas favorables.`);
+    } else if (sentiment === 'bajista') {
+        analysis.push(`${currency} muestra debilidad estructural (índice ${strength.toFixed(1)}) con múltiples indicadores bajo presión.`);
+    } else {
+        analysis.push(`${currency} mantiene posición neutral (índice ${strength.toFixed(1)}) con factores mixtos que se compensan.`);
     }
-
+    
+    // 2. ANÁLISIS DE POLÍTICA MONETARIA
+    if (country && data.interestRate !== null) {
+        if (country.outlook === 'Hawkish') {
+            if (data.inflation > 2.5) {
+                analysis.push(`${country.centralBank} mantiene postura hawkish con tasa en ${data.interestRate.toFixed(2)}% para controlar inflación de ${data.inflation.toFixed(1)}%.`);
+            } else {
+                analysis.push(`${country.centralBank} en modo restrictivo (${data.interestRate.toFixed(2)}%) a pesar de inflación moderada de ${data.inflation.toFixed(1)}%.`);
+            }
+        } else if (country.outlook === 'Dovish') {
+            if (data.gdpGrowth !== null && data.gdpGrowth < 1.0) {
+                analysis.push(`${country.centralBank} adopta postura dovish (tasa ${data.interestRate.toFixed(2)}%) ante desaceleración económica de ${data.gdpGrowth.toFixed(1)}%.`);
+            } else {
+                analysis.push(`${country.centralBank} mantiene política acomodaticia con tasa en ${data.interestRate.toFixed(2)}% buscando estimular crecimiento.`);
+            }
+        } else {
+            analysis.push(`${country.centralBank} en pausa estratégica (${data.interestRate.toFixed(2)}%) evaluando datos antes de próximo movimiento.`);
+        }
+    }
+    
+    // 3. ANÁLISIS DE BALANZA COMERCIAL Y CUENTA CORRIENTE
+    if (data.tradeBalance !== null && data.currentAccount !== null) {
+        if (data.tradeBalance > 1000) {
+            analysis.push(`Superávit comercial robusto de $${(data.tradeBalance / 1000).toFixed(1)}B mensuales sostiene demanda estructural de ${currency}.`);
+        } else if (data.tradeBalance < -10000) {
+            analysis.push(`Déficit comercial significativo de $${Math.abs(data.tradeBalance / 1000).toFixed(1)}B mensuales presiona sobre la divisa.`);
+        }
+        
+        if (data.currentAccount > 3) {
+            analysis.push(`Cuenta corriente superavitaria (+${data.currentAccount.toFixed(1)}% PIB) refuerza posición externa.`);
+        } else if (data.currentAccount < -3) {
+            analysis.push(`Déficit en cuenta corriente (${data.currentAccount.toFixed(1)}% PIB) genera vulnerabilidad externa.`);
+        }
+    }
+    
+    // 4. ANÁLISIS ESPECÍFICO POR DIVISA
+    if (currency === 'USD') {
+        if (data.gdpGrowth !== null && data.gdpGrowth > 2.5) {
+            analysis.push(`Economía estadounidense en expansión sólida (${data.gdpGrowth.toFixed(1)}%) mantiene atractivo del dólar como activo refugio.`);
+        } else if (data.gdpGrowth !== null) {
+            analysis.push(`Desaceleración económica doméstica (${data.gdpGrowth.toFixed(1)}%) limita potencial alcista del dólar.`);
+        }
+    } else if (currency === 'EUR') {
+        if (data.debt !== null && data.debt > 90) {
+            analysis.push(`Carga de deuda elevada (${data.debt.toFixed(0)}% PIB) en contexto de crecimiento débil limita margen del BCE.`);
+        }
+    } else if (currency === 'JPY') {
+        if (data.debt !== null && data.debt > 200) {
+            analysis.push(`Deuda pública extrema (${data.debt.toFixed(0)}% PIB) pero status de safe haven mantiene demanda en aversión al riesgo.`);
+        }
+        if (data.interestRate !== null && data.interestRate < 0.5) {
+            analysis.push(`Política ultra-acomodaticia del BoJ mantiene diferencial negativo frente a otras divisas.`);
+        }
+    } else if (currency === 'GBP') {
+        if (data.inflation !== null && data.inflation > 3.0) {
+            analysis.push(`Inflación persistente (${data.inflation.toFixed(1)}%) fuerza al BoE a mantener política restrictiva.`);
+        }
+    } else if (currency === 'CHF') {
+        if (data.inflation !== null && data.inflation < 1.5 && data.debt !== null && data.debt < 50) {
+            analysis.push(`Estabilidad de precios (${data.inflation.toFixed(1)}%) y deuda baja (${data.debt.toFixed(0)}% PIB) sustentan fortaleza del franco.`);
+        }
+    } else if (currency === 'AUD' || currency === 'NZD' || currency === 'CAD') {
+        if (data.production !== null && data.production < 0) {
+            analysis.push(`Debilidad en sector industrial (${data.production.toFixed(1)}%) refleja desafíos en economía dependiente de commodities.`);
+        } else if (data.tradeBalance !== null && data.tradeBalance > 1000) {
+            analysis.push(`Exportaciones de materias primas sostienen superávit comercial y demanda de ${currency}.`);
+        }
+    }
+    
+    // 5. ANÁLISIS DE CRECIMIENTO Y DESEMPLEO
+    if (data.gdpGrowth !== null && data.unemployment !== null) {
+        if (data.gdpGrowth > 2.5 && data.unemployment < 4.0) {
+            analysis.push(`Combinación de crecimiento robusto (${data.gdpGrowth.toFixed(1)}%) y pleno empleo (${data.unemployment.toFixed(1)}%) caracteriza entorno sólido.`);
+        } else if (data.gdpGrowth < 1.0 && data.unemployment > 6.0) {
+            analysis.push(`Estancamiento con crecimiento débil (${data.gdpGrowth.toFixed(1)}%) y desempleo elevado (${data.unemployment.toFixed(1)}%) complica panorama.`);
+        } else if (data.gdpGrowth < 0) {
+            analysis.push(`Contracción económica (${data.gdpGrowth.toFixed(1)}%) eleva riesgos de recesión y presión sobre la divisa.`);
+        }
+    }
+    
+    // 6. CONCLUSIÓN PROSPECTIVA
+    if (sentiment === 'alcista') {
+        analysis.push(`Perspectivas favorables mientras fundamentos económicos se mantengan sólidos y política monetaria evite giros abruptos.`);
+    } else if (sentiment === 'bajista') {
+        analysis.push(`Riesgos a la baja prevalecen en ausencia de catalizadores positivos que reviertan deterioro fundamental.`);
+    } else {
+        analysis.push(`Evolución dependerá de próximos datos económicos y señales de bancos centrales sobre dirección de política monetaria.`);
+    }
+    
     return analysis.join(' ');
 };
 
