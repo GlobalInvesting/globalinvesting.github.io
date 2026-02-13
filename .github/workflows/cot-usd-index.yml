@@ -1,0 +1,147 @@
+name: Update USD Index COT (CFTC Official)
+on:
+  schedule:
+    - cron: '30 20 * * 5'  # Fridays at 8:30 PM UTC (30 min después del otro)
+  workflow_dispatch:
+
+jobs:
+  update-usd-cot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml --break-system-packages
+      
+      - name: Fetch USD Index COT from CFTC
+        run: |
+          python3 << 'EOFPYTHON'
+          import requests
+          from bs4 import BeautifulSoup
+          import json
+          import re
+          from datetime import date
+          import os
+
+          print("="*70)
+          print("FETCHING US DOLLAR INDEX COT FROM CFTC")
+          print("="*70)
+
+          CFTC_URL = "https://www.cftc.gov/dea/futures/deanybtsf.htm"
+
+          try:
+              print(f"\n🔍 Fetching {CFTC_URL}...")
+              response = requests.get(CFTC_URL, timeout=30)
+              response.raise_for_status()
+              
+              # El contenido es plain text, no HTML
+              content = response.text
+              
+              # Buscar la sección del US Dollar Index
+              # Patrón: "U.S. DOLLAR INDEX" seguido de los datos
+              usd_section = re.search(
+                  r'U\.S\. DOLLAR INDEX.*?'  # Header
+                  r'COMMITMENTS\s+'          # Hasta COMMITMENTS
+                  r'(\d+)\s+(\d+)',          # LONG SHORT (primeros dos números)
+                  content,
+                  re.DOTALL | re.IGNORECASE
+              )
+              
+              if usd_section:
+                  long_positions = int(usd_section.group(1))
+                  short_positions = int(usd_section.group(2))
+                  net_position = long_positions - short_positions
+                  
+                  print(f"\n✅ FOUND USD INDEX DATA:")
+                  print(f"   Long:  {long_positions:,}")
+                  print(f"   Short: {short_positions:,}")
+                  print(f"   Net:   {net_position:+,}")
+                  
+                  # Guardar en formato consistente con los otros archivos COT
+                  cot_data = {
+                      'netPosition': net_position,
+                      'longPositions': long_positions,
+                      'shortPositions': short_positions,
+                      'source': 'CFTC (US Dollar Index - ICE Futures)',
+                      'reportDate': str(date.today()),
+                      'url': CFTC_URL
+                  }
+                  
+                  # Crear directorio si no existe
+                  os.makedirs('cot-data', exist_ok=True)
+                  
+                  # Guardar archivo
+                  with open('cot-data/USD.json', 'w') as f:
+                      json.dump(cot_data, f, indent=2)
+                  
+                  print(f"\n✅ Saved to cot-data/USD.json")
+                  print(f"   Net Position: {net_position:+,} contracts")
+                  
+              else:
+                  print("\n❌ Could not find US Dollar Index section in CFTC report")
+                  print("\nSearching for alternative patterns...")
+                  
+                  # Patrón alternativo más flexible
+                  lines = content.split('\n')
+                  for i, line in enumerate(lines):
+                      if 'DOLLAR INDEX' in line.upper():
+                          print(f"\nFound 'DOLLAR INDEX' at line {i}")
+                          # Mostrar contexto (10 líneas antes y después)
+                          context_start = max(0, i - 5)
+                          context_end = min(len(lines), i + 15)
+                          print("\nContext:")
+                          print('\n'.join(lines[context_start:context_end]))
+                          break
+                  
+                  exit(1)
+          
+          except Exception as e:
+              print(f"\n❌ ERROR: {e}")
+              import traceback
+              traceback.print_exc()
+              exit(1)
+          
+          EOFPYTHON
+      
+      - name: Display USD COT data
+        run: |
+          if [ -f "cot-data/USD.json" ]; then
+            echo ""
+            echo "╔════════════════════════════════════════════════╗"
+            echo "║         USD INDEX COT SUMMARY                  ║"
+            echo "╚════════════════════════════════════════════════╝"
+            echo ""
+            python3 -c "
+          import json
+          with open('cot-data/USD.json') as f:
+              data = json.load(f)
+              print(f\"  Net Position: {data['netPosition']:+,} contracts\")
+              print(f\"  Long:  {data['longPositions']:,}\")
+              print(f\"  Short: {data['shortPositions']:,}\")
+              print(f\"  Source: {data['source']}\")
+              print(f\"  Date: {data['reportDate']}\")
+          "
+          else
+            echo "❌ USD.json not created"
+            exit 1
+          fi
+      
+      - name: Commit and push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add cot-data/USD.json
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📊 USD Index COT update $(date +'%Y-%m-%d') - CFTC official data"
+            git pull --rebase origin main || true
+            git push
+          fi
