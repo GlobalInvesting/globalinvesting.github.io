@@ -1,4 +1,4 @@
-name: Update Economic Data - Hybrid (TE + Investing Fallback)
+name: Update Economic Data - FINAL (TE Multi-source + COT)
 on:
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
@@ -23,7 +23,7 @@ jobs:
       - name: Create data directory
         run: mkdir -p economic-data
       
-      - name: Scrape economic data (hybrid mode)
+      - name: Scrape economic data
         run: |
           python3 << 'EOFPYTHON'
           import requests
@@ -36,7 +36,6 @@ jobs:
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              'Accept-Language': 'en-US,en;q=0.9',
           }
           
           CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
@@ -55,38 +54,32 @@ jobs:
               'manufacturingPMI': 'https://tradingeconomics.com/country-list/manufacturing-pmi'
           }
           
-          INVESTING_FALLBACK_URLS = {
-              'retailSales': {
-                  'AUD': 'https://www.investing.com/economic-calendar/australia-retail-sales-mom-262',
-                  'USD': 'https://www.investing.com/economic-calendar/retail-sales-169',
-                  'EUR': 'https://www.investing.com/economic-calendar/retail-sales-901',
-                  'GBP': 'https://www.investing.com/economic-calendar/retail-sales-238',
-                  'JPY': 'https://www.investing.com/economic-calendar/retail-sales-526',
-                  'CAD': 'https://www.investing.com/economic-calendar/retail-sales-166',
-                  'CHF': 'https://www.investing.com/economic-calendar/retail-sales-1672',
-                  'NZD': 'https://www.investing.com/economic-calendar/retail-sales-1127'
-              }
+          COUNTRY_URLS = {
+              'USD': 'united-states', 'EUR': 'euro-area', 'GBP': 'united-kingdom',
+              'JPY': 'japan', 'CAD': 'canada', 'AUD': 'australia',
+              'CHF': 'switzerland', 'NZD': 'new-zealand'
+          }
+          
+          INDICATOR_PAGES = {
+              'retailSales': 'retail-sales',
+              'wageGrowth': 'wage-growth',
+              'manufacturingPMI': 'manufacturing-pmi'
           }
           
           COUNTRY_NAMES = {
-              'USD': ['United States', 'USA'],
-              'EUR': ['Euro Area', 'Eurozone'],
-              'GBP': ['United Kingdom', 'UK'],
-              'JPY': ['Japan'],
-              'CAD': ['Canada'],
-              'AUD': ['Australia'],
-              'CHF': ['Switzerland'],
-              'NZD': ['New Zealand']
+              'USD': ['United States'], 'EUR': ['Euro Area'], 'GBP': ['United Kingdom'],
+              'JPY': ['Japan'], 'CAD': ['Canada'], 'AUD': ['Australia'],
+              'CHF': ['Switzerland'], 'NZD': ['New Zealand']
           }
           
           exchange_rates = {}
           
-          def fetch_exchange_rates():
+          def fetch_fx():
               global exchange_rates
               try:
-                  response = requests.get('https://api.frankfurter.app/latest?from=USD', timeout=10)
-                  if response.ok:
-                      exchange_rates = response.json().get('rates', {})
+                  r = requests.get('https://api.frankfurter.app/latest?from=USD', timeout=10)
+                  if r.ok:
+                      exchange_rates = r.json().get('rates', {})
                       exchange_rates['USD'] = 1.0
                       return True
               except:
@@ -95,79 +88,63 @@ jobs:
                                'CAD': 1.36, 'AUD': 1.40, 'CHF': 0.77, 'NZD': 1.65}
               return True
           
-          def clean_number(text):
+          def clean_num(text):
               if not text:
                   return None
-              text = str(text).strip().replace(',', '').replace('%', '').replace(' ', '')
-              match = re.search(r'(-?\d+\.?\d*)', text)
-              if match:
-                  try:
-                      return float(match.group(1))
-                  except:
-                      pass
-              return None
+              text = str(text).strip().replace(',', '').replace('%', '')
+              m = re.search(r'(-?\d+\.?\d*)', text)
+              return float(m.group(1)) if m else None
           
-          def scrape_investing_com(url, currency_code, indicator_name):
-              print(f"    → Fallback: Investing.com for {currency_code}...")
+          def scrape_country_page(country_slug, indicator_page, currency_code):
+              url = f'https://tradingeconomics.com/{country_slug}/{indicator_page}'
               try:
-                  response = requests.get(url, headers=HEADERS, timeout=20)
-                  if not response.ok:
+                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  if not r.ok:
                       return None
                   
-                  soup = BeautifulSoup(response.content, 'lxml')
+                  soup = BeautifulSoup(r.content, 'lxml')
                   
-                  # Method 1: dt/dd pairs
-                  dts = soup.find_all('dt')
-                  dds = soup.find_all('dd')
-                  for i, dt in enumerate(dts):
-                      if 'actual' in dt.get_text(strip=True).lower() and i < len(dds):
-                          value = clean_number(dds[i].get_text(strip=True))
-                          if value is not None:
-                              print(f"    ✅ {currency_code}: {value} (Investing.com)")
-                              return value
-                  
-                  # Method 2: Search text patterns
-                  all_elements = soup.find_all(text=re.compile(r'-?\d+\.?\d*%'))
-                  for elem in all_elements[:10]:
-                      parent_text = elem.parent.get_text(strip=True).lower() if elem.parent else ''
-                      if 'actual' in parent_text:
-                          value = clean_number(elem)
-                          if value is not None and -100 <= value <= 1000:
-                              print(f"    ✅ {currency_code}: {value} (Investing.com)")
-                              return value
-                  
+                  # Find table with "Actual" column
+                  for table in soup.find_all('table'):
+                      headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
+                      if 'actual' in headers:
+                          idx = headers.index('actual')
+                          rows = table.find_all('tr')[1:]
+                          if rows:
+                              cells = rows[0].find_all('td')
+                              if len(cells) > idx:
+                                  val = clean_num(cells[idx].get_text(strip=True))
+                                  if val is not None:
+                                      print(f"    ✅ {currency_code}: {val} (country page)")
+                                      return val
                   return None
-              except Exception as e:
-                  print(f"    ❌ Investing.com error: {e}")
+              except:
                   return None
           
-          def parse_trade_balance(cols, currency_code):
+          def parse_tb(cols):
               if len(cols) < 5:
                   return None
-              value = clean_number(cols[1].get_text(strip=True))
-              unit_text = cols[4].get_text(strip=True)
-              if value is None:
+              val = clean_num(cols[1].get_text(strip=True))
+              unit = cols[4].get_text(strip=True)
+              if val is None:
                   return None
-              
-              scale = 1000 if 'billion' in unit_text.lower() else 1
-              source_curr = next((c for c in CURRENCIES if c in unit_text.upper()), 'USD')
-              value_millions = value * scale
-              
-              if source_curr != 'USD':
-                  fx = exchange_rates.get(source_curr, 1)
-                  value_millions = value_millions / fx if fx else value_millions
-              
-              return round(value_millions, 2)
+              scale = 1000 if 'billion' in unit.lower() else 1
+              curr = next((c for c in CURRENCIES if c in unit.upper()), 'USD')
+              val_m = val * scale
+              if curr != 'USD':
+                  fx = exchange_rates.get(curr, 1)
+                  val_m = val_m / fx if fx else val_m
+              return round(val_m, 2)
           
-          def scrape_trading_economics(url, indicator_name):
-              print(f"\n{'='*60}")
-              print(f"SCRAPING: {indicator_name.upper()}")
-              print(f"{'='*60}")
+          def scrape_te(url, indicator):
+              print(f"\n{'='*50}")
+              print(f"SCRAPING: {indicator.upper()}")
+              print(f"{'='*50}")
               
               try:
-                  response = requests.get(url, headers=HEADERS, timeout=20)
-                  response.raise_for_status()
-                  soup = BeautifulSoup(response.content, 'lxml')
+                  r = requests.get(url, headers=HEADERS, timeout=20)
+                  r.raise_for_status()
+                  soup = BeautifulSoup(r.content, 'lxml')
                   
                   data = {}
                   table = soup.find('table', {'class': 'table'})
@@ -179,93 +156,86 @@ jobs:
                       if len(cols) < 2:
                           continue
                       
-                      country_text = cols[0].get_text(strip=True)
+                      ctry = cols[0].get_text(strip=True)
                       
-                      for currency_code, country_names in COUNTRY_NAMES.items():
-                          if any(name.lower() in country_text.lower() for name in country_names):
-                              if indicator_name == 'tradeBalance':
-                                  value = parse_trade_balance(cols, currency_code)
-                              else:
-                                  value = clean_number(cols[1].get_text(strip=True))
-                              
-                              if value is not None:
-                                  data[currency_code] = round(value, 2)
-                                  print(f"  ✓ {currency_code}: {value}")
+                      for code, names in COUNTRY_NAMES.items():
+                          if any(n.lower() in ctry.lower() for n in names):
+                              val = parse_tb(cols) if indicator == 'tradeBalance' else clean_num(cols[1].get_text(strip=True))
+                              if val is not None:
+                                  data[code] = round(val, 2)
+                                  print(f"  ✓ {code}: {val}")
                               break
                   
                   return data
               except Exception as e:
-                  print(f"  ❌ Error: {e}")
+                  print(f"  ❌ {e}")
                   return {}
           
-          def scrape_with_fallback(indicator_name, te_url):
-              data = scrape_trading_economics(te_url, indicator_name)
+          def scrape_fallback(indicator, url):
+              data = scrape_te(url, indicator)
               missing = [c for c in CURRENCIES if c not in data]
               
-              if missing and indicator_name in INVESTING_FALLBACK_URLS:
-                  print(f"\n  → Trying fallback for: {', '.join(missing)}")
-                  for currency_code in missing:
-                      url = INVESTING_FALLBACK_URLS[indicator_name].get(currency_code)
-                      if url:
-                          value = scrape_investing_com(url, currency_code, indicator_name)
-                          if value is not None:
-                              data[currency_code] = value
+              if missing and indicator in INDICATOR_PAGES:
+                  print(f"\n  → Country page fallback for: {', '.join(missing)}")
+                  page = INDICATOR_PAGES[indicator]
+                  
+                  for code in missing:
+                      slug = COUNTRY_URLS.get(code)
+                      if slug:
+                          val = scrape_country_page(slug, page, code)
+                          if val is not None:
+                              data[code] = val
                           time.sleep(1)
               
               return data
           
-          def load_cot_data():
+          def load_cot():
               import os
-              cot_data = {}
+              cot = {}
               if not os.path.exists('cot-data'):
                   return {}
-              
-              for curr in ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']:
-                  filepath = f'cot-data/{curr}.json'
-                  if os.path.exists(filepath):
+              for c in ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']:
+                  fp = f'cot-data/{c}.json'
+                  if os.path.exists(fp):
                       try:
-                          with open(filepath) as f:
-                              cot_data[curr] = json.load(f).get('netPosition')
+                          with open(fp) as f:
+                              cot[c] = json.load(f).get('netPosition')
                       except:
                           pass
-              return cot_data
+              return cot
           
           # MAIN
-          print("="*60)
-          print("HYBRID ECONOMIC DATA SCRAPER")
-          print("="*60)
+          print("="*50)
+          print("ECONOMIC DATA SCRAPER - FINAL")
+          print("="*50)
           
-          fetch_exchange_rates()
-          
+          fetch_fx()
           all_data = {c: {} for c in CURRENCIES}
           
-          for indicator_key, url in TRADING_ECONOMICS_URLS.items():
-              indicator_data = scrape_with_fallback(indicator_key, url)
-              for currency_code, value in indicator_data.items():
-                  all_data[currency_code][indicator_key] = value
+          for ind, url in TRADING_ECONOMICS_URLS.items():
+              ind_data = scrape_fallback(ind, url)
+              for code, val in ind_data.items():
+                  all_data[code][ind] = val
               time.sleep(2)
           
-          cot_data = load_cot_data()
-          for currency_code, value in cot_data.items():
-              all_data[currency_code]['cotPositioning'] = value
+          cot_data = load_cot()
+          for code, val in cot_data.items():
+              all_data[code]['cotPositioning'] = val
           
           # Save
           today = str(date.today())
-          for currency in CURRENCIES:
-              data_package = {
+          for curr in CURRENCIES:
+              pkg = {
                   'lastUpdate': today,
-                  'source': 'TradingEconomics + Investing.com',
-                  'data': all_data[currency]
+                  'source': 'TradingEconomics + COT',
+                  'data': all_data[curr]
               }
-              with open(f'economic-data/{currency}.json', 'w') as f:
-                  json.dump(data_package, f, indent=2)
+              with open(f'economic-data/{curr}.json', 'w') as f:
+                  json.dump(pkg, f, indent=2)
               
               missing = [k for k in ['retailSales', 'wageGrowth', 'manufacturingPMI'] 
-                        if all_data[currency].get(k) is None]
-              if missing:
-                  print(f"⚠️  {currency}: Missing {', '.join(missing)}")
-              else:
-                  print(f"✅ {currency}: Complete")
+                        if all_data[curr].get(k) is None]
+              print(f"{'✅' if not missing else '⚠️ '} {curr}: {'Complete' if not missing else 'Missing ' + ', '.join(missing)}")
           
           print("\n✅ COMPLETED")
           EOFPYTHON
@@ -278,7 +248,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "📊 Economic data (hybrid) $(date +'%Y-%m-%d')"
+            git commit -m "📊 Economic data $(date +'%Y-%m-%d')"
             git pull --rebase origin main || true
             git push
           fi
