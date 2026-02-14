@@ -1940,27 +1940,39 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
                 }
                 break;
             
-            case 'moderate_bullish':
-                // Para COT - alcista moderado es mejor, extremos son malos
-                const absValue = Math.abs(value);
-                
-                if (value > 20000) {
-                    // Extremadamente alcista = saturado = malo
-                    score = Math.max(0, 40 - ((value - 20000) / 20000) * 40);
-                } else if (value > 5000) {
-                    // Moderadamente alcista = óptimo
-                    score = 70 + ((15000 - Math.abs(value - 10000)) / 10000) * 30;
-                } else if (value > -5000) {
-                    // Neutral = aceptable
-                    score = 50 + (value / 5000) * 20;
-                } else if (value > -20000) {
-                    // Moderadamente bajista = malo
-                    score = 30 + ((value + 20000) / 15000) * 20;
-                } else {
-                    // Extremadamente bajista = oversold = puede ser oportunidad
-                    score = 50 - ((Math.abs(value) - 20000) / 20000) * 20;
-                }
-                break;
+case 'moderate_bullish':
+    // COT Positioning: Valores positivos = bullish (buenos), negativos = bearish (malos)
+    // La "moderación" se refiere a evitar extremos de saturación
+    
+    if (value > 30000) {
+        // Extremadamente alcista = posible saturación, pero sigue siendo bullish
+        score = 85 - ((value - 30000) / 20000) * 15; // 85-70
+    } else if (value > 15000) {
+        // Fuertemente alcista = muy bueno
+        score = 95 - ((value - 15000) / 15000) * 10; // 95-85
+    } else if (value > 5000) {
+        // Moderadamente alcista = óptimo (zona dorada)
+        score = 100 - ((value - 5000) / 10000) * 5; // 100-95
+    } else if (value > 0) {
+        // Ligeramente alcista = bueno pero débil
+        score = 70 + (value / 5000) * 30; // 70-100
+    } else if (value === 0) {
+        // Neutral = punto medio
+        score = 50;
+    } else if (value > -5000) {
+        // Ligeramente bajista = malo
+        score = 30 + ((value + 5000) / 5000) * 20; // 30-50
+    } else if (value > -15000) {
+        // Moderadamente bajista = muy malo
+        score = 15 + ((value + 15000) / 10000) * 15; // 15-30
+    } else if (value > -30000) {
+        // Fuertemente bajista = pésimo
+        score = 5 + ((value + 30000) / 15000) * 10; // 5-15
+    } else {
+        // Extremadamente bajista = capitulación (oversold extremo, puede rebotar)
+        score = Math.max(0, 20 - ((Math.abs(value) - 30000) / 20000) * 15); // 20-5
+    }
+    break;
         }
         
         return score;
@@ -2321,7 +2333,7 @@ const indicatorTooltips = {
     retailSales: "Cambio mensual en ventas minoristas. >0.5% indica consumo robusto.",
     wageGrowth: "Crecimiento salarial anual. >3.5% presiona inflación al alza.",
     manufacturingPMI: "Índice de actividad manufacturera. >50 = expansión, <50 = contracción.",
-    cotPositioning: "Posicionamiento neto de traders especulativos. Positivo = bullish, Negativo = bearish."
+    cotPositioning: "Posicionamiento neto de traders especulativos según reporte CFTC. Valores positivos indican contratos largos netos (bullish), valores negativos indican cortos netos (bearish). >20K o <-20K pueden indicar extremos de mercado."
 };
 
         // ========== COMPONENTE PRINCIPAL ==========
@@ -2893,24 +2905,28 @@ const generateAnalysis = (currency, forexRates, economicData) => {
         }
     }
 
-    // 8. ANÁLISIS DE POSICIONAMIENTO ESPECULATIVO (COT)
-    if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
-        const cotK = (data.cotPositioning / 1000).toFixed(0);
-        
-        if (data.cotPositioning > 20000) {
-            analysis.push(`Posicionamiento especulativo extremadamente alcista (${cotK}K contratos netos) sugiere saturación y riesgo de corrección.`);
-        } else if (data.cotPositioning > 10000) {
-            analysis.push(`Traders especulativos fuertemente posicionados al alza (${cotK}K contratos) respalda tendencia alcista.`);
-        } else if (data.cotPositioning < -20000) {
-            analysis.push(`Posicionamiento bajista extremo (${cotK}K contratos) podría catalizar rebote técnico si fundamentos mejoran.`);
-        } else if (data.cotPositioning < -10000) {
-            analysis.push(`Sentimiento especulativo negativo (${cotK}K contratos) amplifica presión vendedora.`);
-        } else if (data.cotPositioning > 0) {
-            analysis.push(`Posicionamiento especulativo moderadamente alcista (${cotK}K contratos) alineado con tendencia.`);
-        } else {
-            analysis.push(`Posicionamiento especulativo moderadamente bajista (${cotK}K contratos) refleja cautela del mercado.`);
-        }
+// 8. ANÁLISIS DE POSICIONAMIENTO ESPECULATIVO (COT)
+if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
+    const cotK = (data.cotPositioning / 1000).toFixed(1);
+    
+    if (data.cotPositioning > 30000) {
+        analysis.push(`Posicionamiento especulativo extremadamente alcista (+${cotK}K contratos netos) sugiere saturación del mercado y riesgo elevado de toma de ganancias.`);
+    } else if (data.cotPositioning > 15000) {
+        analysis.push(`Fuerte posicionamiento alcista de traders especulativos (+${cotK}K contratos) respalda momentum alcista, aunque con posible resistencia cerca.`);
+    } else if (data.cotPositioning > 5000) {
+        analysis.push(`Posicionamiento moderadamente alcista (+${cotK}K contratos) refleja confianza del mercado y sostiene tendencia alcista.`);
+    } else if (data.cotPositioning > 0) {
+        analysis.push(`Leve sesgo alcista en posicionamiento especulativo (+${cotK}K contratos) indica cautela pero con tendencia positiva.`);
+    } else if (data.cotPositioning > -5000) {
+        analysis.push(`Posicionamiento ligeramente bajista (${cotK}K contratos) refleja cautela y presión vendedora moderada.`);
+    } else if (data.cotPositioning > -15000) {
+        analysis.push(`Sentimiento bajista entre especuladores (${cotK}K contratos netos) amplifica presión vendedora y debilita soporte técnico.`);
+    } else if (data.cotPositioning > -30000) {
+        analysis.push(`Fuerte posicionamiento bajista (${cotK}K contratos) señala convicción vendedora y riesgo de continuidad bajista.`);
+    } else {
+        analysis.push(`Posicionamiento bajista extremo (${cotK}K contratos) sugiere posible capitulación; podría catalizar rebote técnico si fundamentos cambian.`);
     }
+}
     
     // 9. CONCLUSIÓN PROSPECTIVA
     if (sentiment === 'alcista') {
