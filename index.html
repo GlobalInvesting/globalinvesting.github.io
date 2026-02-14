@@ -2671,34 +2671,45 @@ const getHeatmapColor = (value, type) => {
                         }
                         break;
                     
-                    case 'cotPositioning':
-    // ✅ FIX: Corrección para USD negativo
+case 'cotPositioning':
+    // Posicionamiento COT: Positivo = Bullish (Verde), Negativo = Bearish (Rojo)
     if (value > 20000) {
-        intensity = Math.min((value - 20000) / 20000, 1);
-        isPositive = false;
-    } else if (value > 5000) {
+        // Extremadamente alcista = verde fuerte (puede estar sobrecomprado pero sigue siendo bullish)
+        intensity = 0.8;
+        isPositive = true;
+    } else if (value > 10000) {
+        // Fuertemente alcista = verde medio-fuerte
         intensity = 0.7;
         isPositive = true;
-    } else if (value > -5000) {
-        // ✅ CRÍTICO: Si está entre -5K y +5K pero es negativo, debe ser rojo
-        if (value < 0) {
-            intensity = 0.4;
-            isPositive = false;
-        } else if (value > 0) {
-            intensity = 0.3;
-            isPositive = true;
-        } else {
-            return 'var(--bg-card)';
-        }
-    } else if (value > -20000) {
-        intensity = 0.6;
-        isPositive = false;
-    } else {
+    } else if (value > 5000) {
+        // Moderadamente alcista = verde medio
         intensity = 0.5;
         isPositive = true;
+    } else if (value > 0) {
+        // Ligeramente alcista = verde débil
+        intensity = 0.3;
+        isPositive = true;
+    } else if (value === 0) {
+        // Neutral = sin color
+        return 'var(--bg-card)';
+    } else if (value > -5000) {
+        // Ligeramente bajista = rojo débil
+        intensity = 0.3;
+        isPositive = false;
+    } else if (value > -10000) {
+        // Moderadamente bajista = rojo medio
+        intensity = 0.5;
+        isPositive = false;
+    } else if (value > -20000) {
+        // Fuertemente bajista = rojo medio-fuerte
+        intensity = 0.7;
+        isPositive = false;
+    } else {
+        // Extremadamente bajista = rojo fuerte (oversold, puede rebotar)
+        intensity = 0.8;
+        isPositive = false;
     }
     break;
-     }
                 // Aplicar colores con intensidad
                 if (isPositive) {
                     if (intensity > 0.7) return '#26a69a';      // Verde fuerte
