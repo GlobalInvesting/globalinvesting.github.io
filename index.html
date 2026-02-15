@@ -1669,63 +1669,66 @@ const response = await fetchWithRetry(githubUrl, {
     mode: 'cors'
 }, 3);
                     
-                    if (response.ok) {
-                        const scrapedData = await response.json();
-                        
-                        if (scrapedData.data) {
-                            const data = scrapedData.data;
-                            
-                            economicData[country.code].gdp = data.gdp ? data.gdp / 1000 : null;
-                            currentStep++;
-                            
-                            economicData[country.code].gdpGrowth = data.gdpGrowth || null;
-                            currentStep++;
-                            
-                            economicData[country.code].inflation = data.inflation || null;
-                            currentStep++;
-                            
-                            economicData[country.code].unemployment = data.unemployment || null;
-                            currentStep++;
-                            
-                            economicData[country.code].currentAccount = data.currentAccount || null;
-                            currentStep++;
-                            
-                            economicData[country.code].debt = data.debt || null;
-                            currentStep++;
-                            
-                            economicData[country.code].tradeBalance = data.tradeBalance || null;
-                            currentStep++;
-                            
-                            setDataLoadingStatus({ 
-                                status: `${country.name}: Tasa de Interés...`, 
-                                progress: Math.round((currentStep / totalSteps) * 100) 
-                            });
-                            economicData[country.code].interestRate = await fetchInterestRate(country);
-                            currentStep++;
-                            
-                            economicData[country.code].production = data.production || null;
-currentStep++;
+if (response.ok) {
+    const scrapedData = await response.json();
+    
+    if (scrapedData.data) {
+        const data = scrapedData.data;
+        
+        economicData[country.code].gdp = data.gdp ? data.gdp / 1000 : null;
+        currentStep++;
+        
+        economicData[country.code].gdpGrowth = data.gdpGrowth || null;
+        currentStep++;
+        
+        economicData[country.code].inflation = data.inflation || null;
+        currentStep++;
+        
+        economicData[country.code].unemployment = data.unemployment || null;
+        currentStep++;
+        
+        economicData[country.code].currentAccount = data.currentAccount || null;
+        currentStep++;
+        
+        economicData[country.code].debt = data.debt || null;
+        currentStep++;
+        
+        economicData[country.code].tradeBalance = data.tradeBalance || null;
+        currentStep++;
+        
+        setDataLoadingStatus({ 
+            status: `${country.name}: Tasa de Interés...`, 
+            progress: Math.round((currentStep / totalSteps) * 100) 
+        });
+        economicData[country.code].interestRate = await fetchInterestRate(country);
+        currentStep++;
+        
+        economicData[country.code].production = data.production || null;
+        currentStep++;
 
-// ✅ NUEVOS INDICADORES CON DEBUG
-economicData[country.code].retailSales = data.retailSales !== undefined ? data.retailSales : null;
-console.log(`📊 ${country.code} Retail Sales: ${economicData[country.code].retailSales}`);
+        // ✅ EXTRAER TIMESTAMP DEL JSON
+        economicData[country.code].lastUpdate = scrapedData.lastUpdate || new Date().toISOString();
 
-economicData[country.code].wageGrowth = data.wageGrowth !== undefined ? data.wageGrowth : null;
-console.log(`💰 ${country.code} Wage Growth: ${economicData[country.code].wageGrowth}`);
+        // ✅ NUEVOS INDICADORES CON DEBUG
+        economicData[country.code].retailSales = data.retailSales !== undefined ? data.retailSales : null;
+        console.log(`📊 ${country.code} Retail Sales: ${economicData[country.code].retailSales}`);
 
-economicData[country.code].manufacturingPMI = data.manufacturingPMI !== undefined ? data.manufacturingPMI : null;
-console.log(`🏭 ${country.code} PMI: ${economicData[country.code].manufacturingPMI}`);
+        economicData[country.code].wageGrowth = data.wageGrowth !== undefined ? data.wageGrowth : null;
+        console.log(`💰 ${country.code} Wage Growth: ${economicData[country.code].wageGrowth}`);
 
-// COT se carga desde archivo separado después
-economicData[country.code].cotPositioning = data.cotPositioning !== undefined ? data.cotPositioning : null;
+        economicData[country.code].manufacturingPMI = data.manufacturingPMI !== undefined ? data.manufacturingPMI : null;
+        console.log(`🏭 ${country.code} PMI: ${economicData[country.code].manufacturingPMI}`);
 
-console.log(`✅ Loaded all data for ${country.code}`);
-                        } else {
-                            console.error(`❌ No data field in scraped file for ${country.code}`);
-                        }
-                    } else {
-                        console.error(`❌ Failed to fetch scraped data for ${country.code}`);
-                    }
+        // COT se carga desde archivo separado después
+        economicData[country.code].cotPositioning = data.cotPositioning !== undefined ? data.cotPositioning : null;
+
+        console.log(`✅ Loaded all data for ${country.code}`);
+    } else {
+        console.error(`❌ No data field in scraped file for ${country.code}`);
+    }
+} else {
+    console.error(`❌ Failed to fetch scraped data for ${country.code}`);
+}
                     
 // CARGAR DATOS COT (archivo separado)
                     try {
@@ -1736,13 +1739,25 @@ const cotResponse = await fetchWithRetry(cotUrl, {
     mode: 'cors'
 }, 2); // Solo 2 intentos para COT (menos crítico)
                         
-                        if (cotResponse.ok) {
-                            const cotData = await cotResponse.json();
-                            if (cotData.netPosition !== null && cotData.netPosition !== undefined) {
-                                economicData[country.code].cotPositioning = cotData.netPosition;
-                                console.log(`✅ Loaded COT for ${country.code}: ${cotData.positioning}`);
-                            }
-                        }
+if (cotResponse.ok) {
+    const cotData = await cotResponse.json();
+    if (cotData.netPosition !== null && cotData.netPosition !== undefined) {
+        economicData[country.code].cotPositioning = cotData.netPosition;
+        
+        // ✅ Actualizar timestamp si COT es más reciente
+        if (cotData.lastUpdate) {
+            const currentTimestamp = new Date(economicData[country.code].lastUpdate || 0);
+            const cotTimestamp = new Date(cotData.lastUpdate);
+            
+            if (cotTimestamp < currentTimestamp) {
+                // Si COT es más antiguo, usar ese timestamp como referencia
+                economicData[country.code].lastUpdate = cotData.lastUpdate;
+            }
+        }
+        
+        console.log(`✅ Loaded COT for ${country.code}: ${cotData.positioning}`);
+    }
+}
                     } catch (error) {
                         if (error.name !== 'AbortError') {
                             console.warn(`No COT data for ${country.code}`);
