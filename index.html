@@ -1584,50 +1584,136 @@ const baseStrength = strengthObj.score || 50;  // ✅
             return historical;
         };
 
-const generateDynamicAlerts = (economicData, forexRates, calendar) => {
-    const cacheKey = 'dynamic_alerts';
+const generateForexPairRecommendations = (economicData, forexRates) => {
+    const cacheKey = 'forex_pair_recommendations';
     const cached = CacheManager.get(cacheKey);
     if (cached !== null) return cached;
 
-    const alerts = [];
+    // Calcular fortaleza de todas las divisas
+    const strengthScores = {};
+    countries.forEach(country => {
+        const data = economicData[country.code] || {};
+        const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
+        strengthScores[country.code] = {
+            score: strengthObj.score,
+            dataQuality: strengthObj.dataQuality,
+            contributions: strengthObj.contributions
+        };
+    });
 
-    if (calendar?.length > 0) {
-        const highImpactEvents = calendar.filter(e => e.impact === 'high').slice(0, 3);
-        highImpactEvents.forEach(event => {
-            alerts.push({
-                type: 'warning',
-                icon: '⚠️',
-                title: `Alerta de Volatilidad - ${event.country}`,
-                message: `${event.event} programado para ${event.date} a las ${event.time}. Alto impacto esperado.`
+    // Función auxiliar para extraer top contribuciones
+    const getTopContributions = (contributions, isPositive) => {
+        const entries = Object.entries(contributions)
+            .filter(([key, val]) => isPositive ? val > 0 : val < 0)
+            .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+            .slice(0, 3);
+        
+        const labels = {
+            'interestRate': 'Tasa de Interés',
+            'currentAccount': 'Cuenta Corriente',
+            'tradeBalance': 'Balanza Comercial',
+            'gdpGrowth': 'Crecimiento PIB',
+            'inflation': 'Inflación',
+            'unemployment': 'Desempleo',
+            'safe_haven_score': 'Safe Haven',
+            'carry_premium': 'Carry Premium',
+            'commodity_exposure': 'Exposición Commodities',
+            'debt_sustainability': 'Sostenibilidad Deuda',
+            'cotPositioning': 'Posicionamiento COT'
+        };
+        
+        return entries.map(([key, val]) => ({
+            factor: labels[key] || key,
+            impact: val.toFixed(1)
+        }));
+    };
+
+    // Ordenar divisas por fortaleza
+    const sortedCurrencies = Object.entries(strengthScores)
+        .sort((a, b) => b[1].score - a[1].score);
+
+    const recommendations = [];
+
+    // Top 3 más fuertes y 3 más débiles
+    const strongCurrencies = sortedCurrencies.slice(0, 3);
+    const weakCurrencies = sortedCurrencies.slice(-3).reverse();
+
+    // Generar combinaciones LONG (Comprar fuerte vs débil)
+    strongCurrencies.forEach(([strongCurr, strongData]) => {
+        weakCurrencies.forEach(([weakCurr, weakData]) => {
+            if (strongCurr === weakCurr) return;
+
+            const spreadStrength = strongData.score - weakData.score;
+            const pairName = `${strongCurr}/${weakCurr}`;
+            
+            const strongReasons = getTopContributions(strongData.contributions, true);
+            const weakReasons = getTopContributions(weakData.contributions, false);
+
+            const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
+            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
+
+            recommendations.push({
+                type: 'long',
+                pair: pairName,
+                direction: 'LONG',
+                actionText: 'Comprar',
+                strength: strongData.score,
+                weakness: weakData.score,
+                spread: spreadStrength,
+                confidence: confidence,
+                dataQuality: avgQuality,
+                strongCurrency: strongCurr,
+                weakCurrency: weakCurr,
+                strongReasons: strongReasons,
+                weakReasons: weakReasons,
+                priority: spreadStrength * avgQuality
             });
         });
-    }
+    });
 
-    Object.keys(economicData).forEach(currency => {
-        const data = economicData[currency];
-        
-        // ✅ CORRECCIÓN: Extraer score del objeto
-        const strengthObj = calculateStrength(currency, data, forexRates, economicData);
-        const strength = strengthObj.score;
-        
-        if (strength >= 75) {
-            alerts.push({
-                type: 'success',
-                icon: '✓',
-                title: `Fortaleza Destacada - ${currency}`,
-                message: `${currency} mantiene fortaleza superior a 75 puntos (${strength}).`
+    // Generar combinaciones SHORT (Vender débil vs fuerte)
+    weakCurrencies.forEach(([weakCurr, weakData]) => {
+        strongCurrencies.forEach(([strongCurr, strongData]) => {
+            if (weakCurr === strongCurr) return;
+
+            const spreadStrength = strongData.score - weakData.score;
+            const pairName = `${weakCurr}/${strongCurr}`;
+            
+            const weakReasons = getTopContributions(weakData.contributions, false);
+            const strongReasons = getTopContributions(strongData.contributions, true);
+
+            const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
+            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
+
+            recommendations.push({
+                type: 'short',
+                pair: pairName,
+                direction: 'SHORT',
+                actionText: 'Vender',
+                strength: strongData.score,
+                weakness: weakData.score,
+                spread: spreadStrength,
+                confidence: confidence,
+                dataQuality: avgQuality,
+                strongCurrency: strongCurr,
+                weakCurrency: weakCurr,
+                weakReasons: weakReasons,
+                strongReasons: strongReasons,
+                priority: spreadStrength * avgQuality
             });
-        }
+        });
     });
 
-    const sortedAlerts = alerts.sort((a, b) => {
-        const priority = { warning: 3, success: 2, info: 1 };
-        return (priority[b.type] || 0) - (priority[a.type] || 0);
-    });
+    // Ordenar por prioridad y tomar top 8
+    recommendations.sort((a, b) => b.priority - a.priority);
+    
+    const longRecs = recommendations.filter(r => r.type === 'long').slice(0, 4);
+    const shortRecs = recommendations.filter(r => r.type === 'short').slice(0, 4);
+    
+    const finalRecommendations = [...longRecs, ...shortRecs];
 
-    const finalAlerts = sortedAlerts.slice(0, 8);
-    CacheManager.set(cacheKey, finalAlerts, CACHE_CONFIG.ALERTS);
-    return finalAlerts;
+    CacheManager.set(cacheKey, finalRecommendations, CACHE_CONFIG.ALERTS);
+    return finalRecommendations;
 };
 
 const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
@@ -3162,9 +3248,9 @@ const hasCOTData = () => {
                         const historical = await generateHistoricalData(loadedData, setDataLoadingStatus);
                         setHistoricalData(historical);
 
-                        setDataLoadingStatus({ status: 'Generando alertas...', progress: 98 });
-                        const alerts = generateDynamicAlerts(loadedData, rates, calendar);
-                        setDynamicAlerts(alerts);
+                        setDataLoadingStatus({ status: 'Generando recomendaciones de pares...', progress: 98 });
+                        const pairRecommendations = generateForexPairRecommendations(loadedData, rates);
+setDynamicAlerts(pairRecommendations);
 
                         setDataLoadingStatus({ status: 'Completado', progress: 100 });
                         setIsLoading(false);
@@ -3412,7 +3498,7 @@ const DataHealthCheck = ({ economicData }) => {
                         <button className={`nav-tab ${activeTab === 'heatmap' ? 'active' : ''}`} onClick={() => setActiveTab('heatmap')}>Mapa de Calor</button>
                         <button className={`nav-tab ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => setActiveTab('trends')}>Tendencias Históricas</button>
                         <button className={`nav-tab ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>Calendario Económico</button>
-                        <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Alertas</button>
+                        <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Mejores Pares</button>
                     </div>
 
                     <div className="content">
@@ -3786,29 +3872,237 @@ const sentiment = getSentiment(strength);
                             </div>
                         )}
 
-                        {activeTab === 'alerts' && (
-                            <div>
-                                <div className="section-header">
-                                    <div className="section-title">Alertas y Notificaciones</div>
+{activeTab === 'alerts' && (
+    <div>
+        <div className="section-header">
+            <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
+            <div className="section-meta">Basado en diferenciales de fortaleza fundamental</div>
+        </div>
+        
+        <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+            gap: '1.5rem' 
+        }}>
+            {dynamicAlerts.map((rec, index) => (
+                <div key={index} className="currency-card" style={{
+                    borderLeft: `4px solid ${rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'}`
+                }}>
+                    <div className="card-header" style={{ 
+                        background: rec.type === 'long' ? 'rgba(38, 166, 154, 0.1)' : 'rgba(239, 83, 80, 0.1)' 
+                    }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ 
+                                fontSize: '1.5rem', 
+                                fontWeight: 700, 
+                                marginBottom: '0.5rem',
+                                color: 'var(--text-primary)'
+                            }}>
+                                {rec.pair}
+                            </div>
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '1rem' 
+                            }}>
+                                <span className={`sentiment-badge sentiment-${rec.type === 'long' ? 'alcista' : 'bajista'}`}>
+                                    {rec.direction} - {rec.actionText}
+                                </span>
+                                <span style={{ 
+                                    fontSize: '0.875rem', 
+                                    color: 'var(--text-secondary)' 
+                                }}>
+                                    Confianza: {rec.confidence}
+                                </span>
+                            </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ 
+                                fontSize: '2rem', 
+                                fontWeight: 700,
+                                color: rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'
+                            }}>
+                                {rec.spread.toFixed(1)}
+                            </div>
+                            <div style={{ 
+                                fontSize: '0.75rem', 
+                                color: 'var(--text-tertiary)' 
+                            }}>
+                                Diferencial
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="card-body">
+                        {/* Fortalezas */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: '0.75rem' 
+                            }}>
+                                <div style={{ 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 600, 
+                                    color: 'var(--text-tertiary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    Fortaleza: {rec.strongCurrency}
                                 </div>
-                                <div className="alerts-container">
-                                    {dynamicAlerts.map((alert, index) => (
-                                        <div key={index} className={`alert-card alert-${alert.type}`}>
-                                            <div className="alert-icon" style={{ 
-                                                background: alert.type === 'warning' ? 'rgba(255, 111, 0, 0.3)' : alert.type === 'success' ? 'rgba(38, 166, 154, 0.3)' : 'rgba(30, 136, 229, 0.3)',
-                                                color: alert.type === 'warning' ? 'var(--orange)' : alert.type === 'success' ? 'var(--green-strong)' : 'var(--blue)'
-                                            }}>
-                                                {alert.icon}
-                                            </div>
-                                            <div className="alert-content">
-                                                <h3>{alert.title}</h3>
-                                                <p>{alert.message}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div style={{ 
+                                    fontSize: '1rem', 
+                                    fontWeight: 700,
+                                    color: 'var(--green-strong)'
+                                }}>
+                                    {rec.strength.toFixed(1)}
                                 </div>
                             </div>
-                        )}
+                            <div style={{ 
+                                background: 'var(--bg-elevated)', 
+                                padding: '0.75rem', 
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                {rec.strongReasons.length > 0 ? (
+                                    rec.strongReasons.map((reason, i) => (
+                                        <div key={i} style={{ 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between',
+                                            fontSize: '0.8125rem',
+                                            padding: '0.25rem 0',
+                                            color: 'var(--text-secondary)'
+                                        }}>
+                                            <span>• {reason.factor}</span>
+                                            <span style={{ 
+                                                color: 'var(--green-strong)',
+                                                fontWeight: 600 
+                                            }}>
+                                                +{reason.impact}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div style={{ 
+                                        fontSize: '0.8125rem',
+                                        color: 'var(--text-tertiary)',
+                                        fontStyle: 'italic'
+                                    }}>
+                                        Datos insuficientes
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Debilidades */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: '0.75rem' 
+                            }}>
+                                <div style={{ 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 600, 
+                                    color: 'var(--text-tertiary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    Debilidad: {rec.weakCurrency}
+                                </div>
+                                <div style={{ 
+                                    fontSize: '1rem', 
+                                    fontWeight: 700,
+                                    color: 'var(--red-strong)'
+                                }}>
+                                    {rec.weakness.toFixed(1)}
+                                </div>
+                            </div>
+                            <div style={{ 
+                                background: 'var(--bg-elevated)', 
+                                padding: '0.75rem', 
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                {rec.weakReasons.length > 0 ? (
+                                    rec.weakReasons.map((reason, i) => (
+                                        <div key={i} style={{ 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between',
+                                            fontSize: '0.8125rem',
+                                            padding: '0.25rem 0',
+                                            color: 'var(--text-secondary)'
+                                        }}>
+                                            <span>• {reason.factor}</span>
+                                            <span style={{ 
+                                                color: 'var(--red-strong)',
+                                                fontWeight: 600 
+                                            }}>
+                                                {reason.impact}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div style={{ 
+                                        fontSize: '0.8125rem',
+                                        color: 'var(--text-tertiary)',
+                                        fontStyle: 'italic'
+                                    }}>
+                                        Datos insuficientes
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Análisis */}
+                        <div style={{ 
+                            background: 'var(--bg-card)', 
+                            padding: '1rem', 
+                            borderRadius: '4px',
+                            borderLeft: `3px solid ${rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'}`,
+                            fontSize: '0.875rem',
+                            lineHeight: '1.6',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <strong style={{ color: 'var(--text-primary)' }}>Análisis:</strong> 
+                            {rec.type === 'long' ? (
+                                <span> {rec.strongCurrency} muestra fundamentos superiores con un índice de fortaleza de {rec.strength.toFixed(1)} puntos, superando a {rec.weakCurrency} ({rec.weakness.toFixed(1)}) por un diferencial de {rec.spread.toFixed(1)} puntos. Este diferencial sugiere una oportunidad de compra (LONG) en {rec.pair}.</span>
+                            ) : (
+                                <span> {rec.weakCurrency} registra debilidad fundamental con {rec.weakness.toFixed(1)} puntos frente a la fortaleza de {rec.strongCurrency} ({rec.strength.toFixed(1)}), generando un diferencial de {rec.spread.toFixed(1)} puntos. Esto indica una oportunidad de venta (SHORT) en {rec.pair}.</span>
+                            )}
+                        </div>
+
+                        {/* Data Quality Indicator */}
+                        <div style={{ 
+                            marginTop: '1rem',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-tertiary)',
+                            textAlign: 'center'
+                        }}>
+                            Calidad de datos: {(rec.dataQuality * 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        {/* Disclaimer */}
+        <div style={{ 
+            marginTop: '2rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            padding: '1.25rem',
+            fontSize: '0.8125rem',
+            lineHeight: '1.6',
+            color: 'var(--text-secondary)'
+        }}>
+            <strong style={{ color: 'var(--text-primary)' }}>⚠️ Aviso Importante:</strong> Estas recomendaciones están basadas exclusivamente en análisis fundamental y no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos significativos. Considere análisis técnico, gestión de riesgo y consulte con un asesor financiero antes de operar.
+        </div>
+    </div>
+)}
 
 <div className="footer">
     <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX - DATA-DRIVEN</div>
