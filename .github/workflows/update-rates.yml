@@ -1,7 +1,7 @@
-name: Update Interest Rates (100% Web Scraping - No APIs)
+name: Update Interest Rates (100% Web Scraping + Dates)
 on:
   schedule:
-    - cron: '0 8 * * *'  # Daily at 8:00 AM UTC
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
@@ -30,17 +30,15 @@ jobs:
           from bs4 import BeautifulSoup
           import json
           import re
-          from datetime import date
+          from datetime import date, datetime
           import time
           
           HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              'Accept-Language': 'en-US,en;q=0.9',
           }
           
           def clean_rate(text):
-              """Extract and validate numeric rate"""
               if not text:
                   return None
               text = str(text).strip().replace('%', '').replace(',', '.')
@@ -54,8 +52,41 @@ jobs:
                       pass
               return None
           
+          def parse_date(date_text):
+              """Parse date from various formats"""
+              if not date_text:
+                  return str(date.today())
+              
+              date_text = date_text.strip()
+              
+              try:
+                  # Format: "Feb 2026" or "Feb/26"
+                  if re.search(r'[A-Za-z]{3}\s*[/\s]\s*\d{2,4}', date_text):
+                      match = re.search(r'([A-Za-z]{3})\s*[/\s]\s*(\d{2,4})', date_text)
+                      if match:
+                          month_str = match.group(1)
+                          year_str = match.group(2)
+                          if len(year_str) == 2:
+                              year_str = '20' + year_str
+                          dt = datetime.strptime(f"{month_str} {year_str}", '%b %Y')
+                          return dt.strftime('%Y-%m-15')
+                  
+                  # Format: "2026-01-29"
+                  if re.search(r'\d{4}-\d{2}-\d{2}', date_text):
+                      return date_text[:10]
+                  
+                  # Format: "January 29, 2026"
+                  if re.search(r'[A-Za-z]+\s+\d{1,2},?\s+\d{4}', date_text):
+                      dt = datetime.strptime(date_text, '%B %d, %Y')
+                      return dt.strftime('%Y-%m-%d')
+                  
+              except Exception as e:
+                  print(f"    Date parse error for '{date_text}': {e}")
+              
+              return str(date.today())
+          
           def fetch_trading_economics():
-              """Primary source: Trading Economics"""
+              """Primary source with date extraction"""
               print("\n" + "="*70)
               print("SOURCE 1: Trading Economics")
               print("="*70)
@@ -79,23 +110,34 @@ jobs:
                   
                   table = soup.find('table', {'class': 'table'})
                   if table:
+                      headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
+                      date_idx = None
+                      if 'reference' in headers:
+                          date_idx = headers.index('reference')
+                      
                       for row in table.find_all('tr')[1:]:
                           cols = row.find_all('td')
                           if len(cols) >= 2:
                               country = cols[0].get_text(strip=True)
                               rate_text = cols[1].get_text(strip=True)
                               
+                              # Extract date if available
+                              data_date = str(date.today())
+                              if date_idx and len(cols) > date_idx:
+                                  date_text = cols[date_idx].get_text(strip=True)
+                                  data_date = parse_date(date_text)
+                              
                               for country_name, currency in country_map.items():
                                   if country_name.lower() in country.lower():
                                       rate = clean_rate(rate_text)
                                       if rate is not None:
-                                          rates[currency] = rate
-                                          print(f"  ✓ {currency}: {rate}%")
+                                          rates[currency] = {
+                                              'value': rate,
+                                              'date': data_date,
+                                              'source': 'TradingEconomics'
+                                          }
+                                          print(f"  ✓ {currency}: {rate}% (date: {data_date})")
                                           break
-                  
-                  missing = [c for c in country_map.values() if c not in rates]
-                  if missing:
-                      print(f"  ⚠️  Missing: {', '.join(missing)}")
                   
                   return rates
                   
@@ -104,8 +146,7 @@ jobs:
                   return {}
           
           def fetch_global_rates(currency):
-              """Backup source: Global-Rates.com (individual pages)"""
-              
+              """Backup source with date extraction"""
               urls = {
                   'USD': 'central-bank-america/fed-interest-rate.aspx',
                   'EUR': 'central-bank-europe/ecb-interest-rate.aspx',
@@ -125,181 +166,63 @@ jobs:
                   r = requests.get(url, headers=HEADERS, timeout=10)
                   soup = BeautifulSoup(r.content, 'lxml')
                   
-                  # Method 1: Look for table with "Current" in it
-                  for table in soup.find_all('table'):
-                      for row in table.find_all('tr'):
-                          cells = row.find_all(['td', 'th'])
-                          if len(cells) >= 2:
-                              header = cells[0].get_text(strip=True).lower()
-                              if 'current' in header and 'rate' in header:
-                                  rate = clean_rate(cells[1].get_text(strip=True))
-                                  if rate:
-                                      return rate
+                  rate = None
+                  data_date = str(date.today())
                   
-                  # Method 2: Find first table, get second row, second column
-                  table = soup.find('table')
-                  if table:
+                  # Try to find table with current rate
+                  for table in soup.find_all('table'):
                       rows = table.find_all('tr')
                       if len(rows) >= 2:
+                          # First column might be date, second is rate
                           cols = rows[1].find_all('td')
                           if len(cols) >= 2:
+                              # Try second column as rate
                               rate = clean_rate(cols[1].get_text(strip=True))
                               if rate:
-                                  return rate
-                  
-                  # Method 3: Search entire page for rate pattern
-                  text = soup.get_text()
-                  patterns = [
-                      r'Current.*?rate.*?(\d+\.?\d*)%',
-                      r'interest rate.*?(\d+\.?\d*)%',
-                      r'(\d+\.?\d*)%.*?current'
-                  ]
-                  
-                  for pattern in patterns:
-                      match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-                      if match:
-                          rate = clean_rate(match.group(1))
-                          if rate:
-                              return rate
+                                  # Try first column as date
+                                  date_text = cols[0].get_text(strip=True)
+                                  data_date = parse_date(date_text)
+                                  return {
+                                      'value': rate,
+                                      'date': data_date,
+                                      'source': 'GlobalRates'
+                                  }
                   
               except Exception as e:
                   print(f"    Error fetching {currency}: {e}")
               
               return None
           
-          def fetch_investopedia_calendar():
-              """Alternative source: Investopedia Economic Calendar"""
-              print("\n" + "="*70)
-              print("SOURCE 3: Investopedia Economic Calendar")
-              print("="*70)
-              
-              try:
-                  url = "https://www.investopedia.com/economic-calendar/"
-                  r = requests.get(url, headers=HEADERS, timeout=15)
-                  soup = BeautifulSoup(r.content, 'lxml')
-                  
-                  rates = {}
-                  text = soup.get_text()
-                  
-                  # Look for interest rate mentions
-                  currency_patterns = {
-                      'USD': [r'(?:US|Fed|Federal).*?(?:rate|FFR).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?(?:Fed|Federal)'],
-                      'EUR': [r'(?:ECB|Euro).*?(?:rate).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?ECB'],
-                      'GBP': [r'(?:BoE|Bank.*?England).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?BoE'],
-                      'JPY': [r'(?:BoJ|Japan).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?BoJ'],
-                      'CAD': [r'(?:BoC|Canada).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?Canada'],
-                      'AUD': [r'(?:RBA|Australia).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?RBA'],
-                      'CHF': [r'(?:SNB|Swiss).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?SNB'],
-                      'NZD': [r'(?:RBNZ|New Zealand).*?(\d+\.?\d*)%', r'(\d+\.?\d*)%.*?(?:New Zealand|RBNZ)']
-                  }
-                  
-                  for currency, patterns in currency_patterns.items():
-                      for pattern in patterns:
-                          match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-                          if match:
-                              rate = clean_rate(match.group(1))
-                              if rate:
-                                  rates[currency] = rate
-                                  print(f"  ✓ {currency}: {rate}%")
-                                  break
-                      if currency in rates:
-                          break
-                  
-                  return rates
-                  
-              except Exception as e:
-                  print(f"  ❌ Error: {e}")
-                  return {}
-          
-          def fetch_myfxbook():
-              """Alternative: MyFxBook"""
-              print("\n" + "="*70)
-              print("SOURCE 4: MyFxBook")
-              print("="*70)
-              
-              try:
-                  url = "https://www.myfxbook.com/forex-economic-calendar/interest-rates"
-                  r = requests.get(url, headers=HEADERS, timeout=15)
-                  text = r.text
-                  
-                  rates = {}
-                  
-                  # Look for currency patterns in the page
-                  patterns = {
-                      'USD': r'(?:USD|US Dollar|United States).*?(\d+\.?\d*)%',
-                      'EUR': r'(?:EUR|Euro).*?(\d+\.?\d*)%',
-                      'GBP': r'(?:GBP|Pound|UK).*?(\d+\.?\d*)%',
-                      'JPY': r'(?:JPY|Yen|Japan).*?(\d+\.?\d*)%',
-                      'CAD': r'(?:CAD|Canadian|Canada).*?(\d+\.?\d*)%',
-                      'AUD': r'(?:AUD|Australian|Australia).*?(\d+\.?\d*)%',
-                      'CHF': r'(?:CHF|Swiss|Switzerland).*?(\d+\.?\d*)%',
-                      'NZD': r'(?:NZD|New Zealand|Kiwi).*?(\d+\.?\d*)%'
-                  }
-                  
-                  for currency, pattern in patterns.items():
-                      match = re.search(pattern, text, re.IGNORECASE)
-                      if match:
-                          rate = clean_rate(match.group(1))
-                          if rate:
-                              rates[currency] = rate
-                              print(f"  ✓ {currency}: {rate}%")
-                  
-                  return rates
-                  
-              except Exception as e:
-                  print(f"  ❌ Error: {e}")
-                  return {}
-          
           # ============================================
           # MAIN EXECUTION
           # ============================================
           
           print("\n" + "="*70)
-          print("FETCHING INTEREST RATES - 100% WEB SCRAPING")
+          print("FETCHING INTEREST RATES WITH DATES")
           print("="*70)
           
           final_rates = {}
           
-          # Source 1: Trading Economics (primary)
+          # Source 1: Trading Economics
           te_rates = fetch_trading_economics()
-          for curr, rate in te_rates.items():
-              if curr not in final_rates:
-                  final_rates[curr] = {'value': rate, 'source': 'TradingEconomics'}
+          final_rates.update(te_rates)
           
           time.sleep(1)
           
-          # Source 2: Global-Rates.com (for missing currencies)
-          missing = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
-          missing = [c for c in missing if c not in final_rates]
+          # Source 2: Global-Rates.com (for missing)
+          missing = [c for c in ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD'] if c not in final_rates]
           
           if missing:
               print("\n" + "="*70)
-              print(f"SOURCE 2: Global-Rates.com (for {', '.join(missing)})")
+              print(f"SOURCE 2: Global-Rates.com")
               print("="*70)
               
               for currency in missing:
-                  rate = fetch_global_rates(currency)
-                  if rate:
-                      final_rates[currency] = {'value': rate, 'source': 'GlobalRates'}
-                      print(f"  ✓ {currency}: {rate}%")
+                  result = fetch_global_rates(currency)
+                  if result:
+                      final_rates[currency] = result
+                      print(f"  ✓ {currency}: {result['value']}% (date: {result['date']})")
                   time.sleep(0.5)
-          
-          # Source 3: Investopedia (for still missing)
-          missing = [c for c in ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD'] if c not in final_rates]
-          if missing:
-              inv_rates = fetch_investopedia_calendar()
-              for curr, rate in inv_rates.items():
-                  if curr not in final_rates:
-                      final_rates[curr] = {'value': rate, 'source': 'Investopedia'}
-              time.sleep(1)
-          
-          # Source 4: MyFxBook (for still missing)
-          missing = [c for c in ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD'] if c not in final_rates]
-          if missing:
-              myfx_rates = fetch_myfxbook()
-              for curr, rate in myfx_rates.items():
-                  if curr not in final_rates:
-                      final_rates[curr] = {'value': rate, 'source': 'MyFxBook'}
           
           # Save results
           print("\n" + "="*70)
@@ -312,7 +235,7 @@ jobs:
               rate_data = {
                   'observations': [{
                       'value': data['value'],
-                      'date': today,
+                      'date': data.get('date', today),
                       'source': data['source']
                   }]
               }
@@ -320,54 +243,21 @@ jobs:
               with open(f'rates/{currency}.json', 'w') as f:
                   json.dump(rate_data, f, indent=2)
               
-              print(f"  💾 {currency}: {data['value']}% ({data['source']})")
+              print(f"  💾 {currency}: {data['value']}% (date: {data.get('date', today)}, source: {data['source']})")
           
           # Validation
-          print("\n" + "="*70)
-          print("VALIDATION")
-          print("="*70)
-          
           required = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
           missing = [c for c in required if c not in final_rates]
           
           if missing:
-              print(f"\n❌ MISSING CURRENCIES: {', '.join(missing)}")
-              print("\nWorkflow FAILED - incomplete data")
+              print(f"\n❌ MISSING: {', '.join(missing)}")
               exit(1)
           else:
-              print("\n✅ ALL 8 CURRENCIES FETCHED!")
-              print("\nFinal rates:")
-              for curr in required:
-                  data = final_rates[curr]
-                  print(f"  {curr}: {data['value']}% ({data['source']})")
+              print("\n✅ ALL 8 CURRENCIES FETCHED WITH DATES!")
           
           EOFPYTHON
           
           python fetch_rates.py
-      
-      - name: Display results
-        run: |
-          echo ""
-          echo "╔════════════════════════════════════════════════╗"
-          echo "║      FINAL RATES (100% WEB SCRAPING)           ║"
-          echo "╚════════════════════════════════════════════════╝"
-          echo ""
-          
-          for currency in USD EUR GBP JPY AUD CAD CHF NZD; do
-            if [ -f "rates/$currency.json" ]; then
-              echo "[$currency]"
-              python3 -c "
-          import json
-          with open('rates/$currency.json') as f:
-              data = json.load(f)
-              obs = data['observations'][0]
-              print(f\"  Rate: {obs['value']}%\")
-              print(f\"  Date: {obs['date']}\")
-              print(f\"  Source: {obs['source']}\")
-          "
-              echo ""
-            fi
-          done
       
       - name: Commit and push
         run: |
@@ -375,9 +265,9 @@ jobs:
           git config user.email github-actions@github.com
           git add rates/
           if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No changes"
           else
-            git commit -m "🔄 Auto-update rates $(date +'%Y-%m-%d %H:%M UTC') - 100% web scraping"
+            git commit -m "🔄 Rates $(date +'%Y-%m-%d') + dates"
             git pull --rebase origin main || true
             git push
           fi
