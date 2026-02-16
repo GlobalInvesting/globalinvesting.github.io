@@ -476,79 +476,79 @@
             font-weight: 400;
         }
 
-        /* Tooltips CORREGIDOS */
-        .tooltip-header {
-            position: relative;
-            cursor: help;
-        }
+/* Tooltips CORREGIDOS */
+.tooltip-header {
+    position: relative;
+    cursor: help;
+}
 
-        .tooltip-icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--blue);
-            color: white;
-            text-align: center;
-            line-height: 16px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-left: 6px;
-            cursor: help;
-            vertical-align: middle;
-            transition: all 0.2s ease;
-        }
+.tooltip-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: white;
+    text-align: center;
+    line-height: 16px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 6px;
+    cursor: help;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+}
 
-        .tooltip-icon:hover {
-            background: var(--green-strong);
-            transform: scale(1.15);
-        }
+.tooltip-icon:hover {
+    background: var(--green-strong);
+    transform: scale(1.15);
+}
 
-        .tooltip-box {
-            display: none;
-            position: fixed;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            padding: 1.25rem;
-            border-radius: 8px;
-            border: 2px solid var(--blue);
-            font-size: 0.8125rem;
-            line-height: 1.7;
-            width: 340px;
-            max-width: 90vw;
-            z-index: 99999;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
-            font-weight: 400;
-            text-align: left;
-            white-space: normal;
-            animation: tooltipFadeIn 0.3s ease;
-            pointer-events: none;
-        }
+.tooltip-box {
+    display: none;
+    position: fixed;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 2px solid var(--blue);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    width: 340px;
+    max-width: 90vw;
+    z-index: 99999;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+    animation: tooltipFadeIn 0.3s ease;
+    pointer-events: none;
+}
 
-        @keyframes tooltipFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .tooltip-box.visible {
-            display: block;
-        }
+.tooltip-box.visible {
+    display: block;
+}
 
-        .tooltip-box::before {
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 10px solid transparent;
-            border-bottom-color: var(--blue);
-        }
+.tooltip-box::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom-color: var(--blue);
+}
 
 .tooltip-box::after {
     content: '';
@@ -561,7 +561,7 @@
     margin-bottom: -1px;
 }
 
-/* Tooltip para celdas del heatmap */
+/* Tooltip para celdas del heatmap - FIXED */
 .heatmap-cell-tooltip {
     display: none;
     position: fixed;
@@ -571,7 +571,7 @@
     border-radius: 6px;
     border: 2px solid var(--blue);
     font-size: 0.75rem;
-    z-index: 99999;
+    z-index: 100000;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
     pointer-events: none;
     white-space: nowrap;
@@ -613,22 +613,28 @@
     color: var(--text-secondary);
 }
 
+/* CRÍTICO: Evitar que el hover afecte celdas adyacentes */
+.heatmap-table td {
+    position: relative;
+    isolation: isolate;
+}
+
 .heatmap-table td[data-has-date="true"] {
     cursor: help;
 }
 
-        .tooltip-header-title {
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: var(--blue);
-            font-size: 1rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
+.tooltip-header-title {
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--blue);
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
 
-        .tooltip-body {
-            color: var(--text-secondary);
-        }
+.tooltip-body {
+    color: var(--text-secondary);
+}
 
         /* Overall column styles */
         .overall-cell {
@@ -2777,116 +2783,134 @@ const indicatorTooltips = {
             };
 
 const HeatmapCell = ({ value, type, currency, indicator, lastUpdate }) => {
-                const [showTooltip, setShowTooltip] = React.useState(false);
-                const [position, setPosition] = React.useState({ x: 0, y: 0 });
-                const cellRef = React.useRef(null);
+    const cellRef = React.useRef(null);
+    const tooltipRef = React.useRef(null);
 
-                const handleMouseEnter = (e) => {
-                    if (!lastUpdate) return;
-                    
-                    const rect = e.target.getBoundingClientRect();
-                    const viewportWidth = window.innerWidth;
-                    let x = rect.left + rect.width / 2;
-                    
-                    // Ajustar si se sale del viewport
-                    const tooltipWidth = 200;
-                    if (x + tooltipWidth / 2 > viewportWidth) x = viewportWidth - tooltipWidth / 2 - 20;
-                    if (x - tooltipWidth / 2 < 0) x = tooltipWidth / 2 + 20;
-                    
-                    setPosition({ x, y: rect.top - 10 });
-                    setShowTooltip(true);
-                };
+    const handleMouseEnter = (e) => {
+        if (!lastUpdate || !tooltipRef.current) return;
+        
+        const rect = e.currentTarget.getBoundingClientRect();
+        const tooltip = tooltipRef.current;
+        
+        // Posicionar el tooltip
+        const tooltipWidth = 200;
+        const tooltipHeight = 60;
+        
+        let left = rect.left + rect.width / 2;
+        let top = rect.top - tooltipHeight - 10;
+        
+        // Ajustar si se sale del viewport
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        if (left + tooltipWidth / 2 > viewportWidth - 20) {
+            left = viewportWidth - tooltipWidth / 2 - 20;
+        }
+        if (left - tooltipWidth / 2 < 20) {
+            left = tooltipWidth / 2 + 20;
+        }
+        
+        // Si no hay espacio arriba, mostrar abajo
+        if (top < 20) {
+            top = rect.bottom + 10;
+            tooltip.style.transform = 'translate(-50%, 0)';
+        } else {
+            tooltip.style.transform = 'translate(-50%, 0)';
+        }
+        
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        tooltip.classList.add('visible');
+    };
 
-                const handleMouseLeave = () => {
-                    setShowTooltip(false);
-                };
+    const handleMouseLeave = () => {
+        if (tooltipRef.current) {
+            tooltipRef.current.classList.remove('visible');
+        }
+    };
 
-                const formatDate = (dateString) => {
-                    if (!dateString) return 'N/D';
-                    try {
-                        const date = new Date(dateString);
-                        const today = new Date();
-                        const diffTime = Math.abs(today - date);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        
-                        if (diffDays === 0) return 'Hoy';
-                        if (diffDays === 1) return 'Ayer';
-                        if (diffDays <= 7) return `${diffDays}d`;
-                        if (diffDays <= 30) return `${Math.floor(diffDays / 7)}sem`;
-                        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-                    } catch {
-                        return dateString;
-                    }
-                };
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/D';
+        try {
+            const date = new Date(dateString);
+            const today = new Date();
+            const diffTime = Math.abs(today - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Hoy';
+            if (diffDays === 1) return 'Ayer';
+            if (diffDays <= 7) return `${diffDays}d`;
+            if (diffDays <= 30) return `${Math.floor(diffDays / 7)}sem`;
+            return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        } catch {
+            return dateString;
+        }
+    };
 
-                const indicatorNames = {
-                    'gdp': 'PIB',
-                    'gdpGrowth': 'Crecimiento PIB',
-                    'interestRate': 'Tasa de Interés',
-                    'inflation': 'Inflación',
-                    'unemployment': 'Desempleo',
-                    'currentAccount': 'Cuenta Corriente',
-                    'debt': 'Deuda Pública',
-                    'tradeBalance': 'Balanza Comercial',
-                    'production': 'Producción Industrial',
-                    'retailSales': 'Ventas Minoristas',
-                    'wageGrowth': 'Crecimiento Salarial',
-                    'manufacturingPMI': 'PMI Manufacturero',
-                    'cotPositioning': 'COT Positioning'
-                };
+    const indicatorNames = {
+        'gdp': 'PIB',
+        'gdpGrowth': 'Crecimiento PIB',
+        'interestRate': 'Tasa de Interés',
+        'inflation': 'Inflación',
+        'unemployment': 'Desempleo',
+        'currentAccount': 'Cuenta Corriente',
+        'debt': 'Deuda Pública',
+        'tradeBalance': 'Balanza Comercial',
+        'production': 'Producción Industrial',
+        'retailSales': 'Ventas Minoristas',
+        'wageGrowth': 'Crecimiento Salarial',
+        'manufacturingPMI': 'PMI Manufacturero',
+        'cotPositioning': 'COT Positioning'
+    };
 
-                return (
+    return (
+        <>
+            <td 
+                ref={cellRef}
+                style={{ background: getHeatmapColor(value, type) }}
+                data-has-date={lastUpdate ? "true" : "false"}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                {type === 'gdp' ? (
                     <>
-                        <td 
-                            ref={cellRef}
-                            style={{ background: getHeatmapColor(value, type) }}
-                            data-has-date={lastUpdate ? "true" : "false"}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            {type === 'gdp' ? (
-                                <>
-                                    <span className="cell-value">{formatValue(value, 2)}</span>
-                                    <span className="cell-suffix">T USD</span>
-                                </>
-                            ) : type === 'gdpGrowth' || type === 'interestRate' || type === 'inflation' || type === 'unemployment' || type === 'production' || type === 'retailSales' || type === 'wageGrowth' ? (
-                                <span className="cell-value">{value > 0 && (type === 'production' || type === 'retailSales') ? '+' : ''}{formatValue(value, type === 'interestRate' ? 2 : 1)}%</span>
-                            ) : type === 'currentAccount' || type === 'debt' ? (
-                                <span className="cell-value">{value > 0 && type === 'currentAccount' ? '+' : ''}{formatValue(value)}%</span>
-                            ) : type === 'tradeBalance' ? (
-                                <span className="cell-value">{value > 0 ? '+' : ''}{(value / 1000).toFixed(1)}B</span>
-                            ) : type === 'manufacturingPMI' ? (
-                                <span className="cell-value">{formatValue(value, 1)}</span>
-                            ) : type === 'cotPositioning' ? (
-                                value !== null && value !== undefined ? (
-                                    <span className="cell-value">
-                                        {value > 0 ? '+' : ''}
-                                        {(value / 1000).toFixed(1)}K
-                                    </span>
-                                ) : (
-                                    <span className="cell-value" style={{ color: 'var(--text-tertiary)' }}>N/A</span>
-                                )
-                            ) : (
-                                <span className="cell-value">{formatValue(value)}</span>
-                            )}
-                        </td>
-                        
-                        {showTooltip && lastUpdate && (
-                            <div 
-                                className="heatmap-cell-tooltip visible" 
-                                style={{ 
-                                    left: `${position.x}px`, 
-                                    top: `${position.y}px`, 
-                                    transform: 'translate(-50%, -100%)' 
-                                }}
-                            >
-                                <span className="tooltip-date">📅 {formatDate(lastUpdate)}</span>
-                                <span className="tooltip-indicator">{currency} - {indicatorNames[indicator] || indicator}</span>
-                            </div>
-                        )}
+                        <span className="cell-value">{formatValue(value, 2)}</span>
+                        <span className="cell-suffix">T USD</span>
                     </>
-                );
-            };
+                ) : type === 'gdpGrowth' || type === 'interestRate' || type === 'inflation' || type === 'unemployment' || type === 'production' || type === 'retailSales' || type === 'wageGrowth' ? (
+                    <span className="cell-value">{value > 0 && (type === 'production' || type === 'retailSales') ? '+' : ''}{formatValue(value, type === 'interestRate' ? 2 : 1)}%</span>
+                ) : type === 'currentAccount' || type === 'debt' ? (
+                    <span className="cell-value">{value > 0 && type === 'currentAccount' ? '+' : ''}{formatValue(value)}%</span>
+                ) : type === 'tradeBalance' ? (
+                    <span className="cell-value">{value > 0 ? '+' : ''}{(value / 1000).toFixed(1)}B</span>
+                ) : type === 'manufacturingPMI' ? (
+                    <span className="cell-value">{formatValue(value, 1)}</span>
+                ) : type === 'cotPositioning' ? (
+                    value !== null && value !== undefined ? (
+                        <span className="cell-value">
+                            {value > 0 ? '+' : ''}
+                            {(value / 1000).toFixed(1)}K
+                        </span>
+                    ) : (
+                        <span className="cell-value" style={{ color: 'var(--text-tertiary)' }}>N/A</span>
+                    )
+                ) : (
+                    <span className="cell-value">{formatValue(value)}</span>
+                )}
+            </td>
+            
+            {lastUpdate && (
+                <div 
+                    ref={tooltipRef}
+                    className="heatmap-cell-tooltip"
+                >
+                    <span className="tooltip-date">📅 {formatDate(lastUpdate)}</span>
+                    <span className="tooltip-indicator">{currency} - {indicatorNames[indicator] || indicator}</span>
+                </div>
+            )}
+        </>
+    );
+};
             
             const TooltipCell = ({ children, tooltip, title }) => {
                 const [showTooltip, setShowTooltip] = React.useState(false);
