@@ -14,7 +14,7 @@
     
     <!-- SEO Meta Tags OPTIMIZADOS -->
     <title>Dashboard Forex | Análisis Fundamental en Tiempo Real 2026 | Indicadores Económicos USD EUR GBP JPY</title>
-    <meta name="description" content="Dashboard profesional de análisis fundamental forex 2026 con 13 indicadores económicos en tiempo real, datos de bancos centrales FRED CFTC, rankings de fortaleza USD EUR GBP JPY AUD CAD CHF NZD. Herramienta gratuita para traders.">
+    <meta name="description" content="Dashboard profesional de análisis fundamental forex 2026 con 18 indicadores económicos en tiempo real, datos de bancos centrales FRED CFTC, rankings de fortaleza USD EUR GBP JPY AUD CAD CHF NZD. Herramienta gratuita para traders.">
     <meta name="keywords" content="dashboard forex 2026, análisis fundamental forex gratis, indicadores económicos tiempo real, fortaleza divisas USD EUR GBP, datos bancos centrales, tasas interés forex, PIB inflación desempleo, trading forex herramientas, análisis técnico fundamental, COT positioning forex, carry trade calculator, forex strength meter, currency analysis dashboard, central bank rates live">
     <meta name="author" content="Global Investing">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -29,7 +29,7 @@
     <meta property="og:url" content="https://globalinvesting.github.io/">
     <meta property="og:site_name" content="Global Investing Forex Dashboard">
     <meta property="og:title" content="Dashboard Forex Profesional | Análisis Fundamental en Tiempo Real 2026">
-    <meta property="og:description" content="Herramienta gratuita de análisis fundamental forex con 13 indicadores económicos en tiempo real. Rastrea PIB, inflación, tasas de interés, balanza comercial y posicionamiento COT para USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
+    <meta property="og:description" content="Herramienta gratuita de análisis fundamental forex con 18 indicadores económicos en tiempo real. Rastrea PIB, inflación, tasas de interés, balanza comercial y posicionamiento COT para USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
     <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -40,7 +40,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://globalinvesting.github.io/">
     <meta name="twitter:title" content="Dashboard Forex Profesional | Análisis Fundamental Tiempo Real">
-    <meta name="twitter:description" content="Herramienta gratuita: 13 indicadores económicos en tiempo real para USD EUR GBP JPY AUD CAD CHF NZD. Datos FRED, CFTC, Trading Economics.">
+    <meta name="twitter:description" content="Herramienta gratuita: 18 indicadores económicos en tiempo real para USD EUR GBP JPY AUD CAD CHF NZD. Datos FRED, CFTC, Trading Economics.">
     <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
     <meta name="twitter:image:alt" content="Dashboard Forex - Indicadores Económicos en Tiempo Real">
     <meta name="twitter:creator" content="@GlobalInvesting">
@@ -62,7 +62,7 @@
       "name": "Dashboard de Análisis Fundamental Forex",
       "alternateName": "Forex Dashboard Global Investing",
       "url": "https://globalinvesting.github.io/",
-      "description": "Dashboard profesional gratuito de análisis fundamental forex con 13 indicadores económicos en tiempo real, datos de bancos centrales y rankings de fortaleza de divisas.",
+      "description": "Dashboard profesional gratuito de análisis fundamental forex con 18 indicadores económicos en tiempo real, datos de bancos centrales y rankings de fortaleza de divisas.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web Browser",
       "offers": {
@@ -2905,8 +2905,12 @@ const getHeatmapColor = (value, type) => {
             break;
 
         case 'currentAccount':
+            intensity = Math.min(Math.abs(value) / 15, 1);  // value = % PIB, máx ~15%
+            isPositive = value > 0;
+            break;
+
         case 'tradeBalance':
-            intensity = Math.min(Math.abs(value) / 15, 1);
+            intensity = Math.min(Math.abs(value) / 15000, 1);  // value = millones USD, máx ~$15B
             isPositive = value > 0;
             break;
 
@@ -3487,11 +3491,11 @@ const DataHealthCheck = ({ economicData }) => {
         {(() => {
             // Mostrar fecha del último reporte COT
             const currencies = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
-            for (const curr of currencies) {
-                const data = economicData[curr];
-                if (data?.cotPositioning !== null && data?.cotPositioning !== undefined) {
-                    if (data.lastUpdate) {
-                        const cotDate = new Date(data.lastUpdate);
+                        for (const curr of currencies) {
+                                const data = economicData[curr];
+                                if (data?.cotPositioning !== null && data?.cotPositioning !== undefined) {
+                                    if (data.cotPositioningDate || data.lastUpdate) {
+                                        const cotDate = new Date(data.cotPositioningDate || data.lastUpdate);
                         const daysAgo = Math.floor((Date.now() - cotDate.getTime()) / (24 * 60 * 60 * 1000));
                         return (
                             <span style={{ 
@@ -3663,8 +3667,8 @@ const DataHealthCheck = ({ economicData }) => {
                                     <div className="metric">
                                         <div className="metric-label">Balanza Comercial</div>
                                         <div className="metric-value metric-value-small" style={{ 
-                                            color: data.tradeBalance !== null && data.tradeBalance > 10 ? 'var(--green-strong)' : 
-                                                   data.tradeBalance !== null && data.tradeBalance < -20 ? 'var(--red-strong)' : 
+                                            color: data.tradeBalance !== null && data.tradeBalance > 1000 ? 'var(--green-strong)' : 
+                                                   data.tradeBalance !== null && data.tradeBalance < -10000 ? 'var(--red-strong)' : 
                                                    'var(--text-primary)' 
                                         }}>
                                             {data.tradeBalance !== null && data.tradeBalance !== undefined 
