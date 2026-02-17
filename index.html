@@ -4280,15 +4280,18 @@ const sentiment = getSentiment(strength);
     </div>
     
     <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-        <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
-            padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
-            borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
-        }}>
-            Limpiar Caché y Recargar Datos
-        </button>
-        <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-            Dashboard v4.7.0 • Creado por Santiago Plá • {new Date().getFullYear()}
-        </div>
+<button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
+    padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
+    borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
+}}>
+    Limpiar Caché y Recargar Datos
+</button>
+<div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+    © {new Date().getFullYear()} Santiago Plá · Global Investing. Todos los derechos reservados.
+</div>
+<div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+    Dashboard v4.7.0
+</div>
     </div>
 </div>
                     </div>
