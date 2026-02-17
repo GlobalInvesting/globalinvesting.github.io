@@ -2501,7 +2501,7 @@ const indicatorTooltips = {
     currentAccount: "Balance comercial + flujos de inversión como % del PIB.",
     debt: "Deuda pública como % del PIB.",
     tradeBalance: "Exportaciones - Importaciones mensuales en miles de millones USD.",
-    production: "Crecimiento anual producción industrial.",
+    production: "Cambio mensual en producción industrial (MoM). >1.5% indica momentum industrial fuerte; >0% expansión moderada; valores negativos señalan contracción sectorial.",
     
     // NUEVOS INDICADORES
     retailSales: "Cambio mensual en ventas minoristas. >0.5% indica consumo robusto.",
@@ -3863,7 +3863,7 @@ const DataHealthCheck = ({ economicData }) => {
                                                     Balanza Comercial<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Miles Millones USD</span>
                                                 </TooltipCell>
                                                 <TooltipCell title="Producción Industrial" tooltip={indicatorTooltips.production}>
-                                                    Prod. Industrial<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% Anual</span>
+                                                    Prod. Industrial<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% MoM</span>
                                                 </TooltipCell>
                                                 <TooltipCell title="Ventas Minoristas" tooltip={indicatorTooltips.retailSales}>
     Ventas Minoristas<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>% MoM</span>
