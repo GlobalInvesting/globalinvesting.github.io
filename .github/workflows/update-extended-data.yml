@@ -104,9 +104,12 @@ jobs:
                               val = clean_num(cols[actual_idx].get_text(strip=True))
                               dt  = parse_te_date(cols[date_idx].get_text(strip=True)) if date_idx and len(cols) > date_idx else str(date.today())
                               if val is not None:
-                                  data[code] = round(val, 4)
-                                  dates[code] = dt
-                                  print(f"  ✓ {code}: {val} ({dt})")
+                  # Normalize confidence indices to comparable base-100 scale
+                  if label in ['consumerConfidence', 'businessConfidence']:
+                      val = normalize_confidence(val, code, label)
+                  data[code] = round(val, 4)
+                  dates[code] = dt
+                  print(f"  ✓ {code}: {val} ({dt})")
                               break
               except Exception as e:
                   print(f"  ❌ {e}")
@@ -149,6 +152,29 @@ jobs:
               except Exception as e:
                   print(f"  ❌ {e}")
               return data, dates
+
+def normalize_confidence(value, currency, indicator):
+    """Normalize confidence indices to a comparable 0-200 scale (base 100 = neutral)."""
+    if value is None:
+        return None
+    
+    # European Commission uses -100 to +100 scale
+    # GER/EUR Business Climate (Ifo) also uses different base
+    EC_SCALE_CURRENCIES = ['EUR']
+    
+    # Japan Cabinet Office uses ~35-50 typical range (not 100-based)
+    JP_CONSUMER_TYPICAL_RANGE = (35, 50)
+    
+    if currency == 'EUR' and indicator in ['consumerConfidence', 'businessConfidence']:
+        # Convert -100/+100 → 0/200 (where 100 = neutral)
+        return round(value + 100, 2)
+    
+    if currency == 'JPY' and indicator == 'consumerConfidence':
+        # Map typical range 35-50 → 85-115 (normalized to base 100)
+        normalized = ((value - 40) / 10) * 15 + 100
+        return round(normalized, 2)
+    
+    return value
 
           # ── MAIN ──────────────────────────────────────
           all_data  = {c: {} for c in CURRENCIES}
