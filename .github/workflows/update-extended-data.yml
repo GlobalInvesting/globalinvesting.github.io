@@ -82,27 +82,49 @@ jobs:
               except: pass
               return str(date.today())
 
+          def normalize_confidence(value, currency, indicator):
+              """Normalize confidence indices to a comparable base-100 scale (100 = neutral).
+              
+              Different countries use incompatible scales:
+                EUR: European Commission scale -100 to +100 (0 = neutral)
+                JPY: Cabinet Office scale ~35-50 typical range (not 100-based)
+                Others: Base 100 scale (100 = neutral)
+              
+              All values are mapped to the base-100 convention so scoring
+              functions can apply uniform thresholds.
+              """
+              if value is None:
+                  return None
+              # European Commission: -100/+100 → 0/200 (where 100 = neutral)
+              if currency == 'EUR' and indicator in ['consumerConfidence', 'businessConfidence']:
+                  return round(value + 100, 2)
+              # Japan Cabinet Office: typical range 35-50 → mapped to 85-115
+              if currency == 'JPY' and indicator == 'consumerConfidence':
+                  normalized = ((value - 40) / 10) * 15 + 100
+                  return round(normalized, 2)
+              return value
+
           def scrape_te_table(url, label):
               print(f"\n{'='*50}\nSCRAPING: {label}\n{'='*50}")
               data, dates = {}, {}
               try:
                   r = requests.get(url, headers=HEADERS, timeout=20)
-
-# Handle rate limiting
-              if r.status_code == 429:
-                  print(f"  ⚠️ Rate limited by TE, waiting 30s...")
-                  time.sleep(30)
-                  r = requests.get(url, headers=HEADERS, timeout=20)
-              r.raise_for_status()
-                  
+                  # Handle rate limiting
+                  if r.status_code == 429:
+                      print(f"  ⚠️ Rate limited by TE, waiting 30s...")
+                      time.sleep(30)
+                      r = requests.get(url, headers=HEADERS, timeout=20)
                   r.raise_for_status()
+
                   soup = BeautifulSoup(r.content, 'lxml')
                   table = soup.find('table', {'class': 'table'})
                   if not table:
                       print("  ❌ No table found"); return data, dates
+
                   headers_row = [h.get_text(strip=True).lower() for h in table.find_all('th')]
                   actual_idx = headers_row.index('actual') if 'actual' in headers_row else 1
                   date_idx   = headers_row.index('reference') if 'reference' in headers_row else None
+
                   for row in table.find_all('tr')[1:]:
                       cols = row.find_all('td')
                       if len(cols) < 2: continue
@@ -112,19 +134,21 @@ jobs:
                               val = clean_num(cols[actual_idx].get_text(strip=True))
                               dt  = parse_te_date(cols[date_idx].get_text(strip=True)) if date_idx and len(cols) > date_idx else str(date.today())
                               if val is not None:
-                  # Normalize confidence indices to comparable base-100 scale
-                  if label in ['consumerConfidence', 'businessConfidence']:
-                      val = normalize_confidence(val, code, label)
-                  data[code] = round(val, 4)
-                  dates[code] = dt
-                  print(f"  ✓ {code}: {val} ({dt})")
+                                  # Normalize confidence indices to comparable base-100 scale
+                                  if label in ['consumerConfidence', 'businessConfidence']:
+                                      val = normalize_confidence(val, code, label)
+                                  data[code] = round(val, 4)
+                                  dates[code] = dt
+                                  print(f"  ✓ {code}: {val} ({dt})")
                               break
               except Exception as e:
                   print(f"  ❌ {e}")
               return data, dates
 
           def scrape_worldgovernmentbonds():
-              """Primary bond source — public, no auth, clean table."""
+              """Primary bond source — public, no auth, clean table.
+              Note: EUR uses Germany (Bund) as proxy for the euro area.
+              """
               print(f"\n{'='*50}\nBOND YIELDS: worldgovernmentbonds.com\n{'='*50}")
               WGB_NAMES = {
                   'USD': ['U.S.', 'United States'],
@@ -161,34 +185,11 @@ jobs:
                   print(f"  ❌ {e}")
               return data, dates
 
-def normalize_confidence(value, currency, indicator):
-    """Normalize confidence indices to a comparable 0-200 scale (base 100 = neutral)."""
-    if value is None:
-        return None
-    
-    # European Commission uses -100 to +100 scale
-    # GER/EUR Business Climate (Ifo) also uses different base
-    EC_SCALE_CURRENCIES = ['EUR']
-    
-    # Japan Cabinet Office uses ~35-50 typical range (not 100-based)
-    JP_CONSUMER_TYPICAL_RANGE = (35, 50)
-    
-    if currency == 'EUR' and indicator in ['consumerConfidence', 'businessConfidence']:
-        # Convert -100/+100 → 0/200 (where 100 = neutral)
-        return round(value + 100, 2)
-    
-    if currency == 'JPY' and indicator == 'consumerConfidence':
-        # Map typical range 35-50 → 85-115 (normalized to base 100)
-        normalized = ((value - 40) / 10) * 15 + 100
-        return round(normalized, 2)
-    
-    return value
-
           # ── MAIN ──────────────────────────────────────
           all_data  = {c: {} for c in CURRENCIES}
           all_dates = {c: {} for c in CURRENCIES}
 
-          # 1. Bond yields
+          # 1. Bond yields (primary: worldgovernmentbonds, fallback: TE)
           bond_data, bond_dates = scrape_worldgovernmentbonds()
           missing = [c for c in CURRENCIES if c not in bond_data]
           if missing:
@@ -202,7 +203,7 @@ def normalize_confidence(value, currency, indicator):
               all_dates[c]['bond10y'] = bond_dates.get(c, str(date.today()))
           time.sleep(2)
 
-          # 2-6. Remaining indicators
+          # 2-6. Remaining indicators (confidence, flows, FDI, inflation expectations)
           for key, url in {k: v for k, v in TE_URLS.items() if k != 'bond10y'}.items():
               d, dt = scrape_te_table(url, key)
               for c in CURRENCIES:
