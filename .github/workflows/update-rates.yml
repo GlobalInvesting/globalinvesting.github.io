@@ -52,48 +52,70 @@ jobs:
                       pass
               return None
           
-          def parse_date(date_text):
-              """Parse date from various formats"""
+          def parse_reference_date(date_text):
+              """
+              Parse the Reference column date from Trading Economics.
+              TE uses formats like "Feb/26", "Jan/26", "Dec/25".
+              Returns an ISO date string (YYYY-MM-DD), using day 15 as proxy
+              since TE only shows month/year in the Reference column.
+              """
               if not date_text:
                   return str(date.today())
               
               date_text = date_text.strip()
               
               try:
-                  # Format: "Feb 2026" or "Feb/26"
-                  if re.search(r'[A-Za-z]{3}\s*[/\s]\s*\d{2,4}', date_text):
-                      match = re.search(r'([A-Za-z]{3})\s*[/\s]\s*(\d{2,4})', date_text)
-                      if match:
-                          month_str = match.group(1)
-                          year_str = match.group(2)
-                          if len(year_str) == 2:
-                              year_str = '20' + year_str
-                          dt = datetime.strptime(f"{month_str} {year_str}", '%b %Y')
-                          return dt.strftime('%Y-%m-15')
+                  # Format: "Feb/26" or "Jan/26" (most common in TE Reference column)
+                  m = re.match(r'^([A-Za-z]{3})/(\d{2})$', date_text)
+                  if m:
+                      month_str = m.group(1)
+                      year_str = '20' + m.group(2)
+                      dt = datetime.strptime(f"{month_str} {year_str}", '%b %Y')
+                      # Use last day of month approximation — day 15 is safe proxy
+                      return dt.strftime('%Y-%m-15')
                   
-                  # Format: "2026-01-29"
-                  if re.search(r'\d{4}-\d{2}-\d{2}', date_text):
-                      return date_text[:10]
+                  # Format: "Feb 2026" (with space)
+                  m = re.match(r'^([A-Za-z]{3})\s+(\d{4})$', date_text)
+                  if m:
+                      dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", '%b %Y')
+                      return dt.strftime('%Y-%m-15')
+                  
+                  # Format: "2026-01-29" (full ISO date)
+                  if re.match(r'^\d{4}-\d{2}-\d{2}$', date_text):
+                      return date_text
                   
                   # Format: "January 29, 2026"
-                  if re.search(r'[A-Za-z]+\s+\d{1,2},?\s+\d{4}', date_text):
-                      dt = datetime.strptime(date_text, '%B %d, %Y')
+                  m = re.match(r'^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$', date_text)
+                  if m:
+                      dt = datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", '%B %d %Y')
                       return dt.strftime('%Y-%m-%d')
-                  
+                      
               except Exception as e:
                   print(f"    Date parse error for '{date_text}': {e}")
               
+              # Fallback to today only if parsing fails
               return str(date.today())
           
           def fetch_trading_economics():
-              """Primary source with date extraction"""
+              """
+              Primary source.
+              Scrapes the Reference column from the TE country-list page.
+              The Reference column contains the period the rate belongs to
+              (e.g. "Feb/26" means the rate was set/confirmed in Feb 2026).
+              This is the date shown in the dashboard tooltip.
+              """
               print("\n" + "="*70)
-              print("SOURCE 1: Trading Economics")
+              print("SOURCE 1: Trading Economics (with Reference date)")
               print("="*70)
               
               try:
-                  url = "https://tradingeconomics.com/country-list/interest-rate"
+                  url = "https://tradingeconomics.com/country-list/interest-rate?continent=world"
                   r = requests.get(url, headers=HEADERS, timeout=15)
+                  if r.status_code == 429:
+                      print("  ⚠️ Rate limited, waiting 30s...")
+                      time.sleep(30)
+                      r = requests.get(url, headers=HEADERS, timeout=15)
+                  r.raise_for_status()
                   soup = BeautifulSoup(r.content, 'lxml')
                   
                   rates = {}
@@ -109,35 +131,64 @@ jobs:
                   }
                   
                   table = soup.find('table', {'class': 'table'})
-                  if table:
-                      headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
-                      date_idx = None
-                      if 'reference' in headers:
-                          date_idx = headers.index('reference')
+                  if not table:
+                      print("  ❌ No table found")
+                      return rates
+                  
+                  # Identify column indices from headers
+                  headers_row = table.find('thead')
+                  header_texts = []
+                  if headers_row:
+                      header_texts = [th.get_text(strip=True).lower()
+                                      for th in headers_row.find_all('th')]
+                  
+                  # TE table columns (0-indexed):
+                  # 0: Country, 1: Last, 2: Previous, 3: Reference, 4: Unit, 5: Next Release
+                  # The "Last" column is index 1 (actual current rate).
+                  # The "Reference" column is index 3 (period the rate belongs to).
+                  last_idx = 1       # "Last" = current rate value
+                  reference_idx = 3  # "Reference" = period (e.g. "Feb/26")
+                  
+                  # Override with detected indices if headers are present
+                  if header_texts:
+                      if 'last' in header_texts:
+                          last_idx = header_texts.index('last')
+                      elif 'actual' in header_texts:
+                          last_idx = header_texts.index('actual')
+                      if 'reference' in header_texts:
+                          reference_idx = header_texts.index('reference')
+                  
+                  for row in table.find_all('tr')[1:]:
+                      cols = row.find_all('td')
+                      if len(cols) < 2:
+                          continue
                       
-                      for row in table.find_all('tr')[1:]:
-                          cols = row.find_all('td')
-                          if len(cols) >= 2:
-                              country = cols[0].get_text(strip=True)
-                              rate_text = cols[1].get_text(strip=True)
+                      country = cols[0].get_text(strip=True)
+                      
+                      for country_name, currency in country_map.items():
+                          if country_name.lower() in country.lower():
+                              # Extract rate value from "Last" column
+                              rate_text = cols[last_idx].get_text(strip=True) if last_idx < len(cols) else ''
+                              rate = clean_rate(rate_text)
                               
-                              # Extract date if available
-                              data_date = str(date.today())
-                              if date_idx and len(cols) > date_idx:
-                                  date_text = cols[date_idx].get_text(strip=True)
-                                  data_date = parse_date(date_text)
+                              # Extract Reference date (period the rate belongs to)
+                              # This is the date that should appear in the dashboard tooltip,
+                              # reflecting when the central bank last set/confirmed this rate.
+                              ref_date_text = ''
+                              if reference_idx < len(cols):
+                                  ref_date_text = cols[reference_idx].get_text(strip=True)
                               
-                              for country_name, currency in country_map.items():
-                                  if country_name.lower() in country.lower():
-                                      rate = clean_rate(rate_text)
-                                      if rate is not None:
-                                          rates[currency] = {
-                                              'value': rate,
-                                              'date': data_date,
-                                              'source': 'TradingEconomics'
-                                          }
-                                          print(f"  ✓ {currency}: {rate}% (date: {data_date})")
-                                          break
+                              reference_date = parse_reference_date(ref_date_text)
+                              
+                              if rate is not None:
+                                  rates[currency] = {
+                                      'value': rate,
+                                      'date': reference_date,   # ← actual policy period
+                                      'rawDate': ref_date_text, # ← for debugging
+                                      'source': 'TradingEconomics'
+                                  }
+                                  print(f"  ✓ {currency}: {rate}% | Reference: '{ref_date_text}' → {reference_date}")
+                              break
                   
                   return rates
                   
@@ -145,8 +196,11 @@ jobs:
                   print(f"  ❌ Error: {e}")
                   return {}
           
-          def fetch_global_rates(currency):
-              """Backup source with date extraction"""
+          def fetch_global_rates_fallback(currency):
+              """
+              Backup source (global-rates.com) for currencies missed by TE scrape.
+              Also attempts to extract the decision date from the page.
+              """
               urls = {
                   'USD': 'central-bank-america/fed-interest-rate.aspx',
                   'EUR': 'central-bank-europe/ecb-interest-rate.aspx',
@@ -166,30 +220,24 @@ jobs:
                   r = requests.get(url, headers=HEADERS, timeout=10)
                   soup = BeautifulSoup(r.content, 'lxml')
                   
-                  rate = None
-                  data_date = str(date.today())
-                  
-                  # Try to find table with current rate
                   for table in soup.find_all('table'):
                       rows = table.find_all('tr')
                       if len(rows) >= 2:
-                          # First column might be date, second is rate
                           cols = rows[1].find_all('td')
                           if len(cols) >= 2:
-                              # Try second column as rate
                               rate = clean_rate(cols[1].get_text(strip=True))
                               if rate:
-                                  # Try first column as date
+                                  # Try to extract date from first column
                                   date_text = cols[0].get_text(strip=True)
-                                  data_date = parse_date(date_text)
+                                  data_date = parse_reference_date(date_text)
                                   return {
                                       'value': rate,
                                       'date': data_date,
+                                      'rawDate': date_text,
                                       'source': 'GlobalRates'
                                   }
-                  
               except Exception as e:
-                  print(f"    Error fetching {currency}: {e}")
+                  print(f"    Error fetching fallback for {currency}: {e}")
               
               return None
           
@@ -198,33 +246,40 @@ jobs:
           # ============================================
           
           print("\n" + "="*70)
-          print("FETCHING INTEREST RATES WITH DATES")
+          print("FETCHING INTEREST RATES WITH REFERENCE DATES")
           print("="*70)
           
           final_rates = {}
           
-          # Source 1: Trading Economics
+          # Source 1: Trading Economics (extracts Reference column date)
           te_rates = fetch_trading_economics()
           final_rates.update(te_rates)
           
           time.sleep(1)
           
-          # Source 2: Global-Rates.com (for missing)
-          missing = [c for c in ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD'] if c not in final_rates]
+          # Source 2: global-rates.com fallback for any missing currencies
+          currencies_needed = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
+          missing = [c for c in currencies_needed if c not in final_rates]
           
           if missing:
               print("\n" + "="*70)
-              print(f"SOURCE 2: Global-Rates.com")
+              print(f"SOURCE 2: Global-Rates.com fallback for: {', '.join(missing)}")
               print("="*70)
               
               for currency in missing:
-                  result = fetch_global_rates(currency)
+                  result = fetch_global_rates_fallback(currency)
                   if result:
                       final_rates[currency] = result
-                      print(f"  ✓ {currency}: {result['value']}% (date: {result['date']})")
+                      print(f"  ✓ {currency}: {result['value']}% | date: {result['date']}")
                   time.sleep(0.5)
           
-          # Save results
+          # ============================================
+          # SAVE RESULTS
+          # The 'date' field in observations now contains the Reference date
+          # from TE (e.g. the month the CB last set the rate), NOT today's date.
+          # The dashboard reads observations[0].date for the tooltip.
+          # ============================================
+          
           print("\n" + "="*70)
           print("SAVING RESULTS")
           print("="*70)
@@ -235,29 +290,58 @@ jobs:
               rate_data = {
                   'observations': [{
                       'value': data['value'],
-                      'date': data.get('date', today),
+                      'date': data.get('date', today),       # ← Reference period date
+                      'rawDate': data.get('rawDate', ''),    # ← original string for debugging
                       'source': data['source']
-                  }]
+                  }],
+                  'lastUpdate': today  # ← when we ran the workflow
               }
               
               with open(f'rates/{currency}.json', 'w') as f:
                   json.dump(rate_data, f, indent=2)
               
-              print(f"  💾 {currency}: {data['value']}% (date: {data.get('date', today)}, source: {data['source']})")
+              print(f"  💾 {currency}: {data['value']}% | period: {data.get('date', today)} | scraped: {today}")
           
           # Validation
-          required = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
-          missing = [c for c in required if c not in final_rates]
+          missing_final = [c for c in currencies_needed if c not in final_rates]
           
-          if missing:
-              print(f"\n❌ MISSING: {', '.join(missing)}")
+          if missing_final:
+              print(f"\n❌ MISSING: {', '.join(missing_final)}")
               exit(1)
           else:
-              print("\n✅ ALL 8 CURRENCIES FETCHED WITH DATES!")
+              print(f"\n✅ ALL 8 CURRENCIES FETCHED WITH REFERENCE DATES!")
           
           EOFPYTHON
           
           python fetch_rates.py
+      
+      - name: Display rates summary
+        run: |
+          echo ""
+          echo "╔════════════════════════════════════════════════╗"
+          echo "║         INTEREST RATES SUMMARY                 ║"
+          echo "╚════════════════════════════════════════════════╝"
+          echo ""
+          for currency in USD EUR GBP JPY CAD AUD CHF NZD; do
+            if [ -f "rates/$currency.json" ]; then
+              echo "[$currency]"
+              python3 -c "
+          import json
+          with open('rates/$currency.json') as f:
+              data = json.load(f)
+              obs = data['observations'][0]
+              print(f\"  Rate:       {obs['value']}%\")
+              print(f\"  Period:     {obs['date']}\")
+              print(f\"  Raw date:   {obs.get('rawDate', 'N/A')}\")
+              print(f\"  Source:     {obs['source']}\")
+              print(f\"  Scraped:    {data['lastUpdate']}\")
+          "
+              echo ""
+            else
+              echo "[$currency] - No data"
+              echo ""
+            fi
+          done
       
       - name: Commit and push
         run: |
@@ -267,7 +351,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "🔄 Rates $(date +'%Y-%m-%d') + dates"
+            git commit -m "🔄 Rates $(date +'%Y-%m-%d') + Reference dates"
             git pull --rebase origin main || true
             git push
           fi
