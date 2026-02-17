@@ -1,4 +1,4 @@
-name: Update Extended Data (Bonds + Sentiment + Flows) - FINAL v4
+name: Update Extended Data (Bonds + Sentiment + Flows) - FINAL v5
 on:
   schedule:
     - cron: '30 6 * * *'
@@ -57,6 +57,29 @@ jobs:
               'inflationExpectations': 'https://tradingeconomics.com/country-list/inflation-expectations?continent=world',
           }
 
+          # ── FX RATES (needed for Capital Flows conversion) ─────────────────────
+          exchange_rates = {}
+
+          def fetch_fx():
+              global exchange_rates
+              try:
+                  r = requests.get('https://api.frankfurter.app/latest?from=USD', timeout=10)
+                  if r.ok:
+                      exchange_rates = r.json().get('rates', {})
+                      exchange_rates['USD'] = 1.0
+                      print(f"  ✅ FX rates loaded: {sorted(exchange_rates.keys())}")
+                      return True
+              except Exception as e:
+                  print(f"  ⚠️ FX fetch failed: {e}")
+              # Fallback approximate rates
+              exchange_rates = {
+                  'USD': 1.0, 'EUR': 0.92, 'GBP': 0.79, 'JPY': 150.0,
+                  'CAD': 1.36, 'AUD': 1.57, 'CHF': 0.90, 'NZD': 1.67,
+              }
+              print("  ⚠️ Using fallback FX rates")
+              return False
+
+          # ── HELPERS ──────────────────────────────────────────────────────────────
           def clean_num(text):
               if not text: return None
               text = str(text).strip().replace(',','').replace('%','')
@@ -67,18 +90,14 @@ jobs:
               if not date_text: return str(date.today())
               date_text = date_text.strip()
               try:
-                  # "Feb/26" or "Jan/26"
                   m = re.match(r'^([A-Za-z]{3})/(\d{2})$', date_text)
                   if m:
-                      yr = '20' + m.group(2)
-                      dt = datetime.strptime(f"{m.group(1)} {yr}", '%b %Y')
+                      dt = datetime.strptime(f"{m.group(1)} 20{m.group(2)}", '%b %Y')
                       return dt.strftime('%Y-%m-15')
-                  # "Feb 2026"
                   m = re.match(r'^([A-Za-z]{3})\s+(\d{4})$', date_text)
                   if m:
                       dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", '%b %Y')
                       return dt.strftime('%Y-%m-15')
-                  # Q1/2026 or Q4 2025
                   m = re.search(r'Q(\d)[/\s](\d{4})', date_text)
                   if m:
                       month = (int(m.group(1)) - 1) * 3 + 2
@@ -86,74 +105,102 @@ jobs:
               except: pass
               return str(date.today())
 
+          # ── CAPITAL FLOWS: Unit-aware FX conversion ────────────────────────────
+          def parse_capital_flows_row(cols):
+              """
+              Parse a Capital Flows row respecting the Unit column.
+
+              TE reports capital flows in each country's local currency and scale:
+                "USD Million"          value is already USD millions
+                "EUR Billion"          multiply by 1000, then divide by EUR/USD rate
+                "AUD Million"          divide by AUD/USD rate
+                "JPY Hundred Million"  multiply by 100 (-> JPY millions), then divide by JPY/USD rate
+                "GBP Million"          divide by GBP/USD rate
+                etc.
+
+              Scale reference:
+                Trillion        -> x 1 000 000
+                Billion         -> x 1 000
+                Hundred Million -> x 100
+                Million         -> x 1   (baseline)
+
+              Returns value in USD millions, or None on failure.
+              """
+              if len(cols) < 5:
+                  return None
+
+              raw_val  = clean_num(cols[1].get_text(strip=True))
+              unit_str = cols[4].get_text(strip=True)   # e.g. "AUD Million"
+
+              if raw_val is None or not unit_str:
+                  return None
+
+              unit_upper = unit_str.upper()
+
+              # --- Scale multiplier (result = native millions) ---
+              if 'TRILLION' in unit_upper:
+                  scale = 1_000_000.0
+              elif 'BILLION' in unit_upper:
+                  scale = 1_000.0
+              elif 'HUNDRED MILLION' in unit_upper:
+                  # "JPY Hundred Million": 7219 units * 100 = 721 900 JPY million
+                  scale = 100.0
+              elif 'MILLION' in unit_upper:
+                  scale = 1.0
+              else:
+                  print(f"    ⚠️ Unknown scale in unit '{unit_str}' — treating as millions")
+                  scale = 1.0
+
+              # --- Source currency (first 3-letter token) ---
+              m = re.match(r'^([A-Z]{3})\b', unit_upper)
+              src_currency = m.group(1) if m else 'USD'
+
+              # --- Convert to USD millions ---
+              val_native_millions = raw_val * scale
+
+              if src_currency == 'USD':
+                  val_usd_millions = val_native_millions
+              else:
+                  # exchange_rates[X] = X per 1 USD, so divide to get USD
+                  fx = exchange_rates.get(src_currency)
+                  if fx and fx > 0:
+                      val_usd_millions = val_native_millions / fx
+                  else:
+                      print(f"    ⚠️ No FX rate for {src_currency} — skipping")
+                      return None
+
+              return round(val_usd_millions, 2)
+
+          # ── CONFIDENCE NORMALIZATION ─────────────────────────────────────────────
           def normalize_confidence(value, currency, indicator):
               """
               Normalize confidence indices to base-100 scale (100 = neutral).
-
-              Each index has a different native scale depending on the source:
-
-              ┌─────────┬──────────────────────────────────────┬──────────────────┬─────────────────────────────────────────────────┐
-              │Currency │ Index / Source                       │ Native scale     │ Normalization                                   │
-              ├─────────┼──────────────────────────────────────┼──────────────────┼─────────────────────────────────────────────────┤
-              │ USD     │ Conference Board / Michigan (con)    │ 0–150+           │ Pass-through (already ~100-based)               │
-              │ USD     │ ISM Manufacturing PMI (biz)          │ 0–100 (50=neut.) │ Pass-through (not shifted; 50 ≠ 100 by design)  │
-              │ EUR     │ European Commission (both)           │ -100 to +100     │ +100 shift → neutral becomes 100               │
-              │ GBP     │ GfK Consumer (con)                   │ -100 to +100     │ +100 shift                                      │
-              │ GBP     │ CBI Industrial Trends (biz)          │ -100 to +100     │ +100 shift                                      │
-              │ JPY     │ Cabinet Office Consumer Conf (con)   │ narrow 35–50     │ ((v-40)/10)*15+100  (maps 40→100)               │
-              │ JPY     │ Tankan Large Mfg (biz)               │ -100 to +100     │ +100 shift                                      │
-              │ AUD     │ Westpac-MI Consumer Sent. (con)      │ ~100-based       │ Pass-through                                    │
-              │ AUD     │ NAB Business Confidence (biz)        │ -100 to +100     │ +100 shift                                      │
-              │ CAD     │ Conference Board Canada (con)        │ ~100-based       │ Pass-through                                    │
-              │ CAD     │ Ivey PMI (biz)                       │ 0–100            │ Pass-through                                    │
-              │ CHF     │ SECO Consumer Confidence (con)       │ -150 to +50      │ +130 shift (neutral ≈ -30 → 100)                │
-              │ CHF     │ KOF Economic Barometer (biz)         │ ~100-based       │ Pass-through                                    │
-              │ NZD     │ ANZ-Roy Morgan Consumer (con)        │ ~100-based       │ Pass-through                                    │
-              │ NZD     │ ANZ Business Outlook (biz)           │ net balance -100/+100 BUT TE reports as is (e.g. 64.1) │
-              │         │                                      │                  │ Pass-through — do NOT add +100                  │
-              └─────────┴──────────────────────────────────────┴──────────────────┴─────────────────────────────────────────────────┘
-
-              KEY INSIGHT for NZD businessConfidence:
-              ANZ Business Outlook is a net balance (% optimists minus % pessimists),
-              so it can range roughly -100 to +100. Trading Economics reports it as-is
-              (e.g. 64.1 in Jan/26 = 64% net optimists). Because the positive territory
-              already indicates expansion and TE's value has no offset, we pass it through
-              directly rather than shifting by +100 (which would produce a nonsensical 164.1).
-              The dashboard scoring function handles this as a net-balance style index
-              centered at 0 (positive = bullish, negative = bearish).
+              See normalization table in workflow comments.
+              NZD businessConfidence (ANZ Business Outlook) is a net balance
+              reported as-is by TE (e.g. 64.1) — do NOT add +100.
               """
               if value is None:
                   return None
 
-              # ---------- consumerConfidence ----------
               if indicator == 'consumerConfidence':
                   if currency in ('EUR', 'GBP'):
-                      # EC / GfK: -100/+100 → shift to base 100
                       return round(value + 100, 2)
                   if currency == 'JPY':
-                      # Cabinet Office: narrow scale centred ~45, neutral ~40
                       return round(((value - 40) / 10) * 15 + 100, 2)
                   if currency == 'CHF':
-                      # SECO: long-run average ≈ -30 → map to 100
                       return round(value + 130, 2)
-                  # USD, AUD, CAD, NZD: already ~100-based → pass-through
-                  return value
+                  return value  # USD, AUD, CAD, NZD: already ~100-based
 
-              # ---------- businessConfidence ----------
               if indicator == 'businessConfidence':
                   if currency in ('EUR', 'GBP', 'JPY', 'AUD'):
-                      # EC / CBI / Tankan / NAB: all -100/+100 → shift to base 100
                       return round(value + 100, 2)
                   if currency == 'NZD':
-                      # ANZ Business Outlook: TE reports net balance directly (e.g. 64.1)
-                      # Do NOT add +100 — pass through as-is.
-                      # Positive = expansion, negative = contraction (centred at 0).
-                      return round(value, 2)
-                  # USD (ISM PMI), CAD (Ivey PMI), CHF (KOF ~100-based): pass-through
-                  return value
+                      return round(value, 2)   # pass-through — net balance centred at 0
+                  return value  # USD (ISM), CAD (Ivey), CHF (KOF): pass-through
 
               return value
 
+          # ── GENERIC TABLE SCRAPER ────────────────────────────────────────────────
           def scrape_te_table(url, label):
               print(f"\n{'='*50}\nSCRAPING: {label}\n{'='*50}")
               data, dates = {}, {}
@@ -171,11 +218,13 @@ jobs:
                       print("  ❌ No table found"); return data, dates
 
                   headers_row = [h.get_text(strip=True).lower() for h in table.find_all('th')]
-                  actual_idx = headers_row.index('actual') if 'actual' in headers_row else 1
-                  # Use "last" column if "actual" not present (country-list pages use "Last")
-                  if actual_idx == 1 and 'last' in headers_row:
+                  if 'actual' in headers_row:
+                      actual_idx = headers_row.index('actual')
+                  elif 'last' in headers_row:
                       actual_idx = headers_row.index('last')
-                  date_idx   = headers_row.index('reference') if 'reference' in headers_row else None
+                  else:
+                      actual_idx = 1
+                  date_idx = headers_row.index('reference') if 'reference' in headers_row else None
 
                   for row in table.find_all('tr')[1:]:
                       cols = row.find_all('td')
@@ -183,56 +232,57 @@ jobs:
                       ctry = cols[0].get_text(strip=True)
                       for code, names in COUNTRY_NAMES.items():
                           if any(n.lower() in ctry.lower() for n in names):
-                              raw_val = clean_num(cols[actual_idx].get_text(strip=True))
                               dt = parse_te_date(cols[date_idx].get_text(strip=True)) if date_idx and len(cols) > date_idx else str(date.today())
-                              if raw_val is not None:
-                                  # Normalize confidence indices to base-100 scale
-                                  if label in ('consumerConfidence', 'businessConfidence'):
+
+                              # ✅ Capital Flows: unit-aware parser (currency + scale -> USD millions)
+                              if label == 'capitalFlows':
+                                  val_usd = parse_capital_flows_row(cols)
+                                  if val_usd is not None:
+                                      unit_str = cols[4].get_text(strip=True) if len(cols) > 4 else 'N/A'
+                                      raw_str  = cols[1].get_text(strip=True)
+                                      print(f"  ✓ {code}: {raw_str} {unit_str} → {val_usd:.1f} USD M ({dt})")
+                                      data[code]  = val_usd
+                                      dates[code] = dt
+
+                              # Confidence: normalize to base-100
+                              elif label in ('consumerConfidence', 'businessConfidence'):
+                                  raw_val = clean_num(cols[actual_idx].get_text(strip=True))
+                                  if raw_val is not None:
                                       normalized = normalize_confidence(raw_val, code, label)
                                       print(f"  ✓ {code}: raw={raw_val} → normalized={normalized} ({dt})")
                                       data[code]  = round(normalized, 4) if normalized is not None else None
-                                  else:
+                                      dates[code] = dt
+
+                              # All other indicators: plain numeric
+                              else:
+                                  raw_val = clean_num(cols[actual_idx].get_text(strip=True))
+                                  if raw_val is not None:
                                       data[code]  = round(raw_val, 4)
+                                      dates[code] = dt
                                       print(f"  ✓ {code}: {raw_val} ({dt})")
-                                  dates[code] = dt
                               break
+
               except Exception as e:
                   print(f"  ❌ {e}")
               return data, dates
 
           # ── BOND YIELDS ─────────────────────────────────────────────────────────
-
           BOND_COUNTRY_MAP = {
-              'USD': ['United States'],
-              'EUR': ['Germany'],       # EUR proxy = Bund
-              'GBP': ['United Kingdom'],
-              'JPY': ['Japan'],
-              'CAD': ['Canada'],
-              'AUD': ['Australia'],
-              'CHF': ['Switzerland'],
-              'NZD': ['New Zealand'],
+              'USD': ['United States'], 'EUR': ['Germany'],
+              'GBP': ['United Kingdom'], 'JPY': ['Japan'],
+              'CAD': ['Canada'], 'AUD': ['Australia'],
+              'CHF': ['Switzerland'], 'NZD': ['New Zealand'],
           }
-
           BOND_COUNTRY_SLUGS = {
-              'USD': 'united-states',
-              'EUR': 'germany',
-              'GBP': 'united-kingdom',
-              'JPY': 'japan',
-              'CAD': 'canada',
-              'AUD': 'australia',
-              'CHF': 'switzerland',
-              'NZD': 'new-zealand',
+              'USD': 'united-states', 'EUR': 'germany',
+              'GBP': 'united-kingdom', 'JPY': 'japan',
+              'CAD': 'canada', 'AUD': 'australia',
+              'CHF': 'switzerland', 'NZD': 'new-zealand',
           }
-
           BOND_EXPECTED_RANGES = {
-              'USD': (3.0, 6.0),
-              'EUR': (1.5, 4.0),
-              'GBP': (3.5, 5.5),
-              'JPY': (0.5, 3.5),
-              'CAD': (2.5, 5.0),
-              'AUD': (3.5, 6.0),
-              'CHF': (0.0, 2.0),
-              'NZD': (3.5, 6.0),
+              'USD': (3.0, 6.0), 'EUR': (1.5, 4.0), 'GBP': (3.5, 5.5),
+              'JPY': (0.5, 3.5), 'CAD': (2.5, 5.0), 'AUD': (3.5, 6.0),
+              'CHF': (0.0, 2.0), 'NZD': (3.5, 6.0),
           }
 
           def _extract_bonds_from_all_tables(soup):
@@ -259,20 +309,18 @@ jobs:
               slug = BOND_COUNTRY_SLUGS.get(code)
               if not slug: return None, None
               min_val, max_val = BOND_EXPECTED_RANGES.get(code, (0.5, 10.0))
-
               url = f'https://tradingeconomics.com/{slug}/government-bond-yield'
               try:
                   r = requests.get(url, headers=HEADERS, timeout=15)
                   r.raise_for_status()
                   soup = BeautifulSoup(r.content, 'lxml')
-
                   for table in soup.find_all('table'):
                       for row in table.find_all('tr'):
                           cols = row.find_all('td')
                           for col in cols:
                               val = clean_num(col.get_text(strip=True))
                               if val is not None and min_val <= val <= max_val:
-                                  print(f"  ✓ {code}: {val}% (country page, range {min_val}-{max_val}%)")
+                                  print(f"  ✓ {code}: {val}% (country page)")
                                   return round(val, 3), str(date.today())
               except Exception as e:
                   print(f"  ❌ Country page fallback {code}: {e}")
@@ -281,7 +329,6 @@ jobs:
           def scrape_bonds():
               print(f"\n{'='*50}\nBOND YIELDS (3-level fallback)\n{'='*50}")
               data, dates = {}, {}
-
               try:
                   r = requests.get(TE_URLS['bond10y'], headers=HEADERS, timeout=20)
                   if r.status_code == 429:
@@ -324,7 +371,7 @@ jobs:
                                   data[code]  = w_data[code]
                                   dates[code] = w_dates[code]
                               else:
-                                  print(f"  ⚠️ {code}: {w_data[code]}% out of range ({min_v}-{max_v}%) → discarded")
+                                  print(f"  ⚠️ {code}: {w_data[code]}% out of range → discarded")
 
               except Exception as e:
                   print(f"  ❌ TE bond page error: {e}")
@@ -344,6 +391,10 @@ jobs:
               return data, dates
 
           # ── MAIN ─────────────────────────────────────────────────────────────────
+          # ✅ Load FX rates first — required for Capital Flows currency conversion
+          print(f"\n{'='*50}\nFETCHING FX RATES\n{'='*50}")
+          fetch_fx()
+
           all_data  = {c: {} for c in CURRENCIES}
           all_dates = {c: {} for c in CURRENCIES}
 
@@ -364,7 +415,7 @@ jobs:
           for curr in CURRENCIES:
               pkg = {
                   'lastUpdate': str(date.today()),
-                  'source': 'TradingEconomics (?continent=world) — v4 NZD businessConf pass-through',
+                  'source': 'TradingEconomics — v5 capitalFlows FX fix + NZD businessConf pass-through',
                   'data':   all_data[curr],
                   'dates':  all_dates[curr]
               }
@@ -389,7 +440,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v4 NZD pass-through fix"
+            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v5 capitalFlows FX fix"
             git pull --rebase origin main || true
             git push
           fi
