@@ -1336,17 +1336,6 @@ const fetchExtendedData = async (countryCode) => {
     return null;
 };
 
-       const fetchProductionDynamic = async (countryCode) => {
-            const cacheKey = `production_${countryCode}`;
-            const cached = CacheManager.get(cacheKey);
-            if (cached !== null) return cached;
-
-            try {
-                const githubUrl = `https://globalinvesting.github.io/economic-data/${countryCode}.json`;
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
         // ✅ OUTLOOK 100% DINÁMICO (sin hardcoding)
         const determineCentralBankOutlook = async (countryCode, economicData) => {
             const cacheKey = `outlook_${countryCode}`;
@@ -2410,11 +2399,11 @@ const checkDataHealth = (economicData) => {
             'capitalFlows', 'inflationExpectations'
         ];
         
-        const available = allIndicators.filter(ind => 
+        const available = indicators.filter(ind => 
             data[ind] !== null && data[ind] !== undefined
         ).length;
         
-        const completeness = Math.round((available / allIndicators.length) * 100);
+        const completeness = Math.round((available / indicators.length) * 100);
         
         if (completeness < 50) {
             issues.push(`${curr}: Completitud de datos muy baja (${completeness}%)`);
@@ -3247,7 +3236,9 @@ const getSortedCountries = () => {
         const indicators = [
             'gdpGrowth', 'interestRate', 'inflation', 'unemployment',
             'currentAccount', 'debt', 'tradeBalance', 'production',
-            'retailSales', 'wageGrowth', 'manufacturingPMI', 'cotPositioning'
+            'retailSales', 'wageGrowth', 'manufacturingPMI', 'cotPositioning',
+            'bond10y', 'consumerConfidence', 'businessConfidence',
+            'capitalFlows', 'inflationExpectations'
         ];
         
         let greenCellsA = 0;
