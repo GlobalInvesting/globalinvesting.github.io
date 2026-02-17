@@ -73,6 +73,7 @@ jobs:
                       'shortPositions': short_positions,
                       'source': 'CFTC (US Dollar Index - ICE Futures)',
                       'reportDate': str(date.today()),
+                      'lastUpdate': str(date.today()),  # ← Permite detección de staleness en el dashboard
                       'url': CFTC_URL
                   }
                   
@@ -124,6 +125,7 @@ jobs:
                                               'shortPositions': short_positions,
                                               'source': 'CFTC (US Dollar Index - ICE Futures)',
                                               'reportDate': str(date.today()),
+                                              'lastUpdate': str(date.today()),  # ← Permite detección de staleness en el dashboard
                                               'url': CFTC_URL
                                           }
                                           
@@ -167,7 +169,8 @@ jobs:
               print(f\"  Long:  {data['longPositions']:,}\")
               print(f\"  Short: {data['shortPositions']:,}\")
               print(f\"  Source: {data['source']}\")
-              print(f\"  Date: {data['reportDate']}\")
+              print(f\"  Report Date: {data['reportDate']}\")
+              print(f\"  Last Update: {data.get('lastUpdate', 'N/A')}\")
           "
           else
             echo "❌ USD.json not created"
