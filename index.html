@@ -1452,27 +1452,24 @@ const fetchExtendedData = async (countryCode) => {
             const cached = CacheManager.get(cacheKey);
             if (cached !== null) return cached;
 
-            const today = new Date();
-            const meetingPatterns = {
-                USD: [1, 3, 5, 7, 9, 11], EUR: [1, 3, 4, 6, 7, 9, 10, 11], GBP: [1, 3, 5, 6, 8, 9, 11],
-                JPY: [0, 1, 3, 4, 6, 7, 9, 10], AUD: [1, 3, 4, 5, 6, 7, 8, 10, 11],
-                CAD: [0, 1, 3, 4, 6, 7, 9, 10], CHF: [2, 5, 8, 11], NZD: [1, 4, 7, 10]
-            };
-            const pattern = meetingPatterns[countryCode] || [1, 4, 7, 10];
-            
-            let nextMeeting = null;
-            for (let month of pattern) {
-                if (month > today.getMonth() || (month === today.getMonth() && today.getDate() < 15)) {
-                    nextMeeting = new Date(today.getFullYear(), month, 15);
-                    break;
+            try {
+                const url = 'https://globalinvesting.github.io/meetings-data/meetings.json';
+                const response = await fetchWithRetry(url, { cache: 'no-cache', mode: 'cors' }, 3);
+                if (response.ok) {
+                    const data = await response.json();
+                    const meetingInfo = data.meetings && data.meetings[countryCode];
+                    if (meetingInfo && meetingInfo.nextMeeting) {
+                        console.log(`✅ Meeting date for ${countryCode}: ${meetingInfo.nextMeeting} (source: cbrates.com)`);
+                        CacheManager.set(cacheKey, meetingInfo.nextMeeting, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
+                        return meetingInfo.nextMeeting;
+                    }
                 }
+            } catch (error) {
+                console.warn(`Meetings fetch failed for ${countryCode}:`, error.message);
             }
-            if (!nextMeeting) nextMeeting = new Date(today.getFullYear() + 1, pattern[0], 15);
 
-            const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-            const result = `${nextMeeting.getDate()} ${monthNames[nextMeeting.getMonth()]}`;
-            CacheManager.set(cacheKey, result, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
-            return result;
+            console.warn(`❌ No meeting data available for ${countryCode}`);
+            return 'Por confirmar';
         };
 
         const generateDynamicEconomicCalendar = () => {
@@ -1789,7 +1786,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '4.7.0-2026-02-17'; // ✅ Health checks + retry logic + error boundary
+            const DASHBOARD_VERSION = '4.8.0-2026-02-17'; // ✅ Health checks + retry logic + error boundary
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -1895,6 +1892,12 @@ setDataLoadingStatus({
 
     economicData[country.code].manufacturingPMI = data.manufacturingPMI !== undefined ? data.manufacturingPMI : null;
     economicData[country.code].manufacturingPMIDate = dates.manufacturingPMI || scrapedData.lastUpdate;
+
+    // ── NUEVO: Terms of Trade ──────────────────────────────────────────────
+    // Índice donde 100 = período base. Sube = exportaciones ganan valor vs importaciones.
+    // Muy relevante para AUD, CAD, NZD (economías exportadoras de commodities).
+    economicData[country.code].termsOfTrade = data.termsOfTrade !== undefined ? data.termsOfTrade : null;
+    economicData[country.code].termsOfTradeDate = dates.termsOfTrade || scrapedData.lastUpdate;
 
     // COT se carga desde archivo separado después
     economicData[country.code].cotPositioning = data.cotPositioning !== undefined ? data.cotPositioning : null;
@@ -2002,18 +2005,13 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     };
     
 // ========== TRADING-ORIENTED WEIGHTS ==========
-// Suma total = 1.00 exacto
-// Tier 1: External Balance & Safe Haven  → 0.28
-// Tier 2: Rate Differentials & Carry     → 0.28
-// Tier 3: Growth & Employment            → 0.20
-// Tier 4: Consumption & Wages            → 0.09
-// Tier 5: Market Sentiment               → 0.15
-// TOTAL                                  → 1.00
 const TRADING_WEIGHTS = {
-    // Tier 1: External Balance & Safe Haven (0.28)
-    currentAccount:        { weight: 0.13, direction: 'higher' },
-    tradeBalance:          { weight: 0.10, direction: 'higher' },
-    debt:                  { weight: 0.05, direction: 'lower'  },
+    // Tier 1: External Balance & Safe Haven (0.27)
+    // termsOfTrade se agrega aquí porque impacta directamente los flujos comerciales reales
+    currentAccount:        { weight: 0.12, direction: 'higher' },
+    tradeBalance:          { weight: 0.09, direction: 'higher' },
+    debt:                  { weight: 0.04, direction: 'lower'  },
+    termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
 
     // Tier 2: Rate Differentials & Carry (0.28)
     interestRate:          { weight: 0.18, direction: 'higher' },
@@ -2037,8 +2035,10 @@ const TRADING_WEIGHTS = {
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
     capitalFlows:          { weight: 0.03, direction: 'flows'            },
 };
-// Verificación de suma (comentario de documentación):
-// 0.13+0.10+0.05 + 0.18+0.08+0.02 + 0.10+0.06+0.04 + 0.04+0.03+0.02 + 0.03+0.04+0.03+0.02+0.03 = 1.00
+// Verificación de suma (18 indicadores):
+// Tier1: 0.12+0.09+0.04+0.02=0.27 | Tier2: 0.18+0.08+0.02=0.28
+// Tier3: 0.10+0.06+0.04=0.20 | Tier4: 0.04+0.03+0.02=0.09 | Tier5: 0.03+0.04+0.03+0.02+0.03=0.15
+// TOTAL: 0.27+0.28+0.20+0.09+0.15 = 0.99 ← se normaliza automáticamente por totalWeight
 
     // ========== SCORING FUNCTIONS ==========
     const scoreIndicator = (value, indicator) => {
@@ -2156,6 +2156,17 @@ const TRADING_WEIGHTS = {
                 else if (value > -50000)  score = 10 + ((value + 50000) / 40000) * 20;
                 else                      score = Math.max(0, 10 - ((Math.abs(value) - 50000) / 100000) * 10);
                 break;
+
+             case 'terms_of_trade':
+                // Index base 100. >100 = favorable, <100 = unfavorable.
+                // Score peaks at 110+ and degrades below 95.
+                if (value >= 110)      score = 90 + Math.min((value - 110) / 20, 1) * 10;
+                else if (value >= 103) score = 70 + ((value - 103) / 7) * 20;
+                else if (value >= 100) score = 55 + ((value - 100) / 3) * 15;
+                else if (value >= 95)  score = 35 + ((value - 95) / 5) * 20;
+                else if (value >= 85)  score = 10 + ((value - 85) / 10) * 25;
+                else                   score = Math.max(0, 10 - ((85 - value) / 10) * 10);
+                break;               
 
             case 'moderate_bullish':
                 // cotPositioning
@@ -2527,7 +2538,8 @@ const indicatorTooltips = {
     bond10y: "Rendimiento del bono soberano a 10 años. Para EUR se usa el Bund alemán como proxy de la zona euro (referencia de mayor calidad crediticia). Refleja expectativas de tasas futuras e inflación. El diferencial de yields entre países es el 'yield spread' que mueve grandes flujos de capital.",    consumerConfidence: "Índice de confianza del consumidor. Base 100. >100 = optimismo, <100 = pesimismo. Indicador adelantado del gasto doméstico y crecimiento futuro.",
     businessConfidence: "Índice de confianza empresarial. Base 100. >100 = expansión esperada, <100 = contracción. Predice inversión, contrataciones y actividad futura.",
     capitalFlows: "Flujos netos de capital (cuenta financiera de la balanza de pagos). Positivo = entrada neta de inversión extranjera → demanda estructural de la divisa. Millones USD.",
-    inflationExpectations: "Expectativas de inflación a 1-2 años. Si superan el objetivo del BC (2%), presionan al alza las tasas futuras → hawkish implícito."
+    inflationExpectations: "Expectativas de inflación a 1-2 años. Si superan el objetivo del BC (2%), presionan al alza las tasas futuras → hawkish implícito.",
+    termsOfTrade: "Índice de términos de intercambio: ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un valor >100 significa que el país recibe más valor por sus exportaciones de lo que paga por sus importaciones → mejora cuenta corriente → positivo para la divisa. Especialmente relevante para AUD, CAD y NZD (economías exportadoras de commodities). Fuente: Trading Economics."
 };
 
         // ========== COMPONENTE PRINCIPAL ==========
@@ -2814,6 +2826,8 @@ const HeatmapCell = ({ value, type, currency, indicator, lastUpdate }) => {
                 )
 ) : type === 'bond10y' || type === 'inflationExpectations' ? (
                 <span className="cell-value">{formatValue(value, 2)}%</span>
+) : type === 'termsOfTrade' ? (
+                <span className="cell-value">{formatValue(value, 1)}</span>
             ) : type === 'consumerConfidence' || type === 'businessConfidence' ? (
                 <span className="cell-value">{formatValue(value, 1)}</span>
             ) : type === 'capitalFlows' ? (
@@ -2973,6 +2987,15 @@ const getHeatmapColor = (value, type) => {
             else if (value > 0)    { intensity = 0.3; isPositive = true;  }
             else if (value > -20000){ intensity = 0.4; isPositive = false; }
             else { intensity = Math.min(Math.abs(value) / 100000, 1); isPositive = false; }
+            break;
+
+        case 'termsOfTrade':
+            // Index base 100: >103 = favorable, <97 = unfavorable
+            if (value >= 110)      { intensity = Math.min((value - 110) / 20, 1); isPositive = true;  }
+            else if (value >= 103) { intensity = 0.6; isPositive = true;  }
+            else if (value >= 100) { intensity = 0.3; isPositive = true;  }
+            else if (value >= 95)  { intensity = 0.4; isPositive = false; }
+            else                   { intensity = Math.min((95 - value) / 15, 1); isPositive = false; }
             break;
 
         default:
@@ -3818,7 +3841,19 @@ const DataHealthCheck = ({ economicData }) => {
         {data.inflationExpectations !== null && data.inflationExpectations !== undefined
             ? `${formatValue(data.inflationExpectations, 1)}%` : 'N/D'}
     </div>
-</div>            
+</div>
+
+<div className="metric">
+    <div className="metric-label">Términos Intercambio</div>
+    <div className="metric-value metric-value-small" style={{
+        color: data.termsOfTrade !== null && data.termsOfTrade >= 103 ? 'var(--green-strong)' :
+               data.termsOfTrade !== null && data.termsOfTrade < 97  ? 'var(--red-strong)' :
+               'var(--text-primary)'
+    }}>
+        {data.termsOfTrade !== null && data.termsOfTrade !== undefined
+            ? formatValue(data.termsOfTrade, 1) : 'N/D'}
+    </div>
+</div>
                                 </div>
 
                                 <div className="analysis-section">
@@ -3907,7 +3942,10 @@ const DataHealthCheck = ({ economicData }) => {
 </TooltipCell>
 <TooltipCell title="Expectativas Inflación" tooltip={indicatorTooltips.inflationExpectations}>
     Exp. Inflación<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>%</span>
-</TooltipCell>                                                
+</TooltipCell>
+<TooltipCell title="Términos de Intercambio" tooltip={indicatorTooltips.termsOfTrade}>
+    Términos de Intercambio<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice base 100</span>
+</TooltipCell>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -3952,7 +3990,8 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.consumerConfidence} type="consumerConfidence" currency={country.code} indicator="consumerConfidence" lastUpdate={data.consumerConfidenceDate} />
 <HeatmapCell value={data.businessConfidence} type="businessConfidence" currency={country.code} indicator="businessConfidence" lastUpdate={data.businessConfidenceDate} />
 <HeatmapCell value={data.capitalFlows} type="capitalFlows" currency={country.code} indicator="capitalFlows" lastUpdate={data.capitalFlowsDate} />
-<HeatmapCell value={data.inflationExpectations} type="inflationExpectations" currency={country.code} indicator="inflationExpectations" lastUpdate={data.inflationExpectationsDate} />                                                        
+<HeatmapCell value={data.inflationExpectations} type="inflationExpectations" currency={country.code} indicator="inflationExpectations" lastUpdate={data.inflationExpectationsDate} />
+<HeatmapCell value={data.termsOfTrade} type="termsOfTrade" currency={country.code} indicator="termsOfTrade" lastUpdate={data.termsOfTradeDate} />
                                                     </tr>
                                                 );
                                             })}
