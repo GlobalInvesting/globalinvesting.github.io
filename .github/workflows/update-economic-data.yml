@@ -150,7 +150,6 @@ jobs:
               url = f'https://tradingeconomics.com/{country_slug}/{indicator_page}'
               try:
                   r = requests.get(url, headers=HEADERS, timeout=20)
-                  # Handle rate limiting
                   if r.status_code == 429:
                       print(f"  ⚠️ Rate limited by TE, waiting 30s...")
                       time.sleep(30)
@@ -162,14 +161,41 @@ jobs:
                   
                   soup = BeautifulSoup(r.content, 'lxml')
                   
+                  # ── STRATEGY 1: "Related indicators" table ──────────────────────────────
+                  # Headers: ['Related', 'Last', 'Previous', 'Unit', 'Reference']
+                  # This table has a proper Reference date (e.g. "Sep 2025") and covers
+                  # indicators published at non-monthly frequency (e.g. NZD quarterly).
+                  # The indicator name is in col[0]; we match it against indicator_page.
+                  for table in soup.find_all('table'):
+                      headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
+                      if 'last' in headers and 'reference' in headers:
+                          last_idx = headers.index('last')
+                          ref_idx  = headers.index('reference')
+                          # Keyword derived from URL slug (e.g. "industrial-production" → "industrial")
+                          keyword  = indicator_page.replace('-', ' ').split()[0].lower()
+                          for row in table.find_all('tr')[1:]:
+                              cells = row.find_all('td')
+                              if len(cells) <= max(last_idx, ref_idx):
+                                  continue
+                              row_label = cells[0].get_text(strip=True).lower()
+                              if keyword in row_label:
+                                  val = clean_num(cells[last_idx].get_text(strip=True))
+                                  if val is not None:
+                                      date_text = cells[ref_idx].get_text(strip=True)
+                                      data_date = parse_te_date(date_text)
+                                      print(f"    ✅ {currency_code} [related-table]: {val} (date: {data_date})")
+                                      return val, data_date
+                  
+                  # ── STRATEGY 2: Main stats table with 'actual' column ───────────────────
+                  # Headers: ['', 'Actual', 'Previous', 'Highest', 'Lowest', 'Dates', ...]
+                  # Value is reliable but 'Dates' contains a range ("1978 - 2025"), not a
+                  # single reference date — so we fall back to today only if Strategy 1
+                  # failed entirely.
                   for table in soup.find_all('table'):
                       headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
                       if 'actual' in headers:
                           actual_idx = headers.index('actual')
-                          date_idx = None
-                          if 'reference' in headers:
-                              date_idx = headers.index('reference')
-                          
+                          date_idx   = headers.index('reference') if 'reference' in headers else None
                           rows = table.find_all('tr')[1:]
                           if rows:
                               cells = rows[0].find_all('td')
@@ -180,8 +206,9 @@ jobs:
                                       date_text = cells[date_idx].get_text(strip=True)
                                       data_date = parse_te_date(date_text)
                                   if val is not None:
-                                      print(f"    ✅ {currency_code}: {val} (date: {data_date})")
+                                      print(f"    ✅ {currency_code} [actual-table]: {val} (date: {data_date})")
                                       return val, data_date
+                  
                   return None, None
               except Exception as e:
                   print(f"    ❌ Error scraping {country_slug}: {e}")
