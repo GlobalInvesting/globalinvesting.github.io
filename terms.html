@@ -338,7 +338,7 @@
         </div>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
-            <p>&copy; 2026 Global Investing. Todos los derechos reservados.</p>
+            <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem;">
                 <a href="index.html">Dashboard</a> | 
                 <a href="about.html">Acerca de</a> | 
@@ -348,5 +348,6 @@
             </p>
         </div>
     </div>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
