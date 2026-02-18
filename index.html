@@ -4452,8 +4452,8 @@ const DataHealthCheck = ({ economicData }) => {
                                         <thead>
                                             <tr>
                                                 <th></th>
-                                                <TooltipCell title="Síntesis: Estructural + Momentum" tooltip="Dos scores independientes: ESTRUCTURAL (3-12 meses) basado en 15 indicadores macro como PIB, tasa de interés, cuenta corriente y balanza comercial. MOMENTUM (1-4 semanas) basado en FX performance 1M, COT positioning y PMI. Cuando divergen, prioriza el horizonte relevante para tu estrategia.">
-    Síntesis<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>E + M</span>
+<TooltipCell title="Síntesis Estructural" tooltip="Score estructural (3-12 meses) basado en 15 indicadores macro: PIB, tasa de interés, cuenta corriente, balanza comercial, inflación, desempleo y otros fundamentos. Alcista ≥62 · Bajista ≤45.">
+    Síntesis<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Estructural</span>
 </TooltipCell>
                                                 <TooltipCell title="PIB Total" tooltip={indicatorTooltips.gdp}>
                                                     PIB<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Trillones USD</span>
@@ -4533,14 +4533,14 @@ const sentiment = getSentiment(strength);
                                                                 </div>
                                                             </div>
                                                         </td>
-<td style={{ background: 'var(--bg-card)', minWidth: '140px' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', padding: '0 0.25rem' }}>
-        <div className="overall-cell" title="Score estructural (3-12 meses): fundamentos macro">
-            <div className="overall-indicator" style={{ background: overallColor }}></div>
-            <span className="overall-label" style={{ color: overallColor, fontSize: '0.65rem' }}>
-                {sentiment} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>({strength})</span>
-            </span>
-        </div>
+<td style={{ background: 'var(--bg-card)', minWidth: '120px' }}>
+    <div className="overall-cell">
+        <div className="overall-indicator" style={{ background: overallColor }}></div>
+        <span className="overall-label" style={{ color: overallColor, fontSize: '0.7rem' }}>
+            {sentiment} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>({strength})</span>
+        </span>
+    </div>
+</td>
         {(() => {
             const mScore = calculateMomentumScore(country.code, data, forexRates, economicData);
             const mSentiment = getMomentumSentiment(mScore);
