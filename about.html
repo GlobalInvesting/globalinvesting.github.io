@@ -72,7 +72,6 @@
             <p style="margin: 0; font-size: 1.1rem;"><strong>Visión:</strong> Proporcionar análisis fundamental riguroso y basado en datos verificados para el mercado forex, combinando metodologías cuantitativas con fuentes oficiales de información económica, permitiendo a traders evaluar la fortaleza relativa de divisas de forma sistemática.</p>
         </div>
 
-        <!-- ✅ CORREGIDO: 17 indicadores (antes decía 13) -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number">8</div>
@@ -97,12 +96,11 @@
             <p>Nuestra plataforma ofrece análisis fundamental completo de las principales divisas G8:</p>
             <ul>
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas</li>
-                <!-- ✅ CORREGIDO: 18 columnas en heatmap (1 General + 1 PIB ref + 17 ponderados - pero el indicador visible es 18 columnas de datos) -->
-                <li><strong>Mapa de Calor de Indicadores:</strong> 17 métricas económicas ponderadas con codificación por color</li>
-                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 20-80 basado en ponderación de 18 factores</li>
+                <li><strong>Mapa de Calor de Indicadores:</strong> 18 métricas económicas ponderadas con codificación por color, más columna de PIB como referencia estructural</li>
+                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 20-80 basado en ponderación de 18 factores distribuidos en 5 tiers temáticos</li>
                 <li><strong>Términos de Intercambio:</strong> Ratio precio exportaciones/importaciones actualizado diariamente. Clave para AUD, CAD, NZD</li>
                 <li><strong>Próximas Reuniones Reales:</strong> Fechas oficiales de reuniones de bancos centrales desde cbrates.com, actualizadas semanalmente</li>
-                <li><strong>Análisis de Bancos Centrales:</strong> Tasas de política, calendarios y perspectivas dinámicas (Hawkish/Neutral/Dovish)</li>
+                <li><strong>Análisis de Bancos Centrales:</strong> Tasas de política, calendarios y perspectivas dinámicas (Hawkish/Neutral/Dovish) calculadas algorítmicamente</li>
                 <li><strong>Datos de Balance Externo:</strong> Cuenta corriente y balanza comercial</li>
                 <li><strong>Bonos Soberanos 10Y:</strong> Yield del bono a 10 años como indicador de carry y expectativas</li>
                 <li><strong>Confianza del Consumidor y Empresarial:</strong> Índices de sentimiento económico adelantados</li>
@@ -110,7 +108,7 @@
                 <li><strong>Expectativas de Inflación:</strong> Indicador de credibilidad del banco central y presiones futuras</li>
                 <li><strong>Posicionamiento COT:</strong> Sentimiento especulativo desde reportes CFTC semanales</li>
                 <li><strong>Recomendaciones de Pares:</strong> Sugerencias LONG/SHORT basadas en diferenciales de fortaleza fundamental</li>
-                <li><strong>Visualización Intuitiva:</strong> Interface optimizada para evaluación rápida con tooltips explicativos</li>
+                <li><strong>Visualización Intuitiva:</strong> Interface optimizada para evaluación rápida con tooltips explicativos en cada indicador</li>
             </ul>
         </div>
 
@@ -120,9 +118,8 @@
             <h3>Enfoque Data-Driven</h3>
             <p>Nuestro modelo está diseñado específicamente para trading de divisas y se basa en factores económicos que históricamente han mostrado correlación con movimientos en el mercado forex:</p>
 
-            <!-- ✅ CORREGIDO: Tabla actualizada con pesos reales del modelo (v4.7.0) -->
             <h3>Sistema de Ponderación — 18 Indicadores (100% Data-Driven)</h3>
-<p>Cada indicador económico contribuye al score final según su relevancia para el trading de divisas. El modelo organiza los 18 indicadores en 5 tiers temáticos que suman ~99% (normalizado automáticamente por el motor de scoring):</p>
+            <p>Cada indicador económico contribuye al score final según su relevancia para el trading de divisas. El modelo organiza los 18 indicadores en 5 tiers temáticos. El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring porque es un stock (nivel acumulado) y no captura momentum; en su lugar se utiliza el crecimiento del PIB (Tier 3), que sí es un indicador de flujo relevante para el trading.</p>
 
             <table>
                 <thead>
@@ -134,7 +131,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- TIER 1: Balance Externo — 27% total (+ToT) -->
                     <tr>
                         <td rowspan="4"><strong>Tier 1 (27%)</strong><br/>Balance Externo<br/>&amp; Safe Haven</td>
                         <td>Cuenta Corriente</td>
@@ -156,7 +152,6 @@
                         <td>2%</td>
                         <td>Ratio precio exportaciones/importaciones (base 100). Especialmente relevante para AUD, CAD, NZD</td>
                     </tr>
-                    <!-- TIER 2: Tasas & Carry — 28% total -->
                     <tr>
                         <td rowspan="3"><strong>Tier 2 (28%)</strong><br/>Tasas &amp; Carry</td>
                         <td>Tasa de Interés</td>
@@ -173,7 +168,6 @@
                         <td>2%</td>
                         <td>Yield a largo plazo y atractivo para inversores de renta fija</td>
                     </tr>
-                    <!-- TIER 3: Crecimiento & Empleo — 20% total -->
                     <tr>
                         <td rowspan="3"><strong>Tier 3 (20%)</strong><br/>Crecimiento<br/>&amp; Empleo</td>
                         <td>Crecimiento PIB</td>
@@ -188,9 +182,8 @@
                     <tr>
                         <td>Producción Industrial</td>
                         <td>4%</td>
-                        <td>Actividad del sector real (% MoM) — más oportuno que YoY para capturar momentum industrial mensual</td>
+                        <td>Actividad del sector real (% MoM). Para NZD el dato es trimestral (QoQ) por frecuencia de publicación de Statistics New Zealand</td>
                     </tr>
-                    <!-- TIER 4: Consumo & Salarios — 9% total -->
                     <tr>
                         <td rowspan="3"><strong>Tier 4 (9%)</strong><br/>Consumo<br/>&amp; Salarios</td>
                         <td>Ventas Minoristas</td>
@@ -207,12 +200,11 @@
                         <td>2%</td>
                         <td>Credibilidad del BC y anclaje de expectativas (objetivo 1.8–2.5%)</td>
                     </tr>
-                    <!-- TIER 5: Sentimiento de Mercado — 15% total -->
                     <tr>
                         <td rowspan="5"><strong>Tier 5 (15%)</strong><br/>Sentimiento<br/>de Mercado</td>
                         <td>COT Positioning</td>
                         <td>4%</td>
-                        <td>Posicionamiento especulativo neto (CFTC oficial)</td>
+                        <td>Posicionamiento especulativo neto (CFTC oficial). Para EUR, GBP, JPY, AUD, CAD, CHF, NZD: Investing.com. Para USD: US Dollar Index (DXY) vía CFTC directo</td>
                     </tr>
                     <tr>
                         <td>Flujos de Capital</td>
@@ -222,7 +214,7 @@
                     <tr>
                         <td>Confianza del Consumidor</td>
                         <td>3%</td>
-                        <td>Índice adelantado del gasto privado (base 100)</td>
+                        <td>Índice adelantado del gasto privado. Normalizado a base 100 (EUR, GBP: +100; JPY: escala propia; CHF: +130; resto: ya en base 100)</td>
                     </tr>
                     <tr>
                         <td>PMI Manufacturero</td>
@@ -232,22 +224,21 @@
                     <tr>
                         <td>Confianza Empresarial</td>
                         <td>2%</td>
-                        <td>Indicador adelantado de inversión y contrataciones (base 100)</td>
+                        <td>Indicador adelantado de inversión y contrataciones. Normalizado a base 100 (EUR, GBP, JPY, AUD: +100; NZD: balance neto sin ajuste; USD, CAD, CHF: escala propia)</td>
                     </tr>
-                    <!-- TOTAL -->
                     <tr style="background: rgba(38,166,154,0.1);">
                         <td><strong>TOTAL</strong></td>
                         <td><strong>18 Indicadores</strong></td>
-                        <td><strong>~100%</strong></td>
-                        <td><strong>27% + 28% + 20% + 9% + 15% = 99% (normalizado automáticamente)</strong></td>
+                        <td><strong>~99%</strong></td>
+                        <td><strong>27% + 28% + 20% + 9% + 15% = 99% (normalizado automáticamente por el motor de scoring)</strong></td>
                     </tr>
                 </tbody>
             </table>
 
             <h3>Ajustes Contextuales Dinámicos</h3>
-            <p>Además de los 18 indicadores ponderados, el modelo aplica modificadores contextuales (±15 puntos máximo) basados en condiciones macroeconómicas específicas:</p>
+            <p>Además de los 18 indicadores ponderados, el modelo aplica modificadores contextuales (±15 puntos máximo sobre el score final) basados en condiciones macroeconómicas específicas:</p>
             <ul>
-                <li><strong>Activo Refugio (Safe Haven):</strong> Evalúa deuda baja, superávit externo y estabilidad de precios. Se amplifica en entornos de aversión al riesgo (COT promedio negativo). Beneficia principalmente a CHF, JPY y USD.</li>
+                <li><strong>Activo Refugio (Safe Haven):</strong> Evalúa deuda baja, superávit externo y estabilidad de precios. Se amplifica en entornos de aversión al riesgo (COT promedio negativo entre las 8 divisas). Beneficia principalmente a CHF, JPY y USD.</li>
                 <li><strong>Exposición a Materias Primas:</strong> Aplicable solo a AUD, CAD y NZD. Ajusta según crecimiento económico global y superávit comercial. Positivo en ciclos de expansión global, negativo en contracción.</li>
                 <li><strong>Prima de Carry Trade:</strong> Bonificación para divisas con tasas de interés significativamente superiores al promedio de las 8 divisas del modelo.</li>
                 <li><strong>Impacto Recesivo:</strong> Penalización proporcional cuando PIB &lt; 0%, amplificada si hay desempleo elevado.</li>
@@ -257,7 +248,7 @@
             </ul>
 
             <h3>Normalización y Escala Final (20–80)</h3>
-            <p>El score final se normaliza a un rango de 20–80 puntos. El modelo suma los 18 indicadores ponderados y divide por el peso total de los indicadores con datos disponibles, evitando que la falta de un dato penalice artificialmente el score:</p>
+            <p>El score final se normaliza a un rango de 20–80 puntos. El motor suma los indicadores ponderados y divide por el peso total de los indicadores con datos disponibles, evitando que la ausencia de un dato penalice artificialmente el score:</p>
             <ul>
                 <li><strong>Alcista (≥ 62):</strong> Top ~30% de divisas. Múltiples indicadores favorables y ajustes contextuales positivos.</li>
                 <li><strong>Neutral (45–62):</strong> Middle ~40%. Factores mixtos que se compensan.</li>
@@ -302,7 +293,6 @@
                 </tbody>
             </table>
 
-            <!-- ✅ CORREGIDO: Ejemplo actualizado con 17 indicadores -->
             <h3>Ejemplo Práctico</h3>
             <div class="highlight-box">
                 <p><strong>Recomendación:</strong> <code>EUR/JPY</code> LONG (Comprar)</p>
@@ -311,7 +301,7 @@
                 <p><strong>Fortaleza EUR (+72.3):</strong></p>
                 <ul style="margin-left: 2rem; margin-top: 0.5rem; margin-bottom: 1rem;">
                     <li>Tasa de Interés: +14.2 (peso 18%)</li>
-                    <li>Cuenta Corriente: +11.8 (peso 13%)</li>
+                    <li>Cuenta Corriente: +11.8 (peso 12%)</li>
                     <li>Crecimiento PIB: +8.5 (peso 10%)</li>
                 </ul>
                 <p><strong>Debilidad JPY (39.8):</strong></p>
@@ -349,11 +339,14 @@
 
             <h3>Proveedores Principales</h3>
             <ul>
-                <li><strong>Trading Economics:</strong> Indicadores macroeconómicos actualizados diariamente (PIB, Inflación, Desempleo, Balanza Comercial, Ventas Minoristas, Salarios, PMI, Bonos 10Y, Confianza, Flujos de Capital)</li>
-                <li><strong>FRED (Federal Reserve Economic Data):</strong> Tasas de interés y datos de bancos centrales oficiales</li>
-                <li><strong>Alpha Vantage:</strong> Federal Funds Rate (fallback para USD)</li>
-                <li><strong>CFTC (Commodity Futures Trading Commission):</strong> Reportes COT semanales oficiales</li>
-                <li><strong>ExchangeRate-API / Frankfurter:</strong> Tipos de cambio en tiempo real</li>
+                <li><strong>Trading Economics:</strong> Indicadores macroeconómicos actualizados diariamente (PIB, Inflación, Desempleo, Balanza Comercial, Ventas Minoristas, Salarios, PMI, Bonos 10Y, Confianza, Flujos de Capital, Expectativas de Inflación, Términos de Intercambio)</li>
+                <li><strong>ONS (Office for National Statistics):</strong> Términos de Intercambio GBP vía serie CTSL (datos trimestrales SA)</li>
+                <li><strong>OECD API:</strong> Términos de Intercambio EUR (fallback a proxy Alemania si la API no responde)</li>
+                <li><strong>World Bank:</strong> Términos de Intercambio como fallback final (indicador TT.PRI.MRCH.XD.WD)</li>
+                <li><strong>CFTC (Commodity Futures Trading Commission):</strong> Reportes COT semanales oficiales para USD (US Dollar Index DXY)</li>
+                <li><strong>Investing.com:</strong> Datos COT semanales para EUR, GBP, JPY, AUD, CAD, CHF, NZD</li>
+                <li><strong>cbrates.com:</strong> Fechas oficiales de reuniones de bancos centrales (actualizadas cada lunes)</li>
+                <li><strong>ExchangeRate-API / Frankfurter:</strong> Tipos de cambio en tiempo real (6 proveedores en cascada)</li>
             </ul>
 
             <h3>Frecuencia de Actualización</h3>
@@ -367,51 +360,54 @@
                 </thead>
                 <tbody>
                     <tr><td>Tipos de Cambio</td><td>60 segundos</td><td>APIs de Forex (6 proveedores en cascada)</td></tr>
-                    <tr><td>Indicadores Económicos (12 base)</td><td>24 horas</td><td>Trading Economics</td></tr>
-                    <tr><td>Términos de Intercambio</td><td>24 horas</td><td>Trading Economics (ratio export prices / import prices). EUR: calculado internamente desde índices de precios de exportación e importación de la Eurozona</td></tr>
-                    <tr><td>Indicadores Extendidos (5)</td><td>24 horas</td><td>Trading Economics (extended-data endpoint)</td></tr>
-                    <tr><td>Tasas de Interés</td><td>24 horas</td><td>Trading Economics / Bancos Centrales</td></tr>
-                    <tr><td>Datos COT</td><td>Semanal (Viernes 15:30 ET)</td><td>CFTC — disponible con ~3 días de retraso natural</td></tr>
-                    <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (cada lunes)</td><td>cbrates.com (International Central Banks — fechas oficiales)</td></tr>
-                    <tr><td>Recomendaciones de Pares</td><td>Calculado en tiempo real</td><td>Algoritmo basado en scores actuales</td></tr>
+                    <tr><td>Indicadores Económicos base (12)</td><td>24 horas (06:00 UTC)</td><td>Trading Economics</td></tr>
+                    <tr><td>Indicadores Extendidos (6: bonos, confianza, flujos, exp. inflación)</td><td>24 horas (06:30 UTC)</td><td>Trading Economics</td></tr>
+                    <tr><td>Tasas de Interés</td><td>24 horas (08:00 UTC)</td><td>Trading Economics / referencia del período de política</td></tr>
+                    <tr><td>Términos de Intercambio</td><td>24 horas</td><td>TE (todos) → ONS (GBP) → OECD (EUR) → DE proxy → World Bank</td></tr>
+                    <tr><td>Datos COT — EUR, GBP, JPY, AUD, CAD, CHF, NZD</td><td>Semanal (Viernes 20:00 UTC)</td><td>Investing.com</td></tr>
+                    <tr><td>Datos COT — USD</td><td>Semanal (Viernes 20:30 UTC)</td><td>CFTC directo (US Dollar Index DXY)</td></tr>
+                    <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com (fechas oficiales)</td></tr>
                     <tr><td>Perspectiva Bancos Centrales (Outlook)</td><td>Calculado dinámicamente</td><td>Algoritmo basado en inflación, crecimiento, desempleo y tasa actual</td></tr>
+                    <tr><td>Recomendaciones de Pares</td><td>Calculado en tiempo real</td><td>Algoritmo basado en scores actuales</td></tr>
                 </tbody>
             </table>
 
             <h3>Sistema de Detección de Frescura de Datos</h3>
             <p>El dashboard incluye un sistema activo de verificación de calidad que monitorea automáticamente:</p>
             <ul>
-                <li><strong>Antigüedad de Datos:</strong> Alerta si algún país tiene datos con más de 7 días de antigüedad</li>
-                <li><strong>Staleness de COT:</strong> Si el scraping del viernes falla, el timestamp COT más antiguo se propaga como referencia, permitiendo detectar que los datos de posicionamiento están desactualizados</li>
-                <li><strong>Indicadores Críticos Faltantes:</strong> Verifica que tasa, inflación, PIB y desempleo estén disponibles para cada país</li>
-                <li><strong>Completitud General:</strong> Score de completitud por divisa (% de 18 indicadores disponibles). Alerta si &lt; 50%, aviso si &lt; 70%</li>
-                <li><strong>Rango de Valores:</strong> Detecta valores fuera de rango que podrían indicar errores de scraping</li>
+                <li><strong>Antigüedad de Datos:</strong> Alerta si algún país tiene datos con más de 7 días de antigüedad; aviso entre 3 y 7 días</li>
+                <li><strong>Staleness de COT:</strong> El timestamp del reporte COT se propaga en cada archivo, permitiendo detectar que los datos de posicionamiento están desactualizados si el workflow del viernes falla</li>
+                <li><strong>Indicadores Críticos Faltantes:</strong> Verifica que tasa de interés, inflación, PIB y desempleo estén disponibles para cada divisa</li>
+                <li><strong>Completitud General:</strong> Score de completitud por divisa (% de 18 indicadores disponibles). Alerta crítica si &lt; 50%, aviso si &lt; 70%</li>
+                <li><strong>Rango de Valores:</strong> Detecta valores fuera de rango que podrían indicar errores de scraping (inflación, desempleo, tasa de interés)</li>
             </ul>
+
+            <h3>Nota sobre la Columna PIB en el Mapa de Calor</h3>
+            <p>El PIB total (en trillones USD) aparece como primera columna de datos en el mapa de calor, pero <strong>no forma parte del modelo de scoring</strong> ni tiene color de calor asignado. Su función es puramente referencial: permite al usuario contextualizar el tamaño económico de cada divisa. El indicador relevante para el score es el <strong>Crecimiento del PIB</strong> (% anual), que sí está incluido en el Tier 3 con un peso del 10%.</p>
 
             <h3>Nota sobre Perspectiva de Bancos Centrales</h3>
-            <p>El "Outlook" (Hawkish/Neutral/Dovish) visible en cada tarjeta de divisa del dashboard se calcula mediante un algoritmo de scoring dinámico que evalúa:</p>
+            <p>El "Outlook" (Hawkish/Neutral/Dovish) visible en cada tarjeta se calcula mediante un algoritmo de scoring dinámico:</p>
             <ul>
-                <li>Si inflación &gt; 3.0% → +2 puntos | Si inflación &lt; 1.5% → −2 puntos</li>
-                <li>Si crecimiento PIB &gt; 2.5% → +1 punto | Si crecimiento PIB &lt; 1.0% → −2 puntos</li>
-                <li>Si desempleo &lt; 3.5% → +1 punto | Si desempleo &gt; 6.0% → −1 punto</li>
-                <li>Si tasa de interés &gt; 4.0% → +1 punto | Si tasa de interés &lt; 2.0% → −1 punto</li>
+                <li>Si inflación &gt; 3.0% → +2 | Si inflación &lt; 1.5% → −2</li>
+                <li>Si crecimiento PIB &gt; 2.5% → +1 | Si crecimiento PIB &lt; 1.0% → −2</li>
+                <li>Si desempleo &lt; 3.5% → +1 | Si desempleo &gt; 6.0% → −1</li>
+                <li>Si tasa de interés &gt; 4.0% → +1 | Si tasa de interés &lt; 2.0% → −1</li>
             </ul>
-            <p><strong>Clasificación:</strong> Score ≥ 2 = Hawkish (restrictivo) | Score ≤ −2 = Dovish (acomodaticio) | Score entre −1 y +1 = Neutral</p>
-            <p>Este cálculo se actualiza cada 24 horas junto con los datos económicos y refleja la postura probable del banco central basándose en condiciones macroeconómicas actuales, no en declaraciones oficiales.</p>
+            <p><strong>Clasificación:</strong> Score ≥ 2 = Hawkish | Score ≤ −2 = Dovish | Score entre −1 y +1 = Neutral. Este cálculo refleja la postura probable basada en condiciones macroeconómicas actuales, no en declaraciones oficiales de los bancos centrales.</p>
 
             <h3>Nota sobre Próximas Reuniones de Bancos Centrales</h3>
-            <p>Las fechas de próximas reuniones de bancos centrales se obtienen semanalmente (cada lunes) mediante scraping de <a href="https://www.cbrates.com/meetings.htm" target="_blank">cbrates.com</a>, que agrega los calendarios oficiales de todos los bancos centrales del mundo. Las fechas son reales y oficiales, no estimadas algorítmicamente. El workflow de GitHub Actions actualiza el archivo <code>meetings-data/meetings.json</code> con la próxima reunión de cada banco central y el calendario completo para el año en curso.</p>
+            <p>Las fechas se obtienen semanalmente (cada lunes) mediante scraping de <a href="https://www.cbrates.com/meetings.htm" target="_blank">cbrates.com</a>, que agrega los calendarios oficiales de todos los bancos centrales del mundo. Las fechas son reales y oficiales, no estimadas algorítmicamente.</p>
 
             <h3>Nota sobre Términos de Intercambio</h3>
-            <p>El índice de Términos de Intercambio (Terms of Trade) mide el ratio entre el precio de las exportaciones y el precio de las importaciones de un país, con base 100 en un período de referencia. Un índice >100 indica que el país exporta más valor del que importa en términos de precios, lo que mejora la balanza comercial y genera mayor demanda de la divisa local. Este indicador es especialmente relevante para AUD, CAD y NZD, donde los precios de materias primas (mineral de hierro, petróleo, productos agrícolas) tienen un impacto directo. El dato se actualiza diariamente desde Trading Economics y se incluye en el Tier 1 del modelo con un peso del 2%.</p>
-            
+            <p>El índice mide el ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un índice &gt;100 indica que el país exporta más valor del que importa en términos de precios. El sistema usa una cadena de fallback: Trading Economics → ONS (GBP) → OECD API (EUR) → Proxy Alemania (EUR fallback, correlación &gt;0.95 con EA20) → World Bank. Es especialmente relevante para AUD, CAD y NZD.</p>
+
             <h3>Nota sobre Datos COT</h3>
-            <p>Los datos de Commitment of Traders provienen de reportes oficiales de la CFTC publicados cada viernes a las 15:30 ET, reflejando posiciones hasta el martes previo. Para USD utilizamos el US Dollar Index (DXY) de ICE Futures. Datos con ~3 días de retraso natural. El dashboard detecta automáticamente si los datos COT están desactualizados comparando el timestamp del último reporte con la fecha actual.</p>
+            <p>Los datos de Commitment of Traders provienen de dos fuentes: reportes oficiales CFTC (para USD, publicados cada viernes a las 15:30 ET usando el US Dollar Index DXY de ICE Futures) e Investing.com para las 7 divisas restantes. Todos los datos COT tienen un retraso natural de ~3 días ya que reflejan posiciones hasta el martes previo. El dashboard detecta automáticamente si los datos están desactualizados comparando el timestamp del último reporte.</p>
 
             <h3>Nota sobre Tendencias Históricas</h3>
             <p>La pestaña "Tendencias Históricas" muestra dos series por divisa:</p>
             <ul>
-                <li><strong>Tasa de Interés:</strong> Datos reales históricos</li>
+                <li><strong>Tasa de Interés:</strong> Datos reales históricos almacenados</li>
                 <li><strong>Índice de Fortaleza:</strong> Estimación algorítmica basada en el score actual con variación simulada — <em>no representa datos históricos reales</em>. Para análisis retrospectivo preciso, consultar fuentes primarias (FRED, Trading Economics)</li>
             </ul>
         </div>
@@ -423,7 +419,7 @@
                 <li><strong>Pesos Explícitos:</strong> Cada uno de los 18 factores muestra su contribución exacta al score</li>
                 <li><strong>Cálculos Visibles:</strong> La lógica de scoring está disponible en el código fuente del dashboard</li>
                 <li><strong>Datos Verificables:</strong> Todas las métricas pueden ser confirmadas en fuentes oficiales</li>
-                <li><strong>Limitaciones Claras:</strong> Reconocemos qué no incluimos (Net Foreign Assets — descartado por datos con 2-3 años de retraso, yield curves completas, etc.)</li>
+                <li><strong>Limitaciones Claras:</strong> El PIB total no está en el modelo de scoring (solo referencia visual). Net Foreign Assets fue descartado por retraso de 2–3 años en la publicación de datos. Yield curves completas no incluidas por complejidad de normalización</li>
                 <li><strong>Metodología Documentada:</strong> El algoritmo de recomendaciones de pares está completamente explicado</li>
                 <li><strong>Honestidad sobre Datos Históricos:</strong> El índice de fortaleza histórico es una estimación algorítmica, no datos reales</li>
             </ul>
