@@ -102,7 +102,7 @@
                 <li><strong>Próximas Reuniones Reales:</strong> Fechas oficiales de reuniones de bancos centrales desde cbrates.com, actualizadas semanalmente</li>
                 <li><strong>Análisis de Bancos Centrales:</strong> Tasas de política, calendarios y perspectivas dinámicas (Hawkish/Neutral/Dovish) calculadas algorítmicamente</li>
                 <li><strong>Datos de Balance Externo:</strong> Cuenta corriente y balanza comercial</li>
-                <li><strong>Bonos Soberanos 10Y:</strong> Yield del bono a 10 años como indicador de carry y expectativas</li>
+                <li><strong>Bonos Soberanos 10Y:</strong> Yield del bono a 10 años como indicador de carry y expectativas. Para EUR se usa el yield oficial de la Zona Euro (GEUGB10Y — agregado publicado directamente por Trading Economics)</li>
                 <li><strong>Confianza del Consumidor y Empresarial:</strong> Índices de sentimiento económico adelantados</li>
                 <li><strong>Flujos de Capital:</strong> Balance de la cuenta financiera como proxy de demanda estructural de divisa</li>
                 <li><strong>Expectativas de Inflación:</strong> Indicador de credibilidad del banco central y presiones futuras</li>
@@ -166,7 +166,7 @@
                     <tr>
                         <td>Bono Soberano 10Y</td>
                         <td>2%</td>
-                        <td>Yield a largo plazo y atractivo para inversores de renta fija</td>
+                        <td>Yield a largo plazo y atractivo para inversores de renta fija. Para EUR: GEUGB10Y (yield oficial Zona Euro, Trading Economics). Para USD: US 10Y Treasury. Para el resto: bono soberano nacional a 10 años.</td>
                     </tr>
                     <tr>
                         <td rowspan="3"><strong>Tier 3 (20%)</strong><br/>Crecimiento<br/>&amp; Empleo</td>
@@ -239,6 +239,7 @@
             <p>Además de los 18 indicadores ponderados, el modelo aplica modificadores contextuales (±15 puntos máximo sobre el score final) basados en condiciones macroeconómicas específicas:</p>
             <ul>
                 <li><strong>Activo Refugio (Safe Haven):</strong> Evalúa deuda baja, superávit externo y estabilidad de precios. Se amplifica en entornos de aversión al riesgo (COT promedio negativo entre las 8 divisas). Beneficia principalmente a CHF, JPY y USD.</li>
+                <li><strong>Prima Safe Haven Tasa Baja:</strong> Corrección específica para CHF y JPY: compensa la penalización que el modelo de tasa de interés aplica a estas divisas cuando sus tasas son significativamente inferiores al promedio global, ya que su atractivo proviene del refugio, no del carry.</li>
                 <li><strong>Exposición a Materias Primas:</strong> Aplicable solo a AUD, CAD y NZD. Ajusta según crecimiento económico global y superávit comercial. Positivo en ciclos de expansión global, negativo en contracción.</li>
                 <li><strong>Prima de Carry Trade:</strong> Bonificación para divisas con tasas de interés significativamente superiores al promedio de las 8 divisas del modelo.</li>
                 <li><strong>Impacto Recesivo:</strong> Penalización proporcional cuando PIB &lt; 0%, amplificada si hay desempleo elevado.</li>
@@ -339,7 +340,7 @@
 
             <h3>Proveedores Principales</h3>
             <ul>
-                <li><strong>Trading Economics:</strong> Indicadores macroeconómicos actualizados diariamente (PIB, Inflación, Desempleo, Balanza Comercial, Ventas Minoristas, Salarios, PMI, Bonos 10Y, Confianza, Flujos de Capital, Expectativas de Inflación, Términos de Intercambio)</li>
+                <li><strong>Trading Economics:</strong> Indicadores macroeconómicos actualizados diariamente (PIB, Inflación, Desempleo, Balanza Comercial, Ventas Minoristas, Salarios, PMI, Confianza, Flujos de Capital, Expectativas de Inflación, Términos de Intercambio). Para los bonos 10Y de EUR, Trading Economics publica directamente el yield oficial de la Zona Euro con símbolo <code>GEUGB10Y:GOV</code> en su página de mercados de bonos (<code>/bonds</code>).</li>
                 <li><strong>ONS (Office for National Statistics):</strong> Términos de Intercambio GBP vía serie CTSL (datos trimestrales SA)</li>
                 <li><strong>OECD API:</strong> Términos de Intercambio EUR (fallback a proxy Alemania si la API no responde)</li>
                 <li><strong>World Bank:</strong> Términos de Intercambio como fallback final (indicador TT.PRI.MRCH.XD.WD)</li>
@@ -364,6 +365,8 @@
                     <tr><td>Indicadores Extendidos (6: bonos, confianza, flujos, exp. inflación)</td><td>24 horas (06:30 UTC)</td><td>Trading Economics</td></tr>
                     <tr><td>Tasas de Interés</td><td>24 horas (08:00 UTC)</td><td>Trading Economics / referencia del período de política</td></tr>
                     <tr><td>Términos de Intercambio</td><td>24 horas</td><td>TE (todos) → ONS (GBP) → OECD (EUR) → DE proxy → World Bank</td></tr>
+                    <tr><td>Bonos 10Y — EUR</td><td>24 horas (06:30 UTC)</td><td>Trading Economics <code>GEUGB10Y:GOV</code> (yield EA, página /bonds)</td></tr>
+                    <tr><td>Bonos 10Y — resto</td><td>24 horas (06:30 UTC)</td><td>Trading Economics country-list/government-bond-yield</td></tr>
                     <tr><td>Datos COT — EUR, GBP, JPY, AUD, CAD, CHF, NZD</td><td>Semanal (Viernes 20:00 UTC)</td><td>Investing.com</td></tr>
                     <tr><td>Datos COT — USD</td><td>Semanal (Viernes 20:30 UTC)</td><td>CFTC directo (US Dollar Index DXY)</td></tr>
                     <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com (fechas oficiales)</td></tr>
@@ -381,6 +384,9 @@
                 <li><strong>Completitud General:</strong> Score de completitud por divisa (% de 18 indicadores disponibles). Alerta crítica si &lt; 50%, aviso si &lt; 70%</li>
                 <li><strong>Rango de Valores:</strong> Detecta valores fuera de rango que podrían indicar errores de scraping (inflación, desempleo, tasa de interés)</li>
             </ul>
+
+            <h3>Nota sobre Bono 10Y — EUR</h3>
+            <p>Trading Economics publica en su página de mercados de bonos (<code>tradingeconomics.com/bonds</code>) una fila explícita para <strong>"Euro area"</strong> con el símbolo <code>GEUGB10Y:GOV</code>. Este es el yield oficial del agregado de la Zona Euro, distinto del Bund alemán (<code>GDBR10</code>, símbolo que aparece en la página de indicadores por país). El workflow de datos extendidos (v6) extrae este yield directamente usando el atributo <code>data-symbol="GEUGB10Y:GOV"</code> del DOM, garantizando que el dato EUR corresponda al agregado de la eurozona y no a ningún soberano individual. El Bund alemán (2.74% en Feb 2026) difiere significativamente del yield EA (3.10%), lo que hace crítica esta distinción para el análisis de carry y flujos de capital.</p>
 
             <h3>Nota sobre la Columna PIB en el Mapa de Calor</h3>
             <p>El PIB total (en trillones USD) aparece como primera columna de datos en el mapa de calor, pero <strong>no forma parte del modelo de scoring</strong> ni tiene color de calor asignado. Su función es puramente referencial: permite al usuario contextualizar el tamaño económico de cada divisa. El indicador relevante para el score es el <strong>Crecimiento del PIB</strong> (% anual), que sí está incluido en el Tier 3 con un peso del 10%.</p>
@@ -419,6 +425,7 @@
                 <li><strong>Pesos Explícitos:</strong> Cada uno de los 18 factores muestra su contribución exacta al score</li>
                 <li><strong>Cálculos Visibles:</strong> La lógica de scoring está disponible en el código fuente del dashboard</li>
                 <li><strong>Datos Verificables:</strong> Todas las métricas pueden ser confirmadas en fuentes oficiales</li>
+                <li><strong>Fuente EUR Bond:</strong> El yield de la Zona Euro (GEUGB10Y) se obtiene directamente de la página de mercados de bonos de Trading Economics, sin proxies nacionales</li>
                 <li><strong>Limitaciones Claras:</strong> El PIB total no está en el modelo de scoring (solo referencia visual). Net Foreign Assets fue descartado por retraso de 2–3 años en la publicación de datos. Yield curves completas no incluidas por complejidad de normalización</li>
                 <li><strong>Metodología Documentada:</strong> El algoritmo de recomendaciones de pares está completamente explicado</li>
                 <li><strong>Honestidad sobre Datos Históricos:</strong> El índice de fortaleza histórico es una estimación algorítmica, no datos reales</li>
