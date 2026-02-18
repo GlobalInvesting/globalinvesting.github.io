@@ -1,4 +1,4 @@
-name: Update Extended Data (Bonds + Sentiment + Flows + rateMomentum) - v8
+name: Update Extended Data (Bonds + Sentiment + Flows + rateMomentum) - v9
 
 on:
   schedule:
@@ -30,7 +30,7 @@ jobs:
           from bs4 import BeautifulSoup
           import json, re, os, time, csv
           from io import StringIO
-          from datetime import date, datetime
+          from datetime import date, datetime, timedelta
 
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -57,6 +57,26 @@ jobs:
               'capitalFlows':          'https://tradingeconomics.com/country-list/capital-flows?continent=world',
               'fdi':                   'https://tradingeconomics.com/country-list/foreign-direct-investment?continent=world',
               'inflationExpectations': 'https://tradingeconomics.com/country-list/inflation-expectations?continent=world',
+          }
+
+          # URLs de páginas históricas de tasas en Trading Economics
+          TE_RATE_HISTORY_URLS = {
+              'USD': 'https://tradingeconomics.com/united-states/interest-rate',
+              'EUR': 'https://tradingeconomics.com/euro-area/interest-rate',
+              'GBP': 'https://tradingeconomics.com/united-kingdom/interest-rate',
+              'JPY': 'https://tradingeconomics.com/japan/interest-rate',
+              'CAD': 'https://tradingeconomics.com/canada/interest-rate',
+              'AUD': 'https://tradingeconomics.com/australia/interest-rate',
+              'CHF': 'https://tradingeconomics.com/switzerland/interest-rate',
+              'NZD': 'https://tradingeconomics.com/new-zealand/interest-rate',
+          }
+
+          # Series FRED como fallback para USD/EUR/GBP/JPY (los que sí funcionan)
+          FRED_SERIES = {
+              'USD': 'FEDFUNDS',
+              'EUR': 'ECBDFR',
+              'GBP': 'BOERUKM',
+              'JPY': 'IRSTCB01JPM156N',
           }
 
           BONDS_MARKET_PAGE = 'https://tradingeconomics.com/bonds'
@@ -108,108 +128,202 @@ jobs:
               except: pass
               return str(date.today())
 
-          # ── v8: rateMomentum via FRED CSV (sin API key) ───────────────────────────
-          def scrape_rate_momentum():
+          def parse_te_rate_date(date_text):
               """
-              Calcula rateMomentum = tasa_actual - tasa_hace_12_meses.
-              Usa FRED CSV público (sin API key) que devuelve historial completo.
-              Fallback: leer extended-data/{CURR}.json anterior si existe.
+              Parsea formatos de fecha que aparecen en tablas históricas de TE.
+              Ejemplos: 'Jan/25', 'Feb/26', 'Mar 2025', '2025-01-01', 'Q1/2025'
+              Devuelve objeto datetime o None.
               """
-              print(f"\n{'='*50}\nRATE MOMENTUM (v8 — FRED CSV sin API key)\n{'='*50}")
+              if not date_text:
+                  return None
+              date_text = date_text.strip()
+              formats = [
+                  (r'^([A-Za-z]{3})/(\d{2})$',    lambda m: datetime.strptime(f"{m.group(1)} 20{m.group(2)}", '%b %Y')),
+                  (r'^([A-Za-z]{3})\s+(\d{4})$',  lambda m: datetime.strptime(f"{m.group(1)} {m.group(2)}", '%b %Y')),
+                  (r'^(\d{4})-(\d{2})-\d{2}$',    lambda m: datetime(int(m.group(1)), int(m.group(2)), 1)),
+                  (r'^(\d{2})/(\d{2})/(\d{4})$',  lambda m: datetime(int(m.group(3)), int(m.group(2)), 1)),
+                  (r'^Q(\d)[/\s](\d{4})$',         lambda m: datetime(int(m.group(2)), (int(m.group(1))-1)*3+1, 1)),
+              ]
+              for pattern, parser in formats:
+                  match = re.match(pattern, date_text)
+                  if match:
+                      try:
+                          return parser(match)
+                      except:
+                          continue
+              return None
+
+          # ── v9: rateMomentum — scraping TE páginas históricas de tasas ───────────
+          def scrape_rate_momentum_te():
+              """
+              Scrapea las páginas individuales de historial de tasas de TE.
+              Cada página tiene una tabla con columnas: Date | Value
+              Busca la observación más cercana a 12 meses atrás y calcula:
+                rateMomentum = tasa_actual - tasa_hace_12M
+              
+              Estrategia de extracción:
+              1. Buscar tabla con historial (class='table' o similar)
+              2. Parsear fechas y valores de cada fila
+              3. Encontrar observación más cercana al target (hoy - 365 días)
+              4. Si TE falla: fallback a FRED para USD/EUR/GBP/JPY
+              """
+              print(f"\n{'='*50}\nRATE MOMENTUM (v9 — TE páginas históricas)\n{'='*50}")
               momentum = {}
               momentum_dates = {}
 
-              # Series FRED para tasa de política monetaria
-              FRED_SERIES = {
-                  'USD': 'FEDFUNDS',            # Federal Funds Rate (mensual efectivo)
-                  'EUR': 'ECBDFR',              # ECB Deposit Facility Rate
-                  'GBP': 'BOERUKM',             # Bank of England Base Rate
-                  'JPY': 'IRSTCB01JPM156N',     # Japan Overnight Call Rate
-                  'CAD': 'BOCPMM',              # Bank of Canada Overnight Rate
-                  'AUD': 'RBAAOR',              # RBA Cash Rate Target
-                  'CHF': 'SNPOLFIR',            # SNB Policy Rate
-                  'NZD': 'RBNZOCR',             # RBNZ Official Cash Rate
-              }
+              today = datetime.today()
+              target_dt = today - timedelta(days=365)
 
-              FRED_BASE = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id='
-
-              for code, series_id in FRED_SERIES.items():
+              for code, url in TE_RATE_HISTORY_URLS.items():
+                  print(f"\n  → {code}: {url}")
                   try:
-                      url = f'{FRED_BASE}{series_id}'
-                      r = requests.get(url, timeout=15, headers={
-                          'User-Agent': 'Mozilla/5.0 (compatible; economic-data-scraper/1.0)'
-                      })
-
+                      r = requests.get(url, headers=HEADERS, timeout=20)
+                      if r.status_code == 429:
+                          print(f"    ⚠️ Rate limited, esperando 20s...")
+                          time.sleep(20)
+                          r = requests.get(url, headers=HEADERS, timeout=20)
                       if r.status_code != 200:
-                          print(f"  ⚠️ {code}: FRED {r.status_code} para serie {series_id}")
+                          print(f"    ⚠️ HTTP {r.status_code}")
                           continue
 
-                      # Parsear CSV: DATE,VALUE
-                      reader = csv.reader(StringIO(r.text))
-                      rows = []
-                      for row in reader:
-                          if len(row) == 2 and row[0] != 'DATE' and row[1] not in ('.', ''):
-                              try:
-                                  dt = datetime.strptime(row[0], '%Y-%m-%d')
-                                  val = float(row[1])
-                                  rows.append((dt, val))
-                              except:
+                      soup = BeautifulSoup(r.content, 'lxml')
+
+                      # Recopilar todas las observaciones (fecha, valor) de todas las tablas
+                      all_obs = []
+
+                      for table in soup.find_all('table'):
+                          rows = table.find_all('tr')
+                          if len(rows) < 3:
+                              continue
+
+                          # Detectar índices de columnas Date y Value
+                          headers_cells = rows[0].find_all(['th', 'td'])
+                          header_texts = [h.get_text(strip=True).lower() for h in headers_cells]
+
+                          date_col = None
+                          val_col  = None
+
+                          for i, h in enumerate(header_texts):
+                              if any(kw in h for kw in ['date', 'period', 'reference', 'month', 'year']):
+                                  if date_col is None:
+                                      date_col = i
+                              if any(kw in h for kw in ['value', 'actual', 'rate', 'last', '%']):
+                                  if val_col is None:
+                                      val_col = i
+
+                          # Si no encontró headers claros, asumir col 0 = fecha, col 1 = valor
+                          if date_col is None: date_col = 0
+                          if val_col  is None: val_col  = 1
+
+                          for row in rows[1:]:
+                              cols = row.find_all('td')
+                              if len(cols) <= max(date_col, val_col):
                                   continue
+                              date_text = cols[date_col].get_text(strip=True)
+                              val_text  = cols[val_col].get_text(strip=True)
+                              obs_dt    = parse_te_rate_date(date_text)
+                              val       = clean_num(val_text)
+                              if obs_dt and val is not None and -5 <= val <= 25:
+                                  all_obs.append((obs_dt, val))
 
-                      if len(rows) < 2:
-                          print(f"  ⚠️ {code}: Datos insuficientes en FRED {series_id} ({len(rows)} filas)")
+                      if not all_obs:
+                          print(f"    ⚠️ Sin observaciones encontradas en tablas")
                           continue
 
-                      # Observación más reciente
-                      latest_dt, current_rate = rows[-1]
+                      # Ordenar por fecha descendente
+                      all_obs.sort(key=lambda x: x[0], reverse=True)
+
+                      current_rate = all_obs[0][1]
+                      current_date = all_obs[0][0]
+                      print(f"    Tasa actual: {current_rate}% ({current_date.strftime('%Y-%m')}), {len(all_obs)} observaciones totales")
 
                       # Buscar observación más cercana a 12 meses atrás
-                      target_dt = latest_dt.replace(year=latest_dt.year - 1)
-                      closest_val = None
+                      closest_val  = None
                       closest_diff = float('inf')
+                      closest_date = None
 
-                      for obs_dt, obs_val in rows[:-1]:
+                      for obs_dt, obs_val in all_obs[1:]:
                           diff = abs((obs_dt - target_dt).days)
                           if diff < closest_diff:
                               closest_diff = diff
-                              closest_val = obs_val
+                              closest_val  = obs_val
+                              closest_date = obs_dt
 
-                      # Aceptar si la observación está dentro de ±45 días del objetivo
-                      if closest_val is not None and closest_diff <= 45:
+                      # Aceptar si la observación está dentro de ±60 días del objetivo
+                      if closest_val is not None and closest_diff <= 60:
                           m_val = round(current_rate - closest_val, 4)
-                          momentum[code] = m_val
-                          momentum_dates[code] = latest_dt.strftime('%Y-%m-%d')
-                          direction = '↑' if m_val > 0 else ('↓' if m_val < 0 else '→')
-                          print(f"  ✓ {code} [{series_id}]: {current_rate}% - {closest_val}% = {m_val:+.3f}% {direction} ({closest_diff}d off 12M target)")
+                          momentum[code]       = m_val
+                          momentum_dates[code] = current_date.strftime('%Y-%m-%d')
+                          direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
+                          print(f"    ✓ {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction} (ref: {closest_date.strftime('%Y-%m')}, {closest_diff}d off target)")
                       else:
-                          print(f"  ⚠️ {code}: Observación 12M demasiado lejana ({closest_diff}d) → momentum=null")
-
-                      time.sleep(0.5)  # Respetar rate limit de FRED
+                          print(f"    ⚠️ Observación 12M demasiado lejana ({closest_diff}d) o no encontrada")
 
                   except Exception as e:
-                      print(f"  ❌ {code} FRED error: {e}")
+                      print(f"    ❌ Error: {e}")
 
-              # ── Fallback: leer archivo anterior si existe ─────────────────────────
+                  time.sleep(2)  # Pausa entre requests para no saturar TE
+
+              # ── Fallback FRED para los que aún faltan (USD/EUR/GBP/JPY) ────────────
+              still_missing = [c for c in CURRENCIES if c not in momentum]
+              fred_candidates = [c for c in still_missing if c in FRED_SERIES]
+              if fred_candidates:
+                  print(f"\n  Fallback FRED para: {', '.join(fred_candidates)}")
+                  FRED_BASE = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id='
+                  for code in fred_candidates:
+                      series_id = FRED_SERIES[code]
+                      try:
+                          r = requests.get(f'{FRED_BASE}{series_id}', timeout=15)
+                          if r.status_code != 200:
+                              print(f"    ⚠️ {code}: FRED {r.status_code} para {series_id}")
+                              continue
+                          reader = csv.reader(StringIO(r.text))
+                          rows = []
+                          for row in reader:
+                              if len(row) == 2 and row[0] != 'DATE' and row[1] not in ('.', ''):
+                                  try:
+                                      rows.append((datetime.strptime(row[0], '%Y-%m-%d'), float(row[1])))
+                                  except: continue
+                          if len(rows) < 2:
+                              continue
+                          latest_dt, current_rate = rows[-1]
+                          target_dt_fred = latest_dt.replace(year=latest_dt.year - 1)
+                          closest_val, closest_diff = None, float('inf')
+                          for obs_dt, obs_val in rows[:-1]:
+                              diff = abs((obs_dt - target_dt_fred).days)
+                              if diff < closest_diff:
+                                  closest_diff, closest_val = diff, obs_val
+                          if closest_val is not None and closest_diff <= 45:
+                              m_val = round(current_rate - closest_val, 4)
+                              momentum[code]       = m_val
+                              momentum_dates[code] = latest_dt.strftime('%Y-%m-%d')
+                              direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
+                              print(f"    ✓ {code} [FRED {series_id}]: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction}")
+                          time.sleep(0.5)
+                      except Exception as e:
+                          print(f"    ❌ {code} FRED: {e}")
+
+              # ── Fallback archivo anterior para los que siguen faltando ───────────
               still_missing = [c for c in CURRENCIES if c not in momentum]
               if still_missing:
-                  print(f"\n  Fallback (archivo anterior) para: {', '.join(still_missing)}")
+                  print(f"\n  Fallback archivo anterior para: {', '.join(still_missing)}")
                   for code in still_missing:
                       try:
                           path = f'extended-data/{code}.json'
                           if os.path.exists(path):
                               with open(path) as f:
                                   prev = json.load(f)
-                              prev_momentum = prev.get('data', {}).get('rateMomentum')
-                              if prev_momentum is not None:
-                                  momentum[code] = prev_momentum
+                              prev_val = prev.get('data', {}).get('rateMomentum')
+                              if prev_val is not None:
+                                  momentum[code]       = prev_val
                                   momentum_dates[code] = prev.get('dates', {}).get('rateMomentum', str(date.today()))
-                                  print(f"  ✓ {code}: Usando valor anterior ({prev_momentum:+.3f}%) [{momentum_dates[code]}]")
+                                  print(f"    ✓ {code}: valor anterior {prev_val:+.4f}% [{momentum_dates[code]}]")
                               else:
-                                  print(f"  ✗ {code}: Sin valor anterior disponible")
+                                  print(f"    ✗ {code}: sin valor anterior")
                           else:
-                              print(f"  ✗ {code}: No existe archivo anterior")
+                              print(f"    ✗ {code}: no existe archivo anterior")
                       except Exception as e:
-                          print(f"  ✗ {code} fallback error: {e}")
+                          print(f"    ✗ {code}: {e}")
 
               final_missing = [c for c in CURRENCIES if c not in momentum]
               if final_missing:
@@ -219,7 +333,7 @@ jobs:
 
               return momentum, momentum_dates
 
-          # ── CAPITAL FLOWS: Unit-aware FX conversion ────────────────────────────
+          # ── CAPITAL FLOWS ────────────────────────────────────────────────────────
           def parse_capital_flows_row(cols):
               if len(cols) < 5:
                   return None
@@ -336,7 +450,7 @@ jobs:
                   print(f"  ❌ {e}")
               return data, dates
 
-          # ── BOND YIELDS ─────────────────────────────────────────────────────────
+          # ── BOND YIELDS ──────────────────────────────────────────────────────────
           BOND_COUNTRY_MAP = {
               'USD': ['United States'],
               'EUR': ['Euro area'],
@@ -543,8 +657,8 @@ jobs:
                   all_dates[c][key] = dt.get(c, str(date.today()))
               time.sleep(2)
 
-          # 3. rateMomentum via FRED (v8 fix)
-          rate_momentum, rate_momentum_dates = scrape_rate_momentum()
+          # 3. rateMomentum via TE páginas históricas (v9)
+          rate_momentum, rate_momentum_dates = scrape_rate_momentum_te()
           for c in CURRENCIES:
               all_data[c]['rateMomentum']  = rate_momentum.get(c)
               all_dates[c]['rateMomentum'] = rate_momentum_dates.get(c, str(date.today()))
@@ -554,7 +668,7 @@ jobs:
           for curr in CURRENCIES:
               pkg = {
                   'lastUpdate': str(date.today()),
-                  'source': 'TradingEconomics + FRED — v8: rateMomentum via FRED CSV (sin API key)',
+                  'source': 'TradingEconomics — v9: rateMomentum via TE páginas históricas de tasas',
                   'data':   all_data[curr],
                   'dates':  all_dates[curr]
               }
@@ -571,14 +685,14 @@ jobs:
                   extras.append(f"bond10y={all_data['EUR'].get('bond10y','N/A')}% EA agg")
               rm = all_data[curr].get('rateMomentum')
               if rm is not None:
-                  direction = '↑' if rm > 0 else ('↓' if rm < 0 else '→')
-                  extras.append(f"rateMomentum={rm:+.3f}% {direction}")
+                  direction = '↑' if rm > 0.001 else ('↓' if rm < -0.001 else '→')
+                  extras.append(f"rateMomentum={rm:+.4f}% {direction}")
               extra_str = f" [{', '.join(extras)}]" if extras else ''
               print(f"{status} {curr}: {', '.join(available) or 'NO DATA'}{extra_str}")
               if missing:
                   print(f"   Missing: {', '.join(missing)}")
 
-          print("\n✅ COMPLETE — v8")
+          print("\n✅ COMPLETE — v9")
           EOFPYTHON
 
       - name: Commit and push
@@ -589,7 +703,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v8 rateMomentum via FRED"
+            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v9 rateMomentum via TE history"
             git pull --rebase origin main || true
             git push
           fi
