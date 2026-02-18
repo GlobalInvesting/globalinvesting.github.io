@@ -547,22 +547,23 @@
 .tooltip-box::before {
     content: '';
     position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: -10px;
+    left: 20px;
+    transform: none;
     border: 10px solid transparent;
+    border-top: none;
     border-bottom-color: var(--blue);
 }
 
 .tooltip-box::after {
     content: '';
     position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: -8px;
+    left: 22px;
+    transform: none;
     border: 8px solid transparent;
+    border-top: none;
     border-bottom-color: var(--bg-elevated);
-    margin-bottom: -1px;
 }
 
 /* Tooltip para celdas del heatmap - FIXED */
@@ -2994,36 +2995,44 @@ const HeatmapCell = ({ value, type, currency, indicator, lastUpdate }) => {
     );
 };
             
-            const TooltipCell = ({ children, tooltip, title }) => {
-                const [showTooltip, setShowTooltip] = React.useState(false);
-                const [position, setPosition] = React.useState({ x: 0, y: 0 });
+const TooltipCell = ({ children, tooltip, title }) => {
+    const [showTooltip, setShowTooltip] = React.useState(false);
+    const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
-                const handleMouseEnter = (e) => {
-                    const rect = e.target.getBoundingClientRect();
-                    const viewportWidth = window.innerWidth;
-                    let x = rect.left + rect.width / 2;
-                    const tooltipWidth = 340;
-                    
-                    if (x + tooltipWidth / 2 > viewportWidth) x = viewportWidth - tooltipWidth / 2 - 20;
-                    if (x - tooltipWidth / 2 < 0) x = tooltipWidth / 2 + 20;
-                    
-                    setPosition({ x, y: rect.top - 10 });
-                    setShowTooltip(true);
-                };
+    const updatePosition = (e) => {
+        const tooltipWidth = 340;
+        const tooltipHeight = 200;
+        const offset = 14;
+        const margin = 12;
+        let x = e.clientX;
+        let y = e.clientY + offset;
+        if (x + tooltipWidth > window.innerWidth - margin) x = window.innerWidth - tooltipWidth - margin;
+        if (x < margin) x = margin;
+        if (y + tooltipHeight > window.innerHeight - margin) y = e.clientY - tooltipHeight - offset;
+        setPosition({ x, y });
+    };
 
-                return (
-                    <th className="tooltip-header">
-                        {children}
-                        <span className="tooltip-icon" onMouseEnter={handleMouseEnter} onMouseLeave={() => setShowTooltip(false)}>?</span>
-                        {showTooltip && (
-                            <div className="tooltip-box visible" style={{ left: `${position.x}px`, top: `${position.y}px`, transform: 'translate(-50%, -100%)' }}>
-                                <div className="tooltip-header-title">{title}</div>
-                                <div className="tooltip-body">{tooltip}</div>
-                            </div>
-                        )}
-                    </th>
-                );
-            };
+    const handleMouseEnter = (e) => { updatePosition(e); setShowTooltip(true); };
+    const handleMouseMove  = (e) => { if (showTooltip) updatePosition(e); };
+
+    return (
+        <th className="tooltip-header">
+            {children}
+            <span
+                className="tooltip-icon"
+                onMouseEnter={handleMouseEnter}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={() => setShowTooltip(false)}
+            >?</span>
+            {showTooltip && (
+                <div className="tooltip-box visible" style={{ left: `${position.x}px`, top: `${position.y}px`, transform: 'none' }}>
+                    <div className="tooltip-header-title">{title}</div>
+                    <div className="tooltip-body">{tooltip}</div>
+                </div>
+            )}
+        </th>
+    );
+};
 
 const getHeatmapColor = (value, type) => {
     if (value === null || value === undefined) return 'var(--bg-card)';
