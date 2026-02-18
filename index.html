@@ -1786,7 +1786,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '4.8.0-2026-02-17'; // ✅ Health checks + retry logic + error boundary
+            const DASHBOARD_VERSION = '4.9.0-2026-02-17'; // ✅ EUR ToT: TE export/import price ratio (v9)
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -2539,7 +2539,7 @@ const indicatorTooltips = {
     businessConfidence: "Índice de confianza empresarial. Base 100. >100 = expansión esperada, <100 = contracción. Predice inversión, contrataciones y actividad futura.",
     capitalFlows: "Flujos netos de capital (cuenta financiera de la balanza de pagos). Positivo = entrada neta de inversión extranjera → demanda estructural de la divisa. Millones USD.",
     inflationExpectations: "Expectativas de inflación a 1-2 años. Si superan el objetivo del BC (2%), presionan al alza las tasas futuras → hawkish implícito.",
-    termsOfTrade: "Índice de términos de intercambio: ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un valor >100 significa que el país recibe más valor por sus exportaciones de lo que paga por sus importaciones → mejora cuenta corriente → positivo para la divisa. Especialmente relevante para AUD, CAD y NZD (economías exportadoras de commodities). Fuente: Trading Economics."
+    termsOfTrade: "Índice de términos de intercambio: ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un valor >100 significa que el país recibe más valor por sus exportaciones de lo que paga por sus importaciones → mejora cuenta corriente → positivo para la divisa. Especialmente relevante para AUD, CAD y NZD (economías exportadoras de commodities). Para EUR se calcula como ratio de los índices de precios de exportación e importación extrazona (ambos de Eurostat vía Trading Economics, base 2015=100). Fuente: Trading Economics."
 };
 
         // ========== COMPONENTE PRINCIPAL ==========
