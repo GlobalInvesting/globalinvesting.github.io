@@ -1,4 +1,4 @@
-name: Update Economic Data - FINAL (TE Multi-source + COT + Dates + Terms of Trade)
+name: Update Economic Data - FINAL v6 (TE + ONS scraping + multi-fallback ToT)
 on:
   schedule:
     - cron: '0 6 * * *'
@@ -10,90 +10,80 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: pip install requests beautifulsoup4 lxml --break-system-packages
-      
+
       - name: Create data directory
         run: mkdir -p economic-data
-      
+
       - name: Scrape economic data
         run: |
           python3 << 'EOFPYTHON'
           import requests
           from bs4 import BeautifulSoup
-          import json
-          import re
+          import json, re, time
           from datetime import date, datetime
-          import time
 
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           }
+          JSON_HEADERS = {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'application/json',
+          }
 
           CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
 
           TRADING_ECONOMICS_URLS = {
-              'gdp': 'https://tradingeconomics.com/country-list/gdp?continent=world',
-              'gdpGrowth': 'https://tradingeconomics.com/country-list/gdp-growth-rate?continent=world',
-              'inflation': 'https://tradingeconomics.com/country-list/inflation-rate?continent=world',
-              'unemployment': 'https://tradingeconomics.com/country-list/unemployment-rate?continent=world',
-              'debt': 'https://tradingeconomics.com/country-list/government-debt-to-gdp',
-              'currentAccount': 'https://tradingeconomics.com/country-list/current-account-to-gdp?continent=world',
-              'production': 'https://tradingeconomics.com/country-list/industrial-production-mom?continent=world',
-              'tradeBalance': 'https://tradingeconomics.com/country-list/balance-of-trade',
-              'retailSales': 'https://tradingeconomics.com/country-list/retail-sales-mom',
-              'wageGrowth': 'https://tradingeconomics.com/country-list/wage-growth',
+              'gdp':              'https://tradingeconomics.com/country-list/gdp?continent=world',
+              'gdpGrowth':        'https://tradingeconomics.com/country-list/gdp-growth-rate?continent=world',
+              'inflation':        'https://tradingeconomics.com/country-list/inflation-rate?continent=world',
+              'unemployment':     'https://tradingeconomics.com/country-list/unemployment-rate?continent=world',
+              'debt':             'https://tradingeconomics.com/country-list/government-debt-to-gdp',
+              'currentAccount':   'https://tradingeconomics.com/country-list/current-account-to-gdp?continent=world',
+              'production':       'https://tradingeconomics.com/country-list/industrial-production-mom?continent=world',
+              'tradeBalance':     'https://tradingeconomics.com/country-list/balance-of-trade',
+              'retailSales':      'https://tradingeconomics.com/country-list/retail-sales-mom',
+              'wageGrowth':       'https://tradingeconomics.com/country-list/wage-growth',
               'manufacturingPMI': 'https://tradingeconomics.com/country-list/manufacturing-pmi',
-              'termsOfTrade': 'https://tradingeconomics.com/country-list/terms-of-trade',
+              'termsOfTrade':     'https://tradingeconomics.com/country-list/terms-of-trade',
           }
 
           COUNTRY_URLS = {
               'USD': 'united-states', 'EUR': 'euro-area', 'GBP': 'united-kingdom',
-              'JPY': 'japan', 'CAD': 'canada', 'AUD': 'australia',
-              'CHF': 'switzerland', 'NZD': 'new-zealand'
+              'JPY': 'japan',         'CAD': 'canada',    'AUD': 'australia',
+              'CHF': 'switzerland',   'NZD': 'new-zealand',
           }
 
           INDICATOR_PAGES = {
-              'retailSales': 'retail-sales',
-              'wageGrowth': 'wage-growth',
+              'retailSales':      'retail-sales',
+              'wageGrowth':       'wage-growth',
               'manufacturingPMI': 'manufacturing-pmi',
-              'production': 'industrial-production',
+              'production':       'industrial-production',
           }
 
           COUNTRY_NAMES = {
               'USD': ['United States'], 'EUR': ['Euro Area'], 'GBP': ['United Kingdom'],
-              'JPY': ['Japan'], 'CAD': ['Canada'], 'AUD': ['Australia'],
-              'CHF': ['Switzerland'], 'NZD': ['New Zealand']
+              'JPY': ['Japan'],         'CAD': ['Canada'],    'AUD': ['Australia'],
+              'CHF': ['Switzerland'],   'NZD': ['New Zealand'],
           }
 
-          # ToT: NZD Stats NZ uses base 2002Q2=1000 (values ~1500) → reject it.
-          # All other G8 currencies from TE are on base ~100 scales.
-          # We apply a strict range filter and fall back to OECD/Eurostat when needed.
-          TOT_MIN = 50.0
-          TOT_MAX = 200.0
-
-          # World Bank country codes for ToT fallback
-          WB_COUNTRY_MAP = {
-              'USD': 'US', 'EUR': 'XC',  # XC = Euro Area in World Bank
-              'GBP': 'GB', 'JPY': 'JP',
-              'CAD': 'CA', 'AUD': 'AU',
-              'CHF': 'CH', 'NZD': 'NZ',
-          }
-
-          # OECD alpha-3 codes (EUR handled via Eurostat)
-          OECD_COUNTRY_MAP = {
-              'USD': 'USA', 'GBP': 'GBR', 'JPY': 'JPN',
-              'CAD': 'CAN', 'AUD': 'AUS', 'CHF': 'CHE', 'NZD': 'NZL',
-          }
+          # ── Terms of Trade valid range ────────────────────────────────────────
+          # NZD Stats NZ uses base 2002Q2=1000 → ~1500 → correctly rejected
+          TOT_MIN, TOT_MAX = 50.0, 200.0
 
           exchange_rates = {}
+
+          # ═══════════════════════════════════════════════════════════════════
+          # UTILS
+          # ═══════════════════════════════════════════════════════════════════
 
           def fetch_fx():
               global exchange_rates
@@ -105,13 +95,13 @@ jobs:
                       return
               except:
                   pass
-              exchange_rates = {'USD': 1.0, 'EUR': 0.84, 'GBP': 0.73, 'JPY': 153.71,
-                                'CAD': 1.36, 'AUD': 1.40, 'CHF': 0.77, 'NZD': 1.65}
+              exchange_rates = {'USD':1.0,'EUR':0.84,'GBP':0.73,'JPY':153.71,
+                                'CAD':1.36,'AUD':1.40,'CHF':0.77,'NZD':1.65}
 
           def clean_num(text):
               if not text:
                   return None
-              text = str(text).strip().replace(',', '').replace('%', '')
+              text = str(text).strip().replace(',','').replace('%','')
               m = re.search(r'(-?\d+\.?\d*)', text)
               return float(m.group(1)) if m else None
 
@@ -120,215 +110,145 @@ jobs:
                   return str(date.today())
               date_text = date_text.strip()
               try:
-                  if re.search(r'[A-Za-z]{3}\s*[/\s]\s*\d{2,4}', date_text):
-                      match = re.search(r'([A-Za-z]{3})\s*[/\s]\s*(\d{2,4})', date_text)
-                      if match:
-                          month_str = match.group(1)
-                          year_str = match.group(2)
-                          if len(year_str) == 2:
-                              year_str = '20' + year_str
-                          dt = datetime.strptime(f"{month_str} {year_str}", '%b %Y')
-                          return dt.strftime('%Y-%m-15')
-                  elif re.search(r'Q\d[/\s]\d{4}', date_text):
-                      match = re.search(r'Q(\d)[/\s](\d{4})', date_text)
-                      if match:
-                          quarter = int(match.group(1))
-                          year = int(match.group(2))
-                          month = (quarter - 1) * 3 + 2
-                          return f"{year}-{month:02d}-15"
-                  elif re.search(r'^\d{4}$', date_text):
-                      return f"{date_text}-06-15"
-                  elif re.search(r'[A-Za-z]{3}/\d{2}', date_text):
-                      dt = datetime.strptime(date_text, '%b/%y')
+                  m = re.search(r'([A-Za-z]{3})\s*[/\s]\s*(\d{2,4})', date_text)
+                  if m:
+                      yr = m.group(2)
+                      if len(yr) == 2: yr = '20' + yr
+                      dt = datetime.strptime(f"{m.group(1)} {yr}", '%b %Y')
                       return dt.strftime('%Y-%m-15')
-              except Exception as e:
-                  print(f"    Warning: Date parse error for '{date_text}': {e}")
+                  m = re.search(r'Q(\d)[/\s](\d{4})', date_text)
+                  if m:
+                      q, yr = int(m.group(1)), int(m.group(2))
+                      return f"{yr}-{(q-1)*3+2:02d}-15"
+                  if re.match(r'^\d{4}$', date_text):
+                      return f"{date_text}-06-15"
+              except:
+                  pass
               return str(date.today())
 
+          def te_get(url, rate_limit_wait=30):
+              """GET from Trading Economics with rate-limit handling."""
+              r = requests.get(url, headers=HEADERS, timeout=20)
+              if r.status_code == 429:
+                  print(f"  ⚠ Rate limited, waiting {rate_limit_wait}s...")
+                  time.sleep(rate_limit_wait)
+                  r = requests.get(url, headers=HEADERS, timeout=20)
+              r.raise_for_status()
+              return r
+
           # ═══════════════════════════════════════════════════════════════════
-          # TERMS OF TRADE — multi-source approach with fallback chain
+          # TERMS OF TRADE — dedicated scrapers per source
           # ═══════════════════════════════════════════════════════════════════
 
-          def fetch_oecd_tot_for_currency(curr):
+          def scrape_tot_te_country_page(currency_code):
               """
-              Try multiple OECD SDMX key patterns for a single currency.
-              Returns (value, date_string) or (None, None).
-
-              The NAAG_I dataflow has dimensions: REF_AREA, FREQ, MEASURE, UNIT_MEASURE
-              Without a transformation dimension — the _Z suffix was wrong.
-              We try both 4-dim and 5-dim patterns.
+              Scrape the TE country-specific Terms of Trade page.
+              These pages show the actual index value even when the country-list
+              page uses a different scale (e.g. Euro Area).
+              URL pattern: tradingeconomics.com/{slug}/terms-of-trade
+              The data table has: Actual | Previous | Highest | Lowest | Dates | Unit | Frequency | Notes
               """
-              oecd_code = OECD_COUNTRY_MAP.get(curr)
-              if not oecd_code:
-                  return None, None
-
-              # Candidate key patterns (dimension order may vary by DSD version)
-              patterns = [
-                  # 4 dims: REF_AREA.FREQ.MEASURE.UNIT_MEASURE
-                  f"{oecd_code}.Q.TOT.IDX2020",
-                  # 5 dims with wildcard last: REF_AREA.FREQ.MEASURE.UNIT_MEASURE.TRANSFORMATION
-                  f"{oecd_code}.Q.TOT.IDX2020.",
-                  # Try without unit constraint
-                  f"{oecd_code}.Q.TOT.",
-                  # Try DF_NAAG (non-index variant) with growth measure
-                  f"{oecd_code}..TOT..",
-              ]
-
-              base_urls = [
-                  "https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAAG@DF_NAAG_I/",
-                  "https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAAG@DF_NAAG/",
-              ]
-
-              for base in base_urls:
-                  for pattern in patterns:
-                      url = f"{base}{pattern}?format=csvfile&startPeriod=2023-Q1"
-                      try:
-                          r = requests.get(url, headers=HEADERS, timeout=15)
-                          if r.status_code == 404:
-                              continue  # wrong key structure, try next
-                          if not r.ok:
-                              print(f"    OECD {curr}: HTTP {r.status_code} for {pattern}")
-                              continue
-                          lines = r.text.strip().splitlines()
-                          if len(lines) < 2:
-                              continue
-                          header = [h.strip().strip('"') for h in lines[0].split(',')]
-                          header_lower = [h.lower() for h in header]
-
-                          def find_col(*names):
-                              for name in names:
-                                  if name in header:
-                                      return header.index(name)
-                                  for i, h in enumerate(header_lower):
-                                      if name.lower() in h:
-                                          return i
-                              return None
-
-                          time_idx  = find_col('TIME_PERIOD', 'time_period')
-                          value_idx = find_col('OBS_VALUE', 'obs_value', 'value')
-                          if None in (time_idx, value_idx):
-                              continue
-
-                          # Collect latest valid observation
-                          best_period, best_val = None, None
-                          for line in lines[1:]:
-                              cols = [c.strip().strip('"') for c in line.split(',')]
-                              if len(cols) <= max(time_idx, value_idx):
-                                  continue
-                              val = clean_num(cols[value_idx])
-                              period = cols[time_idx] if time_idx < len(cols) else None
-                              if val is None or period is None:
-                                  continue
-                              if not (TOT_MIN <= val <= TOT_MAX):
-                                  continue
-                              if best_period is None or period > best_period:
-                                  best_period, best_val = period, val
-
-                          if best_val is not None:
-                              # Parse period: '2025-Q3' or '2025-11'
-                              data_date = str(date.today())
-                              m = re.match(r'^(\d{4})-Q(\d)$', best_period)
-                              if m:
-                                  y, q = int(m.group(1)), int(m.group(2))
-                                  data_date = f"{y}-{(q-1)*3+2:02d}-15"
-                              else:
-                                  m2 = re.match(r'^(\d{4})-(\d{2})$', best_period)
-                                  if m2:
-                                      data_date = f"{m2.group(1)}-{m2.group(2)}-15"
-                              print(f"    OK {curr} [OECD {pattern}]: {best_val} ({best_period})")
-                              return round(best_val, 2), data_date
-
-                      except Exception as e:
-                          print(f"    OECD {curr} pattern '{pattern}': {e}")
-                          continue
-
-              return None, None
-
-          def fetch_eur_tot_eurostat():
-              """
-              Eurostat TIPSNA30 for Euro Area (EA20).
-              Tries multiple unit codes since I10_EUR may not exist.
-              Returns (value, date_string) or (None, None).
-              """
-              # Try without unit filter first → inspect available units
-              for unit_filter in ['', '&unit=I10_EUR', '&unit=I10', '&unit=I15_EUR', '&unit=I15']:
-                  url = (
-                      "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data"
-                      f"/TIPSNA30?format=JSON&lang=EN&geo=EA20&lastTimePeriod=8{unit_filter}"
-                  )
-                  try:
-                      r = requests.get(url, headers=HEADERS, timeout=20)
-                      if not r.ok:
-                          print(f"    Eurostat HTTP {r.status_code} (unit={unit_filter or 'all'})")
-                          continue
-
-                      d = r.json()
-
-                      # Log available units on first (unfiltered) call
-                      if not unit_filter:
-                          dims = d.get('dimension', {})
-                          if 'unit' in dims:
-                              available_units = list(dims['unit']['category']['index'].keys())
-                              print(f"    Eurostat TIPSNA30 available units: {available_units}")
-
-                      values_raw = d.get('value', {})
-                      if isinstance(values_raw, dict):
-                          values = [float(v) for v in values_raw.values() if v is not None]
-                      else:
-                          values = [float(v) for v in values_raw if v is not None]
-
-                      if not values:
-                          print(f"    Eurostat: no values (unit={unit_filter or 'all'})")
-                          continue
-
-                      tot_value = values[-1]
-                      if not (TOT_MIN <= tot_value <= TOT_MAX):
-                          print(f"    Eurostat: value {tot_value} out of range")
-                          continue
-
-                      # Parse date from dimension
-                      data_date = str(date.today())
-                      try:
-                          time_dim = d['dimension']['time']['category']['index']
-                          latest_period = sorted(time_dim.items(), key=lambda x: x[1])[-1][0]
-                          m = re.match(r'^(\d{4})-Q(\d)$', latest_period)
-                          if m:
-                              y, q = latest_period.split('-Q')
-                              data_date = f"{y}-{(int(q)-1)*3+2:02d}-15"
-                          elif re.match(r'^\d{4}$', latest_period):
-                              data_date = f"{latest_period}-06-15"
-                          else:
-                              data_date = latest_period
-                      except Exception as e:
-                          print(f"    Eurostat date parse warn: {e}")
-
-                      print(f"    OK EUR [Eurostat TIPSNA30 unit={unit_filter or 'auto'}]: {tot_value} ({data_date})")
-                      return round(tot_value, 2), data_date
-
-                  except Exception as e:
-                      print(f"    Eurostat error (unit={unit_filter or 'all'}): {e}")
-
-              return None, None
-
-          def fetch_wb_tot(curr):
-              """
-              World Bank API fallback: indicator TM.VAL.MRCH.XD.WD (merchandise terms of trade index).
-              Note: Annual data only, 2-3 year lag typical.
-              Returns (value, date_string) or (None, None).
-              """
-              wb_code = WB_COUNTRY_MAP.get(curr)
-              if not wb_code:
-                  return None, None
-
-              # TT.PRI.MRCH.XD.WD = Net barter terms of trade index (2015=100)
-              url = (
-                  f"https://api.worldbank.org/v2/country/{wb_code}/indicator/TT.PRI.MRCH.XD.WD"
-                  f"?format=json&mrv=5&per_page=5"
-              )
+              slug = COUNTRY_URLS[currency_code]
+              url  = f"https://tradingeconomics.com/{slug}/terms-of-trade"
+              print(f"    → Scraping TE country page: {url}")
               try:
-                  r = requests.get(url, headers=HEADERS, timeout=15)
-                  if not r.ok:
+                  r = te_get(url)
+                  soup = BeautifulSoup(r.content, 'lxml')
+
+                  # The stats table on TE country indicator pages has class "table"
+                  # and a row with: Actual | Previous | Highest | Lowest | Dates | Unit | Frequency
+                  for table in soup.find_all('table'):
+                      headers = [th.get_text(strip=True).lower() for th in table.find_all('th')]
+                      if 'actual' in headers and ('unit' in headers or 'frequency' in headers):
+                          actual_idx = headers.index('actual')
+                          date_idx   = headers.index('dates') if 'dates' in headers else None
+                          rows = table.find_all('tr')[1:]
+                          if rows:
+                              cells = rows[0].find_all('td')
+                              if len(cells) > actual_idx:
+                                  val = clean_num(cells[actual_idx].get_text(strip=True))
+                                  data_date = str(date.today())
+                                  if date_idx and len(cells) > date_idx:
+                                      # Dates column often shows "1957 - 2025" range, not the latest date
+                                      # Try to find the reference date from another column
+                                      pass
+                                  if val is not None and TOT_MIN <= val <= TOT_MAX:
+                                      print(f"    ✓ {currency_code} [TE country page]: {val}")
+                                      return val, data_date
+                                  elif val is not None:
+                                      print(f"    ✗ {currency_code} [TE country page]: {val} out of range (scale mismatch)")
+                                      return None, None
+              except Exception as e:
+                  print(f"    ✗ {currency_code} TE country page error: {e}")
+              return None, None
+
+          def scrape_tot_ons_gbp():
+              """
+              ONS (Office for National Statistics) JSON API for UK Terms of Trade.
+              Series: CTSL (Trade in Goods: Total Terms of Trade, BOP, SA)
+              Dataset: MRET (UK Trade time series)
+              API:     https://api.ons.gov.uk/v1/timeseries/{series}/dataset/{dataset}/data
+              Returns quarterly data; we take the latest quarter.
+              """
+              url = "https://api.ons.gov.uk/v1/timeseries/CTSL/dataset/MRET/data"
+              print(f"    → ONS API: {url}")
+              try:
+                  r = requests.get(url, headers=JSON_HEADERS, timeout=20)
+                  r.raise_for_status()
+                  data = r.json()
+
+                  quarters = data.get('quarters', [])
+                  if not quarters:
+                      print("    ✗ ONS: no quarterly data found")
                       return None, None
+
+                  # quarters is a list of {date: "2025 Q4", value: "100.4", ...}
+                  # Sort by date string descending and take the first non-empty value
+                  def sort_key(q):
+                      d = q.get('date','')
+                      m = re.match(r'(\d{4})\s+Q(\d)', d)
+                      if m:
+                          return int(m.group(1)) * 10 + int(m.group(2))
+                      return 0
+
+                  quarters_sorted = sorted(quarters, key=sort_key, reverse=True)
+                  for q in quarters_sorted:
+                      val = clean_num(q.get('value',''))
+                      date_str = q.get('date','')
+                      if val is not None and TOT_MIN <= val <= TOT_MAX:
+                          # Parse "2025 Q4" → "2025-11-15"
+                          m = re.match(r'(\d{4})\s+Q(\d)', date_str)
+                          if m:
+                              yr, qnum = int(m.group(1)), int(m.group(2))
+                              data_date = f"{yr}-{(qnum-1)*3+2:02d}-15"
+                          else:
+                              data_date = str(date.today())
+                          print(f"    ✓ GBP [ONS CTSL]: {val} ({date_str} → {data_date})")
+                          return round(val, 2), data_date
+
+                  print("    ✗ ONS: no valid quarterly value in range found")
+              except Exception as e:
+                  print(f"    ✗ ONS API error: {e}")
+              return None, None
+
+          def scrape_tot_wb(currency_code):
+              """
+              World Bank API fallback: TT.PRI.MRCH.XD.WD (net barter ToT, base 2015=100).
+              Annual data with 2-3 year lag. Last resort only.
+              """
+              # World Bank country codes
+              wb_map = {
+                  'USD':'US','GBP':'GB','JPY':'JP','CAD':'CA',
+                  'AUD':'AU','CHF':'CH','NZD':'NZ','EUR':'XC',
+              }
+              wb = wb_map.get(currency_code)
+              if not wb:
+                  return None, None
+              url = (f"https://api.worldbank.org/v2/country/{wb}"
+                     f"/indicator/TT.PRI.MRCH.XD.WD?format=json&mrv=5&per_page=5")
+              try:
+                  r = requests.get(url, headers=JSON_HEADERS, timeout=25)
+                  r.raise_for_status()
                   data = r.json()
                   if not data or len(data) < 2 or not data[1]:
                       return None, None
@@ -340,194 +260,170 @@ jobs:
                       if not (TOT_MIN <= val <= TOT_MAX):
                           continue
                       yr = obs.get('date', str(date.today().year))
-                      data_date = f"{yr}-06-15"
-                      print(f"    OK {curr} [World Bank ToT]: {val} ({yr})")
-                      return round(val, 2), data_date
+                      print(f"    ✓ {currency_code} [World Bank ToT {yr}]: {val}")
+                      return round(val, 2), f"{yr}-06-15"
               except Exception as e:
-                  print(f"    World Bank ToT error for {curr}: {e}")
+                  print(f"    ✗ World Bank ToT {currency_code}: {e}")
               return None, None
 
-          def fetch_all_terms_of_trade(te_data, te_dates):
+          def fetch_all_tot(te_list_data, te_list_dates):
               """
-              Build final ToT dict using priority chain:
-                1. TE country-list values that pass range validation
-                2. OECD SDMX API (tries multiple key patterns)
-                3. Eurostat (EUR only)
-                4. World Bank annual (last resort)
-              Returns (data_dict, dates_dict)
-              """
-              data  = {}
-              dates = {}
+              Complete Terms of Trade resolution with prioritized source chain:
 
-              # Step 1: accept valid TE values
-              for curr, val in te_data.items():
-                  if TOT_MIN <= val <= TOT_MAX:
-                      data[curr]  = val
-                      dates[curr] = te_dates.get(curr, str(date.today()))
-                      print(f"  OK {curr} [TE]: {val}")
-                  else:
-                      print(f"  SKIP {curr} [TE]: {val} out of range [{TOT_MIN},{TOT_MAX}]")
+              1. TE country-list values in range (already filtered by scrape_te)
+              2. Per-currency specialist scrapers:
+                 - GBP → ONS API (CTSL, quarterly, most current)
+                 - EUR → TE country page (euro-area/terms-of-trade)
+                 - Others with bad scale → TE country page
+              3. World Bank annual (last resort, ~2yr lag)
+              """
+              data  = dict(te_list_data)
+              dates = dict(te_list_dates)
 
               missing = [c for c in CURRENCIES if c not in data]
               if not missing:
                   return data, dates
 
-              print(f"\n  -> Fetching ToT for missing: {', '.join(missing)}")
+              print(f"\n  → Specialist ToT scrapers for: {', '.join(missing)}")
 
-              # Step 2: OECD for non-EUR
-              for curr in [c for c in missing if c != 'EUR']:
-                  val, d = fetch_oecd_tot_for_currency(curr)
+              for curr in list(missing):
+                  val, d = None, None
+
+                  if curr == 'GBP':
+                      val, d = scrape_tot_ons_gbp()
+                  elif curr in ('EUR', 'NZD'):
+                      # TE country page (NZD page shows 2002Q2=1000 base, will be rejected)
+                      val, d = scrape_tot_te_country_page(curr)
+                  else:
+                      val, d = scrape_tot_te_country_page(curr)
+
                   if val is not None:
                       data[curr]  = val
-                      dates[curr] = d
-                  time.sleep(0.5)
+                      dates[curr] = d or str(date.today())
+                      missing.remove(curr)
+                  time.sleep(1)
 
-              # Step 3: Eurostat for EUR
-              if 'EUR' in missing:
-                  val, d = fetch_eur_tot_eurostat()
-                  if val is not None:
-                      data['EUR']  = val
-                      dates['EUR'] = d
-
-              # Step 4: World Bank for anything still missing
+              # Last resort: World Bank for any still missing
               still_missing = [c for c in CURRENCIES if c not in data]
               if still_missing:
-                  print(f"\n  -> World Bank ToT fallback for: {', '.join(still_missing)}")
+                  print(f"\n  → World Bank ToT fallback for: {', '.join(still_missing)}")
                   for curr in still_missing:
-                      val, d = fetch_wb_tot(curr)
+                      val, d = scrape_tot_wb(curr)
                       if val is not None:
                           data[curr]  = val
                           dates[curr] = d
-                      time.sleep(0.3)
+                      time.sleep(0.5)
 
               final_missing = [c for c in CURRENCIES if c not in data]
               if final_missing:
-                  print(f"  WARN: No ToT available for: {', '.join(final_missing)} -> null")
+                  print(f"  ⚠ No ToT available for: {', '.join(final_missing)} → null")
 
               return data, dates
 
           # ═══════════════════════════════════════════════════════════════════
-          # STANDARD TE SCRAPING (unchanged for non-ToT indicators)
+          # STANDARD TE SCRAPING
           # ═══════════════════════════════════════════════════════════════════
 
           def scrape_country_page(country_slug, indicator_page, currency_code):
               url = f'https://tradingeconomics.com/{country_slug}/{indicator_page}'
               try:
-                  r = requests.get(url, headers=HEADERS, timeout=20)
-                  if r.status_code == 429:
-                      print(f"  Rate limited, waiting 30s...")
-                      time.sleep(30)
-                      r = requests.get(url, headers=HEADERS, timeout=20)
-                  r.raise_for_status()
+                  r = te_get(url)
                   soup = BeautifulSoup(r.content, 'lxml')
                   for table in soup.find_all('table'):
                       headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
                       if 'last' in headers and 'reference' in headers:
-                          last_idx = headers.index('last')
-                          ref_idx  = headers.index('reference')
-                          keyword  = indicator_page.replace('-', ' ').split()[0].lower()
+                          li, ri = headers.index('last'), headers.index('reference')
+                          kw = indicator_page.replace('-',' ').split()[0].lower()
                           for row in table.find_all('tr')[1:]:
                               cells = row.find_all('td')
-                              if len(cells) <= max(last_idx, ref_idx):
-                                  continue
-                              if keyword in cells[0].get_text(strip=True).lower():
-                                  val = clean_num(cells[last_idx].get_text(strip=True))
+                              if len(cells) <= max(li, ri): continue
+                              if kw in cells[0].get_text(strip=True).lower():
+                                  val = clean_num(cells[li].get_text(strip=True))
                                   if val is not None:
-                                      data_date = parse_te_date(cells[ref_idx].get_text(strip=True))
-                                      print(f"    OK {currency_code} [related-table]: {val} ({data_date})")
-                                      return val, data_date
+                                      d = parse_te_date(cells[ri].get_text(strip=True))
+                                      print(f"    ✓ {currency_code} [related-table]: {val} ({d})")
+                                      return val, d
                   for table in soup.find_all('table'):
                       headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
                       if 'actual' in headers:
-                          actual_idx = headers.index('actual')
-                          date_idx   = headers.index('reference') if 'reference' in headers else None
+                          ai = headers.index('actual')
+                          di = headers.index('reference') if 'reference' in headers else None
                           rows = table.find_all('tr')[1:]
                           if rows:
                               cells = rows[0].find_all('td')
-                              if len(cells) > actual_idx:
-                                  val = clean_num(cells[actual_idx].get_text(strip=True))
-                                  data_date = str(date.today())
-                                  if date_idx and len(cells) > date_idx:
-                                      data_date = parse_te_date(cells[date_idx].get_text(strip=True))
+                              if len(cells) > ai:
+                                  val = clean_num(cells[ai].get_text(strip=True))
+                                  d = str(date.today())
+                                  if di and len(cells) > di:
+                                      d = parse_te_date(cells[di].get_text(strip=True))
                                   if val is not None:
-                                      print(f"    OK {currency_code} [actual-table]: {val} ({data_date})")
-                                      return val, data_date
-                  return None, None
+                                      print(f"    ✓ {currency_code} [actual-table]: {val} ({d})")
+                                      return val, d
               except Exception as e:
-                  print(f"    ERROR scraping {country_slug}: {e}")
-                  return None, None
+                  print(f"    ✗ {country_slug}: {e}")
+              return None, None
 
           def parse_tb(cols):
-              if len(cols) < 5:
-                  return None
-              val = clean_num(cols[1].get_text(strip=True))
+              if len(cols) < 5: return None
+              val  = clean_num(cols[1].get_text(strip=True))
               unit = cols[4].get_text(strip=True)
-              if val is None:
-                  return None
+              if val is None: return None
               scale = 1000 if 'billion' in unit.lower() else 1
-              curr = next((c for c in CURRENCIES if c in unit.upper()), 'USD')
+              curr  = next((c for c in CURRENCIES if c in unit.upper()), 'USD')
               val_m = val * scale
               if curr != 'USD':
                   fx = exchange_rates.get(curr, 1)
                   val_m = val_m / fx if fx else val_m
               return round(val_m, 2)
 
-          def scrape_te(url, indicator):
+          def scrape_te_list(url, indicator):
               print(f"\n{'='*50}\nSCRAPING: {indicator.upper()}\n{'='*50}")
               try:
-                  r = requests.get(url, headers=HEADERS, timeout=20)
-                  if r.status_code == 429:
-                      print(f"  Rate limited, waiting 30s...")
-                      time.sleep(30)
-                      r = requests.get(url, headers=HEADERS, timeout=20)
-                  r.raise_for_status()
+                  r = te_get(url)
                   soup = BeautifulSoup(r.content, 'lxml')
-                  data  = {}
-                  dates = {}
+                  data, dates = {}, {}
                   table = soup.find('table', {'class': 'table'})
-                  if not table:
-                      return data, dates
+                  if not table: return data, dates
                   headers = [h.get_text(strip=True).lower() for h in table.find_all('th')]
-                  actual_idx = 1
-                  date_idx = None
-                  if 'actual' in headers:
-                      actual_idx = headers.index('actual')
-                  if 'last' in headers and actual_idx == 1:
-                      actual_idx = headers.index('last')
-                  if 'reference' in headers:
-                      date_idx = headers.index('reference')
+                  ai = 1
+                  if 'actual' in headers: ai = headers.index('actual')
+                  elif 'last' in headers: ai = headers.index('last')
+                  di = headers.index('reference') if 'reference' in headers else None
                   for row in table.find_all('tr')[1:]:
                       cols = row.find_all('td')
-                      if len(cols) < 2:
-                          continue
+                      if len(cols) < 2: continue
                       ctry = cols[0].get_text(strip=True)
                       for code, names in COUNTRY_NAMES.items():
                           if any(n.lower() in ctry.lower() for n in names):
-                              val = parse_tb(cols) if indicator == 'tradeBalance' else clean_num(cols[actual_idx].get_text(strip=True))
-                              data_date = str(date.today())
-                              if date_idx and len(cols) > date_idx:
-                                  data_date = parse_te_date(cols[date_idx].get_text(strip=True))
+                              val = parse_tb(cols) if indicator == 'tradeBalance' \
+                                    else clean_num(cols[ai].get_text(strip=True))
+                              d = str(date.today())
+                              if di and len(cols) > di:
+                                  d = parse_te_date(cols[di].get_text(strip=True))
                               if val is not None:
+                                  # Filter out-of-range ToT values from the list
+                                  if indicator == 'termsOfTrade' and not (TOT_MIN <= val <= TOT_MAX):
+                                      print(f"  ✗ {code}: {val} (out of range — needs specialist scraper)")
+                                      break
                                   data[code]  = round(val, 2)
-                                  dates[code] = data_date
-                                  print(f"  OK {code}: {val} ({data_date})")
+                                  dates[code] = d
+                                  print(f"  ✓ {code}: {val} ({d})")
                               break
                   return data, dates
               except Exception as e:
-                  print(f"  ERROR: {e}")
+                  print(f"  ✗ Error: {e}")
                   return {}, {}
 
           def scrape_fallback(indicator, url):
               if indicator == 'termsOfTrade':
-                  # Scrape TE first to collect valid values, then fill gaps
                   print(f"\n{'='*50}\nSCRAPING: TERMSOFTRADE\n{'='*50}")
-                  te_data, te_dates = scrape_te(url, indicator)
-                  return fetch_all_terms_of_trade(te_data, te_dates)
+                  te_data, te_dates = scrape_te_list(url, indicator)
+                  return fetch_all_tot(te_data, te_dates)
 
-              data, dates = scrape_te(url, indicator)
+              data, dates = scrape_te_list(url, indicator)
               missing = [c for c in CURRENCIES if c not in data]
               if missing and indicator in INDICATOR_PAGES:
-                  print(f"\n  -> Country page fallback for: {', '.join(missing)}")
+                  print(f"\n  → Country page fallback for: {', '.join(missing)}")
                   for code in missing:
                       slug = COUNTRY_URLS.get(code)
                       if slug:
@@ -541,25 +437,23 @@ jobs:
           def load_cot():
               import os
               cot = {}
-              if not os.path.exists('cot-data'):
-                  return {}
-              for c in ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']:
+              if not os.path.exists('cot-data'): return {}
+              for c in ['EUR','GBP','JPY','CAD','AUD','CHF','NZD']:
                   fp = f'cot-data/{c}.json'
                   if os.path.exists(fp):
                       try:
                           with open(fp) as f:
                               cot[c] = json.load(f).get('netPosition')
-                      except:
-                          pass
+                      except: pass
               return cot
 
           # ═══════════════════════════════════════════════════════════════════
           # MAIN
           # ═══════════════════════════════════════════════════════════════════
-          print("="*50)
-          print("ECONOMIC DATA SCRAPER v5")
-          print("ToT sources: TE -> OECD (multi-pattern) -> Eurostat -> World Bank")
-          print("="*50)
+          print("="*60)
+          print("ECONOMIC DATA SCRAPER v6")
+          print("ToT: TE list → ONS (GBP) / TE country page → World Bank")
+          print("="*60)
 
           fetch_fx()
           all_data  = {c: {} for c in CURRENCIES}
@@ -572,26 +466,25 @@ jobs:
                   all_dates[code][ind] = ind_dates.get(code, str(date.today()))
               time.sleep(2)
 
-          cot_data = load_cot()
-          for code, val in cot_data.items():
+          for code, val in load_cot().items():
               all_data[code]['cotPositioning'] = val
 
           today = str(date.today())
-          print("\n" + "="*50 + "\nSUMMARY\n" + "="*50)
+          print("\n" + "="*60 + "\nSUMMARY\n" + "="*60)
           for curr in CURRENCIES:
               pkg = {
                   'lastUpdate': today,
-                  'source': 'TradingEconomics + OECD/Eurostat/WorldBank (ToT) + COT',
-                  'data':  all_data[curr],
-                  'dates': all_dates[curr]
+                  'source': 'TradingEconomics + ONS (GBP ToT) + WorldBank fallback + COT',
+                  'data':   all_data[curr],
+                  'dates':  all_dates[curr],
               }
               with open(f'economic-data/{curr}.json', 'w') as f:
                   json.dump(pkg, f, indent=2)
-              missing = [k for k in ['retailSales', 'wageGrowth', 'manufacturingPMI', 'termsOfTrade']
+              missing = [k for k in ['retailSales','wageGrowth','manufacturingPMI','termsOfTrade']
                          if all_data[curr].get(k) is None]
-              tot = all_data[curr].get('termsOfTrade')
-              status = 'OK' if not missing else 'WARN'
-              print(f"{status} {curr}: ToT={tot}{' | Missing: '+', '.join(missing) if missing else ''}")
+              tot    = all_data[curr].get('termsOfTrade')
+              status = '✓' if not missing else '⚠'
+              print(f"  {status} {curr}: ToT={tot}{' | Missing: '+', '.join(missing) if missing else ''}")
 
           print("\nCOMPLETED")
           EOFPYTHON
@@ -602,9 +495,9 @@ jobs:
           git config user.email github-actions@github.com
           git add economic-data/
           if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes to commit"
           else
-            git commit -m "Economic data $(date +'%Y-%m-%d') + ToT multi-source"
+            git commit -m "Economic data $(date +'%Y-%m-%d') - ToT v6"
             git pull --rebase origin main || true
             git push
           fi
