@@ -1,14 +1,14 @@
 {
   "lastUpdate": "2026-02-18",
-  "source": "TradingEconomics \u2014 v7: +rateMomentum (current_rate - rate_12M_ago); EUR bond10y via /bonds GEUGB10Y:GOV",
+  "source": "TradingEconomics + FRED \u2014 v8: rateMomentum via FRED CSV (sin API key)",
   "data": {
-    "bond10y": 4.072,
+    "bond10y": 4.073,
     "consumerConfidence": 57.3,
     "businessConfidence": 52.6,
     "capitalFlows": 212000.0,
     "fdi": 80553.0,
     "inflationExpectations": 3.1,
-    "rateMomentum": null
+    "rateMomentum": -0.69
   },
   "dates": {
     "bond10y": "2026-02-18",
@@ -17,6 +17,6 @@
     "capitalFlows": "2025-11-15",
     "fdi": "2025-09-15",
     "inflationExpectations": "2026-01-15",
-    "rateMomentum": "2026-02-18"
+    "rateMomentum": "2026-01-01"
   }
 }
