@@ -1084,22 +1084,6 @@
         padding: 1rem;
     }
 }
-
-@media (max-width: 480px) {
-    .card-header {
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-    .card-title-section {
-        flex: 1;
-        min-width: 0;
-    }
-    .card-strength {
-        width: 100%;
-        align-items: flex-start;
-        flex-shrink: 0;
-    }
-}
     </style>
 </head>
 <body>
@@ -1700,339 +1684,132 @@ const baseStrength = strengthObj.score || 50;  // ✅
             return historical;
         };
 
-    // ── SCORE ESTRUCTURAL (3-12 meses): fundamentos macro sin momentum de mercado ──
-const calculateStructuralScore = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
-    if (!data) return 50;
-    
-    // Indicadores puramente fundamentales (sin fxPerformance1M ni cotPositioning)
-    const STRUCTURAL_WEIGHTS = {
-        currentAccount:        { weight: 0.16, direction: 'higher' },
-        tradeBalance:          { weight: 0.12, direction: 'higher' },
-        debt:                  { weight: 0.06, direction: 'lower'  },
-        termsOfTrade:          { weight: 0.03, direction: 'terms_of_trade' },
-        interestRate:          { weight: 0.12, direction: 'higher' },
-        inflation:             { weight: 0.10, direction: 'target' },
-        outlookScore:          { weight: 0.08, direction: 'outlook_direction' },
-        rateMomentum:          { weight: 0.05, direction: 'rate_momentum' },
-        gdpGrowth:             { weight: 0.13, direction: 'higher' },
-        unemployment:          { weight: 0.08, direction: 'lower'  },
-        production:            { weight: 0.05, direction: 'stable' },
-        wageGrowth:            { weight: 0.04, direction: 'stable' },
-        inflationExpectations: { weight: 0.03, direction: 'target' },
-        bond10y:               { weight: 0.02, direction: 'carry_yield' },
-        capitalFlows:          { weight: 0.04, direction: 'flows' },
-    };
-
-    let weightedSum = 0;
-    let totalWeight = 0;
-    
-    const countryObj = (typeof countries !== 'undefined') ? countries.find(c => c.code === currency) : null;
-    let effectiveOutlook = (countryObj && countryObj.outlook && countryObj.outlook !== 'Calculando...') ? countryObj.outlook : null;
-    if (effectiveOutlook && data.rateMomentum !== null && data.rateMomentum !== undefined) {
-        if (data.rateMomentum > 0.3 && effectiveOutlook === 'Dovish') effectiveOutlook = 'Neutral';
-        if (data.rateMomentum < -1.0 && effectiveOutlook === 'Hawkish') effectiveOutlook = 'Neutral';
-    }
-    
-    const allRates = Object.values(allEconomicData).map(d => d.interestRate).filter(v => v != null && !isNaN(v));
-    const avgRate = allRates.length > 0 ? allRates.reduce((a,b) => a+b, 0) / allRates.length : 3.0;
-    const safeHavenThreshold = Math.max(1.0, avgRate - 1.5);
-    
-    let scoringData = { ...data, outlookScore: effectiveOutlook };
-
-    Object.keys(STRUCTURAL_WEIGHTS).forEach(indicator => {
-        const value = scoringData[indicator];
-        if (value === null || value === undefined || isNaN(value)) return;
-        const config = STRUCTURAL_WEIGHTS[indicator];
-        // Reutilizar scoreIndicator del scope exterior (closure)
-        const raw = scoreIndicator(value, indicator, currency, allEconomicData, scoringData);
-        weightedSum += raw * config.weight;
-        totalWeight += config.weight;
-    });
-
-    const base = totalWeight > 0 ? (weightedSum / totalWeight) : 50;
-    const compressed = 20 + (base * 0.58);
-    return Math.max(20, Math.min(82, parseFloat(compressed.toFixed(1))));
-};
-
-// ── SCORE MOMENTUM (1-4 semanas): señales de mercado en tiempo real ──
-const calculateMomentumScore = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
-    if (!data) return 50;
-    
-    const MOMENTUM_WEIGHTS = {
-        fxPerformance1M:   { weight: 0.45, direction: 'fx_momentum' },
-        cotPositioning:    { weight: 0.30, direction: 'moderate_bullish' },
-        manufacturingPMI:  { weight: 0.15, direction: 'expansion' },
-        consumerConfidence:{ weight: 0.05, direction: 'sentiment_index' },
-        businessConfidence:{ weight: 0.05, direction: 'sentiment_index' },
-    };
-
-    let weightedSum = 0;
-    let totalWeight = 0;
-
-    const allRates = Object.values(allEconomicData).map(d => d.interestRate).filter(v => v != null && !isNaN(v));
-    const avgRate = allRates.length > 0 ? allRates.reduce((a,b) => a+b, 0) / allRates.length : 3.0;
-    const safeHavenThreshold = Math.max(1.0, avgRate - 1.5);
-    
-    let scoringData = { ...data };
-    if (currency === 'NZD' && scoringData.businessConfidence !== null && scoringData.businessConfidence !== undefined) {
-        scoringData.businessConfidence = Math.max(0, Math.min(100, (scoringData.businessConfidence / 100) * 50 + 50));
-    }
-    if (currency === 'JPY' && scoringData.consumerConfidence !== null && scoringData.consumerConfidence !== undefined && scoringData.consumerConfidence < 60) {
-        scoringData.consumerConfidence = ((scoringData.consumerConfidence - 25) / 30) * 40 + 85;
-    }
-
-    Object.keys(MOMENTUM_WEIGHTS).forEach(indicator => {
-        const value = scoringData[indicator];
-        if (value === null || value === undefined || isNaN(value)) return;
-        const config = MOMENTUM_WEIGHTS[indicator];
-        const raw = scoreIndicator(value, indicator, currency, allEconomicData, scoringData, safeHavenThreshold);
-        weightedSum += raw * config.weight;
-        totalWeight += config.weight;
-    });
-
-    if (totalWeight === 0) return null; // Sin datos de momentum → no mostrar
-    const base = weightedSum / totalWeight;
-    const compressed = 20 + (base * 0.58);
-    return Math.max(20, Math.min(82, parseFloat(compressed.toFixed(1))));
-};
-
 const generateForexPairRecommendations = (economicData, forexRates) => {
     const cacheKey = 'forex_pair_recommendations';
     const cached = CacheManager.get(cacheKey);
     if (cached !== null) return cached;
 
+    // Calcular fortaleza de todas las divisas
     const strengthScores = {};
     countries.forEach(country => {
         const data = economicData[country.code] || {};
-        const structuralObj  = calculateStrength(country.code, data, forexRates, economicData);
-        const momentumScore  = calculateMomentumScore(country.code, data, forexRates, economicData);
-        const structuralScore = structuralObj.score;
-
-        // Convicción: alta cuando ambos scores apuntan en la misma dirección
-        let conviction = 'Baja';
-        let convictionDetail = 'Sin datos de momentum';
-        let horizonConflict = false;
-
-        if (momentumScore !== null) {
-            const structIsBullish = structuralScore >= 58;
-            const structIsBearish = structuralScore <= 44;
-            const momIsBullish    = momentumScore   >= 58;
-            const momIsBearish    = momentumScore   <= 42;
-            const spread          = Math.abs(structuralScore - momentumScore);
-
-            if ((structIsBullish && momIsBullish) || (structIsBearish && momIsBearish)) {
-                conviction = spread < 10 ? 'Muy Alta' : 'Alta';
-                convictionDetail = 'Fundamentos y momentum alineados';
-                horizonConflict = false;
-            } else if (structIsBullish && momIsBearish) {
-                conviction = 'Conflicto';
-                convictionDetail = 'Fundamentos alcistas, momentum bajista — posible corrección táctica en divisa fundamentalmente sólida';
-                horizonConflict = true;
-            } else if (structIsBearish && momIsBullish) {
-                conviction = 'Conflicto';
-                convictionDetail = 'Fundamentos bajistas, momentum alcista — posible rebote técnico en divisa débil';
-                horizonConflict = true;
-            } else {
-                conviction = 'Media';
-                convictionDetail = 'Señales mixtas entre horizontes';
-                horizonConflict = false;
-            }
-        }
-
+        const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
         strengthScores[country.code] = {
-            structuralScore,
-            momentumScore,
-            conviction,
-            convictionDetail,
-            horizonConflict,
-            dataQuality:   structuralObj.dataQuality,
-            contributions: structuralObj.contributions
+            score: strengthObj.score,
+            dataQuality: strengthObj.dataQuality,
+            contributions: strengthObj.contributions
         };
     });
 
+    // Función auxiliar para extraer top contribuciones
     const getTopContributions = (contributions, isPositive) => {
-        const labels = {
-            'interestRate':        'Tasa de Interés',
-            'currentAccount':      'Cuenta Corriente',
-            'tradeBalance':        'Balanza Comercial',
-            'gdpGrowth':           'Crecimiento PIB',
-            'inflation':           'Inflación',
-            'unemployment':        'Desempleo',
-            'safe_haven_score':    'Safe Haven',
-            'carry_premium':       'Carry Premium',
-            'commodity_exposure':  'Exposición Commodities',
-            'debt_sustainability': 'Sostenibilidad Deuda',
-            'cotPositioning':      'Posicionamiento COT',
-            'fxPerformance1M':     'FX Momentum 1M',
-            'rateMomentum':        'Ciclo Monetario',
-            'low_rate_safe_haven': 'Safe Haven Premium',
-        };
         const entries = Object.entries(contributions)
-            .filter(([, val]) => isPositive ? val > 0 : val < 0)
+            .filter(([key, val]) => isPositive ? val > 0 : val < 0)
             .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
             .slice(0, 3);
+        
+        const labels = {
+            'interestRate': 'Tasa de Interés',
+            'currentAccount': 'Cuenta Corriente',
+            'tradeBalance': 'Balanza Comercial',
+            'gdpGrowth': 'Crecimiento PIB',
+            'inflation': 'Inflación',
+            'unemployment': 'Desempleo',
+            'safe_haven_score': 'Safe Haven',
+            'carry_premium': 'Carry Premium',
+            'commodity_exposure': 'Exposición Commodities',
+            'debt_sustainability': 'Sostenibilidad Deuda',
+            'cotPositioning': 'Posicionamiento COT'
+        };
+        
         return entries.map(([key, val]) => ({
             factor: labels[key] || key,
             impact: val.toFixed(1)
         }));
     };
 
+    // Ordenar divisas por fortaleza
     const sortedCurrencies = Object.entries(strengthScores)
-        .sort((a, b) => b[1].structuralScore - a[1].structuralScore);
-
-    const strongCurrencies = sortedCurrencies.slice(0, 3);
-    const weakCurrencies   = sortedCurrencies.slice(-3).reverse();
+        .sort((a, b) => b[1].score - a[1].score);
 
     const recommendations = [];
 
+    // Top 3 más fuertes y 3 más débiles
+    const strongCurrencies = sortedCurrencies.slice(0, 3);
+    const weakCurrencies = sortedCurrencies.slice(-3).reverse();
+
+    // Generar combinaciones LONG (Comprar fuerte vs débil)
     strongCurrencies.forEach(([strongCurr, strongData]) => {
         weakCurrencies.forEach(([weakCurr, weakData]) => {
             if (strongCurr === weakCurr) return;
 
-            const structuralSpread = strongData.structuralScore - weakData.structuralScore;
-
-            // Momentum spread: si alguno es null, no se puede calcular
-            let momentumSpread = null;
-            let pairConviction = 'Baja';
-            let pairConvictionDetail = 'Sin datos de momentum para el par';
-            let pairHorizonConflict = false;
-
-            if (strongData.momentumScore !== null && weakData.momentumScore !== null) {
-                momentumSpread = strongData.momentumScore - weakData.momentumScore;
-
-                const structAligned  = structuralSpread  >  8;
-                const momentumAligned = momentumSpread   >  8;
-                const momentumOpposed = momentumSpread   < -8;
-
-                if (structAligned && momentumAligned) {
-                    pairConviction = structuralSpread > 20 ? 'Muy Alta' : 'Alta';
-                    pairConvictionDetail = `Fundamentos (${structuralSpread.toFixed(1)}pts) y momentum (${momentumSpread.toFixed(1)}pts) confirman dirección`;
-                    pairHorizonConflict = false;
-                } else if (structAligned && momentumOpposed) {
-                    pairConviction = 'Conflicto';
-                    pairConvictionDetail = `Fundamentos favorables (+${structuralSpread.toFixed(1)}pts) pero momentum adverso (${momentumSpread.toFixed(1)}pts) — esperar confirmación táctica`;
-                    pairHorizonConflict = true;
-                } else if (structAligned) {
-                    pairConviction = 'Media';
-                    pairConvictionDetail = `Fundamentos sólidos (+${structuralSpread.toFixed(1)}pts), momentum neutro`;
-                    pairHorizonConflict = false;
-                } else {
-                    pairConviction = 'Baja';
-                    pairConvictionDetail = 'Diferencial fundamental insuficiente';
-                    pairHorizonConflict = false;
-                }
-            } else {
-                // Sin momentum: usar solo fundamentales
-                pairConviction = structuralSpread > 20 ? 'Alta' : structuralSpread > 12 ? 'Media' : 'Baja';
-                pairConvictionDetail = 'Sin datos de momentum — basado solo en fundamentos';
-            }
+            const spreadStrength = strongData.score - weakData.score;
+            const pairName = `${strongCurr}/${weakCurr}`;
+            
+            const strongReasons = getTopContributions(strongData.contributions, true);
+            const weakReasons = getTopContributions(weakData.contributions, false);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const strongReasons = getTopContributions(strongData.contributions, true);
-            const weakReasons   = getTopContributions(weakData.contributions, false);
-
-            // Prioridad: bonus por alineación de horizontes, penalidad por conflicto
-            const alignmentBonus = pairConviction === 'Muy Alta' ? 1.3
-                                 : pairConviction === 'Alta'     ? 1.1
-                                 : pairConviction === 'Conflicto'? 0.6
-                                 : 1.0;
+            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
 
             recommendations.push({
                 type: 'long',
-                pair: `${strongCurr}/${weakCurr}`,
+                pair: pairName,
                 direction: 'LONG',
                 actionText: 'Comprar',
-                structuralScore:  strongData.structuralScore,
-                structuralSpread,
-                momentumScore:    strongData.momentumScore,
-                momentumSpread,
-                weakStructuralScore:  weakData.structuralScore,
-                weakMomentumScore:    weakData.momentumScore,
-                conviction:            pairConviction,
-                convictionDetail:      pairConvictionDetail,
-                horizonConflict:       pairHorizonConflict,
-                dataQuality:   avgQuality,
+                strength: strongData.score,
+                weakness: weakData.score,
+                spread: spreadStrength,
+                confidence: confidence,
+                dataQuality: avgQuality,
                 strongCurrency: strongCurr,
-                weakCurrency:   weakCurr,
-                strongReasons,
-                weakReasons,
-                priority: structuralSpread * avgQuality * alignmentBonus
+                weakCurrency: weakCurr,
+                strongReasons: strongReasons,
+                weakReasons: weakReasons,
+                priority: spreadStrength * avgQuality
             });
         });
     });
 
+    // Generar combinaciones SHORT (Vender débil vs fuerte)
     weakCurrencies.forEach(([weakCurr, weakData]) => {
         strongCurrencies.forEach(([strongCurr, strongData]) => {
             if (weakCurr === strongCurr) return;
 
-            const structuralSpread = strongData.structuralScore - weakData.structuralScore;
-            let momentumSpread = null;
-            let pairConviction = 'Baja';
-            let pairConvictionDetail = 'Sin datos de momentum para el par';
-            let pairHorizonConflict = false;
-
-            if (strongData.momentumScore !== null && weakData.momentumScore !== null) {
-                momentumSpread = strongData.momentumScore - weakData.momentumScore;
-                const structAligned   = structuralSpread  >  8;
-                const momentumAligned = momentumSpread    >  8;
-                const momentumOpposed = momentumSpread    < -8;
-
-                if (structAligned && momentumAligned) {
-                    pairConviction = structuralSpread > 20 ? 'Muy Alta' : 'Alta';
-                    pairConvictionDetail = `Fundamentos (${structuralSpread.toFixed(1)}pts) y momentum (${momentumSpread.toFixed(1)}pts) confirman dirección`;
-                    pairHorizonConflict = false;
-                } else if (structAligned && momentumOpposed) {
-                    pairConviction = 'Conflicto';
-                    pairConvictionDetail = `Fundamentos favorables (+${structuralSpread.toFixed(1)}pts) pero momentum adverso (${momentumSpread.toFixed(1)}pts)`;
-                    pairHorizonConflict = true;
-                } else if (structAligned) {
-                    pairConviction = 'Media';
-                    pairConvictionDetail = `Fundamentos sólidos (+${structuralSpread.toFixed(1)}pts), momentum neutro`;
-                } else {
-                    pairConviction = 'Baja';
-                    pairConvictionDetail = 'Diferencial fundamental insuficiente';
-                }
-            } else {
-                pairConviction = structuralSpread > 20 ? 'Alta' : structuralSpread > 12 ? 'Media' : 'Baja';
-                pairConvictionDetail = 'Sin datos de momentum — basado solo en fundamentos';
-            }
+            const spreadStrength = strongData.score - weakData.score;
+            const pairName = `${weakCurr}/${strongCurr}`;
+            
+            const weakReasons = getTopContributions(weakData.contributions, false);
+            const strongReasons = getTopContributions(strongData.contributions, true);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const strongReasons = getTopContributions(strongData.contributions, true);
-            const weakReasons   = getTopContributions(weakData.contributions, false);
-
-            const alignmentBonus = pairConviction === 'Muy Alta' ? 1.3
-                                 : pairConviction === 'Alta'     ? 1.1
-                                 : pairConviction === 'Conflicto'? 0.6
-                                 : 1.0;
+            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
 
             recommendations.push({
                 type: 'short',
-                pair: `${weakCurr}/${strongCurr}`,
+                pair: pairName,
                 direction: 'SHORT',
                 actionText: 'Vender',
-                structuralScore:  strongData.structuralScore,
-                structuralSpread,
-                momentumScore:    strongData.momentumScore,
-                momentumSpread,
-                weakStructuralScore:  weakData.structuralScore,
-                weakMomentumScore:    weakData.momentumScore,
-                conviction:            pairConviction,
-                convictionDetail:      pairConvictionDetail,
-                horizonConflict:       pairHorizonConflict,
-                dataQuality:   avgQuality,
+                strength: strongData.score,
+                weakness: weakData.score,
+                spread: spreadStrength,
+                confidence: confidence,
+                dataQuality: avgQuality,
                 strongCurrency: strongCurr,
-                weakCurrency:   weakCurr,
-                strongReasons,
-                weakReasons,
-                priority: structuralSpread * avgQuality * alignmentBonus
+                weakCurrency: weakCurr,
+                weakReasons: weakReasons,
+                strongReasons: strongReasons,
+                priority: spreadStrength * avgQuality
             });
         });
     });
 
+    // Ordenar por prioridad y tomar top 8
     recommendations.sort((a, b) => b.priority - a.priority);
-    const longRecs  = recommendations.filter(r => r.type === 'long').slice(0, 4);
+    
+    const longRecs = recommendations.filter(r => r.type === 'long').slice(0, 4);
     const shortRecs = recommendations.filter(r => r.type === 'short').slice(0, 4);
+    
     const finalRecommendations = [...longRecs, ...shortRecs];
 
     CacheManager.set(cacheKey, finalRecommendations, CACHE_CONFIG.ALERTS);
@@ -2273,9 +2050,27 @@ try {
             return economicData;
         };
 
-// ========== TRADING-ORIENTED WEIGHTS v4.9.5 — scope global ==========
-// Debe estar aquí para que scoreIndicator, calculateStructuralScore y calculateMomentumScore
-// puedan acceder a él. No mover dentro de ninguna función.
+// Ejemplos:
+//   Régimen 2022 (avg ~4.5%): threshold = max(1.0, 3.0) = 3.0%  → CHF 1.4% califica ✓
+//   Régimen 2021 (avg ~0.3%): threshold = max(1.0, −1.2) = 1.0% → solo 0-1% califica
+//   Régimen 2026 (avg ~3.5%): threshold = max(1.0, 2.0) = 2.0%  → CHF/JPY califican ✓
+
+const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
+    if (!data) return { 
+        score: 50, 
+        confidence: { lower: 40, upper: 60 }, 
+        contributions: {}, 
+        dataQuality: 0 
+    };
+    
+// ========== TRADING-ORIENTED WEIGHTS v4.9.5 ==========
+// Cambios vs v4.9.4:
+//  - fxPerformance1M: nuevo indicador (peso 0.07) — momentum de mercado real
+//  - rateMomentum: promovido a indicador con peso propio (0.05) — ciclo monetario
+//  - interestRate: peso reducido 0.12→0.09 para dar espacio a los nuevos
+//  - bond10y: peso reducido 0.02→0.01
+//  - outlookScore: peso sin cambio (0.06)
+// suma real = 1.04 (normalizado automáticamente por totalWeight)
 const TRADING_WEIGHTS = {
     // Tier 1: External Balance & Safe Haven (0.27)
     currentAccount:        { weight: 0.12, direction: 'higher' },
@@ -2284,11 +2079,11 @@ const TRADING_WEIGHTS = {
     termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
 
     // Tier 2: Rate Differentials & Carry (0.26)
-    interestRate:          { weight: 0.09, direction: 'higher' },
+    interestRate:          { weight: 0.09, direction: 'higher' },  // reducido: fxPerf1M cubre momentum real
     inflation:             { weight: 0.08, direction: 'target' },
     outlookScore:          { weight: 0.06, direction: 'outlook_direction' },
     bond10y:               { weight: 0.01, direction: 'carry_yield' },
-    rateMomentum:          { weight: 0.02, direction: 'rate_momentum' },
+    rateMomentum:          { weight: 0.02, direction: 'rate_momentum' },  // NUEVO como indicador propio
 
     // Tier 3: Growth & Employment (0.20)
     gdpGrowth:             { weight: 0.10, direction: 'higher' },
@@ -2307,12 +2102,17 @@ const TRADING_WEIGHTS = {
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
     capitalFlows:          { weight: 0.03, direction: 'flows'            },
 
-    // Tier 6: Market Momentum (0.07)
+    // Tier 6: Market Momentum — NUEVO (0.07)
+    // fxPerformance1M: rendimiento real de la divisa en los últimos 30 días
+    // Fuente: Frankfurter API (ECB reference rates) actualizado diariamente
+    // Es el único indicador 100% forward-looking y libre de lag de publicación
+    // Captura: posicionamiento especulativo, flows institucionales, carry, risk-off
+    // No se puede replicar con ningún otro indicador del modelo
     fxPerformance1M:       { weight: 0.07, direction: 'fx_momentum' },
 };
 
 // ========== SCORING FUNCTIONS v4.9.5 ==========
-const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringDataExplicit, safeHavenThreshold = 2.0) => {
+const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringDataExplicit) => {
     // currencyCtx: código de divisa (e.g. 'JPY', 'CHF') para overrides data-driven
     const config = TRADING_WEIGHTS[indicator];
     if (!config) return 0;
@@ -2574,16 +2374,6 @@ if (isSafeHavenFunder) {
     return Math.max(0, Math.min(100, score));
 };
 
-const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
-    if (!data) return { 
-        score: 50, 
-        confidence: { lower: 40, upper: 60 }, 
-        contributions: {}, 
-        dataQuality: 0 
-    };
-    
-// TRADING_WEIGHTS definido en scope global (ver arriba de scoreIndicator)
-
     // ========== SCORING LOOP ==========
     let weightedScoreSum = 0;   // Suma de (score_i * weight_i)
     let totalWeight = 0;        // Suma de pesos de indicadores con datos
@@ -2656,7 +2446,7 @@ if (currency === 'JPY' && scoringData.consumerConfidence !== null && scoringData
             return;
         }
         const config = TRADING_WEIGHTS[indicator];
-        const rawScore = scoreIndicator(value, indicator, currency, allEconomicData, scoringData, safeHavenThreshold);
+        const rawScore = scoreIndicator(value, indicator, currency, allEconomicData, scoringData); 
         const weighted    = rawScore * config.weight;
         contributions[indicator] = weighted;
         weightedScoreSum += weighted;
@@ -3569,16 +3359,10 @@ const getSentiment = (strength) => {
         ? strength.score 
         : (typeof strength === 'string' ? parseFloat(strength) : strength);
     
-    if (numStrength >= 62) return 'alcista';
-    if (numStrength <= 45) return 'bajista';
-    return 'neutral';
-};
-
-const getMomentumSentiment = (score) => {
-    if (score === null || score === undefined) return null;
-    if (score >= 58) return 'alcista';
-    if (score <= 42) return 'bajista';
-    return 'neutral';
+    // Umbrales institucionales (distribución normal esperada)
+    if (numStrength >= 62) return 'alcista';   // Top 30% (~2-3 divisas)
+    if (numStrength <= 45) return 'bajista';   // Bottom 30% (~2-3 divisas)
+    return 'neutral';                          // Middle 40% (~3-4 divisas)
 };
 
 const generateAnalysis = (currency, forexRates, economicData) => {
@@ -4204,42 +3988,16 @@ const DataHealthCheck = ({ economicData }) => {
                                         <div className="card-currency-name">{country.currency}</div>
                                     </div>
                                 </div>
-<div className="card-strength" style={{ flexShrink: 0 }}>
-    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-        <div style={{ textAlign: 'right' }}>
-            <div className="strength-score" style={{ 
-                color: sentiment === 'alcista' ? 'var(--green-strong)' : 
-                       sentiment === 'bajista' ? 'var(--red-strong)' : 
-                       'var(--neutral)',
-                fontSize: '1.25rem'
-            }}>
-                {strength}
-            </div>
-            <div className="strength-label">Estructural</div>
-            <div style={{ fontSize: '0.6rem', color: 'var(--text-tertiary)', marginTop: '0.15rem' }}>3-12 meses</div>
-        </div>
-        {(() => {
-            const mScore = calculateMomentumScore(country.code, data, forexRates, economicData);
-            const mSentiment = getMomentumSentiment(mScore);
-            if (mScore === null) return null;
-            return (
-                <div style={{ textAlign: 'right', borderLeft: '1px solid var(--border)', paddingLeft: '1rem' }}>
-                    <div style={{ 
-                        fontSize: '1.25rem', 
-                        fontWeight: 700,
-                        color: mSentiment === 'alcista' ? 'var(--green-strong)' : 
-                               mSentiment === 'bajista' ? 'var(--red-strong)' : 
-                               'var(--neutral)'
-                    }}>
-                        {mScore}
-                    </div>
-                    <div className="strength-label">Momentum</div>
-                    <div style={{ fontSize: '0.6rem', color: 'var(--text-tertiary)', marginTop: '0.15rem' }}>1-4 semanas</div>
-                </div>
-            );
-        })()}
-    </div>
-</div>
+                                <div className="card-strength">
+                                    <div className="strength-score" style={{ 
+                                        color: sentiment === 'alcista' ? 'var(--green-strong)' : 
+                                               sentiment === 'bajista' ? 'var(--red-strong)' : 
+                                               'var(--neutral)' 
+                                    }}>
+                                        {strength}
+                                    </div>
+                                    <div className="strength-label">Fortaleza</div>
+                                </div>
                             </div>
                             <div className="card-body">
                                 <div className="central-bank">
@@ -4468,9 +4226,9 @@ const DataHealthCheck = ({ economicData }) => {
                                         <thead>
                                             <tr>
                                                 <th></th>
-<TooltipCell title="Síntesis Estructural" tooltip="Score estructural (3-12 meses) basado en 15 indicadores macro: PIB, tasa de interés, cuenta corriente, balanza comercial, inflación, desempleo y otros fundamentos. Alcista ≥62 · Bajista ≤45.">
-    Síntesis<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Estructural</span>
-</TooltipCell>
+                                                <TooltipCell title="Síntesis General" tooltip="Evaluación global de la fortaleza fundamental de la divisa.">
+                                                    General<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Síntesis</span>
+                                                </TooltipCell>
                                                 <TooltipCell title="PIB Total" tooltip={indicatorTooltips.gdp}>
                                                     PIB<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Trillones USD</span>
                                                 </TooltipCell>
@@ -4549,14 +4307,12 @@ const sentiment = getSentiment(strength);
                                                                 </div>
                                                             </div>
                                                         </td>
-<td style={{ background: 'var(--bg-card)', minWidth: '120px' }}>
-    <div className="overall-cell">
-        <div className="overall-indicator" style={{ background: overallColor }}></div>
-        <span className="overall-label" style={{ color: overallColor, fontSize: '0.7rem' }}>
-            {sentiment} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>({strength})</span>
-        </span>
-    </div>
-</td>
+                                                        <td style={{ background: 'var(--bg-card)' }}>
+                                                            <div className="overall-cell">
+                                                                <div className="overall-indicator" style={{ background: overallColor }}></div>
+                                                                <span className="overall-label" style={{ color: overallColor }}>{sentiment}</span>
+                                                            </div>
+                                                        </td>
 <HeatmapCell value={data.gdp} type="gdp" currency={country.code} indicator="gdp" lastUpdate={data.gdpDate} />
 <HeatmapCell value={data.gdpGrowth} type="gdpGrowth" currency={country.code} indicator="gdpGrowth" lastUpdate={data.gdpGrowthDate} />
 <HeatmapCell value={data.interestRate} type="interestRate" currency={country.code} indicator="interestRate" lastUpdate={data.interestRateDate} />
@@ -4751,321 +4507,231 @@ const sentiment = getSentiment(strength);
 {activeTab === 'alerts' && (
     <div>
         <div className="section-header">
-            <div className="section-title">Mejores Pares de Divisas — Análisis Dual</div>
-            <div className="section-meta">
-                Estructural (3-12M) + Momentum (1-4W) • Ordenados por convicción y diferencial
-            </div>
+            <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
+            <div className="section-meta">Basado en diferenciales de fortaleza fundamental</div>
         </div>
-
-        {/* Leyenda de convicción */}
-        <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            marginBottom: '1.5rem',
-            padding: '1rem 1.25rem',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
-            fontSize: '0.8rem'
-        }}>
-            <span style={{ color: 'var(--text-tertiary)', fontWeight: 600, marginRight: '0.25rem' }}>Convicción:</span>
-            {[
-                { label: 'Muy Alta', color: '#26a69a', desc: 'Fundamentos y momentum alineados, diferencial amplio' },
-                { label: 'Alta',     color: '#00897b', desc: 'Ambos horizontes confirman dirección' },
-                { label: 'Media',    color: '#ff6f00', desc: 'Fundamentos sólidos, momentum neutro' },
-                { label: 'Conflicto',color: '#ef5350', desc: 'Horizontes divergentes — señal táctica vs estructural' },
-                { label: 'Baja',     color: '#607d8b', desc: 'Señales insuficientes' },
-            ].map(({ label, color, desc }) => (
-                <span key={label} title={desc} style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                    cursor: 'help'
-                }}>
-                    <span style={{
-                        width: '10px', height: '10px', borderRadius: '2px',
-                        background: color, display: 'inline-block', flexShrink: 0
-                    }}/>
-                    <span style={{ color }}>{label}</span>
-                </span>
-            ))}
-            <span style={{ color: 'var(--text-tertiary)', marginLeft: 'auto', fontSize: '0.75rem' }}>
-                💡 Hover sobre scores para detalles
-            </span>
-        </div>
-
+        
         <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(420px, 100%), 1fr))', 
-            gap: '1.5rem' 
-        }}>
-            {dynamicAlerts.map((rec, index) => {
-                const convictionColors = {
-                    'Muy Alta': '#26a69a',
-                    'Alta':     '#00897b',
-                    'Media':    '#ff6f00',
-                    'Conflicto':'#ef5350',
-                    'Baja':     '#607d8b',
-                };
-                const convColor = convictionColors[rec.conviction] || '#607d8b';
-                const isLong = rec.type === 'long';
-                const dirColor = isLong ? 'var(--green-strong)' : 'var(--red-strong)';
-
-                return (
-                    <div key={index} className="currency-card" style={{
-                        borderLeft: `4px solid ${rec.horizonConflict ? '#ef5350' : convColor}`
+    display: 'grid', 
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))', 
+    gap: '1.5rem' 
+}}>
+            {dynamicAlerts.map((rec, index) => (
+                <div key={index} className="currency-card" style={{
+                    borderLeft: `4px solid ${rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'}`
+                }}>
+                    <div className="card-header" style={{ 
+                        background: rec.type === 'long' ? 'rgba(38, 166, 154, 0.1)' : 'rgba(239, 83, 80, 0.1)' 
                     }}>
-                        {/* HEADER */}
-                        <div className="card-header" style={{ 
-                            background: rec.horizonConflict
-                                ? 'rgba(239,83,80,0.07)'
-                                : isLong ? 'rgba(38,166,154,0.07)' : 'rgba(239,83,80,0.07)'
-                        }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                                    <span style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                                        {rec.pair}
-                                    </span>
-                                    <span className={`sentiment-badge sentiment-${isLong ? 'alcista' : 'bajista'}`} style={{ fontSize: '0.7rem' }}>
-                                        {rec.direction} — {rec.actionText}
-                                    </span>
-                                    {rec.horizonConflict && (
-                                        <span title={rec.convictionDetail} style={{
-                                            fontSize: '0.7rem', padding: '0.2rem 0.5rem',
-                                            background: 'rgba(239,83,80,0.15)', color: '#ef5350',
-                                            border: '1px solid #ef5350', borderRadius: '4px',
-                                            cursor: 'help'
-                                        }}>
-                                            ⚠ Conflicto
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Convicción badge */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span style={{
-                                        fontSize: '0.72rem', fontWeight: 700,
-                                        padding: '0.2rem 0.6rem', borderRadius: '4px',
-                                        background: `${convColor}22`,
-                                        border: `1px solid ${convColor}`,
-                                        color: convColor,
-                                        letterSpacing: '0.03em'
-                                    }}>
-                                        ◆ Convicción: {rec.conviction}
-                                    </span>
-                                    <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
-                                        Calidad datos: {(rec.dataQuality * 100).toFixed(0)}%
-                                    </span>
-                                </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ 
+                                fontSize: '1.5rem', 
+                                fontWeight: 700, 
+                                marginBottom: '0.5rem',
+                                color: 'var(--text-primary)'
+                            }}>
+                                {rec.pair}
                             </div>
-
-                            {/* Score dual compacto */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', minWidth: '110px' }}>
-<div 
-    title={`Score estructural (3-12M): ${rec.strongCurrency} ${rec.structuralScore?.toFixed(1)} vs ${rec.weakCurrency} ${rec.weakStructuralScore?.toFixed(1)} — Diferencial: +${rec.structuralSpread?.toFixed(1)} pts | ${rec.convictionDetail}`}
-    style={{ 
-        background: 'var(--bg-card)', borderRadius: '4px',
-        padding: '0.4rem 0.6rem', border: '1px solid var(--border)',
-        cursor: 'help'
-    }}
->
-    <div style={{ fontSize: '0.6rem', color: 'var(--text-tertiary)', marginBottom: '0.2rem' }}>ESTRUCTURAL (E)</div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--green-strong)' }}>
-                                            {rec.strongCurrency} {rec.structuralScore?.toFixed(1)}
-                                        </span>
-                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>vs</span>
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--red-strong)' }}>
-                                            {rec.weakCurrency} {rec.weakStructuralScore?.toFixed(1)}
-                                        </span>
-                                    </div>
-                                    <div style={{ fontSize: '0.65rem', color: dirColor, textAlign: 'center', marginTop: '0.15rem' }}>
-                                        Δ {rec.structuralSpread?.toFixed(1)} pts
-                                    </div>
-                                </div>
-
-                                {rec.momentumSpread !== null && rec.momentumSpread !== undefined ? (
-<div 
-    title={`Score momentum (1-4W): ${rec.strongCurrency} ${rec.momentumScore?.toFixed(1)} vs ${rec.weakCurrency} ${rec.weakMomentumScore?.toFixed(1)} — Diferencial: ${rec.momentumSpread?.toFixed(1)} pts${rec.horizonConflict ? ' ⚠ CONFLICTO con fundamentos' : ''}`}
-    style={{ 
-        background: 'var(--bg-card)', borderRadius: '4px',
-        padding: '0.4rem 0.6rem',
-        border: `1px solid ${rec.horizonConflict ? '#ef535044' : 'var(--border)'}`,
-        cursor: 'help'
-    }}
->
-    <div style={{ fontSize: '0.6rem', color: 'var(--text-tertiary)', marginBottom: '0.2rem' }}>MOMENTUM (M)</div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: rec.momentumScore >= 58 ? 'var(--green-strong)' : rec.momentumScore <= 42 ? 'var(--red-strong)' : 'var(--neutral)' }}>
-                                                {rec.strongCurrency} {rec.momentumScore?.toFixed(1)}
-                                            </span>
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>vs</span>
-                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: rec.weakMomentumScore >= 58 ? 'var(--green-strong)' : rec.weakMomentumScore <= 42 ? 'var(--red-strong)' : 'var(--neutral)' }}>
-                                                {rec.weakCurrency} {rec.weakMomentumScore?.toFixed(1)}
-                                            </span>
-                                        </div>
-                                        <div style={{ 
-                                            fontSize: '0.65rem', 
-                                            color: rec.momentumSpread > 0 ? 'var(--green-strong)' : 'var(--red-strong)',
-                                            textAlign: 'center', marginTop: '0.15rem'
-                                        }}>
-                                            {rec.momentumSpread > 0 ? '▲' : '▼'} {rec.momentumSpread?.toFixed(1)} pts
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div style={{
-                                        background: 'var(--bg-card)', borderRadius: '4px',
-                                        padding: '0.4rem 0.6rem', border: '1px solid var(--border)',
-                                        fontSize: '0.65rem', color: 'var(--text-tertiary)', textAlign: 'center'
-                                    }}>
-                                        M: sin datos
-                                    </div>
-                                )}
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '1rem' 
+                            }}>
+                                <span className={`sentiment-badge sentiment-${rec.type === 'long' ? 'alcista' : 'bajista'}`}>
+                                    {rec.direction} - {rec.actionText}
+                                </span>
+                                <span style={{ 
+                                    fontSize: '0.875rem', 
+                                    color: 'var(--text-secondary)' 
+                                }}>
+                                    Confianza: {rec.confidence}
+                                </span>
                             </div>
                         </div>
-
-                        <div className="card-body" style={{ paddingTop: '1rem' }}>
-                            {/* Detalle de convicción */}
-                            <div style={{
-                                padding: '0.6rem 0.875rem',
-                                background: `${convColor}11`,
-                                border: `1px solid ${convColor}44`,
-                                borderRadius: '4px',
-                                marginBottom: '1rem',
-                                fontSize: '0.8rem',
-                                color: 'var(--text-secondary)',
-                                lineHeight: '1.5'
-                            }}>
-                                <span style={{ color: convColor, fontWeight: 600 }}>
-                                    {rec.conviction === 'Conflicto' ? '⚠ ' : rec.conviction === 'Muy Alta' ? '✓✓ ' : rec.conviction === 'Alta' ? '✓ ' : ''}
-                                    {rec.conviction}:
-                                </span>{' '}
-                                {rec.convictionDetail}
-                            </div>
-
-                            {/* Factores: Fortaleza vs Debilidad */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
-                                <div>
-                                    <div style={{ 
-                                        fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-tertiary)',
-                                        textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem'
-                                    }}>
-                                        {rec.strongCurrency} — Fortaleza
-                                    </div>
-                                    <div style={{ background: 'var(--bg-elevated)', padding: '0.6rem', borderRadius: '4px', border: '1px solid var(--border)' }}>
-                                        {rec.strongReasons.length > 0 ? rec.strongReasons.map((r, i) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', padding: '0.2rem 0', color: 'var(--text-secondary)' }}>
-                                                <span>• {r.factor}</span>
-                                                <span style={{ color: 'var(--green-strong)', fontWeight: 600 }}>+{r.impact}</span>
-                                            </div>
-                                        )) : (
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>Datos insuficientes</div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ 
-                                        fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-tertiary)',
-                                        textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem'
-                                    }}>
-                                        {rec.weakCurrency} — Debilidad
-                                    </div>
-                                    <div style={{ background: 'var(--bg-elevated)', padding: '0.6rem', borderRadius: '4px', border: '1px solid var(--border)' }}>
-                                        {rec.weakReasons.length > 0 ? rec.weakReasons.map((r, i) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', padding: '0.2rem 0', color: 'var(--text-secondary)' }}>
-                                                <span>• {r.factor}</span>
-                                                <span style={{ color: 'var(--red-strong)', fontWeight: 600 }}>{r.impact}</span>
-                                            </div>
-                                        )) : (
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>Datos insuficientes</div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Análisis narrativo */}
+                        <div style={{ textAlign: 'right' }}>
                             <div style={{ 
-                                background: 'var(--bg-card)', padding: '0.875rem',
-                                borderRadius: '4px',
-                                borderLeft: `3px solid ${isLong ? 'var(--green-strong)' : 'var(--red-strong)'}`,
-                                fontSize: '0.82rem', lineHeight: '1.6', color: 'var(--text-secondary)'
+                                fontSize: '2rem', 
+                                fontWeight: 700,
+                                color: rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'
                             }}>
-                                <strong style={{ color: 'var(--text-primary)' }}>Análisis: </strong>
-                                {isLong ? (
-                                    <>
-                                        {rec.strongCurrency} lidera con score estructural {rec.structuralScore?.toFixed(1)} frente a {rec.weakStructuralScore?.toFixed(1)} de {rec.weakCurrency} (diferencial +{rec.structuralSpread?.toFixed(1)} pts).
-                                        {rec.momentumSpread !== null && rec.momentumSpread !== undefined && (
-                                            rec.horizonConflict
-                                                ? ` El momentum de mercado (${rec.momentumSpread?.toFixed(1)} pts) diverge de los fundamentos — considere esperar confirmación técnica antes de entrar.`
-                                                : ` El momentum de mercado refuerza la dirección fundamental (${rec.momentumSpread?.toFixed(1)} pts de diferencial) — setup de alta convicción.`
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        {rec.weakCurrency} muestra debilidad estructural ({rec.weakStructuralScore?.toFixed(1)}) frente a {rec.strongCurrency} ({rec.structuralScore?.toFixed(1)}), diferencial de {rec.structuralSpread?.toFixed(1)} pts.
-                                        {rec.momentumSpread !== null && rec.momentumSpread !== undefined && (
-                                            rec.horizonConflict
-                                                ? ` El momentum actual (${rec.momentumSpread?.toFixed(1)} pts) va contra los fundamentos — posible rebote táctico. Gestione el riesgo de entrada.`
-                                                : ` Momentum de mercado confirma la debilidad (${rec.momentumSpread?.toFixed(1)} pts) — presión vendedora consistente en ambos horizontes.`
-                                        )}
-                                    </>
-                                )}
+                                {rec.spread.toFixed(1)}
+                            </div>
+                            <div style={{ 
+                                fontSize: '0.75rem', 
+                                color: 'var(--text-tertiary)' 
+                            }}>
+                                Diferencial
                             </div>
                         </div>
                     </div>
-                );
-            })}
-        </div>
+                    
+                    <div className="card-body">
+                        {/* Fortalezas */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: '0.75rem' 
+                            }}>
+                                <div style={{ 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 600, 
+                                    color: 'var(--text-tertiary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    Fortaleza: {rec.strongCurrency}
+                                </div>
+                                <div style={{ 
+                                    fontSize: '1rem', 
+                                    fontWeight: 700,
+                                    color: 'var(--green-strong)'
+                                }}>
+                                    {rec.strength.toFixed(1)}
+                                </div>
+                            </div>
+                            <div style={{ 
+                                background: 'var(--bg-elevated)', 
+                                padding: '0.75rem', 
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                {rec.strongReasons.length > 0 ? (
+                                    rec.strongReasons.map((reason, i) => (
+                                        <div key={i} style={{ 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between',
+                                            fontSize: '0.8125rem',
+                                            padding: '0.25rem 0',
+                                            color: 'var(--text-secondary)'
+                                        }}>
+                                            <span>• {reason.factor}</span>
+                                            <span style={{ 
+                                                color: 'var(--green-strong)',
+                                                fontWeight: 600 
+                                            }}>
+                                                +{reason.impact}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div style={{ 
+                                        fontSize: '0.8125rem',
+                                        color: 'var(--text-tertiary)',
+                                        fontStyle: 'italic'
+                                    }}>
+                                        Datos insuficientes
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-        {/* Guía de interpretación */}
-        <div style={{ 
-            marginTop: '2rem',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
-            gap: '1rem'
-        }}>
-            <div style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderLeft: '3px solid #26a69a', borderRadius: '6px', padding: '1.1rem'
-            }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#26a69a', marginBottom: '0.5rem' }}>
-                    ✓✓ Convicción Muy Alta / Alta
+                        {/* Debilidades */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                marginBottom: '0.75rem' 
+                            }}>
+                                <div style={{ 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 600, 
+                                    color: 'var(--text-tertiary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    Debilidad: {rec.weakCurrency}
+                                </div>
+                                <div style={{ 
+                                    fontSize: '1rem', 
+                                    fontWeight: 700,
+                                    color: 'var(--red-strong)'
+                                }}>
+                                    {rec.weakness.toFixed(1)}
+                                </div>
+                            </div>
+                            <div style={{ 
+                                background: 'var(--bg-elevated)', 
+                                padding: '0.75rem', 
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)'
+                            }}>
+                                {rec.weakReasons.length > 0 ? (
+                                    rec.weakReasons.map((reason, i) => (
+                                        <div key={i} style={{ 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between',
+                                            fontSize: '0.8125rem',
+                                            padding: '0.25rem 0',
+                                            color: 'var(--text-secondary)'
+                                        }}>
+                                            <span>• {reason.factor}</span>
+                                            <span style={{ 
+                                                color: 'var(--red-strong)',
+                                                fontWeight: 600 
+                                            }}>
+                                                {reason.impact}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div style={{ 
+                                        fontSize: '0.8125rem',
+                                        color: 'var(--text-tertiary)',
+                                        fontStyle: 'italic'
+                                    }}>
+                                        Datos insuficientes
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Análisis */}
+                        <div style={{ 
+                            background: 'var(--bg-card)', 
+                            padding: '1rem', 
+                            borderRadius: '4px',
+                            borderLeft: `3px solid ${rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'}`,
+                            fontSize: '0.875rem',
+                            lineHeight: '1.6',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <strong style={{ color: 'var(--text-primary)' }}>Análisis:</strong> 
+                            {rec.type === 'long' ? (
+                                <span> {rec.strongCurrency} muestra fundamentos superiores con un índice de fortaleza de {rec.strength.toFixed(1)} puntos, superando a {rec.weakCurrency} ({rec.weakness.toFixed(1)}) por un diferencial de {rec.spread.toFixed(1)} puntos. Este diferencial sugiere una oportunidad de compra (LONG) en {rec.pair}.</span>
+                            ) : (
+                                <span> {rec.weakCurrency} registra debilidad fundamental con {rec.weakness.toFixed(1)} puntos frente a la fortaleza de {rec.strongCurrency} ({rec.strength.toFixed(1)}), generando un diferencial de {rec.spread.toFixed(1)} puntos. Esto indica una oportunidad de venta (SHORT) en {rec.pair}.</span>
+                            )}
+                        </div>
+
+                        {/* Data Quality Indicator */}
+                        <div style={{ 
+                            marginTop: '1rem',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-tertiary)',
+                            textAlign: 'center'
+                        }}>
+                            Calidad de datos: {(rec.dataQuality * 100).toFixed(0)}%
+                        </div>
+                    </div>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                    Fundamentos y momentum apuntan en la misma dirección. Setup óptimo para estrategias con horizonte mixto. Menor necesidad de confirmación técnica adicional.
-                </div>
-            </div>
-            <div style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderLeft: '3px solid #ff6f00', borderRadius: '6px', padding: '1.1rem'
-            }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#ff6f00', marginBottom: '0.5rem' }}>
-                    ◆ Convicción Media
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                    Fundamentos favorables pero momentum neutro. Adecuado para estrategias con horizonte estructural (semanas a meses). Combinar con análisis técnico en temporalidades mayores.
-                </div>
-            </div>
-            <div style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderLeft: '3px solid #ef5350', borderRadius: '6px', padding: '1.1rem'
-            }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#ef5350', marginBottom: '0.5rem' }}>
-                    ⚠ Conflicto de Horizonte
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                    Los fundamentos macro y el momentum de mercado divergen. Puede indicar corrección táctica en tendencia estructural, o cambio de régimen. Gestión de riesgo reforzada recomendada.
-                </div>
-            </div>
+            ))}
         </div>
 
         {/* Disclaimer */}
         <div style={{ 
-            marginTop: '1.5rem',
-            background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: '6px', padding: '1.1rem',
-            fontSize: '0.79rem', lineHeight: '1.6', color: 'var(--text-secondary)'
+            marginTop: '2rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            padding: '1.25rem',
+            fontSize: '0.8125rem',
+            lineHeight: '1.6',
+            color: 'var(--text-secondary)'
         }}>
-            <strong style={{ color: 'var(--text-primary)' }}>⚠ Aviso:</strong> Análisis basado en modelos cuantitativos con datos públicos. No constituye asesoramiento financiero. El score Estructural refleja fundamentos macro con 1-12 semanas de lag de publicación. El score Momentum es prácticamente en tiempo real (FX performance 1M, COT semanal, PMI mensual). La divergencia entre ambos es información, no error del modelo.
+            <strong style={{ color: 'var(--text-primary)' }}>⚠️ Aviso Importante:</strong> Estas recomendaciones están basadas exclusivamente en análisis fundamental y no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos significativos. Considere análisis técnico, gestión de riesgo y consulte con un asesor financiero antes de operar.
         </div>
     </div>
 )}
@@ -5075,8 +4741,7 @@ const sentiment = getSentiment(strength);
         DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
     </div>
     <div style={{ marginBottom: '1rem' }}>
-        Metodología: Score Estructural (3-12M) — 15 indicadores macro ponderados | Score Momentum (1-4W) — FX 1M + COT + PMI<br/>
-Arquitectura dual: los scores divergentes son señal, no error — reflejan diferencia entre fundamentos y flujos actuales<br/>
+        Metodología: Modelo cuantitativo basado en datos económicos reales • 20 indicadores ponderados en 6 tiers<br/>
         Balance Externo &amp; Safe Haven (27%) • Tasas &amp; Carry (26%) • Crecimiento &amp; Empleo (20%) • Consumo &amp; Salarios (9%) • Sentimiento de Mercado (15%) • FX Momentum (7%)<br/>
         Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
     </div>
