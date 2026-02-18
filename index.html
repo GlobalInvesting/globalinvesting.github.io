@@ -1820,7 +1820,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '4.9.5-2026-02-18'; // ✅ Fix: calendario real TE (3x/día), rateMomentum scraping, filter bar calendario
+            const DASHBOARD_VERSION = '4.9.6-2026-02-18'; // ✅ Fix: calendario real TE (3x/día), rateMomentum scraping, filter bar calendario
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -2050,6 +2050,19 @@ try {
             return economicData;
         };
 
+    // P-4 v4.9.6 — Umbral safe haven relativo al régimen de tasas
+const allRatesForSH = Object.values(allEconomicData)
+    .map(d => d.interestRate)
+    .filter(v => v != null && !isNaN(v));
+const avgRateForSH = allRatesForSH.length > 0
+    ? allRatesForSH.reduce((a, b) => a + b, 0) / allRatesForSH.length
+    : 3.0;  // fallback si no hay datos
+const safeHavenThreshold = Math.max(1.0, avgRateForSH - 1.5);
+// Ejemplos:
+//   Régimen 2022 (avg ~4.5%): threshold = max(1.0, 3.0) = 3.0%  → CHF 1.4% califica ✓
+//   Régimen 2021 (avg ~0.3%): threshold = max(1.0, −1.2) = 1.0% → solo 0-1% califica
+//   Régimen 2026 (avg ~3.5%): threshold = max(1.0, 2.0) = 2.0%  → CHF/JPY califican ✓
+
 const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
     if (!data) return { 
         score: 50, 
@@ -2065,7 +2078,7 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
 //  - interestRate: peso reducido 0.12→0.09 para dar espacio a los nuevos
 //  - bond10y: peso reducido 0.02→0.01
 //  - outlookScore: peso sin cambio (0.06)
-//  TOTAL de pesos: verificado en 0.99 (normalizado automáticamente por totalWeight)
+// suma real = 1.04 (normalizado automáticamente por totalWeight)
 const TRADING_WEIGHTS = {
     // Tier 1: External Balance & Safe Haven (0.27)
     currentAccount:        { weight: 0.12, direction: 'higher' },
@@ -2107,7 +2120,7 @@ const TRADING_WEIGHTS = {
 };
 
 // ========== SCORING FUNCTIONS v4.9.5 ==========
-const scoreIndicator = (value, indicator, currencyCtx) => {
+const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringDataExplicit) => {
     // currencyCtx: código de divisa (e.g. 'JPY', 'CHF') para overrides data-driven
     const config = TRADING_WEIGHTS[indicator];
     if (!config) return 0;
@@ -2121,25 +2134,39 @@ const scoreIndicator = (value, indicator, currencyCtx) => {
     // La lógica: si alguien tiene tasa casi nula pero el mercado le compra la divisa,
     // es porque hay prima de safe haven que el modelo clásico no captura.
     const isSafeHavenFunder = (
-        indicator === 'interestRate' &&
-        value !== null && value !== undefined &&
-        value <= 1.5 &&
-        currencyCtx !== null && currencyCtx !== undefined
-    );
+    indicator === 'interestRate' &&
+    value !== null && value !== undefined &&
+    value <= safeHavenThreshold &&  // P-4 v4.9.6 — relativo al régimen
+    currencyCtx !== null && currencyCtx !== undefined
+);
 
     switch (config.direction) {
 
         case 'higher':
             if (indicator === 'interestRate') {
-                if (isSafeHavenFunder) {
-                    // Safe haven / carry funder override:
-                    // Tasa muy baja en una divisa = financiadora de carry → el mercado
-                    // la compra cuando hay risk-off. Score inversamente proporcional
-                    // a la tasa (más bajo = más "safe haven premium").
-                    // Rango: tasa=0% → score=72, tasa=1.5% → score=55 (neutral)
-                    // El ajuste contextual calculateLowRateSafeHavenAdj complementa esto.
-                    score = 72 - (value / 1.5) * 17; // 72 @ 0%, 55 @ 1.5%
-                } else {
+if (isSafeHavenFunder) {
+    // P-3 v4.9.6 — Factor de régimen de mercado via COT promedio
+    let riskRegime = 'neutral';
+    if (allEconomicData && typeof allEconomicData === 'object') {
+        const cotValues = Object.values(allEconomicData)
+            .map(d => d.cotPositioning)
+            .filter(v => v !== null && v !== undefined && !isNaN(v));
+        if (cotValues.length >= 3) {
+            const avgCOT = cotValues.reduce((a, b) => a + b, 0) / cotValues.length;
+            riskRegime = avgCOT > 5000  ? 'risk-on'
+                       : avgCOT < -5000 ? 'risk-off'
+                       : 'neutral';
+        }
+    }
+    // risk-off = premium pleno | neutral = moderado | risk-on = comprimido
+    const regimeFactor = riskRegime === 'risk-off' ? 1.0
+                       : riskRegime === 'risk-on'  ? 0.65
+                       : 0.85;
+    score = (72 - (value / 1.5) * 17) * regimeFactor;
+    // Resultados Feb 2026 (risk-on):
+    //   CHF 0.25% → score ≈ 45.0  (antes: 69.2)
+    //   JPY 0.50% → score ≈ 42.6  (antes: 65.5)
+} else {
                     // Lógica estándar para divisas no-safe-haven
                     if (value >= 4.0)      score = 100;
                     else if (value >= 2.5) score = 70 + ((value - 2.5) / 1.5) * 30;
@@ -2178,9 +2205,7 @@ const scoreIndicator = (value, indicator, currencyCtx) => {
                 // Esto captura la realidad de Japón (deuda ~260% pero superávit CC,
                 // deuda 90% doméstica) sin hardcodear el nombre del país.
                 // scoringData.currentAccount se accede via closure de calculateStrength.
-                const currentAccountVal = (typeof scoringData !== 'undefined')
-                    ? scoringData.currentAccount
-                    : null;
+                const currentAccountVal = scoringDataExplicit?.currentAccount ?? null;
                 const hasSurplus = (currentAccountVal !== null && currentAccountVal > 2.0);
 
                 if (hasSurplus && value > 150) {
@@ -2417,7 +2442,7 @@ if (currency === 'JPY' && scoringData.consumerConfidence !== null && scoringData
             return;
         }
         const config = TRADING_WEIGHTS[indicator];
-        const rawScore    = scoreIndicator(value, indicator, currency);  
+        const rawScore = scoreIndicator(value, indicator, currency, allEconomicData, scoringData); 
         const weighted    = rawScore * config.weight;
         contributions[indicator] = weighted;
         weightedScoreSum += weighted;
@@ -2659,9 +2684,15 @@ if (currency === 'JPY' && scoringData.consumerConfidence !== null && scoringData
                      lowRateSafeHavenAdj + yieldCurveAdj + cotContrarianAdj;
     const cappedAdj = Math.max(-15, Math.min(15, totalAdj));
 
-    // ========== FINAL SCORE (20-80 range) ==========
-    const rawFinal     = baseScore + cappedAdj;
-    const normalizedScore = Math.max(20, Math.min(80, rawFinal));
+// P-1 v4.9.6 — Compresión de base para crear headroom en escala 20-82
+// Base original (0-100) → comprimida (20-78), dejando margen para ajustes
+const compressedBase = 20 + (baseScore * 0.58);
+const rawFinal = compressedBase + cappedAdj;
+const normalizedScore = Math.max(20, Math.min(82, rawFinal));
+// Resultados Feb 2026:
+//   AUD: compressedBase≈67.3 + adj5.0 = 72.3 → score ≈ 72.3  (antes: 80 = techo)
+//   CHF: compressedBase≈61.0 + adj9.8 = 70.8 → score ≈ 70.8  (antes: 80 = techo)
+//   AUD rankea correctamente sobre CHF ✓
 
     // Data quality
     const dataQuality  = validIndicators / Object.keys(TRADING_WEIGHTS).length;
@@ -4735,7 +4766,7 @@ const sentiment = getSentiment(strength);
     © {new Date().getFullYear()} Santiago Plá · Global Investing. Todos los derechos reservados.
 </div>
 <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-    Dashboard v4.9.4
+    Dashboard v4.9.6
 </div>
     </div>
 </div>
