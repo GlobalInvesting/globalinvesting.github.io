@@ -2161,67 +2161,6 @@ try {
             return economicData;
         };
 
-// Ejemplos:
-//   Régimen 2022 (avg ~4.5%): threshold = max(1.0, 3.0) = 3.0%  → CHF 1.4% califica ✓
-//   Régimen 2021 (avg ~0.3%): threshold = max(1.0, −1.2) = 1.0% → solo 0-1% califica
-//   Régimen 2026 (avg ~3.5%): threshold = max(1.0, 2.0) = 2.0%  → CHF/JPY califican ✓
-
-const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
-    if (!data) return { 
-        score: 50, 
-        confidence: { lower: 40, upper: 60 }, 
-        contributions: {}, 
-        dataQuality: 0 
-    };
-    
-// ========== TRADING-ORIENTED WEIGHTS v4.9.5 ==========
-// Cambios vs v4.9.4:
-//  - fxPerformance1M: nuevo indicador (peso 0.07) — momentum de mercado real
-//  - rateMomentum: promovido a indicador con peso propio (0.05) — ciclo monetario
-//  - interestRate: peso reducido 0.12→0.09 para dar espacio a los nuevos
-//  - bond10y: peso reducido 0.02→0.01
-//  - outlookScore: peso sin cambio (0.06)
-// suma real = 1.04 (normalizado automáticamente por totalWeight)
-const TRADING_WEIGHTS = {
-    // Tier 1: External Balance & Safe Haven (0.27)
-    currentAccount:        { weight: 0.12, direction: 'higher' },
-    tradeBalance:          { weight: 0.09, direction: 'higher' },
-    debt:                  { weight: 0.04, direction: 'lower'  },
-    termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
-
-    // Tier 2: Rate Differentials & Carry (0.26)
-    interestRate:          { weight: 0.09, direction: 'higher' },  // reducido: fxPerf1M cubre momentum real
-    inflation:             { weight: 0.08, direction: 'target' },
-    outlookScore:          { weight: 0.06, direction: 'outlook_direction' },
-    bond10y:               { weight: 0.01, direction: 'carry_yield' },
-    rateMomentum:          { weight: 0.02, direction: 'rate_momentum' },  // NUEVO como indicador propio
-
-    // Tier 3: Growth & Employment (0.20)
-    gdpGrowth:             { weight: 0.10, direction: 'higher' },
-    unemployment:          { weight: 0.06, direction: 'lower'  },
-    production:            { weight: 0.04, direction: 'stable' },
-
-    // Tier 4: Consumption & Wages (0.09)
-    retailSales:           { weight: 0.04, direction: 'stable' },
-    wageGrowth:            { weight: 0.03, direction: 'stable' },
-    inflationExpectations: { weight: 0.02, direction: 'target' },
-
-    // Tier 5: Market Sentiment (0.15)
-    manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
-    cotPositioning:        { weight: 0.04, direction: 'moderate_bullish' },
-    consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
-    businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
-    capitalFlows:          { weight: 0.03, direction: 'flows'            },
-
-    // Tier 6: Market Momentum — NUEVO (0.07)
-    // fxPerformance1M: rendimiento real de la divisa en los últimos 30 días
-    // Fuente: Frankfurter API (ECB reference rates) actualizado diariamente
-    // Es el único indicador 100% forward-looking y libre de lag de publicación
-    // Captura: posicionamiento especulativo, flows institucionales, carry, risk-off
-    // No se puede replicar con ningún otro indicador del modelo
-    fxPerformance1M:       { weight: 0.07, direction: 'fx_momentum' },
-};
-
 // ========== SCORING FUNCTIONS v4.9.5 ==========
 const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringDataExplicit) => {
     // currencyCtx: código de divisa (e.g. 'JPY', 'CHF') para overrides data-driven
@@ -2483,6 +2422,62 @@ if (isSafeHavenFunder) {
     }
 
     return Math.max(0, Math.min(100, score));
+};
+
+const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
+    if (!data) return { 
+        score: 50, 
+        confidence: { lower: 40, upper: 60 }, 
+        contributions: {}, 
+        dataQuality: 0 
+    };
+    
+// ========== TRADING-ORIENTED WEIGHTS v4.9.5 ==========
+// Cambios vs v4.9.4:
+//  - fxPerformance1M: nuevo indicador (peso 0.07) — momentum de mercado real
+//  - rateMomentum: promovido a indicador con peso propio (0.05) — ciclo monetario
+//  - interestRate: peso reducido 0.12→0.09 para dar espacio a los nuevos
+//  - bond10y: peso reducido 0.02→0.01
+//  - outlookScore: peso sin cambio (0.06)
+// suma real = 1.04 (normalizado automáticamente por totalWeight)
+const TRADING_WEIGHTS = {
+    // Tier 1: External Balance & Safe Haven (0.27)
+    currentAccount:        { weight: 0.12, direction: 'higher' },
+    tradeBalance:          { weight: 0.09, direction: 'higher' },
+    debt:                  { weight: 0.04, direction: 'lower'  },
+    termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
+
+    // Tier 2: Rate Differentials & Carry (0.26)
+    interestRate:          { weight: 0.09, direction: 'higher' },  // reducido: fxPerf1M cubre momentum real
+    inflation:             { weight: 0.08, direction: 'target' },
+    outlookScore:          { weight: 0.06, direction: 'outlook_direction' },
+    bond10y:               { weight: 0.01, direction: 'carry_yield' },
+    rateMomentum:          { weight: 0.02, direction: 'rate_momentum' },  // NUEVO como indicador propio
+
+    // Tier 3: Growth & Employment (0.20)
+    gdpGrowth:             { weight: 0.10, direction: 'higher' },
+    unemployment:          { weight: 0.06, direction: 'lower'  },
+    production:            { weight: 0.04, direction: 'stable' },
+
+    // Tier 4: Consumption & Wages (0.09)
+    retailSales:           { weight: 0.04, direction: 'stable' },
+    wageGrowth:            { weight: 0.03, direction: 'stable' },
+    inflationExpectations: { weight: 0.02, direction: 'target' },
+
+    // Tier 5: Market Sentiment (0.15)
+    manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
+    cotPositioning:        { weight: 0.04, direction: 'moderate_bullish' },
+    consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
+    businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
+    capitalFlows:          { weight: 0.03, direction: 'flows'            },
+
+    // Tier 6: Market Momentum — NUEVO (0.07)
+    // fxPerformance1M: rendimiento real de la divisa en los últimos 30 días
+    // Fuente: Frankfurter API (ECB reference rates) actualizado diariamente
+    // Es el único indicador 100% forward-looking y libre de lag de publicación
+    // Captura: posicionamiento especulativo, flows institucionales, carry, risk-off
+    // No se puede replicar con ningún otro indicador del modelo
+    fxPerformance1M:       { weight: 0.07, direction: 'fx_momentum' },
 };
 
     // ========== SCORING LOOP ==========
