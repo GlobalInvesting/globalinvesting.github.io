@@ -4534,13 +4534,13 @@ const sentiment = getSentiment(strength);
                                                             </div>
                                                         </td>
 <td style={{ background: 'var(--bg-card)', minWidth: '120px' }}>
-    <div className="overall-cell">
-        <div className="overall-indicator" style={{ background: overallColor }}></div>
-        <span className="overall-label" style={{ color: overallColor, fontSize: '0.7rem' }}>
-            {sentiment} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>({strength})</span>
-        </span>
-    </div>
-    
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <div className="overall-cell">
+            <div className="overall-indicator" style={{ background: overallColor }}></div>
+            <span className="overall-label" style={{ color: overallColor, fontSize: '0.7rem' }}>
+                {sentiment} <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>({strength})</span>
+            </span>
+        </div>
         {(() => {
             const mScore = calculateMomentumScore(country.code, data, forexRates, economicData);
             const mSentiment = getMomentumSentiment(mScore);
