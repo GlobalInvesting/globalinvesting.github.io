@@ -1521,6 +1521,54 @@ const fetchExtendedData = async (countryCode) => {
             });
         };
 
+const fetchAIAnalysis = async () => {
+    const cacheKey = 'ai_analysis_gemini';
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) return cached;
+
+    try {
+        const indexUrl = 'https://globalinvesting.github.io/ai-analysis/index.json';
+        const indexResponse = await fetchWithRetry(indexUrl, { cache: 'no-cache', mode: 'cors' }, 2);
+        if (!indexResponse.ok) throw new Error('Index no disponible');
+
+        const index = await indexResponse.json();
+        const analyses = {};
+
+        // Cargar todas las divisas en paralelo
+        const promises = (index.currencies || []).map(async (currency) => {
+            try {
+                const url = `https://globalinvesting.github.io/ai-analysis/${currency}.json`;
+                const response = await fetchWithTimeout(url, { mode: 'cors' }, 8000);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.analysis) {
+                        analyses[currency] = {
+                            text:        data.analysis,
+                            generatedAt: data.generatedAt,
+                            model:       data.model || 'gemini-1.5-flash',
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn(`No análisis AI para ${currency}:`, e.message);
+            }
+        });
+
+        await Promise.all(promises);
+
+        if (Object.keys(analyses).length > 0) {
+            console.log(`✅ Análisis Gemini cargados: ${Object.keys(analyses).join(', ')}`);
+            // Cache de 6 horas — Gemini genera una vez al día
+            CacheManager.set(cacheKey, analyses, 6 * 60 * 60 * 1000);
+            return analyses;
+        }
+    } catch (error) {
+        console.warn('Análisis AI no disponibles, usando algorítmico:', error.message);
+    }
+
+    return null;
+};
+    
 const fetchEconomicCalendar = async () => {
             const cacheKey = 'economic_calendar';
             const cached = CacheManager.get(cacheKey);
@@ -3041,6 +3089,8 @@ const indicatorTooltips = {
             const [calFilter, setCalFilter] = useState('all');
             const [lastUpdate, setLastUpdate] = useState(null);
             const [historicalData, setHistoricalData] = useState({});
+            const [aiAnalyses, setAiAnalyses]           = useState(null);
+            const [aiAnalysisReady, setAiAnalysisReady] = useState(false);
             const [dataLoadingStatus, setDataLoadingStatus] = useState({ status: 'Inicializando...', progress: 0 });
             const [isLoading, setIsLoading] = useState(true);
             const chartRefs = useRef({});
@@ -3854,6 +3904,13 @@ const hasCOTData = () => {
                         const historical = await generateHistoricalData(loadedData, setDataLoadingStatus);
                         setHistoricalData(historical);
 
+                        setDataLoadingStatus({ status: 'Cargando análisis AI (Gemini)...', progress: 96 });
+const aiData = await fetchAIAnalysis();
+if (aiData && Object.keys(aiData).length > 0) {
+    setAiAnalyses(aiData);
+    setAiAnalysisReady(true);
+}
+
                         setDataLoadingStatus({ status: 'Generando recomendaciones de pares...', progress: 98 });
                         const pairRecommendations = generateForexPairRecommendations(loadedData, rates);
 setDynamicAlerts(pairRecommendations);
@@ -4348,16 +4405,79 @@ const DataHealthCheck = ({ economicData }) => {
 </div>
                                 </div>
 
-                                <div className="analysis-section">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                                        <div className="analysis-title">Análisis Fundamental</div>
-                                        <div className={`sentiment-badge sentiment-${sentiment}`}>
-                                            <div className="sentiment-indicator" style={{ background: sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)' }}></div>
-                                            {sentiment}
-                                        </div>
-                                    </div>
-                                    <div className="analysis-text">{generateAnalysis(country.code, forexRates, economicData)}</div>
-                                </div>
+<div className="analysis-section">
+    <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '0.75rem'
+    }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="analysis-title" style={{ marginBottom: 0 }}>
+                Análisis Fundamental
+            </div>
+            {aiAnalysisReady && aiAnalyses && aiAnalyses[country.code] ? (
+                <span style={{
+                    fontSize: '0.6rem',
+                    color: 'var(--green-strong)',
+                    background: 'rgba(38,166,154,0.12)',
+                    border: '1px solid rgba(38,166,154,0.35)',
+                    borderRadius: '4px',
+                    padding: '0.15rem 0.45rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                }}>
+                    Gemini AI
+                </span>
+            ) : (
+                <span style={{
+                    fontSize: '0.6rem',
+                    color: 'var(--text-tertiary)',
+                    background: 'rgba(96,125,139,0.1)',
+                    borderRadius: '4px',
+                    padding: '0.15rem 0.45rem',
+                }}>
+                    Algorítmico
+                </span>
+            )}
+        </div>
+        <div className={`sentiment-badge sentiment-${sentiment}`}>
+            <div className="sentiment-indicator" style={{
+                background: sentiment === 'alcista' ? 'var(--green-strong)'
+                          : sentiment === 'bajista' ? 'var(--red-strong)'
+                          : 'var(--neutral)'
+            }}></div>
+            {sentiment}
+        </div>
+    </div>
+
+    <div className="analysis-text">
+        {aiAnalysisReady && aiAnalyses && aiAnalyses[country.code]
+            ? aiAnalyses[country.code].text
+            : generateAnalysis(country.code, forexRates, economicData)}
+    </div>
+
+    {aiAnalysisReady && aiAnalyses && aiAnalyses[country.code] && (
+        <div style={{
+            marginTop: '0.6rem',
+            paddingTop: '0.5rem',
+            borderTop: '1px solid var(--border)',
+            fontSize: '0.62rem',
+            color: 'var(--text-tertiary)',
+        }}>
+            Generado por Gemini AI ·{' '}
+            {(() => {
+                const ts = aiAnalyses[country.code].generatedAt;
+                if (!ts) return '';
+                return new Date(ts).toLocaleDateString('es-ES', {
+                    day: '2-digit', month: 'short',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            })()}
+        </div>
+    )}
+</div>
                             </div>
                         </div>
                     );
