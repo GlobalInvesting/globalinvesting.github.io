@@ -32,7 +32,7 @@ COUNTRY_META = {
 
 GITHUB_BASE = 'https://globalinvesting.github.io'
 OUTPUT_DIR  = Path('ai-analysis')
-GEMINI_MODEL = 'gemini-2.0-flash-lite'
+GEMINI_MODEL = 'gemini-3-flash-preview'
 GEMINI_URL   = f'https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent'
 
 # ── Carga de datos desde GitHub Pages ─────────────────────────────────────────
