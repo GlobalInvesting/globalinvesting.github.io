@@ -2128,7 +2128,7 @@ const TRADING_WEIGHTS = {
     // El único indicador 100% forward-looking y libre de lag de publicación.
     // Captura: positioning especulativo, flows institucionales, carry, risk-off.
     // Con peso 0.16 tiene impacto real en el ranking sin dominar (anti-overfitting).
-    fxPerformance1M:       { weight: 0.14, direction: 'fx_momentum' },
+    fxPerformance1M:       { weight: 0.16, direction: 'fx_momentum' },
     bond10y:               { weight: 0.04, direction: 'carry_yield' },
 };
     
