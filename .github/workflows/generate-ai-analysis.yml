@@ -1,0 +1,48 @@
+name: Generate AI Analysis with Gemini
+
+on:
+  workflow_run:
+    workflows: ["Update Economic Data"]
+    types: [completed]
+
+  schedule:
+    - cron: '0 10 * * 1-5'  # Lunes a viernes, 10:00 UTC
+
+  workflow_dispatch:
+
+jobs:
+  generate-analysis:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install google-generativeai requests
+
+      - name: Generate AI analysis for all currencies
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/generate_ai_analysis.py
+
+      - name: Commit and push analysis files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ai-analysis/
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🤖 Update AI fundamental analysis [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git push
+          fi
