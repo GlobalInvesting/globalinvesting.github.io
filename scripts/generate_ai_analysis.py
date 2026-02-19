@@ -173,6 +173,9 @@ def generate_analysis(api_key, currency, data):
     for attempt in range(3):
         try:
             text = call_groq_api(api_key, data_summary, currency)
+              # Limpiar saltos de línea irregulares entre párrafos
+            paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+            text = '\n\n'.join(paragraphs)
             word_count = len(text.split())
             if word_count < 80:
                 raise ValueError(f"Respuesta corta: {word_count} palabras")
