@@ -32,7 +32,7 @@ COUNTRY_META = {
 
 GITHUB_BASE = 'https://globalinvesting.github.io'
 OUTPUT_DIR  = Path('ai-analysis')
-GEMINI_URL  = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+GEMINI_URL  = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
 # ── Carga de datos desde GitHub Pages ─────────────────────────────────────────
 
@@ -226,18 +226,18 @@ def generate_analysis(api_key: str, currency: str, data: dict) -> str:
             return text
         except RuntimeError as e:
             if "RATE_LIMIT" in str(e):
-                wait = 60 if attempt == 0 else 120
+                wait = 90 if attempt == 0 else 180
                 print(f"  ⏳ Rate limit, esperando {wait}s...")
                 time.sleep(wait)
             elif attempt < max_retries - 1:
-                wait = 10 * (attempt + 1)
+                wait = 15 * (attempt + 1)
                 print(f"  ⚠️  Error intento {attempt+1}: {e}. Reintentando en {wait}s...")
                 time.sleep(wait)
             else:
                 raise
         except Exception as e:
             if attempt < max_retries - 1:
-                wait = 10 * (attempt + 1)
+                wait = 15 * (attempt + 1)
                 print(f"  ⚠️  Error intento {attempt+1}: {e}. Reintentando en {wait}s...")
                 time.sleep(wait)
             else:
@@ -250,7 +250,7 @@ def generate_analysis(api_key: str, currency: str, data: dict) -> str:
 
 def main():
     print("=" * 60)
-    print("🤖 Generador AI — Gemini 2.0 Flash via REST API")
+    print("🤖 Generador AI — Gemini 1.5 Flash via REST API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
@@ -260,7 +260,7 @@ def main():
 
     print(f"✅ API key configurada ({len(api_key)} caracteres)\n")
 
-    # ── TEST DE CONECTIVIDAD ───────────────────────────────────────────────────
+    # ── TEST DE CONECTIVIDAD (solo internet y GitHub Pages, no Gemini) ─────────
     print("🔍 Testeando conectividad...")
 
     try:
@@ -274,17 +274,6 @@ def main():
         print(f"  ✅ GitHub Pages OK ({r.status_code})")
     except Exception as e:
         print(f"  ❌ GitHub Pages bloqueado: {e}")
-
-    try:
-        r = requests.post(
-            f'{GEMINI_URL}?key={api_key}',
-            json={"contents": [{"role": "user", "parts": [{"text": "Di hola en español"}]}]},
-            headers={"Content-Type": "application/json"},
-            timeout=10
-        )
-        print(f"  ✅ Gemini API OK ({r.status_code}): {r.text[:120]}")
-    except Exception as e:
-        print(f"  ❌ Gemini API bloqueada: {e}")
 
     print()
     # ── FIN TEST ───────────────────────────────────────────────────────────────
@@ -318,7 +307,7 @@ def main():
                 "country":     COUNTRY_META[currency]['name'],
                 "bank":        COUNTRY_META[currency]['bank'],
                 "analysis":    analysis_text,
-                "model":       "gemini-2.0-flash",
+                "model":       "gemini-1.5-flash",
                 "generatedAt": datetime.now(timezone.utc).isoformat(),
                 "dataSnapshot": {
                     "interestRate":    data.get('interestRate'),
@@ -344,8 +333,8 @@ def main():
             print(f"  💾 Guardado → {output_path}")
 
             if i < len(CURRENCIES) - 1:
-                print(f"  ⏸  Pausa 5s...")
-                time.sleep(5)
+                print(f"  ⏸  Pausa 10s...")
+                time.sleep(10)
 
         except Exception as e:
             print(f"  ❌ Error: {e}")
@@ -356,7 +345,7 @@ def main():
     successful = [c for c, r in results.items() if r.get('success')]
     index = {
         "generatedAt":    datetime.now(timezone.utc).isoformat(),
-        "model":          "gemini-2.0-flash",
+        "model":          "gemini-1.5-flash",
         "currencies":     successful,
         "totalGenerated": len(successful),
         "errors":         errors,
