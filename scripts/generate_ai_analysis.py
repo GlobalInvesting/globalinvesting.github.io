@@ -2,26 +2,25 @@
 """
 generate_ai_analysis.py
 Genera análisis fundamentales de divisas forex usando Google Gemini API (gratuita).
-Lee los datos económicos scrapeados desde GitHub Pages y produce textos de análisis
-que el dashboard carga como JSONs estáticos.
+Usa el nuevo SDK google-genai (reemplaza al deprecado google-generativeai).
 
-API gratuita: gemini-1.5-flash — 15 req/min, 1500 req/día
+API gratuita: gemini-2.0-flash — 15 req/min, 1500 req/día
 Obtener key gratis: https://aistudio.google.com
-
-Estructura de salida:
-  /ai-analysis/USD.json
-  /ai-analysis/EUR.json
-  ... (una por divisa)
-  /ai-analysis/index.json  (metadata global)
 """
 
 import os
 import json
 import time
+import socket
 import requests
-import google.generativeai as genai
 from datetime import datetime, timezone
 from pathlib import Path
+
+# Timeout global de red — evita que el script se cuelgue indefinidamente
+socket.setdefaulttimeout(10)
+
+from google import genai
+from google.genai import types
 
 # ── Configuración ──────────────────────────────────────────────────────────────
 
@@ -43,7 +42,7 @@ OUTPUT_DIR  = Path('ai-analysis')
 
 # ── Carga de datos desde GitHub Pages ─────────────────────────────────────────
 
-def fetch_json(url: str, timeout: int = 10) -> dict | None:
+def fetch_json(url: str, timeout: int = 8) -> dict | None:
     """Descarga un JSON desde GitHub Pages. Devuelve None si falla."""
     try:
         r = requests.get(url, timeout=timeout)
@@ -55,10 +54,7 @@ def fetch_json(url: str, timeout: int = 10) -> dict | None:
 
 
 def load_economic_data(currency: str) -> dict:
-    """
-    Carga todos los datos disponibles para una divisa combinando
-    los cuatro endpoints de GitHub Pages.
-    """
+    """Carga todos los datos disponibles para una divisa."""
     data = {}
 
     # 1. Datos económicos principales
@@ -81,8 +77,8 @@ def load_economic_data(currency: str) -> dict:
             'lastUpdate':       main.get('lastUpdate'),
         })
 
-    # 2. Tasa de interés (archivo separado con historial)
-    rates = fetch_json(f'{GITHUB_BASE}/rates/{currency}.json')
+    # 2. Tasa de interés
+    rates = fetch_json(f'{GITHUB_BASE}/rates/{currency}.json', timeout=6)
     if rates and rates.get('observations'):
         obs = rates['observations'][0]
         val = obs.get('value')
@@ -92,8 +88,8 @@ def load_economic_data(currency: str) -> dict:
             except ValueError:
                 pass
 
-    # 3. Datos extendidos (bonds, confianza, flujos, momentum)
-    ext = fetch_json(f'{GITHUB_BASE}/extended-data/{currency}.json')
+    # 3. Datos extendidos
+    ext = fetch_json(f'{GITHUB_BASE}/extended-data/{currency}.json', timeout=6)
     if ext and 'data' in ext:
         d = ext['data']
         data.update({
@@ -105,13 +101,13 @@ def load_economic_data(currency: str) -> dict:
             'rateMomentum':          d.get('rateMomentum'),
         })
 
-    # 4. COT positioning (CFTC)
-    cot = fetch_json(f'{GITHUB_BASE}/cot-data/{currency}.json')
+    # 4. COT positioning
+    cot = fetch_json(f'{GITHUB_BASE}/cot-data/{currency}.json', timeout=5)
     if cot and cot.get('netPosition') is not None:
         data['cotPositioning'] = cot['netPosition']
 
-    # 5. FX performance 1 mes
-    fxp = fetch_json(f'{GITHUB_BASE}/fx-performance/{currency}.json')
+    # 5. FX performance
+    fxp = fetch_json(f'{GITHUB_BASE}/fx-performance/{currency}.json', timeout=5)
     if fxp and fxp.get('fxPerformance1M') is not None:
         data['fxPerformance1M'] = fxp['fxPerformance1M']
 
@@ -120,7 +116,7 @@ def load_economic_data(currency: str) -> dict:
 
 # ── Formateo para el prompt ────────────────────────────────────────────────────
 
-def fmt(value, decimals: int = 1, suffix: str = '') -> str:
+def fmt(value, decimals: int = 1, suffix: str = ''):
     if value is None:
         return None
     try:
@@ -130,10 +126,6 @@ def fmt(value, decimals: int = 1, suffix: str = '') -> str:
 
 
 def build_data_summary(currency: str, data: dict) -> str:
-    """
-    Construye el bloque de texto estructurado que recibe Gemini.
-    Solo incluye indicadores con valor disponible para no contaminar el prompt.
-    """
     meta = COUNTRY_META[currency]
     lines = [
         f"DIVISA: {currency} — {meta['name']}",
@@ -142,7 +134,6 @@ def build_data_summary(currency: str, data: dict) -> str:
         "INDICADORES ECONÓMICOS ACTUALES:",
     ]
 
-    # (clave_en_data, etiqueta_legible, función_de_formato)
     indicators = [
         ('gdp',                  'PIB Total',                 lambda v: fmt(v, 2, ' T USD')),
         ('gdpGrowth',            'Crecimiento PIB',           lambda v: fmt(v, 1, '% anual')),
@@ -177,7 +168,6 @@ def build_data_summary(currency: str, data: dict) -> str:
                 available += 1
 
     lines.append(f"\n[{available} indicadores disponibles de 21]")
-
     last_update = data.get('lastUpdate')
     if last_update:
         lines.append(f"[Datos actualizados: {str(last_update)[:10]}]")
@@ -211,13 +201,10 @@ REGLAS:
 - No incluyas saludos, despedidas ni meta-comentarios sobre el análisis"""
 
 
-# ── Generación con Gemini ──────────────────────────────────────────────────────
+# ── Generación con Gemini (nuevo SDK google-genai) ─────────────────────────────
 
-def generate_analysis(model, currency: str, data: dict) -> str:
-    """
-    Llama a Gemini para generar el análisis de una divisa.
-    Implementa retry con backoff para manejar rate limits del tier gratuito.
-    """
+def generate_analysis(client: genai.Client, currency: str, data: dict) -> str:
+    """Llama a Gemini para generar el análisis de una divisa."""
     data_summary = build_data_summary(currency, data)
 
     full_prompt = f"""{SYSTEM_PROMPT}
@@ -233,19 +220,19 @@ Genera ahora el análisis fundamental para {currency}:"""
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            response = model.generate_content(
-                full_prompt,
-                generation_config=genai.types.GenerationConfig(
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=full_prompt,
+                config=types.GenerateContentConfig(
                     max_output_tokens=500,
-                    temperature=0.4,        # Bajo para análisis factual preciso
+                    temperature=0.4,
                     top_p=0.85,
                 )
             )
 
             text = response.text.strip()
-
-            # Validación básica
             word_count = len(text.split())
+
             if word_count < 80:
                 raise ValueError(f"Respuesta demasiado corta: {word_count} palabras")
 
@@ -254,18 +241,14 @@ Genera ahora el análisis fundamental para {currency}:"""
 
         except Exception as e:
             error_str = str(e).lower()
-
-            # Rate limit del tier gratuito (15 req/min) → esperar más
             if '429' in error_str or 'quota' in error_str or 'rate' in error_str:
                 wait = 60 if attempt == 0 else 120
-                print(f"  ⏳ Rate limit alcanzado, esperando {wait}s...")
+                print(f"  ⏳ Rate limit, esperando {wait}s...")
                 time.sleep(wait)
-
             elif attempt < max_retries - 1:
                 wait = 10 * (attempt + 1)
                 print(f"  ⚠️  Error (intento {attempt + 1}/{max_retries}): {e}. Reintentando en {wait}s...")
                 time.sleep(wait)
-
             else:
                 raise RuntimeError(f"No se pudo generar análisis para {currency}: {e}")
 
@@ -276,24 +259,21 @@ Genera ahora el análisis fundamental para {currency}:"""
 
 def main():
     print("=" * 60)
-    print("🤖 Generador de Análisis AI — Gemini Flash (gratuito)")
+    print("🤖 Generador de Análisis AI — Gemini 2.0 Flash (gratuito)")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
-    # Verificar y configurar API key
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
         raise EnvironmentError(
             "❌ GEMINI_API_KEY no configurada.\n"
             "   Obtenla gratis en: https://aistudio.google.com\n"
-            "   Luego agrégala en: GitHub repo → Settings → Secrets → GEMINI_API_KEY"
+            "   Luego: GitHub repo → Settings → Secrets → GEMINI_API_KEY"
         )
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    print("✅ Gemini 1.5 Flash configurado\n")
+    client = genai.Client(api_key=api_key)
+    print("✅ Gemini 2.0 Flash configurado (SDK google-genai)\n")
 
-    # Crear directorio de salida
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     results = {}
@@ -303,7 +283,6 @@ def main():
         print(f"[{i+1}/{len(CURRENCIES)}] {currency}...")
 
         try:
-            # Cargar datos
             print(f"  📥 Cargando datos económicos...")
             data = load_economic_data(currency)
 
@@ -317,17 +296,15 @@ def main():
                 results[currency] = {"success": False, "error": msg}
                 continue
 
-            # Generar análisis
-            print(f"  🧠 Generando con Gemini...")
-            analysis_text = generate_analysis(model, currency, data)
+            print(f"  🧠 Generando con Gemini 2.0 Flash...")
+            analysis_text = generate_analysis(client, currency, data)
 
-            # Construir JSON de salida
             output = {
                 "currency":    currency,
                 "country":     COUNTRY_META[currency]['name'],
                 "bank":        COUNTRY_META[currency]['bank'],
                 "analysis":    analysis_text,
-                "model":       "gemini-1.5-flash",
+                "model":       "gemini-2.0-flash",
                 "generatedAt": datetime.now(timezone.utc).isoformat(),
                 "dataSnapshot": {
                     "interestRate":    data.get('interestRate'),
@@ -341,7 +318,6 @@ def main():
                 }
             }
 
-            # Guardar
             output_path = OUTPUT_DIR / f"{currency}.json"
             with open(output_path, 'w', encoding='utf-8') as f:
                 json.dump(output, f, ensure_ascii=False, indent=2)
@@ -354,10 +330,8 @@ def main():
 
             print(f"  💾 Guardado en {output_path}")
 
-            # Pausa entre divisas para respetar el rate limit gratuito (15 req/min)
-            # Con 8 divisas y 5s de pausa, el proceso completo tarda ~1 minuto
             if i < len(CURRENCIES) - 1:
-                print(f"  ⏸  Pausa 5s (rate limit tier gratuito)...")
+                print(f"  ⏸  Pausa 5s...")
                 time.sleep(5)
 
         except Exception as e:
@@ -365,11 +339,11 @@ def main():
             errors.append(f"{currency}: {str(e)}")
             results[currency] = {"success": False, "error": str(e)}
 
-    # Generar index.json con metadata global
+    # index.json
     successful = [c for c, r in results.items() if r.get('success')]
     index = {
         "generatedAt":    datetime.now(timezone.utc).isoformat(),
-        "model":          "gemini-1.5-flash",
+        "model":          "gemini-2.0-flash",
         "currencies":     successful,
         "totalGenerated": len(successful),
         "errors":         errors,
@@ -379,7 +353,6 @@ def main():
     with open(OUTPUT_DIR / 'index.json', 'w', encoding='utf-8') as f:
         json.dump(index, f, ensure_ascii=False, indent=2)
 
-    # Resumen
     print("\n" + "=" * 60)
     print("📋 RESUMEN")
     print(f"   ✅ Exitosos: {len(successful)}/{len(CURRENCIES)} — {', '.join(successful) or 'ninguno'}")
