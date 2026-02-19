@@ -32,7 +32,7 @@ COUNTRY_META = {
 
 GITHUB_BASE = 'https://globalinvesting.github.io'
 OUTPUT_DIR  = Path('ai-analysis')
-GEMINI_MODEL = 'gemini-2.5-flash'
+GEMINI_MODEL = 'gemini-2.0-flash-lite'
 GEMINI_URL   = f'https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent'
 
 # ── Carga de datos desde GitHub Pages ─────────────────────────────────────────
@@ -194,7 +194,7 @@ def call_gemini_api(api_key: str, prompt: str) -> str:
         },
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {
-            "maxOutputTokens": 800,
+            "maxOutputTokens": 1024,
             "temperature": 0.4,
             "topP": 0.85
         }
