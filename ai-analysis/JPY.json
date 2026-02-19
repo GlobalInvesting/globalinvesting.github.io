@@ -1,0 +1,18 @@
+{
+  "currency": "JPY",
+  "country": "Japón",
+  "bank": "Banco de Japón (BoJ)",
+  "analysis": "El Banco de Japón mantiene una tasa de interés del 0.75%, con una postura dovish en cuanto a la política monetaria, lo que se refleja en una inflación anual del 2.1%, ligeramente por debajo de las expectativas de inflación del 2.4%. La actividad económica en Japón muestra un crecimiento anual del PIB del 0.1%, con un desempleo del 2.6% y un crecimiento salarial anual del 2.4%, lo que sugiere una economía que se está recuperando lentamente.\n\nLa balanza comercial de Japón muestra un déficit de 7.5 mil millones de dólares estadounidenses al mes, lo que podría tener un impacto negativo en la divisa. Sin embargo, la cuenta corriente como porcentaje del PIB es del 4.7%, lo que indica una posición externa relativamente sólida. La producción industrial y las ventas minoristas muestran una contracción, con un descenso del 0.1% y del 2.0% respectivamente en términos mensuales.\n\nEl sentimiento de mercado hacia el yen japonés es negativo, con una posición neta de -19.1 mil contratos en el COT, y un rendimiento FX reciente del 2.79% vs el dólar estadounidense en el último mes. El yield del bono a 10 años es del 2.14%, lo que sugiere que los inversores están buscando rendimientos más altos en otros activos. La confianza del consumidor y la confianza empresarial se mantienen en niveles relativamente altos, con 96.8 y 115.0 respectivamente, lo que podría apoyar una recuperación económica en el futuro.",
+  "model": "llama-3.3-70b-versatile",
+  "generatedAt": "2026-02-19T15:50:49.526909+00:00",
+  "dataSnapshot": {
+    "interestRate": 0.75,
+    "gdpGrowth": 0.1,
+    "inflation": 2.1,
+    "unemployment": 2.6,
+    "currentAccount": 4.7,
+    "cotPositioning": -19100,
+    "fxPerformance1M": 2.7922,
+    "lastUpdate": "2026-02-19"
+  }
+}

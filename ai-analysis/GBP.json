@@ -1,0 +1,18 @@
+{
+  "currency": "GBP",
+  "country": "Reino Unido",
+  "bank": "Banco de Inglaterra (BoE)",
+  "analysis": "El Banco de Inglaterra mantiene una tasa de interés del 3.75%, con una postura neutral frente a la inflación del 3.0% anual, lo que sugiere una cuidadosa evaluación de la economía para evitar una aceleración excesiva de los precios. La actividad económica del Reino Unido se caracteriza por un crecimiento del PIB del 0.1% anual, con un desempleo del 5.2% y un crecimiento salarial del 4.2% anual, lo que indica una economía en expansión moderada.\n\nLa cuenta corriente en déficit del -2.2% del PIB y la balanza comercial negativa de -5.9B USD/mes sugieren una vulnerabilidad en el sector exterior, aunque el PMI manufacturero en 51.8 indica una expansión en la producción industrial. Las ventas minoristas con un crecimiento del 0.4% MoM y la confianza del consumidor en 84.0 también apuntan a una estabilidad en el consumo.\n\nEl sentimiento de mercado hacia la libra esterlina se ve influenciado por la posición neta de -25.8K contratos en el COT, lo que sugiere una tendencia a la baja, mientras que el rendimiento FX reciente del 1.22% vs USD y el momentum de tasas del -0.25% en 12 meses indican una debilidad relativa en el mercado de divisas. La expectativa de inflación del 3.8% y el yield del bono 10Y del 4.38% también influyen en la percepción de los inversores sobre la divisa.",
+  "model": "llama-3.3-70b-versatile",
+  "generatedAt": "2026-02-19T15:50:44.809336+00:00",
+  "dataSnapshot": {
+    "interestRate": 3.75,
+    "gdpGrowth": 0.1,
+    "inflation": 3.0,
+    "unemployment": 5.2,
+    "currentAccount": -2.2,
+    "cotPositioning": -25800,
+    "fxPerformance1M": 1.222,
+    "lastUpdate": "2026-02-19"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-02-19T15:51:09.188437+00:00",
+  "model": "llama-3.3-70b-versatile",
+  "currencies": [
+    "USD",
+    "EUR",
+    "GBP",
+    "JPY",
+    "AUD",
+    "CAD",
+    "CHF",
+    "NZD"
+  ],
+  "totalGenerated": 8,
+  "errors": [],
+  "results": {
+    "USD": {
+      "success": true,
+      "wordCount": 291,
+      "generatedAt": "2026-02-19T15:50:34.971624+00:00"
+    },
+    "EUR": {
+      "success": true,
+      "wordCount": 220,
+      "generatedAt": "2026-02-19T15:50:39.992153+00:00"
+    },
+    "GBP": {
+      "success": true,
+      "wordCount": 219,
+      "generatedAt": "2026-02-19T15:50:44.809336+00:00"
+    },
+    "JPY": {
+      "success": true,
+      "wordCount": 234,
+      "generatedAt": "2026-02-19T15:50:49.526909+00:00"
+    },
+    "AUD": {
+      "success": true,
+      "wordCount": 257,
+      "generatedAt": "2026-02-19T15:50:54.554068+00:00"
+    },
+    "CAD": {
+      "success": true,
+      "wordCount": 239,
+      "generatedAt": "2026-02-19T15:50:59.457691+00:00"
+    },
+    "CHF": {
+      "success": true,
+      "wordCount": 276,
+      "generatedAt": "2026-02-19T15:51:04.316119+00:00"
+    },
+    "NZD": {
+      "success": true,
+      "wordCount": 254,
+      "generatedAt": "2026-02-19T15:51:09.188073+00:00"
+    }
+  }
+}
