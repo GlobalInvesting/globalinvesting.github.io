@@ -1522,7 +1522,7 @@ const fetchExtendedData = async (countryCode) => {
         };
 
 const fetchAIAnalysis = async () => {
-    const cacheKey = 'ai_analysis_gemini';
+    const cacheKey = 'ai_analysis_Groq';
     const cached = CacheManager.get(cacheKey);
     if (cached !== null) return cached;
 
@@ -1545,7 +1545,7 @@ const fetchAIAnalysis = async () => {
                         analyses[currency] = {
                             text:        data.analysis,
                             generatedAt: data.generatedAt,
-                            model:       data.model || 'gemini-1.5-flash',
+                            model:       data.model || 'llama-3.3-70b-versatile',
                         };
                     }
                 }
@@ -1557,8 +1557,8 @@ const fetchAIAnalysis = async () => {
         await Promise.all(promises);
 
         if (Object.keys(analyses).length > 0) {
-            console.log(`✅ Análisis Gemini cargados: ${Object.keys(analyses).join(', ')}`);
-            // Cache de 6 horas — Gemini genera una vez al día
+            console.log(`✅ Análisis Groq cargados: ${Object.keys(analyses).join(', ')}`);
+            // Cache de 6 horas — Groq genera una vez al día
             CacheManager.set(cacheKey, analyses, 6 * 60 * 60 * 1000);
             return analyses;
         }
@@ -3904,7 +3904,7 @@ const hasCOTData = () => {
                         const historical = await generateHistoricalData(loadedData, setDataLoadingStatus);
                         setHistoricalData(historical);
 
-                        setDataLoadingStatus({ status: 'Cargando análisis AI (Gemini)...', progress: 96 });
+                        setDataLoadingStatus({ status: 'Cargando análisis AI (Groq)...', progress: 96 });
 const aiData = await fetchAIAnalysis();
 if (aiData && Object.keys(aiData).length > 0) {
     setAiAnalyses(aiData);
@@ -4428,7 +4428,7 @@ const DataHealthCheck = ({ economicData }) => {
                     letterSpacing: '0.04em',
                     textTransform: 'uppercase',
                 }}>
-                    Gemini AI
+                    Groq AI
                 </span>
             ) : (
                 <span style={{
@@ -4466,7 +4466,7 @@ const DataHealthCheck = ({ economicData }) => {
             fontSize: '0.62rem',
             color: 'var(--text-tertiary)',
         }}>
-            Generado por Gemini AI ·{' '}
+            Generado por Groq AI ·{' '}
             {(() => {
                 const ts = aiAnalyses[country.code].generatedAt;
                 if (!ts) return '';
