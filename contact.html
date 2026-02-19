@@ -8,150 +8,50 @@
     <meta name="robots" content="index, follow">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-primary: #0b0e14;
-            --bg-secondary: #13171f;
-            --bg-card: #1a1f2e;
-            --text-primary: #e1e4e8;
-            --text-secondary: #8b949e;
-            --border: #30363d;
+            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
+            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
             --blue: #1e88e5;
         }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 3rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--text-primary); }
+        h1 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); }
+        h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
+        ul { margin-left: 2rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
+        strong { color: var(--text-primary); }
+        a { color: var(--blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .contact-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 6px; border: 1px solid var(--border); }
+        .contact-card h3 { font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-primary); }
+        .contact-card p { margin-bottom: 0.5rem; font-size: 0.9rem; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.8;
-            font-size: 15px;
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .brand-title { font-size: 1rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.75rem 1.25rem; }
+            .nav-links a { font-size: 0.85rem; }
+            .container { padding: 2rem 1rem; }
+            h1 { font-size: 1.75rem; }
+            h2 { font-size: 1.25rem; }
+            .section { padding: 1.25rem; }
+            .contact-grid { grid-template-columns: 1fr; }
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-        }
-
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1.5rem 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .header-content {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand-title {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .brand-title:hover {
-            color: var(--blue);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--text-primary);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        p {
-            margin-bottom: 1.25rem;
-            color: var(--text-secondary);
-        }
-
-        ul {
-            margin-left: 2rem;
-            margin-bottom: 1.25rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        strong {
-            color: var(--text-primary);
-        }
-
-        a {
-            color: var(--blue);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .section {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            margin-bottom: 2rem;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .contact-card {
-            background: var(--bg-secondary);
-            padding: 1.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-
-        .contact-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .contact-card p {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+        @media (max-width: 400px) {
+            h1 { font-size: 1.5rem; }
+            .nav-links { gap: 0.5rem 1rem; }
         }
     </style>
 </head>
@@ -208,25 +108,22 @@
             <h2>Preguntas Frecuentes</h2>
             
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Con qué frecuencia se actualizan los datos?</h3>
-            <p>Los tipos de cambio se actualizan cada 60 segundos. Los indicadores económicos se actualizan cada 24 horas mediante scraping automatizado de Trading Economics. Los datos COT se actualizan semanalmente según publicación de la CFTC (viernes 15:30 ET).</p>
+            <p>Los tipos de cambio se actualizan cada 60 segundos. Los indicadores económicos se actualizan cada 24 horas. Los datos COT se actualizan semanalmente según publicación de la CFTC (viernes 15:30 ET).</p>
 
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Esto es asesoramiento financiero?</h3>
-            <p>No. Nuestra plataforma proporciona contenido informativo y educativo únicamente. No proporcionamos asesoramiento financiero, recomendaciones de inversión o señales de trading. Consulte nuestros <a href="terms.html">Términos de Servicio</a> para más detalles.</p>
+            <p>No. Nuestra plataforma proporciona contenido informativo y educativo únicamente. Consulte nuestros <a href="terms.html">Términos de Servicio</a> para más detalles.</p>
 
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Qué divisas cubren?</h3>
             <p>Actualmente cubrimos ocho divisas principales: USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD. Estas divisas representan más del 80% del volumen de trading global en el mercado forex.</p>
 
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Cómo se calcula el score de fortaleza?</h3>
-            <p>El score se calcula mediante un modelo cuantitativo con ponderaciones específicas: Balance Externo (35%), Diferenciales de Tasas (30%), Crecimiento & Empleo (20%), y Sentimiento de Mercado (15%). Todos los datos provienen de fuentes oficiales verificadas. Consulte la sección <a href="about.html">Acerca de</a> para detalles metodológicos completos.</p>
-
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Puedo usar estos datos con fines comerciales?</h3>
-            <p>El dashboard es de uso gratuito para fines educativos e informativos personales. Para usos comerciales, por favor contáctenos a <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> para discutir licencias apropiadas.</p>
+            <p>El score se calcula mediante un modelo cuantitativo con 21 indicadores ponderados en 6 tiers. Consulte la sección <a href="about.html">Acerca de</a> para detalles metodológicos completos.</p>
 
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Los datos son en tiempo real?</h3>
-            <p>Los tipos de cambio son en tiempo real (actualización cada 60 segundos). Los indicadores económicos se actualizan diariamente ya que las fuentes oficiales (bancos centrales, agencias estadísticas) publican datos con frecuencia mensual o trimestral. Los datos COT tienen ~3 días de retraso natural según el calendario de publicación de la CFTC.</p>
+            <p>Los tipos de cambio son en tiempo real (actualización cada 60 segundos). Los indicadores económicos se actualizan diariamente. Los datos COT tienen ~3 días de retraso natural según el calendario de publicación de la CFTC.</p>
 
             <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Cómo puedo reportar un error o sugerir una característica?</h3>
-            <p>Por favor envíe un correo a <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> con información detallada sobre errores o solicitudes de características. También puede reportar problemas en nuestro repositorio de GitHub si está familiarizado con la plataforma. ¡Apreciamos sus comentarios!</p>
+            <p>Por favor envíe un correo a <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> con información detallada. ¡Apreciamos sus comentarios!</p>
         </div>
 
         <div class="section">
@@ -237,11 +134,10 @@
                 <li><strong>Consultas Comerciales:</strong> 2-3 días hábiles</li>
                 <li><strong>Problemas de Seguridad:</strong> 24 horas (alta prioridad)</li>
             </ul>
-            <p>Nos esforzamos por responder a todas las consultas rápidamente durante el horario comercial (Lunes-Viernes, 9 AM - 5 PM EST).</p>
         </div>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
-            <p>© 2026 Santiago Plá · Global Investing. Todos los derechos reservados.</p>
+            <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem;">
                 <a href="index.html">Dashboard</a> | 
                 <a href="about.html">Acerca de</a> | 
