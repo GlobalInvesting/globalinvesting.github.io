@@ -2998,15 +2998,20 @@ const getOldestDataTimestamp = (economicData) => {
     Object.values(economicData).forEach(data => {
         if (data.lastUpdate) {
             const date = new Date(data.lastUpdate);
-            if (!oldest || date < oldest) {
-                oldest = date;
+            // Ignorar timestamps muy antiguos (>3 días) que corresponden
+            // a datos semanales/mensuales como COT o meetings
+            const ageDays = (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+            if (ageDays <= 3) {
+                if (!oldest || date < oldest) {
+                    oldest = date;
+                }
             }
         }
     });
     
     return oldest;
 };
-
+    
 const getCacheAge = (economicData) => {
     const oldest = getOldestDataTimestamp(economicData);
     if (!oldest) return 'Desconocido';
