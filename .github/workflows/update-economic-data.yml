@@ -459,10 +459,17 @@ jobs:
                       return curr, val, d
 
                   if curr == 'NZD':
-                      # TE uses non-standard base (2002Q2=1000) → always rejected.
-                      # Country-page scraper returns the same value → skip it.
-                      # Go straight to World Bank with more generous params.
-                      print("  → NZD ToT: TE base incompatible, fetching World Bank directly...")
+                      # TE publishes NZD ToT on base 2002Q2=1000 (raw ~1567).
+                      # scrape_te_list preserved it as NZD_RAW. Normalize ÷10
+                      # to get base-~100 equivalent (1567→156.7). Zero extra requests.
+                      raw = te_list_data.get('NZD_RAW')
+                      if raw is not None and 500.0 <= raw <= 2500.0:
+                          normalized = round(raw / 10.0, 2)
+                          d = te_list_dates.get('NZD_RAW', str(date.today()))
+                          print(f"  ✓ NZD: TE raw={raw} → normalized {normalized} (÷10, base 2002Q2=1000→~100)")
+                          return curr, normalized, d
+                      # Fallback only if TE raw was missing
+                      print("  → NZD ToT: TE raw unavailable, falling back to World Bank...")
                       val, d = scrape_tot_wb('NZD', timeout=45, retries=3)
                       return curr, val, d
 
@@ -581,6 +588,9 @@ jobs:
                               if val is not None:
                                   if indicator == 'termsOfTrade' and not (TOT_MIN <= val <= TOT_MAX):
                                       print(f"  ✗ {code}: {val} (out of range)")
+                                      if code == 'NZD':  # preserve raw for normalization (base 2002Q2=1000)
+                                          data['NZD_RAW']  = round(val, 2)
+                                          dates['NZD_RAW'] = d
                                       break
                                   data[code]  = round(val, 2)
                                   dates[code] = d
@@ -631,7 +641,7 @@ jobs:
           print("ECONOMIC DATA SCRAPER v11.1")
           print("ToT EUR: OECD legacy → OECD new → Germany proxy (zero extra requests)")
           print("ToT GBP: ONS CTSL → World Bank")
-          print("ToT NZD: World Bank DIRECT (timeout=45s, retries=3) — TE base 2002Q2=1000 incompatible")
+          print("ToT NZD: TE raw ÷10 normalization (base 2002Q2=1000 → ~100) — zero network calls")
           print("ToT ALL: World Bank retry logic added (was failing silently on timeout)")
           print("="*60)
 
