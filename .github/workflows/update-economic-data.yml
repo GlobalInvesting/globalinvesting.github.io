@@ -134,29 +134,7 @@ jobs:
               return r
 
           def scrape_te_price_index(url, label):
-              """
-              Scrape a TE country indicator page (e.g. export-prices, import-prices).
-              Returns (value, date_str) of the most recent data point.
-
-              TE renders indicator pages in 3 different structures depending on the
-              indicator. We try all of them:
-
-              Strategy 1 — Direct indicator table (columns: Last/Actual + Reference).
-                           Works for import-prices. First row is the target value.
-
-              Strategy 2 — Related-indicators table (columns: Last + Reference).
-                           Works for export-prices. Rows are related indicators; we
-                           match the row whose first cell contains a keyword from the
-                           URL slug (e.g. 'export' for export-prices).
-
-              Strategy 3 — Fallback: scan all table rows for any price-like number
-                           (50–300 range) paired with a plausible date.
-
-              Strategy 4 — Last resort: look for standalone number in elements with
-                           class names suggesting a current value display.
-              """
-              # Derive keyword from URL slug for Strategy 2 row matching
-              slug_keyword = url.rstrip('/').split('/')[-1].split('-')[0].lower()  # 'export' or 'import'
+              slug_keyword = url.rstrip('/').split('/')[-1].split('-')[0].lower()
 
               try:
                   r = te_get(url)
@@ -168,7 +146,6 @@ jobs:
                       if not rows:
                           continue
 
-                      # Determine column indices
                       val_col  = None
                       date_col = None
                       if 'actual' in headers:
@@ -181,7 +158,6 @@ jobs:
                       if val_col is None:
                           continue
 
-                      # ── Strategy 1: first data row (direct indicator table) ──
                       cells = rows[0].find_all('td')
                       if len(cells) > val_col:
                           val = clean_num(cells[val_col].get_text(strip=True))
@@ -192,7 +168,6 @@ jobs:
                               print(f"    ✓ {label} [S1-direct]: {val} ({d})")
                               return val, d
 
-                      # ── Strategy 2: scan rows for keyword match (related table) ──
                       for row in rows:
                           cells = row.find_all('td')
                           if not cells:
@@ -207,7 +182,6 @@ jobs:
                                   print(f"    ✓ {label} [S2-keyword]: {val} ({d})")
                                   return val, d
 
-                      # ── Strategy 3: any row with a price-like number ──
                       for row in rows:
                           cells = row.find_all('td')
                           if len(cells) > val_col:
@@ -219,7 +193,6 @@ jobs:
                                   print(f"    ✓ {label} [S3-any]: {val} ({d})")
                                   return val, d
 
-                  # ── Strategy 4: standalone number in known TE value elements ──
                   for tag in soup.find_all(['td', 'span', 'div'],
                                            class_=re.compile(r'(actual|last|value|current)', re.I)):
                       val = clean_num(tag.get_text(strip=True))
@@ -237,29 +210,9 @@ jobs:
           # ═══════════════════════════════════════════════════════════════════
 
           def fetch_tot_eur_oecd():
-              """
-              Fetch EUR Terms of Trade from OECD APIs.
-
-              Tries two endpoints in order:
-                1. OECD legacy (stats.oecd.org) — SDMX-JSON, dataset SNA_TABLE4,
-                   measure P6_P7 (exports/imports deflator ratio) for EA20. This is
-                   the most reliable; EA20 is explicitly supported.
-                2. OECD new Data Explorer (sdmx.oecd.org) — same data, post-July-2024
-                   endpoint. Fallback if legacy is decommissioned.
-
-              Both return annual data (latest available year).
-              Expected range for EUR: 85–115 (historically around 95–105).
-              """
-
-              # ── Endpoint 1: OECD legacy SDMX-JSON ──
-              # Dataset: SNA_TABLE4 = National Accounts, Expenditure approach
-              # Measure: TOT = Terms of Trade (export price index / import price index * 100)
-              # Frequency: A (annual) | Location: EA20
               legacy_urls = [
-                  # Primary: dedicated ToT series
                   "https://stats.oecd.org/SDMX-JSON/data/MEI_PRICES_PPI/EA20.PPPI.A/all"
                   "?dimensionAtObservation=allDimensions&lastNObservations=3",
-                  # Secondary: trade-in-goods deflators via Main Economic Indicators
                   "https://stats.oecd.org/SDMX-JSON/data/MEI/EA20.PRICEULNA.A/all"
                   "?dimensionAtObservation=allDimensions&lastNObservations=3",
               ]
@@ -273,8 +226,6 @@ jobs:
                           continue
                       r.raise_for_status()
                       data = r.json()
-                      # OECD SDMX-JSON: observations live in dataSets[0].observations
-                      # keys are dimension indices joined by ':', values are [obs_val, ...]
                       obs = data.get('dataSets', [{}])[0].get('observations', {})
                       if not obs:
                           print(f"    ✗ OECD legacy: empty observations")
@@ -283,11 +234,9 @@ jobs:
                       for key, v in obs.items():
                           if v and v[0] is not None:
                               vals.append((key, float(v[0])))
-                      # sort by key descending (last index = most recent time period)
                       vals.sort(key=lambda x: x[0], reverse=True)
                       for key, val in vals:
                           if TOT_MIN <= val <= TOT_MAX:
-                              # Recover year from time dimension index
                               try:
                                   time_idx = int(key.split(':')[-1])
                                   time_dim = data['structure']['dimensions']['observation']
@@ -301,9 +250,6 @@ jobs:
                   except Exception as e:
                       print(f"    ✗ OECD legacy: {e}")
 
-              # ── Endpoint 2: OECD new Data Explorer (sdmx.oecd.org) ──
-              # Dataset: OECD.SDD.NAD,DSD_NAAG@DF_NAAG_I — National Accounts
-              # No stable ToT dataflow confirmed yet; try the two most likely ones
               new_urls = [
                   "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_TOT@DF_TOT"
                   "/EA20.A.NBTT...?lastNObservations=3&format=jsondata",
@@ -345,17 +291,6 @@ jobs:
 
 
           def fetch_tot_eur_germany_proxy(te_list_data, te_list_dates):
-              """
-              Last-resort proxy: use Germany's ToT from the TE list as a EUR approximation.
-
-              Rationale: Germany represents ~30% of Eurozone GDP and is the dominant
-              export economy. Its Terms of Trade correlates strongly with the EA aggregate.
-              TE publishes Germany in the country-list/terms-of-trade page; it's already
-              scraped — this function just reads the cached value at zero extra cost.
-
-              The value is labelled 'EUR[proxy:DE]' in logs so it's clearly identifiable.
-              Accuracy: typically within ±3 points of official Eurostat EA20 ToT.
-              """
               val  = te_list_data.get('DE_PROXY')
               d    = te_list_dates.get('DE_PROXY', str(date.today()))
               if val is not None and TOT_MIN <= val <= TOT_MAX:
@@ -368,10 +303,6 @@ jobs:
           # ═══════════════════════════════════════════════════════════════════
 
           def scrape_tot_ons_gbp():
-              """
-              ONS API: Series CTSL (Trade in Goods Total Terms of Trade, SA)
-              Dataset MRET. Returns quarterly data.
-              """
               urls = [
                   "https://api.ons.gov.uk/v1/datasets/MRET/timeseries/CTSL/data",
                   "https://api.ons.gov.uk/v1/timeseries/CTSL/dataset/MRET/data",
@@ -412,10 +343,16 @@ jobs:
 
           # ═══════════════════════════════════════════════════════════════════
           # TERMS OF TRADE — World Bank fallback (all currencies)
+          # FIX: Added retry logic with exponential backoff for NZD timeout issue
           # ═══════════════════════════════════════════════════════════════════
 
-          def scrape_tot_wb(currency_code, timeout=30):
-              """World Bank fallback: TT.PRI.MRCH.XD.WD (net barter ToT, base 2015=100)."""
+          def scrape_tot_wb(currency_code, timeout=30, retries=2):
+              """World Bank fallback: TT.PRI.MRCH.XD.WD (net barter ToT, base 2015=100).
+              
+              FIX v11.1: Added retry logic — NZD was timing out at 30s with no retry,
+              causing it to be silently skipped. Now retries up to `retries` times
+              with exponential backoff (5s, 10s...) before giving up.
+              """
               wb_map = {
                   'USD':'US','GBP':'GB','JPY':'JP','CAD':'CA',
                   'AUD':'AU','CHF':'CH','NZD':'NZ','EUR':'XC',
@@ -425,23 +362,29 @@ jobs:
                   return None, None
               url = (f"https://api.worldbank.org/v2/country/{wb}"
                      f"/indicator/TT.PRI.MRCH.XD.WD?format=json&mrv=5&per_page=5")
-              try:
-                  r = requests.get(url, headers=JSON_HEADERS, timeout=timeout)
-                  r.raise_for_status()
-                  data = r.json()
-                  if not data or len(data) < 2 or not data[1]:
-                      return None, None
-                  for obs in data[1]:
-                      val = obs.get('value')
-                      if val is None:
-                          continue
-                      val = float(val)
-                      if TOT_MIN <= val <= TOT_MAX:
-                          yr = obs.get('date', str(date.today().year))
-                          print(f"    ✓ {currency_code} [World Bank ToT {yr}]: {val}")
-                          return round(val, 2), f"{yr}-06-15"
-              except Exception as e:
-                  print(f"    ✗ World Bank ToT {currency_code}: {e}")
+              for attempt in range(1, retries + 1):
+                  try:
+                      r = requests.get(url, headers=JSON_HEADERS, timeout=timeout)
+                      r.raise_for_status()
+                      data = r.json()
+                      if not data or len(data) < 2 or not data[1]:
+                          return None, None
+                      for obs in data[1]:
+                          val = obs.get('value')
+                          if val is None:
+                              continue
+                          val = float(val)
+                          if TOT_MIN <= val <= TOT_MAX:
+                              yr = obs.get('date', str(date.today().year))
+                              print(f"    ✓ {currency_code} [World Bank ToT {yr}]: {val}")
+                              return round(val, 2), f"{yr}-06-15"
+                  except Exception as e:
+                      if attempt < retries:
+                          wait = 5 * attempt
+                          print(f"    ⚠ World Bank ToT {currency_code} attempt {attempt} failed: {e} — retrying in {wait}s...")
+                          time.sleep(wait)
+                      else:
+                          print(f"    ✗ World Bank ToT {currency_code}: {e}")
               return None, None
 
           # ═══════════════════════════════════════════════════════════════════
@@ -455,7 +398,10 @@ jobs:
                    Also captures Germany (proxy for EUR) from the same list.
                 2. GBP  → ONS API (quarterly, most current)
                 3. EUR  → OECD legacy API → OECD new API → Germany proxy (from TE list)
-                4. Rest → World Bank (annual, ~2yr lag)
+                4. NZD  → World Bank DIRECTLY (TE uses non-standard base 2002Q2=1000,
+                           always out-of-range; skip TE entirely and go straight to WB
+                           with extended timeout=45s and retries=3)
+                5. Rest → World Bank (annual, ~2yr lag)
               """
               data  = {}
               dates = {}
@@ -465,7 +411,6 @@ jobs:
               de_proxy_date = str(date.today())
               for curr, val in te_list_data.items():
                   if curr == 'DE_PROXY':
-                      # Germany captured separately — store but don't assign to EUR yet
                       if TOT_MIN <= val <= TOT_MAX:
                           de_proxy_val  = val
                           de_proxy_date = te_list_dates.get('DE_PROXY', str(date.today()))
@@ -508,12 +453,26 @@ jobs:
                       else:
                           print("  ✗ EUR: Germany proxy also unavailable")
 
-              # Step 4: World Bank for anything still missing
+              # ── Step 4 (NEW): NZD — TE uses non-standard base (2002Q2=1000), always go
+              # straight to World Bank with extended timeout and more retries.
+              # The TE country page scraper would return the same 1000-base value and be
+              # rejected anyway, so we skip it entirely and give WB dedicated effort.
+              if 'NZD' in missing:
+                  print("  → NZD ToT: TE base incompatible (2002Q2=1000), fetching World Bank directly...")
+                  val, d = scrape_tot_wb('NZD', timeout=45, retries=3)
+                  if val is not None:
+                      data['NZD']  = val
+                      dates['NZD'] = d
+                      missing.remove('NZD')
+                  else:
+                      print("  ✗ NZD: World Bank ToT unavailable → null")
+
+              # Step 5: World Bank for anything still missing
               still_missing = [c for c in CURRENCIES if c not in data]
               if still_missing:
                   print(f"\n  → World Bank ToT fallback for: {', '.join(still_missing)}")
                   for curr in still_missing:
-                      val, d = scrape_tot_wb(curr, timeout=30)
+                      val, d = scrape_tot_wb(curr, timeout=30, retries=2)
                       if val is not None:
                           data[curr]  = val
                           dates[curr] = d
@@ -583,7 +542,6 @@ jobs:
 
           def scrape_te_list(url, indicator):
               print(f"\n{'='*50}\nSCRAPING: {indicator.upper()}\n{'='*50}")
-              # For ToT, also capture Germany as potential EUR proxy
               DE_NAMES = ['Germany']
               try:
                   r = te_get(url)
@@ -601,7 +559,6 @@ jobs:
                       if len(cols) < 2: continue
                       ctry = cols[0].get_text(strip=True)
 
-                      # Capture Germany as EUR proxy for ToT
                       if indicator == 'termsOfTrade' and 'DE_PROXY' not in data:
                           if any(n.lower() in ctry.lower() for n in DE_NAMES):
                               val = clean_num(cols[ai].get_text(strip=True))
@@ -670,10 +627,11 @@ jobs:
           # MAIN
           # ═══════════════════════════════════════════════════════════════════
           print("="*60)
-          print("ECONOMIC DATA SCRAPER v11")
+          print("ECONOMIC DATA SCRAPER v11.1")
           print("ToT EUR: OECD legacy → OECD new → Germany proxy (zero extra requests)")
           print("ToT GBP: ONS CTSL → World Bank")
-          print("ToT NZD: World Bank (base 2002Q2=1000 in TE, not comparable)")
+          print("ToT NZD: World Bank DIRECT (timeout=45s, retries=3) — TE base 2002Q2=1000 incompatible")
+          print("ToT ALL: World Bank retry logic added (was failing silently on timeout)")
           print("="*60)
 
           fetch_fx()
@@ -718,7 +676,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Economic data $(date +'%Y-%m-%d') - ToT v11"
+            git commit -m "Economic data $(date +'%Y-%m-%d') - ToT v11.1 NZD fix"
             git pull --rebase origin main || true
             git push
           fi
