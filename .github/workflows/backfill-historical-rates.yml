@@ -1,0 +1,161 @@
+name: Backfill Historical Rates (FRED - Ejecución Única)
+
+on:
+  workflow_dispatch:
+    inputs:
+      months_back:
+        description: 'Meses de histórico a obtener (recomendado: 24)'
+        required: true
+        default: '168'
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Backfill historical rates from FRED
+        env:
+          MONTHS_BACK: ${{ github.event.inputs.months_back }}
+        run: |
+          cat > backfill_rates.py << 'EOFPYTHON'
+          import requests
+          import json
+          import os
+          from datetime import date, datetime, timedelta
+          from dateutil.relativedelta import relativedelta
+
+          # ── FRED series IDs para cada divisa ────────────────────────────────────
+          # Cada serie contiene el histórico oficial de la tasa de política monetaria.
+          # FRED actualiza estas series con cada decisión del banco central.
+          FRED_SERIES = {
+              'USD': 'FEDFUNDS',          # Federal Funds Effective Rate (mensual)
+              'EUR': 'ECBDFR',            # ECB Deposit Facility Rate
+              'GBP': 'BOERUKM',          # Bank of England Official Rate
+              'JPY': 'IRSTCB01JPM156N',  # Bank of Japan Policy Rate
+              'CAD': 'IRSTCB01CAM156N',  # Bank of Canada Overnight Rate
+              'AUD': 'IRSTCB01AUM156N',  # RBA Cash Rate
+              'CHF': 'IRSTCB01CHM156N',  # SNB Policy Rate
+              'NZD': 'IRSTCB01NZM156N',  # RBNZ Official Cash Rate
+          }
+
+          FRED_BASE = 'https://api.stlouisfed.org/fred/series/observations'
+          # FRED no requiere API key para series públicas en formato JSON
+          # (límite generoso: 120 req/min sin key)
+
+          months_back = int(os.environ.get('MONTHS_BACK', '24'))
+          start_date = (date.today() - timedelta(days=months_back * 31)).strftime('%Y-%m-%d')
+          end_date = date.today().strftime('%Y-%m-%d')
+
+          print(f"\n{'='*70}")
+          print(f"BACKFILL HISTÓRICO DESDE FRED")
+          print(f"Período: {start_date} → {end_date} ({months_back} meses)")
+          print(f"{'='*70}\n")
+
+          os.makedirs('rates', exist_ok=True)
+
+          for currency, series_id in FRED_SERIES.items():
+              print(f"── {currency} ({series_id}) ──────────────────────────────")
+              
+              try:
+                  params = {
+                      'series_id': series_id,
+                      'observation_start': start_date,
+                      'observation_end': end_date,
+                      'frequency': 'm',          # mensual
+                      'aggregation_method': 'eop', # end-of-period (último dato del mes)
+                      'file_type': 'json',
+                      'api_key': 'e56a23e536093aa4c08de5d6b8f66cf9'  # clave pública de demo FRED
+                  }
+                  
+                  r = requests.get(FRED_BASE, params=params, timeout=15)
+                  r.raise_for_status()
+                  data = r.json()
+                  
+                  if 'observations' not in data or not data['observations']:
+                      print(f"  ❌ Sin datos para {currency}")
+                      continue
+
+                  # Filtrar observaciones válidas (FRED usa '.' para datos faltantes)
+                  valid_obs = [
+                      {
+                          'value': str(round(float(o['value']), 2)),
+                          'date': o['date'],
+                          'source': 'FRED'
+                      }
+                      for o in data['observations']
+                      if o['value'] != '.'
+                  ]
+
+                  # Ordenar más reciente primero (como espera el dashboard)
+                  valid_obs.sort(key=lambda x: x['date'], reverse=True)
+
+                  output = {
+                      'observations': valid_obs,
+                      'lastUpdate': end_date,
+                      'series': series_id,
+                      'frequency': 'monthly'
+                  }
+
+                  with open(f'rates/{currency}.json', 'w') as f:
+                      json.dump(output, f, indent=2)
+
+                  print(f"  ✅ {len(valid_obs)} observaciones guardadas")
+                  print(f"     Más reciente: {valid_obs[0]['date']} = {valid_obs[0]['value']}%")
+                  print(f"     Más antigua:  {valid_obs[-1]['date']} = {valid_obs[-1]['value']}%")
+
+              except Exception as e:
+                  print(f"  ❌ Error: {e}")
+
+          print(f"\n{'='*70}")
+          print("BACKFILL COMPLETADO")
+          print(f"{'='*70}")
+          EOFPYTHON
+
+          pip install python-dateutil --break-system-packages --quiet
+          python backfill_rates.py
+
+      - name: Mostrar resumen
+        run: |
+          echo ""
+          echo "╔═══════════════════════════════════════════════════╗"
+          echo "║     RESUMEN DE DATOS HISTÓRICOS GENERADOS         ║"
+          echo "╚═══════════════════════════════════════════════════╝"
+          echo ""
+          for currency in USD EUR GBP JPY CAD AUD CHF NZD; do
+            if [ -f "rates/$currency.json" ]; then
+              echo "[$currency]"
+              python3 -c "
+          import json
+          with open('rates/$currency.json') as f:
+              data = json.load(f)
+          obs = data['observations']
+          print(f'  Total observaciones: {len(obs)}')
+          print(f'  Más reciente: {obs[0][\"date\"]} = {obs[0][\"value\"]}%')
+          print(f'  Más antigua:  {obs[-1][\"date\"]} = {obs[-1][\"value\"]}%')
+          "
+              echo ""
+            fi
+          done
+
+      - name: Commit y push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add rates/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "Sin cambios"
+          else
+            git commit -m "📊 Backfill histórico de tasas desde FRED ($(date +'%Y-%m-%d'))"
+            git pull --rebase origin main || true
+            git push
+          fi
