@@ -32,6 +32,7 @@ jobs:
           import re
           from datetime import date, datetime
           import time
+          import os
           
           HEADERS = {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -53,38 +54,27 @@ jobs:
               return None
           
           def parse_reference_date(date_text):
-              """
-              Parse the Reference column date from Trading Economics.
-              TE uses formats like "Feb/26", "Jan/26", "Dec/25".
-              Returns an ISO date string (YYYY-MM-DD), using day 15 as proxy
-              since TE only shows month/year in the Reference column.
-              """
               if not date_text:
                   return str(date.today())
               
               date_text = date_text.strip()
               
               try:
-                  # Format: "Feb/26" or "Jan/26" (most common in TE Reference column)
                   m = re.match(r'^([A-Za-z]{3})/(\d{2})$', date_text)
                   if m:
                       month_str = m.group(1)
                       year_str = '20' + m.group(2)
                       dt = datetime.strptime(f"{month_str} {year_str}", '%b %Y')
-                      # Use last day of month approximation — day 15 is safe proxy
                       return dt.strftime('%Y-%m-15')
                   
-                  # Format: "Feb 2026" (with space)
                   m = re.match(r'^([A-Za-z]{3})\s+(\d{4})$', date_text)
                   if m:
                       dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", '%b %Y')
                       return dt.strftime('%Y-%m-15')
                   
-                  # Format: "2026-01-29" (full ISO date)
                   if re.match(r'^\d{4}-\d{2}-\d{2}$', date_text):
                       return date_text
                   
-                  # Format: "January 29, 2026"
                   m = re.match(r'^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$', date_text)
                   if m:
                       dt = datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", '%B %d %Y')
@@ -93,17 +83,45 @@ jobs:
               except Exception as e:
                   print(f"    Date parse error for '{date_text}': {e}")
               
-              # Fallback to today only if parsing fails
               return str(date.today())
+
+          # ── NUEVO: Cargar histórico existente ────────────────────────────────────
+          # En lugar de sobreescribir el JSON, cargamos el archivo actual y
+          # agregamos la nueva observación al principio (más reciente primero).
+          # Esto preserva el histórico acumulado desde el backfill inicial.
+          def load_existing_observations(currency):
+              path = f'rates/{currency}.json'
+              if not os.path.exists(path):
+                  return []
+              try:
+                  with open(path) as f:
+                      data = json.load(f)
+                  return data.get('observations', [])
+              except Exception as e:
+                  print(f"    ⚠️ No se pudo leer histórico existente para {currency}: {e}")
+                  return []
+
+          def merge_observations(existing, new_obs):
+              """
+              Combina la nueva observación con el histórico existente.
+              - Si ya existe una observación con la misma fecha, la sobreescribe
+                (para corregir valores en caso de revisión del BC).
+              - Mantiene ordenamiento más reciente primero.
+              - Limita el histórico a 36 meses para no inflar el JSON.
+              """
+              # Crear diccionario por fecha para deduplicar
+              obs_map = {o['date']: o for o in existing}
+              
+              # Agregar/sobreescribir con la nueva observación
+              obs_map[new_obs['date']] = new_obs
+              
+              # Ordenar más reciente primero
+              sorted_obs = sorted(obs_map.values(), key=lambda x: x['date'], reverse=True)
+              
+              # Limitar a 36 meses de histórico
+              return sorted_obs[:36]
           
           def fetch_trading_economics():
-              """
-              Primary source.
-              Scrapes the Reference column from the TE country-list page.
-              The Reference column contains the period the rate belongs to
-              (e.g. "Feb/26" means the rate was set/confirmed in Feb 2026).
-              This is the date shown in the dashboard tooltip.
-              """
               print("\n" + "="*70)
               print("SOURCE 1: Trading Economics (with Reference date)")
               print("="*70)
@@ -135,21 +153,15 @@ jobs:
                       print("  ❌ No table found")
                       return rates
                   
-                  # Identify column indices from headers
                   headers_row = table.find('thead')
                   header_texts = []
                   if headers_row:
                       header_texts = [th.get_text(strip=True).lower()
                                       for th in headers_row.find_all('th')]
                   
-                  # TE table columns (0-indexed):
-                  # 0: Country, 1: Last, 2: Previous, 3: Reference, 4: Unit, 5: Next Release
-                  # The "Last" column is index 1 (actual current rate).
-                  # The "Reference" column is index 3 (period the rate belongs to).
-                  last_idx = 1       # "Last" = current rate value
-                  reference_idx = 3  # "Reference" = period (e.g. "Feb/26")
+                  last_idx = 1
+                  reference_idx = 3
                   
-                  # Override with detected indices if headers are present
                   if header_texts:
                       if 'last' in header_texts:
                           last_idx = header_texts.index('last')
@@ -167,13 +179,9 @@ jobs:
                       
                       for country_name, currency in country_map.items():
                           if country_name.lower() in country.lower():
-                              # Extract rate value from "Last" column
                               rate_text = cols[last_idx].get_text(strip=True) if last_idx < len(cols) else ''
                               rate = clean_rate(rate_text)
                               
-                              # Extract Reference date (period the rate belongs to)
-                              # This is the date that should appear in the dashboard tooltip,
-                              # reflecting when the central bank last set/confirmed this rate.
                               ref_date_text = ''
                               if reference_idx < len(cols):
                                   ref_date_text = cols[reference_idx].get_text(strip=True)
@@ -183,8 +191,8 @@ jobs:
                               if rate is not None:
                                   rates[currency] = {
                                       'value': rate,
-                                      'date': reference_date,   # ← actual policy period
-                                      'rawDate': ref_date_text, # ← for debugging
+                                      'date': reference_date,
+                                      'rawDate': ref_date_text,
                                       'source': 'TradingEconomics'
                                   }
                                   print(f"  ✓ {currency}: {rate}% | Reference: '{ref_date_text}' → {reference_date}")
@@ -197,10 +205,6 @@ jobs:
                   return {}
           
           def fetch_global_rates_fallback(currency):
-              """
-              Backup source (global-rates.com) for currencies missed by TE scrape.
-              Also attempts to extract the decision date from the page.
-              """
               urls = {
                   'USD': 'central-bank-america/fed-interest-rate.aspx',
                   'EUR': 'central-bank-europe/ecb-interest-rate.aspx',
@@ -227,7 +231,6 @@ jobs:
                           if len(cols) >= 2:
                               rate = clean_rate(cols[1].get_text(strip=True))
                               if rate:
-                                  # Try to extract date from first column
                                   date_text = cols[0].get_text(strip=True)
                                   data_date = parse_reference_date(date_text)
                                   return {
@@ -246,18 +249,16 @@ jobs:
           # ============================================
           
           print("\n" + "="*70)
-          print("FETCHING INTEREST RATES WITH REFERENCE DATES")
+          print("ACTUALIZANDO TASAS CON ACUMULACIÓN HISTÓRICA")
           print("="*70)
           
           final_rates = {}
           
-          # Source 1: Trading Economics (extracts Reference column date)
           te_rates = fetch_trading_economics()
           final_rates.update(te_rates)
           
           time.sleep(1)
           
-          # Source 2: global-rates.com fallback for any missing currencies
           currencies_needed = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
           missing = [c for c in currencies_needed if c not in final_rates]
           
@@ -274,42 +275,51 @@ jobs:
                   time.sleep(0.5)
           
           # ============================================
-          # SAVE RESULTS
-          # The 'date' field in observations now contains the Reference date
-          # from TE (e.g. the month the CB last set the rate), NOT today's date.
-          # The dashboard reads observations[0].date for the tooltip.
+          # GUARDAR CON ACUMULACIÓN HISTÓRICA
+          # ── DIFERENCIA CLAVE vs workflow original ──
+          # En lugar de sobreescribir todo el JSON, cargamos el histórico
+          # previo y agregamos la nueva observación, preservando el backfill.
           # ============================================
           
           print("\n" + "="*70)
-          print("SAVING RESULTS")
+          print("GUARDANDO CON ACUMULACIÓN HISTÓRICA")
           print("="*70)
           
           today = str(date.today())
           
           for currency, data in final_rates.items():
+              # Cargar histórico existente (del backfill o ejecuciones previas)
+              existing_obs = load_existing_observations(currency)
+              
+              # Crear nueva observación de hoy
+              new_observation = {
+                  'value': data['value'],
+                  'date': data.get('date', today),
+                  'rawDate': data.get('rawDate', ''),
+                  'source': data['source']
+              }
+              
+              # Combinar con histórico (deduplicando por fecha)
+              merged_obs = merge_observations(existing_obs, new_observation)
+              
               rate_data = {
-                  'observations': [{
-                      'value': data['value'],
-                      'date': data.get('date', today),       # ← Reference period date
-                      'rawDate': data.get('rawDate', ''),    # ← original string for debugging
-                      'source': data['source']
-                  }],
-                  'lastUpdate': today  # ← when we ran the workflow
+                  'observations': merged_obs,
+                  'lastUpdate': today,
+                  'totalObservations': len(merged_obs)
               }
               
               with open(f'rates/{currency}.json', 'w') as f:
                   json.dump(rate_data, f, indent=2)
               
-              print(f"  💾 {currency}: {data['value']}% | period: {data.get('date', today)} | scraped: {today}")
+              print(f"  💾 {currency}: {data['value']}% | total histórico: {len(merged_obs)} obs | más antigua: {merged_obs[-1]['date']}")
           
-          # Validation
           missing_final = [c for c in currencies_needed if c not in final_rates]
           
           if missing_final:
               print(f"\n❌ MISSING: {', '.join(missing_final)}")
               exit(1)
           else:
-              print(f"\n✅ ALL 8 CURRENCIES FETCHED WITH REFERENCE DATES!")
+              print(f"\n✅ TODAS LAS DIVISAS ACTUALIZADAS CON HISTÓRICO PRESERVADO!")
           
           EOFPYTHON
           
@@ -329,12 +339,12 @@ jobs:
           import json
           with open('rates/$currency.json') as f:
               data = json.load(f)
-              obs = data['observations'][0]
-              print(f\"  Rate:       {obs['value']}%\")
-              print(f\"  Period:     {obs['date']}\")
-              print(f\"  Raw date:   {obs.get('rawDate', 'N/A')}\")
-              print(f\"  Source:     {obs['source']}\")
-              print(f\"  Scraped:    {data['lastUpdate']}\")
+              obs = data['observations']
+              print(f\"  Rate actual:    {obs[0]['value']}%\")
+              print(f\"  Período:        {obs[0]['date']}\")
+              print(f\"  Total histórico: {len(obs)} observaciones\")
+              print(f\"  Más antigua:    {obs[-1]['date']} = {obs[-1]['value']}%\")
+              print(f\"  Actualizado:    {data['lastUpdate']}\")
           "
               echo ""
             else
@@ -351,7 +361,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "🔄 Rates $(date +'%Y-%m-%d') + Reference dates"
+            git commit -m "🔄 Rates $(date +'%Y-%m-%d') + histórico acumulado"
             git pull --rebase origin main || true
             git push
           fi
