@@ -1640,7 +1640,7 @@ const fetchRealHistoricalRates = async (currencyCode) => {
 
         // Tomar hasta 8 observaciones (más que 6 para tener margen)
         // observations ya viene ordenado más reciente primero
-        const recent = observations.slice(0, 8).reverse(); // más antigua primero para el gráfico
+        const recent = observations.slice(0, 14).reverse(); // más antigua primero para el gráfico
 
         const MONTH_NAMES_ES = {
             '01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr',
@@ -3166,7 +3166,7 @@ datasets: [
                                         },
                                         title: { 
                                             display: true, 
-                                            text: `${country.code} - Tendencias 6 Meses`, 
+                                            text: `${country.code} - Tendencias 12 Meses`, 
                                             color: '#e1e4e8', 
                                             font: { size: 14, weight: 'bold' },
                                             padding: { bottom: 20 }
