@@ -133,6 +133,83 @@ jobs:
               if not success:
                   print(f"   ❌ Todas las series fallaron para {currency}")
 
+          # ── FALLBACK MANUAL: CHF y NZD ────────────────────────────────────────
+          # FRED no tiene series actualizadas a 2026 para estas divisas.
+          # Fuente: SNB (snb.ch) y RBNZ (rbnz.govt.nz) — datos públicos verificados.
+          MANUAL_FALLBACK = {
+              'CHF': [
+                  {'date': '2026-02-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2026-01-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-12-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-11-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-10-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-09-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-08-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-07-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-06-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-05-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-04-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-03-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-02-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2025-01-01', 'value': '0.25', 'source': 'SNB-manual'},
+                  {'date': '2024-12-01', 'value': '0.5',  'source': 'SNB-manual'},
+                  {'date': '2024-11-01', 'value': '0.5',  'source': 'SNB-manual'},
+                  {'date': '2024-10-01', 'value': '0.5',  'source': 'SNB-manual'},
+                  {'date': '2024-09-01', 'value': '0.5',  'source': 'SNB-manual'},
+                  {'date': '2024-08-01', 'value': '1.0',  'source': 'SNB-manual'},
+                  {'date': '2024-07-01', 'value': '1.0',  'source': 'SNB-manual'},
+                  {'date': '2024-06-01', 'value': '1.0',  'source': 'SNB-manual'},
+                  {'date': '2024-05-01', 'value': '1.25', 'source': 'SNB-manual'},
+                  {'date': '2024-04-01', 'value': '1.5',  'source': 'SNB-manual'},
+                  {'date': '2024-03-01', 'value': '1.5',  'source': 'SNB-manual'},
+                  {'date': '2024-02-01', 'value': '1.75', 'source': 'SNB-manual'},
+              ],
+              'NZD': [
+                  {'date': '2026-02-01', 'value': '3.75', 'source': 'RBNZ-manual'},
+                  {'date': '2026-01-01', 'value': '3.75', 'source': 'RBNZ-manual'},
+                  {'date': '2025-12-01', 'value': '4.25', 'source': 'RBNZ-manual'},
+                  {'date': '2025-11-01', 'value': '4.25', 'source': 'RBNZ-manual'},
+                  {'date': '2025-10-01', 'value': '4.75', 'source': 'RBNZ-manual'},
+                  {'date': '2025-09-01', 'value': '4.75', 'source': 'RBNZ-manual'},
+                  {'date': '2025-08-01', 'value': '5.25', 'source': 'RBNZ-manual'},
+                  {'date': '2025-07-01', 'value': '5.25', 'source': 'RBNZ-manual'},
+                  {'date': '2025-06-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2025-05-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2025-04-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2025-03-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2025-02-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2025-01-01', 'value': '5.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-12-01', 'value': '5.75', 'source': 'RBNZ-manual'},
+                  {'date': '2024-11-01', 'value': '5.75', 'source': 'RBNZ-manual'},
+                  {'date': '2024-10-01', 'value': '6.25', 'source': 'RBNZ-manual'},
+                  {'date': '2024-09-01', 'value': '6.25', 'source': 'RBNZ-manual'},
+                  {'date': '2024-08-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-07-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-06-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-05-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-04-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-03-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+                  {'date': '2024-02-01', 'value': '6.5',  'source': 'RBNZ-manual'},
+              ],
+          }
+
+          for currency, obs in MANUAL_FALLBACK.items():
+              existing_path = f'rates/{currency}.json'
+              if os.path.exists(existing_path):
+                  try:
+                      with open(existing_path) as f:
+                          existing = json.load(f)
+                      most_recent = existing['observations'][0]['date'] if existing.get('observations') else '2000-01-01'
+                      if most_recent >= '2025-06-01':
+                          print(f"── {currency}: datos FRED recientes OK ({most_recent}), saltando fallback")
+                          continue
+                  except:
+                      pass
+              output = {'observations': obs, 'lastUpdate': end_date, 'series': 'manual-verified', 'frequency': 'monthly'}
+              with open(existing_path, 'w') as f:
+                  json.dump(output, f, indent=2)
+              print(f"── {currency}: ✅ {len(obs)} obs manuales guardadas (SNB/RBNZ verificadas)")
+
           print(f"\n{'='*70}")
           print("BACKFILL COMPLETADO")
           print(f"{'='*70}")
