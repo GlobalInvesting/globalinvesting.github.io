@@ -20,315 +20,118 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Write exact rates from Investing.com
+      - name: Write and run backfill script
         run: |
-          cat > write_verified_rates.py << 'EOFPYTHON'
-import json
-import os
-from datetime import date, datetime, timedelta
+          cat > /tmp/write_rates.py << 'PYEOF'
+          import json, os
+          from datetime import date, datetime, timedelta
 
-# ===========================================================================
-# TASAS EXACTAS DE INVESTING.COM — DECISIONES REALES DE BANCOS CENTRALES
-#
-# Fuente: columna "Release date" + "Actual" de cada página de Investing.com
-# Metodología de asignación mensual:
-#   - Se generan entradas para CADA MES desde Feb-2024 hasta hoy
-#   - Cada mes recibe la tasa vigente tras la última decisión hasta ese mes
-#   - Si no hubo reunión ese mes, se propaga la tasa de la reunión anterior
-#   - Esto garantiza que el gráfico muestre la trayectoria REAL de tasas
-#
-# NOTA SOBRE EL GRÁFICO:
-#   El dashboard toma las últimas N observaciones del array (ordenado más
-#   reciente primero). Con entradas mensuales desde 2024, el gráfico de
-#   "6 meses" mostrará datos reales con escalones en las fechas correctas.
-# ===========================================================================
+          DECISIONS = {
+              'USD': [
+                  ('2026-01-28', 3.75), ('2025-12-10', 3.75), ('2025-10-29', 4.00),
+                  ('2025-09-17', 4.25), ('2025-07-30', 4.50), ('2025-06-18', 4.50),
+                  ('2025-05-07', 4.50), ('2025-03-19', 4.50), ('2025-01-29', 4.50),
+                  ('2024-12-18', 4.50), ('2024-11-07', 4.75), ('2024-09-18', 5.00),
+                  ('2024-07-31', 5.50), ('2024-01-01', 5.50),
+              ],
+              'EUR': [
+                  ('2026-02-05', 2.15), ('2025-12-18', 2.15), ('2025-10-30', 2.15),
+                  ('2025-09-11', 2.15), ('2025-07-24', 2.15), ('2025-06-05', 2.15),
+                  ('2025-04-17', 2.40), ('2025-03-06', 2.65), ('2025-01-30', 2.90),
+                  ('2024-12-12', 3.15), ('2024-10-17', 3.40), ('2024-09-12', 3.65),
+                  ('2024-07-18', 4.25), ('2024-06-06', 4.25), ('2024-04-11', 4.50),
+                  ('2024-03-07', 4.50), ('2024-01-25', 4.50),
+              ],
+              'GBP': [
+                  ('2026-02-05', 3.75), ('2025-12-18', 3.75), ('2025-11-06', 4.00),
+                  ('2025-09-18', 4.00), ('2025-08-07', 4.00), ('2025-06-19', 4.25),
+                  ('2025-05-08', 4.25), ('2025-03-20', 4.50), ('2025-02-06', 4.50),
+                  ('2024-12-19', 4.75), ('2024-11-07', 4.75), ('2024-09-19', 5.00),
+                  ('2024-08-01', 5.00), ('2024-06-20', 5.25), ('2024-05-09', 5.25),
+                  ('2024-03-21', 5.25), ('2024-02-01', 5.25),
+              ],
+              'JPY': [
+                  ('2026-01-23', 0.75), ('2025-12-19', 0.75), ('2025-10-30', 0.50),
+                  ('2025-09-19', 0.50), ('2025-07-31', 0.50), ('2025-06-17', 0.50),
+                  ('2025-05-01', 0.50), ('2025-03-18', 0.50), ('2025-01-24', 0.50),
+                  ('2024-12-18', 0.25), ('2024-10-31', 0.25), ('2024-09-20', 0.25),
+                  ('2024-07-31', 0.25), ('2024-06-14', 0.10), ('2024-04-26', 0.10),
+                  ('2024-03-19', 0.10), ('2024-01-23', -0.10),
+              ],
+              'CAD': [
+                  ('2026-01-28', 2.25), ('2025-12-10', 2.25), ('2025-10-29', 2.25),
+                  ('2025-09-17', 2.50), ('2025-07-30', 2.75), ('2025-06-04', 2.75),
+                  ('2025-04-16', 2.75), ('2025-03-12', 2.75), ('2025-01-29', 3.00),
+                  ('2024-12-11', 3.25), ('2024-10-23', 3.75), ('2024-09-04', 4.25),
+                  ('2024-07-24', 4.50), ('2024-06-05', 4.75), ('2024-04-10', 5.00),
+                  ('2024-03-06', 5.00), ('2024-01-24', 5.00),
+              ],
+              'AUD': [
+                  ('2026-02-03', 3.85), ('2025-12-09', 3.60), ('2025-11-04', 3.60),
+                  ('2025-09-30', 3.60), ('2025-08-12', 3.60), ('2025-07-08', 3.85),
+                  ('2025-05-20', 3.85), ('2025-04-01', 4.10), ('2025-02-18', 4.10),
+                  ('2024-12-10', 4.35), ('2024-11-05', 4.35), ('2024-09-24', 4.35),
+                  ('2024-08-06', 4.35), ('2024-06-18', 4.35), ('2024-05-07', 4.35),
+                  ('2024-03-19', 4.35), ('2024-02-06', 4.35),
+              ],
+              'CHF': [
+                  ('2025-12-11', 0.00), ('2025-09-25', 0.00), ('2025-06-19', 0.00),
+                  ('2025-03-20', 0.25), ('2024-12-12', 0.50), ('2024-09-26', 1.00),
+                  ('2024-06-20', 1.25), ('2024-03-21', 1.50), ('2023-12-14', 1.75),
+              ],
+              'NZD': [
+                  ('2026-02-17', 2.25), ('2025-11-25', 2.25), ('2025-10-07', 2.50),
+                  ('2025-08-19', 3.00), ('2025-07-08', 3.25), ('2025-05-27', 3.25),
+                  ('2025-04-08', 3.50), ('2025-02-18', 3.75), ('2024-11-26', 4.25),
+                  ('2024-10-08', 4.75), ('2024-08-13', 5.25), ('2024-07-09', 5.50),
+                  ('2024-05-21', 5.50), ('2024-04-09', 5.50), ('2024-02-27', 5.50),
+              ],
+          }
 
-# Decisiones reales por banco central (fecha_decision, tasa_resultante)
-# Solo se listan las fechas donde HUBO reunión y cambio o confirmación
+          def get_rate_for_month(decisions, year, month):
+              last_day = date(year, 12, 31) if month == 12 else date(year, month + 1, 1) - timedelta(days=1)
+              best_rate, best_date = None, None
+              for dec_str, rate in decisions:
+                  dec_date = datetime.strptime(dec_str, '%Y-%m-%d').date()
+                  if dec_date <= last_day:
+                      if best_date is None or dec_date > best_date:
+                          best_date, best_rate = dec_date, rate
+              return best_rate
 
-DECISIONS = {
-    'USD': [
-        # Fed Funds Rate — investing.com/economic-calendar/...168
-        ('2026-01-28', 3.75),
-        ('2025-12-10', 3.75),
-        ('2025-10-29', 4.00),
-        ('2025-09-17', 4.25),
-        ('2025-07-30', 4.50),
-        ('2025-06-18', 4.50),
-        ('2025-05-07', 4.50),
-        ('2025-03-19', 4.50),
-        ('2025-01-29', 4.50),
-        ('2024-12-18', 4.50),
-        ('2024-11-07', 4.75),
-        ('2024-09-18', 5.00),
-        ('2024-07-31', 5.50),
-        # Antes de Jul-2024: sin cambios desde Jul-2023
-        ('2024-01-01', 5.50),  # rate vigente desde Jul-2023
-    ],
-    'EUR': [
-        # ECB Deposit Facility Rate — investing.com/economic-calendar/...164
-        ('2026-02-05', 2.15),
-        ('2025-12-18', 2.15),
-        ('2025-10-30', 2.15),
-        ('2025-09-11', 2.15),
-        ('2025-07-24', 2.15),
-        ('2025-06-05', 2.15),
-        ('2025-04-17', 2.40),
-        ('2025-03-06', 2.65),
-        ('2025-01-30', 2.90),
-        ('2024-12-12', 3.15),
-        ('2024-10-17', 3.40),
-        ('2024-09-12', 3.65),
-        ('2024-07-18', 4.25),
-        ('2024-06-06', 4.25),
-        ('2024-04-11', 4.50),
-        ('2024-03-07', 4.50),
-        ('2024-01-25', 4.50),
-    ],
-    'GBP': [
-        # Bank of England Bank Rate — investing.com/economic-calendar/...170
-        ('2026-02-05', 3.75),
-        ('2025-12-18', 3.75),
-        ('2025-11-06', 4.00),
-        ('2025-09-18', 4.00),
-        ('2025-08-07', 4.00),
-        ('2025-06-19', 4.25),
-        ('2025-05-08', 4.25),
-        ('2025-03-20', 4.50),
-        ('2025-02-06', 4.50),
-        ('2024-12-19', 4.75),
-        ('2024-11-07', 4.75),
-        ('2024-09-19', 5.00),
-        ('2024-08-01', 5.00),
-        ('2024-06-20', 5.25),
-        ('2024-05-09', 5.25),
-        ('2024-03-21', 5.25),
-        ('2024-02-01', 5.25),
-    ],
-    'JPY': [
-        # Bank of Japan Policy Rate — investing.com/economic-calendar/...165
-        ('2026-01-23', 0.75),
-        ('2025-12-19', 0.75),
-        ('2025-10-30', 0.50),
-        ('2025-09-19', 0.50),
-        ('2025-07-31', 0.50),
-        ('2025-06-17', 0.50),
-        ('2025-05-01', 0.50),
-        ('2025-03-18', 0.50),
-        ('2025-01-24', 0.50),
-        ('2024-12-18', 0.25),
-        ('2024-10-31', 0.25),
-        ('2024-09-20', 0.25),
-        ('2024-07-31', 0.25),
-        ('2024-06-14', 0.10),
-        ('2024-04-26', 0.10),
-        ('2024-03-19', 0.10),
-        ('2024-01-23', -0.10),
-    ],
-    'CAD': [
-        # Bank of Canada Overnight Rate — investing.com/economic-calendar/...166
-        ('2026-01-28', 2.25),
-        ('2025-12-10', 2.25),
-        ('2025-10-29', 2.25),
-        ('2025-09-17', 2.50),
-        ('2025-07-30', 2.75),
-        ('2025-06-04', 2.75),
-        ('2025-04-16', 2.75),
-        ('2025-03-12', 2.75),
-        ('2025-01-29', 3.00),
-        ('2024-12-11', 3.25),
-        ('2024-10-23', 3.75),
-        ('2024-09-04', 4.25),
-        ('2024-07-24', 4.50),
-        ('2024-06-05', 4.75),
-        ('2024-04-10', 5.00),
-        ('2024-03-06', 5.00),
-        ('2024-01-24', 5.00),
-    ],
-    'AUD': [
-        # RBA Cash Rate — investing.com/economic-calendar/...171
-        ('2026-02-03', 3.85),
-        ('2025-12-09', 3.60),
-        ('2025-11-04', 3.60),
-        ('2025-09-30', 3.60),
-        ('2025-08-12', 3.60),
-        ('2025-07-08', 3.85),
-        ('2025-05-20', 3.85),
-        ('2025-04-01', 4.10),
-        ('2025-02-18', 4.10),
-        ('2024-12-10', 4.35),
-        ('2024-11-05', 4.35),
-        ('2024-09-24', 4.35),
-        ('2024-08-06', 4.35),
-        ('2024-06-18', 4.35),
-        ('2024-05-07', 4.35),
-        ('2024-03-19', 4.35),
-        ('2024-02-06', 4.35),
-    ],
-    'CHF': [
-        # SNB Policy Rate (quarterly) — investing.com/economic-calendar/...169
-        ('2025-12-11', 0.00),
-        ('2025-09-25', 0.00),
-        ('2025-06-19', 0.00),
-        ('2025-03-20', 0.25),
-        ('2024-12-12', 0.50),
-        ('2024-09-26', 1.00),
-        ('2024-06-20', 1.25),
-        ('2024-03-21', 1.50),
-        ('2023-12-14', 1.75),
-        ('2023-09-21', 1.75),
-    ],
-    'NZD': [
-        # RBNZ OCR — investing.com/economic-calendar/...167
-        ('2026-02-17', 2.25),
-        ('2025-11-25', 2.25),
-        ('2025-10-07', 2.50),
-        ('2025-08-19', 3.00),
-        ('2025-07-08', 3.25),
-        ('2025-05-27', 3.25),
-        ('2025-04-08', 3.50),
-        ('2025-02-18', 3.75),
-        ('2024-11-26', 4.25),
-        ('2024-10-08', 4.75),
-        ('2024-08-13', 5.25),
-        ('2024-07-09', 5.50),
-        ('2024-05-21', 5.50),
-        ('2024-04-09', 5.50),
-        ('2024-02-27', 5.50),
-    ],
-}
+          os.makedirs('rates', exist_ok=True)
+          today = date.today()
+          months = []
+          y, m = 2024, 1
+          while (y, m) <= (today.year, today.month):
+              months.append((y, m))
+              m += 1
+              if m > 12:
+                  m, y = 1, y + 1
 
-def get_rate_for_month(decisions, year, month):
-    """
-    Retorna la tasa vigente para el mes dado.
-    Busca la decisión más reciente que sea <= último día de ese mes.
-    """
-    # Último día del mes
-    if month == 12:
-        last_day = date(year, 12, 31)
-    else:
-        last_day = date(year, month + 1, 1) - timedelta(days=1)
+          for currency, decisions in DECISIONS.items():
+              obs = []
+              for year, month in months:
+                  rate = get_rate_for_month(decisions, year, month)
+                  if rate is not None:
+                      obs.append({'date': f'{year}-{month:02d}-01', 'value': str(rate), 'source': 'investing-com-exact'})
+              obs.sort(key=lambda x: x['date'], reverse=True)
+              with open(f'rates/{currency}.json', 'w') as f:
+                  json.dump({'observations': obs, 'lastUpdate': str(today), 'totalObservations': len(obs)}, f, indent=2)
+              print(f"{currency}: {len(obs)} obs | oldest={obs[-1]['date']}:{obs[-1]['value']}% -> newest={obs[0]['date']}:{obs[0]['value']}%")
 
-    best_rate = None
-    best_date = None
+          print("\nUSD last 14:")
+          import json as j2
+          usd = j2.load(open('rates/USD.json'))['observations']
+          for o in usd[:14]:
+              print(f"  {o['date']}: {o['value']}%")
+          PYEOF
+          python3 /tmp/write_rates.py
 
-    for dec_date_str, rate in decisions:
-        dec_date = datetime.strptime(dec_date_str, '%Y-%m-%d').date()
-        if dec_date <= last_day:
-            if best_date is None or dec_date > best_date:
-                best_date = dec_date
-                best_rate = rate
-
-    return best_rate
-
-# Generar observaciones mensuales desde Ene-2024 hasta hoy
-os.makedirs('rates', exist_ok=True)
-today = date.today()
-
-# Rango: desde Enero 2024 hasta mes actual
-start_year, start_month = 2024, 1
-end_year, end_month = today.year, today.month
-
-months = []
-y, m = start_year, start_month
-while (y, m) <= (end_year, end_month):
-    months.append((y, m))
-    m += 1
-    if m > 12:
-        m = 1
-        y += 1
-
-print(f"\n{'='*70}")
-print(f"GENERATING MONTHLY RATE SERIES — {today}")
-print(f"Range: {start_year}-{start_month:02d} → {end_year}-{end_month:02d} ({len(months)} months)")
-print(f"{'='*70}\n")
-
-for currency, decisions in DECISIONS.items():
-    observations = []
-
-    for year, month in months:
-        rate = get_rate_for_month(decisions, year, month)
-        if rate is not None:
-            observations.append({
-                'date': f'{year}-{month:02d}-01',
-                'value': str(rate),
-                'source': 'investing-com-exact'
-            })
-
-    # Ordenar más reciente primero
-    observations.sort(key=lambda x: x['date'], reverse=True)
-
-    output = {
-        'observations': observations,
-        'lastUpdate': str(today),
-        'series': 'investing-com-central-bank-decisions',
-        'frequency': 'monthly',
-        'totalObservations': len(observations)
-    }
-
-    path = f'rates/{currency}.json'
-    with open(path, 'w') as f:
-        json.dump(output, f, indent=2)
-
-    newest = observations[0]
-    oldest = observations[-1]
-    change = float(newest['value']) - float(oldest['value'])
-    arrow = '↓' if change < 0 else '↑' if change > 0 else '→'
-    print(f"  ✅ {currency}: {len(observations)} obs | "
-          f"{oldest['date']}={oldest['value']}% {arrow} {newest['date']}={newest['value']}%")
-
-# Validación visual de USD
-print(f"\n--- USD últimas 14 observaciones (verificar escalones) ---")
-with open('rates/USD.json') as f:
-    usd = json.load(f)
-for obs in usd['observations'][:14]:
-    print(f"  {obs['date']}: {obs['value']}%")
-
-# Validación visual de JPY
-print(f"\n--- JPY últimas 14 observaciones ---")
-with open('rates/JPY.json') as f:
-    jpy = json.load(f)
-for obs in jpy['observations'][:14]:
-    print(f"  {obs['date']}: {obs['value']}%")
-
-print(f"\n{'='*70}")
-print("ALL RATES WRITTEN SUCCESSFULLY")
-print(f"{'='*70}")
-EOFPYTHON
-
-          python write_verified_rates.py
-
-      - name: Display full summary
-        run: |
-          echo ""
-          echo "==========================================="
-          echo "   RESUMEN COMPLETO — TASAS VERIFICADAS"
-          echo "==========================================="
-          for currency in USD EUR GBP JPY CAD AUD CHF NZD; do
-            if [ -f "rates/$currency.json" ]; then
-              echo ""
-              echo "[$currency] — últimos 14 meses (ventana gráfico ~12m):"
-              python3 -c "
-import json
-with open('rates/$currency.json') as f:
-    data = json.load(f)
-obs = data['observations']
-print(f'  Total: {len(obs)} observaciones')
-for o in obs[:14]:
-    print(f'    {o[\"date\"]}: {o[\"value\"]}%')
-"
-            fi
-          done
-
-      - name: Commit y push
+      - name: Commit and push
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add rates/
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "Sin cambios"
-          else
-            git commit -m "Backfill exact rates from Investing.com ($(date +'%Y-%m-%d'))"
-            git pull --rebase origin main || true
-            git push
-          fi
+          git diff --staged --quiet || git commit -m "Backfill exact rates from Investing.com ($(date +'%Y-%m-%d'))"
+          git pull --rebase origin main || true
+          git push
