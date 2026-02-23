@@ -242,116 +242,90 @@ def fetch_export_composition(currency):
 
     def _parse_comtrade_response(data, year_label):
         """
-        Parsea la respuesta de Comtrade y extrae top 3 sectores HS2.
-        Maneja múltiples formatos posibles de la API pública.
+        Parsea la respuesta de Comtrade.
+        La API pública devuelve HS6 (6 dígitos) — truncamos a HS2 y agregamos por capítulo.
         """
-        # El campo 'data' puede estar en distintos niveles según la versión de la API
         commodities = data.get('data', [])
         if not commodities:
-            # Algunos endpoints devuelven directamente una lista
             if isinstance(data, list):
                 commodities = data
             else:
                 return None
+        if not commodities:
+            return None
 
-        # Log de diagnóstico: primeros 2 registros para ver la estructura real
-        if commodities:
-            sample = commodities[0]
-            print(f"    🔍 Comtrade sample keys: {list(sample.keys())[:8]}")
-            # Detectar el campo de código de producto (varía por versión de API)
-            # Posibles nombres: cmdCode, CmdCode, cmd_code, aggrLevel, classificationCode
-            code_field = next(
-                (k for k in ['cmdCode', 'CmdCode', 'cmd_code', 'classificationCode']
-                 if k in sample),
-                None
-            )
-            value_field = next(
-                (k for k in ['primaryValue', 'PrimaryValue', 'TradeValue', 'tradeValue', 'fobvalue']
-                 if k in sample),
-                None
-            )
-            print(f"    🔍 code_field={code_field}, value_field={value_field}, total_records={len(commodities)}")
+        sample = commodities[0]
+        code_field = next(
+            (k for k in ['cmdCode', 'CmdCode', 'cmd_code', 'classificationCode'] if k in sample),
+            None
+        )
+        value_field = next(
+            (k for k in ['primaryValue', 'PrimaryValue', 'TradeValue', 'tradeValue', 'fobvalue'] if k in sample),
+            None
+        )
+        if not code_field or not value_field:
+            return None
 
-            if not code_field or not value_field:
-                print(f"    ⚠️  Campos no encontrados en respuesta Comtrade")
-                return None
+        # Agregar valores por capítulo HS2 (primeros 2 dígitos del código HS4/HS6)
+        hs2_totals = {}
+        for c in commodities:
+            code_raw = str(c.get(code_field, '')).strip()
+            if code_raw.isdigit() and len(code_raw) >= 1:
+                hs2_code = code_raw[:2].zfill(2) if len(code_raw) >= 2 else code_raw.zfill(2)
+                if hs2_code == '99':
+                    continue
+                val = float(c.get(value_field, 0) or 0)
+                hs2_totals[hs2_code] = hs2_totals.get(hs2_code, 0) + val
 
-            # Filtrar registros HS2: código numérico de exactamente 2 dígitos
-            # Excluir 'TOTAL', 'AG2', 'AG4' y similares agregados
-            hs2_data = []
-            for c in commodities:
-                code_raw = str(c.get(code_field, ''))
-                # HS2 válido: 2 dígitos numéricos, no '99' (mercancías no clasificadas)
-                if code_raw.isdigit() and len(code_raw) == 2 and code_raw != '99':
-                    hs2_data.append(c)
+        if not hs2_totals:
+            return None
 
-            if not hs2_data:
-                # Intentar con aggrLevel=2 si los códigos vienen como 4 o 6 dígitos
-                # (la API a veces devuelve todos los niveles mezclados)
-                hs2_data = []
-                for c in commodities:
-                    aggr = c.get('aggrLevel', c.get('AggrLevel', None))
-                    code_raw = str(c.get(code_field, ''))
-                    if aggr == 2 and code_raw != '99':
-                        hs2_data.append(c)
-                    elif aggr is None and code_raw.isdigit() and 1 <= len(code_raw) <= 2:
-                        # Códigos 1 dígito también son HS2 si len==1 (ej: '1' = animales vivos)
-                        hs2_data.append(c)
+        top3 = sorted(hs2_totals.items(), key=lambda x: x[1], reverse=True)[:3]
+        total_exports = sum(hs2_totals.values())
 
-            if not hs2_data:
-                print(f"    ⚠️  No se encontraron registros HS2 válidos")
-                return None
+        sectors = []
+        for code, value in top3:
+            name = HS2_NAMES_ES.get(code, f'HS{code}')
+            pct = (value / total_exports * 100) if total_exports > 0 else 0
+            value_b = value / 1e9
+            sectors.append(f"{name} ({pct:.0f}%, ${value_b:.1f}B)")
 
-            hs2_data.sort(key=lambda x: float(x.get(value_field, 0) or 0), reverse=True)
-            top3 = hs2_data[:3]
-
-            sectors = []
-            for item in top3:
-                code = str(item.get(code_field, '')).zfill(2)
-                name = HS2_NAMES_ES.get(code, f'HS{code}')
-                value_b = float(item.get(value_field, 0) or 0) / 1e9
-                sectors.append(f"{name} (${value_b:.1f}B)")
-
-            if sectors:
-                return f"Top 3 exportaciones — Comtrade {year_label}: {', '.join(sectors)}"
-
+        if sectors:
+            return f"Top exportaciones — Comtrade {year_label}: {', '.join(sectors)}"
         return None
 
-    # ── Intento 1: Comtrade 2023 sin cmdCode (devuelve desglose por capítulo HS) ──
+    # ── Intento: Comtrade sin cmdCode, año 2023 luego 2022 ───────────────────
     for year in ['2023', '2022']:
         try:
-            # SIN cmdCode=TOTAL — así la API devuelve el desglose por capítulo HS2
-            # cmdCode=TOTAL devuelve solo 1 registro con el total agregado, inútil para nuestro fin
             url = (
                 f"https://comtradeapi.un.org/public/v1/preview/C/A/HS"
                 f"?reporterCode={reporter_code}"
                 f"&period={year}"
-                f"&partnerCode=0"      # 0 = World
-                f"&flowCode=X"         # X = exports
+                f"&partnerCode=0"
+                f"&flowCode=X"
                 f"&customsCode=C00"
                 f"&motCode=0"
             )
             r = requests.get(url, timeout=12, headers={'Accept': 'application/json'})
-            print(f"    📡 Comtrade {year} status: {r.status_code}, size: {len(r.content)} bytes")
-
-            if r.ok and len(r.content) > 100:
-                data = r.json()
-                result_str = _parse_comtrade_response(data, year)
+            if r.status_code == 429:
+                time.sleep(10)
+                r = requests.get(url, timeout=12, headers={'Accept': 'application/json'})
+            if r.ok and len(r.content) > 500:
+                result_str = _parse_comtrade_response(r.json(), year)
                 if result_str:
-                    full_result = f"{result_str}"
-                    print(f"  🌐 Comtrade {year} OK para {currency}: {full_result}")
-                    _export_cache[currency] = full_result
-                    return full_result
-
+                    print(f"  🌐 Comtrade {year} OK para {currency}: {result_str[:80]}")
+                    _export_cache[currency] = result_str
+                    return result_str
         except Exception as e:
-            print(f"  ⚠️  Comtrade {year} falló para {currency}: {e}")
+            print(f"  ⚠️  Comtrade {year} error para {currency}: {e}")
+        time.sleep(2)
 
-    # ── Fallback: HS2 codes estáticos traducidos ──────────────────────────
+    # ── Fallback: HS2 codes estáticos ─────────────────────────────────────
     fallback_codes = EXPORT_FALLBACK_HS2.get(currency, [])
     if fallback_codes:
         sectors = [HS2_NAMES_ES.get(code, f'HS{code}') for code in fallback_codes[:3]]
-        result = f"Top exportaciones {currency} — referencia HS2 (datos estáticos): {', '.join(sectors)}"
-        print(f"  📦 Fallback estático para {currency}: {result}")
+        result = f"Top exportaciones {currency}: {', '.join(sectors)}"
+        print(f"  📦 Fallback para {currency}: {result}")
         _export_cache[currency] = result
         return result
 
