@@ -2,9 +2,9 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda se encuentra en un ciclo dovish, caracterizado por una reducción en las tasas de interés, lo que ejerce presión a la baja sobre la divisa neozelandesa. Esto se debe a que la tasa de interés actual es inferior a la media global, lo que reduce el atractivo del carry para los inversores. La inflación, aunque superior a la esperada, no parece ser una preocupación principal para el banco central, que prioriza el estímulo económico.\n\nLa economía neozelandesa enfrenta desafíos, con un crecimiento del PIB anual del 1.1%, inferior al promedio global. El déficit comercial en bienes, impulsado principalmente por la importación de productos que no son de primera necesidad, se suma a la presión sobre la divisa. Sin embargo, la composición exportadora de Nueva Zelanda, liderada por productos lácteos, carne y cereales, sugiere que el sector agrícola es clave para el balance comercial. La producción industrial en declive y el desempleo en 5.4% también contribuyen a la debilidad económica.\n\nEl sentimiento de mercado hacia el NZD es claramente bajista, como lo indica el posicionamiento especulativo extremo de -35K contratos netos. Esto sugiere un potencial rebote contrarian si los fundamentales económicos mejoran. El rendimiento del NZD en el último mes, con una apreciación del 1.27% frente al USD, puede deberse a factores como la búsqueda de activos de alto carry en un entorno de riesgo global. Sin embargo, el contexto global de risk-on y la tendencia de las divisas de alto carry y commodities a outperform sugieren que el NZD podría beneficiarse de una mejora en los fundamentos económicos y una reversión del sentimiento de mercado.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda se caracteriza por un enfoque dovish, con un momentum de tasas negativo que indica una reducción activa de las tasas de interés, lo que ejerce presión a la baja sobre la divisa neozelandesa debido a la disminución del carry. Esto se produce en un contexto global donde la tasa de interés promedio es ligeramente superior, lo que sugiere que la economía de Nueva Zelanda podría estar enfrentando desafíos específicos que requieren una respuesta más expansiva por parte del banco central.\n\nLa economía de Nueva Zelanda enfrenta desafíos en su balanza comercial, con un déficit en la cuenta corriente y un déficit comercial en bienes, lo que sugiere que la estructura exportadora del país, dominada por productos como leche, productos lácteos y huevos, carne y despojos comestibles, y cereales, no está generando suficientes ingresos para cubrir las importaciones. Esto se combina con un crecimiento del PIB anual moderado y una inflación que, aunque está dentro de los límites tolerados, podría estar presionando a la baja la divisa.\n\nEl sentimiento de mercado hacia el dólar neozelandés es claramente bajista, como lo indica el posicionamiento especulativo extremo, con un número significativo de contratos netos cortos, lo que sugiere un potencial rebote contrarian si los fundamentales de la economía neozelandesa mejoran. El rendimiento del dólar neozelandés en el último mes ha sido positivo, lo que podría deberse a factores como la apreciación del dólar estadounidense o ajustes en el mercado de divisas, y se produce en un contexto global de risk-on, donde las divisas de alto carry y las commodities tienden a desempeñarse bien.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-23T04:53:27.563781+00:00",
+  "generatedAt": "2026-02-23T10:55:26.540103+00:00",
   "exportComposition": "Top exportaciones NZD: leche, productos lácteos y huevos, carne y despojos comestibles, cereales",
   "dataSnapshot": {
     "interestRate": 2.25,
@@ -14,8 +14,8 @@
     "currentAccount": -5.7,
     "rateMomentum": -1.5,
     "cotPositioning": -35000,
-    "fxPerformance1M": 1.2682,
-    "lastUpdate": "2026-02-22"
+    "fxPerformance1M": 0.6788,
+    "lastUpdate": "2026-02-23"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
@@ -23,7 +23,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.28,
-    "avg_fx_perf_1m": 1.28,
+    "avg_fx_perf_1m": 0.86,
     "avg_cot": 17653.5
   }
 }

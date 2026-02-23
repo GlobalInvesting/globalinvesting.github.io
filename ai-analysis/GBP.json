@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "La política monetaria del Banco de Inglaterra se encuentra en un ciclo dovish, con un momentum de tasas negativo, lo que indica que el banco central está recortando tasas, lo que puede ejercer presión bajista sobre la divisa. Esto se debe a que la tasa de interés actual es más alta que el promedio global, lo que puede hacer que la divisa sea menos atractiva para los inversores.\n\nLa economía del Reino Unido se enfrenta a desafíos, con un crecimiento del PIB anual del 0.1%, lo que es inferior al promedio global. La balanza comercial también muestra un déficit, impulsado en parte por la composición exportadora del país, que se centra en maquinaria y equipos mecánicos, productos farmacéuticos, y maquinaria eléctrica y electrónica. Esto sugiere que la economía del Reino Unido es vulnerable a las fluctuaciones en la demanda global de estos productos.\n\nEl sentimiento de mercado hacia la divisa es bajista, como se refleja en el posicionamiento especulativo extremo, con -42K contratos netos, lo que sugiere que el mercado está muy corto y puede estar preparado para un rebote contrarian si los fundamentales mejoran. El rendimiento FX de 1 mes también muestra una apreciación de la divisa frente al USD, lo que puede ser un catalizador para un cambio en el sentimiento de mercado. En este contexto, es importante considerar las señales estructurales inferidas y el contexto global para entender mejor las tendencias y posibles movimientos futuros de la divisa.",
+  "analysis": "La política monetaria del Banco de Inglaterra se encuentra en un ciclo dovish, con una tasa de interés del 3.75% y un momentum de tasas negativo, lo que indica que el banco central está recortando tasas. Esto se debe a la inflación del 3.0% anual, que aunque está por debajo del promedio global, sigue siendo una preocupación. La expectativa de inflación del 3.8% sugiere que el banco central puede seguir monitoreando de cerca la situación para evitar un aumento en la inflación.\n\nLa economía del Reino Unido se encuentra en una situación desafiante, con un crecimiento del PIB del 0.1% anual, lo que es inferior al promedio global. El déficit comercial en bienes y la cuenta corriente en déficit sugieren que la economía está enfrentando desafíos en su sector externo. La composición exportadora del Reino Unido, que se centra en maquinaria y equipos mecánicos, productos farmacéuticos y maquinaria eléctrica y electrónica, no ha sido suficiente para impulsar un superávit comercial.\n\nEl sentimiento de mercado hacia la libra esterlina es bajista, con un posicionamiento especulativo extremo de -42K contratos netos, lo que sugiere que el mercado está muy corto y puede haber un potencial rebote contrarian si los fundamentales mejoran. El rendimiento FX del último mes ha sido negativo, con una depreciación del 0.33% frente al dólar estadounidense, lo que refleja la debilidad de la libra esterlina en el mercado de divisas. En el contexto global, la libra esterlina se encuentra en una posición desafiante, con un rendimiento FX 1M inferior al promedio global, lo que sugiere que la divisa puede seguir debilitándose en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-23T04:53:03.921598+00:00",
+  "generatedAt": "2026-02-23T10:55:03.320590+00:00",
   "exportComposition": "Top exportaciones GBP: maquinaria y equipos mecánicos, productos farmacéuticos, maquinaria eléctrica y electrónica",
   "dataSnapshot": {
     "interestRate": 3.75,
@@ -14,8 +14,8 @@
     "currentAccount": -2.2,
     "rateMomentum": -0.25,
     "cotPositioning": -42400,
-    "fxPerformance1M": 0.4516,
-    "lastUpdate": "2026-02-22"
+    "fxPerformance1M": -0.3276,
+    "lastUpdate": "2026-02-23"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
@@ -23,7 +23,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.28,
-    "avg_fx_perf_1m": 1.28,
+    "avg_fx_perf_1m": 0.86,
     "avg_cot": 17653.5
   }
 }

@@ -2,9 +2,9 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo se caracteriza por una tasa de interés muy baja, lo que sugiere un enfoque dovish y una presión bajista sobre la divisa. Sin embargo, el contexto global de tasas de interés más altas en otras economías puede generar un efecto de financiación de carry trade, lo que podría apoyar la demanda de la divisa suiza en momentos de aversión al riesgo.\n\nEl perfil macroeconómico de Suiza muestra una economía con un superávit comercial en bienes, impulsado principalmente por la exportación de productos farmacéuticos, instrumentos de óptica y precisión, piedras preciosas y metales. La composición exportadora verificada sugiere que estos sectores son clave para el equilibrio comercial del país. La cuenta corriente también muestra un superávit, lo que indica una posición externa sólida.\n\nEl sentimiento de mercado hacia el franco suizo se ve influenciado por un posicionamiento especulativo bajista extremo, lo que podría generar un potencial rebote contrarian si los fundamentales mejoran. La apreciación reciente del franco suizo frente al dólar estadounidense puede estar relacionada con su perfil de safe haven y la búsqueda de activos seguros en un entorno de incertidumbre global. El contexto global de risk-on podría seguir apoyando la demanda de divisas como el franco suizo, que se benefician de su estatus de refugio seguro en momentos de volatilidad.",
+  "analysis": "La política monetaria del Banco Nacional Suizo se caracteriza por una tasa de interés muy baja, lo que la convierte en una divisa probable financiadora de carry trade, especialmente en un contexto global donde la tasa de interés promedio es significativamente más alta. Esto sugiere que la divisa suiza puede experimentar apreciaciones bruscas en episodios de risk-off debido al desmantelamiento de posiciones cortas.\n\nLa economía suiza presenta un perfil de safe haven, con un superávit de cuenta corriente y una deuda pública baja, lo que genera demanda defensiva de la divisa en episodios de aversión al riesgo. La composición exportadora de Suiza, liderada por productos farmacéuticos, instrumentos de óptica y precisión, y piedras preciosas y metales, contribuye a su superávit comercial, lo que a su vez apoya la estabilidad de la divisa.\n\nEl posicionamiento especulativo extremadamente bajista en el mercado de divisas suizas, combinado con un régimen global de risk-on, sugiere un potencial rebote contrarian si los fundamentales económicos de Suiza mejoran. La apreciación reciente de la divisa suiza frente al dólar estadounidense puede ser un reflejo de esta dinámica, donde la demanda defensiva y el desmantelamiento de posiciones cortas impulsan el valor de la divisa en un contexto de incertidumbre global.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-23T04:53:22.625295+00:00",
+  "generatedAt": "2026-02-23T10:55:21.792107+00:00",
   "exportComposition": "Top exportaciones CHF: productos farmacéuticos, instrumentos de óptica y precisión, piedras preciosas y metales",
   "dataSnapshot": {
     "interestRate": 0.0,
@@ -14,8 +14,8 @@
     "currentAccount": 5.1,
     "rateMomentum": -0.5,
     "cotPositioning": -40900,
-    "fxPerformance1M": 2.1828,
-    "lastUpdate": "2026-02-22"
+    "fxPerformance1M": 1.804,
+    "lastUpdate": "2026-02-23"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
@@ -23,7 +23,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.28,
-    "avg_fx_perf_1m": 1.28,
+    "avg_fx_perf_1m": 0.86,
     "avg_cot": 17653.5
   }
 }

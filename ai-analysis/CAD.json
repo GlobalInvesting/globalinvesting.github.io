@@ -2,9 +2,9 @@
   "currency": "CAD",
   "country": "Canadá",
   "bank": "Banco de Canadá (BoC)",
-  "analysis": "El Banco de Canadá ha estado recortando las tasas de interés, lo que se refleja en un momentum de tasas negativo, presionando a la baja la divisa canadiense debido a la reducción del carry. Esto se produce en un contexto global donde la tasa de interés promedio es ligeramente superior a la de Canadá, lo que podría hacer que la divisa canadiense sea menos atractiva para los inversores en busca de rendimientos más altos.\n\nLa economía canadiense enfrenta desafíos, con un crecimiento del PIB anual del 0.6%, lo que es inferior al promedio global, y un desempleo del 6.5%, que es significativamente más alto que el promedio global. La balanza comercial también muestra un déficit, impulsado en parte por la composición exportadora del país, que se centra en combustibles minerales y petróleo, vehículos automóviles y partes, y maquinaria y equipos mecánicos. Estos sectores pueden ser volátiles y sensibles a los cambios en la demanda global y los precios de las commodities.\n\nEl rendimiento del tipo de cambio canadiense en el último mes ha sido positivo, con una apreciación del 0.88% frente al dólar estadounidense, lo que sugiere que los inversores aún ven valor en la divisa canadiense a pesar de los desafíos económicos. El posicionamiento institucional, con 25.8K contratos netos, indica una visión alcista, aunque no es lo suficientemente fuerte como para sugerir una convicción institucional significativa. En este contexto, el riesgo de saturación o reversión parece limitado, y el sentimiento de mercado sigue siendo cautelosamente optimista.",
+  "analysis": "La política monetaria del Banco de Canadá se encuentra en un ciclo dovish, con un momentum de tasas negativo que indica una reducción en las tasas de interés, lo que presiona a la baja la divisa canadiense debido a la disminución del carry. Esto se produce en un contexto global donde la tasa de interés promedio es ligeramente superior a la de Canadá, lo que sugiere que la economía canadiense puede estar enfrentando desafíos específicos que requieren una política monetaria más expansiva.\n\nLa economía canadiense enfrenta desafíos en su balanza comercial, con un déficit en la cuenta corriente y en la balanza comercial de bienes, lo que sugiere que la estructura exportadora del país puede estar enfrentando dificultades. Sin embargo, la composición exportadora verificada indica que los combustibles minerales y petróleo, vehículos automóviles y partes, y maquinaria y equipos mecánicos son los principales sectores que impulsan el comercio exterior, lo que sugiere que la economía canadiense sigue siendo dependiente de estos sectores para su crecimiento.\n\nEl sentimiento de mercado hacia el CAD se encuentra en una posición alcista, con un rendimiento FX positivo en el último mes y un COT positioning que indica una convicción institucional moderada. Sin embargo, el contexto global sugiere que el riesgo apetito está en un régimen risk-on, lo que puede beneficiar a las divisas de alto carry y commodities, lo que podría impulsar al CAD en el corto plazo. No obstante, la deuda pública elevada y el desempleo alto pueden generar presiones a la baja en la divisa a largo plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-23T04:53:18.092867+00:00",
+  "generatedAt": "2026-02-23T10:55:17.319167+00:00",
   "exportComposition": "Top exportaciones CAD: combustibles minerales y petróleo, vehículos automóviles y partes, maquinaria y equipos mecánicos",
   "dataSnapshot": {
     "interestRate": 2.25,
@@ -14,8 +14,8 @@
     "currentAccount": -1.0,
     "rateMomentum": -0.75,
     "cotPositioning": 25800,
-    "fxPerformance1M": 0.8837,
-    "lastUpdate": "2026-02-22"
+    "fxPerformance1M": 0.5112,
+    "lastUpdate": "2026-02-23"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
@@ -23,7 +23,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.28,
-    "avg_fx_perf_1m": 1.28,
+    "avg_fx_perf_1m": 0.86,
     "avg_cot": 17653.5
   }
 }
