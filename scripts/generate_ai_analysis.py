@@ -210,7 +210,11 @@ REGLAS CRÍTICAS:
 - El campo "PIB Total" es el tamaño de la economía en trillones USD — NO es la tasa de crecimiento.
 - La tasa de crecimiento del PIB es el campo "Crecimiento PIB (% anual)".
 - Para USD: el "Rendimiento FX 1M" refleja el índice dólar (DXY) — redáctalo como "el índice dólar subió/cayó X%".
-- Si un indicador no tiene dato, no lo menciones.
+- Si un indicador no tiene dato, NO lo menciones ni lo infieras desde otros indicadores.
+  EJEMPLOS DE ERRORES A EVITAR:
+  · Si no hay dato de Balanza Comercial, NO inferir déficit/superávit desde la Cuenta Corriente.
+  · Si no hay dato de exposición a commodities, NO inferirla desde el contexto de otras divisas.
+  · El signo del Rendimiento FX ya viene interpretado en el dato — NO lo inviertas.
 - Tono: directo, analítico, como un research note de Goldman Sachs o JP Morgan. Sin saludos ni meta-comentarios."""
 
 
@@ -565,12 +569,17 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
          lambda v: fmt(v, 1, '%')),
         ('unemployment',         'Desempleo',
          lambda v: fmt(v, 1, '%')),
-        ('currentAccount',       'Cuenta Corriente',
-         lambda v: fmt(v, 1, '% PIB')),
+        ('currentAccount',       'Cuenta Corriente (% PIB)',
+         lambda v: (
+             f"{v:.1f}% PIB — {'SUPERÁVIT' if v > 0 else 'DÉFICIT'} "
+             f"(≠ balanza comercial; incluye servicios, rentas y transferencias)"
+         ) if v is not None else None),
         ('debt',                 'Deuda Pública',
          lambda v: fmt(v, 1, '% PIB')),
-        ('tradeBalance',         'Balanza Comercial',
-         lambda v: fmt(v / 1000, 1, 'B USD/mes') if v else None),
+        ('tradeBalance',         'Balanza Comercial (bienes)',
+         lambda v: (
+             f"{v/1000:.1f}B USD/mes — {'SUPERÁVIT' if v > 0 else 'DÉFICIT'} comercial en bienes"
+         ) if v is not None else None),
         ('production',           'Producción Industrial',
          lambda v: fmt(v, 1, '% MoM')),
         ('retailSales',          'Ventas Minoristas',
@@ -592,7 +601,10 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
         ('capitalFlows',         'Flujos de Capital',
          lambda v: fmt(v / 1000, 1, 'B USD (positivo=entrada, negativo=salida)') if v else None),
         ('fxPerformance1M',      'Rendimiento FX 1M',
-         lambda v: fmt(v, 2, '% vs USD (positivo=apreciación)')),
+         lambda v: (
+             f"{v:+.2f}% vs USD — {'APRECIACIÓN' if v > 0 else 'DEPRECIACIÓN'} "
+             f"({'divisa se fortaleció' if v > 0 else 'divisa se debilitó'} frente al USD)"
+         ) if v is not None else None),
     ]
 
     available = 0
