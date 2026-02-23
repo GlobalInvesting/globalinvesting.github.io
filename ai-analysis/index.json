@@ -1,6 +1,7 @@
 {
-  "generatedAt": "2026-02-23T04:03:38.316789+00:00",
+  "generatedAt": "2026-02-23T04:29:19.478680+00:00",
   "model": "llama-3.3-70b-versatile",
+  "version": "2.2",
   "currencies": [
     "USD",
     "EUR",
@@ -12,47 +13,56 @@
     "NZD"
   ],
   "totalGenerated": 8,
+  "comtradeHits": 0,
   "errors": [],
   "results": {
     "USD": {
       "success": true,
-      "wordCount": 220,
-      "generatedAt": "2026-02-23T04:03:05.140393+00:00"
+      "wordCount": 247,
+      "generatedAt": "2026-02-23T04:28:47.435100+00:00",
+      "exportDataSource": "fallback"
     },
     "EUR": {
       "success": true,
-      "wordCount": 278,
-      "generatedAt": "2026-02-23T04:03:09.980427+00:00"
+      "wordCount": 279,
+      "generatedAt": "2026-02-23T04:28:52.028129+00:00",
+      "exportDataSource": "fallback"
     },
     "GBP": {
       "success": true,
-      "wordCount": 258,
-      "generatedAt": "2026-02-23T04:03:14.683474+00:00"
+      "wordCount": 293,
+      "generatedAt": "2026-02-23T04:28:56.667068+00:00",
+      "exportDataSource": "fallback"
     },
     "JPY": {
       "success": true,
-      "wordCount": 317,
-      "generatedAt": "2026-02-23T04:03:19.606482+00:00"
+      "wordCount": 266,
+      "generatedAt": "2026-02-23T04:29:01.430627+00:00",
+      "exportDataSource": "fallback"
     },
     "AUD": {
       "success": true,
-      "wordCount": 250,
-      "generatedAt": "2026-02-23T04:03:23.996373+00:00"
+      "wordCount": 238,
+      "generatedAt": "2026-02-23T04:29:06.024257+00:00",
+      "exportDataSource": "fallback"
     },
     "CAD": {
       "success": true,
-      "wordCount": 260,
-      "generatedAt": "2026-02-23T04:03:28.659229+00:00"
+      "wordCount": 242,
+      "generatedAt": "2026-02-23T04:29:10.645379+00:00",
+      "exportDataSource": "fallback"
     },
     "CHF": {
       "success": true,
-      "wordCount": 329,
-      "generatedAt": "2026-02-23T04:03:33.528971+00:00"
+      "wordCount": 216,
+      "generatedAt": "2026-02-23T04:29:15.092139+00:00",
+      "exportDataSource": "fallback"
     },
     "NZD": {
       "success": true,
-      "wordCount": 297,
-      "generatedAt": "2026-02-23T04:03:38.316420+00:00"
+      "wordCount": 228,
+      "generatedAt": "2026-02-23T04:29:19.478328+00:00",
+      "exportDataSource": "fallback"
     }
   },
   "globalContext": {
