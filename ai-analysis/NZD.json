@@ -2,17 +2,27 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "El Banco de la Reserva de Nueva Zelanda mantiene una tasa de interés del 2.25%, con una postura neutral frente a la inflación anual del 3.1%, lo que sugiere una cuidadosa evaluación de la economía. La tasa de crecimiento del PIB es del 1.1% anual, lo que indica un ritmo de expansión lento. El desempleo se mantiene en un 5.4%, lo que puede influir en la política monetaria.\n\nLa actividad económica de Nueva Zelanda se caracteriza por un crecimiento del PIB del 1.1% anual, con un desempleo del 5.4% y un crecimiento salarial anual del 2.0%. El PMI manufacturero se encuentra en 55.2, lo que indica una expansión en el sector manufacturero. La cuenta corriente se mantiene en un déficit del 5.7% del PIB, lo que puede ser un factor de presión sobre la divisa.\n\nEl sentimiento de mercado hacia el NZD se ve influenciado por un rendimiento FX del 2.09% en el último mes, lo que sugiere una apreciación de la divisa. El COT Positioning muestra una posición neta de -34.9K contratos, lo que indica una tendencia bajista en el mercado. La confianza consumidor y empresarial se mantiene en niveles moderados, con 96.5 y 64.1 respectivamente, lo que puede influir en la perspectiva económica general.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda se encuentra en una fase de recorte, con un momentum de tasas negativo de -1.50% en los últimos 12 meses, lo que sugiere que el banco central está reduciendo las tasas de interés para estimular la economía. Esto se refleja en la tasa de interés actual de 2.25%, que es ligeramente inferior al promedio global de 2.34%. La inflación anual de 3.1% es superior a la expectativa de 2.4%, lo que podría generar presión para que el banco central reconsidere su política de recorte de tasas.\n\nLa economía de Nueva Zelanda muestra signos de debilidad, con un crecimiento del PIB anual de 1.1%, inferior al promedio global de 0.5%. El desempleo de 5.4% es superior al promedio global de 4.7%, lo que sugiere que la economía no está generando suficientes empleos. La cuenta corriente en déficit y la balanza comercial negativa también son señales de debilidad en la economía. Sin embargo, el PMI manufacturero en expansión y las ventas minoristas en alza sugieren que hay algunos sectores que están mostrando signos de vida.\n\nEl sentimiento de mercado hacia el NZD es claramente bajista, con un posicionamiento especulativo extremo de -35K contratos netos, lo que sugiere que el mercado está muy corto en esta divisa. El rendimiento FX de 1.27% en el último mes sugiere que la divisa ha apreciado ligeramente, lo que podría ser un signo de que el mercado está empezando a reconsiderar su visión negativa sobre el NZD. En un contexto global de risk-on, el NZD podría beneficiarse de su condición de divisa de alto carry y su exposición a las commodities, lo que podría llevar a un rebote contrarian si los fundamentales mejoran o el banco central sorprende con una política más expansiva.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:41:11.862527+00:00",
+  "generatedAt": "2026-02-23T04:03:38.316420+00:00",
   "dataSnapshot": {
     "interestRate": 2.25,
     "gdpGrowth": 1.1,
     "inflation": 3.1,
     "unemployment": 5.4,
     "currentAccount": -5.7,
-    "cotPositioning": -34900,
-    "fxPerformance1M": 2.091,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -1.5,
+    "cotPositioning": -35000,
+    "fxPerformance1M": 1.2682,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

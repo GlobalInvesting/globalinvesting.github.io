@@ -2,17 +2,27 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal mantiene una tasa de interés del 3.75%, con una postura neutral en cuanto a la inflación, que se encuentra en un 2.4% anual. La economía de Estados Unidos muestra un crecimiento del PIB del 4.4% anual, con un desempleo del 4.3%.\n\nLa actividad económica se ve influenciada por un crecimiento salarial del 3.8% anual y un PMI manufacturero de 52.4, lo que indica expansión en el sector manufacturero. La cuenta corriente se encuentra en un déficit del 3.9% del PIB, mientras que la balanza comercial muestra un déficit de 70.3 mil millones de dólares al mes.\n\nEl sentimiento de mercado se refleja en un COT Positioning de -0.7K contratos netos y un rendimiento FX 1M del -0.68%, lo que indica una ligera depreciación del dólar en el último mes, aunque el índice dólar cayó 0.68% en el último mes.",
+  "analysis": "La Reserva Federal está recortando las tasas de interés, como se refleja en el momentum de tasas negativo de -0.69% en 12 meses, lo que sugiere una presión a la baja sobre la divisa debido a la reducción del carry. Esto se produce en un contexto en el que la tasa de interés actual del 3.75% sigue siendo superior al promedio global de 2.34%, lo que podría mantener some atracción para los inversores a pesar de la tendencia a la baja.\n\nLa economía estadounidense muestra un crecimiento moderado, con un PIB total de 29,185 billones de dólares y un crecimiento anual del 1.4%, ligeramente superior al promedio global de 0.5%. Sin embargo, la balanza comercial deficitaria y el desempleo del 4.3% podrían ejercer presión sobre la divisa. La cuenta corriente en déficit y la deuda pública elevada también plantean desafíos estructurales a largo plazo.\n\nEl rendimiento FX del último mes muestra una caída del -0.93%, lo que podría estar relacionado con la reducción del carry y la presión vendedora estructural debido al déficit comercial. El COT positioning positivo, aunque modesto, sugiere que los inversores institucionales mantienen una visión alcista a corto plazo. En este contexto, la divisa podría seguir experimentando presión a la baja, especialmente si la Reserva Federal continúa recortando las tasas de interés y el déficit comercial persiste.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:40:40.199557+00:00",
+  "generatedAt": "2026-02-23T04:03:05.140393+00:00",
   "dataSnapshot": {
     "interestRate": 3.75,
-    "gdpGrowth": 4.4,
+    "gdpGrowth": 1.4,
     "inflation": 2.4,
     "unemployment": 4.3,
     "currentAccount": -3.9,
-    "cotPositioning": -729,
-    "fxPerformance1M": -0.6758,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -0.69,
+    "cotPositioning": 328,
+    "fxPerformance1M": -0.9275,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

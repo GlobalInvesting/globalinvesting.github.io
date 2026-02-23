@@ -2,17 +2,27 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón mantiene una tasa de interés del 0.75%, con una postura dovish debido a la baja inflación anual del 1.5%, lo que sugiere una política monetaria expansiva para estimular el crecimiento económico. La economía japonesa presenta un crecimiento del PIB del 0.1% anual, lo que indica una desaceleración en la actividad económica. El desempleo se mantiene en un nivel bajo del 2.6%.\n\nLa actividad económica en Japón se ve afectada por una cuenta corriente del 4.7% del PIB y una balanza comercial deficitaria de -7.4B USD/mes, lo que puede influir en la valoración de la divisa. La producción industrial y las ventas minoristas muestran una contracción, con caídas del 0.1% y del 2.0% respectivamente. El PMI manufacturero se mantiene en expansión con un valor de 52.8.\n\nEl sentimiento de mercado hacia el yen japonés se ve influenciado por la posición neta de -19.1K contratos en el COT, lo que sugiere una postura bajista. El rendimiento del yen japonés ha subido un 1.94% en el último mes, lo que puede indicar una apreciación de la divisa. La confianza del consumidor y la confianza empresarial se mantienen en niveles estables, con valores de 96.8 y 115.0 respectivamente.",
+  "analysis": "La política monetaria del Banco de Japón se caracteriza por una tasa de interés baja, del 0.75%, lo que la coloca significativamente por debajo del promedio global de 2.34%. Esto sugiere que el yen japonés es una divisa que financia el carry trade, lo que implica que los inversores pueden estar utilizando el yen para financiar inversiones en otras divisas con tasas de interés más altas. La inflación en Japón es del 1.5% anual, lo que está por debajo de la expectativa de inflación del 2.4%, lo que podría llevar al Banco de Japón a mantener su política monetaria expansiva.\n\nEl crecimiento del PIB en Japón es lento, con un ritmo anual del 0.1%, lo que está por debajo del promedio global de 0.5%. La cuenta corriente del país es positiva, lo que sugiere que Japón tiene un superávit comercial, pero la balanza comercial es deficitaria, lo que podría afectar la divisa. La producción industrial y las ventas minoristas también están en declive, lo que sugiere una desaceleración económica. Sin embargo, el PMI manufacturero está en expansión, lo que podría ser un indicador de que la economía japonesa aún tiene potencial para crecer.\n\nEl rendimiento del yen japonés en el último mes ha sido positivo, con un aumento del 2.31% frente al dólar estadounidense. Esto podría deberse a la búsqueda de activos seguros en un entorno de riesgo global, ya que el yen japonés es considerado una divisa de refugio. El COT positioning también muestra una posición neta alcista, lo que sugiere que los inversores institucionales están comprando el yen japonés. Sin embargo, el riesgo de saturación es bajo, ya que el COT positioning no supera los 30.000 contratos netos. En general, el yen japonés parece ser una divisa atractiva en un entorno de riesgo global, pero su valoración puede ser afectada por la política monetaria del Banco de Japón y la evolución de la economía japonesa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:40:54.097853+00:00",
+  "generatedAt": "2026-02-23T04:03:19.606482+00:00",
   "dataSnapshot": {
     "interestRate": 0.75,
     "gdpGrowth": 0.1,
     "inflation": 1.5,
     "unemployment": 2.6,
     "currentAccount": 4.7,
-    "cotPositioning": -19100,
-    "fxPerformance1M": 1.9367,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": 0.0,
+    "cotPositioning": 13000,
+    "fxPerformance1M": 2.3066,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

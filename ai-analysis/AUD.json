@@ -2,17 +2,27 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "El Banco de la Reserva de Australia mantiene una tasa de interés del 3.85%, con una postura neutral frente a la inflación del 3.8% anual. La economía australiana muestra un crecimiento del PIB del 0.4% anual, con un desempleo del 4.1%.\n\nLa actividad económica se ve influenciada por un crecimiento moderado, con un aumento en las ventas minoristas del 1.2% mensual y una producción industrial del 0.5% mensual. El sector exterior muestra una balanza comercial positiva de 2.4 mil millones de dólares estadounidenses al mes.\n\nEl sentimiento de mercado se refleja en un COT Positioning de 33.2 mil contratos netos, con un rendimiento FX del 4.55% en el último mes, lo que indica una apreciación de la divisa. El índice de confianza consumidor se mantiene en 90.5, mientras que el índice de confianza empresarial es de 103.0.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia se encuentra en una fase de recorte, con un momentum de tasas de -0.50% en los últimos 12 meses, lo que sugiere que el banco central está intentando frenar la economía para controlar la inflación. Sin embargo, la tasa de interés actual de 3.85% sigue siendo significativamente superior al promedio global de 2.34%, lo que hace que la divisa australiana sea atractiva para los inversores de renta fija internacional.\n\nLa economía australiana muestra signos de debilidad, con un crecimiento del PIB de solo 0.4% anual, lo que es inferior al promedio global de 0.5%. Sin embargo, la balanza comercial presenta un superávit de 2.4B USD/mes, lo que sugiere que la divisa se beneficia del precio de sus exportaciones, probablemente commodities o manufactura de alto valor. El posicionamiento especulativo alcista extremo, con 46K contratos netos, sugiere que el mercado está saturado y hay un riesgo elevado de toma de ganancias o reversión si los datos decepcionan.\n\nEl rendimiento FX de 3.53% en el último mes sugiere que la divisa australiana ha sido una de las más fuertes en el contexto global, lo que se explica por su carry atractivo y su exposición a las commodities. Sin embargo, el riesgo de saturación y la posible reversión del mercado especulativo sugieren que la divisa puede experimentar una corrección a corto plazo. En este sentido, es importante monitorear los datos económicos y la política monetaria para determinar la dirección futura de la divisa australiana.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:40:58.385557+00:00",
+  "generatedAt": "2026-02-23T04:03:23.996373+00:00",
   "dataSnapshot": {
     "interestRate": 3.85,
     "gdpGrowth": 0.4,
     "inflation": 3.8,
     "unemployment": 4.1,
     "currentAccount": -2.3,
-    "cotPositioning": 33200,
-    "fxPerformance1M": 4.5471,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -0.5,
+    "cotPositioning": 45900,
+    "fxPerformance1M": 3.5307,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

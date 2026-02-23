@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T10:41:11.862877+00:00",
+  "generatedAt": "2026-02-23T04:03:38.316789+00:00",
   "model": "llama-3.3-70b-versatile",
   "currencies": [
     "USD",
@@ -16,43 +16,52 @@
   "results": {
     "USD": {
       "success": true,
-      "wordCount": 142,
-      "generatedAt": "2026-02-20T10:40:40.199557+00:00"
+      "wordCount": 220,
+      "generatedAt": "2026-02-23T04:03:05.140393+00:00"
     },
     "EUR": {
       "success": true,
-      "wordCount": 135,
-      "generatedAt": "2026-02-20T10:40:44.754608+00:00"
+      "wordCount": 278,
+      "generatedAt": "2026-02-23T04:03:09.980427+00:00"
     },
     "GBP": {
       "success": true,
-      "wordCount": 215,
-      "generatedAt": "2026-02-20T10:40:49.233230+00:00"
+      "wordCount": 258,
+      "generatedAt": "2026-02-23T04:03:14.683474+00:00"
     },
     "JPY": {
       "success": true,
-      "wordCount": 198,
-      "generatedAt": "2026-02-20T10:40:54.097853+00:00"
+      "wordCount": 317,
+      "generatedAt": "2026-02-23T04:03:19.606482+00:00"
     },
     "AUD": {
       "success": true,
-      "wordCount": 137,
-      "generatedAt": "2026-02-20T10:40:58.385557+00:00"
+      "wordCount": 250,
+      "generatedAt": "2026-02-23T04:03:23.996373+00:00"
     },
     "CAD": {
       "success": true,
-      "wordCount": 204,
-      "generatedAt": "2026-02-20T10:41:02.931996+00:00"
+      "wordCount": 260,
+      "generatedAt": "2026-02-23T04:03:28.659229+00:00"
     },
     "CHF": {
       "success": true,
-      "wordCount": 161,
-      "generatedAt": "2026-02-20T10:41:07.348977+00:00"
+      "wordCount": 329,
+      "generatedAt": "2026-02-23T04:03:33.528971+00:00"
     },
     "NZD": {
       "success": true,
-      "wordCount": 206,
-      "generatedAt": "2026-02-20T10:41:11.862527+00:00"
+      "wordCount": 297,
+      "generatedAt": "2026-02-23T04:03:38.316420+00:00"
     }
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

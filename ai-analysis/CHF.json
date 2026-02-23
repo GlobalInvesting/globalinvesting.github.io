@@ -2,17 +2,27 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "El Banco Nacional Suizo mantiene una tasa de interés del 0.00%, con una postura neutral en medio de una inflación anual del 0.1%, lo que sugiere una política monetaria cautelosa. La economía suiza presenta un crecimiento del PIB del 0.2% anual, lo que indica una expansión lenta. El desempleo se mantiene en un nivel bajo del 3.2%.\n\nLa actividad económica en Suiza se caracteriza por un crecimiento lento, con un PIB total de 937.00 billones de dólares y un desempleo del 3.2%. El sector exterior muestra una balanza comercial positiva de 4.7 billones de dólares al mes, lo que sugiere una contribución positiva al crecimiento económico.\n\nEl sentimiento de mercado hacia el franco suizo es mixto, con un rendimiento del 1.85% en el último mes, lo que indica una apreciación de la divisa. El positioning de los inversores, medido por el COT, muestra una posición neta negativa de 42.3 mil contratos, lo que sugiere una visión bearish hacia el franco suizo.",
+  "analysis": "La política monetaria del Banco Nacional Suizo se caracteriza por una tasa de interés del 0.00%, lo que se encuentra significativamente por debajo del promedio global de 2.34%. Esto sugiere que el CHF es una divisa que financia el carry trade, lo que implica que los inversores pueden estar utilizando el franco suizo para financiar inversiones en otras divisas con tasas de interés más altas. El momentum de tasas negativo de -0.50% en los últimos 12 meses indica que el banco central ha estado recortando las tasas de interés, lo que puede debilitar la divisa en un contexto de risk-on.\n\nEl contexto macroeconómico de Suiza muestra un crecimiento del PIB del 0.2% anual, lo que es inferior al promedio global de 0.5%. La inflación es muy baja, con un 0.1% anual, y el desempleo es del 3.2%, lo que es inferior al promedio global de 4.7%. La combinación de un superávit de cuenta corriente del 5.1% del PIB, una deuda baja del 15.7% del PIB y una tasa de interés por debajo del promedio global sugiere que el CHF es una divisa safe haven que puede apreciar en episodios de aversión al riesgo global. El superávit comercial robusto de 4.7 mil millones de dólares al mes también genera demanda estructural de la divisa.\n\nEl posicionamiento especulativo bajista extremo de -40.9K contratos netos sugiere que el mercado está muy corto, lo que puede generar un potencial rebote contrarian si los fundamentales mejoran o el banco central sorprende. El rendimiento FX del último mes del 2.18% vs el USD puede ser atribuido a la búsqueda de seguridad en un contexto de incertidumbre global. En general, el CHF parece ser una divisa que se beneficia de la aversión al riesgo, pero que puede debilitarse en un contexto de risk-on debido a su bajo rendimiento. El contexto global de risk-on puede continuar presionando al CHF hacia la debilidad, a menos que surjan preocupaciones sobre la estabilidad global que lo impulse como safe haven.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:41:07.348977+00:00",
+  "generatedAt": "2026-02-23T04:03:33.528971+00:00",
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.2,
     "inflation": 0.1,
     "unemployment": 3.2,
     "currentAccount": 5.1,
-    "cotPositioning": -42300,
-    "fxPerformance1M": 1.8508,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -0.5,
+    "cotPositioning": -40900,
+    "fxPerformance1M": 2.1828,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

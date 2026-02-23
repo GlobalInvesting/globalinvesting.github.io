@@ -2,17 +2,27 @@
   "currency": "CAD",
   "country": "Canadá",
   "bank": "Banco de Canadá (BoC)",
-  "analysis": "El Banco de Canadá mantiene una tasa de interés del 2.25%, con una postura neutral frente a la inflación del 2.3% anual, lo que sugiere una política monetaria cautelosa. La economía canadiense muestra un crecimiento del PIB del 0.6% anual, lo que indica una expansión lenta. El desempleo se mantiene en un 6.5%, lo que puede influir en la decisión del banco central.\n\nLa actividad económica en Canadá se ve afectada por una cuenta corriente deficitaria del -1.0% del PIB y una balanza comercial negativa de -1.0B USD al mes, lo que puede generar presión sobre la divisa. Sin embargo, la producción industrial muestra un crecimiento del 4.4% mensual, lo que puede ser un indicador positivo para la economía. El PMI manufacturero se mantiene en expansión con un valor de 50.4.\n\nEl sentimiento de mercado hacia el CAD se ve influenciado por un rendimiento FX del 0.88% en el último mes, lo que sugiere una apreciación de la divisa. El COT Positioning muestra 13.3K contratos netos, lo que puede indicar una posición compradora en el mercado. La confianza consumidor y empresarial se mantiene en niveles moderados, con 49.3 y 50.9 respectivamente, lo que puede influir en la perspectiva del mercado hacia la divisa canadiense.",
+  "analysis": "El Banco de Canadá ha estado recortando las tasas de interés, como se refleja en el momentum de tasas negativo de -0.75% en los últimos 12 meses, lo que sugiere una presión a la baja sobre la divisa canadiense debido a la reducción del carry. Esto se produce en un contexto global donde la tasa de interés promedio es de 2.34%, ligeramente superior a la tasa actual del 2.25% en Canadá, lo que podría hacer que la divisa canadiense sea menos atractiva para los inversores en busca de rendimiento.\n\nLa economía canadiense muestra un crecimiento lento, con un PIB anual del 0.6%, lo que es inferior al promedio global del 0.5%, aunque la producción industrial y las ventas minoristas muestran un crecimiento moderado. La cuenta corriente en déficit y la balanza comercial negativa también podrían presionar a la baja la divisa. Sin embargo, el término de intercambio favorable y el PMI manufacturero en expansión sugieren que la economía canadiense todavía tiene algunos puntos fuertes.\n\nEl rendimiento FX de 0.88% en el último mes sugiere que la divisa canadiense ha apreciado ligeramente, lo que podría deberse a la percepción de que la economía canadiense es más resiliente que otras en un contexto global de riesgo. El COT positioning de 25.8K contratos netos positivos también sugiere que los inversores institucionales están adoptando una postura alcista sobre la divisa canadiense, aunque no alcanza el umbral de saturación. En general, la divisa canadiense parece estar en una posición moderadamente débil, pero con algunos factores estructurales que podrían apoyar su valor en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:41:02.931996+00:00",
+  "generatedAt": "2026-02-23T04:03:28.659229+00:00",
   "dataSnapshot": {
     "interestRate": 2.25,
     "gdpGrowth": 0.6,
     "inflation": 2.3,
     "unemployment": 6.5,
     "currentAccount": -1.0,
-    "cotPositioning": 13300,
-    "fxPerformance1M": 0.8829,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -0.75,
+    "cotPositioning": 25800,
+    "fxPerformance1M": 0.8837,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }

@@ -2,17 +2,27 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra mantiene una tasa de interés del 3.75%, con una postura neutral frente a la inflación del 3.0% anual, lo que sugiere un equilibrio en la política monetaria. La economía del Reino Unido presenta un crecimiento del PIB del 0.1% anual, lo que indica una desaceleración en la actividad económica. El desempleo se mantiene en un 5.2%, lo que sugiere una estabilidad en el mercado laboral.\n\nLa actividad económica del Reino Unido se ve afectada por una cuenta corriente deficitaria del -2.2% del PIB y una balanza comercial negativa de -5.8B USD/mes, lo que puede influir en la divisa. El crecimiento salarial del 4.2% anual y el PMI manufacturero de 51.8 sugieren una expansión en la producción y el empleo. La confianza del consumidor y la confianza empresarial se mantienen en niveles moderados, con 84.0 y 81.0 respectivamente.\n\nEl sentimiento de mercado hacia la libra esterlina se ve influenciado por la posición neta de -25.8K contratos en el COT, lo que sugiere una tendencia a la baja. El rendimiento del índice dólar subió 0.03% en el último mes, lo que puede influir en la valoración de la divisa. Los flujos de capital y el momentum de tasas también pueden influir en la valoración de la libra esterlina en el mercado de divisas.",
+  "analysis": "La política monetaria del Banco de Inglaterra se encuentra en una fase de recorte, con un momentum de tasas de -0.25% en los últimos 12 meses, lo que sugiere una tendencia a la baja en las tasas de interés. Esto se debe a la inflación moderada del 3.0% anual, que se encuentra por debajo del promedio global de 2.2%. La tasa de interés actual del 3.75% es superior al promedio global de 2.34%, lo que podría atraer inversores en busca de rendimientos más altos.\n\nLa economía del Reino Unido se encuentra en una fase de crecimiento lento, con un crecimiento del PIB del 0.1% anual, inferior al promedio global de 0.5%. La balanza comercial también es deficitaria, con un déficit de 5.9 mil millones de dólares al mes. Sin embargo, el rendimiento del bono a 10 años del 4.36% es atractivo en comparación con el promedio global de 3.28%, lo que podría atraer inversores a la divisa.\n\nEl sentimiento de mercado hacia la libra esterlina es bajista, con un posicionamiento especulativo extremo de -42.4K contratos netos, lo que sugiere un potencial rebote contrarian si los fundamentales mejoran o el Banco de Inglaterra sorprende con una decisión inesperada. El rendimiento de la divisa en el último mes ha sido de 0.45% vs USD, lo que sugiere una apreciación moderada. En el contexto global de risk-on, la libra esterlina podría seguir siendo atractiva para inversores en busca de rendimientos más altos, aunque el posicionamiento especulativo extremo sugiere que el mercado está muy corto y podría estar preparado para un rebote.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-20T10:40:49.233230+00:00",
+  "generatedAt": "2026-02-23T04:03:14.683474+00:00",
   "dataSnapshot": {
     "interestRate": 3.75,
     "gdpGrowth": 0.1,
     "inflation": 3.0,
     "unemployment": 5.2,
     "currentAccount": -2.2,
-    "cotPositioning": -25800,
-    "fxPerformance1M": 0.0296,
-    "lastUpdate": "2026-02-20"
+    "rateMomentum": -0.25,
+    "cotPositioning": -42400,
+    "fxPerformance1M": 0.4516,
+    "lastUpdate": "2026-02-22"
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.53,
+    "avg_inflation": 2.24,
+    "avg_unemployment": 4.69,
+    "avg_bond10y": 3.28,
+    "avg_fx_perf_1m": 1.28,
+    "avg_cot": 17653.5
   }
 }
