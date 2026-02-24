@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "La política monetaria del Banco de Japón se caracteriza por una tasa de interés muy baja, lo que la convierte en una divisa atractiva para el carry trade, especialmente en un contexto global donde la tasa de interés promedio es significativamente más alta. Esta situación puede llevar a una apreciación brusca de la divisa en episodios de risk-off, ya que los inversores desmantelan posiciones cortas.\n\nLa economía japonesa enfrenta desafíos, con un crecimiento del PIB anual muy bajo y una producción industrial en contracción, lo que sugiere una debilidad en la actividad económica. Sin embargo, la composición exportadora de Japón, liderada por vehículos automóviles y partes, maquinaria y equipos mecánicos, y maquinaria eléctrica y electrónica, indica que estos sectores son clave para el balance comercial del país, aunque actualmente se enfrenta a un déficit comercial en bienes.\n\nEl rendimiento del yen japonés ha mostrado una apreciación frente al dólar estadounidense en el último mes, lo que puede estar relacionado con el desmantelamiento de posiciones cortas en un contexto de risk-off. El posicionamiento institucional, con un número neto de contratos positivo, sugiere una convicción alcista en el mercado, aunque no alcanza niveles que indiquen saturación. En este contexto, la divisa japonesa parece seguir siendo atractiva como financiadora de carry trade, y su comportamiento puede estar influenciado por los cambios en el sentimiento de riesgo global y las decisiones de inversión en busca de rendimiento.",
+  "analysis": "La política monetaria del Banco de Japón se caracteriza por una tasa de interés muy baja, lo que la convierte en una divisa probable financiadora de carry trade, especialmente en un contexto global donde la tasa de interés promedio es significativamente más alta. Esto sugiere que la divisa japonesa podría experimentar apreciaciones bruscas en episodios de risk-off debido al desmantelamiento de posiciones cortas.\n\nLa economía japonesa enfrenta desafíos, con un crecimiento del PIB anual muy bajo y una producción industrial en contracción, lo que se refleja en una balanza comercial deficitaria en bienes. Sin embargo, la composición exportadora de Japón, liderada por vehículos automóviles y partes, maquinaria y equipos mecánicos, y maquinaria eléctrica y electrónica, sugiere que estos sectores son clave para el balance comercial del país.\n\nEl rendimiento FX de la divisa japonesa en el último mes ha sido de apreciación frente al dólar estadounidense, lo que puede estar relacionado con el contexto global de risk-on, donde las divisas de alto carry y commodities tienden a outperform. El posicionamiento institucional, con un COT positivo, aunque no extremo, sugiere una convicción moderada en la apreciación de la divisa, lo que podría influir en el sentimiento de mercado a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-23T10:55:08.042217+00:00",
+  "generatedAt": "2026-02-24T10:54:01.684602+00:00",
   "exportComposition": "Top exportaciones JPY: vehículos automóviles y partes, maquinaria y equipos mecánicos, maquinaria eléctrica y electrónica",
   "dataSnapshot": {
     "interestRate": 0.75,
@@ -14,16 +14,16 @@
     "currentAccount": 4.7,
     "rateMomentum": 0.0,
     "cotPositioning": 13000,
-    "fxPerformance1M": 1.9007,
-    "lastUpdate": "2026-02-23"
+    "fxPerformance1M": 2.1573,
+    "lastUpdate": "2026-02-24"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.53,
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
-    "avg_bond10y": 3.28,
-    "avg_fx_perf_1m": 0.86,
+    "avg_bond10y": 3.25,
+    "avg_fx_perf_1m": 0.98,
     "avg_cot": 17653.5
   }
 }
