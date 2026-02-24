@@ -1,55 +1,45 @@
-name: Generate AI Analysis with Groq
+name: Generate AI Analysis
 
 on:
   workflow_run:
     workflows: ["Update Economic Data"]
     types: [completed]
-
   schedule:
-    - cron: '0 10 * * 1-5'  # Lunes a viernes, 10:00 UTC
-
+    # Lunes a viernes a las 10:30 UTC (30 min después del workflow de datos)
+    - cron: '30 10 * * 1-5'
   workflow_dispatch:
 
 jobs:
-  generate-analysis:
+  generate:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install requests
+        run: pip install requests
 
-      - name: Generate AI analysis for all currencies
+      - name: Generate AI analysis
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-        run: |
-          echo "=== Working directory ==="
-          pwd
-          echo "=== Script exists? ==="
-          ls -la scripts/generate_ai_analysis.py
-          echo "=== Python version ==="
-          python --version
-          echo "=== Starting script ==="
-          python -u scripts/generate_ai_analysis.py
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/generate_ai_analysis.py
 
-      - name: Commit and push analysis files
+      - name: Commit and push
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ai-analysis/
-
-          if git diff --staged --quiet; then
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🤖 Update AI fundamental analysis [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+            git commit -m "chore: update AI analysis [$(date -u +'%Y-%m-%d %H:%M UTC')]"
             git push
           fi
