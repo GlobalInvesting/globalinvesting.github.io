@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia ha sido recientemente expansiva, con una disminución de las tasas de interés a 3.85%, lo que aunque sigue siendo superior al promedio global, reduce el atractivo del carry para los inversores internacionales. Esto ha generado una presión bajista sobre la divisa australiana, aunque su tasa de interés sigue siendo atractiva en un contexto global. La inflación se mantiene por encima del objetivo, lo que podría llevar a un ajuste en la política monetaria en el futuro.\n\nLa balanza comercial de Australia muestra un superávit de 2.4B USD/mes, gracias a los términos de intercambio favorables y a las exportaciones de minerales metalíferos, combustibles y petróleo, lo que debería apoyar la divisa. Sin embargo, la cuenta corriente presenta un déficit, lo que podría ejercer presión a la baja en el valor de la divisa. El sector manufacturero también muestra signos de expansión, con un PMI de 51.5, lo que es positivo para la economía en general.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 45.9K contratos netos, lo que indica un riesgo de corrección si los datos económicos no cumplen con las expectativas. A pesar de esto, la divisa australiana ha depreciado un 4.43% en el último mes, lo que podría ser el inicio de un cierre de posiciones largas. En resumen, el panorama para la divisa australiana es complejo, con factores tanto positivos como negativos que podrían influir en su valor en el corto plazo.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global, lo que genera un carry atractivo para inversores de renta fija internacional. Esta decisión de subir tasas refleja un ciclo restrictivo activo, estructuralmente alcista para la divisa por mayor carry diferencial. Aunque la inflación se mantiene por encima del objetivo, el banco central parece priorizar el control de la inflación sobre el crecimiento económico.\n\nLa balanza comercial presenta un superávit de 2.4B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación, ampliando el excedente. Sin embargo, la cuenta corriente muestra un déficit, lo que podría generar presión vendedora estructural. La composición exportadora, liderada por minerales metalíferos, combustibles y petróleo, cereales, explica el origen del superávit comercial.\n\nEl posicionamiento especulativo está muy estirado al alza, con 46K contratos netos, lo que indica un mercado saturado de largos y un riesgo de corrección rápida ante cualquier decepción en los datos. Aunque la divisa cayó un 4.4% el último mes, lo que podría ser un inicio de cierre de largos, el régimen global risk-on favorece divisas de alto carry y exportadoras de materias primas, lo que podría mantener la presión alcista sobre la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:40:00.569671+00:00",
+  "generatedAt": "2026-02-24T23:48:54.821319+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "dataSnapshot": {
     "interestRate": 3.85,
@@ -14,12 +14,14 @@
     "currentAccount": -2.3,
     "rateMomentum": -0.5,
     "lastRateDecision": {
-      "direction": "BAJÓ",
-      "delta": -0.4208,
-      "current_rate": 1.55833333333333,
-      "prev_rate": 1.97916666666667,
-      "date": "2019",
-      "source": "WorldBank"
+      "direction": "SUBIÓ",
+      "delta": 0.25,
+      "current_rate": 3.85,
+      "prev_rate": 3.6,
+      "date": "2026-02-01",
+      "source": "rates_history",
+      "cycle_12m": -0.25,
+      "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 45900,
     "fxPerformance1M": -4.4291,

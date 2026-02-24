@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal ha decidido bajar las tasas de interés, lo que puede ejercer presión bajista sobre la divisa debido a la disminución del carry. Aunque la tasa de interés sigue siendo superior al promedio global, la decisión de bajar las tasas sugiere un enfoque más expansivo por parte del banco central. La inflación se mantiene por encima del objetivo, lo que podría limitar la capacidad del banco central para seguir relajando la política monetaria.\n\nLa cuenta corriente y la balanza comercial presentan déficits significativos, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora de los Estados Unidos, con un enfoque en maquinaria industrial y equipos eléctricos, no parece ser lo suficientemente fuerte como para revertir este déficit. Sin embargo, los términos de intercambio favorables sugieren que las exportaciones pueden seguir siendo competitivas en el mercado global.\n\nEl posicionamiento especulativo sigue siendo ligeramente alcista, aunque el rendimiento FX del último mes ha sido negativo. Esto sugiere que el mercado puede estar preparado para una posible corrección a la baja. Con todo, el panorama a corto plazo sigue siendo incierto, y el comportamiento de la divisa dependerá de cómo se desarrollen los fundamentos económicos y la política monetaria en el futuro.",
+  "analysis": "La Reserva Federal acaba de reducir las tasas de interés en 0.25pp, lo que supone un cambio en la política monetaria hacia un enfoque más expansivo, aunque la tasa de interés sigue siendo alta en comparación con el promedio global. Esto podría presionar a la baja la divisa, ya que el menor carry diferencial reduce su atractivo para los inversores. La inflación sigue por encima del objetivo, lo que podría limitar la capacidad del banco central para seguir reduciendo las tasas.\n\nLa cuenta corriente y la balanza comercial presentan un déficit significativo, lo que ejerce presión vendedora estructural sobre la divisa. Sin embargo, la composición exportadora de la economía, con un fuerte componente de maquinaria industrial y equipos eléctricos, podría ayudar a mitigar este efecto. La producción industrial y el PMI manufacturero también muestran signos de expansión, lo que podría apoyar la divisa.\n\nEl posicionamiento especulativo es ligeramente alcista, aunque no muy cargado, lo que reduce el riesgo de corrección. El rendimiento FX del último mes ha sido negativo, lo que sugiere que la divisa ha depreciado en relación con otras divisas. En general, el panorama para la divisa es complejo, con factores tanto alcistas como bajistas en juego, por lo que es difícil predecir su comportamiento a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:39:42.714103+00:00",
+  "generatedAt": "2026-02-24T23:48:36.962270+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "dataSnapshot": {
     "interestRate": 3.75,
@@ -15,11 +15,13 @@
     "rateMomentum": -0.69,
     "lastRateDecision": {
       "direction": "BAJÓ",
-      "delta": -0.08,
-      "current_rate": 3.64,
-      "prev_rate": 3.72,
-      "date": "2026-01-01",
-      "source": "FRED"
+      "delta": -0.25,
+      "current_rate": 3.75,
+      "prev_rate": 4.0,
+      "date": "2025-12-01",
+      "source": "rates_history",
+      "cycle_12m": -0.75,
+      "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 328,
     "fxPerformance1M": -0.4161,

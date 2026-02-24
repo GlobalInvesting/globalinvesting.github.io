@@ -2,9 +2,9 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo se caracteriza por una tasa de interés del 0.00%, lo que se encuentra por debajo del promedio global. Esto sugiere que la divisa suiza podría ser utilizada como financiadora de carry trade, lo que podría generar apreciación brusca en episodios de aversión al riesgo. Aunque la inflación se encuentra por debajo del objetivo, el crecimiento del PIB es inferior al promedio global, lo que podría influir en la decisión del banco central de mantener una política monetaria expansiva.\n\nLa balanza comercial y la cuenta corriente de Suiza muestran un superávit, lo que se debe en parte a la composición exportadora del país, que se centra en productos farmacéuticos, instrumentos de precisión y piedras preciosas. Esto genera una demanda estructural de la divisa, lo que podría influir en su valor. Sin embargo, el término de intercambio desfavorable y la contracción del PMI manufacturero podrían afectar negativamente las exportaciones y, por ende, la divisa.\n\nEl posicionamiento especulativo en la divisa suiza se encuentra muy cargado a la baja, con un COT de -40.9K contratos netos, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. El rendimiento FX del último mes ha sido negativo, lo que refleja la depreciación de la divisa frente al dólar estadounidense. Con todo, la combinación de un superávit de cuenta corriente, deuda contenida y tasa baja podría generar flujos defensivos hacia la divisa en momentos de tensión global.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global de 2.34%. Esto sugiere que la divisa puede ser utilizada como financiadora de carry trade, lo que podría presionar a la baja su valor en episodios de aversión al riesgo. Aunque la inflación es baja, el crecimiento del PIB es inferior al promedio global, lo que puede influir en la decisión del banco central de mantener una política monetaria expansiva.\n\nLa balanza comercial y la cuenta corriente presentan un superávit, lo que indica una demanda estructural de la divisa. Las principales exportaciones de Suiza, como productos farmacéuticos e instrumentos de precisión, contribuyen a este superávit. Sin embargo, el término de intercambio desfavorable puede encarecer las importaciones, lo que podría afectar la economía. La confianza del consumidor y la confianza empresarial son altas, lo que puede influir en la actividad económica.\n\nEl posicionamiento especulativo en el mercado es muy cargado a la baja, con un COT de -40.9K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. El rendimiento FX del último mes ha sido negativo, con una depreciación de -2.01% vs USD. Aunque la divisa puede ser considerada un activo refugio en momentos de tensión global, el menor carry y la política monetaria expansiva pueden presionar a la baja su valor en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:40:09.612496+00:00",
+  "generatedAt": "2026-02-24T23:49:03.749929+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
   "dataSnapshot": {
     "interestRate": 0.0,
@@ -14,12 +14,14 @@
     "currentAccount": 5.1,
     "rateMomentum": -0.5,
     "lastRateDecision": {
-      "direction": null,
-      "delta": null,
+      "direction": "BAJÓ",
+      "delta": -0.25,
       "current_rate": 0.0,
-      "prev_rate": null,
-      "date": "desconocida",
-      "source": "static"
+      "prev_rate": 0.25,
+      "date": "2025-06-01",
+      "source": "rates_history",
+      "cycle_12m": -0.25,
+      "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": -40900,
     "fxPerformance1M": -2.0063,
