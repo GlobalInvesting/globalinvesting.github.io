@@ -4,9 +4,9 @@ generate_ai_analysis.py
 Genera análisis fundamentales de divisas forex usando Groq API (gratuita).
 Modelo: llama-3.3-70b-versatile — sin SDK, solo requests.
 
-v2.2 — Composición exportadora obtenida en vivo desde UN Comtrade API.
+v2.3 — Prompt reescrito para redacción más natural y concisa en español.
+       Composición exportadora obtenida en vivo desde UN Comtrade API.
        Fallback a HS2 codes estáticos si la API no responde.
-       Sin hardcoding de narrativas: los datos determinan el análisis.
 """
 
 import os
@@ -32,28 +32,22 @@ COUNTRY_META = {
     'NZD': {'name': 'Nueva Zelanda',   'bank': 'Banco de la Reserva de Nueva Zelanda (RBNZ)'},
 }
 
-# ─── UN Comtrade reporter codes ───────────────────────────────────────────────
-# Estándar ISO 3166-1 numeric — no cambian, son códigos oficiales de la ONU
 COMTRADE_REPORTER_CODES = {
-    'AUD': '36',    # Australia
-    'CAD': '124',   # Canada
-    'NZD': '554',   # New Zealand
-    'CHF': '756',   # Switzerland
-    'USD': '842',   # United States
-    'EUR': '276',   # Germany como proxy de Eurozona (mayor exportador del bloque)
-    'GBP': '826',   # United Kingdom
-    'JPY': '392',   # Japan
+    'AUD': '36',
+    'CAD': '124',
+    'NZD': '554',
+    'CHF': '756',
+    'USD': '842',
+    'EUR': '276',
+    'GBP': '826',
+    'JPY': '392',
 }
 
-# ─── Traducción de códigos HS2 a español ──────────────────────────────────────
-# El Harmonized System (HS) es un estándar internacional — los códigos no cambian.
-# Esto traduce códigos objetivos a términos legibles. NO es una descripción
-# de qué exporta cada país — eso lo determina la API en tiempo real.
 HS2_NAMES_ES = {
     '01': 'animales vivos',
     '02': 'carne y despojos comestibles',
     '03': 'pescado y crustáceos',
-    '04': 'leche, productos lácteos y huevos',
+    '04': 'leche y productos lácteos',
     '05': 'otros productos de origen animal',
     '06': 'plantas vivas y floricultura',
     '07': 'hortalizas y tubérculos',
@@ -66,104 +60,99 @@ HS2_NAMES_ES = {
     '14': 'materias vegetales trenzables',
     '15': 'grasas y aceites animales o vegetales',
     '16': 'preparaciones de carne o pescado',
-    '17': 'azúcares y artículos de confitería',
+    '17': 'azúcares y confitería',
     '18': 'cacao y sus preparaciones',
     '19': 'preparaciones a base de cereales',
     '20': 'preparaciones de hortalizas o frutas',
     '21': 'preparaciones alimenticias diversas',
     '22': 'bebidas y líquidos alcohólicos',
     '23': 'residuos de industrias alimentarias',
-    '24': 'tabaco y sucedáneos',
-    '25': 'sal, azufre, piedras y cementos',
-    '26': 'minerales metalíferos y concentrados',
-    '27': 'combustibles minerales y petróleo',
+    '24': 'tabaco',
+    '25': 'sal, azufre y cementos',
+    '26': 'minerales metalíferos',
+    '27': 'combustibles y petróleo',
     '28': 'productos químicos inorgánicos',
     '29': 'productos químicos orgánicos',
     '30': 'productos farmacéuticos',
     '31': 'abonos',
-    '32': 'extractos curtientes y colorantes',
+    '32': 'colorantes y pigmentos',
     '33': 'aceites esenciales y perfumería',
-    '34': 'jabones y agentes de superficie',
-    '35': 'materias albuminoideas y almidones',
-    '36': 'pólvoras y explosivos',
-    '37': 'productos fotográficos y cinematográficos',
-    '38': 'productos diversos de industrias químicas',
-    '39': 'plásticos y manufacturas',
-    '40': 'caucho y manufacturas',
+    '34': 'jabones y detergentes',
+    '35': 'materias albuminoideas',
+    '36': 'explosivos',
+    '37': 'productos fotográficos',
+    '38': 'productos químicos diversos',
+    '39': 'plásticos',
+    '40': 'caucho',
     '41': 'pieles y cueros en bruto',
     '42': 'manufacturas de cuero',
-    '43': 'peletería y confecciones',
-    '44': 'madera y manufacturas de madera',
-    '45': 'corcho y manufacturas',
-    '46': 'manufacturas de cestería',
+    '43': 'peletería',
+    '44': 'madera y manufacturas',
+    '45': 'corcho',
+    '46': 'cestería',
     '47': 'pasta de madera y papel reciclado',
-    '48': 'papel, cartón y manufacturas',
-    '49': 'productos editoriales e impresos',
+    '48': 'papel y cartón',
+    '49': 'libros e impresos',
     '50': 'seda',
     '51': 'lana y pelo animal',
     '52': 'algodón',
-    '53': 'otras fibras textiles vegetales',
-    '54': 'filamentos sintéticos o artificiales',
-    '55': 'fibras sintéticas o artificiales discontinuas',
-    '56': 'guata, fieltro y artículos no tejidos',
-    '57': 'alfombras y revestimientos textiles',
+    '53': 'otras fibras textiles',
+    '54': 'filamentos sintéticos',
+    '55': 'fibras sintéticas discontinuas',
+    '56': 'guata y fieltro',
+    '57': 'alfombras',
     '58': 'tejidos especiales',
-    '59': 'tejidos impregnados o recubiertos',
+    '59': 'tejidos técnicos',
     '60': 'tejidos de punto',
-    '61': 'prendas y complementos de punto',
-    '62': 'prendas y complementos excepto de punto',
-    '63': 'demás artículos textiles confeccionados',
-    '64': 'calzado y partes',
-    '65': 'sombreros y tocados',
-    '66': 'paraguas y bastones',
-    '67': 'plumas preparadas y artículos',
-    '68': 'manufacturas de piedra y yeso',
-    '69': 'productos cerámicos',
-    '70': 'vidrio y manufacturas',
+    '61': 'prendas de punto',
+    '62': 'prendas excepto de punto',
+    '63': 'artículos textiles confeccionados',
+    '64': 'calzado',
+    '65': 'sombreros',
+    '66': 'paraguas',
+    '67': 'plumas y artículos',
+    '68': 'manufacturas de piedra',
+    '69': 'cerámica',
+    '70': 'vidrio',
     '71': 'piedras preciosas y metales',
-    '72': 'fundición, hierro y acero',
-    '73': 'manufacturas de fundición y acero',
-    '74': 'cobre y manufacturas',
-    '75': 'níquel y manufacturas',
-    '76': 'aluminio y manufacturas',
-    '77': 'reservado (futuro uso HS)',
-    '78': 'plomo y manufacturas',
-    '79': 'cinc y manufacturas',
-    '80': 'estaño y manufacturas',
-    '81': 'demás metales comunes',
-    '82': 'herramientas y cuchillería metálica',
-    '83': 'manufacturas diversas de metal común',
-    '84': 'maquinaria y equipos mecánicos',
-    '85': 'maquinaria eléctrica y electrónica',
-    '86': 'vehículos y material ferroviario',
-    '87': 'vehículos automóviles y partes',
-    '88': 'aeronaves y partes',
-    '89': 'barcos y embarcaciones',
-    '90': 'instrumentos de óptica y precisión',
-    '91': 'relojes y aparatos de relojería',
+    '72': 'hierro y acero',
+    '73': 'manufacturas de acero',
+    '74': 'cobre',
+    '75': 'níquel',
+    '76': 'aluminio',
+    '77': 'reservado HS',
+    '78': 'plomo',
+    '79': 'cinc',
+    '80': 'estaño',
+    '81': 'metales comunes diversos',
+    '82': 'herramientas metálicas',
+    '83': 'manufacturas de metal',
+    '84': 'maquinaria industrial',
+    '85': 'equipos eléctricos y electrónicos',
+    '86': 'material ferroviario',
+    '87': 'vehículos y autopartes',
+    '88': 'aeronaves',
+    '89': 'embarcaciones',
+    '90': 'instrumentos de precisión',
+    '91': 'relojería',
     '92': 'instrumentos musicales',
     '93': 'armas y municiones',
-    '94': 'muebles y artículos de cama',
-    '95': 'juguetes y artículos de deporte',
+    '94': 'muebles',
+    '95': 'juguetes y artículos deportivos',
     '96': 'manufacturas diversas',
-    '97': 'objetos de arte y antigüedades',
+    '97': 'obras de arte y antigüedades',
     '99': 'mercancías no clasificadas',
 }
 
-# ─── Fallback estático (HS2 codes, no narrativas) ─────────────────────────────
-# Solo se usa si la API de Comtrade falla completamente.
-# Son códigos objetivos del HS — si la composición exportadora cambia
-# significativamente, actualizar estos códigos (no el texto).
-# Fuente de referencia: OEC / UN Comtrade 2022-2023.
 EXPORT_FALLBACK_HS2 = {
-    'AUD': ['26', '27', '10', '12'],   # Minerales, combustibles, cereales, semillas
-    'CAD': ['27', '87', '84', '26'],   # Combustibles, vehículos, maquinaria, minerales
-    'NZD': ['04', '02', '10', '03'],   # Lácteos, carne, cereales, pescado
-    'CHF': ['30', '90', '71', '84'],   # Farmacéuticos, instrumentos, metales preciosos, maquinaria
-    'USD': ['84', '85', '88', '30'],   # Maquinaria, electrónica, aeronaves, farmacéuticos
-    'EUR': ['84', '87', '85', '30'],   # Maquinaria, vehículos, electrónica, farmacéuticos
-    'GBP': ['84', '30', '85', '88'],   # Maquinaria, farmacéuticos, electrónica, aeronaves
-    'JPY': ['87', '84', '85', '90'],   # Vehículos, maquinaria, electrónica, instrumentos
+    'AUD': ['26', '27', '10', '12'],
+    'CAD': ['27', '87', '84', '26'],
+    'NZD': ['04', '02', '10', '03'],
+    'CHF': ['30', '90', '71', '84'],
+    'USD': ['84', '85', '88', '30'],
+    'EUR': ['84', '87', '85', '30'],
+    'GBP': ['84', '30', '85', '88'],
+    'JPY': ['87', '84', '85', '90'],
 }
 
 GITHUB_BASE = 'https://globalinvesting.github.io'
@@ -171,51 +160,40 @@ OUTPUT_DIR  = Path('ai-analysis')
 GROQ_MODEL  = 'llama-3.3-70b-versatile'
 GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions'
 
-# Cache para no hacer múltiples requests a Comtrade en el mismo run
 _export_cache = {}
 
 
-# ─── SYSTEM PROMPT v2.2 ──────────────────────────────────────────────────────
-SYSTEM_PROMPT = """Eres un analista de forex institucional senior. Escribes research notes para traders profesionales.
+# ─── SYSTEM PROMPT v2.3 ──────────────────────────────────────────────────────
+SYSTEM_PROMPT = """Eres un analista de mercados cambiarios senior que escribe comentarios diarios para una mesa de trading. Tu estilo es el de un profesional hispanohablante nativo: directo, sin rodeos, con frases cortas y vocabulario preciso del mundo financiero.
 
-TAREA: Generar un análisis fundamental interpretativo de la divisa indicada, en español.
+TAREA: Redactar un análisis fundamental conciso sobre la divisa indicada.
 
-FORMATO:
-- Texto corrido, sin bullets, sin títulos, sin markdown
-- 3 párrafos separados por línea en blanco
-- Entre 130 y 170 palabras totales
+FORMATO OBLIGATORIO:
+- Texto corrido, sin títulos, sin viñetas, sin markdown
+- Exactamente 3 párrafos separados por línea en blanco
+- Entre 100 y 130 palabras en total
+- Cada párrafo: 2-3 oraciones como máximo
 
-ESTRUCTURA:
-1. Política monetaria e inflación: ¿Qué está haciendo el banco central y POR QUÉ?
-   REGLA ESTRICTA para el campo "Momentum de Tasas":
-   - Valor NEGATIVO = el BC está RECORTANDO tasas → ciclo dovish → presión bajista sobre la divisa
-   - Valor POSITIVO = el BC está SUBIENDO tasas → ciclo hawkish → presión alcista
-   - Valor cero o cercano a cero = pausa. No inviertas esta lógica bajo ninguna circunstancia.
-   Compara la tasa actual vs el promedio global del contexto.
+ESTRUCTURA DE LOS PÁRRAFOS:
+1. Política monetaria: ¿Qué está haciendo el banco central y por qué? Menciona si está subiendo, bajando o pausando tasas, y qué dato lo justifica (inflación, crecimiento).
+2. Macroeconomía: interpreta el PIB, el empleo y la balanza exterior. Si tienes la composición exportadora verificada, úsala para explicar el origen del superávit o déficit.
+3. Mercado: ¿Qué dicen el COT y el rendimiento del último mes? ¿Hay convergencia o divergencia entre posicionamiento y precio? Cierra con perspectivas breves.
 
-2. Fundamentos macroeconómicos: interpreta el PIB, empleo y balanza exterior.
-   Si el input incluye "Composición exportadora (Comtrade)", úsala para afirmar con precisión
-   qué sectores impulsan el superávit o déficit comercial. No especules sobre el sector exportador
-   si no tienes el dato — solo afirma lo que el dato confirma.
-   Usa las "Señales estructurales inferidas" para enriquecer el contexto.
+REGLAS DE REDACCIÓN:
+- Escribe como lo haría un español o latinoamericano nativo, no como una traducción del inglés
+- Evita construcciones calcadas del inglés: "esto se debe a que", "lo que sugiere que", "en un contexto donde"
+- Usa conectores naturales: "así", "de ahí que", "por eso", "con todo", "aunque", "si bien"
+- Varía la estructura de las oraciones; no empieces tres seguidas con el mismo sujeto
+- Nada de frases genéricas del tipo "la perspectiva a corto plazo dependerá de..."
 
-3. Sentimiento e impulso de mercado: interpreta el COT (¿qué dice el posicionamiento institucional?)
-   y el rendimiento FX del último mes (¿por qué se movió así?). Cierra con perspectivas a corto plazo.
-
-REGLAS CRÍTICAS:
-- INTERPRETA, no listes. El objetivo es explicar POR QUÉ los datos importan, no solo QUÉ dicen.
-- Usa el "Contexto global" para hacer comparaciones relativas concretas.
-- Si el COT supera ±30K contratos, señala el riesgo de saturación/reversión o la convicción institucional.
-- Si el FX 1M supera ±3%, explica el catalizador probable (carry, commodities, risk-on/off, diferencial de tasas).
-- El campo "PIB Total" es el tamaño de la economía en trillones USD — NO es la tasa de crecimiento.
-- La tasa de crecimiento del PIB es el campo "Crecimiento PIB (% anual)".
-- Para USD: el "Rendimiento FX 1M" refleja el índice dólar (DXY) — redáctalo como "el índice dólar subió/cayó X%".
-- Si un indicador no tiene dato, NO lo menciones ni lo infieras desde otros indicadores.
-  EJEMPLOS DE ERRORES A EVITAR:
-  · Si no hay dato de Balanza Comercial, NO inferir déficit/superávit desde la Cuenta Corriente.
-  · Si no hay dato de exposición a commodities, NO inferirla desde el contexto de otras divisas.
-  · El signo del Rendimiento FX ya viene interpretado en el dato — NO lo inviertas.
-- Tono: directo, analítico, como un research note de Goldman Sachs o JP Morgan. Sin saludos ni meta-comentarios."""
+REGLAS SOBRE LOS DATOS:
+- Momentum de tasas NEGATIVO = el banco central está RECORTANDO → ciclo expansivo → presión bajista sobre la divisa
+- Momentum de tasas POSITIVO = el banco central está SUBIENDO → ciclo restrictivo → presión alcista
+- COT > +30K contratos: posicionamiento muy estirado al alza; riesgo de corrección
+- COT < -30K contratos: posicionamiento muy estirado a la baja; potencial rebote contrario
+- Si un indicador no tiene dato, ignóralo completamente; no lo menciones ni lo infieras
+- El campo "Rendimiento FX 1M" ya tiene el signo correcto; no lo inviertas
+- Para USD: el rendimiento FX refleja el dólar índice (DXY)"""
 
 
 def fetch_json(url, timeout=8):
@@ -229,14 +207,6 @@ def fetch_json(url, timeout=8):
 
 
 def fetch_export_composition(currency):
-    """
-    Obtiene la composición exportadora del país desde UN Comtrade API pública.
-    Devuelve una string descriptiva con los top sectores exportadores.
-    Si la API falla, usa el fallback de HS2 codes estáticos.
-    
-    Fuente: UN Comtrade Public Preview API (sin autenticación, gratuita).
-    Datos: último año disponible (generalmente 2022-2023).
-    """
     if currency in _export_cache:
         return _export_cache[currency]
 
@@ -245,10 +215,6 @@ def fetch_export_composition(currency):
         return None
 
     def _parse_comtrade_response(data, year_label):
-        """
-        Parsea la respuesta de Comtrade.
-        La API pública devuelve HS6 (6 dígitos) — truncamos a HS2 y agregamos por capítulo.
-        """
         commodities = data.get('data', [])
         if not commodities:
             if isinstance(data, list):
@@ -270,7 +236,6 @@ def fetch_export_composition(currency):
         if not code_field or not value_field:
             return None
 
-        # Agregar valores por capítulo HS2 (primeros 2 dígitos del código HS4/HS6)
         hs2_totals = {}
         for c in commodities:
             code_raw = str(c.get(code_field, '')).strip()
@@ -295,10 +260,9 @@ def fetch_export_composition(currency):
             sectors.append(f"{name} ({pct:.0f}%, ${value_b:.1f}B)")
 
         if sectors:
-            return f"Top exportaciones — Comtrade {year_label}: {', '.join(sectors)}"
+            return f"Comtrade {year_label}: {', '.join(sectors)}"
         return None
 
-    # ── Intento: Comtrade sin cmdCode, año 2023 luego 2022 ───────────────────
     for year in ['2023', '2022']:
         try:
             url = (
@@ -324,11 +288,10 @@ def fetch_export_composition(currency):
             print(f"  ⚠️  Comtrade {year} error para {currency}: {e}")
         time.sleep(2)
 
-    # ── Fallback: HS2 codes estáticos ─────────────────────────────────────
     fallback_codes = EXPORT_FALLBACK_HS2.get(currency, [])
     if fallback_codes:
         sectors = [HS2_NAMES_ES.get(code, f'HS{code}') for code in fallback_codes[:3]]
-        result = f"Top exportaciones {currency}: {', '.join(sectors)}"
+        result = f"Principales exportaciones: {', '.join(sectors)}"
         print(f"  📦 Fallback para {currency}: {result}")
         _export_cache[currency] = result
         return result
@@ -392,7 +355,6 @@ def load_economic_data(currency):
 
 
 def compute_global_context(all_data):
-    """Calcula promedios globales entre las 8 divisas para comparaciones relativas."""
     def avg(key):
         values = [d[key] for d in all_data.values() if d.get(key) is not None]
         return round(sum(values) / len(values), 2) if values else None
@@ -409,128 +371,94 @@ def compute_global_context(all_data):
 
 
 def infer_structural_signals(currency, data, global_context):
-    """
-    Genera señales estructurales inferidas 100% desde los datos actuales.
-    Sin hardcoding de narrativas: los datos determinan las señales.
-    """
     signals = []
-    avg_rate = global_context.get('avg_interest_rate') or 3.0
+    avg_rate  = global_context.get('avg_interest_rate') or 3.0
+    avg_cot   = global_context.get('avg_cot') or 0
 
-    rate         = data.get('interestRate')
+    rate          = data.get('interestRate')
     rate_momentum = data.get('rateMomentum')
     current_account = data.get('currentAccount')
     trade_balance = data.get('tradeBalance')
-    debt         = data.get('debt')
-    cot          = data.get('cotPositioning')
-    fx_1m        = data.get('fxPerformance1M')
+    debt          = data.get('debt')
+    cot           = data.get('cotPositioning')
+    fx_1m         = data.get('fxPerformance1M')
     terms_of_trade = data.get('termsOfTrade')
-    avg_cot      = global_context.get('avg_cot') or 0
 
-    # ── Carry trade / safe haven por diferencial de tasas ─────────────────
     if rate is not None and avg_rate is not None:
         rate_gap = avg_rate - rate
         if rate_gap >= 1.5:
             signals.append(
-                f"Tasa muy por debajo del promedio global ({rate:.2f}% vs {avg_rate:.2f}% promedio): "
+                f"Tasa muy por debajo del promedio global ({rate:.2f}% vs {avg_rate:.2f}%): "
                 f"divisa probable financiadora de carry trade. "
-                f"Su apreciación en episodios de risk-off puede ser brusca por desmantelamiento de posiciones cortas."
+                f"En episodios de aversión al riesgo puede apreciarse bruscamente por el cierre de posiciones cortas."
             )
         elif rate - avg_rate >= 1.5:
             signals.append(
-                f"Tasa significativamente superior al promedio global ({rate:.2f}% vs {avg_rate:.2f}% promedio): "
-                f"la divisa ofrece carry atractivo y puede captar flujos de inversión de renta fija internacional."
+                f"Tasa significativamente superior al promedio global ({rate:.2f}% vs {avg_rate:.2f}%): "
+                f"carry atractivo para inversores de renta fija internacional."
             )
 
-    # ── Ciclo del banco central ────────────────────────────────────────────
     if rate_momentum is not None:
         if rate_momentum > 0.5:
             signals.append(
-                f"Momentum de tasas positivo ({rate_momentum:+.2f}% en 12 meses): "
-                f"banco central en ciclo de normalización — structuralmente alcista para la divisa."
+                f"El banco central lleva subiendo tasas {rate_momentum:+.2f}pp en 12 meses: ciclo restrictivo activo, structuralmente alcista para la divisa."
             )
         elif rate_momentum < -0.5:
             signals.append(
-                f"Momentum de tasas negativo ({rate_momentum:+.2f}% en 12 meses): "
-                f"banco central recortando activamente — presiona a la baja la divisa vía reducción del carry."
+                f"El banco central lleva recortando {rate_momentum:+.2f}pp en 12 meses: ciclo expansivo, el menor carry presiona a la baja la divisa."
             )
 
-    # ── Safe haven por balance exterior + deuda baja ──────────────────────
     ca_surplus = current_account is not None and current_account > 2.0
     low_debt   = debt is not None and debt < 60
     low_rate   = rate is not None and avg_rate is not None and (avg_rate - rate) >= 1.5
 
     if ca_surplus and low_debt and low_rate:
         signals.append(
-            f"Perfil safe haven detectado: superávit de cuenta corriente ({current_account:.1f}% PIB), "
-            f"deuda baja ({debt:.0f}% PIB) y tasa por debajo del promedio global. "
-            f"Esta combinación genera demanda defensiva de la divisa en episodios de aversión al riesgo."
+            f"Perfil de activo refugio: superávit de cuenta corriente ({current_account:.1f}% del PIB), "
+            f"deuda contenida ({debt:.0f}% del PIB) y tasa baja. "
+            f"En momentos de tensión global esta combinación genera flujos defensivos hacia la divisa."
         )
     elif ca_surplus and low_debt:
         signals.append(
-            f"Superávit de cuenta corriente ({current_account:.1f}% PIB) y deuda controlada ({debt:.0f}% PIB): "
-            f"balance exterior sólido que genera demanda estructural de la divisa."
+            f"Balance exterior sólido: superávit de cuenta corriente ({current_account:.1f}% del PIB) y deuda controlada ({debt:.0f}% del PIB)."
         )
 
-    # ── Balance comercial + términos de intercambio ───────────────────────
-    # NOTA: Si fetch_export_composition() tuvo éxito, el modelo ya tiene el dato
-    # concreto de qué sectores exporta el país — estas señales son complementarias.
     if trade_balance is not None and terms_of_trade is not None:
         if trade_balance > 2000 and terms_of_trade > 100:
             signals.append(
-                f"Superávit comercial de {trade_balance/1000:.1f}B USD/mes con términos de intercambio "
-                f"favorables (índice {terms_of_trade:.1f} sobre base 100): "
-                f"los precios de exportación superan a los de importación, lo que amplifica "
-                f"el beneficio del superávit y genera demanda adicional de la divisa."
+                f"Superávit comercial de {trade_balance/1000:.1f}B USD/mes con términos de intercambio favorables (índice {terms_of_trade:.1f}): "
+                f"los precios de exportación superan a los de importación, lo que amplía el excedente."
             )
         elif trade_balance < -15000:
             signals.append(
-                f"Déficit comercial pronunciado ({trade_balance/1000:.1f}B USD/mes): "
-                f"presión vendedora estructural sobre la divisa compensada por flujos financieros."
+                f"Déficit comercial pronunciado ({trade_balance/1000:.1f}B USD/mes): presión vendedora estructural sobre la divisa."
             )
-    elif trade_balance is not None and trade_balance > 2000:
-        signals.append(
-            f"Superávit comercial de {trade_balance/1000:.1f}B USD/mes: "
-            f"genera demanda estructural de la divisa por conversión de ingresos de exportación."
-        )
 
-    # ── COT extremo ────────────────────────────────────────────────────────
     if cot is not None:
         if cot > 30000:
             signals.append(
-                f"Posicionamiento especulativo alcista extremo ({cot/1000:.0f}K contratos netos): "
-                f"mercado saturado — riesgo elevado de toma de ganancias si los datos decepcionan."
+                f"COT muy estirado al alza ({cot/1000:.0f}K contratos): el mercado está saturado de largos; cualquier decepción en los datos puede provocar una corrección rápida."
             )
         elif cot < -30000:
             signals.append(
-                f"Posicionamiento especulativo bajista extremo ({cot/1000:.0f}K contratos netos): "
-                f"mercado muy corto — potencial rebote contrarian si los fundamentales mejoran."
+                f"COT muy estirado a la baja ({cot/1000:.0f}K contratos): mercado con posición corta extrema; potencial rebote contrario si los datos mejoran."
             )
 
-    # ── Divergencia COT vs FX ──────────────────────────────────────────────
     if cot is not None and fx_1m is not None:
         if cot < -20000 and fx_1m > 2.5:
             signals.append(
-                f"Divergencia: posicionamiento bajista ({cot/1000:.0f}K) pero apreciación del {fx_1m:.1f}% "
-                f"en el último mes — posible squeeze de cortos en curso."
+                f"Divergencia relevante: posicionamiento bajista ({cot/1000:.0f}K) pero la divisa se apreció {fx_1m:.1f}% el último mes — posible squeeze de cortos."
             )
         elif cot > 20000 and fx_1m < -2.0:
             signals.append(
-                f"Divergencia: posicionamiento alcista ({cot/1000:.0f}K) pero depreciación del {fx_1m:.1f}% "
-                f"— posible inicio de liquidación de largos."
+                f"Divergencia relevante: posicionamiento alcista ({cot/1000:.0f}K) pero la divisa cayó {abs(fx_1m):.1f}% el último mes — posible inicio de cierre de largos."
             )
 
-    # ── Régimen global ─────────────────────────────────────────────────────
     if avg_cot is not None:
         if avg_cot > 8000:
-            signals.append(
-                "Régimen global: risk-on (COT promedio positivo entre las 8 divisas). "
-                "Divisas de alto carry y commodities tienden a outperform."
-            )
+            signals.append("Régimen global risk-on: el apetito por riesgo favorece divisas de alto carry y exportadoras de materias primas.")
         elif avg_cot < -8000:
-            signals.append(
-                "Régimen global: risk-off (COT promedio negativo entre las 8 divisas). "
-                "Divisas safe haven y de bajo carry tienden a apreciarse."
-            )
+            signals.append("Régimen global risk-off: los flujos se dirigen hacia activos refugio.")
 
     return signals
 
@@ -551,60 +479,48 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
         f"DIVISA: {currency} — {meta['name']}",
         f"BANCO CENTRAL: {meta['bank']}",
         "",
-        "INDICADORES ECONÓMICOS ACTUALES:",
+        "INDICADORES:",
     ]
 
     indicators = [
-        ('gdp',                  'PIB Total',
-         lambda v: fmt(v, 2, ' T USD')),
         ('gdpGrowth',            'Crecimiento PIB',
          lambda v: fmt(v, 1, '% anual')),
-        ('interestRate',         'Tasa de Interés',
+        ('interestRate',         'Tasa de interés',
          lambda v: fmt(v, 2, '%')),
-        ('rateMomentum',         'Momentum de Tasas (cambio 12M)',
+        ('rateMomentum',         'Momentum de tasas (12M)',
          lambda v: fmt(v, 2, '% — NEGATIVO=recortando, POSITIVO=subiendo')),
-        ('inflation',            'Inflación (IPC)',
+        ('inflation',            'Inflación',
          lambda v: fmt(v, 1, '% anual')),
-        ('inflationExpectations', 'Expect. Inflación',
-         lambda v: fmt(v, 1, '%')),
         ('unemployment',         'Desempleo',
          lambda v: fmt(v, 1, '%')),
-        ('currentAccount',       'Cuenta Corriente (% PIB)',
+        ('currentAccount',       'Cuenta corriente',
          lambda v: (
-             f"{v:.1f}% PIB — {'SUPERÁVIT' if v > 0 else 'DÉFICIT'} "
-             f"(≠ balanza comercial; incluye servicios, rentas y transferencias)"
+             f"{v:.1f}% del PIB ({'superávit' if v > 0 else 'déficit'})"
          ) if v is not None else None),
-        ('debt',                 'Deuda Pública',
-         lambda v: fmt(v, 1, '% PIB')),
-        ('tradeBalance',         'Balanza Comercial (bienes)',
+        ('tradeBalance',         'Balanza comercial (bienes)',
          lambda v: (
-             f"{v/1000:.1f}B USD/mes — {'SUPERÁVIT' if v > 0 else 'DÉFICIT'} comercial en bienes"
+             f"{v/1000:.1f}B USD/mes ({'superávit' if v > 0 else 'déficit'})"
          ) if v is not None else None),
-        ('production',           'Producción Industrial',
-         lambda v: fmt(v, 1, '% MoM')),
-        ('retailSales',          'Ventas Minoristas',
-         lambda v: fmt(v, 1, '% MoM')),
-        ('wageGrowth',           'Crecimiento Salarial',
-         lambda v: fmt(v, 1, '% anual')),
-        ('manufacturingPMI',     'PMI Manufacturero',
-         lambda v: fmt(v, 1, ' (>50=expansión, <50=contracción)')),
-        ('termsOfTrade',         'Términos de Intercambio',
-         lambda v: fmt(v, 1, ' (base 100, >100=precios exportación > importación)')),
-        ('cotPositioning',       'COT Positioning',
-         lambda v: fmt(v / 1000, 1, 'K contratos netos (positivo=alcista, negativo=bajista)') if v else None),
-        ('bond10y',              'Yield Bono 10Y',
+        ('debt',                 'Deuda pública',
+         lambda v: fmt(v, 1, '% del PIB')),
+        ('manufacturingPMI',     'PMI manufacturero',
+         lambda v: fmt(v, 1, ' (>50 = expansión)')),
+        ('termsOfTrade',         'Términos de intercambio',
+         lambda v: fmt(v, 1, ' (base 100)')),
+        ('cotPositioning',       'COT (posicionamiento especulativo)',
+         lambda v: (
+             f"{v/1000:+.1f}K contratos netos ({'alcista' if v > 0 else 'bajista'})"
+         ) if v is not None else None),
+        ('bond10y',              'Yield bono 10Y',
          lambda v: fmt(v, 2, '%')),
-        ('consumerConfidence',   'Confianza Consumidor',
-         lambda v: fmt(v, 1, ' (base 100)')),
-        ('businessConfidence',   'Confianza Empresarial',
-         lambda v: fmt(v, 1, ' (base 100)')),
-        ('capitalFlows',         'Flujos de Capital',
-         lambda v: fmt(v / 1000, 1, 'B USD (positivo=entrada, negativo=salida)') if v else None),
-        ('fxPerformance1M',      'Rendimiento FX 1M',
+        ('fxPerformance1M',      'Rendimiento FX último mes',
          lambda v: (
-             f"{v:+.2f}% vs USD — {'APRECIACIÓN' if v > 0 else 'DEPRECIACIÓN'} "
-             f"({'divisa se fortaleció' if v > 0 else 'divisa se debilitó'} frente al USD)"
+             f"{v:+.2f}% vs USD ({'apreciación' if v > 0 else 'depreciación'})"
          ) if v is not None else None),
+        ('inflationExpectations', 'Expectativas de inflación',
+         lambda v: fmt(v, 1, '%')),
+        ('wageGrowth',           'Crecimiento salarial',
+         lambda v: fmt(v, 1, '% anual')),
     ]
 
     available = 0
@@ -616,40 +532,33 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
                 lines.append(f"  • {label}: {formatted}")
                 available += 1
 
-    lines.append(f"\n[{available} indicadores disponibles de 21]")
+    lines.append(f"\n[{available} indicadores disponibles]")
     if data.get('lastUpdate'):
-        lines.append(f"[Datos actualizados: {str(data['lastUpdate'])[:10]}]")
+        lines.append(f"[Datos a: {str(data['lastUpdate'])[:10]}]")
 
-    # ── Composición exportadora (dato en vivo de Comtrade) ─────────────────
     if export_composition:
         lines.append("")
-        lines.append("COMPOSICIÓN EXPORTADORA (dato verificado):")
-        lines.append(f"  • {export_composition}")
-        lines.append("  (Usa este dato para afirmar con precisión qué sectores impulsan el balance comercial)")
+        lines.append(f"COMPOSICIÓN EXPORTADORA: {export_composition}")
 
-    # ── Contexto global ────────────────────────────────────────────────────
     if global_context:
         lines.append("")
-        lines.append("CONTEXTO GLOBAL (promedio de las 8 divisas principales):")
+        lines.append("PROMEDIOS GLOBALES (8 divisas principales):")
         mappings = [
-            ('avg_interest_rate', 'Tasa de interés promedio', 2, '%'),
-            ('avg_gdp_growth',    'Crecimiento PIB promedio', 1, '% anual'),
-            ('avg_inflation',     'Inflación promedio',       1, '%'),
-            ('avg_unemployment',  'Desempleo promedio',       1, '%'),
-            ('avg_bond10y',       'Yield bono 10Y promedio',  2, '%'),
-            ('avg_fx_perf_1m',    'Rendimiento FX 1M promedio', 2, '%'),
+            ('avg_interest_rate', 'Tasa', 2, '%'),
+            ('avg_gdp_growth',    'PIB', 1, '% anual'),
+            ('avg_inflation',     'Inflación', 1, '%'),
+            ('avg_fx_perf_1m',    'FX 1M', 2, '%'),
         ]
         for key, label, decimals, suffix in mappings:
             val = global_context.get(key)
             if val is not None:
                 lines.append(f"  • {label}: {val:.{decimals}f}{suffix}")
 
-    # ── Señales estructurales inferidas ────────────────────────────────────
     if global_context:
         signals = infer_structural_signals(currency, data, global_context)
         if signals:
             lines.append("")
-            lines.append("SEÑALES ESTRUCTURALES INFERIDAS DESDE LOS DATOS:")
+            lines.append("SEÑALES ESTRUCTURALES:")
             for signal in signals:
                 lines.append(f"  → {signal}")
 
@@ -666,15 +575,14 @@ def call_groq_api(api_key, data_summary, currency):
                 "content": (
                     f"{data_summary}\n\n"
                     f"---\n\n"
-                    f"Genera el análisis fundamental para {currency}. "
-                    f"PROHIBIDO listar datos. OBLIGATORIO explicar causas y consecuencias. "
-                    f"Si tienes composición exportadora verificada, úsala para afirmar, no especular. "
-                    f"Usa las señales estructurales y el contexto global para contextualizar cada punto:"
+                    f"Redacta el análisis para {currency}. "
+                    f"Recuerda: 3 párrafos, 100-130 palabras en total, español natural y directo. "
+                    f"Interpreta causas y consecuencias; no te limites a listar cifras."
                 ),
             },
         ],
-        "max_tokens": 600,
-        "temperature": 0.4,
+        "max_tokens": 500,
+        "temperature": 0.45,
         "top_p": 0.85,
     }
     response = requests.post(
@@ -710,7 +618,7 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
             word_count = len(text.split())
             if word_count < 60:
-                raise ValueError(f"Respuesta corta: {word_count} palabras")
+                raise ValueError(f"Respuesta demasiado corta: {word_count} palabras")
 
             print(f"  ✅ {word_count} palabras generadas")
             return text
@@ -742,7 +650,7 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
 def main():
     print("=" * 60)
-    print(f"🤖 Generador AI v2.2 — {GROQ_MODEL} via Groq API")
+    print(f"🤖 Generador AI v2.3 — {GROQ_MODEL} via Groq API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
@@ -771,8 +679,7 @@ def main():
 
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    # ── Paso 1: cargar todos los datos económicos ──────────────────────────
-    print("📥 Cargando datos económicos de las 8 divisas...")
+    print("📥 Cargando datos económicos...")
     all_data = {}
     for currency in CURRENCIES:
         print(f"  • {currency}...", end=' ', flush=True)
@@ -787,7 +694,6 @@ def main():
             print(f"   {k}: {v}")
     print()
 
-    # ── Paso 2: obtener composición exportadora (Comtrade) ─────────────────
     print("📦 Obteniendo composición exportadora (UN Comtrade)...")
     export_compositions = {}
     for currency in CURRENCIES:
@@ -798,7 +704,6 @@ def main():
             print("sin dato")
     print()
 
-    # ── Paso 3: generar análisis ───────────────────────────────────────────
     results = {}
     errors  = []
 
@@ -868,7 +773,6 @@ def main():
             errors.append(f"{currency}: {str(e)}")
             results[currency] = {"success": False, "error": str(e)}
 
-    # ── Índice general ─────────────────────────────────────────────────────
     successful = [c for c, r in results.items() if r.get('success')]
     comtrade_count = sum(
         1 for r in results.values()
@@ -878,7 +782,7 @@ def main():
     index = {
         "generatedAt":      datetime.now(timezone.utc).isoformat(),
         "model":            GROQ_MODEL,
-        "version":          "2.2",
+        "version":          "2.3",
         "currencies":       successful,
         "totalGenerated":   len(successful),
         "comtradeHits":     comtrade_count,
