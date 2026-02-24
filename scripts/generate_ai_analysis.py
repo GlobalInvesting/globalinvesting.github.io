@@ -4,7 +4,8 @@ generate_ai_analysis.py
 Genera análisis fundamentales de divisas forex usando Groq API (gratuita).
 Modelo: llama-3.3-70b-versatile — sin SDK, solo requests.
 
-v2.3 — Prompt reescrito para redacción más natural y concisa en español.
+v2.4 — Prompt reescrito para análisis narrativos y fluidos en español.
+       Contexto enriquecido con comparaciones relativas para guiar la narrativa.
        Composición exportadora obtenida en vivo desde UN Comtrade API.
        Fallback a HS2 codes estáticos si la API no responde.
 """
@@ -163,37 +164,40 @@ GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions'
 _export_cache = {}
 
 
-# ─── SYSTEM PROMPT v2.3 ──────────────────────────────────────────────────────
-SYSTEM_PROMPT = """Eres un analista de mercados cambiarios senior que escribe comentarios diarios para una mesa de trading. Tu estilo es el de un profesional hispanohablante nativo: directo, sin rodeos, con frases cortas y vocabulario preciso del mundo financiero.
+# ─── SYSTEM PROMPT v2.4 ──────────────────────────────────────────────────────
+SYSTEM_PROMPT = """Eres un analista de mercados de divisas senior que redacta comentarios de mercado para una plataforma de trading profesional. Escribes en español de forma nativa, fluida y analítica — como un profesional de habla hispana que lleva años cubriendo los mercados cambiarios, no como alguien que traduce del inglés.
 
-TAREA: Redactar un análisis fundamental conciso sobre la divisa indicada.
+TAREA: Redactar un análisis fundamental de la divisa indicada a partir de los datos económicos proporcionados.
 
 FORMATO OBLIGATORIO:
-- Texto corrido, sin títulos, sin viñetas, sin markdown
+- Texto corrido, sin títulos, sin viñetas, sin markdown, sin negrita
 - Exactamente 3 párrafos separados por línea en blanco
-- Entre 100 y 130 palabras en total
-- Cada párrafo: 2-3 oraciones como máximo
+- Entre 150 y 200 palabras en total
+- Los párrafos deben tener longitud similar; ninguno puede ser de una sola oración
 
-ESTRUCTURA DE LOS PÁRRAFOS:
-1. Política monetaria: ¿Qué está haciendo el banco central y por qué? Menciona si está subiendo, bajando o pausando tasas, y qué dato lo justifica (inflación, crecimiento).
-2. Macroeconomía: interpreta el PIB, el empleo y la balanza exterior. Si tienes la composición exportadora verificada, úsala para explicar el origen del superávit o déficit.
-3. Mercado: ¿Qué dicen el COT y el rendimiento del último mes? ¿Hay convergencia o divergencia entre posicionamiento y precio? Cierra con perspectivas breves.
+ESTRUCTURA NARRATIVA:
+Párrafo 1 — Política monetaria y contexto macro: explica qué está haciendo el banco central, por qué, y cómo encaja con los datos de inflación y crecimiento. Compara la tasa con el promedio global si es relevante. No te limites a describir el dato; interpreta qué significa para la divisa.
 
-REGLAS DE REDACCIÓN:
-- Escribe como lo haría un español o latinoamericano nativo, no como una traducción del inglés
-- Evita construcciones calcadas del inglés: "esto se debe a que", "lo que sugiere que", "en un contexto donde"
-- Usa conectores naturales: "así", "de ahí que", "por eso", "con todo", "aunque", "si bien"
-- Varía la estructura de las oraciones; no empieces tres seguidas con el mismo sujeto
-- Nada de frases genéricas del tipo "la perspectiva a corto plazo dependerá de..."
+Párrafo 2 — Fundamentos externos y sectoriales: analiza la balanza comercial y la cuenta corriente. Si tienes la composición exportadora, úsala para explicar de dónde viene el superávit o déficit y qué factores externos (precios de commodities, demanda global, ciclo de inversión) influyen. Conecta los datos con las perspectivas del sector.
 
-REGLAS SOBRE LOS DATOS:
-- Momentum de tasas NEGATIVO = el banco central está RECORTANDO → ciclo expansivo → presión bajista sobre la divisa
-- Momentum de tasas POSITIVO = el banco central está SUBIENDO → ciclo restrictivo → presión alcista
-- COT > +30K contratos: posicionamiento muy estirado al alza; riesgo de corrección
-- COT < -30K contratos: posicionamiento muy estirado a la baja; potencial rebote contrario
-- Si un indicador no tiene dato, ignóralo completamente; no lo menciones ni lo infieras
-- El campo "Rendimiento FX 1M" ya tiene el signo correcto; no lo inviertas
-- Para USD: el rendimiento FX refleja el dólar índice (DXY)"""
+Párrafo 3 — Posicionamiento de mercado y perspectivas: interpreta el COT y el rendimiento FX del último mes. ¿El precio confirma o contradice el posicionamiento especulativo? ¿Hay riesgo de squeeze, corrección o continuación de tendencia? Cierra con una valoración equilibrada del panorama a corto plazo, mencionando los principales catalizadores o riesgos.
+
+ESTILO Y REDACCIÓN:
+- Escribe con fluidez narrativa: conecta ideas con "aunque", "de ahí que", "sin embargo", "así", "con todo", "por eso", "si bien", "en cambio"
+- Varía la longitud y estructura de las oraciones para evitar monotonía
+- Evita estructuras calcadas del inglés: "esto se debe a que", "lo que sugiere que", "en un contexto de", "en un entorno donde"
+- Prohibido usar frases vacías: "la perspectiva dependerá de los datos", "el mercado estará atento a", "sigue siendo clave"
+- No repitas el nombre de la divisa más de dos veces por párrafo; usa pronombres o referencias indirectas
+
+INTERPRETACIÓN DE DATOS — REGLAS ESTRICTAS:
+- Momentum de tasas NEGATIVO = banco central está RECORTANDO → presión bajista sobre la divisa por menor carry
+- Momentum de tasas POSITIVO = banco central está SUBIENDO → presión alcista por mayor carry diferencial
+- COT > +30K contratos netos: posicionamiento muy cargado al alza; menciona el riesgo de corrección ante cualquier decepción
+- COT < -30K contratos netos: posicionamiento muy cargado a la baja; señala el potencial rebote contrario
+- Si un indicador no tiene dato, ignóralo por completo; no lo menciones ni lo infieras desde otros datos
+- El signo del "Rendimiento FX 1M" ya está calculado correctamente; no lo inviertas nunca
+- Para USD: el rendimiento FX 1M refleja el comportamiento del dólar índice (DXY)
+- El campo "PIB Total" es el tamaño absoluto de la economía en trillones USD, no la tasa de crecimiento"""
 
 
 def fetch_json(url, timeout=8):
@@ -474,80 +478,137 @@ def fmt(value, decimals=1, suffix=''):
 
 def build_data_summary(currency, data, global_context=None, export_composition=None):
     meta = COUNTRY_META[currency]
+    avg_rate = (global_context or {}).get('avg_interest_rate') or 3.0
+    avg_fx   = (global_context or {}).get('avg_fx_perf_1m') or 0.0
 
     lines = [
         f"DIVISA: {currency} — {meta['name']}",
         f"BANCO CENTRAL: {meta['bank']}",
         "",
-        "INDICADORES:",
+        "INDICADORES ECONÓMICOS:",
     ]
 
-    indicators = [
-        ('gdpGrowth',            'Crecimiento PIB',
-         lambda v: fmt(v, 1, '% anual')),
-        ('interestRate',         'Tasa de interés',
-         lambda v: fmt(v, 2, '%')),
-        ('rateMomentum',         'Momentum de tasas (12M)',
-         lambda v: fmt(v, 2, '% — NEGATIVO=recortando, POSITIVO=subiendo')),
-        ('inflation',            'Inflación',
-         lambda v: fmt(v, 1, '% anual')),
-        ('unemployment',         'Desempleo',
-         lambda v: fmt(v, 1, '%')),
-        ('currentAccount',       'Cuenta corriente',
-         lambda v: (
-             f"{v:.1f}% del PIB ({'superávit' if v > 0 else 'déficit'})"
-         ) if v is not None else None),
-        ('tradeBalance',         'Balanza comercial (bienes)',
-         lambda v: (
-             f"{v/1000:.1f}B USD/mes ({'superávit' if v > 0 else 'déficit'})"
-         ) if v is not None else None),
-        ('debt',                 'Deuda pública',
-         lambda v: fmt(v, 1, '% del PIB')),
-        ('manufacturingPMI',     'PMI manufacturero',
-         lambda v: fmt(v, 1, ' (>50 = expansión)')),
-        ('termsOfTrade',         'Términos de intercambio',
-         lambda v: fmt(v, 1, ' (base 100)')),
-        ('cotPositioning',       'COT (posicionamiento especulativo)',
-         lambda v: (
-             f"{v/1000:+.1f}K contratos netos ({'alcista' if v > 0 else 'bajista'})"
-         ) if v is not None else None),
-        ('bond10y',              'Yield bono 10Y',
-         lambda v: fmt(v, 2, '%')),
-        ('fxPerformance1M',      'Rendimiento FX último mes',
-         lambda v: (
-             f"{v:+.2f}% vs USD ({'apreciación' if v > 0 else 'depreciación'})"
-         ) if v is not None else None),
-        ('inflationExpectations', 'Expectativas de inflación',
-         lambda v: fmt(v, 1, '%')),
-        ('wageGrowth',           'Crecimiento salarial',
-         lambda v: fmt(v, 1, '% anual')),
-    ]
+    # ── Política monetaria ─────────────────────────────────────────────────
+    rate = data.get('interestRate')
+    rate_mom = data.get('rateMomentum')
+    inflation = data.get('inflation')
+    gdp_growth = data.get('gdpGrowth')
 
-    available = 0
-    for key, label, formatter in indicators:
-        value = data.get(key)
-        if value is not None:
-            formatted = formatter(value)
-            if formatted:
-                lines.append(f"  • {label}: {formatted}")
-                available += 1
+    if rate is not None:
+        rate_vs_avg = rate - avg_rate
+        direction = "por encima" if rate_vs_avg > 0 else "por debajo"
+        lines.append(f"  • Tasa de interés: {rate:.2f}% ({abs(rate_vs_avg):.2f}pp {direction} del promedio global de {avg_rate:.2f}%)")
+    if rate_mom is not None:
+        if rate_mom > 0:
+            lines.append(f"  • Ciclo monetario: SUBIENDO tasas ({rate_mom:+.2f}pp en 12 meses) → hawkish, presión alcista sobre la divisa")
+        elif rate_mom < 0:
+            lines.append(f"  • Ciclo monetario: RECORTANDO tasas ({rate_mom:+.2f}pp en 12 meses) → dovish, presión bajista sobre la divisa")
+        else:
+            lines.append(f"  • Ciclo monetario: en pausa (0.00pp en 12 meses)")
+    if inflation is not None:
+        target_diff = inflation - 2.0
+        status = "por encima del objetivo" if target_diff > 0.3 else ("por debajo del objetivo" if target_diff < -0.3 else "cerca del objetivo del 2%")
+        lines.append(f"  • Inflación: {inflation:.1f}% anual ({status})")
+    if gdp_growth is not None:
+        avg_gdp = (global_context or {}).get('avg_gdp_growth') or 0.5
+        vs_global = "superior" if gdp_growth > avg_gdp else "inferior"
+        lines.append(f"  • Crecimiento PIB: {gdp_growth:.1f}% anual ({vs_global} al promedio global de {avg_gdp:.1f}%)")
 
-    lines.append(f"\n[{available} indicadores disponibles]")
-    if data.get('lastUpdate'):
-        lines.append(f"[Datos a: {str(data['lastUpdate'])[:10]}]")
+    # ── Empleo y consumo ───────────────────────────────────────────────────
+    unemployment = data.get('unemployment')
+    wage_growth  = data.get('wageGrowth')
+    retail_sales = data.get('retailSales')
+    if unemployment is not None:
+        avg_unemp = (global_context or {}).get('avg_unemployment') or 4.5
+        label = "bajo" if unemployment < avg_unemp else "elevado"
+        lines.append(f"  • Desempleo: {unemployment:.1f}% ({label} respecto al promedio de {avg_unemp:.1f}%)")
+    if wage_growth is not None:
+        lines.append(f"  • Crecimiento salarial: {wage_growth:.1f}% anual")
+    if retail_sales is not None:
+        lines.append(f"  • Ventas minoristas: {retail_sales:+.1f}% mensual")
+
+    # ── Balance exterior ───────────────────────────────────────────────────
+    ca = data.get('currentAccount')
+    tb = data.get('tradeBalance')
+    tot = data.get('termsOfTrade')
+    if ca is not None:
+        lines.append(f"  • Cuenta corriente: {ca:+.1f}% del PIB ({'superávit — demanda estructural de la divisa' if ca > 0 else 'déficit — presión vendedora estructural'})")
+    if tb is not None:
+        lines.append(f"  • Balanza comercial: {tb/1000:+.1f}B USD/mes ({'superávit' if tb > 0 else 'déficit'} en bienes)")
+    if tot is not None:
+        label = "favorable (exportaciones ganan valor relativo)" if tot > 100 else "desfavorable (importaciones encarecidas)"
+        lines.append(f"  • Términos de intercambio: {tot:.1f} (base 100 — {label})")
+
+    # ── Actividad ──────────────────────────────────────────────────────────
+    pmi = data.get('manufacturingPMI')
+    prod = data.get('production')
+    debt = data.get('debt')
+    bond = data.get('bond10y')
+    if pmi is not None:
+        lines.append(f"  • PMI manufacturero: {pmi:.1f} ({'expansión' if pmi >= 50 else 'contracción'})")
+    if prod is not None:
+        lines.append(f"  • Producción industrial: {prod:+.1f}% mensual")
+    if debt is not None:
+        lines.append(f"  • Deuda pública: {debt:.0f}% del PIB")
+    if bond is not None:
+        avg_bond = (global_context or {}).get('avg_bond10y') or 3.0
+        lines.append(f"  • Yield bono 10Y: {bond:.2f}% (promedio global: {avg_bond:.2f}%)")
+
+    # ── Sentimiento e inflación esperada ───────────────────────────────────
+    cc  = data.get('consumerConfidence')
+    bc  = data.get('businessConfidence')
+    ie  = data.get('inflationExpectations')
+    cf  = data.get('capitalFlows')
+    if cc is not None:
+        lines.append(f"  • Confianza del consumidor: {cc:.1f}")
+    if bc is not None:
+        lines.append(f"  • Confianza empresarial: {bc:.1f}")
+    if ie is not None:
+        lines.append(f"  • Expectativas de inflación: {ie:.1f}%")
+    if cf is not None:
+        lines.append(f"  • Flujos de capital: {cf/1000:+.1f}B USD ({'entrada neta' if cf > 0 else 'salida neta'})")
+
+    # ── Mercado ────────────────────────────────────────────────────────────
+    cot  = data.get('cotPositioning')
+    fx1m = data.get('fxPerformance1M')
+    if cot is not None:
+        if cot > 30000:
+            cot_interp = f"POSICIÓN ALCISTA EXTREMA — mercado muy cargado al alza, riesgo de corrección ante cualquier decepción"
+        elif cot < -30000:
+            cot_interp = f"POSICIÓN BAJISTA EXTREMA — mercado muy cargado a la baja, potencial rebote contrario si mejoran los datos"
+        elif cot > 0:
+            cot_interp = "sesgo especulativo neto alcista"
+        else:
+            cot_interp = "sesgo especulativo neto bajista"
+        lines.append(f"  • COT (posicionamiento especulativo): {cot/1000:+.1f}K contratos netos — {cot_interp}")
+    if fx1m is not None:
+        fx_vs_avg = fx1m - avg_fx
+        move = "apreciación" if fx1m > 0 else "depreciación"
+        rel = "por encima" if fx_vs_avg > 0 else "por debajo"
+        lines.append(f"  • Rendimiento FX último mes: {fx1m:+.2f}% vs USD ({move}) — {abs(fx_vs_avg):.2f}pp {rel} del promedio de las 8 divisas principales ({avg_fx:+.2f}%)")
+
+    available = sum(1 for v in [rate, rate_mom, inflation, gdp_growth, unemployment, wage_growth,
+                                 retail_sales, ca, tb, tot, pmi, prod, debt, bond, cc, bc, ie, cf, cot, fx1m]
+                    if v is not None)
+    lines.append(f"\n[{available} indicadores disponibles | Datos a: {str(data.get('lastUpdate', 'N/D'))[:10]}]")
 
     if export_composition:
         lines.append("")
-        lines.append(f"COMPOSICIÓN EXPORTADORA: {export_composition}")
+        lines.append(f"COMPOSICIÓN EXPORTADORA VERIFICADA:")
+        lines.append(f"  {export_composition}")
+        lines.append("  (Dato objetivo: úsalo para explicar el origen del superávit/déficit comercial sin especular)")
 
     if global_context:
         lines.append("")
-        lines.append("PROMEDIOS GLOBALES (8 divisas principales):")
+        lines.append("CONTEXTO GLOBAL — PROMEDIOS DE LAS 8 DIVISAS PRINCIPALES:")
         mappings = [
-            ('avg_interest_rate', 'Tasa', 2, '%'),
-            ('avg_gdp_growth',    'PIB', 1, '% anual'),
-            ('avg_inflation',     'Inflación', 1, '%'),
-            ('avg_fx_perf_1m',    'FX 1M', 2, '%'),
+            ('avg_interest_rate', 'Tasa de interés promedio', 2, '%'),
+            ('avg_gdp_growth',    'Crecimiento PIB promedio',  1, '% anual'),
+            ('avg_inflation',     'Inflación promedio',        1, '%'),
+            ('avg_unemployment',  'Desempleo promedio',        1, '%'),
+            ('avg_bond10y',       'Yield bono 10Y promedio',   2, '%'),
+            ('avg_fx_perf_1m',    'Rendimiento FX 1M promedio', 2, '%'),
+            ('avg_cot',           'COT promedio',               0, ' contratos netos'),
         ]
         for key, label, decimals, suffix in mappings:
             val = global_context.get(key)
@@ -558,7 +619,7 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
         signals = infer_structural_signals(currency, data, global_context)
         if signals:
             lines.append("")
-            lines.append("SEÑALES ESTRUCTURALES:")
+            lines.append("SEÑALES ESTRUCTURALES INFERIDAS (úsalas para enriquecer el análisis):")
             for signal in signals:
                 lines.append(f"  → {signal}")
 
@@ -576,14 +637,16 @@ def call_groq_api(api_key, data_summary, currency):
                     f"{data_summary}\n\n"
                     f"---\n\n"
                     f"Redacta el análisis para {currency}. "
-                    f"Recuerda: 3 párrafos, 100-130 palabras en total, español natural y directo. "
-                    f"Interpreta causas y consecuencias; no te limites a listar cifras."
+                    f"Recuerda: 3 párrafos con línea en blanco entre ellos, 150-200 palabras en total. "
+                    f"El objetivo es interpretar las causas y consecuencias de los datos, "
+                    f"no simplemente listarlos. Redacción en español natural y fluido, "
+                    f"como un análisis de mercado profesional hispanohablante."
                 ),
             },
         ],
-        "max_tokens": 500,
-        "temperature": 0.45,
-        "top_p": 0.85,
+        "max_tokens": 700,
+        "temperature": 0.5,
+        "top_p": 0.9,
     }
     response = requests.post(
         GROQ_URL,
@@ -617,7 +680,7 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
             text = '\n\n'.join(paragraphs)
 
             word_count = len(text.split())
-            if word_count < 60:
+            if word_count < 80:
                 raise ValueError(f"Respuesta demasiado corta: {word_count} palabras")
 
             print(f"  ✅ {word_count} palabras generadas")
@@ -650,7 +713,7 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
 def main():
     print("=" * 60)
-    print(f"🤖 Generador AI v2.3 — {GROQ_MODEL} via Groq API")
+    print(f"🤖 Generador AI v2.4 — {GROQ_MODEL} via Groq API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
@@ -782,7 +845,7 @@ def main():
     index = {
         "generatedAt":      datetime.now(timezone.utc).isoformat(),
         "model":            GROQ_MODEL,
-        "version":          "2.3",
+        "version":          "2.4",
         "currencies":       successful,
         "totalGenerated":   len(successful),
         "comtradeHits":     comtrade_count,
