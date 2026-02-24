@@ -25,32 +25,10 @@ from pathlib import Path
 
 socket.setdefaulttimeout(15)
 
-# ─── FRED API — series IDs para tasas de bancos centrales ────────────────────
-# Requiere FRED_API_KEY en GitHub Secrets (gratis en fred.stlouisfed.org)
-FRED_RATE_SERIES = {
-    'USD': 'FEDFUNDS',       # Fed Funds Rate (monthly)
-    'EUR': 'ECBDFR',         # ECB Deposit Facility Rate
-    'GBP': 'BOEBR',         # Bank of England Base Rate
-    'JPY': 'IRSTCB01JPM156N', # Japan central bank rate
-    'AUD': 'RBAADONYX',     # RBA Cash Rate Target — fallback a World Bank
-    'CAD': 'IRSTCB01CAM156N', # Bank of Canada overnight rate
-    'CHF': 'IRSTCB01CHM156N', # Swiss National Bank rate
-    'NZD': 'IRSTCB01NZM156N', # RBNZ official cash rate
-}
-
-# ─── World Bank — indicadores de tasa de política monetaria ──────────────────
-# Sin API key requerida
-WORLDBANK_RATE_INDICATOR = 'FR.INR.RINR'  # fallback genérico
-WORLDBANK_COUNTRY_CODES = {
-    'USD': 'US', 'EUR': 'XC', 'GBP': 'GB', 'JPY': 'JP',
-    'AUD': 'AU', 'CAD': 'CA', 'CHF': 'CH', 'NZD': 'NZ',
-}
-
 # ─── Frankfurter API — FX en tiempo real (ECB rates, sin key) ────────────────
 FRANKFURTER_BASE = 'https://api.frankfurter.dev/v1'
 
-# Cache para evitar llamadas repetidas
-_rate_decision_cache = {}
+# Cache para evitar llamadas repetidas en el mismo run
 _fx_performance_cache = {}
 
 CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']
@@ -243,141 +221,120 @@ def fetch_json(url, timeout=8):
         return None
 
 
+def derive_rate_decision_from_history(currency, observations):
+    """
+    Deriva la decisión real del banco central analizando el historial de tasas
+    almacenado en rates/{currency}.json.
+
+    Lógica:
+      1. Filtra observaciones con valor numérico válido.
+      2. Busca el PRIMER cambio real respecto al valor más reciente
+         (ignorando días consecutivos con el mismo valor — son confirmaciones,
+         no nuevas decisiones).
+      3. Calcula delta, dirección y fecha de la última decisión.
+      4. También analiza la tendencia de los últimos 12 meses para distinguir
+         entre "subida puntual dentro de un ciclo bajista" vs. "giro de política".
+
+    Devuelve dict con: direction, delta, current_rate, prev_rate, date,
+                       source, cycle_12m, cycle_label.
+    """
+    if not observations:
+        return None
+
+    # Parsear y ordenar: más reciente primero
+    parsed = []
+    for obs in observations:
+        val = obs.get('value')
+        date = obs.get('date', '')
+        if val is None or val == '.':
+            continue
+        try:
+            parsed.append({'value': float(val), 'date': date})
+        except (ValueError, TypeError):
+            continue
+
+    if not parsed:
+        return None
+
+    # Ordenar descendente por fecha
+    parsed.sort(key=lambda x: x['date'], reverse=True)
+
+    current_rate = parsed[0]['value']
+    current_date = parsed[0]['date']
+
+    # ── Encontrar la última decisión: primer valor distinto al actual ─────────
+    prev_rate = None
+    decision_date = current_date
+    for obs in parsed[1:]:
+        if abs(obs['value'] - current_rate) > 0.01:
+            prev_rate = obs['value']
+            decision_date = parsed[parsed.index(obs) - 1]['date'] if parsed.index(obs) > 0 else current_date
+            # La fecha de la decisión es cuando APARECIÓ el nuevo valor
+            # (el primer registro con el valor actual)
+            for i, o in enumerate(parsed):
+                if abs(o['value'] - current_rate) > 0.01:
+                    decision_date = parsed[i - 1]['date'] if i > 0 else current_date
+                    break
+            break
+
+    if prev_rate is None:
+        # Tasa estable en todo el historial disponible
+        return {
+            'direction':    'MANTUVO',
+            'delta':        0.0,
+            'current_rate': current_rate,
+            'prev_rate':    current_rate,
+            'date':         current_date,
+            'source':       'rates_history',
+            'cycle_12m':    0.0,
+            'cycle_label':  'sin cambios en el período analizado',
+        }
+
+    delta = round(current_rate - prev_rate, 4)
+    direction = 'SUBIÓ' if delta > 0.01 else ('BAJÓ' if delta < -0.01 else 'MANTUVO')
+
+    # ── Calcular ciclo de los últimos 12 meses ────────────────────────────────
+    from datetime import datetime as dt
+    try:
+        today = dt.strptime(current_date[:10], '%Y-%m-%d')
+        cutoff = today.replace(year=today.year - 1)
+        cutoff_str = cutoff.strftime('%Y-%m-%d')
+        within_12m = [o for o in parsed if o['date'] >= cutoff_str]
+        if within_12m:
+            oldest_in_12m = within_12m[-1]['value']
+            cycle_12m = round(current_rate - oldest_in_12m, 4)
+        else:
+            cycle_12m = 0.0
+    except Exception:
+        cycle_12m = 0.0
+
+    # Etiqueta del ciclo para el contexto del modelo
+    if cycle_12m > 0.1:
+        cycle_label = f"ciclo ALCISTA en 12M (+{cycle_12m:.2f}pp acumulados)"
+    elif cycle_12m < -0.1:
+        cycle_label = f"ciclo BAJISTA en 12M ({cycle_12m:.2f}pp acumulados)"
+    else:
+        cycle_label = "estable en los últimos 12 meses"
+
+    return {
+        'direction':    direction,
+        'delta':        delta,
+        'current_rate': current_rate,
+        'prev_rate':    prev_rate,
+        'date':         decision_date,
+        'source':       'rates_history',
+        'cycle_12m':    cycle_12m,
+        'cycle_label':  cycle_label,
+    }
+
+
 def fetch_live_rate_decision(currency, current_rate, fred_api_key=None):
     """
-    Obtiene la decisión real del último meeting del banco central.
-    Devuelve dict con: direction ('SUBIÓ'/'BAJÓ'/'MANTUVO'), delta (pp),
-    current_rate, prev_rate, date, source.
-
-    Cascada:
-      1. FRED API (requiere FRED_API_KEY, cobertura casi total)
-      2. World Bank API (sin key, datos mensuales con 2-3 meses de retraso)
-      3. Inferencia desde rateMomentum (último recurso)
+    DEPRECATED en v2.6 — reemplazado por derive_rate_decision_from_history().
+    Se mantiene como stub por compatibilidad; retorna None para forzar
+    el uso del historial local.
     """
-    if currency in _rate_decision_cache:
-        return _rate_decision_cache[currency]
-
-    result = None
-
-    # ── Fuente 1: FRED API ────────────────────────────────────────────────────
-    if fred_api_key and currency in FRED_RATE_SERIES:
-        series_id = FRED_RATE_SERIES[currency]
-        try:
-            today = datetime.now(timezone.utc)
-            obs_start = (today - timedelta(days=400)).strftime('%Y-%m-%d')
-            url = (
-                f"https://api.stlouisfed.org/fred/series/observations"
-                f"?series_id={series_id}"
-                f"&api_key={fred_api_key}"
-                f"&file_type=json"
-                f"&sort_order=desc"
-                f"&limit=24"
-                f"&observation_start={obs_start}"
-            )
-            data = fetch_json(url, timeout=10)
-            if data and data.get('observations'):
-                obs = [o for o in data['observations'] if o.get('value') not in ('.', '', None)]
-                if len(obs) >= 2:
-                    latest_val  = float(obs[0]['value'])
-                    prev_val    = float(obs[1]['value'])
-                    latest_date = obs[0]['date']
-                    delta = round(latest_val - prev_val, 4)
-
-                    # Buscar el punto donde cambió (última decisión real)
-                    change_idx = 0
-                    for i, o in enumerate(obs):
-                        if abs(float(o['value']) - latest_val) > 0.01:
-                            change_idx = i - 1
-                            break
-
-                    if change_idx > 0:
-                        # La tasa actual es nueva respecto a la anterior
-                        prev_val    = float(obs[change_idx + 1]['value'])
-                        latest_date = obs[change_idx]['date']
-                        delta = round(latest_val - prev_val, 4)
-
-                    if abs(delta) > 0.01:
-                        direction = 'SUBIÓ' if delta > 0 else 'BAJÓ'
-                    else:
-                        direction = 'MANTUVO'
-                        # Buscar cuándo fue el último cambio efectivo
-                        for o in obs[1:]:
-                            if abs(float(o['value']) - latest_val) > 0.01:
-                                prev_val = float(o['value'])
-                                delta    = round(latest_val - prev_val, 4)
-                                break
-
-                    result = {
-                        'direction':    direction,
-                        'delta':        delta,
-                        'current_rate': latest_val,
-                        'prev_rate':    prev_val,
-                        'date':         latest_date,
-                        'source':       'FRED',
-                    }
-                    print(f"  📡 FRED {currency}: {direction} {delta:+.2f}pp → {latest_val:.2f}% ({latest_date})")
-        except Exception as e:
-            print(f"  ⚠️  FRED error {currency}: {e}")
-
-    # ── Fuente 2: World Bank API ──────────────────────────────────────────────
-    if result is None:
-        wb_code = WORLDBANK_COUNTRY_CODES.get(currency)
-        # World Bank central bank rate indicator
-        wb_indicator = 'FR.INR.DPST'  # deposit interest rate como proxy
-        # Para las principales divisas usamos el indicador más directo
-        wb_cb_indicators = {
-            'USD': 'FR.INR.DPST',
-            'EUR': 'FR.INR.DPST',
-            'GBP': 'FR.INR.DPST',
-            'JPY': 'FR.INR.DPST',
-            'AUD': 'FR.INR.DPST',
-            'CAD': 'FR.INR.DPST',
-            'CHF': 'FR.INR.DPST',
-            'NZD': 'FR.INR.DPST',
-        }
-        if wb_code:
-            try:
-                today = datetime.now(timezone.utc)
-                url = (
-                    f"https://api.worldbank.org/v2/country/{wb_code}"
-                    f"/indicator/FR.INR.DPST"
-                    f"?format=json&mrv=3&per_page=3"
-                )
-                data = fetch_json(url, timeout=10)
-                if data and len(data) > 1 and data[1]:
-                    entries = [e for e in data[1] if e.get('value') is not None]
-                    if len(entries) >= 2:
-                        cur = entries[0]['value']
-                        prv = entries[1]['value']
-                        delta = round(cur - prv, 4)
-                        direction = 'SUBIÓ' if delta > 0.1 else ('BAJÓ' if delta < -0.1 else 'MANTUVO')
-                        result = {
-                            'direction':    direction,
-                            'delta':        delta,
-                            'current_rate': cur,
-                            'prev_rate':    prv,
-                            'date':         entries[0].get('date', 'N/D'),
-                            'source':       'WorldBank',
-                        }
-                        print(f"  🌍 WorldBank {currency}: {direction} ({entries[0]['date']})")
-            except Exception as e:
-                print(f"  ⚠️  WorldBank error {currency}: {e}")
-
-    # ── Fuente 3: Inferencia desde rateMomentum (datos propios) ──────────────
-    # Este fallback solo se usa si las APIs fallan. Aquí queda explícito que es
-    # un proxy acumulado de 12 meses, NO la decisión de la última reunión.
-    if result is None and current_rate is not None:
-        result = {
-            'direction':    None,   # desconocida, se marcará como tal en el summary
-            'delta':        None,
-            'current_rate': current_rate,
-            'prev_rate':    None,
-            'date':         'desconocida',
-            'source':       'static',
-        }
-
-    _rate_decision_cache[currency] = result
-    return result
+    return None
 
 
 def fetch_frankfurter_fx(currency, days=30):
@@ -559,14 +516,28 @@ def load_economic_data(currency, fred_api_key=None):
             'lastUpdate':       main.get('lastUpdate'),
         })
 
-    rates = fetch_json(f'{GITHUB_BASE}/rates/{currency}.json', timeout=6)
-    if rates and rates.get('observations'):
-        val = rates['observations'][0].get('value')
-        if val and val != '.':
-            try:
-                data['interestRate'] = float(val)
-            except ValueError:
-                pass
+    # ── Tasa de interés + historial completo para derivar decisión ────────────
+    rates_raw = fetch_json(f'{GITHUB_BASE}/rates/{currency}.json', timeout=6)
+    if rates_raw and rates_raw.get('observations'):
+        observations = rates_raw['observations']
+        # Tasa actual: primer valor válido
+        for obs in observations:
+            val = obs.get('value')
+            if val and val != '.':
+                try:
+                    data['interestRate'] = float(val)
+                    break
+                except ValueError:
+                    pass
+
+        # Decisión del banco central: derivada del historial propio
+        rate_decision = derive_rate_decision_from_history(currency, observations)
+        if rate_decision:
+            data['lastRateDecision'] = rate_decision
+            dir_str = rate_decision['direction']
+            delta   = rate_decision.get('delta', 0) or 0
+            cycle   = rate_decision.get('cycle_label', '')
+            print(f"  📊 {currency}: {dir_str} {delta:+.2f}pp | {cycle}")
 
     ext = fetch_json(f'{GITHUB_BASE}/extended-data/{currency}.json', timeout=6)
     if ext and 'data' in ext:
@@ -594,15 +565,6 @@ def load_economic_data(currency, fred_api_key=None):
         if fxp and fxp.get('fxPerformance1M') is not None:
             data['fxPerformance1M'] = fxp['fxPerformance1M']
             data['fxSource'] = 'static'
-
-    # ── Decisión real del banco central ───────────────────────────────────────
-    rate_decision = fetch_live_rate_decision(
-        currency,
-        current_rate=data.get('interestRate'),
-        fred_api_key=fred_api_key
-    )
-    if rate_decision:
-        data['lastRateDecision'] = rate_decision
 
     return data
 
@@ -659,7 +621,7 @@ def infer_structural_signals(currency, data, global_context):
         rd    = last_decision['direction']
         delta = last_decision.get('delta') or 0
         src   = last_decision.get('source', '')
-        src_note = '' if src in ('FRED', 'WorldBank') else ' [⚠️ dato estático]'
+        src_note = ''  # datos propios siempre son confiables
         if rd == 'SUBIÓ':
             signals.append(
                 f"El banco central acaba de SUBIR tasas ({delta:+.2f}pp): ciclo restrictivo activo, "
@@ -785,36 +747,31 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
 
     # Ciclo monetario: usamos la decisión real si está disponible, si no el momentum
     if last_decision and last_decision.get('direction'):
-        src = last_decision['source']
-        src_label = {'FRED': '📡 FRED', 'WorldBank': '🌍 World Bank', 'static': '📦 dato estático'}.get(src, src)
         direction = last_decision['direction']
-        delta     = last_decision.get('delta')
+        delta     = last_decision.get('delta') or 0
         prev      = last_decision.get('prev_rate')
         date      = last_decision.get('date', 'N/D')
+        cycle     = last_decision.get('cycle_label', '')
 
-        if direction == 'MANTUVO':
-            # Buscar cuándo fue el último cambio real
-            if prev is not None and delta is not None and abs(delta) > 0.01:
-                trend = 'venía de subir' if delta > 0 else 'venía de recortar'
-                lines.append(
-                    f"  • Última decisión monetaria: MANTUVO la tasa en {rate:.2f}% ({date}) — {trend} {abs(delta):.2f}pp "
-                    f"[{src_label}] → sesgo ambiguo hasta próxima reunión"
-                )
-            else:
-                lines.append(
-                    f"  • Última decisión monetaria: MANTUVO la tasa en {rate:.2f}% ({date}) "
-                    f"[{src_label}] → sin cambios recientes, neutral para la divisa"
-                )
-        elif direction == 'SUBIÓ':
+        if direction == 'SUBIÓ':
             lines.append(
-                f"  • Última decisión monetaria: SUBIÓ tasas {delta:+.2f}pp a {rate:.2f}% ({date}) "
-                f"[{src_label}] → HAWKISH — presión ALCISTA sobre la divisa por mayor carry diferencial"
+                f"  • Última decisión monetaria: SUBIÓ tasas {delta:+.2f}pp "
+                f"(de {prev:.2f}% a {rate:.2f}%, ef. {date}) "
+                f"→ HAWKISH — presión ALCISTA sobre la divisa"
             )
         elif direction == 'BAJÓ':
             lines.append(
-                f"  • Última decisión monetaria: BAJÓ tasas {delta:.2f}pp a {rate:.2f}% ({date}) "
-                f"[{src_label}] → DOVISH — presión BAJISTA sobre la divisa por menor carry"
+                f"  • Última decisión monetaria: BAJÓ tasas {abs(delta):.2f}pp "
+                f"(de {prev:.2f}% a {rate:.2f}%, ef. {date}) "
+                f"→ DOVISH — presión BAJISTA sobre la divisa"
             )
+        else:
+            lines.append(
+                f"  • Última decisión monetaria: MANTUVO en {rate:.2f}% ({date}) "
+                f"→ neutral a corto plazo"
+            )
+        if cycle:
+            lines.append(f"  • Contexto de ciclo (12M): {cycle}")
     elif rate_mom is not None:
         # Fallback: momentum acumulado 12M — menos preciso pero útil
         if rate_mom > 0:
@@ -1037,7 +994,7 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
 def main():
     print("=" * 60)
-    print(f"🤖 Generador AI v2.5 — {GROQ_MODEL} via Groq API")
+    print(f"🤖 Generador AI v2.6 — {GROQ_MODEL} via Groq API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
@@ -1048,53 +1005,36 @@ def main():
             "Agrégala en Settings → Secrets → Actions del repo."
         )
 
-    fred_api_key = os.environ.get('FRED_API_KEY')
-    if fred_api_key:
-        print(f"✅ FRED_API_KEY configurada — datos de decisiones monetarias en tiempo real")
-    else:
-        print(f"⚠️  FRED_API_KEY no configurada — usando World Bank + fallback estático")
-        print(f"   Obtén tu key gratis en: https://fred.stlouisfed.org/docs/api/api_key.html")
-        print(f"   Agrégala como secret FRED_API_KEY en GitHub Actions")
-
     print(f"✅ GROQ_API_KEY configurada ({len(api_key)} caracteres)")
     print(f"🔧 Modelo: {GROQ_MODEL}")
-    print(f"💱 FX Performance: Frankfurter API (ECB, sin key, tiempo real)\n")
+    print(f"📊 Decisiones monetarias: historial propio rates/{{currency}}.json (sin APIs externas)")
+    print(f"💱 FX Performance: Frankfurter API (ECB, sin key) con fallback estático\n")
 
     print("🔍 Testeando conectividad...")
     for label, url in [
-        ("Internet",       "https://httpbin.org/get"),
-        ("GitHub Pages",   "https://globalinvesting.github.io/economic-data/USD.json"),
-        ("Frankfurter API","https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD"),
-        ("UN Comtrade",    "https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=36&period=2022&partnerCode=0&cmdCode=TOTAL&flowCode=X&customsCode=C00&motCode=0"),
+        ("Internet",        "https://httpbin.org/get"),
+        ("GitHub Pages",    "https://globalinvesting.github.io/economic-data/USD.json"),
+        ("Frankfurter API", "https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD"),
+        ("UN Comtrade",     "https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=36&period=2022&partnerCode=0&cmdCode=TOTAL&flowCode=X&customsCode=C00&motCode=0"),
     ]:
         try:
             r = requests.get(url, timeout=8)
             print(f"  ✅ {label} OK ({r.status_code})")
         except Exception as e:
             print(f"  ❌ {label}: {e}")
-
-    if fred_api_key:
-        try:
-            test_url = f"https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key={fred_api_key}&file_type=json&limit=1"
-            r = requests.get(test_url, timeout=8)
-            print(f"  ✅ FRED API OK ({r.status_code})")
-        except Exception as e:
-            print(f"  ❌ FRED API: {e}")
     print()
 
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    print("📥 Cargando datos económicos + decisiones monetarias en tiempo real...")
+    print("📥 Cargando datos económicos + decisiones monetarias del historial...")
     all_data = {}
     for currency in CURRENCIES:
         print(f"  • {currency}...", end=' ', flush=True)
-        all_data[currency] = load_economic_data(currency, fred_api_key=fred_api_key)
+        all_data[currency] = load_economic_data(currency)
         available = sum(1 for k, v in all_data[currency].items()
                         if v is not None and k not in ('lastRateDecision', 'fxSource'))
-        rd = all_data[currency].get('lastRateDecision', {})
-        rd_str = f" | Decisión: {rd.get('direction','?')} [{rd.get('source','?')}]" if rd else ""
         fx_src = all_data[currency].get('fxSource', '?')
-        print(f"{available} indicadores | FX:{fx_src}{rd_str}")
+        print(f"{available} indicadores | FX:{fx_src}")
 
     global_context = compute_global_context(all_data)
     print(f"\n🌐 Contexto global:")
@@ -1193,7 +1133,7 @@ def main():
     index = {
         "generatedAt":      datetime.now(timezone.utc).isoformat(),
         "model":            GROQ_MODEL,
-        "version":          "2.5",
+        "version":          "2.6",
         "currencies":       successful,
         "totalGenerated":   len(successful),
         "comtradeHits":     comtrade_count,
