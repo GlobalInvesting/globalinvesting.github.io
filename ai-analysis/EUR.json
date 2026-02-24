@@ -2,9 +2,9 @@
   "currency": "EUR",
   "country": "Eurozona",
   "bank": "Banco Central Europeo (BCE)",
-  "analysis": "El Banco Central Europeo ha estado recortando tasas de interés, lo que ha generado una presión bajista sobre la divisa. Aunque la tasa de interés actual es de 2.15%, está por debajo del promedio global, lo que puede afectar la atracción de inversores. La inflación se mantiene por debajo del objetivo, lo que justifica la decisión del banco central de recortar tasas. Sin embargo, el crecimiento del PIB es inferior al promedio global, lo que puede ser un factor de preocupación.\n\nLa balanza comercial y la cuenta corriente muestran un superávit, lo que es positivo para la divisa. La composición exportadora de la eurozona, que se centra en maquinaria industrial y vehículos, ha contribuido a este superávit. Los términos de intercambio favorables también han ayudado a ampliar el excedente comercial. Aunque la producción industrial ha disminuido, el PMI manufacturero sigue en expansión, lo que sugiere que la actividad económica sigue siendo estable.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +174.5K contratos netos, lo que puede generar un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, aunque inferior al promedio de las divisas principales. En general, el panorama para la divisa es complejo, con factores tanto positivos como negativos que pueden influir en su valoración.",
+  "analysis": "La política monetaria del Banco Central Europeo se mantiene neutral, con una tasa de interés del 2.15%, lo que se traduce en una presión bajista sobre la divisa debido al menor carry. Aunque la inflación se encuentra por debajo del objetivo, el crecimiento del PIB es inferior al promedio global, lo que sugiere una economía en expansión lenta. La cuenta corriente presenta un superávit del 1.6% del PIB, lo que indica una demanda estructural de la divisa.\n\nLa balanza comercial también muestra un superávit de 14.9B USD/mes, gracias a la composición exportadora de maquinaria industrial, vehículos y autopartes, que se benefician de los términos de intercambio favorables. Esto amplía el excedente comercial y apoya la divisa. Sin embargo, el mercado está saturado de largos, con un COT de 174K contratos netos, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos.\n\nEl rendimiento FX del último mes muestra una apreciación del 0.36% vs USD, lo que refleja la demanda de la divisa. Aunque el mercado está muy cargado al alza, el riesgo de corrección es alto debido al posicionamiento especulativo extremo. En este contexto, cualquier decepción en los datos puede provocar una corrección rápida, por lo que es importante monitorear los indicadores económicos para anticipar posibles cambios en la tendencia.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:06:26.947918+00:00",
+  "generatedAt": "2026-02-24T23:39:46.930996+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, vehículos y autopartes, equipos eléctricos y electrónicos",
   "dataSnapshot": {
     "interestRate": 2.15,
@@ -13,8 +13,17 @@
     "unemployment": 6.2,
     "currentAccount": 1.6,
     "rateMomentum": -0.75,
+    "lastRateDecision": {
+      "direction": "MANTUVO",
+      "delta": 0.0,
+      "current_rate": 2.0,
+      "prev_rate": 2.0,
+      "date": "2026-02-24",
+      "source": "FRED"
+    },
     "cotPositioning": 174500,
     "fxPerformance1M": 0.3571,
+    "fxSource": "static",
     "lastUpdate": "2026-02-24"
   },
   "globalContext": {
@@ -23,7 +32,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": 0.98,
+    "avg_fx_perf_1m": -1.36,
     "avg_cot": 17653.5
   }
 }

@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia se encuentra en un ciclo de recorte de tasas, lo que ejerce presión bajista sobre la divisa. Aunque la tasa de interés se mantiene por encima del promedio global, la tendencia a la baja puede afectar el atractivo de la divisa para los inversores de renta fija internacional. La inflación se encuentra por encima del objetivo, lo que podría llevar a un ajuste en la política monetaria en el futuro.\n\nLa balanza comercial presenta un superávit de 2.4B USD/mes, gracias a los términos de intercambio favorables y la composición exportadora de minerales metalíferos, combustibles y petróleo, y cereales. Sin embargo, la cuenta corriente muestra un déficit del 2.3% del PIB, lo que puede generar presión vendedora estructural sobre la divisa.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +45.9K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción en los datos. El rendimiento FX del último mes ha sido positivo, con una apreciación del 2.98% vs USD, lo que refleja el atractivo de la divisa en el contexto global risk-on.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia ha sido recientemente expansiva, con una disminución de las tasas de interés a 3.85%, lo que aunque sigue siendo superior al promedio global, reduce el atractivo del carry para los inversores internacionales. Esto ha generado una presión bajista sobre la divisa australiana, aunque su tasa de interés sigue siendo atractiva en un contexto global. La inflación se mantiene por encima del objetivo, lo que podría llevar a un ajuste en la política monetaria en el futuro.\n\nLa balanza comercial de Australia muestra un superávit de 2.4B USD/mes, gracias a los términos de intercambio favorables y a las exportaciones de minerales metalíferos, combustibles y petróleo, lo que debería apoyar la divisa. Sin embargo, la cuenta corriente presenta un déficit, lo que podría ejercer presión a la baja en el valor de la divisa. El sector manufacturero también muestra signos de expansión, con un PMI de 51.5, lo que es positivo para la economía en general.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 45.9K contratos netos, lo que indica un riesgo de corrección si los datos económicos no cumplen con las expectativas. A pesar de esto, la divisa australiana ha depreciado un 4.43% en el último mes, lo que podría ser el inicio de un cierre de posiciones largas. En resumen, el panorama para la divisa australiana es complejo, con factores tanto positivos como negativos que podrían influir en su valor en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:06:40.220027+00:00",
+  "generatedAt": "2026-02-24T23:40:00.569671+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "dataSnapshot": {
     "interestRate": 3.85,
@@ -13,8 +13,17 @@
     "unemployment": 4.1,
     "currentAccount": -2.3,
     "rateMomentum": -0.5,
+    "lastRateDecision": {
+      "direction": "BAJÓ",
+      "delta": -0.4208,
+      "current_rate": 1.55833333333333,
+      "prev_rate": 1.97916666666667,
+      "date": "2019",
+      "source": "WorldBank"
+    },
     "cotPositioning": 45900,
-    "fxPerformance1M": 2.9834,
+    "fxPerformance1M": -4.4291,
+    "fxSource": "frankfurter",
     "lastUpdate": "2026-02-24"
   },
   "globalContext": {
@@ -23,7 +32,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": 0.98,
+    "avg_fx_perf_1m": -1.36,
     "avg_cot": 17653.5
   }
 }

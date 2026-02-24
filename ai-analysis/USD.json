@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal ha estado recortando tasas de interés, lo que ha generado una presión bajista sobre la divisa debido al menor carry. Aunque la tasa de interés actual es de 3.75%, por encima del promedio global, el ciclo monetario dovish y la inflación por encima del objetivo sugieren que la presión bajista puede continuar. El crecimiento del PIB anual es superior al promedio global, lo que podría mitigar esta presión, aunque el desempleo bajo y el crecimiento salarial también pueden influir en la decisión del banco central.\n\nLa cuenta corriente y la balanza comercial presentan un déficit, lo que genera una presión vendedora estructural sobre la divisa. La composición exportadora, liderada por maquinaria industrial y equipos eléctricos, no parece ser lo suficientemente fuerte como para revertir este déficit. Sin embargo, los términos de intercambio favorables y el PMI manufacturero en expansión podrían sugerir una mejora en las exportaciones en el futuro.\n\nEl posicionamiento especulativo neto alcista y el rendimiento FX negativo en el último mes sugieren que la divisa puede seguir bajo presión. Aunque el flujo de capital es positivo, el déficit comercial y la política monetaria dovish pueden continuar ejerciendo presión bajista sobre la divisa. En este contexto, es probable que la divisa siga debilitándose en el corto plazo, aunque cualquier cambio en la política monetaria o en los fundamentos económicos podría revertir esta tendencia.",
+  "analysis": "La Reserva Federal ha decidido bajar las tasas de interés, lo que puede ejercer presión bajista sobre la divisa debido a la disminución del carry. Aunque la tasa de interés sigue siendo superior al promedio global, la decisión de bajar las tasas sugiere un enfoque más expansivo por parte del banco central. La inflación se mantiene por encima del objetivo, lo que podría limitar la capacidad del banco central para seguir relajando la política monetaria.\n\nLa cuenta corriente y la balanza comercial presentan déficits significativos, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora de los Estados Unidos, con un enfoque en maquinaria industrial y equipos eléctricos, no parece ser lo suficientemente fuerte como para revertir este déficit. Sin embargo, los términos de intercambio favorables sugieren que las exportaciones pueden seguir siendo competitivas en el mercado global.\n\nEl posicionamiento especulativo sigue siendo ligeramente alcista, aunque el rendimiento FX del último mes ha sido negativo. Esto sugiere que el mercado puede estar preparado para una posible corrección a la baja. Con todo, el panorama a corto plazo sigue siendo incierto, y el comportamiento de la divisa dependerá de cómo se desarrollen los fundamentos económicos y la política monetaria en el futuro.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:06:22.564469+00:00",
+  "generatedAt": "2026-02-24T23:39:42.714103+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "dataSnapshot": {
     "interestRate": 3.75,
@@ -13,8 +13,17 @@
     "unemployment": 4.3,
     "currentAccount": -3.9,
     "rateMomentum": -0.69,
+    "lastRateDecision": {
+      "direction": "BAJÓ",
+      "delta": -0.08,
+      "current_rate": 3.64,
+      "prev_rate": 3.72,
+      "date": "2026-01-01",
+      "source": "FRED"
+    },
     "cotPositioning": 328,
-    "fxPerformance1M": -0.6641,
+    "fxPerformance1M": -0.4161,
+    "fxSource": "frankfurter",
     "lastUpdate": "2026-02-24"
   },
   "globalContext": {
@@ -23,7 +32,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": 0.98,
+    "avg_fx_perf_1m": -1.36,
     "avg_cot": 17653.5
   }
 }

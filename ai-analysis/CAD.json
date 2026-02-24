@@ -2,9 +2,9 @@
   "currency": "CAD",
   "country": "Canadá",
   "bank": "Banco de Canadá (BoC)",
-  "analysis": "El Banco de Canadá ha estado recortando tasas de interés, lo que ha generado una presión bajista sobre la divisa canadiense debido a la disminución del carry. Aunque la inflación se encuentra cerca del objetivo del 2%, el ciclo monetario dovish y la tasa de interés por debajo del promedio global sugieren que la divisa puede seguir bajo presión. El crecimiento del PIB, aunque superior al promedio global, no ha sido suficiente para contrarrestar los efectos de la política monetaria expansiva.\n\nLa cuenta corriente en déficit y la balanza comercial negativa también ejercen presión vendedora sobre la divisa. Sin embargo, los términos de intercambio favorables y el crecimiento de la producción industrial sugieren que la economía canadiense sigue mostrando signos de resistencia. La composición exportadora, liderada por combustibles y petróleo, vehículos y maquinaria industrial, explica en parte el origen del déficit comercial, aunque la demanda global y los precios de las materias primas también juegan un papel importante.\n\nEl posicionamiento especulativo neto alcista, según el COT, y el rendimiento FX positivo en el último mes sugieren que los inversores siguen mostrando interés en la divisa canadiense. Aunque el rendimiento FX es inferior al promedio de las 8 divisas principales, la economía canadiense sigue siendo atractiva para los inversores que buscan divisas de alto carry y exportadoras de materias primas en un régimen global risk-on.",
+  "analysis": "La política monetaria del Banco de Canadá se mantiene neutral, con una tasa de interés del 2.25%, ligeramente por debajo del promedio global. Aunque la inflación se encuentra cerca del objetivo del 2%, el crecimiento del PIB es superior al promedio global, lo que sugiere una economía en expansión. Sin embargo, el desempleo sigue siendo elevado, lo que podría limitar el crecimiento del consumo y, por ende, la divisa.\n\nLa balanza comercial y la cuenta corriente presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de combustibles y petróleo, vehículos y autopartes, y maquinaria industrial son fundamentales para la economía canadiense, y su comportamiento influye directamente en la balanza comercial. Aunque los términos de intercambio son favorables, el déficit comercial sigue siendo un factor de presión sobre la divisa.\n\nEl posicionamiento especulativo muestra un sesgo alcista, con 25.8K contratos netos, lo que podría indicar un potencial de corrección si no se confirma con fundamentos. El rendimiento FX del último mes ha sido negativo, lo que sugiere una depreciación de la divisa. En este contexto, el panorama a corto plazo para la divisa canadiense parece incierto, con riesgos de depreciación si no se mejora la balanza comercial y se mantiene el déficit en la cuenta corriente.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:06:44.908387+00:00",
+  "generatedAt": "2026-02-24T23:40:05.096372+00:00",
   "exportComposition": "Principales exportaciones: combustibles y petróleo, vehículos y autopartes, maquinaria industrial",
   "dataSnapshot": {
     "interestRate": 2.25,
@@ -13,8 +13,17 @@
     "unemployment": 6.5,
     "currentAccount": -1.0,
     "rateMomentum": -0.75,
+    "lastRateDecision": {
+      "direction": "MANTUVO",
+      "delta": 0.0,
+      "current_rate": 0.1,
+      "prev_rate": 0.1,
+      "date": "2017",
+      "source": "WorldBank"
+    },
     "cotPositioning": 25800,
-    "fxPerformance1M": 0.5332,
+    "fxPerformance1M": -0.8275,
+    "fxSource": "frankfurter",
     "lastUpdate": "2026-02-24"
   },
   "globalContext": {
@@ -23,7 +32,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": 0.98,
+    "avg_fx_perf_1m": -1.36,
     "avg_cot": 17653.5
   }
 }

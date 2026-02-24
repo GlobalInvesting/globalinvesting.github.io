@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "La política monetaria del Banco de Inglaterra se encuentra en un ciclo de recorte de tasas, lo que ejerce presión bajista sobre la divisa. Aunque la tasa de interés se mantiene por encima del promedio global, el momentum negativo de las tasas sugiere una tendencia a la baja. La inflación, por encima del objetivo, y el crecimiento del PIB, inferior al promedio global, apuntan a una economía que enfrenta desafíos. La deuda pública elevada y el déficit en la cuenta corriente también ejercen presión sobre la divisa.\n\nLa balanza comercial deficitaria y los términos de intercambio desfavorables sugieren que la economía del Reino Unido enfrenta desafíos en su sector externo. Las exportaciones de maquinaria industrial, productos farmacéuticos y equipos eléctricos y electrónicos no son suficientes para compensar el déficit en bienes. Sin embargo, la entrada neta de flujos de capital y la confianza del consumidor y empresarial relativamente altas podrían apuntalar la divisa en el corto plazo.\n\nEl posicionamiento especulativo extremadamente bajista y el rendimiento FX negativo en el último mes sugieren que la divisa está depreciada. Aunque el mercado está muy cargado a la baja, cualquier mejora en los datos podría generar un rebote contrario. En este contexto, es importante monitorear los indicadores económicos y las decisiones del Banco de Inglaterra para anticipar posibles cambios en la tendencia de la divisa.",
+  "analysis": "La política monetaria del Banco de Inglaterra ha sido hawkish, con un aumento de tasas de interés a 3.75%, lo que genera presión alcista sobre la divisa debido al mayor carry diferencial. Aunque la inflación se encuentra por encima del objetivo, el crecimiento del PIB es inferior al promedio global, lo que podría influir en la decisión del banco central en el futuro. La tasa de interés del Reino Unido es significativamente más alta que el promedio global, lo que atrae inversores en busca de rendimientos más altos.\n\nLa balanza comercial y la cuenta corriente del Reino Unido muestran un déficit, lo que ejerce presión vendedora sobre la divisa. Sin embargo, la composición exportadora del país, que se centra en maquinaria industrial y productos farmacéuticos, podría ser beneficiada por un entorno global con apetito por riesgo. La producción industrial ha disminuido, pero el PMI manufacturero sigue en expansión, lo que sugiere que el sector manufacturero podría estar experimentando un ajuste en lugar de una contracción.\n\nEl posicionamiento especulativo en la divisa es muy cargado a la baja, lo que podría generar un rebote contrario si los datos económicos mejoran. El rendimiento FX del último mes ha sido negativo, lo que refleja la depreciación de la divisa. Aunque el banco central ha adoptado una postura hawkish, el mercado podría estar subestimando el potencial de la divisa, lo que podría generar una oportunidad de compra si los fundamentos económicos del Reino Unido mejoran.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:06:31.454435+00:00",
+  "generatedAt": "2026-02-24T23:39:51.568365+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
   "dataSnapshot": {
     "interestRate": 3.75,
@@ -13,8 +13,17 @@
     "unemployment": 5.2,
     "currentAccount": -2.2,
     "rateMomentum": -0.25,
+    "lastRateDecision": {
+      "direction": "SUBIÓ",
+      "delta": 0.8517,
+      "current_rate": 4.48333333333333,
+      "prev_rate": 3.63166666666667,
+      "date": "1998",
+      "source": "WorldBank"
+    },
     "cotPositioning": -42400,
-    "fxPerformance1M": -0.251,
+    "fxPerformance1M": -0.3133,
+    "fxSource": "frankfurter",
     "lastUpdate": "2026-02-24"
   },
   "globalContext": {
@@ -23,7 +32,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": 0.98,
+    "avg_fx_perf_1m": -1.36,
     "avg_cot": 17653.5
   }
 }
