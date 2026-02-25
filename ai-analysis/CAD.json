@@ -2,9 +2,9 @@
   "currency": "CAD",
   "country": "Canadá",
   "bank": "Banco de Canadá (BoC)",
-  "analysis": "La decisión del Banco de Canadá de bajar las tasas de interés un 0.25pp ha generado una presión bajista sobre la divisa canadiense, aunque la inflación se mantiene cerca del objetivo del 2%. El crecimiento del PIB es superior al promedio global, lo que sugiere una economía relativamente sólida. Sin embargo, el desempleo sigue siendo elevado, lo que podría limitar el crecimiento económico en el futuro.\n\nLa balanza comercial canadiense muestra un déficit, lo que se explica en parte por la composición exportadora del país, que se centra en combustibles y petróleo, vehículos y autopartes, y maquinaria industrial. Aunque los términos de intercambio son favorables, la cuenta corriente también muestra un déficit, lo que ejerce presión vendedora estructural sobre la divisa. El PMI manufacturero y la producción industrial muestran signos de expansión, lo que podría ayudar a mejorar la balanza comercial en el futuro.\n\nEl posicionamiento especulativo en la divisa canadiense es netamente alcista, con un COT de +25.8K contratos netos. Sin embargo, el rendimiento FX del último mes ha sido negativo, lo que sugiere que el precio no confirma el posicionamiento especulativo. El riesgo de corrección es elevado si los fundamentos no mejoran, aunque el apetito por riesgo en el mercado global podría favorecer a la divisa canadiense en el corto plazo.",
+  "analysis": "La política monetaria del Banco de Canadá ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que sugiere un ciclo bajista en el corto plazo. Aunque la inflación se mantiene cerca del objetivo del 2%, la decisión de bajar tasas puede presionar a la baja la divisa canadiense debido a la disminución del carry. La tasa de interés actual de 2.25% es ligeramente inferior al promedio global, lo que puede afectar la atracción de inversores hacia la divisa.\n\nLa balanza comercial canadiense presenta un déficit, lo que puede ser un factor de presión sobre la divisa. Sin embargo, la composición exportadora de Canadá, que se centra en combustibles y petróleo, vehículos y autopartes, y maquinaria industrial, puede ser beneficiada por el régimen global risk-on, que favorece las divisas de alto carry y exportadoras de materias primas. La producción industrial y las ventas minoristas también muestran signos de expansión, lo que puede ayudar a mitigar la presión sobre la divisa.\n\nEl posicionamiento especulativo en la divisa canadiense es ligeramente alcista, con 25.8K contratos netos, lo que puede indicar una expectativa de apreciación en el corto plazo. Sin embargo, el rendimiento FX del último mes ha sido negativo, lo que puede sugerir una corrección en el precio de la divisa. En general, el panorama para la divisa canadiense es complejo, con factores tanto alcistas como bajistas que pueden influir en su valor en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-24T23:48:59.275605+00:00",
+  "generatedAt": "2026-02-25T11:25:00.056679+00:00",
   "exportComposition": "Principales exportaciones: combustibles y petróleo, vehículos y autopartes, maquinaria industrial",
   "dataSnapshot": {
     "interestRate": 2.25,
@@ -24,17 +24,17 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 25800,
-    "fxPerformance1M": -0.8275,
+    "fxPerformance1M": -0.5935,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-24"
+    "lastUpdate": "2026-02-25"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.53,
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
-    "avg_bond10y": 3.25,
-    "avg_fx_perf_1m": -1.36,
+    "avg_bond10y": 3.26,
+    "avg_fx_perf_1m": -1.2,
     "avg_cot": 17653.5
   }
 }
