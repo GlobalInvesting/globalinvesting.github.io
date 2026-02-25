@@ -3641,10 +3641,10 @@ const getSentiment = (strength) => {
         ? strength.score 
         : (typeof strength === 'string' ? parseFloat(strength) : strength);
     
-    // Umbrales institucionales (distribución normal esperada)
-    if (numStrength >= 62) return 'alcista';   // Top 30% (~2-3 divisas)
-    if (numStrength <= 45) return 'bajista';   // Bottom 30% (~2-3 divisas)
-    return 'neutral';                          // Middle 40% (~3-4 divisas)
+    // Umbrales calibrados a escala comprimida (rango real: 20-82, distribución Feb 2026: 45-62)
+    if (numStrength >= 57) return 'alcista';   // Top ~25% — AUD(61.8), CHF(57+)
+    if (numStrength <= 49) return 'bajista';   // Bottom ~25% — USD(46), NZD(45.1), GBP(49.3)
+    return 'neutral';                          // Centro — JPY, EUR, CAD
 };
 
 const generateAnalysis = (currency, forexRates, economicData) => {
