@@ -2682,7 +2682,10 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             if (data.currentAccount > 5)       safeHavenScore += 30;
             else if (data.currentAccount > 2)  safeHavenScore += 20;
             else if (data.currentAccount > 0)  safeHavenScore += 10;
-            else if (data.currentAccount < -3) safeHavenScore -= 10;
+            // CA negativa NO se penaliza aquí — ya está penalizada en:
+            // 1. scoreIndicator(currentAccount, weight 3%)
+            // 2. calculateStructuralDeficit(CA < -3%)
+            // Esta función mide potencial safe haven, no castiga su ausencia.
         }
         if (data.inflation !== null && data.inflation !== undefined) {
             const dev = Math.abs(data.inflation - 2.0);
@@ -2705,8 +2708,9 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         let multiplier = 1.0;
         if (regime === 'risk-off') multiplier = safeHavenScore > 60 ? 1.5 : 1.0;
         if (regime === 'risk-on')  multiplier = safeHavenScore > 70 ? 1.1 : 0.7;
-        // Normalize to -5 / +10 score-point range
-        return Math.max(-5, Math.min(10, ((safeHavenScore * multiplier) / 100) * 15 - 5));
+        // Rango: 0 a +10 pts — la función solo premia safe haven genuino, no penaliza su ausencia.
+        // Las penalizaciones negativas ya vienen de calculateStructuralDeficit y scoreIndicator.
+        return Math.max(0, Math.min(10, ((safeHavenScore * multiplier) / 100) * 15 - 5));
     };
 
     // 2. Commodity Exposure — dynamic
@@ -2755,8 +2759,18 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
     // 5. Structural Deficit — dynamic
     const calculateStructuralDeficit = (data) => {
         let score = 0;
-        if (data.currentAccount !== null && data.currentAccount < -3)
-            score -= (Math.abs(data.currentAccount + 3) / 3) * 5;
+        if (data.currentAccount !== null && data.currentAccount < -3) {
+            const rawPenalty = (Math.abs(data.currentAccount + 3) / 3) * 5;
+            // Escalar por tamaño de economía (GDP en trillones):
+            // Economías grandes (>5T) tienen déficits CA más estructurales → penalidad plena.
+            // Economías pequeñas (<0.5T) tienen déficits CA más cíclicos (commodities, ciclo
+            // de términos de intercambio) que no representan riesgo soberano equivalente.
+            // Factor: 1.0 para GDP≥5T, ~0.5 para GDP≤0.5T, lineal entre ambos extremos.
+            // 100% data-driven: usa data.gdp, no el nombre de la divisa.
+            const gdp = (data.gdp != null && !isNaN(data.gdp)) ? data.gdp : 2.0;
+            const gdpScale = Math.min(1.0, Math.max(0.5, gdp / 5.0));
+            score -= rawPenalty * gdpScale;
+        }
         if (data.tradeBalance !== null && data.tradeBalance < -30000)
             score -= (Math.abs(data.tradeBalance + 30000) / 30000) * 5;
         if (data.currentAccount !== null && data.currentAccount < -3 &&
@@ -2877,18 +2891,36 @@ const calculateCotContrarianAdj = (data, countryObj) => {
         // el fxPerformance1M (peso 0.14) puede compensar y reflejar la realidad.
 const adj = combinedFactor * 8;
 
-        // Régimen COT — DENTRO de la función (antes del return)
+        // Régimen de riesgo — doble señal: COT promedio + FX momentum cross-sectional
         const cotValues = Object.values(allEconomicData)
             .map(d => d.cotPositioning)
             .filter(v => v !== null && v !== undefined && !isNaN(v));
         const avgCOT = cotValues.length >= 3
             ? cotValues.reduce((a, b) => a + b, 0) / cotValues.length : 0;
 
-        // En risk-on (COT promedio positivo), reducir el cap de safe haven
-        const regimeCapMultiplier = avgCOT > 10000 ? 0.5   // risk-on fuerte
-                                  : avgCOT > 0     ? 0.7   // risk-on leve  
-                                  : avgCOT > -5000 ? 1.0   // neutral
-                                  : 1.3;                   // risk-off
+        // Step 1: regime via avgCOT (existing)
+        const cotRegimeMult = avgCOT > 10000 ? 0.5
+                            : avgCOT > 0     ? 0.7
+                            : avgCOT > -5000 ? 1.0
+                            : 1.3;
+
+        // Step 2: regime via FX performance cross-sectional
+        // Se mide el máximo fxPerformance1M entre divisas NO-safe-haven (tasa > threshold)
+        // Si la divisa de mayor retorno real supera 2%, el mercado está en risk-on genuino
+        // independientemente de si el avgCOT llegó al umbral exacto.
+        // Es 100% data-driven: lee fxPerformance1M desde allEconomicData, sin hardcodear divisas.
+        const shThresholdForFX = Math.max(1.0, avgRate - 1.5);
+        const fxValsNonSH = Object.values(allEconomicData)
+            .filter(d => d.interestRate != null && d.interestRate > shThresholdForFX
+                      && d.fxPerformance1M != null)
+            .map(d => d.fxPerformance1M);
+        const maxFxNonSH = fxValsNonSH.length > 0 ? Math.max(...fxValsNonSH) : 0;
+
+        const fxRegimeMult = maxFxNonSH > 3.5 ? 0.45   // risk-on muy fuerte
+                           : maxFxNonSH > 2.0 ? 0.65   // risk-on moderado
+                           : 1.0;                        // neutral o risk-off
+
+        const regimeCapMultiplier = cotRegimeMult * fxRegimeMult;
 
 // Si el propio COT de la divisa es muy bajista, el mercado contradice
         // el safe haven premium → reducirlo proporcionalmente.
