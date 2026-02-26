@@ -1568,6 +1568,23 @@ const fetchExtendedData = async (countryCode) => {
             return 'Por confirmar';
         };
 
+        const formatEventTime = (timeUTC, dateISO) => {
+            if (!timeUTC || !dateISO) return '';
+            try {
+                // Construir fecha UTC completa y convertir a zona local del navegador
+                const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
+                // Verificar que la fecha es válida
+                if (isNaN(utcDatetime.getTime())) return timeUTC;
+                return utcDatetime.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch {
+                return timeUTC;
+            }
+        };
+    
         const generateDynamicEconomicCalendar = () => {
             const today = new Date();
             const events = [];
@@ -4990,7 +5007,7 @@ const sentiment = getSentiment(strength);
                                             <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isToday ? 'var(--blue)' : 'inherit' }}>
                                                 {event.date}
                                             </div>
-                                            <div>{event.time}</div>
+                                            <div>{formatEventTime(event.timeUTC || event.time, event.dateISO)}</div>
                                         </div>
                                         <div className="event-details">
                                             <div className="event-title">{event.event}</div>
