@@ -115,8 +115,7 @@
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo). El cambio de ciclo monetario es una señal más relevante para el precio que el nivel absoluto de tasa. También corrige automáticamente el Outlook Score: si el BC está subiendo tasas activamente, un outlook Dovish residual se actualiza a Neutral, y viceversa.</li>
                 <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde reportes CFTC e Investing.com. Incluye lógica contrarian automática para posiciones extremas y penalización directa sobre la prima safe haven cuando el propio COT de una divisa contradice su perfil estructural.</li>
                 <li><strong>Safe Haven Threshold Dinámico:</strong> El umbral que activa la prima safe haven para CHF y JPY se calcula automáticamente como <code>max(1.0, avgRate − 1.5)</code>. El cap máximo de la prima es +5 pts y se aplica una penalización proporcional al COT propio de la divisa: si los institucionales están vendiendo agresivamente una divisa con perfil de safe haven, el modelo reduce su prima, alineándose con el mercado.</li>
-                <li><strong>Régimen de Mercado vía COT:</strong> La prima safe haven se amplifica o comprime según el régimen de riesgo detectado a partir del posicionamiento COT promedio de las 8 divisas, reflejando si el mercado está en modo risk-off, neutral o risk-on.</li>
-                <li><strong>Perspectiva del BC (Outlook Score) — Peso 7%:</strong> El outlook Hawkish/Neutral/Dovish se incorpora como indicador de scoring, capturando la dirección de política monetaria además del nivel de tasa. Corregido automáticamente por <code>rateMomentum</code>.</li>
+<li><strong>Régimen de Mercado — Doble Señal:</strong> La prima safe haven se amplifica o comprime según dos señales independientes: (1) el posicionamiento COT promedio de las 8 divisas, y (2) el máximo fxPerformance1M entre divisas no-safe-haven. Si la divisa de mayor retorno real supera el 2% mensual, el modelo detecta risk-on genuino y comprime la prima safe haven incluso cuando el avgCOT no ha llegado a su umbral exacto. Ambas señales son 100% data-driven: ninguna hardcodea nombres de divisas.</li>                <li><strong>Perspectiva del BC (Outlook Score) — Peso 7%:</strong> El outlook Hawkish/Neutral/Dovish se incorpora como indicador de scoring, capturando la dirección de política monetaria además del nivel de tasa. Corregido automáticamente por <code>rateMomentum</code>.</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos de Trading Economics tres veces al día (00:00, 08:00 y 16:00 UTC), con datos reales de publicación (actual, estimado, previo), horarios precisos, impacto oficial y filtro por nivel de impacto.</li>
                 <li><strong>Términos de Intercambio — Peso 2%:</strong> Ratio precio exportaciones/importaciones (índice base 100) actualizado diariamente. Especialmente relevante para AUD, CAD y NZD.</li>
                 <li><strong>Próximas Reuniones:</strong> Fechas oficiales de reuniones de bancos centrales obtenidas de cbrates.com, actualizadas cada lunes.</li>
@@ -156,8 +155,7 @@
                         <td rowspan="4"><strong>Tier 2 — ~12%</strong><br/>Balance Externo</td>
                         <td>Balanza Comercial</td><td>5%</td><td>Flujos comerciales mensuales en millones USD.</td>
                     </tr>
-                    <tr><td>Cuenta Corriente</td><td>3%</td><td>Demanda estructural de divisa por flujos reales de bienes y servicios.</td></tr>
-                    <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal. Con corrección para economías con superávit de CA y deuda mayormente doméstica.</td></tr>
+<tr><td>Cuenta Corriente</td><td>3%</td><td>Demanda estructural de divisa por flujos reales de bienes y servicios. El déficit de CA se penaliza una única vez en este indicador y en <code>calculateStructuralDeficit</code> — no en <code>calculateSafeHavenScore</code>, que solo premia el potencial safe haven sin castigar su ausencia.</td></tr>                    <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal. Con corrección para economías con superávit de CA y deuda mayormente doméstica.</td></tr>
                     <tr><td>Términos de Intercambio</td><td>2%</td><td>Ratio precio exportaciones/importaciones (base 100). Especialmente relevante para AUD, CAD, NZD.</td></tr>
 
                     <tr>
@@ -279,7 +277,7 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
                 <a href="privacy.html">Política de Privacidad</a> |
                 <a href="contact.html">Contacto</a>
             </p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v5.1.0</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v5.2.0</p>
         </div>
     </div>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
