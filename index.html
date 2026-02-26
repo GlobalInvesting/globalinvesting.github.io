@@ -3165,7 +3165,7 @@ const indicatorTooltips = {
 
     manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via Trading Economics.",
 
-    cotPositioning: "Posicionamiento neto de traders especulativos (non-commercial) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Valores positivos = el 'smart money' especulativo tiene posición neta larga → sesgo alcista del mercado institucional. Valores negativos = posición corta neta → sesgo bajista. >30K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-30K = bajista extremo, posible rebote contrarian. Es la señal más directa disponible sobre dónde están apostando los grandes jugadores institucionales. Fuente: CFTC (cftc.gov), actualización viernes.",
+    cotPositioning: "Posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Fuente: reporte Futures Only (financial_lf.htm) — excluye opciones para reflejar únicamente presión directa sobre el precio. Valores positivos = el smart money especulativo tiene posición neta larga → sesgo alcista institucional. Valores negativos = posición corta neta → sesgo bajista. >80K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-80K = bajista extremo, posible rebote contrarian. Los Leveraged Funds son el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas, sin mandatos de cobertura ni posiciones pasivas. Fuente: CFTC oficial (cftc.gov/dea/futures/financial_lf.htm), actualización viernes.",
 
     consumerConfidence: "Índice que mide el optimismo o pesimismo de los hogares sobre su situación económica actual y futura. Varía por país: USA usa el índice de Michigan Consumer Sentiment (escala ~50–100); Eurozona, UK, AUD, CAD usan índices propios base 100. >100 (o equivalente) = los consumidores se sienten optimistas → mayor disposición al gasto, inversión, endeudamiento → positivo para crecimiento y divisa. <95 = pesimismo → contracción del consumo privado anticipada → negativo. Es un indicador adelantado del ciclo económico: la confianza cae antes de que los datos duros (PIB, ventas) lo reflejen. Fuente: Trading Economics.",
 
@@ -3824,7 +3824,7 @@ if (economicData[currency]?.outlook && country) {
 if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
     const cotK = (data.cotPositioning / 1000).toFixed(1);
     
-    if (data.cotPositioning > 30000) {
+    if (data.cotPositioning > 80000) {
         analysis.push(`Posicionamiento especulativo extremadamente alcista (+${cotK}K contratos netos) sugiere saturación del mercado y riesgo elevado de toma de ganancias.`);
     } else if (data.cotPositioning > 15000) {
         analysis.push(`Fuerte posicionamiento alcista de traders especulativos (+${cotK}K contratos) respalda momentum alcista, aunque con posible resistencia cerca.`);
@@ -3836,7 +3836,7 @@ if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
         analysis.push(`Posicionamiento ligeramente bajista (${cotK}K contratos) refleja cautela y presión vendedora moderada.`);
     } else if (data.cotPositioning > -15000) {
         analysis.push(`Sentimiento bajista entre especuladores (${cotK}K contratos netos) amplifica presión vendedora y debilita soporte técnico.`);
-    } else if (data.cotPositioning > -30000) {
+    } else if (data.cotPositioning > -80000) {
         analysis.push(`Fuerte posicionamiento bajista (${cotK}K contratos) señala convicción vendedora y riesgo de continuidad bajista.`);
     } else {
         analysis.push(`Posicionamiento bajista extremo (${cotK}K contratos) sugiere posible capitulación; podría catalizar rebote técnico si fundamentos cambian.`);
