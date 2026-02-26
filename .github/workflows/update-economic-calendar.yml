@@ -1,4 +1,4 @@
-name: Update Economic Calendar - v3 (RSS Multi-Source)
+name: Update Economic Calendar - v5 (Robust Multi-Source)
 
 on:
   schedule:
@@ -377,32 +377,66 @@ jobs:
                   print(f"  [Investing] Found {len(rows)} rows")
 
                   cc_map = {
+                      # Uppercase (from flag_ class after .upper())
                       'US':'USD','EU':'EUR','GB':'GBP','JP':'JPY',
                       'AU':'AUD','CA':'CAD','CH':'CHF','NZ':'NZD',
-                      'DE':'EUR','FR':'EUR','IT':'EUR','ES':'EUR',
+                      'DE':'EUR','FR':'EUR','IT':'EUR','ES':'EUR','PT':'EUR','NL':'EUR',
+                      # Lowercase (from data-img_pair attribute)
+                      'usd':'USD','eur':'EUR','gbp':'GBP','jpy':'JPY',
+                      'aud':'AUD','cad':'CAD','chf':'CHF','nzd':'NZD',
+                      'us':'USD','eu':'EUR','gb':'GBP','jp':'JPY',
+                      'au':'AUD','ca':'CAD','ch':'CHF','nz':'NZD',
+                      'de':'EUR','fr':'EUR','it':'EUR','es':'EUR',
                   }
                   events = []
                   for row in rows:
                       try:
                           dt_str = row.get('data-event-datetime', '')
                           event_date = None
-                          for fmt in ['%Y/%m/%d %H:%M:%S', '%Y-%m-%d %H:%M:%S']:
-                              try:
-                                  dt = datetime.strptime(dt_str[:19], fmt)
-                                  event_date = dt.date(); break
-                              except: pass
+                          if dt_str:
+                              # Normalize: replace T separator (ISO 8601) with space
+                              dt_norm = dt_str.strip().replace('T', ' ')
+                              for fmt in ['%Y/%m/%d %H:%M:%S', '%Y-%m-%d %H:%M:%S',
+                                          '%Y/%m/%d %H:%M',    '%Y-%m-%d %H:%M']:
+                                  try:
+                                      event_date = datetime.strptime(dt_norm[:19], fmt).date()
+                                      break
+                                  except: pass
+                              if event_date is None:
+                                  # Last resort: regex extract YYYY-MM-DD or YYYY/MM/DD
+                                  m2 = re.search(r'(\d{4})[-/](\d{2})[-/](\d{2})', dt_str)
+                                  if m2:
+                                      try: event_date = date(int(m2.group(1)), int(m2.group(2)), int(m2.group(3)))
+                                      except: pass
                           if not event_date or event_date not in target_dates: continue
 
-                          # Currency from flag span
+                          # Currency extraction — 4 methods in order of reliability
                           currency = ''
-                          flag_td = row.find('td', class_=re.compile('flagCur'))
-                          if flag_td:
-                              for sp in flag_td.find_all('span', class_=True):
+                          # Method 1: data-currency attribute on the <tr> (most direct)
+                          dc = row.get('data-currency', '').strip().upper()
+                          if dc and dc in TRACKED_CURRENCIES:
+                              currency = dc
+                          # Method 2: data-img_pair attribute (very stable, always lowercase)
+                          if not currency:
+                              pair = row.get('data-img_pair', '').strip().lower()
+                              if pair:
+                                  currency = cc_map.get(pair.upper(), cc_map.get(pair, ''))
+                          # Method 3: flag_XX class on any span inside the row
+                          if not currency:
+                              for sp in row.find_all('span', class_=True):
                                   cls = ' '.join(sp.get('class', []))
                                   m = re.search(r'flag_(\w+)', cls)
                                   if m:
                                       currency = cc_map.get(m.group(1).upper(), '')
                                       if currency: break
+                          # Method 4: raw text of flagCur td
+                          if not currency:
+                              flag_td = row.find('td', class_=re.compile('flagCur'))
+                              if flag_td:
+                                  txt = flag_td.get_text(strip=True).upper()
+                                  for c in TRACKED_CURRENCIES:
+                                      if c in txt:
+                                          currency = c; break
                           if currency not in TRACKED_CURRENCIES: continue
 
                           # Time
@@ -462,9 +496,16 @@ jobs:
                       except: continue
 
                   print(f"  [Investing] ✅ Parsed {len(events)} events")
+                  if len(events) == 0 and len(rows) > 0:
+                      # Debug: show first row raw to diagnose future issues
+                      first = rows[0]
+                      print(f"  [Investing] DEBUG first row attrs: {dict(first.attrs)}")
+                      print(f"  [Investing] DEBUG first row HTML[:300]: {str(first)[:300]}")
                   return events
               except Exception as e:
+                  import traceback
                   print(f"  [Investing] Error: {e}")
+                  print(f"  [Investing] Traceback: {traceback.format_exc()[:500]}")
                   return []
 
           # ════════════════════════════════════════════════════════════════════
@@ -521,7 +562,7 @@ jobs:
           # ════════════════════════════════════════════════════════════════════
 
           print("=" * 60)
-          print("ECONOMIC CALENDAR SCRAPER v4 (RSS Multi-Source, No Fake Data)")
+          print("ECONOMIC CALENDAR SCRAPER v5 (Robust Multi-Source, No Fake Data)")
           print("Sources: MQL5 RSS → TE RSS → Investing.com → Official RSS")
           print("Policy: if all sources fail, calendar is saved as EMPTY with error status.")
           print("        NEVER generates synthetic/hardcoded events.")
@@ -548,12 +589,12 @@ jobs:
               ("3: Investing.com", fetch_investing_calendar, (from_date.isoformat(), to_date.isoformat(), target_dates)),
               ("4: Official RSS",  fetch_official_rss,       (target_dates,)),
           ]:
-              if len(all_events) >= 5:
+              if len(all_events) >= 3:
                   break
               print(f"\n{'='*50}\nSTRATEGY {label}\n{'='*50}")
               try:
                   result = fetcher(*args)
-                  if len(result) >= 5:
+                  if len(result) >= 3:
                       all_events  = result
                       source_used = label.split(': ', 1)[1]
                       print(f"✅ {label}: {len(all_events)} events — using this source")
@@ -561,10 +602,13 @@ jobs:
                       msg = f"{label}: only {len(result)} events returned"
                       print(f"⚠️  {msg}")
                       fetch_errors.append(msg)
-                      # Keep partial results only if nothing better is found later
-                      if not all_events and result:
-                          all_events  = result
-                          source_used = label.split(': ', 1)[1] + ' (partial)'
+                      # Accumulate partial results across sources (de-duped later)
+                      if result:
+                          for ev in result:
+                              if ev not in all_events:
+                                  all_events.append(ev)
+                          if not source_used:
+                              source_used = label.split(': ', 1)[1] + ' (partial)'
               except Exception as e:
                   msg = f"{label} failed: {e}"
                   print(f"❌ {msg}")
