@@ -1955,7 +1955,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '5.1.0-2026-02-18';
+            const DASHBOARD_VERSION = '5.2.0-2026-02-26';
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -3856,17 +3856,18 @@ if (economicData[currency]?.outlook && country) {
 if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
     const cotK = (data.cotPositioning / 1000).toFixed(1);
     
+    // Umbrales calibrados para futures-only (financial_lf.htm) — ~40-50% menores que combined
     if (data.cotPositioning > 80000) {
         analysis.push(`Posicionamiento especulativo extremadamente alcista (+${cotK}K contratos netos) sugiere saturación del mercado y riesgo elevado de toma de ganancias.`);
-    } else if (data.cotPositioning > 15000) {
+    } else if (data.cotPositioning > 40000) {
         analysis.push(`Fuerte posicionamiento alcista de traders especulativos (+${cotK}K contratos) respalda momentum alcista, aunque con posible resistencia cerca.`);
-    } else if (data.cotPositioning > 5000) {
+    } else if (data.cotPositioning > 15000) {
         analysis.push(`Posicionamiento moderadamente alcista (+${cotK}K contratos) refleja confianza del mercado y sostiene tendencia alcista.`);
     } else if (data.cotPositioning > 0) {
         analysis.push(`Leve sesgo alcista en posicionamiento especulativo (+${cotK}K contratos) indica cautela pero con tendencia positiva.`);
-    } else if (data.cotPositioning > -5000) {
-        analysis.push(`Posicionamiento ligeramente bajista (${cotK}K contratos) refleja cautela y presión vendedora moderada.`);
     } else if (data.cotPositioning > -15000) {
+        analysis.push(`Posicionamiento ligeramente bajista (${cotK}K contratos) refleja cautela y presión vendedora moderada.`);
+    } else if (data.cotPositioning > -40000) {
         analysis.push(`Sentimiento bajista entre especuladores (${cotK}K contratos netos) amplifica presión vendedora y debilita soporte técnico.`);
     } else if (data.cotPositioning > -80000) {
         analysis.push(`Fuerte posicionamiento bajista (${cotK}K contratos) señala convicción vendedora y riesgo de continuidad bajista.`);
@@ -5294,7 +5295,7 @@ const sentiment = getSentiment(strength);
             © {new Date().getFullYear()} Santiago Plá · Global Investing. Todos los derechos reservados.
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-            Dashboard v5.1.0
+            Dashboard v5.2.0
         </div>
     </div>
 </div>
