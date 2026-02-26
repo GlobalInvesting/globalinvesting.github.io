@@ -33,8 +33,6 @@ jobs:
           print("=" * 70)
 
           # ── Fuentes CFTC ────────────────────────────────────────────────────────
-          # financial_lof.htm → EUR, GBP, JPY, CAD, CHF, AUD, NZD  (CME FX futures)
-          # deanybtsf.htm     → USD Index                            (ICE Futures)
           FINANCIAL_URL = "https://www.cftc.gov/dea/options/financial_lof.htm"
           USD_INDEX_URL = "https://www.cftc.gov/dea/futures/deanybtsf.htm"
 
@@ -45,16 +43,22 @@ jobs:
               )
           }
 
-          # ── Mapeo: divisa → nombre exacto que aparece en el reporte CFTC ───────
-          # El parser busca esta cadena (case-insensitive) antes de "COMMITMENTS".
+          # ── Mapeo: divisa → nombre(s) exactos en el reporte CFTC ────────────────
+          # Se aceptan múltiples aliases por divisa para mayor robustez ante cambios
+          # menores de formato en el archivo fuente.
           CURRENCY_NAMES = {
-              "EUR": "EURO FX - CHICAGO MERCANTILE EXCHANGE",
-              "GBP": "BRITISH POUND - CHICAGO MERCANTILE EXCHANGE",
-              "JPY": "JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE",
-              "CAD": "CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
-              "CHF": "SWISS FRANC - CHICAGO MERCANTILE EXCHANGE",
-              "AUD": "AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE",
-              "NZD": "NEW ZEALAND DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+              "EUR": ["EURO FX - CHICAGO MERCANTILE EXCHANGE"],
+              "GBP": ["BRITISH POUND - CHICAGO MERCANTILE EXCHANGE"],
+              "JPY": ["JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE"],
+              "CAD": ["CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE"],
+              "CHF": ["SWISS FRANC - CHICAGO MERCANTILE EXCHANGE"],
+              "AUD": ["AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE"],
+              "NZD": [
+                  "NEW ZEALAND DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+                  "N.Z. DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+                  "NZ DOLLAR - CHICAGO MERCANTILE EXCHANGE",
+                  "NEW ZEALAND DOLLAR - CME",
+              ],
           }
 
           # ── Helpers ─────────────────────────────────────────────────────────────
@@ -75,66 +79,103 @@ jobs:
               """Extract all integers/comma-separated numbers from a line."""
               return [int(s.replace(",", "")) for s in re.findall(r"[\d,]+", line)]
 
-          # ── Parser for financial_lof.htm ─────────────────────────────────────
-          # Layout per currency block:
+          # ── Diagnostic helper: find what names actually appear in the file ───────
+          def find_actual_name(content, currency):
+              """
+              Search the file for any plausible section header for this currency.
+              Prints what it finds so we can update aliases if needed.
+              """
+              keywords = {
+                  "NZD": ["zealand", "n.z."],
+                  "AUD": ["australian"],
+                  "CAD": ["canadian"],
+                  "CHF": ["swiss franc"],
+                  "GBP": ["british pound"],
+                  "JPY": ["japanese yen"],
+                  "EUR": ["euro fx"],
+              }
+              kws = keywords.get(currency, [])
+              for kw in kws:
+                  for m in re.finditer(kw, content, re.IGNORECASE):
+                      # Print the surrounding line
+                      start = content.rfind('\n', 0, m.start()) + 1
+                      end = content.find('\n', m.end())
+                      if end == -1:
+                          end = m.end() + 100
+                      line = content[start:end].strip()
+                      print(f"  🔍 Found '{kw}' at pos {m.start()}: {repr(line[:120])}")
+
+          # ── Parser for financial_lof.htm ─────────────────────────────────────────
+          # Layout per currency block (disaggregated format):
           #
-          #   <CURRENCY NAME> - CHICAGO MERCANTILE EXCHANGE  ...
-          #   CFTC Code #XXXXXX                 Open Interest is  NNN,NNN
+          #   <CURRENCY NAME> - CHICAGO MERCANTILE EXCHANGE  (Code #XXXXXX ...)
           #   Positions
           #     DD_L  DD_S  DD_SP  AM_L  AM_S  AM_SP  LF_L  LF_S  LF_SP  OR_L ...
           #
-          # Columns (0-indexed, within the single "Positions" data line):
+          # Columns (0-indexed within the single "Positions" data line):
           #   0  Dealer Long        1  Dealer Short       2  Dealer Spreading
           #   3  Asset Mgr Long     4  Asset Mgr Short    5  Asset Mgr Spreading
           #   6  Leveraged Long     7  Leveraged Short    8  Leveraged Spreading
-          #   9  Other Long        10  Other Short       11  Other Spreading
-          #  12  Nonrep Long       13  Nonrep Short
+          #   9  Other Long        10  Other Short       ...
           #
           # "Leveraged Funds" (indices 6 & 7) = speculative / non-commercial equivalent.
-          # We compute: net = Leveraged Long − Leveraged Short
+          #
+          # IMPORTANT: Some smaller markets (NZD) may have the data split across two
+          # physical lines in the file, or may have fewer populated columns.  The parser
+          # now concatenates adjacent non-empty lines until it has ≥ 8 numbers.
 
-          def extract_leveraged_net(content, currency_name):
+          def extract_leveraged_net(content, currency_code, aliases):
               """
-              Returns (long, short, net) for Leveraged Funds, or None on failure.
+              Tries every alias for the currency.
+              Returns (long, short, net, matched_name) or (None, None, None, None).
               """
-              # Find currency header (case-insensitive)
-              pattern = re.compile(
-                  re.escape(currency_name.upper()),
-                  re.IGNORECASE | re.DOTALL,
-              )
-              m = pattern.search(content)
-              if not m:
-                  print(f"  ❌ Section not found for: {currency_name}")
-                  return None
+              for name in aliases:
+                  pattern = re.compile(re.escape(name.upper()), re.IGNORECASE | re.DOTALL)
+                  m = pattern.search(content)
+                  if not m:
+                      print(f"  ⚙️  Alias not found: '{name}'")
+                      continue
 
-              # Slice to the next ~25 lines after the header
-              snippet = content[m.start(): m.start() + 3000]
-              lines = snippet.splitlines()
+                  print(f"  ✔️  Matched alias: '{name}' at pos {m.start()}")
+                  snippet = content[m.start(): m.start() + 4000]
+                  lines = snippet.splitlines()
 
-              # Find "Positions" line, then the very next non-empty line has the data
-              for i, line in enumerate(lines):
-                  if re.match(r"\s*Positions\s*$", line, re.IGNORECASE):
-                      for j in range(i + 1, min(i + 5, len(lines))):
-                          nums = parse_numbers(lines[j])
-                          if len(nums) >= 8:
-                              lev_long  = nums[6]
-                              lev_short = nums[7]
+                  for i, line in enumerate(lines):
+                      if re.match(r"\s*Positions\s*$", line, re.IGNORECASE):
+                          print(f"  📌 'Positions' keyword found at snippet line {i}")
+
+                          # Collect numbers from the next few lines, merging until ≥ 8
+                          collected_nums = []
+                          for j in range(i + 1, min(i + 8, len(lines))):
+                              raw = lines[j].strip()
+                              if not raw:
+                                  continue  # skip blank separator lines
+                              nums = parse_numbers(raw)
+                              if not nums:
+                                  break     # non-numeric line = end of data block
+                              collected_nums.extend(nums)
+                              print(f"  📊 Line {j}: {len(nums)} numbers → cumulative {len(collected_nums)}: {nums[:10]}...")
+                              if len(collected_nums) >= 8:
+                                  break
+
+                          if len(collected_nums) >= 8:
+                              lev_long  = collected_nums[6]
+                              lev_short = collected_nums[7]
                               net = lev_long - lev_short
-                              return lev_long, lev_short, net
-              print(f"  ❌ Could not parse Positions data for: {currency_name}")
-              return None
+                              print(f"  ✅ Leveraged Long={lev_long:,}  Short={lev_short:,}  Net={net:+,}")
+                              return lev_long, lev_short, net, name
+                          else:
+                              print(f"  ⚠️  Only {len(collected_nums)} numbers found after 'Positions' — need ≥ 8")
+                              print(f"  ⚠️  Numbers collected: {collected_nums}")
 
-          # ── Parser for deanybtsf.htm (USD Index — legacy non-commercial) ──────
-          # This file uses the older Commercial/Non-Commercial layout:
-          #   NON-COMMERCIAL  COMMERCIAL  TOTAL  NONREPORTABLE
-          #     L   S  Spread   L   S      L   S    L   S
-          # Non-commercial Long = index 0, Short = index 1
+              # Nothing worked — run diagnostics
+              print(f"  ❌ All aliases failed for {currency_code}. Running diagnostics:")
+              find_actual_name(content, currency_code)
+              return None, None, None, None
 
+          # ── Parser for deanybtsf.htm (USD Index — legacy non-commercial) ─────────
           def extract_usd_noncommercial(content):
-              pattern = re.compile(
-                  r"U\.S\. DOLLAR INDEX",
-                  re.IGNORECASE | re.DOTALL,
-              )
+              pattern = re.compile(r"U\.S\. DOLLAR INDEX", re.IGNORECASE | re.DOTALL)
               m = pattern.search(content)
               if not m:
                   print("  ❌ USD Index section not found")
@@ -155,19 +196,19 @@ jobs:
               print("  ❌ Could not parse USD Index commitments")
               return None
 
-          # ── Save helper ──────────────────────────────────────────────────────
+          # ── Save helper ──────────────────────────────────────────────────────────
           os.makedirs("cot-data", exist_ok=True)
           today = str(date.today())
           results = {}
 
           def save(currency, long_pos, short_pos, net, source_url, category):
               data = {
-                  "netPosition":   net,
-                  "longPositions": long_pos,
+                  "netPosition":    net,
+                  "longPositions":  long_pos,
                   "shortPositions": short_pos,
                   "positionCategory": category,
-                  "source": "CFTC Official",
-                  "sourceUrl": source_url,
+                  "source":     "CFTC Official",
+                  "sourceUrl":  source_url,
                   "reportDate": today,
                   "lastUpdate": today,
               }
@@ -180,26 +221,28 @@ jobs:
                   f"(L {long_pos:,} / S {short_pos:,})  [{category}]"
               )
 
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           # 1. EUR, GBP, JPY, CAD, CHF, AUD, NZD  — from financial_lof.htm
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           print(f"\n{'─'*60}")
           print(f"Fetching {FINANCIAL_URL}")
           print(f"{'─'*60}")
           fin_content = fetch_url(FINANCIAL_URL)
 
-          for currency, section_name in CURRENCY_NAMES.items():
-              print(f"\n[{currency}] Parsing '{section_name}'...")
-              result = extract_leveraged_net(fin_content, section_name)
-              if result:
-                  lev_long, lev_short, net = result
-                  save(currency, lev_long, lev_short, net, FINANCIAL_URL, "Leveraged Funds (non-commercial equivalent)")
+          for currency, aliases in CURRENCY_NAMES.items():
+              print(f"\n[{currency}] Searching with {len(aliases)} alias(es)...")
+              lev_long, lev_short, net, matched = extract_leveraged_net(
+                  fin_content, currency, aliases
+              )
+              if lev_long is not None:
+                  save(currency, lev_long, lev_short, net,
+                       FINANCIAL_URL, "Leveraged Funds (non-commercial equivalent)")
               else:
                   print(f"  ⚠️  No data saved for {currency}")
 
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           # 2. USD Index — from deanybtsf.htm  (non-commercial classic)
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           print(f"\n{'─'*60}")
           print(f"Fetching {USD_INDEX_URL}")
           print(f"{'─'*60}")
@@ -209,13 +252,14 @@ jobs:
           usd_result = extract_usd_noncommercial(usd_content)
           if usd_result:
               nc_long, nc_short, net = usd_result
-              save("USD", nc_long, nc_short, net, USD_INDEX_URL, "Non-Commercial (classic)")
+              save("USD", nc_long, nc_short, net,
+                   USD_INDEX_URL, "Non-Commercial (classic)")
           else:
               print("  ⚠️  No data saved for USD")
 
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           # Summary
-          # ════════════════════════════════════════════════════════════════════
+          # ════════════════════════════════════════════════════════════════════════
           print(f"\n{'='*70}")
           print(f"SUMMARY — {len(results)}/8 currencies updated")
           print(f"{'='*70}")
@@ -226,11 +270,14 @@ jobs:
               sign     = "+" if d['netPosition'] >= 0 else ""
               print(f"  {curr:3s}  {sign}{d['netPosition']:>9,}  {bar}")
 
-          if len(results) < 7:
-              print("\n⚠️  Some currencies missing — check logs above")
+          missing = [c for c in ["USD","EUR","GBP","JPY","AUD","CAD","CHF","NZD"]
+                     if c not in results]
+          if missing:
+              print(f"\n⚠️  Missing currencies: {', '.join(missing)}")
+              # Fail loudly so GitHub Actions marks the run as failed
               raise SystemExit(1)
           else:
-              print("\n✅ All currencies saved successfully")
+              print("\n✅ All 8 currencies saved successfully")
           EOFPYTHON
 
       - name: Display COT summary
@@ -244,16 +291,32 @@ jobs:
             if [ -f "cot-data/$currency.json" ]; then
               echo "[$currency]"
               python3 -c "
-          import json
-          with open('cot-data/$currency.json') as f:
-              d = json.load(f)
-          sign = '+' if d['netPosition'] >= 0 else ''
-          print(f\"  Net Position : {sign}{d['netPosition']:,} contracts\")
-          print(f\"  Long         : {d['longPositions']:,}\")
-          print(f\"  Short        : {d['shortPositions']:,}\")
-          print(f\"  Category     : {d['positionCategory']}\")
-          print(f\"  Report Date  : {d['reportDate']}\")
-          print(f\"  Source       : {d['source']}\")
+          import json, sys
+          try:
+              with open('cot-data/$currency.json') as f:
+                  d = json.load(f)
+          except Exception as e:
+              print(f'  ❌ Could not read file: {e}')
+              sys.exit(0)
+
+          # Robust display — handle both old schema (no longPositions) and new schema
+          net = d.get('netPosition')
+          if net is None:
+              print('  Net Position : N/A')
+          else:
+              sign = '+' if net >= 0 else ''
+              print(f'  Net Position : {sign}{net:,} contracts')
+
+          long_pos  = d.get('longPositions')
+          short_pos = d.get('shortPositions')
+          if long_pos is not None:
+              print(f'  Long         : {long_pos:,}')
+          if short_pos is not None:
+              print(f'  Short        : {short_pos:,}')
+
+          print(f'  Category     : {d.get(\"positionCategory\", \"N/A\")}')
+          print(f'  Report Date  : {d.get(\"reportDate\", d.get(\"lastUpdate\", \"N/A\"))}')
+          print(f'  Source       : {d.get(\"source\", \"N/A\")}')
           "
               echo ""
             else
