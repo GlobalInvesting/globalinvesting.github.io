@@ -3185,6 +3185,7 @@ const indicatorTooltips = {
             const [dynamicAlerts, setDynamicAlerts] = useState([]);
             const [economicCalendar, setEconomicCalendar] = useState({ events: [], lastUpdate: null, source: null, impactCounts: {}, currencyCounts: {} });
             const [calFilter, setCalFilter] = useState('all');
+            const [calSelectedDate, setCalSelectedDate] = useState(null);
             const [lastUpdate, setLastUpdate] = useState(null);
             const [historicalData, setHistoricalData] = useState({});
             const [aiAnalyses, setAiAnalyses]           = useState(null);
@@ -4713,150 +4714,297 @@ const sentiment = getSentiment(strength);
                         )}
 
 {activeTab === 'calendar' && (
-                            <div>
-                                <div className="section-header">
-                                    <div className="section-title">Calendario Económico</div>
-                                    <div className="section-meta">
-                                        {economicCalendar.source && economicCalendar.source !== 'fallback-generator'
-                                            ? `Fuente: Trading Economics • Actualizado ${economicCalendar.lastUpdate || ''}`
-                                            : 'Calendario estimado (scraping en proceso)'}
-                                        {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
-                                            <span style={{ marginLeft: '1rem' }}>
-                                                🔴 {economicCalendar.impactCounts.high} alto
-                                                {economicCalendar.impactCounts.medium > 0 && ` · 🟠 ${economicCalendar.impactCounts.medium} medio`}
+    <div>
+        <div className="section-header">
+            <div className="section-title">Calendario Económico</div>
+            <div className="section-meta">
+                {economicCalendar.source && economicCalendar.source !== 'fallback-generator'
+                    ? `Fuente: Trading Economics • Actualizado ${economicCalendar.lastUpdate || ''}`
+                    : 'Calendario estimado (scraping en proceso)'}
+                {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
+                    <span style={{ marginLeft: '1rem' }}>
+                        🔴 {economicCalendar.impactCounts.high} alto
+                        {economicCalendar.impactCounts.medium > 0 && ` · 🟠 ${economicCalendar.impactCounts.medium} medio`}
+                    </span>
+                )}
+            </div>
+        </div>
+
+        {(() => {
+            const allEvents = (economicCalendar.events || []);
+
+            // ── Agrupar eventos por fecha ──────────────────────────────
+            const dayMap = {};
+            allEvents.forEach(e => {
+                const key = e.dateISO || e.date || 'Sin fecha';
+                if (!dayMap[key]) dayMap[key] = { label: e.date || key, dateISO: key, events: [] };
+                dayMap[key].events.push(e);
+            });
+            const days = Object.values(dayMap).sort((a, b) =>
+                (a.dateISO || '').localeCompare(b.dateISO || '')
+            );
+
+            // Día seleccionado: por defecto el primero disponible (hoy o futuro)
+            const todayISO = new Date().toISOString().split('T')[0];
+            const defaultDay = days.find(d => d.dateISO >= todayISO) || days[0];
+            const activeDateISO = calSelectedDate || (defaultDay && defaultDay.dateISO) || null;
+            const activeDayIdx = days.findIndex(d => d.dateISO === activeDateISO);
+            const activeDay = days[activeDayIdx] || null;
+
+            const goToPrev = () => {
+                if (activeDayIdx > 0) setCalSelectedDate(days[activeDayIdx - 1].dateISO);
+            };
+            const goToNext = () => {
+                if (activeDayIdx < days.length - 1) setCalSelectedDate(days[activeDayIdx + 1].dateISO);
+            };
+
+            const filteredEvents = activeDay
+                ? (calFilter === 'all' ? activeDay.events : activeDay.events.filter(e => e.impact === calFilter))
+                : [];
+
+            if (allEvents.length === 0) {
+                return (
+                    <div style={{
+                        textAlign: 'center', padding: '3rem',
+                        color: 'var(--text-secondary)',
+                        background: 'var(--bg-secondary)',
+                        borderRadius: '6px', border: '1px solid var(--border)'
+                    }}>
+                        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
+                        <div style={{ fontWeight: 600, color: 'var(--orange)', marginBottom: '0.75rem' }}>
+                            Datos del calendario no disponibles
+                        </div>
+                        <div style={{ fontSize: '0.875rem', lineHeight: '1.7', maxWidth: '480px', margin: '0 auto' }}>
+                            {economicCalendar.errorMessage || 'El scraping automático no ha podido obtener datos.'}
+                        </div>
+                        <div style={{ marginTop: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>
+                            Consulte directamente:{' '}
+                            <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>ForexFactory</a>
+                            {' · '}
+                            <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Investing.com</a>
+                            {' · '}
+                            <a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>TradingEconomics</a>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <>
+                    {/* ── Barra de navegación de días ───────────────────── */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0',
+                        marginBottom: '1rem',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        overflow: 'hidden'
+                    }}>
+                        {/* Botón anterior */}
+                        <button
+                            onClick={goToPrev}
+                            disabled={activeDayIdx <= 0}
+                            style={{
+                                padding: '0.75rem 1rem',
+                                background: 'transparent',
+                                border: 'none',
+                                borderRight: '1px solid var(--border)',
+                                color: activeDayIdx <= 0 ? 'var(--text-tertiary)' : 'var(--text-primary)',
+                                cursor: activeDayIdx <= 0 ? 'default' : 'pointer',
+                                fontSize: '1rem',
+                                transition: 'background 0.15s',
+                                flexShrink: 0
+                            }}
+                            onMouseEnter={e => { if (activeDayIdx > 0) e.currentTarget.style.background = 'var(--bg-elevated)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                        >
+                            ‹
+                        </button>
+
+                        {/* Pestañas de días — scrollable */}
+                        <div style={{
+                            display: 'flex',
+                            overflowX: 'auto',
+                            flex: 1,
+                            scrollbarWidth: 'none',
+                        }}>
+                            {days.map((day, idx) => {
+                                const isActive = day.dateISO === activeDateISO;
+                                const isToday  = day.dateISO === todayISO;
+                                const highCount = day.events.filter(e => e.impact === 'high').length;
+                                return (
+                                    <button
+                                        key={day.dateISO}
+                                        onClick={() => setCalSelectedDate(day.dateISO)}
+                                        style={{
+                                            padding: '0.625rem 1.125rem',
+                                            background: isActive ? 'var(--bg-card)' : 'transparent',
+                                            border: 'none',
+                                            borderBottom: isActive ? '2px solid var(--blue)' : '2px solid transparent',
+                                            color: isActive ? 'var(--text-primary)' : isToday ? 'var(--blue)' : 'var(--text-secondary)',
+                                            cursor: 'pointer',
+                                            fontSize: '0.8125rem',
+                                            fontWeight: isActive ? 600 : 400,
+                                            whiteSpace: 'nowrap',
+                                            transition: 'all 0.15s',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '0.2rem',
+                                            position: 'relative',
+                                            flexShrink: 0
+                                        }}
+                                    >
+                                        <span>{day.label}</span>
+                                        {/* Indicador de eventos de alto impacto */}
+                                        {highCount > 0 && (
+                                            <span style={{
+                                                display: 'flex',
+                                                gap: '2px',
+                                                justifyContent: 'center'
+                                            }}>
+                                                {Array.from({ length: Math.min(highCount, 5) }).map((_, i) => (
+                                                    <span key={i} style={{
+                                                        width: '4px', height: '4px',
+                                                        borderRadius: '50%',
+                                                        background: 'var(--red-strong)',
+                                                        display: 'inline-block'
+                                                    }}/>
+                                                ))}
                                             </span>
                                         )}
-                                    </div>
-                                </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
 
-                                {/* Filter bar */}
-                                {(() => {
-    const events = (economicCalendar.events || []);
-    const filtered = calFilter === 'all'
-        ? events
-        : events.filter(e => e.impact === calFilter);
+                        {/* Botón siguiente */}
+                        <button
+                            onClick={goToNext}
+                            disabled={activeDayIdx >= days.length - 1}
+                            style={{
+                                padding: '0.75rem 1rem',
+                                background: 'transparent',
+                                border: 'none',
+                                borderLeft: '1px solid var(--border)',
+                                color: activeDayIdx >= days.length - 1 ? 'var(--text-tertiary)' : 'var(--text-primary)',
+                                cursor: activeDayIdx >= days.length - 1 ? 'default' : 'pointer',
+                                fontSize: '1rem',
+                                transition: 'background 0.15s',
+                                flexShrink: 0
+                            }}
+                            onMouseEnter={e => { if (activeDayIdx < days.length - 1) e.currentTarget.style.background = 'var(--bg-elevated)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                        >
+                            ›
+                        </button>
+                    </div>
 
-    return (
-        <>
-                                            <div style={{
-                                                display: 'flex',
-                                                gap: '0.5rem',
-                                                marginBottom: '1rem',
-                                                flexWrap: 'wrap'
-                                            }}>
-                                                {['all', 'high', 'medium', 'low'].map(f => (
-                                                    <button
-                                                        key={f}
-                                                        onClick={() => setCalFilter(f)}
-                                                        style={{
-                                                            padding: '0.375rem 0.875rem',
-                                                            borderRadius: '4px',
-                                                            border: '1px solid var(--border)',
-                                                            background: calFilter === f ? 'var(--blue)' : 'var(--bg-card)',
-                                                            color: calFilter === f ? 'white' : 'var(--text-secondary)',
-                                                            cursor: 'pointer',
-                                                            fontSize: '0.8125rem',
-                                                            fontWeight: 500,
-                                                            transition: 'all 0.15s'
-                                                        }}
-                                                    >
-                                                        {f === 'all'    ? 'Todos'       :
-                                                         f === 'high'   ? '🔴 Alto'     :
-                                                         f === 'medium' ? '🟠 Medio'    : '⚪ Bajo'}
-                                                    </button>
-                                                ))}
-                                                <span style={{
-                                                    marginLeft: 'auto',
-                                                    fontSize: '0.75rem',
-                                                    color: 'var(--text-tertiary)',
-                                                    alignSelf: 'center'
-                                                }}>
-                                                    {filtered.length} eventos
-                                                </span>
+                    {/* ── Filtros de impacto ─────────────────────────────── */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        marginBottom: '1rem',
+                        flexWrap: 'wrap',
+                        alignItems: 'center'
+                    }}>
+                        {['all', 'high', 'medium', 'low'].map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setCalFilter(f)}
+                                style={{
+                                    padding: '0.375rem 0.875rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid var(--border)',
+                                    background: calFilter === f ? 'var(--blue)' : 'var(--bg-card)',
+                                    color: calFilter === f ? 'white' : 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8125rem',
+                                    fontWeight: 500,
+                                    transition: 'all 0.15s'
+                                }}
+                            >
+                                {f === 'all'    ? 'Todos'    :
+                                 f === 'high'   ? '🔴 Alto'  :
+                                 f === 'medium' ? '🟠 Medio' : '⚪ Bajo'}
+                            </button>
+                        ))}
+                        <span style={{
+                            marginLeft: 'auto',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-tertiary)',
+                        }}>
+                            {filteredEvents.length} eventos
+                            {activeDay && (
+                                <span style={{ marginLeft: '0.5rem', color: 'var(--text-tertiary)' }}>
+                                    — {activeDay.label}
+                                </span>
+                            )}
+                        </span>
+                    </div>
+
+                    {/* ── Lista de eventos del día activo ───────────────── */}
+                    {filteredEvents.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center', padding: '2.5rem',
+                            color: 'var(--text-secondary)',
+                            background: 'var(--bg-secondary)',
+                            borderRadius: '6px', border: '1px solid var(--border)'
+                        }}>
+                            No hay eventos con ese filtro para este día.
+                        </div>
+                    ) : (
+                        <div className="calendar-container">
+                            {filteredEvents.map((event, index) => {
+                                const isToday = event.dateISO === todayISO;
+                                const hasActual = event.actual && event.actual !== '';
+                                return (
+                                    <div key={index} className="calendar-event" style={{
+                                        borderLeft: isToday ? '3px solid var(--blue)' : 'none',
+                                        opacity: hasActual ? 0.78 : 1,
+                                    }}>
+                                        <div className="event-time">
+                                            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isToday ? 'var(--blue)' : 'inherit' }}>
+                                                {event.date}
                                             </div>
-
-                                            {filtered.length === 0 ? (
+                                            <div>{event.time}</div>
+                                        </div>
+                                        <div className="event-details">
+                                            <div className="event-title">{event.event}</div>
+                                            <div className="event-country">
+                                                <span className="flag-emoji">{event.flag}</span> {event.country || event.currency}
+                                            </div>
+                                            {(event.actual || event.forecast || event.previous) && (
                                                 <div style={{
-                                                    textAlign: 'center',
-                                                    padding: '3rem',
-                                                    color: 'var(--text-secondary)',
-                                                    background: 'var(--bg-secondary)',
-                                                    borderRadius: '6px',
-                                                    border: '1px solid var(--border)'
+                                                    display: 'flex', gap: '0.75rem',
+                                                    marginTop: '0.25rem',
+                                                    fontSize: '0.75rem',
+                                                    color: 'var(--text-tertiary)'
                                                 }}>
-                                                    {(economicCalendar.events || []).length === 0
-                                                        ? (
-                                                            <div>
-                                                                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
-                                                                <div style={{ fontWeight: 600, color: 'var(--orange)', marginBottom: '0.75rem' }}>
-                                                                    Datos del calendario no disponibles
-                                                                </div>
-                                                                <div style={{ fontSize: '0.875rem', lineHeight: '1.7', maxWidth: '480px', margin: '0 auto' }}>
-                                                                    {economicCalendar.errorMessage || 'El scraping automático no ha podido obtener datos de ninguna fuente.'}
-                                                                </div>
-                                                                <div style={{ marginTop: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>
-                                                                    Consulte directamente:{' '}
-                                                                    <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>ForexFactory</a>
-                                                                    {' · '}
-                                                                    <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Investing.com</a>
-                                                                    {' · '}
-                                                                    <a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>TradingEconomics</a>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                        : 'No hay eventos con ese filtro de impacto.'}
-                                                </div>
-                                            ) : (
-                                                <div className="calendar-container">
-                                                    {filtered.map((event, index) => {
-                                                        const isToday = event.dateISO === new Date().toISOString().split('T')[0];
-                                                        const hasActual = event.actual && event.actual !== '';
-                                                        return (
-                                                            <div key={index} className="calendar-event" style={{
-                                                                borderLeft: isToday ? '3px solid var(--blue)' : 'none',
-                                                                opacity: hasActual ? 0.75 : 1,
-                                                            }}>
-                                                                <div className="event-time">
-                                                                    <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isToday ? 'var(--blue)' : 'inherit' }}>
-                                                                        {event.date}
-                                                                    </div>
-                                                                    <div>{event.time}</div>
-                                                                </div>
-                                                                <div className="event-details">
-                                                                    <div className="event-title">{event.event}</div>
-                                                                    <div className="event-country">
-                                                                        <span className="flag-emoji">{event.flag}</span> {event.country || event.currency}
-                                                                    </div>
-                                                                    {(event.actual || event.forecast || event.previous) && (
-                                                                        <div style={{
-                                                                            display: 'flex',
-                                                                            gap: '0.75rem',
-                                                                            marginTop: '0.25rem',
-                                                                            fontSize: '0.75rem',
-                                                                            color: 'var(--text-tertiary)'
-                                                                        }}>
-                                                                            {event.actual   && <span>Real: <strong style={{ color: 'var(--green-strong)' }}>{event.actual}</strong></span>}
-                                                                            {event.forecast && <span>Est: <strong style={{ color: 'var(--text-secondary)' }}>{event.forecast}</strong></span>}
-                                                                            {event.previous && <span>Ant: {event.previous}</span>}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <div className={`event-impact impact-${event.impact}`}>
-                                                                    {event.impact === 'high'   ? 'Alto Impacto' :
-                                                                     event.impact === 'medium' ? 'Medio' : 'Bajo'}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
+                                                    {event.actual   && <span>Real: <strong style={{ color: 'var(--green-strong)' }}>{event.actual}</strong></span>}
+                                                    {event.forecast && <span>Est: <strong style={{ color: 'var(--text-secondary)' }}>{event.forecast}</strong></span>}
+                                                    {event.previous && <span>Ant: {event.previous}</span>}
                                                 </div>
                                             )}
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        )}
+                                        </div>
+                                        <div className={`event-impact impact-${event.impact}`}>
+                                            {event.impact === 'high'   ? 'Alto Impacto' :
+                                             event.impact === 'medium' ? 'Medio' : 'Bajo'}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </>
+            );
+        })()}
+    </div>
+)}
 
-{activeTab === 'alerts' && (
+{activeTab === 'alerts' &&
     <div>
         <div className="section-header">
             <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
