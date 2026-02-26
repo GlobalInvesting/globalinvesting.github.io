@@ -132,9 +132,6 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 1: MQL5 Economic Calendar RSS
-          # URL: https://calendar.mql5.com/en/economic_calendar/rss
-          # WHY: Server-side XML, no JS needed, covers all 8 currencies,
-          #      includes actual/forecast/previous, no auth required.
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_mql5_rss(target_dates):
@@ -166,7 +163,6 @@ jobs:
                           continue
 
                       print(f"  [MQL5] Got {len(r.content)} bytes")
-                      # Try XML parser first, then HTML parser as fallback
                       for parser in ['lxml-xml', 'lxml', 'html.parser']:
                           soup = BeautifulSoup(r.text, parser)
                           items = soup.find_all('item')
@@ -184,7 +180,6 @@ jobs:
                               if not title_tag: continue
                               title_text = title_tag.get_text(strip=True)
 
-                              # Title format: "USD: Initial Jobless Claims"
                               currency = ''
                               event_name = title_text
                               if ':' in title_text:
@@ -204,7 +199,6 @@ jobs:
 
                               if currency not in TRACKED_CURRENCIES: continue
 
-                              # Date + time from pubDate
                               pub = item.find('pubDate')
                               event_date = None
                               time_str = ''
@@ -212,12 +206,11 @@ jobs:
                                   try:
                                       dt = parsedate_to_datetime(pub.get_text(strip=True))
                                       event_date = dt.date()
-                                      time_str = dt.strftime('%H:%M')
+                                      time_str = dt.strftime('%H:%M')  # UTC time
                                   except: pass
 
                               if not event_date or event_date not in target_dates: continue
 
-                              # Description: actual/forecast/previous/impact
                               desc_tag = item.find('description')
                               desc_raw = ''
                               if desc_tag:
@@ -225,7 +218,6 @@ jobs:
 
                               actual, forecast, previous, desc_impact = parse_desc_html(desc_raw)
 
-                              # Impact: check <importance> tag first
                               impact = ''
                               imp_tag = item.find(re.compile(r'importance', re.I))
                               if imp_tag:
@@ -237,11 +229,16 @@ jobs:
                                   impact = desc_impact if desc_impact else classify_impact_kw(event_name)
 
                               batch.append({
-                                  'date': fmt_date(event_date), 'dateISO': event_date.isoformat(),
-                                  'time': time_str, 'country': currency, 'currency': currency,
-                                  'flag': CURRENCY_FLAGS.get(currency,''), 'event': event_name,
-                                  'impact': impact, 'actual': actual,
-                                  'forecast': forecast, 'previous': previous,
+                                  'date': fmt_date(event_date),
+                                  'dateISO': event_date.isoformat(),
+                                  'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                                  'country': currency, 'currency': currency,
+                                  'flag': CURRENCY_FLAGS.get(currency,''),
+                                  'event': event_name,
+                                  'impact': impact,
+                                  'actual': actual,
+                                  'forecast': forecast,
+                                  'previous': previous,
                               })
                           except: continue
 
@@ -312,7 +309,7 @@ jobs:
                                   try:
                                       dt = parsedate_to_datetime(pub.get_text(strip=True))
                                       event_date = dt.date()
-                                      time_str = dt.strftime('%H:%M')
+                                      time_str = dt.strftime('%H:%M')  # UTC time
                                   except: pass
                               if not event_date or event_date not in target_dates: continue
 
@@ -322,11 +319,16 @@ jobs:
                               impact = imp if imp else classify_impact_kw(event_name)
 
                               batch.append({
-                                  'date': fmt_date(event_date), 'dateISO': event_date.isoformat(),
-                                  'time': time_str, 'country': currency, 'currency': currency,
-                                  'flag': CURRENCY_FLAGS.get(currency,''), 'event': event_name,
-                                  'impact': impact, 'actual': actual,
-                                  'forecast': forecast, 'previous': previous,
+                                  'date': fmt_date(event_date),
+                                  'dateISO': event_date.isoformat(),
+                                  'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                                  'country': currency, 'currency': currency,
+                                  'flag': CURRENCY_FLAGS.get(currency,''),
+                                  'event': event_name,
+                                  'impact': impact,
+                                  'actual': actual,
+                                  'forecast': forecast,
+                                  'previous': previous,
                               })
                           except: continue
 
@@ -339,7 +341,6 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 3: Investing.com (fixed parser)
-          # Fixed: currency extraction from flag_XX class, impact from icon title
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_investing_calendar(from_str, to_str, target_dates):
@@ -353,7 +354,6 @@ jobs:
                   'Referer': 'https://www.investing.com/economic-calendar/',
                   'Origin': 'https://www.investing.com',
               }
-              # Country IDs: USD=5, EUR=72, GBP=4, JPY=35, AUD=25, CAD=6, CHF=12, NZD=43
               data = [
                   ('dateFrom', from_str), ('dateTo', to_str),
                   ('timeZone', '0'), ('timeFilter', 'timeRemain'),
@@ -377,11 +377,9 @@ jobs:
                   print(f"  [Investing] Found {len(rows)} rows")
 
                   cc_map = {
-                      # Uppercase (from flag_ class after .upper())
                       'US':'USD','EU':'EUR','GB':'GBP','JP':'JPY',
                       'AU':'AUD','CA':'CAD','CH':'CHF','NZ':'NZD',
                       'DE':'EUR','FR':'EUR','IT':'EUR','ES':'EUR','PT':'EUR','NL':'EUR',
-                      # Lowercase (from data-img_pair attribute)
                       'usd':'USD','eur':'EUR','gbp':'GBP','jpy':'JPY',
                       'aud':'AUD','cad':'CAD','chf':'CHF','nzd':'NZD',
                       'us':'USD','eu':'EUR','gb':'GBP','jp':'JPY',
@@ -394,7 +392,6 @@ jobs:
                           dt_str = row.get('data-event-datetime', '')
                           event_date = None
                           if dt_str:
-                              # Normalize: replace T separator (ISO 8601) with space
                               dt_norm = dt_str.strip().replace('T', ' ')
                               for fmt in ['%Y/%m/%d %H:%M:%S', '%Y-%m-%d %H:%M:%S',
                                           '%Y/%m/%d %H:%M',    '%Y-%m-%d %H:%M']:
@@ -403,25 +400,27 @@ jobs:
                                       break
                                   except: pass
                               if event_date is None:
-                                  # Last resort: regex extract YYYY-MM-DD or YYYY/MM/DD
                                   m2 = re.search(r'(\d{4})[-/](\d{2})[-/](\d{2})', dt_str)
                                   if m2:
                                       try: event_date = date(int(m2.group(1)), int(m2.group(2)), int(m2.group(3)))
                                       except: pass
                           if not event_date or event_date not in target_dates: continue
 
-                          # Currency extraction — 4 methods in order of reliability
+                          # Extraer hora UTC del datetime
+                          time_str = ''
+                          if dt_str:
+                              dt_norm = dt_str.strip().replace('T', ' ')
+                              m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}:\d{2})', dt_norm)
+                              if m_t: time_str = m_t.group(1)
+
                           currency = ''
-                          # Method 1: data-currency attribute on the <tr> (most direct)
                           dc = row.get('data-currency', '').strip().upper()
                           if dc and dc in TRACKED_CURRENCIES:
                               currency = dc
-                          # Method 2: data-img_pair attribute (very stable, always lowercase)
                           if not currency:
                               pair = row.get('data-img_pair', '').strip().lower()
                               if pair:
                                   currency = cc_map.get(pair.upper(), cc_map.get(pair, ''))
-                          # Method 3: flag_XX class on any span inside the row
                           if not currency:
                               for sp in row.find_all('span', class_=True):
                                   cls = ' '.join(sp.get('class', []))
@@ -429,7 +428,6 @@ jobs:
                                   if m:
                                       currency = cc_map.get(m.group(1).upper(), '')
                                       if currency: break
-                          # Method 4: raw text of flagCur td
                           if not currency:
                               flag_td = row.find('td', class_=re.compile('flagCur'))
                               if flag_td:
@@ -439,20 +437,6 @@ jobs:
                                           currency = c; break
                           if currency not in TRACKED_CURRENCIES: continue
 
-                          # Time
-                          time_td = row.find('td', class_=re.compile('js-time|time'))
-                          time_str = ''
-                          if time_td:
-                              t = time_td.get_text(strip=True)
-                              m = re.match(r'(\d{1,2}):(\d{2})\s*(am|pm)?', t, re.I)
-                              if m:
-                                  h, mn = int(m.group(1)), m.group(2)
-                                  ap = (m.group(3) or '').lower()
-                                  if ap == 'pm' and h != 12: h += 12
-                                  elif ap == 'am' and h == 12: h = 0
-                                  time_str = f"{h:02d}:{mn}"
-
-                          # Impact from sentiment icon — check TITLE attribute first
                           impact = 'low'
                           sent_td = row.find('td', class_=re.compile('sentiment'))
                           if sent_td:
@@ -465,7 +449,6 @@ jobs:
                                   elif 'orange' in ic or 'medium' in ic.lower() or 'medium' in title_attr:
                                       impact = 'medium'
 
-                          # Event name
                           ev_td = row.find('td', class_=re.compile('event'))
                           event_name = ''
                           if ev_td:
@@ -474,7 +457,6 @@ jobs:
                               event_name = re.sub(r'\s+[A-Z]{3}/\d+$', '', event_name).strip()
                           if not event_name: continue
 
-                          # Values
                           def gcell(pat):
                               td = row.find('td', id=re.compile(pat))
                               return clean_val(td.get_text(strip=True)) if td else ''
@@ -487,17 +469,21 @@ jobs:
                               impact = classify_impact_kw(event_name)
 
                           events.append({
-                              'date': fmt_date(event_date), 'dateISO': event_date.isoformat(),
-                              'time': time_str, 'country': currency, 'currency': currency,
-                              'flag': CURRENCY_FLAGS.get(currency,''), 'event': event_name,
-                              'impact': impact, 'actual': actual,
-                              'forecast': forecast, 'previous': previous,
+                              'date': fmt_date(event_date),
+                              'dateISO': event_date.isoformat(),
+                              'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                              'country': currency, 'currency': currency,
+                              'flag': CURRENCY_FLAGS.get(currency,''),
+                              'event': event_name,
+                              'impact': impact,
+                              'actual': actual,
+                              'forecast': forecast,
+                              'previous': previous,
                           })
                       except: continue
 
                   print(f"  [Investing] ✅ Parsed {len(events)} events")
                   if len(events) == 0 and len(rows) > 0:
-                      # Debug: show first row raw to diagnose future issues
                       first = rows[0]
                       print(f"  [Investing] DEBUG first row attrs: {dict(first.attrs)}")
                       print(f"  [Investing] DEBUG first row HTML[:300]: {str(first)[:300]}")
@@ -510,7 +496,6 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 4: Official Government / Central Bank RSS
-          # These never block — limited scope but 100% reliable
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_official_rss(target_dates):
@@ -543,13 +528,16 @@ jobs:
                               try:
                                   dt = parsedate_to_datetime(pub.get_text(strip=True))
                                   event_date = dt.date()
-                                  time_str = dt.strftime('%H:%M')
+                                  time_str = dt.strftime('%H:%M')  # UTC time
                               except: pass
                           if not event_date or event_date not in target_dates: continue
                           events.append({
-                              'date': fmt_date(event_date), 'dateISO': event_date.isoformat(),
-                              'time': time_str or '', 'country': currency, 'currency': currency,
-                              'flag': CURRENCY_FLAGS.get(currency,''), 'event': event_name,
+                              'date': fmt_date(event_date),
+                              'dateISO': event_date.isoformat(),
+                              'timeUTC': time_str or '',   # ← UTC, el frontend convierte a local
+                              'country': currency, 'currency': currency,
+                              'flag': CURRENCY_FLAGS.get(currency,''),
+                              'event': event_name,
                               'impact': classify_impact_kw(event_name),
                               'actual': '', 'forecast': '', 'previous': '',
                           })
@@ -566,6 +554,7 @@ jobs:
           print("Sources: MQL5 RSS → TE RSS → Investing.com → Official RSS")
           print("Policy: if all sources fail, calendar is saved as EMPTY with error status.")
           print("        NEVER generates synthetic/hardcoded events.")
+          print("        All times stored as UTC — frontend converts to user local timezone.")
           print("=" * 60)
 
           today      = date.today()
@@ -580,7 +569,7 @@ jobs:
           print(f"\nTarget: {from_date} → {to_date} ({len(target_dates)} days)\n")
 
           all_events  = []
-          source_used = None   # None = no data obtained from any real source
+          source_used = None
           fetch_errors = []
 
           for label, fetcher, args in [
@@ -602,7 +591,6 @@ jobs:
                       msg = f"{label}: only {len(result)} events returned"
                       print(f"⚠️  {msg}")
                       fetch_errors.append(msg)
-                      # Accumulate partial results across sources (de-duped later)
                       if result:
                           for ev in result:
                               if ev not in all_events:
@@ -615,16 +603,11 @@ jobs:
                   fetch_errors.append(msg)
               time.sleep(2)
 
-          # ── No data obtained: save empty calendar with explicit error status ──
-          # We NEVER generate synthetic events. Users must see "data unavailable"
-          # rather than fabricated dates/events, which would be financially dangerous.
           if not all_events:
               print(f"\n{'='*50}")
               print("⛔ ALL SOURCES FAILED — saving empty calendar with error status")
-              print("   Errors:")
               for e in fetch_errors:
                   print(f"   • {e}")
-              print("   The dashboard will show a 'data unavailable' message to users.")
               print("=" * 50)
 
           # Deduplicate
@@ -635,9 +618,9 @@ jobs:
               if k not in seen:
                   seen.add(k); unique_events.append(ev)
 
-          # Sort
+          # Sort by dateISO + timeUTC
           def sort_key(ev):
-              t = ev.get('time') or '00:00'
+              t = ev.get('timeUTC') or '00:00'
               return ev['dateISO'] + 'T' + (t if re.match(r'\d{2}:\d{2}', t) else '00:00')
 
           unique_events.sort(key=sort_key)
@@ -661,14 +644,13 @@ jobs:
               currency_counts[c] = currency_counts.get(c, 0) + 1
               impact_counts[ev.get('impact','low')] = impact_counts.get(ev.get('impact','low'), 0) + 1
 
-          # ── Determine status ──────────────────────────────────────────────
           import sys
           data_ok = len(final_events) >= 5
 
-          # Save
           output = {
               'lastUpdate':     today.isoformat(),
               'generatedAt':    datetime.utcnow().isoformat() + 'Z',
+              'timezoneNote':   'All times stored in UTC. Frontend converts to user local timezone.',
               'status':         'ok'    if data_ok else 'error',
               'source':         source_used if data_ok else None,
               'errorMessage':   None    if data_ok else (
@@ -701,23 +683,18 @@ jobs:
                   for ev in high:
                       fc = f" | est:{ev['forecast']}" if ev.get('forecast') else ''
                       ac = f" → {ev['actual']}"        if ev.get('actual')   else ''
-                      print(f"   {ev['dateISO']} {(ev['time'] or '?'):5s} [{ev['currency']}] {ev['event']}{fc}{ac}")
+                      print(f"   {ev['dateISO']} {(ev['timeUTC'] or '?'):5s} UTC [{ev['currency']}] {ev['event']}{fc}{ac}")
           else:
               print(f"⛔ SAVED EMPTY CALENDAR — all sources failed")
-              print(f"   The dashboard will show a clear 'data unavailable' error.")
-              print(f"   Errors logged:")
               for e in fetch_errors:
                   print(f"   • {e}")
           print("=" * 60)
 
-          # Fail the workflow so GitHub sends an alert email to repo maintainers
           if not data_ok:
               sys.exit(1)
           EOFPYTHON
 
       - name: Commit and push
-        # Run even if scraping step failed so the error-state JSON reaches the repo
-        # and the dashboard can show "data unavailable" instead of showing stale data.
         if: always()
         run: |
           git config user.name github-actions
@@ -726,13 +703,12 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to calendar data"
           else
-            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v4 RSS no-fake-data"
+            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v5 timeUTC"
             git pull --rebase origin main || true
             git push
           fi
 
       - name: Fail if no data was obtained
-        # Raise failure AFTER commit so GitHub marks the run red and emails maintainers.
         if: failure()
         run: |
           echo "⛔ Calendar scraping failed — all sources returned 0 usable events."
