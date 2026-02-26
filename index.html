@@ -2472,19 +2472,22 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
 
         case 'moderate_bullish':
             // cotPositioning — con lógica contrarian para extremos
-            if (value > 100000) {
-                score = Math.max(20, 60 - ((value - 100000) / 50000) * 30);
-            } else if (value > 30000)       score = 85 - ((value - 30000) / 70000) * 25;
-            else if (value > 15000)  score = 95 - ((value - 15000) / 15000) * 10;
-            else if (value > 5000)   score = 100 - ((value - 5000) / 10000) * 5;
-            else if (value > 0)      score = 70 + (value / 5000) * 30;
+            // Umbrales calibrados para futures-only (financial_lf.htm):
+            // Los valores netos son ~40-50% menores que en futures+options.
+            // El contrarian penalty ahora empieza en 80K (antes 30K en combined).
+            if (value > 200000) {
+                score = Math.max(20, 60 - ((value - 200000) / 100000) * 30);
+            } else if (value > 80000)       score = 85 - ((value - 80000) / 120000) * 25;
+            else if (value > 40000)  score = 95 - ((value - 40000) / 40000) * 10;
+            else if (value > 15000)  score = 100 - ((value - 15000) / 25000) * 5;
+            else if (value > 0)      score = 70 + (value / 15000) * 30;
             else if (value === 0)    score = 50;
-            else if (value > -5000)  score = 30 + ((value + 5000) / 5000) * 20;
-            else if (value > -15000) score = 15 + ((value + 15000) / 10000) * 15;
-            else if (value > -30000) score = 5  + ((value + 30000) / 15000) * 10;
-            else if (value > -100000) score = Math.max(5, 5 - ((Math.abs(value) - 30000) / 70000) * 5);
+            else if (value > -15000) score = 30 + ((value + 15000) / 15000) * 20;
+            else if (value > -40000) score = 15 + ((value + 40000) / 25000) * 15;
+            else if (value > -80000) score = 5  + ((value + 80000) / 40000) * 10;
+            else if (value > -200000) score = Math.max(5, 5 - ((Math.abs(value) - 80000) / 120000) * 5);
             else {
-                score = Math.min(80, 20 + ((Math.abs(value) - 100000) / 50000) * 30);
+                score = Math.min(80, 20 + ((Math.abs(value) - 200000) / 100000) * 30);
             }
             break;
 
@@ -3582,15 +3585,16 @@ const getHeatmapColor = (value, type) => {
             break;
 
         case 'cotPositioning':
-            if (value === 0)       return 'var(--bg-card)';
-            if (value > 20000)     { intensity = 0.8; isPositive = true;  }
-            else if (value > 10000){ intensity = 0.7; isPositive = true;  }
-            else if (value > 5000) { intensity = 0.5; isPositive = true;  }
-            else if (value > 0)    { intensity = 0.3; isPositive = true;  }
-            else if (value > -5000){ intensity = 0.3; isPositive = false; }
-            else if (value > -10000){ intensity = 0.5; isPositive = false; }
-            else if (value > -20000){ intensity = 0.7; isPositive = false; }
-            else                   { intensity = 0.8; isPositive = false; }
+            // Umbrales calibrados para futures-only (financial_lf.htm).
+            if (value === 0)        return 'var(--bg-card)';
+            if (value > 50000)      { intensity = 0.8; isPositive = true;  }
+            else if (value > 25000) { intensity = 0.7; isPositive = true;  }
+            else if (value > 10000) { intensity = 0.5; isPositive = true;  }
+            else if (value > 0)     { intensity = 0.3; isPositive = true;  }
+            else if (value > -10000){ intensity = 0.3; isPositive = false; }
+            else if (value > -25000){ intensity = 0.5; isPositive = false; }
+            else if (value > -50000){ intensity = 0.7; isPositive = false; }
+            else                    { intensity = 0.8; isPositive = false; }
             break;
 
         case 'bond10y':
