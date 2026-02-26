@@ -176,7 +176,7 @@
 
                     <tr>
                         <td rowspan="5"><strong>Tier 5 — ~19%</strong><br/>Sentimiento de Mercado</td>
-                        <td>COT Positioning</td><td><strong>7%</strong></td><td>Huella directa del smart money. Lógica contrarian para posiciones extremas. Fuente: CFTC Oficial (<code>financial_lof.htm</code>) — Leveraged Funds para las 8 divisas.</td>
+                        <td>COT Positioning</td><td><strong>7%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Lógica contrarian para posiciones extremas. Fuente: CFTC Oficial (<code>financial_lof.htm</code>), categoría Leveraged Funds — el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas.</td>
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>4%</td><td>Indicador adelantado de actividad industrial (&gt;50 = expansión).</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
@@ -243,7 +243,7 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
                     <tr><td>FX Performance 1M</td><td>24 horas (07:00 UTC)</td><td>Frankfurter API (ECB)</td></tr>
                     <tr><td>Análisis de IA por divisa</td><td>24 horas</td><td>Groq AI (llama-3.3-70b-versatile)</td></tr>
                     <tr><td>Calendario Económico</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>Trading Economics</td></tr>
-                    <tr><td>COT — USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD</td><td>Semanal (Viernes ~20:00 UTC)</td><td>CFTC Oficial (financial_lof.htm) — Leveraged Funds</td></tr>
+                    <tr><td>COT — USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD</td><td>Semanal (Viernes ~20:00 UTC)</td><td>CFTC Oficial (financial_lof.htm) — categoría Leveraged Funds (hedge funds y CTAs; equivalente especulativo del Non-Commercial clásico)</td>
                     <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com</td></tr>
                 </tbody>
             </table>
