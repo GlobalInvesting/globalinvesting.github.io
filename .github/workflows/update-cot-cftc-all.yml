@@ -32,9 +32,8 @@ jobs:
           print("COT DATA FETCHER — CFTC OFFICIAL (financial_lof.htm)")
           print("=" * 70)
 
-          # ── Fuentes CFTC ────────────────────────────────────────────────────────
+          # ── Fuente CFTC ─────────────────────────────────────────────────────────
           FINANCIAL_URL = "https://www.cftc.gov/dea/options/financial_lof.htm"
-          USD_INDEX_URL = "https://www.cftc.gov/dea/futures/deanybtsf.htm"
 
           HEADERS = {
               "User-Agent": (
@@ -47,6 +46,11 @@ jobs:
           # Se aceptan múltiples aliases por divisa para mayor robustez ante cambios
           # menores de formato en el archivo fuente.
           CURRENCY_NAMES = {
+              "USD": [
+                  "USD INDEX - ICE FUTURES U.S.",
+                  "U.S. DOLLAR INDEX - ICE FUTURES U.S.",
+                  "US DOLLAR INDEX - ICE FUTURES U.S.",
+              ],
               "EUR": ["EURO FX - CHICAGO MERCANTILE EXCHANGE"],
               "GBP": ["BRITISH POUND - CHICAGO MERCANTILE EXCHANGE"],
               "JPY": ["JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE"],
@@ -86,7 +90,8 @@ jobs:
               Prints what it finds so we can update aliases if needed.
               """
               keywords = {
-                  "NZD": ["zealand", "n.z."],
+                  "USD": ["usd index", "dollar index"],
+              "NZD": ["zealand", "n.z."],
                   "AUD": ["australian"],
                   "CAD": ["canadian"],
                   "CHF": ["swiss franc"],
@@ -173,29 +178,6 @@ jobs:
               find_actual_name(content, currency_code)
               return None, None, None, None
 
-          # ── Parser for deanybtsf.htm (USD Index — legacy non-commercial) ─────────
-          def extract_usd_noncommercial(content):
-              pattern = re.compile(r"U\.S\. DOLLAR INDEX", re.IGNORECASE | re.DOTALL)
-              m = pattern.search(content)
-              if not m:
-                  print("  ❌ USD Index section not found")
-                  return None
-
-              snippet = content[m.start(): m.start() + 3000]
-              lines = snippet.splitlines()
-
-              for i, line in enumerate(lines):
-                  if re.match(r"\s*COMMITMENTS\s*$", line, re.IGNORECASE):
-                      for j in range(i + 1, min(i + 5, len(lines))):
-                          nums = parse_numbers(lines[j])
-                          if len(nums) >= 2:
-                              nc_long  = nums[0]
-                              nc_short = nums[1]
-                              net = nc_long - nc_short
-                              return nc_long, nc_short, net
-              print("  ❌ Could not parse USD Index commitments")
-              return None
-
           # ── Save helper ──────────────────────────────────────────────────────────
           os.makedirs("cot-data", exist_ok=True)
           today = str(date.today())
@@ -222,7 +204,7 @@ jobs:
               )
 
           # ════════════════════════════════════════════════════════════════════════
-          # 1. EUR, GBP, JPY, CAD, CHF, AUD, NZD  — from financial_lof.htm
+          # 1. All 8 currencies — from financial_lof.htm  (Leveraged Funds)
           # ════════════════════════════════════════════════════════════════════════
           print(f"\n{'─'*60}")
           print(f"Fetching {FINANCIAL_URL}")
@@ -239,23 +221,6 @@ jobs:
                        FINANCIAL_URL, "Leveraged Funds (non-commercial equivalent)")
               else:
                   print(f"  ⚠️  No data saved for {currency}")
-
-          # ════════════════════════════════════════════════════════════════════════
-          # 2. USD Index — from deanybtsf.htm  (non-commercial classic)
-          # ════════════════════════════════════════════════════════════════════════
-          print(f"\n{'─'*60}")
-          print(f"Fetching {USD_INDEX_URL}")
-          print(f"{'─'*60}")
-          usd_content = fetch_url(USD_INDEX_URL)
-
-          print("\n[USD] Parsing 'U.S. DOLLAR INDEX'...")
-          usd_result = extract_usd_noncommercial(usd_content)
-          if usd_result:
-              nc_long, nc_short, net = usd_result
-              save("USD", nc_long, nc_short, net,
-                   USD_INDEX_URL, "Non-Commercial (classic)")
-          else:
-              print("  ⚠️  No data saved for USD")
 
           # ════════════════════════════════════════════════════════════════════════
           # Summary
