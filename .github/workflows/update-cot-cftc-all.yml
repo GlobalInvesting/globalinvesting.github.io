@@ -33,7 +33,7 @@ jobs:
           print("=" * 70)
 
           # ── Fuente CFTC ─────────────────────────────────────────────────────────
-          FINANCIAL_URL = "https://www.cftc.gov/dea/futures/financial_lof.htm"
+          FINANCIAL_URL = "https://www.cftc.gov/dea/futures/financial_lf.htm"
 
           HEADERS = {
               "User-Agent": (
