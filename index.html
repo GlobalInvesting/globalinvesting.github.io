@@ -1689,26 +1689,24 @@ const fetchEconomicCalendar = async () => {
                         return result;
                     }
                 }
-            } catch (error) {
-                console.warn('Real calendar fetch failed:', error.message);
-            }
+} catch (error) {
+        console.warn('Real calendar fetch failed:', error.message);
+    }
 
-            // ❌ NO FALLBACK — si el scraping falla, devolver estado de error explícito.
-            // Nunca mostrar datos sintéticos en una herramienta financiera profesional.
-            console.error('⛔ Calendar scraping failed — returning empty error state');
-            const errorResult = {
-                events: [],
-                lastUpdate: null,
-                source: null,
-                status: 'error',
-                errorMessage: 'No se pudieron obtener datos del calendario. Consulte directamente forexfactory.com, investing.com/economic-calendar o tradingeconomics.com/calendar',
-                impactCounts: {},
-                currencyCounts: {},
-            };
-            // No cachear el error — reintentar en la próxima llamada
-            return errorResult;
-        }
-        // ← cierre del catch
+    // ❌ NO FALLBACK — si el scraping falla, devolver estado de error explícito.
+    // Nunca mostrar datos sintéticos en una herramienta financiera profesional.
+    console.error('⛔ Calendar scraping failed — returning empty error state');
+    const errorResult = {
+        events: [],
+        lastUpdate: null,
+        source: null,
+        status: 'error',
+        errorMessage: 'No se pudieron obtener datos del calendario. Consulte directamente forexfactory.com, investing.com/economic-calendar o tradingeconomics.com/calendar',
+        impactCounts: {},
+        currencyCounts: {},
+    };
+    // No cachear el error — reintentar en la próxima llamada
+    return errorResult;
 };
 // ← cierre de fetchEconomicCalendar
 
