@@ -1693,19 +1693,20 @@ const fetchEconomicCalendar = async () => {
                 console.warn('Real calendar fetch failed:', error.message);
             }
 
-            // ✅ Fallback: dynamic calendar generator (hardcoded schedule)
-            console.warn('⚠️ Falling back to dynamic calendar generator');
-            const dynamicCalendar = generateDynamicEconomicCalendar();
-            const fallbackResult = {
-                events: dynamicCalendar,
+            // ❌ NO FALLBACK — si el scraping falla, devolver estado de error explícito.
+            // Nunca mostrar datos sintéticos en una herramienta financiera profesional.
+            console.error('⛔ Calendar scraping failed — returning empty error state');
+            const errorResult = {
+                events: [],
                 lastUpdate: null,
-                source: 'fallback-generator',
+                source: null,
+                status: 'error',
+                errorMessage: 'No se pudieron obtener datos del calendario. Consulte directamente forexfactory.com, investing.com/economic-calendar o tradingeconomics.com/calendar',
                 impactCounts: {},
                 currencyCounts: {},
             };
-            CacheManager.set(cacheKey, fallbackResult, CACHE_CONFIG.CALENDAR);
-            return fallbackResult;
-        };
+            // No cachear el error — reintentar en la próxima llamada
+            return errorResult;
 
 const fetchHistoricalFXData = async (currencyCode) => {
     // Esta función ya no se usa para las Tendencias Históricas.
@@ -4782,7 +4783,25 @@ const sentiment = getSentiment(strength);
                                                     border: '1px solid var(--border)'
                                                 }}>
                                                     {(economicCalendar.events || []).length === 0
-                                                        ? 'Cargando calendario... El scraping se ejecuta a las 00:00, 08:00 y 16:00 UTC.'
+                                                        ? (
+                                                            <div>
+                                                                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
+                                                                <div style={{ fontWeight: 600, color: 'var(--orange)', marginBottom: '0.75rem' }}>
+                                                                    Datos del calendario no disponibles
+                                                                </div>
+                                                                <div style={{ fontSize: '0.875rem', lineHeight: '1.7', maxWidth: '480px', margin: '0 auto' }}>
+                                                                    {economicCalendar.errorMessage || 'El scraping automático no ha podido obtener datos de ninguna fuente.'}
+                                                                </div>
+                                                                <div style={{ marginTop: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>
+                                                                    Consulte directamente:{' '}
+                                                                    <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>ForexFactory</a>
+                                                                    {' · '}
+                                                                    <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Investing.com</a>
+                                                                    {' · '}
+                                                                    <a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>TradingEconomics</a>
+                                                                </div>
+                                                            </div>
+                                                        )
                                                         : 'No hay eventos con ese filtro de impacto.'}
                                                 </div>
                                             ) : (
