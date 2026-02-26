@@ -1,9 +1,8 @@
-name: Update Economic Calendar (TE Scraping) - v1
+name: Update Economic Calendar - v2 (Multi-Source)
 
 on:
   schedule:
     # Runs 3x/day: 00:00, 08:00, 16:00 UTC
-    # Calendar events can be added/revised throughout the day
     - cron: '0 0 * * *'
     - cron: '0 8 * * *'
     - cron: '0 16 * * *'
@@ -35,531 +34,889 @@ jobs:
           import json, re, time
           from datetime import date, datetime, timedelta
 
-          HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Accept-Encoding': 'gzip, deflate, br',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Referer': 'https://tradingeconomics.com/',
-          }
+          # ── CONSTANTS ────────────────────────────────────────────────────────────
 
-          # ── CURRENCIES WE TRACK ───────────────────────────────────────────────────
           TRACKED_CURRENCIES = {'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'}
 
-          COUNTRY_TO_CURRENCY = {
-              'united states': 'USD',
-              'us':            'USD',
-              'usa':           'USD',
-              'euro area':     'EUR',
-              'european union': 'EUR',
-              'eurozone':      'EUR',
-              'germany':       'EUR',
-              'france':        'EUR',
-              'italy':         'EUR',
-              'spain':         'EUR',
-              'united kingdom': 'GBP',
-              'uk':            'GBP',
-              'japan':         'JPY',
-              'australia':     'AUD',
-              'canada':        'CAD',
-              'switzerland':   'CHF',
-              'new zealand':   'NZD',
-          }
-
-          # Country flags
           CURRENCY_FLAGS = {
-              'USD': '🇺🇸',
-              'EUR': '🇪🇺',
-              'GBP': '🇬🇧',
-              'JPY': '🇯🇵',
-              'AUD': '🇦🇺',
-              'CAD': '🇨🇦',
-              'CHF': '🇨🇭',
-              'NZD': '🇳🇿',
+              'USD': '🇺🇸', 'EUR': '🇪🇺', 'GBP': '🇬🇧', 'JPY': '🇯🇵',
+              'AUD': '🇦🇺', 'CAD': '🇨🇦', 'CHF': '🇨🇭', 'NZD': '🇳🇿',
           }
 
-          # ── IMPACT KEYWORDS ──────────────────────────────────────────────────────
-          # High impact: rate decisions, GDP, CPI, NFP, PMI, unemployment
+          COUNTRY_TO_CURRENCY = {
+              'united states': 'USD', 'us': 'USD', 'usa': 'USD',
+              'euro area': 'EUR', 'european union': 'EUR', 'eurozone': 'EUR',
+              'germany': 'EUR', 'france': 'EUR', 'italy': 'EUR', 'spain': 'EUR',
+              'united kingdom': 'GBP', 'uk': 'GBP', 'britain': 'GBP',
+              'japan': 'JPY',
+              'australia': 'AUD',
+              'canada': 'CAD',
+              'switzerland': 'CHF',
+              'new zealand': 'NZD',
+          }
+
+          # ForexFactory uses 2-letter country codes
+          FF_COUNTRY_TO_CURRENCY = {
+              'USD': 'USD', 'EUR': 'EUR', 'GBP': 'GBP', 'JPY': 'JPY',
+              'AUD': 'AUD', 'CAD': 'CAD', 'CHF': 'CHF', 'NZD': 'NZD',
+          }
+
           HIGH_IMPACT_KEYWORDS = [
               'interest rate', 'rate decision', 'fed funds', 'bank rate',
-              'gdp', 'gross domestic product',
-              'cpi', 'consumer price', 'inflation',
-              'nonfarm payrolls', 'nonfarm', 'employment change',
-              'unemployment rate', 'jobless rate',
-              'central bank', 'monetary policy', 'fomc', 'ecb', 'boe', 'boj',
-              'rba', 'boc', 'snb', 'rbnz',
-              'trade balance',
-              'retail sales',
-              'pmi', 'purchasing managers',
-              'current account',
+              'gdp', 'gross domestic product', 'cpi', 'consumer price', 'inflation',
+              'nonfarm payrolls', 'nonfarm', 'employment change', 'claimant count',
+              'unemployment rate', 'jobless rate', 'unemployment claims',
+              'fomc', 'ecb', 'boe', 'boj', 'rba', 'boc', 'snb', 'rbnz',
+              'monetary policy', 'central bank', 'trade balance',
+              'retail sales', 'pmi', 'purchasing managers',
           ]
 
           MEDIUM_IMPACT_KEYWORDS = [
               'manufacturing', 'industrial production', 'factory orders',
               'housing', 'building permits', 'housing starts',
-              'consumer confidence', 'business confidence',
-              'ppi', 'producer price',
-              'wage', 'earnings',
-              'ism', 'empire state',
-              'durable goods',
-              'job openings', 'jolts',
-              'import price', 'export price',
+              'consumer confidence', 'business confidence', 'sentiment',
+              'ppi', 'producer price', 'wage', 'earnings', 'ism',
+              'durable goods', 'job openings', 'jolts', 'current account',
+              'import price', 'export price', 'capital flows',
           ]
 
+          MONTH_ES = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',
+                      7:'Jul',8:'Ago',9:'Sep',10:'Oct',11:'Nov',12:'Dic'}
+
           def classify_impact(event_name, te_importance=None):
-              """
-              Classify event impact based on event name keywords and TE importance flag.
-              TE importance: 1=low, 2=medium, 3=high (when available from HTML class)
-              """
               name_lower = event_name.lower()
-
-              # Use TE's own importance rating if available
-              if te_importance == 3:
-                  return 'high'
-              if te_importance == 1:
-                  return 'low'
-
-              # Keyword-based classification
+              if te_importance == 3: return 'high'
+              if te_importance == 1: return 'low'
               for kw in HIGH_IMPACT_KEYWORDS:
-                  if kw in name_lower:
-                      return 'high'
+                  if kw in name_lower: return 'high'
               for kw in MEDIUM_IMPACT_KEYWORDS:
-                  if kw in name_lower:
-                      return 'medium'
-
-              # TE importance == 2 maps to medium
-              if te_importance == 2:
-                  return 'medium'
-
+                  if kw in name_lower: return 'medium'
+              if te_importance == 2: return 'medium'
               return 'low'
 
           def resolve_currency(country_text):
-              """Map a country name string to its tracked currency code."""
               if not country_text: return None
               ct = country_text.lower().strip()
               for key, curr in COUNTRY_TO_CURRENCY.items():
-                  if key in ct:
-                      return curr
+                  if key in ct: return curr
               return None
 
-          def format_event_date(dt_obj):
-              """Return a human-readable date string like '14 Feb'."""
-              months = ['Ene','Feb','Mar','Abr','May','Jun',
-                        'Jul','Ago','Sep','Oct','Nov','Dic']
-              return f"{dt_obj.day} {months[dt_obj.month - 1]}"
+          def fmt_date(dt_obj):
+              return f"{dt_obj.day} {MONTH_ES[dt_obj.month]}"
 
-          def parse_te_calendar_html(html_content, target_dates):
+          def clean_value(v):
+              """Remove None/nan strings, keep real values."""
+              if v is None: return ''
+              s = str(v).strip()
+              if s.lower() in ('none', 'nan', '-', 'n/a', ''): return ''
+              return s
+
+          # ═══════════════════════════════════════════════════════════════════════
+          # STRATEGY 1: Trading Economics API (official, returns JSON)
+          # TE has a public calendar API: https://api.tradingeconomics.com/calendar
+          # Also accessible without key via:
+          #   https://tradingeconomics.com/calendar/rss  (RSS feed, XML)
+          # ═══════════════════════════════════════════════════════════════════════
+
+          def fetch_te_rss(currency_code):
               """
-              Parse the TE calendar HTML.
-              TE calendar page structure (as of 2025/2026):
-                <table id="calendar" class="table table-hover">
-                  <thead>...</thead>
-                  <tbody>
-                    <tr class="calendar-header"><td colspan="7">Monday February 17 2025</td></tr>
-                    <tr data-importance="3" data-country="United States" ...>
-                      <td class="datecol">10:00 AM</td>
-                      <td class="event"><a>...</a></td>
-                      <td class="actual">...</td>
-                      <td class="previous">...</td>
-                      <td class="forecast">...</td>
-                      <td class="unit">...</td>
-                    </tr>
-                    ...
-                  </tbody>
+              TE provides per-currency RSS feeds that are pure XML (no JS needed).
+              URL: https://tradingeconomics.com/{country}/rss
+              We use the global calendar RSS: https://tradingeconomics.com/calendar/rss
+              """
+              url = 'https://tradingeconomics.com/calendar/rss'
+              print(f"  [TE RSS] Fetching: {url}")
+              headers = {
+                  'User-Agent': 'Mozilla/5.0 (compatible; RSS reader)',
+                  'Accept': 'application/rss+xml, application/xml, text/xml',
+              }
+              try:
+                  r = requests.get(url, headers=headers, timeout=20)
+                  if r.ok:
+                      print(f"  [TE RSS] Got {len(r.content)} bytes")
+                      return r.text
+              except Exception as e:
+                  print(f"  [TE RSS] Error: {e}")
+              return None
+
+          def parse_te_rss(xml_text, target_dates):
+              """Parse TE RSS calendar feed."""
+              events = []
+              try:
+                  soup = BeautifulSoup(xml_text, 'lxml-xml')
+                  items = soup.find_all('item')
+                  print(f"  [TE RSS] Found {len(items)} RSS items")
+                  for item in items:
+                      title = item.find('title')
+                      if not title: continue
+                      title_text = title.get_text(strip=True)
+                      # Title format: "Country - Event Name"
+                      pub_date = item.find('pubDate')
+                      desc = item.find('description')
+                      guid = item.find('guid')
+
+                      # Parse date from pubDate
+                      event_date = None
+                      if pub_date:
+                          try:
+                              from email.utils import parsedate_to_datetime
+                              event_date = parsedate_to_datetime(pub_date.get_text()).date()
+                          except:
+                              pass
+
+                      if event_date is None or event_date not in target_dates:
+                          continue
+
+                      # Extract country and event from title
+                      if ' - ' in title_text:
+                          parts = title_text.split(' - ', 1)
+                          country_raw = parts[0].strip()
+                          event_name = parts[1].strip()
+                      else:
+                          country_raw = ''
+                          event_name = title_text
+
+                      currency = resolve_currency(country_raw)
+                      if not currency or currency not in TRACKED_CURRENCIES:
+                          continue
+
+                      # Extract actual/forecast/previous from description
+                      actual = forecast = previous = ''
+                      if desc:
+                          desc_text = desc.get_text()
+                          for line in desc_text.split('\n'):
+                              line = line.strip()
+                              if 'actual' in line.lower():
+                                  m = re.search(r'actual[:\s]+([^\s,]+)', line, re.IGNORECASE)
+                                  if m: actual = m.group(1)
+                              if 'forecast' in line.lower() or 'consensus' in line.lower():
+                                  m = re.search(r'(?:forecast|consensus)[:\s]+([^\s,]+)', line, re.IGNORECASE)
+                                  if m: forecast = m.group(1)
+                              if 'previous' in line.lower():
+                                  m = re.search(r'previous[:\s]+([^\s,]+)', line, re.IGNORECASE)
+                                  if m: previous = m.group(1)
+
+                      events.append({
+                          'date': fmt_date(event_date),
+                          'dateISO': event_date.isoformat(),
+                          'time': '',
+                          'country': country_raw,
+                          'currency': currency,
+                          'flag': CURRENCY_FLAGS.get(currency, ''),
+                          'event': event_name,
+                          'impact': classify_impact(event_name),
+                          'actual': clean_value(actual),
+                          'forecast': clean_value(forecast),
+                          'previous': clean_value(previous),
+                      })
+              except Exception as e:
+                  print(f"  [TE RSS] Parse error: {e}")
+              return events
+
+          # ═══════════════════════════════════════════════════════════════════════
+          # STRATEGY 2: ForexFactory Calendar (HTML, server-side rendered)
+          # FF renders the calendar server-side. The HTML IS the data.
+          # URL: https://www.forexfactory.com/calendar?week=this
+          # ═══════════════════════════════════════════════════════════════════════
+
+          def fetch_forex_factory(week_offset=0):
+              """
+              Fetch ForexFactory calendar HTML.
+              week_offset=0 → this week, 1 → next week, etc.
+              FF also supports: ?week=feb26.2026 format
+              """
+              if week_offset == 0:
+                  url = 'https://www.forexfactory.com/calendar?week=this'
+              elif week_offset == 1:
+                  url = 'https://www.forexfactory.com/calendar?week=next'
+              else:
+                  # Calculate the date for future weeks
+                  target_monday = date.today() + timedelta(weeks=week_offset)
+                  # Get the Monday of that week
+                  target_monday -= timedelta(days=target_monday.weekday())
+                  url = f"https://www.forexfactory.com/calendar?week={target_monday.strftime('%b%d.%Y').lower()}"
+
+              print(f"  [FF] Fetching: {url}")
+              headers = {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                  'Accept-Language': 'en-US,en;q=0.9',
+                  'Accept-Encoding': 'gzip, deflate, br',
+                  'Connection': 'keep-alive',
+                  'Cache-Control': 'max-age=0',
+                  'Referer': 'https://www.forexfactory.com/',
+              }
+              try:
+                  r = requests.get(url, headers=headers, timeout=25)
+                  if r.status_code == 429:
+                      print("  [FF] Rate limited, waiting 30s...")
+                      time.sleep(30)
+                      r = requests.get(url, headers=headers, timeout=25)
+                  if r.ok:
+                      print(f"  [FF] Got {len(r.content)} bytes (status {r.status_code})")
+                      return r.text
+                  else:
+                      print(f"  [FF] HTTP {r.status_code}")
+              except Exception as e:
+                  print(f"  [FF] Error: {e}")
+              return None
+
+          def parse_forex_factory(html, target_dates):
+              """
+              Parse ForexFactory calendar HTML.
+              FF calendar table structure:
+                <table class="calendar__table">
+                  <tr class="calendar__row calendar__row--day-breaker">
+                    <td class="calendar__cell calendar__date">Thu Feb 26</td>
+                  </tr>
+                  <tr class="calendar__row" data-event-id="...">
+                    <td class="calendar__cell calendar__time">2:00pm</td>
+                    <td class="calendar__cell calendar__currency">USD</td>
+                    <td class="calendar__cell calendar__impact">
+                      <span class="icon icon--ff-impact-red">...</span>  ← high
+                      <span class="icon icon--ff-impact-ora">...</span>  ← medium
+                      <span class="icon icon--ff-impact-yel">...</span>  ← low
+                    </td>
+                    <td class="calendar__cell calendar__event">
+                      <span class="calendar__event-title">Event Name</span>
+                    </td>
+                    <td class="calendar__cell calendar__actual">value</td>
+                    <td class="calendar__cell calendar__forecast">value</td>
+                    <td class="calendar__cell calendar__previous">value</td>
+                  </tr>
                 </table>
               """
               events = []
-              soup = BeautifulSoup(html_content, 'lxml')
-
-              # Try the main calendar table
-              cal_table = soup.find('table', {'id': 'calendar'})
-              if not cal_table:
-                  # Fallback: any table with calendar class
-                  cal_table = soup.find('table', class_=re.compile('calendar'))
-              if not cal_table:
-                  print("  ⚠️ No calendar table found — trying full page scan")
-                  cal_table = soup.find('table')
-
-              if not cal_table:
-                  print("  ❌ No table found in calendar page")
+              if not html:
                   return events
 
-              current_date_obj = None
+              try:
+                  soup = BeautifulSoup(html, 'lxml')
+                  table = soup.find('table', class_=re.compile('calendar'))
+                  if not table:
+                      print("  [FF] No calendar table found in HTML")
+                      # Debug: show first 500 chars
+                      print(f"  [FF] HTML preview: {html[:300]}")
+                      return events
 
-              for row in cal_table.find_all('tr'):
-                  row_classes = row.get('class', [])
-                  row_class_str = ' '.join(row_classes).lower()
+                  current_date = None
+                  current_year = date.today().year
 
-                  # ── Date header row ───────────────────────────────────────────────
-                  if 'calendar-header' in row_class_str or 'datecol' in row_class_str:
-                      date_text = row.get_text(strip=True)
-                      # Parse "Monday February 17 2025" or "Feb 17 2025" etc.
-                      try:
-                          # Try multiple date formats
-                          for fmt in ['%A %B %d %Y', '%B %d %Y', '%b %d %Y',
-                                      '%A, %B %d, %Y', '%d %B %Y']:
+                  rows = table.find_all('tr', class_=re.compile('calendar__row'))
+                  print(f"  [FF] Found {len(rows)} table rows")
+
+                  for row in rows:
+                      row_classes = ' '.join(row.get('class', []))
+
+                      # ── Date header row ────────────────────────────────────────
+                      if 'day-breaker' in row_classes:
+                          date_cell = row.find('td', class_=re.compile('date'))
+                          if date_cell:
+                              date_text = date_cell.get_text(strip=True)
+                              # Format: "Thu Feb 26" or "Fri Feb 27"
                               try:
-                                  # Remove day-of-week prefix if present
-                                  clean = re.sub(r'^[A-Za-z]+day,?\s*', '', date_text)
-                                  current_date_obj = datetime.strptime(clean.strip(), fmt).date()
-                                  break
-                              except: pass
-                          if current_date_obj is None:
-                              # Try regex extraction
-                              m = re.search(r'(\w+ \d{1,2}[,\s]+\d{4})', date_text)
-                              if m:
-                                  for fmt in ['%B %d, %Y', '%B %d %Y', '%b %d, %Y']:
+                                  # Try current year first, then next year
+                                  for year in [current_year, current_year + 1]:
                                       try:
-                                          current_date_obj = datetime.strptime(m.group(1).strip(), fmt).date()
+                                          parsed = datetime.strptime(f"{date_text} {year}", "%a %b %d %Y")
+                                          current_date = parsed.date()
                                           break
-                                      except: pass
-                      except Exception as e:
-                          pass
-                      continue
+                                      except:
+                                          pass
+                              except:
+                                  pass
+                          continue
 
-                  # ── Data rows ─────────────────────────────────────────────────────
-                  # Get data attributes from the row
-                  data_country    = row.get('data-country', '')
-                  data_importance = row.get('data-importance', '')
-                  data_event      = row.get('data-event', '')
-                  data_date       = row.get('data-date', '')  # ISO datetime string
+                      # ── Event row ─────────────────────────────────────────────
+                      if current_date is None or current_date not in target_dates:
+                          continue
 
-                  # Parse date from data-date attribute if available
-                  event_date_obj = current_date_obj
-                  if data_date:
-                      try:
-                          # "2025-02-17T10:00:00"
-                          event_date_obj = datetime.fromisoformat(data_date.replace('Z','')).date()
-                      except: pass
+                      # Currency
+                      curr_cell = row.find('td', class_=re.compile('currency'))
+                      if not curr_cell:
+                          continue
+                      currency = curr_cell.get_text(strip=True).upper()
+                      if currency not in TRACKED_CURRENCIES:
+                          continue
 
-                  if event_date_obj is None:
-                      continue
+                      # Time
+                      time_cell = row.find('td', class_=re.compile('time'))
+                      time_text = ''
+                      if time_cell:
+                          raw_time = time_cell.get_text(strip=True)
+                          if raw_time:
+                              # "2:00pm" → "14:00"
+                              m = re.match(r'(\d{1,2}):(\d{2})(am|pm)', raw_time, re.IGNORECASE)
+                              if m:
+                                  hour = int(m.group(1))
+                                  minute = m.group(2)
+                                  ampm = m.group(3).lower()
+                                  if ampm == 'pm' and hour != 12: hour += 12
+                                  elif ampm == 'am' and hour == 12: hour = 0
+                                  time_text = f"{hour:02d}:{minute}"
+                              else:
+                                  time_text = raw_time[:5]
 
-                  # Filter to target date range
-                  if event_date_obj not in target_dates:
-                      continue
+                      # Impact from icon class
+                      impact = 'low'
+                      impact_cell = row.find('td', class_=re.compile('impact'))
+                      if impact_cell:
+                          impact_span = impact_cell.find('span', class_=True)
+                          if impact_span:
+                              span_classes = ' '.join(impact_span.get('class', []))
+                              if 'red' in span_classes:
+                                  impact = 'high'
+                              elif 'ora' in span_classes or 'orange' in span_classes:
+                                  impact = 'medium'
+                              elif 'yel' in span_classes or 'yellow' in span_classes:
+                                  impact = 'low'
 
-                  # Resolve currency
-                  currency = resolve_currency(data_country)
-                  if not currency:
-                      # Try from row cells
-                      flag_cell = row.find('td', class_=re.compile('flag|country'))
-                      if flag_cell:
-                          currency = resolve_currency(flag_cell.get_text(strip=True))
-
-                  if currency not in TRACKED_CURRENCIES:
-                      continue
-
-                  # Get event name
-                  cols = row.find_all('td')
-                  if not cols:
-                      continue
-
-                  event_name = data_event
-                  if not event_name:
-                      event_col = row.find('td', class_=re.compile('event'))
-                      if event_col:
-                          event_name = event_col.get_text(strip=True)
-                      elif len(cols) > 1:
-                          event_name = cols[1].get_text(strip=True)
-
-                  if not event_name or len(event_name) < 3:
-                      continue
-
-                  # Get time
-                  time_text = ''
-                  time_col = row.find('td', class_=re.compile('date|time'))
-                  if time_col:
-                      time_text = time_col.get_text(strip=True)
-                  elif cols:
-                      time_text = cols[0].get_text(strip=True)
-
-                  # Normalize time to HH:MM
-                  if time_text:
-                      # "10:00 AM" → "10:00" / "02:30 PM" → "14:30"
-                      m = re.match(r'(\d{1,2}):(\d{2})\s*([AP]M)?', time_text, re.IGNORECASE)
-                      if m:
-                          hour = int(m.group(1))
-                          minute = m.group(2)
-                          ampm = (m.group(3) or '').upper()
-                          if ampm == 'PM' and hour != 12:
-                              hour += 12
-                          elif ampm == 'AM' and hour == 12:
-                              hour = 0
-                          time_text = f"{hour:02d}:{minute}"
+                      # Event name
+                      event_cell = row.find('td', class_=re.compile('event'))
+                      if not event_cell:
+                          continue
+                      event_title_span = event_cell.find('span', class_=re.compile('title'))
+                      if event_title_span:
+                          event_name = event_title_span.get_text(strip=True)
                       else:
-                          time_text = time_text[:5]  # Take first 5 chars as HH:MM
+                          event_name = event_cell.get_text(strip=True)
 
-                  # Get actual/forecast/previous
-                  actual   = ''
-                  forecast = ''
-                  previous = ''
-                  actual_col = row.find('td', class_=re.compile('actual'))
-                  if actual_col: actual = actual_col.get_text(strip=True)
-                  forecast_col = row.find('td', class_=re.compile('forecast'))
-                  if forecast_col: forecast = forecast_col.get_text(strip=True)
-                  previous_col = row.find('td', class_=re.compile('previous'))
-                  if previous_col: previous = previous_col.get_text(strip=True)
+                      if not event_name or len(event_name) < 2:
+                          continue
 
-                  # Importance
-                  try:
-                      importance_int = int(data_importance) if data_importance else None
-                  except:
-                      importance_int = None
+                      # Actual / Forecast / Previous
+                      actual = ''
+                      forecast = ''
+                      previous = ''
 
-                  impact = classify_impact(event_name, importance_int)
+                      actual_cell = row.find('td', class_=re.compile('actual'))
+                      if actual_cell:
+                          actual = clean_value(actual_cell.get_text(strip=True))
 
-                  events.append({
-                      'date':      format_event_date(event_date_obj),
-                      'dateISO':   event_date_obj.isoformat(),
-                      'time':      time_text,
-                      'country':   data_country or currency,
-                      'currency':  currency,
-                      'flag':      CURRENCY_FLAGS.get(currency, ''),
-                      'event':     event_name,
-                      'impact':    impact,
-                      'actual':    actual,
-                      'forecast':  forecast,
-                      'previous':  previous,
-                  })
+                      forecast_cell = row.find('td', class_=re.compile('forecast'))
+                      if forecast_cell:
+                          forecast = clean_value(forecast_cell.get_text(strip=True))
+
+                      previous_cell = row.find('td', class_=re.compile('previous'))
+                      if previous_cell:
+                          previous = clean_value(previous_cell.get_text(strip=True))
+
+                      # Re-classify impact using keywords as backup
+                      if impact == 'low':
+                          kw_impact = classify_impact(event_name)
+                          if kw_impact in ('high', 'medium'):
+                              impact = kw_impact
+
+                      events.append({
+                          'date': fmt_date(current_date),
+                          'dateISO': current_date.isoformat(),
+                          'time': time_text,
+                          'country': currency,
+                          'currency': currency,
+                          'flag': CURRENCY_FLAGS.get(currency, ''),
+                          'event': event_name,
+                          'impact': impact,
+                          'actual': actual,
+                          'forecast': forecast,
+                          'previous': previous,
+                      })
+
+              except Exception as e:
+                  import traceback
+                  print(f"  [FF] Parse error: {e}")
+                  traceback.print_exc()
 
               return events
 
-          # ── SCRAPING STRATEGIES ──────────────────────────────────────────────────
+          # ═══════════════════════════════════════════════════════════════════════
+          # STRATEGY 3: Investing.com Calendar API (JSON endpoint)
+          # Investing has an undocumented but stable JSON endpoint.
+          # ═══════════════════════════════════════════════════════════════════════
 
-          def fetch_te_calendar_page(from_date, to_date):
+          def fetch_investing_calendar(from_date_str, to_date_str):
               """
-              Fetch TE calendar for a date range.
-              TE calendar URL: https://tradingeconomics.com/calendar
-              With date filter:  ?from=2025-02-17&to=2025-03-14
-              The page returns a full HTML page with the calendar table.
+              Investing.com has a POST endpoint for their economic calendar:
+              https://www.investing.com/economic-calendar/Service/getCalendarFilteredData
               """
-              url = f"https://tradingeconomics.com/calendar?from={from_date}&to={to_date}"
-              print(f"  Fetching: {url}")
-              try:
-                  r = requests.get(url, headers=HEADERS, timeout=25)
-                  if r.status_code == 429:
-                      print("  ⚠️ Rate limited, waiting 45s...")
-                      time.sleep(45)
-                      r = requests.get(url, headers=HEADERS, timeout=25)
-                  if r.ok:
-                      print(f"  ✅ Got {len(r.content)} bytes (status {r.status_code})")
-                      return r.text
-                  else:
-                      print(f"  ❌ HTTP {r.status_code}")
-                      return None
-              except Exception as e:
-                  print(f"  ❌ Error: {e}")
-                  return None
+              url = 'https://www.investing.com/economic-calendar/Service/getCalendarFilteredData'
+              headers = {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                  'Accept': 'application/json, text/javascript, */*; q=0.01',
+                  'Accept-Language': 'en-US,en;q=0.9',
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'Referer': 'https://www.investing.com/economic-calendar/',
+                  'Origin': 'https://www.investing.com',
+              }
 
-          def fetch_te_calendar_api(from_date, to_date):
-              """
-              Fallback: TE has an internal API endpoint used by the calendar widget.
-              This returns JSON directly.
-              """
-              # TE internal API (undocumented, may change)
-              api_url = f"https://tradingeconomics.com/api/calendar?from={from_date}&to={to_date}"
-              print(f"  Trying TE API: {api_url}")
+              # Country IDs for tracked currencies (Investing.com internal IDs)
+              country_ids = {
+                  'USD': 5,    # United States
+                  'EUR': 72,   # Euro Zone
+                  'GBP': 4,    # United Kingdom
+                  'JPY': 35,   # Japan
+                  'AUD': 25,   # Australia
+                  'CAD': 6,    # Canada
+                  'CHF': 12,   # Switzerland
+                  'NZD': 43,   # New Zealand
+              }
+
+              data = {
+                  'dateFrom': from_date_str,
+                  'dateTo': to_date_str,
+                  'timeZone': '0',
+                  'timeFilter': 'timeRemain',
+                  'currentTab': 'custom',
+                  'limit_from': '0',
+              }
+
+              # Add country filters
+              for i, (curr, cid) in enumerate(country_ids.items()):
+                  data[f'country[]'] = cid  # This sends multiple values with same key
+
+              print(f"  [Investing] Fetching calendar {from_date_str} → {to_date_str}")
+
               try:
-                  headers = {**HEADERS, 'X-Requested-With': 'XMLHttpRequest'}
-                  r = requests.get(api_url, headers=headers, timeout=20)
+                  # For multiple country[] values, use list syntax
+                  data_list = []
+                  data_list.append(('dateFrom', from_date_str))
+                  data_list.append(('dateTo', to_date_str))
+                  data_list.append(('timeZone', '0'))
+                  data_list.append(('timeFilter', 'timeRemain'))
+                  data_list.append(('currentTab', 'custom'))
+                  data_list.append(('limit_from', '0'))
+                  for curr, cid in country_ids.items():
+                      data_list.append(('country[]', str(cid)))
+
+                  r = requests.post(url, headers=headers, data=data_list, timeout=25)
                   if r.ok:
+                      print(f"  [Investing] Got {len(r.content)} bytes (status {r.status_code})")
                       try:
-                          data = r.json()
-                          if isinstance(data, list) and len(data) > 0:
-                              print(f"  ✅ TE API returned {len(data)} events")
-                              return data
-                      except: pass
+                          return r.json()
+                      except:
+                          # May return HTML snippet
+                          return {'data': r.text}
+                  else:
+                      print(f"  [Investing] HTTP {r.status_code}")
               except Exception as e:
-                  print(f"  ⚠️ TE API: {e}")
+                  print(f"  [Investing] Error: {e}")
               return None
 
-          def parse_te_api_events(api_data, target_dates):
-              """Parse events from the TE JSON API response."""
+          INVESTING_COUNTRY_MAP = {
+              'United States': 'USD',
+              'Euro Zone': 'EUR', 'Germany': 'EUR', 'France': 'EUR',
+              'Italy': 'EUR', 'Spain': 'EUR', 'European Union': 'EUR',
+              'United Kingdom': 'GBP',
+              'Japan': 'JPY',
+              'Australia': 'AUD',
+              'Canada': 'CAD',
+              'Switzerland': 'CHF',
+              'New Zealand': 'NZD',
+          }
+
+          INVESTING_IMPACT_MAP = {
+              '1': 'low', '2': 'medium', '3': 'high',
+              'low': 'low', 'moderate': 'medium', 'high': 'high',
+          }
+
+          def parse_investing_response(response_data, target_dates):
+              """
+              Parse Investing.com JSON/HTML response.
+              The response contains 'data' field with HTML table rows.
+              """
               events = []
-              for item in api_data:
-                  if not isinstance(item, dict): continue
+              if not response_data:
+                  return events
 
-                  # Extract fields
-                  country    = item.get('Country', item.get('country', ''))
-                  event_name = item.get('Event',   item.get('event',   item.get('Indicator', '')))
-                  date_str   = item.get('Date',    item.get('date',    ''))
-                  importance = item.get('Importance', item.get('importance', 0))
-                  actual     = str(item.get('Actual',   item.get('actual',   '')))
-                  forecast   = str(item.get('Forecast', item.get('forecast', '')))
-                  previous   = str(item.get('Previous', item.get('previous', '')))
+              html_data = None
+              if isinstance(response_data, dict):
+                  html_data = response_data.get('data', '')
+              elif isinstance(response_data, str):
+                  html_data = response_data
 
-                  # Parse date
-                  event_date_obj = None
-                  for fmt in ['%Y-%m-%dT%H:%M:%S', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d']:
+              if not html_data:
+                  return events
+
+              try:
+                  soup = BeautifulSoup(html_data, 'lxml')
+                  rows = soup.find_all('tr', {'id': re.compile('eventRowId_')})
+                  print(f"  [Investing] Found {len(rows)} event rows")
+
+                  for row in rows:
                       try:
-                          event_date_obj = datetime.strptime(date_str[:19], fmt)
-                          break
-                      except: pass
+                          # Date from data attribute
+                          event_date_str = row.get('data-event-datetime', '')
+                          event_date = None
+                          if event_date_str:
+                              try:
+                                  event_date = datetime.strptime(event_date_str[:10], '%Y/%m/%d').date()
+                              except:
+                                  try:
+                                      event_date = datetime.strptime(event_date_str[:10], '%Y-%m-%d').date()
+                                  except:
+                                      pass
 
-                  if event_date_obj is None: continue
-                  if event_date_obj.date() not in target_dates: continue
+                          if event_date is None or event_date not in target_dates:
+                              continue
 
-                  currency = resolve_currency(country)
-                  if currency not in TRACKED_CURRENCIES: continue
+                          # Currency/country
+                          flag_td = row.find('td', class_=re.compile('flagCur'))
+                          currency = ''
+                          if flag_td:
+                              flag_span = flag_td.find('span', class_=True)
+                              if flag_span:
+                                  classes = ' '.join(flag_span.get('class', []))
+                                  # Class like "ceFlag flag_us" → extract country code
+                                  m = re.search(r'flag_(\w+)', classes)
+                                  if m:
+                                      country_code = m.group(1).upper()
+                                      # Map 2-letter to currency
+                                      cc_map = {
+                                          'US': 'USD', 'EU': 'EUR', 'GB': 'GBP',
+                                          'JP': 'JPY', 'AU': 'AUD', 'CA': 'CAD',
+                                          'CH': 'CHF', 'NZ': 'NZD',
+                                          'DE': 'EUR', 'FR': 'EUR', 'IT': 'EUR', 'ES': 'EUR',
+                                      }
+                                      currency = cc_map.get(country_code, '')
 
-                  time_text = event_date_obj.strftime('%H:%M')
-                  impact = classify_impact(event_name, int(importance) if importance else None)
+                          if not currency or currency not in TRACKED_CURRENCIES:
+                              continue
 
-                  events.append({
-                      'date':     format_event_date(event_date_obj.date()),
-                      'dateISO':  event_date_obj.date().isoformat(),
-                      'time':     time_text,
-                      'country':  country,
-                      'currency': currency,
-                      'flag':     CURRENCY_FLAGS.get(currency, ''),
-                      'event':    event_name,
-                      'impact':   impact,
-                      'actual':   actual if actual not in ('None', '') else '',
-                      'forecast': forecast if forecast not in ('None', '') else '',
-                      'previous': previous if previous not in ('None', '') else '',
-                  })
+                          # Time
+                          time_td = row.find('td', class_=re.compile('time'))
+                          time_text = ''
+                          if time_td:
+                              time_text = time_td.get_text(strip=True)
+                              # Convert "2:00am" → "02:00", "2:00pm" → "14:00"
+                              m = re.match(r'(\d{1,2}):(\d{2})(am|pm)?', time_text, re.IGNORECASE)
+                              if m:
+                                  hour = int(m.group(1))
+                                  minute = m.group(2)
+                                  ampm = (m.group(3) or '').lower()
+                                  if ampm == 'pm' and hour != 12: hour += 12
+                                  elif ampm == 'am' and hour == 12: hour = 0
+                                  time_text = f"{hour:02d}:{minute}"
+
+                          # Impact
+                          impact = 'low'
+                          impact_td = row.find('td', class_=re.compile('sentiment'))
+                          if impact_td:
+                              # Icon class: "grayFullBullishIcon" → low
+                              # "orangeFullBullishIcon" → medium
+                              # "redFullBullishIcon" → high
+                              icon = impact_td.find(class_=True)
+                              if icon:
+                                  icon_classes = ' '.join(icon.get('class', []))
+                                  if 'red' in icon_classes or 'high' in icon_classes.lower():
+                                      impact = 'high'
+                                  elif 'orange' in icon_classes or 'medium' in icon_classes.lower():
+                                      impact = 'medium'
+
+                          # Event name
+                          event_td = row.find('td', class_=re.compile('event'))
+                          event_name = ''
+                          if event_td:
+                              event_a = event_td.find('a')
+                              if event_a:
+                                  event_name = event_a.get_text(strip=True)
+                              else:
+                                  event_name = event_td.get_text(strip=True)
+
+                          if not event_name:
+                              continue
+
+                          # Actual / Forecast / Previous
+                          actual = ''
+                          forecast = ''
+                          previous = ''
+
+                          actual_td = row.find('td', id=re.compile('eventActual_'))
+                          if actual_td: actual = clean_value(actual_td.get_text(strip=True))
+
+                          forecast_td = row.find('td', id=re.compile('eventForecast_'))
+                          if forecast_td: forecast = clean_value(forecast_td.get_text(strip=True))
+
+                          previous_td = row.find('td', id=re.compile('eventPrevious_'))
+                          if previous_td: previous = clean_value(previous_td.get_text(strip=True))
+
+                          # Keyword-based impact backup
+                          if impact == 'low':
+                              kw_impact = classify_impact(event_name)
+                              if kw_impact == 'high': impact = 'high'
+                              elif kw_impact == 'medium': impact = 'medium'
+
+                          events.append({
+                              'date': fmt_date(event_date),
+                              'dateISO': event_date.isoformat(),
+                              'time': time_text,
+                              'country': currency,
+                              'currency': currency,
+                              'flag': CURRENCY_FLAGS.get(currency, ''),
+                              'event': event_name,
+                              'impact': impact,
+                              'actual': actual,
+                              'forecast': forecast,
+                              'previous': previous,
+                          })
+                      except Exception as row_err:
+                          continue
+
+              except Exception as e:
+                  import traceback
+                  print(f"  [Investing] Parse error: {e}")
+                  traceback.print_exc()
+
               return events
 
-          # ── MAIN SCRAPING FLOW ───────────────────────────────────────────────────
+          # ═══════════════════════════════════════════════════════════════════════
+          # FALLBACK: Hard-coded schedule generator (always works)
+          # ═══════════════════════════════════════════════════════════════════════
+
+          def generate_fallback_calendar(today, target_dates):
+              """
+              Fallback: generates approximate calendar based on known release schedules.
+              Less accurate but always provides *something* useful.
+              """
+              events = []
+              economic_schedule = [
+                  # (currency, event, day_of_month, time_utc, impact, monthly)
+                  ('USD', 'IPC (Inflación)', 12, '13:30', 'high', True),
+                  ('USD', 'Ventas Minoristas', 15, '13:30', 'high', True),
+                  ('USD', 'Initial Jobless Claims', None, '13:30', 'medium', 'weekly_thu'),
+                  ('USD', 'PMI Manufacturero ISM', 1, '15:00', 'high', True),
+                  ('USD', 'PIB Preliminar', None, '13:30', 'high', 'quarterly'),
+                  ('EUR', 'PMI Manufacturero', 1, '09:00', 'high', True),
+                  ('EUR', 'IPC Zona Euro', 18, '10:00', 'high', True),
+                  ('EUR', 'Tasa BCE', None, '13:15', 'high', '6weeks'),
+                  ('GBP', 'IPC UK', 18, '07:00', 'high', True),
+                  ('GBP', 'Decisión Tasa BoE', None, '12:00', 'high', '6weeks'),
+                  ('JPY', 'IPC Tokio Core', None, '23:30', 'high', 'last_fri'),
+                  ('JPY', 'Producción Industrial', 28, '23:50', 'medium', True),
+                  ('AUD', 'Decisión Tasa RBA', None, '03:30', 'high', 'rba'),
+                  ('AUD', 'IPC Australia', None, '00:30', 'high', 'quarterly'),
+                  ('CAD', 'IPC Canadá', 20, '13:30', 'high', True),
+                  ('CAD', 'Decisión Tasa BoC', None, '14:00', 'high', '6weeks'),
+                  ('CHF', 'IPC Suiza', 6, '07:30', 'medium', True),
+                  ('CHF', 'Decisión Tasa SNB', None, '08:30', 'high', 'quarterly'),
+                  ('NZD', 'PIB Nueva Zelanda', None, '21:45', 'high', 'quarterly'),
+                  ('NZD', 'Decisión Tasa RBNZ', None, '01:00', 'high', '6weeks'),
+              ]
+
+              today_month = today.month
+              today_year = today.year
+
+              for months_ahead in range(3):
+                  target_month = (today_month + months_ahead - 1) % 12 + 1
+                  target_year = today_year + (today_month + months_ahead - 1) // 12
+
+                  for entry in economic_schedule:
+                      curr, event_name, dom, time_utc, impact, freq = entry
+
+                      event_date = None
+                      if isinstance(dom, int):
+                          try:
+                              event_date = date(target_year, target_month, dom)
+                          except:
+                              continue
+                      elif freq == 'weekly_thu':
+                          # Find all Thursdays in this month
+                          d = date(target_year, target_month, 1)
+                          while d.month == target_month:
+                              if d.weekday() == 3:  # Thursday
+                                  if d in target_dates:
+                                      events.append({
+                                          'date': fmt_date(d), 'dateISO': d.isoformat(),
+                                          'time': time_utc, 'country': curr, 'currency': curr,
+                                          'flag': CURRENCY_FLAGS.get(curr,''), 'event': event_name,
+                                          'impact': impact, 'actual': '', 'forecast': '', 'previous': ''
+                                      })
+                              d += timedelta(days=1)
+                          continue
+                      elif freq == 'last_fri':
+                          # Last Friday of the month
+                          d = date(target_year, target_month, 28)
+                          while True:
+                              try:
+                                  d = date(target_year, target_month, d.day + 1)
+                              except:
+                                  break
+                          while d.weekday() != 4:
+                              d -= timedelta(days=1)
+                          event_date = d
+                      elif freq in ('quarterly', '6weeks', 'rba', None):
+                          # Skip for now - complex scheduling
+                          continue
+
+                      if event_date and event_date in target_dates and event_date >= today:
+                          events.append({
+                              'date': fmt_date(event_date),
+                              'dateISO': event_date.isoformat(),
+                              'time': time_utc,
+                              'country': curr, 'currency': curr,
+                              'flag': CURRENCY_FLAGS.get(curr,''),
+                              'event': event_name,
+                              'impact': impact,
+                              'actual': '', 'forecast': '', 'previous': ''
+                          })
+
+              # Deduplicate
+              seen = set()
+              unique = []
+              for ev in events:
+                  k = (ev['dateISO'], ev['currency'], ev['event'][:20])
+                  if k not in seen:
+                      seen.add(k)
+                      unique.append(ev)
+
+              return sorted(unique, key=lambda x: x['dateISO'] + x['time'])
+
+          # ═══════════════════════════════════════════════════════════════════════
+          # MAIN
+          # ═══════════════════════════════════════════════════════════════════════
 
           print("=" * 60)
-          print("ECONOMIC CALENDAR SCRAPER v1")
-          print("Source: tradingeconomics.com/calendar")
+          print("ECONOMIC CALENDAR SCRAPER v2 (Multi-Source)")
+          print("Sources: ForexFactory → Investing.com → TE RSS → Fallback")
           print("=" * 60)
 
           today = date.today()
-          # Scrape 2 days back (to catch "actual" values just released) + 30 days ahead
-          from_date = today - timedelta(days=2)
-          to_date   = today + timedelta(days=30)
+          from_date = today - timedelta(days=1)   # yesterday (for actuals)
+          to_date = today + timedelta(days=30)
 
           from_str = from_date.isoformat()
-          to_str   = to_date.isoformat()
+          to_str = to_date.isoformat()
 
-          # Build set of target dates
           target_dates = set()
           d = from_date
           while d <= to_date:
               target_dates.add(d)
               d += timedelta(days=1)
 
-          print(f"\nTarget range: {from_str} → {to_str} ({len(target_dates)} days)")
-          print(f"Tracking currencies: {sorted(TRACKED_CURRENCIES)}")
+          print(f"\nTarget: {from_str} → {to_str} ({len(target_dates)} days)")
+          print(f"Tracking: {sorted(TRACKED_CURRENCIES)}\n")
 
           all_events = []
+          source_used = 'fallback'
 
-          # ── Strategy 1: HTML page scraping ───────────────────────────────────────
-          print(f"\n{'='*50}\nSTRATEGY 1: TE Calendar HTML Page\n{'='*50}")
-          html = fetch_te_calendar_page(from_str, to_str)
-          if html:
-              parsed = parse_te_calendar_html(html, target_dates)
-              print(f"  Parsed {len(parsed)} events from HTML")
-              all_events.extend(parsed)
-          time.sleep(2)
-
-          # ── Strategy 2: TE JSON API (if HTML yielded nothing) ────────────────────
-          if len(all_events) == 0:
-              print(f"\n{'='*50}\nSTRATEGY 2: TE JSON API fallback\n{'='*50}")
-              api_data = fetch_te_calendar_api(from_str, to_str)
-              if api_data:
-                  parsed = parse_te_api_events(api_data, target_dates)
-                  print(f"  Parsed {len(parsed)} events from API")
-                  all_events.extend(parsed)
+          # ── STRATEGY 1: ForexFactory ─────────────────────────────────────────
+          print(f"{'='*50}\nSTRATEGY 1: ForexFactory\n{'='*50}")
+          ff_events = []
+          for week_offset in range(5):  # this week + next 4 weeks
+              html = fetch_forex_factory(week_offset)
+              if html:
+                  parsed = parse_forex_factory(html, target_dates)
+                  print(f"  Week +{week_offset}: {len(parsed)} events parsed")
+                  ff_events.extend(parsed)
               time.sleep(2)
 
-          # ── Strategy 3: Fetch week by week if range fetch failed ─────────────────
-          if len(all_events) == 0:
-              print(f"\n{'='*50}\nSTRATEGY 3: Week-by-week fallback\n{'='*50}")
-              # Fetch in 7-day chunks to avoid rate limiting / large responses
-              current = from_date
-              while current <= to_date:
-                  chunk_end = min(current + timedelta(days=6), to_date)
-                  html = fetch_te_calendar_page(current.isoformat(), chunk_end.isoformat())
-                  if html:
-                      chunk_dates = set()
-                      d = current
-                      while d <= chunk_end:
-                          chunk_dates.add(d)
-                          d += timedelta(days=1)
-                      parsed = parse_te_calendar_html(html, chunk_dates)
-                      print(f"  Chunk {current} → {chunk_end}: {len(parsed)} events")
-                      all_events.extend(parsed)
-                  current = chunk_end + timedelta(days=1)
-                  time.sleep(3)
+          if ff_events:
+              all_events = ff_events
+              source_used = 'forexfactory.com'
+              print(f"\n✅ ForexFactory: {len(all_events)} events total")
+          else:
+              print("⚠️ ForexFactory returned 0 events, trying next source...")
 
-          # ── Deduplicate ──────────────────────────────────────────────────────────
+          # ── STRATEGY 2: Investing.com ────────────────────────────────────────
+          if len(all_events) == 0:
+              print(f"\n{'='*50}\nSTRATEGY 2: Investing.com\n{'='*50}")
+              time.sleep(3)
+              inv_data = fetch_investing_calendar(from_str, to_str)
+              if inv_data:
+                  inv_events = parse_investing_response(inv_data, target_dates)
+                  if inv_events:
+                      all_events = inv_events
+                      source_used = 'investing.com'
+                      print(f"\n✅ Investing.com: {len(all_events)} events total")
+                  else:
+                      print("⚠️ Investing.com returned 0 events")
+
+          # ── STRATEGY 3: TE RSS ───────────────────────────────────────────────
+          if len(all_events) == 0:
+              print(f"\n{'='*50}\nSTRATEGY 3: Trading Economics RSS\n{'='*50}")
+              time.sleep(3)
+              rss_xml = fetch_te_rss('all')
+              if rss_xml:
+                  rss_events = parse_te_rss(rss_xml, target_dates)
+                  if rss_events:
+                      all_events = rss_events
+                      source_used = 'tradingeconomics.com/rss'
+                      print(f"\n✅ TE RSS: {len(all_events)} events total")
+
+          # ── STRATEGY 4: Fallback generator ───────────────────────────────────
+          if len(all_events) == 0:
+              print(f"\n{'='*50}\nSTRATEGY 4: Fallback Generator\n{'='*50}")
+              all_events = generate_fallback_calendar(today, target_dates)
+              source_used = 'fallback-generator'
+              print(f"  Generated {len(all_events)} approximate events")
+
+          # ── Deduplicate ──────────────────────────────────────────────────────
           seen = set()
           unique_events = []
           for ev in all_events:
-              key = (ev['dateISO'], ev['currency'], ev['event'][:30])
-              if key not in seen:
-                  seen.add(key)
+              k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
+              if k not in seen:
+                  seen.add(k)
                   unique_events.append(ev)
 
-          # ── Sort by date + time ──────────────────────────────────────────────────
+          # ── Sort ─────────────────────────────────────────────────────────────
           def sort_key(ev):
-              dt_str = ev['dateISO'] + 'T' + (ev['time'] or '00:00')
-              try:
-                  return datetime.fromisoformat(dt_str)
-              except:
-                  return datetime(2099, 1, 1)
+              t = ev.get('time', '00:00') or '00:00'
+              if len(t) < 5: t = '00:00'
+              return ev['dateISO'] + 'T' + t
 
           unique_events.sort(key=sort_key)
 
-          # ── Filter: keep only upcoming + today (with actual values) ──────────────
+          # ── Filter to relevant window ─────────────────────────────────────────
           final_events = []
           for ev in unique_events:
               try:
                   ev_date = date.fromisoformat(ev['dateISO'])
-                  # Keep events from today onwards, or past events with actual data
+                  # Keep future events + past events with actual values
                   if ev_date >= today:
                       final_events.append(ev)
-                  elif ev_date >= today - timedelta(days=2) and ev.get('actual'):
-                      # Recent past with actual released — useful for context
+                  elif ev_date >= today - timedelta(days=1) and ev.get('actual'):
                       final_events.append(ev)
-              except: pass
+              except:
+                  pass
 
-          # ── Build summary stats ──────────────────────────────────────────────────
+          # ── Stats ─────────────────────────────────────────────────────────────
           currency_counts = {}
-          impact_counts   = {'high': 0, 'medium': 0, 'low': 0}
+          impact_counts = {'high': 0, 'medium': 0, 'low': 0}
           for ev in final_events:
               c = ev['currency']
               currency_counts[c] = currency_counts.get(c, 0) + 1
-              impact_counts[ev['impact']] = impact_counts.get(ev['impact'], 0) + 1
+              impact_counts[ev.get('impact','low')] = impact_counts.get(ev.get('impact','low'), 0) + 1
 
-          # ── Output ───────────────────────────────────────────────────────────────
+          # ── Save ──────────────────────────────────────────────────────────────
           output = {
-              'lastUpdate':     today.isoformat(),
-              'generatedAt':    datetime.utcnow().isoformat() + 'Z',
-              'source':         'tradingeconomics.com/calendar',
-              'rangeFrom':      from_str,
-              'rangeTo':        to_str,
-              'totalEvents':    len(final_events),
+              'lastUpdate': today.isoformat(),
+              'generatedAt': datetime.utcnow().isoformat() + 'Z',
+              'source': source_used,
+              'rangeFrom': from_str,
+              'rangeTo': to_str,
+              'totalEvents': len(final_events),
               'currencyCounts': currency_counts,
-              'impactCounts':   impact_counts,
-              'events':         final_events,
+              'impactCounts': impact_counts,
+              'events': final_events,
           }
 
           with open('calendar-data/calendar.json', 'w', encoding='utf-8') as f:
               json.dump(output, f, indent=2, ensure_ascii=False)
 
           print(f"\n{'='*60}")
-          print(f"✅ CALENDAR SAVED: calendar-data/calendar.json")
-          print(f"   Total events: {len(final_events)}")
-          print(f"   Impact breakdown: {impact_counts}")
+          print(f"✅ SAVED: calendar-data/calendar.json")
+          print(f"   Source: {source_used}")
+          print(f"   Total:  {len(final_events)} events")
+          print(f"   Impact: {impact_counts}")
           print(f"   By currency: {dict(sorted(currency_counts.items()))}")
 
-          # Show sample (next 5 high-impact)
-          high_events = [e for e in final_events if e['impact'] == 'high'][:5]
+          high_events = [e for e in final_events if e.get('impact') == 'high'][:8]
           if high_events:
               print(f"\n   Next high-impact events:")
               for ev in high_events:
-                  print(f"   {ev['dateISO']} {ev['time']:5s} [{ev['currency']}] {ev['event']}")
-          else:
-              print("\n   ⚠️ No high-impact events found — check scraping output above")
-
+                  actual_str = f" → Actual: {ev['actual']}" if ev.get('actual') else ''
+                  forecast_str = f" (est: {ev['forecast']})" if ev.get('forecast') else ''
+                  print(f"   {ev['dateISO']} {(ev['time'] or '?'):5s} [{ev['currency']}] {ev['event']}{forecast_str}{actual_str}")
           print("=" * 60)
           EOFPYTHON
 
@@ -571,7 +928,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to calendar data"
           else
-            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') — TE scraping v1"
+            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v2 multi-source"
             git pull --rebase origin main || true
             git push
           fi
