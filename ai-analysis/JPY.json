@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "La política monetaria del Banco de Japón ha tomado un giro hawkish, subiendo las tasas de interés en 0.25 puntos porcentuales, lo que puede ejercer presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, esta decisión puede ser un paso hacia la normalización de la política monetaria. La inflación sigue siendo baja, lo que puede limitar el alcance de las subidas de tasas, pero el crecimiento del PIB, aunque lento, puede estar recibiendo un impulso de la política monetaria.\n\nLa cuenta corriente presenta un superávit, lo que sugiere una demanda estructural de la divisa, aunque la balanza comercial muestra un déficit. Las exportaciones de vehículos y maquinaria industrial pueden estar siendo afectadas por los términos de intercambio desfavorables, lo que puede estar contribuyendo al déficit comercial. Sin embargo, la confianza del consumidor y la confianza empresarial siguen siendo altas, lo que puede estar apoyando la demanda interna.\n\nEl posicionamiento especulativo muestra un sesgo alcista, con un saldo neto de 13.000 contratos, lo que puede estar reflejando las expectativas de una mayor subida de tasas. El rendimiento FX del último mes ha sido negativo, lo que puede estar reflejando la debilidad de la divisa en el corto plazo. Sin embargo, la tendencia alcista puede seguir siendo dominante, especialmente si el Banco de Japón sigue subiendo las tasas de interés.",
+  "analysis": "La política monetaria del Banco de Japón ha tomado un giro hawkish al subir las tasas de interés en 0.25 puntos porcentuales, lo que puede ejercer presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, el ciclo restrictivo activo puede estructuralmente favorecer a la divisa por un mayor carry diferencial. La inflación anual del 1.5% sigue por debajo del objetivo, lo que puede limitar el alcance de las subidas de tasas en el futuro.\n\nLa cuenta corriente presenta un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. Sin embargo, la balanza comercial muestra un déficit de 7.4 mil millones de dólares al mes, principalmente debido a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Estos productos pueden ser sensibles a las fluctuaciones en la demanda global y los precios de las materias primas.\n\nEl posicionamiento especulativo muestra un sesgo alcista neto con 13.0 mil contratos netos, lo que puede indicar un riesgo de corrección si los fundamentos no confirman las expectativas. El rendimiento FX del último mes ha sido negativo, con una depreciación del 1.29% frente al dólar estadounidense. Aunque el panorama a corto plazo puede ser volátil, la tendencia alcista estructural de la divisa puede prevalecer si el banco central mantiene su postura restrictiva y la demanda global por los productos japoneses se mantiene estable.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-25T11:24:50.989396+00:00",
+  "generatedAt": "2026-02-26T11:25:22.805003+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
   "dataSnapshot": {
     "interestRate": 0.75,
@@ -24,9 +24,9 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": 13000,
-    "fxPerformance1M": -1.2375,
+    "fxPerformance1M": -1.2925,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-25"
+    "lastUpdate": "2026-02-26"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
@@ -34,7 +34,7 @@
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
     "avg_bond10y": 3.26,
-    "avg_fx_perf_1m": -1.2,
+    "avg_fx_perf_1m": -1.49,
     "avg_cot": 17653.5
   }
 }
