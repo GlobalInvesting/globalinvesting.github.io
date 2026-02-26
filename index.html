@@ -1707,6 +1707,10 @@ const fetchEconomicCalendar = async () => {
             };
             // No cachear el error — reintentar en la próxima llamada
             return errorResult;
+        }
+        // ← cierre del catch
+};
+// ← cierre de fetchEconomicCalendar
 
 const fetchHistoricalFXData = async (currencyCode) => {
     // Esta función ya no se usa para las Tendencias Históricas.
