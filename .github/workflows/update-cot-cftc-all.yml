@@ -29,11 +29,11 @@ jobs:
           from datetime import date
 
           print("=" * 70)
-          print("COT DATA FETCHER — CFTC OFFICIAL (financial_lof.htm)")
+          print("COT DATA FETCHER — CFTC OFFICIAL (futures/financial_lof.htm — Futures Only)")
           print("=" * 70)
 
           # ── Fuente CFTC ─────────────────────────────────────────────────────────
-          FINANCIAL_URL = "https://www.cftc.gov/dea/options/financial_lof.htm"
+          FINANCIAL_URL = "https://www.cftc.gov/dea/futures/financial_lof.htm"
 
           HEADERS = {
               "User-Agent": (
@@ -110,7 +110,7 @@ jobs:
                       line = content[start:end].strip()
                       print(f"  🔍 Found '{kw}' at pos {m.start()}: {repr(line[:120])}")
 
-          # ── Parser for financial_lof.htm ─────────────────────────────────────────
+          # ── Parser for financial_lof.htm (FUTURES ONLY) ─────────────────────────
           # Layout per currency block (disaggregated format):
           #
           #   <CURRENCY NAME> - CHICAGO MERCANTILE EXCHANGE  (Code #XXXXXX ...)
@@ -204,7 +204,7 @@ jobs:
               )
 
           # ════════════════════════════════════════════════════════════════════════
-          # 1. All 8 currencies — from financial_lof.htm  (Leveraged Funds)
+          # 1. All 8 currencies — from futures/financial_lof.htm  (Leveraged Funds, Futures Only)
           # ════════════════════════════════════════════════════════════════════════
           print(f"\n{'─'*60}")
           print(f"Fetching {FINANCIAL_URL}")
