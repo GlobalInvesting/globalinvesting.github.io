@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-02-27",
-  "generatedAt": "2026-02-27T08:41:47.452234Z",
+  "generatedAt": "2026-02-27T16:27:34.414997Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -8,13 +8,13 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-26",
   "rangeTo": "2026-03-29",
-  "totalEvents": 195,
+  "totalEvents": 194,
   "currencyCounts": {
     "JPY": 28,
     "CHF": 10,
     "EUR": 26,
     "USD": 64,
-    "CAD": 17,
+    "CAD": 16,
     "GBP": 17,
     "AUD": 25,
     "NZD": 8
@@ -22,7 +22,7 @@
   "impactCounts": {
     "high": 65,
     "medium": 24,
-    "low": 106
+    "low": 105
   },
   "events": [
     {
@@ -678,19 +678,6 @@
     {
       "date": "27 Feb",
       "dateISO": "2026-02-27",
-      "timeUTC": "11:30",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Wholesale Sales (MoM)  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "2.0%"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
       "timeUTC": "13:00",
       "country": "GBP",
       "currency": "GBP",
@@ -710,9 +697,9 @@
       "flag": "🇺🇸",
       "event": "Core PPI (MoM)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "0.8%",
       "forecast": "0.3%",
-      "previous": "0.7%"
+      "previous": "0.6%"
     },
     {
       "date": "27 Feb",
@@ -723,7 +710,7 @@
       "flag": "🇺🇸",
       "event": "Core PPI (YoY)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.6%",
       "forecast": "3.0%",
       "previous": "3.3%"
     },
@@ -736,9 +723,9 @@
       "flag": "🇺🇸",
       "event": "PPI (MoM)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "0.5%",
       "forecast": "0.3%",
-      "previous": "0.5%"
+      "previous": "0.4%"
     },
     {
       "date": "27 Feb",
@@ -749,7 +736,7 @@
       "flag": "🇺🇸",
       "event": "PPI (YoY)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "2.9%",
       "forecast": "2.6%",
       "previous": "3.0%"
     },
@@ -762,7 +749,7 @@
       "flag": "🇺🇸",
       "event": "PPI ex. Food/Energy/Transport (YoY)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.4%",
       "forecast": "",
       "previous": "3.5%"
     },
@@ -775,9 +762,9 @@
       "flag": "🇨🇦",
       "event": "GDP Implicit Price (QoQ)  (Q4)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.70%",
       "forecast": "",
-      "previous": "0.80%"
+      "previous": "0.90%"
     },
     {
       "date": "27 Feb",
@@ -788,7 +775,7 @@
       "flag": "🇨🇦",
       "event": "GDP (MoM)  (Dec)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "0.0%"
     },
@@ -801,7 +788,7 @@
       "flag": "🇨🇦",
       "event": "GDP (QoQ)  (Q4)",
       "impact": "high",
-      "actual": "",
+      "actual": "-0.2%",
       "forecast": "",
       "previous": "0.6%"
     },
@@ -814,9 +801,9 @@
       "flag": "🇨🇦",
       "event": "GDP (YoY)  (Q4)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.72%",
       "forecast": "",
-      "previous": "1.42%"
+      "previous": "1.58%"
     },
     {
       "date": "27 Feb",
@@ -827,9 +814,9 @@
       "flag": "🇨🇦",
       "event": "GDP Annualized (QoQ)  (Q4)",
       "impact": "high",
-      "actual": "",
+      "actual": "-0.6%",
       "forecast": "0.0%",
-      "previous": "2.6%"
+      "previous": "2.4%"
     },
     {
       "date": "27 Feb",
@@ -840,9 +827,9 @@
       "flag": "🇨🇦",
       "event": "GDP (MoM)  (Jan)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.0%",
       "forecast": "",
-      "previous": ""
+      "previous": "0.2%"
     },
     {
       "date": "27 Feb",
@@ -853,7 +840,7 @@
       "flag": "🇺🇸",
       "event": "Chicago PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "57.7",
       "forecast": "52.0",
       "previous": "54.0"
     },
@@ -866,9 +853,9 @@
       "flag": "🇺🇸",
       "event": "Construction Spending (MoM)  (Dec)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.3%",
       "forecast": "0.2%",
-      "previous": "0.5%"
+      "previous": "-0.1%"
     },
     {
       "date": "27 Feb",
@@ -879,22 +866,9 @@
       "flag": "🇨🇦",
       "event": "Budget Balance  (Dec)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.20B",
       "forecast": "",
       "previous": "-8.02B"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "16:00",
-      "country": "CAD",
-      "currency": "CAD",
-      "flag": "🇨🇦",
-      "event": "Budget Balance (YoY)  (Dec)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "-26.39B"
     },
     {
       "date": "27 Feb",
@@ -1181,6 +1155,19 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "1 Mar",
+      "dateISO": "2026-03-01",
+      "timeUTC": "16:00",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Budget Balance (YoY)  (Dec)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-26.39B"
     },
     {
       "date": "1 Mar",
