@@ -99,12 +99,10 @@ jobs:
               """
               Parse actual/forecast/previous/impact from description field.
               Handles both MQL5 HTML format and plain text format.
-              Uses regex directly on raw HTML string for reliability.
               """
               actual = forecast = previous = impact = ''
               if not raw_desc: return actual, forecast, previous, impact
 
-              # Pattern: <b>Label:</b> VALUE<br/>
               m = re.search(r'<b>\s*Actual\s*:?\s*</b>\s*([^<\n]*)', raw_desc, re.I)
               if m: actual = clean_val(m.group(1))
 
@@ -119,7 +117,6 @@ jobs:
                   vl = m.group(1).strip().lower()
                   impact = 'high' if 'high' in vl else 'medium' if 'medium' in vl else 'low'
 
-              # Plain text fallback: "Actual: 212K. Forecast: 217K. Previous: 208K."
               if not actual and not forecast:
                   m = re.search(r'Actual[:\s]+([^\.\n,<;]+)', raw_desc, re.I)
                   if m: actual = clean_val(m.group(1))
@@ -132,6 +129,7 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 1: MQL5 Economic Calendar RSS
+          # Times from pubDate are already in UTC (RFC 2822 with timezone info)
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_mql5_rss(target_dates):
@@ -199,14 +197,20 @@ jobs:
 
                               if currency not in TRACKED_CURRENCIES: continue
 
+                              # pubDate includes timezone info → parsedate_to_datetime
+                              # normalizes to UTC automatically
                               pub = item.find('pubDate')
                               event_date = None
                               time_str = ''
                               if pub:
                                   try:
                                       dt = parsedate_to_datetime(pub.get_text(strip=True))
+                                      # Convert to UTC if it has timezone info
+                                      if dt.tzinfo is not None:
+                                          import datetime as dt_module
+                                          dt = dt.astimezone(dt_module.timezone.utc)
                                       event_date = dt.date()
-                                      time_str = dt.strftime('%H:%M')  # UTC time
+                                      time_str = dt.strftime('%H:%M')
                                   except: pass
 
                               if not event_date or event_date not in target_dates: continue
@@ -231,9 +235,9 @@ jobs:
                               batch.append({
                                   'date': fmt_date(event_date),
                                   'dateISO': event_date.isoformat(),
-                                  'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                                  'timeUTC': time_str,
                                   'country': currency, 'currency': currency,
-                                  'flag': CURRENCY_FLAGS.get(currency,''),
+                                  'flag': CURRENCY_FLAGS.get(currency, ''),
                                   'event': event_name,
                                   'impact': impact,
                                   'actual': actual,
@@ -254,6 +258,7 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 2: Trading Economics RSS
+          # Times from pubDate include timezone → normalized to UTC
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_te_rss(target_dates):
@@ -308,8 +313,11 @@ jobs:
                               if pub:
                                   try:
                                       dt = parsedate_to_datetime(pub.get_text(strip=True))
+                                      if dt.tzinfo is not None:
+                                          import datetime as dt_module
+                                          dt = dt.astimezone(dt_module.timezone.utc)
                                       event_date = dt.date()
-                                      time_str = dt.strftime('%H:%M')  # UTC time
+                                      time_str = dt.strftime('%H:%M')
                                   except: pass
                               if not event_date or event_date not in target_dates: continue
 
@@ -321,9 +329,9 @@ jobs:
                               batch.append({
                                   'date': fmt_date(event_date),
                                   'dateISO': event_date.isoformat(),
-                                  'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                                  'timeUTC': time_str,
                                   'country': currency, 'currency': currency,
-                                  'flag': CURRENCY_FLAGS.get(currency,''),
+                                  'flag': CURRENCY_FLAGS.get(currency, ''),
                                   'event': event_name,
                                   'impact': impact,
                                   'actual': actual,
@@ -340,11 +348,37 @@ jobs:
               return events
 
           # ════════════════════════════════════════════════════════════════════
-          # SOURCE 3: Investing.com (fixed parser)
+          # SOURCE 3: Investing.com
+          # IMPORTANT: Investing.com returns times in EST (UTC-5) regardless of
+          # the timeZone parameter sent in the POST request.
+          # We convert EST → UTC by adding 5 hours before storing.
+          # Verification: ECB Lagarde stored as 03:30 EST → 08:30 UTC
+          #               Frontend (UTC-3) shows 05:30 ✅
           # ════════════════════════════════════════════════════════════════════
+
+          def est_to_utc(time_str, event_date):
+              """
+              Convert EST (UTC-5) time string 'HH:MM' to UTC.
+              Returns (utc_time_str, possibly_adjusted_date).
+              Investing.com always returns EST regardless of timeZone parameter.
+              """
+              if not time_str:
+                  return time_str, event_date
+              try:
+                  h, m = map(int, time_str.split(':'))
+                  total_minutes = h * 60 + m + 300  # +5 hours = EST → UTC
+                  day_overflow = total_minutes >= 1440
+                  total_minutes = total_minutes % 1440
+                  utc_str = f"{total_minutes // 60:02d}:{total_minutes % 60:02d}"
+                  if day_overflow and event_date:
+                      event_date = event_date + timedelta(days=1)
+                  return utc_str, event_date
+              except:
+                  return time_str, event_date
 
           def fetch_investing_calendar(from_str, to_str, target_dates):
               print(f"  [Investing] Fetching {from_str} → {to_str}")
+              print(f"  [Investing] NOTE: Times will be converted EST → UTC (+5h)")
               url = 'https://www.investing.com/economic-calendar/Service/getCalendarFilteredData'
               headers = {
                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0.0.0 Safari/537.36',
@@ -404,14 +438,23 @@ jobs:
                                   if m2:
                                       try: event_date = date(int(m2.group(1)), int(m2.group(2)), int(m2.group(3)))
                                       except: pass
-                          if not event_date or event_date not in target_dates: continue
+                          if not event_date: continue
 
-                          # Extraer hora UTC del datetime
-                          time_str = ''
+                          # Extract raw EST time from datetime string
+                          raw_time_est = ''
                           if dt_str:
                               dt_norm = dt_str.strip().replace('T', ' ')
-                              m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}:\d{2})', dt_norm)
-                              if m_t: time_str = m_t.group(1)
+                              m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}):(\d{2})', dt_norm)
+                              if m_t:
+                                  raw_time_est = f"{m_t.group(1)}:{m_t.group(2)}"
+
+                          # Convert EST → UTC (Investing always returns EST)
+                          time_str_utc, event_date = est_to_utc(raw_time_est, event_date)
+
+                          # After date adjustment, check if still in target range
+                          # (extend target_dates by 1 day to catch overflow events)
+                          extended_dates = target_dates | {max(target_dates) + timedelta(days=1)}
+                          if event_date not in extended_dates: continue
 
                           currency = ''
                           dc = row.get('data-currency', '').strip().upper()
@@ -471,9 +514,9 @@ jobs:
                           events.append({
                               'date': fmt_date(event_date),
                               'dateISO': event_date.isoformat(),
-                              'timeUTC': time_str,   # ← UTC, el frontend convierte a local
+                              'timeUTC': time_str_utc,
                               'country': currency, 'currency': currency,
-                              'flag': CURRENCY_FLAGS.get(currency,''),
+                              'flag': CURRENCY_FLAGS.get(currency, ''),
                               'event': event_name,
                               'impact': impact,
                               'actual': actual,
@@ -496,6 +539,7 @@ jobs:
 
           # ════════════════════════════════════════════════════════════════════
           # SOURCE 4: Official Government / Central Bank RSS
+          # pubDate includes timezone → normalized to UTC
           # ════════════════════════════════════════════════════════════════════
 
           def fetch_official_rss(target_dates):
@@ -527,16 +571,19 @@ jobs:
                           if pub:
                               try:
                                   dt = parsedate_to_datetime(pub.get_text(strip=True))
+                                  if dt.tzinfo is not None:
+                                      import datetime as dt_module
+                                      dt = dt.astimezone(dt_module.timezone.utc)
                                   event_date = dt.date()
-                                  time_str = dt.strftime('%H:%M')  # UTC time
+                                  time_str = dt.strftime('%H:%M')
                               except: pass
                           if not event_date or event_date not in target_dates: continue
                           events.append({
                               'date': fmt_date(event_date),
                               'dateISO': event_date.isoformat(),
-                              'timeUTC': time_str or '',   # ← UTC, el frontend convierte a local
+                              'timeUTC': time_str or '',
                               'country': currency, 'currency': currency,
-                              'flag': CURRENCY_FLAGS.get(currency,''),
+                              'flag': CURRENCY_FLAGS.get(currency, ''),
                               'event': event_name,
                               'impact': classify_impact_kw(event_name),
                               'actual': '', 'forecast': '', 'previous': '',
@@ -550,11 +597,12 @@ jobs:
           # ════════════════════════════════════════════════════════════════════
 
           print("=" * 60)
-          print("ECONOMIC CALENDAR SCRAPER v5 (Robust Multi-Source, No Fake Data)")
+          print("ECONOMIC CALENDAR SCRAPER v5.1 (EST→UTC fix)")
           print("Sources: MQL5 RSS → TE RSS → Investing.com → Official RSS")
-          print("Policy: if all sources fail, calendar is saved as EMPTY with error status.")
-          print("        NEVER generates synthetic/hardcoded events.")
-          print("        All times stored as UTC — frontend converts to user local timezone.")
+          print("Timezone policy:")
+          print("  - MQL5/TE/Official RSS: pubDate normalized to UTC via parsedate_to_datetime")
+          print("  - Investing.com: returns EST (UTC-5), converted +5h to UTC before storing")
+          print("  - All timeUTC fields are UTC — frontend converts to user local timezone")
           print("=" * 60)
 
           today      = date.today()
@@ -650,7 +698,7 @@ jobs:
           output = {
               'lastUpdate':     today.isoformat(),
               'generatedAt':    datetime.utcnow().isoformat() + 'Z',
-              'timezoneNote':   'All times stored in UTC. Frontend converts to user local timezone.',
+              'timezoneNote':   'All timeUTC fields are UTC. Frontend converts to user local timezone.',
               'status':         'ok'    if data_ok else 'error',
               'source':         source_used if data_ok else None,
               'errorMessage':   None    if data_ok else (
@@ -679,7 +727,7 @@ jobs:
               print(f"   By currency: {dict(sorted(currency_counts.items()))}")
               high = [e for e in final_events if e.get('impact') == 'high'][:8]
               if high:
-                  print(f"\n   Next high-impact events:")
+                  print(f"\n   Next high-impact events (UTC):")
                   for ev in high:
                       fc = f" | est:{ev['forecast']}" if ev.get('forecast') else ''
                       ac = f" → {ev['actual']}"        if ev.get('actual')   else ''
@@ -703,7 +751,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to calendar data"
           else
-            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v5 timeUTC"
+            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v5.1 EST→UTC fix"
             git pull --rebase origin main || true
             git push
           fi
