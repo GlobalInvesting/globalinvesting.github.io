@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la tendencia bajista en las tasas de interés puede debilitar la divisa. La inflación se mantiene por encima del objetivo, lo que podría llevar a una reconsideración de la política monetaria en el futuro.\n\nLa balanza comercial muestra un déficit pronunciado, lo que genera presión vendedora estructural sobre la divisa. La composición exportadora se basa en maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves, lo que sugiere que la economía está expuesta a la demanda global de estos productos. Sin embargo, el déficit comercial puede ser un lastre para la divisa en el corto plazo.\n\nEl posicionamiento especulativo es ligeramente alcista, aunque no es significativo. El rendimiento FX del último mes muestra una depreciación de la divisa, lo que puede ser un reflejo de la tendencia bajista en las tasas de interés y el déficit comercial. En general, el panorama para la divisa es cauteloso, con riesgos de debilidad en el corto plazo debido a la política monetaria y la balanza comercial.",
+  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que sugiere un ciclo expansivo y una menor presión alcista sobre la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la tendencia a la baja puede ejercer presión bajista sobre la divisa. La inflación sigue por encima del objetivo, lo que podría llevar a un ajuste en la política monetaria en el futuro.\n\nLa balanza comercial muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora de maquinaria industrial, equipos eléctricos y aeronaves sugiere que el déficit comercial se debe en parte a la dependencia de importaciones de bienes. Sin embargo, los términos de intercambio favorables sugieren que las exportaciones ganan valor relativo, lo que podría ayudar a mitigar el déficit comercial.\n\nEl posicionamiento especulativo muestra un sesgo alcista neto, aunque el rendimiento FX del último mes ha sido negativo. La entrada neta de flujos de capital sugiere que los inversores siguen interesados en la divisa, aunque la tendencia a la baja en las tasas de interés podría cambiar esto en el futuro. En general, el panorama para la divisa es complejo, con presiones bajistas y alcistas que se equilibran.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-26T11:25:08.740356+00:00",
+  "generatedAt": "2026-02-27T11:08:07.259461+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "dataSnapshot": {
     "interestRate": 3.75,
@@ -23,18 +23,18 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": 328,
-    "fxPerformance1M": -0.6619,
+    "cotPositioning": 1892,
+    "fxPerformance1M": -0.6094,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-26"
+    "lastUpdate": "2026-02-27"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.53,
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
-    "avg_bond10y": 3.26,
-    "avg_fx_perf_1m": -1.49,
-    "avg_cot": 17653.5
+    "avg_bond10y": 3.23,
+    "avg_fx_perf_1m": -1.33,
+    "avg_cot": 9587.75
   }
 }

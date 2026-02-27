@@ -2,9 +2,9 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha tomado un giro dovish, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Aunque la inflación se encuentra por encima del objetivo, el ciclo bajista en 12 meses y la decisión de bajar tasas sugieren que el banco central está priorizando el crecimiento económico. La tasa de interés de 2.25% se encuentra ligeramente por debajo del promedio global, lo que podría afectar la atracción de inversores.\n\nLa balanza comercial y la cuenta corriente presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Sin embargo, los términos de intercambio favorables y la expansión en el PMI manufacturero sugieren que el sector exportador sigue siendo competitivo. La composición exportadora, liderada por productos lácteos y carne, puede beneficiarse de los precios favorables en los mercados globales.\n\nEl posicionamiento especulativo está muy cargado a la baja, con un COT de -35K contratos netos, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. El rendimiento FX del último mes ha sido negativo, con una depreciación de -1.57% vs USD, lo que se encuentra en línea con el promedio de las divisas principales. En este contexto, el mercado parece estar preparado para una posible corrección alcista si se presentan señales de recuperación en la economía.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que ha generado presión bajista sobre la divisa. Aunque la inflación se encuentra por encima del objetivo, el crecimiento del PIB es superior al promedio global, lo que sugiere que la economía sigue siendo resiliente. Sin embargo, la tasa de interés se encuentra por debajo del promedio global, lo que puede afectar la atracción de inversores.\n\nLa balanza comercial y la cuenta corriente presentan un déficit, lo que puede generar presión vendedora estructural sobre la divisa. La composición exportadora de Nueva Zelanda, con un enfoque en productos lácteos y carne, puede ser sensible a los cambios en la demanda global y los precios de las materias primas. Aunque los términos de intercambio son favorables, el déficit comercial puede ser un factor de debilidad para la divisa.\n\nEl posicionamiento especulativo neto bajista, según el COT, y el rendimiento FX negativo en el último mes, sugieren que la divisa puede seguir bajo presión. Aunque el yield bono 10Y es alto, la tasa de interés baja y el déficit comercial pueden seguir pesando sobre la divisa. En este contexto, es probable que la divisa siga depreciándose en el corto plazo, a menos que se produzcan cambios significativos en la política monetaria o en la economía global.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-26T11:25:41.026719+00:00",
+  "generatedAt": "2026-02-27T11:08:38.665351+00:00",
   "exportComposition": "Principales exportaciones: leche y productos lácteos, carne y despojos comestibles, cereales",
   "dataSnapshot": {
     "interestRate": 2.25,
@@ -23,18 +23,18 @@
       "cycle_12m": -1.5,
       "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
     },
-    "cotPositioning": -35000,
-    "fxPerformance1M": -1.575,
+    "cotPositioning": -12465,
+    "fxPerformance1M": -1.2802,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-26"
+    "lastUpdate": "2026-02-27"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.53,
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
-    "avg_bond10y": 3.26,
-    "avg_fx_perf_1m": -1.49,
-    "avg_cot": 17653.5
+    "avg_bond10y": 3.23,
+    "avg_fx_perf_1m": -1.33,
+    "avg_cot": 9587.75
   }
 }

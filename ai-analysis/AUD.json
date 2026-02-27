@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. Aunque el crecimiento del PIB es inferior al promedio global, la inflación se mantiene por encima del objetivo, lo que justifica la postura hawkish del banco central.\n\nLa balanza comercial muestra un superávit de 2.4B USD/mes, gracias a los términos de intercambio favorables y las exportaciones de minerales metalíferos, combustibles y petróleo. Sin embargo, la cuenta corriente presenta un déficit, lo que podría ejercer presión vendedora estructural. El mercado está saturado de largos, con un COT de 46K contratos, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos.\n\nLa divergencia entre el posicionamiento alcista y la caída del 4.0% en el último mes sugiere que el mercado podría estar iniciando un cierre de largos. Aunque el régimen global risk-on favorece divisas de alto carry y exportadoras de materias primas, el riesgo de corrección es alto debido al posicionamiento extremo del mercado. Por eso, cualquier decepción en los datos podría provocar una corrección rápida en la divisa.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. Aunque el crecimiento del PIB es inferior al promedio global, la inflación se mantiene por encima del objetivo, lo que justifica la postura hawkish del banco central.\n\nLa balanza comercial muestra un superávit de 2.4B USD/mes, gracias a la exportación de minerales metalíferos, combustibles y petróleo, y cereales. Los términos de intercambio favorables también contribuyen a ampliar el excedente. Sin embargo, la cuenta corriente presenta un déficit del 2.3% del PIB, lo que ejerce presión vendedora estructural sobre la divisa.\n\nEl posicionamiento especulativo es muy alcista, con 70K contratos netos, lo que indica un mercado saturado de largos. Aunque la divisa cayó un 3.58% el último mes, lo que podría ser el inicio de una corrección, el régimen global risk-on favorece divisas de alto carry y exportadoras de materias primas, como el AUD. Por eso, cualquier decepción en los datos puede provocar una corrección rápida, pero el carry atractivo y el superávit comercial deberían mantener la presión alcista a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-26T11:25:27.054535+00:00",
+  "generatedAt": "2026-02-27T11:08:25.283081+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "dataSnapshot": {
     "interestRate": 3.85,
@@ -23,18 +23,18 @@
       "cycle_12m": -0.25,
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
-    "cotPositioning": 45900,
-    "fxPerformance1M": -4.0123,
+    "cotPositioning": 70260,
+    "fxPerformance1M": -3.5847,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-26"
+    "lastUpdate": "2026-02-27"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.53,
     "avg_inflation": 2.24,
     "avg_unemployment": 4.69,
-    "avg_bond10y": 3.26,
-    "avg_fx_perf_1m": -1.49,
-    "avg_cot": 17653.5
+    "avg_bond10y": 3.23,
+    "avg_fx_perf_1m": -1.33,
+    "avg_cot": 9587.75
   }
 }
