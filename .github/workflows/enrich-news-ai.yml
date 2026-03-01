@@ -1,0 +1,47 @@
+name: Enrich News with AI
+
+on:
+  schedule:
+    - cron: '0 8 * * *'    # 8:00 UTC — mañana
+    - cron: '0 20 * * *'   # 20:00 UTC — noche
+  workflow_dispatch:        # permite correrlo manualmente desde GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git pull --rebase origin main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run enrichment script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python scripts/enrich_news.py
+
+      - name: Commit enriched news.json if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news-data/news.json
+          git diff --cached --quiet && echo "Sin cambios, nada que commitear." && exit 0
+          git commit -m "chore: AI enrich news [$(date -u '+%Y-%m-%d %H:%M') UTC]"
+          # Reintentar push hasta 3 veces con pull --rebase
+          for i in 1 2 3; do
+            git push && break
+            echo "Push rechazado (intento $i), haciendo pull --rebase..."
+            git pull --rebase origin main
+          done
