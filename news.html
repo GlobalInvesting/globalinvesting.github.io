@@ -344,14 +344,26 @@ async function ensureDailyBaseline() {
       return;
     }
 
+    // Frankfurter solo tiene datos hasta ayer — usar fecha de cierre real
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=USD`, { signal: ctrl.signal });
+    // Pedir tasas base EUR para poder calcular todos los cruces
+    const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=EUR`, { signal: ctrl.signal });
     if (!res.ok) return;
     const data = await res.json();
     if (!data.rates) return;
 
-    const prices = ratesToPairPrices(data.rates);
+    // Frankfurter devuelve rates respecto a EUR; necesitamos USD como base
+    // Convertir: si EUR→USD = X, entonces USD→X = 1/X, USD→Y = rates[Y]/rates[USD]
+    const eurUsd = data.rates['USD'];
+    if (!eurUsd) return;
+    const usdRates = {};
+    Object.entries(data.rates).forEach(([cur, val]) => {
+      usdRates[cur] = val / eurUsd;
+    });
+    usdRates['EUR'] = 1 / eurUsd;
+
+    const prices = ratesToPairPrices(usdRates);
     prices._date = tradingDay;
     localStorage.setItem(PREV_RATES_KEY, JSON.stringify(prices));
     prevRates = prices;
@@ -510,7 +522,9 @@ function computeSentiment(articles) {
   CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
   articles.forEach(a => {
     if (!counts[a.cur]) return;
-    const s = scoreSentiment(a.title, a.expand || a.description);
+    // Usar ai_headline si existe (análisis Groq), si no caer al título original
+    const textForSentiment = a.ai_headline || a.title;
+    const s = scoreSentiment(textForSentiment, '');
     counts[a.cur][s]++;
     counts[a.cur].total++;
   });
@@ -913,7 +927,7 @@ async function initFeed() {
               ai_headline: a.ai_headline || null,
             };
           })
-          .filter(a => isForexRelevant(a.title, a.expand, a.source))
+          .filter(a => a.ai_headline)  // solo mostrar artículos con síntesis AI
           .sort((a, b) => (b.ts || 0) - (a.ts || 0));
         renderFeed();
         return;
