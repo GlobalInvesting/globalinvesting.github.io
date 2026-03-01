@@ -23,13 +23,16 @@ jobs:
       - name: Install dependencies
         run: pip install feedparser requests python-dateutil
 
+      - name: Create output directory
+        run: mkdir -p news-data
+
       - name: Run fetch script
         run: python scripts/fetch_news.py
 
-      - name: Commit news.json if changed
+      - name: Commit news-data/news.json if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add news.json
-          git diff --cached --quiet || git commit -m "chore: update news.json [$(date -u '+%Y-%m-%d %H:%M')] UTC"
+          git add news-data/news.json
+          git diff --cached --quiet || git commit -m "chore: update news.json [$(date -u '+%Y-%m-%d %H:%M') UTC]"
           git push
