@@ -167,14 +167,44 @@ FEEDS = [
         "lang": "es",
     },
     # ── FXStreet ES ───────────────────────────
-    # Feed oficial confirmado en rssdirectory de FXStreet
     {
         "source": "FXStreet ES",
         "url": "https://www.fxstreet.es/rss/news",
         "method": "feedparser",
         "lang": "es",
     },
+    # ── DailyForex ES ─────────────────────────
+    {
+        "source": "DailyForex ES",
+        "url": "https://es.dailyforex.com/rss/es/forexnews.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "DailyForex ES",
+        "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "DailyForex ES",
+        "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "DailyForex ES",
+        "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
     # ── Investing.com ES (vía proxy CORS) ─────
+    {
+        "source": "Investing.com ES",
+        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_1.rss",
+        "method": "proxy_xml",
+        "lang": "es",
+    },
     {
         "source": "Investing.com ES",
         "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_25.rss",
