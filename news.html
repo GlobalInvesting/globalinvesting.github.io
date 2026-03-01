@@ -215,7 +215,7 @@
         <span>Hora</span>
         <span>Divisa</span>
         <span>Imp.</span>
-        <span style="padding:0 .75rem;">Titular</span>
+        <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
         <span style="text-align:right;">Fuente</span>
       </div>
       <div id="feed-body">
@@ -284,8 +284,6 @@ document.getElementById('ts').textContent = `${pad(now.getUTCHours())}:${pad(now
 document.getElementById('year').textContent = now.getFullYear();
 
 // ── TICKER: Precios DINÁMICOS desde Frankfurter API ──────────────────────────
-// Los pares se calculan a partir de tasas base USD en tiempo real.
-// Sin hardcodeo de precios — todos los valores vienen de la API.
 const TICKER_PAIRS = [
   { pair:'EUR/USD', base:'EUR', quote:'USD', invert:false },
   { pair:'GBP/USD', base:'GBP', quote:'USD', invert:false },
@@ -299,8 +297,6 @@ const TICKER_PAIRS = [
   { pair:'GBP/JPY', base:'GBP', quote:'JPY', invert:false },
 ];
 
-// prevRates se persiste en localStorage para mostrar % de cambio
-// incluso en la primera carga de la sesión (comparando vs última visita).
 const PREV_RATES_KEY = 'fx_prev_rates';
 
 function loadPrevRates() {
@@ -315,19 +311,16 @@ function savePrevRates(obj) {
 
 let prevRates = loadPrevRates();
 
-// Devuelve la fecha del último día de trading (lunes-viernes)
 function lastTradingDay() {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
-  // Si es lunes (1) → viernes anterior; si es domingo (0) → viernes anterior
   const dow = d.getUTCDay();
   if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
   else if (dow === 1) d.setUTCDate(d.getUTCDate() - 3);
   else d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  return d.toISOString().split('T')[0];
 }
 
-// Convierte tasas base USD a precios de par
 function ratesToPairPrices(rates) {
   const prices = {};
   TICKER_PAIRS.forEach(({ pair, base, quote }) => {
@@ -340,21 +333,17 @@ function ratesToPairPrices(rates) {
   return prices;
 }
 
-// Carga tasas del cierre del último día de trading como baseline diario fijo.
-// Solo se refresca una vez al día (compara la fecha guardada con hoy).
 async function ensureDailyBaseline() {
   try {
     const stored = localStorage.getItem(PREV_RATES_KEY);
     const parsed = stored ? JSON.parse(stored) : null;
     const tradingDay = lastTradingDay();
 
-    // Si ya tenemos el baseline del día correcto, usarlo
     if (parsed && parsed._date === tradingDay && Object.keys(parsed).length > 1) {
       prevRates = parsed;
       return;
     }
 
-    // Cargar cierre del último día de trading desde Frankfurter
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
     const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=USD`, { signal: ctrl.signal });
@@ -363,17 +352,16 @@ async function ensureDailyBaseline() {
     if (!data.rates) return;
 
     const prices = ratesToPairPrices(data.rates);
-    prices._date = tradingDay; // marcador de fecha para saber si hay que refrescar mañana
+    prices._date = tradingDay;
     localStorage.setItem(PREV_RATES_KEY, JSON.stringify(prices));
     prevRates = prices;
-  } catch(_) { /* si falla, el ticker muestra precios sin % */ }
+  } catch(_) {}
 }
 
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
 
   try {
-    // Cargar baseline del día anterior antes de fetch de precios actuales
     await ensureDailyBaseline();
 
     let rates = null;
@@ -392,7 +380,7 @@ async function fetchAndBuildTicker() {
           const data = await res.json();
           if (data.rates) { rates = data.rates; break; }
         }
-      } catch(e) { /* intentar siguiente */ }
+      } catch(e) {}
     }
 
     if (!rates) throw new Error('Todas las fuentes de FX fallaron');
@@ -405,7 +393,7 @@ async function fetchAndBuildTicker() {
       if (!price || isNaN(price)) return null;
 
       const decimals  = pair.includes('JPY') ? 2 : 4;
-      const prevPrice = prevRates[pair];  // cierre del día anterior
+      const prevPrice = prevRates[pair];
       let chgStr = '', up = null;
 
       if (prevPrice && Math.abs(prevPrice - price) > 0.000001) {
@@ -436,13 +424,11 @@ async function fetchAndBuildTicker() {
   }
 }
 
-// Cargar ticker al inicio y refrescar cada 60 s
 fetchAndBuildTicker();
 setInterval(fetchAndBuildTicker, 60000);
 
 // ── RSS SOURCES ───────────────────────────────────────────────────────────────
 const RSS_SOURCES = [
-  // ── EN ESPAÑOL ────────────────────────────────────────────────────────────
   { name:'FXStreet ES',         url:'https://www.fxstreet.es/rss/news',                                    lang:'es' },
   { name:'DailyForex ES',       url:'https://es.dailyforex.com/rss/es/forexnews.xml',                      lang:'es' },
   { name:'DailyForex ES · Fund',url:'https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml',            lang:'es' },
@@ -455,7 +441,6 @@ const RSS_SOURCES = [
   { name:'InfoMercados',        url:'https://www.infomercados.com/rss/',                                    lang:'es' },
   { name:'Forexduet ES',        url:'https://es.forexduet.com/feed/',                                       lang:'es' },
   { name:'Cinco Días',          url:'https://cincodias.elpais.com/rss/economia/',                           lang:'es' },
-  // ── EN INGLÉS ─────────────────────────────────────────────────────────────
   { name:'FXStreet News',       url:'https://www.fxstreet.com/rss/news',                                    lang:'en' },
   { name:'DailyForex',          url:'https://www.dailyforex.com/rss/forexnews.xml',                         lang:'en' },
   { name:'Reuters Forex',       url:'https://feeds.reuters.com/reuters/businessNews',                       lang:'en' },
@@ -463,23 +448,17 @@ const RSS_SOURCES = [
 ];
 
 // ── CURRENCY FLAGS MAP ────────────────────────────────────────────────────────
-// Cubre tanto códigos de 3 letras (ISO 4217) como abreviaturas de 2 letras
-// que algunas fuentes de calendario usan (p.ej. "AU" en vez de "AUD").
 const CURRENCY_FLAGS = {
-  // 3 letras (estándar)
   USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
   AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
-  // 2 letras (algunas fuentes de calendario)
   US:'🇺🇸', EU:'🇪🇺', UK:'🇬🇧', JP:'🇯🇵',
   AU:'🇦🇺', CA:'🇨🇦', CH:'🇨🇭', NZ:'🇳🇿',
 };
 
 function resolveFlag(event) {
-  // Prioridad: campo "flag" del JSON → currency (3L) → currency (2L) → vacío
   if (event.flag) return event.flag;
   const cur3 = (event.currency || '').toUpperCase();
   if (CURRENCY_FLAGS[cur3]) return CURRENCY_FLAGS[cur3];
-  // Algunos calendarios usan los 2 primeros caracteres del código de país
   const cur2 = cur3.slice(0, 2);
   return CURRENCY_FLAGS[cur2] || '';
 }
@@ -552,9 +531,7 @@ function computeSentiment(articles) {
   });
 }
 
-// ── UPCOMING EVENTS desde calendar.json (con bandera y hora local correcta) ──
-// Usa exactamente la misma lógica que index.html para hora local:
-// construye la fecha UTC completa y la convierte a la zona del navegador.
+// ── UPCOMING EVENTS ───────────────────────────────────────────────────────────
 async function loadUpcomingEvents() {
   const container = document.getElementById('upcoming-events');
   try {
@@ -568,7 +545,6 @@ async function loadUpcomingEvents() {
     const allEvents = data.events || [];
     const highMed   = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
 
-    // Hoy primero; solo usar mañana si hoy no tiene eventos de alto/medio impacto
     let todayEvents = allEvents.filter(e => e.dateISO === todayISO && highMed(e));
     const useTomorrow = todayEvents.length === 0;
     const upcoming = useTomorrow
@@ -590,7 +566,6 @@ async function loadUpcomingEvents() {
         e.previous ? 'Prev: ' + e.previous : ''
       ].filter(Boolean).join(' · ');
 
-      // ── Hora local del usuario (mismo método que index.html) ─────────────
       let localTime = e.timeUTC || '--:--';
       if (e.timeUTC && e.dateISO) {
         try {
@@ -602,10 +577,9 @@ async function loadUpcomingEvents() {
               hour12: false,
             });
           }
-        } catch(_) { /* mantener timeUTC como fallback */ }
+        } catch(_) {}
       }
 
-      // ── Bandera del país (robusta: 3L, 2L o campo flag del JSON) ────────────
       const flag = resolveFlag(e);
 
       container.innerHTML += `<div class="ev-row">
@@ -637,14 +611,8 @@ function renderSources() {
   ).join('');
 }
 
-// ── DETECT CURRENCY FROM TITLE / DESCRIPTION ─────────────────────────────────
-// Array ordenado: primero las divisas con keywords MÁS ESPECÍFICOS para evitar
-// falsos positivos (p.ej. "oil prices" asignado a USD en lugar de CAD).
-// IMPORTANTE: el orden determina la prioridad — no usar Object (sin orden garantizado).
+// ── DETECT CURRENCY ───────────────────────────────────────────────────────────
 const CUR_KEYWORDS = [
-  // CAD primero — keywords muy específicos para evitar confusión con USD.
-  // No usar trailing space (' ') como único delimitador: falla al final de frase.
-  // En su lugar se incluyen variantes con y sin espacio/puntuación.
   ['CAD', [
     'bank of canada','banco de canadá','banco de canada','boc meeting','macklem',
     'loonie','cad/','cad usd','usd/cad','/cad',
@@ -656,14 +624,12 @@ const CUR_KEYWORDS = [
     'crudo brent','crudo wti','barrel','barril ',
     'canada ', 'canadá ', 'in canada','de canadá','de canada',
   ]],
-  // CHF
   ['CHF', [
     'swiss national bank','snb meeting','snb decision','banco nacional suizo',
     'swiss franc','franco suizo','chf/','usd/chf','/chf',
     'switzerland','suiza','economía suiza','swiss economy',
     'swiss inflation','swiss cpi','ipc suiza',
   ]],
-  // NZD
   ['NZD', [
     'reserve bank of new zealand','rbnz meeting','rbnz decision',
     'banco de la reserva de nueva zelanda',
@@ -671,7 +637,6 @@ const CUR_KEYWORDS = [
     'new zealand','nueva zelanda','nz gdp','nz cpi','nz jobs',
     'dólar neozelandés','dolar neozelandes',
   ]],
-  // AUD
   ['AUD', [
     'reserve bank of australia','rba meeting','rba decision',
     'banco de la reserva de australia',
@@ -682,7 +647,6 @@ const CUR_KEYWORDS = [
     'caixin pmi','china pmi','china gdp','china economy',
     'australia ', 'australi',
   ]],
-  // EUR
   ['EUR', [
     'european central bank','banco central europeo','ecb meeting','ecb decision',
     'bce reunión','bce decisión','lagarde',
@@ -694,7 +658,6 @@ const CUR_KEYWORDS = [
     'inflación zona euro','ipc zona euro','pib zona euro',
     'euro ', 'en euros',
   ]],
-  // GBP
   ['GBP', [
     'bank of england','banco de inglaterra','boe meeting','boe decision','bailey ',
     'pound sterling','sterling','british pound','libra esterlina',
@@ -703,7 +666,6 @@ const CUR_KEYWORDS = [
     'uk inflation','uk jobs','uk economy','ftse index','gilts yield',
     'economía del reino unido','ipc uk','pib uk',
   ]],
-  // JPY
   ['JPY', [
     'bank of japan','banco de japón','banco de japan','boj meeting','boj decision','ueda ',
     'jpy/','jpy usd','usd/jpy','/jpy',
@@ -713,7 +675,6 @@ const CUR_KEYWORDS = [
     'nikkei index','shunto','ipc japón',
     'japan ', 'japón ', 'en japón',
   ]],
-  // USD — al final (fallback): keywords muy genéricos van aquí
   ['USD', [
     'federal reserve','reserva federal','fomc meeting','fomc decision','powell ',
     'us dollar','american dollar','dólar estadounidense',
@@ -736,8 +697,6 @@ function detectCurrency(text) {
   return 'USD';
 }
 
-// ── SOURCE → CURRENCY MAP ─────────────────────────────────────────────────────
-// Cuando el título no contiene keywords de divisa, la fuente da la pista definitiva.
 const SOURCE_CURRENCY = {
   'Bank of Canada':  'CAD',
   'ECB':             'EUR',
@@ -749,15 +708,12 @@ const SOURCE_CURRENCY = {
   'Federal Reserve': 'USD',
 };
 
-// Fuentes forex especializadas — artículos siempre relevantes
 const FOREX_SOURCES = new Set([
   'FXStreet ES','FXStreet','ForexLive','DailyForex ES','DailyForex',
   'Bank of Canada','ECB','Bank of England','Bank of Japan',
   'RBA','RBNZ','SNB','Federal Reserve',
 ]);
 
-// Keywords mínimas para considerar un artículo relevante para forex/mercados.
-// Si no contiene ninguna Y la fuente no es especializada → se descarta.
 const FOREX_RELEVANCE_KW = [
   'usd','eur','gbp','jpy','aud','cad','chf','nzd',
   'dollar','dólar','euro','pound','yen','franc','franco',
@@ -787,7 +743,6 @@ function detectCurrencyWithSource(text, source) {
   return SOURCE_CURRENCY[source] || 'USD';
 }
 
-// ── DETECT IMPACT FROM KEYWORDS ───────────────────────────────────────────────
 const HIGH_IMPACT_KW = [
   'gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','interest rate',
   'tasa de interés','rate decision','decisión de tasas','fed','bce','ecb','boj','boe','rba',
@@ -807,9 +762,7 @@ function detectImpact(title, description) {
   return 'low';
 }
 
-// ── RSS PROXY SERVICES ────────────────────────────────────────────────────────
-// Los navegadores bloquean RSS directo por CORS. Usamos servicios proxy públicos
-// que convierten RSS a JSON sin requerir backend propio.
+// ── RSS PROXY ─────────────────────────────────────────────────────────────────
 const RSS_TO_JSON_PROXIES = [
   (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&api_key=&count=20`,
   (url) => `https://rss.app/feeds/v1.1/${encodeURIComponent(url)}.json`,
@@ -824,8 +777,6 @@ async function fetchRSSviaProxy(rssUrl) {
       });
       if (!res.ok) continue;
       const data = await res.json();
-
-      // rss2json format
       if (data.items && Array.isArray(data.items) && data.items.length > 0) {
         return data.items.map(item => ({
           title:       item.title || '',
@@ -835,12 +786,11 @@ async function fetchRSSviaProxy(rssUrl) {
           source:      data.feed?.title || new URL(rssUrl).hostname,
         }));
       }
-    } catch(_) { /* intentar siguiente proxy */ }
+    } catch(_) {}
   }
   return null;
 }
 
-// ── PARSE DATE → time string UTC ─────────────────────────────────────────────
 function parseTime(pubDate) {
   if (!pubDate) return '--:--';
   try {
@@ -894,16 +844,30 @@ function renderFeed() {
       <span class="col-time">${esc(a.time)}</span>
       <span class="col-cur">${esc(a.cur)}</span>
       <div class="col-impact ${ic}"><div class="impact-dot"></div></div>
-      <span class="col-title" title="${esc(a.title)}">${esc(a.title)}</span>
+      <span class="col-title" title="${esc(a.ai_headline || a.title)}">${esc(a.ai_headline || a.title)}</span>
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
-      ${esc(a.description || a.title)}
+      ${a.ai_headline
+        ? `<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">
+             ${esc(a.ai_headline)}
+             <span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span>
+           </div>`
+        : ''}
+      <span style="color:var(--text-secondary)">${esc(a.expand || a.description || a.title)}</span>
       ${a.link ? `<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>` : ''}
     </div>`;
   });
 
   document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
+
+  // Mostrar badge AI si al menos un artículo visible tiene ai_headline
+  const aiBadge = document.getElementById('ai-badge');
+  if (aiBadge) {
+    const hasAI = filtered.slice(0, visible).some(a => a.ai_headline);
+    aiBadge.style.display = hasAI ? 'inline' : 'none';
+  }
+
   computeSentiment(filtered);
 }
 
@@ -927,31 +891,26 @@ function toggleImpact(btn) {
   visible = PAGE; renderFeed();
 }
 
-// ── INIT FEED: Solo fuentes RSS reales, sin datos hardcodeados ────────────────
-// Estrategia:
-//   1. Intentar cargar news-data/news.json (generado por GitHub Action de scraping)
-//   2. Si falla o está vacío, intentar feeds RSS vía proxy público
-//   3. Si todo falla, mostrar estado de error explícito con enlaces directos
-//    NO se usa SAMPLE / datos hardcodeados en ningún caso.
+// ── INIT FEED ─────────────────────────────────────────────────────────────────
 async function initFeed() {
   const feedBody = document.getElementById('feed-body');
 
-  // Estrategia 1: JSON pre-generado por GitHub Actions (scraping diario)
+  // Estrategia 1: JSON pre-generado por GitHub Actions
   try {
     const res = await fetch('news-data/news.json?_=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       const articles = (data.articles || []);
       if (articles.length > 0) {
-        // Normalizar artículos del JSON
         allArticles = articles
           .map(a => {
             const text = a.title + ' ' + (a.expand || '');
             return {
               ...a,
-              cur:    detectCurrencyWithSource(text, a.source),
-              impact: a.impact || detectImpact(a.title, a.expand),
-              time:   a.time   || '--:--',
+              cur:         detectCurrencyWithSource(text, a.source),
+              impact:      a.impact || detectImpact(a.title, a.expand),
+              time:        a.time   || '--:--',
+              ai_headline: a.ai_headline || null,
             };
           })
           .filter(a => isForexRelevant(a.title, a.expand, a.source))
@@ -970,9 +929,6 @@ async function initFeed() {
   </div>`;
 
   const collected = [];
-  let successCount = 0;
-
-  // Cargar fuentes en paralelo (limitado a las más confiables para evitar exceso de requests)
   const ACTIVE_SOURCES = RSS_SOURCES.filter(s =>
     ['FXStreet ES','DailyForex ES','DailyForex ES · Fund','ElEconomista.es','FXStreet News','DailyForex','Reuters Forex'].includes(s.name)
   );
@@ -984,7 +940,6 @@ async function initFeed() {
   for (const result of results) {
     if (result.status === 'fulfilled' && result.value.items) {
       const { src, items } = result.value;
-      successCount++;
       items.forEach(item => {
         const text   = item.title + ' ' + item.description;
         const source = item.source || src.name;
@@ -1001,19 +956,19 @@ async function initFeed() {
           title:       item.title,
           description: item.description.replace(/<[^>]*>/g, '').substring(0, 300),
           link:        item.link,
+          ai_headline: null,
         });
       });
     }
   }
 
   if (collected.length > 0) {
-    // Ordenar por timestamp descendente (más reciente primero)
     allArticles = collected.sort((a, b) => b.ts - a.ts);
     renderFeed();
     return;
   }
 
-  // Estrategia 3: Todo falló → mostrar error sin datos inventados
+  // Estrategia 3: Todo falló
   const loading2 = document.getElementById('feed-loading');
   if (loading2) loading2.remove();
 
@@ -1028,8 +983,6 @@ async function initFeed() {
     <a href="https://www.eleconomista.es/mercados-cotizaciones/" target="_blank" rel="noopener">ElEconomista.es</a><br>
     <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES — Forex</a><br>
     <a href="https://es.dailyforex.com/" target="_blank" rel="noopener">DailyForex ES</a><br>
-    <a href="https://www.forex.com/es/news-and-analysis/" target="_blank" rel="noopener">Forex.com ES</a><br>
-    <a href="https://es.marketscreener.com/noticias/divisas/" target="_blank" rel="noopener">MarketScreener ES — Divisas</a><br>
     <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters — Forex</a><br>
     <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet EN</a>
   </div>`;
