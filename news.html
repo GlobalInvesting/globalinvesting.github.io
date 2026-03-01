@@ -166,11 +166,7 @@
   .badge-h{background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.2);color:var(--red);}
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
-  .src-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
-  .src-row:last-child{border-bottom:none;}
-  .src-name{font-size:.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:.3rem;}
-  .src-ok{font-size:.62rem;color:var(--green);font-weight:500;}
-  .lang-tag{font-size:.55rem;background:rgba(30,136,229,.15);color:var(--blue);border-radius:2px;padding:.05rem .3rem;}
+
   .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-secondary);font-size:.85rem;margin-top:3rem;}
   .site-footer a{color:var(--text-secondary);text-decoration:none;}
   .site-footer a:hover{color:var(--text-primary);}
@@ -275,10 +271,10 @@
         </div>
         <div class="s-panel">
           <div class="s-header">
-            <span class="s-title">Fuentes RSS</span>
-            <span class="s-sub">estado</span>
+            <span class="s-title">Cobertura por divisa</span>
+            <span class="s-sub">últimas 72h</span>
           </div>
-          <div id="sources-body"></div>
+          <div id="coverage-body"></div>
         </div>
       </div>
     </aside>
@@ -524,31 +520,47 @@ async function fetchAndBuildTicker() {
 fetchAndBuildTicker();
 setInterval(fetchAndBuildTicker, 60000);
 
-// ── RSS SOURCES ───────────────────────────────────────────────────────────────
-const RSS_SOURCES = [
-  { name:'FXStreet ES',           lang:'es' },
-  { name:'DailyForex ES',         lang:'es' },
-  { name:'DailyForex ES · Fund',  lang:'es' },
-  { name:'DailyForex ES · Tec',   lang:'es' },
-  { name:'Investing.com ES',      lang:'es' },
-  { name:'FXStreet',              lang:'en' },
-  { name:'FXStreet · Analysis',   lang:'en' },
-  { name:'ForexLive',             lang:'en' },
-  { name:'ForexLive · CB',        lang:'en' },
-  { name:'ActionForex',           lang:'en' },
-  { name:'ActionForex · Insight', lang:'en' },
-  { name:'InvestingLive · CB',    lang:'en' },
-  { name:'InvestingLive · Tech',  lang:'en' },
-  { name:'MyFXBook',              lang:'en' },
-  { name:'Investing.com · Fund',  lang:'en' },
-  { name:'Investing.com · Tech',  lang:'en' },
-  { name:'DailyForex',            lang:'en' },
-  { name:'Bank of Canada',        lang:'en' },
-  { name:'ECB',                   lang:'en' },
-  { name:'Bank of England',       lang:'en' },
-  { name:'InstaForex · News',     lang:'en' },
-  { name:'InstaForex · Analytics',lang:'en' },
-];
+// ── COVERAGE RENDER ──────────────────────────────────────────────────────────
+// Muestra cuántas noticias hay por divisa en el pool actual (últimas 72h).
+// Reemplaza el panel de Fuentes RSS que no aportaba información dinámica.
+function renderCoverage(articles) {
+  const body = document.getElementById('coverage-body');
+  if (!body) return;
+
+  const CURRENCIES_ORDERED = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const counts = {};
+  const highCounts = {};
+  CURRENCIES_ORDERED.forEach(c => { counts[c] = 0; highCounts[c] = 0; });
+
+  (articles || []).forEach(a => {
+    if (counts[a.cur] !== undefined) {
+      counts[a.cur]++;
+      if (a.impact === 'high') highCounts[a.cur]++;
+    }
+  });
+
+  const maxCount = Math.max(...Object.values(counts), 1);
+
+  body.innerHTML = CURRENCIES_ORDERED.map(cur => {
+    const n    = counts[cur] || 0;
+    const h    = highCounts[cur] || 0;
+    const pct  = Math.round((n / maxCount) * 100);
+    const flag = flagImg(cur, 14);
+    const barColor = n === 0 ? 'var(--text-dim)'
+                   : n >= 4  ? 'var(--green)'
+                   : n >= 2  ? 'var(--blue)'
+                   : 'var(--orange)';
+    const highBadge = h > 0
+      ? `<span style="font-size:.55rem;color:var(--red);font-weight:600;margin-left:.2rem;">${h}▲</span>`
+      : '';
+    return `<div class="sent-row">
+      <span class="sent-cur">${flag} ${cur}</span>
+      <div class="sent-bar-wrap"><div class="sent-bar" style="width:${pct}%;background:${barColor};"></div></div>
+      <span class="sent-count">${n}</span>
+      ${highBadge || '<span style="width:20px;display:inline-block;"></span>'}
+    </div>`;
+  }).join('');
+}
 
 // ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
@@ -685,15 +697,7 @@ async function loadUpcomingEvents() {
   }
 }
 
-// ── SOURCES RENDER ────────────────────────────────────────────────────────────
-function renderSources() {
-  document.getElementById('sources-body').innerHTML = RSS_SOURCES.map(s =>
-    `<div class="src-row">
-      <span class="src-name">${esc(s.name)}${s.lang==='es'?'<span class="lang-tag">ES</span>':''}</span>
-      <span class="src-ok">● Activo</span>
-    </div>`
-  ).join('');
-}
+
 
 // ── CURRENCY DETECTION ────────────────────────────────────────────────────────
 const CUR_KEYWORDS = [
@@ -768,6 +772,7 @@ function renderFeed() {
     </div>`;
     document.getElementById('load-more-btn').style.display = 'none';
     computeSentiment([]);
+    renderCoverage([]);
     return;
   }
 
@@ -806,6 +811,7 @@ function renderFeed() {
   }
 
   computeSentiment(filtered);
+  renderCoverage(allArticles);
 }
 
 function loadMore() { visible += PAGE; renderFeed(); }
@@ -888,12 +894,12 @@ async function initFeed() {
     <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a>
   </div>`;
   computeSentiment([]);
+  renderCoverage([]);
 }
 
 // ── ARRANQUE ──────────────────────────────────────────────────────────────────
 initFeed();
 loadUpcomingEvents();
-renderSources();
 </script>
 </body>
 </html>
