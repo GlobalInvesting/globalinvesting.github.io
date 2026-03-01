@@ -3,21 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- ── CACHÉ: forzar recarga ─────────────────────────────────────────────── -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-
-<!-- ── SEO BÁSICO ────────────────────────────────────────────────────────── -->
 <title>Noticias Forex en Tiempo Real · Análisis Fundamental | Global Investing</title>
 <meta name="description" content="Feed de noticias forex en tiempo real con análisis fundamental AI. Cobertura de las 8 divisas principales: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. Actualizado 3 veces al día con titulares generados por IA.">
 <meta name="keywords" content="noticias forex, análisis fundamental forex, USD EUR GBP JPY, noticias divisas, banco central, fed, bce, boe, boj, trading forex, tipo de cambio, mercado de divisas">
 <meta name="author" content="Santiago Plá · Global Investing">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/news.html">
-
-<!-- ── OPEN GRAPH (Facebook / LinkedIn / WhatsApp) ───────────────────────── -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
 <meta property="og:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
@@ -27,15 +21,11 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_ES">
-
-<!-- ── TWITTER / X CARD ──────────────────────────────────────────────────── -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@GlobalInvesting">
 <meta name="twitter:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
 <meta name="twitter:description" content="Feed de noticias forex con análisis AI. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/assets/og-news.png">
-
-<!-- ── SCHEMA.ORG STRUCTURED DATA ────────────────────────────────────────── -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -67,12 +57,9 @@
   ]
 }
 </script>
-
-<!-- ── FUENTES ────────────────────────────────────────────────────────────── -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{
@@ -90,8 +77,6 @@
     --orange:#e0a020;
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;}
-
-  /* HEADER */
   .site-header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1.5rem 2rem;}
   .header-inner{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
   .brand{font-size:1.125rem;font-weight:700;color:var(--text-primary);text-decoration:none;}
@@ -100,8 +85,6 @@
   .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;transition:color .2s;}
   .nav-links a:hover{color:var(--text-primary);}
   .nav-links a.active{color:var(--blue);}
-
-  /* TICKER */
   .ticker-wrap{background:var(--bg-secondary);border-bottom:1px solid var(--border);overflow:hidden;height:30px;display:flex;align-items:center;}
   .ticker-label{font-size:.62rem;font-weight:600;color:var(--text-secondary);background:var(--bg-card);border-right:1px solid var(--border);padding:0 .9rem;height:100%;display:flex;align-items:center;letter-spacing:.08em;flex-shrink:0;}
   .ticker-overflow{overflow:hidden;flex:1;}
@@ -113,27 +96,19 @@
   .ticker-chg.dn{color:var(--red);}
   .ticker-loading{font-size:.68rem;color:var(--text-dim);padding:0 1rem;}
   @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-
-  /* LAYOUT */
   .page-wrap{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 4rem;}
   .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
   .page-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);}
   .live-badge{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-secondary);}
   .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-
-  /* FILTER BAR */
   .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
   .filter-btn{font-size:.72rem;font-weight:500;padding:.25rem .7rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;font-family:inherit;}
   .filter-btn:hover{border-color:#444d5a;color:var(--text-primary);}
   .filter-btn.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
   .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
   .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
-
-  /* MAIN GRID */
   .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
-
-  /* NEWS PANEL */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .panel-header{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
   .news-row{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
@@ -151,28 +126,21 @@
   .impact-low .impact-dot{background:var(--text-dim);}
   .col-title{font-size:.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .75rem;font-weight:400;}
   .news-row.featured .col-title{font-weight:500;}
-  /* Badge "histórico" para noticias de más de 24h */
   .col-title .hist-tag{font-size:.55rem;color:var(--text-dim);border:1px solid var(--border);border-radius:2px;padding:.03rem .22rem;margin-left:.3rem;vertical-align:middle;font-weight:400;}
   .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .news-expand{display:none;grid-column:1/-1;padding:.6rem .75rem .75rem 1.5rem;border-bottom:1px solid rgba(48,54,61,.6);font-size:.75rem;color:var(--text-secondary);line-height:1.65;background:rgba(255,255,255,.01);border-left:2px solid var(--border);}
   .news-row.open + .news-expand{display:block;}
   .load-more{display:flex;align-items:center;justify-content:center;padding:.7rem;font-size:.72rem;color:var(--text-secondary);cursor:pointer;transition:color .15s;gap:.35rem;border-top:1px solid var(--border);background:var(--bg-secondary);}
   .load-more:hover{color:var(--blue);}
-
-  /* EMPTY / ERROR STATES */
   .feed-empty{padding:2.5rem 1.5rem;text-align:center;color:var(--text-secondary);font-size:.82rem;line-height:1.7;}
   .feed-empty a{color:var(--blue);text-decoration:none;}
   .feed-empty a:hover{text-decoration:underline;}
   .feed-error-icon{font-size:2rem;margin-bottom:.75rem;}
-
-  /* SIDEBAR */
   .sidebar{display:flex;flex-direction:column;gap:1rem;}
   .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
   .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
   .s-sub{font-size:.62rem;color:var(--text-dim);}
-
-  /* Sentiment */
   .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .sent-row:last-child{border-bottom:none;}
   .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:30px;flex-shrink:0;}
@@ -186,8 +154,6 @@
   .sent-label.bull{color:var(--green);}
   .sent-label.bear{color:var(--red);}
   .sent-label.neut{color:var(--text-dim);}
-
-  /* Events */
   .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .ev-row:last-child{border-bottom:none;}
   .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
@@ -200,19 +166,14 @@
   .badge-h{background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.2);color:var(--red);}
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
-
-  /* Sources */
   .src-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .src-row:last-child{border-bottom:none;}
   .src-name{font-size:.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:.3rem;}
   .src-ok{font-size:.62rem;color:var(--green);font-weight:500;}
   .lang-tag{font-size:.55rem;background:rgba(30,136,229,.15);color:var(--blue);border-radius:2px;padding:.05rem .3rem;}
-
-  /* Footer */
   .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-secondary);font-size:.85rem;margin-top:3rem;}
   .site-footer a{color:var(--text-secondary);text-decoration:none;}
   .site-footer a:hover{color:var(--text-primary);}
-
   @media(max-width:900px){
     .layout-cols{grid-template-columns:1fr;}
     .site-header{padding:1rem;}
@@ -242,7 +203,6 @@
   </div>
 </header>
 
-<!-- TICKER -->
 <div class="ticker-wrap" aria-hidden="true">
   <div class="ticker-label">FX LIVE</div>
   <div class="ticker-overflow">
@@ -276,8 +236,6 @@
   </div>
 
   <div class="layout-cols">
-
-    <!-- FEED -->
     <section aria-label="Feed de noticias forex">
       <div class="news-panel">
         <div class="panel-header" aria-hidden="true">
@@ -297,11 +255,8 @@
       </div>
     </section>
 
-    <!-- SIDEBAR -->
     <aside aria-label="Panel lateral">
       <div class="sidebar">
-
-        <!-- SENTIMIENTO -->
         <div class="s-panel">
           <div class="s-header">
             <span class="s-title">Sentimiento 24h</span>
@@ -309,8 +264,6 @@
           </div>
           <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
         </div>
-
-        <!-- PRÓXIMOS EVENTOS -->
         <div class="s-panel">
           <div class="s-header">
             <span class="s-title">Próximos eventos</span>
@@ -320,8 +273,6 @@
             <div class="ev-empty">Cargando eventos…</div>
           </div>
         </div>
-
-        <!-- FUENTES RSS -->
         <div class="s-panel">
           <div class="s-header">
             <span class="s-title">Fuentes RSS</span>
@@ -329,7 +280,6 @@
           </div>
           <div id="sources-body"></div>
         </div>
-
       </div>
     </aside>
   </div>
@@ -375,20 +325,23 @@ function resolveFlag(cur) {
 
 // ── TICKER ────────────────────────────────────────────────────────────────────
 const TICKER_PAIRS = [
-  { pair:'EUR/USD', base:'EUR', quote:'USD', invert:false },
-  { pair:'GBP/USD', base:'GBP', quote:'USD', invert:false },
-  { pair:'USD/JPY', base:'USD', quote:'JPY', invert:true  },
-  { pair:'USD/CHF', base:'USD', quote:'CHF', invert:true  },
-  { pair:'AUD/USD', base:'AUD', quote:'USD', invert:false },
-  { pair:'USD/CAD', base:'USD', quote:'CAD', invert:true  },
-  { pair:'NZD/USD', base:'NZD', quote:'USD', invert:false },
-  { pair:'EUR/GBP', base:'EUR', quote:'GBP', invert:false },
-  { pair:'EUR/JPY', base:'EUR', quote:'JPY', invert:false },
-  { pair:'GBP/JPY', base:'GBP', quote:'JPY', invert:false },
+  { pair:'EUR/USD', base:'EUR', quote:'USD' },
+  { pair:'GBP/USD', base:'GBP', quote:'USD' },
+  { pair:'USD/JPY', base:'USD', quote:'JPY' },
+  { pair:'USD/CHF', base:'USD', quote:'CHF' },
+  { pair:'AUD/USD', base:'AUD', quote:'USD' },
+  { pair:'USD/CAD', base:'USD', quote:'CAD' },
+  { pair:'NZD/USD', base:'NZD', quote:'USD' },
+  { pair:'EUR/GBP', base:'EUR', quote:'GBP' },
+  { pair:'EUR/JPY', base:'EUR', quote:'JPY' },
+  { pair:'GBP/JPY', base:'GBP', quote:'JPY' },
 ];
 
-// Caché de precios de apertura del DÍA ACTUAL (se limpia si cambia la fecha)
-const OPEN_PRICES_KEY = 'fx_open_prices_v2';
+// ── FIX 1 & 2: Caché mejorado ────────────────────────────────────────────────
+// Clave nueva (v3) para evitar colisiones con la caché antigua (v2)
+// Se guarda _fetchedOn (fecha de la petición) para validar, no _date (fecha de mercado)
+// Esto corrige el problema cuando Frankfurter devuelve fecha de viernes estando en lunes
+const OPEN_PRICES_KEY = 'fx_ref_prices_v3';
 
 function getTodayISO() {
   return new Date().toISOString().split('T')[0];
@@ -399,15 +352,16 @@ function loadOpenPrices() {
     const raw = localStorage.getItem(OPEN_PRICES_KEY);
     if (!raw) return null;
     const obj = JSON.parse(raw);
-    // Solo válido si es del día de hoy
-    if (obj._date !== getTodayISO()) return null;
-    return obj;
+    // Válido si se guardó HOY (independiente de qué fecha de mercado contiene)
+    // Cubre fines de semana/festivos donde Frankfurter devuelve el último cierre disponible
+    if (obj._fetchedOn === getTodayISO()) return obj;
+    return null;
   } catch(_) { return null; }
 }
 
-function saveOpenPrices(obj) {
+function saveOpenPrices(priceMap, marketDate) {
   try {
-    obj._date = getTodayISO();
+    const obj = { ...priceMap, _date: marketDate, _fetchedOn: getTodayISO() };
     localStorage.setItem(OPEN_PRICES_KEY, JSON.stringify(obj));
   } catch(_) {}
 }
@@ -424,36 +378,32 @@ function ratesToPairPrices(usdRates) {
   return prices;
 }
 
-// Obtiene precios de apertura del día (00:00 UTC) desde Frankfurter
+// FIX 2: Usa /latest en lugar de fecha fija de hoy
+// Frankfurter /latest siempre devuelve el último cierre ECB disponible (cubre festivos y fines de semana)
 async function ensureDailyOpenPrices() {
   const cached = loadOpenPrices();
-  if (cached && Object.keys(cached).length > 1) return cached;
+  if (cached && Object.keys(cached).filter(k => !k.startsWith('_')).length > 0) return cached;
 
   try {
-    // Precio de apertura = cierre del día anterior en ECB = fecha de hoy 00:00 UTC
-    const todayISO = getTodayISO();
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
 
-    // Frankfurter devuelve el último precio disponible para esa fecha
-    const res = await fetch(
-      `https://api.frankfurter.app/${todayISO}?from=EUR`,
-      { signal: ctrl.signal }
-    );
+    const res = await fetch('https://api.frankfurter.app/latest?from=EUR', { signal: ctrl.signal });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.rates) throw new Error('Sin rates');
 
-    // Convertir todo a base USD
     const eurUsd = data.rates['USD'];
     if (!eurUsd) throw new Error('Sin EUR/USD');
+
     const usdRates = { EUR: 1 / eurUsd };
     Object.entries(data.rates).forEach(([cur, val]) => {
       usdRates[cur] = val / eurUsd;
     });
 
     const prices = ratesToPairPrices(usdRates);
-    saveOpenPrices(prices);
+    // Guardamos la fecha real del último cierre de mercado que devolvió la API
+    saveOpenPrices(prices, data.date || getTodayISO());
     return prices;
   } catch(_) {
     return null;
@@ -502,11 +452,10 @@ async function fetchAndBuildTicker() {
 
       if (openPrices && openPrices[pair]) {
         const prev = openPrices[pair];
-        const diff = price - prev;
-        if (Math.abs(diff / prev) > 0.000001) {
-          const pct = (diff / prev) * 100;
-          // Solo mostrar si el cambio es significativo (> 0.005%)
-          if (Math.abs(pct) >= 0.005) {
+        // FIX 3: Umbral reducido de 0.005% → 0.001% para capturar movimientos intradía
+        if (Math.abs(prev) > 0) {
+          const pct = ((price - prev) / prev) * 100;
+          if (Math.abs(pct) >= 0.001) {
             up = pct >= 0;
             chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
           }
@@ -536,31 +485,29 @@ async function fetchAndBuildTicker() {
 fetchAndBuildTicker();
 setInterval(fetchAndBuildTicker, 60000);
 
-// ── RSS SOURCES (sidebar) ─────────────────────────────────────────────────────
+// ── RSS SOURCES ───────────────────────────────────────────────────────────────
 const RSS_SOURCES = [
-  // ESPAÑOL
-  { name:'FXStreet ES',          lang:'es' },
-  { name:'DailyForex ES',        lang:'es' },
-  { name:'DailyForex ES · Fund', lang:'es' },
-  { name:'DailyForex ES · Tec',  lang:'es' },
-  { name:'Investing.com ES',     lang:'es' },
-  // INGLÉS
-  { name:'FXStreet',             lang:'en' },
-  { name:'FXStreet · Analysis',  lang:'en' },
-  { name:'ForexLive',            lang:'en' },
-  { name:'ForexLive · CB',       lang:'en' },
-  { name:'ActionForex',          lang:'en' },
-  { name:'ActionForex · Insight',lang:'en' },
-  { name:'InvestingLive · CB',   lang:'en' },
-  { name:'InvestingLive · Tech', lang:'en' },
-  { name:'MyFXBook',             lang:'en' },
-  { name:'Investing.com · Fund', lang:'en' },
-  { name:'Investing.com · Tech', lang:'en' },
-  { name:'DailyForex',           lang:'en' },
-  { name:'Bank of Canada',       lang:'en' },
-  { name:'ECB',                  lang:'en' },
-  { name:'Bank of England',      lang:'en' },
-  { name:'InstaForex · News',    lang:'en' },
+  { name:'FXStreet ES',           lang:'es' },
+  { name:'DailyForex ES',         lang:'es' },
+  { name:'DailyForex ES · Fund',  lang:'es' },
+  { name:'DailyForex ES · Tec',   lang:'es' },
+  { name:'Investing.com ES',      lang:'es' },
+  { name:'FXStreet',              lang:'en' },
+  { name:'FXStreet · Analysis',   lang:'en' },
+  { name:'ForexLive',             lang:'en' },
+  { name:'ForexLive · CB',        lang:'en' },
+  { name:'ActionForex',           lang:'en' },
+  { name:'ActionForex · Insight', lang:'en' },
+  { name:'InvestingLive · CB',    lang:'en' },
+  { name:'InvestingLive · Tech',  lang:'en' },
+  { name:'MyFXBook',              lang:'en' },
+  { name:'Investing.com · Fund',  lang:'en' },
+  { name:'Investing.com · Tech',  lang:'en' },
+  { name:'DailyForex',            lang:'en' },
+  { name:'Bank of Canada',        lang:'en' },
+  { name:'ECB',                   lang:'en' },
+  { name:'Bank of England',       lang:'en' },
+  { name:'InstaForex · News',     lang:'en' },
   { name:'InstaForex · Analytics',lang:'en' },
 ];
 
@@ -644,9 +591,8 @@ async function loadUpcomingEvents() {
 
     const todayISO    = new Date().toISOString().split('T')[0];
     const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
-    const allEvents = data.events || [];
-    const highMed   = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
+    const allEvents   = data.events || [];
+    const highMed     = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
 
     let todayEvents = allEvents.filter(e => e.dateISO === todayISO && highMed(e));
     const useTomorrow = todayEvents.length === 0;
@@ -754,9 +700,9 @@ function tsToLocalTime(ts) {
 }
 
 // ── FEED STATE ────────────────────────────────────────────────────────────────
-const PAGE      = 30;
-let allArticles = [];
-let visible     = PAGE;
+const PAGE       = 30;
+let allArticles  = [];
+let visible      = PAGE;
 let activeFilter = 'ALL';
 let highOnly     = false;
 
@@ -789,7 +735,7 @@ function renderFeed() {
   filtered.slice(0, visible).forEach(a => {
     const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
     const flag    = resolveFlag(a.cur);
-    const isHist  = a.recent === false; // artículo de más de 24h
+    const isHist  = a.recent === false;
     const histTag = isHist ? '<span class="hist-tag" title="Noticia histórica (1-3 días)">hist</span>' : '';
     const headline = a.ai_headline || a.title;
 
@@ -846,11 +792,10 @@ function toggleImpact(btn) {
 // ── INIT FEED ─────────────────────────────────────────────────────────────────
 async function initFeed() {
   try {
-    // Cache-busting: timestamp + versión para forzar recarga siempre
-    const cb = Date.now();
+    const cb  = Date.now();
     const res = await fetch(`news-data/news.json?v=${cb}`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    const data     = await res.json();
     const articles = data.articles || [];
 
     if (articles.length > 0) {
@@ -866,15 +811,14 @@ async function initFeed() {
           }
           return {
             ...a,
-            cur:        detectCurrencyWithSource(text, a.source),
-            impact:     a.impact || detectImpact(a.title, a.expand),
-            time:       localTime,
+            cur:         detectCurrencyWithSource(text, a.source),
+            impact:      a.impact || detectImpact(a.title, a.expand),
+            time:        localTime,
             ai_headline: a.ai_headline || null,
-            recent:     a.recent !== undefined ? a.recent : true,
+            recent:      a.recent !== undefined ? a.recent : true,
           };
         })
         .filter(a => {
-          // Mostrar artículos con ai_headline válido, o sin headline (fallback al título)
           if (a.ai_headline && a.ai_headline.toUpperCase().includes('IRRELEVANTE')) return false;
           return true;
         })
@@ -887,7 +831,6 @@ async function initFeed() {
     console.warn('news.json no disponible:', e.message);
   }
 
-  // Fallback si el JSON no carga
   const feedBody = document.getElementById('feed-body');
   const loading  = document.getElementById('feed-loading');
   if (loading) loading.remove();
