@@ -315,6 +315,18 @@ function savePrevRates(obj) {
 
 let prevRates = loadPrevRates();
 
+// Devuelve la fecha del último día de trading (lunes-viernes)
+function lastTradingDay() {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  // Si es lunes (1) → viernes anterior; si es domingo (0) → viernes anterior
+  const dow = d.getUTCDay();
+  if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
+  else if (dow === 1) d.setUTCDate(d.getUTCDate() - 3);
+  else d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().split('T')[0]; // "YYYY-MM-DD"
+}
+
 // Convierte tasas base USD a precios de par
 function ratesToPairPrices(rates) {
   const prices = {};
@@ -328,30 +340,41 @@ function ratesToPairPrices(rates) {
   return prices;
 }
 
-// Si localStorage está vacío, carga las tasas de ayer de Frankfurter como baseline
-async function ensurePrevRates() {
-  if (Object.keys(prevRates).length > 0) return; // ya tenemos datos
+// Carga tasas del cierre del último día de trading como baseline diario fijo.
+// Solo se refresca una vez al día (compara la fecha guardada con hoy).
+async function ensureDailyBaseline() {
   try {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    const ctrl = new AbortController();
-    setTimeout(() => ctrl.abort(), 6000);
-    const res = await fetch(`https://api.frankfurter.app/${yesterday}?from=USD`, { signal: ctrl.signal });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.rates) {
-        prevRates = ratesToPairPrices(data.rates);
-        savePrevRates(prevRates);
-      }
+    const stored = localStorage.getItem(PREV_RATES_KEY);
+    const parsed = stored ? JSON.parse(stored) : null;
+    const tradingDay = lastTradingDay();
+
+    // Si ya tenemos el baseline del día correcto, usarlo
+    if (parsed && parsed._date === tradingDay && Object.keys(parsed).length > 1) {
+      prevRates = parsed;
+      return;
     }
-  } catch(_) { /* silencioso: el ticker mostrará sin % la primera vez */ }
+
+    // Cargar cierre del último día de trading desde Frankfurter
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=USD`, { signal: ctrl.signal });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.rates) return;
+
+    const prices = ratesToPairPrices(data.rates);
+    prices._date = tradingDay; // marcador de fecha para saber si hay que refrescar mañana
+    localStorage.setItem(PREV_RATES_KEY, JSON.stringify(prices));
+    prevRates = prices;
+  } catch(_) { /* si falla, el ticker muestra precios sin % */ }
 }
 
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
 
   try {
-    // Garantizar que tenemos rates previos antes de la primera llamada
-    await ensurePrevRates();
+    // Cargar baseline del día anterior antes de fetch de precios actuales
+    await ensureDailyBaseline();
 
     let rates = null;
     const sources = [
@@ -374,7 +397,6 @@ async function fetchAndBuildTicker() {
 
     if (!rates) throw new Error('Todas las fuentes de FX fallaron');
 
-    const newPrev = {};
     const items = TICKER_PAIRS.map(({ pair, base, quote }) => {
       let price;
       if (base === 'USD')        price = rates[quote];
@@ -383,7 +405,7 @@ async function fetchAndBuildTicker() {
       if (!price || isNaN(price)) return null;
 
       const decimals  = pair.includes('JPY') ? 2 : 4;
-      const prevPrice = prevRates[pair];
+      const prevPrice = prevRates[pair];  // cierre del día anterior
       let chgStr = '', up = null;
 
       if (prevPrice && Math.abs(prevPrice - price) > 0.000001) {
@@ -392,13 +414,8 @@ async function fetchAndBuildTicker() {
         chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
       }
 
-      newPrev[pair] = price;
       return { pair, price: price.toFixed(decimals), chgStr, up };
     }).filter(Boolean);
-
-    // Persistir precios actuales para siguiente visita/refresh
-    savePrevRates(newPrev);
-    prevRates = { ...prevRates, ...newPrev };
 
     const html = [...items, ...items].map(({ pair, price, chgStr, up }) => {
       const chgHtml = chgStr
@@ -716,7 +733,58 @@ function detectCurrency(text) {
   for (const [cur, kws] of CUR_KEYWORDS) {
     if (kws.some(kw => lower.includes(kw))) return cur;
   }
-  return 'USD';   // fallback genérico
+  return 'USD';
+}
+
+// ── SOURCE → CURRENCY MAP ─────────────────────────────────────────────────────
+// Cuando el título no contiene keywords de divisa, la fuente da la pista definitiva.
+const SOURCE_CURRENCY = {
+  'Bank of Canada':  'CAD',
+  'ECB':             'EUR',
+  'Bank of England': 'GBP',
+  'Bank of Japan':   'JPY',
+  'RBA':             'AUD',
+  'RBNZ':            'NZD',
+  'SNB':             'CHF',
+  'Federal Reserve': 'USD',
+};
+
+// Fuentes forex especializadas — artículos siempre relevantes
+const FOREX_SOURCES = new Set([
+  'FXStreet ES','FXStreet','ForexLive','DailyForex ES','DailyForex',
+  'Bank of Canada','ECB','Bank of England','Bank of Japan',
+  'RBA','RBNZ','SNB','Federal Reserve',
+]);
+
+// Keywords mínimas para considerar un artículo relevante para forex/mercados.
+// Si no contiene ninguna Y la fuente no es especializada → se descarta.
+const FOREX_RELEVANCE_KW = [
+  'usd','eur','gbp','jpy','aud','cad','chf','nzd',
+  'dollar','dólar','euro','pound','yen','franc','franco',
+  'forex','fx ','currency','currencies','divisa','divisas','tipo de cambio',
+  'fed','bce','ecb','boe','boj','rba','boc','snb','rbnz','banco central','central bank',
+  'interest rate','tasa de interés','tipos de interés','inflation','inflación',
+  'gdp','pib','cpi','ipc','unemployment','desempleo','payroll','nóminas',
+  'trade balance','balanza','pmi','retail sales','ventas minoristas',
+  'recession','recesión','monetary policy','política monetaria',
+  'stock market','bolsa','equity','bonos','bond','yield','treasury',
+  'oil','petróleo','gold','oro','commodit',
+  'market','mercado','trading','investor','inversor',
+  'sanctions','sanciones','tariff','arancel','trade war','guerra comercial',
+];
+
+function isForexRelevant(title, expand, source) {
+  if (FOREX_SOURCES.has(source)) return true;
+  const text = ((title || '') + ' ' + (expand || '')).toLowerCase();
+  return FOREX_RELEVANCE_KW.some(kw => text.includes(kw));
+}
+
+function detectCurrencyWithSource(text, source) {
+  const lower = (text || '').toLowerCase();
+  for (const [cur, kws] of CUR_KEYWORDS) {
+    if (kws.some(kw => lower.includes(kw))) return cur;
+  }
+  return SOURCE_CURRENCY[source] || 'USD';
 }
 
 // ── DETECT IMPACT FROM KEYWORDS ───────────────────────────────────────────────
@@ -877,13 +945,17 @@ async function initFeed() {
       if (articles.length > 0) {
         // Normalizar artículos del JSON
         allArticles = articles
-          .map(a => ({
-            ...a,
-            cur:    a.cur    || detectCurrency(a.title + ' ' + (a.expand || '')),
-            impact: a.impact || detectImpact(a.title, a.expand),
-            time:   a.time   || '--:--',
-          }))
-          .sort((a, b) => (b.ts || 0) - (a.ts || 0)); // más reciente primero
+          .map(a => {
+            const text = a.title + ' ' + (a.expand || '');
+            return {
+              ...a,
+              cur:    detectCurrencyWithSource(text, a.source),
+              impact: a.impact || detectImpact(a.title, a.expand),
+              time:   a.time   || '--:--',
+            };
+          })
+          .filter(a => isForexRelevant(a.title, a.expand, a.source))
+          .sort((a, b) => (b.ts || 0) - (a.ts || 0));
         renderFeed();
         return;
       }
@@ -915,7 +987,9 @@ async function initFeed() {
       successCount++;
       items.forEach(item => {
         const text   = item.title + ' ' + item.description;
-        const cur    = detectCurrency(text);
+        const source = item.source || src.name;
+        if (!isForexRelevant(item.title, item.description, source)) return;
+        const cur    = detectCurrencyWithSource(text, source);
         const impact = detectImpact(item.title, item.description);
         collected.push({
           time:        parseTime(item.pubDate),
