@@ -143,7 +143,7 @@
   .s-sub{font-size:.62rem;color:var(--text-dim);}
   .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .sent-row:last-child{border-bottom:none;}
-  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:46px;flex-shrink:0;display:flex;align-items:center;gap:.3rem;}
+  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:52px;flex-shrink:0;display:flex;align-items:center;gap:.3rem;}
   .sent-bar-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
   .sent-bar{height:100%;border-radius:1px;}
   .sent-bar.bull{background:var(--green);}
@@ -157,7 +157,7 @@
   .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .ev-row:last-child{border-bottom:none;}
   .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
-  .ev-flag{font-size:1rem;line-height:1;}
+  .ev-flag{display:flex;align-items:center;justify-content:center;}
   .ev-time{font-size:.63rem;color:var(--blue);font-weight:600;white-space:nowrap;}
   .ev-body{flex:1;}
   .ev-name{font-size:.72rem;color:var(--text-primary);font-weight:500;line-height:1.3;}
@@ -223,14 +223,14 @@
 
   <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
     <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
-    <button class="filter-btn" onclick="setFilter('USD',this)">🇺🇸 USD</button>
-    <button class="filter-btn" onclick="setFilter('EUR',this)">🇪🇺 EUR</button>
-    <button class="filter-btn" onclick="setFilter('GBP',this)">🇬🇧 GBP</button>
-    <button class="filter-btn" onclick="setFilter('JPY',this)">🇯🇵 JPY</button>
-    <button class="filter-btn" onclick="setFilter('AUD',this)">🇦🇺 AUD</button>
-    <button class="filter-btn" onclick="setFilter('CAD',this)">🇨🇦 CAD</button>
-    <button class="filter-btn" onclick="setFilter('CHF',this)">🇨🇭 CHF</button>
-    <button class="filter-btn" onclick="setFilter('NZD',this)">🇳🇿 NZD</button>
+    <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
+    <button class="filter-btn" onclick="setFilter('EUR',this)"><img src="https://flagcdn.com/16x12/eu.png" srcset="https://flagcdn.com/32x24/eu.png 2x" width="16" height="12" alt="EU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> EUR</button>
+    <button class="filter-btn" onclick="setFilter('GBP',this)"><img src="https://flagcdn.com/16x12/gb.png" srcset="https://flagcdn.com/32x24/gb.png 2x" width="16" height="12" alt="GB" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> GBP</button>
+    <button class="filter-btn" onclick="setFilter('JPY',this)"><img src="https://flagcdn.com/16x12/jp.png" srcset="https://flagcdn.com/32x24/jp.png 2x" width="16" height="12" alt="JP" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> JPY</button>
+    <button class="filter-btn" onclick="setFilter('AUD',this)"><img src="https://flagcdn.com/16x12/au.png" srcset="https://flagcdn.com/32x24/au.png 2x" width="16" height="12" alt="AU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> AUD</button>
+    <button class="filter-btn" onclick="setFilter('CAD',this)"><img src="https://flagcdn.com/16x12/ca.png" srcset="https://flagcdn.com/32x24/ca.png 2x" width="16" height="12" alt="CA" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CAD</button>
+    <button class="filter-btn" onclick="setFilter('CHF',this)"><img src="https://flagcdn.com/16x12/ch.png" srcset="https://flagcdn.com/32x24/ch.png 2x" width="16" height="12" alt="CH" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CHF</button>
+    <button class="filter-btn" onclick="setFilter('NZD',this)"><img src="https://flagcdn.com/16x12/nz.png" srcset="https://flagcdn.com/32x24/nz.png 2x" width="16" height="12" alt="NZ" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> NZD</button>
     <div class="filter-sep" aria-hidden="true"></div>
     <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
   </div>
@@ -329,13 +329,17 @@ const CURRENCY_FLAGS = {
   AU:'🇦🇺',  CA:'🇨🇦',  CH:'🇨🇭',  NZ:'🇳🇿',
 };
 
-function flagImg(cur, size = 16) {
+// flagcdn.com acepta tamaños específicos: 16x12, 20x15, 24x18, 32x24, 40x30, 48x36, 64x48
+const FLAG_SIZES = [[16,12],[20,15],[24,18],[32,24],[40,30],[48,36],[64,48]];
+function nearestFlagSize(px) {
+  return FLAG_SIZES.reduce((best, s) => Math.abs(s[0]-px) < Math.abs(best[0]-px) ? s : best);
+}
+function flagImg(cur, px = 16) {
   const code = FLAG_CODES[cur];
   if (!code) return '';
-  return `<img src="https://flagcdn.com/${size}x${Math.round(size*0.75)}/${code}.png"
-    srcset="https://flagcdn.com/${size*2}x${Math.round(size*0.75*2)}/${code}.png 2x"
-    width="${size}" height="${Math.round(size*0.75)}"
-    alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
+  const [w, h]   = nearestFlagSize(px);
+  const [w2, h2] = nearestFlagSize(px * 2);
+  return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
 function resolveFlag(cur) {
@@ -606,7 +610,7 @@ function computeSentiment(articles) {
     if (d.total === 0 || d.bull === d.bear) { label='Neut'; cls='neut'; width=50; }
     else if (d.bull > d.bear) { label='Bull'; cls='bull'; width=Math.round(50+(d.bull/d.total)*50); }
     else { label='Bear'; cls='bear'; width=Math.round(50-(d.bear/d.total)*50); }
-    const flag = flagImg(cur, 14);
+    const flag = flagImg(cur, 16);
     body.innerHTML += `<div class="sent-row">
       <span class="sent-cur">${flag} ${cur}</span>
       <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${width}%"></div></div>
@@ -660,11 +664,12 @@ async function loadUpcomingEvents() {
         } catch(_) {}
       }
 
-      const flag = CURRENCY_FLAGS[e.currency] || CURRENCY_FLAGS[(e.currency||'').slice(0,2)] || '🌐';
+      const evCur = (e.currency||'').length > 2 ? e.currency.slice(0,2) : e.currency;
+      const flag = flagImg(evCur, 20) || '🌐';
 
       container.innerHTML += `<div class="ev-row">
         <div class="ev-left">
-          <span class="ev-flag">${flag}</span>
+          <span class="ev-flag" style="display:flex;align-items:center;justify-content:center;">${flag}</span>
           <span class="ev-time" style="${isTomorrow ? 'color:var(--text-dim)' : ''}">${esc(localTime)}</span>
         </div>
         <div class="ev-body">
