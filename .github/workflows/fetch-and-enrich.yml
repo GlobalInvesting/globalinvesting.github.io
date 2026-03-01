@@ -2,9 +2,9 @@ name: Fetch and Enrich Forex News
 
 on:
   schedule:
-    - cron: '0 6 * * *'    # 06:00 UTC
-    - cron: '0 14 * * *'   # 14:00 UTC
-    - cron: '0 22 * * *'   # 22:00 UTC
+  - cron: '0 9 * * *'    # 09:00 UTC → 06:00 MVD
+  - cron: '0 15 * * *'   # 15:00 UTC → 12:00 MVD
+  - cron: '0 23 * * *'   # 23:00 UTC → 20:00 MVD
   workflow_dispatch:
 
 permissions:
