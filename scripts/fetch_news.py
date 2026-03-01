@@ -8,19 +8,10 @@ SELECCIÓN INTELIGENTE (MAX_NEWS = 30):
   - Recopila todos los artículos válidos de los últimos MAX_AGE_DAYS días
   - Agrupa por divisa (8 divisas: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD)
   - Dentro de cada divisa, ordena por impacto (high > med > low) y luego por fecha
-  - Toma los mejores artículos de forma rotativa por divisa hasta llegar a 30
-  - Garantiza cobertura equilibrada: ninguna divisa acapara el feed
-
-Formato de salida compatible con news.html:
-  {
-    "articles": [ { "cur", "impact", "title", "expand", "source", "link", "time", "ts", "featured" }, ... ],
-    "updated_utc": "...",
-    "updated_label": "...",
-    "total": N,
-    "total_high": N,
-    "total_med": N,
-    "sources_active": [...]
-  }
+  - Fase 1: toma hasta GUARANTEED_PER_CUR artículos de cada divisa que tenga contenido
+  - Fase 2: reparte los slots restantes hasta MAX_NEWS entre todas las divisas
+            priorizando siempre high > med > low
+  - Garantiza cobertura de todas las divisas disponibles sin desperdiciar slots
 """
 
 import json
@@ -30,16 +21,18 @@ import feedparser
 import requests
 from datetime import datetime, timezone, timedelta
 from dateutil import parser as dateparser
+from collections import Counter
 
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
-MAX_NEWS     = 30   # noticias máximas en el JSON final (selección inteligente)
-MAX_AGE_DAYS = 2    # descartar noticias más antiguas que esto
-MAX_PER_CUR  = 5    # máximo artículos por divisa en la selección final
-OUTPUT_FILE  = "news-data/news.json"
-
-IMPACT_ORDER = {"high": 0, "med": 1, "low": 2}
+MAX_NEWS          = 30   # noticias máximas en el JSON final
+MAX_AGE_DAYS      = 2    # descartar noticias más antiguas
+GUARANTEED_PER_CUR = 2   # mínimo garantizado por divisa (si hay contenido)
+MAX_PER_CUR       = 6    # máximo por divisa (para evitar monopolio)
+OUTPUT_FILE       = "news-data/news.json"
+IMPACT_ORDER      = {"high": 0, "med": 1, "low": 2}
+CURRENCIES        = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
 
 # ─────────────────────────────────────────────
 # DETECCIÓN DE DIVISA
@@ -51,7 +44,7 @@ CURRENCY_KEYWORDS = {
         "treasury", "debt ceiling", "ism ", "us jobs", "american economy",
         "wall street", "nasdaq", "dow jones", "s&p 500",
         "reserva federal", "dólar", "dolar americano", "economía de eeuu",
-        "economía estadounidense", "pib eeuu", "inflación eeuu", "inflación de estados unidos",
+        "economía estadounidense", "pib eeuu", "inflación eeuu",
         "mercado laboral eeuu", "bonos del tesoro", "deuda eeuu",
     ],
     "EUR": [
@@ -60,37 +53,33 @@ CURRENCY_KEYWORDS = {
         "zew", "pmi europe", "eu economy", "european economy", "bund",
         "banco central europeo", "bce", "zona euro", "eurozona",
         "alemania", "economía europea", "pib zona euro", "inflación zona euro",
-        "inflación de la zona euro", "ipc zona euro",
-        "balanza comercial alemania", "confianza zew", "confianza ifo",
+        "ipc zona euro", "balanza comercial alemania",
     ],
     "GBP": [
         "boe", "bank of england", "bailey", "pound", "gbp", "sterling",
         "uk economy", "united kingdom", "britain", "brexit", "gilts",
         "uk gdp", "uk inflation", "uk jobs",
         "banco de inglaterra", "libra esterlina", "libra ", "reino unido",
-        "economía uk", "economía del reino unido", "pib uk", "inflación uk",
-        "inflación del reino unido", "ipc uk", "pmi uk",
+        "economía uk", "pib uk", "inflación uk", "ipc uk", "pmi uk",
     ],
     "JPY": [
         "boj", "bank of japan", "ueda", "yen", "jpy", "japan economy",
         "japanese", "nikkei", "shunto", "boj meeting", "japan gdp",
-        "banco de japón", "banco de japan", "yen japonés", "yen japones",
-        "economía japonesa", "economía de japón", "pib japón", "inflación japón",
-        "ipc japón", "producción industrial japón",
+        "banco de japón", "yen japonés", "economía japonesa", "pib japón",
+        "inflación japón", "ipc japón",
     ],
     "AUD": [
         "rba", "reserve bank of australia", "aussie", "aud", "australia",
         "australian economy", "australian jobs", "caixin",
-        "banco de la reserva de australia", "dólar australiano", "dolar australiano",
-        "economía australia", "economía de australia", "pib australia",
-        "empleo australia", "inflación australia",
+        "banco de la reserva de australia", "dólar australiano",
+        "economía australia", "pib australia", "empleo australia",
     ],
     "CAD": [
         "boc", "bank of canada", "macklem", "canadian dollar", "cad",
         "canada economy", "loonie", "oil prices", "crude oil", "wti",
-        "banco de canadá", "banco de canada", "dólar canadiense", "dolar canadiense",
-        "economía canadá", "economía de canadá", "pib canadá", "inflación canadá",
-        "ipc canadá", "petróleo", "precio del petróleo", "crudo ",
+        "banco de canadá", "dólar canadiense",
+        "economía canadá", "pib canadá", "inflación canadá", "ipc canadá",
+        "petróleo", "precio del petróleo", "crudo ",
     ],
     "CHF": [
         "snb", "swiss national bank", "jordan", "swiss franc", "chf",
@@ -101,9 +90,8 @@ CURRENCY_KEYWORDS = {
     "NZD": [
         "rbnz", "reserve bank of new zealand", "orr", "kiwi", "nzd",
         "new zealand", "nz economy", "nz jobs",
-        "banco de la reserva de nueva zelanda", "dólar neozelandés", "dolar neozelandes",
+        "banco de la reserva de nueva zelanda", "dólar neozelandés",
         "nueva zelanda", "economía de nueva zelanda", "pib nueva zelanda",
-        "inflación nueva zelanda",
     ],
 }
 
@@ -111,178 +99,44 @@ CURRENCY_KEYWORDS = {
 # FEEDS RSS
 # ─────────────────────────────────────────────
 FEEDS = [
-
-    # ══════════════════════════════════════════
-    # FUENTES EN ESPAÑOL
-    # ══════════════════════════════════════════
-
-    {
-        "source": "FXStreet ES",
-        "url": "https://www.fxstreet.es/rss/news",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "DailyForex ES",
-        "url": "https://es.dailyforex.com/rss/es/forexnews.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "DailyForex ES",
-        "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "DailyForex ES",
-        "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "DailyForex ES",
-        "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "Investing.com ES",
-        "url": "https://es.investing.com/rss/news_1.rss",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "Investing.com ES",
-        "url": "https://es.investing.com/rss/news_25.rss",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "Investing.com ES",
-        "url": "https://es.investing.com/rss/news_14.rss",
-        "method": "feedparser",
-        "lang": "es",
-    },
-
-    # ══════════════════════════════════════════
-    # FUENTES EN INGLÉS
-    # ══════════════════════════════════════════
-
-    {
-        "source": "FXStreet",
-        "url": "https://www.fxstreet.com/rss/news",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "FXStreet",
-        "url": "https://www.fxstreet.com/rss/analysis",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "ForexLive",
-        "url": "https://www.forexlive.com/feed/news",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "ForexLive",
-        "url": "https://www.forexlive.com/feed/centralbank",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "ECB",
-        "url": "https://www.ecb.europa.eu/rss/press.html",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Bank of England",
-        "url": "https://www.bankofengland.co.uk/rss/news",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Bank of Canada",
-        "url": "https://www.bankofcanada.ca/feed/",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "DailyForex",
-        "url": "https://www.dailyforex.com/rss/forexnews.xml",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "ActionForex",
-        "url": "https://www.actionforex.com/category/live-comments/feed/",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "ActionForex",
-        "url": "https://www.actionforex.com/category/action-insight/feed/",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "InvestingLive",
-        "url": "https://investinglive.com/feed/centralbank/",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "InvestingLive",
-        "url": "https://investinglive.com/feed/technicalanalysis/",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "MyFXBook",
-        "url": "https://www.myfxbook.com/rss/latest-forex-news",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Investing.com",
-        "url": "https://www.investing.com/rss/forex_Technical.rss",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Investing.com",
-        "url": "https://www.investing.com/rss/forex_Fundamental.rss",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Investing.com",
-        "url": "https://www.investing.com/rss/forex_Opinion.rss",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Investing.com",
-        "url": "https://www.investing.com/rss/forex_Signals.rss",
-        "method": "feedparser",
-        "lang": "en",
-    },
+    # ── ESPAÑOL ──────────────────────────────────────────────────────────────
+    { "source": "FXStreet ES",    "url": "https://www.fxstreet.es/rss/news",                              "method": "feedparser", "lang": "es" },
+    { "source": "DailyForex ES",  "url": "https://es.dailyforex.com/rss/es/forexnews.xml",                "method": "feedparser", "lang": "es" },
+    { "source": "DailyForex ES",  "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",        "method": "feedparser", "lang": "es" },
+    { "source": "DailyForex ES",  "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",      "method": "feedparser", "lang": "es" },
+    { "source": "DailyForex ES",  "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",            "method": "feedparser", "lang": "es" },
+    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_1.rss",                       "method": "feedparser", "lang": "es" },
+    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_25.rss",                      "method": "feedparser", "lang": "es" },
+    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_14.rss",                      "method": "feedparser", "lang": "es" },
+    # ── INGLÉS ───────────────────────────────────────────────────────────────
+    { "source": "FXStreet",       "url": "https://www.fxstreet.com/rss/news",                              "method": "feedparser", "lang": "en" },
+    { "source": "FXStreet",       "url": "https://www.fxstreet.com/rss/analysis",                          "method": "feedparser", "lang": "en" },
+    { "source": "ForexLive",      "url": "https://www.forexlive.com/feed/news",                            "method": "feedparser", "lang": "en" },
+    { "source": "ForexLive",      "url": "https://www.forexlive.com/feed/centralbank",                     "method": "feedparser", "lang": "en" },
+    { "source": "ECB",            "url": "https://www.ecb.europa.eu/rss/press.html",                       "method": "feedparser", "lang": "en" },
+    { "source": "Bank of England","url": "https://www.bankofengland.co.uk/rss/news",                       "method": "feedparser", "lang": "en" },
+    { "source": "Bank of Canada", "url": "https://www.bankofcanada.ca/feed/",                              "method": "feedparser", "lang": "en" },
+    { "source": "DailyForex",     "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "method": "feedparser", "lang": "en" },
+    { "source": "ActionForex",    "url": "https://www.actionforex.com/category/live-comments/feed/",       "method": "feedparser", "lang": "en" },
+    { "source": "ActionForex",    "url": "https://www.actionforex.com/category/action-insight/feed/",      "method": "feedparser", "lang": "en" },
+    { "source": "InvestingLive",  "url": "https://investinglive.com/feed/centralbank/",                    "method": "feedparser", "lang": "en" },
+    { "source": "InvestingLive",  "url": "https://investinglive.com/feed/technicalanalysis/",              "method": "feedparser", "lang": "en" },
+    { "source": "MyFXBook",       "url": "https://www.myfxbook.com/rss/latest-forex-news",                 "method": "feedparser", "lang": "en" },
+    { "source": "Investing.com",  "url": "https://www.investing.com/rss/forex_Technical.rss",              "method": "feedparser", "lang": "en" },
+    { "source": "Investing.com",  "url": "https://www.investing.com/rss/forex_Fundamental.rss",            "method": "feedparser", "lang": "en" },
+    { "source": "Investing.com",  "url": "https://www.investing.com/rss/forex_Opinion.rss",                "method": "feedparser", "lang": "en" },
+    { "source": "Investing.com",  "url": "https://www.investing.com/rss/forex_Signals.rss",                "method": "feedparser", "lang": "en" },
 ]
 
 # ─────────────────────────────────────────────
-# PALABRAS CLAVE DE IMPACTO — ES + EN
+# PALABRAS CLAVE DE IMPACTO
 # ─────────────────────────────────────────────
 HIGH_IMPACT_KW = [
     "rate decision", "interest rate", "hike", "cut rates", "fomc", "ecb meeting",
     "boe meeting", "boj meeting", "nonfarm", "non-farm", "cpi", "inflation report",
     "gdp", "recession", "emergency", "crisis", "default", "shock",
     "surprise", "unexpected", "powell", "lagarde", "ueda", "bailey",
-    "central bank", "rate hike", "rate cut", "quantitative easing",
-    "quantitative tightening", "monetary policy",
+    "central bank", "rate hike", "rate cut", "monetary policy",
     "decisión de tasas", "tasa de interés", "subida de tipos", "bajada de tipos",
     "alza de tasas", "recorte de tasas", "sube tasas", "baja tasas",
     "inflación", "ipc ", "pib ", "recesión", "crisis ", "sorprende",
@@ -294,29 +148,20 @@ MED_IMPACT_KW = [
     "pmi", "employment", "jobless", "trade balance", "retail sales",
     "industrial production", "consumer confidence", "business confidence",
     "housing", "wages", "earnings", "exports", "imports", "deficit",
-    "surplus", "forecast", "outlook", "guidance", "payroll",
-    "manufacturing", "services sector",
+    "surplus", "forecast", "outlook", "guidance", "payroll", "manufacturing",
     "pmi manufacturero", "pmi de servicios", "desempleo", "tasa de paro",
     "balanza comercial", "ventas minoristas", "producción industrial",
-    "confianza del consumidor", "confianza empresarial",
-    "salarios", "exportaciones", "importaciones", "déficit",
-    "superávit", "previsión", "perspectivas", "nóminas",
+    "confianza del consumidor", "salarios", "exportaciones", "importaciones",
     "manufactura", "sector servicios", "cuenta corriente",
 ]
 
 # ─────────────────────────────────────────────
 # HELPERS
 # ─────────────────────────────────────────────
-
 SOURCE_CURRENCY = {
-    "Bank of Canada":  "CAD",
-    "ECB":             "EUR",
-    "Bank of England": "GBP",
-    "Bank of Japan":   "JPY",
-    "RBA":             "AUD",
-    "RBNZ":            "NZD",
-    "SNB":             "CHF",
-    "Federal Reserve": "USD",
+    "Bank of Canada":  "CAD", "ECB": "EUR", "Bank of England": "GBP",
+    "Bank of Japan":   "JPY", "RBA": "AUD", "RBNZ":            "NZD",
+    "SNB":             "CHF", "Federal Reserve": "USD",
 }
 
 FOREX_SOURCES = {
@@ -329,49 +174,42 @@ FOREX_SOURCES = {
 FOREX_RELEVANCE_KW = [
     "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
     "dollar", "dólar", "euro", "pound", "yen", "franc", "franco",
-    "forex", " fx ", "currency", "currencies", "divisa", "divisas", "tipo de cambio",
+    "forex", " fx ", "currency", "currencies", "divisa", "divisas",
     "fed", "bce", "ecb", "boe", "boj", "rba", "boc", "snb", "rbnz",
-    "banco central", "central bank",
-    "interest rate", "tasa de interés", "tipos de interés",
+    "banco central", "central bank", "interest rate", "tasa de interés",
     "inflation", "inflación", "gdp", "pib", "cpi", "ipc",
-    "unemployment", "desempleo", "payroll", "nóminas",
-    "trade balance", "balanza", "pmi", "retail sales", "ventas minoristas",
+    "unemployment", "desempleo", "payroll", "pmi", "retail sales",
     "recession", "recesión", "monetary policy", "política monetaria",
-    "stock market", "bolsa", "bonos", "bond", "yield", "treasury",
-    "oil", "petróleo", "gold", "oro", "commodit",
-    "market", "mercado", "trading", "investor", "inversor",
-    "sanctions", "sanciones", "tariff", "arancel", "trade war", "guerra comercial",
+    "bond", "yield", "treasury", "oil", "petróleo", "gold", "oro",
+    "market", "mercado", "trading", "tariff", "arancel",
 ]
 
 
-def is_forex_relevant(title: str, summary: str, source: str) -> bool:
+def is_forex_relevant(title, summary, source):
     if source in FOREX_SOURCES:
         return True
     text = (title + " " + summary).lower()
     return any(kw in text for kw in FOREX_RELEVANCE_KW)
 
 
-def detect_currency(title: str, summary: str, source: str = "") -> str:
+def detect_currency(title, summary, source=""):
     text = (title + " " + summary).lower()
     for currency, keywords in CURRENCY_KEYWORDS.items():
-        for kw in keywords:
-            if kw in text:
-                return currency
+        if any(kw in text for kw in keywords):
+            return currency
     return SOURCE_CURRENCY.get(source, "USD")
 
 
-def detect_impact(title: str, summary: str) -> str:
+def detect_impact(title, summary):
     text = (title + " " + summary).lower()
-    for kw in HIGH_IMPACT_KW:
-        if kw in text:
-            return "high"
-    for kw in MED_IMPACT_KW:
-        if kw in text:
-            return "med"
+    if any(kw in text for kw in HIGH_IMPACT_KW):
+        return "high"
+    if any(kw in text for kw in MED_IMPACT_KW):
+        return "med"
     return "low"
 
 
-def parse_date(entry) -> datetime:
+def parse_date(entry):
     for attr in ("published", "updated", "created"):
         val = getattr(entry, attr, None)
         if val:
@@ -382,19 +220,18 @@ def parse_date(entry) -> datetime:
     return datetime.now(timezone.utc)
 
 
-def clean_html(text: str) -> str:
+def clean_html(text):
     if not text:
         return ""
     text = re.sub(r"<[^>]+>", " ", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def entry_id(title: str, source: str) -> str:
+def entry_id(title, source):
     return hashlib.md5(f"{source}:{title}".encode()).hexdigest()[:12]
 
 
-def fetch_via_feedparser(feed_cfg: dict) -> list:
+def fetch_via_feedparser(feed_cfg):
     try:
         d = feedparser.parse(
             feed_cfg["url"],
@@ -405,20 +242,7 @@ def fetch_via_feedparser(feed_cfg: dict) -> list:
         )
         return d.entries
     except Exception as e:
-        print(f"  [ERROR] feedparser {feed_cfg['url'][:65]}: {e}")
-        return []
-
-
-def fetch_via_proxy(feed_cfg: dict) -> list:
-    try:
-        resp = requests.get(feed_cfg["url"], timeout=15, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; ForexNewsBot/1.0)"
-        })
-        resp.raise_for_status()
-        d = feedparser.parse(resp.text)
-        return d.entries
-    except Exception as e:
-        print(f"  [ERROR] proxy {feed_cfg['url'][:65]}: {e}")
+        print(f"  [ERROR] {feed_cfg['url'][:65]}: {e}")
         return []
 
 
@@ -426,22 +250,19 @@ def fetch_via_proxy(feed_cfg: dict) -> list:
 # SELECCIÓN INTELIGENTE
 # ─────────────────────────────────────────────
 
-def smart_select(articles: list, max_total: int, max_per_cur: int) -> list:
+def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
     """
-    Selecciona hasta max_total artículos con cobertura equilibrada por divisa.
+    Selección en dos fases:
+      Fase 1 — Garantía: toma hasta `guaranteed_per_cur` artículos de CADA divisa
+               que tenga contenido, priorizando high > med > low.
+      Fase 2 — Relleno: con los slots restantes, toma más artículos del pool
+               completo, priorizando high > med > low y luego por ts desc,
+               respetando el límite max_per_cur por divisa.
 
-    Algoritmo:
-      1. Agrupa artículos por divisa
-      2. Dentro de cada grupo: ordena por impacto (high > med > low) y luego por ts desc
-      3. Rellena de forma rotativa: toma el mejor artículo de cada divisa en turnos
-         hasta llegar a max_total o agotar candidatos, respetando max_per_cur
-
-    Esto garantiza que en un run donde solo hay noticias de USD/EUR,
-    no se llene el feed con 30 artículos de la misma divisa.
+    Esto garantiza cobertura de todas las divisas disponibles y rellena
+    el resto con los artículos de mayor impacto disponibles.
     """
-    CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
-
-    # Agrupar y ordenar cada grupo
+    # Agrupar y ordenar por impacto + fecha dentro de cada grupo
     groups = {cur: [] for cur in CURRENCIES}
     for a in articles:
         cur = a.get("cur", "USD")
@@ -449,37 +270,43 @@ def smart_select(articles: list, max_total: int, max_per_cur: int) -> list:
             groups[cur].append(a)
 
     for cur in CURRENCIES:
-        groups[cur].sort(
-            key=lambda x: (IMPACT_ORDER.get(x["impact"], 2), -x["ts"])
-        )
+        groups[cur].sort(key=lambda x: (IMPACT_ORDER.get(x["impact"], 2), -x["ts"]))
 
-    # Punteros para cada grupo
-    pointers = {cur: 0 for cur in CURRENCIES}
-    taken    = {cur: 0 for cur in CURRENCIES}
+    selected_ids = set()
     selected = []
+    taken = {cur: 0 for cur in CURRENCIES}
 
-    while len(selected) < max_total:
-        added_this_round = 0
-        for cur in CURRENCIES:
+    # ── Fase 1: garantía mínima por divisa ───────────────────────────────────
+    for cur in CURRENCIES:
+        for a in groups[cur]:
+            if taken[cur] >= guaranteed_per_cur:
+                break
             if len(selected) >= max_total:
                 break
-            if taken[cur] >= max_per_cur:
-                continue
-            idx = pointers[cur]
-            if idx >= len(groups[cur]):
-                continue
-            selected.append(groups[cur][idx])
-            pointers[cur] += 1
-            taken[cur]     += 1
-            added_this_round += 1
+            selected.append(a)
+            selected_ids.add(a["id"])
+            taken[cur] += 1
 
-        # Si no se agregó nada en este turno, no hay más candidatos
-        if added_this_round == 0:
+    # ── Fase 2: relleno con los mejores del pool completo ────────────────────
+    remaining_pool = [
+        a for a in articles
+        if a["id"] not in selected_ids and taken.get(a["cur"], 0) < max_per_cur
+    ]
+    # Ordenar el pool por impacto y luego por ts desc
+    remaining_pool.sort(key=lambda x: (IMPACT_ORDER.get(x["impact"], 2), -x["ts"]))
+
+    for a in remaining_pool:
+        if len(selected) >= max_total:
             break
+        cur = a.get("cur", "USD")
+        if taken.get(cur, 0) >= max_per_cur:
+            continue
+        selected.append(a)
+        selected_ids.add(a["id"])
+        taken[cur] = taken.get(cur, 0) + 1
 
-    # Ordenar el resultado final por ts desc (cronológico para el feed)
+    # Ordenar resultado final cronológicamente
     selected.sort(key=lambda x: x["ts"], reverse=True)
-
     return selected
 
 
@@ -488,29 +315,24 @@ def smart_select(articles: list, max_total: int, max_per_cur: int) -> list:
 # ─────────────────────────────────────────────
 
 def main():
-    now_utc  = datetime.now(timezone.utc)
-    cutoff   = now_utc - timedelta(days=MAX_AGE_DAYS)
+    now_utc = datetime.now(timezone.utc)
+    cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
     seen_ids = set()
     raw_articles = []
+    es_raw = en_raw = 0
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
-
-    es_raw = 0
-    en_raw = 0
 
     for feed_cfg in FEEDS:
         source = feed_cfg["source"]
         lang   = feed_cfg.get("lang", "en")
         print(f"  [{lang.upper()}] Fetching {source} — {feed_cfg['url'][:65]}...")
 
-        if feed_cfg["method"] == "proxy_xml":
-            entries = fetch_via_proxy(feed_cfg)
-        else:
-            entries = fetch_via_feedparser(feed_cfg)
-
+        entries = fetch_via_feedparser(feed_cfg)
         count = 0
+
         for entry in entries:
-            title   = clean_html(getattr(entry, "title",   ""))
+            title   = clean_html(getattr(entry, "title", ""))
             summary = clean_html(
                 getattr(entry, "summary", "")
                 or getattr(entry, "description", "")
@@ -560,35 +382,41 @@ def main():
 
         print(f"    → {count} noticias válidas")
 
-    print(f"\n📦 Total artículos recopilados (antes de filtrar): {len(raw_articles)}")
+    print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
 
-    # ── Distribución por divisa antes de filtrar ──────────────────────────────
-    from collections import Counter
-    dist_before = Counter(a["cur"] for a in raw_articles)
+    dist_before   = Counter(a["cur"] for a in raw_articles)
     impact_before = Counter(a["impact"] for a in raw_articles)
     print(f"   Distribución: {dict(sorted(dist_before.items()))}")
     print(f"   Impacto: high={impact_before['high']} | med={impact_before['med']} | low={impact_before['low']}")
 
-    # ── Selección inteligente: 30 mejores con cobertura equilibrada ───────────
-    articles = smart_select(raw_articles, max_total=MAX_NEWS, max_per_cur=MAX_PER_CUR)
+    # Divisas sin cobertura
+    missing = [c for c in CURRENCIES if dist_before.get(c, 0) == 0]
+    if missing:
+        print(f"   ⚠️  Sin artículos hoy: {', '.join(missing)}")
 
-    dist_after  = Counter(a["cur"] for a in articles)
+    # ── Selección inteligente ─────────────────────────────────────────────────
+    articles = smart_select(
+        raw_articles,
+        max_total=MAX_NEWS,
+        guaranteed_per_cur=GUARANTEED_PER_CUR,
+        max_per_cur=MAX_PER_CUR,
+    )
+
+    dist_after   = Counter(a["cur"] for a in articles)
     impact_after = Counter(a["impact"] for a in articles)
-    print(f"\n✂️  Selección final ({len(articles)} artículos, máx {MAX_PER_CUR}/divisa):")
+    print(f"\n✂️  Selección final ({len(articles)} artículos | garantía: {GUARANTEED_PER_CUR}/divisa | máx: {MAX_PER_CUR}/divisa):")
     print(f"   Distribución: {dict(sorted(dist_after.items()))}")
     print(f"   Impacto: high={impact_after['high']} | med={impact_after['med']} | low={impact_after['low']}")
 
-    total_high = impact_after["high"]
-    total_med  = impact_after["med"]
     sources_ok = sorted(set(a["source"] for a in articles))
 
     output = {
         "updated_utc":    now_utc.isoformat(),
         "updated_label":  now_utc.strftime("%H:%M UTC"),
         "total":          len(articles),
-        "total_high":     total_high,
-        "total_med":      total_med,
+        "total_high":     impact_after["high"],
+        "total_med":      impact_after["med"],
         "sources_active": sources_ok,
         "lang_counts": {
             "es": sum(1 for a in articles if a.get("lang") == "es"),
