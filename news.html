@@ -315,10 +315,44 @@ function savePrevRates(obj) {
 
 let prevRates = loadPrevRates();
 
+// Convierte tasas base USD a precios de par
+function ratesToPairPrices(rates) {
+  const prices = {};
+  TICKER_PAIRS.forEach(({ pair, base, quote }) => {
+    let p;
+    if (base === 'USD')       p = rates[quote];
+    else if (quote === 'USD') p = 1 / rates[base];
+    else                      p = rates[quote] / rates[base];
+    if (p && !isNaN(p)) prices[pair] = p;
+  });
+  return prices;
+}
+
+// Si localStorage está vacío, carga las tasas de ayer de Frankfurter como baseline
+async function ensurePrevRates() {
+  if (Object.keys(prevRates).length > 0) return; // ya tenemos datos
+  try {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(`https://api.frankfurter.app/${yesterday}?from=USD`, { signal: ctrl.signal });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.rates) {
+        prevRates = ratesToPairPrices(data.rates);
+        savePrevRates(prevRates);
+      }
+    }
+  } catch(_) { /* silencioso: el ticker mostrará sin % la primera vez */ }
+}
+
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
 
   try {
+    // Garantizar que tenemos rates previos antes de la primera llamada
+    await ensurePrevRates();
+
     let rates = null;
     const sources = [
       'https://api.frankfurter.app/latest?from=USD',
@@ -358,13 +392,12 @@ async function fetchAndBuildTicker() {
         chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
       }
 
-      newPrev[pair] = price;   // guardar precio actual para próxima comparación
+      newPrev[pair] = price;
       return { pair, price: price.toFixed(decimals), chgStr, up };
     }).filter(Boolean);
 
-    // Persistir precios actuales como "previos" para el siguiente refresh
+    // Persistir precios actuales para siguiente visita/refresh
     savePrevRates(newPrev);
-    // Actualizar en memoria también (para el refresh de 60 s dentro de la misma sesión)
     prevRates = { ...prevRates, ...newPrev };
 
     const html = [...items, ...items].map(({ pair, price, chgStr, up }) => {
@@ -463,8 +496,8 @@ const BEAR_KW = [
   'pierde terreno','cede terreno','debilidad','bajo mínimos'
 ];
 
-function scoreSentiment(title) {
-  const lower = (title||'').toLowerCase();
+function scoreSentiment(title, expand) {
+  const lower = ((title || '') + ' ' + (expand || '')).toLowerCase();
   let bull = 0, bear = 0;
   BULL_KW.forEach(kw => { if (lower.includes(kw)) bull++; });
   BEAR_KW.forEach(kw => { if (lower.includes(kw)) bear++; });
@@ -478,7 +511,7 @@ function computeSentiment(articles) {
   CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
   articles.forEach(a => {
     if (!counts[a.cur]) return;
-    const s = scoreSentiment(a.title);
+    const s = scoreSentiment(a.title, a.expand || a.description);
     counts[a.cur][s]++;
     counts[a.cur].total++;
   });
@@ -512,13 +545,15 @@ async function loadUpcomingEvents() {
     const todayISO    = new Date().toISOString().split('T')[0];
     const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-    const upcoming = (data.events || [])
-      .filter(e => {
-        const d   = e.dateISO || '';
-        const imp = (e.impact || '').toLowerCase();
-        return (d === todayISO || d === tomorrowISO) && ['high','medium'].includes(imp);
-      })
-      .slice(0, 8);
+    const allEvents = data.events || [];
+    const highMed   = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
+
+    // Hoy primero; solo usar mañana si hoy no tiene eventos de alto/medio impacto
+    let todayEvents = allEvents.filter(e => e.dateISO === todayISO && highMed(e));
+    const useTomorrow = todayEvents.length === 0;
+    const upcoming = useTomorrow
+      ? allEvents.filter(e => e.dateISO === tomorrowISO && highMed(e)).slice(0, 8)
+      : todayEvents.slice(0, 8);
 
     if (upcoming.length === 0) {
       container.innerHTML = '<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';
@@ -587,68 +622,88 @@ function renderSources() {
 // falsos positivos (p.ej. "oil prices" asignado a USD en lugar de CAD).
 // IMPORTANTE: el orden determina la prioridad — no usar Object (sin orden garantizado).
 const CUR_KEYWORDS = [
-  // CAD primero — "canada", "bank of canada", "petróleo" son muy específicos
-  // y antes se confundían con USD al estar USD primero.
+  // CAD primero — keywords muy específicos para evitar confusión con USD.
+  // No usar trailing space (' ') como único delimitador: falla al final de frase.
+  // En su lugar se incluyen variantes con y sin espacio/puntuación.
   ['CAD', [
-    'bank of canada','banco de canadá','banco de canada','boc ','macklem',
-    'loonie','cad ','canadian dollar','dólar canadiense','dolar canadiense',
-    'canada ','canadá ','canada economy','canadian economy','economía canadá',
-    'economía de canadá','pib canadá','ipc canadá','tsx ',
-    'oil prices','crude oil','wti ','petróleo','precio del petróleo','crudo ',
+    'bank of canada','banco de canadá','banco de canada','boc meeting','macklem',
+    'loonie','cad/','cad usd','usd/cad','/cad',
+    'canadian dollar','dólar canadiense','dolar canadiense','canadian economy',
+    'canada economy','economía canadá','economía de canadá',
+    'pib canadá','ipc canadá','empleo canadá','inflación canadá',
+    'canada gdp','canada cpi','canada jobs','canadian','tsx index',
+    'oil prices','crude oil','wti crude','petróleo','precio del petróleo',
+    'crudo brent','crudo wti','barrel','barril ',
+    'canada ', 'canadá ', 'in canada','de canadá','de canada',
   ]],
-  // CHF — muy específico, pocas ambigüedades
+  // CHF
   ['CHF', [
-    'swiss national bank','snb ','banco nacional suizo',
-    'swiss franc','franco suizo','chf ','switzerland','suiza',
-    'swiss economy','economía suiza','swiss inflation','ipc suiza',
+    'swiss national bank','snb meeting','snb decision','banco nacional suizo',
+    'swiss franc','franco suizo','chf/','usd/chf','/chf',
+    'switzerland','suiza','economía suiza','swiss economy',
+    'swiss inflation','swiss cpi','ipc suiza',
   ]],
-  // NZD — antes de AUD para evitar que "new zealand" quede sin match
+  // NZD
   ['NZD', [
-    'reserve bank of new zealand','rbnz','banco de la reserva de nueva zelanda',
-    'kiwi dollar','nzd ','nueva zelanda','new zealand','nz economy',
+    'reserve bank of new zealand','rbnz meeting','rbnz decision',
+    'banco de la reserva de nueva zelanda',
+    'nzd/','nzd usd','usd/nzd','/nzd',
+    'new zealand','nueva zelanda','nz gdp','nz cpi','nz jobs',
     'dólar neozelandés','dolar neozelandes',
   ]],
-  // AUD — antes de USD para que "australia" no quede sin match
+  // AUD
   ['AUD', [
-    'reserve bank of australia','rba ','banco de la reserva de australia',
-    'aussie dollar','aud ','australia ','australian economy','economía australia',
-    'asx ','australian jobs','australian inflation','ipc australia',
+    'reserve bank of australia','rba meeting','rba decision',
+    'banco de la reserva de australia',
+    'aud/','aud usd','usd/aud','/aud',
+    'australia gdp','australia cpi','australia jobs','australian economy',
+    'economía australia','economía de australia','ipc australia',
     'dólar australiano','dolar australiano',
-    // China PMI afecta principalmente a AUD
     'caixin pmi','china pmi','china gdp','china economy',
+    'australia ', 'australi',
   ]],
   // EUR
   ['EUR', [
-    'european central bank','banco central europeo','ecb ','bce ',
-    'lagarde','eurozone','eurozona','zona euro','euro area',
-    'euro ','eur ','germany ','alemania ','france ','francia ',
-    'draghi','ifo ','zew ','bund ','eu economy','economía europea',
-    'inflación zona euro','ipc zona euro','pib zona euro','pib alemania',
+    'european central bank','banco central europeo','ecb meeting','ecb decision',
+    'bce reunión','bce decisión','lagarde',
+    'eur/','eur usd','usd/eur','/eur',
+    'eurozone','eurozona','zona euro','euro area','area euro',
+    'germany gdp','german cpi','french gdp','italian gdp',
+    'germany ','alemania ','france ','francia ','italia ','italy ',
+    'draghi','ifo index','zew index','bund yield','eu economy','economía europea',
+    'inflación zona euro','ipc zona euro','pib zona euro',
+    'euro ', 'en euros',
   ]],
   // GBP
   ['GBP', [
-    'bank of england','banco de inglaterra','boe ','bailey ',
-    'pound sterling','sterling','british pound','libra esterlina','gbp ',
-    'united kingdom','reino unido','britain ','uk economy',
-    'uk gdp','uk inflation','uk jobs','ftse ','gilts ',
+    'bank of england','banco de inglaterra','boe meeting','boe decision','bailey ',
+    'pound sterling','sterling','british pound','libra esterlina',
+    'gbp/','gbp usd','usd/gbp','/gbp',
+    'united kingdom','reino unido','britain','uk gdp','uk cpi',
+    'uk inflation','uk jobs','uk economy','ftse index','gilts yield',
     'economía del reino unido','ipc uk','pib uk',
   ]],
   // JPY
   ['JPY', [
-    'bank of japan','banco de japón','banco de japan','boj ','ueda ',
-    'japanese yen','yen ','jpy ','japan ','japón ','nikkei ',
-    'japan economy','japanese economy','economía japonesa','economía de japón',
-    'japan gdp','japan inflation','shunto','ipc japón',
+    'bank of japan','banco de japón','banco de japan','boj meeting','boj decision','ueda ',
+    'jpy/','jpy usd','usd/jpy','/jpy',
+    'japanese yen','yen japonés','yen japones',
+    'japan gdp','japan cpi','japan inflation','japan jobs',
+    'japanese economy','economía japonesa','economía de japón',
+    'nikkei index','shunto','ipc japón',
+    'japan ', 'japón ', 'en japón',
   ]],
-  // USD — al final: es el fallback más común, sus keywords son muy genéricos
-  // Ej: "fed" puede aparecer en contextos europeos; "wall street" en cualquier noticia
+  // USD — al final (fallback): keywords muy genéricos van aquí
   ['USD', [
-    'federal reserve','reserva federal','fomc ','powell ',
-    'us dollar','american dollar','dollar ','dólar ','usd ',
-    'us economy','american economy','economía eeuu','economía de eeuu',
-    'us gdp','us inflation','us jobs','nonfarm','non-farm',
-    'wall street','treasury bond','dow jones','nasdaq ','s&p 500',
-    'estados unidos','united states','eeuu ',
+    'federal reserve','reserva federal','fomc meeting','fomc decision','powell ',
+    'us dollar','american dollar','dólar estadounidense',
+    'usd/','dollar index','dxy ',
+    'us gdp','us cpi','us inflation','us jobs','us economy','us retail',
+    'nonfarm payroll','non-farm payroll','jobless claims',
+    'american economy','economía eeuu','economía de eeuu','economía estadounidense',
+    'wall street','treasury yield','dow jones','nasdaq index','s&p 500',
+    'estados unidos','united states','eeuu',
+    'dollar ', 'dólar ',
   ]],
 ];
 
@@ -730,7 +785,7 @@ function parseTimestamp(pubDate) {
 }
 
 // ── NEWS FEED STATE ───────────────────────────────────────────────────────────
-const PAGE       = 15;
+const PAGE       = 30;
 let allArticles  = [];
 let visible      = PAGE;
 let activeFilter = 'ALL';
