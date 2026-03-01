@@ -1,10 +1,11 @@
 {
-  "updated_utc": "2026-03-01T14:26:25.729561+00:00",
-  "updated_label": "14:26 UTC",
-  "total": 15,
-  "total_high": 11,
+  "updated_utc": "2026-03-01T14:32:14.436228+00:00",
+  "updated_label": "14:32 UTC",
+  "total": 17,
+  "total_high": 13,
   "total_med": 1,
   "sources_active": [
+    "ActionForex",
     "Bank of Canada",
     "DailyForex ES",
     "FXStreet",
@@ -13,8 +14,8 @@
     "Investing.com ES"
   ],
   "lang_counts": {
-    "es": 7,
-    "en": 8
+    "es": 8,
+    "en": 9
   },
   "articles": [
     {
@@ -31,7 +32,7 @@
       "lang": "en",
       "date": "23 Dec",
       "datetime": "2026-12-23T13:30:41+00:00",
-      "ai_headline": "Resumen de deliberaciones del BoC sobre decisión de política monetaria anterior no ofrece sorpresas: neutralidad en CAD"
+      "ai_headline": "Resumen de deliberaciones del BoC sobre decisión de política monetaria anterior no ofrece sorpresas: impacto neutro en CAD"
     },
     {
       "id": "eafca3471bc1",
@@ -47,7 +48,7 @@
       "lang": "en",
       "date": "09 Dec",
       "datetime": "2026-12-09T09:45:17+00:00",
-      "ai_headline": "Anuncio de tasas de interés del Banco de Canadá: decisión clave para CAD en el corto plazo"
+      "ai_headline": "BoC mantiene tasas en 3% pero señala recorte en abril: orientación dovish pesa sobre CAD a medio plazo"
     },
     {
       "id": "2c76eb27b95d",
@@ -63,7 +64,7 @@
       "lang": "en",
       "date": "09 Nov",
       "datetime": "2026-11-09T10:30:55+00:00",
-      "ai_headline": "Encuesta de participantes del mercado de Bank of Canada muestra expectativas de estabilidad en tasas: neutro para CAD"
+      "ai_headline": "Encuesta de participantes del mercado del Banco de Canadá muestra perspectivas mixtas sobre política monetaria: impacto neutro en CAD"
     },
     {
       "id": "97ec761d51f8",
@@ -79,7 +80,7 @@
       "lang": "en",
       "date": "28 Oct",
       "datetime": "2026-10-28T09:45:56+00:00",
-      "ai_headline": "BoC mantiene tasas en 4.5%: decisión neutral sobre CAD a corto plazo"
+      "ai_headline": "BoC mantiene tasas sin cambios: decisión neutral sobre CAD a corto plazo"
     },
     {
       "id": "523729e581f9",
@@ -94,8 +95,7 @@
       "featured": false,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T11:24:13+00:00",
-      "ai_headline": "Tensión geopolítica en Medio Oriente afecta tráfico aéreo: aversión al riesgo podría ser neutra para EUR"
+      "datetime": "2026-03-01T11:24:13+00:00"
     },
     {
       "id": "78c20409d110",
@@ -110,8 +110,7 @@
       "featured": false,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T11:12:51+00:00",
-      "ai_headline": "Tensión geopolítica en Medio Oriente aumenta aversión al riesgo: presión bajista EUR"
+      "datetime": "2026-03-01T11:12:51+00:00"
     },
     {
       "id": "fbf3ab38e6b4",
@@ -126,8 +125,7 @@
       "featured": true,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T09:43:14+00:00",
-      "ai_headline": "PPI EEUU sube fuerte: presión inflacionaria y tensión geopolítica mantienen soporte en USD"
+      "datetime": "2026-03-01T09:43:14+00:00"
     },
     {
       "id": "c3c494e47661",
@@ -142,8 +140,7 @@
       "featured": false,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T09:36:03+00:00",
-      "ai_headline": "Impuesto francés de 2 euros a paquetes no UE: efecto neutro en EUR"
+      "datetime": "2026-03-01T09:36:03+00:00"
     },
     {
       "id": "dd387138a86a",
@@ -158,8 +155,7 @@
       "featured": true,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T05:54:20+00:00",
-      "ai_headline": "Tensión geopolítica en Irán presiona precios del gas: aversión al riesgo podría impulsar demanda de activos refugio y debilitar CAD"
+      "datetime": "2026-03-01T05:54:20+00:00"
     },
     {
       "id": "da07792f48b9",
@@ -174,8 +170,22 @@
       "featured": true,
       "lang": "en",
       "date": "01 Mar",
-      "datetime": "2026-03-01T05:45:37+00:00",
-      "ai_headline": "Tensión geopolítica en Medio Oriente se intensifica: aversión al riesgo favorece activos refugio, presión bajista en pares con USD"
+      "datetime": "2026-03-01T05:45:37+00:00"
+    },
+    {
+      "id": "c6d82ace46be",
+      "cur": "CAD",
+      "impact": "high",
+      "title": "From Geneva Collapse to Market Shock – Technical Levels for DOW, TNX, DXY, CHF, Gold and WTI",
+      "expand": "Global markets closed February under conditions few anticipated even days ago. The events in the last 48 hours have shifted the framework from negotiation risk to open conflict. A geopolitical “black swan” has moved from theoretical scenario to live reality. What had been treated for months as a tai...",
+      "source": "ActionForex",
+      "link": "https://www.actionforex.com/action-insight/market-overview/weekly-report/631537-from-geneva-collapse-to-market-shock-technical-levels-for-dow-tnx-dxy-chf-gold-and-wti/",
+      "time": "03:24",
+      "ts": 1772335451000,
+      "featured": true,
+      "lang": "en",
+      "date": "01 Mar",
+      "datetime": "2026-03-01T03:24:11+00:00"
     },
     {
       "id": "22a07c4c30da",
@@ -190,8 +200,7 @@
       "featured": true,
       "lang": "en",
       "date": "28 Feb",
-      "datetime": "2026-02-28T07:26:38+00:00",
-      "ai_headline": "Tensión geopolítica en Medio Oriente por ataques aéreos en Irán: aversión al riesgo favorece activos refugio, presión bajista GBP"
+      "datetime": "2026-02-28T07:26:38+00:00"
     },
     {
       "id": "a0d1d4011d8b",
@@ -206,8 +215,7 @@
       "featured": true,
       "lang": "en",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:51:43+00:00",
-      "ai_headline": "Tensión geopolítica y preocupación por inflación y estrés crediticio pesan sobre mercados: aversión al riesgo favorece USD"
+      "datetime": "2026-02-27T21:51:43+00:00"
     },
     {
       "id": "50c588423dd7",
@@ -222,8 +230,7 @@
       "featured": true,
       "lang": "es",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:03:43+00:00",
-      "ai_headline": "Tensión EE.UU e Irán y alta inflación empujan oro a 5260$: aversión al riesgo favorece activos refugio, presión bajista USD"
+      "datetime": "2026-02-27T21:03:43+00:00"
     },
     {
       "id": "f1bbb62359ed",
@@ -238,8 +245,22 @@
       "featured": true,
       "lang": "en",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:03:04+00:00",
-      "ai_headline": "Tensión geopolítica y estanflación impulsan oro a 5260: aversión al riesgo favorece activos refugio, presión bajista USD"
+      "datetime": "2026-02-27T21:03:04+00:00"
+    },
+    {
+      "id": "317a429dfef5",
+      "cur": "USD",
+      "impact": "high",
+      "title": "El DXY cae mientras la alta inflación del IPP aviva los temores de estanflación",
+      "expand": "El DXY cayó alrededor del 0.2% el viernes, retrocediendo a 97.60 después de que un informe del Índice de Precios de Productor (IPP) más caliente de lo esperado amplificara las preocupaciones de que la inflación está demostrando ser más persistente de lo que la Reserva Federal (Fed) desearía, pesando",
+      "source": "FXStreet ES",
+      "link": "https://www.fxstreet.es/news/el-dxy-cae-a-medida-que-el-ipp-elevado-aviva-los-temores-de-estanflacion-202602271925",
+      "time": "19:25",
+      "ts": 1772220323000,
+      "featured": true,
+      "lang": "es",
+      "date": "27 Feb",
+      "datetime": "2026-02-27T19:25:23+00:00"
     },
     {
       "id": "0cedfb135735",
@@ -254,10 +275,9 @@
       "featured": false,
       "lang": "es",
       "date": "27 Feb",
-      "datetime": "2026-02-27T16:35:38+00:00",
-      "ai_headline": "Crédito al Consumo Neto y Aprobaciones de Hipotecas en Reino Unido esperan aumento: señal positiva para GBP a corto plazo"
+      "datetime": "2026-02-27T16:35:38+00:00"
     }
   ],
-  "ai_enriched_at": "2026-03-01T14:26:34.633566+00:00",
+  "ai_enriched_at": "2026-03-01T14:32:20.682404+00:00",
   "ai_model": "llama-3.3-70b-versatile"
 }
