@@ -22,16 +22,19 @@ import requests
 from datetime import datetime, timezone, timedelta
 from dateutil import parser as dateparser
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 
 # ─────────────────────────────────────────────
-MAX_NEWS              = 35   # Aumentado por más fuentes
-MAX_AGE_DAYS          = 3
+MAX_NEWS              = 35
+MAX_AGE_DAYS          = 4    # 4 días para capturar NZD, CHF que tienen menos cobertura
 GUARANTEED_PER_CUR    = 2
 MAX_PER_CUR           = 6
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
 CURRENCIES            = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+FETCH_TIMEOUT         = 12   # Timeout por feed en segundos
+FETCH_WORKERS         = 8    # Feeds descargados en paralelo (ahorra ~3 min)
 
 # Contenido mínimo aceptable: descripción debe tener al menos estas palabras
 # para no ser un simple anuncio de calendario o encabezado vacío
@@ -133,17 +136,20 @@ CURRENCY_KEYWORDS = {
         "economía canadá", "pib canadá", "inflación canadá", "petróleo",
     ],
     "CHF": [
-        "snb", "swiss national bank", "jordan", "swiss franc", "chf",
-        "switzerland", "swiss economy", "swiss inflation",
+        "snb", "swiss national bank", "jordan", "schlegel", "swiss franc", "chf",
+        "switzerland", "swiss economy", "swiss inflation", "swiss cpi",
         "switzerland gdp", "switzerland cpi", "switzerland trade",
-        "banco nacional suizo", "franco suizo", "suiza",
+        "chf/jpy", "eur/chf", "usd/chf", "swiss pmi", "swiss kof",
+        "banco nacional suizo", "franco suizo", "suiza", "helvetia",
     ],
     "NZD": [
         "rbnz", "reserve bank of new zealand", "orr", "kiwi", "nzd",
-        "new zealand", "nz economy", "nz jobs",
+        "new zealand", "nz economy", "nz jobs", "nzd/usd", "nzd/jpy",
         "new zealand inflation", "new zealand cpi", "new zealand gdp",
-        "new zealand trade", "new zealand employment",
-        "banco de la reserva de nueva zelanda", "dólar neozelandés",
+        "new zealand trade", "new zealand employment", "new zealand dollar",
+        "nz gdp", "nz cpi", "nz retail", "nz pmi", "nz trade",
+        "nueva zelanda", "nzd usd", "banco de la reserva de nueva zelanda",
+        "dólar neozelandés", "dólar neozelandes",
     ],
 }
 
@@ -356,20 +362,50 @@ def entry_id(title: str, source: str) -> str:
 
 
 def fetch_via_feedparser(feed_cfg: dict):
+    """Descarga y parsea un feed RSS. Usada en paralelo por fetch_all_feeds()."""
+    ua_map = {
+        # ForexCrunch necesita User-Agent de navegador real para no bloquear
+        "ForexCrunch": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    }
+    ua = ua_map.get(feed_cfg.get("source", ""), "Mozilla/5.0 (compatible; ForexNewsBot/2.0)")
     try:
-        d = feedparser.parse(
+        # feedparser no tiene timeout nativo — lo forzamos via requests + contenido
+        resp = requests.get(
             feed_cfg["url"],
-            request_headers={
-                "User-Agent": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+            headers={
+                "User-Agent": ua,
                 "Accept": "application/rss+xml, application/xml, text/xml, */*",
-            }
+            },
+            timeout=FETCH_TIMEOUT,
+            allow_redirects=True,
         )
+        if resp.status_code != 200:
+            return []
+        d = feedparser.parse(resp.content)
         if d.bozo and not d.entries:
-            print(f"    [WARN] Feed malformado o vacío: {feed_cfg['url'][:65]}")
+            return []
         return d.entries
-    except Exception as e:
-        print(f"  [ERROR] {feed_cfg['url'][:65]}: {e}")
+    except Exception:
         return []
+
+
+def fetch_all_feeds(feeds: list) -> dict:
+    """
+    Descarga todos los feeds en paralelo con ThreadPoolExecutor.
+    Retorna {feed_url: [entries]} para cada feed.
+    Ahorra ~3 min respecto a descarga secuencial de 31 feeds.
+    """
+    results = {}
+    with ThreadPoolExecutor(max_workers=FETCH_WORKERS) as executor:
+        future_to_feed = {executor.submit(fetch_via_feedparser, f): f for f in feeds}
+        for future in as_completed(future_to_feed):
+            feed_cfg = future_to_feed[future]
+            try:
+                entries = future.result()
+                results[feed_cfg["url"]] = entries
+            except Exception:
+                results[feed_cfg["url"]] = []
+    return results
 
 
 def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
@@ -433,12 +469,15 @@ def main():
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
 
+    print(f"  Descargando {len(FEEDS)} feeds en paralelo (workers={FETCH_WORKERS})...")
+    all_entries = fetch_all_feeds(FEEDS)
+    print(f"  Descarga completada.")
+
     for feed_cfg in FEEDS:
         source = feed_cfg["source"]
         lang   = feed_cfg.get("lang", "en")
-        print(f"  [{lang.upper()}] Fetching {source} — {feed_cfg['url'][:65]}...")
 
-        entries = fetch_via_feedparser(feed_cfg)
+        entries = all_entries.get(feed_cfg["url"], [])
         count = 0
 
         for entry in entries:
@@ -515,7 +554,8 @@ def main():
             else:
                 en_raw += 1
 
-        print(f"    → {count} noticias válidas")
+        if count > 0:
+            print(f"    [{lang.upper()}] {source}: {count} noticias")
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
