@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-fetch_news.py
+fetch_news.py — v3
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v2:
-  - MAX_AGE_DAYS = 3 para capturar noticias de divisas menos cubiertas (JPY, AUD, CHF, NZD)
-  - Agregadas fuentes InstaForex EN: /news y /analytics
-  - smart_select() en dos fases: garantía mínima por divisa + relleno por impacto
-  - Campo 'recent' en cada artículo (True si < 24h) para que el frontend lo pueda mostrar
+CAMBIOS v3:
+  - Nuevos feeds: FXStreet /rss, InvestingLive /feed/, BabyPips, InvestMacro, ForexCrunch
+  - Filtro anti-calendario: descarta entradas que son eventos futuros del calendario
+    económico (sin contenido editorial real)
+  - Validación de contenido mínimo: título + descripción deben tener sustancia real
+  - Filtro anti-duplicado mejorado por similitud de título (no solo hash exacto)
+  - is_real_news(): rechaza anuncios de agenda, recordatorios, comunicados vacíos
+  - MIN_DESCRIPTION_WORDS: descarta artículos sin descripción sustancial
+  - MAX_AGE_DAYS = 3 para divisas menos cubiertas (JPY, AUD, CHF, NZD)
 """
 
 import json
@@ -21,13 +25,70 @@ from collections import Counter
 import os
 
 # ─────────────────────────────────────────────
-MAX_NEWS           = 30
-MAX_AGE_DAYS       = 3    # 3 días para capturar divisas menos cubiertas
-GUARANTEED_PER_CUR = 2    # mínimo garantizado por divisa
-MAX_PER_CUR        = 6    # máximo por divisa
-OUTPUT_FILE        = "news-data/news.json"
-IMPACT_ORDER       = {"high": 0, "med": 1, "low": 2}
-CURRENCIES         = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+MAX_NEWS              = 35   # Aumentado por más fuentes
+MAX_AGE_DAYS          = 3
+GUARANTEED_PER_CUR    = 2
+MAX_PER_CUR           = 6
+OUTPUT_FILE           = "news-data/news.json"
+IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
+CURRENCIES            = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+
+# Contenido mínimo aceptable: descripción debe tener al menos estas palabras
+# para no ser un simple anuncio de calendario o encabezado vacío
+MIN_DESCRIPTION_WORDS = 12
+
+# ─────────────────────────────────────────────
+# PATRONES QUE INDICAN CONTENIDO DE CALENDARIO / EVENTO FUTURO
+# (no son noticias editoriales reales)
+# ─────────────────────────────────────────────
+CALENDAR_PATTERNS = [
+    # Frases explícitas de agenda/calendario
+    r"upcoming event",
+    r"content type.*upcoming",
+    r"scheduled date",
+    r"eight scheduled",
+    r"on eight",
+    r"share this page by email",
+    r"governing council presents",
+    r"\bpress release explaining\b",
+    r"four times a year.*governing",
+    r"announces the setting for the overnight rate",
+    r"bank of canada announces",
+    # Patrones de agenda económica genérica
+    r"^(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2},?\s+\d{4}$",
+    r"^\d{1,2}:\d{2}\s*\(et\)",   # Sólo hora en ET sin contenido
+    r"content type\(s\):",
+    # Resúmenes vacíos habituales de bancos centrales
+    r"^on (eight|four|six) scheduled dates",
+    r"^the bank of (canada|england|japan|reserve)",
+    r"monetary policy report$",
+    r"rate announcement$",
+    # BabyPips/educativo puro sin evento de mercado
+    r"^(what is|how to|learn|guide to|introduction to|basics of|beginner)",
+]
+CALENDAR_RE = re.compile("|".join(CALENDAR_PATTERNS), re.IGNORECASE)
+
+# Títulos que son eventos de calendario, no noticias
+CALENDAR_TITLE_PATTERNS = [
+    r"^interest rate announcement",
+    r"^monetary policy (report|decision|statement|meeting)$",
+    r"^(fomc|ecb|boe|boj|rba|rbnz|boc|snb) (meeting|statement|decision|minutes)$",
+    r"^rate (announcement|decision|statement)$",
+    r"^upcoming (event|release|data)",
+    r"^economic (calendar|data release)",
+    r"^(january|february|march|april|may|june|july|august|september|october|november|december) \d{1,2}",
+]
+CALENDAR_TITLE_RE = re.compile("|".join(CALENDAR_TITLE_PATTERNS), re.IGNORECASE)
+
+# Palabras clave educativas puras (BabyPips tipo "School of Pipsology")
+EDUCATIONAL_ONLY_PATTERNS = [
+    r"school of pipsology",
+    r"babypips quiz",
+    r"^quiz:",
+    r"^lesson \d+",
+    r"pips? glossary",
+]
+EDUCATIONAL_RE = re.compile("|".join(EDUCATIONAL_ONLY_PATTERNS), re.IGNORECASE)
 
 # ─────────────────────────────────────────────
 CURRENCY_KEYWORDS = {
@@ -38,7 +99,7 @@ CURRENCY_KEYWORDS = {
         "wall street", "nasdaq", "dow jones", "s&p 500",
         "reserva federal", "dólar", "dolar americano", "economía de eeuu",
         "economía estadounidense", "pib eeuu", "inflación eeuu",
-        "mercado laboral eeuu", "bonos del tesoro",
+        "mercado laboral eeuu", "bonos del tesoro", "tariff", "arancel",
     ],
     "EUR": [
         "ecb", "european central bank", "lagarde", "euro ", "eur", "eurozone",
@@ -89,34 +150,40 @@ CURRENCY_KEYWORDS = {
 # ─────────────────────────────────────────────
 FEEDS = [
     # ── ESPAÑOL ──────────────────────────────────────────────────────────────
-    { "source": "FXStreet ES",     "url": "https://www.fxstreet.es/rss/news",                              "lang": "es" },
-    { "source": "DailyForex ES",   "url": "https://es.dailyforex.com/rss/es/forexnews.xml",                "lang": "es" },
-    { "source": "DailyForex ES",   "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",        "lang": "es" },
-    { "source": "DailyForex ES",   "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",      "lang": "es" },
-    { "source": "DailyForex ES",   "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",            "lang": "es" },
-    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_1.rss",                        "lang": "es" },
-    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_25.rss",                       "lang": "es" },
-    { "source": "Investing.com ES","url": "https://es.investing.com/rss/news_14.rss",                       "lang": "es" },
-    # ── INGLÉS ───────────────────────────────────────────────────────────────
-    { "source": "FXStreet",        "url": "https://www.fxstreet.com/rss/news",                              "lang": "en" },
-    { "source": "FXStreet",        "url": "https://www.fxstreet.com/rss/analysis",                          "lang": "en" },
-    { "source": "ForexLive",       "url": "https://www.forexlive.com/feed/news",                            "lang": "en" },
-    { "source": "ForexLive",       "url": "https://www.forexlive.com/feed/centralbank",                     "lang": "en" },
-    { "source": "ECB",             "url": "https://www.ecb.europa.eu/rss/press.html",                       "lang": "en" },
-    { "source": "Bank of England", "url": "https://www.bankofengland.co.uk/rss/news",                       "lang": "en" },
-    { "source": "Bank of Canada",  "url": "https://www.bankofcanada.ca/feed/",                              "lang": "en" },
-    { "source": "DailyForex",      "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
-    { "source": "ActionForex",     "url": "https://www.actionforex.com/category/live-comments/feed/",       "lang": "en" },
-    { "source": "ActionForex",     "url": "https://www.actionforex.com/category/action-insight/feed/",      "lang": "en" },
-    { "source": "InvestingLive",   "url": "https://investinglive.com/feed/centralbank/",                    "lang": "en" },
-    { "source": "InvestingLive",   "url": "https://investinglive.com/feed/technicalanalysis/",              "lang": "en" },
-    { "source": "MyFXBook",        "url": "https://www.myfxbook.com/rss/latest-forex-news",                 "lang": "en" },
-    { "source": "Investing.com",   "url": "https://www.investing.com/rss/forex_Technical.rss",              "lang": "en" },
-    { "source": "Investing.com",   "url": "https://www.investing.com/rss/forex_Fundamental.rss",            "lang": "en" },
-    { "source": "Investing.com",   "url": "https://www.investing.com/rss/forex_Opinion.rss",                "lang": "en" },
-    { "source": "Investing.com",   "url": "https://www.investing.com/rss/forex_Signals.rss",                "lang": "en" },
-    { "source": "InstaForex",      "url": "https://news.instaforex.com/news",                               "lang": "en" },
-    { "source": "InstaForex",      "url": "https://news.instaforex.com/analytics",                          "lang": "en" },
+    { "source": "FXStreet ES",      "url": "https://www.fxstreet.es/rss/news",                              "lang": "es" },
+    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/forexnews.xml",                "lang": "es" },
+    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",        "lang": "es" },
+    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",      "lang": "es" },
+    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",            "lang": "es" },
+    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_1.rss",                        "lang": "es" },
+    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_25.rss",                       "lang": "es" },
+    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_14.rss",                       "lang": "es" },
+    # ── INGLÉS — EXISTENTES ──────────────────────────────────────────────────
+    { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/news",                              "lang": "en" },
+    { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/analysis",                          "lang": "en" },
+    { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/news",                             "lang": "en" },
+    { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/centralbank",                      "lang": "en" },
+    { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/press.html",                        "lang": "en" },
+    { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/news",                        "lang": "en" },
+    # Bank of Canada ELIMINADO: su feed trae eventos de calendario sin contenido editorial
+    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
+    { "source": "ActionForex",      "url": "https://www.actionforex.com/category/live-comments/feed/",        "lang": "en" },
+    { "source": "ActionForex",      "url": "https://www.actionforex.com/category/action-insight/feed/",       "lang": "en" },
+    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/centralbank/",                     "lang": "en" },
+    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/technicalanalysis/",               "lang": "en" },
+    { "source": "MyFXBook",         "url": "https://www.myfxbook.com/rss/latest-forex-news",                  "lang": "en" },
+    { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Technical.rss",               "lang": "en" },
+    { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Fundamental.rss",             "lang": "en" },
+    { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Opinion.rss",                 "lang": "en" },
+    { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Signals.rss",                 "lang": "en" },
+    { "source": "InstaForex",       "url": "https://news.instaforex.com/news",                                "lang": "en" },
+    { "source": "InstaForex",       "url": "https://news.instaforex.com/analytics",                           "lang": "en" },
+    # ── INGLÉS — NUEVOS ──────────────────────────────────────────────────────
+    { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss",                                    "lang": "en" },
+    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/",                                  "lang": "en" },
+    { "source": "BabyPips",         "url": "https://www.babypips.com/feed.rss",                               "lang": "en" },
+    { "source": "InvestMacro",      "url": "https://investmacro.com/feed/",                                    "lang": "en" },
+    { "source": "ForexCrunch",      "url": "https://forexcrunch.com/feed/",                                    "lang": "en" },
 ]
 
 # ─────────────────────────────────────────────
@@ -142,18 +209,22 @@ MED_IMPACT_KW = [
     "producción industrial", "confianza del consumidor", "salarios",
 ]
 
-# ─────────────────────────────────────────────
 SOURCE_CURRENCY = {
-    "Bank of Canada": "CAD", "ECB": "EUR", "Bank of England": "GBP",
-    "Bank of Japan":  "JPY", "RBA": "AUD", "RBNZ":           "NZD",
-    "SNB":            "CHF", "Federal Reserve": "USD",
+    "ECB": "EUR",
+    "Bank of England": "GBP",
+    "Bank of Japan":   "JPY",
+    "RBA":             "AUD",
+    "RBNZ":            "NZD",
+    "SNB":             "CHF",
+    "Federal Reserve": "USD",
+    # Bank of Canada eliminado del mapping para no asignar CAD por defecto
 }
 
 FOREX_SOURCES = {
     "FXStreet ES", "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
-    "Bank of Canada", "ECB", "Bank of England", "Bank of Japan",
-    "RBA", "RBNZ", "SNB", "Federal Reserve",
-    "ActionForex", "InvestingLive", "MyFXBook", "Investing.com", "InstaForex",
+    "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
+    "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
+    "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
 }
 
 FOREX_RELEVANCE_KW = [
@@ -170,14 +241,72 @@ FOREX_RELEVANCE_KW = [
 ]
 
 
-def is_forex_relevant(title, summary, source):
-    if source in FOREX_SOURCES:
+# ─────────────────────────────────────────────
+# FILTROS DE CALIDAD
+# ─────────────────────────────────────────────
+
+def is_calendar_entry(title: str, description: str) -> bool:
+    """
+    Detecta si una entrada es un evento de calendario económico futuro
+    o un anuncio institucional vacío de contenido editorial.
+    Retorna True si debe ser DESCARTADA.
+    """
+    combined = (title + " " + description).strip()
+
+    # 1. Título que coincide con patrones de calendario
+    if CALENDAR_TITLE_RE.search(title.strip()):
         return True
+
+    # 2. Descripción que contiene frases típicas de calendario/agenda
+    if CALENDAR_RE.search(combined):
+        return True
+
+    # 3. Descripción demasiado corta para ser una noticia real
+    #    (evento de calendario suele tener descripción de <10 palabras útiles)
+    desc_words = len(description.split())
+    if desc_words < MIN_DESCRIPTION_WORDS:
+        return True
+
+    # 4. Contenido educativo puro (BabyPips school, etc.)
+    if EDUCATIONAL_RE.search(combined):
+        return True
+
+    return False
+
+
+def has_real_content(title: str, description: str) -> bool:
+    """
+    Verifica que el artículo tenga contenido editorial real:
+    - Título con al menos 5 palabras
+    - Descripción con al menos MIN_DESCRIPTION_WORDS palabras
+    - No es solo metadatos (fechas, horarios, tipos de contenido)
+    """
+    title_words = len(title.split())
+    desc_words  = len(description.split())
+
+    if title_words < 5:
+        return False
+    if desc_words < MIN_DESCRIPTION_WORDS:
+        return False
+
+    # Detectar si la descripción es casi idéntica al título (sin valor añadido)
+    title_lower = title.lower().strip()
+    desc_lower  = description.lower().strip()
+    if desc_lower.startswith(title_lower[:30]) and desc_words < 20:
+        return False
+
+    return True
+
+
+def is_forex_relevant(title: str, summary: str, source: str) -> bool:
+    if source in FOREX_SOURCES:
+        text = (title + " " + summary).lower()
+        return any(kw in text for kw in FOREX_RELEVANCE_KW)
     text = (title + " " + summary).lower()
     return any(kw in text for kw in FOREX_RELEVANCE_KW)
 
 
-def detect_currency(title, summary, source=""):
+def detect_currency(title: str, summary: str, source: str = "") -> str:
     text = (title + " " + summary).lower()
     for currency, keywords in CURRENCY_KEYWORDS.items():
         if any(kw in text for kw in keywords):
@@ -185,7 +314,7 @@ def detect_currency(title, summary, source=""):
     return SOURCE_CURRENCY.get(source, "USD")
 
 
-def detect_impact(title, summary):
+def detect_impact(title: str, summary: str) -> str:
     text = (title + " " + summary).lower()
     if any(kw in text for kw in HIGH_IMPACT_KW):
         return "high"
@@ -205,26 +334,38 @@ def parse_date(entry):
     return datetime.now(timezone.utc)
 
 
-def clean_html(text):
+def clean_html(text: str) -> str:
     if not text:
         return ""
     text = re.sub(r"<[^>]+>", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"&[a-zA-Z]+;", " ", text)   # HTML entities
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
 
 
-def entry_id(title, source):
+def normalize_title(title: str) -> str:
+    """Normaliza un título para detección de duplicados por similitud."""
+    t = title.lower().strip()
+    t = re.sub(r"[^a-z0-9 ]", "", t)
+    t = re.sub(r"\s+", " ", t)
+    return t
+
+
+def entry_id(title: str, source: str) -> str:
     return hashlib.md5(f"{source}:{title}".encode()).hexdigest()[:12]
 
 
-def fetch_via_feedparser(feed_cfg):
+def fetch_via_feedparser(feed_cfg: dict):
     try:
         d = feedparser.parse(
             feed_cfg["url"],
             request_headers={
-                "User-Agent": "Mozilla/5.0 (compatible; ForexNewsBot/1.0)",
+                "User-Agent": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
                 "Accept": "application/rss+xml, application/xml, text/xml, */*",
             }
         )
+        if d.bozo and not d.entries:
+            print(f"    [WARN] Feed malformado o vacío: {feed_cfg['url'][:65]}")
         return d.entries
     except Exception as e:
         print(f"  [ERROR] {feed_cfg['url'][:65]}: {e}")
@@ -233,8 +374,8 @@ def fetch_via_feedparser(feed_cfg):
 
 def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
     """
-    Fase 1: garantía mínima por divisa (priorizando high > med > low, luego más reciente).
-    Fase 2: rellena slots restantes con los mejores artículos del pool completo.
+    Fase 1: garantía mínima por divisa (priorizando high > med > low).
+    Fase 2: rellena slots restantes con los mejores del pool completo.
     """
     groups = {cur: [] for cur in CURRENCIES}
     for a in articles:
@@ -246,10 +387,10 @@ def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
         groups[cur].sort(key=lambda x: (IMPACT_ORDER.get(x["impact"], 2), -x["ts"]))
 
     selected_ids = set()
-    selected = []
-    taken = {cur: 0 for cur in CURRENCIES}
+    selected     = []
+    taken        = {cur: 0 for cur in CURRENCIES}
 
-    # Fase 1
+    # Fase 1 — garantía mínima
     for cur in CURRENCIES:
         for a in groups[cur]:
             if taken[cur] >= guaranteed_per_cur or len(selected) >= max_total:
@@ -258,7 +399,7 @@ def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
             selected_ids.add(a["id"])
             taken[cur] += 1
 
-    # Fase 2
+    # Fase 2 — relleno por calidad
     remaining = [
         a for a in articles
         if a["id"] not in selected_ids and taken.get(a["cur"], 0) < max_per_cur
@@ -282,9 +423,13 @@ def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
 def main():
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
-    seen_ids = set()
+    seen_ids     = set()
+    seen_titles  = set()   # Para deduplicación por similitud de título
     raw_articles = []
     es_raw = en_raw = 0
+    filtered_calendar = 0
+    filtered_quality  = 0
+    filtered_relevance = 0
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
 
@@ -308,21 +453,44 @@ def main():
             if not title or len(title) < 15:
                 continue
 
+            # ── Filtro de antigüedad ─────────────────────────────────────────
             pub_date = parse_date(entry)
             if pub_date < cutoff:
                 continue
 
+            # ── Filtro de eventos de calendario / contenido vacío ────────────
+            # Esta es la corrección principal para el problema de Bank of Canada
+            # y fuentes similares que publican avisos de agenda sin contenido
+            if is_calendar_entry(title, summary):
+                filtered_calendar += 1
+                continue
+
+            # ── Filtro de contenido mínimo real ──────────────────────────────
+            if not has_real_content(title, summary):
+                filtered_quality += 1
+                continue
+
+            # ── Filtro de relevancia forex ────────────────────────────────────
+            if not is_forex_relevant(title, summary, source):
+                filtered_relevance += 1
+                continue
+
+            # ── Deduplicación por ID exacto ───────────────────────────────────
             nid = entry_id(title, source)
             if nid in seen_ids:
                 continue
             seen_ids.add(nid)
 
-            if not is_forex_relevant(title, summary, source):
+            # ── Deduplicación por similitud de título (cross-source) ──────────
+            norm_title = normalize_title(title)
+            title_key  = norm_title[:60]  # primeros 60 chars normalizados
+            if title_key in seen_titles:
                 continue
+            seen_titles.add(title_key)
 
             cur    = detect_currency(title, summary, source)
             impact = detect_impact(title, summary)
-            expand = summary[:300] + ("..." if len(summary) > 300 else "")
+            expand = summary[:350] + ("..." if len(summary) > 350 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
 
             raw_articles.append({
@@ -351,6 +519,7 @@ def main():
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
+    print(f"   🚫 Descartados — Calendario/vacíos: {filtered_calendar} | Sin contenido: {filtered_quality} | Sin relevancia: {filtered_relevance}")
 
     dist_before   = Counter(a["cur"] for a in raw_articles)
     impact_before = Counter(a["impact"] for a in raw_articles)
