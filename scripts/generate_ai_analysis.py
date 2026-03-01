@@ -1,27 +1,36 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # PATCH para generate_ai_analysis.py — soporte multi-key con fallback
-# v2 — check_groq_key() conservador: solo marca daily_limit si el mensaje
-#      menciona EXPLÍCITAMENTE "per day" o "tpd" (nunca "per minute")
+# v3 — Alineado con enrich_news v6:
+#      • parse_429_type() imprime el mensaje RAW de Groq para diagnóstico
+#      • Solo marca daily_limit si el mensaje dice explícitamente "per day"/"tpd"
+#      • Pausa KEY_SWITCH_PAUSE=15s al cambiar de key
+#      • check_groq_key() con beneficio de la duda en cualquier caso ambiguo
 #
-# Reemplaza en el script original:
-#   call_groq_api(), generate_analysis(), main()
-# Agrega antes de main():
-#   is_daily_limit_message(), load_groq_keys(), mask_key(), check_groq_key()
+# INSTRUCCIONES:
+#   1. Agrega las funciones nuevas ANTES de call_groq_api() en el script original
+#   2. Reemplaza call_groq_api(), generate_analysis() y main() completos
 # ─────────────────────────────────────────────────────────────────────────────
 
+KEY_SWITCH_PAUSE = 15  # segundos de pausa al cambiar de key (agregar junto a otras constantes)
 
-def is_daily_limit_message(response) -> bool:
+
+def parse_429_type(response) -> str:
     """
-    Detecta si un 429 es por límite diario de TOKENS.
-    Solo True si el mensaje menciona "per day" o "tpd" (no "per minute").
+    Analiza un 429 y devuelve: 'daily' | 'minute' | 'unknown'.
+    Imprime el mensaje raw de Groq para diagnóstico.
     """
     try:
-        msg = response.json().get("error", {}).get("message", "").lower()
-        is_daily     = any(x in msg for x in ("per day", "tpd", "tokens per day"))
-        is_per_minute = "per minute" in msg or "rpm" in msg or "tpm" in msg
-        return is_daily and not is_per_minute
+        body = response.json()
+        msg  = body.get("error", {}).get("message", "")
+        print(f"  📋 Groq 429: {msg[:200]}")
+        msg_lower = msg.lower()
+        if any(x in msg_lower for x in ("per day", "tpd", "tokens per day")):
+            return "daily"
+        if any(x in msg_lower for x in ("per minute", "rpm", "tpm", "requests per")):
+            return "minute"
+        return "unknown"
     except Exception:
-        return False
+        return "unknown"
 
 
 def load_groq_keys() -> list:
@@ -40,15 +49,9 @@ def mask_key(key: str) -> str:
 
 def check_groq_key(key: str) -> str:
     """
-    Verifica el estado de una key con una llamada de prueba mínima.
-
-    Devuelve:
-      'ok'          → key funciona o error ambiguo (beneficio de la duda)
-      'daily_limit' → confirmado límite diario de tokens ("per day" / "tpd")
-      'invalid'     → key inválida (401)
-
-    IMPORTANTE: cualquier 429 que NO sea explícitamente límite diario
-    se trata como 'ok' — no descartar keys válidas por rate limit temporal.
+    Verifica una key con una llamada de prueba mínima.
+    Conservador: solo marca daily_limit si está CONFIRMADO explícitamente.
+    Cualquier ambigüedad → 'ok' (beneficio de la duda).
     """
     try:
         r = requests.post(
@@ -64,20 +67,17 @@ def check_groq_key(key: str) -> str:
         if r.status_code == 401:
             return "invalid"
         if r.status_code == 429:
-            if is_daily_limit_message(r):
-                return "daily_limit"
-            # 429 por RPM, TPM u otro rate limit temporal → key disponible
-            return "ok"
+            t = parse_429_type(r)
+            return "daily_limit" if t == "daily" else "ok"
         return "ok"
     except Exception:
-        # Error de red → asumir OK, el fallo real se verá al usar la key
-        return "ok"
+        return "ok"  # error de red → asumir OK
 
 
 def call_groq_api(api_key, data_summary, currency):
     """
-    Lanza RuntimeError("RATE_LIMIT")  si recibe 429 por rate limit de minuto.
-    Lanza RuntimeError("DAILY_LIMIT") si recibe 429 por cuota diaria de tokens.
+    Lanza RuntimeError("RATE_LIMIT")  → 429 por minuto (esperar y reintentar).
+    Lanza RuntimeError("DAILY_LIMIT") → 429 por cuota diaria (cambiar key).
     """
     payload = {
         "model": GROQ_MODEL,
@@ -108,7 +108,8 @@ def call_groq_api(api_key, data_summary, currency):
     )
 
     if response.status_code == 429:
-        if is_daily_limit_message(response):
+        t = parse_429_type(response)
+        if t == "daily":
             raise RuntimeError("DAILY_LIMIT")
         raise RuntimeError("RATE_LIMIT")
 
@@ -124,7 +125,7 @@ def call_groq_api(api_key, data_summary, currency):
 
 
 def generate_analysis(api_key, currency, data, global_context=None, export_composition=None):
-    """Propaga DAILY_LIMIT para que main() haga el cambio de key."""
+    """Propaga DAILY_LIMIT sin reintentar para que main() haga el cambio de key."""
     data_summary = build_data_summary(currency, data, global_context, export_composition)
 
     for attempt in range(3):
@@ -182,11 +183,10 @@ def main():
         status = check_groq_key(key)
         label  = f"Key {i} ({mask_key(key)})"
         if status == "daily_limit":
-            print(f"  ⛔ {label} — límite diario de tokens confirmado")
+            print(f"  ⛔ {label} — límite diario confirmado")
         elif status == "invalid":
             print(f"  ❌ {label} — inválida (401)")
         else:
-            # 'ok' o cualquier duda → incluir
             print(f"  ✅ {label} — disponible")
             available_keys.append(key)
 
@@ -196,7 +196,7 @@ def main():
         sys.exit(0)
 
     current_key_idx = 0
-    print(f"\n✅ Usando Key 1 de {len(available_keys)} disponibles")
+    print(f"\n✅ {len(available_keys)} key(s) disponible(s) | Usando Key 1")
     print(f"🔧 Modelo: {GROQ_MODEL}")
     print(f"📊 Decisiones monetarias: historial propio rates/{{currency}}.json")
     print(f"💱 FX Performance: Frankfurter API con fallback estático\n")
@@ -282,12 +282,13 @@ def main():
                     if current_key_idx >= len(available_keys):
                         print("  ⛔ Todas las keys agotadas — deteniendo")
                         break
-                    print(f"  🔄 Key {current_key_idx + 1} ({mask_key(available_keys[current_key_idx])})")
+                    print(f"  🔄 Key {current_key_idx + 1} ({mask_key(available_keys[current_key_idx])}) — pausa {KEY_SWITCH_PAUSE}s...")
+                    time.sleep(KEY_SWITCH_PAUSE)
                 else:
                     raise
 
         if analysis_text is None:
-            msg = "Todas las keys de Groq agotadas" if current_key_idx >= len(available_keys) else "Error en generación"
+            msg = "Todas las keys agotadas" if current_key_idx >= len(available_keys) else "Error en generación"
             print(f"  ❌ {msg}")
             errors.append(f"{currency}: {msg}")
             results[currency] = {"success": False, "error": msg}
