@@ -113,18 +113,6 @@ FEEDS = [
         "lang": "es",
     },
     {
-        "source": "Expansión",
-        "url": "https://www.expansion.com/rss/mercados.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "Expansión",
-        "url": "https://www.expansion.com/rss/economia.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
         "source": "DailyForex ES",
         "url": "https://es.dailyforex.com/rss/es/forexnews.xml",
         "method": "feedparser",
