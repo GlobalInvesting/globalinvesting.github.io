@@ -243,7 +243,7 @@
       <div class="s-panel">
         <div class="s-header">
           <span class="s-title">Próximos eventos</span>
-          <span class="s-sub">hoy/mañana · local</span>
+          <span class="s-sub">hoy/mañana · hora local</span>
         </div>
         <div id="upcoming-events">
           <div class="ev-empty">Cargando eventos…</div>
@@ -279,8 +279,11 @@
 // ── UTILS ────────────────────────────────────────────────────────────────────
 const pad = n => String(n).padStart(2,'0');
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── TIMESTAMP "Actualizado" EN HORA LOCAL DEL USUARIO ────────────────────────
 const now = new Date();
-document.getElementById('ts').textContent = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())} UTC`;
+document.getElementById('ts').textContent =
+  now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' (hora local)';
 document.getElementById('year').textContent = now.getFullYear();
 
 // ── TICKER: Precios DINÁMICOS desde Frankfurter API ──────────────────────────
@@ -344,17 +347,13 @@ async function ensureDailyBaseline() {
       return;
     }
 
-    // Frankfurter solo tiene datos hasta ayer — usar fecha de cierre real
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
-    // Pedir tasas base EUR para poder calcular todos los cruces
     const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=EUR`, { signal: ctrl.signal });
     if (!res.ok) return;
     const data = await res.json();
     if (!data.rates) return;
 
-    // Frankfurter devuelve rates respecto a EUR; necesitamos USD como base
-    // Convertir: si EUR→USD = X, entonces USD→X = 1/X, USD→Y = rates[Y]/rates[USD]
     const eurUsd = data.rates['USD'];
     if (!eurUsd) return;
     const usdRates = {};
@@ -527,7 +526,6 @@ function computeSentiment(articles) {
   CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
   articles.forEach(a => {
     if (!counts[a.cur]) return;
-    // Usar ai_headline si existe (análisis Groq), si no caer al título original
     const textForSentiment = a.ai_headline || a.title;
     const s = scoreSentiment(textForSentiment, '');
     counts[a.cur][s]++;
@@ -585,6 +583,7 @@ async function loadUpcomingEvents() {
         e.previous ? 'Prev: ' + e.previous : ''
       ].filter(Boolean).join(' · ');
 
+      // ── HORA LOCAL DEL USUARIO ──────────────────────────────────────────────
       let localTime = e.timeUTC || '--:--';
       if (e.timeUTC && e.dateISO) {
         try {
@@ -810,12 +809,20 @@ async function fetchRSSviaProxy(rssUrl) {
   return null;
 }
 
+// ── HORA LOCAL A PARTIR DE TIMESTAMP ─────────────────────────────────────────
+function tsToLocalTime(ts) {
+  if (!ts) return '--:--';
+  const d = new Date(ts);
+  if (isNaN(d)) return '--:--';
+  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
 function parseTime(pubDate) {
   if (!pubDate) return '--:--';
   try {
     const d = new Date(pubDate);
     if (isNaN(d)) return '--:--';
-    return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
   } catch(_) { return '--:--'; }
 }
 
@@ -880,7 +887,6 @@ function renderFeed() {
 
   document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
 
-  // Mostrar badge AI si al menos un artículo visible tiene ai_headline
   const aiBadge = document.getElementById('ai-badge');
   if (aiBadge) {
     const hasAI = filtered.slice(0, visible).some(a => a.ai_headline);
@@ -924,15 +930,25 @@ async function initFeed() {
         allArticles = articles
           .map(a => {
             const text = a.title + ' ' + (a.expand || '');
+            // ── Convertir ts (Unix ms) a hora local del usuario ──────────────
+            let localTime = '--:--';
+            if (a.ts) {
+              localTime = tsToLocalTime(a.ts);
+            } else if (a.datetime) {
+              const d = new Date(a.datetime);
+              if (!isNaN(d)) localTime = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+            } else if (a.time && a.time !== '--:--') {
+              localTime = a.time; // fallback: ya viene formateada
+            }
             return {
               ...a,
               cur:         detectCurrencyWithSource(text, a.source),
               impact:      a.impact || detectImpact(a.title, a.expand),
-              time:        a.time   || '--:--',
+              time:        localTime,
               ai_headline: a.ai_headline || null,
             };
           })
-          .filter(a => a.ai_headline && !a.ai_headline.toUpperCase().includes('IRRELEVANTE'))  // solo mostrar artículos con síntesis AI válida
+          .filter(a => a.ai_headline && !a.ai_headline.toUpperCase().includes('IRRELEVANTE'))
           .sort((a, b) => (b.ts || 0) - (a.ts || 0));
         renderFeed();
         return;
@@ -965,9 +981,10 @@ async function initFeed() {
         if (!isForexRelevant(item.title, item.description, source)) return;
         const cur    = detectCurrencyWithSource(text, source);
         const impact = detectImpact(item.title, item.description);
+        const ts     = parseTimestamp(item.pubDate);
         collected.push({
-          time:        parseTime(item.pubDate),
-          ts:          parseTimestamp(item.pubDate),
+          time:        ts ? tsToLocalTime(ts) : '--:--',
+          ts,
           cur,
           impact,
           featured:    impact === 'high',
