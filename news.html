@@ -143,7 +143,7 @@
   .s-sub{font-size:.62rem;color:var(--text-dim);}
   .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .sent-row:last-child{border-bottom:none;}
-  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:30px;flex-shrink:0;}
+  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:46px;flex-shrink:0;display:flex;align-items:center;gap:.3rem;}
   .sent-bar-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
   .sent-bar{height:100%;border-radius:1px;}
   .sent-bar.bull{background:var(--green);}
@@ -312,12 +312,31 @@ document.getElementById('ts').textContent =
 document.getElementById('year').textContent = now.getFullYear();
 
 // ── BANDERAS POR DIVISA ───────────────────────────────────────────────────────
+// Usamos imágenes SVG de flagcdn.com en lugar de emojis para compatibilidad
+// con Edge/Windows donde los flag emojis no se renderizan correctamente
+const FLAG_CODES = {
+  USD:'us', EUR:'eu', GBP:'gb', JPY:'jp',
+  AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz',
+  US:'us',  EU:'eu',  UK:'gb',  JP:'jp',
+  AU:'au',  CA:'ca',  CH:'ch',  NZ:'nz',
+};
+
+// Emojis como fallback para contextos que no admiten imágenes (ej: filter buttons)
 const CURRENCY_FLAGS = {
   USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
   AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
   US:'🇺🇸',  EU:'🇪🇺',  UK:'🇬🇧',  JP:'🇯🇵',
   AU:'🇦🇺',  CA:'🇨🇦',  CH:'🇨🇭',  NZ:'🇳🇿',
 };
+
+function flagImg(cur, size = 16) {
+  const code = FLAG_CODES[cur];
+  if (!code) return '';
+  return `<img src="https://flagcdn.com/${size}x${Math.round(size*0.75)}/${code}.png"
+    srcset="https://flagcdn.com/${size*2}x${Math.round(size*0.75*2)}/${code}.png 2x"
+    width="${size}" height="${Math.round(size*0.75)}"
+    alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
+}
 
 function resolveFlag(cur) {
   return CURRENCY_FLAGS[cur] || '';
@@ -337,32 +356,44 @@ const TICKER_PAIRS = [
   { pair:'GBP/JPY', base:'GBP', quote:'JPY' },
 ];
 
-// ── FIX 1 & 2: Caché mejorado ────────────────────────────────────────────────
-// Clave nueva (v3) para evitar colisiones con la caché antigua (v2)
-// Se guarda _fetchedOn (fecha de la petición) para validar, no _date (fecha de mercado)
-// Esto corrige el problema cuando Frankfurter devuelve fecha de viernes estando en lunes
-const OPEN_PRICES_KEY = 'fx_ref_prices_v3';
+// ── CACHÉ DE CIERRE DEL DÍA ANTERIOR (precio de referencia) ──────────────────
+// Clave v4: guarda el cierre de AYER (o el último disponible) como referencia
+// Se separa completamente de la fuente de precios actuales para evitar que ambos
+// devuelvan el mismo valor (que causaba el +0.00%)
+const PREV_CLOSE_KEY = 'fx_prev_close_v4';
 
 function getTodayISO() {
   return new Date().toISOString().split('T')[0];
 }
 
-function loadOpenPrices() {
+// Devuelve la fecha ISO del último día de mercado anterior al actual
+// (si hoy es lunes devuelve viernes, si es martes devuelve lunes, etc.)
+function getPrevMarketDayISO() {
+  const d = new Date();
+  // Retroceder al menos 1 día
+  d.setUTCDate(d.getUTCDate() - 1);
+  // Si es domingo (0) → viernes; si es sábado (6) → viernes
+  const dow = d.getUTCDay();
+  if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
+  if (dow === 6) d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
+function loadPrevClose() {
   try {
-    const raw = localStorage.getItem(OPEN_PRICES_KEY);
+    const raw = localStorage.getItem(PREV_CLOSE_KEY);
     if (!raw) return null;
     const obj = JSON.parse(raw);
-    // Válido si se guardó HOY (independiente de qué fecha de mercado contiene)
-    // Cubre fines de semana/festivos donde Frankfurter devuelve el último cierre disponible
+    // Válido si se guardó hoy (el cierre de ayer no cambia durante el día)
     if (obj._fetchedOn === getTodayISO()) return obj;
     return null;
   } catch(_) { return null; }
 }
 
-function saveOpenPrices(priceMap, marketDate) {
+function savePrevClose(priceMap, marketDate) {
   try {
-    const obj = { ...priceMap, _date: marketDate, _fetchedOn: getTodayISO() };
-    localStorage.setItem(OPEN_PRICES_KEY, JSON.stringify(obj));
+    const obj = { ...priceMap, _marketDate: marketDate, _fetchedOn: getTodayISO() };
+    localStorage.setItem(PREV_CLOSE_KEY, JSON.stringify(obj));
   } catch(_) {}
 }
 
@@ -378,43 +409,46 @@ function ratesToPairPrices(usdRates) {
   return prices;
 }
 
-// FIX 2: Usa /latest en lugar de fecha fija de hoy
-// Frankfurter /latest siempre devuelve el último cierre ECB disponible (cubre festivos y fines de semana)
-async function ensureDailyOpenPrices() {
-  const cached = loadOpenPrices();
+// Obtiene el cierre del ÚLTIMO DÍA DE MERCADO ANTERIOR a hoy desde Frankfurter.
+// Frankfurter es perfecto para esto: datos históricos precisos del ECB.
+// Este precio se usa SOLO como referencia para calcular el % de cambio diario.
+async function ensurePrevClose() {
+  const cached = loadPrevClose();
   if (cached && Object.keys(cached).filter(k => !k.startsWith('_')).length > 0) return cached;
 
+  const prevDay = getPrevMarketDayISO();
   try {
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
-
-    const res = await fetch('https://api.frankfurter.app/latest?from=EUR', { signal: ctrl.signal });
+    // Pedimos explícitamente la fecha del día anterior de mercado
+    const res = await fetch(`https://api.frankfurter.app/${prevDay}?from=EUR`, { signal: ctrl.signal });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.rates) throw new Error('Sin rates');
 
     const eurUsd = data.rates['USD'];
     if (!eurUsd) throw new Error('Sin EUR/USD');
-
     const usdRates = { EUR: 1 / eurUsd };
-    Object.entries(data.rates).forEach(([cur, val]) => {
-      usdRates[cur] = val / eurUsd;
-    });
+    Object.entries(data.rates).forEach(([cur, val]) => { usdRates[cur] = val / eurUsd; });
 
     const prices = ratesToPairPrices(usdRates);
-    // Guardamos la fecha real del último cierre de mercado que devolvió la API
-    saveOpenPrices(prices, data.date || getTodayISO());
+    savePrevClose(prices, data.date || prevDay);
     return prices;
   } catch(_) {
     return null;
   }
 }
 
+// Obtiene precios ACTUALES desde APIs que se actualizan cada hora o más frecuente.
+// Se evita usar Frankfurter aquí porque sus datos son idénticos a los del cierre ECB
+// (solo se actualizan una vez al día ~16:00 CET), lo que causaba el +0.00%.
 async function fetchCurrentRates() {
+  // open.er-api.com actualiza cada hora; exchangerate-api.com también
+  // Frankfurter queda como último recurso (sus precios "actuales" son ECB de ayer → 0%)
   const sources = [
-    'https://api.frankfurter.app/latest?from=USD',
     'https://open.er-api.com/v6/latest/USD',
     'https://api.exchangerate-api.com/v4/latest/USD',
+    'https://api.frankfurter.app/latest?from=USD',  // fallback (puede dar 0%)
   ];
   for (const url of sources) {
     try {
@@ -433,8 +467,8 @@ async function fetchCurrentRates() {
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
   try {
-    const [openPrices, rates] = await Promise.all([
-      ensureDailyOpenPrices(),
+    const [prevClose, rates] = await Promise.all([
+      ensurePrevClose(),
       fetchCurrentRates(),
     ]);
 
@@ -450,11 +484,12 @@ async function fetchAndBuildTicker() {
       const decimals = pair.includes('JPY') ? 2 : 4;
       let chgStr = '', up = null;
 
-      if (openPrices && openPrices[pair]) {
-        const prev = openPrices[pair];
-        // FIX 3: Umbral reducido de 0.005% → 0.001% para capturar movimientos intradía
+      // Comparar precio actual con el cierre del día anterior (fuente diferente)
+      if (prevClose && prevClose[pair]) {
+        const prev = prevClose[pair];
         if (Math.abs(prev) > 0) {
           const pct = ((price - prev) / prev) * 100;
+          // Mostrar cualquier cambio >= 0.001% (forex mueve típicamente 0.1–1% al día)
           if (Math.abs(pct) >= 0.001) {
             up = pct >= 0;
             chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
@@ -571,7 +606,7 @@ function computeSentiment(articles) {
     if (d.total === 0 || d.bull === d.bear) { label='Neut'; cls='neut'; width=50; }
     else if (d.bull > d.bear) { label='Bull'; cls='bull'; width=Math.round(50+(d.bull/d.total)*50); }
     else { label='Bear'; cls='bear'; width=Math.round(50-(d.bear/d.total)*50); }
-    const flag = resolveFlag(cur);
+    const flag = flagImg(cur, 14);
     body.innerHTML += `<div class="sent-row">
       <span class="sent-cur">${flag} ${cur}</span>
       <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${width}%"></div></div>
@@ -734,14 +769,13 @@ function renderFeed() {
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
     const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
-    const flag    = resolveFlag(a.cur);
     const isHist  = a.recent === false;
     const histTag = isHist ? '<span class="hist-tag" title="Noticia histórica (1-3 días)">hist</span>' : '';
     const headline = a.ai_headline || a.title;
 
     body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
-      <span class="col-cur"><span class="flag" aria-hidden="true">${flag}</span>${esc(a.cur)}</span>
+      <span class="col-cur">${flagImg(a.cur)}${esc(a.cur)}</span>
       <div class="col-impact ${ic}" aria-label="Impacto ${a.impact}"><div class="impact-dot"></div></div>
       <span class="col-title" title="${esc(headline)}">${esc(headline)}${histTag}</span>
       <span class="col-source">${esc(a.source)}</span>
