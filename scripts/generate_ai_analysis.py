@@ -1,174 +1,107 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# PATCH para generate_ai_analysis.py — soporte multi-key con fallback
-# v3 — Alineado con enrich_news v6:
-#      • parse_429_type() imprime el mensaje RAW de Groq para diagnóstico
-#      • Solo marca daily_limit si el mensaje dice explícitamente "per day"/"tpd"
-#      • Pausa KEY_SWITCH_PAUSE=15s al cambiar de key
-#      • check_groq_key() con beneficio de la duda en cualquier caso ambiguo
+# PATCH para generate_ai_analysis.py — v4
+# Reutiliza análisis existente si los datos económicos no cambiaron,
+# evitando llamadas innecesarias a Groq y ahorrando tokens.
 #
-# INSTRUCCIONES:
-#   1. Agrega las funciones nuevas ANTES de call_groq_api() en el script original
-#   2. Reemplaza call_groq_api(), generate_analysis() y main() completos
+# CAMBIOS v4 respecto a v3:
+#   • load_previous_analysis(): carga el análisis guardado para una divisa
+#   • data_has_changed(): compara dataSnapshot anterior vs datos actuales
+#   • main() modificado: salta Groq si los datos son idénticos al snapshot
+#   • Reporte detallado: cuántas divisas se reutilizaron vs regeneraron
+#
+# INSTRUCCIONES DE APLICACIÓN:
+#   1. Agrega las nuevas funciones (load_previous_analysis, data_has_changed)
+#      ANTES de la función main() en generate_ai_analysis.py
+#   2. Reemplaza la función main() completa con la versión de este patch
+#   3. Las demás funciones (call_groq_api, generate_analysis, etc.) no cambian
 # ─────────────────────────────────────────────────────────────────────────────
 
-KEY_SWITCH_PAUSE = 15  # segundos de pausa al cambiar de key (agregar junto a otras constantes)
+# ── NUEVAS FUNCIONES — agregar antes de main() ────────────────────────────────
 
-
-def parse_429_type(response) -> str:
+def load_previous_analysis(currency: str) -> dict | None:
     """
-    Analiza un 429 y devuelve: 'daily' | 'minute' | 'unknown'.
-    Imprime el mensaje raw de Groq para diagnóstico.
+    Carga el análisis JSON guardado previamente para una divisa.
+    Retorna el dict completo o None si no existe o está corrupto.
     """
+    path = OUTPUT_DIR / f"{currency}.json"
+    if not path.exists():
+        return None
     try:
-        body = response.json()
-        msg  = body.get("error", {}).get("message", "")
-        print(f"  📋 Groq 429: {msg[:200]}")
-        msg_lower = msg.lower()
-        if any(x in msg_lower for x in ("per day", "tpd", "tokens per day")):
-            return "daily"
-        if any(x in msg_lower for x in ("per minute", "rpm", "tpm", "requests per")):
-            return "minute"
-        return "unknown"
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
     except Exception:
-        return "unknown"
+        return None
 
 
-def load_groq_keys() -> list:
-    """Carga todas las keys de Groq disponibles en orden de prioridad."""
-    keys = []
-    for var in ("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3"):
-        k = os.environ.get(var, "").strip()
-        if k:
-            keys.append(k)
-    return keys
+# Campos del dataSnapshot que se comparan para detectar cambios.
+# Se excluyen campos volátiles (lastUpdate, fxSource) que cambian
+# aunque los datos macroeconómicos sean los mismos.
+SNAPSHOT_COMPARE_KEYS = [
+    "interestRate",
+    "gdpGrowth",
+    "inflation",
+    "unemployment",
+    "currentAccount",
+    "rateMomentum",
+    "lastRateDecision",
+    "cotPositioning",
+    "fxPerformance1M",
+]
 
 
-def mask_key(key: str) -> str:
-    return key[:8] + "..." + key[-4:] if len(key) > 12 else "***"
-
-
-def check_groq_key(key: str) -> str:
+def data_has_changed(currency: str, current_data: dict, prev_analysis: dict | None) -> bool:
     """
-    Verifica una key con una llamada de prueba mínima.
-    Conservador: solo marca daily_limit si está CONFIRMADO explícitamente.
-    Cualquier ambigüedad → 'ok' (beneficio de la duda).
+    Compara los datos económicos actuales con el dataSnapshot del análisis previo.
+
+    Retorna True  → los datos cambiaron → hay que regenerar con Groq
+    Retorna False → los datos son idénticos → se puede reutilizar el análisis
+
+    Criterios de cambio:
+    - No existe análisis previo → siempre regenerar
+    - Algún indicador clave difiere (interestRate, gdpGrowth, inflation, etc.)
+    - rateMomentum cambió (señal de nueva decisión del banco central)
+    - lastRateDecision es diferente (nueva reunión procesada)
+
+    Se ignoran diferencias mínimas de float (< 0.01%) para evitar
+    regeneraciones por redondeo de API.
     """
-    try:
-        r = requests.post(
-            GROQ_URL,
-            json={
-                "model": GROQ_MODEL,
-                "messages": [{"role": "user", "content": "hi"}],
-                "max_tokens": 1,
-            },
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            timeout=10,
-        )
-        if r.status_code == 401:
-            return "invalid"
-        if r.status_code == 429:
-            t = parse_429_type(r)
-            return "daily_limit" if t == "daily" else "ok"
-        return "ok"
-    except Exception:
-        return "ok"  # error de red → asumir OK
+    if prev_analysis is None:
+        return True
+
+    prev_snapshot = prev_analysis.get("dataSnapshot", {})
+    if not prev_snapshot:
+        return True
+
+    for key in SNAPSHOT_COMPARE_KEYS:
+        curr_val = current_data.get(key)
+        prev_val = prev_snapshot.get(key)
+
+        # Ambos None → sin cambio para este campo
+        if curr_val is None and prev_val is None:
+            continue
+
+        # Uno tiene valor y el otro no → cambio
+        if (curr_val is None) != (prev_val is None):
+            return True
+
+        # Comparación numérica con tolerancia mínima (evitar falsos positivos por redondeo)
+        if isinstance(curr_val, (int, float)) and isinstance(prev_val, (int, float)):
+            if abs(float(curr_val) - float(prev_val)) > 0.001:
+                return True
+            continue
+
+        # Comparación de strings y otros tipos
+        if str(curr_val).strip() != str(prev_val).strip():
+            return True
+
+    return False  # Todos los campos son iguales → reutilizar
 
 
-def call_groq_api(api_key, data_summary, currency):
-    """
-    Lanza RuntimeError("RATE_LIMIT")  → 429 por minuto (esperar y reintentar).
-    Lanza RuntimeError("DAILY_LIMIT") → 429 por cuota diaria (cambiar key).
-    """
-    payload = {
-        "model": GROQ_MODEL,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": (
-                    f"{data_summary}\n\n"
-                    f"---\n\n"
-                    f"Redacta el análisis para {currency}. "
-                    f"Recuerda: 3 párrafos con línea en blanco entre ellos, 150-200 palabras en total. "
-                    f"El objetivo es interpretar las causas y consecuencias de los datos, "
-                    f"no simplemente listarlos. Redacción en español natural y fluido, "
-                    f"como un análisis de mercado profesional hispanohablante."
-                ),
-            },
-        ],
-        "max_tokens": 700,
-        "temperature": 0.5,
-        "top_p": 0.9,
-    }
-    response = requests.post(
-        GROQ_URL,
-        json=payload,
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
-        timeout=40,
-    )
-
-    if response.status_code == 429:
-        t = parse_429_type(response)
-        if t == "daily":
-            raise RuntimeError("DAILY_LIMIT")
-        raise RuntimeError("RATE_LIMIT")
-
-    if response.status_code == 401:
-        raise RuntimeError("INVALID_KEY")
-
-    response.raise_for_status()
-    data = response.json()
-    try:
-        return data['choices'][0]['message']['content'].strip()
-    except (KeyError, IndexError) as e:
-        raise RuntimeError(f"Respuesta inesperada: {data}") from e
-
-
-def generate_analysis(api_key, currency, data, global_context=None, export_composition=None):
-    """Propaga DAILY_LIMIT sin reintentar para que main() haga el cambio de key."""
-    data_summary = build_data_summary(currency, data, global_context, export_composition)
-
-    for attempt in range(3):
-        try:
-            text = call_groq_api(api_key, data_summary, currency)
-            paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-            text = '\n\n'.join(paragraphs)
-            word_count = len(text.split())
-            if word_count < 80:
-                raise ValueError(f"Respuesta demasiado corta: {word_count} palabras")
-            print(f"  ✅ {word_count} palabras generadas")
-            return text
-
-        except RuntimeError as e:
-            err_str = str(e)
-            if "DAILY_LIMIT" in err_str:
-                raise  # propagar — main() cambia de key
-            if "RATE_LIMIT" in err_str:
-                wait = 60 if attempt == 0 else 120
-                print(f"  ⏳ Rate limit temporal, esperando {wait}s...")
-                time.sleep(wait)
-            elif "INVALID_KEY" in err_str:
-                raise
-            elif attempt < 2:
-                wait = 15 * (attempt + 1)
-                print(f"  ⚠️  Error intento {attempt+1}: {e}. Reintentando en {wait}s...")
-                time.sleep(wait)
-            else:
-                raise
-        except Exception as e:
-            if attempt < 2:
-                wait = 15 * (attempt + 1)
-                print(f"  ⚠️  Error intento {attempt+1}: {e}. Reintentando en {wait}s...")
-                time.sleep(wait)
-            else:
-                raise RuntimeError(f"Falló para {currency}: {e}")
-
-    raise RuntimeError(f"Agotados reintentos para {currency}")
-
+# ── main() COMPLETO — reemplaza el existente ─────────────────────────────────
 
 def main():
     print("=" * 60)
-    print(f"🤖 Generador AI v2.6 — {GROQ_MODEL} via Groq API")
+    print(f"🤖 Generador AI v4.0 — {GROQ_MODEL} via Groq API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
@@ -244,12 +177,69 @@ def main():
             print("sin dato")
     print()
 
-    results = {}
-    errors  = []
+    # ── Pre-check: ¿qué divisas necesitan regeneración? ──────────────────────
+    print("🔎 Comparando datos actuales con snapshots anteriores...")
+    needs_regen  = []  # divisas con datos nuevos → llamar a Groq
+    can_reuse    = []  # divisas sin cambios → reutilizar análisis guardado
+    prev_analyses = {}
 
-    for i, currency in enumerate(CURRENCIES):
-        print(f"[{i+1}/{len(CURRENCIES)}] {currency}...")
-        data = all_data[currency]
+    for currency in CURRENCIES:
+        prev = load_previous_analysis(currency)
+        prev_analyses[currency] = prev
+        changed = data_has_changed(currency, all_data[currency], prev)
+        if changed:
+            needs_regen.append(currency)
+            reason = "sin análisis previo" if prev is None else "datos actualizados"
+            print(f"  🆕 {currency} — {reason}")
+        else:
+            can_reuse.append(currency)
+            prev_age = ""
+            if prev and prev.get("generatedAt"):
+                try:
+                    from datetime import datetime, timezone
+                    gen_at = datetime.fromisoformat(prev["generatedAt"].replace("Z", "+00:00"))
+                    hours  = (datetime.now(timezone.utc) - gen_at).total_seconds() / 3600
+                    prev_age = f" (generado hace {hours:.0f}h)"
+                except Exception:
+                    pass
+            print(f"  ♻️  {currency} — sin cambios en datos{prev_age}, reutilizando análisis")
+
+    print(f"\n   🆕 A regenerar:  {len(needs_regen)} divisas — {', '.join(needs_regen) or 'ninguna'}")
+    print(f"   ♻️  A reutilizar: {len(can_reuse)} divisas — {', '.join(can_reuse) or 'ninguna'}")
+
+    if not needs_regen:
+        print("\n✅ Todos los análisis están actualizados. Sin llamadas a Groq necesarias.")
+        # Actualizar solo el index.json con timestamp fresco
+        successful = [c for c in CURRENCIES if prev_analyses.get(c) is not None]
+        index = {
+            "generatedAt":    datetime.now(timezone.utc).isoformat(),
+            "model":          GROQ_MODEL,
+            "version":        "4.0",
+            "currencies":     successful,
+            "totalGenerated": 0,
+            "totalReused":    len(can_reuse),
+            "keysUsed":       0,
+            "errors":         [],
+            "results":        {c: {"success": True, "reused": True} for c in can_reuse},
+            "globalContext":  global_context,
+        }
+        with open(OUTPUT_DIR / 'index.json', 'w', encoding='utf-8') as f:
+            json.dump(index, f, ensure_ascii=False, indent=2)
+        return
+    print()
+
+    # ── Generar solo las divisas que cambiaron ────────────────────────────────
+    results = {}
+
+    # Marcar las divisas reutilizadas como exitosas sin procesamiento
+    for currency in can_reuse:
+        results[currency] = {"success": True, "reused": True}
+
+    errors = []
+
+    for i, currency in enumerate(needs_regen):
+        print(f"[{i+1}/{len(needs_regen)}] {currency} — generando análisis...")
+        data       = all_data[currency]
         export_comp = export_compositions.get(currency)
 
         available = sum(1 for v in data.values() if v is not None)
@@ -288,6 +278,12 @@ def main():
                     raise
 
         if analysis_text is None:
+            # Si falló Groq pero hay análisis previo, conservarlo como fallback
+            prev = prev_analyses.get(currency)
+            if prev and prev.get("analysis"):
+                print(f"  ⚠️  Groq falló — conservando análisis previo como fallback")
+                results[currency] = {"success": True, "reused": True, "fallback": True}
+                continue
             msg = "Todas las keys agotadas" if current_key_idx >= len(available_keys) else "Error en generación"
             print(f"  ❌ {msg}")
             errors.append(f"{currency}: {msg}")
@@ -327,6 +323,7 @@ def main():
 
         results[currency] = {
             "success":          True,
+            "reused":           False,
             "wordCount":        len(analysis_text.split()),
             "generatedAt":      output["generatedAt"],
             "exportDataSource": "comtrade" if export_comp and "Comtrade" in export_comp else "fallback",
@@ -334,21 +331,25 @@ def main():
         }
         print(f"  💾 Guardado → {output_path}")
 
-        if i < len(CURRENCIES) - 1:
+        if i < len(needs_regen) - 1 and not (current_key_idx >= len(available_keys)):
             print(f"  ⏸  Pausa 3s...")
             time.sleep(3)
 
-    successful = [c for c, r in results.items() if r.get('success')]
-    comtrade_count = sum(1 for r in results.values() if r.get('exportDataSource') == 'comtrade')
+    # ── Índice final ──────────────────────────────────────────────────────────
+    successful      = [c for c, r in results.items() if r.get('success')]
+    regenerated     = [c for c, r in results.items() if r.get('success') and not r.get('reused')]
+    reused_final    = [c for c, r in results.items() if r.get('reused')]
+    comtrade_count  = sum(1 for r in results.values() if r.get('exportDataSource') == 'comtrade')
 
     index = {
         "generatedAt":    datetime.now(timezone.utc).isoformat(),
         "model":          GROQ_MODEL,
-        "version":        "2.6",
+        "version":        "4.0",
         "currencies":     successful,
-        "totalGenerated": len(successful),
+        "totalGenerated": len(regenerated),
+        "totalReused":    len(reused_final),
         "comtradeHits":   comtrade_count,
-        "keysUsed":       current_key_idx + 1,
+        "keysUsed":       current_key_idx + 1 if needs_regen else 0,
         "errors":         errors,
         "results":        results,
         "globalContext":  global_context,
@@ -358,9 +359,14 @@ def main():
 
     print("\n" + "=" * 60)
     print("📋 RESUMEN")
-    print(f"   ✅ Exitosos: {len(successful)}/{len(CURRENCIES)} — {', '.join(successful) or 'ninguno'}")
-    print(f"   🌐 Comtrade en vivo: {comtrade_count}/{len(CURRENCIES)} divisas")
-    print(f"   🔑 Keys usadas: hasta Key {current_key_idx + 1} de {len(available_keys)}")
+    print(f"   ✅ Exitosos:      {len(successful)}/{len(CURRENCIES)}")
+    print(f"   🆕 Regenerados:  {len(regenerated)} — {', '.join(regenerated) or 'ninguno'}")
+    print(f"   ♻️  Reutilizados: {len(reused_final)} — {', '.join(reused_final) or 'ninguno'}")
+    print(f"   🌐 Comtrade:     {comtrade_count}/{len(CURRENCIES)} divisas")
+    if needs_regen:
+        print(f"   🔑 Keys usadas:  hasta Key {current_key_idx + 1} de {len(available_keys)}")
+    else:
+        print(f"   🔑 Groq:         0 llamadas (todos reutilizados)")
     if errors:
         print(f"   ❌ Errores:")
         for err in errors:
