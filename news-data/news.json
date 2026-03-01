@@ -1,23 +1,20 @@
 {
-  "updated_utc": "2026-03-01T07:57:17.142507+00:00",
-  "updated_label": "07:57 UTC",
-  "total": 24,
-  "total_high": 20,
-  "total_med": 3,
+  "updated_utc": "2026-03-01T14:17:47.303993+00:00",
+  "updated_label": "14:17 UTC",
+  "total": 15,
+  "total_high": 11,
+  "total_med": 1,
   "sources_active": [
-    "ActionForex",
     "Bank of Canada",
-    "Bank of England",
-    "ECB",
+    "DailyForex ES",
     "FXStreet",
     "FXStreet ES",
     "ForexLive",
-    "Investing.com ES",
-    "InvestingLive"
+    "Investing.com ES"
   ],
   "lang_counts": {
-    "es": 5,
-    "en": 19
+    "es": 7,
+    "en": 8
   },
   "articles": [
     {
@@ -34,7 +31,7 @@
       "lang": "en",
       "date": "23 Dec",
       "datetime": "2026-12-23T13:30:41+00:00",
-      "ai_headline": "Resumen de deliberaciones del BoC sobre decisión de política monetaria anterior: señal contradictoria para CAD"
+      "ai_headline": "Resumen de deliberaciones del BoC sobre decisión de política monetaria anterior no ofrece sorpresas: neutro para CAD"
     },
     {
       "id": "eafca3471bc1",
@@ -49,7 +46,8 @@
       "featured": true,
       "lang": "en",
       "date": "09 Dec",
-      "datetime": "2026-12-09T09:45:17+00:00"
+      "datetime": "2026-12-09T09:45:17+00:00",
+      "ai_headline": "BoC mantiene tasas en 4.5%: decisión neutral sobre CAD a corto plazo"
     },
     {
       "id": "2c76eb27b95d",
@@ -64,7 +62,8 @@
       "featured": true,
       "lang": "en",
       "date": "09 Nov",
-      "datetime": "2026-11-09T10:30:55+00:00"
+      "datetime": "2026-11-09T10:30:55+00:00",
+      "ai_headline": "Encuesta de participantes del mercado del Bank of Canada: resultados neutros para CAD en ausencia de sorpresas significativas"
     },
     {
       "id": "97ec761d51f8",
@@ -79,7 +78,72 @@
       "featured": true,
       "lang": "en",
       "date": "28 Oct",
-      "datetime": "2026-10-28T09:45:56+00:00"
+      "datetime": "2026-10-28T09:45:56+00:00",
+      "ai_headline": "BoC mantiene tasas estables: decisión neutral sobre CAD a corto plazo"
+    },
+    {
+      "id": "523729e581f9",
+      "cur": "EUR",
+      "impact": "low",
+      "title": "Air France extiende al martes la anulación de vuelos a Tel Aviv, Riad, Dubái y Beirut",
+      "expand": "",
+      "source": "Investing.com ES",
+      "link": "https://es.investing.com/news/stock-market-news/air-france-extiende-al-martes-la-anulacion-de-vuelos-a-tel-aviv-riad-dubai-y-beirut-3539641",
+      "time": "11:24",
+      "ts": 1772364253000,
+      "featured": false,
+      "lang": "es",
+      "date": "01 Mar",
+      "datetime": "2026-03-01T11:24:13+00:00",
+      "ai_headline": "Tensión geopolítica en Medio Oriente aumenta aversión al riesgo: presión bajista EUR"
+    },
+    {
+      "id": "78c20409d110",
+      "cur": "EUR",
+      "impact": "low",
+      "title": "Air France prolonga hasta el lunes la anulación de vuelos a Tel Aviv, Riad, Dubái y Beirut",
+      "expand": "",
+      "source": "Investing.com ES",
+      "link": "https://es.investing.com/news/stock-market-news/air-france-prolonga-hasta-el-lunes-la-anulacion-de-vuelos-a-tel-aviv-riad-dubai-y-beirut-3539640",
+      "time": "11:12",
+      "ts": 1772363571000,
+      "featured": false,
+      "lang": "es",
+      "date": "01 Mar",
+      "datetime": "2026-03-01T11:12:51+00:00",
+      "ai_headline": "Tensión geopolítica en Medio Oriente aumenta aversión al riesgo: presión bajista EUR"
+    },
+    {
+      "id": "fbf3ab38e6b4",
+      "cur": "USD",
+      "impact": "high",
+      "title": "EUR/USD Semanal: Entre Presión Inflacionaria y Riesgo Geopolítico - 01 marzo 2026",
+      "expand": "El EUR/USD se mantiene cerca de mínimos recientes tras un PPI fuerte en EE.UU. y la escalada entre Israel e Irán. El mercado evalúa el impacto en la Fed, la inflación europea y niveles técnicos clave.",
+      "source": "DailyForex ES",
+      "link": "https://es.dailyforex.com/forex-technical-analysis/2026/03/eurusd-bajo-tension-01-marzo-2026/241829",
+      "time": "09:43",
+      "ts": 1772358194000,
+      "featured": true,
+      "lang": "es",
+      "date": "01 Mar",
+      "datetime": "2026-03-01T09:43:14+00:00",
+      "ai_headline": "PPI EEUU fuerte y tensión geopolítica Oriente Próximo: presión bajista EUR/USD se mantiene debido a fortaleza USD"
+    },
+    {
+      "id": "c3c494e47661",
+      "cur": "EUR",
+      "impact": "low",
+      "title": "Entra en vigor en Francia el impuesto de 2 euros a los pequeños paquetes de fuera de la UE",
+      "expand": "",
+      "source": "Investing.com ES",
+      "link": "https://es.investing.com/news/stock-market-news/entra-en-vigor-en-francia-el-impuesto-de-2-euros-a-los-pequenos-paquetes-de-fuera-de-la-ue-3539629",
+      "time": "09:36",
+      "ts": 1772357763000,
+      "featured": false,
+      "lang": "es",
+      "date": "01 Mar",
+      "datetime": "2026-03-01T09:36:03+00:00",
+      "ai_headline": "Impuesto francés de 2 euros a paquetes no UE: efecto mixto en EUR debido a ingresos fiscales versus posibles tensiones comerciales"
     },
     {
       "id": "dd387138a86a",
@@ -94,7 +158,8 @@
       "featured": true,
       "lang": "es",
       "date": "01 Mar",
-      "datetime": "2026-03-01T05:54:20+00:00"
+      "datetime": "2026-03-01T05:54:20+00:00",
+      "ai_headline": "Tensión geopolítica en Irán eleva precios del gas: aversión al riesgo podría apoyar USD en detrimento del CAD"
     },
     {
       "id": "da07792f48b9",
@@ -109,7 +174,8 @@
       "featured": true,
       "lang": "en",
       "date": "01 Mar",
-      "datetime": "2026-03-01T05:45:37+00:00"
+      "datetime": "2026-03-01T05:45:37+00:00",
+      "ai_headline": "Tensión geopolítica en Medio Oriente se intensifica: aversión al riesgo favorece activos refugio, presión alcista USD"
     },
     {
       "id": "22a07c4c30da",
@@ -124,7 +190,8 @@
       "featured": true,
       "lang": "en",
       "date": "28 Feb",
-      "datetime": "2026-02-28T07:26:38+00:00"
+      "datetime": "2026-02-28T07:26:38+00:00",
+      "ai_headline": "Tensión geopolítica en Medio Oriente por ataques a Irán: aversión al riesgo favorece activos refugio, presión bajista GBP"
     },
     {
       "id": "a0d1d4011d8b",
@@ -139,7 +206,8 @@
       "featured": true,
       "lang": "en",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:51:43+00:00"
+      "datetime": "2026-02-27T21:51:43+00:00",
+      "ai_headline": "Tensión geopolítica y preocupaciones inflacionarias pesan sobre mercados: aversión al riesgo favorece USD"
     },
     {
       "id": "50c588423dd7",
@@ -154,7 +222,8 @@
       "featured": true,
       "lang": "es",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:03:43+00:00"
+      "datetime": "2026-02-27T21:03:43+00:00",
+      "ai_headline": "Tensión EE.UU.-Irán y alta inflación en EEUU empujan oro a 5260$: aversión al riesgo favorece activos refugio, presión bajista USD"
     },
     {
       "id": "f1bbb62359ed",
@@ -169,22 +238,8 @@
       "featured": true,
       "lang": "en",
       "date": "27 Feb",
-      "datetime": "2026-02-27T21:03:04+00:00"
-    },
-    {
-      "id": "317a429dfef5",
-      "cur": "USD",
-      "impact": "high",
-      "title": "El DXY cae mientras la alta inflación del IPP aviva los temores de estanflación",
-      "expand": "El DXY cayó alrededor del 0.2% el viernes, retrocediendo a 97.60 después de que un informe del Índice de Precios de Productor (IPP) más caliente de lo esperado amplificara las preocupaciones de que la inflación está demostrando ser más persistente de lo que la Reserva Federal (Fed) desearía, pesando",
-      "source": "FXStreet ES",
-      "link": "https://www.fxstreet.es/news/el-dxy-cae-a-medida-que-el-ipp-elevado-aviva-los-temores-de-estanflacion-202602271925",
-      "time": "19:25",
-      "ts": 1772220323000,
-      "featured": true,
-      "lang": "es",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T19:25:23+00:00"
+      "datetime": "2026-02-27T21:03:04+00:00",
+      "ai_headline": "Tensión geopolítica y estanflación en EEUU impulsan oro a 5260: aversión al riesgo favorece activos refugio, presión bajista USD"
     },
     {
       "id": "0cedfb135735",
@@ -199,189 +254,10 @@
       "featured": false,
       "lang": "es",
       "date": "27 Feb",
-      "datetime": "2026-02-27T16:35:38+00:00"
-    },
-    {
-      "id": "3fb0cdaebbbb",
-      "cur": "AUD",
-      "impact": "high",
-      "title": "AUD: Fuerte crecimiento del crédito pero la perspectiva de política monetaria se mantiene sin cambios – BNY",
-      "expand": "Bob Savage, Jefe de Estrategia Macro de Mercados de BNY, señala que los agregados financieros de Australia de enero muestran un aumento del 0.5% en el crédito mes a mes y del 7.7% interanual, con el crédito hipotecario y el crédito empresarial acelerándose ambos en términos anuales. El crecimiento d...",
-      "source": "FXStreet ES",
-      "link": "https://www.fxstreet.es/news/aud-fuerte-crecimiento-del-credito-pero-la-perspectiva-de-politica-se-mantiene-sin-cambios-bny-202602271409",
-      "time": "14:09",
-      "ts": 1772201372000,
-      "featured": true,
-      "lang": "es",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T14:09:32+00:00"
-    },
-    {
-      "id": "b506dd4311ef",
-      "cur": "AUD",
-      "impact": "med",
-      "title": "AUD: Strong credit growth but policy view unchanged – BNY",
-      "expand": "BNY’s Head of Markets Macro Strategy Bob Savage notes Australia’s January financial aggregates show total credit up 0.5% month-on-month and 7.7% year-on-year, with housing and business credit both accelerating on an annual basis. Broad money growth has also picked up.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/aud-strong-credit-growth-but-policy-view-unchanged-bny-202602271409",
-      "time": "14:09",
-      "ts": 1772201358000,
-      "featured": false,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T14:09:18+00:00"
-    },
-    {
-      "id": "680a34778b1f",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Decisions taken by the Governing Council of the ECB (in addition to decisions setting interest rates)",
-      "expand": "",
-      "source": "ECB",
-      "link": "https://www.ecb.europa.eu//press/govcdec/otherdec/2026/html/ecb.gc260227~a3ad2bb150.en.html",
-      "time": "14:00",
-      "ts": 1772200800000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T14:00:00+00:00"
-    },
-    {
-      "id": "609b82cb7baa",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "EUR/GBP gains amid UK political jitters and dovish BoE bets",
-      "expand": "The Euro (EUR) ticks higher against the British Pound (GBP) on Friday, with Sterling under broad pressure as renewed political uncertainty in the United Kingdom (UK) dampens investor sentiment.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/eur-gbp-gains-mmid-uk-political-jitters-and-dovish-boe-bets-202602271348",
-      "time": "13:48",
-      "ts": 1772200136000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T13:48:56+00:00"
-    },
-    {
-      "id": "9d2a0983830c",
-      "cur": "GBP",
-      "impact": "low",
-      "title": "Braddick to take the helm at the UK’s banking watchdog",
-      "expand": "Katharine Braddick CB appointed as the next Deputy Governor for Prudential Regulation at the Bank of England and Chief Executive of the Prudential Regulation Authority, succeeding Sam Woods when his term ends in June 2026.",
-      "source": "Bank of England",
-      "link": "https://www.bankofengland.co.uk/news/2026/february/braddick-to-take-the-helm-at-the-uks-banking-watchdog",
-      "time": "13:08",
-      "ts": 1772197706000,
-      "featured": false,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T13:08:26+00:00"
-    },
-    {
-      "id": "da0061b36a60",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Germany February preliminary CPI +1.9% vs +2.0% y/y expected",
-      "expand": "Prior +2.1% HICP +2.0% vs +2.1% y/y expected Prior +2.1% Core CPI Y/Y +2.5% vs +2.5% prior We have slight misses here but that was pretty much expected after the softer German states readings here . Having said that, the core measure matched the prior reading. The data won't change anything for the ...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/germany-february-preliminary-cpi-19-vs-20-yy-expected-20260227/",
-      "time": "13:00",
-      "ts": 1772197208000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T13:00:08+00:00"
-    },
-    {
-      "id": "5e64edc4d8e9",
-      "cur": "JPY",
-      "impact": "high",
-      "title": "BOJ will only have little room to raise interest rates further - ANZ",
-      "expand": "While a lot of focus on the BOJ is turning to the outcome of the spring wage negotiations in the weeks ahead, ANZ is one to argue that the bigger picture outlook might be one that limits the scope for the central bank to stay on the tightening path. And the firm argues that it won't be from a shake ...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/centralbank/boj-will-only-have-little-room-to-raise-interest-rates-further-anz-20260227/",
-      "time": "11:43",
-      "ts": 1772192611000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T11:43:31+00:00"
-    },
-    {
-      "id": "eaa3cccf8ad1",
-      "cur": "JPY",
-      "impact": "high",
-      "title": "BOJ will only have little room to raise interest rates further - ANZ",
-      "expand": "While a lot of focus on the BOJ is turning to the outcome of the spring wage negotiations in the weeks ahead, ANZ is one to argue that the bigger picture outlook might be one that limits the scope for the central bank to stay on the tightening path. And the firm argues that it won't be from a shake ...",
-      "source": "InvestingLive",
-      "link": "https://investinglive.com/centralbank/boj-will-only-have-little-room-to-raise-interest-rates-further-anz-20260227/",
-      "time": "11:43",
-      "ts": 1772192611000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T11:43:31+00:00"
-    },
-    {
-      "id": "6a6bd0c31231",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Bavaria February CPI +1.9% vs +2.1% y/y prior",
-      "expand": "The other readings released around the same time (updated on the go): North Rhine Westphalia CPI +1.8% vs +2.0% y/y prior Saxony CPI +1.9% vs +2.1% y/y prior Baden-Wuerttemberg CPI +1.8% vs +2.1% y/y prior The early indications point to headline annual inflation softening by a bit more than the Janu...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/bavaria-february-cpi-19-vs-21-yy-prior-20260227/",
-      "time": "09:00",
-      "ts": 1772182812000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T09:00:12+00:00"
-    },
-    {
-      "id": "23f840992828",
-      "cur": "CHF",
-      "impact": "med",
-      "title": "Swiss KOF barometer strengthens to 104.2, demand outlook improves",
-      "expand": "Switzerland’s economic outlook brightened in February as the KOF Economic Barometer rose from 103.3 to 104.2, beating expectations of 103.1. The increase resumes the upward trend seen in recent months after a brief dip in January and leaves the gauge comfortably above its medium-term average of 100....",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/631368-swiss-kof-barometer-strengthens-to-104-2-demand-outlook-improves/",
-      "time": "08:39",
-      "ts": 1772181594000,
-      "featured": false,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T08:39:54+00:00"
-    },
-    {
-      "id": "05f2dd7a1242",
-      "cur": "CHF",
-      "impact": "high",
-      "title": "Swiss GDP returns to modest 0.1% qoq growth, domestic demand stabilizes Q4",
-      "expand": "Switzerland’s economy returned to modest growth in Q1, with GDP expanding 0.1% qoq. While slightly below expectations of 0.2%, the reading marks a rebound from the -0.4% contraction recorded in Q3. According to the State Secretariat for Economic Affairs, performance varied across sectors, with domes...",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/631365-swiss-gdp-returns-to-modest-0-1-qoq-growth-domestic-demand-stabilizes-q4/",
-      "time": "08:35",
-      "ts": 1772181305000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T08:35:05+00:00"
-    },
-    {
-      "id": "e01dd3860619",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "Switzerland Q4 GDP +0.1% vs +0.2% q/q expected",
-      "expand": "Prior -0.5%; revised to -0.4% Swiss economic output bounces back in the final quarter of last year, after a drag in the third quarter. The decline was largely due to a big fall in the chemical and pharmaceutical industry, but that has now rebounded (+1.9%) in Q4 2025. Domestic demand conditions (+0....",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/switzerland-q4-gdp-01-vs-02-qq-expected-20260227/",
-      "time": "08:01",
-      "ts": 1772179289000,
-      "featured": true,
-      "lang": "en",
-      "date": "27 Feb",
-      "datetime": "2026-02-27T08:01:29+00:00"
+      "datetime": "2026-02-27T16:35:38+00:00",
+      "ai_headline": "Crédito al Consumo Neto y Aprobaciones de Hipotecas en Reino Unido suben: señal positiva para economía británica mantiene soporte en GBP"
     }
   ],
-  "ai_enriched_at": "2026-03-01T07:57:23.038616+00:00",
+  "ai_enriched_at": "2026-03-01T14:18:00.289398+00:00",
   "ai_model": "llama-3.3-70b-versatile"
 }
