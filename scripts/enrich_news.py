@@ -10,6 +10,9 @@ Procesa TODOS los artículos (hasta 60) sin filtrar por impacto.
 
 Modelo: llama-3.3-70b-versatile (Groq free tier)
 Estimación de tokens: ~25.200 por ejecución × 2 = ~50.400/día (10% del límite de 500K)
+Tiempo de ejecución: ~10 min para 60 artículos (10s entre llamadas, sin rate limits)
+  → SLEEP_BETWEEN = 10s evita los 429 de raíz (6K tokens/min ÷ 420 tok/req = 14 req/min máx)
+  → Si igual ocurre un 429, se lee el header Retry-After de Groq y se espera exactamente eso
 
 Campos que lee de news.json (generados por fetch_news.py):
   - title    → título original
@@ -36,11 +39,17 @@ from pathlib import Path
 NEWS_FILE      = Path("news-data/news.json")
 GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL     = "llama-3.3-70b-versatile"
-MAX_TOKENS     = 180       # Aumentado para titulares más elaborados (~150 chars)
+MAX_TOKENS     = 180       # Suficiente para titulares elaborados (~150 chars)
 TEMPERATURE    = 0.25      # Bajo: respuestas consistentes y factuales
-SLEEP_BETWEEN  = 1.2       # Segundos entre llamadas (evita rate limit 6K tok/min)
-RETRY_WAIT     = 65        # Segundos a esperar tras un 429 antes de reintentar
-MAX_RETRIES    = 2         # Reintentos por artículo tras rate limit
+
+# ── Rate limiting ──────────────────────────────────────────────────────────────
+# Groq free tier: 6,000 tokens/minuto para llama-3.3-70b-versatile
+# Cada request usa ~420 tokens (prompt ~240 + respuesta ~180)
+# 6000 / 420 = ~14 requests/min máximo → 60s / 14 = ~4.3s entre llamadas
+# Usamos 10s para tener margen cómodo y evitar 429 completamente
+SLEEP_BETWEEN  = 10        # Segundos entre llamadas — evita rate limit de raíz
+MAX_RETRIES    = 3         # Reintentos por artículo tras rate limit
+DEFAULT_RETRY_WAIT = 62    # Segundos de espera si Groq no devuelve Retry-After
 
 # ─────────────────────────────────────────────
 # NOMBRES DE DIVISA PARA EL PROMPT
@@ -113,9 +122,30 @@ def build_user_prompt(article: dict) -> str:
     )
 
 
+def get_retry_after(response) -> int:
+    """
+    Extrae el tiempo de espera recomendado del header Retry-After de Groq.
+    Groq devuelve 'x-ratelimit-reset-tokens' o 'retry-after' en segundos.
+    Si no está disponible, devuelve DEFAULT_RETRY_WAIT.
+    """
+    # Groq puede devolver cualquiera de estos headers
+    for header in ("retry-after", "x-ratelimit-reset-tokens", "x-ratelimit-reset-requests"):
+        val = response.headers.get(header)
+        if val:
+            try:
+                # Puede ser un número de segundos o una cadena como "60s"
+                val_clean = str(val).lower().replace("s", "").strip()
+                wait = int(float(val_clean))
+                return min(wait + 2, 120)  # +2s de margen, cap en 120s
+            except (ValueError, TypeError):
+                pass
+    return DEFAULT_RETRY_WAIT
+
+
 def call_groq(api_key: str, article: dict) -> str | None:
     """
     Llama a Groq con reintentos automáticos tras rate limit (429).
+    Usa el header Retry-After de Groq para esperar exactamente lo necesario.
     Devuelve el titular generado o None si el artículo es irrelevante/error permanente.
     """
     payload = {
@@ -127,41 +157,20 @@ def call_groq(api_key: str, article: dict) -> str | None:
         "max_tokens":  MAX_TOKENS,
         "temperature": TEMPERATURE,
     }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type":  "application/json",
+    }
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            r = requests.post(
-                GROQ_URL,
-                json=payload,
-                headers={
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type":  "application/json",
-                },
-                timeout=25,
-            )
+            r = requests.post(GROQ_URL, json=payload, headers=headers, timeout=25)
 
             if r.status_code == 429:
-                if attempt < MAX_RETRIES:
-                    print(f"  ⏳ Rate limit — esperando {RETRY_WAIT}s (intento {attempt}/{MAX_RETRIES})...")
-                    time.sleep(RETRY_WAIT)
-                    continue
-                else:
-                    print(f"  ⏳ Rate limit — esperando {RETRY_WAIT}s (último intento)...")
-                    time.sleep(RETRY_WAIT)
-                    # Un intento final tras la espera
-                    r2 = requests.post(
-                        GROQ_URL,
-                        json=payload,
-                        headers={
-                            "Authorization": f"Bearer {api_key}",
-                            "Content-Type":  "application/json",
-                        },
-                        timeout=25,
-                    )
-                    if r2.status_code == 429:
-                        print("  ❌ Rate limit persistente — artículo omitido temporalmente")
-                        return None
-                    r = r2
+                wait = get_retry_after(r)
+                print(f"  ⏳ Rate limit (intento {attempt}/{MAX_RETRIES}) — esperando {wait}s...")
+                time.sleep(wait)
+                continue  # Reintentar tras la espera exacta
 
             if r.status_code == 401:
                 raise RuntimeError("GROQ_API_KEY inválida o no configurada.")
@@ -173,7 +182,7 @@ def call_groq(api_key: str, article: dict) -> str | None:
             if content.strip().upper() == "IRRELEVANTE":
                 return None
 
-            # Limpiar formato residual
+            # Limpiar comillas residuales del modelo
             content = content.strip('"').strip("'").strip()
 
             # Validar longitud mínima
@@ -184,7 +193,7 @@ def call_groq(api_key: str, article: dict) -> str | None:
             return content
 
         except requests.exceptions.Timeout:
-            print(f"  ⚠️  Timeout en llamada a Groq (intento {attempt})")
+            print(f"  ⚠️  Timeout (intento {attempt}/{MAX_RETRIES})")
             if attempt < MAX_RETRIES:
                 time.sleep(5)
                 continue
@@ -195,6 +204,7 @@ def call_groq(api_key: str, article: dict) -> str | None:
             print(f"  ⚠️  Error Groq: {e}")
             return None
 
+    print("  ❌ Rate limit persistente tras todos los reintentos — artículo omitido")
     return None
 
 
@@ -241,8 +251,11 @@ def main():
             json.dump(data, f, ensure_ascii=False, indent=2)
         return
 
-    estimated_tokens = len(to_process) * 450
+    estimated_tokens = len(to_process) * 420
+    estimated_time   = len(to_process) * SLEEP_BETWEEN
     print(f"📊 Tokens estimados: ~{estimated_tokens:,} (límite diario: 500,000)")
+    print(f"⏱️  Tiempo estimado: ~{estimated_time // 60}min {estimated_time % 60}s "
+          f"({SLEEP_BETWEEN}s entre llamadas, sin rate limits)")
     print()
 
     enriched = 0
