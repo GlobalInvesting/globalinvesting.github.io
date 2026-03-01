@@ -4,6 +4,13 @@ fetch_news.py
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 Corre via GitHub Actions 3 veces al día junto con enrich_news.py.
 
+SELECCIÓN INTELIGENTE (MAX_NEWS = 30):
+  - Recopila todos los artículos válidos de los últimos MAX_AGE_DAYS días
+  - Agrupa por divisa (8 divisas: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD)
+  - Dentro de cada divisa, ordena por impacto (high > med > low) y luego por fecha
+  - Toma los mejores artículos de forma rotativa por divisa hasta llegar a 30
+  - Garantiza cobertura equilibrada: ninguna divisa acapara el feed
+
 Formato de salida compatible con news.html:
   {
     "articles": [ { "cur", "impact", "title", "expand", "source", "link", "time", "ts", "featured" }, ... ],
@@ -27,9 +34,12 @@ from dateutil import parser as dateparser
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
-MAX_NEWS     = 60   # noticias máximas en el JSON final
-MAX_AGE_DAYS = 3    # descartar noticias más antiguas que esto
+MAX_NEWS     = 30   # noticias máximas en el JSON final (selección inteligente)
+MAX_AGE_DAYS = 2    # descartar noticias más antiguas que esto
+MAX_PER_CUR  = 5    # máximo artículos por divisa en la selección final
 OUTPUT_FILE  = "news-data/news.json"
+
+IMPACT_ORDER = {"high": 0, "med": 1, "low": 2}
 
 # ─────────────────────────────────────────────
 # DETECCIÓN DE DIVISA
@@ -154,10 +164,6 @@ FEEDS = [
         "method": "feedparser",
         "lang": "es",
     },
-    # ✗ ElEconomista  — bloquea el User-Agent de Actions
-    # ✗ InfoMercados  — noticias no especializadas en forex
-    # ✗ Forexduet ES  — 0 noticias consistentemente
-    # ✗ Cinco Días    — noticias no especializadas en forex
 
     # ══════════════════════════════════════════
     # FUENTES EN INGLÉS
@@ -211,10 +217,6 @@ FEEDS = [
         "method": "feedparser",
         "lang": "en",
     },
-
-    # ── NUEVAS FUENTES EN INGLÉS ───────────────────────────────────────────────
-
-    # Action Forex — análisis técnico y comentarios en vivo de alta calidad
     {
         "source": "ActionForex",
         "url": "https://www.actionforex.com/category/live-comments/feed/",
@@ -227,8 +229,6 @@ FEEDS = [
         "method": "feedparser",
         "lang": "en",
     },
-
-    # InvestingLive — banco central y análisis técnico
     {
         "source": "InvestingLive",
         "url": "https://investinglive.com/feed/centralbank/",
@@ -241,16 +241,12 @@ FEEDS = [
         "method": "feedparser",
         "lang": "en",
     },
-
-    # MyFXBook — noticias forex en tiempo real
     {
         "source": "MyFXBook",
         "url": "https://www.myfxbook.com/rss/latest-forex-news",
         "method": "feedparser",
         "lang": "en",
     },
-
-    # Investing.com EN — secciones específicas de forex
     {
         "source": "Investing.com",
         "url": "https://www.investing.com/rss/forex_Technical.rss",
@@ -323,7 +319,6 @@ SOURCE_CURRENCY = {
     "Federal Reserve": "USD",
 }
 
-# Todas las fuentes del feed son especializadas en forex — artículos siempre relevantes
 FOREX_SOURCES = {
     "FXStreet ES", "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
     "Bank of Canada", "ECB", "Bank of England", "Bank of Japan",
@@ -428,6 +423,67 @@ def fetch_via_proxy(feed_cfg: dict) -> list:
 
 
 # ─────────────────────────────────────────────
+# SELECCIÓN INTELIGENTE
+# ─────────────────────────────────────────────
+
+def smart_select(articles: list, max_total: int, max_per_cur: int) -> list:
+    """
+    Selecciona hasta max_total artículos con cobertura equilibrada por divisa.
+
+    Algoritmo:
+      1. Agrupa artículos por divisa
+      2. Dentro de cada grupo: ordena por impacto (high > med > low) y luego por ts desc
+      3. Rellena de forma rotativa: toma el mejor artículo de cada divisa en turnos
+         hasta llegar a max_total o agotar candidatos, respetando max_per_cur
+
+    Esto garantiza que en un run donde solo hay noticias de USD/EUR,
+    no se llene el feed con 30 artículos de la misma divisa.
+    """
+    CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+
+    # Agrupar y ordenar cada grupo
+    groups = {cur: [] for cur in CURRENCIES}
+    for a in articles:
+        cur = a.get("cur", "USD")
+        if cur in groups:
+            groups[cur].append(a)
+
+    for cur in CURRENCIES:
+        groups[cur].sort(
+            key=lambda x: (IMPACT_ORDER.get(x["impact"], 2), -x["ts"])
+        )
+
+    # Punteros para cada grupo
+    pointers = {cur: 0 for cur in CURRENCIES}
+    taken    = {cur: 0 for cur in CURRENCIES}
+    selected = []
+
+    while len(selected) < max_total:
+        added_this_round = 0
+        for cur in CURRENCIES:
+            if len(selected) >= max_total:
+                break
+            if taken[cur] >= max_per_cur:
+                continue
+            idx = pointers[cur]
+            if idx >= len(groups[cur]):
+                continue
+            selected.append(groups[cur][idx])
+            pointers[cur] += 1
+            taken[cur]     += 1
+            added_this_round += 1
+
+        # Si no se agregó nada en este turno, no hay más candidatos
+        if added_this_round == 0:
+            break
+
+    # Ordenar el resultado final por ts desc (cronológico para el feed)
+    selected.sort(key=lambda x: x["ts"], reverse=True)
+
+    return selected
+
+
+# ─────────────────────────────────────────────
 # MAIN
 # ─────────────────────────────────────────────
 
@@ -435,12 +491,12 @@ def main():
     now_utc  = datetime.now(timezone.utc)
     cutoff   = now_utc - timedelta(days=MAX_AGE_DAYS)
     seen_ids = set()
-    articles = []
+    raw_articles = []
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
 
-    es_count = 0
-    en_count = 0
+    es_raw = 0
+    en_raw = 0
 
     for feed_cfg in FEEDS:
         source = feed_cfg["source"]
@@ -479,10 +535,9 @@ def main():
 
             cur    = detect_currency(title, summary, source)
             impact = detect_impact(title, summary)
-
             expand = summary[:300] + ("..." if len(summary) > 300 else "")
 
-            articles.append({
+            raw_articles.append({
                 "id":       nid,
                 "cur":      cur,
                 "impact":   impact,
@@ -499,17 +554,33 @@ def main():
             })
             count += 1
             if lang == "es":
-                es_count += 1
+                es_raw += 1
             else:
-                en_count += 1
+                en_raw += 1
 
         print(f"    → {count} noticias válidas")
 
-    articles.sort(key=lambda x: x["ts"], reverse=True)
-    articles = articles[:MAX_NEWS]
+    print(f"\n📦 Total artículos recopilados (antes de filtrar): {len(raw_articles)}")
+    print(f"   ES: {es_raw} | EN: {en_raw}")
 
-    total_high = sum(1 for a in articles if a["impact"] == "high")
-    total_med  = sum(1 for a in articles if a["impact"] == "med")
+    # ── Distribución por divisa antes de filtrar ──────────────────────────────
+    from collections import Counter
+    dist_before = Counter(a["cur"] for a in raw_articles)
+    impact_before = Counter(a["impact"] for a in raw_articles)
+    print(f"   Distribución: {dict(sorted(dist_before.items()))}")
+    print(f"   Impacto: high={impact_before['high']} | med={impact_before['med']} | low={impact_before['low']}")
+
+    # ── Selección inteligente: 30 mejores con cobertura equilibrada ───────────
+    articles = smart_select(raw_articles, max_total=MAX_NEWS, max_per_cur=MAX_PER_CUR)
+
+    dist_after  = Counter(a["cur"] for a in articles)
+    impact_after = Counter(a["impact"] for a in articles)
+    print(f"\n✂️  Selección final ({len(articles)} artículos, máx {MAX_PER_CUR}/divisa):")
+    print(f"   Distribución: {dict(sorted(dist_after.items()))}")
+    print(f"   Impacto: high={impact_after['high']} | med={impact_after['med']} | low={impact_after['low']}")
+
+    total_high = impact_after["high"]
+    total_med  = impact_after["med"]
     sources_ok = sorted(set(a["source"] for a in articles))
 
     output = {
@@ -520,8 +591,8 @@ def main():
         "total_med":      total_med,
         "sources_active": sources_ok,
         "lang_counts": {
-            "es": es_count,
-            "en": en_count,
+            "es": sum(1 for a in articles if a.get("lang") == "es"),
+            "en": sum(1 for a in articles if a.get("lang") == "en"),
         },
         "articles": articles,
     }
@@ -533,8 +604,6 @@ def main():
         json.dump(output, f, ensure_ascii=False, indent=2)
 
     print(f"\n✓ {len(articles)} artículos guardados en {OUTPUT_FILE}")
-    print(f"  ES: {es_count} | EN: {en_count}")
-    print(f"  Alto impacto: {total_high} | Medio: {total_med}")
     print(f"  Fuentes activas: {', '.join(sources_ok)}")
 
 
