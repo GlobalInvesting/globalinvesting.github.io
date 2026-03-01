@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto - Dashboard de Análisis Fundamental Forex</title>
-    <meta name="description" content="Contáctenos para soporte, consultas o comentarios sobre nuestra plataforma de análisis fundamental forex.">
+    <meta name="description" content="Contáctenos para consultas sobre el Dashboard de Análisis Fundamental Forex.">
     <meta name="robots" content="index, follow">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -12,7 +12,7 @@
         :root {
             --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
             --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
-            --blue: #1e88e5;
+            --blue: #1e88e5; --green: #26a69a;
         }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
         .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
@@ -23,6 +23,7 @@
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
         .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a.active { color: var(--text-primary); }
         h1 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); }
         h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
         p { margin-bottom: 1.25rem; color: var(--text-secondary); }
@@ -32,10 +33,18 @@
         a { color: var(--blue); text-decoration: none; }
         a:hover { text-decoration: underline; }
         .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .contact-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 6px; border: 1px solid var(--border); }
-        .contact-card h3 { font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--text-primary); }
-        .contact-card p { margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .contact-card { background: var(--bg-secondary); padding: 1.75rem; border-radius: 8px; border: 1px solid var(--border); }
+        .contact-card-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.6rem; }
+        .contact-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .contact-card p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        .contact-card a { font-size: 0.9rem; color: var(--blue); }
+        .response-tag { display: inline-block; background: rgba(38,166,154,0.1); color: var(--green); font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.6rem; border-radius: 3px; margin-top: 0.5rem; border: 1px solid rgba(38,166,154,0.2); }
+        .highlight-box { background: rgba(30, 136, 229, 0.06); border-left: 3px solid var(--blue); padding: 1.5rem; margin: 2rem 0; border-radius: 0 4px 4px 0; }
+        .faq-item { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.25rem; }
+        .faq-item:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+        .faq-item h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-primary); }
+        .faq-item p { margin-bottom: 0; font-size: 0.9rem; }
 
         @media (max-width: 768px) {
             .header { padding: 1rem; }
@@ -47,7 +56,7 @@
             h1 { font-size: 1.75rem; }
             h2 { font-size: 1.25rem; }
             .section { padding: 1.25rem; }
-            .contact-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; gap: 1rem; }
         }
         @media (max-width: 400px) {
             h1 { font-size: 1.5rem; }
@@ -61,109 +70,133 @@
             <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
             <div class="nav-links">
                 <a href="index.html">Dashboard</a>
+                <a href="news.html">Noticias</a>
                 <a href="about.html">Acerca de</a>
                 <a href="terms.html">Términos</a>
                 <a href="privacy.html">Privacidad</a>
-                <a href="contact.html">Contacto</a>
+                <a href="contact.html" class="active">Contacto</a>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <h1>Contáctenos</h1>
-        <p>Valoramos sus comentarios y estamos aquí para ayudarle con cualquier pregunta o inquietud sobre nuestra plataforma.</p>
+        <h1>Contacto</h1>
+        <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 620px;">Para consultas sobre la metodología, reporte de errores en los datos o sugerencias de mejora, utilice los canales indicados a continuación.</p>
 
         <div class="contact-grid">
             <div class="contact-card">
+                <div class="contact-card-label">General</div>
                 <h3>Consultas Generales</h3>
-                <p><strong>Email:</strong> <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a></p>
-                <p>Para preguntas generales sobre nuestra plataforma, características o fuentes de datos.</p>
+                <p>Para preguntas sobre la plataforma, sus características o las fuentes de datos utilizadas.</p>
+                <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+                <div><span class="response-tag">Respuesta en 24–48 h</span></div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-card-label">Datos</div>
+                <h3>Errores de Datos</h3>
+                <p>Si detecta un indicador incorrecto, desactualizado o un error de cálculo en el score fundamental.</p>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Error%20de%20datos%20-%20Dashboard%20Forex">Reportar error de datos →</a>
+            </div>
+            <div class="contact-card">
+                <div class="contact-card-label">Noticias</div>
+                <h3>Feed de Noticias</h3>
+                <p>Para reportar errores en el feed, noticias mal clasificadas o proponer nuevas fuentes RSS.</p>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Feed%20de%20Noticias%20-%20Sugerencia">Escribir sobre noticias →</a>
+            </div>
+            <div class="contact-card">
+                <div class="contact-card-label">Mejoras</div>
+                <h3>Sugerencias</h3>
+                <p>Propuestas de nuevos indicadores, funcionalidades o mejoras en el diseño de la plataforma.</p>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Sugerencia%20-%20Dashboard%20Forex">Enviar sugerencia →</a>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Envíenos un Mensaje</h2>
-            <p>Para ponerse en contacto con nosotros, por favor envíe un correo electrónico a:</p>
-            
-            <div class="contact-grid">
-                <div class="contact-card">
-                    <h3>Correo Electrónico Principal</h3>
-                    <p><strong>Email:</strong> <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a></p>
-                    <p>Tiempo de respuesta típico: 24-48 horas</p>
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border);">
-                <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-primary);">Al contactarnos, por favor incluya:</h3>
-                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
-                    <li>Su nombre completo</li>
-                    <li>Asunto claro del mensaje</li>
-                    <li>Descripción detallada de su consulta o problema</li>
-                    <li>Información relevante (capturas de pantalla si aplica)</li>
-                </ul>
-            </div>
+        <div class="highlight-box">
+            <p style="margin: 0;"><strong>Nota:</strong> Esta es una plataforma de código abierto mantenida de forma independiente. La metodología y las fuentes de datos son públicas y están documentadas en la sección <a href="about.html">Acerca de</a>. El feedback técnico y financiero es especialmente bienvenido.</p>
         </div>
 
         <div class="section">
             <h2>Preguntas Frecuentes</h2>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Con qué frecuencia se actualizan los datos?</h3>
-            <p>Los tipos de cambio se actualizan cada 60 segundos. Los indicadores económicos se actualizan diariamente a las 06:00–08:00 UTC. Los datos de FX Performance 1M se actualizan a las 07:00 UTC. El calendario económico se actualiza tres veces al día (00:00, 08:00 y 16:00 UTC). Los datos COT se actualizan semanalmente según la publicación de la CFTC (viernes ~20:00 UTC). Las próximas reuniones de bancos centrales se actualizan cada lunes.</p>
+            <div class="faq-item">
+                <h3>¿Los scores son señales de trading?</h3>
+                <p>No. Los scores son un índice cuantitativo de fortaleza fundamental relativa entre las divisas del G8. Constituyen un insumo informativo para el análisis y no representan recomendaciones de compra o venta.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Esto es asesoramiento financiero?</h3>
-            <p>No. Nuestra plataforma proporciona contenido informativo y educativo únicamente. Los scores de fortaleza, rankings y recomendaciones de pares son cálculos cuantitativos basados en datos macroeconómicos públicos y no constituyen señales de trading ni asesoramiento de inversión. Consulte nuestros <a href="terms.html">Términos de Servicio</a> para más detalles.</p>
+            <div class="faq-item">
+                <h3>¿Con qué frecuencia se actualizan los datos del dashboard?</h3>
+                <p>Los tipos de cambio se actualizan cada 60 segundos. Los indicadores económicos se actualizan diariamente entre las 06:00 y las 09:00 UTC. El COT se actualiza cada viernes a las ~20:00 UTC, siguiendo el calendario de publicación de la CFTC.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Qué divisas cubren?</h3>
-            <p>Actualmente cubrimos las ocho divisas principales del G8: USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD. Estas divisas representan más del 80% del volumen de trading global en el mercado forex.</p>
+            <div class="faq-item">
+                <h3>¿Con qué frecuencia se actualiza el feed de noticias?</h3>
+                <p>El feed se actualiza automáticamente cada hora. El panel lateral de la sección <a href="news.html">Noticias</a> muestra la hora exacta de la última actualización y el estado operativo de cada fuente RSS.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Cómo se calcula el score de fortaleza?</h3>
-            <p>El score se calcula mediante un modelo cuantitativo con 21 indicadores ponderados distribuidos en 6 tiers temáticos, normalizado a una escala de 20 a 82 puntos. Los tiers son: Tasas &amp; Ciclo Monetario (~32%), FX Momentum &amp; Smart Money (~23%), Crecimiento &amp; Empleo (~17%), Sentimiento de Mercado (~16%), Balance Externo (~12%) y Consumo &amp; Salarios (~9%). El tier de mayor peso combina el FX Performance 1M (rendimiento real de la divisa en los últimos 30 días, peso 18%) con el bono soberano 10Y (peso 5%). Consulte la sección <a href="about.html">Acerca de</a> para detalles metodológicos completos.</p>
+            <div class="faq-item">
+                <h3>¿Cómo se calcula el nivel de impacto de las noticias?</h3>
+                <p>El nivel de impacto (Alto / Medio / Bajo) se estima automáticamente mediante palabras clave en el titular. Las noticias relacionadas con decisiones de tasas, IPC, NFP, PIB o reuniones de bancos centrales se clasifican como Alto Impacto. No constituye una evaluación editorial manual.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Qué es el FX Performance 1M?</h3>
-            <p>Es el rendimiento real de cada divisa frente al USD en los últimos 30 días, calculado con tasas de referencia del Banco Central Europeo (Frankfurter API). Es el único indicador del modelo completamente libre de lag de publicación: refleja posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real. Por eso tiene el mayor peso individual del modelo (18%).</p>
+            <div class="faq-item">
+                <h3>¿Por qué un indicador aparece en gris sin datos?</h3>
+                <p>Algunos indicadores tienen menor frecuencia de publicación (trimestral o semestral) o no están disponibles para todas las economías. El modelo normaliza automáticamente el score en función de los datos disponibles.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Los datos son en tiempo real?</h3>
-            <p>Los tipos de cambio se actualizan en tiempo real (cada 60 segundos desde 6 proveedores en cascada). Los indicadores económicos se actualizan diariamente. Los datos COT tienen un retraso natural de aproximadamente 3 días hábiles según el calendario de publicación de la CFTC. El FX Performance 1M se recalcula diariamente con datos del día anterior.</p>
+            <div class="faq-item">
+                <h3>¿Cómo se calcula el score de fortaleza fundamental?</h3>
+                <p>El score se calcula mediante un modelo cuantitativo con 21 indicadores ponderados distribuidos en 6 tiers temáticos, normalizado a una escala de 20 a 82 puntos. Los tiers son: Tasas y Ciclo Monetario (~32%), FX Momentum y Smart Money (~23%), Crecimiento y Empleo (~17%), Sentimiento de Mercado (~16%), Balance Externo (~12%) y Consumo y Salarios (~9%). Consulte la sección <a href="about.html">Acerca de</a> para la descripción metodológica completa.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Qué son los datos COT y de dónde provienen?</h3>
-            <p>COT son los reportes de Commitment of Traders publicados semanalmente por la CFTC (Commodity Futures Trading Commission). Muestran el posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) en los mercados de futuros de divisas de Chicago. Los datos provienen directamente del sitio oficial de la CFTC (reporte <em>financial_lf.htm</em> — Futures Only), que refleja únicamente posiciones especulativas puras sin mandatos de cobertura. El modelo aplica lógica contrarian automática para posiciones extremas y penalización sobre la prima safe haven cuando el COT contradice el perfil estructural de la divisa.</p>
+            <div class="faq-item">
+                <h3>¿Qué es el FX Performance 1M?</h3>
+                <p>Es el rendimiento real de cada divisa frente al USD en los últimos 30 días, calculado con tasas de referencia del Banco Central Europeo (Frankfurter API). Es el único indicador del modelo completamente libre de lag de publicación, ya que refleja posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real. Por ello, tiene el mayor peso individual del modelo (18%).</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿El calendario económico muestra los horarios en mi zona horaria?</h3>
-            <p>Sí. Los horarios de los eventos se almacenan internamente en UTC y se convierten automáticamente a la zona horaria local de su navegador al mostrarse. Esto significa que verá los eventos en su hora local sin necesidad de ninguna configuración adicional.</p>
+            <div class="faq-item">
+                <h3>¿Qué son los datos COT y de dónde provienen?</h3>
+                <p>Los reportes COT (Commitment of Traders) son publicados semanalmente por la CFTC. Muestran el posicionamiento neto de la categoría Leveraged Funds en los mercados de futuros de divisas de Chicago. Los datos provienen directamente del sitio oficial de la CFTC (reporte <em>financial_lf.htm</em> — Futures Only). El modelo aplica lógica contrarian automática para posiciones extremas y una penalización sobre la prima safe haven cuando el COT contradice el perfil estructural de la divisa.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿El calendario económico muestra datos reales o estimados?</h3>
-            <p>El calendario muestra datos reales obtenidos tres veces al día (00:00, 08:00 y 16:00 UTC) mediante un sistema de obtención de datos en cascada que consulta múltiples fuentes: MQL5 RSS, Trading Economics RSS, Investing.com y fuentes oficiales de gobiernos y bancos centrales. Incluye el valor real publicado (actual), el estimado previo (forecast) y el valor anterior (previous), junto con el horario preciso en UTC y el nivel de impacto oficial. En caso de que los datos no estén disponibles, el calendario muestra un mensaje de error con enlaces a fuentes externas verificadas.</p>
+            <div class="faq-item">
+                <h3>¿El calendario económico muestra horarios en mi zona horaria?</h3>
+                <p>Sí. Los horarios se almacenan internamente en UTC y se convierten automáticamente a la zona horaria local del navegador al mostrarse, sin necesidad de configuración adicional.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿El análisis fundamental es generado por IA?</h3>
-            <p>Sí, parcialmente. Los textos de análisis fundamental en las tarjetas de divisas son generados por Groq AI (modelo llama-3.3-70b-versatile) con datos económicos reales actualizados diariamente. Cuando el análisis de IA no está disponible, el dashboard utiliza un generador algorítmico propio basado en los mismos datos. En ambos casos, el análisis es descriptivo e informativo, no constituye asesoramiento financiero.</p>
+            <div class="faq-item">
+                <h3>¿Los análisis de texto son redactados por personas?</h3>
+                <p>No. Los análisis narrativos de cada divisa son generados automáticamente por Groq AI (modelo llama-3.3-70b-versatile) a partir de los datos económicos actualizados. Son de carácter descriptivo e informativo, y no constituyen asesoramiento financiero.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Qué significan los niveles de confianza en las recomendaciones de pares?</h3>
-            <p>Las recomendaciones de pares en la pestaña "Mejores Pares" se basan en el diferencial de scores entre dos divisas. Confianza Alta indica un diferencial superior a 20 puntos, Media entre 12 y 20 puntos, y Baja por debajo de 12 puntos. También se muestra el porcentaje de calidad de datos: valores ≥70% indican que el análisis cuenta con suficientes indicadores para ser fiable.</p>
+            <div class="faq-item">
+                <h3>¿Qué significan los niveles de confianza en las recomendaciones de pares?</h3>
+                <p>Las recomendaciones de la pestaña "Mejores Pares" se basan en el diferencial de scores entre dos divisas. Confianza Alta indica un diferencial superior a 20 puntos; Media, entre 12 y 20 puntos; Baja, inferior a 12 puntos. También se muestra el porcentaje de calidad de datos: valores iguales o superiores al 70% indican que el análisis cuenta con suficientes indicadores para considerarse fiable.</p>
+            </div>
 
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Puedo ver cuándo se publicó cada dato en el mapa de calor?</h3>
-            <p>Sí. Al pasar el cursor sobre cualquier celda del mapa de calor, aparece un tooltip que indica la fecha de publicación del dato correspondiente (por ejemplo, "3d" = hace 3 días, "2sem" = hace 2 semanas). Esto permite identificar rápidamente qué indicadores están actualizados y cuáles podrían estar próximos a revisión.</p>
-
-            <h3 style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem;">¿Cómo puedo reportar un error o sugerir una característica?</h3>
-            <p>Por favor envíe un correo a <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> con información detallada. ¡Apreciamos sus comentarios!</p>
+            <div class="faq-item">
+                <h3>¿Cómo puedo reportar un error o proponer una funcionalidad?</h3>
+                <p>Envíe un correo a <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> con una descripción detallada. Para errores de datos, incluya el indicador afectado, la divisa y la fecha de referencia si es posible.</p>
+            </div>
         </div>
 
         <div class="section">
             <h2>Tiempos de Respuesta</h2>
             <ul>
-                <li><strong>Consultas Generales:</strong> 24-48 horas</li>
-                <li><strong>Soporte Técnico:</strong> 24-48 horas</li>
-                <li><strong>Consultas Comerciales:</strong> 2-3 días hábiles</li>
-                <li><strong>Problemas de Seguridad:</strong> 24 horas (alta prioridad)</li>
+                <li><strong>Consultas generales:</strong> 24–48 horas</li>
+                <li><strong>Reporte de errores de datos:</strong> 24–48 horas</li>
+                <li><strong>Sugerencias de funcionalidad:</strong> 2–3 días hábiles</li>
+                <li><strong>Problemas de seguridad:</strong> 24 horas (prioridad alta)</li>
             </ul>
         </div>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
             <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem;">
-                <a href="index.html">Dashboard</a> | 
-                <a href="about.html">Acerca de</a> | 
-                <a href="terms.html">Términos de Servicio</a> | 
-                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="index.html">Dashboard</a> |
+                <a href="news.html">Noticias</a> |
+                <a href="about.html">Acerca de</a> |
+                <a href="terms.html">Términos de Servicio</a> |
+                <a href="privacy.html">Política de Privacidad</a> |
                 <a href="contact.html">Contacto</a>
             </p>
         </div>
