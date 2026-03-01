@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noticias de Mercado — Análisis Fundamental Forex</title>
+<meta name="description" content="Noticias fundamentales forex en tiempo real para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD.">
+<meta name="robots" content="index, follow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg-primary:#0b0e14;
+    --bg-secondary:#13171f;
+    --bg-card:#1a1f2e;
+    --text-primary:#e1e4e8;
+    --text-secondary:#8b949e;
+    --text-dim:#4d5566;
+    --border:#30363d;
+    --blue:#1e88e5;
+    --blue-dim:rgba(30,136,229,0.1);
+    --green:#26a69a;
+    --red:#ef5350;
+  }
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--bg-primary);
+    color:var(--text-primary);
+    min-height:100vh;
+    font-size:13px;
+    line-height:1.4;
+  }
+
+  /* ── HEADER ── */
+  .site-header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1.5rem 2rem;}
+  .header-inner{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
+  .brand{font-size:1.125rem;font-weight:700;color:var(--text-primary);text-decoration:none;}
+  .brand:hover{color:var(--blue);}
+  .nav-links{display:flex;gap:2rem;}
+  .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;transition:color .2s;}
+  .nav-links a:hover{color:var(--text-primary);}
+  .nav-links a.active{color:var(--blue);}
+
+  /* ── TICKER ── */
+  .ticker-wrap{background:var(--bg-secondary);border-bottom:1px solid var(--border);overflow:hidden;height:30px;display:flex;align-items:center;}
+  .ticker-label{font-size:.62rem;font-weight:600;color:var(--text-secondary);background:var(--bg-card);border-right:1px solid var(--border);padding:0 .9rem;height:100%;display:flex;align-items:center;letter-spacing:.08em;flex-shrink:0;}
+  .ticker-overflow{overflow:hidden;flex:1;}
+  .ticker-track{display:flex;animation:ticker-scroll 45s linear infinite;white-space:nowrap;}
+  .ticker-item{font-size:.68rem;padding:0 1.25rem;display:flex;align-items:center;gap:.45rem;border-right:1px solid var(--border);height:30px;}
+  .ticker-pair{color:var(--text-dim);font-weight:500;}
+  .ticker-rate{color:var(--text-primary);font-weight:600;}
+  .ticker-chg.up{color:var(--green);}
+  .ticker-chg.dn{color:var(--red);}
+  @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+  /* ── LAYOUT ── */
+  .page-wrap{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 3rem;}
+
+  .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+  .page-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);}
+  .live-badge{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-secondary);}
+  .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  /* ── STATUS BAR ── */
+  .status-bar{display:flex;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;overflow:hidden;}
+  .status-item{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;font-size:.72rem;color:var(--text-secondary);border-right:1px solid var(--border);flex:1;justify-content:center;}
+  .status-item:last-child{border-right:none;}
+  .status-item .label{color:var(--text-dim);font-size:.68rem;}
+  .status-item .val{color:var(--text-primary);font-weight:600;}
+  .status-item .val.ok{color:var(--green);}
+  .status-item .val.warn{color:#e0a020;}
+
+  /* ── FILTER BAR ── */
+  .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
+  .filter-btn{font-size:.72rem;font-weight:500;padding:.25rem .7rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;font-family:inherit;}
+  .filter-btn:hover{border-color:#444d5a;color:var(--text-primary);}
+  .filter-btn.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
+  .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
+  .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
+
+  /* ── MAIN GRID ── */
+  .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
+
+  /* ── NEWS PANEL ── */
+  .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+
+  .panel-header{
+    display:grid;
+    grid-template-columns:44px 48px 14px 1fr 100px;
+    gap:0;
+    padding:.5rem .75rem;
+    background:var(--bg-secondary);
+    border-bottom:1px solid var(--border);
+    font-size:.62rem;font-weight:600;color:var(--text-dim);
+    letter-spacing:.06em;text-transform:uppercase;
+  }
+
+  /* ── NEWS ROW ── */
+  .news-row{
+    display:grid;
+    grid-template-columns:44px 48px 14px 1fr 100px;
+    gap:0;
+    padding:.42rem .75rem;
+    border-bottom:1px solid rgba(48,54,61,.6);
+    cursor:pointer;
+    transition:background .1s;
+    align-items:center;
+  }
+  .news-row:last-child{border-bottom:none;}
+  .news-row:hover{background:rgba(255,255,255,.03);}
+  .news-row.featured{background:rgba(30,136,229,.04);border-left:2px solid var(--blue);padding-left:calc(.75rem - 2px);}
+  .news-row.featured:hover{background:rgba(30,136,229,.07);}
+  .news-row.open{background:rgba(255,255,255,.025);}
+
+  .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
+  .col-date{font-size:.6rem;color:var(--text-dim);}
+  .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;}
+  .col-impact{display:flex;align-items:center;justify-content:center;}
+  .impact-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .impact-HIGH .impact-dot{background:var(--red);}
+  .impact-MED  .impact-dot{background:#e0a020;}
+  .impact-LOW  .impact-dot{background:var(--text-dim);}
+  .col-title{
+    font-size:.78rem;color:var(--text-primary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    padding:0 .75rem;font-weight:400;
+  }
+  .news-row.featured .col-title{font-weight:500;}
+  .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* ── EXPAND ── */
+  .news-expand{
+    display:none;
+    padding:.55rem .75rem .65rem 2.25rem;
+    border-bottom:1px solid rgba(48,54,61,.6);
+    font-size:.75rem;color:var(--text-secondary);line-height:1.65;
+    background:rgba(255,255,255,.012);
+  }
+  .news-expand a{color:var(--blue);font-size:.68rem;text-decoration:none;margin-top:.35rem;display:inline-block;}
+  .news-expand a:hover{text-decoration:underline;}
+  .news-row.open + .news-expand{display:block;}
+
+  /* ── LOADING / EMPTY STATES ── */
+  .feed-loading{padding:3rem;text-align:center;color:var(--text-dim);font-size:.82rem;}
+  .feed-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .feed-empty{padding:2.5rem;text-align:center;color:var(--text-dim);font-size:.82rem;}
+
+  /* ── LOAD MORE ── */
+  .load-more{
+    display:flex;align-items:center;justify-content:center;
+    padding:.7rem;font-size:.72rem;color:var(--text-secondary);
+    cursor:pointer;transition:color .15s;gap:.35rem;
+    border-top:1px solid var(--border);background:var(--bg-secondary);
+  }
+  .load-more:hover{color:var(--blue);}
+
+  /* ── SIDEBAR ── */
+  .sidebar{display:flex;flex-direction:column;gap:1rem;}
+  .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
+  .s-sub{font-size:.62rem;color:var(--text-dim);}
+
+  /* Sentiment */
+  .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
+  .sent-row:last-child{border-bottom:none;}
+  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:30px;flex-shrink:0;}
+  .sent-bar-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
+  .sent-bar{height:100%;border-radius:1px;transition:width .5s ease;}
+  .sent-bar.bull{background:var(--green);}
+  .sent-bar.bear{background:var(--red);}
+  .sent-bar.neut{background:var(--text-dim);}
+  .sent-count{font-size:.6rem;color:var(--text-dim);width:30px;text-align:right;}
+  .sent-label{font-size:.6rem;font-weight:600;width:28px;text-align:right;}
+  .sent-label.bull{color:var(--green);}
+  .sent-label.bear{color:var(--red);}
+  .sent-label.neut{color:var(--text-dim);}
+
+  /* Sources status */
+  .src-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
+  .src-row:last-child{border-bottom:none;}
+  .src-name{font-size:.72rem;color:var(--text-secondary);}
+  .src-ok{font-size:.62rem;color:var(--green);font-weight:500;}
+  .src-warn{font-size:.62rem;color:#e0a020;font-weight:500;}
+  .src-err{font-size:.62rem;color:var(--red);font-weight:500;}
+
+  /* About box */
+  .about-box{padding:1rem;font-size:.72rem;color:var(--text-secondary);line-height:1.65;}
+  .about-box strong{color:var(--text-primary);}
+
+  /* ── FOOTER ── */
+  .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-secondary);font-size:.85rem;margin-top:3rem;}
+  .site-footer a{color:var(--text-secondary);text-decoration:none;}
+  .site-footer a:hover{color:var(--text-primary);}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px){
+    .layout-cols{grid-template-columns:1fr;}
+    .site-header{padding:1rem;}
+    .header-inner{flex-direction:column;align-items:flex-start;gap:.75rem;}
+    .nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
+    .nav-links a{font-size:.85rem;}
+    .page-wrap{padding:1rem 1rem 3rem;}
+    .status-bar{flex-wrap:wrap;}
+    .status-item{flex:none;width:50%;}
+    .panel-header,
+    .news-row{grid-template-columns:40px 44px 14px 1fr;}
+    .col-source{display:none;}
+    .panel-header span:last-child{display:none;}
+  }
+  @media(max-width:480px){
+    .filter-bar .filter-btn{font-size:.68rem;padding:.22rem .55rem;}
+    .status-item{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+    .status-item:last-child{border-bottom:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">Análisis Fundamental Forex</a>
+    <nav class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="news.html" class="active">Noticias</a>
+      <a href="about.html">Acerca de</a>
+      <a href="terms.html">Términos</a>
+      <a href="privacy.html">Privacidad</a>
+      <a href="contact.html">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">FX LIVE</div>
+  <div class="ticker-overflow">
+    <div class="ticker-track" id="ticker"></div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page-wrap">
+
+  <div class="page-title-row">
+    <h1 class="page-title">Noticias de Mercado</h1>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;">--:-- UTC</span>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-item"><span class="label">Fuentes</span><span class="val ok" id="stat-sources">—</span></div>
+    <div class="status-item"><span class="label">Noticias</span><span class="val" id="stat-total">—</span></div>
+    <div class="status-item"><span class="label">Alto impacto</span><span class="val warn" id="stat-high">—</span></div>
+    <div class="status-item"><span class="label">Actualización</span><span class="val ok" id="stat-update">—</span></div>
+    <div class="status-item"><span class="label">Próx. evento</span><span class="val" id="stat-next">Cargando…</span></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
+    <button class="filter-btn" onclick="setFilter('USD',this)">USD</button>
+    <button class="filter-btn" onclick="setFilter('EUR',this)">EUR</button>
+    <button class="filter-btn" onclick="setFilter('GBP',this)">GBP</button>
+    <button class="filter-btn" onclick="setFilter('JPY',this)">JPY</button>
+    <button class="filter-btn" onclick="setFilter('AUD',this)">AUD</button>
+    <button class="filter-btn" onclick="setFilter('CAD',this)">CAD</button>
+    <button class="filter-btn" onclick="setFilter('CHF',this)">CHF</button>
+    <button class="filter-btn" onclick="setFilter('NZD',this)">NZD</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn" id="btn-high" onclick="toggleImpact(this,'HIGH')">● Alto impacto</button>
+  </div>
+
+  <div class="layout-cols">
+
+    <!-- FEED PRINCIPAL -->
+    <div class="news-panel" id="news-panel">
+      <div class="panel-header">
+        <span>Hora</span>
+        <span>Divisa</span>
+        <span></span>
+        <span style="padding:0 .75rem;">Titular</span>
+        <span style="text-align:right;">Fuente</span>
+      </div>
+      <div id="feed-body">
+        <div class="feed-loading">
+          <div class="feed-spinner"></div>
+          Cargando noticias…
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- SENTIMIENTO -->
+      <div class="s-panel">
+        <div class="s-header">
+          <span class="s-title">Sentimiento 24h</span>
+          <span class="s-sub" id="sent-label">por divisa</span>
+        </div>
+        <div id="sentiment-list">
+          <!-- generado por JS -->
+        </div>
+      </div>
+
+      <!-- FUENTES -->
+      <div class="s-panel">
+        <div class="s-header">
+          <span class="s-title">Fuentes RSS</span>
+          <span class="s-sub">estado</span>
+        </div>
+        <div id="sources-list">
+          <!-- generado por JS -->
+        </div>
+      </div>
+
+      <!-- ACERCA DE -->
+      <div class="s-panel">
+        <div class="s-header">
+          <span class="s-title">Acerca del feed</span>
+        </div>
+        <div class="about-box">
+          <p>Las noticias se obtienen automáticamente cada hora desde <strong>múltiples fuentes RSS</strong> (FXStreet, ForexLive, Reuters, Investing.com, bancos centrales oficiales) mediante GitHub Actions.</p>
+          <p style="margin-top:.6rem;">El nivel de <strong>impacto</strong> se estima por palabras clave en el titular. El <strong>sentimiento</strong> se calcula como ratio de noticias positivas/negativas por divisa en las últimas 24h.</p>
+          <p style="margin-top:.6rem;color:var(--text-dim);">Esta sección es informativa. No constituye asesoramiento financiero.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
+  <p style="margin-top:.5rem;">
+    <a href="index.html">Dashboard</a> |
+    <a href="news.html">Noticias</a> |
+    <a href="about.html">Acerca de</a> |
+    <a href="terms.html">Términos de Servicio</a> |
+    <a href="privacy.html">Política de Privacidad</a> |
+    <a href="contact.html">Contacto</a>
+  </p>
+  <p style="margin-top:.5rem;font-size:.75rem;color:var(--text-dim);">Dashboard v5.2.0</p>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────
+// ESTADO
+// ─────────────────────────────────────────────────────
+let allNews       = [];
+let filteredNews  = [];
+let activeFilter  = 'ALL';
+let impactFilter  = null;
+let shownCount    = 0;
+const PAGE_SIZE   = 20;
+
+// ─────────────────────────────────────────────────────
+// TICKER FX (rates estáticos de referencia — se pueden
+// conectar al mismo sistema de rates del dashboard)
+// ─────────────────────────────────────────────────────
+const TICKERS = [
+  {pair:'EUR/USD',rate:'--',chg:'',up:true},
+  {pair:'GBP/USD',rate:'--',chg:'',up:false},
+  {pair:'USD/JPY',rate:'--',chg:'',up:true},
+  {pair:'USD/CHF',rate:'--',chg:'',up:false},
+  {pair:'AUD/USD',rate:'--',chg:'',up:true},
+  {pair:'USD/CAD',rate:'--',chg:'',up:true},
+  {pair:'NZD/USD',rate:'--',chg:'',up:false},
+  {pair:'EUR/GBP',rate:'--',chg:'',up:true},
+  {pair:'EUR/JPY',rate:'--',chg:'',up:true},
+  {pair:'GBP/JPY',rate:'--',chg:'',up:true},
+];
+
+function buildTicker() {
+  const el = document.getElementById('ticker');
+  [...TICKERS, ...TICKERS].forEach(({pair, rate, chg, up}) => {
+    el.innerHTML += `<div class="ticker-item">
+      <span class="ticker-pair">${pair}</span>
+      <span class="ticker-rate">${rate}</span>
+      ${chg ? `<span class="ticker-chg ${up?'up':'dn'}">${chg}</span>` : ''}
+    </div>`;
+  });
+}
+
+// Intenta obtener rates desde el mismo sistema que usa el dashboard
+async function fetchRates() {
+  const PROVIDERS = [
+    'https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD,CAD,CHF,NZD',
+  ];
+  for (const url of PROVIDERS) {
+    try {
+      const res = await fetch(url);
+      const d   = await res.json();
+      if (d && d.rates) return d.rates;
+    } catch(e) { /* fallback */ }
+  }
+  return null;
+}
+
+async function updateTicker() {
+  const rates = await fetchRates();
+  if (!rates) return;
+  const map = {
+    'EUR/USD': (1/rates.EUR).toFixed(4),
+    'GBP/USD': (1/rates.GBP).toFixed(4),
+    'USD/JPY': rates.JPY.toFixed(2),
+    'USD/CHF': rates.CHF.toFixed(4),
+    'AUD/USD': (1/rates.AUD).toFixed(4),
+    'USD/CAD': rates.CAD.toFixed(4),
+    'NZD/USD': (1/rates.NZD).toFixed(4),
+  };
+  // Rebuild ticker with real rates
+  const el = document.getElementById('ticker');
+  el.innerHTML = '';
+  const items = TICKERS.map(t => ({
+    ...t,
+    rate: map[t.pair] || t.rate
+  }));
+  [...items, ...items].forEach(({pair, rate, chg, up}) => {
+    el.innerHTML += `<div class="ticker-item">
+      <span class="ticker-pair">${pair}</span>
+      <span class="ticker-rate">${rate}</span>
+    </div>`;
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// CARGA DE NOTICIAS
+// ─────────────────────────────────────────────────────
+async function loadNews() {
+  try {
+    const res = await fetch('news.json?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    // Status bar
+    document.getElementById('stat-sources').textContent =
+      (data.sources_active || []).length + ' activas';
+    document.getElementById('stat-total').textContent =
+      data.total || 0;
+    document.getElementById('stat-high').textContent =
+      data.total_high || 0;
+    document.getElementById('ts').textContent =
+      data.updated_label || '--:-- UTC';
+    document.getElementById('stat-update').textContent =
+      data.updated_label || '—';
+
+    allNews = data.news || [];
+
+    buildSentiment(allNews);
+    buildSourcesList(data.sources_active || []);
+    applyFilters();
+
+  } catch(e) {
+    document.getElementById('feed-body').innerHTML =
+      `<div class="feed-empty">No se pudo cargar news.json.<br>
+       <span style="font-size:.68rem;color:var(--text-dim);">
+       El workflow de GitHub Actions genera este archivo automáticamente cada hora.
+       Si acabas de desplegar el sitio, espera al primer ciclo o ejecuta el workflow manualmente.
+       </span></div>`;
+    console.error('News load error:', e);
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// FILTROS
+// ─────────────────────────────────────────────────────
+function applyFilters() {
+  filteredNews = allNews.filter(n => {
+    const matchCur    = activeFilter === 'ALL' || n.currency === activeFilter;
+    const matchImpact = !impactFilter || n.impact === impactFilter;
+    return matchCur && matchImpact;
+  });
+  shownCount = 0;
+  renderFeed(true);
+}
+
+function setFilter(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn:not(#btn-high)').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function toggleImpact(btn, val) {
+  if (impactFilter === val) {
+    impactFilter = null;
+    btn.classList.remove('active-green');
+  } else {
+    impactFilter = val;
+    btn.classList.add('active-green');
+  }
+  applyFilters();
+}
+
+// ─────────────────────────────────────────────────────
+// RENDER FEED
+// ─────────────────────────────────────────────────────
+function renderFeed(reset) {
+  const body = document.getElementById('feed-body');
+  if (reset) body.innerHTML = '';
+
+  if (filteredNews.length === 0) {
+    body.innerHTML = `<div class="feed-empty">No hay noticias para los filtros seleccionados.</div>`;
+    return;
+  }
+
+  const slice = filteredNews.slice(shownCount, shownCount + PAGE_SIZE);
+  shownCount += slice.length;
+
+  slice.forEach((n, i) => {
+    const isFeatured = n.impact === 'HIGH' && i < 3 && shownCount <= PAGE_SIZE;
+    const row = document.createElement('div');
+    row.className = `news-row impact-${n.impact}${isFeatured ? ' featured' : ''}`;
+    row.dataset.id = n.id;
+    row.innerHTML = `
+      <span class="col-time">${n.time}</span>
+      <span class="col-cur">${n.currency}</span>
+      <div class="col-impact"><div class="impact-dot"></div></div>
+      <span class="col-title" title="${escHtml(n.title)}">${escHtml(n.title)}</span>
+      <span class="col-source">${escHtml(n.source)}</span>`;
+    row.addEventListener('click', () => toggleExpand(row, n));
+
+    const expand = document.createElement('div');
+    expand.className = 'news-expand';
+    expand.innerHTML = `${escHtml(n.summary)}
+      ${n.link ? `<a href="${n.link}" target="_blank" rel="noopener">Leer artículo completo →</a>` : ''}`;
+
+    body.appendChild(row);
+    body.appendChild(expand);
+  });
+
+  // Load more button
+  const existingBtn = body.querySelector('.load-more-btn');
+  if (existingBtn) existingBtn.remove();
+
+  if (shownCount < filteredNews.length) {
+    const btn = document.createElement('div');
+    btn.className = 'load-more load-more-btn';
+    btn.textContent = `↓ Cargar más noticias (${filteredNews.length - shownCount} restantes)`;
+    btn.addEventListener('click', () => {
+      btn.remove();
+      renderFeed(false);
+    });
+    body.appendChild(btn);
+  }
+}
+
+function toggleExpand(row, n) {
+  const isOpen = row.classList.contains('open');
+  document.querySelectorAll('.news-row.open').forEach(r => r.classList.remove('open'));
+  if (!isOpen) row.classList.add('open');
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────────────
+// SENTIMIENTO
+// ─────────────────────────────────────────────────────
+const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const BULL_KW = ['rises','gains','strengthens','surges','hawkish','beats','above','hike','strong','higher','supports','jumps','rallies'];
+const BEAR_KW = ['falls','drops','weakens','declines','dovish','misses','below','cut','weak','lower','pressures','slides','sells'];
+
+function detectSentiment(title, summary) {
+  const t = (title + ' ' + summary).toLowerCase();
+  let bull = 0, bear = 0;
+  BULL_KW.forEach(k => { if (t.includes(k)) bull++; });
+  BEAR_KW.forEach(k => { if (t.includes(k)) bear++; });
+  if (bull > bear) return 'bull';
+  if (bear > bull) return 'bear';
+  return 'neut';
+}
+
+function buildSentiment(news) {
+  const now = new Date();
+  const cutoff = new Date(now - 24 * 3600 * 1000);
+
+  const stats = {};
+  CURRENCIES.forEach(c => { stats[c] = {bull:0, bear:0, neut:0, total:0}; });
+
+  news.forEach(n => {
+    if (!stats[n.currency]) return;
+    try {
+      const dt = new Date(n.datetime);
+      if (dt < cutoff) return;
+    } catch(e) {}
+    const s = detectSentiment(n.title, n.summary);
+    stats[n.currency][s]++;
+    stats[n.currency].total++;
+  });
+
+  const el = document.getElementById('sentiment-list');
+  el.innerHTML = CURRENCIES.map(c => {
+    const st = stats[c];
+    if (st.total === 0) {
+      return `<div class="sent-row">
+        <span class="sent-cur">${c}</span>
+        <div class="sent-bar-wrap"><div class="sent-bar neut" style="width:0%"></div></div>
+        <span class="sent-count">0</span>
+        <span class="sent-label neut">—</span>
+      </div>`;
+    }
+    let dominant, pct;
+    if (st.bull >= st.bear && st.bull >= st.neut) { dominant='bull'; pct=Math.round(st.bull/st.total*100); }
+    else if (st.bear >= st.bull && st.bear >= st.neut) { dominant='bear'; pct=Math.round(st.bear/st.total*100); }
+    else { dominant='neut'; pct=50; }
+
+    const label = {bull:'Bull', bear:'Bear', neut:'Neut'}[dominant];
+    return `<div class="sent-row">
+      <span class="sent-cur">${c}</span>
+      <div class="sent-bar-wrap"><div class="sent-bar ${dominant}" style="width:${pct}%"></div></div>
+      <span class="sent-count">${st.total}</span>
+      <span class="sent-label ${dominant}">${label}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('sent-label').textContent =
+    news.length + ' noticias 24h';
+}
+
+// ─────────────────────────────────────────────────────
+// FUENTES STATUS
+// ─────────────────────────────────────────────────────
+const ALL_SOURCES = [
+  {name:'FXStreet',    key:'FXStreet'},
+  {name:'ForexLive',   key:'ForexLive'},
+  {name:'Reuters',     key:'Reuters'},
+  {name:'Investing.com', key:'Investing.com', proxy:true},
+  {name:'Fed / BCE / BoE / BoJ / RBA / BoC / SNB / RBNZ', key:'Federal Reserve', multi:true},
+];
+
+function buildSourcesList(active) {
+  const el = document.getElementById('sources-list');
+  el.innerHTML = ALL_SOURCES.map(s => {
+    const isActive = s.multi
+      ? active.some(a => ['Federal Reserve','ECB','Bank of England','Bank of Japan','RBA','Bank of Canada','SNB','RBNZ'].includes(a))
+      : active.includes(s.key);
+    const status = isActive
+      ? `<span class="src-ok">● Activo</span>`
+      : `<span class="src-err">○ Sin datos</span>`;
+    const proxy = s.proxy ? `<span class="src-warn" style="margin-right:.4rem;">proxy</span>` : '';
+    return `<div class="src-row"><span class="src-name">${s.name}</span><span>${proxy}${status}</span></div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+document.getElementById('year').textContent = new Date().getFullYear();
+buildTicker();
+updateTicker();
+loadNews();
+// Refresca cada 5 minutos
+setInterval(loadNews, 5 * 60 * 1000);
+</script>
+</body>
+</html>
