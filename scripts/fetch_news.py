@@ -309,14 +309,61 @@ MED_IMPACT_KW = [
 # HELPERS
 # ─────────────────────────────────────────────
 
-def detect_currency(title: str, summary: str) -> str:
-    """Detecta la divisa principal (devuelve código 3 letras o 'USD' por defecto)."""
+# Fuente → divisa forzada cuando el título no tiene keywords
+SOURCE_CURRENCY = {
+    "Bank of Canada":  "CAD",
+    "ECB":             "EUR",
+    "Bank of England": "GBP",
+    "Bank of Japan":   "JPY",
+    "RBA":             "AUD",
+    "RBNZ":            "NZD",
+    "SNB":             "CHF",
+    "Federal Reserve": "USD",
+}
+
+# Fuentes especializadas en forex → artículos siempre relevantes
+FOREX_SOURCES = {
+    "FXStreet ES", "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
+    "Bank of Canada", "ECB", "Bank of England", "Bank of Japan",
+    "RBA", "RBNZ", "SNB", "Federal Reserve",
+}
+
+# Keywords mínimas de relevancia forex/macro
+FOREX_RELEVANCE_KW = [
+    "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
+    "dollar", "dólar", "euro", "pound", "yen", "franc", "franco",
+    "forex", " fx ", "currency", "currencies", "divisa", "divisas", "tipo de cambio",
+    "fed", "bce", "ecb", "boe", "boj", "rba", "boc", "snb", "rbnz",
+    "banco central", "central bank",
+    "interest rate", "tasa de interés", "tipos de interés",
+    "inflation", "inflación", "gdp", "pib", "cpi", "ipc",
+    "unemployment", "desempleo", "payroll", "nóminas",
+    "trade balance", "balanza", "pmi", "retail sales", "ventas minoristas",
+    "recession", "recesión", "monetary policy", "política monetaria",
+    "stock market", "bolsa", "bonos", "bond", "yield", "treasury",
+    "oil", "petróleo", "gold", "oro", "commodit",
+    "market", "mercado", "trading", "investor", "inversor",
+    "sanctions", "sanciones", "tariff", "arancel", "trade war", "guerra comercial",
+]
+
+
+def is_forex_relevant(title: str, summary: str, source: str) -> bool:
+    """Descarta artículos sin relación con forex/macro (política local, cultura, etc.)."""
+    if source in FOREX_SOURCES:
+        return True
+    text = (title + " " + summary).lower()
+    return any(kw in text for kw in FOREX_RELEVANCE_KW)
+
+
+def detect_currency(title: str, summary: str, source: str = "") -> str:
+    """Detecta la divisa principal. Usa el nombre de la fuente como fallback."""
     text = (title + " " + summary).lower()
     for currency, keywords in CURRENCY_KEYWORDS.items():
         for kw in keywords:
             if kw in text:
                 return currency
-    return "USD"  # Fallback: la mayoría de noticias genéricas de mercados son USD
+    # Fallback: fuente especializada → divisa forzada
+    return SOURCE_CURRENCY.get(source, "USD")
 
 
 def detect_impact(title: str, summary: str) -> str:
@@ -438,7 +485,11 @@ def main():
                 continue
             seen_ids.add(nid)
 
-            cur    = detect_currency(title, summary)
+            # Descartar artículos sin relevancia forex/macro
+            if not is_forex_relevant(title, summary, source):
+                continue
+
+            cur    = detect_currency(title, summary, source)
             impact = detect_impact(title, summary)   # 'high' | 'med' | 'low'
 
             # Recortar summary a 300 chars
