@@ -117,25 +117,23 @@ CURRENCY_KEYWORDS = {
 
 # ─────────────────────────────────────────────
 # FEEDS RSS — ES primero, luego EN
+# Fuentes marcadas según resultado del log 2026-03-01:
+#   ✓ = devuelve artículos   ✗ = 0 resultados / bloqueado (eliminado)
 # ─────────────────────────────────────────────
 FEEDS = [
 
     # ══════════════════════════════════════════
-    # FUENTES EN ESPAÑOL (prioridad)
+    # FUENTES EN ESPAÑOL
     # ══════════════════════════════════════════
 
+    # ✓ 30 noticias
     {
-        "source": "ElEconomista",
-        "url": "https://www.eleconomista.es/rss/rss-mercados.xml",
+        "source": "FXStreet ES",
+        "url": "https://www.fxstreet.es/rss/news",
         "method": "feedparser",
         "lang": "es",
     },
-    {
-        "source": "ElEconomista",
-        "url": "https://www.eleconomista.es/rss/rss-economia.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
+    # ✓ 21 + 26 noticias
     {
         "source": "Expansión",
         "url": "https://www.expansion.com/rss/mercados.xml",
@@ -148,47 +146,24 @@ FEEDS = [
         "method": "feedparser",
         "lang": "es",
     },
-    {
-        "source": "Forexduet ES",
-        "url": "https://es.forexduet.com/feed/",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "InfoMercados",
-        "url": "https://www.infomercados.com/rss/",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    {
-        "source": "Cinco Días",
-        "url": "https://cincodias.elpais.com/rss/economia/",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    # ── FXStreet ES ───────────────────────────
-    {
-        "source": "FXStreet ES",
-        "url": "https://www.fxstreet.es/rss/news",
-        "method": "feedparser",
-        "lang": "es",
-    },
-    # ── DailyForex ES ─────────────────────────
+    # ✓ 1 noticia (feed real confirmado)
     {
         "source": "DailyForex ES",
         "url": "https://es.dailyforex.com/rss/es/forexnews.xml",
         "method": "feedparser",
         "lang": "es",
     },
-    {
-        "source": "DailyForex ES",
-        "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",
-        "method": "feedparser",
-        "lang": "es",
-    },
+    # ✓ 11 noticias
     {
         "source": "DailyForex ES",
         "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    # ✓ feed confirmado (0 hoy por falta de artículos recientes, no por bloqueo)
+    {
+        "source": "DailyForex ES",
+        "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",
         "method": "feedparser",
         "lang": "es",
     },
@@ -198,31 +173,36 @@ FEEDS = [
         "method": "feedparser",
         "lang": "es",
     },
-    # ── Investing.com ES (vía proxy CORS) ─────
+    # Investing.com ES — fetchar directamente sin proxy (allorigins da 500)
+    # GitHub Actions tiene acceso directo a internet
     {
         "source": "Investing.com ES",
-        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_1.rss",
-        "method": "proxy_xml",
+        "url": "https://es.investing.com/rss/news_1.rss",
+        "method": "feedparser",
         "lang": "es",
     },
     {
         "source": "Investing.com ES",
-        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_25.rss",
-        "method": "proxy_xml",
+        "url": "https://es.investing.com/rss/news_25.rss",
+        "method": "feedparser",
         "lang": "es",
     },
     {
         "source": "Investing.com ES",
-        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_14.rss",
-        "method": "proxy_xml",
+        "url": "https://es.investing.com/rss/news_14.rss",
+        "method": "feedparser",
         "lang": "es",
     },
+    # ✗ ElEconomista — bloquea el User-Agent de Actions (0 noticias)
+    # ✗ Forexduet ES  — 0 noticias
+    # ✗ InfoMercados  — 0 noticias
+    # ✗ Cinco Días    — 0 noticias
 
     # ══════════════════════════════════════════
     # FUENTES EN INGLÉS
     # ══════════════════════════════════════════
 
-    # ── FXStreet EN ───────────────────────────
+    # ✓ 30 + 13 noticias
     {
         "source": "FXStreet",
         "url": "https://www.fxstreet.com/rss/news",
@@ -235,23 +215,7 @@ FEEDS = [
         "method": "feedparser",
         "lang": "en",
     },
-    # ── DailyForex ────────────────────────────
-    # No tiene subdominio ES con RSS; los feeds son en inglés
-    # pero cubre análisis fundamentales relevantes para todos los pares
-    {
-        "source": "DailyForex",
-        "url": "https://www.dailyforex.com/rss/forexnews.xml",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "DailyForex",
-        "url": "https://www.dailyforex.com/rss/fundamentalanalysis.xml",
-        "method": "feedparser",
-        "lang": "en",
-    },
-
-    # ── ForexLive ─────────────────────────────
+    # ✓ 25 + 14 noticias
     {
         "source": "ForexLive",
         "url": "https://www.forexlive.com/feed/news",
@@ -264,78 +228,42 @@ FEEDS = [
         "method": "feedparser",
         "lang": "en",
     },
-
-    # ── Reuters ───────────────────────────────
-    {
-        "source": "Reuters",
-        "url": "https://feeds.reuters.com/reuters/businessNews",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "Reuters",
-        "url": "https://feeds.reuters.com/reuters/UKBusinessNews",
-        "method": "feedparser",
-        "lang": "en",
-    },
-
-    # ── MQL5 Economic Calendar ─────────────────
-    {
-        "source": "MQL5",
-        "url": "https://www.mql5.com/en/economic-calendar/rss",
-        "method": "feedparser",
-        "lang": "en",
-    },
-
-    # ── Bancos Centrales (fuentes oficiales) ───
-    {
-        "source": "Federal Reserve",
-        "url": "https://www.federalreserve.gov/feeds/press_all.xml",
-        "method": "feedparser",
-        "lang": "en",
-    },
+    # ✓ 5 noticias (comunicados oficiales BCE)
     {
         "source": "ECB",
         "url": "https://www.ecb.europa.eu/rss/press.html",
         "method": "feedparser",
         "lang": "en",
     },
+    # ✓ 3 noticias
     {
         "source": "Bank of England",
         "url": "https://www.bankofengland.co.uk/rss/news",
         "method": "feedparser",
         "lang": "en",
     },
-    {
-        "source": "Bank of Japan",
-        "url": "https://www.boj.or.jp/en/about/press/index.htm",
-        "method": "feedparser",
-        "lang": "en",
-    },
-    {
-        "source": "RBA",
-        "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",
-        "method": "feedparser",
-        "lang": "en",
-    },
+    # ✓ 7 noticias
     {
         "source": "Bank of Canada",
         "url": "https://www.bankofcanada.ca/feed/",
         "method": "feedparser",
         "lang": "en",
     },
+    # ✓ 1 noticia
     {
-        "source": "SNB",
-        "url": "https://www.snb.ch/en/rss/medmit",
+        "source": "DailyForex",
+        "url": "https://www.dailyforex.com/rss/forexnews.xml",
         "method": "feedparser",
         "lang": "en",
     },
-    {
-        "source": "RBNZ",
-        "url": "https://www.rbnz.govt.nz/feed/news",
-        "method": "feedparser",
-        "lang": "en",
-    },
+    # ✗ Reuters       — bloquea Actions (0 noticias)
+    # ✗ MQL5          — 0 noticias
+    # ✗ Federal Reserve — 0 noticias
+    # ✗ Bank of Japan — 0 noticias
+    # ✗ RBA           — 0 noticias
+    # ✗ SNB           — 0 noticias
+    # ✗ RBNZ          — 0 noticias
+    # ✗ DailyForex fundamentalanalysis.xml — 0 noticias
 ]
 
 # ─────────────────────────────────────────────
