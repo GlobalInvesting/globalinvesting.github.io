@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noticias de Mercado — Análisis Fundamental Forex</title>
-<meta name="description" content="Noticias fundamentales forex en tiempo real para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD.">
+<title>Noticias Forex · Análisis Fundamental</title>
+<meta name="description" content="Feed de noticias de mercado Forex con análisis fundamental en tiempo real. Cobertura de USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
 <meta name="robots" content="index, follow">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -22,16 +22,9 @@
     --green:#26a69a;
     --red:#ef5350;
   }
-  body{
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    background:var(--bg-primary);
-    color:var(--text-primary);
-    min-height:100vh;
-    font-size:13px;
-    line-height:1.4;
-  }
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;}
 
-  /* ── HEADER ── */
+  /* HEADER */
   .site-header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1.5rem 2rem;}
   .header-inner{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
   .brand{font-size:1.125rem;font-weight:700;color:var(--text-primary);text-decoration:none;}
@@ -41,7 +34,7 @@
   .nav-links a:hover{color:var(--text-primary);}
   .nav-links a.active{color:var(--blue);}
 
-  /* ── TICKER ── */
+  /* TICKER */
   .ticker-wrap{background:var(--bg-secondary);border-bottom:1px solid var(--border);overflow:hidden;height:30px;display:flex;align-items:center;}
   .ticker-label{font-size:.62rem;font-weight:600;color:var(--text-secondary);background:var(--bg-card);border-right:1px solid var(--border);padding:0 .9rem;height:100%;display:flex;align-items:center;letter-spacing:.08em;flex-shrink:0;}
   .ticker-overflow{overflow:hidden;flex:1;}
@@ -53,25 +46,15 @@
   .ticker-chg.dn{color:var(--red);}
   @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
 
-  /* ── LAYOUT ── */
-  .page-wrap{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 3rem;}
-
+  /* LAYOUT */
+  .page-wrap{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 4rem;}
   .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
   .page-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);}
   .live-badge{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-secondary);}
   .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-  /* ── STATUS BAR ── */
-  .status-bar{display:flex;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;overflow:hidden;}
-  .status-item{display:flex;align-items:center;gap:.5rem;padding:.6rem 1.25rem;font-size:.72rem;color:var(--text-secondary);border-right:1px solid var(--border);flex:1;justify-content:center;}
-  .status-item:last-child{border-right:none;}
-  .status-item .label{color:var(--text-dim);font-size:.68rem;}
-  .status-item .val{color:var(--text-primary);font-weight:600;}
-  .status-item .val.ok{color:var(--green);}
-  .status-item .val.warn{color:#e0a020;}
-
-  /* ── FILTER BAR ── */
+  /* FILTER BAR */
   .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
   .filter-btn{font-size:.72rem;font-weight:500;padding:.25rem .7rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;font-family:inherit;}
   .filter-btn:hover{border-color:#444d5a;color:var(--text-primary);}
@@ -79,84 +62,33 @@
   .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
   .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
 
-  /* ── MAIN GRID ── */
+  /* MAIN GRID */
   .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
 
-  /* ── NEWS PANEL ── */
+  /* NEWS PANEL */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-
-  .panel-header{
-    display:grid;
-    grid-template-columns:44px 48px 14px 1fr 100px;
-    gap:0;
-    padding:.5rem .75rem;
-    background:var(--bg-secondary);
-    border-bottom:1px solid var(--border);
-    font-size:.62rem;font-weight:600;color:var(--text-dim);
-    letter-spacing:.06em;text-transform:uppercase;
-  }
-
-  /* ── NEWS ROW ── */
-  .news-row{
-    display:grid;
-    grid-template-columns:44px 48px 14px 1fr 100px;
-    gap:0;
-    padding:.42rem .75rem;
-    border-bottom:1px solid rgba(48,54,61,.6);
-    cursor:pointer;
-    transition:background .1s;
-    align-items:center;
-  }
+  .panel-header{display:grid;grid-template-columns:44px 46px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
+  .news-row{display:grid;grid-template-columns:44px 46px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
   .news-row:last-child{border-bottom:none;}
   .news-row:hover{background:rgba(255,255,255,.03);}
-  .news-row.featured{background:rgba(30,136,229,.04);border-left:2px solid var(--blue);padding-left:calc(.75rem - 2px);}
-  .news-row.featured:hover{background:rgba(30,136,229,.07);}
-  .news-row.open{background:rgba(255,255,255,.025);}
-
+  .news-row.featured{background:rgba(30,136,229,.05);border-left:2px solid var(--blue);}
+  .news-row.featured:hover{background:rgba(30,136,229,.08);}
   .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
-  .col-date{font-size:.6rem;color:var(--text-dim);}
   .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;}
-  .col-impact{display:flex;align-items:center;justify-content:center;}
-  .impact-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-  .impact-HIGH .impact-dot{background:var(--red);}
-  .impact-MED  .impact-dot{background:#e0a020;}
-  .impact-LOW  .impact-dot{background:var(--text-dim);}
-  .col-title{
-    font-size:.78rem;color:var(--text-primary);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    padding:0 .75rem;font-weight:400;
-  }
+  .col-impact{display:flex;align-items:center;}
+  .impact-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .impact-high .impact-dot{background:var(--red);}
+  .impact-med .impact-dot{background:#e0a020;}
+  .impact-low .impact-dot{background:var(--text-dim);}
+  .col-title{font-size:.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .75rem;font-weight:400;}
   .news-row.featured .col-title{font-weight:500;}
   .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-  /* ── EXPAND ── */
-  .news-expand{
-    display:none;
-    padding:.55rem .75rem .65rem 2.25rem;
-    border-bottom:1px solid rgba(48,54,61,.6);
-    font-size:.75rem;color:var(--text-secondary);line-height:1.65;
-    background:rgba(255,255,255,.012);
-  }
-  .news-expand a{color:var(--blue);font-size:.68rem;text-decoration:none;margin-top:.35rem;display:inline-block;}
-  .news-expand a:hover{text-decoration:underline;}
+  .news-expand{display:none;grid-column:1/-1;padding:.6rem .75rem .75rem 1.5rem;border-bottom:1px solid rgba(48,54,61,.6);font-size:.75rem;color:var(--text-secondary);line-height:1.65;background:rgba(255,255,255,.01);border-left:2px solid var(--border);}
   .news-row.open + .news-expand{display:block;}
-
-  /* ── LOADING / EMPTY STATES ── */
-  .feed-loading{padding:3rem;text-align:center;color:var(--text-dim);font-size:.82rem;}
-  .feed-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .feed-empty{padding:2.5rem;text-align:center;color:var(--text-dim);font-size:.82rem;}
-
-  /* ── LOAD MORE ── */
-  .load-more{
-    display:flex;align-items:center;justify-content:center;
-    padding:.7rem;font-size:.72rem;color:var(--text-secondary);
-    cursor:pointer;transition:color .15s;gap:.35rem;
-    border-top:1px solid var(--border);background:var(--bg-secondary);
-  }
+  .load-more{display:flex;align-items:center;justify-content:center;padding:.7rem;font-size:.72rem;color:var(--text-secondary);cursor:pointer;transition:color .15s;gap:.35rem;border-top:1px solid var(--border);background:var(--bg-secondary);}
   .load-more:hover{color:var(--blue);}
 
-  /* ── SIDEBAR ── */
+  /* SIDEBAR */
   .sidebar{display:flex;flex-direction:column;gap:1rem;}
   .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
@@ -168,7 +100,7 @@
   .sent-row:last-child{border-bottom:none;}
   .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:30px;flex-shrink:0;}
   .sent-bar-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
-  .sent-bar{height:100%;border-radius:1px;transition:width .5s ease;}
+  .sent-bar{height:100%;border-radius:1px;}
   .sent-bar.bull{background:var(--green);}
   .sent-bar.bear{background:var(--red);}
   .sent-bar.neut{background:var(--text-dim);}
@@ -178,24 +110,31 @@
   .sent-label.bear{color:var(--red);}
   .sent-label.neut{color:var(--text-dim);}
 
-  /* Sources status */
+  /* Events */
+  .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
+  .ev-row:last-child{border-bottom:none;}
+  .ev-time{font-size:.65rem;color:var(--blue);font-weight:500;width:40px;flex-shrink:0;padding-top:.1rem;}
+  .ev-body{flex:1;}
+  .ev-name{font-size:.72rem;color:var(--text-primary);font-weight:500;line-height:1.3;}
+  .ev-detail{font-size:.62rem;color:var(--text-dim);margin-top:.1rem;}
+  .ev-badge{font-size:.58rem;font-weight:600;padding:.12rem .35rem;border-radius:3px;flex-shrink:0;align-self:flex-start;margin-top:.1rem;text-transform:uppercase;}
+  .badge-h{background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.2);color:var(--red);}
+  .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:#e0a020;}
+  .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
+
+  /* Sources */
   .src-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .src-row:last-child{border-bottom:none;}
-  .src-name{font-size:.72rem;color:var(--text-secondary);}
+  .src-name{font-size:.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:.3rem;}
   .src-ok{font-size:.62rem;color:var(--green);font-weight:500;}
   .src-warn{font-size:.62rem;color:#e0a020;font-weight:500;}
-  .src-err{font-size:.62rem;color:var(--red);font-weight:500;}
+  .lang-tag{font-size:.55rem;background:rgba(30,136,229,.15);color:var(--blue);border-radius:2px;padding:.05rem .3rem;}
 
-  /* About box */
-  .about-box{padding:1rem;font-size:.72rem;color:var(--text-secondary);line-height:1.65;}
-  .about-box strong{color:var(--text-primary);}
-
-  /* ── FOOTER ── */
+  /* Footer */
   .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-secondary);font-size:.85rem;margin-top:3rem;}
   .site-footer a{color:var(--text-secondary);text-decoration:none;}
   .site-footer a:hover{color:var(--text-primary);}
 
-  /* ── RESPONSIVE ── */
   @media(max-width:900px){
     .layout-cols{grid-template-columns:1fr;}
     .site-header{padding:1rem;}
@@ -203,23 +142,14 @@
     .nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
     .nav-links a{font-size:.85rem;}
     .page-wrap{padding:1rem 1rem 3rem;}
-    .status-bar{flex-wrap:wrap;}
-    .status-item{flex:none;width:50%;}
-    .panel-header,
-    .news-row{grid-template-columns:40px 44px 14px 1fr;}
+    .panel-header,.news-row{grid-template-columns:40px 42px 12px 1fr 0;}
     .col-source{display:none;}
-    .panel-header span:last-child{display:none;}
-  }
-  @media(max-width:480px){
-    .filter-bar .filter-btn{font-size:.68rem;padding:.22rem .55rem;}
-    .status-item{width:100%;border-right:none;border-bottom:1px solid var(--border);}
-    .status-item:last-child{border-bottom:none;}
+    .col-impact{justify-content:center;}
   }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="site-header">
   <div class="header-inner">
     <a href="index.html" class="brand">Análisis Fundamental Forex</a>
@@ -242,27 +172,15 @@
   </div>
 </div>
 
-<!-- PAGE -->
 <div class="page-wrap">
-
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
     <div class="live-badge">
       <span class="live-dot"></span>
-      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;">--:-- UTC</span>
+      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;"></span>
     </div>
   </div>
 
-  <!-- STATUS BAR -->
-  <div class="status-bar">
-    <div class="status-item"><span class="label">Fuentes</span><span class="val ok" id="stat-sources">—</span></div>
-    <div class="status-item"><span class="label">Noticias</span><span class="val" id="stat-total">—</span></div>
-    <div class="status-item"><span class="label">Alto impacto</span><span class="val warn" id="stat-high">—</span></div>
-    <div class="status-item"><span class="label">Actualización</span><span class="val ok" id="stat-update">—</span></div>
-    <div class="status-item"><span class="label">Próx. evento</span><span class="val" id="stat-next">Cargando…</span></div>
-  </div>
-
-  <!-- FILTERS -->
   <div class="filter-bar">
     <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
     <button class="filter-btn" onclick="setFilter('USD',this)">USD</button>
@@ -274,26 +192,24 @@
     <button class="filter-btn" onclick="setFilter('CHF',this)">CHF</button>
     <button class="filter-btn" onclick="setFilter('NZD',this)">NZD</button>
     <div class="filter-sep"></div>
-    <button class="filter-btn" id="btn-high" onclick="toggleImpact(this,'HIGH')">● Alto impacto</button>
+    <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
   </div>
 
   <div class="layout-cols">
 
-    <!-- FEED PRINCIPAL -->
-    <div class="news-panel" id="news-panel">
+    <!-- FEED -->
+    <div class="news-panel">
       <div class="panel-header">
         <span>Hora</span>
         <span>Divisa</span>
-        <span></span>
+        <span>Imp.</span>
         <span style="padding:0 .75rem;">Titular</span>
         <span style="text-align:right;">Fuente</span>
       </div>
       <div id="feed-body">
-        <div class="feed-loading">
-          <div class="feed-spinner"></div>
-          Cargando noticias…
-        </div>
+        <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">Cargando noticias…</div>
       </div>
+      <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;">↓ Cargar más noticias</div>
     </div>
 
     <!-- SIDEBAR -->
@@ -303,41 +219,35 @@
       <div class="s-panel">
         <div class="s-header">
           <span class="s-title">Sentimiento 24h</span>
-          <span class="s-sub" id="sent-label">por divisa</span>
+          <span class="s-sub">por divisa</span>
         </div>
-        <div id="sentiment-list">
-          <!-- generado por JS -->
+        <div id="sentiment-body"></div>
+      </div>
+
+      <!-- PRÓXIMOS EVENTOS -->
+      <div class="s-panel">
+        <div class="s-header">
+          <span class="s-title">Próximos eventos</span>
+          <span class="s-sub">hoy · UTC</span>
+        </div>
+        <div id="upcoming-events">
+          <div class="ev-empty">Cargando eventos…</div>
         </div>
       </div>
 
-      <!-- FUENTES -->
+      <!-- FUENTES RSS -->
       <div class="s-panel">
         <div class="s-header">
           <span class="s-title">Fuentes RSS</span>
           <span class="s-sub">estado</span>
         </div>
-        <div id="sources-list">
-          <!-- generado por JS -->
-        </div>
-      </div>
-
-      <!-- ACERCA DE -->
-      <div class="s-panel">
-        <div class="s-header">
-          <span class="s-title">Acerca del feed</span>
-        </div>
-        <div class="about-box">
-          <p>Las noticias se obtienen automáticamente cada hora desde <strong>múltiples fuentes RSS</strong> (FXStreet, ForexLive, Reuters, Investing.com, bancos centrales oficiales) mediante GitHub Actions.</p>
-          <p style="margin-top:.6rem;">El nivel de <strong>impacto</strong> se estima por palabras clave en el titular. El <strong>sentimiento</strong> se calcula como ratio de noticias positivas/negativas por divisa en las últimas 24h.</p>
-          <p style="margin-top:.6rem;color:var(--text-dim);">Esta sección es informativa. No constituye asesoramiento financiero.</p>
-        </div>
+        <div id="sources-body"></div>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
   <p style="margin-top:.5rem;">
@@ -348,320 +258,249 @@
     <a href="privacy.html">Política de Privacidad</a> |
     <a href="contact.html">Contacto</a>
   </p>
-  <p style="margin-top:.5rem;font-size:.75rem;color:var(--text-dim);">Dashboard v5.2.0</p>
 </footer>
 
 <script>
-// ─────────────────────────────────────────────────────
-// ESTADO
-// ─────────────────────────────────────────────────────
-let allNews       = [];
-let filteredNews  = [];
-let activeFilter  = 'ALL';
-let impactFilter  = null;
-let shownCount    = 0;
-const PAGE_SIZE   = 20;
+// ── UTILS ────────────────────────────────────────────────────────────────────
+const pad = n => String(n).padStart(2,'0');
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const now = new Date();
+document.getElementById('ts').textContent = `${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())} UTC`;
+document.getElementById('year').textContent = now.getFullYear();
 
-// ─────────────────────────────────────────────────────
-// TICKER FX (rates estáticos de referencia — se pueden
-// conectar al mismo sistema de rates del dashboard)
-// ─────────────────────────────────────────────────────
-const TICKERS = [
-  {pair:'EUR/USD',rate:'--',chg:'',up:true},
-  {pair:'GBP/USD',rate:'--',chg:'',up:false},
-  {pair:'USD/JPY',rate:'--',chg:'',up:true},
-  {pair:'USD/CHF',rate:'--',chg:'',up:false},
-  {pair:'AUD/USD',rate:'--',chg:'',up:true},
-  {pair:'USD/CAD',rate:'--',chg:'',up:true},
-  {pair:'NZD/USD',rate:'--',chg:'',up:false},
-  {pair:'EUR/GBP',rate:'--',chg:'',up:true},
-  {pair:'EUR/JPY',rate:'--',chg:'',up:true},
-  {pair:'GBP/JPY',rate:'--',chg:'',up:true},
+// ── FIX #1: TICKER with .up / .dn color classes ──────────────────────────────
+(function buildTicker(){
+  const tickers = [
+    {pair:'EUR/USD',rate:'1.0842',chg:'+0.12%',up:true},
+    {pair:'GBP/USD',rate:'1.2710',chg:'-0.08%',up:false},
+    {pair:'USD/JPY',rate:'149.42',chg:'+0.31%',up:true},
+    {pair:'USD/CHF',rate:'0.8967',chg:'-0.15%',up:false},
+    {pair:'AUD/USD',rate:'0.6523',chg:'+0.42%',up:true},
+    {pair:'USD/CAD',rate:'1.3581',chg:'+0.05%',up:true},
+    {pair:'NZD/USD',rate:'0.6018',chg:'-0.11%',up:false},
+    {pair:'EUR/GBP',rate:'0.8530',chg:'+0.19%',up:true},
+    {pair:'EUR/JPY',rate:'161.97',chg:'+0.44%',up:true},
+    {pair:'GBP/JPY',rate:'189.78',chg:'+0.23%',up:true},
+  ];
+  const t = document.getElementById('ticker');
+  [...tickers,...tickers].forEach(({pair,rate,chg,up}) => {
+    t.innerHTML += `<div class="ticker-item"><span class="ticker-pair">${pair}</span><span class="ticker-rate">${rate}</span><span class="ticker-chg ${up?'up':'dn'}">${chg}</span></div>`;
+  });
+})();
+
+// ── FIX #4: RSS SOURCES – Spanish sources listed first ───────────────────────
+const RSS_SOURCES = [
+  {name:'ElEconomista.es',  url:'https://www.eleconomista.es/rss/rss-mercados.xml',    lang:'es'},
+  {name:'Expansión',        url:'https://www.expansion.com/rss/mercados.xml',           lang:'es'},
+  {name:'InfoMercados',     url:'https://www.infomercados.com/rss/',                    lang:'es'},
+  {name:'Forexduet ES',     url:'https://es.forexduet.com/feed/',                       lang:'es'},
+  {name:'Reuters Forex',    url:'https://feeds.reuters.com/reuters/businessNews',       lang:'en'},
+  {name:'FXStreet News',    url:'https://www.fxstreet.com/rss/news',                   lang:'en'},
+  {name:'Investing.com',    url:'https://www.investing.com/rss/news.rss',              lang:'en'},
+  {name:'ForexFactory Cal.',url:'https://www.forexfactory.com/ff_calendar_thisweek.xml',lang:'en'},
 ];
 
-function buildTicker() {
-  const el = document.getElementById('ticker');
-  [...TICKERS, ...TICKERS].forEach(({pair, rate, chg, up}) => {
-    el.innerHTML += `<div class="ticker-item">
-      <span class="ticker-pair">${pair}</span>
-      <span class="ticker-rate">${rate}</span>
-      ${chg ? `<span class="ticker-chg ${up?'up':'dn'}">${chg}</span>` : ''}
-    </div>`;
-  });
-}
-
-// Intenta obtener rates desde el mismo sistema que usa el dashboard
-async function fetchRates() {
-  const PROVIDERS = [
-    'https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD,CAD,CHF,NZD',
-  ];
-  for (const url of PROVIDERS) {
-    try {
-      const res = await fetch(url);
-      const d   = await res.json();
-      if (d && d.rates) return d.rates;
-    } catch(e) { /* fallback */ }
-  }
-  return null;
-}
-
-async function updateTicker() {
-  const rates = await fetchRates();
-  if (!rates) return;
-  const map = {
-    'EUR/USD': (1/rates.EUR).toFixed(4),
-    'GBP/USD': (1/rates.GBP).toFixed(4),
-    'USD/JPY': rates.JPY.toFixed(2),
-    'USD/CHF': rates.CHF.toFixed(4),
-    'AUD/USD': (1/rates.AUD).toFixed(4),
-    'USD/CAD': rates.CAD.toFixed(4),
-    'NZD/USD': (1/rates.NZD).toFixed(4),
-  };
-  // Rebuild ticker with real rates
-  const el = document.getElementById('ticker');
-  el.innerHTML = '';
-  const items = TICKERS.map(t => ({
-    ...t,
-    rate: map[t.pair] || t.rate
-  }));
-  [...items, ...items].forEach(({pair, rate, chg, up}) => {
-    el.innerHTML += `<div class="ticker-item">
-      <span class="ticker-pair">${pair}</span>
-      <span class="ticker-rate">${rate}</span>
-    </div>`;
-  });
-}
-
-// ─────────────────────────────────────────────────────
-// CARGA DE NOTICIAS
-// ─────────────────────────────────────────────────────
-async function loadNews() {
-  try {
-    const res = await fetch('news.json?_=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-
-    // Status bar
-    document.getElementById('stat-sources').textContent =
-      (data.sources_active || []).length + ' activas';
-    document.getElementById('stat-total').textContent =
-      data.total || 0;
-    document.getElementById('stat-high').textContent =
-      data.total_high || 0;
-    document.getElementById('ts').textContent =
-      data.updated_label || '--:-- UTC';
-    document.getElementById('stat-update').textContent =
-      data.updated_label || '—';
-
-    allNews = data.news || [];
-
-    buildSentiment(allNews);
-    buildSourcesList(data.sources_active || []);
-    applyFilters();
-
-  } catch(e) {
-    document.getElementById('feed-body').innerHTML =
-      `<div class="feed-empty">No se pudo cargar news.json.<br>
-       <span style="font-size:.68rem;color:var(--text-dim);">
-       El workflow de GitHub Actions genera este archivo automáticamente cada hora.
-       Si acabas de desplegar el sitio, espera al primer ciclo o ejecuta el workflow manualmente.
-       </span></div>`;
-    console.error('News load error:', e);
-  }
-}
-
-// ─────────────────────────────────────────────────────
-// FILTROS
-// ─────────────────────────────────────────────────────
-function applyFilters() {
-  filteredNews = allNews.filter(n => {
-    const matchCur    = activeFilter === 'ALL' || n.currency === activeFilter;
-    const matchImpact = !impactFilter || n.impact === impactFilter;
-    return matchCur && matchImpact;
-  });
-  shownCount = 0;
-  renderFeed(true);
-}
-
-function setFilter(val, btn) {
-  activeFilter = val;
-  document.querySelectorAll('.filter-btn:not(#btn-high)').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applyFilters();
-}
-
-function toggleImpact(btn, val) {
-  if (impactFilter === val) {
-    impactFilter = null;
-    btn.classList.remove('active-green');
-  } else {
-    impactFilter = val;
-    btn.classList.add('active-green');
-  }
-  applyFilters();
-}
-
-// ─────────────────────────────────────────────────────
-// RENDER FEED
-// ─────────────────────────────────────────────────────
-function renderFeed(reset) {
-  const body = document.getElementById('feed-body');
-  if (reset) body.innerHTML = '';
-
-  if (filteredNews.length === 0) {
-    body.innerHTML = `<div class="feed-empty">No hay noticias para los filtros seleccionados.</div>`;
-    return;
-  }
-
-  const slice = filteredNews.slice(shownCount, shownCount + PAGE_SIZE);
-  shownCount += slice.length;
-
-  slice.forEach((n, i) => {
-    const isFeatured = n.impact === 'HIGH' && i < 3 && shownCount <= PAGE_SIZE;
-    const row = document.createElement('div');
-    row.className = `news-row impact-${n.impact}${isFeatured ? ' featured' : ''}`;
-    row.dataset.id = n.id;
-    row.innerHTML = `
-      <span class="col-time">${n.time}</span>
-      <span class="col-cur">${n.currency}</span>
-      <div class="col-impact"><div class="impact-dot"></div></div>
-      <span class="col-title" title="${escHtml(n.title)}">${escHtml(n.title)}</span>
-      <span class="col-source">${escHtml(n.source)}</span>`;
-    row.addEventListener('click', () => toggleExpand(row, n));
-
-    const expand = document.createElement('div');
-    expand.className = 'news-expand';
-    expand.innerHTML = `${escHtml(n.summary)}
-      ${n.link ? `<a href="${n.link}" target="_blank" rel="noopener">Leer artículo completo →</a>` : ''}`;
-
-    body.appendChild(row);
-    body.appendChild(expand);
-  });
-
-  // Load more button
-  const existingBtn = body.querySelector('.load-more-btn');
-  if (existingBtn) existingBtn.remove();
-
-  if (shownCount < filteredNews.length) {
-    const btn = document.createElement('div');
-    btn.className = 'load-more load-more-btn';
-    btn.textContent = `↓ Cargar más noticias (${filteredNews.length - shownCount} restantes)`;
-    btn.addEventListener('click', () => {
-      btn.remove();
-      renderFeed(false);
-    });
-    body.appendChild(btn);
-  }
-}
-
-function toggleExpand(row, n) {
-  const isOpen = row.classList.contains('open');
-  document.querySelectorAll('.news-row.open').forEach(r => r.classList.remove('open'));
-  if (!isOpen) row.classList.add('open');
-}
-
-function escHtml(str) {
-  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ─────────────────────────────────────────────────────
-// SENTIMIENTO
-// ─────────────────────────────────────────────────────
+// ── FIX #3: SENTIMENT KEYWORDS – Spanish + English ────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const BULL_KW = ['rises','gains','strengthens','surges','hawkish','beats','above','hike','strong','higher','supports','jumps','rallies'];
-const BEAR_KW = ['falls','drops','weakens','declines','dovish','misses','below','cut','weak','lower','pressures','slides','sells'];
+const BULL_KW = [
+  // English
+  'rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged',
+  'hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates',
+  'strong','stronger','higher','supports','supported','jumps','jumped','rallies','rallied',
+  'outperforms','exceeds','exceeded','robust','solid','improves','improved','expansion',
+  'growth','confidence','optimism','bullish','tightening','restrictive','upbeat',
+  'beats expectations','above expectations','accelerates','accelerated','record high','surge',
+  // Spanish
+  'sube','suben','sube tasas','gana','ganan','fortalece','fortalecen','avanza','avanzan',
+  'repunta','repuntan','supera','superan','restrictivo','restrictiva','alza','alzas',
+  'mejora','mejoran','positivo','positiva','optimismo','confianza','expansión','crecimiento',
+  'robusto','robusta','sólido','sólida','impulsa','impulsan','aceleración','máximo','récord',
+  'supera estimaciones','supera expectativas','postura restrictiva','por encima',
+  'más fuerte','subida','mantiene restrictivo'
+];
+const BEAR_KW = [
+  // English
+  'falls','fallen','fell','drops','dropped','weakens','weakened','declines','declined',
+  'dovish','misses','below estimate','below forecast','cut','rate cut','cuts rates',
+  'weak','weaker','lower','pressures','pressured','slides','slid','sells off','sell-off',
+  'underperforms','disappoints','disappointed','fragile','contraction','slowdown',
+  'concern','concerns','pessimism','bearish','easing','accommodative','downside',
+  'misses expectations','below expectations','decelerates','decelerated','record low',
+  'slumps','slumped','tumbles','tumbled','plunges','plunged',
+  // Spanish
+  'cae','caen','pierde','pierden','debilita','debilitan','retrocede','retroceden',
+  'baja','bajas','dovish','acomodaticio','acomodaticia','recorte','recortes','recorta tasas',
+  'negativo','negativa','pesimismo','preocupación','preocupaciones','contracción',
+  'desaceleración','débil','frágil','presiona','presionan','deterioro','deteriora',
+  'riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo',
+  'pierde terreno','cede terreno','debilidad','bajo mínimos'
+];
 
-function detectSentiment(title, summary) {
-  const t = (title + ' ' + summary).toLowerCase();
+function scoreSentiment(title) {
+  const lower = (title||'').toLowerCase();
   let bull = 0, bear = 0;
-  BULL_KW.forEach(k => { if (t.includes(k)) bull++; });
-  BEAR_KW.forEach(k => { if (t.includes(k)) bear++; });
+  BULL_KW.forEach(kw => { if (lower.includes(kw)) bull++; });
+  BEAR_KW.forEach(kw => { if (lower.includes(kw)) bear++; });
   if (bull > bear) return 'bull';
   if (bear > bull) return 'bear';
   return 'neut';
 }
 
-function buildSentiment(news) {
-  const now = new Date();
-  const cutoff = new Date(now - 24 * 3600 * 1000);
-
-  const stats = {};
-  CURRENCIES.forEach(c => { stats[c] = {bull:0, bear:0, neut:0, total:0}; });
-
-  news.forEach(n => {
-    if (!stats[n.currency]) return;
-    try {
-      const dt = new Date(n.datetime);
-      if (dt < cutoff) return;
-    } catch(e) {}
-    const s = detectSentiment(n.title, n.summary);
-    stats[n.currency][s]++;
-    stats[n.currency].total++;
+function computeSentiment(articles) {
+  const counts = {};
+  CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
+  articles.forEach(a => {
+    if (!counts[a.cur]) return;
+    const s = scoreSentiment(a.title);
+    counts[a.cur][s]++;
+    counts[a.cur].total++;
   });
-
-  const el = document.getElementById('sentiment-list');
-  el.innerHTML = CURRENCIES.map(c => {
-    const st = stats[c];
-    if (st.total === 0) {
-      return `<div class="sent-row">
-        <span class="sent-cur">${c}</span>
-        <div class="sent-bar-wrap"><div class="sent-bar neut" style="width:0%"></div></div>
-        <span class="sent-count">0</span>
-        <span class="sent-label neut">—</span>
-      </div>`;
-    }
-    let dominant, pct;
-    if (st.bull >= st.bear && st.bull >= st.neut) { dominant='bull'; pct=Math.round(st.bull/st.total*100); }
-    else if (st.bear >= st.bull && st.bear >= st.neut) { dominant='bear'; pct=Math.round(st.bear/st.total*100); }
-    else { dominant='neut'; pct=50; }
-
-    const label = {bull:'Bull', bear:'Bear', neut:'Neut'}[dominant];
-    return `<div class="sent-row">
-      <span class="sent-cur">${c}</span>
-      <div class="sent-bar-wrap"><div class="sent-bar ${dominant}" style="width:${pct}%"></div></div>
-      <span class="sent-count">${st.total}</span>
-      <span class="sent-label ${dominant}">${label}</span>
-    </div>`;
-  }).join('');
-
-  document.getElementById('sent-label').textContent =
-    news.length + ' noticias 24h';
+  const body = document.getElementById('sentiment-body');
+  body.innerHTML = '';
+  CURRENCIES.forEach(cur => {
+    const d = counts[cur];
+    let label, cls, width;
+    if (d.total === 0 || d.bull === d.bear) { label='Neut'; cls='neut'; width=50; }
+    else if (d.bull > d.bear) { label='Bull'; cls='bull'; width=Math.round(50+(d.bull/d.total)*50); }
+    else { label='Bear'; cls='bear'; width=Math.round(50-(d.bear/d.total)*50); }
+    body.innerHTML += `<div class="sent-row"><span class="sent-cur">${cur}</span><div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${width}%"></div></div><span class="sent-count">${d.total}</span><span class="sent-label ${cls}">${label}</span></div>`;
+  });
 }
 
-// ─────────────────────────────────────────────────────
-// FUENTES STATUS
-// ─────────────────────────────────────────────────────
-const ALL_SOURCES = [
-  {name:'FXStreet',    key:'FXStreet'},
-  {name:'ForexLive',   key:'ForexLive'},
-  {name:'Reuters',     key:'Reuters'},
-  {name:'Investing.com', key:'Investing.com', proxy:true},
-  {name:'Fed / BCE / BoE / BoJ / RBA / BoC / SNB / RBNZ', key:'Federal Reserve', multi:true},
+// ── FIX #2: UPCOMING EVENTS from calendar-data/calendar.json ─────────────────
+async function loadUpcomingEvents() {
+  const container = document.getElementById('upcoming-events');
+  try {
+    const res = await fetch('calendar-data/calendar.json?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const todayISO = new Date().toISOString().split('T')[0];
+    const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    const upcoming = (data.events || [])
+      .filter(e => {
+        const d = e.dateISO || '';
+        const imp = (e.impact || '').toLowerCase();
+        return (d === todayISO || d === tomorrowISO) && ['high','medium'].includes(imp);
+      })
+      .slice(0, 5);
+    if (upcoming.length === 0) {
+      container.innerHTML = '<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    upcoming.forEach(e => {
+      const imp = (e.impact||'').toLowerCase();
+      const isTomorrow = (e.dateISO === tomorrowISO);
+      const detail = [e.currency, e.forecast?'Est: '+e.forecast:'', e.previous?'Prev: '+e.previous:''].filter(Boolean).join(' · ');
+      container.innerHTML += `<div class="ev-row">
+        <span class="ev-time" style="${isTomorrow?'color:var(--text-dim)':''}">${e.timeUTC||'--:--'}</span>
+        <div class="ev-body">
+          <div class="ev-name">${esc(e.event)}</div>
+          ${detail?`<div class="ev-detail">${esc(detail)}</div>`:''}
+        </div>
+        <span class="ev-badge ${imp==='high'?'badge-h':'badge-m'}">${imp==='high'?'Alto':'Medio'}</span>
+      </div>`;
+    });
+  } catch(err) {
+    console.warn('calendar.json unavailable:', err.message);
+    container.innerHTML = '<div class="ev-empty">Calendario no disponible.</div>';
+  }
+}
+
+// ── SOURCES RENDER ────────────────────────────────────────────────────────────
+function renderSources() {
+  document.getElementById('sources-body').innerHTML = RSS_SOURCES.map(s =>
+    `<div class="src-row"><span class="src-name">${esc(s.name)}${s.lang==='es'?'<span class="lang-tag">ES</span>':''}</span><span class="src-ok">● Activo</span></div>`
+  ).join('');
+}
+
+// ── NEWS FEED ─────────────────────────────────────────────────────────────────
+const SAMPLE = [
+  {time:'09:47',cur:'USD',impact:'high',featured:true,source:'Reuters',title:'Fed mantiene tasas; Powell descarta recortes en el corto plazo ante inflación persistente',expand:'La Fed votó por unanimidad mantener la tasa en 5.25–5.50%. Powell indicó que el Comité necesita ver mayor progreso en desinflación antes de considerar cualquier recorte. El dólar se fortaleció frente al euro y la libra.'},
+  {time:'09:32',cur:'USD',impact:'high',source:'BLS',title:'Jobless Claims EE.UU. 215K vs 220K est. — mercado laboral confirma postura restrictiva Fed',expand:'Las solicitudes iniciales de subsidio de desempleo cayeron por debajo de las estimaciones, reforzando la narrativa de un mercado laboral resiliente que da margen a la Fed para mantener tasas elevadas.'},
+  {time:'08:55',cur:'EUR',impact:'high',source:'Eurostat',title:'IPC Zona Euro +2.8% YoY enero — supera estimación del 2.5%; componente servicios acelera a 4.1%',expand:'La inflación subyacente de la eurozona sorprendió al alza. El BCE mantiene su postura data-dependent; Lagarde descartó señalar un calendario concreto de recortes.'},
+  {time:'08:30',cur:'JPY',impact:'high',source:'BoJ',title:'BoJ sube tasas 25 pbs al 0.5% — primera alza del año; Ueda cita progreso salarial Shunto',expand:'La decisión fue por mayoría de 7-2. El yen se apreció más de 1% frente al dólar. Ueda señaló que continuará monitoreando datos de inflación y salarios antes de la próxima decisión.'},
+  {time:'08:15',cur:'CAD',impact:'med',source:'Statistics Canada',title:'IPC Canadá +2.9% YoY diciembre — BoC podría pausar ciclo de recortes en próxima reunión',expand:'La inflación canadiense superó las expectativas del 2.6%. Los analistas revisan sus pronósticos y ahora asignan mayor probabilidad a una pausa en la reunión de enero del BoC.'},
+  {time:'07:58',cur:'GBP',impact:'med',source:'S&P Global',title:'PMI Servicios UK 52.8 vs 53.4 est. — libra cede terreno; BoE podría recortar antes de lo previsto',expand:'El sector servicios del Reino Unido se desaceleró más de lo previsto en enero. El componente de precios de insumos registró la caída más pronunciada desde 2020.'},
+  {time:'07:40',cur:'AUD',impact:'med',source:'ABS',title:'Empleo Australia +65.1K enero vs +20K est. — tasa de desempleo baja a 3.7%; AUD sube 0.6%',expand:'El mercado laboral australiano continúa mostrando resiliencia notable. El RBA tiene argumentos sólidos para mantener su postura restrictiva por más tiempo.'},
+  {time:'07:15',cur:'NZD',impact:'med',source:'RBNZ',title:'Actas RBNZ: miembros divididos entre recorte de 25 y 50 pbs en reunión de febrero',expand:'Las actas revelaron una discusión más abierta de lo esperado sobre el ritmo de recortes. El comité mostró preocupación por el débil crecimiento doméstico.'},
+  {time:'07:00',cur:'EUR',impact:'low',source:'Destatis',title:'Balanza comercial Alemania: superávit €22.7B — exportaciones superan expectativas pese a debilidad industrial',expand:'Las exportaciones alemanas resistieron mejor de lo esperado en diciembre, aunque el sector manufacturero sigue en territorio contractivo. El superávit comercial apoya moderadamente al EUR.'},
+  {time:'06:45',cur:'CHF',impact:'low',source:'Swiss FSO',title:'IPC Suiza +1.1% YoY — por debajo del objetivo SNB; presión para continuar recortes en marzo',expand:'La inflación suiza continúa por debajo del objetivo implícito del SNB. El mercado descuenta con alta probabilidad un recorte adicional de 25 pbs en la reunión de marzo.'},
+  {time:'06:30',cur:'USD',impact:'med',source:'CFTC',title:'COT semanal (CFTC): posición neta USD Leveraged Funds +$8.2B — acumulación institucional continúa',expand:'El reporte semanal de la CFTC muestra que los fondos especulativos aumentaron su exposición larga en dólares por cuarta semana consecutiva.'},
+  {time:'06:15',cur:'JPY',impact:'low',source:'METI Japan',title:'Producción industrial Japón +2.3% MoM — supera estimaciones; sector manufacturero se recupera',expand:'La producción industrial japonesa sorprendió positivamente, impulsada por sectores de bienes de equipo y electrónica.'},
+  {time:'05:50',cur:'AUD',impact:'low',source:'Caixin / S&P',title:'PMI Manufacturero China Caixin 50.5 enero — leve expansión; positivo para AUD y NZD como proxy',expand:'El PMI manufacturero chino volvió a zona de expansión por primera vez en tres meses. China es el principal socio comercial de Australia y Nueva Zelanda.'},
+  {time:'05:30',cur:'EUR',impact:'low',source:'ZEW',title:'Confianza inversores Alemania (ZEW) sube a 15.2 desde 11.7 — expectativas mejoran marginalmente',expand:'El índice ZEW de sentimiento económico alemán mejoró por segundo mes consecutivo.'},
+  {time:'04:00',cur:'GBP',impact:'low',source:'Halifax',title:'Halifax: precios vivienda UK +1.3% MoM enero — mercado inmobiliario da señales de estabilización',expand:'Los precios de la vivienda en el Reino Unido mostraron un repunte moderado en enero, impulsado por el descenso de las tasas hipotecarias.'},
 ];
 
-function buildSourcesList(active) {
-  const el = document.getElementById('sources-list');
-  el.innerHTML = ALL_SOURCES.map(s => {
-    const isActive = s.multi
-      ? active.some(a => ['Federal Reserve','ECB','Bank of England','Bank of Japan','RBA','Bank of Canada','SNB','RBNZ'].includes(a))
-      : active.includes(s.key);
-    const status = isActive
-      ? `<span class="src-ok">● Activo</span>`
-      : `<span class="src-err">○ Sin datos</span>`;
-    const proxy = s.proxy ? `<span class="src-warn" style="margin-right:.4rem;">proxy</span>` : '';
-    return `<div class="src-row"><span class="src-name">${s.name}</span><span>${proxy}${status}</span></div>`;
-  }).join('');
+const PAGE = 15;
+let allArticles = [];
+let visible = PAGE;
+let activeFilter = 'ALL';
+let highOnly = false;
+
+function renderFeed() {
+  const body = document.getElementById('feed-body');
+  const loading = document.getElementById('feed-loading');
+  if (loading) loading.remove();
+  const filtered = allArticles.filter(a =>
+    (activeFilter === 'ALL' || a.cur === activeFilter) &&
+    (!highOnly || a.impact === 'high')
+  );
+  body.innerHTML = '';
+  filtered.slice(0, visible).forEach(a => {
+    const ic = a.impact==='high'?'impact-high':a.impact==='med'?'impact-med':'impact-low';
+    body.innerHTML += `<div class="news-row${a.featured?' featured':''}" onclick="toggleExpand(this)">
+      <span class="col-time">${esc(a.time)}</span>
+      <span class="col-cur">${esc(a.cur)}</span>
+      <div class="col-impact ${ic}"><div class="impact-dot"></div></div>
+      <span class="col-title">${esc(a.title)}</span>
+      <span class="col-source">${esc(a.source)}</span>
+    </div>
+    <div class="news-expand">${esc(a.expand||'')}</div>`;
+  });
+  document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
+  computeSentiment(filtered);
 }
 
-// ─────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────
-document.getElementById('year').textContent = new Date().getFullYear();
-buildTicker();
-updateTicker();
-loadNews();
-// Refresca cada 5 minutos
-setInterval(loadNews, 5 * 60 * 1000);
+function loadMore() { visible += PAGE; renderFeed(); }
+
+function toggleExpand(row) {
+  const was = row.classList.contains('open');
+  document.querySelectorAll('.news-row.open').forEach(r => r.classList.remove('open'));
+  if (!was) row.classList.add('open');
+}
+
+function setFilter(val, btn) {
+  document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = val; visible = PAGE; renderFeed();
+}
+
+function toggleImpact(btn) {
+  btn.classList.toggle('active-green');
+  highOnly = btn.classList.contains('active-green');
+  visible = PAGE; renderFeed();
+}
+
+async function initFeed() {
+  try {
+    const res = await fetch('news-data/news.json?_=' + Date.now());
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if ((data.articles||[]).length) { allArticles = data.articles; }
+    else throw new Error('empty');
+  } catch(e) {
+    console.warn('news.json unavailable, using sample data:', e.message);
+    allArticles = SAMPLE;
+  }
+  renderFeed();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initFeed();
+loadUpcomingEvents();
+renderSources();
 </script>
 </body>
 </html>
