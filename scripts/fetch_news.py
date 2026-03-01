@@ -166,12 +166,33 @@ FEEDS = [
         "method": "feedparser",
         "lang": "es",
     },
+    # ── FXStreet ES ───────────────────────────
+    # Feed oficial confirmado en rssdirectory de FXStreet
+    {
+        "source": "FXStreet ES",
+        "url": "https://www.fxstreet.es/rss/news",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    # ── Investing.com ES (vía proxy CORS) ─────
+    {
+        "source": "Investing.com ES",
+        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_25.rss",
+        "method": "proxy_xml",
+        "lang": "es",
+    },
+    {
+        "source": "Investing.com ES",
+        "url": "https://api.allorigins.win/raw?url=https://es.investing.com/rss/news_14.rss",
+        "method": "proxy_xml",
+        "lang": "es",
+    },
 
     # ══════════════════════════════════════════
     # FUENTES EN INGLÉS
     # ══════════════════════════════════════════
 
-    # ── FXStreet ──────────────────────────────
+    # ── FXStreet EN ───────────────────────────
     {
         "source": "FXStreet",
         "url": "https://www.fxstreet.com/rss/news",
@@ -181,6 +202,21 @@ FEEDS = [
     {
         "source": "FXStreet",
         "url": "https://www.fxstreet.com/rss/analysis",
+        "method": "feedparser",
+        "lang": "en",
+    },
+    # ── DailyForex ────────────────────────────
+    # No tiene subdominio ES con RSS; los feeds son en inglés
+    # pero cubre análisis fundamentales relevantes para todos los pares
+    {
+        "source": "DailyForex",
+        "url": "https://www.dailyforex.com/rss/forexnews.xml",
+        "method": "feedparser",
+        "lang": "en",
+    },
+    {
+        "source": "DailyForex",
+        "url": "https://www.dailyforex.com/rss/fundamentalanalysis.xml",
         "method": "feedparser",
         "lang": "en",
     },
@@ -213,23 +249,7 @@ FEEDS = [
         "lang": "en",
     },
 
-    # ── Investing.com (vía proxy CORS) ─────────
-    {
-        "source": "Investing.com",
-        "url": "https://api.allorigins.win/raw?url=https://www.investing.com/rss/news_25.rss",
-        "method": "proxy_xml",
-        "lang": "en",
-    },
-    {
-        "source": "Investing.com",
-        "url": "https://api.allorigins.win/raw?url=https://www.investing.com/rss/news_14.rss",
-        "method": "proxy_xml",
-        "lang": "en",
-    },
-
     # ── MQL5 Economic Calendar ─────────────────
-    {
-        "source": "MQL5",
         "url": "https://www.mql5.com/en/economic-calendar/rss",
         "method": "feedparser",
         "lang": "en",
