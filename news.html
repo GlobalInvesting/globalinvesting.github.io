@@ -3,10 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noticias Forex · Análisis Fundamental</title>
-<meta name="description" content="Feed de noticias de mercado Forex con análisis fundamental en tiempo real. Cobertura de USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
-<meta name="robots" content="index, follow">
+
+<!-- ── CACHÉ: forzar recarga ─────────────────────────────────────────────── -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<!-- ── SEO BÁSICO ────────────────────────────────────────────────────────── -->
+<title>Noticias Forex en Tiempo Real · Análisis Fundamental | Global Investing</title>
+<meta name="description" content="Feed de noticias forex en tiempo real con análisis fundamental AI. Cobertura de las 8 divisas principales: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. Actualizado 3 veces al día con titulares generados por IA.">
+<meta name="keywords" content="noticias forex, análisis fundamental forex, USD EUR GBP JPY, noticias divisas, banco central, fed, bce, boe, boj, trading forex, tipo de cambio, mercado de divisas">
+<meta name="author" content="Santiago Plá · Global Investing">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://globalinvesting.github.io/news.html">
+
+<!-- ── OPEN GRAPH (Facebook / LinkedIn / WhatsApp) ───────────────────────── -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
+<meta property="og:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
+<meta property="og:description" content="Feed de noticias forex con análisis AI. Cobertura de USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. Actualizado 3 veces al día.">
+<meta property="og:url" content="https://globalinvesting.github.io/news.html">
+<meta property="og:image" content="https://globalinvesting.github.io/assets/og-news.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_ES">
+
+<!-- ── TWITTER / X CARD ──────────────────────────────────────────────────── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@GlobalInvesting">
+<meta name="twitter:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
+<meta name="twitter:description" content="Feed de noticias forex con análisis AI. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
+<meta name="twitter:image" content="https://globalinvesting.github.io/assets/og-news.png">
+
+<!-- ── SCHEMA.ORG STRUCTURED DATA ────────────────────────────────────────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://globalinvesting.github.io/news.html",
+      "url": "https://globalinvesting.github.io/news.html",
+      "name": "Noticias Forex en Tiempo Real · Análisis Fundamental",
+      "description": "Feed de noticias forex en tiempo real con análisis fundamental AI para las 8 divisas principales.",
+      "inLanguage": "es",
+      "isPartOf": { "@id": "https://globalinvesting.github.io/" },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Dashboard", "item": "https://globalinvesting.github.io/" },
+          { "@type": "ListItem", "position": 2, "name": "Noticias", "item": "https://globalinvesting.github.io/news.html" }
+        ]
+      }
+    },
+    {
+      "@type": "NewsMediaOrganization",
+      "name": "Global Investing · Análisis Fundamental Forex",
+      "url": "https://globalinvesting.github.io/",
+      "logo": "https://globalinvesting.github.io/assets/logo.png",
+      "description": "Plataforma de análisis fundamental forex con cobertura de las 8 divisas principales.",
+      "contactPoint": { "@type": "ContactPoint", "contactType": "customer support", "url": "https://globalinvesting.github.io/contact.html" }
+    }
+  ]
+}
+</script>
+
+<!-- ── FUENTES ────────────────────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   :root{
@@ -69,14 +135,15 @@
 
   /* NEWS PANEL */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .panel-header{display:grid;grid-template-columns:44px 46px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
-  .news-row{display:grid;grid-template-columns:44px 46px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
+  .panel-header{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
+  .news-row{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
   .news-row:last-child{border-bottom:none;}
   .news-row:hover{background:rgba(255,255,255,.03);}
   .news-row.featured{background:rgba(30,136,229,.05);border-left:2px solid var(--blue);}
   .news-row.featured:hover{background:rgba(30,136,229,.08);}
   .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
-  .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;}
+  .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;display:flex;align-items:center;gap:.3rem;}
+  .col-cur .flag{font-size:.82rem;line-height:1;}
   .col-impact{display:flex;align-items:center;}
   .impact-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
   .impact-high .impact-dot{background:var(--red);}
@@ -84,6 +151,8 @@
   .impact-low .impact-dot{background:var(--text-dim);}
   .col-title{font-size:.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .75rem;font-weight:400;}
   .news-row.featured .col-title{font-weight:500;}
+  /* Badge "histórico" para noticias de más de 24h */
+  .col-title .hist-tag{font-size:.55rem;color:var(--text-dim);border:1px solid var(--border);border-radius:2px;padding:.03rem .22rem;margin-left:.3rem;vertical-align:middle;font-weight:400;}
   .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .news-expand{display:none;grid-column:1/-1;padding:.6rem .75rem .75rem 1.5rem;border-bottom:1px solid rgba(48,54,61,.6);font-size:.75rem;color:var(--text-secondary);line-height:1.65;background:rgba(255,255,255,.01);border-left:2px solid var(--border);}
   .news-row.open + .news-expand{display:block;}
@@ -137,7 +206,6 @@
   .src-row:last-child{border-bottom:none;}
   .src-name{font-size:.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:.3rem;}
   .src-ok{font-size:.62rem;color:var(--green);font-weight:500;}
-  .src-warn{font-size:.62rem;color:var(--orange);font-weight:500;}
   .lang-tag{font-size:.55rem;background:rgba(30,136,229,.15);color:var(--blue);border-radius:2px;padding:.05rem .3rem;}
 
   /* Footer */
@@ -152,7 +220,7 @@
     .nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
     .nav-links a{font-size:.85rem;}
     .page-wrap{padding:1rem 1rem 3rem;}
-    .panel-header,.news-row{grid-template-columns:40px 42px 12px 1fr 0;}
+    .panel-header,.news-row{grid-template-columns:40px 56px 12px 1fr 0;}
     .col-source{display:none;}
     .col-impact{justify-content:center;}
   }
@@ -163,9 +231,9 @@
 <header class="site-header">
   <div class="header-inner">
     <a href="index.html" class="brand">Análisis Fundamental Forex</a>
-    <nav class="nav-links">
+    <nav class="nav-links" aria-label="Navegación principal">
       <a href="index.html">Dashboard</a>
-      <a href="news.html" class="active">Noticias</a>
+      <a href="news.html" class="active" aria-current="page">Noticias</a>
       <a href="about.html">Acerca de</a>
       <a href="terms.html">Términos</a>
       <a href="privacy.html">Privacidad</a>
@@ -175,7 +243,7 @@
 </header>
 
 <!-- TICKER -->
-<div class="ticker-wrap">
+<div class="ticker-wrap" aria-hidden="true">
   <div class="ticker-label">FX LIVE</div>
   <div class="ticker-overflow">
     <div class="ticker-track" id="ticker">
@@ -184,84 +252,88 @@
   </div>
 </div>
 
-<div class="page-wrap">
+<main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
     <div class="live-badge">
-      <span class="live-dot"></span>
-      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;"></span>
+      <span class="live-dot" aria-hidden="true"></span>
+      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;"></span> <span style="margin-left:.2rem;">(hora local)</span>
     </div>
   </div>
 
-  <div class="filter-bar">
+  <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
     <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
-    <button class="filter-btn" onclick="setFilter('USD',this)">USD</button>
-    <button class="filter-btn" onclick="setFilter('EUR',this)">EUR</button>
-    <button class="filter-btn" onclick="setFilter('GBP',this)">GBP</button>
-    <button class="filter-btn" onclick="setFilter('JPY',this)">JPY</button>
-    <button class="filter-btn" onclick="setFilter('AUD',this)">AUD</button>
-    <button class="filter-btn" onclick="setFilter('CAD',this)">CAD</button>
-    <button class="filter-btn" onclick="setFilter('CHF',this)">CHF</button>
-    <button class="filter-btn" onclick="setFilter('NZD',this)">NZD</button>
-    <div class="filter-sep"></div>
+    <button class="filter-btn" onclick="setFilter('USD',this)">🇺🇸 USD</button>
+    <button class="filter-btn" onclick="setFilter('EUR',this)">🇪🇺 EUR</button>
+    <button class="filter-btn" onclick="setFilter('GBP',this)">🇬🇧 GBP</button>
+    <button class="filter-btn" onclick="setFilter('JPY',this)">🇯🇵 JPY</button>
+    <button class="filter-btn" onclick="setFilter('AUD',this)">🇦🇺 AUD</button>
+    <button class="filter-btn" onclick="setFilter('CAD',this)">🇨🇦 CAD</button>
+    <button class="filter-btn" onclick="setFilter('CHF',this)">🇨🇭 CHF</button>
+    <button class="filter-btn" onclick="setFilter('NZD',this)">🇳🇿 NZD</button>
+    <div class="filter-sep" aria-hidden="true"></div>
     <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
   </div>
 
   <div class="layout-cols">
 
     <!-- FEED -->
-    <div class="news-panel">
-      <div class="panel-header">
-        <span>Hora</span>
-        <span>Divisa</span>
-        <span>Imp.</span>
-        <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
-        <span style="text-align:right;">Fuente</span>
-      </div>
-      <div id="feed-body">
-        <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
-          <div style="margin-bottom:.5rem;">⏳</div>
-          Cargando noticias desde fuentes RSS…
+    <section aria-label="Feed de noticias forex">
+      <div class="news-panel">
+        <div class="panel-header" aria-hidden="true">
+          <span>Hora</span>
+          <span>Divisa</span>
+          <span>Imp.</span>
+          <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
+          <span style="text-align:right;">Fuente</span>
         </div>
+        <div id="feed-body" role="feed" aria-busy="true" aria-label="Noticias forex">
+          <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
+            <div style="margin-bottom:.5rem;">⏳</div>
+            Cargando noticias…
+          </div>
+        </div>
+        <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">↓ Cargar más noticias</div>
       </div>
-      <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;">↓ Cargar más noticias</div>
-    </div>
+    </section>
 
     <!-- SIDEBAR -->
-    <div class="sidebar">
+    <aside aria-label="Panel lateral">
+      <div class="sidebar">
 
-      <!-- SENTIMIENTO -->
-      <div class="s-panel">
-        <div class="s-header">
-          <span class="s-title">Sentimiento 24h</span>
-          <span class="s-sub">por divisa</span>
+        <!-- SENTIMIENTO -->
+        <div class="s-panel">
+          <div class="s-header">
+            <span class="s-title">Sentimiento 24h</span>
+            <span class="s-sub">por divisa</span>
+          </div>
+          <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
         </div>
-        <div id="sentiment-body"></div>
+
+        <!-- PRÓXIMOS EVENTOS -->
+        <div class="s-panel">
+          <div class="s-header">
+            <span class="s-title">Próximos eventos</span>
+            <span class="s-sub">hoy/mañana · hora local</span>
+          </div>
+          <div id="upcoming-events">
+            <div class="ev-empty">Cargando eventos…</div>
+          </div>
+        </div>
+
+        <!-- FUENTES RSS -->
+        <div class="s-panel">
+          <div class="s-header">
+            <span class="s-title">Fuentes RSS</span>
+            <span class="s-sub">estado</span>
+          </div>
+          <div id="sources-body"></div>
+        </div>
+
       </div>
-
-      <!-- PRÓXIMOS EVENTOS -->
-      <div class="s-panel">
-        <div class="s-header">
-          <span class="s-title">Próximos eventos</span>
-          <span class="s-sub">hoy/mañana · hora local</span>
-        </div>
-        <div id="upcoming-events">
-          <div class="ev-empty">Cargando eventos…</div>
-        </div>
-      </div>
-
-      <!-- FUENTES RSS -->
-      <div class="s-panel">
-        <div class="s-header">
-          <span class="s-title">Fuentes RSS</span>
-          <span class="s-sub">estado</span>
-        </div>
-        <div id="sources-body"></div>
-      </div>
-
-    </div>
+    </aside>
   </div>
-</div>
+</main>
 
 <footer class="site-footer">
   <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
@@ -273,20 +345,35 @@
     <a href="privacy.html">Política de Privacidad</a> |
     <a href="contact.html">Contacto</a>
   </p>
+  <p style="margin-top:.75rem;font-size:.75rem;color:var(--text-dim);">
+    Los datos mostrados son informativos y no constituyen asesoramiento financiero.
+    Fuentes: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook, bancos centrales.
+  </p>
 </footer>
 
 <script>
 // ── UTILS ────────────────────────────────────────────────────────────────────
-const pad = n => String(n).padStart(2,'0');
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-// ── TIMESTAMP "Actualizado" EN HORA LOCAL DEL USUARIO ────────────────────────
+// ── TIMESTAMP EN HORA LOCAL ───────────────────────────────────────────────────
 const now = new Date();
 document.getElementById('ts').textContent =
-  now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' (hora local)';
+  now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 document.getElementById('year').textContent = now.getFullYear();
 
-// ── TICKER: Precios DINÁMICOS desde Frankfurter API ──────────────────────────
+// ── BANDERAS POR DIVISA ───────────────────────────────────────────────────────
+const CURRENCY_FLAGS = {
+  USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
+  AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
+  US:'🇺🇸',  EU:'🇪🇺',  UK:'🇬🇧',  JP:'🇯🇵',
+  AU:'🇦🇺',  CA:'🇨🇦',  CH:'🇨🇭',  NZ:'🇳🇿',
+};
+
+function resolveFlag(cur) {
+  return CURRENCY_FLAGS[cur] || '';
+}
+
+// ── TICKER ────────────────────────────────────────────────────────────────────
 const TICKER_PAIRS = [
   { pair:'EUR/USD', base:'EUR', quote:'USD', invert:false },
   { pair:'GBP/USD', base:'GBP', quote:'USD', invert:false },
@@ -300,101 +387,108 @@ const TICKER_PAIRS = [
   { pair:'GBP/JPY', base:'GBP', quote:'JPY', invert:false },
 ];
 
-const PREV_RATES_KEY = 'fx_prev_rates';
+// Caché de precios de apertura del DÍA ACTUAL (se limpia si cambia la fecha)
+const OPEN_PRICES_KEY = 'fx_open_prices_v2';
 
-function loadPrevRates() {
+function getTodayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function loadOpenPrices() {
   try {
-    const raw = localStorage.getItem(PREV_RATES_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch(_) { return {}; }
-}
-function savePrevRates(obj) {
-  try { localStorage.setItem(PREV_RATES_KEY, JSON.stringify(obj)); } catch(_) {}
-}
-
-let prevRates = loadPrevRates();
-
-function lastTradingDay() {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  const dow = d.getUTCDay();
-  if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
-  else if (dow === 1) d.setUTCDate(d.getUTCDate() - 3);
-  else d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().split('T')[0];
+    const raw = localStorage.getItem(OPEN_PRICES_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    // Solo válido si es del día de hoy
+    if (obj._date !== getTodayISO()) return null;
+    return obj;
+  } catch(_) { return null; }
 }
 
-function ratesToPairPrices(rates) {
+function saveOpenPrices(obj) {
+  try {
+    obj._date = getTodayISO();
+    localStorage.setItem(OPEN_PRICES_KEY, JSON.stringify(obj));
+  } catch(_) {}
+}
+
+function ratesToPairPrices(usdRates) {
   const prices = {};
   TICKER_PAIRS.forEach(({ pair, base, quote }) => {
     let p;
-    if (base === 'USD')       p = rates[quote];
-    else if (quote === 'USD') p = 1 / rates[base];
-    else                      p = rates[quote] / rates[base];
+    if (base === 'USD')       p = usdRates[quote];
+    else if (quote === 'USD') p = 1 / usdRates[base];
+    else                      p = usdRates[quote] / usdRates[base];
     if (p && !isNaN(p)) prices[pair] = p;
   });
   return prices;
 }
 
-async function ensureDailyBaseline() {
+// Obtiene precios de apertura del día (00:00 UTC) desde Frankfurter
+async function ensureDailyOpenPrices() {
+  const cached = loadOpenPrices();
+  if (cached && Object.keys(cached).length > 1) return cached;
+
   try {
-    const stored = localStorage.getItem(PREV_RATES_KEY);
-    const parsed = stored ? JSON.parse(stored) : null;
-    const tradingDay = lastTradingDay();
-
-    if (parsed && parsed._date === tradingDay && Object.keys(parsed).length > 1) {
-      prevRates = parsed;
-      return;
-    }
-
+    // Precio de apertura = cierre del día anterior en ECB = fecha de hoy 00:00 UTC
+    const todayISO = getTodayISO();
     const ctrl = new AbortController();
     setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(`https://api.frankfurter.app/${tradingDay}?from=EUR`, { signal: ctrl.signal });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (!data.rates) return;
 
+    // Frankfurter devuelve el último precio disponible para esa fecha
+    const res = await fetch(
+      `https://api.frankfurter.app/${todayISO}?from=EUR`,
+      { signal: ctrl.signal }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.rates) throw new Error('Sin rates');
+
+    // Convertir todo a base USD
     const eurUsd = data.rates['USD'];
-    if (!eurUsd) return;
-    const usdRates = {};
+    if (!eurUsd) throw new Error('Sin EUR/USD');
+    const usdRates = { EUR: 1 / eurUsd };
     Object.entries(data.rates).forEach(([cur, val]) => {
       usdRates[cur] = val / eurUsd;
     });
-    usdRates['EUR'] = 1 / eurUsd;
 
     const prices = ratesToPairPrices(usdRates);
-    prices._date = tradingDay;
-    localStorage.setItem(PREV_RATES_KEY, JSON.stringify(prices));
-    prevRates = prices;
-  } catch(_) {}
+    saveOpenPrices(prices);
+    return prices;
+  } catch(_) {
+    return null;
+  }
+}
+
+async function fetchCurrentRates() {
+  const sources = [
+    'https://api.frankfurter.app/latest?from=USD',
+    'https://open.er-api.com/v6/latest/USD',
+    'https://api.exchangerate-api.com/v4/latest/USD',
+  ];
+  for (const url of sources) {
+    try {
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), 6000);
+      const res = await fetch(url, { signal: ctrl.signal });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.rates) return data.rates;
+      }
+    } catch(_) {}
+  }
+  return null;
 }
 
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
-
   try {
-    await ensureDailyBaseline();
+    const [openPrices, rates] = await Promise.all([
+      ensureDailyOpenPrices(),
+      fetchCurrentRates(),
+    ]);
 
-    let rates = null;
-    const sources = [
-      'https://api.frankfurter.app/latest?from=USD',
-      'https://open.er-api.com/v6/latest/USD',
-      'https://api.exchangerate-api.com/v4/latest/USD',
-    ];
-
-    for (const url of sources) {
-      try {
-        const ctrl = new AbortController();
-        setTimeout(() => ctrl.abort(), 6000);
-        const res = await fetch(url, { signal: ctrl.signal });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.rates) { rates = data.rates; break; }
-        }
-      } catch(e) {}
-    }
-
-    if (!rates) throw new Error('Todas las fuentes de FX fallaron');
+    if (!rates) throw new Error('Sin tasas de cambio');
 
     const items = TICKER_PAIRS.map(({ pair, base, quote }) => {
       let price;
@@ -403,14 +497,20 @@ async function fetchAndBuildTicker() {
       else                       price = rates[quote] / rates[base];
       if (!price || isNaN(price)) return null;
 
-      const decimals  = pair.includes('JPY') ? 2 : 4;
-      const prevPrice = prevRates[pair];
+      const decimals = pair.includes('JPY') ? 2 : 4;
       let chgStr = '', up = null;
 
-      if (prevPrice && Math.abs(prevPrice - price) > 0.000001) {
-        const pct = ((price - prevPrice) / prevPrice) * 100;
-        up = pct >= 0;
-        chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
+      if (openPrices && openPrices[pair]) {
+        const prev = openPrices[pair];
+        const diff = price - prev;
+        if (Math.abs(diff / prev) > 0.000001) {
+          const pct = (diff / prev) * 100;
+          // Solo mostrar si el cambio es significativo (> 0.005%)
+          if (Math.abs(pct) >= 0.005) {
+            up = pct >= 0;
+            chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
+          }
+        }
       }
 
       return { pair, price: price.toFixed(decimals), chgStr, up };
@@ -428,59 +528,45 @@ async function fetchAndBuildTicker() {
     }).join('');
 
     t.innerHTML = html;
-
   } catch(err) {
-    t.innerHTML = `<span class="ticker-loading">No se pudieron cargar tipos de cambio en tiempo real.</span>`;
-    console.warn('Ticker error:', err.message);
+    t.innerHTML = `<span class="ticker-loading">Tipos de cambio no disponibles.</span>`;
   }
 }
 
 fetchAndBuildTicker();
 setInterval(fetchAndBuildTicker, 60000);
 
-// ── RSS SOURCES ───────────────────────────────────────────────────────────────
+// ── RSS SOURCES (sidebar) ─────────────────────────────────────────────────────
 const RSS_SOURCES = [
-  // ── EN ESPAÑOL ────────────────────────────────────────────────────────────
-  { name:'FXStreet ES',         url:'https://www.fxstreet.es/rss/news',                                lang:'es' },
-  { name:'DailyForex ES',       url:'https://es.dailyforex.com/rss/es/forexnews.xml',                  lang:'es' },
-  { name:'DailyForex ES · Fund',url:'https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml',        lang:'es' },
-  { name:'DailyForex ES · Tec', url:'https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml',          lang:'es' },
-  { name:'Investing.com ES',    url:'https://es.investing.com/rss/news_1.rss',                          lang:'es' },
-  // ── EN INGLÉS ─────────────────────────────────────────────────────────────
-  { name:'FXStreet',            url:'https://www.fxstreet.com/rss/news',                                lang:'en' },
-  { name:'ForexLive',           url:'https://www.forexlive.com/feed/news',                              lang:'en' },
-  { name:'ForexLive · CB',      url:'https://www.forexlive.com/feed/centralbank',                       lang:'en' },
-  { name:'ActionForex',         url:'https://www.actionforex.com/category/live-comments/feed/',         lang:'en' },
-  { name:'ActionForex · Insight',url:'https://www.actionforex.com/category/action-insight/feed/',      lang:'en' },
-  { name:'InvestingLive · CB',  url:'https://investinglive.com/feed/centralbank/',                      lang:'en' },
-  { name:'InvestingLive · Tech',url:'https://investinglive.com/feed/technicalanalysis/',                lang:'en' },
-  { name:'MyFXBook',            url:'https://www.myfxbook.com/rss/latest-forex-news',                   lang:'en' },
-  { name:'Investing.com · Fund',url:'https://www.investing.com/rss/forex_Fundamental.rss',              lang:'en' },
-  { name:'Investing.com · Tech',url:'https://www.investing.com/rss/forex_Technical.rss',                lang:'en' },
-  { name:'DailyForex',          url:'https://www.dailyforex.com/rss/forexnews.xml',                     lang:'en' },
-  { name:'Bank of Canada',      url:'https://www.bankofcanada.ca/feed/',                                 lang:'en' },
-  { name:'ECB',                 url:'https://www.ecb.europa.eu/rss/press.html',                          lang:'en' },
-  { name:'Bank of England',     url:'https://www.bankofengland.co.uk/rss/news',                          lang:'en' },
+  // ESPAÑOL
+  { name:'FXStreet ES',          lang:'es' },
+  { name:'DailyForex ES',        lang:'es' },
+  { name:'DailyForex ES · Fund', lang:'es' },
+  { name:'DailyForex ES · Tec',  lang:'es' },
+  { name:'Investing.com ES',     lang:'es' },
+  // INGLÉS
+  { name:'FXStreet',             lang:'en' },
+  { name:'FXStreet · Analysis',  lang:'en' },
+  { name:'ForexLive',            lang:'en' },
+  { name:'ForexLive · CB',       lang:'en' },
+  { name:'ActionForex',          lang:'en' },
+  { name:'ActionForex · Insight',lang:'en' },
+  { name:'InvestingLive · CB',   lang:'en' },
+  { name:'InvestingLive · Tech', lang:'en' },
+  { name:'MyFXBook',             lang:'en' },
+  { name:'Investing.com · Fund', lang:'en' },
+  { name:'Investing.com · Tech', lang:'en' },
+  { name:'DailyForex',           lang:'en' },
+  { name:'Bank of Canada',       lang:'en' },
+  { name:'ECB',                  lang:'en' },
+  { name:'Bank of England',      lang:'en' },
+  { name:'InstaForex · News',    lang:'en' },
+  { name:'InstaForex · Analytics',lang:'en' },
 ];
 
-// ── CURRENCY FLAGS MAP ────────────────────────────────────────────────────────
-const CURRENCY_FLAGS = {
-  USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
-  AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
-  US:'🇺🇸', EU:'🇪🇺', UK:'🇬🇧', JP:'🇯🇵',
-  AU:'🇦🇺', CA:'🇨🇦', CH:'🇨🇭', NZ:'🇳🇿',
-};
-
-function resolveFlag(event) {
-  if (event.flag) return event.flag;
-  const cur3 = (event.currency || '').toUpperCase();
-  if (CURRENCY_FLAGS[cur3]) return CURRENCY_FLAGS[cur3];
-  const cur2 = cur3.slice(0, 2);
-  return CURRENCY_FLAGS[cur2] || '';
-}
-
-// ── SENTIMENT KEYWORDS ────────────────────────────────────────────────────────
+// ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+
 const BULL_KW = [
   'rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged',
   'hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates',
@@ -488,12 +574,12 @@ const BULL_KW = [
   'outperforms','exceeds','exceeded','robust','solid','improves','improved','expansion',
   'growth','confidence','optimism','bullish','tightening','restrictive','upbeat',
   'beats expectations','above expectations','accelerates','accelerated','record high',
-  'sube','suben','sube tasas','gana','ganan','fortalece','fortalecen','avanza','avanzan',
+  'sube','suben','gana','ganan','fortalece','fortalecen','avanza','avanzan',
   'repunta','repuntan','supera','superan','restrictivo','restrictiva','alza','alzas',
   'mejora','mejoran','positivo','positiva','optimismo','confianza','expansión','crecimiento',
   'robusto','robusta','sólido','sólida','impulsa','impulsan','aceleración','máximo','récord',
   'supera estimaciones','supera expectativas','postura restrictiva','por encima',
-  'más fuerte','subida','mantiene restrictivo'
+  'más fuerte','subida','mantiene restrictivo','apoya','apoyado','sube tasas'
 ];
 const BEAR_KW = [
   'falls','fallen','fell','drops','dropped','weakens','weakened','declines','declined',
@@ -508,11 +594,11 @@ const BEAR_KW = [
   'negativo','negativa','pesimismo','preocupación','preocupaciones','contracción',
   'desaceleración','débil','frágil','presiona','presionan','deterioro','deteriora',
   'riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo',
-  'pierde terreno','cede terreno','debilidad','bajo mínimos'
+  'pierde terreno','cede terreno','debilidad','bajo mínimos','presión bajista'
 ];
 
-function scoreSentiment(title, expand) {
-  const lower = ((title || '') + ' ' + (expand || '')).toLowerCase();
+function scoreSentiment(text) {
+  const lower = (text || '').toLowerCase();
   let bull = 0, bear = 0;
   BULL_KW.forEach(kw => { if (lower.includes(kw)) bull++; });
   BEAR_KW.forEach(kw => { if (lower.includes(kw)) bear++; });
@@ -526,8 +612,7 @@ function computeSentiment(articles) {
   CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
   articles.forEach(a => {
     if (!counts[a.cur]) return;
-    const textForSentiment = a.ai_headline || a.title;
-    const s = scoreSentiment(textForSentiment, '');
+    const s = scoreSentiment(a.ai_headline || a.title);
     counts[a.cur][s]++;
     counts[a.cur].total++;
   });
@@ -539,8 +624,9 @@ function computeSentiment(articles) {
     if (d.total === 0 || d.bull === d.bear) { label='Neut'; cls='neut'; width=50; }
     else if (d.bull > d.bear) { label='Bull'; cls='bull'; width=Math.round(50+(d.bull/d.total)*50); }
     else { label='Bear'; cls='bear'; width=Math.round(50-(d.bear/d.total)*50); }
+    const flag = resolveFlag(cur);
     body.innerHTML += `<div class="sent-row">
-      <span class="sent-cur">${cur}</span>
+      <span class="sent-cur">${flag} ${cur}</span>
       <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${width}%"></div></div>
       <span class="sent-count">${d.total}</span>
       <span class="sent-label ${cls}">${label}</span>
@@ -575,30 +661,25 @@ async function loadUpcomingEvents() {
 
     container.innerHTML = '';
     upcoming.forEach(e => {
-      const imp       = (e.impact||'').toLowerCase();
+      const imp        = (e.impact||'').toLowerCase();
       const isTomorrow = (e.dateISO === tomorrowISO);
-      const detail    = [
+      const detail     = [
         e.currency,
         e.forecast ? 'Est: ' + e.forecast : '',
         e.previous ? 'Prev: ' + e.previous : ''
       ].filter(Boolean).join(' · ');
 
-      // ── HORA LOCAL DEL USUARIO ──────────────────────────────────────────────
       let localTime = e.timeUTC || '--:--';
       if (e.timeUTC && e.dateISO) {
         try {
           const utcDate = new Date(`${e.dateISO}T${e.timeUTC}:00Z`);
           if (!isNaN(utcDate.getTime())) {
-            localTime = utcDate.toLocaleTimeString('es-ES', {
-              hour:   '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            });
+            localTime = utcDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
           }
         } catch(_) {}
       }
 
-      const flag = resolveFlag(e);
+      const flag = CURRENCY_FLAGS[e.currency] || CURRENCY_FLAGS[(e.currency||'').slice(0,2)] || '🌐';
 
       container.innerHTML += `<div class="ev-row">
         <div class="ev-left">
@@ -614,7 +695,6 @@ async function loadUpcomingEvents() {
     });
 
   } catch(err) {
-    console.warn('calendar.json unavailable:', err.message);
     container.innerHTML = '<div class="ev-empty">Calendario no disponible.</div>';
   }
 }
@@ -629,212 +709,54 @@ function renderSources() {
   ).join('');
 }
 
-// ── DETECT CURRENCY ───────────────────────────────────────────────────────────
+// ── CURRENCY DETECTION ────────────────────────────────────────────────────────
 const CUR_KEYWORDS = [
-  ['CAD', [
-    'bank of canada','banco de canadá','banco de canada','boc meeting','macklem',
-    'loonie','cad/','cad usd','usd/cad','/cad',
-    'canadian dollar','dólar canadiense','dolar canadiense','canadian economy',
-    'canada economy','economía canadá','economía de canadá',
-    'pib canadá','ipc canadá','empleo canadá','inflación canadá',
-    'canada gdp','canada cpi','canada jobs','canadian','tsx index',
-    'oil prices','crude oil','wti crude','petróleo','precio del petróleo',
-    'crudo brent','crudo wti','barrel','barril ',
-    'canada ', 'canadá ', 'in canada','de canadá','de canada',
-  ]],
-  ['CHF', [
-    'swiss national bank','snb meeting','snb decision','banco nacional suizo',
-    'swiss franc','franco suizo','chf/','usd/chf','/chf',
-    'switzerland','suiza','economía suiza','swiss economy',
-    'swiss inflation','swiss cpi','ipc suiza',
-  ]],
-  ['NZD', [
-    'reserve bank of new zealand','rbnz meeting','rbnz decision',
-    'banco de la reserva de nueva zelanda',
-    'nzd/','nzd usd','usd/nzd','/nzd',
-    'new zealand','nueva zelanda','nz gdp','nz cpi','nz jobs',
-    'dólar neozelandés','dolar neozelandes',
-  ]],
-  ['AUD', [
-    'reserve bank of australia','rba meeting','rba decision',
-    'banco de la reserva de australia',
-    'aud/','aud usd','usd/aud','/aud',
-    'australia gdp','australia cpi','australia jobs','australian economy',
-    'economía australia','economía de australia','ipc australia',
-    'dólar australiano','dolar australiano',
-    'caixin pmi','china pmi','china gdp','china economy',
-    'australia ', 'australi',
-  ]],
-  ['EUR', [
-    'european central bank','banco central europeo','ecb meeting','ecb decision',
-    'bce reunión','bce decisión','lagarde',
-    'eur/','eur usd','usd/eur','/eur',
-    'eurozone','eurozona','zona euro','euro area','area euro',
-    'germany gdp','german cpi','french gdp','italian gdp',
-    'germany ','alemania ','france ','francia ','italia ','italy ',
-    'draghi','ifo index','zew index','bund yield','eu economy','economía europea',
-    'inflación zona euro','ipc zona euro','pib zona euro',
-    'euro ', 'en euros',
-  ]],
-  ['GBP', [
-    'bank of england','banco de inglaterra','boe meeting','boe decision','bailey ',
-    'pound sterling','sterling','british pound','libra esterlina',
-    'gbp/','gbp usd','usd/gbp','/gbp',
-    'united kingdom','reino unido','britain','uk gdp','uk cpi',
-    'uk inflation','uk jobs','uk economy','ftse index','gilts yield',
-    'economía del reino unido','ipc uk','pib uk',
-  ]],
-  ['JPY', [
-    'bank of japan','banco de japón','banco de japan','boj meeting','boj decision','ueda ',
-    'jpy/','jpy usd','usd/jpy','/jpy',
-    'japanese yen','yen japonés','yen japones',
-    'japan gdp','japan cpi','japan inflation','japan jobs',
-    'japanese economy','economía japonesa','economía de japón',
-    'nikkei index','shunto','ipc japón',
-    'japan ', 'japón ', 'en japón',
-  ]],
-  ['USD', [
-    'federal reserve','reserva federal','fomc meeting','fomc decision','powell ',
-    'us dollar','american dollar','dólar estadounidense',
-    'usd/','dollar index','dxy ',
-    'us gdp','us cpi','us inflation','us jobs','us economy','us retail',
-    'nonfarm payroll','non-farm payroll','jobless claims',
-    'american economy','economía eeuu','economía de eeuu','economía estadounidense',
-    'wall street','treasury yield','dow jones','nasdaq index','s&p 500',
-    'estados unidos','united states','eeuu',
-    'dollar ', 'dólar ',
-  ]],
+  ['CAD', ['bank of canada','banco de canadá','banco de canada','boc meeting','macklem','loonie','cad/','usd/cad','/cad','canadian dollar','dólar canadiense','canadian economy','canada economy','economía canadá','oil prices','crude oil','wti crude','petróleo','precio del petróleo','crudo wti','canada ','canadá ']],
+  ['CHF', ['swiss national bank','snb meeting','snb decision','banco nacional suizo','swiss franc','franco suizo','chf/','usd/chf','/chf','switzerland','suiza','swiss economy']],
+  ['NZD', ['reserve bank of new zealand','rbnz meeting','rbnz decision','banco de la reserva de nueva zelanda','nzd/','nzd usd','usd/nzd','/nzd','new zealand','nueva zelanda','nz gdp','nz cpi','dólar neozelandés']],
+  ['AUD', ['reserve bank of australia','rba meeting','rba decision','banco de la reserva de australia','aud/','aud usd','usd/aud','/aud','australia gdp','australia cpi','australia jobs','australian economy','economía australia','dólar australiano','australia ']],
+  ['EUR', ['european central bank','banco central europeo','ecb meeting','ecb decision','bce ','lagarde','eur/','eur usd','usd/eur','/eur','eurozone','eurozona','zona euro','euro area','germany gdp','german cpi','ifo index','zew index','bund yield','economía europea','inflación zona euro','euro ']],
+  ['GBP', ['bank of england','banco de inglaterra','boe meeting','boe decision','bailey ','pound sterling','sterling','british pound','libra esterlina','gbp/','gbp usd','usd/gbp','/gbp','united kingdom','reino unido','britain','uk gdp','uk cpi','uk inflation','ftse index']],
+  ['JPY', ['bank of japan','banco de japón','boj meeting','boj decision','ueda ','jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés','japan gdp','japan cpi','japanese economy','economía japonesa','nikkei index','japan ','japón ']],
+  ['USD', ['federal reserve','reserva federal','fomc meeting','fomc decision','powell ','us dollar','dólar estadounidense','usd/','dollar index','dxy ','us gdp','us cpi','us inflation','us jobs','us economy','nonfarm payroll','jobless claims','american economy','economía eeuu','wall street','treasury yield','dow jones','s&p 500','estados unidos','united states','dollar ','dólar ']],
 ];
-
-function detectCurrency(text) {
-  if (!text) return 'USD';
-  const lower = text.toLowerCase();
-  for (const [cur, kws] of CUR_KEYWORDS) {
-    if (kws.some(kw => lower.includes(kw))) return cur;
-  }
-  return 'USD';
-}
 
 const SOURCE_CURRENCY = {
-  'Bank of Canada':  'CAD',
-  'ECB':             'EUR',
-  'Bank of England': 'GBP',
-  'Bank of Japan':   'JPY',
-  'RBA':             'AUD',
-  'RBNZ':            'NZD',
-  'SNB':             'CHF',
-  'Federal Reserve': 'USD',
+  'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP',
+  'Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD',
 };
 
-const FOREX_SOURCES = new Set([
-  'FXStreet ES','FXStreet','ForexLive','DailyForex ES','DailyForex',
-  'Bank of Canada','ECB','Bank of England','Bank of Japan',
-  'RBA','RBNZ','SNB','Federal Reserve',
-]);
-
-const FOREX_RELEVANCE_KW = [
-  'usd','eur','gbp','jpy','aud','cad','chf','nzd',
-  'dollar','dólar','euro','pound','yen','franc','franco',
-  'forex','fx ','currency','currencies','divisa','divisas','tipo de cambio',
-  'fed','bce','ecb','boe','boj','rba','boc','snb','rbnz','banco central','central bank',
-  'interest rate','tasa de interés','tipos de interés','inflation','inflación',
-  'gdp','pib','cpi','ipc','unemployment','desempleo','payroll','nóminas',
-  'trade balance','balanza','pmi','retail sales','ventas minoristas',
-  'recession','recesión','monetary policy','política monetaria',
-  'stock market','bolsa','equity','bonos','bond','yield','treasury',
-  'oil','petróleo','gold','oro','commodit',
-  'market','mercado','trading','investor','inversor',
-  'sanctions','sanciones','tariff','arancel','trade war','guerra comercial',
-];
-
-function isForexRelevant(title, expand, source) {
-  if (FOREX_SOURCES.has(source)) return true;
-  const text = ((title || '') + ' ' + (expand || '')).toLowerCase();
-  return FOREX_RELEVANCE_KW.some(kw => text.includes(kw));
-}
-
 function detectCurrencyWithSource(text, source) {
-  const lower = (text || '').toLowerCase();
+  if (!text) return SOURCE_CURRENCY[source] || 'USD';
+  const lower = text.toLowerCase();
   for (const [cur, kws] of CUR_KEYWORDS) {
     if (kws.some(kw => lower.includes(kw))) return cur;
   }
   return SOURCE_CURRENCY[source] || 'USD';
 }
 
-const HIGH_IMPACT_KW = [
-  'gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','interest rate',
-  'tasa de interés','rate decision','decisión de tasas','fed','bce','ecb','boj','boe','rba',
-  'jobs','employment','nonfarm','payroll','fomc','hawkish','dovish','recession','recesión',
-  'crisis','hike','recorte','cut rates','baja tasas','sube tasas'
-];
-const MED_IMPACT_KW = [
-  'pmi','manufacturing','manufactura','retail','ventas minoristas','trade balance','balanza',
-  'cot','positioning','current account','cuenta corriente','confidence','confianza',
-  'gdp growth','crecimiento','housing','vivienda','earnings','beneficios','survey','encuesta'
-];
+const HIGH_IMPACT_KW = ['gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','interest rate','tasa de interés','rate decision','decisión de tasas','fed','bce','ecb','boj','boe','rba','jobs','employment','nonfarm','payroll','fomc','hawkish','dovish','recession','recesión','crisis','hike','recorte','cut rates','baja tasas','sube tasas'];
+const MED_IMPACT_KW  = ['pmi','manufacturing','manufactura','retail','ventas minoristas','trade balance','balanza','cot','positioning','current account','cuenta corriente','confidence','confianza','gdp growth','crecimiento','housing','vivienda','earnings','survey','encuesta'];
 
 function detectImpact(title, description) {
-  const text = ((title || '') + ' ' + (description || '')).toLowerCase();
+  const text = ((title||'') + ' ' + (description||'')).toLowerCase();
   if (HIGH_IMPACT_KW.some(kw => text.includes(kw))) return 'high';
   if (MED_IMPACT_KW.some(kw => text.includes(kw))) return 'med';
   return 'low';
 }
 
-// ── RSS PROXY ─────────────────────────────────────────────────────────────────
-const RSS_TO_JSON_PROXIES = [
-  (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&api_key=&count=20`,
-  (url) => `https://rss.app/feeds/v1.1/${encodeURIComponent(url)}.json`,
-];
-
-async function fetchRSSviaProxy(rssUrl) {
-  for (const proxyFn of RSS_TO_JSON_PROXIES) {
-    try {
-      const proxyUrl = proxyFn(rssUrl);
-      const res = await fetch(proxyUrl, {
-        signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (data.items && Array.isArray(data.items) && data.items.length > 0) {
-        return data.items.map(item => ({
-          title:       item.title || '',
-          description: item.description || item.content || '',
-          link:        item.link || item.url || '',
-          pubDate:     item.pubDate || item.isoDate || '',
-          source:      data.feed?.title || new URL(rssUrl).hostname,
-        }));
-      }
-    } catch(_) {}
-  }
-  return null;
-}
-
-// ── HORA LOCAL A PARTIR DE TIMESTAMP ─────────────────────────────────────────
+// ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
 function tsToLocalTime(ts) {
   if (!ts) return '--:--';
   const d = new Date(ts);
   if (isNaN(d)) return '--:--';
-  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return d.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
 }
 
-function parseTime(pubDate) {
-  if (!pubDate) return '--:--';
-  try {
-    const d = new Date(pubDate);
-    if (isNaN(d)) return '--:--';
-    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-  } catch(_) { return '--:--'; }
-}
-
-function parseTimestamp(pubDate) {
-  if (!pubDate) return 0;
-  try { return new Date(pubDate).getTime() || 0; } catch(_) { return 0; }
-}
-
-// ── NEWS FEED STATE ───────────────────────────────────────────────────────────
-const PAGE       = 30;
-let allArticles  = [];
-let visible      = PAGE;
+// ── FEED STATE ────────────────────────────────────────────────────────────────
+const PAGE      = 30;
+let allArticles = [];
+let visible     = PAGE;
 let activeFilter = 'ALL';
 let highOnly     = false;
 
@@ -842,6 +764,7 @@ function renderFeed() {
   const body    = document.getElementById('feed-body');
   const loading = document.getElementById('feed-loading');
   if (loading) loading.remove();
+  body.setAttribute('aria-busy', 'false');
 
   const filtered = allArticles.filter(a =>
     (activeFilter === 'ALL' || a.cur === activeFilter) &&
@@ -851,12 +774,11 @@ function renderFeed() {
   if (filtered.length === 0) {
     body.innerHTML = `<div class="feed-empty">
       <div class="feed-error-icon">📰</div>
-      <strong>No se encontraron noticias verificables</strong><br>
-      Los feeds RSS no devolvieron artículos para el filtro actual.<br><br>
+      <strong>No se encontraron noticias para el filtro actual</strong><br>
       Consulte directamente:<br>
-      <a href="https://www.eleconomista.es/mercados-cotizaciones/" target="_blank" rel="noopener">ElEconomista.es</a> ·
-      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a> ·
-      <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a>
+      <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> ·
+      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> ·
+      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a>
     </div>`;
     document.getElementById('load-more-btn').style.display = 'none';
     computeSentiment([]);
@@ -865,12 +787,17 @@ function renderFeed() {
 
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
-    const ic = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
+    const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
+    const flag    = resolveFlag(a.cur);
+    const isHist  = a.recent === false; // artículo de más de 24h
+    const histTag = isHist ? '<span class="hist-tag" title="Noticia histórica (1-3 días)">hist</span>' : '';
+    const headline = a.ai_headline || a.title;
+
     body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
-      <span class="col-cur">${esc(a.cur)}</span>
-      <div class="col-impact ${ic}"><div class="impact-dot"></div></div>
-      <span class="col-title" title="${esc(a.ai_headline || a.title)}">${esc(a.ai_headline || a.title)}</span>
+      <span class="col-cur"><span class="flag" aria-hidden="true">${flag}</span>${esc(a.cur)}</span>
+      <div class="col-impact ${ic}" aria-label="Impacto ${a.impact}"><div class="impact-dot"></div></div>
+      <span class="col-title" title="${esc(headline)}">${esc(headline)}${histTag}</span>
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
@@ -918,115 +845,70 @@ function toggleImpact(btn) {
 
 // ── INIT FEED ─────────────────────────────────────────────────────────────────
 async function initFeed() {
-  const feedBody = document.getElementById('feed-body');
-
-  // Estrategia 1: JSON pre-generado por GitHub Actions
   try {
-    const res = await fetch('news-data/news.json?_=' + Date.now());
-    if (res.ok) {
-      const data = await res.json();
-      const articles = (data.articles || []);
-      if (articles.length > 0) {
-        allArticles = articles
-          .map(a => {
-            const text = a.title + ' ' + (a.expand || '');
-            // ── Convertir ts (Unix ms) a hora local del usuario ──────────────
-            let localTime = '--:--';
-            if (a.ts) {
-              localTime = tsToLocalTime(a.ts);
-            } else if (a.datetime) {
-              const d = new Date(a.datetime);
-              if (!isNaN(d)) localTime = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-            } else if (a.time && a.time !== '--:--') {
-              localTime = a.time; // fallback: ya viene formateada
-            }
-            return {
-              ...a,
-              cur:         detectCurrencyWithSource(text, a.source),
-              impact:      a.impact || detectImpact(a.title, a.expand),
-              time:        localTime,
-              ai_headline: a.ai_headline || null,
-            };
-          })
-          .filter(a => a.ai_headline && !a.ai_headline.toUpperCase().includes('IRRELEVANTE'))
-          .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-        renderFeed();
-        return;
-      }
+    // Cache-busting: timestamp + versión para forzar recarga siempre
+    const cb = Date.now();
+    const res = await fetch(`news-data/news.json?v=${cb}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const articles = data.articles || [];
+
+    if (articles.length > 0) {
+      allArticles = articles
+        .map(a => {
+          const text = (a.title || '') + ' ' + (a.expand || '');
+          let localTime = '--:--';
+          if (a.ts) {
+            localTime = tsToLocalTime(a.ts);
+          } else if (a.datetime) {
+            const d = new Date(a.datetime);
+            if (!isNaN(d)) localTime = d.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
+          }
+          return {
+            ...a,
+            cur:        detectCurrencyWithSource(text, a.source),
+            impact:     a.impact || detectImpact(a.title, a.expand),
+            time:       localTime,
+            ai_headline: a.ai_headline || null,
+            recent:     a.recent !== undefined ? a.recent : true,
+          };
+        })
+        .filter(a => {
+          // Mostrar artículos con ai_headline válido, o sin headline (fallback al título)
+          if (a.ai_headline && a.ai_headline.toUpperCase().includes('IRRELEVANTE')) return false;
+          return true;
+        })
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+      renderFeed();
+      return;
     }
   } catch(e) {
     console.warn('news.json no disponible:', e.message);
   }
 
-  // Estrategia 2: Feeds RSS vía proxy público
-  feedBody.innerHTML = `<div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
-    Obteniendo noticias desde fuentes RSS…
-  </div>`;
-
-  const collected = [];
-  const ACTIVE_SOURCES = RSS_SOURCES.filter(s =>
-    ['FXStreet ES','DailyForex ES','DailyForex ES · Fund','ElEconomista.es','FXStreet News','DailyForex','Reuters Forex'].includes(s.name)
-  );
-
-  const results = await Promise.allSettled(
-    ACTIVE_SOURCES.map(src => fetchRSSviaProxy(src.url).then(items => ({ src, items })))
-  );
-
-  for (const result of results) {
-    if (result.status === 'fulfilled' && result.value.items) {
-      const { src, items } = result.value;
-      items.forEach(item => {
-        const text   = item.title + ' ' + item.description;
-        const source = item.source || src.name;
-        if (!isForexRelevant(item.title, item.description, source)) return;
-        const cur    = detectCurrencyWithSource(text, source);
-        const impact = detectImpact(item.title, item.description);
-        const ts     = parseTimestamp(item.pubDate);
-        collected.push({
-          time:        ts ? tsToLocalTime(ts) : '--:--',
-          ts,
-          cur,
-          impact,
-          featured:    impact === 'high',
-          source:      item.source || src.name,
-          title:       item.title,
-          description: item.description.replace(/<[^>]*>/g, '').substring(0, 300),
-          link:        item.link,
-          ai_headline: null,
-        });
-      });
-    }
-  }
-
-  if (collected.length > 0) {
-    allArticles = collected.sort((a, b) => b.ts - a.ts);
-    renderFeed();
-    return;
-  }
-
-  // Estrategia 3: Todo falló
-  const loading2 = document.getElementById('feed-loading');
-  if (loading2) loading2.remove();
+  // Fallback si el JSON no carga
+  const feedBody = document.getElementById('feed-body');
+  const loading  = document.getElementById('feed-loading');
+  if (loading) loading.remove();
+  feedBody.setAttribute('aria-busy', 'false');
 
   feedBody.innerHTML = `<div class="feed-empty">
     <div class="feed-error-icon">⚠️</div>
-    <strong>No se pudieron obtener noticias en tiempo real</strong><br><br>
-    Los feeds RSS y el archivo de noticias no están disponibles en este momento.<br>
-    Esto puede deberse a restricciones CORS del navegador o a que el proceso
-    de scraping automático aún no ha ejecutado.<br><br>
+    <strong>No se pudieron cargar las noticias</strong><br><br>
+    El archivo de noticias no está disponible en este momento.<br>
+    Puede que el proceso de actualización automática aún no haya ejecutado.<br><br>
     <strong>Consulte noticias directamente:</strong><br><br>
     <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
-    <a href="https://www.eleconomista.es/mercados-cotizaciones/" target="_blank" rel="noopener">ElEconomista.es</a><br>
-    <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES — Forex</a><br>
-    <a href="https://es.dailyforex.com/" target="_blank" rel="noopener">DailyForex ES</a><br>
-    <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters — Forex</a><br>
-    <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet EN</a>
+    <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES</a><br>
+    <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br>
+    <a href="https://news.instaforex.com/news" target="_blank" rel="noopener">InstaForex News</a><br>
+    <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a>
   </div>`;
-
   computeSentiment([]);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── ARRANQUE ──────────────────────────────────────────────────────────────────
 initFeed();
 loadUpcomingEvents();
 renderSources();
