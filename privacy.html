@@ -23,6 +23,7 @@
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
         .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a.active { color: var(--text-primary); }
         h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
         .last-updated { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; }
         h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
@@ -58,9 +59,10 @@
             <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
             <div class="nav-links">
                 <a href="index.html">Dashboard</a>
+                <a href="news.html">Noticias</a>
                 <a href="about.html">Acerca de</a>
                 <a href="terms.html">Términos</a>
-                <a href="privacy.html">Privacidad</a>
+                <a href="privacy.html" class="active">Privacidad</a>
                 <a href="contact.html">Contacto</a>
             </div>
         </div>
@@ -112,7 +114,7 @@
             <h2>4. Cookies y Tecnologías de Seguimiento</h2>
             <ul>
                 <li><strong>Cookies Esenciales:</strong> Necesarias para que el sitio web funcione correctamente.</li>
-                <li><strong>Cookies de Análisis:</strong> Nos ayudan a entender cómo los visitantes interactúan con nuestro sitio (por ejemplo, Google Analytics si está habilitado).</li>
+                <li><strong>Cookies de Análisis:</strong> Nos ayudan a entender cómo los visitantes interactúan con nuestro sitio.</li>
                 <li><strong>Cookies de Publicidad:</strong> Usadas para entregar anuncios relevantes mediante Google AdSense.</li>
             </ul>
             <p>Puede controlar el uso de cookies desde la configuración de su navegador. Tenga en cuenta que deshabilitar ciertas cookies puede afectar la funcionalidad del sitio.</p>
@@ -129,15 +131,19 @@
             <ul>
                 <li>Frankfurter API (Banco Central Europeo) — tipos de cambio y FX Performance 1M</li>
                 <li>Trading Economics — indicadores económicos y calendario</li>
-                <li>Investing.com — datos COT de divisas</li>
-                <li>CFTC (cftc.gov) — datos COT del USD</li>
+                <li>Investing.com — datos de mercado</li>
+                <li>CFTC (cftc.gov) — datos COT</li>
                 <li>cbrates.com — fechas de reuniones de bancos centrales</li>
-                <li>GitHub Pages (globalinvesting.github.io) — datos procesados y análisis de IA</li>
+                <li>GitHub Pages (globalinvesting.github.io) — datos procesados, análisis de IA y feed de noticias (<code>news.json</code>)</li>
+                <li>FXStreet, ForexLive, Reuters — feeds RSS de noticias procesados vía GitHub Actions</li>
                 <li>Otros proveedores de tipos de cambio como respaldo en cascada</li>
             </ul>
 
-            <h3>5.3 Groq AI</h3>
-            <p>Los análisis narrativos de divisas son generados mediante la API de Groq AI. Los datos económicos utilizados para generar estos análisis (indicadores macroeconómicos agregados y públicos) son enviados a los servidores de Groq para su procesamiento. No se envía información personal del usuario. Los análisis generados se publican en GitHub Pages y se sirven directamente desde allí al dashboard, sin procesamiento adicional en tiempo real por parte del usuario. Consulte la <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener">Política de Privacidad de Groq</a> para más información.</p>
+            <h3>5.3 Feed de Noticias</h3>
+            <p>La sección de Noticias obtiene titulares desde feeds RSS públicos (FXStreet, ForexLive, Reuters, Investing.com y bancos centrales oficiales) mediante un workflow automatizado de GitHub Actions que se ejecuta cada hora en los servidores de GitHub. Las solicitudes a estos feeds se realizan desde los servidores de GitHub, no desde el navegador del usuario. El resultado es un archivo estático <code>news.json</code> publicado en GitHub Pages, que su navegador descarga directamente sin exponer su IP a las fuentes RSS originales.</p>
+
+            <h3>5.4 Groq AI</h3>
+            <p>Los análisis narrativos de divisas son generados mediante la API de Groq AI. Los datos económicos utilizados son enviados a los servidores de Groq para su procesamiento. No se envía información personal del usuario. Consulte la <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener">Política de Privacidad de Groq</a> para más información.</p>
         </div>
 
         <div class="section">
@@ -174,7 +180,7 @@
 
         <div class="section">
             <h2>10. Cambios a esta Política</h2>
-            <p>Podemos actualizar nuestra Política de Privacidad cuando añadamos nuevas funcionalidades, cambiemos proveedores de servicios o lo requieran cambios legales. Le notificaremos cualquier cambio publicando la nueva Política en esta página y actualizando la fecha de "Última Actualización" en la parte superior.</p>
+            <p>Podemos actualizar nuestra Política de Privacidad cuando añadamos nuevas funcionalidades, cambiemos proveedores de servicios o lo requieran cambios legales. Le notificaremos cualquier cambio publicando la nueva Política en esta página y actualizando la fecha de "Última Actualización".</p>
         </div>
 
         <div class="section">
@@ -188,10 +194,11 @@
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
             <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem;">
-                <a href="index.html">Dashboard</a> | 
-                <a href="about.html">Acerca de</a> | 
-                <a href="terms.html">Términos de Servicio</a> | 
-                <a href="privacy.html">Política de Privacidad</a> | 
+                <a href="index.html">Dashboard</a> |
+                <a href="news.html">Noticias</a> |
+                <a href="about.html">Acerca de</a> |
+                <a href="terms.html">Términos de Servicio</a> |
+                <a href="privacy.html">Política de Privacidad</a> |
                 <a href="contact.html">Contacto</a>
             </p>
         </div>
