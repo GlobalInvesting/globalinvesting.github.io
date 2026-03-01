@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 """
 enrich_news.py
-Lee news-data/news.json, llama a Groq API para generar un titular sintético
-de impacto para cada artículo sin `ai_headline`, y sobreescribe el JSON.
+Lee news-data/news.json (generado por fetch_news.py), llama a Groq API para
+generar un titular sintético de impacto para cada artículo sin `ai_headline`,
+y sobreescribe el JSON preservando todos los campos existentes.
 
 Corre 2 veces al día via GitHub Actions (8:00 y 20:00 UTC).
-Solo procesa artículos con impacto 'high' o 'med' para optimizar tokens.
+Procesa TODOS los artículos (hasta 60) sin filtrar por impacto.
 
 Modelo: llama-3.3-70b-versatile (Groq free tier)
-Estimación de tokens por ejecución: ~24.000 (< 5% del límite diario de 500K)
+Estimación de tokens: ~25.200 por ejecución × 2 = ~50.400/día (10% del límite de 500K)
+
+Campos que lee de news.json (generados por fetch_news.py):
+  - title    → título original
+  - expand   → descripción corta (hasta 300 chars)
+  - cur      → divisa detectada ('USD', 'EUR', etc.)
+  - impact   → nivel de impacto ('high' | 'med' | 'low')
+  - source   → nombre de la fuente
+  - lang     → idioma ('es' | 'en')
+
+Campo que agrega este script:
+  - ai_headline → titular sintético en español generado por Groq
 """
 
 import os
@@ -21,44 +33,43 @@ from pathlib import Path
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
-NEWS_FILE    = Path("news-data/news.json")
-GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL   = "llama-3.3-70b-versatile"
-MAX_TOKENS   = 120          # La síntesis es corta, no necesitamos más
-TEMPERATURE  = 0.3          # Bajo para respuestas consistentes y factuales
-SLEEP_BETWEEN = 1.2         # Segundos entre llamadas (evita rate limit de 6K tok/min)
-PROCESS_IMPACTS = {"high", "med"}  # Solo procesar artículos relevantes
+NEWS_FILE     = Path("news-data/news.json")
+GROQ_URL      = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL    = "llama-3.3-70b-versatile"
+MAX_TOKENS    = 140       # Suficiente para un titular de ~120 chars
+TEMPERATURE   = 0.25      # Bajo: respuestas consistentes y factuales
+SLEEP_BETWEEN = 1.2       # Segundos entre llamadas (evita rate limit 6K tok/min)
+# Sin filtro de impacto — se procesan TODOS los artículos sin ai_headline
 
 # ─────────────────────────────────────────────
-# DIVISAS PRINCIPALES (para el contexto del prompt)
+# NOMBRES DE DIVISA PARA EL PROMPT
 # ─────────────────────────────────────────────
 CURRENCY_NAMES = {
-    "USD": "el dólar estadounidense",
-    "EUR": "el euro",
-    "GBP": "la libra esterlina",
-    "JPY": "el yen japonés",
-    "AUD": "el dólar australiano",
-    "CAD": "el dólar canadiense",
-    "CHF": "el franco suizo",
-    "NZD": "el dólar neozelandés",
+    "USD": "dólar estadounidense",
+    "EUR": "euro",
+    "GBP": "libra esterlina",
+    "JPY": "yen japonés",
+    "AUD": "dólar australiano",
+    "CAD": "dólar canadiense",
+    "CHF": "franco suizo",
+    "NZD": "dólar neozelandés",
 }
 
-
 # ─────────────────────────────────────────────
-# PROMPT SYSTEM
+# PROMPT DEL SISTEMA
 # ─────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista de mercados forex que redacta titulares sintéticos para una plataforma profesional de trading.
 
-TAREA: Dado el título y descripción de una noticia económica, genera un titular de una sola línea que:
-1. Explica el dato o evento en términos concretos (con cifras si las hay)
-2. Indica el impacto esperado en la divisa indicada (alcista/bajista/neutral)
-3. Menciona el mecanismo de transmisión si es relevante (carry, inflación, crecimiento, etc.)
+TAREA: Dado el título y descripción de una noticia económica, genera un titular de UNA SOLA LÍNEA que:
+1. Expresa el dato o evento concreto (con cifras si las hay en el texto)
+2. Indica el impacto esperado en la divisa indicada (alcista / bajista / neutro)
+3. Menciona el mecanismo si es relevante (inflación, empleo, política monetaria, etc.)
 
 FORMATO OBLIGATORIO:
 - Una sola línea, sin punto final
-- Entre 80 y 140 caracteres
+- Entre 80 y 135 caracteres
 - En español, tono profesional y directo
-- Sin markdown, sin comillas, sin emojis
+- Sin markdown, sin comillas, sin emojis, sin introducción
 
 EJEMPLOS DE BUENOS TITULARES:
 - IPC EEUU sube 3.2% en enero, supera estimaciones: hawkish para Fed → alcista USD
@@ -66,36 +77,35 @@ EJEMPLOS DE BUENOS TITULARES:
 - PMI manufacturero zona euro cae a 44.2: contracción profunda → presión bajista EUR
 - Nóminas EEUU: 256K empleos vs 160K esperados, sorpresa alcista → rally USD probable
 - RBA sube tasas 25pb a 4.35%: ciclo restrictivo continúa → alcista AUD corto plazo
+- EUR/USD consolida en 1.08 tras datos mixtos: sesgo neutro sin catalizador claro
 
 REGLAS:
-- Si no hay dato numérico concreto, sintetiza el mensaje clave del banco central o institución
-- Si el impacto es ambiguo, indicar "neutro" o "mixto"
-- Nunca inventes datos que no estén en el texto
-- Si la noticia no tiene relación clara con forex/macro, responde solo: IRRELEVANTE"""
+- Si el texto no trae cifra concreta, sintetiza la decisión o mensaje clave
+- Si el impacto es ambiguo, usar "mixto" o "neutro"
+- Para análisis técnicos (soporte, resistencia, niveles clave), indicar el rango y sesgo
+- Nunca inventes datos que no estén en el texto recibido
+- Si la noticia es irrelevante para forex/macro, responde solo la palabra: IRRELEVANTE"""
 
 
 def build_user_prompt(article: dict) -> str:
-    """Construye el prompt de usuario para un artículo."""
-    currency = article.get("cur", "USD")
-    currency_name = CURRENCY_NAMES.get(currency, currency)
-    title = article.get("title", "")
-    expand = article.get("expand", "")
-    source = article.get("source", "")
+    cur        = article.get("cur", "USD")
+    cur_name   = CURRENCY_NAMES.get(cur, cur)
+    title      = article.get("title", "")
+    expand     = article.get("expand", "") or ""
+    source     = article.get("source", "")
+    lang       = article.get("lang", "en")
+    lang_label = "español" if lang == "es" else "inglés"
 
     return (
-        f"DIVISA AFECTADA: {currency} ({currency_name})\n"
-        f"FUENTE: {source}\n"
+        f"DIVISA AFECTADA: {cur} ({cur_name})\n"
+        f"FUENTE: {source} (artículo en {lang_label})\n"
         f"TÍTULO ORIGINAL: {title}\n"
         f"DESCRIPCIÓN: {expand[:400] if expand else 'Sin descripción'}\n\n"
-        f"Genera el titular sintético de impacto para {currency}:"
+        f"Genera el titular sintético de impacto para {cur}:"
     )
 
 
 def call_groq(api_key: str, article: dict) -> str | None:
-    """
-    Llama a Groq API para un artículo.
-    Devuelve el titular generado o None si falla.
-    """
     payload = {
         "model": GROQ_MODEL,
         "messages": [
@@ -128,13 +138,10 @@ def call_groq(api_key: str, article: dict) -> str | None:
         r.raise_for_status()
         content = r.json()["choices"][0]["message"]["content"].strip()
 
-        # Descartar respuestas que indican irrelevancia
         if content.upper().startswith("IRRELEVANTE"):
             return None
 
-        # Limpiar posibles artefactos de formato
         content = content.strip('"').strip("'").strip()
-
         return content if len(content) > 20 else None
 
     except requests.exceptions.Timeout:
@@ -154,7 +161,6 @@ def main():
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 60)
 
-    # ── Leer GROQ_API_KEY ────────────────────────────────────────
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         raise EnvironmentError(
@@ -163,9 +169,8 @@ def main():
         )
     print(f"✅ GROQ_API_KEY configurada ({len(api_key)} chars)")
 
-    # ── Leer news.json ────────────────────────────────────────────
     if not NEWS_FILE.exists():
-        raise FileNotFoundError(f"❌ No se encontró {NEWS_FILE}. Ejecuta fetch_news.py primero.")
+        raise FileNotFoundError(f"❌ No se encontró {NEWS_FILE}.")
 
     with open(NEWS_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -177,37 +182,31 @@ def main():
 
     print(f"\n📰 Total artículos en news.json: {len(articles)}")
 
-    # ── Filtrar los que necesitan enriquecimiento ─────────────────
-    # Solo artículos de impacto relevante que aún no tienen ai_headline
+    # Todos los artículos sin ai_headline, sin filtro de impacto
     to_process = [
         (i, a) for i, a in enumerate(articles)
-        if a.get("impact") in PROCESS_IMPACTS
-        and not a.get("ai_headline")
+        if not a.get("ai_headline")
     ]
 
-    print(f"🔍 Artículos a enriquecer (high/med sin ai_headline): {len(to_process)}")
+    print(f"🔍 Artículos a enriquecer (sin ai_headline): {len(to_process)}")
 
     if not to_process:
-        print("✅ Todos los artículos relevantes ya tienen ai_headline. Sin trabajo adicional.")
-        # Actualizar timestamp de enriquecimiento igualmente
+        print("✅ Todos los artículos ya tienen ai_headline.")
         data["ai_enriched_at"] = now_utc.isoformat()
         with open(NEWS_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return
 
-    # Estimación de tokens
-    estimated_tokens = len(to_process) * 420  # ~300 entrada + 120 salida
+    estimated_tokens = len(to_process) * 420
     print(f"📊 Tokens estimados: ~{estimated_tokens:,} (límite diario: 500,000)")
     print()
 
-    # ── Procesar artículos ────────────────────────────────────────
     enriched = 0
     skipped  = 0
-    errors   = 0
 
     for idx, (article_idx, article) in enumerate(to_process):
         title_preview = article.get("title", "")[:60]
-        cur = article.get("cur", "?")
+        cur    = article.get("cur", "?")
         impact = article.get("impact", "?")
 
         print(f"[{idx+1}/{len(to_process)}] {cur} [{impact}] {title_preview}...")
@@ -222,11 +221,9 @@ def main():
             skipped += 1
             print(f"  ⏭️  Sin síntesis (irrelevante o error)")
 
-        # Pausa entre llamadas para respetar rate limit
         if idx < len(to_process) - 1:
             time.sleep(SLEEP_BETWEEN)
 
-    # ── Guardar JSON actualizado ──────────────────────────────────
     data["articles"] = articles
     data["ai_enriched_at"] = now_utc.isoformat()
     data["ai_model"] = GROQ_MODEL
@@ -234,13 +231,11 @@ def main():
     with open(NEWS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # ── Resumen ───────────────────────────────────────────────────
     print()
     print("=" * 60)
     print("📋 RESUMEN")
     print(f"   ✅ Enriquecidos:  {enriched}")
     print(f"   ⏭️  Omitidos:      {skipped}")
-    print(f"   ❌ Errores:       {errors}")
     print(f"   💾 Guardado en:   {NEWS_FILE}")
     print("=" * 60)
 
