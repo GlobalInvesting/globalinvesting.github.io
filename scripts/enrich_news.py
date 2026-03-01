@@ -5,25 +5,19 @@ Lee news-data/news.json (generado por fetch_news.py), llama a Groq API para
 generar un titular sintético de impacto para cada artículo sin `ai_headline`,
 y sobreescribe el JSON preservando todos los campos existentes.
 
-Corre 2 veces al día via GitHub Actions (8:00 y 20:00 UTC).
-Procesa TODOS los artículos (hasta 60) sin filtrar por impacto.
+Corre 3 veces al día via GitHub Actions (6:00, 14:00, 22:00 UTC).
+
+Con MAX_NEWS=30 en fetch_news.py:
+  - Máximo 30 artículos a procesar por ejecución
+  - 30 artículos × 12s = ~6 min (sin rate limits)
+  - ~30 × 420 tok = ~12.600 tokens/ejecución × 3 = ~37.800/día (7.5% del límite de 500K)
+
+Rate limiting Groq free tier:
+  - SLEEP_BETWEEN = 12s → 5 req/min → 5 × 420 = 2.100 tok/min (límite: 6.000/min)
+  - Margen amplio, los 429 deberían ser raros
+  - Si ocurre un 429, se lee Retry-After y se espera exactamente eso
 
 Modelo: llama-3.3-70b-versatile (Groq free tier)
-Estimación de tokens: ~25.200 por ejecución × 2 = ~50.400/día (10% del límite de 500K)
-Tiempo de ejecución: ~10 min para 60 artículos (10s entre llamadas, sin rate limits)
-  → SLEEP_BETWEEN = 10s evita los 429 de raíz (6K tokens/min ÷ 420 tok/req = 14 req/min máx)
-  → Si igual ocurre un 429, se lee el header Retry-After de Groq y se espera exactamente eso
-
-Campos que lee de news.json (generados por fetch_news.py):
-  - title    → título original
-  - expand   → descripción corta (hasta 300 chars)
-  - cur      → divisa detectada ('USD', 'EUR', etc.)
-  - impact   → nivel de impacto ('high' | 'med' | 'low')
-  - source   → nombre de la fuente
-  - lang     → idioma ('es' | 'en')
-
-Campo que agrega este script:
-  - ai_headline → titular sintético en español generado por Groq
 """
 
 import os
@@ -39,17 +33,12 @@ from pathlib import Path
 NEWS_FILE      = Path("news-data/news.json")
 GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL     = "llama-3.3-70b-versatile"
-MAX_TOKENS     = 180       # Suficiente para titulares elaborados (~150 chars)
-TEMPERATURE    = 0.25      # Bajo: respuestas consistentes y factuales
+MAX_TOKENS     = 180
+TEMPERATURE    = 0.25
 
-# ── Rate limiting ──────────────────────────────────────────────────────────────
-# Groq free tier: 6,000 tokens/minuto para llama-3.3-70b-versatile
-# Cada request usa ~420 tokens (prompt ~240 + respuesta ~180)
-# 6000 / 420 = ~14 requests/min máximo → 60s / 14 = ~4.3s entre llamadas
-# Usamos 10s para tener margen cómodo y evitar 429 completamente
-SLEEP_BETWEEN  = 10        # Segundos entre llamadas — evita rate limit de raíz
-MAX_RETRIES    = 3         # Reintentos por artículo tras rate limit
-DEFAULT_RETRY_WAIT = 62    # Segundos de espera si Groq no devuelve Retry-After
+SLEEP_BETWEEN      = 12     # 5 req/min → muy por debajo del límite de 14 req/min
+MAX_RETRIES        = 3
+DEFAULT_RETRY_WAIT = 65     # segundos si Groq no devuelve Retry-After
 
 # ─────────────────────────────────────────────
 # NOMBRES DE DIVISA PARA EL PROMPT
@@ -123,31 +112,19 @@ def build_user_prompt(article: dict) -> str:
 
 
 def get_retry_after(response) -> int:
-    """
-    Extrae el tiempo de espera recomendado del header Retry-After de Groq.
-    Groq devuelve 'x-ratelimit-reset-tokens' o 'retry-after' en segundos.
-    Si no está disponible, devuelve DEFAULT_RETRY_WAIT.
-    """
-    # Groq puede devolver cualquiera de estos headers
     for header in ("retry-after", "x-ratelimit-reset-tokens", "x-ratelimit-reset-requests"):
         val = response.headers.get(header)
         if val:
             try:
-                # Puede ser un número de segundos o una cadena como "60s"
                 val_clean = str(val).lower().replace("s", "").strip()
                 wait = int(float(val_clean))
-                return min(wait + 2, 120)  # +2s de margen, cap en 120s
+                return min(wait + 2, 120)
             except (ValueError, TypeError):
                 pass
     return DEFAULT_RETRY_WAIT
 
 
 def call_groq(api_key: str, article: dict) -> str | None:
-    """
-    Llama a Groq con reintentos automáticos tras rate limit (429).
-    Usa el header Retry-After de Groq para esperar exactamente lo necesario.
-    Devuelve el titular generado o None si el artículo es irrelevante/error permanente.
-    """
     payload = {
         "model": GROQ_MODEL,
         "messages": [
@@ -170,7 +147,7 @@ def call_groq(api_key: str, article: dict) -> str | None:
                 wait = get_retry_after(r)
                 print(f"  ⏳ Rate limit (intento {attempt}/{MAX_RETRIES}) — esperando {wait}s...")
                 time.sleep(wait)
-                continue  # Reintentar tras la espera exacta
+                continue
 
             if r.status_code == 401:
                 raise RuntimeError("GROQ_API_KEY inválida o no configurada.")
@@ -178,14 +155,11 @@ def call_groq(api_key: str, article: dict) -> str | None:
             r.raise_for_status()
             content = r.json()["choices"][0]["message"]["content"].strip()
 
-            # Solo marcar como irrelevante si la respuesta es EXCLUSIVAMENTE esa palabra
             if content.strip().upper() == "IRRELEVANTE":
                 return None
 
-            # Limpiar comillas residuales del modelo
             content = content.strip('"').strip("'").strip()
 
-            # Validar longitud mínima
             if len(content) < 25:
                 print(f"  ⚠️  Respuesta demasiado corta ({len(content)} chars): '{content}'")
                 return None
@@ -236,13 +210,19 @@ def main():
 
     print(f"\n📰 Total artículos en news.json: {len(articles)}")
 
-    # Todos los artículos sin ai_headline, sin filtro de impacto
+    # Distribución por divisa e impacto
+    from collections import Counter
+    dist   = Counter(a.get("cur","?") for a in articles)
+    impact = Counter(a.get("impact","?") for a in articles)
+    print(f"   Divisas: {dict(sorted(dist.items()))}")
+    print(f"   Impacto: high={impact['high']} | med={impact['med']} | low={impact['low']}")
+
     to_process = [
         (i, a) for i, a in enumerate(articles)
         if not a.get("ai_headline")
     ]
 
-    print(f"🔍 Artículos a enriquecer (sin ai_headline): {len(to_process)}")
+    print(f"\n🔍 Artículos a enriquecer (sin ai_headline): {len(to_process)}")
 
     if not to_process:
         print("✅ Todos los artículos ya tienen ai_headline.")
@@ -251,23 +231,23 @@ def main():
             json.dump(data, f, ensure_ascii=False, indent=2)
         return
 
-    estimated_tokens = len(to_process) * 420
-    estimated_time   = len(to_process) * SLEEP_BETWEEN
-    print(f"📊 Tokens estimados: ~{estimated_tokens:,} (límite diario: 500,000)")
-    print(f"⏱️  Tiempo estimado: ~{estimated_time // 60}min {estimated_time % 60}s "
-          f"({SLEEP_BETWEEN}s entre llamadas, sin rate limits)")
+    est_tokens = len(to_process) * 420
+    est_time   = len(to_process) * SLEEP_BETWEEN
+    print(f"📊 Tokens estimados: ~{est_tokens:,} (límite diario: 500,000)")
+    print(f"⏱️  Tiempo estimado: ~{est_time // 60}min {est_time % 60}s "
+          f"({SLEEP_BETWEEN}s entre llamadas)")
     print()
 
-    enriched = 0
-    skipped  = 0
+    enriched   = 0
+    skipped    = 0
     irrelevant = 0
 
     for idx, (article_idx, article) in enumerate(to_process):
         title_preview = article.get("title", "")[:60]
         cur    = article.get("cur", "?")
-        impact = article.get("impact", "?")
+        impact_lv = article.get("impact", "?")
 
-        print(f"[{idx+1}/{len(to_process)}] {cur} [{impact}] {title_preview}...")
+        print(f"[{idx+1}/{len(to_process)}] {cur} [{impact_lv}] {title_preview}...")
 
         headline = call_groq(api_key, article)
 
@@ -277,14 +257,14 @@ def main():
             preview = headline[:90] + ('...' if len(headline) > 90 else '')
             print(f"  ✅ {preview}")
         else:
-            # Distinguir entre irrelevante real y error/rate-limit
-            # Si el título menciona pares de divisas o términos forex, es probable un error
-            title_lower = article.get("title", "").lower()
+            title_lower  = article.get("title", "").lower()
             expand_lower = (article.get("expand", "") or "").lower()
-            forex_terms = ["usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
-                          "dollar", "euro", "pound", "yen", "franc",
-                          "/usd", "/eur", "forex", "fx ", "rate", "fed", "ecb", "boe",
-                          "gdp", "cpi", "inflation", "inflación"]
+            forex_terms  = [
+                "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
+                "dollar", "euro", "pound", "yen", "franc",
+                "/usd", "/eur", "forex", "fx ", "rate", "fed", "ecb", "boe",
+                "gdp", "cpi", "inflation", "inflación",
+            ]
             looks_forex = any(t in title_lower or t in expand_lower for t in forex_terms)
 
             if looks_forex:
@@ -297,9 +277,9 @@ def main():
         if idx < len(to_process) - 1:
             time.sleep(SLEEP_BETWEEN)
 
-    data["articles"] = articles
+    data["articles"]       = articles
     data["ai_enriched_at"] = now_utc.isoformat()
-    data["ai_model"] = GROQ_MODEL
+    data["ai_model"]       = GROQ_MODEL
 
     with open(NEWS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
