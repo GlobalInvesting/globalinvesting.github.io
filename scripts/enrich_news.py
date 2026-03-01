@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-enrich_news.py — v3
-Lee news-data/news.json, llama a Groq API para generar titulares AI.
+enrich_news.py — v4
+Soporte para múltiples API keys de Groq con fallback automático.
+Si la key principal alcanza el límite diario, cambia automáticamente a la siguiente.
 
-PROTECCIONES ANTI-CUELGUE:
-  - check_groq_quota(): prueba antes de empezar, detecta límite diario vs por minuto
-  - GLOBAL_TIMEOUT_MIN: para y guarda tras N minutos pase lo que pase
-  - SKIP_IF_WAIT_EXCEEDS: si Retry-After > N seg, omite artículo en vez de esperar
-  - Sentinel "DAILY_LIMIT": para inmediatamente si Groq confirma límite diario
-  - save_progress(): guarda siempre, aunque sea parcial
+Configura en GitHub Actions Secrets:
+  GROQ_API_KEY   → key principal
+  GROQ_API_KEY_2 → key de respaldo (opcional)
 """
 
 import os
@@ -29,19 +27,35 @@ GROQ_MODEL            = "llama-3.3-70b-versatile"
 MAX_TOKENS            = 180
 TEMPERATURE           = 0.25
 
-SLEEP_BETWEEN         = 12   # segundos entre llamadas (5 req/min << límite 14 req/min)
-MAX_RETRIES           = 2    # reintentos por artículo tras 429
-DEFAULT_RETRY_WAIT    = 65   # segundos de espera si Groq no da Retry-After
-SKIP_IF_WAIT_EXCEEDS  = 90   # si Retry-After > esto, omitir artículo
-GLOBAL_TIMEOUT_MIN    = 8    # minutos: el script para y guarda aunque no termine
+SLEEP_BETWEEN         = 12
+MAX_RETRIES           = 2
+DEFAULT_RETRY_WAIT    = 65
+SKIP_IF_WAIT_EXCEEDS  = 90
+GLOBAL_TIMEOUT_MIN    = 10  # un poco más holgado con 2 keys
 
 _START_TIME = time.time()
 
-def elapsed_min() -> float:
+def elapsed_min():
     return (time.time() - _START_TIME) / 60.0
 
-def timeout_reached() -> bool:
+def timeout_reached():
     return elapsed_min() >= GLOBAL_TIMEOUT_MIN
+
+# ─────────────────────────────────────────────
+# MÚLTIPLES API KEYS
+# ─────────────────────────────────────────────
+def load_api_keys() -> list[str]:
+    """Carga todas las keys disponibles en orden de prioridad."""
+    keys = []
+    for var in ("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3"):
+        k = os.environ.get(var, "").strip()
+        if k:
+            keys.append(k)
+    return keys
+
+
+def mask_key(key: str) -> str:
+    return key[:8] + "..." + key[-4:] if len(key) > 12 else "***"
 
 # ─────────────────────────────────────────────
 CURRENCY_NAMES = {
@@ -55,7 +69,7 @@ SYSTEM_PROMPT = """Eres un analista senior de mercados forex que redacta titular
 
 TAREA: Dado el título y descripción de una noticia económica o financiera, genera un titular de UNA SOLA LÍNEA que:
 1. Describe el evento o dato concreto con precisión (incluye cifras si están disponibles)
-2. Explica brevemente el mecanismo o contexto (ej: subida de PPI → temores estanflación, tensión geopolítica → aversión al riesgo)
+2. Explica brevemente el mecanismo o contexto (ej: subida de PPI → temores estanflación)
 3. Indica el impacto esperado en la divisa indicada (alcista / bajista / neutro / mixto)
 
 FORMATO OBLIGATORIO:
@@ -63,22 +77,20 @@ FORMATO OBLIGATORIO:
 - Entre 100 y 150 caracteres
 - En español, tono profesional y analítico
 - Sin markdown, sin comillas, sin emojis, sin introducción
-- Nunca empieces con "El" o "La" si puedes evitarlo — empieza por el dato/evento
+- Nunca empieces con "El" o "La" — empieza por el dato/evento
 
-EJEMPLOS DE BUENOS TITULARES:
+EJEMPLOS:
 - IPC EEUU sube 3.2% en enero superando estimaciones: presión hawkish sobre Fed mantiene soporte en USD
 - BoC mantiene tasas en 3% pero señala recorte en abril: orientación dovish pesa sobre CAD a medio plazo
 - PMI manufacturero zona euro cae a 44.2: contracción profunda del sector industrial → presión bajista EUR
-- Nóminas EEUU: 256K empleos vs 160K esperado, sorpresa alcista refuerza narrativa de excepción americana → USD
 - GBP/USD cae por escalada en Oriente Próximo: aversión al riesgo favorece activos refugio, presión bajista GBP
-- AUD/USD mantiene alzas pese a retroceso USD: resistencia técnica sugiere sesgo alcista AUD a corto plazo
 - RBA sube tasas 25pb a 4.35%: ciclo restrictivo continúa respaldando demanda de AUD en el corto plazo
 
 REGLAS:
 - Pares de divisas (GBP/USD, AUD/USD, etc.) SIEMPRE son relevantes
 - Para análisis técnicos incluye nivel clave o rango y el sesgo resultante
 - Si impacto ambiguo: "mixto" o "señal contradictoria"
-- Si la noticia es completamente irrelevante para forex (moda, deportes, cultura): responde solo IRRELEVANTE"""
+- Si completamente irrelevante para forex (moda, deportes, cultura): responde solo IRRELEVANTE"""
 
 
 def build_user_prompt(article: dict) -> str:
@@ -86,11 +98,9 @@ def build_user_prompt(article: dict) -> str:
     lang = article.get("lang", "en")
     return (
         f"DIVISA PRINCIPAL AFECTADA: {cur} ({CURRENCY_NAMES.get(cur, cur)})\n"
-        f"FUENTE: {article.get('source', '')} (artículo en {'español' if lang == 'es' else 'inglés'})\n"
+        f"FUENTE: {article.get('source', '')} ({'español' if lang == 'es' else 'inglés'})\n"
         f"TÍTULO ORIGINAL: {article.get('title', '')}\n"
         f"DESCRIPCIÓN: {(article.get('expand', '') or '')[:400] or 'Sin descripción'}\n\n"
-        f"Nota: Si el artículo menciona un par de divisas como GBP/USD o AUD/USD, "
-        f"es SIEMPRE relevante. Analiza el movimiento del par y genera el titular.\n\n"
         f"Genera el titular sintético de impacto:"
     )
 
@@ -106,8 +116,24 @@ def get_retry_after(response) -> int:
     return DEFAULT_RETRY_WAIT
 
 
-def check_groq_quota(api_key: str) -> bool:
-    """Llamada de prueba (1 token) para detectar límite diario antes de empezar."""
+def is_daily_limit(response) -> bool:
+    """Detecta si el 429 es por límite diario (no por minuto)."""
+    try:
+        body = response.json()
+        msg  = str(body.get("error", {}).get("message", "")).lower()
+        return any(x in msg for x in ("per day", "daily", "tokens per day", "tpd"))
+    except Exception:
+        return False
+
+
+def check_key(api_key: str) -> str:
+    """
+    Verifica una key. Devuelve:
+      'ok'          → key funciona
+      'daily_limit' → límite diario agotado
+      'invalid'     → key inválida (401)
+      'error'       → otro error (asumir OK)
+    """
     try:
         r = requests.post(
             GROQ_URL,
@@ -116,37 +142,22 @@ def check_groq_quota(api_key: str) -> bool:
             timeout=10,
         )
         if r.status_code == 401:
-            print("  ❌ GROQ_API_KEY inválida (401)")
-            return False
+            return "invalid"
         if r.status_code == 429:
-            wait = get_retry_after(r)
-            body = {}
-            try:
-                body = r.json()
-            except Exception:
-                pass
-            error_msg = str(body.get("error", {}).get("message", "")).lower()
-            print(f"  ⚠️  Groq 429 en check inicial — wait sugerido: {wait}s")
-            print(f"      Mensaje: {body.get('error', {}).get('message', 'N/A')}")
-            if any(x in error_msg for x in ("day", "daily", "exceeded", "limit")):
-                print("  ❌ LÍMITE DIARIO DE TOKENS — no se puede enriquecer hoy")
-                return False
-            # Es rate limit por minuto, no diario → se puede continuar con espera
-            print("  ℹ️  Rate limit por minuto (no diario) — continuando...")
-            time.sleep(min(wait, 30))
-            return True
-        return True  # 200 o cualquier otro código → OK
-    except Exception as e:
-        print(f"  ⚠️  No se pudo verificar Groq ({e}) — asumiendo OK")
-        return True
+            if is_daily_limit(r):
+                return "daily_limit"
+            return "ok"  # rate limit por minuto, no diario
+        return "ok"
+    except Exception:
+        return "error"
 
 
 def call_groq(api_key: str, article: dict) -> str | None:
     """
     Devuelve:
-      - str: titular generado
-      - None: artículo irrelevante o error no recuperable
-      - "DAILY_LIMIT": límite diario alcanzado → parar todo
+      str           → titular generado
+      None          → irrelevante o error no recuperable
+      "DAILY_LIMIT" → límite diario → cambiar a siguiente key
     """
     payload = {
         "model": GROQ_MODEL,
@@ -164,30 +175,18 @@ def call_groq(api_key: str, article: dict) -> str | None:
             r = requests.post(GROQ_URL, json=payload, headers=headers, timeout=25)
 
             if r.status_code == 429:
-                wait = get_retry_after(r)
-                body = {}
-                try:
-                    body = r.json()
-                except Exception:
-                    pass
-                error_msg = str(body.get("error", {}).get("message", "")).lower()
-
-                # Detectar límite diario
-                if any(x in error_msg for x in ("day", "daily", "exceeded")):
-                    print(f"\n  🛑 LÍMITE DIARIO: {body.get('error', {}).get('message', 'N/A')}")
+                if is_daily_limit(r):
                     return "DAILY_LIMIT"
-
-                # Retry-After demasiado largo → omitir artículo
+                wait = get_retry_after(r)
                 if wait > SKIP_IF_WAIT_EXCEEDS:
                     print(f"  ⏭️  Retry-After={wait}s > {SKIP_IF_WAIT_EXCEEDS}s — omitiendo")
                     return None
-
                 print(f"  ⏳ Rate limit (intento {attempt}/{MAX_RETRIES}) — esperando {wait}s...")
                 time.sleep(wait)
                 continue
 
             if r.status_code == 401:
-                raise RuntimeError("GROQ_API_KEY inválida.")
+                return "DAILY_LIMIT"  # tratar como no disponible, pasar a siguiente key
 
             r.raise_for_status()
             content = r.json()["choices"][0]["message"]["content"].strip()
@@ -202,17 +201,14 @@ def call_groq(api_key: str, article: dict) -> str | None:
             print(f"  ⚠️  Timeout (intento {attempt}/{MAX_RETRIES})")
             if attempt < MAX_RETRIES:
                 time.sleep(5)
-        except RuntimeError:
-            raise
         except Exception as e:
             print(f"  ⚠️  Error: {e}")
             return None
 
-    print("  ❌ Reintentos agotados — omitiendo")
     return None
 
 
-def save_progress(data: dict, articles: list, now_utc: datetime) -> None:
+def save_progress(data, articles, now_utc):
     data["articles"]       = articles
     data["ai_enriched_at"] = now_utc.isoformat()
     data["ai_model"]       = GROQ_MODEL
@@ -220,9 +216,11 @@ def save_progress(data: dict, articles: list, now_utc: datetime) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-FOREX_TERMS = ["usd","eur","gbp","jpy","aud","cad","chf","nzd","dollar","euro",
-               "pound","yen","franc","/usd","/eur","forex","fx ","rate","fed",
-               "ecb","boe","gdp","cpi","inflation","inflación"]
+FOREX_TERMS = [
+    "usd","eur","gbp","jpy","aud","cad","chf","nzd","dollar","euro",
+    "pound","yen","franc","/usd","/eur","forex","fx ","rate","fed",
+    "ecb","boe","gdp","cpi","inflation","inflación",
+]
 
 
 def main():
@@ -232,17 +230,37 @@ def main():
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}  |  Timeout: {GLOBAL_TIMEOUT_MIN} min")
     print("=" * 60)
 
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        raise EnvironmentError("❌ GROQ_API_KEY no configurada.")
-    print(f"✅ GROQ_API_KEY configurada ({len(api_key)} chars)")
+    # ── Cargar y verificar todas las keys disponibles ─────────────────────────
+    all_keys = load_api_keys()
+    if not all_keys:
+        raise EnvironmentError("❌ No se encontró ninguna GROQ_API_KEY.")
 
-    print("\n🔎 Verificando estado de Groq API...")
-    if not check_groq_quota(api_key):
-        print("⛔ Groq no disponible. Saliendo sin modificar news.json.")
+    print(f"\n🔑 Keys disponibles: {len(all_keys)}")
+    available_keys = []
+    for i, key in enumerate(all_keys, 1):
+        status = check_key(key)
+        label  = f"Key {i} ({mask_key(key)})"
+        if status == "ok":
+            print(f"  ✅ {label} — operativa")
+            available_keys.append(key)
+        elif status == "daily_limit":
+            print(f"  ⛔ {label} — límite diario agotado")
+        elif status == "invalid":
+            print(f"  ❌ {label} — inválida (401)")
+        else:
+            print(f"  ⚠️  {label} — error de red, asumiendo OK")
+            available_keys.append(key)
+
+    if not available_keys:
+        print("\n⛔ Todas las keys han alcanzado el límite diario. Saliendo.")
         sys.exit(0)
-    print("✅ Groq API operativa\n")
 
+    print(f"\n✅ Keys disponibles para usar: {len(available_keys)}")
+    current_key_idx = 0
+    current_key     = available_keys[current_key_idx]
+    print(f"   Usando: Key con índice {current_key_idx + 1}\n")
+
+    # ── Cargar news.json ──────────────────────────────────────────────────────
     if not NEWS_FILE.exists():
         raise FileNotFoundError(f"❌ No se encontró {NEWS_FILE}.")
 
@@ -277,7 +295,7 @@ def main():
     for idx, (article_idx, article) in enumerate(to_process):
 
         if timeout_reached():
-            print(f"\n⏰ Timeout {GLOBAL_TIMEOUT_MIN} min tras {idx} artículos — guardando parcial")
+            print(f"\n⏰ Timeout {GLOBAL_TIMEOUT_MIN} min — guardando parcial")
             stopped_early = True
             break
 
@@ -285,24 +303,37 @@ def main():
         imp = article.get("impact", "?")
         print(f"[{idx+1}/{len(to_process)}] {cur} [{imp}] {article.get('title','')[:60]}...")
 
-        result = call_groq(api_key, article)
+        result = call_groq(current_key, article)
 
+        # ── Si la key actual se agotó, intentar con la siguiente ──────────────
         if result == "DAILY_LIMIT":
-            print(f"⛔ Límite diario — guardando {enriched} enriquecidos")
-            stopped_early = True
-            break
-        elif result:
+            print(f"  ⛔ Key {current_key_idx + 1} agotada — buscando siguiente key...")
+            current_key_idx += 1
+            if current_key_idx >= len(available_keys):
+                print("  ⛔ Todas las keys agotadas — guardando progreso")
+                stopped_early = True
+                break
+            current_key = available_keys[current_key_idx]
+            print(f"  🔄 Cambiando a Key {current_key_idx + 1} ({mask_key(current_key)})")
+            # Reintentar el mismo artículo con la nueva key
+            result = call_groq(current_key, article)
+            if result == "DAILY_LIMIT":
+                print("  ⛔ Nueva key también agotada — deteniendo")
+                stopped_early = True
+                break
+
+        if result and result != "DAILY_LIMIT":
             articles[article_idx]["ai_headline"] = result
             enriched += 1
             print(f"  ✅ {result[:90]}{'...' if len(result) > 90 else ''}")
-        else:
+        elif result is None:
             txt = article.get("title","").lower() + " " + (article.get("expand","") or "").lower()
             if any(t in txt for t in FOREX_TERMS):
                 skipped += 1
                 print("  ⚠️  Sin síntesis (posible error de API)")
             else:
                 irrelevant += 1
-                print("  ⏭️  Sin síntesis (irrelevante para forex)")
+                print("  ⏭️  Sin síntesis (irrelevante)")
 
         if idx < len(to_process) - 1:
             time.sleep(SLEEP_BETWEEN)
@@ -317,6 +348,7 @@ def main():
     print(f"   ⏭️  Irrelevantes:  {irrelevant}")
     if stopped_early:
         print(f"   ⏰ Detenido antes de completar")
+    print(f"   🔑 Keys usadas:   {current_key_idx + 1} de {len(available_keys)}")
     print(f"   ⏱️  Tiempo total:  {elapsed_min():.1f} min")
     print(f"   💾 Guardado en:   {NEWS_FILE}")
     print("=" * 60)
