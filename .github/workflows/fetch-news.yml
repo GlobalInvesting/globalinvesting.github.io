@@ -1,0 +1,35 @@
+name: Fetch Forex News
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # cada hora en punto
+  workflow_dispatch:        # permite correrlo manualmente desde GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser requests python-dateutil
+
+      - name: Run fetch script
+        run: python scripts/fetch_news.py
+
+      - name: Commit news.json if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news.json
+          git diff --cached --quiet || git commit -m "chore: update news.json [$(date -u '+%Y-%m-%d %H:%M')] UTC"
+          git push
