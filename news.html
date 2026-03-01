@@ -441,22 +441,28 @@ setInterval(fetchAndBuildTicker, 60000);
 
 // ── RSS SOURCES ───────────────────────────────────────────────────────────────
 const RSS_SOURCES = [
-  { name:'FXStreet ES',         url:'https://www.fxstreet.es/rss/news',                                    lang:'es' },
-  { name:'DailyForex ES',       url:'https://es.dailyforex.com/rss/es/forexnews.xml',                      lang:'es' },
-  { name:'DailyForex ES · Fund',url:'https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml',            lang:'es' },
-  { name:'DailyForex ES · Tec', url:'https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml',              lang:'es' },
-  { name:'DailyForex ES · Art', url:'https://es.dailyforex.com/rss/es/forexarticles.xml',                  lang:'es' },
-  { name:'ElEconomista.es',     url:'https://www.eleconomista.es/rss/rss-mercados.xml',                     lang:'es' },
-  { name:'Expansión',           url:'https://www.expansion.com/rss/mercados.xml',                           lang:'es' },
-  { name:'Investing.com ES',    url:'https://es.investing.com/rss/news_1.rss',                              lang:'es' },
-  { name:'Investing.com ES',    url:'https://es.investing.com/rss/news_25.rss',                             lang:'es' },
-  { name:'InfoMercados',        url:'https://www.infomercados.com/rss/',                                    lang:'es' },
-  { name:'Forexduet ES',        url:'https://es.forexduet.com/feed/',                                       lang:'es' },
-  { name:'Cinco Días',          url:'https://cincodias.elpais.com/rss/economia/',                           lang:'es' },
-  { name:'FXStreet News',       url:'https://www.fxstreet.com/rss/news',                                    lang:'en' },
-  { name:'DailyForex',          url:'https://www.dailyforex.com/rss/forexnews.xml',                         lang:'en' },
-  { name:'Reuters Forex',       url:'https://feeds.reuters.com/reuters/businessNews',                       lang:'en' },
-  { name:'ForexLive',           url:'https://www.forexlive.com/feed/news',                                  lang:'en' },
+  // ── EN ESPAÑOL ────────────────────────────────────────────────────────────
+  { name:'FXStreet ES',         url:'https://www.fxstreet.es/rss/news',                                lang:'es' },
+  { name:'DailyForex ES',       url:'https://es.dailyforex.com/rss/es/forexnews.xml',                  lang:'es' },
+  { name:'DailyForex ES · Fund',url:'https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml',        lang:'es' },
+  { name:'DailyForex ES · Tec', url:'https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml',          lang:'es' },
+  { name:'Expansión',           url:'https://www.expansion.com/rss/mercados.xml',                       lang:'es' },
+  { name:'Investing.com ES',    url:'https://es.investing.com/rss/news_1.rss',                          lang:'es' },
+  // ── EN INGLÉS ─────────────────────────────────────────────────────────────
+  { name:'FXStreet',            url:'https://www.fxstreet.com/rss/news',                                lang:'en' },
+  { name:'ForexLive',           url:'https://www.forexlive.com/feed/news',                              lang:'en' },
+  { name:'ForexLive · CB',      url:'https://www.forexlive.com/feed/centralbank',                       lang:'en' },
+  { name:'ActionForex',         url:'https://www.actionforex.com/category/live-comments/feed/',         lang:'en' },
+  { name:'ActionForex · Insight',url:'https://www.actionforex.com/category/action-insight/feed/',      lang:'en' },
+  { name:'InvestingLive · CB',  url:'https://investinglive.com/feed/centralbank/',                      lang:'en' },
+  { name:'InvestingLive · Tech',url:'https://investinglive.com/feed/technicalanalysis/',                lang:'en' },
+  { name:'MyFXBook',            url:'https://www.myfxbook.com/rss/latest-forex-news',                   lang:'en' },
+  { name:'Investing.com · Fund',url:'https://www.investing.com/rss/forex_Fundamental.rss',              lang:'en' },
+  { name:'Investing.com · Tech',url:'https://www.investing.com/rss/forex_Technical.rss',                lang:'en' },
+  { name:'DailyForex',          url:'https://www.dailyforex.com/rss/forexnews.xml',                     lang:'en' },
+  { name:'Bank of Canada',      url:'https://www.bankofcanada.ca/feed/',                                 lang:'en' },
+  { name:'ECB',                 url:'https://www.ecb.europa.eu/rss/press.html',                          lang:'en' },
+  { name:'Bank of England',     url:'https://www.bankofengland.co.uk/rss/news',                          lang:'en' },
 ];
 
 // ── CURRENCY FLAGS MAP ────────────────────────────────────────────────────────
@@ -927,7 +933,7 @@ async function initFeed() {
               ai_headline: a.ai_headline || null,
             };
           })
-          .filter(a => a.ai_headline)  // solo mostrar artículos con síntesis AI
+          .filter(a => a.ai_headline && !a.ai_headline.toUpperCase().includes('IRRELEVANTE'))  // solo mostrar artículos con síntesis AI válida
           .sort((a, b) => (b.ts || 0) - (a.ts || 0));
         renderFeed();
         return;
