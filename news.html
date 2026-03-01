@@ -299,13 +299,26 @@ const TICKER_PAIRS = [
   { pair:'GBP/JPY', base:'GBP', quote:'JPY', invert:false },
 ];
 
-let prevRates = {};   // Guardamos tasas anteriores para calcular cambio %
+// prevRates se persiste en localStorage para mostrar % de cambio
+// incluso en la primera carga de la sesión (comparando vs última visita).
+const PREV_RATES_KEY = 'fx_prev_rates';
+
+function loadPrevRates() {
+  try {
+    const raw = localStorage.getItem(PREV_RATES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(_) { return {}; }
+}
+function savePrevRates(obj) {
+  try { localStorage.setItem(PREV_RATES_KEY, JSON.stringify(obj)); } catch(_) {}
+}
+
+let prevRates = loadPrevRates();
 
 async function fetchAndBuildTicker() {
   const t = document.getElementById('ticker');
 
   try {
-    // Intentar fuente primaria: Frankfurter (ECB)
     let rates = null;
     const sources = [
       'https://api.frankfurter.app/latest?from=USD',
@@ -315,7 +328,9 @@ async function fetchAndBuildTicker() {
 
     for (const url of sources) {
       try {
-        const res = await fetch(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined });
+        const ctrl = new AbortController();
+        setTimeout(() => ctrl.abort(), 6000);
+        const res = await fetch(url, { signal: ctrl.signal });
         if (res.ok) {
           const data = await res.json();
           if (data.rates) { rates = data.rates; break; }
@@ -325,22 +340,17 @@ async function fetchAndBuildTicker() {
 
     if (!rates) throw new Error('Todas las fuentes de FX fallaron');
 
-    // Calcular precio de cada par y variación vs sesión anterior (simulada como ±0 si no hay previo)
-    const items = TICKER_PAIRS.map(({ pair, base, quote, invert }) => {
+    const newPrev = {};
+    const items = TICKER_PAIRS.map(({ pair, base, quote }) => {
       let price;
-      if (base === 'USD') {
-        price = rates[quote];
-      } else if (quote === 'USD') {
-        price = 1 / rates[base];
-      } else {
-        price = rates[quote] / rates[base];
-      }
+      if (base === 'USD')        price = rates[quote];
+      else if (quote === 'USD')  price = 1 / rates[base];
+      else                       price = rates[quote] / rates[base];
       if (!price || isNaN(price)) return null;
 
-      const decimals = (pair.includes('JPY')) ? 2 : 4;
+      const decimals  = pair.includes('JPY') ? 2 : 4;
       const prevPrice = prevRates[pair];
-      let chgStr = '';
-      let up = null;
+      let chgStr = '', up = null;
 
       if (prevPrice && Math.abs(prevPrice - price) > 0.000001) {
         const pct = ((price - prevPrice) / prevPrice) * 100;
@@ -348,11 +358,15 @@ async function fetchAndBuildTicker() {
         chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
       }
 
-      prevRates[pair] = price;
+      newPrev[pair] = price;   // guardar precio actual para próxima comparación
       return { pair, price: price.toFixed(decimals), chgStr, up };
     }).filter(Boolean);
 
-    // Renderizar doble para scroll continuo
+    // Persistir precios actuales como "previos" para el siguiente refresh
+    savePrevRates(newPrev);
+    // Actualizar en memoria también (para el refresh de 60 s dentro de la misma sesión)
+    prevRates = { ...prevRates, ...newPrev };
+
     const html = [...items, ...items].map(({ pair, price, chgStr, up }) => {
       const chgHtml = chgStr
         ? `<span class="ticker-chg ${up ? 'up' : 'dn'}">${esc(chgStr)}</span>`
@@ -377,23 +391,45 @@ fetchAndBuildTicker();
 setInterval(fetchAndBuildTicker, 60000);
 
 // ── RSS SOURCES ───────────────────────────────────────────────────────────────
-// Fuentes RSS verificables ordenadas por idioma (ES primero)
 const RSS_SOURCES = [
-  { name:'ElEconomista.es',   url:'https://www.eleconomista.es/rss/rss-mercados.xml',     lang:'es' },
-  { name:'Expansión',         url:'https://www.expansion.com/rss/mercados.xml',            lang:'es' },
-  { name:'InfoMercados',      url:'https://www.infomercados.com/rss/',                     lang:'es' },
-  { name:'Forexduet ES',      url:'https://es.forexduet.com/feed/',                        lang:'es' },
-  { name:'Reuters Forex',     url:'https://feeds.reuters.com/reuters/businessNews',        lang:'en' },
-  { name:'FXStreet News',     url:'https://www.fxstreet.com/rss/news',                    lang:'en' },
-  { name:'Investing.com',     url:'https://www.investing.com/rss/news.rss',               lang:'en' },
-  { name:'ForexFactory Cal.', url:'https://www.forexfactory.com/ff_calendar_thisweek.xml',lang:'en' },
+  // ── EN ESPAÑOL ────────────────────────────────────────────────────────────
+  { name:'FXStreet ES',       url:'https://www.fxstreet.es/rss/news',                       lang:'es' },
+  { name:'ElEconomista.es',   url:'https://www.eleconomista.es/rss/rss-mercados.xml',        lang:'es' },
+  { name:'Expansión',         url:'https://www.expansion.com/rss/mercados.xml',              lang:'es' },
+  { name:'Investing.com ES',  url:'https://es.investing.com/rss/news_25.rss',                lang:'es' },
+  { name:'InfoMercados',      url:'https://www.infomercados.com/rss/',                       lang:'es' },
+  { name:'Forexduet ES',      url:'https://es.forexduet.com/feed/',                          lang:'es' },
+  { name:'Cinco Días',        url:'https://cincodias.elpais.com/rss/economia/',              lang:'es' },
+  // Nota: es.dailyforex.com, forex.com/es y es.marketscreener.com no publican
+  // feeds RSS nativos; se enlazan como referencias pero no se pueden scrapear.
+  // ── EN INGLÉS ─────────────────────────────────────────────────────────────
+  { name:'FXStreet News',     url:'https://www.fxstreet.com/rss/news',                      lang:'en' },
+  { name:'DailyForex',        url:'https://www.dailyforex.com/rss/forexnews.xml',            lang:'en' },
+  { name:'Reuters Forex',     url:'https://feeds.reuters.com/reuters/businessNews',          lang:'en' },
+  { name:'ForexLive',         url:'https://www.forexlive.com/feed/news',                     lang:'en' },
 ];
 
 // ── CURRENCY FLAGS MAP ────────────────────────────────────────────────────────
+// Cubre tanto códigos de 3 letras (ISO 4217) como abreviaturas de 2 letras
+// que algunas fuentes de calendario usan (p.ej. "AU" en vez de "AUD").
 const CURRENCY_FLAGS = {
+  // 3 letras (estándar)
   USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
   AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
+  // 2 letras (algunas fuentes de calendario)
+  US:'🇺🇸', EU:'🇪🇺', UK:'🇬🇧', JP:'🇯🇵',
+  AU:'🇦🇺', CA:'🇨🇦', CH:'🇨🇭', NZ:'🇳🇿',
 };
+
+function resolveFlag(event) {
+  // Prioridad: campo "flag" del JSON → currency (3L) → currency (2L) → vacío
+  if (event.flag) return event.flag;
+  const cur3 = (event.currency || '').toUpperCase();
+  if (CURRENCY_FLAGS[cur3]) return CURRENCY_FLAGS[cur3];
+  // Algunos calendarios usan los 2 primeros caracteres del código de país
+  const cur2 = cur3.slice(0, 2);
+  return CURRENCY_FLAGS[cur2] || '';
+}
 
 // ── SENTIMENT KEYWORDS ────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
@@ -514,10 +550,8 @@ async function loadUpcomingEvents() {
         } catch(_) { /* mantener timeUTC como fallback */ }
       }
 
-      // ── Bandera del país (desde currency o campo flag) ────────────────────
-      // Prioridad: campo flag del JSON → currency → vacío
-      const flagFromCurrency = CURRENCY_FLAGS[e.currency] || '';
-      const flag = e.flag || flagFromCurrency;
+      // ── Bandera del país (robusta: 3L, 2L o campo flag del JSON) ────────────
+      const flag = resolveFlag(e);
 
       container.innerHTML += `<div class="ev-row">
         <div class="ev-left">
@@ -549,25 +583,82 @@ function renderSources() {
 }
 
 // ── DETECT CURRENCY FROM TITLE / DESCRIPTION ─────────────────────────────────
-// Heurístico multi-idioma para asignar divisa a cada noticia RSS.
-const CUR_KEYWORDS = {
-  USD: ['dollar','dólar','usd','fed','federal reserve','reserva federal','wall street','treasury','nasdaq','s&p','dow jones','eeuu','estados unidos','united states'],
-  EUR: ['euro','eur','ecb','bce','eurozone','eurozona','zona euro','germany','alemania','france','francia','draghi','lagarde','bund'],
-  GBP: ['pound','libra','gbp','boe','bank of england','uk','reino unido','united kingdom','ftse','sterling'],
-  JPY: ['yen','jpy','boj','bank of japan','banco de japón','japan','japón','nikkei'],
-  AUD: ['aussie','aud','rba','reserve bank of australia','australia','asx'],
-  CAD: ['loonie','cad','boc','bank of canada','banco de canadá','canada','canadá','tsx'],
-  CHF: ['franc','franco','chf','snb','swiss national bank','switzerland','suiza','suizo'],
-  NZD: ['kiwi','nzd','rbnz','reserve bank of new zealand','nueva zelanda','new zealand'],
-};
+// Array ordenado: primero las divisas con keywords MÁS ESPECÍFICOS para evitar
+// falsos positivos (p.ej. "oil prices" asignado a USD en lugar de CAD).
+// IMPORTANTE: el orden determina la prioridad — no usar Object (sin orden garantizado).
+const CUR_KEYWORDS = [
+  // CAD primero — "canada", "bank of canada", "petróleo" son muy específicos
+  // y antes se confundían con USD al estar USD primero.
+  ['CAD', [
+    'bank of canada','banco de canadá','banco de canada','boc ','macklem',
+    'loonie','cad ','canadian dollar','dólar canadiense','dolar canadiense',
+    'canada ','canadá ','canada economy','canadian economy','economía canadá',
+    'economía de canadá','pib canadá','ipc canadá','tsx ',
+    'oil prices','crude oil','wti ','petróleo','precio del petróleo','crudo ',
+  ]],
+  // CHF — muy específico, pocas ambigüedades
+  ['CHF', [
+    'swiss national bank','snb ','banco nacional suizo',
+    'swiss franc','franco suizo','chf ','switzerland','suiza',
+    'swiss economy','economía suiza','swiss inflation','ipc suiza',
+  ]],
+  // NZD — antes de AUD para evitar que "new zealand" quede sin match
+  ['NZD', [
+    'reserve bank of new zealand','rbnz','banco de la reserva de nueva zelanda',
+    'kiwi dollar','nzd ','nueva zelanda','new zealand','nz economy',
+    'dólar neozelandés','dolar neozelandes',
+  ]],
+  // AUD — antes de USD para que "australia" no quede sin match
+  ['AUD', [
+    'reserve bank of australia','rba ','banco de la reserva de australia',
+    'aussie dollar','aud ','australia ','australian economy','economía australia',
+    'asx ','australian jobs','australian inflation','ipc australia',
+    'dólar australiano','dolar australiano',
+    // China PMI afecta principalmente a AUD
+    'caixin pmi','china pmi','china gdp','china economy',
+  ]],
+  // EUR
+  ['EUR', [
+    'european central bank','banco central europeo','ecb ','bce ',
+    'lagarde','eurozone','eurozona','zona euro','euro area',
+    'euro ','eur ','germany ','alemania ','france ','francia ',
+    'draghi','ifo ','zew ','bund ','eu economy','economía europea',
+    'inflación zona euro','ipc zona euro','pib zona euro','pib alemania',
+  ]],
+  // GBP
+  ['GBP', [
+    'bank of england','banco de inglaterra','boe ','bailey ',
+    'pound sterling','sterling','british pound','libra esterlina','gbp ',
+    'united kingdom','reino unido','britain ','uk economy',
+    'uk gdp','uk inflation','uk jobs','ftse ','gilts ',
+    'economía del reino unido','ipc uk','pib uk',
+  ]],
+  // JPY
+  ['JPY', [
+    'bank of japan','banco de japón','banco de japan','boj ','ueda ',
+    'japanese yen','yen ','jpy ','japan ','japón ','nikkei ',
+    'japan economy','japanese economy','economía japonesa','economía de japón',
+    'japan gdp','japan inflation','shunto','ipc japón',
+  ]],
+  // USD — al final: es el fallback más común, sus keywords son muy genéricos
+  // Ej: "fed" puede aparecer en contextos europeos; "wall street" en cualquier noticia
+  ['USD', [
+    'federal reserve','reserva federal','fomc ','powell ',
+    'us dollar','american dollar','dollar ','dólar ','usd ',
+    'us economy','american economy','economía eeuu','economía de eeuu',
+    'us gdp','us inflation','us jobs','nonfarm','non-farm',
+    'wall street','treasury bond','dow jones','nasdaq ','s&p 500',
+    'estados unidos','united states','eeuu ',
+  ]],
+];
 
 function detectCurrency(text) {
   if (!text) return 'USD';
   const lower = text.toLowerCase();
-  for (const [cur, kws] of Object.entries(CUR_KEYWORDS)) {
+  for (const [cur, kws] of CUR_KEYWORDS) {
     if (kws.some(kw => lower.includes(kw))) return cur;
   }
-  return 'USD';
+  return 'USD';   // fallback genérico
 }
 
 // ── DETECT IMPACT FROM KEYWORDS ───────────────────────────────────────────────
@@ -752,7 +843,9 @@ async function initFeed() {
   let successCount = 0;
 
   // Cargar fuentes en paralelo (limitado a las más confiables para evitar exceso de requests)
-  const ACTIVE_SOURCES = RSS_SOURCES.filter(s => ['Reuters Forex','FXStreet News','ElEconomista.es','Expansión'].includes(s.name));
+  const ACTIVE_SOURCES = RSS_SOURCES.filter(s =>
+    ['FXStreet ES','ElEconomista.es','Inversting.com ES','Reuters Forex','FXStreet News','DailyForex'].includes(s.name)
+  );
 
   const results = await Promise.allSettled(
     ACTIVE_SOURCES.map(src => fetchRSSviaProxy(src.url).then(items => ({ src, items })))
@@ -799,11 +892,14 @@ async function initFeed() {
     Esto puede deberse a restricciones CORS del navegador o a que el proceso
     de scraping automático aún no ha ejecutado.<br><br>
     <strong>Consulte noticias directamente:</strong><br><br>
-    <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters — Forex</a><br>
-    <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet News</a><br>
+    <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
     <a href="https://www.eleconomista.es/mercados-cotizaciones/" target="_blank" rel="noopener">ElEconomista.es</a><br>
-    <a href="https://www.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com — Forex</a><br>
-    <a href="https://es.forexduet.com/" target="_blank" rel="noopener">Forexduet ES</a>
+    <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES — Forex</a><br>
+    <a href="https://es.dailyforex.com/" target="_blank" rel="noopener">DailyForex ES</a><br>
+    <a href="https://www.forex.com/es/news-and-analysis/" target="_blank" rel="noopener">Forex.com ES</a><br>
+    <a href="https://es.marketscreener.com/noticias/divisas/" target="_blank" rel="noopener">MarketScreener ES — Divisas</a><br>
+    <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters — Forex</a><br>
+    <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet EN</a>
   </div>`;
 
   computeSentiment([]);
