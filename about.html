@@ -23,6 +23,7 @@
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
         .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a.active { color: var(--text-primary); }
         h1 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); }
         h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
         h3 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary); }
@@ -74,7 +75,8 @@
             <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
             <div class="nav-links">
                 <a href="index.html">Dashboard</a>
-                <a href="about.html">Acerca de</a>
+                <a href="news.html">Noticias</a>
+                <a href="about.html" class="active">Acerca de</a>
                 <a href="terms.html">Términos</a>
                 <a href="privacy.html">Privacidad</a>
                 <a href="contact.html">Contacto</a>
@@ -111,21 +113,39 @@
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 20–82 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, normalizado automáticamente por los indicadores disponibles.</li>
-                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 18%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días, calculado con tasas de referencia ECB (Frankfurter API) normalizadas a la fecha de ayer. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real. Tiene el mayor peso individual del modelo.</li>
-                <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo). El cambio de ciclo monetario es una señal más relevante para el precio que el nivel absoluto de tasa. También corrige automáticamente el Outlook Score: si el BC está subiendo tasas activamente, un outlook Dovish residual se actualiza a Neutral, y viceversa.</li>
-                <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds). Incluye lógica contrarian automática para posiciones extremas y penalización directa sobre la prima safe haven cuando el propio COT de una divisa contradice su perfil estructural.</li>
-                <li><strong>Safe Haven Threshold Dinámico:</strong> El umbral que activa la prima safe haven para CHF y JPY se calcula automáticamente como <code>max(1.0, avgRate − 1.5)</code>. El cap máximo de la prima es +5 pts y se aplica una penalización proporcional al COT propio de la divisa: si los institucionales están vendiendo agresivamente una divisa con perfil de safe haven, el modelo reduce su prima, alineándose con el mercado.</li>
-                <li><strong>Régimen de Mercado — Doble Señal:</strong> La prima safe haven se amplifica o comprime según dos señales independientes: (1) el posicionamiento COT promedio de las 8 divisas, y (2) el máximo fxPerformance1M entre divisas no-safe-haven. Si la divisa de mayor retorno real supera el 2% mensual, el modelo detecta risk-on genuino y comprime la prima safe haven incluso cuando el avgCOT no ha llegado a su umbral exacto. Ambas señales son 100% data-driven: ninguna hardcodea nombres de divisas.</li>
-                <li><strong>Perspectiva del BC (Outlook Score) — Peso 7%:</strong> El outlook Hawkish/Neutral/Dovish se incorpora como indicador de scoring, capturando la dirección de política monetaria además del nivel de tasa. Corregido automáticamente por <code>rateMomentum</code>.</li>
-                <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día (00:00, 08:00 y 16:00 UTC) mediante obtención de datos en cascada desde múltiples fuentes: MQL5 RSS, Trading Economics RSS, Investing.com y fuentes oficiales de gobiernos y bancos centrales. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos automáticamente a la zona horaria local del usuario, impacto oficial y filtro por nivel de impacto.</li>
-                <li><strong>Términos de Intercambio — Peso 2%:</strong> Ratio precio exportaciones/importaciones (índice base 100) actualizado diariamente. Especialmente relevante para AUD, CAD y NZD.</li>
-                <li><strong>Próximas Reuniones:</strong> Fechas oficiales de reuniones de bancos centrales obtenidas de cbrates.com, actualizadas cada lunes.</li>
-                <li><strong>Bonos Soberanos 10Y — Peso 5%:</strong> Yield del bono a 10 años como indicador de carry y expectativas de tasas futuras. Para EUR se usa el yield oficial de la Zona Euro (GEUGB10Y).</li>
-                <li><strong>Análisis Fundamental con IA:</strong> Los textos de análisis por divisa son generados por Groq AI (modelo llama-3.3-70b-versatile) con datos económicos actualizados diariamente. Cuando el análisis de IA no está disponible, se activa un generador algorítmico propio basado en los mismos datos.</li>
-                <li><strong>Recomendaciones de Pares:</strong> Sugerencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, con factores positivos y negativos detallados por par y nivel de confianza según amplitud del diferencial.</li>
-                <li><strong>Verificación de Calidad de Datos:</strong> Sistema activo que detecta datos desactualizados, indicadores críticos faltantes y completitud por divisa, con alertas diferenciadas por severidad visible en el dashboard.</li>
+                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 18%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real.</li>
+                <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
+                <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
+                <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
+                <li><strong>Análisis Fundamental con IA:</strong> Los textos de análisis por divisa son generados por Groq AI (modelo llama-3.3-70b-versatile) con datos económicos actualizados diariamente.</li>
+                <li><strong>Recomendaciones de Pares:</strong> Sugerencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, con factores positivos y negativos detallados por par y nivel de confianza.</li>
+                <li><strong>Verificación de Calidad de Datos:</strong> Sistema activo que detecta datos desactualizados, indicadores críticos faltantes y completitud por divisa, con alertas diferenciadas por severidad.</li>
             </ul>
         </div>
+
+        <!-- FEED DE NOTICIAS -->
+        <div class="section">
+            <h2>Feed de Noticias de Mercado</h2>
+            <p>La sección <a href="news.html">Noticias</a> ofrece un feed en tiempo real de noticias económicas y de mercado relevantes para el trading de divisas, con estética de terminal Bloomberg y actualización horaria automática.</p>
+
+            <h3>Fuentes RSS Integradas</h3>
+            <ul>
+                <li><strong>FXStreet</strong> — Noticias y análisis especializados en forex.</li>
+                <li><strong>ForexLive</strong> — Cobertura en tiempo real de bancos centrales y datos económicos.</li>
+                <li><strong>Reuters Business</strong> — Noticias financieras internacionales de referencia.</li>
+                <li><strong>Investing.com</strong> — Cobertura amplia de mercados financieros globales.</li>
+                <li><strong>Bancos Centrales Oficiales</strong> — Comunicados directos de la Fed, BCE, BoE, BoJ, RBA, BoC, SNB y RBNZ.</li>
+            </ul>
+
+            <h3>Funcionalidades del Feed</h3>
+            <ul>
+                <li><strong>Feed denso estilo terminal:</strong> Una línea por noticia con hora, divisa afectada, nivel de impacto (Alto / Medio / Bajo), titular y fuente. Click en cualquier fila expande el resumen completo.</li>
+                <li><strong>Detección automática de divisa:</strong> Cada noticia es etiquetada automáticamente con la divisa principal que menciona (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD o GENERAL).</li>
+                <li><strong>Nivel de impacto estimado:</strong> Calculado por palabras clave en el titular. Noticias sobre decisiones de tasas, IPC, NFP o reuniones de bancos centrales se clasifican como Alto Impacto.</li>
+                <li><strong>Sentimiento 24h por divisa:</strong> Panel lateral que calcula automáticamente el ratio bull/bear/neutral de las últimas 24 horas para cada divisa según el tono de los titulares.</li>
+                <li><strong>Filtros:</strong> Por divisa (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) y por nivel de impacto alto.</li>
+                <li><strong>Estado de fuentes RSS:</strong> Panel lateral que muestra qué fuentes están activas y cuáles con proxy.</li>
+            </div>
 
         <!-- METODOLOGÍA -->
         <div class="section">
@@ -137,7 +157,7 @@
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 9%), que sí es un indicador de flujo relevante para el trading.</p>
 
             <h3>Sistema de Ponderación — 21 Indicadores en 6 Tiers</h3>
-            <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score. La suma bruta de pesos es aproximadamente 1.03 y queda normalizada en cada evaluación.</p>
+            <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
                 <thead>
@@ -146,48 +166,48 @@
                 <tbody>
                     <tr>
                         <td rowspan="4"><strong>Tier 1 — ~32%</strong><br/>Tasas &amp; Ciclo Monetario</td>
-                        <td>Tasa de Interés</td><td>12%</td><td>Nivel actual de tasa y diferencial de carry trade. El carry es el motor principal del forex.</td>
+                        <td>Tasa de Interés</td><td>12%</td><td>Nivel actual de tasa y diferencial de carry trade.</td>
                     </tr>
-                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo del modelo 1.8–2.5%.</td></tr>
-                    <tr><td>Perspectiva del BC (Outlook Score)</td><td>7%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10. Corregido automáticamente por <code>rateMomentum</code>.</td></tr>
-                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>6%</td><td>Variación de la tasa respecto a hace 12 meses. El cambio de ciclo es más informativo que el nivel absoluto. Corrige también el Outlook Score cuando hay divergencia.</td></tr>
+                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%.</td></tr>
+                    <tr><td>Perspectiva del BC (Outlook Score)</td><td>7%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
+                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>6%</td><td>Variación de la tasa respecto a hace 12 meses.</td></tr>
 
                     <tr>
                         <td rowspan="4"><strong>Tier 2 — ~12%</strong><br/>Balance Externo</td>
                         <td>Balanza Comercial</td><td>5%</td><td>Flujos comerciales mensuales en millones USD.</td>
                     </tr>
-                    <tr><td>Cuenta Corriente</td><td>3%</td><td>Demanda estructural de divisa por flujos reales de bienes y servicios. El déficit de CA se penaliza una única vez en este indicador y en <code>calculateStructuralDeficit</code> — no en <code>calculateSafeHavenScore</code>, que solo premia el potencial safe haven sin castigar su ausencia.</td></tr>
-                    <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal. Con corrección para economías con superávit de CA y deuda mayormente doméstica.</td></tr>
-                    <tr><td>Términos de Intercambio</td><td>2%</td><td>Ratio precio exportaciones/importaciones (base 100). Especialmente relevante para AUD, CAD, NZD.</td></tr>
+                    <tr><td>Cuenta Corriente</td><td>3%</td><td>Demanda estructural de divisa por flujos reales.</td></tr>
+                    <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal.</td></tr>
+                    <tr><td>Términos de Intercambio</td><td>2%</td><td>Ratio precio exportaciones/importaciones (base 100).</td></tr>
 
                     <tr>
                         <td rowspan="3"><strong>Tier 3 — ~17%</strong><br/>Crecimiento &amp; Empleo</td>
                         <td>Crecimiento PIB</td><td>9%</td><td>Momentum económico fundamental.</td>
                     </tr>
-                    <tr><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral y presiones salariales.</td></tr>
-                    <tr><td>Producción Industrial</td><td>3%</td><td>Actividad del sector real (% MoM / QoQ para NZD).</td></tr>
+                    <tr><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral.</td></tr>
+                    <tr><td>Producción Industrial</td><td>3%</td><td>Actividad del sector real.</td></tr>
 
                     <tr>
                         <td rowspan="3"><strong>Tier 4 — ~8%</strong><br/>Consumo &amp; Salarios</td>
-                        <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico (% MoM).</td>
+                        <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>3%</td><td>Presiones inflacionarias laborales (% YoY).</td></tr>
-                    <tr><td>Expectativas de Inflación</td><td>2%</td><td>Credibilidad del banco central y anclaje de expectativas.</td></tr>
+                    <tr><td>Crecimiento Salarial</td><td>3%</td><td>Presiones inflacionarias laborales.</td></tr>
+                    <tr><td>Expectativas de Inflación</td><td>2%</td><td>Credibilidad del banco central.</td></tr>
 
                     <tr>
                         <td rowspan="5"><strong>Tier 5 — ~19%</strong><br/>Sentimiento de Mercado</td>
-                        <tr><td><strong>COT Positioning</strong></td><td><strong>7%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Lógica contrarian para posiciones extremas (umbral: ±80K contratos en reporte Futures Only). Fuente: CFTC Oficial (<code>financial_lf.htm</code>), categoría Leveraged Funds — el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas.</td>
+                        <td><strong>COT Positioning</strong></td><td><strong>7%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial.</td>
                     </tr>
-                    <tr><td>PMI Manufacturero</td><td>4%</td><td>Indicador adelantado de actividad industrial (&gt;50 = expansión).</td></tr>
+                    <tr><td>PMI Manufacturero</td><td>4%</td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>Flujos de Capital</td><td>3%</td><td>Cuenta financiera de la balanza de pagos (millones USD).</td></tr>
+                    <tr><td>Flujos de Capital</td><td>3%</td><td>Cuenta financiera de la balanza de pagos.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
 
                     <tr style="background: rgba(38,166,154,0.07);">
                         <td rowspan="2"><strong>Tier 6 — ~23%</strong><br/>FX Momentum &amp; Smart Money</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
                         <td><strong>18%</strong></td>
-                        <td>Rendimiento real de la divisa vs USD en los últimos 30 días (Frankfurter/ECB). Único indicador 100% forward-looking, sin lag de publicación. Mayor peso individual del modelo.</td>
+                        <td>Rendimiento real de la divisa vs USD en los últimos 30 días. Mayor peso individual del modelo.</td>
                     </tr>
                     <tr style="background: rgba(38,166,154,0.07);">
                         <td>Bono Soberano 10Y</td>
@@ -199,17 +219,16 @@
                         <td><strong>Total</strong></td>
                         <td><strong>21 Indicadores</strong></td>
                         <td><strong>~103%</strong></td>
-                        <td>Normalizado automáticamente por peso total de indicadores con datos disponibles.</td>
+                        <td>Normalizado automáticamente por peso total de indicadores disponibles.</td>
                     </tr>
                 </tbody>
             </table>
 
             <h3>Normalización y Escala Final (20–82)</h3>
-            <p>El score final se normaliza a un rango de 20–82 puntos para crear headroom y evitar que las divisas se compriman artificialmente en los extremos:</p>
+            <p>El score final se normaliza a un rango de 20–82 puntos para crear headroom y evitar compresión artificial en los extremos:</p>
             <pre>compressedBase  = 20 + (baseScore × 0.58)
 rawFinal        = compressedBase + cappedAdj  [±15 pts máximo]
 normalizedScore = clamp(rawFinal, 20, 82)</pre>
-            <p>El ajuste contextual (<code>cappedAdj</code>) incorpora factores como prima safe haven dinámica, exposición a commodities, carry premium, impacto de recesión, déficit estructural, sostenibilidad de deuda, estabilidad de inflación, proxy de curva de rendimiento y ajuste contrarian COT.</p>
         </div>
 
         <!-- RECOMENDACIONES DE PARES -->
@@ -222,7 +241,7 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
                     <tr><td><strong>Par</strong></td><td>Divisa base / Divisa cotizada</td><td>Estructura del par recomendado</td></tr>
                     <tr><td><strong>Dirección</strong></td><td>LONG (Comprar) o SHORT (Vender)</td><td>Acción recomendada sobre el par</td></tr>
                     <tr><td><strong>Diferencial</strong></td><td>Score fuerte − Score débil</td><td>Mayor diferencial = mayor divergencia fundamental</td></tr>
-                    <tr><td><strong>Confianza</strong></td><td>Alta (&gt;20 pts) / Media (12–20 pts) / Baja (&lt;12 pts)</td><td>Basada en amplitud del diferencial de scores (escala comprimida 20–82)</td></tr>
+                    <tr><td><strong>Confianza</strong></td><td>Alta (&gt;20 pts) / Media (12–20 pts) / Baja (&lt;12 pts)</td><td>Basada en amplitud del diferencial</td></tr>
                     <tr><td><strong>Calidad de Datos</strong></td><td>% de los 21 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
                 </tbody>
             </table>
@@ -239,20 +258,13 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
                     <tr><td>Indicadores Económicos base</td><td>24 horas (06:00 UTC)</td><td>Trading Economics</td></tr>
                     <tr><td>Indicadores Extendidos (bonos, confianza, flujos)</td><td>24 horas (06:30 UTC)</td><td>Trading Economics</td></tr>
                     <tr><td>Tasas de Interés (actual)</td><td>24 horas (08:00 UTC)</td><td>Trading Economics</td></tr>
-                    <tr><td>Histórico de Tasas (24+ meses)</td><td>Acumulación diaria + histórico de Investing.com</td><td>Investing.com (decisiones oficiales de cada banco central)</td></tr>
+                    <tr><td>Histórico de Tasas (24+ meses)</td><td>Acumulación diaria</td><td>Investing.com (decisiones oficiales de cada banco central)</td></tr>
                     <tr><td>FX Performance 1M</td><td>24 horas (07:00 UTC)</td><td>Frankfurter API (ECB)</td></tr>
                     <tr><td>Análisis de IA por divisa</td><td>24 horas</td><td>Groq AI (llama-3.3-70b-versatile)</td></tr>
-                    <tr>
-                        <td>Calendario Económico</td>
-                        <td>3× al día (00:00, 08:00, 16:00 UTC)</td>
-                        <td>Cascada de fuentes: MQL5 RSS → Trading Economics RSS → Investing.com → Fuentes oficiales de gobiernos y bancos centrales. Los horarios se almacenan en UTC y se convierten a la zona horaria local del usuario en el navegador.</td>
-                    </tr>
-                    <tr>
-                        <td>COT — USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD</td>
-                        <td>Semanal (Viernes ~20:00 UTC)</td>
-                        <td>CFTC Oficial (<code>financial_lf.htm</code>) — categoría Leveraged Funds (hedge funds y CTAs; reporte Futures Only — excluye opciones para reflejar únicamente presión directa sobre el precio)</td>
-                    </tr>
+                    <tr><td>Calendario Económico</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>MQL5 RSS → Trading Economics RSS → Investing.com → Fuentes oficiales</td></tr>
+                    <tr><td>COT — 8 divisas principales</td><td>Semanal (Viernes ~20:00 UTC)</td><td>CFTC Oficial (<code>financial_lf.htm</code>) — categoría Leveraged Funds</td></tr>
                     <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com</td></tr>
+                    <tr><td><strong>Feed de Noticias</strong></td><td><strong>Cada hora</strong></td><td><strong>FXStreet, ForexLive, Reuters, Investing.com, Bancos Centrales Oficiales (vía GitHub Actions)</strong></td></tr>
                 </tbody>
             </table>
         </div>
@@ -261,7 +273,7 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
         <div class="section">
             <h2>Transparencia Metodológica</h2>
             <p>Nuestro sistema es transparente en cuanto a pesos explícitos, cálculos visibles, datos verificables y limitaciones claras. El modelo es un anclaje fundamental de medio plazo: la correlación esperada con los movimientos de precio es de 0.4–0.6 a 1 mes y de 0.7–0.9 a 3–6 meses. Para horizontes intraday o de muy corto plazo, el análisis técnico complementa mejor el análisis fundamental.</p>
-            <p>El caché de datos económicos se almacena en el localStorage del navegador del usuario con una versión de código explícita. Cada actualización de versión del dashboard invalida el caché automáticamente, garantizando que los datos frescos se cargan tras cada despliegue.</p>
+            <p>El caché de datos económicos se almacena en el localStorage del navegador del usuario con una versión de código explícita. Cada actualización de versión del dashboard invalida el caché automáticamente.</p>
         </div>
 
         <div class="highlight-box">
@@ -282,6 +294,7 @@ normalizedScore = clamp(rawFinal, 20, 82)</pre>
             <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
             <p style="margin-top: 0.5rem;">
                 <a href="index.html">Dashboard</a> |
+                <a href="news.html">Noticias</a> |
                 <a href="about.html">Acerca de</a> |
                 <a href="terms.html">Términos de Servicio</a> |
                 <a href="privacy.html">Política de Privacidad</a> |
