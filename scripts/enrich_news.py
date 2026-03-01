@@ -32,11 +32,13 @@ GROQ_MODEL            = "llama-3.3-70b-versatile"
 MAX_TOKENS            = 180
 TEMPERATURE           = 0.2   # Más conservador: menos "creatividad", más fidelidad
 
-SLEEP_BETWEEN         = 12
+# Groq free tier: ~30 req/min en llama-3.3-70b → 2s entre requests es seguro
+# Con 35 artículos: 35 * 4s = ~2.3 min en lugar de 35 * 12s = ~7 min
+SLEEP_BETWEEN         = 4    # Reducido de 12s → 4s (Groq soporta ~15 req/min con holgura)
 MAX_RETRIES           = 2
 DEFAULT_RETRY_WAIT    = 65
 SKIP_IF_WAIT_EXCEEDS  = 90
-GLOBAL_TIMEOUT_MIN    = 10
+GLOBAL_TIMEOUT_MIN    = 14   # Aumentado: fetch ~1.5min + enrich ~2.5min + margen
 
 # Contenido mínimo que debe tener la descripción para justificar enriquecimiento
 MIN_CONTENT_WORDS = 15
@@ -121,15 +123,10 @@ def build_user_prompt(article: dict) -> str:
 def is_enrichable(article: dict) -> tuple[bool, str]:
     """
     Verifica si un artículo tiene suficiente contenido real para ser enriquecido por IA.
-
     Retorna (True, "") si es apto, o (False, razón) si debe saltarse.
-
-    Esta función es la segunda línea de defensa después del filtrado en fetch_news.py.
-    Evita enviar a Groq artículos que resultarían en titulares fabricados.
     """
     title   = (article.get("title", "") or "").strip()
     expand  = (article.get("expand", "") or "").strip()
-    source  = article.get("source", "")
 
     # 1. Descripción demasiado corta para síntesis real
     word_count = len(expand.split())
@@ -150,8 +147,8 @@ def is_enrichable(article: dict) -> tuple[bool, str]:
     # 4. Descripción es solo metadatos o encabezados de sección
     meta_patterns = [
         r"^\s*(read more|continue reading|click here|leer más|ver más)\b",
-        r"^\s*[\[\(].*[\]\)]\s*$",    # Solo [categoría] o (tipo)
-        r"^\s*\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\s*$",  # Solo fecha
+        r"^\s*[\[\(].*[\]\)]\s*$",
+        r"^\s*\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\s*$",
     ]
     for pat in meta_patterns:
         if re.match(pat, expand, re.IGNORECASE):
@@ -358,7 +355,7 @@ def main():
         return
 
     est_time = len(to_process) * SLEEP_BETWEEN
-    print(f"⏱️  Estimado: ~{est_time // 60}min {est_time % 60}s\n")
+    print(f"⏱️  Estimado: ~{est_time // 60}min {est_time % 60}s  |  Timeout: {GLOBAL_TIMEOUT_MIN}min\n")
 
     enriched = skipped = irrelevant = not_enrichable = 0
     stopped_early = False
@@ -412,7 +409,9 @@ def main():
                 irrelevant += 1
                 print("  ⏭️  Sin síntesis (irrelevante)")
 
-        if idx < len(to_process) - 1:
+        # Pausa adaptativa: SLEEP_BETWEEN base, pero si la llamada fue rápida
+        # podemos ser más agresivos; si hubo rate limit ya esperamos dentro de call_groq
+        if idx < len(to_process) - 1 and not timeout_reached():
             time.sleep(SLEEP_BETWEEN)
 
     save_progress(data, articles, now_utc)
