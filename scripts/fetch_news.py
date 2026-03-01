@@ -1,8 +1,19 @@
 #!/usr/bin/env python3
 """
 fetch_news.py
-Obtiene noticias forex desde múltiples fuentes RSS y genera news.json.
+Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 Corre via GitHub Actions cada hora.
+
+Formato de salida compatible con news.html:
+  {
+    "articles": [ { "cur", "impact", "title", "expand", "source", "link", "time", "ts", "featured" }, ... ],
+    "updated_utc": "...",
+    "updated_label": "...",
+    "total": N,
+    "total_high": N,
+    "total_med": N,
+    "sources_active": [...]
+  }
 """
 
 import json
@@ -16,166 +27,331 @@ from dateutil import parser as dateparser
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN
 # ─────────────────────────────────────────────
-MAX_NEWS     = 50   # noticias máximas en el JSON final
+MAX_NEWS     = 60   # noticias máximas en el JSON final
 MAX_AGE_DAYS = 3    # descartar noticias más antiguas que esto
-OUTPUT_FILE  = "news.json"
+OUTPUT_FILE  = "news-data/news.json"
 
-# Palabras clave para detectar qué divisa menciona cada noticia.
+# ─────────────────────────────────────────────
+# DETECCIÓN DE DIVISA
+# Palabras clave ES + EN para cada divisa.
 # Orden importa: se asigna la primera coincidencia.
+# ─────────────────────────────────────────────
 CURRENCY_KEYWORDS = {
-    "USD": ["fed ", "federal reserve", "fomc", "powell", "dollar", "usd", "us economy",
-            "us gdp", "nonfarm", "non-farm", "jobless claims", "cpi usa", "us inflation",
-            "treasury", "debt ceiling", "ism ", "us jobs", "american economy"],
-    "EUR": ["ecb", "european central bank", "lagarde", "euro ", "eur", "eurozone",
-            "euro zone", "germany", "france", "italy", "spain", "draghi", "ifo",
-            "zew", "pmi europe", "eu economy", "european economy", "bund"],
-    "GBP": ["boe", "bank of england", "bailey", "pound", "gbp", "sterling",
-            "uk economy", "united kingdom", "britain", "brexit", "gilts",
-            "uk gdp", "uk inflation", "uk jobs"],
-    "JPY": ["boj", "bank of japan", "ueda", "yen", "jpy", "japan economy",
-            "japanese", "nikkei", "shunto", "boj meeting", "japan gdp"],
-    "AUD": ["rba", "reserve bank of australia", "aussie", "aud", "australia",
-            "australian economy", "australian jobs", "caixin"],
-    "CAD": ["boc", "bank of canada", "macklem", "canadian dollar", "cad",
-            "canada economy", "loonie", "oil prices", "crude oil", "wti"],
-    "CHF": ["snb", "swiss national bank", "jordan", "swiss franc", "chf",
-            "switzerland", "swiss economy", "swiss inflation"],
-    "NZD": ["rbnz", "reserve bank of new zealand", "orr", "kiwi", "nzd",
-            "new zealand", "nz economy", "nz jobs"],
+    "USD": [
+        # EN
+        "fed ", "federal reserve", "fomc", "powell", "dollar", "usd", "us economy",
+        "us gdp", "nonfarm", "non-farm", "jobless claims", "us inflation",
+        "treasury", "debt ceiling", "ism ", "us jobs", "american economy",
+        "wall street", "nasdaq", "dow jones", "s&p 500",
+        # ES
+        "reserva federal", "dólar", "dolar americano", "economía de eeuu",
+        "economía estadounidense", "pib eeuu", "inflación eeuu", "inflación de estados unidos",
+        "mercado laboral eeuu", "bonos del tesoro", "deuda eeuu",
+    ],
+    "EUR": [
+        # EN
+        "ecb", "european central bank", "lagarde", "euro ", "eur", "eurozone",
+        "euro zone", "germany", "france", "italy", "spain", "draghi", "ifo",
+        "zew", "pmi europe", "eu economy", "european economy", "bund",
+        # ES
+        "banco central europeo", "bce", "zona euro", "eurozona", "lagarde",
+        "alemania", "economía europea", "pib zona euro", "inflación zona euro",
+        "inflación de la zona euro", "ipc zona euro", "alemania ",
+        "balanza comercial alemania", "confianza zew", "confianza ifo",
+    ],
+    "GBP": [
+        # EN
+        "boe", "bank of england", "bailey", "pound", "gbp", "sterling",
+        "uk economy", "united kingdom", "britain", "brexit", "gilts",
+        "uk gdp", "uk inflation", "uk jobs",
+        # ES
+        "banco de inglaterra", "libra esterlina", "libra ", "reino unido",
+        "economía uk", "economía del reino unido", "pib uk", "inflación uk",
+        "inflación del reino unido", "ipc uk", "pmi uk",
+    ],
+    "JPY": [
+        # EN
+        "boj", "bank of japan", "ueda", "yen", "jpy", "japan economy",
+        "japanese", "nikkei", "shunto", "boj meeting", "japan gdp",
+        # ES
+        "banco de japón", "banco de japan", "yen japonés", "yen japones",
+        "economía japonesa", "economía de japón", "pib japón", "inflación japón",
+        "ipc japón", "producción industrial japón", "shunto",
+    ],
+    "AUD": [
+        # EN
+        "rba", "reserve bank of australia", "aussie", "aud", "australia",
+        "australian economy", "australian jobs", "caixin",
+        # ES
+        "banco de la reserva de australia", "dólar australiano", "dolar australiano",
+        "economía australia", "economía de australia", "pib australia",
+        "empleo australia", "inflación australia",
+    ],
+    "CAD": [
+        # EN
+        "boc", "bank of canada", "macklem", "canadian dollar", "cad",
+        "canada economy", "loonie", "oil prices", "crude oil", "wti",
+        # ES
+        "banco de canadá", "banco de canada", "dólar canadiense", "dolar canadiense",
+        "economía canadá", "economía de canadá", "pib canadá", "inflación canadá",
+        "ipc canadá", "petróleo", "precio del petróleo", "crudo ",
+    ],
+    "CHF": [
+        # EN
+        "snb", "swiss national bank", "jordan", "swiss franc", "chf",
+        "switzerland", "swiss economy", "swiss inflation",
+        # ES
+        "banco nacional suizo", "franco suizo", "suiza", "economía suiza",
+        "pib suiza", "inflación suiza", "ipc suiza",
+    ],
+    "NZD": [
+        # EN
+        "rbnz", "reserve bank of new zealand", "orr", "kiwi", "nzd",
+        "new zealand", "nz economy", "nz jobs",
+        # ES
+        "banco de la reserva de nueva zelanda", "dólar neozelandés", "dolar neozelandes",
+        "nueva zelanda", "economía de nueva zelanda", "pib nueva zelanda",
+        "inflación nueva zelanda",
+    ],
 }
 
-# Feeds RSS — en orden de prioridad / confiabilidad
+# ─────────────────────────────────────────────
+# FEEDS RSS — ES primero, luego EN
+# ─────────────────────────────────────────────
 FEEDS = [
-    # ── FXStreet ──────────────────────────────────────────────────
+
+    # ══════════════════════════════════════════
+    # FUENTES EN ESPAÑOL (prioridad)
+    # ══════════════════════════════════════════
+
+    {
+        "source": "ElEconomista",
+        "url": "https://www.eleconomista.es/rss/rss-mercados.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "ElEconomista",
+        "url": "https://www.eleconomista.es/rss/rss-economia.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "Expansión",
+        "url": "https://www.expansion.com/rss/mercados.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "Expansión",
+        "url": "https://www.expansion.com/rss/economia.xml",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "Forexduet ES",
+        "url": "https://es.forexduet.com/feed/",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "InfoMercados",
+        "url": "https://www.infomercados.com/rss/",
+        "method": "feedparser",
+        "lang": "es",
+    },
+    {
+        "source": "Cinco Días",
+        "url": "https://cincodias.elpais.com/rss/economia/",
+        "method": "feedparser",
+        "lang": "es",
+    },
+
+    # ══════════════════════════════════════════
+    # FUENTES EN INGLÉS
+    # ══════════════════════════════════════════
+
+    # ── FXStreet ──────────────────────────────
     {
         "source": "FXStreet",
         "url": "https://www.fxstreet.com/rss/news",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "FXStreet",
         "url": "https://www.fxstreet.com/rss/analysis",
         "method": "feedparser",
+        "lang": "en",
     },
-    # ── ForexLive ─────────────────────────────────────────────────
+
+    # ── ForexLive ─────────────────────────────
     {
         "source": "ForexLive",
         "url": "https://www.forexlive.com/feed/news",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "ForexLive",
         "url": "https://www.forexlive.com/feed/centralbank",
         "method": "feedparser",
+        "lang": "en",
     },
-    # ── Reuters (vía rss.app proxy público, sin auth) ─────────────
+
+    # ── Reuters ───────────────────────────────
     {
         "source": "Reuters",
         "url": "https://feeds.reuters.com/reuters/businessNews",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "Reuters",
         "url": "https://feeds.reuters.com/reuters/UKBusinessNews",
         "method": "feedparser",
+        "lang": "en",
     },
-    # ── Investing.com (vía allorigins proxy CORS) ──────────────────
+
+    # ── Investing.com (vía proxy CORS) ─────────
     {
         "source": "Investing.com",
         "url": "https://api.allorigins.win/raw?url=https://www.investing.com/rss/news_25.rss",
         "method": "proxy_xml",
+        "lang": "en",
     },
     {
         "source": "Investing.com",
         "url": "https://api.allorigins.win/raw?url=https://www.investing.com/rss/news_14.rss",
         "method": "proxy_xml",
+        "lang": "en",
     },
-    # ── MQL5 Economic Calendar ─────────────────────────────────────
+
+    # ── MQL5 Economic Calendar ─────────────────
     {
         "source": "MQL5",
         "url": "https://www.mql5.com/en/economic-calendar/rss",
         "method": "feedparser",
+        "lang": "en",
     },
-    # ── Bancos Centrales (fuentes oficiales) ───────────────────────
+
+    # ── Bancos Centrales (fuentes oficiales) ───
     {
         "source": "Federal Reserve",
         "url": "https://www.federalreserve.gov/feeds/press_all.xml",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "ECB",
         "url": "https://www.ecb.europa.eu/rss/press.html",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "Bank of England",
         "url": "https://www.bankofengland.co.uk/rss/news",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "Bank of Japan",
         "url": "https://www.boj.or.jp/en/about/press/index.htm",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "RBA",
         "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "Bank of Canada",
         "url": "https://www.bankofcanada.ca/feed/",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "SNB",
         "url": "https://www.snb.ch/en/rss/medmit",
         "method": "feedparser",
+        "lang": "en",
     },
     {
         "source": "RBNZ",
         "url": "https://www.rbnz.govt.nz/feed/news",
         "method": "feedparser",
+        "lang": "en",
     },
 ]
+
+# ─────────────────────────────────────────────
+# PALABRAS CLAVE DE IMPACTO — ES + EN
+# ─────────────────────────────────────────────
+HIGH_IMPACT_KW = [
+    # EN
+    "rate decision", "interest rate", "hike", "cut rates", "fomc", "ecb meeting",
+    "boe meeting", "boj meeting", "nonfarm", "non-farm", "cpi", "inflation report",
+    "gdp", "recession", "emergency", "crisis", "default", "shock",
+    "surprise", "unexpected", "powell", "lagarde", "ueda", "bailey",
+    "central bank", "rate hike", "rate cut", "quantitative easing",
+    "quantitative tightening", "monetary policy",
+    # ES
+    "decisión de tasas", "tasa de interés", "subida de tipos", "bajada de tipos",
+    "alza de tasas", "recorte de tasas", "sube tasas", "baja tasas",
+    "inflación", "ipc ", "pib ", "recesión", "crisis ", "sorprende",
+    "inesperado", "inesperada", "política monetaria", "banco central",
+    "reunión del bce", "reunión de la fed", "reunión del boj",
+    "reunión del boe", "hawkish", "dovish", "restrictivo", "acomodaticio",
+    "reunión de política", "decisión de política",
+]
+
+MED_IMPACT_KW = [
+    # EN
+    "pmi", "employment", "jobless", "trade balance", "retail sales",
+    "industrial production", "consumer confidence", "business confidence",
+    "housing", "wages", "earnings", "exports", "imports", "deficit",
+    "surplus", "forecast", "outlook", "guidance", "payroll",
+    "manufacturing", "services sector",
+    # ES
+    "pmi manufacturero", "pmi de servicios", "desempleo", "tasa de paro",
+    "balanza comercial", "ventas minoristas", "producción industrial",
+    "confianza del consumidor", "confianza empresarial", "confianza del inversor",
+    "salarios", "beneficios", "exportaciones", "importaciones", "déficit",
+    "superávit", "previsión", "perspectivas", "orientación", "nóminas",
+    "manufactura", "sector servicios", "producción", "cuenta corriente",
+    "posicionamiento", "cot ", "balanza de pagos",
+]
+
 
 # ─────────────────────────────────────────────
 # HELPERS
 # ─────────────────────────────────────────────
 
 def detect_currency(title: str, summary: str) -> str:
-    """Detecta la divisa principal mencionada en la noticia."""
+    """Detecta la divisa principal (devuelve código 3 letras o 'USD' por defecto)."""
     text = (title + " " + summary).lower()
     for currency, keywords in CURRENCY_KEYWORDS.items():
         for kw in keywords:
             if kw in text:
                 return currency
-    return "GENERAL"
+    return "USD"  # Fallback: la mayoría de noticias genéricas de mercados son USD
 
 
 def detect_impact(title: str, summary: str) -> str:
-    """Estima el nivel de impacto por palabras clave."""
+    """
+    Estima nivel de impacto. Devuelve 'high', 'med' o 'low' (minúsculas)
+    para coincidir con lo que espera news.html.
+    """
     text = (title + " " + summary).lower()
-    high_kw = [
-        "rate decision", "interest rate", "hike", "cut", "fomc", "ecb meeting",
-        "boe meeting", "boj meeting", "nonfarm", "non-farm", "cpi", "inflation",
-        "gdp", "recession", "emergency", "crisis", "default", "shock",
-        "surprise", "unexpected", "powell", "lagarde", "ueda", "bailey",
-        "central bank", "rate hike", "rate cut", "quantitative",
-    ]
-    med_kw = [
-        "pmi", "employment", "jobless", "trade balance", "retail sales",
-        "industrial production", "consumer confidence", "business confidence",
-        "housing", "wages", "earnings", "exports", "imports", "deficit",
-        "surplus", "forecast", "outlook", "guidance",
-    ]
-    for kw in high_kw:
+    for kw in HIGH_IMPACT_KW:
         if kw in text:
-            return "HIGH"
-    for kw in med_kw:
+            return "high"
+    for kw in MED_IMPACT_KW:
         if kw in text:
-            return "MED"
-    return "LOW"
+            return "med"
+    return "low"
 
 
 def parse_date(entry) -> datetime:
@@ -191,14 +367,16 @@ def parse_date(entry) -> datetime:
 
 
 def clean_html(text: str) -> str:
-    """Elimina tags HTML de un string."""
+    """Elimina tags HTML y recorta espacios."""
     if not text:
         return ""
-    return re.sub(r"<[^>]+>", "", text).strip()
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 
 def entry_id(title: str, source: str) -> str:
-    """Genera un ID único por noticia."""
+    """Genera un ID único por noticia para deduplicar."""
     return hashlib.md5(f"{source}:{title}".encode()).hexdigest()[:12]
 
 
@@ -209,12 +387,12 @@ def fetch_via_feedparser(feed_cfg: dict) -> list:
             feed_cfg["url"],
             request_headers={
                 "User-Agent": "Mozilla/5.0 (compatible; ForexNewsBot/1.0)",
-                "Accept": "application/rss+xml, application/xml, text/xml",
+                "Accept": "application/rss+xml, application/xml, text/xml, */*",
             }
         )
         return d.entries
     except Exception as e:
-        print(f"  [ERROR] feedparser {feed_cfg['url'][:60]}: {e}")
+        print(f"  [ERROR] feedparser {feed_cfg['url'][:65]}: {e}")
         return []
 
 
@@ -228,7 +406,7 @@ def fetch_via_proxy(feed_cfg: dict) -> list:
         d = feedparser.parse(resp.text)
         return d.entries
     except Exception as e:
-        print(f"  [ERROR] proxy {feed_cfg['url'][:60]}: {e}")
+        print(f"  [ERROR] proxy {feed_cfg['url'][:65]}: {e}")
         return []
 
 
@@ -237,16 +415,20 @@ def fetch_via_proxy(feed_cfg: dict) -> list:
 # ─────────────────────────────────────────────
 
 def main():
-    now_utc    = datetime.now(timezone.utc)
-    cutoff     = now_utc - timedelta(days=MAX_AGE_DAYS)
-    seen_ids   = set()
-    all_items  = []
+    now_utc  = datetime.now(timezone.utc)
+    cutoff   = now_utc - timedelta(days=MAX_AGE_DAYS)
+    seen_ids = set()
+    articles = []  # Lista final — nombre alineado con news.html ("articles")
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
 
+    es_count = 0
+    en_count = 0
+
     for feed_cfg in FEEDS:
         source = feed_cfg["source"]
-        print(f"  Fetching {source} — {feed_cfg['url'][:65]}...")
+        lang   = feed_cfg.get("lang", "en")
+        print(f"  [{lang.upper()}] Fetching {source} — {feed_cfg['url'][:65]}...")
 
         if feed_cfg["method"] == "proxy_xml":
             entries = fetch_via_proxy(feed_cfg)
@@ -256,10 +438,14 @@ def main():
         count = 0
         for entry in entries:
             title   = clean_html(getattr(entry, "title",   ""))
-            summary = clean_html(getattr(entry, "summary", "") or
-                                 getattr(entry, "description", ""))
-            link    = getattr(entry, "link", "")
+            summary = clean_html(
+                getattr(entry, "summary", "")
+                or getattr(entry, "description", "")
+                or getattr(entry, "content", [{}])[0].get("value", "") if hasattr(entry, "content") else ""
+            )
+            link = getattr(entry, "link", "") or getattr(entry, "id", "")
 
+            # Filtrar títulos vacíos o muy cortos (evita entradas de calendario sin texto)
             if not title or len(title) < 15:
                 continue
 
@@ -272,52 +458,75 @@ def main():
                 continue
             seen_ids.add(nid)
 
-            currency = detect_currency(title, summary)
-            impact   = detect_impact(title, summary)
+            cur    = detect_currency(title, summary)
+            impact = detect_impact(title, summary)   # 'high' | 'med' | 'low'
 
-            # Recortar summary a 280 chars
-            if len(summary) > 280:
-                summary = summary[:277] + "..."
+            # Recortar summary a 300 chars
+            expand = summary[:300] + ("..." if len(summary) > 300 else "")
 
-            all_items.append({
+            # ── Formato alineado con news.html ───────────────────────────────
+            # news.html espera:
+            #   cur, impact (lower), title, expand, source, link, time, ts, featured
+            articles.append({
                 "id":       nid,
+                "cur":      cur,                                # 'USD', 'EUR', etc.
+                "impact":   impact,                             # 'high' | 'med' | 'low'
                 "title":    title,
-                "summary":  summary,
-                "currency": currency,
-                "impact":   impact,
+                "expand":   expand,                             # descripción corta
                 "source":   source,
                 "link":     link,
-                "time":     pub_date.strftime("%H:%M"),
-                "datetime": pub_date.isoformat(),
-                "date":     pub_date.strftime("%d %b"),
+                "time":     pub_date.strftime("%H:%M"),         # "14:30" (UTC)
+                "ts":       int(pub_date.timestamp() * 1000),   # epoch ms para ordenar
+                "featured": impact == "high",                   # azul destacado en UI
+                "lang":     lang,                               # 'es' | 'en'
+                "date":     pub_date.strftime("%d %b"),         # "12 Mar"
+                "datetime": pub_date.isoformat(),               # ISO completo
             })
             count += 1
+            if lang == "es":
+                es_count += 1
+            else:
+                en_count += 1
 
-        print(f"    → {count} noticias válidas de {source}")
+        print(f"    → {count} noticias válidas")
 
-    # Ordenar por fecha descendente y tomar top MAX_NEWS
-    all_items.sort(key=lambda x: x["datetime"], reverse=True)
-    all_items = all_items[:MAX_NEWS]
+    # Ordenar por timestamp descendente (más reciente primero)
+    articles.sort(key=lambda x: x["ts"], reverse=True)
 
-    # Estadísticas para el status bar
-    total_high = sum(1 for n in all_items if n["impact"] == "HIGH")
-    total_med  = sum(1 for n in all_items if n["impact"] == "MED")
-    sources_ok = list({n["source"] for n in all_items})
+    # Limitar al máximo configurado
+    articles = articles[:MAX_NEWS]
+
+    # ── Estadísticas ─────────────────────────────────────────────────────────
+    total_high = sum(1 for a in articles if a["impact"] == "high")
+    total_med  = sum(1 for a in articles if a["impact"] == "med")
+    sources_ok = sorted(set(a["source"] for a in articles))
 
     output = {
-        "updated_utc": now_utc.isoformat(),
-        "updated_label": now_utc.strftime("%H:%M UTC"),
-        "total": len(all_items),
-        "total_high": total_high,
-        "total_med": total_med,
+        # ── Metadata ─────────────────────────────────────────────────────────
+        "updated_utc":    now_utc.isoformat(),
+        "updated_label":  now_utc.strftime("%H:%M UTC"),
+        "total":          len(articles),
+        "total_high":     total_high,
+        "total_med":      total_med,
         "sources_active": sources_ok,
-        "news": all_items,
+        "lang_counts": {
+            "es": es_count,
+            "en": en_count,
+        },
+
+        # ── Artículos (clave que espera news.html) ────────────────────────────
+        "articles": articles,
     }
+
+    # Crear directorio si no existe
+    import os
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✓ {len(all_items)} noticias guardadas en {OUTPUT_FILE}")
+    print(f"\n✓ {len(articles)} artículos guardados en {OUTPUT_FILE}")
+    print(f"  ES: {es_count} | EN: {en_count}")
     print(f"  Alto impacto: {total_high} | Medio: {total_med}")
     print(f"  Fuentes activas: {', '.join(sources_ok)}")
 
