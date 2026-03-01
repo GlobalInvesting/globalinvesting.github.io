@@ -408,6 +408,26 @@ def fetch_all_feeds(feeds: list) -> dict:
     return results
 
 
+def load_previous_headlines() -> dict:
+    """
+    Carga los ai_headline ya generados en la ejecución anterior.
+    Retorna un dict {article_id: ai_headline} para reutilizarlos
+    sin gastar tokens de Groq en artículos que no cambiaron.
+    """
+    if not os.path.exists(OUTPUT_FILE):
+        return {}
+    try:
+        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        prev = {}
+        for a in data.get("articles", []):
+            if a.get("ai_headline") and a.get("id"):
+                prev[a["id"]] = a["ai_headline"]
+        return prev
+    except Exception:
+        return {}
+
+
 def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
     """
     Fase 1: garantía mínima por divisa (priorizando high > med > low).
@@ -570,6 +590,16 @@ def main():
     if missing:
         print(f"   ⚠️  Sin artículos en {MAX_AGE_DAYS} días: {', '.join(missing)}")
 
+    # ── Recuperar ai_headlines ya generados para no gastar tokens de Groq ──────
+    prev_headlines = load_previous_headlines()
+    reused = 0
+    for a in raw_articles:
+        if a["id"] in prev_headlines:
+            a["ai_headline"] = prev_headlines[a["id"]]
+            reused += 1
+    if reused:
+        print(f"   ♻️  Titulares reutilizados del JSON anterior: {reused}")
+
     articles = smart_select(
         raw_articles,
         max_total=MAX_NEWS,
@@ -606,7 +636,11 @@ def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
+    new_count    = sum(1 for a in articles if not a.get("ai_headline"))
+    reused_final = sum(1 for a in articles if a.get("ai_headline"))
     print(f"\n✓ {len(articles)} artículos guardados en {OUTPUT_FILE}")
+    print(f"  ♻️  Con titular previo (sin coste Groq): {reused_final}")
+    print(f"  🆕 Sin titular (pendientes de Groq):    {new_count}")
     print(f"  Fuentes activas: {', '.join(sources_ok)}")
 
 
