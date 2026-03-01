@@ -250,6 +250,8 @@ FEEDS = [
     },
 
     # ── MQL5 Economic Calendar ─────────────────
+    {
+        "source": "MQL5",
         "url": "https://www.mql5.com/en/economic-calendar/rss",
         "method": "feedparser",
         "lang": "en",
