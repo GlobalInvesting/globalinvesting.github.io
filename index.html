@@ -3681,9 +3681,9 @@ const getSentiment = (strength) => {
         : (typeof strength === 'string' ? parseFloat(strength) : strength);
     
     // Bandas fijas escala 0–100
-    // < 38 = Débil · 38–62 = Neutral · > 62 = Fuerte
-    if (numStrength > 62) return 'alcista';
-    if (numStrength < 38) return 'bajista';
+    // < 53 = Débil · 53–62 = Neutral · > 62 = Fuerte
+    if (numStrength > 63) return 'alcista';
+    if (numStrength < 53) return 'bajista';
     return 'neutral';
 };
 
