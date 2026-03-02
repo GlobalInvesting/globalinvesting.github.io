@@ -2945,32 +2945,6 @@ const adj = combinedFactor * 8;
 
     };
 
-    // Apply contextual adjustments
-    const safeHavenAdj        = calculateSafeHavenScore(currency, data, allEconomicData);
-    const commodityAdj        = calculateCommodityScore(currency, data, allEconomicData);
-    const carryAdj            = calculateCarryPremium(data, allEconomicData);
-    const recessionAdj        = calculateRecessionImpact(data);
-    const deficitAdj          = calculateStructuralDeficit(data);
-    const debtAdj             = calculateDebtSustainability(data);
-    const inflationStabAdj    = calculateInflationStability(data);
-    const lowRateSafeHavenAdj = calculateLowRateSafeHavenAdj(currency, data, allEconomicData);
-    const yieldCurveAdj       = calculateYieldCurveAdj(data);
-    const cotContrarianAdj    = calculateCotContrarianAdj(data, countryObj);
-
-    // ── COT Contrarian Override para momentum divergente ──────────────────
-    // COT extremadamente bajista + fxPerf fuerte = squeeze potencial
-    const cotMomentumDivergence = (() => {
-        const cot = scoringData.cotPositioning;
-        const fxPerf = scoringData.fxPerformance1M;
-        if (cot === null || cot === undefined || fxPerf === null || fxPerf === undefined) return 0;
-        if (cot < -25000 && fxPerf > 2.5) {
-            const cotExtremeness = Math.min(Math.abs(cot + 25000) / 50000, 1.0);
-            const momentumStrength = Math.min((fxPerf - 2.5) / 3.0, 1.0);
-            return Math.round((cotExtremeness * momentumStrength) * 5 * 10) / 10;
-        }
-        return 0;
-    })();
-
 // Apply contextual adjustments
     const safeHavenAdj        = calculateSafeHavenScore(currency, data, allEconomicData);
     const commodityAdj        = calculateCommodityScore(currency, data, allEconomicData);
