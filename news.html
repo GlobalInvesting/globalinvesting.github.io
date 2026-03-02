@@ -110,8 +110,8 @@
   .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
   .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .panel-header{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
-  .news-row{display:grid;grid-template-columns:44px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
+  .panel-header{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
+  .news-row{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
   .news-row:last-child{border-bottom:none;}
   .news-row:hover{background:rgba(255,255,255,.03);}
   .news-row.featured{background:rgba(30,136,229,.05);border-left:2px solid var(--blue);}
@@ -126,7 +126,6 @@
   .impact-low .impact-dot{background:var(--text-dim);}
   .col-title{font-size:.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .75rem;font-weight:400;}
   .news-row.featured .col-title{font-weight:500;}
-  .col-title .hist-tag{font-size:.55rem;color:var(--text-dim);border:1px solid var(--border);border-radius:2px;padding:.03rem .22rem;margin-left:.3rem;vertical-align:middle;font-weight:400;}
   .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .news-expand{display:none;grid-column:1/-1;padding:.6rem .75rem .75rem 1.5rem;border-bottom:1px solid rgba(48,54,61,.6);font-size:.75rem;color:var(--text-secondary);line-height:1.65;background:rgba(255,255,255,.01);border-left:2px solid var(--border);}
   .news-row.open + .news-expand{display:block;}
@@ -177,7 +176,7 @@
     .nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
     .nav-links a{font-size:.85rem;}
     .page-wrap{padding:1rem 1rem 3rem;}
-    .panel-header,.news-row{grid-template-columns:40px 56px 12px 1fr 0;}
+    .panel-header,.news-row { grid-template-columns: 36px 60px 60px 1fr 52px;}
     .col-source{display:none;}
     .col-impact{justify-content:center;}
   }
@@ -236,7 +235,7 @@
     <section aria-label="Feed de noticias forex">
       <div class="news-panel">
         <div class="panel-header" aria-hidden="true">
-          <span>Hora</span>
+          <span>Hace</span>
           <span>Divisa</span>
           <span>Imp.</span>
           <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
@@ -737,12 +736,17 @@ function detectImpact(title, description) {
   return 'low';
 }
 
-// ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
-function tsToLocalTime(ts) {
-  if (!ts) return '--:--';
+// ── TIEMPO RELATIVO DESDE TS ───────────────────────────────────────────────────────
+function tsToRelative(ts) {
+  if (!ts) return '--';
   const d = new Date(ts);
-  if (isNaN(d)) return '--:--';
-  return d.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
+  if (isNaN(d)) return '--';
+  const diffMin = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (diffMin < 1)  return 'ahora';
+  if (diffMin < 60) return `${diffMin}m`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24)   return `${diffH}h`;
+  return `${Math.floor(diffH / 24)}d`;
 }
 
 // ── FEED STATE ────────────────────────────────────────────────────────────────
@@ -781,15 +785,13 @@ function renderFeed() {
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
     const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
-    const isHist  = a.recent === false;
-    const histTag = isHist ? '<span class="hist-tag" title="Noticia histórica (1-3 días)">hist</span>' : '';
     const headline = a.ai_headline || a.title;
 
     body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
       <span class="col-cur">${flagImg(a.cur)}${esc(a.cur)}</span>
       <div class="col-impact ${ic}" aria-label="Impacto ${a.impact}"><div class="impact-dot"></div></div>
-      <span class="col-title" title="${esc(headline)}">${esc(headline)}${histTag}</span>
+      <span class="col-title" title="${esc(headline)}">${esc(headline)}</span>
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
@@ -849,18 +851,11 @@ async function initFeed() {
       allArticles = articles
         .map(a => {
           const text = (a.title || '') + ' ' + (a.expand || '');
-          let localTime = '--:--';
-          if (a.ts) {
-            localTime = tsToLocalTime(a.ts);
-          } else if (a.datetime) {
-            const d = new Date(a.datetime);
-            if (!isNaN(d)) localTime = d.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
-          }
           return {
             ...a,
             cur:         detectCurrencyWithSource(text, a.source),
             impact:      a.impact || detectImpact(a.title, a.expand),
-            time:        localTime,
+            time: tsToRelative(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
             ai_headline: a.ai_headline || null,
             recent:      a.recent !== undefined ? a.recent : true,
           };
