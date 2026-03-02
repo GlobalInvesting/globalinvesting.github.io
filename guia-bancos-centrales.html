@@ -8,6 +8,8 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://globalinvesting.github.io/guia-bancos-centrales.html">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Flag icons — SVG-based, compatible with all browsers including Edge/Windows -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -38,7 +40,22 @@
         a:hover { text-decoration: underline; }
         .cb-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; margin-bottom: 1.5rem; }
         .cb-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-        .cb-flag { font-size: 2rem; line-height: 1; }
+
+        /* Flag container — replaces emoji with SVG-backed flag-icons */
+        .cb-flag {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .cb-flag .fi {
+            width: 3rem;
+            height: 2.25rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            background-size: cover;
+            background-position: center;
+        }
+
         .cb-info { flex: 1; }
         .cb-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); }
         .cb-full { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.1rem; }
@@ -50,7 +67,7 @@
         .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
         .highlight-box p { margin: 0; }
         .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; display: block; }
         .related-card:hover { border-color: var(--blue); }
         .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
         .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
@@ -64,6 +81,7 @@
             .container { padding: 2rem 1rem 4rem; }
             h1 { font-size: 1.7rem; }
             .cb-card { padding: 1.25rem; }
+            .cb-flag .fi { width: 2.5rem; height: 1.875rem; }
         }
     </style>
 </head>
@@ -101,9 +119,10 @@
         <p><strong>Cómo se refleja la política monetaria en el score:</strong> El dashboard de Global Investing asigna un "Outlook Score" a cada banco central (Hawkish=90, Neutral=50, Dovish=10) que se incorpora con un peso del 7% en el score de fortaleza fundamental de cada divisa. Este score se actualiza diariamente basándose en los comunicados y proyecciones más recientes de cada banco.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ FED ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇺🇸</div>
+            <div class="cb-flag"><span class="fi fi-us fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Reserva Federal — Fed / FOMC</div>
                 <div class="cb-full">Federal Reserve System · Federal Open Market Committee</div>
@@ -120,9 +139,10 @@
         <p>Las herramientas clave son: la tasa de fondos federales (FFR), el balance sheet (QE/QT), y la comunicación forward guidance a través de las proyecciones económicas trimestrales (dot plot). Las declaraciones del presidente de la Fed en la conferencia de prensa post-reunión y en el simposio anual de Jackson Hole son eventos de altísimo impacto para el dólar y para todos los mercados.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ BCE ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇪🇺</div>
+            <div class="cb-flag"><span class="fi fi-eu fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco Central Europeo — BCE</div>
                 <div class="cb-full">European Central Bank · Banco Central Europeo</div>
@@ -139,9 +159,10 @@
         <p>La presidenta Christine Lagarde y los miembros del Consejo de Gobierno realizan numerosos discursos públicos entre reuniones que el mercado analiza minuciosamente buscando señales de la próxima decisión. El índice IFO de confianza empresarial alemana y el IPC de la Eurozona son los datos macroeconómicos más vigilados para anticipar las decisiones del BCE.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ BoE ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇬🇧</div>
+            <div class="cb-flag"><span class="fi fi-gb fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco de Inglaterra — BoE</div>
                 <div class="cb-full">Bank of England · Monetary Policy Committee</div>
@@ -157,9 +178,10 @@
         <p>La GBP es una de las divisas más volátiles del G8, parcialmente por la incertidumbre estructural post-Brexit y por la sensibilidad de la economía del Reino Unido a los precios de la energía y a las condiciones financieras globales. El Informe de Política Monetaria (MPR) trimestral del BoE es un evento de alto impacto para la libra.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ BoJ ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇯🇵</div>
+            <div class="cb-flag"><span class="fi fi-jp fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco de Japón — BoJ</div>
                 <div class="cb-full">Bank of Japan · 日本銀行</div>
@@ -175,9 +197,10 @@
         <p>El yen tiene además un rol de <strong>refugio seguro</strong> especial: en episodios de alta volatilidad o crisis de mercados, los inversores tienden a cerrar posiciones de carry trade (que implican estar short en JPY) y el yen se aprecia bruscamente independientemente de los fundamentos económicos de Japón. Este fenómeno es crítico para entender el comportamiento del JPY y está incorporado como ajuste contextual en el modelo de scoring del dashboard.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ RBA ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇦🇺</div>
+            <div class="cb-flag"><span class="fi fi-au fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco de la Reserva de Australia — RBA</div>
                 <div class="cb-full">Reserve Bank of Australia</div>
@@ -193,9 +216,10 @@
         <p>El RBA reformó su estructura de reuniones en 2024, reduciéndolas de 11 a 8 por año y añadiendo más comunicación post-reunión para mejorar la transparencia. Las estadísticas de empleo y los datos del sector de la vivienda son los indicadores más seguidos para anticipar las decisiones del RBA.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ BoC ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇨🇦</div>
+            <div class="cb-flag"><span class="fi fi-ca fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco de Canadá — BoC</div>
                 <div class="cb-full">Bank of Canada · Banque du Canada</div>
@@ -211,9 +235,10 @@
         <p>La política del BoC tiende a divergir de la Fed en períodos de precios de commodities extremos o de ciclos económicos desalineados entre ambos países, lo que puede crear oportunidades de trading en el par USD/CAD. Las cifras de empleo y el PIB mensual canadiense son los datos más seguidos para anticipar las decisiones del BoC.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ SNB ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇨🇭</div>
+            <div class="cb-flag"><span class="fi fi-ch fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco Nacional Suizo — SNB</div>
                 <div class="cb-full">Swiss National Bank · Schweizerische Nationalbank</div>
@@ -229,9 +254,10 @@
         <p>El SNB es conocido por su disposición a <strong>intervenir directamente en el mercado cambiario</strong> para debilitar el franco cuando su apreciación amenaza la competitividad de la economía suiza. En 2015, la eliminación sorpresiva del piso EUR/CHF (que mantenía el tipo de cambio por encima de 1.20) generó uno de los movimientos más violentos en la historia del forex moderno, con el EUR/CHF cayendo más del 15% en minutos. El SNB solo se reúne cuatro veces al año, lo que hace que las decisiones entre reuniones sean especialmente impactantes cuando ocurren.</p>
     </div>
 
+    <!-- ══════════════════════════════════════ RBNZ ══ -->
     <div class="cb-card">
         <div class="cb-header">
-            <div class="cb-flag">🇳🇿</div>
+            <div class="cb-flag"><span class="fi fi-nz fis"></span></div>
             <div class="cb-info">
                 <div class="cb-name">Banco de la Reserva de Nueva Zelanda — RBNZ</div>
                 <div class="cb-full">Reserve Bank of New Zealand</div>
