@@ -4611,35 +4611,8 @@ const DataHealthCheck = ({ economicData }) => {
         <DataHealthCheck economicData={economicData} />
 
         <div className="section-header">
-            <div className="section-title">Mapa de Calor de Indicadores Económicos</div>
-        </div>
-
-        {/* Leyenda de escala de fortaleza */}
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0',
-            marginBottom: '1rem',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
-            overflow: 'hidden',
-            fontSize: '0.75rem',
-            fontWeight: 600
-        }}>
-            <div style={{ padding: '0.5rem 1rem', color: 'var(--text-tertiary)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
-                Índice de Fortaleza (0–100)
-            </div>
-            <div style={{ padding: '0.5rem 1rem', background: 'rgba(239,83,80,0.15)', color: 'var(--red-strong)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
-                &lt; 38 · Débil
-            </div>
-            <div style={{ padding: '0.5rem 1rem', background: 'rgba(96,125,139,0.15)', color: 'var(--neutral)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
-                38 – 62 · Neutral
-            </div>
-            <div style={{ padding: '0.5rem 1rem', background: 'rgba(38,166,154,0.15)', color: 'var(--green-strong)', whiteSpace: 'nowrap' }}>
-                &gt; 62 · Fuerte
-            </div>
-        </div>
+                                    <div className="section-title">Mapa de Calor de Indicadores Económicos</div>
+                                </div>
                                 <div className="heatmap-container">
                                     <table className="heatmap-table">
                                         <thead>
