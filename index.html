@@ -1406,45 +1406,12 @@ const fetchInterestRate = async (country) => {
                 }
             }
 
-            // Fallback: Alpha Vantage (solo USD)
-            // IMPORTANTE: mover estas keys a GitHub Secrets y consumirlas
-            // desde un workflow que genere rates/USD.json — no deben estar aquí.
-            // Mientras tanto se leen desde una variable de entorno inyectada
-            // en build time, o se omiten si no están disponibles.
+// Alpha Vantage eliminado — rates/USD.json se genera diariamente
+// desde el workflow de GitHub Actions (Trading Economics scraping).
+// Si llegamos aquí, el archivo rates/USD.json no estaba disponible.
 if (country.code === 'USD') {
-    const alphaKeys = [
-        typeof __AV_KEY_1__ !== 'undefined' ? __AV_KEY_1__ : '',
-        typeof __AV_KEY_2__ !== 'undefined' ? __AV_KEY_2__ : '',
-    ].filter(Boolean);
-    if (alphaKeys.length === 0) {
-        console.warn('Alpha Vantage keys no configuradas — omitiendo fallback USD');
-    }
-    
-    for (const apiKey of alphaKeys) {
-        try {
-            const url = `https://www.alphavantage.co/query?function=FEDERAL_FUNDS_RATE&apikey=${apiKey}`;
-            
-            const response = await fetchWithRetry(url, { // ✅ Usar 'url', no 'githubUrl'
-                mode: 'cors'
-            }, 2); // ✅ Menos intentos para Alpha Vantage
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.data && data.data.length > 0) {
-                                const value = parseFloat(data.data[0].value);
-                                if (!isNaN(value) && value >= 0 && value < 25) {
-                                    console.log(`✅ Alpha Vantage fallback rate for USD: ${value}%`);
-                                    const result = { rate: value, date: null };
-                                    CacheManager.set(cacheKey, result, CACHE_CONFIG.ECONOMIC_DATA);
-                                    return result;
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        continue;
-                    }
-                }
-            }
+    console.warn('rates/USD.json no disponible — sin fallback para USD');
+}
 
             console.error(`❌ All sources exhausted for ${country.code} - NO DATA AVAILABLE`);
             return null;
