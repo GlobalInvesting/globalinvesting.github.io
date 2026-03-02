@@ -1,43 +1,30 @@
 {
-  "lastUpdate": "2026-03-01",
-  "generatedAt": "2026-03-01T16:14:25.527895Z",
+  "lastUpdate": "2026-03-02",
+  "generatedAt": "2026-03-02T02:37:11.571849Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2026-02-28",
-  "rangeTo": "2026-03-31",
-  "totalEvents": 197,
+  "rangeFrom": "2026-03-01",
+  "rangeTo": "2026-04-01",
+  "totalEvents": 196,
   "currencyCounts": {
-    "USD": 85,
     "AUD": 25,
     "JPY": 13,
     "GBP": 21,
     "CHF": 8,
     "EUR": 29,
     "CAD": 10,
+    "USD": 84,
     "NZD": 6
   },
   "impactCounts": {
     "high": 79,
     "medium": 19,
-    "low": 99
+    "low": 98
   },
   "events": [
-    {
-      "date": "1 Mar",
-      "dateISO": "2026-03-01",
-      "timeUTC": "10:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "OPEC Meeting",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
     {
       "date": "1 Mar",
       "dateISO": "2026-03-01",
@@ -47,9 +34,9 @@
       "flag": "🇦🇺",
       "event": "S&P Global Manufacturing PMI  (Feb)",
       "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "51.5"
+      "actual": "51.0",
+      "forecast": "51.5",
+      "previous": "52.3"
     },
     {
       "date": "2 Mar",
@@ -60,7 +47,7 @@
       "flag": "🇦🇺",
       "event": "MI Inflation Gauge (MoM)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "-0.2%",
       "forecast": "",
       "previous": "0.2%"
     },
@@ -71,11 +58,24 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
+      "event": "ANZ Job Advertisements (MoM)  (Feb)",
+      "impact": "low",
+      "actual": "3.2%",
+      "forecast": "",
+      "previous": "5.2%"
+    },
+    {
+      "date": "2 Mar",
+      "dateISO": "2026-03-02",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
       "event": "Business inventories (MoM)  (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "-0.1%",
       "forecast": "",
-      "previous": "-0.9%"
+      "previous": "-0.8%"
     },
     {
       "date": "2 Mar",
@@ -86,9 +86,9 @@
       "flag": "🇦🇺",
       "event": "Company Gross Operating Profits (QoQ)  (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "5.8%",
       "forecast": "1.8%",
-      "previous": "0.0%"
+      "previous": "1.5%"
     },
     {
       "date": "2 Mar",
@@ -99,7 +99,7 @@
       "flag": "🇦🇺",
       "event": "Company Profits Pre-Tax (QoQ)  (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "1.6%",
       "forecast": "",
       "previous": "0.4%"
     },
@@ -112,22 +112,9 @@
       "flag": "🇯🇵",
       "event": "S&P Global Manufacturing PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "53.0",
       "forecast": "52.8",
-      "previous": "52.8"
-    },
-    {
-      "date": "2 Mar",
-      "dateISO": "2026-03-02",
-      "timeUTC": "01:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "ANZ Job Advertisements (MoM)  (Feb)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "4.4%"
+      "previous": "51.5"
     },
     {
       "date": "2 Mar",
