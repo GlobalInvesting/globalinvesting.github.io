@@ -1406,9 +1406,19 @@ const fetchInterestRate = async (country) => {
                 }
             }
 
-// Fallback: Alpha Vantage (solo USD)
+            // Fallback: Alpha Vantage (solo USD)
+            // IMPORTANTE: mover estas keys a GitHub Secrets y consumirlas
+            // desde un workflow que genere rates/USD.json — no deben estar aquí.
+            // Mientras tanto se leen desde una variable de entorno inyectada
+            // en build time, o se omiten si no están disponibles.
 if (country.code === 'USD') {
-    const alphaKeys = ['2TW8Y8DDBPRQ2VTV', 'RIBXT3XYLI69O5WY'];
+    const alphaKeys = [
+        typeof __AV_KEY_1__ !== 'undefined' ? __AV_KEY_1__ : '',
+        typeof __AV_KEY_2__ !== 'undefined' ? __AV_KEY_2__ : '',
+    ].filter(Boolean);
+    if (alphaKeys.length === 0) {
+        console.warn('Alpha Vantage keys no configuradas — omitiendo fallback USD');
+    }
     
     for (const apiKey of alphaKeys) {
         try {
@@ -2994,42 +3004,60 @@ const adj = combinedFactor * 8;
         return 0;
     })();
 
-    contributions['safe_haven_score']       = safeHavenAdj;
-    contributions['low_rate_safe_haven']    = lowRateSafeHavenAdj;
-    contributions['commodity_exposure']     = commodityAdj;
-    contributions['carry_premium']          = carryAdj;
-    contributions['recession_impact']       = recessionAdj;
-    contributions['structural_deficit']     = deficitAdj;
-    contributions['debt_sustainability']    = debtAdj;
-    contributions['inflation_stability']    = inflationStabAdj;
-    contributions['yield_curve_proxy']      = yieldCurveAdj;
-    contributions['cot_contrarian']         = cotContrarianAdj;
+// Apply contextual adjustments
+    const safeHavenAdj        = calculateSafeHavenScore(currency, data, allEconomicData);
+    const commodityAdj        = calculateCommodityScore(currency, data, allEconomicData);
+    const carryAdj            = calculateCarryPremium(data, allEconomicData);
+    const recessionAdj        = calculateRecessionImpact(data);
+    const deficitAdj          = calculateStructuralDeficit(data);
+    const debtAdj             = calculateDebtSustainability(data);
+    const inflationStabAdj    = calculateInflationStability(data);
+    const lowRateSafeHavenAdj = calculateLowRateSafeHavenAdj(currency, data, allEconomicData);
+    const yieldCurveAdj       = calculateYieldCurveAdj(data);
+    const cotContrarianAdj    = calculateCotContrarianAdj(data, countryObj);
+
+    // COT Contrarian Override para momentum divergente
+    const cotMomentumDivergence = (() => {
+        const cot = scoringData.cotPositioning;
+        const fxPerf = scoringData.fxPerformance1M;
+        if (cot === null || cot === undefined || fxPerf === null || fxPerf === undefined) return 0;
+        if (cot < -25000 && fxPerf > 2.5) {
+            const cotExtremeness = Math.min(Math.abs(cot + 25000) / 50000, 1.0);
+            const momentumStrength = Math.min((fxPerf - 2.5) / 3.0, 1.0);
+            return Math.round((cotExtremeness * momentumStrength) * 5 * 10) / 10;
+        }
+        return 0;
+    })();
+
+    contributions['safe_haven_score']        = safeHavenAdj;
+    contributions['low_rate_safe_haven']     = lowRateSafeHavenAdj;
+    contributions['commodity_exposure']      = commodityAdj;
+    contributions['carry_premium']           = carryAdj;
+    contributions['recession_impact']        = recessionAdj;
+    contributions['structural_deficit']      = deficitAdj;
+    contributions['debt_sustainability']     = debtAdj;
+    contributions['inflation_stability']     = inflationStabAdj;
+    contributions['yield_curve_proxy']       = yieldCurveAdj;
+    contributions['cot_contrarian']          = cotContrarianAdj;
     contributions['cot_momentum_divergence'] = cotMomentumDivergence;
 
-    // All adjustments are in "score point" units (same scale as 0-100)
-    // Cap total adjustment so it can shift the score ±15 points max
+    // ── ESCALA 0–100 CON BANDAS FIJAS ────────────────────────────────────
+    // Los ajustes contextuales operan en el mismo espacio que el score base.
+    // Cap de ±15 puntos para evitar que un solo factor domine el resultado.
+    // Bandas interpretativas: < 38 = Débil · 38–62 = Neutral · > 62 = Fuerte
     const totalAdj = safeHavenAdj + commodityAdj + carryAdj +
-                 recessionAdj + deficitAdj + debtAdj + inflationStabAdj +
-                 lowRateSafeHavenAdj + yieldCurveAdj + cotContrarianAdj +
-                 cotMomentumDivergence;
+                     recessionAdj + deficitAdj + debtAdj + inflationStabAdj +
+                     lowRateSafeHavenAdj + yieldCurveAdj + cotContrarianAdj +
+                     cotMomentumDivergence;
     const cappedAdj = Math.max(-15, Math.min(15, totalAdj));
+    const normalizedScore = Math.max(0, Math.min(100, baseScore + cappedAdj));
 
-// P-1 v4.9.6 — Compresión de base para crear headroom en escala 20-82
-// Base original (0-100) → comprimida (20-78), dejando margen para ajustes
-const compressedBase = 20 + (baseScore * 0.58);
-const rawFinal = compressedBase + cappedAdj;
-const normalizedScore = Math.max(20, Math.min(82, rawFinal));
-// Resultados Feb 2026:
-//   AUD: compressedBase≈67.3 + adj5.0 = 72.3 → score ≈ 72.3  (antes: 80 = techo)
-//   CHF: compressedBase≈61.0 + adj9.8 = 70.8 → score ≈ 70.8  (antes: 80 = techo)
-//   AUD rankea correctamente sobre CHF ✓
-
-    // Data quality
-    const dataQuality  = validIndicators / Object.keys(TRADING_WEIGHTS).length;
-    const standardError = (1 - dataQuality * 0.8) * 8;
+    // Data quality & confidence interval
+    const dataQuality   = validIndicators / Object.keys(TRADING_WEIGHTS).length;
+    const standardError = (1 - dataQuality * 0.8) * 10; // algo más amplio en escala 0-100
     const confidenceInterval = {
-        lower: Math.max(20, normalizedScore - 1.96 * standardError),
-        upper: Math.min(80, normalizedScore + 1.96 * standardError)
+        lower: Math.max(0,   normalizedScore - 1.96 * standardError),
+        upper: Math.min(100, normalizedScore + 1.96 * standardError)
     };
 
     return {
@@ -3038,7 +3066,7 @@ const normalizedScore = Math.max(20, Math.min(82, rawFinal));
             lower: parseFloat(confidenceInterval.lower.toFixed(1)),
             upper: parseFloat(confidenceInterval.upper.toFixed(1))
         },
-        contributions: contributions,
+        contributions,
         dataQuality: parseFloat(dataQuality.toFixed(2))
     };
 };
@@ -3711,10 +3739,11 @@ const getSentiment = (strength) => {
         ? strength.score 
         : (typeof strength === 'string' ? parseFloat(strength) : strength);
     
-    // Umbrales calibrados a escala comprimida (rango real: 20-82, distribución Feb 2026: 45-62)
-    if (numStrength >= 57) return 'alcista';   // Top ~25% — AUD(61.8), CHF(57+)
-    if (numStrength <= 49) return 'bajista';   // Bottom ~25% — USD(46), NZD(45.1), GBP(49.3)
-    return 'neutral';                          // Centro — JPY, EUR, CAD
+    // Bandas fijas escala 0–100
+    // < 38 = Débil · 38–62 = Neutral · > 62 = Fuerte
+    if (numStrength > 62) return 'alcista';
+    if (numStrength < 38) return 'bajista';
+    return 'neutral';
 };
 
 const generateAnalysis = (currency, forexRates, economicData) => {
@@ -4045,6 +4074,16 @@ const hasCOTData = () => {
             useEffect(() => {
                 const loadInitialData = async () => {
                     setIsLoading(true);
+
+                    // Timeout máximo global: si en 60s no termina, mostrar error
+                    const globalTimeout = setTimeout(() => {
+                        setIsLoading(false);
+                        setDataLoadingStatus({
+                            status: '⚠️ Tiempo de carga agotado. Algunos datos pueden no estar disponibles.',
+                            progress: 100
+                        });
+                    }, 60000);
+
                     try {
                         setDataLoadingStatus({ status: 'Cargando tipos de cambio...', progress: 10 });
                         const rates = await fetchForexRates();
@@ -4072,9 +4111,15 @@ if (aiData && Object.keys(aiData).length > 0) {
 setDynamicAlerts(pairRecommendations);
 
                         setDataLoadingStatus({ status: 'Completado', progress: 100 });
+                        clearTimeout(globalTimeout);
                         setIsLoading(false);
                     } catch (error) {
                         console.error('Error loading initial data:', error);
+                        clearTimeout(globalTimeout);
+                        setDataLoadingStatus({
+                            status: `⚠️ Error al cargar datos: ${error.message}. Intenta limpiar el caché.`,
+                            progress: 100
+                        });
                         setIsLoading(false);
                     }
                 };
@@ -4325,10 +4370,16 @@ const DataHealthCheck = ({ economicData }) => {
 {activeTab === 'overview' && (
     <>
         <DataHealthCheck economicData={economicData} />
-        
+
         <div className="section-header">
             <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
-            <div className="section-meta">Ordenadas por fortaleza fundamental • Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}</div>
+            <div className="section-meta">
+                Ordenadas por fortaleza fundamental · Escala 0–100 ·{' '}
+                <span style={{ color: 'var(--red-strong)' }}>&lt;38 Débil</span> ·{' '}
+                <span style={{ color: 'var(--neutral)' }}>38–62 Neutral</span> ·{' '}
+                <span style={{ color: 'var(--green-strong)' }}>&gt;62 Fuerte</span> ·{' '}
+                Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
+            </div>
         </div>
         
         {Object.keys(economicData).length === 0 ? (
@@ -4618,13 +4669,40 @@ const DataHealthCheck = ({ economicData }) => {
         )}
     </>
 )}
-                        {activeTab === 'heatmap' && (
+                       {activeTab === 'heatmap' && (
     <div>
         <DataHealthCheck economicData={economicData} />
-        
+
         <div className="section-header">
-                                    <div className="section-title">Mapa de Calor de Indicadores Económicos</div>
-                                </div>
+            <div className="section-title">Mapa de Calor de Indicadores Económicos</div>
+        </div>
+
+        {/* Leyenda de escala de fortaleza */}
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0',
+            marginBottom: '1rem',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            fontSize: '0.75rem',
+            fontWeight: 600
+        }}>
+            <div style={{ padding: '0.5rem 1rem', color: 'var(--text-tertiary)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
+                Índice de Fortaleza (0–100)
+            </div>
+            <div style={{ padding: '0.5rem 1rem', background: 'rgba(239,83,80,0.15)', color: 'var(--red-strong)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
+                &lt; 38 · Débil
+            </div>
+            <div style={{ padding: '0.5rem 1rem', background: 'rgba(96,125,139,0.15)', color: 'var(--neutral)', borderRight: '1px solid var(--border)', whiteSpace: 'nowrap' }}>
+                38 – 62 · Neutral
+            </div>
+            <div style={{ padding: '0.5rem 1rem', background: 'rgba(38,166,154,0.15)', color: 'var(--green-strong)', whiteSpace: 'nowrap' }}>
+                &gt; 62 · Fuerte
+            </div>
+        </div>
                                 <div className="heatmap-container">
                                     <table className="heatmap-table">
                                         <thead>
