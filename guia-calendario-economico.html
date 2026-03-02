@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cómo Usar el Calendario Económico en el Trading Forex | Global Investing</title>
+    <meta name="description" content="Aprende a usar el calendario económico en el trading de divisas. Qué eventos mueven el mercado, cómo prepararse para publicaciones de alto impacto y cómo integrar el calendario con el análisis fundamental.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/guia-calendario-economico.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
+            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
+            --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+        .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
+        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
+        strong { color: var(--text-primary); }
+        a { color: var(--blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .warning-box { background: rgba(239,83,80,0.08); border-left: 4px solid var(--red); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .highlight-box p, .warning-box p { margin: 0; }
+        .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .impact-card { border-radius: 6px; padding: 1.25rem; border: 1px solid; }
+        .impact-high { background: rgba(239,83,80,0.07); border-color: rgba(239,83,80,0.2); }
+        .impact-med { background: rgba(224,160,32,0.07); border-color: rgba(224,160,32,0.2); }
+        .impact-low { background: rgba(139,148,158,0.07); border-color: var(--border); }
+        .impact-card h3 { margin-top: 0; font-size: 0.95rem; }
+        .impact-high h3 { color: var(--red); }
+        .impact-med h3 { color: var(--orange); }
+        .impact-low h3 { color: var(--text-secondary); }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
+        .data-table td { color: var(--text-secondary); font-size: 0.9rem; }
+        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card:hover { border-color: var(--blue); }
+        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { color: var(--text-primary); }
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+            .container { padding: 2rem 1rem 4rem; }
+            h1 { font-size: 1.7rem; }
+            .section { padding: 1.25rem; }
+            .data-table { display: block; overflow-x: auto; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
+        <nav class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="news.html">Noticias</a>
+            <a href="about.html">Acerca de</a>
+            <a href="contact.html">Contacto</a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="index.html">Inicio</a> › <a href="about.html">Guías</a> › Cómo usar el calendario económico
+    </div>
+
+    <h1>Cómo Usar el Calendario Económico en el Trading Forex</h1>
+    <div class="meta">
+        <span>📅 Nivel principiante a intermedio</span>
+        <span>⏱ Lectura: 9 minutos</span>
+        <span>🗓 Actualizado: marzo 2026</span>
+    </div>
+
+    <p>El <strong>calendario económico</strong> es una de las herramientas más fundamentales para cualquier trader de divisas. Es la agenda de publicaciones de datos económicos, decisiones de bancos centrales y otros eventos que pueden mover el mercado forex de forma significativa. Saber leer el calendario, entender qué eventos importan más y cómo posicionarse antes y después de las publicaciones puede ser la diferencia entre una operación rentable y una pérdida innecesaria.</p>
+
+    <div class="section">
+        <h2>¿Qué es el calendario económico?</h2>
+        <p>Un calendario económico es una lista cronológica de eventos programados que tienen el potencial de afectar los precios de las divisas. Cada evento incluye información clave: la fecha y hora de publicación, el país o región afectada, el nombre del indicador, el valor estimado por los analistas (consenso), el valor previo y, una vez publicado, el valor real.</p>
+        <p>La dinámica central del mercado forex en torno a estos eventos es simple pero poderosa: el mercado anticipa los datos y los "pone en precio" antes de la publicación. Cuando el dato real coincide con el estimado, el impacto suele ser limitado. Cuando el dato sorprende — positiva o negativamente — el movimiento puede ser rápido e importante.</p>
+
+        <div class="highlight-box">
+            <p><strong>La regla del consenso:</strong> El mercado ya tiene "descontado" el valor estimado por los analistas. Lo que mueve el precio no es si el dato es bueno o malo en términos absolutos, sino si es mejor o peor que lo esperado. Un dato de inflación del 3% puede ser alcista para el dólar si el consenso era 2.5%, o bajista si el consenso era 3.5%.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Los tres niveles de impacto</h2>
+        <p>Los calendarios económicos clasifican los eventos por su impacto esperado sobre el mercado:</p>
+
+        <div class="impact-grid">
+            <div class="impact-card impact-high">
+                <h3>● Alto Impacto</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0;">Eventos que históricamente generan movimientos significativos en el mercado. Las posiciones abiertas están en riesgo si no se gestiona la exposición antes de la publicación.</p>
+            </div>
+            <div class="impact-card impact-med">
+                <h3>● Medio Impacto</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0;">Eventos relevantes que pueden generar volatilidad, especialmente si el resultado sorprende al consenso, pero con menor impacto promedio que los de alto impacto.</p>
+            </div>
+            <div class="impact-card impact-low">
+                <h3>● Bajo Impacto</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0;">Publicaciones de datos secundarios o con baja correlación histórica con los movimientos de precio. Generalmente ignorados por la mayoría de los traders.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Los eventos de mayor impacto en forex</h2>
+        <p>No todos los eventos del calendario tienen el mismo peso. Estos son los que históricamente generan los movimientos más grandes en el mercado de divisas:</p>
+
+        <h3>Decisiones de tasas de interés y comunicados de bancos centrales</h3>
+        <p>Son los eventos más importantes del calendario forex. Una decisión de subir, bajar o mantener las tasas de interés puede mover los pares de divisas afectados entre el 0.5% y el 2% o más en cuestión de minutos. Pero tan importante como la decisión en sí es el comunicado que la acompaña y la rueda de prensa posterior del presidente del banco central. El mercado analiza cada palabra buscando señales sobre el camino futuro de las tasas (forward guidance).</p>
+
+        <h3>Non-Farm Payrolls (NFP) de Estados Unidos</h3>
+        <p>El reporte de empleo no agrícola de EE.UU. es probablemente el dato económico individual que más mueve el mercado forex. Se publica el primer viernes de cada mes a las 8:30 AM hora de Nueva York. Incluye el número de puestos de trabajo creados, la tasa de desempleo y el crecimiento salarial. Una sorpresa significativa puede mover el USD entre 50 y 150 pips en los primeros minutos.</p>
+
+        <h3>Datos de inflación (CPI e IPC)</h3>
+        <p>El Índice de Precios al Consumidor es crítico porque la inflación es el principal mandato de la mayoría de los bancos centrales. Una inflación más alta de lo esperado aumenta las probabilidades de que el banco central suba tasas, fortaleciendo la divisa. Una inflación más baja abre la puerta a recortes, debilitándola.</p>
+
+        <h3>PIB (Crecimiento económico trimestral)</h3>
+        <p>Los datos de PIB se publican trimestralmente y muestran si la economía se expande o contrae. Las estimaciones preliminares y revisiones finales pueden causar movimientos importantes, especialmente si se alejan del consenso.</p>
+
+        <h3>PMI (Índices de gestores de compras)</h3>
+        <p>Los PMI son indicadores adelantados cruciales porque se publican mucho antes que el PIB y dan una lectura de la actividad económica del mes en curso. Un PMI manufacturero por encima de 50 indica expansión; por debajo, contracción.</p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Evento</th><th>Divisa afectada</th><th>Frecuencia</th><th>Impacto típico</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Decisión de tasas Fed + Rueda de prensa</td><td>USD</td><td>8 veces/año</td><td>Muy alto</td></tr>
+                <tr><td>Non-Farm Payrolls</td><td>USD</td><td>Mensual (1er viernes)</td><td>Muy alto</td></tr>
+                <tr><td>CPI EE.UU.</td><td>USD</td><td>Mensual</td><td>Alto</td></tr>
+                <tr><td>Decisión BCE + Rueda de prensa Lagarde</td><td>EUR</td><td>8 veces/año</td><td>Muy alto</td></tr>
+                <tr><td>Decisión BoE + Informe de Política</td><td>GBP</td><td>8 veces/año</td><td>Alto</td></tr>
+                <tr><td>Decisión BoJ</td><td>JPY</td><td>8 veces/año</td><td>Muy alto</td></tr>
+                <tr><td>PIB EE.UU. (estimación preliminar)</td><td>USD</td><td>Trimestral</td><td>Alto</td></tr>
+                <tr><td>PMI Manufacturero (flash)</td><td>Múltiples</td><td>Mensual</td><td>Medio-Alto</td></tr>
+                <tr><td>Ventas minoristas EE.UU.</td><td>USD</td><td>Mensual</td><td>Medio</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Estrategias para operar con el calendario</h2>
+
+        <h3>Estrategia 1: Operar la sorpresa (event trading)</h3>
+        <p>Consiste en tener una posición preparada para entrar en el mercado inmediatamente después de la publicación, en la dirección que indique la sorpresa. Si el NFP sale muy por encima del consenso, se entra largo en USD. Si sale muy por debajo, se entra corto.</p>
+        <p>Esta estrategia requiere ejecución muy rápida y gestión estricta del riesgo, porque el movimiento inicial puede ser violento y revertirse. Es más apropiada para traders con experiencia en scalping o trading de alta frecuencia.</p>
+
+        <h3>Estrategia 2: Operar el posicionamiento previo (pre-event fade)</h3>
+        <p>En las horas o días previos a un evento importante, el mercado tiende a moverse en la dirección que anticipa el resultado. Si el consenso es alcista para el dólar (dato de empleo esperado bueno), el USD puede apreciarse antes de la publicación. En estos casos, algunos traders van en contra del movimiento previo ("fade") apostando a que hay sobrereacción anticipatoria.</p>
+
+        <h3>Estrategia 3: Evitar el evento y operar la tendencia posterior</h3>
+        <p>La estrategia más conservadora: cerrar o reducir posiciones antes del evento para evitar la volatilidad, y volver al mercado una vez que el polvo se asiente y la dirección del movimiento sea clara. Esta es generalmente la opción más prudente para traders que no están especializados en trading de eventos.</p>
+
+        <div class="warning-box">
+            <p><strong>Nunca operes sin stop-loss durante eventos de alto impacto.</strong> Los spreads se amplían significativamente y los movimientos pueden ser de 50-200 pips en segundos. Una posición sin stop en un evento de alto impacto puede generar pérdidas que superen el margen disponible.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Cómo integrar el calendario con el análisis fundamental</h2>
+        <p>El análisis fundamental de medio plazo (como el score de fortaleza) y el calendario económico son complementarios, no excluyentes. La forma correcta de usarlos juntos es:</p>
+        <ol>
+            <li><strong>Determiná la dirección con el análisis fundamental:</strong> El score te dice qué divisas tienen fundamentos más fuertes y cuáles más débiles. Eso define el sesgo de trading del período.</li>
+            <li><strong>Usá el calendario para identificar catalizadores:</strong> Los eventos próximos pueden confirmar o cuestionar el análisis fundamental. Una publicación de PIB fuerte en una economía ya con score alto refuerza la posición; un dato de inflación muy por debajo del objetivo puede cambiar las perspectivas de tasas y alterar el score.</li>
+            <li><strong>Gestioná el riesgo en torno a los eventos:</strong> Incluso si el análisis fundamental es sólido, un evento de alto impacto puede generar volatilidad temporal en contra. Reducir el tamaño de posición o protegerse con stop-loss más ajustado antes de publicaciones críticas es una gestión de riesgo prudente.</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>El calendario en el dashboard de Global Investing</h2>
+        <p>El calendario económico integrado en el dashboard se actualiza tres veces al día (00:00, 08:00 y 16:00 UTC) y muestra los eventos de hoy y mañana con todos los datos disponibles: estimado, previo, y el dato real una vez publicado. Los horarios se convierten automáticamente a la zona horaria local de tu navegador, sin necesidad de hacer conversiones manuales.</p>
+        <p>En la sección de <a href="news.html">Noticias</a>, el panel lateral "Próximos eventos" muestra los eventos de alto y medio impacto más cercanos, filtrados por relevancia para que puedas identificar rápidamente qué eventos pueden afectar tus posiciones en las próximas horas.</p>
+    </div>
+
+    <h2>Guías relacionadas</h2>
+    <div class="related-links">
+        <a href="guia-bancos-centrales.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Los 8 bancos centrales del G8</div>
+        </a>
+        <a href="guia-score-fortaleza.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo leer un score de fortaleza</div>
+        </a>
+        <a href="tecnico-vs-fundamental.html" class="related-card">
+            <div class="rc-label">Artículo</div>
+            <div class="rc-title">Análisis técnico vs fundamental</div>
+        </a>
+        <a href="glosario-forex.html" class="related-card">
+            <div class="rc-label">Referencia</div>
+            <div class="rc-title">Glosario de términos fundamentales</div>
+        </a>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
+    <p style="margin-top:0.5rem;">
+        <a href="index.html">Dashboard</a> |
+        <a href="news.html">Noticias</a> |
+        <a href="about.html">Acerca de</a> |
+        <a href="terms.html">Términos</a> |
+        <a href="privacy.html">Privacidad</a> |
+        <a href="contact.html">Contacto</a>
+    </p>
+    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

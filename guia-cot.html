@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qué es el COT y Cómo Interpretarlo en Forex | Global Investing</title>
+    <meta name="description" content="Guía completa sobre el Commitment of Traders (COT) de la CFTC. Aprende a leer el reporte COT, interpretar el posicionamiento institucional y usarlo como señal contrarian en el trading de divisas.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/guia-cot.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
+            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
+            --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+        .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
+        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
+        strong { color: var(--text-primary); }
+        a { color: var(--blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .warning-box { background: rgba(224,160,32,0.08); border-left: 4px solid var(--orange); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .highlight-box p, .warning-box p { margin: 0; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
+        .data-table td { color: var(--text-secondary); font-size: 0.9rem; }
+        .example-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+        .example-box .example-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card:hover { border-color: var(--blue); }
+        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { color: var(--text-primary); }
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+            .container { padding: 2rem 1rem 4rem; }
+            h1 { font-size: 1.7rem; }
+            .section { padding: 1.25rem; }
+            .data-table { display: block; overflow-x: auto; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
+        <nav class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="news.html">Noticias</a>
+            <a href="about.html">Acerca de</a>
+            <a href="contact.html">Contacto</a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="index.html">Inicio</a> › <a href="about.html">Guías</a> › Qué es el COT y cómo interpretarlo
+    </div>
+
+    <h1>Qué es el COT y Cómo Interpretarlo en el Trading de Divisas</h1>
+    <div class="meta">
+        <span>📊 Nivel intermedio</span>
+        <span>⏱ Lectura: 10 minutos</span>
+        <span>🗓 Actualizado: marzo 2026</span>
+    </div>
+
+    <p>El <strong>Commitment of Traders (COT)</strong> es uno de los reportes más valiosos y menos utilizados por traders minoristas en el mercado forex. Publicado semanalmente por la <strong>Commodity Futures Trading Commission (CFTC)</strong> de Estados Unidos, el reporte COT revela el posicionamiento real de los grandes participantes institucionales en los mercados de futuros de divisas de Chicago. En otras palabras: te dice dónde tiene el dinero posicionado el <em>smart money</em>.</p>
+
+    <p>Entender el COT puede darte una ventaja significativa porque ves el posicionamiento de los mismos actores que mueven el mercado: hedge funds, CTAs (commodity trading advisors) y otros gestores de dinero profesionales.</p>
+
+    <div class="section">
+        <h2>¿Qué es exactamente el reporte COT?</h2>
+        <p>La CFTC obliga a todos los participantes de los mercados de futuros regulados en Estados Unidos a reportar sus posiciones cuando estas superan ciertos umbrales de tamaño. Con esos datos, la CFTC publica cada viernes a las 15:30 hora de Nueva York el reporte COT, que refleja las posiciones al cierre del martes de esa semana.</p>
+
+        <p>Para el mercado forex, los contratos relevantes son los futuros de divisas que se negocian en el Chicago Mercantile Exchange (CME): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD y otros pares importantes.</p>
+
+        <div class="highlight-box">
+            <p><strong>Retraso importante:</strong> El reporte tiene un retraso de aproximadamente 3 días hábiles. Los datos publicados el viernes corresponden al posicionamiento del martes anterior. Esto significa que el COT es una herramienta de análisis de posicionamiento, no de timing de entrada de muy corto plazo.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Los diferentes tipos de traders en el COT</h2>
+        <p>El reporte COT clasifica a los participantes en categorías según su perfil. El reporte más útil para el análisis forex es el <strong>Financial Traders Report</strong> (también llamado COTR — COT Report for Financials), que divide a los participantes en cuatro categorías:</p>
+
+        <table class="data-table">
+            <thead>
+                <tr><th>Categoría</th><th>Quiénes son</th><th>Cómo opera típicamente</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Dealer/Intermediary</strong></td>
+                    <td>Bancos y distribuidores que actúan como contrapartida de los clientes.</td>
+                    <td>Su posicionamiento refleja el flujo de clientes, no su visión propia del mercado.</td>
+                </tr>
+                <tr>
+                    <td><strong>Asset Manager / Institutional</strong></td>
+                    <td>Fondos de pensiones, fondos mutuos, gestores de activos conservadores.</td>
+                    <td>Posiciones grandes y duraderas, reflejo de asignación estratégica de largo plazo.</td>
+                </tr>
+                <tr>
+                    <td><strong>Leveraged Funds</strong></td>
+                    <td>Hedge funds, CTAs, fondos de arbitraje — el smart money especulativo.</td>
+                    <td>Posiciones activas y direccionales basadas en análisis macro y técnico. Son los más seguidos.</td>
+                </tr>
+                <tr>
+                    <td><strong>Other Reportables</strong></td>
+                    <td>Corporaciones, tesorerías, participantes no clasificados en las otras categorías.</td>
+                    <td>Principalmente cobertura (hedging) de exposición cambiaria real.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Para el análisis de posicionamiento especulativo, la categoría más relevante es <strong>Leveraged Funds</strong>. Son los hedge funds y CTAs los que toman posiciones direccionales activas basadas en su visión del mercado — y son los que con mayor frecuencia se equivocan en los extremos, creando señales contrarian.</p>
+    </div>
+
+    <div class="section">
+        <h2>Cómo leer el reporte: posición neta y su significado</h2>
+        <p>El dato clave del COT es la <strong>posición neta</strong>, que se calcula como:</p>
+        <p style="text-align:center;font-family:'Courier New',monospace;background:var(--bg-secondary);padding:0.75rem 1rem;border-radius:4px;border:1px solid var(--border);color:var(--text-primary);">Posición Neta = Contratos Long (Comprados) − Contratos Short (Vendidos)</p>
+
+        <p>Una posición neta <strong>positiva</strong> significa que los Leveraged Funds tienen más contratos comprados que vendidos en esa divisa: sesgo alcista. Una posición neta <strong>negativa</strong> significa lo contrario: sesgo bajista.</p>
+
+        <div class="example-box">
+            <div class="example-title">Ejemplo de lectura — EUR</div>
+            <p style="color:var(--text-secondary);margin-bottom:0.5rem;">Si el reporte muestra para EUR/USD:</p>
+            <ul style="margin-bottom:0;">
+                <li>Leveraged Funds Long: 85,000 contratos</li>
+                <li>Leveraged Funds Short: 32,000 contratos</li>
+                <li><strong>Posición Neta: +53,000 contratos</strong> (alcista en EUR)</li>
+            </ul>
+        </div>
+
+        <p>Pero el número aislado no dice mucho. Lo que importa es el <strong>contexto histórico</strong>: ¿es esa posición alta o baja en comparación con los últimos 12 o 24 meses? ¿Está en máximos históricos o cerca de mínimos?</p>
+    </div>
+
+    <div class="section">
+        <h2>La señal contrarian: cómo usar posiciones extremas</h2>
+        <p>La aplicación más poderosa del COT en forex es como indicador contrarian. La lógica es la siguiente: cuando los Leveraged Funds acumulan posiciones extremas en una dirección — comprados en máximos históricos o vendidos en mínimos históricos — el mercado está potencialmente saturado de posiciones en esa dirección.</p>
+        <p>Cuando todos los que querían comprar ya compraron, ¿quién queda para seguir empujando el precio hacia arriba? La respuesta es nadie, y el precio es vulnerable a una corrección o reversión.</p>
+
+        <div class="highlight-box">
+            <p><strong>La señal contrarian clásica:</strong> Posición neta en máximos históricos de 52 semanas → potencial techo. Posición neta en mínimos históricos de 52 semanas → potencial piso. Estas señales son especialmente poderosas cuando coinciden con niveles técnicos clave y con un cambio en el momentum de precio.</p>
+        </div>
+
+        <h3>Ejemplos históricos de señales COT exitosas</h3>
+        <p>En múltiples ocasiones a lo largo de la historia del forex, picos de posicionamiento extremo en Leveraged Funds han precedido reversiones importantes. El caso más clásico es el del JPY: cuando los hedge funds acumulan posiciones short masivas en JPY (apostando a que el yen se debilita), los episodios de "carry unwind" pueden ser violentos y rápidos, con el yen apreciándose el 5-10% en pocos días cuando el mercado revierte.</p>
+    </div>
+
+    <div class="section">
+        <h2>Cómo el dashboard incorpora el COT en el score</h2>
+        <p>En el modelo de fortaleza fundamental de Global Investing, el COT tiene un peso del <strong>7%</strong> sobre el score total, dentro del Tier 5 (Sentimiento de Mercado). No es el componente de mayor peso, pero sí uno de los más diferenciadores porque:</p>
+
+        <ul>
+            <li><strong>Es el único indicador de posicionamiento real:</strong> Todos los demás son indicadores económicos rezagados. El COT refleja dónde está apostando el dinero institucional en este momento.</li>
+            <li><strong>Es de fuente oficial:</strong> Los datos vienen directamente de la CFTC, no de encuestas ni estimaciones.</li>
+            <li><strong>Tiene lógica contrarian incorporada:</strong> Posiciones extremas no suman al score en la dirección del posicionamiento, sino que aplican un ajuste negativo — porque las posiciones extremas son señal de saturación, no de momentum.</li>
+        </ul>
+
+        <p>Adicionalmente, el modelo aplica una penalización específica cuando el posicionamiento COT contradice el perfil de safe haven de una divisa. Por ejemplo, si CHF tiene una posición neta negativa extrema en Leveraged Funds (muchos vendidos en franco suizo) pero al mismo tiempo hay alta volatilidad en los mercados de renta variable, el modelo reduce el ajuste negativo del COT porque el franco tiene un rol de refugio que puede activarse con independencia del posicionamiento especulativo.</p>
+
+        <div class="warning-box">
+            <p><strong>Limitación clave:</strong> El COT mide posicionamiento en futuros, no en el mercado spot de forex. El mercado spot es mucho más grande y los datos de posicionamiento real en spot no son públicos. Sin embargo, los futuros de divisas del CME son un proxy válido del posicionamiento especulativo institucional, especialmente para los fondos con mandato de retorno absoluto (hedge funds y CTAs).</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Cómo acceder al reporte COT directamente</h2>
+        <p>El reporte COT es de acceso público y gratuito. La CFTC lo publica en su sitio web oficial cada viernes. Para el análisis forex, el reporte más relevante es el <strong>"Traders in Financial Futures — Futures Only"</strong>, disponible en la sección de reportes de la CFTC.</p>
+
+        <p>Los pasos para encontrarlo:</p>
+        <ol>
+            <li>Ir a <strong>cftc.gov</strong> → sección Commitments of Traders.</li>
+            <li>Seleccionar "Financial Traders" (no el reporte legacy).</li>
+            <li>Buscar los contratos de interés: "EURO FX", "BRITISH POUND", "JAPANESE YEN", etc.</li>
+            <li>La columna relevante es "Leveraged Funds" → comparar "Long" vs "Short".</li>
+        </ol>
+
+        <p>El dashboard de Global Investing descarga y procesa automáticamente este reporte cada viernes a las ~20:00 UTC, integrando los datos en los scores de las 8 divisas principales sin que el usuario necesite buscarlos manualmente.</p>
+    </div>
+
+    <div class="section">
+        <h2>Resumen: claves para usar el COT correctamente</h2>
+        <ol>
+            <li><strong>Siempre mirá el contexto histórico</strong> — Un número absoluto no dice nada. Lo que importa es si está en máximos o mínimos de 52 semanas.</li>
+            <li><strong>Usalo como indicador de saturación, no de tendencia</strong> — El COT no te dice en qué dirección va el precio; te dice cuándo el mercado puede estar saturado en una dirección.</li>
+            <li><strong>Combinalo con el análisis técnico</strong> — Una señal contrarian COT es mucho más poderosa cuando coincide con un nivel técnico relevante (soporte, resistencia, patrón de velas).</li>
+            <li><strong>Considerá el retraso</strong> — Los datos son de martes, publicados el viernes. Para análisis semanal o mensual es aceptable; para trading intradía, no es relevante.</li>
+            <li><strong>No operés solo porque el COT sea extremo</strong> — Los mercados pueden mantener posiciones extremas durante semanas o meses. La señal contraria necesita confirmación de momentum o catalizador.</li>
+        </ol>
+    </div>
+
+    <h2>Guías relacionadas</h2>
+    <div class="related-links">
+        <a href="guia-score-fortaleza.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo leer un score de fortaleza fundamental</div>
+        </a>
+        <a href="guia-bancos-centrales.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Los 8 bancos centrales del G8</div>
+        </a>
+        <a href="guia-carry-trade.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo funciona el carry trade</div>
+        </a>
+        <a href="glosario-forex.html" class="related-card">
+            <div class="rc-label">Referencia</div>
+            <div class="rc-title">Glosario de términos fundamentales</div>
+        </a>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
+    <p style="margin-top:0.5rem;">
+        <a href="index.html">Dashboard</a> |
+        <a href="news.html">Noticias</a> |
+        <a href="about.html">Acerca de</a> |
+        <a href="terms.html">Términos</a> |
+        <a href="privacy.html">Privacidad</a> |
+        <a href="contact.html">Contacto</a>
+    </p>
+    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
