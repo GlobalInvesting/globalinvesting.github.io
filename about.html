@@ -112,7 +112,7 @@
             <ul>
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
-                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 20–82 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, normalizado automáticamente por los indicadores disponibles.</li>
+                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;38 Débil · 38–62 Neutral · &gt;62 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
                 <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 18%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
@@ -218,17 +218,19 @@
                     <tr style="background: rgba(38,166,154,0.12);">
                         <td><strong>Total</strong></td>
                         <td><strong>21 Indicadores</strong></td>
-                        <td><strong>~103%</strong></td>
+                        <td><strong>100%</strong></td>
                         <td>Normalizado automáticamente por peso total de indicadores disponibles.</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h3>Normalización y Escala Final (20–82)</h3>
-            <p>El score final se normaliza a un rango de 20–82 puntos para crear headroom y evitar compresión artificial en los extremos:</p>
-            <pre>compressedBase  = 20 + (baseScore × 0.58)
-rawFinal        = compressedBase + cappedAdj  [±15 pts máximo]
-normalizedScore = clamp(rawFinal, 20, 82)</pre>
+<h3>Normalización y Escala Final (0–100)</h3>
+<p>El score final opera en una escala fija de 0–100 con bandas interpretativas predefinidas. Los ajustes contextuales están capados en ±15 puntos para evitar que un solo factor domine el resultado:</p>
+<pre>totalAdj        = suma de ajustes contextuales (safe haven, carry, COT, etc.)
+cappedAdj       = clamp(totalAdj, −15, +15)
+normalizedScore = clamp(baseScore + cappedAdj, 0, 100)
+
+Bandas: &lt; 38 = Débil · 38–62 = Neutral · &gt; 62 = Fuerte</pre>
         </div>
 
         <!-- RECOMENDACIONES DE PARES -->
