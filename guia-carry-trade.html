@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cómo Funciona el Carry Trade en Forex: Guía Completa | Global Investing</title>
+    <meta name="description" content="Guía completa sobre el carry trade en forex. Qué es, cómo funciona, cuáles son los mejores pares para carry, riesgos del carry unwind y cómo integrarlo en el análisis fundamental.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/guia-carry-trade.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
+            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
+            --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+        .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
+        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
+        strong { color: var(--text-primary); }
+        a { color: var(--blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .warning-box { background: rgba(239,83,80,0.08); border-left: 4px solid var(--red); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .green-box { background: rgba(38,166,154,0.08); border-left: 4px solid var(--green); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .highlight-box p, .warning-box p, .green-box p { margin: 0; }
+        .example-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+        .example-box .example-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
+        .data-table td { color: var(--text-secondary); font-size: 0.9rem; }
+        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card:hover { border-color: var(--blue); }
+        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { color: var(--text-primary); }
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+            .container { padding: 2rem 1rem 4rem; }
+            h1 { font-size: 1.7rem; }
+            .section { padding: 1.25rem; }
+            .data-table { display: block; overflow-x: auto; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
+        <nav class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="news.html">Noticias</a>
+            <a href="about.html">Acerca de</a>
+            <a href="contact.html">Contacto</a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="index.html">Inicio</a> › <a href="about.html">Guías</a> › Cómo funciona el carry trade
+    </div>
+
+    <h1>Cómo Funciona el Carry Trade en Forex</h1>
+    <div class="meta">
+        <span>💱 Nivel intermedio</span>
+        <span>⏱ Lectura: 10 minutos</span>
+        <span>🗓 Actualizado: marzo 2026</span>
+    </div>
+
+    <p>El <strong>carry trade</strong> es una de las estrategias más utilizadas por los inversores institucionales en el mercado de divisas y uno de los principales motores estructurales de los flujos de capital en el forex. Entender cómo funciona — y cuándo falla — es esencial para cualquier trader que opere con análisis fundamental.</p>
+
+    <div class="section">
+        <h2>¿Qué es el carry trade?</h2>
+        <p>El carry trade consiste en <strong>pedir prestado en una divisa de bajo interés y reinvertir en una divisa de alto interés</strong>, capturando la diferencia entre ambas tasas — el "carry" o diferencial de tasas — como ganancia.</p>
+        <p>La lógica es simple: si puedo pedir prestado en yenes japoneses al 0.1% anual e invertir esos fondos en dólares australianos que rinden al 4.35% anual, obtengo un diferencial de 4.25% anual sin hacer nada más, siempre que el tipo de cambio AUD/JPY no se mueva en mi contra.</p>
+
+        <div class="example-box">
+            <div class="example-title">Ejemplo simplificado de carry trade</div>
+            <ol style="margin-bottom:0;">
+                <li>Pido prestado 10,000,000 JPY al 0.1% anual.</li>
+                <li>Convierto los yenes a dólares australianos (supongamos AUD/JPY = 100, obtengo 100,000 AUD).</li>
+                <li>Invierto los 100,000 AUD en un depósito o instrumento que rinde 4.35% anual.</li>
+                <li>Al año, recibo 104,350 AUD.</li>
+                <li>Devuelvo el préstamo en JPY: 10,010,000 JPY (principal + 0.1% de interés).</li>
+                <li><strong>Ganancia:</strong> Si AUD/JPY sigue en 100, los 104,350 AUD = 10,435,000 JPY → ganancia de ~425,000 JPY (4.25%).</li>
+            </ol>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>El supuesto clave:</strong> El carry trade solo es rentable si el tipo de cambio no se mueve lo suficiente en contra como para borrar el diferencial de tasas. Si el AUD se deprecia más de ~4.25% frente al JPY en el año, la operación pierde dinero a pesar del diferencial positivo.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Por qué el carry trade mueve el mercado forex</h2>
+        <p>El carry trade no es solo una estrategia minorista — es una fuerza estructural que mueve <strong>billones de dólares</strong> en los mercados de divisas. Los hedge funds, fondos de pensiones y bancos de inversión implementan carry trades a escala masiva cuando las condiciones son favorables.</p>
+        <p>Cuando el carry trade es popular, crea una demanda sostenida de las divisas de alto rendimiento (AUD, NZD, USD en períodos de tasas altas) y una oferta continua de las divisas de bajo rendimiento usadas como financiación (JPY, CHF en períodos de tasas bajas). Esto explica por qué estos pares tienden a tener tendencias prolongadas: el flujo continuo de capital en la misma dirección genera momentum.</p>
+        <p>En el modelo de scoring del dashboard, la tasa de interés tiene el mayor peso individual (12%) y el carry premium es uno de los ajustes contextuales incorporados al score. Una divisa con alto diferencial de tasas frente al grupo recibe una prima adicional en su score que refleja este flujo estructural.</p>
+    </div>
+
+    <div class="section">
+        <h2>Las mejores condiciones para el carry trade</h2>
+        <p>El carry trade funciona mejor bajo condiciones específicas de mercado:</p>
+        <ul>
+            <li><strong>Apetito por el riesgo elevado (risk-on):</strong> Cuando los mercados de renta variable están al alza y la volatilidad es baja, los inversores buscan rendimiento y el carry trade prospera.</li>
+            <li><strong>Diferencial de tasas amplio y estable:</strong> Cuanto mayor sea la diferencia de tasas entre la divisa de alta y baja rentabilidad, y cuanto más tiempo se espere que dure esa diferencia, más atractivo es el carry.</li>
+            <li><strong>Baja volatilidad implícita (VIX bajo):</strong> En mercados tranquilos, el riesgo de tipo de cambio es manejable. En mercados volátiles, el riesgo de una reversión brusca supera el beneficio del diferencial de tasas.</li>
+            <li><strong>Tendencia de precio favorable:</strong> El carry trade es más rentable cuando la divisa de alto rendimiento también se aprecia por otros motivos fundamentales (crecimiento sólido, banco central hawkish).</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>El carry unwind: el mayor riesgo del carry trade</h2>
+        <p>El <strong>carry unwind</strong> es el fenómeno más temido por los traders de carry: el cierre masivo y simultáneo de posiciones de carry trade. Cuando ocurre, puede generar movimientos extremadamente rápidos y violentos en los pares de divisas afectados.</p>
+        <p>¿Cómo se produce? Cuando el mercado entra en modo risk-off (crisis, alta volatilidad, aversión al riesgo global), los inversores cierran sus posiciones de carry simultáneamente para reducir exposición. Esto significa vender masivamente las divisas de alto rendimiento y comprar masivamente las divisas de financiación (JPY, CHF). El efecto es autorreferencial: las salidas generan más depreciación en la divisa de alto rendimiento, lo que genera más pérdidas en las posiciones de carry, lo que genera más cierres.</p>
+
+        <div class="warning-box">
+            <p><strong>El carry unwind en el JPY:</strong> El yen japonés es la divisa de financiación del carry trade más utilizada históricamente. En agosto de 2024, un episodio de carry unwind de JPY causó que el USD/JPY cayera más de 12 figuras (1,200 pips) en pocas semanas, mientras el yen se apreciaba con fuerza frente a todas las divisas del G8, independientemente de sus fundamentos económicos individuales.</p>
+        </div>
+
+        <h3>Señales de advertencia de un posible carry unwind</h3>
+        <ul>
+            <li>Aumento súbito del VIX (índice de volatilidad del S&P 500) por encima de 20-25.</li>
+            <li>Caídas significativas en los mercados de renta variable globales.</li>
+            <li>Posicionamiento COT muy largo en divisas de alto rendimiento y muy corto en JPY/CHF.</li>
+            <li>Divergencia entre los fundamentos del JPY y la trayectoria de precios (el yen débil a pesar de buenos datos económicos japoneses).</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Carry trade y el modelo de scoring</h2>
+        <p>El dashboard de Global Investing incorpora el carry trade en el modelo de scoring de varias formas:</p>
+        <ul>
+            <li><strong>Tasa de interés (12%):</strong> El nivel absoluto de la tasa oficial es el componente de mayor peso del modelo, reflejando directamente el carry disponible.</li>
+            <li><strong>Bono soberano 10Y (5%):</strong> El rendimiento del bono a 10 años captura las expectativas de tasas futuras, relevante para el carry de largo plazo.</li>
+            <li><strong>Carry Premium (ajuste contextual):</strong> El modelo aplica una prima adicional a divisas cuyo diferencial de tasas frente al grupo es especialmente favorable, amplificando el efecto del carry en el score.</li>
+            <li><strong>FX Performance 1M (18%):</strong> Este indicador captura en parte el momentum generado por los flujos de carry, ya que las divisas de alto carry tienden a apreciarse en entornos risk-on.</li>
+        </ul>
+
+        <div class="green-box">
+            <p><strong>Aplicación práctica:</strong> Cuando el dashboard muestra una divisa de alto rendimiento con score alcista (por encima de 63) en un entorno de mercado risk-on (VIX bajo, bolsas al alza), la probabilidad de que los flujos de carry trade sostengan el movimiento alcista es elevada. Es una de las convergencias fundamentales más sólidas que puede identificar el modelo.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Resumen: claves del carry trade</h2>
+        <ol>
+            <li><strong>El carry trade se financia en divisas de bajo rendimiento</strong> (JPY, CHF históricamente) y se invierte en divisas de alto rendimiento.</li>
+            <li><strong>Es rentable cuando el tipo de cambio no se mueve en contra</strong> más que el diferencial de tasas capturado.</li>
+            <li><strong>Funciona mejor en entornos risk-on</strong> con volatilidad baja y diferencial amplio y estable.</li>
+            <li><strong>El carry unwind puede ser rápido y violento</strong>, especialmente en JPY y CHF como divisas de financiación.</li>
+            <li><strong>El posicionamiento COT</strong> es una señal de advertencia de posibles carry unwind cuando el posicionamiento en divisas de financiación es extremadamente corto.</li>
+        </ol>
+    </div>
+
+    <h2>Guías relacionadas</h2>
+    <div class="related-links">
+        <a href="guia-bancos-centrales.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Los 8 bancos centrales del G8</div>
+        </a>
+        <a href="guia-cot.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Qué es el COT y cómo interpretarlo</div>
+        </a>
+        <a href="guia-score-fortaleza.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo leer un score de fortaleza</div>
+        </a>
+        <a href="tecnico-vs-fundamental.html" class="related-card">
+            <div class="rc-label">Artículo</div>
+            <div class="rc-title">Análisis técnico vs fundamental</div>
+        </a>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
+    <p style="margin-top:0.5rem;">
+        <a href="index.html">Dashboard</a> |
+        <a href="news.html">Noticias</a> |
+        <a href="about.html">Acerca de</a> |
+        <a href="terms.html">Términos</a> |
+        <a href="privacy.html">Privacidad</a> |
+        <a href="contact.html">Contacto</a>
+    </p>
+    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
