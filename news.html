@@ -235,7 +235,7 @@
     <section aria-label="Feed de noticias forex">
       <div class="news-panel">
         <div class="panel-header" aria-hidden="true">
-          <span>Hace</span>
+          <span>Hora</span>
           <span>Divisa</span>
           <span>Imp.</span>
           <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
@@ -736,17 +736,12 @@ function detectImpact(title, description) {
   return 'low';
 }
 
-// ── TIEMPO RELATIVO DESDE TS ───────────────────────────────────────────────────────
-function tsToRelative(ts) {
-  if (!ts) return '--';
+// ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
+function tsToLocalTime(ts) {
+  if (!ts) return '--:--';
   const d = new Date(ts);
-  if (isNaN(d)) return '--';
-  const diffMin = Math.floor((Date.now() - d.getTime()) / 60000);
-  if (diffMin < 1)  return 'ahora';
-  if (diffMin < 60) return `${diffMin}m`;
-  const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24)   return `${diffH}h`;
-  return `${Math.floor(diffH / 24)}d`;
+  if (isNaN(d)) return '--:--';
+  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 // ── FEED STATE ────────────────────────────────────────────────────────────────
@@ -855,7 +850,7 @@ async function initFeed() {
             ...a,
             cur:         detectCurrencyWithSource(text, a.source),
             impact:      a.impact || detectImpact(a.title, a.expand),
-            time: tsToRelative(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
+            time: tsToLocalTime(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
             ai_headline: a.ai_headline || null,
             recent:      a.recent !== undefined ? a.recent : true,
           };
