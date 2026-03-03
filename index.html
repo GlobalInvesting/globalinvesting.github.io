@@ -3302,11 +3302,7 @@ datasets: [
                                             } 
                                         },
                                         title: { 
-                                            display: true, 
-                                            text: `${country.code} - Tendencias 12 Meses`, 
-                                            color: '#e1e4e8', 
-                                            font: { size: 14, weight: 'bold' },
-                                            padding: { bottom: 20 }
+                                            display: false
                                         },
                                         tooltip: {
                                             backgroundColor: 'rgba(26, 31, 46, 0.95)',
@@ -4763,14 +4759,42 @@ const sentiment = getSentiment(strength);
 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(500px, 100%), 1fr))', gap: '1.5rem' }}>
-                                    {countries.map(country => (
-                                        <div key={country.code} className="chart-container">
-                                            <div className="chart-wrapper">
-                                                <canvas id={`chart-${country.code}`}></canvas>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+    {(() => {
+        const FLAG_CODES = {
+            USD:'us', EUR:'eu', GBP:'gb', JPY:'jp',
+            AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz'
+        };
+        return countries.map(country => {
+            const fc = FLAG_CODES[country.code] || 'us';
+            return (
+                <div key={country.code} className="chart-container">
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginBottom: '0.75rem',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        color: '#e1e4e8'
+                    }}>
+                        <img
+                            src={`https://flagcdn.com/24x18/${fc}.png`}
+                            srcSet={`https://flagcdn.com/48x36/${fc}.png 2x`}
+                            width="24"
+                            height="18"
+                            alt={country.code}
+                            style={{ borderRadius: '2px', flexShrink: 0 }}
+                        />
+                        {country.code} - Tendencias 12 Meses
+                    </div>
+                    <div className="chart-wrapper">
+                        <canvas id={`chart-${country.code}`}></canvas>
+                    </div>
+                </div>
+            );
+        });
+    })()}
+</div>
                             </div>
                         )}
 
