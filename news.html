@@ -247,14 +247,117 @@
     .layout-cols{grid-template-columns:1fr;}
   }
   @media(max-width:768px){
-    .header-content{flex-direction:column;align-items:flex-start;gap:.75rem;}
-    .page-nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
-    .page-nav-links a{white-space:nowrap;}
-    .page-wrap{padding:1rem 1rem 3rem;}
-    .panel-header,.news-row{grid-template-columns:36px 60px 60px 1fr 52px;}
+    /* ── HEADER ── */
+    .header{padding:.75rem 1rem;}
+    .header-content{flex-direction:column;align-items:flex-start;gap:.5rem;}
+    .header-brand .brand-title{font-size:1rem;}
+    .header-nav{display:none;}
+    .header-info-block{width:100%;}
+
+    /* ── NAV TABS — ocultar scrollbar, tabs más compactos ── */
+    .nav-tabs{
+      padding:0 .25rem;
+      gap:0;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+    }
+    .nav-tabs::-webkit-scrollbar{display:none;}
+    .nav-tab{padding:.7rem .85rem;font-size:.73rem;}
+
+    /* ── PAGE CONTENT ── */
+    .page-wrap{padding:.75rem .75rem 3rem;}
+    .page-title-row{margin-bottom:1rem;padding-bottom:.6rem;}
+    .page-title{font-size:.9rem;}
+    .filter-bar{gap:.2rem;}
+    .filter-btn{font-size:.67rem;padding:.2rem .5rem;}
+    .filter-sep{display:none;}
+
+    /* ── NEWS PANEL: 3 columnas móvil ──
+       [impacto 28px] [titular flex] [hora 42px]
+       La divisa y fuente se suprimen; divisa aparece en el titular vía JS (ya existe).
+    ── */
+    .panel-header{
+      display:grid;
+      grid-template-columns:28px 1fr 42px;
+      padding:.4rem .65rem;
+      gap:0;
+      align-items:center;
+    }
+    /* Ocultar columnas Hora / Divisa / Fuente del encabezado */
+    .panel-header span:nth-child(1), /* Hora */
+    .panel-header span:nth-child(2), /* Divisa */
+    .panel-header span:nth-child(5)  /* Fuente */
+    { display:none; }
+    /* Reubicar "Imp." y "Titular" */
+    .panel-header span:nth-child(3){grid-column:1;text-align:center;}
+    .panel-header span:nth-child(4){grid-column:2;padding:0 .5rem;}
+    /* Agregar "Hora" sintética en columna 3 via content */
+    .panel-header::after{
+      content:'Hora';
+      grid-column:3;
+      font-size:.63rem;
+      font-weight:600;
+      color:var(--text-dim);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      text-align:right;
+    }
+
+    .news-row{
+      display:grid;
+      grid-template-columns:28px 1fr 42px;
+      padding:.5rem .65rem;
+      gap:0;
+      align-items:center;
+    }
+    /* Ocultar col-cur y col-source en móvil */
+    .col-cur{display:none;}
     .col-source{display:none;}
-    .col-impact{justify-content:center;}
+
+    /* Impacto — columna 1 */
+    .col-impact{
+      grid-column:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .impact-dot{width:8px;height:8px;}
+
+    /* Titular — columna 2, permite wrapping a 2 líneas */
+    .col-title{
+      grid-column:2;
+      padding:0 .5rem;
+      font-size:.77rem;
+      white-space:normal;
+      line-height:1.35;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+
+    /* Hora — columna 3 */
+    .col-time{
+      grid-column:3;
+      font-size:.63rem;
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    /* Expand */
+    .news-expand{
+      grid-column:1/-1;
+      padding:.5rem .65rem .65rem;
+      font-size:.73rem;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar{gap:.75rem;margin-top:.75rem;}
+
+    /* ── LOAD MORE ── */
+    .load-more{font-size:.75rem;padding:.85rem;}
   }
+
 </style>
 </head>
 <body>
