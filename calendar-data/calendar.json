@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-03",
-  "generatedAt": "2026-03-03T08:42:32.289843Z",
+  "generatedAt": "2026-03-03T16:33:21.189715Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -502,7 +502,7 @@
       "flag": "🇪🇺",
       "event": "Core CPI (YoY)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "2.4%",
       "forecast": "2.2%",
       "previous": "2.2%"
     },
@@ -515,7 +515,7 @@
       "flag": "🇪🇺",
       "event": "Core CPI (MoM)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.8%",
       "forecast": "",
       "previous": "-1.1%"
     },
@@ -528,7 +528,7 @@
       "flag": "🇪🇺",
       "event": "CPI (YoY)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "1.9%",
       "forecast": "1.7%",
       "previous": "1.7%"
     },
@@ -541,7 +541,7 @@
       "flag": "🇪🇺",
       "event": "CPI (MoM)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.7%",
       "forecast": "",
       "previous": "-0.6%"
     },
@@ -554,9 +554,9 @@
       "flag": "🇪🇺",
       "event": "CPI, n.s.a  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "100.72",
       "forecast": "",
-      "previous": "100.05"
+      "previous": "100.06"
     },
     {
       "date": "3 Mar",
@@ -567,9 +567,9 @@
       "flag": "🇪🇺",
       "event": "HICP ex Energy & Food (YoY)  (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "2.3%",
       "forecast": "",
-      "previous": "2.1%"
+      "previous": "2.2%"
     },
     {
       "date": "3 Mar",
@@ -580,35 +580,9 @@
       "flag": "🇪🇺",
       "event": "HICP ex Energy and Food (MoM)  (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.7%",
       "forecast": "",
       "previous": "-0.8%"
-    },
-    {
-      "date": "3 Mar",
-      "dateISO": "2026-03-03",
-      "timeUTC": "12:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "GlobalDairyTrade Price Index",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "3.6%"
-    },
-    {
-      "date": "3 Mar",
-      "dateISO": "2026-03-03",
-      "timeUTC": "12:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Milk Auctions",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "4,028.0"
     },
     {
       "date": "3 Mar",
@@ -632,7 +606,7 @@
       "flag": "🇺🇸",
       "event": "Redbook (YoY)",
       "impact": "low",
-      "actual": "",
+      "actual": "7.0%",
       "forecast": "",
       "previous": "6.7%"
     },
@@ -658,9 +632,35 @@
       "flag": "🇺🇸",
       "event": "IBD/TIPP Economic Optimism",
       "impact": "medium",
-      "actual": "",
+      "actual": "47.5",
       "forecast": "50.1",
       "previous": "48.8"
+    },
+    {
+      "date": "3 Mar",
+      "dateISO": "2026-03-03",
+      "timeUTC": "15:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "GlobalDairyTrade Price Index",
+      "impact": "low",
+      "actual": "5.7%",
+      "forecast": "",
+      "previous": "3.6%"
+    },
+    {
+      "date": "3 Mar",
+      "dateISO": "2026-03-03",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Milk Auctions",
+      "impact": "low",
+      "actual": "4,301.0",
+      "forecast": "",
+      "previous": "4,028.0"
     },
     {
       "date": "3 Mar",
@@ -685,7 +685,7 @@
       "event": "API Weekly Crude Oil Stock",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.200M",
       "previous": "11.400M"
     },
     {
@@ -698,7 +698,7 @@
       "event": "Terms of Trade - Exports Prices  (Q4)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.5%",
       "previous": "-1.6%"
     },
     {
@@ -711,7 +711,7 @@
       "event": "Terms of Trade - Imports Prices  (Q4)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.8%",
       "previous": "0.5%"
     },
     {
@@ -893,7 +893,7 @@
       "event": "Household Confidence  (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "38.1",
+      "forecast": "38.2",
       "previous": "37.9"
     },
     {
@@ -919,7 +919,7 @@
       "event": "CPI (YoY)  (Feb)",
       "impact": "high",
       "actual": "",
-      "forecast": "0.0%",
+      "forecast": "-0.1%",
       "previous": "0.1%"
     },
     {
@@ -1010,7 +1010,7 @@
       "event": "PPI (YoY)  (Jan)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "-2.7%",
       "previous": "-2.1%"
     },
     {
@@ -1101,7 +1101,7 @@
       "event": "ADP Nonfarm Employment Change  (Feb)",
       "impact": "high",
       "actual": "",
-      "forecast": "49K",
+      "forecast": "50K",
       "previous": "22K"
     },
     {
@@ -1180,7 +1180,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "52.3",
-      "previous": "52.3"
+      "previous": "52.7"
     },
     {
       "date": "4 Mar",
@@ -2125,11 +2125,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Average Hourly Earnings (YoY) (YoY)  (Feb)",
+      "event": "Average Hourly Earnings (MoM)  (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
-      "previous": "3.7%"
+      "forecast": "0.3%",
+      "previous": "0.4%"
     },
     {
       "date": "6 Mar",
