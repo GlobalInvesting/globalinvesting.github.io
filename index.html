@@ -4206,7 +4206,6 @@ const DataHealthCheck = ({ economicData }) => {
                                 <div className="brand-subtitle">Dashboard Profesional</div>
                             </div>
 <div className="page-nav-links">
-    <a href="news.html">Noticias</a>
     <a href="about.html">Acerca de</a>
     <a href="terms.html">Términos</a>
     <a href="privacy.html">Privacidad</a>
@@ -4306,6 +4305,7 @@ const DataHealthCheck = ({ economicData }) => {
                         <button className={`nav-tab ${activeTab === 'trends' ? 'active' : ''}`} onClick={() => setActiveTab('trends')}>Tendencias Históricas</button>
                         <button className={`nav-tab ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>Calendario Económico</button>
                         <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Mejores Pares</button>
+                        <a href="news.html" className="nav-tab" style={{textDecoration:'none'}}>Noticias</a>
                     </div>
 
                     <div className="content">
@@ -5318,7 +5318,6 @@ const sentiment = getSentiment(strength);
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-    <a href="news.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', marginRight: '1rem' }}>Noticias</a>
     <a href="about.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', marginRight: '1rem' }}>Acerca de</a>
     <a href="terms.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', marginRight: '1rem' }}>Términos</a>
     <a href="privacy.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', marginRight: '1rem' }}>Privacidad</a>
