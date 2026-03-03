@@ -581,24 +581,54 @@ function renderCoverage(articles) {
 
 // ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const BULL_KW = ['rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged','hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates','strong','stronger','higher','supports','supported','jumps','jumped','rallies','rallied','outperforms','exceeds','exceeded','robust','solid','improves','improved','expansion','growth','confidence','optimism','bullish','tightening','restrictive','upbeat','beats expectations','above expectations','accelerates','accelerated','record high','sube','suben','gana','ganan','fortalece','fortalecen','avanza','avanzan','repunta','repuntan','supera','superan','restrictivo','restrictiva','alza','alzas','mejora','mejoran','positivo','positiva','optimismo','confianza','expansión','crecimiento','robusto','robusta','sólido','sólida','impulsa','impulsan','aceleración','máximo','récord','supera estimaciones','supera expectativas','postura restrictiva','por encima','más fuerte','subida','mantiene restrictivo','apoya','apoyado','sube tasas'];
-const BEAR_KW = ['falls','fallen','fell','drops','dropped','weakens','weakened','declines','declined','dovish','misses','below estimate','below forecast','cut','rate cut','cuts rates','weak','weaker','lower','pressures','pressured','slides','slid','sells off','sell-off','underperforms','disappoints','disappointed','fragile','contraction','slowdown','concern','concerns','pessimism','bearish','easing','accommodative','downside','misses expectations','below expectations','decelerates','decelerated','record low','slumps','slumped','tumbles','tumbled','plunges','plunged','cae','caen','pierde','pierden','debilita','debilitan','retrocede','retroceden','baja','bajas','acomodaticio','acomodaticia','recorte','recortes','recorta tasas','negativo','negativa','pesimismo','preocupación','preocupaciones','contracción','desaceleración','débil','frágil','presiona','presionan','deterioro','deteriora','riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo','pierde terreno','cede terreno','debilidad','bajo mínimos','presión bajista'];
-function scoreSentiment(text) {
-  const lower = (text || '').toLowerCase();
-  let bull = 0, bear = 0;
-  BULL_KW.forEach(kw => { if (lower.includes(kw)) bull++; });
-  BEAR_KW.forEach(kw => { if (lower.includes(kw)) bear++; });
-  if (bull > bear) return 'bull';
-  if (bear > bull) return 'bear';
+/**
+ * scoreSentiment — lee el campo "sentiment" precalculado por enrich_news.py v7.
+ * El backend ejecuta la lógica con acceso al contexto completo del artículo y
+ * con conocimiento de correlaciones macroeconómicas (petróleo→CAD, riesgo→JPY, etc.)
+ *
+ * Fallbacks en orden:
+ *   1. article.sentiment  (precalculado por Groq via enrich_news.py v7)
+ *   2. Patrón final del ai_headline "→ DIVISA alcista/bajista/neutral/mixto"
+ *   3. Keywords básicos sobre el ai_headline (legacy)
+ */
+function scoreSentiment(article) {
+  // ── 1. Campo precalculado por el backend ──────────────────────────────────
+  if (article && article.sentiment) {
+    const s = article.sentiment.toLowerCase();
+    if (s === 'bull' || s === 'alcista')  return 'bull';
+    if (s === 'bear' || s === 'bajista')  return 'bear';
+    if (s === 'mixed' || s === 'mixto')   return 'mixed';
+    return 'neut';
+  }
+  // ── 2. Patrón estructurado al final del ai_headline ───────────────────────
+  const hl = ((article && article.ai_headline) || (article && article.title) || '').toLowerCase();
+  const m = hl.match(/→\s*(?:\w+\s+)?(alcista|bajista|neutral|neutro|mixto)\s*$/);
+  if (m) {
+    const w = m[1];
+    if (w === 'alcista')          return 'bull';
+    if (w === 'bajista')          return 'bear';
+    if (w === 'mixto')            return 'mixed';
+    if (w === 'neutral' || w === 'neutro') return 'neut';
+  }
+  // ── 3. Fallback keywords básicos ─────────────────────────────────────────
+  const BULL = ['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
+  const BEAR = ['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
+  let b = 0, r = 0;
+  BULL.forEach(k => { if (hl.includes(k)) b++; });
+  BEAR.forEach(k => { if (hl.includes(k)) r++; });
+  if (b > r) return 'bull';
+  if (r > b) return 'bear';
   return 'neut';
 }
 function computeSentiment(articles) {
   const counts = {};
-  CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
+  CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,mixed:0,total:0}; });
   articles.forEach(a => {
     if (!counts[a.cur]) return;
-    const s = scoreSentiment(a.ai_headline || a.title);
-    counts[a.cur][s]++;
+    // Pasar el artículo completo para aprovechar el campo sentiment del backend
+    const s = scoreSentiment(a);
+    const key = (s === 'mixed') ? 'neut' : s; // mixto cuenta como neutro en el gauge
+    counts[a.cur][key]++;
     counts[a.cur].total++;
   });
   const body = document.getElementById('sentiment-body');
