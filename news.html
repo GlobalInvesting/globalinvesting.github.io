@@ -83,7 +83,7 @@
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
-  /* ── HEADER (matches index.html exactly) ─────────────────────────────── */
+  /* ── HEADER ─────────────────────────────────────────────────────────────── */
   .header{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -97,9 +97,9 @@
     max-width:1800px;
     margin:0 auto;
     display:flex;
-    justify-content:space-between;
     align-items:center;
   }
+  .header-brand{ flex:1; }
   .brand-title{
     font-size:1.125rem;
     font-weight:700;
@@ -115,6 +115,11 @@
     letter-spacing:0.05em;
     text-transform:uppercase;
   }
+  .header-nav{
+    flex:1;
+    display:flex;
+    justify-content:center;
+  }
   .page-nav-links{
     display:flex;
     align-items:center;
@@ -129,8 +134,9 @@
   }
   .page-nav-links a:hover{color:var(--text-primary);}
   .page-nav-links a.active{color:var(--text-primary);}
+  .header-spacer{ flex:1; }
 
-  /* ── NAV TABS (matches index.html exactly) ────────────────────────────── */
+  /* ── NAV TABS ────────────────────────────────────────────────────────────── */
   .nav-tabs-wrap{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -238,7 +244,7 @@
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
 
-  /* ── FOOTER (matches index.html exactly) ─────────────────────────────── */
+  /* ── FOOTER ──────────────────────────────────────────────────────────── */
   .footer{
     margin-top:4rem;
     padding:2rem;
@@ -247,14 +253,19 @@
     color:var(--text-tertiary);
     font-size:0.75rem;
   }
+  .footer a{color:var(--text-secondary);text-decoration:none;margin:0 .5rem;}
+  .footer a:hover{color:var(--text-primary);}
+  .footer a.active-link{color:var(--text-primary);}
 
   @media(max-width:1200px){
     .layout-cols{grid-template-columns:1fr;}
   }
   @media(max-width:768px){
-    .header-content{flex-direction:column;align-items:flex-start;gap:.75rem;}
+    .header-content{flex-wrap:wrap;gap:.75rem;}
+    .header-brand{flex:0 0 100%;}
+    .header-nav{flex:0 0 100%;justify-content:flex-start;}
+    .header-spacer{display:none;}
     .page-nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
-    .page-nav-links a{white-space:nowrap;}
     .page-wrap{padding:1rem 1rem 3rem;}
     .panel-header,.news-row{grid-template-columns:36px 60px 60px 1fr 52px;}
     .col-source{display:none;}
@@ -267,11 +278,11 @@
 <!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
 <div class="header">
   <div class="header-content">
-    <div>
+    <div class="header-brand">
       <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
       <div class="brand-subtitle">Dashboard Profesional</div>
     </div>
-    <div style="flex:1;display:flex;justify-content:center;">
+    <div class="header-nav">
       <div class="page-nav-links">
         <a href="about.html">Acerca de</a>
         <a href="terms.html">Términos</a>
@@ -280,7 +291,7 @@
         <a href="about.html#recursos">Guías</a>
       </div>
     </div>
-    <div style="flex:1;"></div>
+    <div class="header-spacer"></div>
   </div>
 </div>
 
@@ -369,19 +380,19 @@
   </div>
 </main>
 
-<!-- ── FOOTER (igual al index.html) ──────────────────────────────────────── -->
+<!-- ── FOOTER ──────────────────────────────────────────────────────────────── -->
 <div class="footer">
-  <div style="font-weight:600;margin-bottom:.5rem;">
+  <div style="font-weight:600;margin-bottom:.5rem;color:var(--text-secondary);">
     DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
   </div>
   <div style="margin-bottom:1rem;">
-    Metodología: Modelo cuantitativo basado en datos económicos reales · 21 indicadores ponderados en 6 tiers<br>
-    Tasas &amp; Ciclo Monetario (25%) · FX Momentum &amp; Smart Money (23%) · Crecimiento &amp; Empleo (17%) · Sentimiento de Mercado (16%) · Balance Externo (10%) · Consumo &amp; Salarios (9%)<br>
+    Metodología: Modelo cuantitativo basado en datos económicos reales • 21 indicadores ponderados en 6 tiers<br>
+    Tasas &amp; Ciclo Monetario (25%) • FX Momentum &amp; Smart Money (23%) • Crecimiento &amp; Empleo (17%) • Sentimiento de Mercado (16%) • Balance Externo (10%) • Consumo &amp; Salarios (9%)<br>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
   </div>
 
-  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;max-width:900px;margin-left:auto;margin-right:auto;">
-    <strong style="color:var(--text-primary);">Aviso Legal:</strong><br>
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;text-align:left;max-width:900px;margin-left:auto;margin-right:auto;">
+    <strong style="color:var(--text-secondary);">Aviso Legal:</strong><br>
     Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
     Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
     macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
@@ -390,19 +401,20 @@
     Fuentes de noticias: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
   </div>
 
-  <div style="margin-top:1rem;">
-    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Acerca de</a>
-    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Términos</a>
-    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Privacidad</a>
-    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Contacto</a>
-    <a href="about.html#recursos" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Guías</a>
+  <div style="margin-bottom:.75rem;">
+    <a href="index.html">Dashboard</a>
+    <a href="news.html" class="active-link">Noticias</a>
+    <a href="about.html">Acerca de</a>
+    <a href="terms.html">Términos</a>
+    <a href="privacy.html">Privacidad</a>
+    <a href="contact.html">Contacto</a>
+    <a href="about.html#recursos">Guías</a>
   </div>
 
-  <div style="margin-top:1rem;">
+  <div style="margin-top:.5rem;">
     © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
-      </div>
-  <div>Dashboard v5.2.0</div>
   </div>
+  <div>Dashboard v5.2.0</div>
 </div>
 
 <script>
@@ -421,12 +433,6 @@ const FLAG_CODES = {
   AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz',
   US:'us',  EU:'eu',  UK:'gb',  JP:'jp',
   AU:'au',  CA:'ca',  CH:'ch',  NZ:'nz',
-};
-const CURRENCY_FLAGS = {
-  USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
-  AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
-  US:'🇺🇸',  EU:'🇪🇺',  UK:'🇬🇧',  JP:'🇯🇵',
-  AU:'🇦🇺',  CA:'🇨🇦',  CH:'🇨🇭',  NZ:'🇳🇿',
 };
 const FLAG_SIZES = [[16,12],[20,15],[24,18],[32,24],[40,30],[48,36],[64,48]];
 function nearestFlagSize(px) {
