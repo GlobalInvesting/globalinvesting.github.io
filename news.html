@@ -275,7 +275,12 @@
         <a href="about.html#recursos">Guías</a>
       </div>
     </div>
-    <div class="header-spacer"></div>
+    <div class="header-spacer" style="flex:1;display:flex;justify-content:flex-end;align-items:center;">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;color:var(--text-secondary);">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0;"></div>
+        <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -289,7 +294,6 @@
     <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
     <a href="news.html" class="nav-tab active">Noticias</a>
   </div>
-</div>
 
 <main class="page-wrap">
   <div class="page-title-row">
@@ -406,8 +410,10 @@ const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 
 // ── TIMESTAMP EN HORA LOCAL ───────────────────────────────────────────────────
 const now = new Date();
-document.getElementById('ts').textContent =
-  now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+const _tsStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+document.getElementById('ts').textContent = _tsStr;
+const _tsHeader = document.getElementById('ts-header');
+if (_tsHeader) _tsHeader.textContent = _tsStr;
 document.getElementById('year').textContent = now.getFullYear();
 
 // ── BANDERAS POR DIVISA ───────────────────────────────────────────────────────
