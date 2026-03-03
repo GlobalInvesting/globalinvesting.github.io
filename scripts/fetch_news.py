@@ -334,7 +334,13 @@ def parse_date(entry):
         val = getattr(entry, attr, None)
         if val:
             try:
-                return dateparser.parse(val).astimezone(timezone.utc)
+                dt = dateparser.parse(val)
+                # Si no tiene tzinfo, asumir UTC explícitamente
+                # (evita que el runner de GitHub Actions interprete
+                # la hora como local del servidor en lugar de UTC)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                return dt.astimezone(timezone.utc)
             except Exception:
                 pass
     return datetime.now(timezone.utc)
