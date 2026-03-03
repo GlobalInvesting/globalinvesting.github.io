@@ -75,7 +75,7 @@
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
-  /* ── HEADER — idéntico al index.html ─────────────────────────── */
+  /* ── HEADER ─────────────────────────────────────────────────────── */
   .header{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -92,9 +92,11 @@
     justify-content:space-between;
     align-items:center;
   }
+  /* FIX: 3-block flex identical to index.html */
   .header-brand{flex:1;}
   .header-nav{flex:1;display:flex;justify-content:center;}
-  .header-spacer{flex:1;}
+  .header-info-block{flex:1;display:flex;justify-content:flex-end;align-items:center;}
+
   .brand-title{
     font-size:1.125rem;
     font-weight:700;
@@ -124,10 +126,9 @@
   }
   .page-nav-links a:hover{color:var(--text-primary);}
 
-  /* ── NAV TABS — idéntico al index.html ───────────────────────── */
-  /* En index, el wrapper de tabs NO tiene clase nav-tabs-wrap.
-     Los tabs están dentro de un div sin borde propio — el border
-     viene del .header border-bottom. Aquí replicamos igual. */
+  /* ── NAV TABS — wrapper identical to index.html ──────────────────
+     index.html wraps .nav-tabs in a plain div with bg + border-bottom.
+     We replicate that here. The inner .nav-tabs has NO extra border.  */
   .nav-tabs-container{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -162,8 +163,8 @@
   .page-wrap{max-width:1800px;margin:0 auto;padding:2rem;}
   .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
   .page-title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-primary);}
-  .live-badge{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-secondary);}
-  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 
   .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
@@ -233,7 +234,7 @@
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
 
-  /* ── FOOTER — idéntico al index.html ─────────────────────────── */
+  /* ── FOOTER ───────────────────────────────────────────────────── */
   .footer{
     margin-top:4rem;
     padding:2rem;
@@ -259,13 +260,17 @@
 </head>
 <body>
 
-<!-- ── HEADER — misma estructura exacta del index.html ────────────────────── -->
+<!-- ── HEADER — estructura 3 bloques idéntica a index.html ─────────────────── -->
 <div class="header">
   <div class="header-content">
+
+    <!-- Bloque 1: Brand (izquierda) -->
     <div class="header-brand">
       <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
       <div class="brand-subtitle">Dashboard Profesional</div>
     </div>
+
+    <!-- Bloque 2: Nav links (centro) -->
     <div class="header-nav">
       <div class="page-nav-links">
         <a href="about.html">Acerca de</a>
@@ -275,16 +280,20 @@
         <a href="about.html#recursos">Guías</a>
       </div>
     </div>
-    <div class="header-spacer" style="flex:1;display:flex;justify-content:flex-end;align-items:center;">
+
+    <!-- Bloque 3: Info (derecha) — timestamp único, igual que index -->
+    <div class="header-info-block">
       <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;color:var(--text-secondary);">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0;"></div>
+        <div class="live-dot"></div>
         <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ── NAV TABS ────────────────────────────────────────────────────────────── -->
+<!-- ── NAV TABS — wrapper con border-bottom, igual que index.html ────────────
+     FIX: div.nav-tabs-container se cierra correctamente antes de <main>        -->
 <div class="nav-tabs-container">
   <div class="nav-tabs">
     <a href="index.html" class="nav-tab">Resumen de Divisas</a>
@@ -294,14 +303,14 @@
     <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
     <a href="news.html" class="nav-tab active">Noticias</a>
   </div>
+</div><!-- FIX: cierre correcto de nav-tabs-container ANTES de main -->
 
+<!-- ── CONTENIDO ─────────────────────────────────────────────────────────────
+     FIX: se eliminó el live-badge duplicado con id="ts" que repetía la hora    -->
 <main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
-    <div class="live-badge">
-      <span class="live-dot" aria-hidden="true"></span>
-      Actualizado <span id="ts" style="color:var(--text-primary);margin-left:.3rem;font-weight:500;"></span> <span style="margin-left:.2rem;">(hora local)</span>
-    </div>
+    <!-- FIX: hora eliminada de aquí — ya aparece en el header -->
   </div>
 
   <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
@@ -368,7 +377,7 @@
   </div>
 </main>
 
-<!-- ── FOOTER — idéntico al index.html ────────────────────────────────────── -->
+<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
 <div class="footer">
   <div style="font-weight:600;margin-bottom:.5rem;">
     DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
@@ -408,10 +417,10 @@
 // ── UTILS ────────────────────────────────────────────────────────────────────
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-// ── TIMESTAMP EN HORA LOCAL ───────────────────────────────────────────────────
+// ── TIMESTAMP ────────────────────────────────────────────────────────────────
 const now = new Date();
 const _tsStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-document.getElementById('ts').textContent = _tsStr;
+// Actualizar solo el header — el badge dentro de main fue eliminado
 const _tsHeader = document.getElementById('ts-header');
 if (_tsHeader) _tsHeader.textContent = _tsStr;
 document.getElementById('year').textContent = now.getFullYear();
