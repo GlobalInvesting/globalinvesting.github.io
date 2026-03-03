@@ -45,14 +45,6 @@
           { "@type": "ListItem", "position": 2, "name": "Noticias", "item": "https://globalinvesting.github.io/news.html" }
         ]
       }
-    },
-    {
-      "@type": "NewsMediaOrganization",
-      "name": "Global Investing · Análisis Fundamental Forex",
-      "url": "https://globalinvesting.github.io/",
-      "logo": "https://globalinvesting.github.io/assets/logo.png",
-      "description": "Plataforma de análisis fundamental forex con cobertura de las 8 divisas principales.",
-      "contactPoint": { "@type": "ContactPoint", "contactType": "customer support", "url": "https://globalinvesting.github.io/contact.html" }
     }
   ]
 }
@@ -83,7 +75,7 @@
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
-  /* ── HEADER ─────────────────────────────────────────────────────────────── */
+  /* ── HEADER — idéntico al index.html ─────────────────────────── */
   .header{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -97,9 +89,12 @@
     max-width:1800px;
     margin:0 auto;
     display:flex;
+    justify-content:space-between;
     align-items:center;
   }
-  .header-brand{ flex:1; }
+  .header-brand{flex:1;}
+  .header-nav{flex:1;display:flex;justify-content:center;}
+  .header-spacer{flex:1;}
   .brand-title{
     font-size:1.125rem;
     font-weight:700;
@@ -115,11 +110,6 @@
     letter-spacing:0.05em;
     text-transform:uppercase;
   }
-  .header-nav{
-    flex:1;
-    display:flex;
-    justify-content:center;
-  }
   .page-nav-links{
     display:flex;
     align-items:center;
@@ -133,11 +123,12 @@
     transition:color 0.2s;
   }
   .page-nav-links a:hover{color:var(--text-primary);}
-  .page-nav-links a.active{color:var(--text-primary);}
-  .header-spacer{ flex:1; }
 
-  /* ── NAV TABS ────────────────────────────────────────────────────────────── */
-  .nav-tabs-wrap{
+  /* ── NAV TABS — idéntico al index.html ───────────────────────── */
+  /* En index, el wrapper de tabs NO tiene clase nav-tabs-wrap.
+     Los tabs están dentro de un div sin borde propio — el border
+     viene del .header border-bottom. Aquí replicamos igual. */
+  .nav-tabs-container{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
   }
@@ -167,7 +158,7 @@
   .nav-tab:hover{color:var(--text-primary);}
   .nav-tab.active{color:var(--text-primary);border-bottom-color:var(--blue);}
 
-  /* ── PAGE CONTENT ─────────────────────────────────────────────────────── */
+  /* ── PAGE CONTENT ─────────────────────────────────────────────── */
   .page-wrap{max-width:1800px;margin:0 auto;padding:2rem;}
   .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
   .page-title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-primary);}
@@ -184,7 +175,7 @@
 
   .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
 
-  /* ── NEWS PANEL ───────────────────────────────────────────────────────── */
+  /* ── NEWS PANEL ───────────────────────────────────────────────── */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .panel-header{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
   .news-row{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
@@ -194,7 +185,6 @@
   .news-row.featured:hover{background:rgba(30,136,229,.08);}
   .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
   .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;display:flex;align-items:center;gap:.3rem;}
-  .col-cur .flag{font-size:.82rem;line-height:1;}
   .col-impact{display:flex;align-items:center;}
   .impact-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
   .impact-high .impact-dot{background:var(--red);}
@@ -212,7 +202,7 @@
   .feed-empty a:hover{text-decoration:underline;}
   .feed-error-icon{font-size:2rem;margin-bottom:.75rem;}
 
-  /* ── SIDEBAR ──────────────────────────────────────────────────────────── */
+  /* ── SIDEBAR ──────────────────────────────────────────────────── */
   .sidebar{display:flex;flex-direction:column;gap:1rem;}
   .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
@@ -234,7 +224,6 @@
   .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .ev-row:last-child{border-bottom:none;}
   .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
-  .ev-flag{display:flex;align-items:center;justify-content:center;}
   .ev-time{font-size:.63rem;color:var(--blue);font-weight:600;white-space:nowrap;}
   .ev-body{flex:1;}
   .ev-name{font-size:.72rem;color:var(--text-primary);font-weight:500;line-height:1.3;}
@@ -244,7 +233,7 @@
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
 
-  /* ── FOOTER ──────────────────────────────────────────────────────────── */
+  /* ── FOOTER — idéntico al index.html ─────────────────────────── */
   .footer{
     margin-top:4rem;
     padding:2rem;
@@ -253,19 +242,14 @@
     color:var(--text-tertiary);
     font-size:0.75rem;
   }
-  .footer a{color:var(--text-secondary);text-decoration:none;margin:0 .5rem;}
-  .footer a:hover{color:var(--text-primary);}
-  .footer a.active-link{color:var(--text-primary);}
 
   @media(max-width:1200px){
     .layout-cols{grid-template-columns:1fr;}
   }
   @media(max-width:768px){
-    .header-content{flex-wrap:wrap;gap:.75rem;}
-    .header-brand{flex:0 0 100%;}
-    .header-nav{flex:0 0 100%;justify-content:flex-start;}
-    .header-spacer{display:none;}
+    .header-content{flex-direction:column;align-items:flex-start;gap:.75rem;}
     .page-nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
+    .page-nav-links a{white-space:nowrap;}
     .page-wrap{padding:1rem 1rem 3rem;}
     .panel-header,.news-row{grid-template-columns:36px 60px 60px 1fr 52px;}
     .col-source{display:none;}
@@ -275,7 +259,7 @@
 </head>
 <body>
 
-<!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
+<!-- ── HEADER — misma estructura exacta del index.html ────────────────────── -->
 <div class="header">
   <div class="header-content">
     <div class="header-brand">
@@ -296,7 +280,7 @@
 </div>
 
 <!-- ── NAV TABS ────────────────────────────────────────────────────────────── -->
-<div class="nav-tabs-wrap">
+<div class="nav-tabs-container">
   <div class="nav-tabs">
     <a href="index.html" class="nav-tab">Resumen de Divisas</a>
     <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
@@ -380,9 +364,9 @@
   </div>
 </main>
 
-<!-- ── FOOTER ──────────────────────────────────────────────────────────────── -->
+<!-- ── FOOTER — idéntico al index.html ────────────────────────────────────── -->
 <div class="footer">
-  <div style="font-weight:600;margin-bottom:.5rem;color:var(--text-secondary);">
+  <div style="font-weight:600;margin-bottom:.5rem;">
     DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
   </div>
   <div style="margin-bottom:1rem;">
@@ -391,8 +375,8 @@
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
   </div>
 
-  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;text-align:left;max-width:900px;margin-left:auto;margin-right:auto;">
-    <strong style="color:var(--text-secondary);">Aviso Legal:</strong><br>
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;">
+    <strong>Aviso Legal:</strong><br>
     Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
     Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
     macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
@@ -401,20 +385,19 @@
     Fuentes de noticias: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
   </div>
 
-  <div style="margin-bottom:.75rem;">
-    <a href="index.html">Dashboard</a>
-    <a href="news.html" class="active-link">Noticias</a>
-    <a href="about.html">Acerca de</a>
-    <a href="terms.html">Términos</a>
-    <a href="privacy.html">Privacidad</a>
-    <a href="contact.html">Contacto</a>
-    <a href="about.html#recursos">Guías</a>
+  <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+    <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
+      © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
+    </div>
+    Dashboard v5.2.0
   </div>
-
-  <div style="margin-top:.5rem;">
-    © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
+  <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
+    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
+    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Términos</a>
+    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Privacidad</a>
+    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Contacto</a>
+    <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;">Guías</a>
   </div>
-  <div>Dashboard v5.2.0</div>
 </div>
 
 <script>
@@ -484,35 +467,8 @@ function renderCoverage(articles) {
 
 // ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const BULL_KW = [
-  'rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged',
-  'hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates',
-  'strong','stronger','higher','supports','supported','jumps','jumped','rallies','rallied',
-  'outperforms','exceeds','exceeded','robust','solid','improves','improved','expansion',
-  'growth','confidence','optimism','bullish','tightening','restrictive','upbeat',
-  'beats expectations','above expectations','accelerates','accelerated','record high',
-  'sube','suben','gana','ganan','fortalece','fortalecen','avanza','avanzan',
-  'repunta','repuntan','supera','superan','restrictivo','restrictiva','alza','alzas',
-  'mejora','mejoran','positivo','positiva','optimismo','confianza','expansión','crecimiento',
-  'robusto','robusta','sólido','sólida','impulsa','impulsan','aceleración','máximo','récord',
-  'supera estimaciones','supera expectativas','postura restrictiva','por encima',
-  'más fuerte','subida','mantiene restrictivo','apoya','apoyado','sube tasas'
-];
-const BEAR_KW = [
-  'falls','fallen','fell','drops','dropped','weakens','weakened','declines','declined',
-  'dovish','misses','below estimate','below forecast','cut','rate cut','cuts rates',
-  'weak','weaker','lower','pressures','pressured','slides','slid','sells off','sell-off',
-  'underperforms','disappoints','disappointed','fragile','contraction','slowdown',
-  'concern','concerns','pessimism','bearish','easing','accommodative','downside',
-  'misses expectations','below expectations','decelerates','decelerated','record low',
-  'slumps','slumped','tumbles','tumbled','plunges','plunged',
-  'cae','caen','pierde','pierden','debilita','debilitan','retrocede','retroceden',
-  'baja','bajas','acomodaticio','acomodaticia','recorte','recortes','recorta tasas',
-  'negativo','negativa','pesimismo','preocupación','preocupaciones','contracción',
-  'desaceleración','débil','frágil','presiona','presionan','deterioro','deteriora',
-  'riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo',
-  'pierde terreno','cede terreno','debilidad','bajo mínimos','presión bajista'
-];
+const BULL_KW = ['rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged','hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates','strong','stronger','higher','supports','supported','jumps','jumped','rallies','rallied','outperforms','exceeds','exceeded','robust','solid','improves','improved','expansion','growth','confidence','optimism','bullish','tightening','restrictive','upbeat','beats expectations','above expectations','accelerates','accelerated','record high','sube','suben','gana','ganan','fortalece','fortalecen','avanza','avanzan','repunta','repuntan','supera','superan','restrictivo','restrictiva','alza','alzas','mejora','mejoran','positivo','positiva','optimismo','confianza','expansión','crecimiento','robusto','robusta','sólido','sólida','impulsa','impulsan','aceleración','máximo','récord','supera estimaciones','supera expectativas','postura restrictiva','por encima','más fuerte','subida','mantiene restrictivo','apoya','apoyado','sube tasas'];
+const BEAR_KW = ['falls','fallen','fell','drops','dropped','weakens','weakened','declines','declined','dovish','misses','below estimate','below forecast','cut','rate cut','cuts rates','weak','weaker','lower','pressures','pressured','slides','slid','sells off','sell-off','underperforms','disappoints','disappointed','fragile','contraction','slowdown','concern','concerns','pessimism','bearish','easing','accommodative','downside','misses expectations','below expectations','decelerates','decelerated','record low','slumps','slumped','tumbles','tumbled','plunges','plunged','cae','caen','pierde','pierden','debilita','debilitan','retrocede','retroceden','baja','bajas','acomodaticio','acomodaticia','recorte','recortes','recorta tasas','negativo','negativa','pesimismo','preocupación','preocupaciones','contracción','desaceleración','débil','frágil','presiona','presionan','deterioro','deteriora','riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo','pierde terreno','cede terreno','debilidad','bajo mínimos','presión bajista'];
 function scoreSentiment(text) {
   const lower = (text || '').toLowerCase();
   let bull = 0, bear = 0;
@@ -573,21 +529,15 @@ async function loadUpcomingEvents() {
     upcoming.forEach(e => {
       const imp        = (e.impact||'').toLowerCase();
       const isTomorrow = (e.dateISO === tomorrowISO);
-      const detail     = [
-        e.currency,
-        e.forecast ? 'Est: ' + e.forecast : '',
-        e.previous ? 'Prev: ' + e.previous : ''
-      ].filter(Boolean).join(' · ');
+      const detail     = [e.currency, e.forecast ? 'Est: '+e.forecast : '', e.previous ? 'Prev: '+e.previous : ''].filter(Boolean).join(' · ');
       let localTime = e.timeUTC || '--:--';
       if (e.timeUTC && e.dateISO) {
         try {
           const utcDate = new Date(`${e.dateISO}T${e.timeUTC}:00Z`);
-          if (!isNaN(utcDate.getTime())) {
-            localTime = utcDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
-          }
+          if (!isNaN(utcDate.getTime())) localTime = utcDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
         } catch(_) {}
       }
-      const evCur = (e.currency||'').slice(0, 3).toUpperCase();
+      const evCur = (e.currency||'').slice(0,3).toUpperCase();
       const flag = flagImg(evCur, 20) || '🌐';
       container.innerHTML += `<div class="ev-row">
         <div class="ev-left">
@@ -617,10 +567,7 @@ const CUR_KEYWORDS = [
   ['JPY', ['bank of japan','banco de japón','boj meeting','boj decision','ueda ','jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés','japan gdp','japan cpi','japanese economy','economía japonesa','nikkei index','japan ','japón ']],
   ['USD', ['federal reserve','reserva federal','fomc meeting','fomc decision','powell ','us dollar','dólar estadounidense','usd/','dollar index','dxy ','us gdp','us cpi','us inflation','us jobs','us economy','nonfarm payroll','jobless claims','american economy','economía eeuu','wall street','treasury yield','dow jones','s&p 500','estados unidos','united states','dollar ','dólar ']],
 ];
-const SOURCE_CURRENCY = {
-  'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP',
-  'Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD',
-};
+const SOURCE_CURRENCY = {'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP','Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD'};
 function detectCurrencyWithSource(text, source) {
   if (!text) return SOURCE_CURRENCY[source] || 'USD';
   const lower = text.toLowerCase();
@@ -637,8 +584,6 @@ function detectImpact(title, description) {
   if (MED_IMPACT_KW.some(kw => text.includes(kw))) return 'med';
   return 'low';
 }
-
-// ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
 function tsToLocalTime(ts) {
   if (!ts) return '--:--';
   const ms = ts < 1e10 ? ts * 1000 : ts;
@@ -679,7 +624,7 @@ function renderFeed() {
   }
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
-    const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
+    const ic = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
     const headline = a.ai_headline || a.title;
     body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
@@ -689,12 +634,7 @@ function renderFeed() {
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
-      ${a.ai_headline
-        ? `<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">
-             ${esc(a.ai_headline)}
-             <span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span>
-           </div>`
-        : ''}
+      ${a.ai_headline ? `<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>` : ''}
       <span style="color:var(--text-secondary)">${esc(a.expand || a.description || a.title)}</span>
       ${a.link ? `<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>` : ''}
     </div>`;
@@ -732,8 +672,7 @@ function toggleImpact(btn) {
 // ── INIT FEED ─────────────────────────────────────────────────────────────────
 async function initFeed() {
   try {
-    const cb  = Date.now();
-    const res = await fetch(`news-data/news.json?v=${cb}`);
+    const res = await fetch(`news-data/news.json?v=${Date.now()}`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data     = await res.json();
     const articles = data.articles || [];
@@ -745,7 +684,7 @@ async function initFeed() {
             ...a,
             cur:         detectCurrencyWithSource(text, a.source),
             impact:      a.impact || detectImpact(a.title, a.expand),
-            time: tsToLocalTime(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
+            time:        tsToLocalTime(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
             ai_headline: a.ai_headline || null,
             recent:      a.recent !== undefined ? a.recent : true,
           };
@@ -768,20 +707,17 @@ async function initFeed() {
   feedBody.innerHTML = `<div class="feed-empty">
     <div class="feed-error-icon">⚠️</div>
     <strong>No se pudieron cargar las noticias</strong><br><br>
-    El archivo de noticias no está disponible en este momento.<br>
-    Puede que el proceso de actualización automática aún no haya ejecutado.<br><br>
+    El archivo de noticias no está disponible en este momento.<br><br>
     <strong>Consulte noticias directamente:</strong><br><br>
     <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
     <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES</a><br>
     <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br>
-    <a href="https://news.instaforex.com/news" target="_blank" rel="noopener">InstaForex News</a><br>
     <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a>
   </div>`;
   computeSentiment([]);
   renderCoverage([]);
 }
 
-// ── ARRANQUE ──────────────────────────────────────────────────────────────────
 initFeed();
 loadUpcomingEvents();
 </script>
