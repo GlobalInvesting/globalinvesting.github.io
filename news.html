@@ -739,9 +739,12 @@ function detectImpact(title, description) {
 // ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
 function tsToLocalTime(ts) {
   if (!ts) return '--:--';
-  const d = new Date(ts);
+  // Si ts < 1e10 está en segundos; si >= 1e10 está en milisegundos
+  const ms = ts < 1e10 ? ts * 1000 : ts;
+  const d = new Date(ms);
   if (isNaN(d)) return '--:--';
-  return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+  // [] usa el locale del navegador → toma automáticamente la zona horaria local del usuario
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 // ── FEED STATE ────────────────────────────────────────────────────────────────
