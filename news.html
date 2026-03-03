@@ -66,54 +66,122 @@
     --bg-primary:#0b0e14;
     --bg-secondary:#13171f;
     --bg-card:#1a1f2e;
+    --bg-elevated:#20253a;
     --text-primary:#e1e4e8;
     --text-secondary:#8b949e;
+    --text-tertiary:#6e7681;
     --text-dim:#6b7585;
     --border:#30363d;
+    --border-hover:#484f58;
     --blue:#1e88e5;
     --blue-dim:rgba(30,136,229,0.1);
     --green:#26a69a;
+    --green-strong:#26a69a;
     --red:#ef5350;
+    --red-strong:#ef5350;
     --orange:#e0a020;
   }
-  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;}
-  .site-header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1.5rem 2rem;}
-  .header-inner{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
-  .brand{font-size:1.125rem;font-weight:700;color:var(--text-primary);text-decoration:none;}
-  .brand:hover{color:var(--blue);}
-  .nav-links{display:flex;gap:2rem;}
-  .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;transition:color .2s;}
-  .nav-links a:hover{color:var(--text-primary);}
-  .nav-links a.active{color:var(--blue);}
-  .ticker-wrap{background:var(--bg-secondary);border-bottom:1px solid var(--border);overflow:hidden;height:30px;display:flex;align-items:center;}
-  .ticker-label{font-size:.62rem;font-weight:600;color:var(--text-secondary);background:var(--bg-card);border-right:1px solid var(--border);padding:0 .9rem;height:100%;display:flex;align-items:center;letter-spacing:.08em;flex-shrink:0;}
-  .ticker-overflow{overflow:hidden;flex:1;}
-  .ticker-track{display:flex;animation:ticker-scroll 60s linear infinite;white-space:nowrap;}
-  .ticker-item{font-size:.68rem;padding:0 1.25rem;display:flex;align-items:center;gap:.45rem;border-right:1px solid var(--border);height:30px;}
-  .ticker-pair{color:var(--text-dim);font-weight:500;}
-  .ticker-rate{color:var(--text-primary);font-weight:600;}
-  .ticker-chg.up{color:var(--green);}
-  .ticker-chg.dn{color:var(--red);}
-  .ticker-loading{font-size:.68rem;color:var(--text-dim);padding:0 1rem;}
-  @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-  .page-wrap{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 4rem;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
+
+  /* ── HEADER (matches index.html) ─────────────────────────────────────── */
+  .header{
+    background:var(--bg-secondary);
+    border-bottom:1px solid var(--border);
+    padding:1.25rem 2rem;
+    position:sticky;
+    top:0;
+    z-index:100;
+    backdrop-filter:blur(10px);
+  }
+  .header-content{
+    max-width:1800px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .brand-title{
+    font-size:1.125rem;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    color:var(--text-primary);
+  }
+  .brand-title a{color:inherit;text-decoration:none;}
+  .brand-title a:hover{color:var(--blue);}
+  .brand-subtitle{
+    font-size:0.75rem;
+    color:var(--text-tertiary);
+    font-weight:500;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+  }
+  .page-nav-links{
+    display:flex;
+    align-items:center;
+    gap:1.5rem;
+  }
+  .page-nav-links a{
+    color:var(--text-secondary);
+    text-decoration:none;
+    font-size:0.875rem;
+    font-weight:500;
+    transition:color 0.2s;
+  }
+  .page-nav-links a:hover{color:var(--text-primary);}
+  .page-nav-links a.active{color:var(--text-primary);}
+
+  /* ── NAV TABS (matches index.html nav-tabs) ────────────────────────────── */
+  .nav-tabs{
+    background:var(--bg-secondary);
+    border-bottom:1px solid var(--border);
+    padding:0 2rem;
+    display:flex;
+    gap:0.5rem;
+    max-width:1800px;
+    margin:0 auto;
+    overflow-x:auto;
+  }
+  .nav-tab{
+    padding:1rem 1.5rem;
+    background:transparent;
+    border:none;
+    color:var(--text-secondary);
+    font-size:0.875rem;
+    font-weight:500;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all 0.2s ease;
+    white-space:nowrap;
+    text-decoration:none;
+    display:inline-block;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .nav-tab:hover{color:var(--text-primary);}
+  .nav-tab.active{color:var(--text-primary);border-bottom-color:var(--blue);}
+
+  /* ── PAGE CONTENT ─────────────────────────────────────────────────────── */
+  .page-wrap{max-width:1800px;margin:0 auto;padding:2rem;}
   .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
-  .page-title{font-size:1.1rem;font-weight:700;color:var(--text-primary);}
+  .page-title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-primary);}
   .live-badge{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text-secondary);}
-  .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
   .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
   .filter-btn{font-size:.72rem;font-weight:500;padding:.25rem .7rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;font-family:inherit;}
-  .filter-btn:hover{border-color:#444d5a;color:var(--text-primary);}
+  .filter-btn:hover{border-color:var(--border-hover);color:var(--text-primary);}
   .filter-btn.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
   .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
   .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
+
   .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
+
+  /* ── NEWS PANEL ───────────────────────────────────────────────────────── */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .panel-header{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
   .news-row{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
   .news-row:last-child{border-bottom:none;}
-  .news-row:hover{background:rgba(255,255,255,.03);}
+  .news-row:hover{background:var(--bg-elevated);}
   .news-row.featured{background:rgba(30,136,229,.05);border-left:2px solid var(--blue);}
   .news-row.featured:hover{background:rgba(30,136,229,.08);}
   .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
@@ -135,6 +203,8 @@
   .feed-empty a{color:var(--blue);text-decoration:none;}
   .feed-empty a:hover{text-decoration:underline;}
   .feed-error-icon{font-size:2rem;margin-bottom:.75rem;}
+
+  /* ── SIDEBAR ──────────────────────────────────────────────────────────── */
   .sidebar{display:flex;flex-direction:column;gap:1rem;}
   .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
@@ -166,17 +236,27 @@
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
 
-  .site-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text-secondary);font-size:.85rem;margin-top:3rem;}
-  .site-footer a{color:var(--text-secondary);text-decoration:none;}
-  .site-footer a:hover{color:var(--text-primary);}
-  @media(max-width:900px){
+  /* ── FOOTER (matches index.html) ─────────────────────────────────────── */
+  .footer{
+    margin-top:4rem;
+    padding:2rem;
+    text-align:center;
+    border-top:1px solid var(--border);
+    color:var(--text-tertiary);
+    font-size:0.75rem;
+  }
+  .footer a{color:var(--text-secondary);text-decoration:none;margin:0 .5rem;}
+  .footer a:hover{color:var(--text-primary);}
+
+  @media(max-width:1200px){
     .layout-cols{grid-template-columns:1fr;}
-    .site-header{padding:1rem;}
-    .header-inner{flex-direction:column;align-items:flex-start;gap:.75rem;}
-    .nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
-    .nav-links a{font-size:.85rem;}
+  }
+  @media(max-width:768px){
+    .header-content{flex-direction:column;align-items:flex-start;gap:.75rem;}
+    .page-nav-links{flex-wrap:wrap;gap:.5rem 1.25rem;}
+    .page-nav-links a{white-space:nowrap;}
     .page-wrap{padding:1rem 1rem 3rem;}
-    .panel-header,.news-row { grid-template-columns: 36px 60px 60px 1fr 52px;}
+    .panel-header,.news-row{grid-template-columns:36px 60px 60px 1fr 52px;}
     .col-source{display:none;}
     .col-impact{justify-content:center;}
   }
@@ -184,27 +264,32 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="index.html" class="brand">Análisis Fundamental Forex</a>
-    <nav class="nav-links" aria-label="Navegación principal">
-      <a href="index.html">Dashboard</a>
-      <a href="news.html" class="active" aria-current="page">Noticias</a>
+<!-- ── HEADER (mismo estilo que index.html) ──────────────────────────────── -->
+<div class="header">
+  <div class="header-content">
+    <div>
+      <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
+      <div class="brand-subtitle">Dashboard Profesional</div>
+    </div>
+    <div class="page-nav-links">
       <a href="about.html">Acerca de</a>
       <a href="terms.html">Términos</a>
       <a href="privacy.html">Privacidad</a>
       <a href="contact.html">Contacto</a>
       <a href="about.html#recursos">Guías</a>
-    </nav>
-  </div>
-</header>
-
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker-label">FX LIVE</div>
-  <div class="ticker-overflow">
-    <div class="ticker-track" id="ticker">
-      <span class="ticker-loading">Cargando tipos de cambio…</span>
     </div>
+  </div>
+</div>
+
+<!-- ── NAV TABS (mismo estilo que index.html) ────────────────────────────── -->
+<div style="background:var(--bg-secondary);border-bottom:1px solid var(--border);">
+  <div class="nav-tabs">
+    <a href="index.html" class="nav-tab">Resumen de Divisas</a>
+    <a href="index.html" class="nav-tab">Mapa de Calor</a>
+    <a href="index.html" class="nav-tab">Tendencias Históricas</a>
+    <a href="index.html" class="nav-tab">Calendario Económico</a>
+    <a href="index.html" class="nav-tab">Mejores Pares</a>
+    <a href="news.html"  class="nav-tab active">Noticias ↗</a>
   </div>
 </div>
 
@@ -281,22 +366,34 @@
   </div>
 </main>
 
-<footer class="site-footer">
-  <p>© <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.</p>
-  <p style="margin-top:.5rem;">
-    <a href="index.html">Dashboard</a> |
-    <a href="news.html">Noticias</a> |
-    <a href="about.html">Acerca de</a> |
-    <a href="terms.html">Términos de Servicio</a> |
-    <a href="privacy.html">Política de Privacidad</a> |
-    <a href="contact.html">Contacto</a> |
+<!-- ── FOOTER (mismo estilo que index.html) ──────────────────────────────── -->
+<div class="footer">
+  <div style="font-weight:600;margin-bottom:.5rem;color:var(--text-secondary);">
+    DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
+  </div>
+  <div style="margin-bottom:1rem;">
+    Datos obtenidos de Trading Economics, Frankfurter/ECB y CFTC · Actualización diaria automática
+  </div>
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;text-align:left;max-width:900px;margin-left:auto;margin-right:auto;">
+    <strong style="color:var(--text-secondary);">Aviso Legal:</strong><br>
+    Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
+    Los datos mostrados no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos
+    significativos de pérdida de capital. Consulte con un asesor financiero certificado antes de operar.
+    Fuentes de noticias: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
+  </div>
+  <div>
+    <a href="index.html">Dashboard</a>
+    <a href="news.html" style="color:var(--text-primary);">Noticias</a>
+    <a href="about.html">Acerca de</a>
+    <a href="terms.html">Términos</a>
+    <a href="privacy.html">Privacidad</a>
+    <a href="contact.html">Contacto</a>
     <a href="about.html#recursos">Guías</a>
-  </p>
-  <p style="margin-top:.75rem;font-size:.75rem;color:var(--text-dim);">
-    Los datos mostrados son informativos y no constituyen asesoramiento financiero.
-    Fuentes: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook, bancos centrales.
-  </p>
-</footer>
+  </div>
+  <div style="margin-top:1rem;">
+    © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
+  </div>
+</div>
 
 <script>
 // ── UTILS ────────────────────────────────────────────────────────────────────
@@ -309,24 +406,18 @@ document.getElementById('ts').textContent =
 document.getElementById('year').textContent = now.getFullYear();
 
 // ── BANDERAS POR DIVISA ───────────────────────────────────────────────────────
-// Usamos imágenes SVG de flagcdn.com en lugar de emojis para compatibilidad
-// con Edge/Windows donde los flag emojis no se renderizan correctamente
 const FLAG_CODES = {
   USD:'us', EUR:'eu', GBP:'gb', JPY:'jp',
   AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz',
   US:'us',  EU:'eu',  UK:'gb',  JP:'jp',
   AU:'au',  CA:'ca',  CH:'ch',  NZ:'nz',
 };
-
-// Emojis como fallback para contextos que no admiten imágenes (ej: filter buttons)
 const CURRENCY_FLAGS = {
   USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵',
   AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿',
   US:'🇺🇸',  EU:'🇪🇺',  UK:'🇬🇧',  JP:'🇯🇵',
   AU:'🇦🇺',  CA:'🇨🇦',  CH:'🇨🇭',  NZ:'🇳🇿',
 };
-
-// flagcdn.com acepta tamaños específicos: 16x12, 20x15, 24x18, 32x24, 40x30, 48x36, 64x48
 const FLAG_SIZES = [[16,12],[20,15],[24,18],[32,24],[40,30],[48,36],[64,48]];
 function nearestFlagSize(px) {
   return FLAG_SIZES.reduce((best, s) => Math.abs(s[0]-px) < Math.abs(best[0]-px) ? s : best);
@@ -339,209 +430,21 @@ function flagImg(cur, px = 16) {
   return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-function resolveFlag(cur) {
-  return CURRENCY_FLAGS[cur] || '';
-}
-
-// ── TICKER ────────────────────────────────────────────────────────────────────
-const TICKER_PAIRS = [
-  { pair:'EUR/USD', base:'EUR', quote:'USD' },
-  { pair:'GBP/USD', base:'GBP', quote:'USD' },
-  { pair:'USD/JPY', base:'USD', quote:'JPY' },
-  { pair:'USD/CHF', base:'USD', quote:'CHF' },
-  { pair:'AUD/USD', base:'AUD', quote:'USD' },
-  { pair:'USD/CAD', base:'USD', quote:'CAD' },
-  { pair:'NZD/USD', base:'NZD', quote:'USD' },
-  { pair:'EUR/GBP', base:'EUR', quote:'GBP' },
-  { pair:'EUR/JPY', base:'EUR', quote:'JPY' },
-  { pair:'GBP/JPY', base:'GBP', quote:'JPY' },
-];
-
-// ── CACHÉ DE CIERRE DEL DÍA ANTERIOR (precio de referencia) ──────────────────
-// Clave v4: guarda el cierre de AYER (o el último disponible) como referencia
-// Se separa completamente de la fuente de precios actuales para evitar que ambos
-// devuelvan el mismo valor (que causaba el +0.00%)
-const PREV_CLOSE_KEY = 'fx_prev_close_v4';
-
-function getTodayISO() {
-  return new Date().toISOString().split('T')[0];
-}
-
-// Devuelve la fecha ISO del último día de mercado anterior al actual
-// (si hoy es lunes devuelve viernes, si es martes devuelve lunes, etc.)
-function getPrevMarketDayISO() {
-  const d = new Date();
-  // Retroceder al menos 1 día
-  d.setUTCDate(d.getUTCDate() - 1);
-  // Si es domingo (0) → viernes; si es sábado (6) → viernes
-  const dow = d.getUTCDay();
-  if (dow === 0) d.setUTCDate(d.getUTCDate() - 2);
-  if (dow === 6) d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().split('T')[0];
-}
-
-function loadPrevClose() {
-  try {
-    const raw = localStorage.getItem(PREV_CLOSE_KEY);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    // Válido si se guardó hoy (el cierre de ayer no cambia durante el día)
-    if (obj._fetchedOn === getTodayISO()) return obj;
-    return null;
-  } catch(_) { return null; }
-}
-
-function savePrevClose(priceMap, marketDate) {
-  try {
-    const obj = { ...priceMap, _marketDate: marketDate, _fetchedOn: getTodayISO() };
-    localStorage.setItem(PREV_CLOSE_KEY, JSON.stringify(obj));
-  } catch(_) {}
-}
-
-function ratesToPairPrices(usdRates) {
-  const prices = {};
-  TICKER_PAIRS.forEach(({ pair, base, quote }) => {
-    let p;
-    if (base === 'USD')       p = usdRates[quote];
-    else if (quote === 'USD') p = 1 / usdRates[base];
-    else                      p = usdRates[quote] / usdRates[base];
-    if (p && !isNaN(p)) prices[pair] = p;
-  });
-  return prices;
-}
-
-// Obtiene el cierre del ÚLTIMO DÍA DE MERCADO ANTERIOR a hoy desde Frankfurter.
-// Frankfurter es perfecto para esto: datos históricos precisos del ECB.
-// Este precio se usa SOLO como referencia para calcular el % de cambio diario.
-async function ensurePrevClose() {
-  const cached = loadPrevClose();
-  if (cached && Object.keys(cached).filter(k => !k.startsWith('_')).length > 0) return cached;
-
-  const prevDay = getPrevMarketDayISO();
-  try {
-    const ctrl = new AbortController();
-    setTimeout(() => ctrl.abort(), 8000);
-    // Pedimos explícitamente la fecha del día anterior de mercado
-    const res = await fetch(`https://api.frankfurter.app/${prevDay}?from=EUR`, { signal: ctrl.signal });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data.rates) throw new Error('Sin rates');
-
-    const eurUsd = data.rates['USD'];
-    if (!eurUsd) throw new Error('Sin EUR/USD');
-    const usdRates = { EUR: 1 / eurUsd };
-    Object.entries(data.rates).forEach(([cur, val]) => { usdRates[cur] = val / eurUsd; });
-
-    const prices = ratesToPairPrices(usdRates);
-    savePrevClose(prices, data.date || prevDay);
-    return prices;
-  } catch(_) {
-    return null;
-  }
-}
-
-// Obtiene precios ACTUALES desde APIs que se actualizan cada hora o más frecuente.
-// Se evita usar Frankfurter aquí porque sus datos son idénticos a los del cierre ECB
-// (solo se actualizan una vez al día ~16:00 CET), lo que causaba el +0.00%.
-async function fetchCurrentRates() {
-  // open.er-api.com actualiza cada hora; exchangerate-api.com también
-  // Frankfurter queda como último recurso (sus precios "actuales" son ECB de ayer → 0%)
-  const sources = [
-    'https://open.er-api.com/v6/latest/USD',
-    'https://api.exchangerate-api.com/v4/latest/USD',
-    'https://api.frankfurter.app/latest?from=USD',  // fallback (puede dar 0%)
-  ];
-  for (const url of sources) {
-    try {
-      const ctrl = new AbortController();
-      setTimeout(() => ctrl.abort(), 6000);
-      const res = await fetch(url, { signal: ctrl.signal });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.rates) return data.rates;
-      }
-    } catch(_) {}
-  }
-  return null;
-}
-
-async function fetchAndBuildTicker() {
-  const t = document.getElementById('ticker');
-  try {
-    const [prevClose, rates] = await Promise.all([
-      ensurePrevClose(),
-      fetchCurrentRates(),
-    ]);
-
-    if (!rates) throw new Error('Sin tasas de cambio');
-
-    const items = TICKER_PAIRS.map(({ pair, base, quote }) => {
-      let price;
-      if (base === 'USD')        price = rates[quote];
-      else if (quote === 'USD')  price = 1 / rates[base];
-      else                       price = rates[quote] / rates[base];
-      if (!price || isNaN(price)) return null;
-
-      const decimals = pair.includes('JPY') ? 2 : 4;
-      let chgStr = '', up = null;
-
-      // Comparar precio actual con el cierre del día anterior (fuente diferente)
-      if (prevClose && prevClose[pair]) {
-        const prev = prevClose[pair];
-        if (Math.abs(prev) > 0) {
-          const pct = ((price - prev) / prev) * 100;
-          // Mostrar cualquier cambio >= 0.001% (forex mueve típicamente 0.1–1% al día)
-          if (Math.abs(pct) >= 0.001) {
-            up = pct >= 0;
-            chgStr = `${up ? '+' : ''}${pct.toFixed(2)}%`;
-          }
-        }
-      }
-
-      return { pair, price: price.toFixed(decimals), chgStr, up };
-    }).filter(Boolean);
-
-    const html = [...items, ...items].map(({ pair, price, chgStr, up }) => {
-      const chgHtml = chgStr
-        ? `<span class="ticker-chg ${up ? 'up' : 'dn'}">${esc(chgStr)}</span>`
-        : '';
-      return `<div class="ticker-item">
-        <span class="ticker-pair">${pair}</span>
-        <span class="ticker-rate">${price}</span>
-        ${chgHtml}
-      </div>`;
-    }).join('');
-
-    t.innerHTML = html;
-  } catch(err) {
-    t.innerHTML = `<span class="ticker-loading">Tipos de cambio no disponibles.</span>`;
-  }
-}
-
-fetchAndBuildTicker();
-setInterval(fetchAndBuildTicker, 60000);
-
 // ── COVERAGE RENDER ──────────────────────────────────────────────────────────
-// Muestra cuántas noticias hay por divisa en el pool actual (últimas 72h).
-// Reemplaza el panel de Fuentes RSS que no aportaba información dinámica.
 function renderCoverage(articles) {
   const body = document.getElementById('coverage-body');
   if (!body) return;
-
   const CURRENCIES_ORDERED = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const counts = {};
   const highCounts = {};
   CURRENCIES_ORDERED.forEach(c => { counts[c] = 0; highCounts[c] = 0; });
-
   (articles || []).forEach(a => {
     if (counts[a.cur] !== undefined) {
       counts[a.cur]++;
       if (a.impact === 'high') highCounts[a.cur]++;
     }
   });
-
   const maxCount = Math.max(...Object.values(counts), 1);
-
   body.innerHTML = CURRENCIES_ORDERED.map(cur => {
     const n    = counts[cur] || 0;
     const h    = highCounts[cur] || 0;
@@ -565,7 +468,6 @@ function renderCoverage(articles) {
 
 // ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-
 const BULL_KW = [
   'rises','risen','rose','gains','gained','strengthens','strengthened','surges','surged',
   'hawkish','beats','above estimate','above forecast','hike','rate hike','raises rates',
@@ -595,7 +497,6 @@ const BEAR_KW = [
   'riesgo','riesgos','por debajo','más débil','caída','descenso','bajada','mínimo',
   'pierde terreno','cede terreno','debilidad','bajo mínimos','presión bajista'
 ];
-
 function scoreSentiment(text) {
   const lower = (text || '').toLowerCase();
   let bull = 0, bear = 0;
@@ -605,7 +506,6 @@ function scoreSentiment(text) {
   if (bear > bull) return 'bear';
   return 'neut';
 }
-
 function computeSentiment(articles) {
   const counts = {};
   CURRENCIES.forEach(c => { counts[c] = {bull:0,bear:0,neut:0,total:0}; });
@@ -640,23 +540,19 @@ async function loadUpcomingEvents() {
     const res = await fetch('calendar-data/calendar.json?_=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-
     const todayISO    = new Date().toISOString().split('T')[0];
     const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split('T')[0];
     const allEvents   = data.events || [];
     const highMed     = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
-
     let todayEvents = allEvents.filter(e => e.dateISO === todayISO && highMed(e));
     const useTomorrow = todayEvents.length === 0;
     const upcoming = useTomorrow
       ? allEvents.filter(e => e.dateISO === tomorrowISO && highMed(e)).slice(0, 8)
       : todayEvents.slice(0, 8);
-
     if (upcoming.length === 0) {
       container.innerHTML = '<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';
       return;
     }
-
     container.innerHTML = '';
     upcoming.forEach(e => {
       const imp        = (e.impact||'').toLowerCase();
@@ -666,7 +562,6 @@ async function loadUpcomingEvents() {
         e.forecast ? 'Est: ' + e.forecast : '',
         e.previous ? 'Prev: ' + e.previous : ''
       ].filter(Boolean).join(' · ');
-
       let localTime = e.timeUTC || '--:--';
       if (e.timeUTC && e.dateISO) {
         try {
@@ -676,10 +571,8 @@ async function loadUpcomingEvents() {
           }
         } catch(_) {}
       }
-
       const evCur = (e.currency||'').slice(0, 3).toUpperCase();
       const flag = flagImg(evCur, 20) || '🌐';
-
       container.innerHTML += `<div class="ev-row">
         <div class="ev-left">
           <span class="ev-flag" style="display:flex;align-items:center;justify-content:center;">${flag}</span>
@@ -692,13 +585,10 @@ async function loadUpcomingEvents() {
         <span class="ev-badge ${imp==='high' ? 'badge-h' : 'badge-m'}">${imp==='high' ? 'Alto' : 'Medio'}</span>
       </div>`;
     });
-
   } catch(err) {
     container.innerHTML = '<div class="ev-empty">Calendario no disponible.</div>';
   }
 }
-
-
 
 // ── CURRENCY DETECTION ────────────────────────────────────────────────────────
 const CUR_KEYWORDS = [
@@ -711,12 +601,10 @@ const CUR_KEYWORDS = [
   ['JPY', ['bank of japan','banco de japón','boj meeting','boj decision','ueda ','jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés','japan gdp','japan cpi','japanese economy','economía japonesa','nikkei index','japan ','japón ']],
   ['USD', ['federal reserve','reserva federal','fomc meeting','fomc decision','powell ','us dollar','dólar estadounidense','usd/','dollar index','dxy ','us gdp','us cpi','us inflation','us jobs','us economy','nonfarm payroll','jobless claims','american economy','economía eeuu','wall street','treasury yield','dow jones','s&p 500','estados unidos','united states','dollar ','dólar ']],
 ];
-
 const SOURCE_CURRENCY = {
   'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP',
   'Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD',
 };
-
 function detectCurrencyWithSource(text, source) {
   if (!text) return SOURCE_CURRENCY[source] || 'USD';
   const lower = text.toLowerCase();
@@ -725,10 +613,8 @@ function detectCurrencyWithSource(text, source) {
   }
   return SOURCE_CURRENCY[source] || 'USD';
 }
-
 const HIGH_IMPACT_KW = ['gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','interest rate','tasa de interés','rate decision','decisión de tasas','fed','bce','ecb','boj','boe','rba','jobs','employment','nonfarm','payroll','fomc','hawkish','dovish','recession','recesión','crisis','hike','recorte','cut rates','baja tasas','sube tasas'];
 const MED_IMPACT_KW  = ['pmi','manufacturing','manufactura','retail','ventas minoristas','trade balance','balanza','cot','positioning','current account','cuenta corriente','confidence','confianza','gdp growth','crecimiento','housing','vivienda','earnings','survey','encuesta'];
-
 function detectImpact(title, description) {
   const text = ((title||'') + ' ' + (description||'')).toLowerCase();
   if (HIGH_IMPACT_KW.some(kw => text.includes(kw))) return 'high';
@@ -739,11 +625,9 @@ function detectImpact(title, description) {
 // ── HORA LOCAL DESDE TS ───────────────────────────────────────────────────────
 function tsToLocalTime(ts) {
   if (!ts) return '--:--';
-  // Si ts < 1e10 está en segundos; si >= 1e10 está en milisegundos
   const ms = ts < 1e10 ? ts * 1000 : ts;
   const d = new Date(ms);
   if (isNaN(d)) return '--:--';
-  // [] usa el locale del navegador → toma automáticamente la zona horaria local del usuario
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
@@ -759,12 +643,10 @@ function renderFeed() {
   const loading = document.getElementById('feed-loading');
   if (loading) loading.remove();
   body.setAttribute('aria-busy', 'false');
-
   const filtered = allArticles.filter(a =>
     (activeFilter === 'ALL' || a.cur === activeFilter) &&
     (!highOnly || a.impact === 'high')
   );
-
   if (filtered.length === 0) {
     body.innerHTML = `<div class="feed-empty">
       <div class="feed-error-icon">📰</div>
@@ -779,12 +661,10 @@ function renderFeed() {
     renderCoverage([]);
     return;
   }
-
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
     const ic      = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
     const headline = a.ai_headline || a.title;
-
     body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
       <span class="col-cur">${flagImg(a.cur)}${esc(a.cur)}</span>
@@ -803,15 +683,12 @@ function renderFeed() {
       ${a.link ? `<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>` : ''}
     </div>`;
   });
-
   document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
-
   const aiBadge = document.getElementById('ai-badge');
   if (aiBadge) {
     const hasAI = filtered.slice(0, visible).some(a => a.ai_headline);
     aiBadge.style.display = hasAI ? 'inline' : 'none';
   }
-
   computeSentiment(filtered);
   renderCoverage(allArticles);
 }
@@ -844,7 +721,6 @@ async function initFeed() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data     = await res.json();
     const articles = data.articles || [];
-
     if (articles.length > 0) {
       allArticles = articles
         .map(a => {
@@ -863,19 +739,16 @@ async function initFeed() {
           return true;
         })
         .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-
       renderFeed();
       return;
     }
   } catch(e) {
     console.warn('news.json no disponible:', e.message);
   }
-
   const feedBody = document.getElementById('feed-body');
   const loading  = document.getElementById('feed-loading');
   if (loading) loading.remove();
   feedBody.setAttribute('aria-busy', 'false');
-
   feedBody.innerHTML = `<div class="feed-empty">
     <div class="feed-error-icon">⚠️</div>
     <strong>No se pudieron cargar las noticias</strong><br><br>
