@@ -83,7 +83,7 @@
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
-  /* ── HEADER (matches index.html) ─────────────────────────────────────── */
+  /* ── HEADER (matches index.html exactly) ─────────────────────────────── */
   .header{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
@@ -130,15 +130,17 @@
   .page-nav-links a:hover{color:var(--text-primary);}
   .page-nav-links a.active{color:var(--text-primary);}
 
-  /* ── NAV TABS (matches index.html nav-tabs) ────────────────────────────── */
-  .nav-tabs{
+  /* ── NAV TABS (matches index.html exactly) ────────────────────────────── */
+  .nav-tabs-wrap{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
+  }
+  .nav-tabs{
+    max-width:1800px;
+    margin:0 auto;
     padding:0 2rem;
     display:flex;
     gap:0.5rem;
-    max-width:1800px;
-    margin:0 auto;
     overflow-x:auto;
   }
   .nav-tab{
@@ -236,7 +238,7 @@
   .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
   .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
 
-  /* ── FOOTER (matches index.html) ─────────────────────────────────────── */
+  /* ── FOOTER (matches index.html exactly) ─────────────────────────────── */
   .footer{
     margin-top:4rem;
     padding:2rem;
@@ -245,8 +247,6 @@
     color:var(--text-tertiary);
     font-size:0.75rem;
   }
-  .footer a{color:var(--text-secondary);text-decoration:none;margin:0 .5rem;}
-  .footer a:hover{color:var(--text-primary);}
 
   @media(max-width:1200px){
     .layout-cols{grid-template-columns:1fr;}
@@ -264,7 +264,7 @@
 </head>
 <body>
 
-<!-- ── HEADER (mismo estilo que index.html) ──────────────────────────────── -->
+<!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
 <div class="header">
   <div class="header-content">
     <div>
@@ -281,15 +281,16 @@
   </div>
 </div>
 
-<!-- ── NAV TABS (mismo estilo que index.html) ────────────────────────────── -->
-<div class="nav-tabs">
-  <a href="index.html" class="nav-tab">Resumen de Divisas</a>
+<!-- ── NAV TABS ────────────────────────────────────────────────────────────── -->
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <a href="index.html" class="nav-tab">Resumen de Divisas</a>
     <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
     <a href="index.html?tab=trends" class="nav-tab">Tendencias Históricas</a>
     <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
     <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
     <a href="news.html" class="nav-tab active">Noticias</a>
-</div>
+  </div>
 </div>
 
 <main class="page-wrap">
@@ -365,30 +366,37 @@
   </div>
 </main>
 
-<!-- ── FOOTER (mismo estilo que index.html) ──────────────────────────────── -->
+<!-- ── FOOTER (igual al index.html) ──────────────────────────────────────── -->
 <div class="footer">
-  <div style="font-weight:600;margin-bottom:.5rem;color:var(--text-secondary);">
+  <div style="font-weight:600;margin-bottom:.5rem;">
     DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN
   </div>
   <div style="margin-bottom:1rem;">
-    Datos obtenidos de Trading Economics, Frankfurter/ECB y CFTC · Actualización diaria automática
+    Metodología: Modelo cuantitativo basado en datos económicos reales · 21 indicadores ponderados en 6 tiers<br>
+    Tasas &amp; Ciclo Monetario (25%) · FX Momentum &amp; Smart Money (23%) · Crecimiento &amp; Empleo (17%) · Sentimiento de Mercado (16%) · Balance Externo (10%) · Consumo &amp; Salarios (9%)<br>
+    Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
   </div>
-  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;text-align:left;max-width:900px;margin-left:auto;margin-right:auto;">
-    <strong style="color:var(--text-secondary);">Aviso Legal:</strong><br>
+
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-bottom:1.5rem;font-size:.8125rem;line-height:1.6;max-width:900px;margin-left:auto;margin-right:auto;">
+    <strong style="color:var(--text-primary);">Aviso Legal:</strong><br>
     Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
-    Los datos mostrados no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos
-    significativos de pérdida de capital. Consulte con un asesor financiero certificado antes de operar.
+    Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
+    macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
+    El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
+    Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
     Fuentes de noticias: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
   </div>
-  <div>
-    <a href="index.html">Dashboard</a>
-    <a href="news.html" style="color:var(--text-primary);">Noticias</a>
-    <a href="about.html">Acerca de</a>
-    <a href="terms.html">Términos</a>
-    <a href="privacy.html">Privacidad</a>
-    <a href="contact.html">Contacto</a>
-    <a href="about.html#recursos">Guías</a>
+
+  <div style="margin-top:1rem;">
+    <a href="index.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Dashboard</a>
+    <a href="news.html" style="color:var(--text-primary);text-decoration:none;margin:0 .5rem;">Noticias</a>
+    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Acerca de</a>
+    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Términos</a>
+    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Privacidad</a>
+    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Contacto</a>
+    <a href="about.html#recursos" style="color:var(--text-secondary);text-decoration:none;margin:0 .5rem;">Guías</a>
   </div>
+
   <div style="margin-top:1rem;">
     © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
   </div>
