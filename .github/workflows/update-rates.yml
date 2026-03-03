@@ -79,20 +79,16 @@ jobs:
               - Caps at 36 months.
               """
               def month_key(obs):
-                  # Accept both "YYYY-MM-DD" and "YYYY-MM" formats
                   return obs['date'][:7]  # "YYYY-MM"
 
               def normalise_date(obs):
-                  # Always store as first day of the month
                   return obs['date'][:7] + '-01'
 
-              # Build map keyed by month, normalising dates
               obs_map = {}
               for o in existing:
                   mk = month_key(o)
                   obs_map[mk] = {'date': normalise_date(o), 'value': o['value']}
 
-              # Overwrite/add new observation for this month
               mk_new = month_key(new_obs)
               obs_map[mk_new] = {'date': normalise_date(new_obs), 'value': new_obs['value']}
 
@@ -202,10 +198,6 @@ jobs:
           # ============================================
 
           today = str(date.today())
-          # Canonical date for this observation: first day of current month.
-          # All observations are stored as YYYY-MM-01 so the chart shows
-          # exactly one point per month regardless of how many times the
-          # workflow runs in the same month.
           today_month_start = date.today().strftime('%Y-%m-01')
 
           currencies_needed = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
@@ -240,9 +232,6 @@ jobs:
 
               existing_obs = load_existing_observations(currency)
 
-              # Use today_month_start as the date for the new observation,
-              # NOT today's exact date. This ensures merge_observations()
-              # correctly deduplicates: "2026-03-01" == "2026-03-01" every run.
               new_observation = {
                   'value': final_rates[currency],
                   'date': today_month_start,
@@ -253,7 +242,7 @@ jobs:
 
               rate_data = {
                   'observations': merged_obs,
-                  'lastUpdate': today,          # exact run date, used for "updated X ago"
+                  'lastUpdate': today_month_start,  # ← CAMBIADO: fecha de la observación, no del workflow
                   'totalObservations': len(merged_obs)
               }
 
@@ -293,7 +282,6 @@ jobs:
           print(f'  Updated:  {data[\"lastUpdate\"]}')
           print(f'  History:  {len(obs)} observations')
           print(f'  Oldest:   {obs[-1][\"date\"]} = {obs[-1][\"value\"]}%')
-          # Verify no duplicate months
           months = [o[\"date\"][:7] for o in obs]
           dupes = [m for m in set(months) if months.count(m) > 1]
           if dupes:
