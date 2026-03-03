@@ -3213,7 +3213,11 @@ const indicatorTooltips = {
 
         // ========== COMPONENTE PRINCIPAL ==========
         const ForexDashboard = () => {
-            const [activeTab, setActiveTab] = useState('overview');
+            const [activeTab, setActiveTab] = useState(() => {
+                const params = new URLSearchParams(window.location.search);
+                const tab = params.get('tab');
+                return ['overview','heatmap','trends','calendar','alerts'].includes(tab) ? tab : 'overview';
+            });
             const [forexRates, setForexRates] = useState({});
             const [economicData, setEconomicData] = useState({});
             const [dynamicAlerts, setDynamicAlerts] = useState([]);
