@@ -126,19 +126,15 @@
   }
   .page-nav-links a:hover{color:var(--text-primary);}
 
-  /* ── NAV TABS — wrapper identical to index.html ──────────────────
-     index.html wraps .nav-tabs in a plain div with bg + border-bottom.
-     We replicate that here. The inner .nav-tabs has NO extra border.  */
-  .nav-tabs-wrap{
+  /* ── NAV TABS — estructura idéntica a index.html: un único div ── */
+  .nav-tabs{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
-  }
-  .nav-tabs{
-    max-width:1800px;
-    margin:0 auto;
     padding:0 2rem;
     display:flex;
     gap:0.5rem;
+    max-width:1800px;
+    margin:0 auto;
     overflow-x:auto;
   }
   .nav-tab{
@@ -292,17 +288,14 @@
   </div>
 </div>
 
-<!-- ── NAV TABS — wrapper con border-bottom, igual que index.html ────────────
-     FIX: div.nav-tabs-container se cierra correctamente antes de <main>        -->
-<div class="nav-tabs-wrap">
-  <div class="nav-tabs">
-    <a href="index.html" class="nav-tab">Resumen de Divisas</a>
-    <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
-    <a href="index.html?tab=trends" class="nav-tab">Tendencias Históricas</a>
-    <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
-    <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
-    <a href="news.html" class="nav-tab active">Noticias</a>
-  </div>
+<!-- ── NAV TABS — estructura idéntica a index.html ──────────────────────── -->
+<div class="nav-tabs">
+  <a href="index.html" class="nav-tab">Resumen de Divisas</a>
+  <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
+  <a href="index.html?tab=trends" class="nav-tab">Tendencias Históricas</a>
+  <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
+  <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
+  <a href="news.html" class="nav-tab active">Noticias</a>
 </div>
 
 <!-- ── CONTENIDO ─────────────────────────────────────────────────────────────
