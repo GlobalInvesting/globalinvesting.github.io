@@ -129,7 +129,7 @@
   /* ── NAV TABS — wrapper identical to index.html ──────────────────
      index.html wraps .nav-tabs in a plain div with bg + border-bottom.
      We replicate that here. The inner .nav-tabs has NO extra border.  */
-  .nav-tabs-container{
+  .nav-tabs-wrap{
     background:var(--bg-secondary);
     border-bottom:1px solid var(--border);
   }
@@ -161,7 +161,7 @@
 
   /* ── PAGE CONTENT ─────────────────────────────────────────────── */
   .page-wrap{max-width:1800px;margin:0 auto;padding:2rem;}
-  .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+  .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.75rem;}
   .page-title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-primary);}
 
   .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
@@ -294,7 +294,7 @@
 
 <!-- ── NAV TABS — wrapper con border-bottom, igual que index.html ────────────
      FIX: div.nav-tabs-container se cierra correctamente antes de <main>        -->
-<div class="nav-tabs-container">
+<div class="nav-tabs-wrap">
   <div class="nav-tabs">
     <a href="index.html" class="nav-tab">Resumen de Divisas</a>
     <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
@@ -303,7 +303,7 @@
     <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
     <a href="news.html" class="nav-tab active">Noticias</a>
   </div>
-</div><!-- FIX: cierre correcto de nav-tabs-container ANTES de main -->
+</div>
 
 <!-- ── CONTENIDO ─────────────────────────────────────────────────────────────
      FIX: se eliminó el live-badge duplicado con id="ts" que repetía la hora    -->
