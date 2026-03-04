@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-04",
-  "generatedAt": "2026-03-04T08:40:50.146916Z",
+  "generatedAt": "2026-03-04T16:29:09.602087Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -11,9 +11,9 @@
   "totalEvents": 192,
   "currencyCounts": {
     "EUR": 28,
-    "USD": 88,
+    "USD": 89,
     "NZD": 6,
-    "AUD": 19,
+    "AUD": 18,
     "JPY": 26,
     "CHF": 8,
     "GBP": 9,
@@ -21,8 +21,8 @@
   },
   "impactCounts": {
     "high": 69,
-    "medium": 20,
-    "low": 103
+    "medium": 19,
+    "low": 104
   },
   "events": [
     {
@@ -437,7 +437,7 @@
       "flag": "🇪🇺",
       "event": "HCOB Eurozone Composite PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "51.9",
       "forecast": "51.9",
       "previous": "51.9"
     },
@@ -450,7 +450,7 @@
       "flag": "🇪🇺",
       "event": "HCOB Eurozone Services PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "51.9",
       "forecast": "51.8",
       "previous": "51.8"
     },
@@ -463,7 +463,7 @@
       "flag": "🇬🇧",
       "event": "S&P Global Composite PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "53.7",
       "forecast": "53.9",
       "previous": "53.9"
     },
@@ -476,7 +476,7 @@
       "flag": "🇬🇧",
       "event": "S&P Global Services PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "53.9",
       "forecast": "53.9",
       "previous": "53.9"
     },
@@ -502,7 +502,7 @@
       "flag": "🇪🇺",
       "event": "PPI (MoM)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "0.7%",
       "forecast": "0.2%",
       "previous": "-0.3%"
     },
@@ -515,9 +515,9 @@
       "flag": "🇪🇺",
       "event": "PPI (YoY)  (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-2.1%",
       "forecast": "-2.7%",
-      "previous": "-2.1%"
+      "previous": "-2.0%"
     },
     {
       "date": "4 Mar",
@@ -528,7 +528,7 @@
       "flag": "🇪🇺",
       "event": "Unemployment Rate  (Jan)",
       "impact": "high",
-      "actual": "",
+      "actual": "6.1%",
       "forecast": "6.2%",
       "previous": "6.2%"
     },
@@ -541,7 +541,7 @@
       "flag": "🇺🇸",
       "event": "MBA 30-Year Mortgage Rate",
       "impact": "low",
-      "actual": "",
+      "actual": "6.09%",
       "forecast": "",
       "previous": "6.09%"
     },
@@ -554,7 +554,7 @@
       "flag": "🇺🇸",
       "event": "MBA Mortgage Applications (WoW)",
       "impact": "low",
-      "actual": "",
+      "actual": "11.0%",
       "forecast": "",
       "previous": "0.4%"
     },
@@ -567,7 +567,7 @@
       "flag": "🇺🇸",
       "event": "MBA Purchase Index",
       "impact": "low",
-      "actual": "",
+      "actual": "158.9",
       "forecast": "",
       "previous": "149.7"
     },
@@ -580,7 +580,7 @@
       "flag": "🇺🇸",
       "event": "Mortgage Market Index",
       "impact": "low",
-      "actual": "",
+      "actual": "377.5",
       "forecast": "",
       "previous": "340.2"
     },
@@ -593,7 +593,7 @@
       "flag": "🇺🇸",
       "event": "Mortgage Refinance Index",
       "impact": "low",
-      "actual": "",
+      "actual": "1,637.5",
       "forecast": "",
       "previous": "1,432.9"
     },
@@ -606,9 +606,9 @@
       "flag": "🇺🇸",
       "event": "ADP Nonfarm Employment Change  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "63K",
       "forecast": "50K",
-      "previous": "22K"
+      "previous": "11K"
     },
     {
       "date": "4 Mar",
@@ -619,7 +619,7 @@
       "flag": "🇨🇦",
       "event": "Reserve Assets Total  (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "128.1B",
       "forecast": "",
       "previous": "128.7B"
     },
@@ -632,9 +632,9 @@
       "flag": "🇨🇦",
       "event": "Labor Productivity (QoQ)  (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "-0.1%",
       "forecast": "-0.1%",
-      "previous": "0.9%"
+      "previous": "1.1%"
     },
     {
       "date": "4 Mar",
@@ -658,7 +658,7 @@
       "flag": "🇨🇦",
       "event": "S&P Global Services PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "46.50",
       "forecast": "",
       "previous": "45.80"
     },
@@ -671,9 +671,9 @@
       "flag": "🇺🇸",
       "event": "S&P Global Composite PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "51.9",
       "forecast": "52.3",
-      "previous": "52.3"
+      "previous": "53.0"
     },
     {
       "date": "4 Mar",
@@ -684,9 +684,35 @@
       "flag": "🇺🇸",
       "event": "S&P Global Services PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "51.7",
       "forecast": "52.3",
-      "previous": "52.3"
+      "previous": "52.7"
+    },
+    {
+      "date": "4 Mar",
+      "dateISO": "2026-03-04",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "All Car Sales  (Feb)",
+      "impact": "low",
+      "actual": "2.68M",
+      "forecast": "",
+      "previous": "2.60M"
+    },
+    {
+      "date": "4 Mar",
+      "dateISO": "2026-03-04",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "All Truck Sales  (Feb)",
+      "impact": "low",
+      "actual": "13.07M",
+      "forecast": "",
+      "previous": "12.22M"
     },
     {
       "date": "4 Mar",
@@ -697,7 +723,7 @@
       "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing Business Activity  (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "59.9",
       "forecast": "",
       "previous": "57.4"
     },
@@ -710,7 +736,7 @@
       "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing Employment  (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "51.8",
       "forecast": "",
       "previous": "50.3"
     },
@@ -723,8 +749,8 @@
       "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing New Orders  (Feb)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "",
+      "actual": "58.6",
+      "forecast": "53.5",
       "previous": "53.1"
     },
     {
@@ -736,7 +762,7 @@
       "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing PMI  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "56.1",
       "forecast": "53.5",
       "previous": "53.8"
     },
@@ -749,8 +775,8 @@
       "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing Prices  (Feb)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "",
+      "actual": "63.0",
+      "forecast": "68.3",
       "previous": "66.6"
     },
     {
@@ -762,7 +788,7 @@
       "flag": "🇺🇸",
       "event": "Crude Oil Inventories",
       "impact": "low",
-      "actual": "",
+      "actual": "3.475M",
       "forecast": "3.000M",
       "previous": "15.989M"
     },
@@ -775,7 +801,7 @@
       "flag": "🇺🇸",
       "event": "EIA Refinery Crude Runs  (WoW)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.180M",
       "forecast": "",
       "previous": "-0.416M"
     },
@@ -788,7 +814,7 @@
       "flag": "🇺🇸",
       "event": "Crude Oil Imports",
       "impact": "low",
-      "actual": "",
+      "actual": "-0.019M",
       "forecast": "",
       "previous": "0.412M"
     },
@@ -801,7 +827,7 @@
       "flag": "🇺🇸",
       "event": "Cushing Crude Oil Inventories",
       "impact": "low",
-      "actual": "",
+      "actual": "1.564M",
       "forecast": "",
       "previous": "0.881M"
     },
@@ -814,7 +840,7 @@
       "flag": "🇺🇸",
       "event": "Distillate Fuel Production",
       "impact": "low",
-      "actual": "",
+      "actual": "0.061M",
       "forecast": "",
       "previous": "-0.136M"
     },
@@ -827,7 +853,7 @@
       "flag": "🇺🇸",
       "event": "EIA Weekly Distillates Stocks",
       "impact": "low",
-      "actual": "",
+      "actual": "0.429M",
       "forecast": "-2.600M",
       "previous": "0.252M"
     },
@@ -840,7 +866,7 @@
       "flag": "🇺🇸",
       "event": "Gasoline Production",
       "impact": "low",
-      "actual": "",
+      "actual": "0.119M",
       "forecast": "",
       "previous": "-0.223M"
     },
@@ -853,7 +879,7 @@
       "flag": "🇺🇸",
       "event": "Heating Oil Stockpiles",
       "impact": "low",
-      "actual": "",
+      "actual": "0.355M",
       "forecast": "",
       "previous": "-0.119M"
     },
@@ -866,7 +892,7 @@
       "flag": "🇺🇸",
       "event": "EIA Weekly Refinery Utilization Rates (WoW)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.6%",
       "forecast": "",
       "previous": "-2.4%"
     },
@@ -879,7 +905,7 @@
       "flag": "🇺🇸",
       "event": "Gasoline Inventories",
       "impact": "low",
-      "actual": "",
+      "actual": "-1.704M",
       "forecast": "-1.000M",
       "previous": "-1.011M"
     },
@@ -971,7 +997,7 @@
       "event": "Trade Balance  (Jan)",
       "impact": "high",
       "actual": "",
-      "forecast": "3.890B",
+      "forecast": "3.780B",
       "previous": "3.373B"
     },
     {
@@ -1062,7 +1088,7 @@
       "event": "S&P Global Construction PMI  (Feb)",
       "impact": "high",
       "actual": "",
-      "forecast": "47.1",
+      "forecast": "47.0",
       "previous": "46.4"
     },
     {
@@ -1075,7 +1101,7 @@
       "event": "Retail Sales (MoM)  (Jan)",
       "impact": "high",
       "actual": "",
-      "forecast": "0.2%",
+      "forecast": "0.3%",
       "previous": "-0.5%"
     },
     {
@@ -1088,7 +1114,7 @@
       "event": "Retail Sales (YoY)  (Jan)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "1.7%",
       "previous": "1.3%"
     },
     {
@@ -1153,7 +1179,7 @@
       "event": "Continuing Jobless Claims",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "1,850K",
       "previous": "1,833K"
     },
     {
@@ -1166,7 +1192,7 @@
       "event": "Export Price Index (MoM)  (Jan)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.3%",
       "previous": "0.3%"
     },
     {
@@ -1205,7 +1231,7 @@
       "event": "Import Price Index (MoM)  (Jan)",
       "impact": "medium",
       "actual": "",
-      "forecast": "0.2%",
+      "forecast": "0.3%",
       "previous": "0.1%"
     },
     {
@@ -1270,7 +1296,7 @@
       "event": "Nonfarm Productivity (QoQ)  (Q4)",
       "impact": "high",
       "actual": "",
-      "forecast": "1.7%",
+      "forecast": "1.9%",
       "previous": "4.9%"
     },
     {
@@ -1283,7 +1309,7 @@
       "event": "Unit Labor Costs (QoQ)  (Q4)",
       "impact": "low",
       "actual": "",
-      "forecast": "2.1%",
+      "forecast": "2.0%",
       "previous": "-1.9%"
     },
     {
@@ -1322,7 +1348,7 @@
       "event": "Natural Gas Storage",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "-122B",
       "previous": "-52B"
     },
     {
@@ -1549,80 +1575,15 @@
     {
       "date": "6 Mar",
       "dateISO": "2026-03-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Core Retail Sales (MoM)  (Jan)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "0.0%",
-      "previous": "0.0%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Retail Control (MoM)  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "-0.1%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Retail Sales (MoM)  (Jan)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "-0.3%",
-      "previous": "0.0%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Retail Sales (YoY)  (Jan)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "2.43%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Retail Sales Ex Gas/Autos (MoM)  (Jan)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "0.0%",
-      "previous": "0.0%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
       "timeUTC": "13:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Average Hourly Earnings (MoM)  (Feb)",
+      "event": "Average Hourly Earnings (YoY) (YoY)  (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "0.3%",
-      "previous": "0.4%"
+      "forecast": "",
+      "previous": "3.7%"
     },
     {
       "date": "6 Mar",
@@ -1636,6 +1597,19 @@
       "actual": "",
       "forecast": "34.3",
       "previous": "34.3"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Core Retail Sales (MoM)  (Jan)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "0.0%",
+      "previous": "0.0%"
     },
     {
       "date": "6 Mar",
@@ -1701,6 +1675,58 @@
       "actual": "",
       "forecast": "70K",
       "previous": "172K"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Control (MoM)  (Jan)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.1%"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales (MoM)  (Jan)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "-0.3%",
+      "previous": "0.0%"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales (YoY)  (Jan)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "2.43%"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Sales Ex Gas/Autos (MoM)  (Jan)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "0.0%",
+      "previous": "0.0%"
     },
     {
       "date": "6 Mar",
@@ -2320,11 +2346,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Household Spending (MoM)  (Jan)",
+      "event": "Household Spending (YoY)  (Jan)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-2.9%"
+      "previous": "-2.6%"
     },
     {
       "date": "9 Mar",
@@ -2333,11 +2359,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Household Spending (YoY)  (Jan)",
+      "event": "Household Spending (MoM)  (Jan)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-2.6%"
+      "previous": "-2.9%"
     },
     {
       "date": "9 Mar",
@@ -2494,32 +2520,6 @@
       "actual": "",
       "forecast": "",
       "previous": "7"
-    },
-    {
-      "date": "10 Mar",
-      "dateISO": "2026-03-10",
-      "timeUTC": "00:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Private House Approvals  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "1.1%",
-      "previous": "1.2%"
-    },
-    {
-      "date": "10 Mar",
-      "dateISO": "2026-03-10",
-      "timeUTC": "10:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "NFIB Small Business Optimism  (Feb)",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "99.3"
     }
   ]
 }
