@@ -54,10 +54,6 @@ jobs:
               return None
 
           def parse_reference_date(ref_text):
-              """
-              Convierte 'Jan/26' -> '2026-01-01', 'Feb/26' -> '2026-02-01', etc.
-              Si no puede parsear, devuelve None.
-              """
               if not ref_text:
                   return None
               ref_text = ref_text.strip()
@@ -89,25 +85,16 @@ jobs:
                   return []
 
           def merge_observations(existing, new_obs):
-              """
-              Deduplicates by MONTH (YYYY-MM).
-              Normalises all dates to YYYY-MM-01.
-              Keeps sorted most-recent first, capped at 36 months.
-              """
               def month_key(obs):
                   return obs['date'][:7]
-
               def normalise_date(obs):
                   return obs['date'][:7] + '-01'
-
               obs_map = {}
               for o in existing:
                   mk = month_key(o)
                   obs_map[mk] = {'date': normalise_date(o), 'value': o['value']}
-
               mk_new = month_key(new_obs)
               obs_map[mk_new] = {'date': normalise_date(new_obs), 'value': new_obs['value']}
-
               sorted_obs = sorted(obs_map.values(), key=lambda x: x['date'], reverse=True)
               return sorted_obs[:36]
 
@@ -115,7 +102,6 @@ jobs:
               print("\n" + "="*70)
               print("SOURCE: Trading Economics (Interest Rates + Reference Dates)")
               print("="*70)
-
               try:
                   url = "https://tradingeconomics.com/country-list/interest-rate?continent=world"
                   r = requests.get(url, headers=HEADERS, timeout=15)
@@ -125,7 +111,6 @@ jobs:
                       r = requests.get(url, headers=HEADERS, timeout=15)
                   r.raise_for_status()
                   soup = BeautifulSoup(r.content, 'lxml')
-
                   results = {}
                   country_map = {
                       'United States': 'USD',
@@ -137,50 +122,37 @@ jobs:
                       'Switzerland':   'CHF',
                       'New Zealand':   'NZD'
                   }
-
                   table = soup.find('table', {'class': 'table'})
                   if not table:
                       print("  ERROR: No table found")
                       return results
-
-                  # Detectar índices de columnas desde el thead
                   headers_row = table.find('thead')
                   header_texts = []
                   if headers_row:
                       header_texts = [th.get_text(strip=True).lower()
                                       for th in headers_row.find_all('th')]
-
-                  last_idx = 1      # columna "Last"
-                  ref_idx  = 3      # columna "Reference" (default según HTML analizado)
-
+                  last_idx = 1
+                  ref_idx  = 3
                   if header_texts:
                       for i, h in enumerate(header_texts):
                           if 'last' in h:
                               last_idx = i
                           if 'reference' in h:
                               ref_idx = i
-
                   print(f"  Column indices → Last={last_idx}, Reference={ref_idx}")
-
                   for row in table.find_all('tr')[1:]:
                       cols = row.find_all('td')
                       if len(cols) < 2:
                           continue
-
                       country = cols[0].get_text(strip=True)
-
                       for country_name, currency in country_map.items():
                           if country_name.lower() in country.lower():
-                              # Tasa
                               rate_text = cols[last_idx].get_text(strip=True) if last_idx < len(cols) else ''
                               rate = clean_rate(rate_text)
-
-                              # Fecha de la decisión (columna Reference)
                               ref_text = ''
                               if ref_idx < len(cols):
                                   ref_text = cols[ref_idx].get_text(strip=True)
                               ref_date = parse_reference_date(ref_text)
-
                               if rate is not None:
                                   results[currency] = {
                                       'rate': rate,
@@ -189,9 +161,7 @@ jobs:
                                   }
                                   print(f"  OK {currency}: {rate}%  reference={ref_text} → {ref_date}")
                               break
-
                   return results
-
               except Exception as e:
                   print(f"  ERROR: {e}")
                   return {}
@@ -266,11 +236,20 @@ jobs:
               entry = final_rates[currency]
               rate_value = entry['rate']
 
-              # Fecha real de la decisión del banco central (de la columna Reference)
-              # Si no está disponible, caer al primer día del mes de ejecución
               observation_date = entry['ref_date'] if entry['ref_date'] else today_month_start
 
               existing_obs = load_existing_observations(currency)
+
+              # Eliminar observaciones posteriores al Reference date (limpia entradas fantasma)
+              if entry['ref_date']:
+                  before_count = len(existing_obs)
+                  existing_obs = [
+                      o for o in existing_obs
+                      if o['date'][:7] <= observation_date[:7]
+                  ]
+                  removed = before_count - len(existing_obs)
+                  if removed > 0:
+                      print(f"  CLEANED {currency}: eliminadas {removed} obs posteriores a {observation_date[:7]}")
 
               new_observation = {
                   'value': rate_value,
@@ -282,7 +261,7 @@ jobs:
 
               rate_data = {
                   'observations':      merged_obs,
-                  'lastUpdate':        observation_date,   # ← fecha real de la decisión del BC
+                  'lastUpdate':        observation_date,
                   'totalObservations': len(merged_obs)
               }
 
@@ -299,9 +278,9 @@ jobs:
               print(f"\nALL CURRENCIES UPDATED OK")
 
           EOFPYTHON
-
+          
           python fetch_rates.py
-
+      
       - name: Display summary
         run: |
           echo ""
@@ -332,7 +311,7 @@ jobs:
               echo ""
             fi
           done
-
+      
       - name: Commit and push
         run: |
           git config user.name github-actions
