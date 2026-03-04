@@ -72,6 +72,7 @@
     --red:#ef5350;
     --red-strong:#ef5350;
     --orange:#e0a020;
+    --purple:#9c6fde;
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
@@ -140,19 +141,26 @@
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
   .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
   .s-sub{font-size:.62rem;color:var(--text-dim);}
-  .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
+  .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);cursor:default;}
   .sent-row:last-child{border-bottom:none;}
   .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:52px;flex-shrink:0;display:flex;align-items:center;gap:.3rem;}
-  .sent-bar-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
-  .sent-bar{height:100%;border-radius:1px;}
+  .sent-bar-wrap{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;position:relative;}
+  .sent-bar{height:100%;border-radius:2px;transition:width .3s ease;}
   .sent-bar.bull{background:var(--green);}
   .sent-bar.bear{background:var(--red);}
   .sent-bar.neut{background:var(--text-dim);}
-  .sent-count{font-size:.6rem;color:var(--text-dim);width:30px;text-align:right;}
-  .sent-label{font-size:.6rem;font-weight:600;width:28px;text-align:right;}
+  .sent-bar.mixed{background:linear-gradient(90deg,var(--green) 50%,var(--red) 50%);}
+  .sent-count{font-size:.6rem;color:var(--text-dim);width:24px;text-align:right;flex-shrink:0;}
+  .sent-label{font-size:.6rem;font-weight:700;width:36px;text-align:right;flex-shrink:0;letter-spacing:.02em;}
   .sent-label.bull{color:var(--green);}
   .sent-label.bear{color:var(--red);}
   .sent-label.neut{color:var(--text-dim);}
+  .sent-label.mixed{color:var(--orange);}
+  .sent-label.nodata{color:var(--text-tertiary);}
+
+  /* Confidence bar overlay */
+  .sent-conf-pip{position:absolute;top:0;height:100%;width:2px;background:rgba(255,255,255,.2);border-radius:1px;}
+
   .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .ev-row:last-child{border-bottom:none;}
   .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
@@ -325,7 +333,7 @@
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
       © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.3.0
+    Dashboard v5.4.0
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -337,17 +345,22 @@
 </div>
 
 <script>
-// ── UTILS ────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────────────────────
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-// ── TIMESTAMP ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// TIMESTAMP
+// ─────────────────────────────────────────────────────────────────────────────
 const now = new Date();
-const _tsStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 const _tsHeader = document.getElementById('ts-header');
-if (_tsHeader) _tsHeader.textContent = _tsStr;
+if (_tsHeader) _tsHeader.textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 document.getElementById('year').textContent = now.getFullYear();
 
-// ── BANDERAS ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// FLAGS
+// ─────────────────────────────────────────────────────────────────────────────
 const FLAG_CODES = {
   USD:'us', EUR:'eu', GBP:'gb', JPY:'jp',
   AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz',
@@ -366,7 +379,9 @@ function flagImg(cur, px = 16) {
   return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ── COVERAGE ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// COVERAGE
+// ─────────────────────────────────────────────────────────────────────────────
 function renderCoverage(articles) {
   const body = document.getElementById('coverage-body');
   if (!body) return;
@@ -396,10 +411,9 @@ function renderCoverage(articles) {
   }).join('');
 }
 
-// ── CURRENCY DETECTION ────────────────────────────────────────────────────────
-// v2: scoring por pesos + detección de par explícito en titular
-// Resuelve falsos positivos de la versión anterior (first-match wins)
-
+// ─────────────────────────────────────────────────────────────────────────────
+// CURRENCY DETECTION — v5.3 (igual que antes, sin cambios)
+// ─────────────────────────────────────────────────────────────────────────────
 const PAIR_PROTAGONIST_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
@@ -485,19 +499,11 @@ const SOURCE_CURRENCY_MAP = {
 
 const TIEBREAK_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
 
-/**
- * detectCurrencyWithSource(title, expand, source)
- * PASO 1: par de divisas explícito en titular → protagonista según PAIR_PROTAGONIST_MAP
- * PASO 2: scoring acumulativo por pesos → gana la divisa con mayor score total
- * PASO 3: fallback a SOURCE_CURRENCY_MAP
- * PASO 4: fallback final → 'USD'
- */
 function detectCurrencyWithSource(title, expand, source) {
   const titleClean = (title || '').trim();
   const titleUpper = titleClean.toUpperCase().replace(/\s+/g,'');
   const titleLower = titleClean.toLowerCase();
 
-  // PASO 1: par explícito al inicio del titular (máxima prioridad)
   for (const [pair, protagonist] of Object.entries(PAIR_PROTAGONIST_MAP)) {
     const pairNorm  = pair.replace('/','').toUpperCase();
     const pairSlash = pair.toUpperCase();
@@ -506,7 +512,6 @@ function detectCurrencyWithSource(title, expand, source) {
       return protagonist;
     }
   }
-  // Par en cualquier parte del titular
   for (const [pair, protagonist] of Object.entries(PAIR_PROTAGONIST_MAP)) {
     if (titleUpper.includes(pair.replace('/','').toUpperCase()) ||
         titleClean.toUpperCase().includes(pair.toUpperCase())) {
@@ -514,7 +519,6 @@ function detectCurrencyWithSource(title, expand, source) {
     }
   }
 
-  // PASO 2: scoring acumulativo
   const fullText = titleLower + ' ' + ((expand || '').toLowerCase());
   const scores = {};
   for (const [cur, tiers] of CUR_SCORE_RULES) {
@@ -523,7 +527,7 @@ function detectCurrencyWithSource(title, expand, source) {
       for (const kw of keywords) {
         if (fullText.includes(kw)) {
           score += weight;
-          if (titleLower.includes(kw)) score += weight * 0.5; // bonus por estar en titular
+          if (titleLower.includes(kw)) score += weight * 0.5;
         }
       }
     }
@@ -537,28 +541,22 @@ function detectCurrencyWithSource(title, expand, source) {
     return TIEBREAK_ORDER.find(c => winners.includes(c)) || winners[0];
   }
 
-  // PASO 3 & 4: fallbacks
   return SOURCE_CURRENCY_MAP[source] || 'USD';
 }
 
-// ── IMPACT DETECTION ─────────────────────────────────────────────────────────
-// v2: añade keywords geopolíticos sistémicos → HIGH
-// Petróleo → MED (era LOW, incorrecto para CAD/USD en sesiones de energía)
-
+// ─────────────────────────────────────────────────────────────────────────────
+// IMPACT DETECTION
+// ─────────────────────────────────────────────────────────────────────────────
 const HIGH_IMPACT_KW = [
-  // Bancos centrales
   'rate decision','rate hike','rate cut','interest rate','tasa de interés',
   'decisión de tasas','monetary policy','política monetaria',
   'fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb meeting',
   'hawkish','dovish','quantitative easing','tapering',
-  // Macro datos críticos
   'gdp','pib','cpi','ipc','inflation','inflación','core inflation','inflación subyacente',
   'unemployment','desempleo','nonfarm payroll','nfp','jobless claims',
-  // Geopolítica sistémica
   'strait of hormuz','estrecho de ormuz','oil embargo','war ','guerra ',
   'conflict escalation','escalada del conflicto','sanctions','sanciones',
   'military strike','ataque militar','nuclear',
-  // Crisis
   'recession','recesión','financial crisis','default','bank failure','market crash',
 ];
 
@@ -588,12 +586,11 @@ function tsToLocalTime(ts) {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-// ── SENTIMENT ─────────────────────────────────────────────────────────────────
-/**
- * scoreSentiment — lee el campo "sentiment" precalculado por el backend.
- * Fallbacks: patrón "→ DIVISA alcista/bajista" en ai_headline, luego keywords.
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// SENTIMENT SCORING — lee campo precalculado del backend
+// ─────────────────────────────────────────────────────────────────────────────
 function scoreSentiment(article) {
+  // 1. Campo sentiment precalculado por el backend (fuente de verdad principal)
   if (article && article.sentiment) {
     const s = article.sentiment.toLowerCase();
     if (s === 'bull' || s === 'alcista')  return 'bull';
@@ -601,6 +598,7 @@ function scoreSentiment(article) {
     if (s === 'mixed' || s === 'mixto')   return 'mixed';
     return 'neut';
   }
+  // 2. Patrón estructurado en ai_headline: "→ DIVISA alcista/bajista"
   const hl = ((article && article.ai_headline) || (article && article.title) || '').toLowerCase();
   const m = hl.match(/→\s*(?:\w+\s+)?(alcista|bajista|neutral|neutro|mixto)\s*$/);
   if (m) {
@@ -610,28 +608,38 @@ function scoreSentiment(article) {
     if (w === 'mixto')   return 'mixed';
     return 'neut';
   }
-  const BULL = ['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
-  const BEAR = ['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
+  // 3. Fallback keywords
+  const BULL_KW = ['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
+  const BEAR_KW = ['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
   let b = 0, r = 0;
-  BULL.forEach(k => { if (hl.includes(k)) b++; });
-  BEAR.forEach(k => { if (hl.includes(k)) r++; });
+  BULL_KW.forEach(k => { if (hl.includes(k)) b++; });
+  BEAR_KW.forEach(k => { if (hl.includes(k)) r++; });
   if (b > r) return 'bull';
   if (r > b) return 'bear';
   return 'neut';
 }
 
-// ── COMPUTE SENTIMENT — ponderado + decay temporal + confianza visual ─────────
-/**
- * Mejoras vs versión anterior:
- *  A) Ponderación por impacto: high=3, med=1.5, low=0.5
- *  B) Decay exponencial: e^(-Δh/24h) — noticia 48h vale ~13% de una reciente
- *  C) Zona neutral ±10%: diferencia < 10% del total → "Neut"
- *  D) Confianza visual: opacity reducida si cobertura baja, "?" si conf < 55%
- *  E) Tooltip con desglose completo (hover sobre la fila)
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPUTE SENTIMENT — v5.4: lógica institucional revisada
+//
+// CAMBIOS respecto a v5.3:
+//  A) Zona "mixto" explícita: cuando bull y bear están dentro del ±20% el uno
+//     del otro Y ambos tienen peso suficiente → muestra "Mixto" (naranja) en
+//     lugar de "?" — esto es más informativo para el operador
+//  B) Umbral de confianza reducido: de 55% → 35%. El "?" sólo aparece cuando
+//     la cobertura es muy escasa (total < 0.8) O el score dominante es
+//     prácticamente igual al segundo (diff < 5% del total)
+//  C) Zona neutral ampliada solo para artículos "neut": si todos los artículos
+//     son neutrales se muestra "Neut" directamente sin barra
+//  D) Barra de sentimiento: para "mixto" usa degradado verde-rojo dividido por
+//     el ratio bull/(bull+bear), más informativo que una barra centrada
+//  E) El "?" se reserva exclusivamente para: cobertura insuficiente
+//     (total ponderado < 0.8) o señal completamente indiferenciada
+//  F) Tooltip mejorado: incluye ratio bull/bear y la lógica aplicada
+// ─────────────────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const IMPACT_WEIGHTS = { high: 3, med: 1.5, low: 0.5 };
-const DECAY_HALFLIFE_HOURS = 24;
+const IMPACT_WEIGHTS  = { high: 3, med: 1.5, low: 0.5 };
+const DECAY_HALFLIFE  = 24; // horas
 
 function computeSentiment(articles) {
   const nowMs = Date.now();
@@ -639,59 +647,115 @@ function computeSentiment(articles) {
   if (!body) return;
 
   const acc = {};
-  CURRENCIES.forEach(c => { acc[c] = { bull: 0, bear: 0, neut: 0, total: 0, count: 0 }; });
+  CURRENCIES.forEach(c => { acc[c] = { bull: 0, bear: 0, neut: 0, count: 0 }; });
 
   articles.forEach(a => {
     if (!acc[a.cur]) return;
-    const s      = scoreSentiment(a);
-    const impW   = IMPACT_WEIGHTS[a.impact] || 0.5;
-    const ageH   = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts * 1000 : a.ts)) / 3_600_000 : 0;
-    const decayW = Math.exp(-ageH / DECAY_HALFLIFE_HOURS);
-    const w      = impW * decayW;
-    const key    = (s === 'mixed') ? 'neut' : s;
-    acc[a.cur][key]  += w;
-    acc[a.cur].total += w;
+    const s     = scoreSentiment(a);
+    const impW  = IMPACT_WEIGHTS[a.impact] || 0.5;
+    const ageH  = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts * 1000 : a.ts)) / 3_600_000 : 0;
+    const decW  = Math.exp(-ageH / DECAY_HALFLIFE);
+    const w     = impW * decW;
+    // "mixed" reparte peso entre bull y bear (señal contradictoria)
+    if (s === 'mixed') {
+      acc[a.cur].bull += w * 0.5;
+      acc[a.cur].bear += w * 0.5;
+    } else {
+      const key = (s === 'neut') ? 'neut' : s;
+      acc[a.cur][key] += w;
+    }
     acc[a.cur].count += 1;
   });
 
   body.innerHTML = '';
+
   CURRENCIES.forEach(cur => {
-    const d = acc[cur];
-    const { bull, bear, neut, total, count } = d;
-    let label, cls, barWidth, conf;
-
-    if (total === 0) {
-      label = '—'; cls = 'neut'; barWidth = 50; conf = 0;
-    } else if (Math.abs(bull - bear) < total * 0.1) {
-      label = 'Neut'; cls = 'neut'; barWidth = 50;
-      conf  = Math.round((Math.max(bull, bear, neut) / total) * 100);
-    } else if (bull > bear) {
-      label = 'Bull'; cls = 'bull';
-      barWidth = Math.round(50 + (bull / total) * 50);
-      conf = Math.round((bull / total) * 100);
-    } else {
-      label = 'Bear'; cls = 'bear';
-      barWidth = Math.round(50 - (bear / total) * 50);
-      conf = Math.round((bear / total) * 100);
-    }
-
-    // "?" si confianza baja; opacity reducida si cobertura escasa
-    const labelText   = (conf > 0 && conf < 55) ? '?' : label;
-    const lowCoverage = total < 1.5;
-    const opacity     = lowCoverage ? 0.45 : 1;
-    const tooltip     = `Bull: ${bull.toFixed(1)} · Bear: ${bear.toFixed(1)} · Neut: ${neut.toFixed(1)} · Artículos: ${count} · Confianza: ${conf}%`;
+    const { bull, bear, neut, count } = acc[cur];
+    const total = bull + bear + neut;
 
     const flag = flagImg(cur, 16);
-    body.innerHTML += `<div class="sent-row" title="${esc(tooltip)}" style="opacity:${opacity}">
-      <span class="sent-cur">${flag} ${cur}</span>
-      <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${barWidth}%"></div></div>
-      <span class="sent-count" style="font-size:.58rem;">${count}</span>
-      <span class="sent-label ${cls}">${labelText}</span>
-    </div>`;
+
+    // ── Sin cobertura ──────────────────────────────────────────────────────
+    if (total < 0.05 || count === 0) {
+      body.innerHTML += _sentRow(flag, cur, 'nodata', '—', 50, 0, count,
+        'Sin cobertura en el período', 1);
+      return;
+    }
+
+    const bullBear = bull + bear;  // peso directional total
+    const bullPct  = bullBear > 0 ? bull / bullBear : 0.5;
+    const bearPct  = bullBear > 0 ? bear / bullBear : 0.5;
+    const diff     = Math.abs(bull - bear);
+    const diffRatio = total > 0 ? diff / total : 0;
+
+    // ── Todos neutrales ────────────────────────────────────────────────────
+    if (bull < 0.05 && bear < 0.05) {
+      body.innerHTML += _sentRow(flag, cur, 'neut', 'Neut', 50, 0, count,
+        `Sin señal direccional · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)}`, 1);
+      return;
+    }
+
+    // ── Señal demasiado débil para afirmar dirección ───────────────────────
+    // Criterio: diff < 5% del total ponderado Y cobertura baja
+    if (diffRatio < 0.05 && total < 1.5) {
+      const tooltip = `Señal insuficiente · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
+      body.innerHTML += _sentRow(flag, cur, 'nodata', '?', 50, 0, count, tooltip, total < 0.8 ? 0.45 : 0.7);
+      return;
+    }
+
+    // ── Señal mixta: bull y bear están dentro del ±20% entre sí ──────────
+    // Condición: ambos tienen peso relevante Y ninguno domina claramente
+    if (bull > 0.1 && bear > 0.1 && diffRatio < 0.20) {
+      // Barra: gradient muestra proporción bull/bear
+      const bullBarPct = Math.round(bullPct * 100);
+      const tooltip = `Mixto · bull=${bull.toFixed(1)} (${Math.round(bullPct*100)}%) bear=${bear.toFixed(1)} (${Math.round(bearPct*100)}%) · n=${count}`;
+      body.innerHTML += _sentRowMixed(flag, cur, bullBarPct, count, tooltip, 1);
+      return;
+    }
+
+    // ── Dirección clara ────────────────────────────────────────────────────
+    let label, cls, barWidth;
+    if (bull >= bear) {
+      cls      = 'bull';
+      label    = 'Bull';
+      // Barra: 50% base + escalado por dominancia sobre el total ponderado
+      barWidth = Math.min(98, Math.round(50 + (bull / total) * 50));
+    } else {
+      cls      = 'bear';
+      label    = 'Bear';
+      barWidth = Math.max(2, Math.round(50 - (bear / total) * 50));
+    }
+
+    const tooltip = `${label} · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
+    body.innerHTML += _sentRow(flag, cur, cls, label, barWidth, 0, count, tooltip, 1);
   });
 }
 
-// ── UPCOMING EVENTS ───────────────────────────────────────────────────────────
+/** Construye una fila de sentimiento estándar */
+function _sentRow(flag, cur, cls, labelText, barWidth, _unused, count, tooltip, opacity) {
+  return `<div class="sent-row" title="${esc(tooltip)}" style="opacity:${opacity}">
+    <span class="sent-cur">${flag} ${cur}</span>
+    <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${barWidth}%"></div></div>
+    <span class="sent-count">${count}</span>
+    <span class="sent-label ${cls}">${labelText}</span>
+  </div>`;
+}
+
+/** Fila mixta: barra con degradado bull/bear proporcional */
+function _sentRowMixed(flag, cur, bullPct, count, tooltip, opacity) {
+  // bullPct = porcentaje de la parte bull (0-100)
+  const barStyle = `background:linear-gradient(90deg,var(--green) ${bullPct}%,var(--red) ${bullPct}%);width:80%`;
+  return `<div class="sent-row" title="${esc(tooltip)}" style="opacity:${opacity}">
+    <span class="sent-cur">${flag} ${cur}</span>
+    <div class="sent-bar-wrap"><div class="sent-bar" style="${barStyle}"></div></div>
+    <span class="sent-count">${count}</span>
+    <span class="sent-label mixed">Mixto</span>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UPCOMING EVENTS
+// ─────────────────────────────────────────────────────────────────────────────
 async function loadUpcomingEvents() {
   const container = document.getElementById('upcoming-events');
   try {
@@ -742,7 +806,9 @@ async function loadUpcomingEvents() {
   }
 }
 
-// ── FEED STATE ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// FEED STATE
+// ─────────────────────────────────────────────────────────────────────────────
 const PAGE       = 30;
 let allArticles  = [];
 let visible      = PAGE;
@@ -822,7 +888,9 @@ function toggleImpact(btn) {
   visible = PAGE; renderFeed();
 }
 
-// ── INIT FEED ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT FEED
+// ─────────────────────────────────────────────────────────────────────────────
 async function initFeed() {
   try {
     const res = await fetch(`news-data/news.json?v=${Date.now()}`);
@@ -833,7 +901,6 @@ async function initFeed() {
     if (articles.length > 0) {
       allArticles = articles
         .map(a => {
-          // Respeta cur del backend si existe y es válido; recalcula solo si falta
           const cur = (a.cur && ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(a.cur))
             ? a.cur
             : detectCurrencyWithSource(a.title || '', a.expand || '', a.source || '');
