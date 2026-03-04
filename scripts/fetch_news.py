@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5
+fetch_news.py — v5.1
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5 (sobre v4):
-  - detect_currency() integra la misma lógica de scoring de news.html v5.3:
-      • PASO 1: Par de divisas explícito en el TÍTULO (EUR/USD, NZD/USD, AUD/JPY...)
-                → asigna divisa protagonista según PAIR_PROTAGONIST_MAP
-                → resuelve el bug principal: "NZD/USD" asignado a USD, "EUR/GBP" a GBP
-      • PASO 2: Scoring acumulativo por pesos (igual que v4, sin cambios)
-      • Eliminados duplicados: la lógica de pares ya cubre EUR/GBP, AUD/JPY, etc.
-  - Añadido keyword 'strait of hormuz' → USD (peso 9) en CURRENCY_KEYWORDS_WEIGHTED
-    → resuelve "US could provide military protection to Strait of Hormuz" → NZD→USD
-  - 'trump ' (con espacio) → USD peso 9 (geopolítica liderada por EEUU)
-  - PAIR_PROTAGONIST_MAP sincronizado con news.html para coherencia
-  - detect_currency() sigue retornando None si ninguna divisa alcanza el umbral
-  - Sin cambios en feeds, smart_select, impacto, ni estructura del JSON
+CAMBIOS v5.1 (sobre v5):
+  CORRECCIÓN 1 — EMERGING_MARKET_TITLE_RE integrado en is_forex_relevant():
+    El patrón estaba definido pero nunca se llamaba. Ahora filtra en la primera
+    comprobación de is_forex_relevant(), eliminando artículos como "Ibovespa Gains"
+    que contaminaban el sentimiento de divisas incorrectas (ej. NZD).
+
+  CORRECCIÓN 2 — Filtro de ruido cripto (CRYPTO_NOISE_RE):
+    Artículos de criptomonedas sin nexo directo con divisas fiat eran asignados
+    a divisas por scoring débil (ej. Bitcoin → AUD). Nuevo filtro los descarta
+    salvo que mencionen explícitamente bancos centrales, dólar, etc.
+
+  CORRECCIÓN 3 — featured más selectivo:
+    Antes "featured" = impact == "high" marcaba el 100% como destacado.
+    Ahora requiere además age_hours <= 6, haciendo la distinción visual útil.
+
+  Sin cambios en feeds, PAIR_PROTAGONIST_MAP, CURRENCY_KEYWORDS_WEIGHTED,
+  smart_select, impacto, ni estructura del JSON.
 """
 
 import json
@@ -42,13 +46,10 @@ FETCH_WORKERS         = 8
 MIN_DESCRIPTION_WORDS = 12
 
 # Umbral mínimo de score para asignar divisa por keywords
-# (el paso de pares explícitos ignora este umbral)
 CURRENCY_MIN_SCORE = 3
 
 # ─────────────────────────────────────────────
 # PAR EXPLÍCITO → DIVISA PROTAGONISTA
-# Sincronizado con PAIR_PROTAGONIST_MAP de news.html v5.3
-# El protagonista es la divisa BASE del par (la que se está analizando/moviendo).
 # ─────────────────────────────────────────────
 PAIR_PROTAGONIST_MAP = {
     'EUR/USD': 'EUR', 'EURUSD': 'EUR',
@@ -81,7 +82,7 @@ PAIR_PROTAGONIST_MAP = {
 }
 
 # ─────────────────────────────────────────────
-# PATRONES DE CALENDARIO
+# PATRONES DE FILTRO
 # ─────────────────────────────────────────────
 CALENDAR_PATTERNS = [
     r"upcoming event", r"content type.*upcoming", r"scheduled date",
@@ -114,25 +115,48 @@ EDUCATIONAL_ONLY_PATTERNS = [
 ]
 EDUCATIONAL_RE = re.compile("|".join(EDUCATIONAL_ONLY_PATTERNS), re.IGNORECASE)
 
+# CORRECCIÓN 1 — v5.1: ahora se usa activamente en is_forex_relevant()
+EMERGING_MARKET_TITLE_RE = re.compile(
+    r"\b(ibovespa|bovespa|bist 100|istanbul|turkish stocks?|south african rand|"
+    r"rand weakens?|sugar futures?|silver (price|slammed|falls?)|"
+    r"copper (price|falls?|rises?)|gold (price|slammed)|platinum|palladium|"
+    r"crude oil (price|rises?|falls?)|brent (price|rises?|falls?)|"
+    r"turkish (lira|assets?)|emerging market|"
+    r"kospi|nikkei 225|hang seng|shanghai composite|sensex|"
+    r"peso mexicano|real brasileiro|lira turca)\b",
+    re.IGNORECASE,
+)
+
+# CORRECCIÓN 2 — v5.1: filtro de ruido cripto
+CRYPTO_NOISE_RE = re.compile(
+    r"\b(bitcoin|ethereum|crypto|cryptocurrency|altcoin|blockchain|defi|nft|"
+    r"solana|ripple|binance|dogecoin|litecoin|cardano|polkadot|avalanche|"
+    r"trading recommendations? for (bitcoin|ethereum|crypto)|"
+    r"crypto market|digital asset)\b",
+    re.IGNORECASE,
+)
+
+# Keywords que redimen un artículo cripto (lo mantienen si hablan de regulación/CBDCs)
+CRYPTO_FOREX_BRIDGE_KW = [
+    "central bank", "federal reserve", "ecb", "boe", "cbdc",
+    "digital dollar", "digital euro", "regulation", "sec ruling",
+    "us dollar", "usd stablecoin",
+]
+
 # ─────────────────────────────────────────────
-# KEYWORDS CON PESOS — v5
-# Cambios vs v4:
-#   - USD: añadidos 'strait of hormuz' (peso 9), 'trump ' (peso 9),
-#          'us military', 'us navy', 'white house', 'pentagon' (peso 9)
-#   - Sin otros cambios de keywords (el paso de pares explícitos
-#     ya resuelve la mayoría de los falsos positivos anteriores)
+# KEYWORDS CON PESOS
 # ─────────────────────────────────────────────
 CURRENCY_KEYWORDS_WEIGHTED = {
     "USD": [
         # Banco central / institucional (10)
         ("fed ", 10), ("federal reserve", 10), ("fomc", 10), ("powell", 10),
         ("us treasury", 10), ("reserva federal", 10),
-        # Geopolítica liderada por EEUU (9) — NUEVO v5
+        # Geopolítica liderada por EEUU (9)
         ("strait of hormuz", 9), ("estrecho de ormuz", 9),
         ("us military", 9), ("us navy", 9), ("us sanctions", 9),
         ("us-iran", 9), ("us iran conflict", 9), ("us strikes", 9),
         ("trump ", 9), ("white house", 9), ("pentagon", 9),
-        # Tickers y pares (5) — sin pares cruzados (manejados por PAIR_PROTAGONIST_MAP)
+        # Tickers (5)
         ("usd/", 5), ("dollar index", 5), ("dxy", 5), ("us dollar", 5),
         ("dólar estadounidense", 5),
         # Macro EEUU (8)
@@ -178,7 +202,7 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("uk cpi", 5), ("reino unido", 5),
         # Tickers (5)
         ("gbp/", 5), ("/gbp", 5),
-        # Débil (1) — "pound" solo puede ser unidad de medida
+        # Débil (1)
         ("pound", 1), ("british", 1), ("ftse", 1), ("brexit", 1),
     ],
     "JPY": [
@@ -229,8 +253,7 @@ CURRENCY_KEYWORDS_WEIGHTED = {
         ("canadian economy", 5),
         # Tickers (5)
         ("cad/", 5), ("/cad", 5), ("usd/cad", 5), ("cad ", 3),
-        # Petróleo (correlación CAD, pero solo peso 1 para evitar falsos positivos
-        # en artículos puramente geopolíticos — el scoring de USD con peso 9 gana)
+        # Petróleo (peso 1 para evitar falsos positivos geopolíticos)
         ("crude oil", 1), ("wti ", 1), ("brent", 1), ("petróleo", 1),
         ("oil prices", 1), ("opec", 1),
         # Débil (1)
@@ -270,7 +293,7 @@ CURRENCY_KEYWORDS_WEIGHTED = {
 }
 
 # ─────────────────────────────────────────────
-# FALSE POSITIVE GUARDS — sin cambios vs v4
+# FALSE POSITIVE GUARDS
 # ─────────────────────────────────────────────
 FALSE_POSITIVE_GUARDS = [
     {
@@ -302,15 +325,6 @@ FALSE_POSITIVE_GUARDS = [
         "penalize": {"CAD": 2, "AUD": 1},
     },
 ]
-
-EMERGING_MARKET_TITLE_RE = re.compile(
-    r"\b(ibovespa|bovespa|bist 100|istanbul|turkish stocks?|south african rand|"
-    r"rand weakens?|sugar futures?|silver (price|slammed|falls?)|"
-    r"copper (price|falls?|rises?)|gold (price|slammed)|platinum|palladium|"
-    r"crude oil (price|rises?|falls?)|brent (price|rises?|falls?)|"
-    r"turkish (lira|assets?)|emerging market)\b",
-    re.IGNORECASE,
-)
 
 # ─────────────────────────────────────────────
 FEEDS = [
@@ -361,7 +375,6 @@ HIGH_IMPACT_KW = [
     "inflación", "ipc ", "pib ", "recesión", "crisis ", "sorprende",
     "inesperado", "inesperada", "política monetaria", "banco central",
     "hawkish", "dovish",
-    # Geopolítica sistémica — v5
     "strait of hormuz", "estrecho de ormuz", "war ", "guerra ",
     "military strike", "ataque militar", "sanctions", "sanciones",
 ]
@@ -373,7 +386,6 @@ MED_IMPACT_KW = [
     "surplus", "forecast", "outlook", "guidance", "payroll", "manufacturing",
     "pmi manufacturero", "desempleo", "balanza comercial", "ventas minoristas",
     "producción industrial", "confianza del consumidor", "salarios",
-    # Petróleo → MED (era LOW, incorrecto para sesiones de energía)
     "crude oil", "oil prices", "petróleo", "brent", "wti",
 ]
 
@@ -422,6 +434,20 @@ def has_real_content(title: str, description: str) -> bool:
 
 
 def is_forex_relevant(title: str, summary: str) -> bool:
+    """
+    v5.1: CORRECCIÓN 1 — EMERGING_MARKET_TITLE_RE activo.
+    CORRECCIÓN 2 — filtro cripto activo.
+    """
+    # CORRECCIÓN 1: descartar mercados emergentes/commodities sin nexo FX
+    if EMERGING_MARKET_TITLE_RE.search(title):
+        return False
+
+    # CORRECCIÓN 2: descartar cripto salvo que tenga nexo con divisas fiat
+    if CRYPTO_NOISE_RE.search(title):
+        combined_lower = (title + " " + summary).lower()
+        if not any(kw in combined_lower for kw in CRYPTO_FOREX_BRIDGE_KW):
+            return False
+
     FOREX_RELEVANCE_KW = [
         "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
         "dollar", "dólar", "euro", "pound sterling", "yen", "franc", "franco",
@@ -439,44 +465,23 @@ def is_forex_relevant(title: str, summary: str) -> bool:
 
 
 def detect_currency(title: str, summary: str, source: str = "") -> str | None:
-    """
-    v5: añade PASO 1 (par explícito en título) antes del scoring.
-
-    PASO 1: busca par de divisas explícito en el TÍTULO.
-            Si el título empieza con "EUR/USD", "NZD/USD:", "AUD/JPY breaks..."
-            → asigna la divisa protagonista (generalmente la base del par).
-            Esto resuelve: "NZD/USD: bajistas acechan" → NZD (no USD)
-                           "EUR/GBP se suaviza" → EUR (no GBP)
-                           "AUD/JPY breaks high" → AUD (no JPY)
-
-    PASO 2: scoring ponderado (igual que v4).
-            Resuelve: "US could provide military protection to Strait of Hormuz"
-                      → USD (peso 9 por 'strait of hormuz') > CAD (peso 1 por 'oil')
-
-    PASO 3: fallback a SOURCE_CURRENCY si la fuente es institucional conocida.
-
-    PASO 4: retorna None → artículo descartado.
-    """
     title_clean = (title or '').strip()
     title_upper = title_clean.upper().replace(' ', '')
 
-    # ── PASO 1: par explícito en el título ──────────────────────────────────
-    # Busca primero al inicio del título (primeros 35 chars), luego en todo el título
+    # PASO 1: par explícito en el título
     title_start_upper = title_clean.upper()[:35].replace(' ', '')
     for pair, protagonist in PAIR_PROTAGONIST_MAP.items():
         pair_noslash = pair.replace('/', '').upper()
         pair_slash   = pair.upper()
-        # Inicio del título (prioridad máxima)
         if pair_noslash in title_start_upper or pair_slash in title_clean.upper()[:35]:
             return protagonist
-    # En cualquier parte del título
     for pair, protagonist in PAIR_PROTAGONIST_MAP.items():
         pair_noslash = pair.replace('/', '').upper()
         if pair_noslash in title_upper or pair.upper() in title_clean.upper():
             return protagonist
 
-    # ── PASO 2: scoring acumulativo ──────────────────────────────────────────
-    text   = (title_clean + " " + (summary or '')).lower()
+    # PASO 2: scoring acumulativo
+    text        = (title_clean + " " + (summary or '')).lower()
     title_lower = title_clean.lower()
     scores: dict[str, float] = {cur: 0.0 for cur in CURRENCIES}
 
@@ -484,11 +489,9 @@ def detect_currency(title: str, summary: str, source: str = "") -> str | None:
         for kw, weight in kws:
             if kw in text:
                 scores[cur] += weight
-                # Bonus 50% si la keyword está en el título
                 if kw in title_lower:
                     scores[cur] += weight * 0.5
 
-    # Penalizaciones de falsos positivos
     for guard in FALSE_POSITIVE_GUARDS:
         if guard["pattern"].search(text):
             for cur, penalty in guard["penalize"].items():
@@ -500,11 +503,10 @@ def detect_currency(title: str, summary: str, source: str = "") -> str | None:
     if best_score >= CURRENCY_MIN_SCORE:
         return best_cur
 
-    # ── PASO 3: fallback institucional ───────────────────────────────────────
+    # PASO 3: fallback institucional
     if source in SOURCE_CURRENCY:
         return SOURCE_CURRENCY[source]
 
-    # ── PASO 4: sin divisa confiable ─────────────────────────────────────────
     return None
 
 
@@ -662,7 +664,7 @@ def main():
     filtered_relevance   = 0
     filtered_no_currency = 0
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.1 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
@@ -718,8 +720,8 @@ def main():
                 filtered_no_currency += 1
                 continue
 
-            impact = detect_impact(title, summary)
-            expand = summary[:350] + ("..." if len(summary) > 350 else "")
+            impact    = detect_impact(title, summary)
+            expand    = summary[:350] + ("..." if len(summary) > 350 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
 
             raw_articles.append({
@@ -732,7 +734,8 @@ def main():
                 "link":     link,
                 "time":     pub_date.strftime("%H:%M"),
                 "ts":       int(pub_date.timestamp() * 1000),
-                "featured": impact == "high",
+                # CORRECCIÓN 3: featured más selectivo — solo high + reciente (<6h)
+                "featured": impact == "high" and age_hours <= 6,
                 "lang":     lang,
                 "date":     pub_date.strftime("%d %b"),
                 "datetime": pub_date.isoformat(),
@@ -764,7 +767,6 @@ def main():
     if missing:
         print(f"   ⚠️  Sin artículos en {MAX_AGE_DAYS} días: {', '.join(missing)}")
 
-    # Reutilizar titulares y sentimientos del JSON anterior
     prev_data = load_previous_headlines()
     reused = 0
     for a in raw_articles:
@@ -786,10 +788,12 @@ def main():
     dist_after   = Counter(a["cur"] for a in articles)
     impact_after = Counter(a["impact"] for a in articles)
     recent_count = sum(1 for a in articles if a.get("recent", True))
+    featured_count = sum(1 for a in articles if a.get("featured", False))
     print(f"\n✂️  Selección final ({len(articles)} artículos):")
     print(f"   Distribución: {dict(sorted(dist_after.items()))}")
     print(f"   Impacto: high={impact_after['high']} | med={impact_after['med']} | low={impact_after['low']}")
     print(f"   Recientes (<24h): {recent_count} | Históricos: {len(articles) - recent_count}")
+    print(f"   Destacados (<6h + high): {featured_count}")
 
     sources_ok = sorted(set(a["source"] for a in articles))
 
