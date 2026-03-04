@@ -1,31 +1,28 @@
 #!/usr/bin/env python3
 """
-enrich_news.py — v9
+enrich_news.py — v9.1
 Soporte para múltiples API keys de Groq con fallback automático.
 
-CAMBIOS v9 (sobre v8):
-  CORRECCIÓN CRÍTICA — score_from_headline(headline, cur):
-    El bug raíz: cuando Groq escribe "→ USD alcista" en un artículo etiquetado como
-    EUR, NZD o cualquier otra divisa, score_from_headline() leía "alcista" y devolvía
-    "bull" para esa divisa no-USD. Resultado: EUR con sentiment="bull" aunque el
-    artículo decía claramente que el EUR caía mientras el USD subía.
+CAMBIOS v9.1 (sobre v9):
+  CORRECCIÓN 1 — REGLA SNB más precisa en SYSTEM_PROMPT:
+    Antes: "SNB amenaza con intervenir → CHF neutral"
+    Ahora: tres estados diferenciados:
+      - SNB interviene activamente para depreciar → CHF bajista
+      - SNB amenaza como techo implícito → CHF mixto
+      - Franco fuerte sin mención de intervención → CHF alcista
+    Evita que Nomura-style articles (fuerza estructural + riesgo intervención)
+    sean clasificados como neutral cuando el correcto es mixto.
 
-    Fix: extraer la DIVISA del patrón final "→ [DIVISA] [sentimiento]":
-      - Si DIVISA == cur → sentimiento directo (sin cambio)
-      - Si DIVISA == 'USD' y cur ∈ MAJORS_VS_USD → invertir sentimiento
-        (USD sube = EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan)
-      - Si DIVISA ≠ USD y ≠ cur → usar sentimiento tal como está
-        (cross pairs ya tienen cur correcto por PAIR_PROTAGONIST_MAP)
-      - Si no hay DIVISA en el patrón → comportamiento v8 sin cambio
+  CORRECCIÓN 2 — REGLA DE ESPECIFICIDAD en SYSTEM_PROMPT:
+    Groq generaba titulares genéricos ("importa petróleo refinado") cuando el
+    artículo contenía datos concretos. Nueva regla obliga a incluir cifras,
+    porcentajes o nombres institucionales cuando estén presentes en el texto.
 
-  CORRECCIÓN SYSTEM_PROMPT — regla explícita de perspectiva:
-    "El titular SIEMPRE debe describir el movimiento desde la perspectiva de la
-     DIVISA ASIGNADA, nunca desde la perspectiva de otra divisa.
-     INCORRECTO: artículo EUR con '→ USD alcista'
-     CORRECTO:   artículo EUR con '→ EUR bajista'"
-    Esto corrige el problema de raíz en Groq, no solo el síntoma.
+  CORRECCIÓN 3 — score_from_headline() con detección SNB mejorada:
+    Patrón SNB_INTERVENTION_RE más preciso: distingue intervención activa
+    (bajista) de amenaza como techo (mixto).
 
-  Sin otros cambios funcionales respecto a v8.
+  Sin otros cambios funcionales respecto a v9.
 """
 
 import os
@@ -77,11 +74,11 @@ CALENDAR_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Divisas que cotizan contra el USD — para la inversión de sentimiento
+# Divisas que cotizan contra el USD
 MAJORS_VS_USD = {"EUR", "GBP", "AUD", "NZD", "CAD", "CHF", "JPY"}
 
 # ─────────────────────────────────────────────
-# SYSTEM PROMPT — ESTÁNDAR INSTITUCIONAL v9
+# SYSTEM PROMPT — ESTÁNDAR INSTITUCIONAL v9.1
 # ─────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading.
 Tu tarea es sintetizar noticias económicas y financieras en titulares estructurados para una plataforma profesional.
@@ -105,8 +102,9 @@ EJEMPLOS CORRECTOS:
   PMI manufacturero zona euro cae a 44.2 puntos: contracción industrial profundiza presión sobre el BCE → EUR bajista
   Petróleo WTI sube 8% por bloqueo del Estrecho de Ormuz: ingresos por exportación de crudo en riesgo → CAD alcista
   BOJ pospone alza de tasas de marzo por volatilidad de mercados: decisión dovish retrasa normalización → JPY bajista
-  SNB podría intervenir para frenar apreciación excesiva del franco: techo implícito sobre valorización → CHF neutral
+  SNB podría intervenir para frenar apreciación excesiva del franco: techo implícito sobre valorización → CHF mixto
   EUR/USD cae 0.63% pese a inflación en zona euro: tensiones en Oriente Medio impulsan al USD → EUR bajista
+  PIB de Canadá se contrae 0.6% en Q4 superando pronóstico de caída: debilidad económica presiona al BoC → CAD bajista
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLA CRÍTICA DE PERSPECTIVA — NUNCA VIOLAR
@@ -129,6 +127,25 @@ CORRECTO (artículo NZD, NZD como sujeto):
 
 La regla es simple: si el USD sube, el EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan. Escribe siempre
 el impacto SOBRE LA DIVISA ASIGNADA, no sobre el USD u otra divisa.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGLA DE ESPECIFICIDAD — OBLIGATORIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Si el artículo menciona un porcentaje, precio, nivel o nombre de institución
+concreto, el titular DEBE incluirlo. No uses frases genéricas cuando el texto
+proporciona datos específicos.
+
+INCORRECTO (genérico, dato disponible):
+  "PIB canadiense se contrae en Q4: debilidad económica presiona al CAD → CAD bajista"
+
+CORRECTO (con dato específico):
+  "PIB de Canadá se contrae 0.6% en Q4 superando pronóstico de caída: debilidad económica presiona al BoC → CAD bajista"
+
+INCORRECTO (genérico, nivel disponible):
+  "USD/JPY retrocede desde máximos: señal de venta confirmada → JPY alcista"
+
+CORRECTO (con nivel específico):
+  "USD/JPY retrocede desde 157.49 con MACD descendente: señal de venta confirma entrada corta → JPY alcista"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS ABSOLUTAS — NUNCA VIOLAR
@@ -165,9 +182,18 @@ EXCEPCIÓN JPY — ACTIVO REFUGIO:
   - Si el artículo trata PRINCIPALMENTE de la política del BOJ (dovish) → JPY bajista
   - Si ambos factores están presentes → JPY mixto
 
-REGLA SNB:
-  - Si el SNB AMENAZA con intervenir para FRENAR la apreciación → CHF neutral
-  - Si el franco se aprecia sin mención de intervención → CHF alcista
+REGLA SNB — TRES ESTADOS (v9.1):
+  Aplica según el contenido concreto del artículo:
+  - SNB interviene ACTIVAMENTE en el mercado para DEPRECIAR el franco (compra divisas) → CHF bajista
+  - SNB AMENAZA con intervenir como techo implícito a la apreciación, pero el CHF
+    sigue siendo estructuralmente fuerte (inflación baja, flujos de refugio) → CHF mixto
+  - Franco se aprecia sin mención de intervención del SNB → CHF alcista
+
+  EJEMPLO de CHF mixto:
+    Artículo: "Nomura analiza que el CHF está fuerte reduciendo precios de importación.
+               El banco destaca que el SNB podría intervenir para frenar la apreciación."
+    → Titular: "CHF en máximos históricos reduce precios de importación: SNB contempla
+                intervención como techo implícito → CHF mixto"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CORRELACIONES MACROECONÓMICAS CLAVE
@@ -207,6 +233,7 @@ def build_user_prompt(article: dict) -> str:
         f"DESCRIPCIÓN: {(article.get('expand', '') or '')[:500] or 'Sin descripción'}\n\n"
         f"INSTRUCCIÓN: Sintetiza en un titular donde el sujeto del sentimiento final\n"
         f"sea SIEMPRE {cur} ({CURRENCY_NAMES.get(cur, cur)}), nunca otra divisa.\n"
+        f"Si el artículo contiene cifras, porcentajes o niveles específicos, inclúyelos en el titular.\n"
         f"Si el artículo NO trata sobre {cur} ni tiene impacto demostrable en {cur}, "
         f"responde solo: IRRELEVANTE\n\n"
         f"Titular (debe terminar en '→ {cur} [alcista|bajista|neutral|mixto]'):"
@@ -214,7 +241,7 @@ def build_user_prompt(article: dict) -> str:
 
 
 # ─────────────────────────────────────────────
-# SCORING DE SENTIMIENTO — v9
+# SCORING DE SENTIMIENTO — v9.1
 # ─────────────────────────────────────────────
 SENTIMENT_FINAL_RE = re.compile(
     r"→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$",
@@ -244,9 +271,20 @@ POSTPONE_HIKE_RE = re.compile(
     re.IGNORECASE,
 )
 
-SNB_INTERVENTION_RE = re.compile(
+# CORRECCIÓN 3 — v9.1: SNB con dos patrones diferenciados
+# Intervención activa (compra divisas para depreciar CHF) → bajista
+SNB_ACTIVE_INTERVENTION_RE = re.compile(
     r"\b(snb|swiss national bank|banco nacional suizo)\b.{0,80}"
-    r"\b(intervenir|intervene|interven|frenar|dampen|curb|limit)\b",
+    r"\b(interviene|intervino|intervened|selling francs?|compra(ndo)? divisas|"
+    r"fx (purchase|buying)|actively intervening)\b",
+    re.IGNORECASE,
+)
+# Amenaza / techo implícito → mixto
+SNB_THREAT_RE = re.compile(
+    r"\b(snb|swiss national bank|banco nacional suizo)\b.{0,120}"
+    r"\b(podría intervenir|could intervene|may intervene|might intervene|"
+    r"intervenir si|intervention (focus|risk|threat)|techo|cap|ceiling|"
+    r"frenar (la )?apreciación|dampen|curb|limit (appreciation|strength))\b",
     re.IGNORECASE,
 )
 
@@ -255,17 +293,8 @@ def score_from_headline(headline: str | None, cur: str = "USD") -> str:
     """
     Extrae el sentimiento del ai_headline con validación de divisa cruzada.
 
-    v9: FIX CRÍTICO
-    Si el patrón final menciona una divisa diferente a `cur`:
-      - "→ USD alcista" en artículo EUR/NZD/etc. → invertir → 'bear'
-      - "→ USD bajista" en artículo EUR/NZD/etc. → invertir → 'bull'
-      - Cross sin USD: usar sentimiento tal como está
-
-    Prioridad:
-      1. Patrón final estructurado con validación de divisa
-      2. Detección de postergación de alza (DOVISH)
-      3. Detección de intervención SNB → neutral
-      4. Conteo de keywords
+    v9.1: SNB con dos patrones (activo=bear, amenaza=mixed).
+    Resto igual que v9.
     """
     if not headline:
         return "neut"
@@ -273,29 +302,24 @@ def score_from_headline(headline: str | None, cur: str = "USD") -> str:
     hl = headline.lower()
 
     # Prioridad 1 — patrón estructurado al final (con divisa opcional)
-    m = SENTIMENT_FINAL_RE.search(headline)  # usar original para mayúsculas
+    m = SENTIMENT_FINAL_RE.search(headline)
     if m:
         pattern_cur  = m.group(1).upper() if m.group(1) else None
         pattern_word = m.group(2).lower()
 
-        # Mapear palabra → sentimiento base
         base_sent = {
             "alcista": "bull", "bajista": "bear",
             "neutral": "neut", "neutro":  "neut",
             "mixto":   "mixed",
         }.get(pattern_word, "neut")
 
-        # FIX v9: validación de divisa cruzada
+        # FIX: validación de divisa cruzada
         if pattern_cur and pattern_cur != cur.upper():
             if pattern_cur == "USD" and cur.upper() in MAJORS_VS_USD:
-                # USD sube → esta divisa baja (inversión)
                 if base_sent == "bull":
                     return "bear"
                 elif base_sent == "bear":
                     return "bull"
-                # neut/mixed → sin inversión
-            # Cross no-USD: confiar en el sentimiento tal como está
-            # (el par ya tiene cur correcto por PAIR_PROTAGONIST_MAP)
 
         return base_sent
 
@@ -303,9 +327,11 @@ def score_from_headline(headline: str | None, cur: str = "USD") -> str:
     if POSTPONE_HIKE_RE.search(hl):
         return "bear"
 
-    # Prioridad 3 — SNB intervención = neutral
-    if SNB_INTERVENTION_RE.search(hl):
-        return "neut"
+    # Prioridad 3 — SNB: intervención activa = bear, amenaza = mixed
+    if SNB_ACTIVE_INTERVENTION_RE.search(hl):
+        return "bear"
+    if SNB_THREAT_RE.search(hl):
+        return "mixed"
 
     # Prioridad 4 — fallback keywords
     bull_score = sum(1 for kw in BULL_KW  if kw in hl)
@@ -478,7 +504,7 @@ def save_progress(data, articles, now_utc):
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v9 institucional")
+    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v9.1 institucional")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}  |  Timeout: {GLOBAL_TIMEOUT_MIN} min")
     print("=" * 65)
 
@@ -523,7 +549,7 @@ def main():
     print(f"   Divisas: {dict(sorted(dist.items()))}")
     print(f"   Impacto: high={impact['high']} | med={impact['med']} | low={impact['low']}")
 
-    # ── RECALCULAR sentimientos con lógica v9 (fix divisa cruzada) ──────────
+    # Recalcular sentimientos con lógica v9.1
     sentiments_recalculated = 0
     corrections_log = []
     for article in articles:
@@ -538,8 +564,8 @@ def main():
                     f"    {cur} | {old_sent}→{new_sent} | {article['ai_headline'][:70]}..."
                 )
     if sentiments_recalculated:
-        print(f"\n   🔄 Sentimientos corregidos (v9 — fix divisa cruzada): {sentiments_recalculated}")
-        for log in corrections_log[:10]:  # mostrar máx 10
+        print(f"\n   🔄 Sentimientos corregidos (v9.1): {sentiments_recalculated}")
+        for log in corrections_log[:10]:
             print(log)
         if len(corrections_log) > 10:
             print(f"    ... y {len(corrections_log)-10} más")
@@ -632,7 +658,7 @@ def main():
 
     print()
     print("=" * 65)
-    print("📊 SENTIMIENTO POR DIVISA (post-fix v9)")
+    print("📊 SENTIMIENTO POR DIVISA (post-fix v9.1)")
     print("-" * 65)
     for cur in ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]:
         c = sent_by_cur.get(cur, Counter())
@@ -648,16 +674,16 @@ def main():
 
     print()
     print("📋 RESUMEN ENRIQUECIMIENTO")
-    print(f"   ✅ Enriquecidos:          {enriched}")
+    print(f"   ✅ Enriquecidos:            {enriched}")
     print(f"   🔄 Sentimientos corregidos: {sentiments_recalculated}")
-    print(f"   ⛔ No enriquecibles:      {not_enrichable}")
-    print(f"   ⚠️  Error API:            {skipped}")
-    print(f"   ⏭️  Irrelevantes:         {irrelevant}")
+    print(f"   ⛔ No enriquecibles:        {not_enrichable}")
+    print(f"   ⚠️  Error API:              {skipped}")
+    print(f"   ⏭️  Irrelevantes:           {irrelevant}")
     if stopped_early:
         print(f"   ⏰ Detenido antes de completar")
-    print(f"   🔑 Keys usadas:          hasta Key {current_key_idx + 1} de {len(available_keys)}")
-    print(f"   ⏱️  Tiempo total:         {elapsed_min():.1f} min")
-    print(f"   💾 Guardado en:          {NEWS_FILE}")
+    print(f"   🔑 Keys usadas:            hasta Key {current_key_idx + 1} de {len(available_keys)}")
+    print(f"   ⏱️  Tiempo total:           {elapsed_min():.1f} min")
+    print(f"   💾 Guardado en:            {NEWS_FILE}")
     print("=" * 65)
 
 
