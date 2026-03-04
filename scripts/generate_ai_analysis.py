@@ -1063,12 +1063,9 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
         except RuntimeError as e:
             err_str = str(e)
-            if "DAILY_LIMIT" in err_str:
-                raise  # propagar para que main() cambie de key
-            if "RATE_LIMIT" in err_str:
-                wait = 60 if attempt == 0 else 120
-                print(f"  ⏳ Rate limit por minuto, esperando {wait}s...")
-                time.sleep(wait)
+            if "DAILY_LIMIT" in err_str or "RATE_LIMIT" in err_str:
+                # Propagar al main() para que rote de key — cada key tiene límites independientes
+                raise
             elif "INVALID_KEY" in err_str:
                 raise
             elif attempt < 2:
@@ -1261,11 +1258,13 @@ def main():
                 break
 
             except RuntimeError as e:
-                if "DAILY_LIMIT" in str(e):
-                    print(f"  ⛔ Key {current_key_idx + 1} agotada — buscando siguiente...")
+                err_str = str(e)
+                if "DAILY_LIMIT" in err_str or "RATE_LIMIT" in err_str:
+                    label = "agotada (límite diario)" if "DAILY_LIMIT" in err_str else "con rate limit persistente — rotando"
+                    print(f"  ⛔ Key {current_key_idx + 1} {label} — buscando siguiente...")
                     current_key_idx += 1
                     if current_key_idx >= len(available_keys):
-                        print("  ⛔ Todas las keys agotadas — deteniendo")
+                        print("  ⛔ Todas las keys agotadas o con rate limit — deteniendo")
                         break
                     print(f"  🔄 Cambiando a Key {current_key_idx + 1} ({mask_key(available_keys[current_key_idx])}) — pausa {KEY_SWITCH_PAUSE}s...")
                     time.sleep(KEY_SWITCH_PAUSE)
