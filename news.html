@@ -141,20 +141,18 @@
   .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
   .s-sub{font-size:.62rem;color:var(--text-dim);}
 
-  /* ── SENTIMENT ROWS — v5.5 ── */
+  /* ── SENTIMENT ROWS — v5.5.1 ── */
   .sent-row{display:flex;align-items:center;gap:.55rem;padding:.48rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);cursor:default;transition:background .12s;}
   .sent-row:last-child{border-bottom:none;}
   .sent-row:hover{background:rgba(255,255,255,.02);}
   .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:50px;flex-shrink:0;display:flex;align-items:center;gap:.28rem;}
 
-  /* Bar track — nueva geometría */
   .sent-track{flex:1;height:4px;background:rgba(48,54,61,.8);border-radius:2px;overflow:hidden;position:relative;}
   .sent-fill{height:100%;border-radius:2px;transition:width .35s ease;}
   .sent-fill.bull {background:var(--green);}
   .sent-fill.bear {background:var(--red);}
   .sent-fill.neut {background:var(--text-dim);}
   .sent-fill.nodata{background:transparent;}
-  /* Mixto: degradado proporcional */
   .sent-fill.mixed{background:linear-gradient(90deg,var(--green) var(--bull-pct),var(--red) var(--bull-pct));}
 
   .sent-count{font-size:.58rem;color:var(--text-dim);width:18px;text-align:right;flex-shrink:0;}
@@ -346,7 +344,7 @@
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
       © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.5.0
+    Dashboard v5.5.1
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -385,7 +383,7 @@ function flagImg(cur,px=16){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CURRENCY DETECTION — v5.3 (sin cambios, el backend ya asigna cur correctamente)
+// CURRENCY DETECTION
 // ═══════════════════════════════════════════════════════════════════════════════
 const PAIR_PROTAGONIST_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
@@ -453,69 +451,37 @@ function tsToLocalTime(ts){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SENTIMENT SCORING — v5.5
-//
-// FIX CRÍTICO: validación de divisa en el patrón final "→ DIVISA sentimiento"
-//
-// Problema raíz: el backend Groq a veces escribe "→ USD alcista" en un artículo
-// etiquetado como EUR o NZD, porque el redactor describió el movimiento desde
-// la perspectiva del USD. Esto genera sentiment="bull" incorrecto para EUR/NZD.
-//
-// Solución: si la DIVISA en el patrón ≠ cur del artículo, aplicar:
-//   - "→ USD alcista" en artículo EUR/NZD/GBP/AUD/CAD/CHF/JPY → bear (USD sube = resto cae)
-//   - "→ USD bajista" → bull
-//   - Cross ≠ USD: usar el sentimiento tal como está (la base del par ya fue asignada)
+// SENTIMENT SCORING — v5.5.1
 // ═══════════════════════════════════════════════════════════════════════════════
 const MAJORS_VS_USD = new Set(['EUR','GBP','AUD','NZD','CAD','CHF','JPY']);
-
-// Patrón final: "→ [DIVISA] [sentimiento]" — admite variantes sin divisa explícita
 const FINAL_PATTERN_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
 const SENT_WORD_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
 
-/**
- * scoreSentiment(article)
- *
- * Prioridad:
- *  1. Campo `sentiment` del backend (si es válido y no es producto de mala etiqueta)
- *     → validado contra el patrón del ai_headline para detectar etiquetas cruzadas
- *  2. Patrón final en ai_headline con validación de divisa
- *  3. Keywords fallback
- */
 function scoreSentiment(article) {
   const cur     = (article.cur || '').toUpperCase();
   const hl      = ((article.ai_headline || article.title || '')).toLowerCase();
   const hlOrig  = (article.ai_headline || article.title || '');
 
-  // ── Extraer patrón final del ai_headline ──────────────────────────────────
   const m = hlOrig.match(FINAL_PATTERN_RE);
-  let patternSent = null;   // sentimiento en bull/bear/neut/mixed
-  let patternCur  = null;   // divisa mencionada en el patrón (puede ser undefined)
+  let patternSent = null;
+  let patternCur  = null;
 
   if (m) {
     patternCur  = m[1] ? m[1].toUpperCase() : null;
     patternSent = SENT_WORD_MAP[m[2].toLowerCase()] || 'neut';
 
-    // FIX: si la divisa en el patrón es diferente a cur del artículo
     if (patternCur && patternCur !== cur) {
-      // Caso: "→ USD alcista" en artículo de divisa no-USD
       if (patternCur === 'USD' && MAJORS_VS_USD.has(cur)) {
-        // USD sube → el artículo (EUR/NZD/etc.) es bajista
         patternSent = patternSent === 'bull' ? 'bear'
                     : patternSent === 'bear' ? 'bull'
-                    : patternSent; // neut/mixed sin inversión
+                    : patternSent;
       }
-      // Caso: divisa cruzada (ej. "→ GBP alcista" en artículo EUR)
-      // No invertimos — la asignación de cur ya maneja el protagonista del par
     }
 
-    // Validar contra campo `sentiment` del backend:
-    // Si el backend dice "bull" pero el patrón (corregido) dice "bear" → usar patrón
     if (article.sentiment) {
       const backendSent = article.sentiment.toLowerCase();
       const mapped = {bull:'bull',bear:'bear',alcista:'bull',bajista:'bear',mixed:'mixed',mixto:'mixed'}[backendSent] || 'neut';
-      // Solo usar backend si coincide con patrón o si no hay patrón
       if (m && patternSent !== mapped && patternCur) {
-        // Patrón con divisa explícita tiene precedencia sobre backend
         return patternSent;
       }
       return mapped;
@@ -524,7 +490,6 @@ function scoreSentiment(article) {
     return patternSent;
   }
 
-  // ── Sin patrón estructurado: usar backend o keywords ──────────────────────
   if (article.sentiment) {
     const s = article.sentiment.toLowerCase();
     if (s==='bull'||s==='alcista')  return 'bull';
@@ -533,7 +498,6 @@ function scoreSentiment(article) {
     return 'neut';
   }
 
-  // Fallback keywords
   const BULL_KW=['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
   const BEAR_KW=['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
   let b=0,r=0;
@@ -543,30 +507,29 @@ function scoreSentiment(article) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// COMPUTE SENTIMENT — v5.5 (nivel institucional)
+// COMPUTE SENTIMENT — v5.5.1
 //
-// CAMBIOS vs v5.4:
-//  A) diffRatio = |bull-bear| / (bull+bear)   ← sobre peso DIRECCIONAL, no total
-//     → elimina la dilución artificial del neut que hacía que EUR pareciera Mixto
-//  B) Umbral Mixto: 15% (era 20%) sobre bullBear
-//     → EUR: 0.194 > 0.15 → Bear ✓
-//  C) Barra rediseñada: siempre refleja el ratio bull/(bull+bear) en toda su anchura
-//     → Bear: barra roja de 0 a (bear/bullBear)*100% — visualmente intuitivo
-//     → Bull: barra verde de 0 a (bull/bullBear)*100%
-//     → Mixto: degradado con punto de corte en bullPct%
-//  D) Badge de baja cobertura: si total < 1.5 → opacity 0.50 + label "~Bear/~Bull"
-//  E) Tooltip detallado: bull%, bear%, artículos, edad media ponderada
+// CAMBIO vs v5.5: decay diferenciado por impacto del artículo.
+//   high: vida media 8h  → resolución intradiaria correcta cuando hay señales
+//         contradictorias del mismo día (caso CHF con artículos ForexLive vs ActionForex)
+//   med:  vida media 16h → equilibrio entre recencia y contexto
+//   low:  vida media 28h → artículos de baja señal aportan como contexto de fondo
+//
+// Con DECAY_H=24 fijo, un artículo HIGH de hace 8h tenía peso e^(-8/24)=0.72
+// vs uno reciente a 1.0 — diferencia insuficiente para resolver contradicciones intradiarias.
+// Con DECAY_H=8 para HIGH, ese mismo artículo tiene peso e^(-1)=0.37 — resolución clara.
 // ═══════════════════════════════════════════════════════════════════════════════
 const CURRENCIES   = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 const IMPACT_W     = { high:3, med:1.5, low:0.5 };
-const DECAY_H      = 24; // vida media del decay
+
+// v5.5.1: decay diferenciado por impacto
+const DECAY_H_BY_IMPACT = { high: 8, med: 16, low: 28 };
 
 function computeSentiment(articles) {
   const nowMs = Date.now();
   const body  = document.getElementById('sentiment-body');
   if (!body) return;
 
-  // Acumuladores por divisa
   const acc = {};
   CURRENCIES.forEach(c => { acc[c] = { bull:0, bear:0, neut:0, wSum:0, count:0 }; });
 
@@ -575,10 +538,12 @@ function computeSentiment(articles) {
     const s    = scoreSentiment(a);
     const impW = IMPACT_W[a.impact] || 0.5;
     const ageH = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts*1000 : a.ts)) / 3_600_000 : 0;
-    const decW = Math.exp(-ageH / DECAY_H);
-    const w    = impW * decW;
 
-    // 'mixed' contribuye 50% a cada lado (señal bimodal real)
+    // v5.5.1: decay según impacto del artículo
+    const decayH = DECAY_H_BY_IMPACT[a.impact] || 16;
+    const decW   = Math.exp(-ageH / decayH);
+    const w      = impW * decW;
+
     if (s === 'mixed') {
       acc[a.cur].bull += w * 0.5;
       acc[a.cur].bear += w * 0.5;
@@ -598,43 +563,36 @@ function computeSentiment(articles) {
   CURRENCIES.forEach(cur => {
     const { bull, bear, neut, wSum, count } = acc[cur];
     const flag      = flagImg(cur, 16);
-    const bullBear  = bull + bear;   // peso direccional total
+    const bullBear  = bull + bear;
     const total     = bullBear + neut;
 
-    // ── Sin datos ───────────────────────────────────────────────────────────
     if (count === 0 || total < 0.05) {
       body.innerHTML += _row(flag, cur, '—', 'nodata', 0, 0, count, 'Sin cobertura', 0.4);
       return;
     }
 
-    // ── Solo neutrales (sin señal direccional) ──────────────────────────────
     if (bullBear < 0.05) {
       const tip = `Sin señal direccional · neut=${neut.toFixed(2)} · n=${count}`;
       body.innerHTML += _row(flag, cur, 'Neut', 'neut', 50, 50, count, tip, 0.65);
       return;
     }
 
-    // FIX A+B: diffRatio sobre bullBear (no total) + umbral 15%
     const diff      = Math.abs(bull - bear);
-    const diffRatio = diff / bullBear;   // ← FIX A: denominador = bullBear
+    const diffRatio = diff / bullBear;
 
-    // Cobertura baja → reducir opacidad y añadir "~" al label
-    const lowCov    = total < 1.5;
-    const opacity   = lowCov ? 0.52 : 1.0;
-    const prefix    = lowCov ? '~' : '';
+    const lowCov  = total < 1.5;
+    const opacity = lowCov ? 0.52 : 1.0;
+    const prefix  = lowCov ? '~' : '';
 
-    // Ratio para la barra — siempre sobre bullBear
-    const bullPct   = Math.round((bull / bullBear) * 100);  // FIX C
-    const bearPct   = 100 - bullPct;
+    const bullPct = Math.round((bull / bullBear) * 100);
+    const bearPct = 100 - bullPct;
 
-    // ── Señal Mixta: diff < 15% de bullBear ─────────────────────────────────
-    if (diffRatio < 0.15) {  // FIX B: umbral 15% (era 20%)
+    if (diffRatio < 0.15) {
       const tip = `Mixto · bull=${bull.toFixed(1)} (${bullPct}%) bear=${bear.toFixed(1)} (${bearPct}%) · n=${count}`;
       body.innerHTML += _rowMixed(flag, cur, bullPct, count, tip, opacity);
       return;
     }
 
-    // ── Dirección clara ──────────────────────────────────────────────────────
     if (bull >= bear) {
       const tip = `Bull · ${bullPct}% bull · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
       body.innerHTML += _row(flag, cur, prefix+'Bull', 'bull', bullPct, bullPct, count, tip, opacity);
@@ -645,10 +603,6 @@ function computeSentiment(articles) {
   });
 }
 
-/**
- * _row — fila estándar (Bull/Bear/Neut/nodata)
- * barPct: porcentaje de anchura de la barra (0–100), relativo a bullBear
- */
 function _row(flag, cur, label, cls, barPct, _unused, count, tip, opacity) {
   return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
@@ -658,12 +612,7 @@ function _row(flag, cur, label, cls, barPct, _unused, count, tip, opacity) {
   </div>`;
 }
 
-/**
- * _rowMixed — barra con degradado verde/rojo proporcional al ratio bull/bear
- * bullPct: porcentaje de la parte bull (0–100)
- */
 function _rowMixed(flag, cur, bullPct, count, tip, opacity) {
-  // CSS custom property para el punto de corte del gradient
   return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
     <div class="sent-track">
