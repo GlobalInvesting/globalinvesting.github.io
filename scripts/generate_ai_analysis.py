@@ -4,11 +4,24 @@ generate_ai_analysis.py
 Genera análisis fundamentales de divisas forex usando Groq API (gratuita).
 Modelo: llama-3.3-70b-versatile — sin SDK, solo requests.
 
+v5.0 — Integración de noticias recientes en la narrativa:
+       • get_relevant_news(): filtra artículos de alto/medio impacto
+         para cada divisa desde news-data/news.json (generado por fetch_news.py)
+       • format_news_for_prompt(): serializa titulares en formato compacto
+         orientado a argumento, sin nombres de fuentes
+       • System prompt actualizado: las noticias se tejen DENTRO de los
+         párrafos del análisis, no como sección separada
+       • news_has_changed(): fuerza regeneración cuando llegan noticias
+         nuevas de alto impacto no contempladas en el snapshot previo
+       • dataSnapshot ampliado con latestNewsTs y newsHeadlines para
+         detectar cambios noticiosos en el pre-check de caché
+       • TTL reducido a 12h por defecto (era 24h) dado que las noticias
+         de alto impacto pueden cambiar el contexto en pocas horas
+
 v4.0 — Patch de caché inteligente sobre v2.6:
        • load_previous_analysis(): carga análisis guardado para una divisa
        • data_has_changed(): compara dataSnapshot anterior vs datos actuales
        • TTL de 24h: fuerza regeneración diaria aunque los datos no cambien
-         (fxPerformance1M cambia cada día por definición)
        • main() con soporte de múltiples keys (GROQ_API_KEY + GROQ_API_KEY_2)
          y fallback automático al agotar el límite diario de una key
        • Reporte detallado: divisas regeneradas vs reutilizadas
@@ -166,23 +179,25 @@ EXPORT_FALLBACK_HS2 = {
     'JPY': ['87', '84', '85', '90'],
 }
 
-GITHUB_BASE = 'https://globalinvesting.github.io'
-OUTPUT_DIR  = Path('ai-analysis')
-GROQ_MODEL  = 'llama-3.3-70b-versatile'
-GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions'
+GITHUB_BASE  = 'https://globalinvesting.github.io'
+OUTPUT_DIR   = Path('ai-analysis')
+NEWS_PATH    = Path('news-data/news.json')   # generado por fetch_news.py
+GROQ_MODEL   = 'llama-3.3-70b-versatile'
+GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions'
 KEY_SWITCH_PAUSE = 5  # segundos entre cambio de key
 
-# TTL máximo de un análisis aunque los datos no cambien.
-# fxPerformance1M cambia cada día → 24h garantiza regeneración diaria.
-MAX_ANALYSIS_AGE_HOURS = 24
+# TTL máximo de un análisis aunque los datos macro no cambien.
+# Reducido a 12h en v5.0: las noticias de alto impacto pueden cambiar
+# el contexto de mercado en pocas horas, especialmente en días de eventos.
+MAX_ANALYSIS_AGE_HOURS = 12
 
 _export_cache = {}
 
 
-# ─── SYSTEM PROMPT ───────────────────────────────────────────────────────────
+# ─── SYSTEM PROMPT v5.0 ──────────────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista de mercados de divisas senior que redacta comentarios de mercado para una plataforma de trading profesional. Escribes en español de forma nativa, fluida y analítica — como un profesional de habla hispana que lleva años cubriendo los mercados cambiarios, no como alguien que traduce del inglés.
 
-TAREA: Redactar un análisis fundamental de la divisa indicada a partir de los datos económicos proporcionados.
+TAREA: Redactar un análisis fundamental de la divisa indicada a partir de los datos económicos y el contexto noticioso proporcionados.
 
 FORMATO OBLIGATORIO:
 - Texto corrido, sin títulos, sin viñetas, sin markdown, sin negrita
@@ -212,7 +227,40 @@ INTERPRETACIÓN DE DATOS — REGLAS ESTRICTAS:
 - Si un indicador no tiene dato, ignóralo por completo; no lo menciones ni lo infieras desde otros datos
 - El signo del "Rendimiento FX 1M" ya está calculado correctamente; no lo inviertas nunca
 - Para USD: el rendimiento FX 1M refleja el comportamiento del dólar índice (DXY)
-- El campo "PIB Total" es el tamaño absoluto de la economía en trillones USD, no la tasa de crecimiento"""
+- El campo "PIB Total" es el tamaño absoluto de la economía en trillones USD, no la tasa de crecimiento
+
+INTEGRACIÓN DE NOTICIAS RECIENTES — REGLAS DE REDACCIÓN:
+Las noticias se proporcionan como CONTEXTO_NOTICIOSO_DIVISA.
+No son un apartado separado. Son evidencia de mercado que debes tejer
+dentro de los tres párrafos del análisis cuando sea relevante.
+
+Cómo integrarlas por párrafo:
+- Párrafo 1 (política monetaria): si hay una noticia sobre el banco central
+  o sobre expectativas de tasas, incorpórala como evidencia que confirma o
+  cuestiona la postura del BC. Ejemplo: "Los mercados de futuros ya
+  descuentan un recorte adicional en marzo, coherente con las declaraciones
+  del gobernador que anticipan aproximadamente 100pb de bajadas este año."
+- Párrafo 2 (balanza/sector): si hay noticias sobre commodities, energía,
+  comercio exterior o datos sectoriales, úsalas para enriquecer el
+  argumento sobre la balanza comercial o la cuenta corriente.
+- Párrafo 3 (posicionamiento/perspectivas): si hay una noticia que
+  contradice o refuerza el COT o el rendimiento FX reciente, intégrala
+  como catalizador de corto plazo dentro del argumento.
+
+Reglas estrictas para la integración de noticias:
+1. No cites la fuente ni el nombre del medio en el texto final.
+2. No uses la fórmula "según X" ni "de acuerdo con Y".
+3. Integra preferentemente noticias de impacto ALTO. Las de impacto MEDIO
+   solo si son directamente relevantes y no hay noticias de alto impacto.
+4. Si una noticia contradice el análisis macro, señala explícitamente
+   la divergencia: "aunque los datos estructurales apuntan a X, el mercado
+   reaccionó esta semana a Y, lo que introduce incertidumbre de corto plazo."
+5. Si no hay noticias relevantes, no lo menciones en absoluto. Escribe
+   el análisis macro puro sin referencias a la ausencia de noticias.
+6. Máximo dos noticias integradas en todo el análisis. Elige las de
+   mayor impacto y mayor coherencia con la narrativa macro.
+7. El tono sigue siendo institucional. El resultado debe parecer que el
+   analista conoce el contexto de mercado, no un resumen de titulares."""
 
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -247,7 +295,7 @@ def mask_key(key):
 def check_groq_key(key):
     """
     Verifica rápidamente si una key es válida y no ha alcanzado el límite diario.
-    Retorna: 'ok', 'daily_limit', 'invalid'
+    Retorna: 'ok', 'daily_limit', 'invalid', 'rate_limit'
     """
     try:
         r = requests.post(
@@ -269,15 +317,138 @@ def check_groq_key(key):
             body = r.text.lower()
             if 'daily' in body or 'quota' in body or 'limit' in body:
                 return 'daily_limit'
-            return 'rate_limit'  # límite por minuto, no diario
+            return 'rate_limit'
         return 'ok'
     except Exception:
-        return 'ok'  # Si falla la conexión, asumir OK y dejar que falle en el uso real
+        return 'ok'
 
 
-# ─── CACHÉ INTELIGENTE v4 ────────────────────────────────────────────────────
+# ─── NOTICIAS RECIENTES v5.0 ─────────────────────────────────────────────────
 
-def load_previous_analysis(currency):
+def load_news_file() -> dict:
+    """
+    Carga news-data/news.json desde disco (generado por fetch_news.py).
+    Retorna el dict completo o {} si no existe o está corrupto.
+    """
+    if not NEWS_PATH.exists():
+        print(f"  ⚠️  {NEWS_PATH} no encontrado — análisis sin contexto noticioso")
+        return {}
+    try:
+        with open(NEWS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        age_h = ""
+        updated = data.get("updated_utc")
+        if updated:
+            try:
+                dt = datetime.fromisoformat(updated.replace("Z", "+00:00"))
+                h  = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
+                age_h = f" (actualizado hace {h:.1f}h)"
+            except Exception:
+                pass
+        total = len(data.get("articles", []))
+        print(f"  📰 news.json cargado: {total} artículos{age_h}")
+        return data
+    except Exception as e:
+        print(f"  ⚠️  Error cargando {NEWS_PATH}: {e}")
+        return {}
+
+
+def get_relevant_news(currency: str, news_data: dict, max_items: int = 3) -> list:
+    """
+    Filtra y ordena las noticias de alto/medio impacto para una divisa.
+    Prioriza: impacto alto > impacto medio, luego más recientes primero.
+    Excluye noticias con sentiment neutro y sin ai_headline.
+    """
+    articles = news_data.get("articles", [])
+    if not articles:
+        return []
+
+    relevant = [
+        a for a in articles
+        if a.get("cur") == currency
+        and a.get("impact") in ("high", "med")
+        and a.get("ai_headline")  # requiere titular enriquecido
+        and a.get("sentiment") in ("bull", "bear", "alcista", "bajista", "mixed", "mixto")
+    ]
+
+    # Ordenar: primero high, luego más recientes
+    relevant.sort(key=lambda x: (
+        0 if x.get("impact") == "high" else 1,
+        -(x.get("ts") or 0)
+    ))
+
+    return relevant[:max_items]
+
+
+def format_news_for_prompt(news_items: list, currency: str) -> str:
+    """
+    Serializa noticias en formato compacto para el prompt de Groq.
+    - Quita el sufijo "→ XXX alcista/bajista" del ai_headline (Groq no debe
+      reproducir ese texto literal, sino interpretarlo).
+    - No incluye nombre de fuente (para que Groq no lo cite).
+    - Incluye antigüedad en horas para que Groq calibre la relevancia temporal.
+    """
+    if not news_items:
+        return f"Sin noticias de alto/medio impacto para {currency} en las últimas 24h."
+
+    SENT_MAP = {
+        "bull": "alcista", "bear": "bajista",
+        "mixed": "mixto",  "neut": "neutral",
+        "alcista": "alcista", "bajista": "bajista",
+        "mixto": "mixto",  "neutral": "neutral",
+    }
+
+    lines = []
+    for a in news_items:
+        imp  = a.get("impact", "low")
+        sent = SENT_MAP.get(a.get("sentiment", "neut"), "neutral")
+        hl   = a.get("ai_headline") or a.get("title", "")
+
+        # Quitar sufijo "→ …" que ya está interpretado — Groq debe inferirlo del contexto
+        if "→" in hl:
+            hl = hl[:hl.rfind("→")].strip()
+        hl = hl.strip(" .:,")
+
+        age_label = ""
+        ts = a.get("ts")
+        if ts:
+            h = (time.time() - ts / 1000) / 3600
+            if h < 1:
+                age_label = "<1h"
+            elif h < 24:
+                age_label = f"{h:.0f}h"
+            else:
+                age_label = f"{h/24:.0f}d"
+
+        lines.append(f"  • [{imp.upper()}·{sent}·{age_label}] {hl}")
+
+    return "\n".join(lines)
+
+
+def news_has_changed(currency: str, prev_analysis: dict, current_news: list) -> bool:
+    """
+    Retorna True si hay noticias de alto impacto nuevas que no estaban
+    en el snapshot anterior — fuerza regeneración sin esperar al TTL.
+
+    Compara timestamps: si el ts máximo de las noticias actuales de alto
+    impacto es posterior al latestNewsTs guardado, hay novedades.
+    """
+    if prev_analysis is None:
+        return True
+
+    prev_ts = prev_analysis.get("dataSnapshot", {}).get("latestNewsTs", 0)
+
+    high_news = [a for a in current_news if a.get("impact") == "high"]
+    if not high_news:
+        return False  # sin noticias de alto impacto → no forzar regeneración
+
+    max_ts = max((a.get("ts", 0) or 0) for a in high_news) / 1000  # ms → s
+    return max_ts > prev_ts
+
+
+# ─── CACHÉ INTELIGENTE v5.0 ──────────────────────────────────────────────────
+
+def load_previous_analysis(currency: str) -> dict | None:
     """
     Carga el análisis JSON guardado previamente para una divisa.
     Retorna el dict completo o None si no existe o está corrupto.
@@ -292,9 +463,7 @@ def load_previous_analysis(currency):
         return None
 
 
-# Campos del dataSnapshot que se comparan para detectar cambios.
-# fxPerformance1M incluido — cambia cada día por definición,
-# pero el TTL de 24h ya garantiza regeneración diaria de todas formas.
+# Campos del dataSnapshot que se comparan para detectar cambios en datos macro.
 SNAPSHOT_COMPARE_KEYS = [
     "interestRate",
     "gdpGrowth",
@@ -308,35 +477,33 @@ SNAPSHOT_COMPARE_KEYS = [
 ]
 
 
-def data_has_changed(currency, current_data, prev_analysis):
+def data_has_changed(currency: str, current_data: dict, prev_analysis: dict | None) -> bool:
     """
-    Retorna True si los datos cambiaron O si el análisis tiene más de
-    MAX_ANALYSIS_AGE_HOURS horas (TTL diario).
-
-    Lógica:
-    1. Sin análisis previo → siempre regenerar
-    2. Análisis > 24h → regenerar (fxPerformance1M cambia cada día)
-    3. Algún indicador clave difiere → regenerar
-    4. Todo igual y fresco → reutilizar
+    Retorna True si:
+    1. No hay análisis previo
+    2. El análisis tiene más de MAX_ANALYSIS_AGE_HOURS horas (TTL)
+    3. Algún indicador macro clave difiere del snapshot guardado
+    4. [v5.0] Hay noticias de alto impacto nuevas (se evalúa por separado
+       en news_has_changed() y se combina en main())
     """
     if prev_analysis is None:
         return True
 
-    # ── TTL: forzar regeneración diaria ──────────────────────────────────────
+    # TTL
     generated_at = prev_analysis.get("generatedAt")
     if generated_at:
         try:
-            gen_dt = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+            gen_dt    = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
             age_hours = (datetime.now(timezone.utc) - gen_dt).total_seconds() / 3600
             if age_hours > MAX_ANALYSIS_AGE_HOURS:
                 print(f"    ⏰ TTL expirado ({age_hours:.0f}h > {MAX_ANALYSIS_AGE_HOURS}h) → regenerar")
                 return True
         except Exception:
-            return True  # fecha no parseable → regenerar por seguridad
+            return True
     else:
-        return True  # sin timestamp → regenerar
+        return True
 
-    # ── Comparación de snapshot ───────────────────────────────────────────────
+    # Snapshot de datos macro
     prev_snapshot = prev_analysis.get("dataSnapshot", {})
     if not prev_snapshot:
         return True
@@ -345,36 +512,30 @@ def data_has_changed(currency, current_data, prev_analysis):
         curr_val = current_data.get(key)
         prev_val = prev_snapshot.get(key)
 
-        # Ambos None → sin cambio para este campo
         if curr_val is None and prev_val is None:
             continue
-
-        # Uno tiene valor y el otro no → cambio
         if (curr_val is None) != (prev_val is None):
             return True
 
-        # lastRateDecision es un dict — comparar como string JSON
         if key == "lastRateDecision":
             if json.dumps(curr_val, sort_keys=True) != json.dumps(prev_val, sort_keys=True):
                 return True
             continue
 
-        # Comparación numérica con tolerancia mínima
         if isinstance(curr_val, (int, float)) and isinstance(prev_val, (int, float)):
             if abs(float(curr_val) - float(prev_val)) > 0.001:
                 return True
             continue
 
-        # Strings y otros tipos
         if str(curr_val).strip() != str(prev_val).strip():
             return True
 
-    return False  # Todo igual y dentro del TTL → reutilizar
+    return False
 
 
 # ─── DATOS DE TASAS ──────────────────────────────────────────────────────────
 
-def derive_rate_decision_from_history(currency, observations):
+def derive_rate_decision_from_history(currency: str, observations: list) -> dict | None:
     """
     Deriva la decisión real del banco central analizando el historial de tasas
     almacenado en rates/{currency}.json.
@@ -384,7 +545,7 @@ def derive_rate_decision_from_history(currency, observations):
 
     parsed = []
     for obs in observations:
-        val = obs.get('value')
+        val  = obs.get('value')
         date = obs.get('date', '')
         if val is None or val == '.':
             continue
@@ -400,7 +561,7 @@ def derive_rate_decision_from_history(currency, observations):
     current_rate = parsed[0]['value']
     current_date = parsed[0]['date']
 
-    prev_rate = None
+    prev_rate     = None
     decision_date = current_date
     for obs in parsed[1:]:
         if abs(obs['value'] - current_rate) > 0.01:
@@ -413,25 +574,25 @@ def derive_rate_decision_from_history(currency, observations):
 
     if prev_rate is None:
         return {
-            'direction':    'MANTUVO',
-            'delta':        0.0,
+            'direction':   'MANTUVO',
+            'delta':       0.0,
             'current_rate': current_rate,
-            'prev_rate':    current_rate,
-            'date':         current_date,
-            'source':       'rates_history',
-            'cycle_12m':    0.0,
-            'cycle_label':  'sin cambios en el período analizado',
+            'prev_rate':   current_rate,
+            'date':        current_date,
+            'source':      'rates_history',
+            'cycle_12m':   0.0,
+            'cycle_label': 'sin cambios en el período analizado',
         }
 
-    delta = round(current_rate - prev_rate, 4)
+    delta     = round(current_rate - prev_rate, 4)
     direction = 'SUBIÓ' if delta > 0.01 else ('BAJÓ' if delta < -0.01 else 'MANTUVO')
 
     try:
-        today = datetime.strptime(current_date[:10], '%Y-%m-%d')
-        cutoff = today.replace(year=today.year - 1)
-        cutoff_str = cutoff.strftime('%Y-%m-%d')
-        within_12m = [o for o in parsed if o['date'] >= cutoff_str]
-        cycle_12m = round(current_rate - within_12m[-1]['value'], 4) if within_12m else 0.0
+        today    = datetime.strptime(current_date[:10], '%Y-%m-%d')
+        cutoff   = today.replace(year=today.year - 1)
+        cutoff_s = cutoff.strftime('%Y-%m-%d')
+        within   = [o for o in parsed if o['date'] >= cutoff_s]
+        cycle_12m = round(current_rate - within[-1]['value'], 4) if within else 0.0
     except Exception:
         cycle_12m = 0.0
 
@@ -461,7 +622,7 @@ def fetch_live_rate_decision(currency, current_rate, fred_api_key=None):
 
 # ─── FX PERFORMANCE ──────────────────────────────────────────────────────────
 
-def fetch_frankfurter_fx(currency, days=30):
+def fetch_frankfurter_fx(currency: str, days: int = 30) -> float | None:
     if currency in _fx_performance_cache:
         return _fx_performance_cache[currency]
 
@@ -482,9 +643,9 @@ def fetch_frankfurter_fx(currency, days=30):
                 print(f"  💱 Frankfurter USD: {pct:+.2f}% (1M vs EUR proxy)")
                 return pct
         else:
-            symbols  = f"{currency},USD"
-            url_now  = f"{FRANKFURTER_BASE}/latest?base=EUR&symbols={symbols}"
-            url_past = f"{FRANKFURTER_BASE}/{past}?base=EUR&symbols={symbols}"
+            symbols   = f"{currency},USD"
+            url_now   = f"{FRANKFURTER_BASE}/latest?base=EUR&symbols={symbols}"
+            url_past  = f"{FRANKFURTER_BASE}/{past}?base=EUR&symbols={symbols}"
             now_data  = fetch_json(url_now,  timeout=8)
             past_data = fetch_json(url_past, timeout=8)
 
@@ -509,7 +670,7 @@ def fetch_frankfurter_fx(currency, days=30):
 
 # ─── COMPOSICIÓN EXPORTADORA ─────────────────────────────────────────────────
 
-def fetch_export_composition(currency):
+def fetch_export_composition(currency: str) -> str | None:
     if currency in _export_cache:
         return _export_cache[currency]
 
@@ -527,8 +688,8 @@ def fetch_export_composition(currency):
         if not commodities:
             return None
 
-        sample = commodities[0]
-        code_field = next(
+        sample      = commodities[0]
+        code_field  = next(
             (k for k in ['cmdCode', 'CmdCode', 'cmd_code', 'classificationCode'] if k in sample),
             None
         )
@@ -552,13 +713,12 @@ def fetch_export_composition(currency):
         if not hs2_totals:
             return None
 
-        top3 = sorted(hs2_totals.items(), key=lambda x: x[1], reverse=True)[:3]
-        total_exports = sum(hs2_totals.values())
-
-        sectors = []
+        top3           = sorted(hs2_totals.items(), key=lambda x: x[1], reverse=True)[:3]
+        total_exports  = sum(hs2_totals.values())
+        sectors        = []
         for code, value in top3:
-            name = HS2_NAMES_ES.get(code, f'HS{code}')
-            pct = (value / total_exports * 100) if total_exports > 0 else 0
+            name    = HS2_NAMES_ES.get(code, f'HS{code}')
+            pct     = (value / total_exports * 100) if total_exports > 0 else 0
             value_b = value / 1e9
             sectors.append(f"{name} ({pct:.0f}%, ${value_b:.1f}B)")
 
@@ -594,7 +754,7 @@ def fetch_export_composition(currency):
     fallback_codes = EXPORT_FALLBACK_HS2.get(currency, [])
     if fallback_codes:
         sectors = [HS2_NAMES_ES.get(code, f'HS{code}') for code in fallback_codes[:3]]
-        result = f"Principales exportaciones: {', '.join(sectors)}"
+        result  = f"Principales exportaciones: {', '.join(sectors)}"
         print(f"  📦 Fallback para {currency}: {result}")
         _export_cache[currency] = result
         return result
@@ -605,7 +765,7 @@ def fetch_export_composition(currency):
 
 # ─── CARGA DE DATOS ECONÓMICOS ───────────────────────────────────────────────
 
-def load_economic_data(currency, fred_api_key=None):
+def load_economic_data(currency: str, fred_api_key=None) -> dict:
     data = {}
 
     main = fetch_json(f'{GITHUB_BASE}/economic-data/{currency}.json')
@@ -676,7 +836,7 @@ def load_economic_data(currency, fred_api_key=None):
     return data
 
 
-def compute_global_context(all_data):
+def compute_global_context(all_data: dict) -> dict:
     def avg(key):
         values = [d[key] for d in all_data.values() if d.get(key) is not None]
         return round(sum(values) / len(values), 2) if values else None
@@ -694,19 +854,19 @@ def compute_global_context(all_data):
 
 # ─── SEÑALES ESTRUCTURALES ───────────────────────────────────────────────────
 
-def infer_structural_signals(currency, data, global_context):
-    signals = []
+def infer_structural_signals(currency: str, data: dict, global_context: dict) -> list:
+    signals  = []
     avg_rate = global_context.get('avg_interest_rate') or 3.0
     avg_cot  = global_context.get('avg_cot') or 0
 
-    rate            = data.get('interestRate')
-    rate_momentum   = data.get('rateMomentum')
-    current_account = data.get('currentAccount')
-    trade_balance   = data.get('tradeBalance')
-    debt            = data.get('debt')
-    cot             = data.get('cotPositioning')
-    fx_1m           = data.get('fxPerformance1M')
-    terms_of_trade  = data.get('termsOfTrade')
+    rate           = data.get('interestRate')
+    rate_momentum  = data.get('rateMomentum')
+    current_account= data.get('currentAccount')
+    trade_balance  = data.get('tradeBalance')
+    debt           = data.get('debt')
+    cot            = data.get('cotPositioning')
+    fx_1m          = data.get('fxPerformance1M')
+    terms_of_trade = data.get('termsOfTrade')
 
     if rate is not None and avg_rate is not None:
         rate_gap = avg_rate - rate
@@ -771,18 +931,21 @@ def infer_structural_signals(currency, data, global_context):
         )
     elif ca_surplus and low_debt:
         signals.append(
-            f"Balance exterior sólido: superávit de cuenta corriente ({current_account:.1f}% del PIB) y deuda controlada ({debt:.0f}% del PIB)."
+            f"Balance exterior sólido: superávit de cuenta corriente ({current_account:.1f}% del PIB) "
+            f"y deuda controlada ({debt:.0f}% del PIB)."
         )
 
     if trade_balance is not None and terms_of_trade is not None:
         if trade_balance > 2000 and terms_of_trade > 100:
             signals.append(
-                f"Superávit comercial de {trade_balance/1000:.1f}B USD/mes con términos de intercambio favorables (índice {terms_of_trade:.1f}): "
-                f"los precios de exportación superan a los de importación, lo que amplía el excedente."
+                f"Superávit comercial de {trade_balance/1000:.1f}B USD/mes con términos de intercambio "
+                f"favorables (índice {terms_of_trade:.1f}): los precios de exportación superan a los de "
+                f"importación, lo que amplía el excedente."
             )
         elif trade_balance < -15000:
             signals.append(
-                f"Déficit comercial pronunciado ({trade_balance/1000:.1f}B USD/mes): presión vendedora estructural sobre la divisa."
+                f"Déficit comercial pronunciado ({trade_balance/1000:.1f}B USD/mes): "
+                f"presión vendedora estructural sobre la divisa."
             )
 
     if cot is not None:
@@ -800,11 +963,13 @@ def infer_structural_signals(currency, data, global_context):
     if cot is not None and fx_1m is not None:
         if cot < -20000 and fx_1m > 2.5:
             signals.append(
-                f"Divergencia relevante: posicionamiento bajista ({cot/1000:.0f}K) pero la divisa se apreció {fx_1m:.1f}% el último mes — posible squeeze de cortos."
+                f"Divergencia relevante: posicionamiento bajista ({cot/1000:.0f}K) pero la divisa "
+                f"se apreció {fx_1m:.1f}% el último mes — posible squeeze de cortos."
             )
         elif cot > 20000 and fx_1m < -2.0:
             signals.append(
-                f"Divergencia relevante: posicionamiento alcista ({cot/1000:.0f}K) pero la divisa cayó {abs(fx_1m):.1f}% el último mes — posible inicio de cierre de largos."
+                f"Divergencia relevante: posicionamiento alcista ({cot/1000:.0f}K) pero la divisa "
+                f"cayó {abs(fx_1m):.1f}% el último mes — posible inicio de cierre de largos."
             )
 
     if avg_cot is not None:
@@ -827,7 +992,9 @@ def fmt(value, decimals=1, suffix=''):
 
 # ─── CONSTRUCCIÓN DEL PROMPT ─────────────────────────────────────────────────
 
-def build_data_summary(currency, data, global_context=None, export_composition=None):
+def build_data_summary(currency: str, data: dict,
+                       global_context: dict = None,
+                       export_composition: str = None) -> str:
     meta     = COUNTRY_META[currency]
     avg_rate = (global_context or {}).get('avg_interest_rate') or 3.0
     avg_fx   = (global_context or {}).get('avg_fx_perf_1m') or 0.0
@@ -847,8 +1014,11 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
 
     if rate is not None:
         rate_vs_avg = rate - avg_rate
-        direction = "por encima" if rate_vs_avg > 0 else "por debajo"
-        lines.append(f"  • Tasa de interés: {rate:.2f}% ({abs(rate_vs_avg):.2f}pp {direction} del promedio global de {avg_rate:.2f}%)")
+        direction   = "por encima" if rate_vs_avg > 0 else "por debajo"
+        lines.append(
+            f"  • Tasa de interés: {rate:.2f}% "
+            f"({abs(rate_vs_avg):.2f}pp {direction} del promedio global de {avg_rate:.2f}%)"
+        )
 
     if last_decision and last_decision.get('direction'):
         direction = last_decision['direction']
@@ -885,19 +1055,27 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
 
     if inflation is not None:
         target_diff = inflation - 2.0
-        status = "por encima del objetivo" if target_diff > 0.3 else ("por debajo del objetivo" if target_diff < -0.3 else "cerca del objetivo del 2%")
+        status = (
+            "por encima del objetivo" if target_diff > 0.3
+            else "por debajo del objetivo" if target_diff < -0.3
+            else "cerca del objetivo del 2%"
+        )
         lines.append(f"  • Inflación: {inflation:.1f}% anual ({status})")
+
     if gdp_growth is not None:
-        avg_gdp = (global_context or {}).get('avg_gdp_growth') or 0.5
+        avg_gdp   = (global_context or {}).get('avg_gdp_growth') or 0.5
         vs_global = "superior" if gdp_growth > avg_gdp else "inferior"
-        lines.append(f"  • Crecimiento PIB: {gdp_growth:.1f}% anual ({vs_global} al promedio global de {avg_gdp:.1f}%)")
+        lines.append(
+            f"  • Crecimiento PIB: {gdp_growth:.1f}% anual "
+            f"({vs_global} al promedio global de {avg_gdp:.1f}%)"
+        )
 
     unemployment = data.get('unemployment')
     wage_growth  = data.get('wageGrowth')
     retail_sales = data.get('retailSales')
     if unemployment is not None:
         avg_unemp = (global_context or {}).get('avg_unemployment') or 4.5
-        label = "bajo" if unemployment < avg_unemp else "elevado"
+        label     = "bajo" if unemployment < avg_unemp else "elevado"
         lines.append(f"  • Desempleo: {unemployment:.1f}% ({label} respecto al promedio de {avg_unemp:.1f}%)")
     if wage_growth is not None:
         lines.append(f"  • Crecimiento salarial: {wage_growth:.1f}% anual")
@@ -908,9 +1086,15 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
     tb  = data.get('tradeBalance')
     tot = data.get('termsOfTrade')
     if ca is not None:
-        lines.append(f"  • Cuenta corriente: {ca:+.1f}% del PIB ({'superávit — demanda estructural de la divisa' if ca > 0 else 'déficit — presión vendedora estructural'})")
+        lines.append(
+            f"  • Cuenta corriente: {ca:+.1f}% del PIB "
+            f"({'superávit — demanda estructural de la divisa' if ca > 0 else 'déficit — presión vendedora estructural'})"
+        )
     if tb is not None:
-        lines.append(f"  • Balanza comercial: {tb/1000:+.1f}B USD/mes ({'superávit' if tb > 0 else 'déficit'} en bienes)")
+        lines.append(
+            f"  • Balanza comercial: {tb/1000:+.1f}B USD/mes "
+            f"({'superávit' if tb > 0 else 'déficit'} en bienes)"
+        )
     if tot is not None:
         label = "favorable (exportaciones ganan valor relativo)" if tot > 100 else "desfavorable (importaciones encarecidas)"
         lines.append(f"  • Términos de intercambio: {tot:.1f} (base 100 — {label})")
@@ -940,7 +1124,10 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
     if ie is not None:
         lines.append(f"  • Expectativas de inflación: {ie:.1f}%")
     if cf is not None:
-        lines.append(f"  • Flujos de capital: {cf/1000:+.1f}B USD ({'entrada neta' if cf > 0 else 'salida neta'})")
+        lines.append(
+            f"  • Flujos de capital: {cf/1000:+.1f}B USD "
+            f"({'entrada neta' if cf > 0 else 'salida neta'})"
+        )
 
     cot  = data.get('cotPositioning')
     fx1m = data.get('fxPerformance1M')
@@ -958,11 +1145,16 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
         fx_vs_avg = fx1m - avg_fx
         move = "apreciación" if fx1m > 0 else "depreciación"
         rel  = "por encima" if fx_vs_avg > 0 else "por debajo"
-        lines.append(f"  • Rendimiento FX último mes: {fx1m:+.2f}% vs USD ({move}) — {abs(fx_vs_avg):.2f}pp {rel} del promedio de las 8 divisas principales ({avg_fx:+.2f}%)")
+        lines.append(
+            f"  • Rendimiento FX último mes: {fx1m:+.2f}% vs USD ({move}) — "
+            f"{abs(fx_vs_avg):.2f}pp {rel} del promedio de las 8 divisas principales ({avg_fx:+.2f}%)"
+        )
 
-    available = sum(1 for v in [rate, rate_mom, inflation, gdp_growth, unemployment, wage_growth,
-                                 retail_sales, ca, tb, tot, pmi, prod, debt, bond, cc, bc, ie, cf, cot, fx1m]
-                    if v is not None)
+    available = sum(
+        1 for v in [rate, rate_mom, inflation, gdp_growth, unemployment, wage_growth,
+                    retail_sales, ca, tb, tot, pmi, prod, debt, bond, cc, bc, ie, cf, cot, fx1m]
+        if v is not None
+    )
     lines.append(f"\n[{available} indicadores disponibles | Datos a: {str(data.get('lastUpdate', 'N/D'))[:10]}]")
 
     if export_composition:
@@ -975,13 +1167,13 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
         lines.append("")
         lines.append("CONTEXTO GLOBAL — PROMEDIOS DE LAS 8 DIVISAS PRINCIPALES:")
         mappings = [
-            ('avg_interest_rate', 'Tasa de interés promedio', 2, '%'),
-            ('avg_gdp_growth',    'Crecimiento PIB promedio',  1, '% anual'),
-            ('avg_inflation',     'Inflación promedio',        1, '%'),
-            ('avg_unemployment',  'Desempleo promedio',        1, '%'),
-            ('avg_bond10y',       'Yield bono 10Y promedio',   2, '%'),
-            ('avg_fx_perf_1m',    'Rendimiento FX 1M promedio', 2, '%'),
-            ('avg_cot',           'COT promedio',               0, ' contratos netos'),
+            ('avg_interest_rate', 'Tasa de interés promedio',    2, '%'),
+            ('avg_gdp_growth',    'Crecimiento PIB promedio',     1, '% anual'),
+            ('avg_inflation',     'Inflación promedio',           1, '%'),
+            ('avg_unemployment',  'Desempleo promedio',           1, '%'),
+            ('avg_bond10y',       'Yield bono 10Y promedio',      2, '%'),
+            ('avg_fx_perf_1m',    'Rendimiento FX 1M promedio',   2, '%'),
+            ('avg_cot',           'COT promedio',                  0, ' contratos netos'),
         ]
         for key, label, decimals, suffix in mappings:
             val = global_context.get(key)
@@ -999,29 +1191,39 @@ def build_data_summary(currency, data, global_context=None, export_composition=N
     return "\n".join(lines)
 
 
+def build_user_prompt(currency: str, data_summary: str, news_items: list) -> str:
+    """
+    Construye el user prompt incluyendo el bloque noticioso.
+    Las noticias van en CONTEXTO_NOTICIOSO_DIVISA para que Groq las
+    teja dentro de los párrafos pertinentes.
+    """
+    news_block = format_news_for_prompt(news_items, currency)
+
+    return (
+        f"{data_summary}\n\n"
+        f"CONTEXTO_NOTICIOSO_DIVISA:\n{news_block}\n\n"
+        f"---\n\n"
+        f"Redacta el análisis para {currency}. "
+        f"Recuerda: exactamente 3 párrafos separados por línea en blanco, 150-200 palabras en total. "
+        f"Las noticias del CONTEXTO_NOTICIOSO_DIVISA deben quedar integradas "
+        f"dentro de los párrafos pertinentes, no como sección separada. "
+        f"El objetivo es interpretar causas y consecuencias, no listar datos. "
+        f"Redacción en español natural y fluido."
+    )
+
+
 # ─── LLAMADA A GROQ ──────────────────────────────────────────────────────────
 
-def call_groq_api(api_key, data_summary, currency):
+def call_groq_api(api_key: str, user_prompt: str) -> str:
     payload = {
         "model": GROQ_MODEL,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": (
-                    f"{data_summary}\n\n"
-                    f"---\n\n"
-                    f"Redacta el análisis para {currency}. "
-                    f"Recuerda: 3 párrafos con línea en blanco entre ellos, 150-200 palabras en total. "
-                    f"El objetivo es interpretar las causas y consecuencias de los datos, "
-                    f"no simplemente listarlos. Redacción en español natural y fluido, "
-                    f"como un análisis de mercado profesional hispanohablante."
-                ),
-            },
+            {"role": "user",   "content": user_prompt},
         ],
-        "max_tokens": 700,
+        "max_tokens":  700,
         "temperature": 0.5,
-        "top_p": 0.9,
+        "top_p":       0.9,
     }
     response = requests.post(
         GROQ_URL,
@@ -1047,14 +1249,23 @@ def call_groq_api(api_key, data_summary, currency):
         raise RuntimeError(f"Respuesta inesperada: {data}") from e
 
 
-def generate_analysis(api_key, currency, data, global_context=None, export_composition=None):
-    data_summary = build_data_summary(currency, data, global_context, export_composition)
+def generate_analysis(api_key: str, currency: str, data: dict,
+                      global_context: dict = None,
+                      export_composition: str = None,
+                      news_items: list = None) -> str:
+    """
+    Genera el análisis llamando a Groq.
+    news_items: lista de artículos ya filtrados para esta divisa.
+    """
+    news_items    = news_items or []
+    data_summary  = build_data_summary(currency, data, global_context, export_composition)
+    user_prompt   = build_user_prompt(currency, data_summary, news_items)
 
     for attempt in range(3):
         try:
-            text = call_groq_api(api_key, data_summary, currency)
+            text       = call_groq_api(api_key, user_prompt)
             paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-            text = '\n\n'.join(paragraphs)
+            text       = '\n\n'.join(paragraphs)
             word_count = len(text.split())
             if word_count < 80:
                 raise ValueError(f"Respuesta demasiado corta: {word_count} palabras")
@@ -1064,7 +1275,6 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
         except RuntimeError as e:
             err_str = str(e)
             if "DAILY_LIMIT" in err_str or "RATE_LIMIT" in err_str:
-                # Propagar al main() para que rote de key — cada key tiene límites independientes
                 raise
             elif "INVALID_KEY" in err_str:
                 raise
@@ -1089,9 +1299,9 @@ def generate_analysis(api_key, currency, data, global_context=None, export_compo
 
 def main():
     print("=" * 60)
-    print(f"🤖 Generador AI v4.0 — {GROQ_MODEL} via Groq API")
+    print(f"🤖 Generador AI v5.0 — {GROQ_MODEL} via Groq API")
     print(f"   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
-    print(f"   TTL análisis: {MAX_ANALYSIS_AGE_HOURS}h (regeneración diaria garantizada)")
+    print(f"   TTL análisis: {MAX_ANALYSIS_AGE_HOURS}h | Noticias integradas en narrativa")
     print("=" * 60)
 
     # ── Keys ─────────────────────────────────────────────────────────────────
@@ -1121,7 +1331,8 @@ def main():
     print(f"\n✅ {len(available_keys)} key(s) disponible(s) | Usando Key 1")
     print(f"🔧 Modelo: {GROQ_MODEL}")
     print(f"📊 Decisiones monetarias: historial propio rates/{{currency}}.json")
-    print(f"💱 FX Performance: Frankfurter API (ECB, sin key) con fallback estático\n")
+    print(f"💱 FX Performance: Frankfurter API (ECB, sin key) con fallback estático")
+    print(f"📰 Noticias: {NEWS_PATH}\n")
 
     print("🔍 Testeando conectividad...")
     for label, url in [
@@ -1139,13 +1350,28 @@ def main():
 
     OUTPUT_DIR.mkdir(exist_ok=True)
 
+    # ── Cargar noticias una sola vez para todo el run ─────────────────────────
+    print("📰 Cargando noticias recientes...")
+    news_data = load_news_file()
+    # Pre-calcular noticias por divisa para el pre-check de caché
+    all_news: dict[str, list] = {
+        c: get_relevant_news(c, news_data) for c in CURRENCIES
+    }
+    for c, items in all_news.items():
+        if items:
+            print(f"  • {c}: {len(items)} noticia(s) relevante(s) "
+                  f"[{', '.join(a.get('impact','?') for a in items)}]")
+    print()
+
     print("📥 Cargando datos económicos + decisiones monetarias del historial...")
     all_data = {}
     for currency in CURRENCIES:
         print(f"  • {currency}...", end=' ', flush=True)
         all_data[currency] = load_economic_data(currency)
-        available = sum(1 for k, v in all_data[currency].items()
-                        if v is not None and k not in ('lastRateDecision', 'fxSource'))
+        available = sum(
+            1 for k, v in all_data[currency].items()
+            if v is not None and k not in ('lastRateDecision', 'fxSource')
+        )
         fx_src = all_data[currency].get('fxSource', '?')
         print(f"{available} indicadores | FX:{fx_src}")
 
@@ -1166,27 +1392,41 @@ def main():
             print("sin dato")
     print()
 
-    # ── Pre-check: TTL + snapshot ─────────────────────────────────────────────
-    print("🔎 Verificando TTL y cambios en datos...")
+    # ── Pre-check: TTL + snapshot de datos + noticias nuevas ─────────────────
+    print("🔎 Verificando TTL, cambios en datos y noticias recientes...")
     needs_regen   = []
     can_reuse     = []
     prev_analyses = {}
 
     for currency in CURRENCIES:
-        prev = load_previous_analysis(currency)
+        prev    = load_previous_analysis(currency)
         prev_analyses[currency] = prev
-        changed = data_has_changed(currency, all_data[currency], prev)
+
+        macro_changed = data_has_changed(currency, all_data[currency], prev)
+        news_changed  = news_has_changed(currency, prev or {}, all_news[currency])
+        changed       = macro_changed or news_changed
+
         if changed:
             needs_regen.append(currency)
             if prev is None:
                 reason = "sin análisis previo"
             else:
-                # Distinguir si fue TTL o cambio de datos
                 generated_at = prev.get("generatedAt", "")
                 try:
                     gen_dt = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
                     age_h  = (datetime.now(timezone.utc) - gen_dt).total_seconds() / 3600
-                    reason = f"TTL expirado ({age_h:.0f}h)" if age_h > MAX_ANALYSIS_AGE_HOURS else "datos actualizados"
+                    if age_h > MAX_ANALYSIS_AGE_HOURS:
+                        reason = f"TTL expirado ({age_h:.0f}h)"
+                    elif news_changed:
+                        n_new = len([
+                            a for a in all_news[currency]
+                            if a.get("impact") == "high"
+                            and (a.get("ts") or 0) / 1000
+                               > (prev.get("dataSnapshot", {}).get("latestNewsTs") or 0)
+                        ])
+                        reason = f"noticias nuevas de alto impacto ({n_new})"
+                    else:
+                        reason = "datos macroeconómicos actualizados"
                 except Exception:
                     reason = "datos actualizados"
             print(f"  🆕 {currency} — {reason}")
@@ -1211,7 +1451,7 @@ def main():
         index = {
             "generatedAt":    datetime.now(timezone.utc).isoformat(),
             "model":          GROQ_MODEL,
-            "version":        "4.0",
+            "version":        "5.0",
             "currencies":     successful,
             "totalGenerated": 0,
             "totalReused":    len(can_reuse),
@@ -1233,11 +1473,16 @@ def main():
         print(f"[{i+1}/{len(needs_regen)}] {currency} — generando análisis...")
         data        = all_data[currency]
         export_comp = export_compositions.get(currency)
+        news_items  = all_news[currency]
 
         available = sum(1 for v in data.values() if v is not None)
         print(f"  📊 {available} indicadores económicos")
         if export_comp:
             print(f"  🏭 Exportaciones: {export_comp[:80]}...")
+        if news_items:
+            print(f"  📰 Noticias: {len(news_items)} artículo(s) integrado(s) en el prompt")
+        else:
+            print(f"  📰 Noticias: sin contexto noticioso disponible")
 
         if available < 4:
             msg = f"Datos insuficientes ({available})"
@@ -1252,33 +1497,46 @@ def main():
             try:
                 print(f"  🧠 Groq API (Key {current_key_idx + 1})...")
                 analysis_text = generate_analysis(
-                    available_keys[current_key_idx], currency, data,
-                    global_context, export_comp
+                    available_keys[current_key_idx],
+                    currency,
+                    data,
+                    global_context,
+                    export_comp,
+                    news_items,
                 )
                 break
 
             except RuntimeError as e:
                 err_str = str(e)
                 if "DAILY_LIMIT" in err_str or "RATE_LIMIT" in err_str:
-                    label = "agotada (límite diario)" if "DAILY_LIMIT" in err_str else "con rate limit persistente — rotando"
+                    label = (
+                        "agotada (límite diario)" if "DAILY_LIMIT" in err_str
+                        else "con rate limit persistente — rotando"
+                    )
                     print(f"  ⛔ Key {current_key_idx + 1} {label} — buscando siguiente...")
                     current_key_idx += 1
                     if current_key_idx >= len(available_keys):
                         print("  ⛔ Todas las keys agotadas o con rate limit — deteniendo")
                         break
-                    print(f"  🔄 Cambiando a Key {current_key_idx + 1} ({mask_key(available_keys[current_key_idx])}) — pausa {KEY_SWITCH_PAUSE}s...")
+                    print(
+                        f"  🔄 Cambiando a Key {current_key_idx + 1} "
+                        f"({mask_key(available_keys[current_key_idx])}) — pausa {KEY_SWITCH_PAUSE}s..."
+                    )
                     time.sleep(KEY_SWITCH_PAUSE)
                 else:
                     raise
 
         if analysis_text is None:
-            # Conservar análisis previo como fallback si existe
             prev = prev_analyses.get(currency)
             if prev and prev.get("analysis"):
                 print(f"  ⚠️  Groq falló — conservando análisis previo")
                 results[currency] = {"success": True, "reused": True, "fallback": True}
                 continue
-            msg = "Todas las keys agotadas" if current_key_idx >= len(available_keys) else "Error en generación"
+            msg = (
+                "Todas las keys agotadas"
+                if current_key_idx >= len(available_keys)
+                else "Error en generación"
+            )
             print(f"  ❌ {msg}")
             errors.append(f"{currency}: {msg}")
             results[currency] = {"success": False, "error": msg}
@@ -1286,6 +1544,18 @@ def main():
                 print("\n⛔ Sin keys disponibles — deteniendo generación")
                 break
             continue
+
+        # Calcular latestNewsTs para el snapshot — permite detectar noticias nuevas
+        latest_news_ts = 0
+        news_headlines = []
+        if news_items:
+            latest_news_ts = max(
+                (a.get("ts", 0) or 0) for a in news_items
+            ) / 1000  # ms → s
+            news_headlines = [
+                (a.get("ai_headline") or a.get("title", ""))[:80]
+                for a in news_items[:3]
+            ]
 
         output = {
             "currency":    currency,
@@ -1295,6 +1565,7 @@ def main():
             "model":       GROQ_MODEL,
             "generatedAt": datetime.now(timezone.utc).isoformat(),
             "exportComposition": export_comp,
+            "newsCount":   len(news_items),
             "dataSnapshot": {
                 "interestRate":      data.get('interestRate'),
                 "gdpGrowth":         data.get('gdpGrowth'),
@@ -1307,6 +1578,9 @@ def main():
                 "fxPerformance1M":   data.get('fxPerformance1M'),
                 "fxSource":          data.get('fxSource'),
                 "lastUpdate":        data.get('lastUpdate'),
+                # ── v5.0: campos para detectar cambios noticiosos ──
+                "latestNewsTs":      latest_news_ts,
+                "newsHeadlines":     news_headlines,
             },
             "globalContext": global_context,
         }
@@ -1320,6 +1594,7 @@ def main():
             "reused":           False,
             "wordCount":        len(analysis_text.split()),
             "generatedAt":      output["generatedAt"],
+            "newsIntegrated":   len(news_items),
             "exportDataSource": "comtrade" if export_comp and "Comtrade" in export_comp else "fallback",
             "keyUsed":          current_key_idx + 1,
         }
@@ -1330,19 +1605,21 @@ def main():
             time.sleep(3)
 
     # ── Índice final ──────────────────────────────────────────────────────────
-    successful   = [c for c, r in results.items() if r.get('success')]
-    regenerated  = [c for c, r in results.items() if r.get('success') and not r.get('reused')]
-    reused_final = [c for c, r in results.items() if r.get('reused')]
+    successful     = [c for c, r in results.items() if r.get('success')]
+    regenerated    = [c for c, r in results.items() if r.get('success') and not r.get('reused')]
+    reused_final   = [c for c, r in results.items() if r.get('reused')]
     comtrade_count = sum(1 for r in results.values() if r.get('exportDataSource') == 'comtrade')
+    news_total     = sum(r.get('newsIntegrated', 0) for r in results.values() if not r.get('reused'))
 
     index = {
         "generatedAt":    datetime.now(timezone.utc).isoformat(),
         "model":          GROQ_MODEL,
-        "version":        "4.0",
+        "version":        "5.0",
         "currencies":     successful,
         "totalGenerated": len(regenerated),
         "totalReused":    len(reused_final),
         "comtradeHits":   comtrade_count,
+        "newsIntegrated": news_total,
         "keysUsed":       current_key_idx + 1 if needs_regen else 0,
         "errors":         errors,
         "results":        results,
@@ -1353,14 +1630,15 @@ def main():
 
     print("\n" + "=" * 60)
     print("📋 RESUMEN")
-    print(f"   ✅ Exitosos:      {len(successful)}/{len(CURRENCIES)}")
-    print(f"   🆕 Regenerados:  {len(regenerated)} — {', '.join(regenerated) or 'ninguno'}")
-    print(f"   ♻️  Reutilizados: {len(reused_final)} — {', '.join(reused_final) or 'ninguno'}")
-    print(f"   🌐 Comtrade:     {comtrade_count}/{len(CURRENCIES)} divisas")
+    print(f"   ✅ Exitosos:          {len(successful)}/{len(CURRENCIES)}")
+    print(f"   🆕 Regenerados:      {len(regenerated)} — {', '.join(regenerated) or 'ninguno'}")
+    print(f"   ♻️  Reutilizados:     {len(reused_final)} — {', '.join(reused_final) or 'ninguno'}")
+    print(f"   🌐 Comtrade:         {comtrade_count}/{len(CURRENCIES)} divisas")
+    print(f"   📰 Noticias en prompt: {news_total} artículos totales")
     if needs_regen:
-        print(f"   🔑 Keys usadas:  hasta Key {current_key_idx + 1} de {len(available_keys)}")
+        print(f"   🔑 Keys usadas:      hasta Key {current_key_idx + 1} de {len(available_keys)}")
     else:
-        print(f"   🔑 Groq:         0 llamadas (todos reutilizados)")
+        print(f"   🔑 Groq:             0 llamadas (todos reutilizados)")
     if errors:
         print(f"   ❌ Errores:")
         for err in errors:
