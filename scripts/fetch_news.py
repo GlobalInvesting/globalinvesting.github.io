@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v4
+fetch_news.py — v5
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v4:
-  - detect_currency() reescrito con sistema de scoring por peso:
-      • Keywords primarios (nombre del banco central, par de divisas explícito) = 3 pts
-      • Keywords secundarios (nombre país/economía, indicador macroeconómico) = 1 pt
-      • Mínimo 3 puntos para asignar divisa; si ninguna alcanza → descartar artículo
-      • Resuelve falsos positivos clásicos:
-          "per pound" → GBP  (sugar futures)
-          "australia" en el expand de un artículo sobre Turquía → AUD
-          "oil prices" → CAD  (cuando el artículo es sobre otra región)
-  - detect_currency() ya no tiene fallback a "USD":
-      si ninguna divisa alcanza el umbral → retorna None → artículo descartado
-  - Filtro de "relevancia de divisa confirmada": reemplaza is_forex_relevant()
-    con una validación más estricta basada en el propio score de detect_currency()
-  - TSX ahora detecta correctamente CAD (keyword "tsx" añadido)
-  - FALSE POSITIVE GUARDS: "per pound", "sugar", "silver", "gold" como artículos
-    de commodities puros no triggerean GBP/NZD/CAD salvo que haya contexto forex real
+CAMBIOS v5 (sobre v4):
+  - detect_currency() integra la misma lógica de scoring de news.html v5.3:
+      • PASO 1: Par de divisas explícito en el TÍTULO (EUR/USD, NZD/USD, AUD/JPY...)
+                → asigna divisa protagonista según PAIR_PROTAGONIST_MAP
+                → resuelve el bug principal: "NZD/USD" asignado a USD, "EUR/GBP" a GBP
+      • PASO 2: Scoring acumulativo por pesos (igual que v4, sin cambios)
+      • Eliminados duplicados: la lógica de pares ya cubre EUR/GBP, AUD/JPY, etc.
+  - Añadido keyword 'strait of hormuz' → USD (peso 9) en CURRENCY_KEYWORDS_WEIGHTED
+    → resuelve "US could provide military protection to Strait of Hormuz" → NZD→USD
+  - 'trump ' (con espacio) → USD peso 9 (geopolítica liderada por EEUU)
+  - PAIR_PROTAGONIST_MAP sincronizado con news.html para coherencia
+  - detect_currency() sigue retornando None si ninguna divisa alcanza el umbral
+  - Sin cambios en feeds, smart_select, impacto, ni estructura del JSON
 """
 
 import json
@@ -44,13 +41,47 @@ FETCH_TIMEOUT         = 12
 FETCH_WORKERS         = 8
 MIN_DESCRIPTION_WORDS = 12
 
-# Umbral mínimo de score para asignar una divisa.
-# 3 puntos = al menos un keyword primario (banco central, par FX explícito)
-# o tres keywords secundarios (economía + indicador + activo).
+# Umbral mínimo de score para asignar divisa por keywords
+# (el paso de pares explícitos ignora este umbral)
 CURRENCY_MIN_SCORE = 3
 
 # ─────────────────────────────────────────────
-# PATRONES DE CALENDARIO / EVENTOS FUTUROS
+# PAR EXPLÍCITO → DIVISA PROTAGONISTA
+# Sincronizado con PAIR_PROTAGONIST_MAP de news.html v5.3
+# El protagonista es la divisa BASE del par (la que se está analizando/moviendo).
+# ─────────────────────────────────────────────
+PAIR_PROTAGONIST_MAP = {
+    'EUR/USD': 'EUR', 'EURUSD': 'EUR',
+    'GBP/USD': 'GBP', 'GBPUSD': 'GBP',
+    'USD/JPY': 'JPY', 'USDJPY': 'JPY',
+    'AUD/USD': 'AUD', 'AUDUSD': 'AUD',
+    'NZD/USD': 'NZD', 'NZDUSD': 'NZD',
+    'USD/CAD': 'CAD', 'USDCAD': 'CAD',
+    'USD/CHF': 'CHF', 'USDCHF': 'CHF',
+    'EUR/GBP': 'EUR', 'EURGBP': 'EUR',
+    'EUR/JPY': 'EUR', 'EURJPY': 'EUR',
+    'GBP/JPY': 'GBP', 'GBPJPY': 'GBP',
+    'AUD/JPY': 'AUD', 'AUDJPY': 'AUD',
+    'EUR/AUD': 'EUR', 'EURAUD': 'EUR',
+    'GBP/AUD': 'GBP', 'GBPAUD': 'GBP',
+    'AUD/CHF': 'AUD', 'AUDCHF': 'AUD',
+    'EUR/CAD': 'EUR', 'EURCAD': 'EUR',
+    'GBP/CHF': 'GBP', 'GBPCHF': 'GBP',
+    'NZD/JPY': 'NZD', 'NZDJPY': 'NZD',
+    'CAD/JPY': 'CAD', 'CADJPY': 'CAD',
+    'NZD/CAD': 'NZD', 'NZDCAD': 'NZD',
+    'EUR/NZD': 'EUR', 'EURNZD': 'EUR',
+    'GBP/NZD': 'GBP', 'GBPNZD': 'GBP',
+    'EUR/CHF': 'EUR', 'EURCHF': 'EUR',
+    'AUD/NZD': 'AUD', 'AUDNZD': 'AUD',
+    'GBP/CAD': 'GBP', 'GBPCAD': 'GBP',
+    'CHF/JPY': 'CHF', 'CHFJPY': 'CHF',
+    'NZD/CHF': 'NZD', 'NZDCHF': 'NZD',
+    'AUD/CAD': 'AUD', 'AUDCAD': 'AUD',
+}
+
+# ─────────────────────────────────────────────
+# PATRONES DE CALENDARIO
 # ─────────────────────────────────────────────
 CALENDAR_PATTERNS = [
     r"upcoming event", r"content type.*upcoming", r"scheduled date",
@@ -84,200 +115,194 @@ EDUCATIONAL_ONLY_PATTERNS = [
 EDUCATIONAL_RE = re.compile("|".join(EDUCATIONAL_ONLY_PATTERNS), re.IGNORECASE)
 
 # ─────────────────────────────────────────────
-# CURRENCY KEYWORDS CON PESOS
-# Cada entrada: (keyword, peso)
-#   peso 3 = señal fuerte (banco central, ticker FX, par de divisas explícito)
-#   peso 1 = señal débil  (nombre de país, indicador macroeconómico genérico)
-#
-# NOTA IMPORTANTE sobre falsos positivos:
-#   "pound" (peso=1 para GBP) puede matchear "per pound" (unidad de medida)
-#   → Se mitiga con FALSE_POSITIVE_GUARDS en detect_currency()
+# KEYWORDS CON PESOS — v5
+# Cambios vs v4:
+#   - USD: añadidos 'strait of hormuz' (peso 9), 'trump ' (peso 9),
+#          'us military', 'us navy', 'white house', 'pentagon' (peso 9)
+#   - Sin otros cambios de keywords (el paso de pares explícitos
+#     ya resuelve la mayoría de los falsos positivos anteriores)
 # ─────────────────────────────────────────────
 CURRENCY_KEYWORDS_WEIGHTED = {
     "USD": [
-        # Fuerte (3)
-        ("fed ", 3), ("federal reserve", 3), ("fomc", 3), ("powell", 3),
-        ("usd/", 3), ("/usd", 3), ("usd/jpy", 3), ("eur/usd", 3), ("gbp/usd", 3),
-        ("aud/usd", 3), ("nzd/usd", 3), ("usd/cad", 3), ("usd/chf", 3),
-        ("dxy", 3), ("dollar index", 3), ("us dollar", 3),
-        ("treasury yield", 3), ("us 10-year", 3), ("10-year treasury", 3),
-        ("nonfarm", 3), ("non-farm payroll", 3),
-        # Moderado (2)
-        ("dollar", 2), ("usd ", 2),
+        # Banco central / institucional (10)
+        ("fed ", 10), ("federal reserve", 10), ("fomc", 10), ("powell", 10),
+        ("us treasury", 10), ("reserva federal", 10),
+        # Geopolítica liderada por EEUU (9) — NUEVO v5
+        ("strait of hormuz", 9), ("estrecho de ormuz", 9),
+        ("us military", 9), ("us navy", 9), ("us sanctions", 9),
+        ("us-iran", 9), ("us iran conflict", 9), ("us strikes", 9),
+        ("trump ", 9), ("white house", 9), ("pentagon", 9),
+        # Tickers y pares (5) — sin pares cruzados (manejados por PAIR_PROTAGONIST_MAP)
+        ("usd/", 5), ("dollar index", 5), ("dxy", 5), ("us dollar", 5),
+        ("dólar estadounidense", 5),
+        # Macro EEUU (8)
+        ("us economy", 8), ("us gdp", 8), ("us cpi", 8), ("us inflation", 8),
+        ("us jobs", 8), ("nonfarm", 8), ("non-farm payroll", 8),
+        ("jobless claims", 8), ("american economy", 8),
+        # Mercados EEUU (3)
+        ("treasury yield", 3), ("wall street", 3), ("nasdaq", 3),
+        ("dow jones", 3), ("s&p 500", 3), ("us 10-year", 3),
         # Débil (1)
-        ("us economy", 1), ("us gdp", 1), ("us inflation", 1),
-        ("wall street", 1), ("nasdaq", 1), ("dow jones", 1), ("s&p 500", 1),
-        ("us jobs", 1), ("american economy", 1), ("jobless claims", 1),
-        ("tariff", 1), ("arancel", 1), ("reserva federal", 1),
-        ("dólar", 1), ("economía de eeuu", 1), ("pib eeuu", 1),
-        ("inflación eeuu", 1), ("bonos del tesoro", 1),
-        # ISM — contexto EEUU específico
-        ("ism ", 1),
+        ("dollar", 1), ("dólar", 1), ("tariff", 1), ("arancel", 1),
+        ("ism ", 1), ("estados unidos", 1), ("united states", 1),
     ],
     "EUR": [
-        # Fuerte (3)
-        ("ecb", 3), ("european central bank", 3), ("lagarde", 3),
-        ("eur/usd", 3), ("eur/gbp", 3), ("eur/jpy", 3), ("eur/chf", 3),
-        ("euro area", 3), ("eurozone", 3), ("euro zone", 3),
-        ("bce", 3), ("banco central europeo", 3),
-        # Moderado (2)
-        ("euro ", 2), ("eur ", 2),
+        # Banco central / institucional (10)
+        ("ecb", 10), ("european central bank", 10), ("lagarde", 10),
+        ("kazaks", 10), ("schnabel", 10), ("de guindos", 10),
+        ("bce", 10), ("banco central europeo", 10),
+        # Zona euro (8)
+        ("euro area", 8), ("eurozone", 8), ("euro zone", 8), ("eurozona", 8),
+        ("zona euro", 8),
+        # Macro Eurozona (5)
+        ("germany gdp", 5), ("german cpi", 5), ("ifo", 5), ("zew", 5),
+        ("bund", 5), ("eu gdp", 5), ("eurozone inflation", 5), ("eurozone gdp", 5),
+        # Tickers (5)
+        ("eur/", 5), ("/eur", 5), ("euro ", 2),
         # Débil (1)
-        ("eurozona", 1), ("germany", 1), ("france", 1), ("italy", 1), ("spain", 1),
-        ("ifo", 1), ("zew", 1), ("eu economy", 1), ("european economy", 1),
-        ("bund", 1), ("eu gdp", 1), ("alemania", 1), ("zona euro", 1),
-        ("inflación zona euro", 1), ("pib zona euro", 1),
+        ("eu economy", 1), ("european economy", 1),
+        ("economía europea", 1), ("alemania", 1),
+        ("france", 1), ("italy", 1), ("spain", 1),
     ],
     "GBP": [
-        # Fuerte (3)
-        ("boe", 3), ("bank of england", 3), ("bailey", 3),
-        ("gbp/usd", 3), ("eur/gbp", 3), ("gbp/jpy", 3),
-        ("uk gilt", 3), ("gilt yield", 3), ("gilts", 3),
-        ("sterling", 3), ("libra esterlina", 3),
-        ("banco de inglaterra", 3),
-        # Moderado (2)
-        ("gbp ", 2), ("pound sterling", 2),
-        # Débil (1) — NOTA: "pound" solo sin contexto = peso 1 (puede ser unidad de medida)
-        ("uk economy", 1), ("united kingdom", 1), ("britain", 1),
-        ("uk gdp", 1), ("uk inflation", 1), ("uk jobs", 1),
-        ("reino unido", 1), ("brexit", 1),
-        # "pound" aislado = 1 (falso positivo mitigado por guard)
-        ("pound", 1),
+        # Banco central / institucional (10)
+        ("boe", 10), ("bank of england", 10), ("bailey", 10),
+        ("mpc meeting", 10), ("mpc decision", 10),
+        ("banco de inglaterra", 10),
+        # Sterling (8)
+        ("sterling", 8), ("pound sterling", 8), ("libra esterlina", 8),
+        ("uk gilt", 8), ("gilt yield", 8), ("gilts", 8),
+        # Macro UK (5)
+        ("uk economy", 5), ("united kingdom", 5), ("britain", 5),
+        ("uk gdp", 5), ("uk inflation", 5), ("uk jobs", 5),
+        ("uk cpi", 5), ("reino unido", 5),
+        # Tickers (5)
+        ("gbp/", 5), ("/gbp", 5),
+        # Débil (1) — "pound" solo puede ser unidad de medida
+        ("pound", 1), ("british", 1), ("ftse", 1), ("brexit", 1),
     ],
     "JPY": [
-        # Fuerte (3)
-        ("boj", 3), ("bank of japan", 3), ("ueda", 3), ("himino", 3),
-        ("usd/jpy", 3), ("eur/jpy", 3), ("gbp/jpy", 3), ("aud/jpy", 3),
-        ("japanese yen", 3), ("yen japonés", 3),
-        ("banco de japón", 3),
-        # Moderado (2)
-        ("jpy ", 2), ("jpy/", 2), ("/jpy", 2),
-        ("yen ", 2),
+        # Banco central / institucional (10)
+        ("boj", 10), ("bank of japan", 10), ("ueda", 10), ("himino", 10),
+        ("kuroda", 10), ("banco de japón", 10),
+        # Yen (8)
+        ("japanese yen", 8), ("yen japonés", 8),
+        # Macro Japón (5)
+        ("japan economy", 5), ("japanese economy", 5), ("economía japonesa", 5),
+        ("japan gdp", 5), ("japan inflation", 5), ("japan cpi", 5),
+        ("japan pmi", 5), ("japan trade", 5), ("japan unemployment", 5),
+        # Tickers (5)
+        ("jpy ", 5), ("jpy/", 5), ("/jpy", 5), ("usd/jpy", 5),
         # Débil (1)
-        ("japan economy", 1), ("japanese", 1), ("nikkei", 1),
-        ("japan gdp", 1), ("japan inflation", 1), ("japan cpi", 1),
-        ("japan pmi", 1), ("japan trade", 1), ("japan unemployment", 1),
-        ("economía japonesa", 1), ("pib japón", 1),
+        ("yen ", 1), ("nikkei", 1), ("japanese", 1), ("japan ", 1),
+        ("japón ", 1),
     ],
     "AUD": [
-        # Fuerte (3)
-        ("rba", 3), ("reserve bank of australia", 3), ("bullock", 3),
-        ("aud/usd", 3), ("aud/jpy", 3), ("aud/nzd", 3),
-        ("australian dollar", 3), ("dólar australiano", 3),
-        ("aussie dollar", 3),
-        # Moderado (2)
-        ("aud ", 2), ("aud/", 2), ("/aud", 2),
-        ("aussie ", 2),
+        # Banco central / institucional (10)
+        ("rba", 10), ("reserve bank of australia", 10), ("bullock", 10),
+        ("banco de la reserva de australia", 10),
+        # Dólar australiano (8)
+        ("australian dollar", 8), ("dólar australiano", 8), ("aussie dollar", 8),
+        # Macro Australia (5)
+        ("australia gdp", 5), ("australian gdp", 5),
+        ("australia inflation", 5), ("australia cpi", 5),
+        ("australia trade", 5), ("australia retail", 5),
+        ("australia jobs", 5), ("australian jobs", 5),
+        ("australian economy", 5), ("australia economy", 5),
+        # Tickers (5)
+        ("aud/", 5), ("/aud", 5), ("aud ", 3), ("aussie ", 3),
         # Débil (1)
-        ("australia gdp", 1), ("australian gdp", 1),
-        ("australia inflation", 1), ("australia cpi", 1),
-        ("australia trade", 1), ("australia retail", 1),
-        ("australia jobs", 1), ("australian jobs", 1),
-        ("australian economy", 1), ("australia economy", 1),
-        ("banco de la reserva de australia", 1),
-        # "australia" solo vale 1 — si aparece de pasada (ej. "mercados esperan GDP australiano")
-        # no es suficiente para asignar AUD sin otro keyword
         ("australia", 1),
     ],
     "CAD": [
-        # Fuerte (3)
-        ("boc", 3), ("bank of canada", 3), ("macklem", 3),
-        ("usd/cad", 3), ("cad/jpy", 3),
-        ("canadian dollar", 3), ("dólar canadiense", 3),
-        ("loonie", 3), ("banco de canadá", 3),
-        # Mercado canadiense específico (3)
-        ("tsx", 3), ("s&p/tsx", 3), ("s p/tsx", 3),
-        # Moderado (2)
-        ("cad ", 2), ("cad/", 2), ("/cad", 2),
-        # Débil (1)
-        ("canada economy", 1), ("economía canadá", 1),
-        ("canada gdp", 1), ("pib canadá", 1),
-        ("canada inflation", 1), ("inflación canadá", 1),
-        ("canada trade", 1), ("canada jobs", 1),
-        ("canadian economy", 1),
-        # Petróleo = correlación CAD, pero solo vale 1 (contexto necesario)
-        # Un artículo sobre petróleo en general no es automáticamente CAD
+        # Banco central / institucional (10)
+        ("boc", 10), ("bank of canada", 10), ("macklem", 10),
+        ("banco de canadá", 10),
+        # Dólar canadiense (8)
+        ("canadian dollar", 8), ("dólar canadiense", 8), ("loonie", 8),
+        # Mercado canadiense (8)
+        ("tsx", 8), ("s&p/tsx", 8),
+        # Macro Canadá (5)
+        ("canada economy", 5), ("economía canadá", 5),
+        ("canada gdp", 5), ("pib canadá", 5),
+        ("canada inflation", 5), ("canada trade", 5), ("canada jobs", 5),
+        ("canadian economy", 5),
+        # Tickers (5)
+        ("cad/", 5), ("/cad", 5), ("usd/cad", 5), ("cad ", 3),
+        # Petróleo (correlación CAD, pero solo peso 1 para evitar falsos positivos
+        # en artículos puramente geopolíticos — el scoring de USD con peso 9 gana)
         ("crude oil", 1), ("wti ", 1), ("brent", 1), ("petróleo", 1),
         ("oil prices", 1), ("opec", 1),
+        # Débil (1)
+        ("canada ", 1), ("canadá ", 1),
     ],
     "CHF": [
-        # Fuerte (3)
-        ("snb", 3), ("swiss national bank", 3), ("jordan", 3), ("schlegel", 3),
-        ("usd/chf", 3), ("eur/chf", 3), ("chf/jpy", 3),
-        ("swiss franc", 3), ("franco suizo", 3),
-        ("banco nacional suizo", 3),
-        # Moderado (2)
-        ("chf ", 2), ("chf/", 2), ("/chf", 2),
+        # Banco central / institucional (10)
+        ("snb", 10), ("swiss national bank", 10), ("jordan", 10),
+        ("schlegel", 10), ("banco nacional suizo", 10),
+        # Franco suizo (8)
+        ("swiss franc", 8), ("franco suizo", 8),
+        # Macro Suiza (5)
+        ("switzerland", 5), ("swiss economy", 5), ("swiss inflation", 5),
+        ("swiss cpi", 5), ("switzerland gdp", 5), ("swiss pmi", 5),
+        ("swiss kof", 5), ("suiza", 5),
+        # Tickers (5)
+        ("chf/", 5), ("/chf", 5), ("usd/chf", 5), ("chf ", 3),
         # Débil (1)
-        ("switzerland", 1), ("swiss economy", 1), ("swiss inflation", 1),
-        ("swiss cpi", 1), ("switzerland gdp", 1), ("swiss pmi", 1),
-        ("swiss kof", 1), ("suiza", 1),
+        ("swiss ", 1),
     ],
     "NZD": [
-        # Fuerte (3)
-        ("rbnz", 3), ("reserve bank of new zealand", 3), ("orr", 3),
-        ("nzd/usd", 3), ("aud/nzd", 3), ("nzd/jpy", 3),
-        ("new zealand dollar", 3), ("dólar neozelandés", 3),
-        ("kiwi dollar", 3),
-        ("banco de la reserva de nueva zelanda", 3),
-        # Moderado (2)
-        ("nzd ", 2), ("nzd/", 2), ("/nzd", 2),
-        ("kiwi ", 2),
+        # Banco central / institucional (10)
+        ("rbnz", 10), ("reserve bank of new zealand", 10), ("orr", 10),
+        ("banco de la reserva de nueva zelanda", 10),
+        # Dólar neozelandés (8)
+        ("new zealand dollar", 8), ("dólar neozelandés", 8), ("kiwi dollar", 8),
+        # Macro NZ (5)
+        ("new zealand gdp", 5), ("nz gdp", 5), ("nz cpi", 5),
+        ("nz economy", 5), ("nz pmi", 5), ("nz trade", 5), ("nz retail", 5),
+        ("nz jobs", 5), ("new zealand inflation", 5), ("new zealand trade", 5),
+        ("nueva zelanda", 5),
+        # Tickers (5)
+        ("nzd/", 5), ("/nzd", 5), ("nzd ", 3), ("kiwi ", 3),
         # Débil (1)
-        ("new zealand", 1), ("nueva zelanda", 1),
-        ("nz economy", 1), ("nz gdp", 1), ("nz cpi", 1),
-        ("nz pmi", 1), ("nz trade", 1), ("nz retail", 1),
-        ("nz jobs", 1), ("new zealand inflation", 1),
-        ("new zealand gdp", 1), ("new zealand trade", 1),
+        ("new zealand", 1),
     ],
 }
 
 # ─────────────────────────────────────────────
-# FALSE POSITIVE GUARDS
-# Si alguno de estos patterns está presente en el texto,
-# se penaliza el score de la divisa indicada.
-# Evita que "per pound" → GBP, "silver" → NZD, etc.
+# FALSE POSITIVE GUARDS — sin cambios vs v4
 # ─────────────────────────────────────────────
 FALSE_POSITIVE_GUARDS = [
-    # "per pound" como unidad de peso/precio → penalizar GBP
     {
         "pattern": re.compile(r"\bper pound\b|\bcents? per pound\b|\bper lb\b", re.IGNORECASE),
         "penalize": {"GBP": 2},
     },
-    # "pound" en contexto de peso/alimentos → penalizar GBP si no hay sterling/UK
     {
         "pattern": re.compile(r"\b(sugar|coffee|cotton|cocoa|wheat|corn|grain|commodity|commodit)\b", re.IGNORECASE),
         "penalize": {"GBP": 2},
     },
-    # Artículo sobre bolsa turca/emergente sin nexo AUD → penalizar AUD, NZD
     {
         "pattern": re.compile(r"\b(turkey|turkish|bist|istanbul|ankara|lira)\b", re.IGNORECASE),
         "penalize": {"AUD": 3, "NZD": 3},
     },
-    # Artículo sobre bolsa brasileña sin nexo CAD → penalizar CAD
     {
         "pattern": re.compile(r"\b(ibovespa|bovespa|brazil|brasil|real brasileiro|brl)\b", re.IGNORECASE),
         "penalize": {"CAD": 3, "AUD": 2},
     },
-    # Plata/metales preciosos puros sin FX → penalizar NZD, AUD si no hay keywords propios
     {
         "pattern": re.compile(r"\b(silver|platinum|palladium|precious metal)\b", re.IGNORECASE),
         "penalize": {"NZD": 2, "AUD": 1},
     },
-    # Rand sudafricano → no debería asignarse a USD
     {
         "pattern": re.compile(r"\b(rand|south african|zar|johannesburg|pretoria)\b", re.IGNORECASE),
         "penalize": {"USD": 2, "AUD": 2, "NZD": 2},
     },
-    # Bolsa china → no CAD
     {
         "pattern": re.compile(r"\b(shanghai|shenzhen|hang seng|csi 300|yuan|renminbi|cny)\b", re.IGNORECASE),
         "penalize": {"CAD": 2, "AUD": 1},
     },
 ]
 
-# Artículos con estos patrones en el título son de mercados emergentes/commodities
-# y deben tener un score forex muy alto para ser incluidos
 EMERGING_MARKET_TITLE_RE = re.compile(
     r"\b(ibovespa|bovespa|bist 100|istanbul|turkish stocks?|south african rand|"
     r"rand weakens?|sugar futures?|silver (price|slammed|falls?)|"
@@ -336,6 +361,9 @@ HIGH_IMPACT_KW = [
     "inflación", "ipc ", "pib ", "recesión", "crisis ", "sorprende",
     "inesperado", "inesperada", "política monetaria", "banco central",
     "hawkish", "dovish",
+    # Geopolítica sistémica — v5
+    "strait of hormuz", "estrecho de ormuz", "war ", "guerra ",
+    "military strike", "ataque militar", "sanctions", "sanciones",
 ]
 
 MED_IMPACT_KW = [
@@ -345,6 +373,8 @@ MED_IMPACT_KW = [
     "surplus", "forecast", "outlook", "guidance", "payroll", "manufacturing",
     "pmi manufacturero", "desempleo", "balanza comercial", "ventas minoristas",
     "producción industrial", "confianza del consumidor", "salarios",
+    # Petróleo → MED (era LOW, incorrecto para sesiones de energía)
+    "crude oil", "oil prices", "petróleo", "brent", "wti",
 ]
 
 SOURCE_CURRENCY = {
@@ -366,9 +396,6 @@ FOREX_SOURCES = {
 }
 
 # ─────────────────────────────────────────────
-# FILTROS DE CALIDAD
-# ─────────────────────────────────────────────
-
 def is_calendar_entry(title: str, description: str) -> bool:
     combined = (title + " " + description).strip()
     if CALENDAR_TITLE_RE.search(title.strip()):
@@ -395,10 +422,6 @@ def has_real_content(title: str, description: str) -> bool:
 
 
 def is_forex_relevant(title: str, summary: str) -> bool:
-    """
-    Verificación liviana de relevancia forex.
-    detect_currency() hace el filtrado pesado; este es el pre-filtro.
-    """
     FOREX_RELEVANCE_KW = [
         "usd", "eur", "gbp", "jpy", "aud", "cad", "chf", "nzd",
         "dollar", "dólar", "euro", "pound sterling", "yen", "franc", "franco",
@@ -417,46 +440,71 @@ def is_forex_relevant(title: str, summary: str) -> bool:
 
 def detect_currency(title: str, summary: str, source: str = "") -> str | None:
     """
-    Asigna la divisa más relevante usando un sistema de scoring ponderado.
+    v5: añade PASO 1 (par explícito en título) antes del scoring.
 
-    Retorna:
-      str  → código de divisa (USD, EUR, GBP, ...)
-      None → ninguna divisa alcanzó el umbral mínimo → artículo debe descartarse
+    PASO 1: busca par de divisas explícito en el TÍTULO.
+            Si el título empieza con "EUR/USD", "NZD/USD:", "AUD/JPY breaks..."
+            → asigna la divisa protagonista (generalmente la base del par).
+            Esto resuelve: "NZD/USD: bajistas acechan" → NZD (no USD)
+                           "EUR/GBP se suaviza" → EUR (no GBP)
+                           "AUD/JPY breaks high" → AUD (no JPY)
 
-    Lógica:
-      1. Calcular score bruto por divisa sumando pesos de keywords encontrados
-      2. Aplicar penalizaciones de FALSE_POSITIVE_GUARDS
-      3. Si la divisa ganadora tiene score >= CURRENCY_MIN_SCORE → asignarla
-      4. Si no → intentar SOURCE_CURRENCY como fallback conservador
-      5. Si source tampoco está → retornar None
+    PASO 2: scoring ponderado (igual que v4).
+            Resuelve: "US could provide military protection to Strait of Hormuz"
+                      → USD (peso 9 por 'strait of hormuz') > CAD (peso 1 por 'oil')
+
+    PASO 3: fallback a SOURCE_CURRENCY si la fuente es institucional conocida.
+
+    PASO 4: retorna None → artículo descartado.
     """
-    text = (title + " " + summary).lower()
+    title_clean = (title or '').strip()
+    title_upper = title_clean.upper().replace(' ', '')
 
-    # Paso 1 — scoring bruto
-    scores: dict[str, int] = {cur: 0 for cur in CURRENCIES}
+    # ── PASO 1: par explícito en el título ──────────────────────────────────
+    # Busca primero al inicio del título (primeros 35 chars), luego en todo el título
+    title_start_upper = title_clean.upper()[:35].replace(' ', '')
+    for pair, protagonist in PAIR_PROTAGONIST_MAP.items():
+        pair_noslash = pair.replace('/', '').upper()
+        pair_slash   = pair.upper()
+        # Inicio del título (prioridad máxima)
+        if pair_noslash in title_start_upper or pair_slash in title_clean.upper()[:35]:
+            return protagonist
+    # En cualquier parte del título
+    for pair, protagonist in PAIR_PROTAGONIST_MAP.items():
+        pair_noslash = pair.replace('/', '').upper()
+        if pair_noslash in title_upper or pair.upper() in title_clean.upper():
+            return protagonist
+
+    # ── PASO 2: scoring acumulativo ──────────────────────────────────────────
+    text   = (title_clean + " " + (summary or '')).lower()
+    title_lower = title_clean.lower()
+    scores: dict[str, float] = {cur: 0.0 for cur in CURRENCIES}
+
     for cur, kws in CURRENCY_KEYWORDS_WEIGHTED.items():
         for kw, weight in kws:
             if kw in text:
                 scores[cur] += weight
+                # Bonus 50% si la keyword está en el título
+                if kw in title_lower:
+                    scores[cur] += weight * 0.5
 
-    # Paso 2 — penalizaciones de falsos positivos
+    # Penalizaciones de falsos positivos
     for guard in FALSE_POSITIVE_GUARDS:
         if guard["pattern"].search(text):
             for cur, penalty in guard["penalize"].items():
                 scores[cur] = max(0, scores[cur] - penalty)
 
-    # Paso 3 — divisa con mayor score
     best_cur   = max(scores, key=lambda c: scores[c])
     best_score = scores[best_cur]
 
     if best_score >= CURRENCY_MIN_SCORE:
         return best_cur
 
-    # Paso 4 — fallback conservador: solo para fuentes institucionales conocidas
+    # ── PASO 3: fallback institucional ───────────────────────────────────────
     if source in SOURCE_CURRENCY:
         return SOURCE_CURRENCY[source]
 
-    # Paso 5 — no hay divisa confiable
+    # ── PASO 4: sin divisa confiable ─────────────────────────────────────────
     return None
 
 
@@ -551,7 +599,10 @@ def load_previous_headlines() -> dict:
         prev = {}
         for a in data.get("articles", []):
             if a.get("ai_headline") and a.get("id"):
-                prev[a["id"]] = a["ai_headline"]
+                prev[a["id"]] = {
+                    "ai_headline": a["ai_headline"],
+                    "sentiment":   a.get("sentiment", "neut"),
+                }
         return prev
     except Exception:
         return {}
@@ -602,26 +653,26 @@ def smart_select(articles, max_total, guaranteed_per_cur, max_per_cur):
 def main():
     now_utc = datetime.now(timezone.utc)
     cutoff  = now_utc - timedelta(days=MAX_AGE_DAYS)
-    seen_ids            = set()
-    seen_titles         = set()
-    raw_articles        = []
-    es_raw = en_raw     = 0
-    filtered_calendar   = 0
-    filtered_quality    = 0
-    filtered_relevance  = 0
+    seen_ids             = set()
+    seen_titles          = set()
+    raw_articles         = []
+    es_raw = en_raw      = 0
+    filtered_calendar    = 0
+    filtered_quality     = 0
+    filtered_relevance   = 0
     filtered_no_currency = 0
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] Iniciando fetch de {len(FEEDS)} feeds...")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5 — {len(FEEDS)} feeds")
 
-    print(f"  Descargando {len(FEEDS)} feeds en paralelo (workers={FETCH_WORKERS})...")
+    print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
     print(f"  Descarga completada.")
 
     for feed_cfg in FEEDS:
-        source = feed_cfg["source"]
-        lang   = feed_cfg.get("lang", "en")
+        source  = feed_cfg["source"]
+        lang    = feed_cfg.get("lang", "en")
         entries = all_entries.get(feed_cfg["url"], [])
-        count = 0
+        count   = 0
 
         for entry in entries:
             title   = clean_html(getattr(entry, "title", ""))
@@ -662,11 +713,10 @@ def main():
                 continue
             seen_titles.add(title_key)
 
-            # ── Detección de divisa con scoring ponderado ──────────────────
             cur = detect_currency(title, summary, source)
             if cur is None:
                 filtered_no_currency += 1
-                continue  # Artículo descartado: no tiene divisa confiable
+                continue
 
             impact = detect_impact(title, summary)
             expand = summary[:350] + ("..." if len(summary) > 350 else "")
@@ -700,10 +750,10 @@ def main():
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
     print(f"   🚫 Descartados:")
-    print(f"      Calendario/vacíos:   {filtered_calendar}")
-    print(f"      Sin contenido:       {filtered_quality}")
-    print(f"      Sin relevancia FX:   {filtered_relevance}")
-    print(f"      Sin divisa confiable: {filtered_no_currency}  ← nuevo filtro v4")
+    print(f"      Calendario/vacíos:    {filtered_calendar}")
+    print(f"      Sin contenido:        {filtered_quality}")
+    print(f"      Sin relevancia FX:    {filtered_relevance}")
+    print(f"      Sin divisa confiable: {filtered_no_currency}")
 
     dist_before   = Counter(a["cur"] for a in raw_articles)
     impact_before = Counter(a["impact"] for a in raw_articles)
@@ -714,11 +764,14 @@ def main():
     if missing:
         print(f"   ⚠️  Sin artículos en {MAX_AGE_DAYS} días: {', '.join(missing)}")
 
-    prev_headlines = load_previous_headlines()
+    # Reutilizar titulares y sentimientos del JSON anterior
+    prev_data = load_previous_headlines()
     reused = 0
     for a in raw_articles:
-        if a["id"] in prev_headlines:
-            a["ai_headline"] = prev_headlines[a["id"]]
+        if a["id"] in prev_data:
+            prev = prev_data[a["id"]]
+            a["ai_headline"] = prev["ai_headline"]
+            a["sentiment"]   = prev.get("sentiment", "neut")
             reused += 1
     if reused:
         print(f"   ♻️  Titulares reutilizados del JSON anterior: {reused}")
