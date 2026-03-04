@@ -68,11 +68,8 @@
     --blue:#1e88e5;
     --blue-dim:rgba(30,136,229,0.1);
     --green:#26a69a;
-    --green-strong:#26a69a;
     --red:#ef5350;
-    --red-strong:#ef5350;
     --orange:#e0a020;
-    --purple:#9c6fde;
   }
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
@@ -90,7 +87,7 @@
   .page-nav-links a:hover{color:var(--text-primary);}
 
   .nav-tabs{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;gap:0.5rem;max-width:1800px;margin:0 auto;overflow-x:auto;}
-  .nav-tab{padding:1rem 1.5rem;background:transparent;border:none;color:var(--text-secondary);font-size:0.875rem;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s ease;white-space:nowrap;text-decoration:none;display:flex;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;font-size:14px;}
+  .nav-tab{padding:1rem 1.5rem;background:transparent;border:none;color:var(--text-secondary);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s ease;white-space:nowrap;text-decoration:none;display:flex;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;}
   .nav-tab:hover{color:var(--text-primary);}
   .nav-tab.active{color:var(--text-primary);border-bottom-color:var(--blue);}
 
@@ -108,8 +105,9 @@
   .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
   .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
 
-  .layout-cols{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;}
+  .layout-cols{display:grid;grid-template-columns:1fr 268px;gap:1rem;align-items:start;}
 
+  /* ── NEWS PANEL ── */
   .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .panel-header{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
   .news-row{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
@@ -136,31 +134,47 @@
   .feed-empty a:hover{text-decoration:underline;}
   .feed-error-icon{font-size:2rem;margin-bottom:.75rem;}
 
+  /* ── SIDEBAR ── */
   .sidebar{display:flex;flex-direction:column;gap:1rem;}
   .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
   .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
   .s-sub{font-size:.62rem;color:var(--text-dim);}
-  .sent-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);cursor:default;}
+
+  /* ── SENTIMENT ROWS — v5.5 ── */
+  .sent-row{display:flex;align-items:center;gap:.55rem;padding:.48rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);cursor:default;transition:background .12s;}
   .sent-row:last-child{border-bottom:none;}
-  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:52px;flex-shrink:0;display:flex;align-items:center;gap:.3rem;}
-  .sent-bar-wrap{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;position:relative;}
-  .sent-bar{height:100%;border-radius:2px;transition:width .3s ease;}
-  .sent-bar.bull{background:var(--green);}
-  .sent-bar.bear{background:var(--red);}
-  .sent-bar.neut{background:var(--text-dim);}
-  .sent-bar.mixed{background:linear-gradient(90deg,var(--green) 50%,var(--red) 50%);}
-  .sent-count{font-size:.6rem;color:var(--text-dim);width:24px;text-align:right;flex-shrink:0;}
-  .sent-label{font-size:.6rem;font-weight:700;width:36px;text-align:right;flex-shrink:0;letter-spacing:.02em;}
-  .sent-label.bull{color:var(--green);}
-  .sent-label.bear{color:var(--red);}
-  .sent-label.neut{color:var(--text-dim);}
-  .sent-label.mixed{color:var(--orange);}
-  .sent-label.nodata{color:var(--text-tertiary);}
+  .sent-row:hover{background:rgba(255,255,255,.02);}
+  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:50px;flex-shrink:0;display:flex;align-items:center;gap:.28rem;}
 
-  /* Confidence bar overlay */
-  .sent-conf-pip{position:absolute;top:0;height:100%;width:2px;background:rgba(255,255,255,.2);border-radius:1px;}
+  /* Bar track — nueva geometría */
+  .sent-track{flex:1;height:4px;background:rgba(48,54,61,.8);border-radius:2px;overflow:hidden;position:relative;}
+  .sent-fill{height:100%;border-radius:2px;transition:width .35s ease;}
+  .sent-fill.bull {background:var(--green);}
+  .sent-fill.bear {background:var(--red);}
+  .sent-fill.neut {background:var(--text-dim);}
+  .sent-fill.nodata{background:transparent;}
+  /* Mixto: degradado proporcional */
+  .sent-fill.mixed{background:linear-gradient(90deg,var(--green) var(--bull-pct),var(--red) var(--bull-pct));}
 
+  .sent-count{font-size:.58rem;color:var(--text-dim);width:18px;text-align:right;flex-shrink:0;}
+  .sent-label{font-size:.62rem;font-weight:700;width:38px;text-align:right;flex-shrink:0;letter-spacing:.01em;}
+  .sent-label.bull  {color:var(--green);}
+  .sent-label.bear  {color:var(--red);}
+  .sent-label.neut  {color:var(--text-dim);}
+  .sent-label.mixed {color:var(--orange);}
+  .sent-label.nodata{color:var(--text-tertiary);font-weight:400;}
+
+  /* ── COVERAGE ── */
+  .cov-row{display:flex;align-items:center;gap:.55rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
+  .cov-row:last-child{border-bottom:none;}
+  .cov-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:50px;flex-shrink:0;display:flex;align-items:center;gap:.28rem;}
+  .cov-track{flex:1;height:3px;background:rgba(48,54,61,.8);border-radius:2px;overflow:hidden;}
+  .cov-fill{height:100%;border-radius:2px;}
+  .cov-count{font-size:.6rem;color:var(--text-dim);width:18px;text-align:right;}
+  .cov-badge{font-size:.55rem;font-weight:700;padding:.07rem .28rem;border-radius:2px;flex-shrink:0;}
+
+  /* ── EVENTS ── */
   .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
   .ev-row:last-child{border-bottom:none;}
   .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
@@ -275,8 +289,7 @@
         </div>
         <div id="feed-body" role="feed" aria-busy="true" aria-label="Noticias forex">
           <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
-            <div style="margin-bottom:.5rem;">⏳</div>
-            Cargando noticias…
+            <div style="margin-bottom:.5rem;">⏳</div>Cargando noticias…
           </div>
         </div>
         <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">↓ Cargar más noticias</div>
@@ -288,7 +301,7 @@
         <div class="s-panel">
           <div class="s-header">
             <span class="s-title">Sentimiento 24h</span>
-            <span class="s-sub">por divisa · ponderado</span>
+            <span class="s-sub">ponderado · decay</span>
           </div>
           <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
         </div>
@@ -333,7 +346,7 @@
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
       © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.4.0
+    Dashboard v5.5.0
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -345,75 +358,35 @@
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════════════
 // UTILS
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TIMESTAMP
-// ─────────────────────────────────────────────────────────────────────────────
 const now = new Date();
-const _tsHeader = document.getElementById('ts-header');
-if (_tsHeader) _tsHeader.textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+const _tsH = document.getElementById('ts-header');
+if (_tsH) _tsH.textContent = now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
 document.getElementById('year').textContent = now.getFullYear();
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 // FLAGS
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 const FLAG_CODES = {
-  USD:'us', EUR:'eu', GBP:'gb', JPY:'jp',
-  AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz',
-  US:'us',  EU:'eu',  UK:'gb',  JP:'jp',
-  AU:'au',  CA:'ca',  CH:'ch',  NZ:'nz',
+  USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz',
+  US:'us',EU:'eu',UK:'gb',JP:'jp',AU:'au',CA:'ca',CH:'ch',NZ:'nz',
 };
 const FLAG_SIZES = [[16,12],[20,15],[24,18],[32,24],[40,30],[48,36],[64,48]];
-function nearestFlagSize(px) {
-  return FLAG_SIZES.reduce((best, s) => Math.abs(s[0]-px) < Math.abs(best[0]-px) ? s : best);
-}
-function flagImg(cur, px = 16) {
-  const code = FLAG_CODES[cur];
-  if (!code) return '';
-  const [w, h]   = nearestFlagSize(px);
-  const [w2, h2] = nearestFlagSize(px * 2);
+function nearestFlagSize(px){return FLAG_SIZES.reduce((b,s)=>Math.abs(s[0]-px)<Math.abs(b[0]-px)?s:b);}
+function flagImg(cur,px=16){
+  const code=FLAG_CODES[cur]; if(!code) return '';
+  const [w,h]=nearestFlagSize(px),[w2,h2]=nearestFlagSize(px*2);
   return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COVERAGE
-// ─────────────────────────────────────────────────────────────────────────────
-function renderCoverage(articles) {
-  const body = document.getElementById('coverage-body');
-  if (!body) return;
-  const CURRENCIES_ORDERED = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-  const counts = {}, highCounts = {};
-  CURRENCIES_ORDERED.forEach(c => { counts[c] = 0; highCounts[c] = 0; });
-  (articles || []).forEach(a => {
-    if (counts[a.cur] !== undefined) {
-      counts[a.cur]++;
-      if (a.impact === 'high') highCounts[a.cur]++;
-    }
-  });
-  const maxCount = Math.max(...Object.values(counts), 1);
-  body.innerHTML = CURRENCIES_ORDERED.map(cur => {
-    const n   = counts[cur] || 0;
-    const h   = highCounts[cur] || 0;
-    const pct = Math.round((n / maxCount) * 100);
-    const flag = flagImg(cur, 14);
-    const barColor = n === 0 ? 'var(--text-dim)' : n >= 4 ? 'var(--green)' : n >= 2 ? 'var(--blue)' : 'var(--orange)';
-    const highBadge = h > 0 ? `<span style="font-size:.55rem;color:var(--red);font-weight:600;margin-left:.2rem;">${h}▲</span>` : '';
-    return `<div class="sent-row">
-      <span class="sent-cur">${flag} ${cur}</span>
-      <div class="sent-bar-wrap"><div class="sent-bar" style="width:${pct}%;background:${barColor};"></div></div>
-      <span class="sent-count">${n}</span>
-      ${highBadge || '<span style="width:20px;display:inline-block;"></span>'}
-    </div>`;
-  }).join('');
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CURRENCY DETECTION — v5.3 (igual que antes, sin cambios)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// CURRENCY DETECTION — v5.3 (sin cambios, el backend ya asigna cur correctamente)
+// ═══════════════════════════════════════════════════════════════════════════════
 const PAIR_PROTAGONIST_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
@@ -426,426 +399,371 @@ const PAIR_PROTAGONIST_MAP = {
   'NZD/JPY':'NZD','NZDJPY':'NZD','CAD/JPY':'CAD','CADJPY':'CAD',
   'NZD/CAD':'NZD','NZDCAD':'NZD','EUR/NZD':'EUR','EURNZD':'EUR',
 };
-
 const CUR_SCORE_RULES = [
-  ['USD', [
-    [10, ['federal reserve','reserva federal','fomc','powell ','us treasury','tesoro eeuu']],
-    [ 9, ['strait of hormuz','estrecho de ormuz','us military','us navy','us sanctions',
-          'us-iran','us iran conflict','us strikes','trump ','white house','pentagon',
-          'casa blanca','us forces','fuerzas de eeuu']],
-    [ 8, ['united states','estados unidos','us economy','economía eeuu','us gdp','us cpi',
-          'us inflation','us jobs','nonfarm payroll','jobless claims','american economy','wall street']],
-    [ 5, ['usd/','dollar index','dxy ','us dollar','dólar estadounidense','dollar ']],
-    [ 3, ['dow jones','s&p 500','nasdaq','treasury yield']],
-    [ 1, ['dólar ','dollar strength']],
-  ]],
-  ['EUR', [
-    [10, ['european central bank','banco central europeo','ecb ','bce ','lagarde ','kazaks ',
-          'schnabel ','de guindos ']],
-    [ 8, ['eurozone','eurozona','zona euro','euro area','germany gdp','german cpi','ifo index',
-          'zew index','economía europea','inflación zona euro','eurozone inflation','eurozone gdp']],
-    [ 5, ['eur/','eur usd','/eur','bund yield']],
-    [ 3, ['euro ']],
-    [ 1, ['european ']],
-  ]],
-  ['GBP', [
-    [10, ['bank of england','banco de inglaterra','boe ','bailey ','mpc meeting','mpc decision']],
-    [ 8, ['united kingdom','reino unido','britain','uk gdp','uk cpi','uk inflation','british economy']],
-    [ 5, ['gbp/','gbp usd','/gbp','pound sterling','sterling','british pound','libra esterlina']],
-    [ 3, ['ftse ']],
-    [ 1, ['british ']],
-  ]],
-  ['JPY', [
-    [10, ['bank of japan','banco de japón','boj ','ueda ','himino ','boj meeting','boj decision','boj rate']],
-    [ 8, ['japan gdp','japan cpi','japanese economy','economía japonesa','japón ','japan ']],
-    [ 5, ['jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés']],
-    [ 3, ['nikkei ']],
-    [ 1, ['yen ']],
-  ]],
-  ['AUD', [
-    [10, ['reserve bank of australia','rba ','rba meeting','rba decision','rba rate','bullock ']],
-    [ 8, ['australia gdp','australia cpi','australia jobs','australian economy','economía australia']],
-    [ 5, ['aud/','aud usd','usd/aud','/aud','australian dollar','dólar australiano']],
-    [ 3, ['australia ']],
-    [ 1, ['aussie ']],
-  ]],
-  ['CAD', [
-    [10, ['bank of canada','banco de canadá','boc ','boc meeting','macklem ']],
-    [ 8, ['canada economy','economía canadá','canada gdp','canada cpi','canadian economy']],
-    [ 5, ['cad/','usd/cad','/cad','canadian dollar','dólar canadiense','loonie ']],
-    [ 3, ['crude oil','wti crude','petróleo crudo','brent crude','oil prices',
-          'precio del petróleo','crudo wti','opec ','opep ']],
-    [ 1, ['canada ','canadá ']],
-  ]],
-  ['CHF', [
-    [10, ['swiss national bank','snb ','snb meeting','snb decision','banco nacional suizo']],
-    [ 8, ['switzerland','suiza','swiss economy','swiss gdp']],
-    [ 5, ['chf/','usd/chf','/chf','swiss franc','franco suizo']],
-    [ 1, ['swiss ']],
-  ]],
-  ['NZD', [
-    [10, ['reserve bank of new zealand','rbnz ','rbnz meeting','rbnz decision',
-          'banco de la reserva de nueva zelanda','orr ']],
-    [ 8, ['new zealand gdp','new zealand cpi','new zealand economy','nueva zelanda','nz gdp','nz cpi']],
-    [ 5, ['nzd/','nzd usd','usd/nzd','/nzd','new zealand dollar','dólar neozelandés','kiwi ']],
-    [ 1, ['new zealand ']],
-  ]],
+  ['USD',[[10,['federal reserve','reserva federal','fomc','powell ','us treasury','tesoro eeuu']],[9,['strait of hormuz','estrecho de ormuz','us military','us navy','us sanctions','us-iran','us iran conflict','us strikes','trump ','white house','pentagon','casa blanca','us forces','fuerzas de eeuu']],[8,['united states','estados unidos','us economy','economía eeuu','us gdp','us cpi','us inflation','us jobs','nonfarm payroll','jobless claims','american economy','wall street']],[5,['usd/','dollar index','dxy ','us dollar','dólar estadounidense','dollar ']],[3,['dow jones','s&p 500','nasdaq','treasury yield']],[1,['dólar ','dollar strength']]]],
+  ['EUR',[[10,['european central bank','banco central europeo','ecb ','bce ','lagarde ','kazaks ','schnabel ','de guindos ']],[8,['eurozone','eurozona','zona euro','euro area','germany gdp','german cpi','ifo index','zew index','economía europea','inflación zona euro','eurozone inflation','eurozone gdp']],[5,['eur/','eur usd','/eur','bund yield']],[3,['euro ']],[1,['european ']]]],
+  ['GBP',[[10,['bank of england','banco de inglaterra','boe ','bailey ','mpc meeting','mpc decision']],[8,['united kingdom','reino unido','britain','uk gdp','uk cpi','uk inflation','british economy']],[5,['gbp/','gbp usd','/gbp','pound sterling','sterling','british pound','libra esterlina']],[3,['ftse ']],[1,['british ']]]],
+  ['JPY',[[10,['bank of japan','banco de japón','boj ','ueda ','himino ','boj meeting','boj decision','boj rate']],[8,['japan gdp','japan cpi','japanese economy','economía japonesa','japón ','japan ']],[5,['jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés']],[3,['nikkei ']],[1,['yen ']]]],
+  ['AUD',[[10,['reserve bank of australia','rba ','rba meeting','rba decision','rba rate','bullock ']],[8,['australia gdp','australia cpi','australia jobs','australian economy','economía australia']],[5,['aud/','aud usd','usd/aud','/aud','australian dollar','dólar australiano']],[3,['australia ']],[1,['aussie ']]]],
+  ['CAD',[[10,['bank of canada','banco de canadá','boc ','boc meeting','macklem ']],[8,['canada economy','economía canadá','canada gdp','canada cpi','canadian economy']],[5,['cad/','usd/cad','/cad','canadian dollar','dólar canadiense','loonie ']],[3,['crude oil','wti crude','petróleo crudo','brent crude','oil prices','precio del petróleo','crudo wti','opec ','opep ']],[1,['canada ','canadá ']]]],
+  ['CHF',[[10,['swiss national bank','snb ','snb meeting','snb decision','banco nacional suizo']],[8,['switzerland','suiza','swiss economy','swiss gdp']],[5,['chf/','usd/chf','/chf','swiss franc','franco suizo']],[1,['swiss ']]]],
+  ['NZD',[[10,['reserve bank of new zealand','rbnz ','rbnz meeting','rbnz decision','banco de la reserva de nueva zelanda','orr ']],[8,['new zealand gdp','new zealand cpi','new zealand economy','nueva zelanda','nz gdp','nz cpi']],[5,['nzd/','nzd usd','usd/nzd','/nzd','new zealand dollar','dólar neozelandés','kiwi ']],[1,['new zealand ']]]],
 ];
+const SOURCE_CURRENCY_MAP={'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP','Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD'};
+const TIEBREAK_ORDER=['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
 
-const SOURCE_CURRENCY_MAP = {
-  'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP','Bank of Japan':'JPY',
-  'RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD',
-};
-
-const TIEBREAK_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
-
-function detectCurrencyWithSource(title, expand, source) {
-  const titleClean = (title || '').trim();
-  const titleUpper = titleClean.toUpperCase().replace(/\s+/g,'');
-  const titleLower = titleClean.toLowerCase();
-
-  for (const [pair, protagonist] of Object.entries(PAIR_PROTAGONIST_MAP)) {
-    const pairNorm  = pair.replace('/','').toUpperCase();
-    const pairSlash = pair.toUpperCase();
-    const titleStart = titleUpper.substring(0, 30);
-    if (titleStart.includes(pairNorm) || titleClean.toUpperCase().substring(0, 30).includes(pairSlash)) {
-      return protagonist;
-    }
+function detectCurrencyWithSource(title,expand,source){
+  const tc=(title||'').trim(),tu=tc.toUpperCase().replace(/\s+/g,''),tl=tc.toLowerCase();
+  for(const[pair,prot]of Object.entries(PAIR_PROTAGONIST_MAP)){
+    const pn=pair.replace('/','').toUpperCase(),ps=pair.toUpperCase();
+    const ts=tu.substring(0,30);
+    if(ts.includes(pn)||tc.toUpperCase().substring(0,30).includes(ps)) return prot;
   }
-  for (const [pair, protagonist] of Object.entries(PAIR_PROTAGONIST_MAP)) {
-    if (titleUpper.includes(pair.replace('/','').toUpperCase()) ||
-        titleClean.toUpperCase().includes(pair.toUpperCase())) {
-      return protagonist;
-    }
+  for(const[pair,prot]of Object.entries(PAIR_PROTAGONIST_MAP)){
+    if(tu.includes(pair.replace('/','').toUpperCase())||tc.toUpperCase().includes(pair.toUpperCase())) return prot;
   }
-
-  const fullText = titleLower + ' ' + ((expand || '').toLowerCase());
-  const scores = {};
-  for (const [cur, tiers] of CUR_SCORE_RULES) {
-    let score = 0;
-    for (const [weight, keywords] of tiers) {
-      for (const kw of keywords) {
-        if (fullText.includes(kw)) {
-          score += weight;
-          if (titleLower.includes(kw)) score += weight * 0.5;
-        }
-      }
-    }
-    scores[cur] = score;
+  const ft=tl+' '+((expand||'').toLowerCase());
+  const scores={};
+  for(const[cur,tiers]of CUR_SCORE_RULES){
+    let sc=0;
+    for(const[w,kws]of tiers) for(const kw of kws) if(ft.includes(kw)){sc+=w;if(tl.includes(kw))sc+=w*0.5;}
+    scores[cur]=sc;
   }
-
-  const maxScore = Math.max(...Object.values(scores));
-  if (maxScore > 0) {
-    const winners = Object.entries(scores).filter(([,s]) => s === maxScore).map(([c]) => c);
-    if (winners.length === 1) return winners[0];
-    return TIEBREAK_ORDER.find(c => winners.includes(c)) || winners[0];
-  }
-
-  return SOURCE_CURRENCY_MAP[source] || 'USD';
+  const mx=Math.max(...Object.values(scores));
+  if(mx>0){const ws=Object.entries(scores).filter(([,s])=>s===mx).map(([c])=>c);if(ws.length===1)return ws[0];return TIEBREAK_ORDER.find(c=>ws.includes(c))||ws[0];}
+  return SOURCE_CURRENCY_MAP[source]||'USD';
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 // IMPACT DETECTION
-// ─────────────────────────────────────────────────────────────────────────────
-const HIGH_IMPACT_KW = [
-  'rate decision','rate hike','rate cut','interest rate','tasa de interés',
-  'decisión de tasas','monetary policy','política monetaria',
-  'fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb meeting',
-  'hawkish','dovish','quantitative easing','tapering',
-  'gdp','pib','cpi','ipc','inflation','inflación','core inflation','inflación subyacente',
-  'unemployment','desempleo','nonfarm payroll','nfp','jobless claims',
-  'strait of hormuz','estrecho de ormuz','oil embargo','war ','guerra ',
-  'conflict escalation','escalada del conflicto','sanctions','sanciones',
-  'military strike','ataque militar','nuclear',
-  'recession','recesión','financial crisis','default','bank failure','market crash',
-];
-
-const MED_IMPACT_KW = [
-  'pmi','manufacturing','manufactura','retail sales','ventas minoristas',
-  'consumer confidence','confianza del consumidor','trade balance','balanza comercial',
-  'current account','cuenta corriente','industrial production','producción industrial',
-  'housing starts','building permits','crude oil','oil prices','precio del petróleo',
-  'wti','brent','opec','opep','bond yield','rendimiento del bono','yield curve',
-  'risk off','risk on','flight to safety','refugio seguro',
-  'breakout','ruptura','moving average','media móvil','200-day','dma de 200',
-  'cot report','commitment of traders',
-];
-
-function detectImpact(title, description) {
-  const text = ((title||'') + ' ' + (description||'')).toLowerCase();
-  if (HIGH_IMPACT_KW.some(kw => text.includes(kw))) return 'high';
-  if (MED_IMPACT_KW.some(kw => text.includes(kw))) return 'med';
-  return 'low';
+// ═══════════════════════════════════════════════════════════════════════════════
+const HIGH_IMPACT_KW=['rate decision','rate hike','rate cut','interest rate','tasa de interés','decisión de tasas','monetary policy','política monetaria','fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb meeting','hawkish','dovish','quantitative easing','tapering','gdp','pib','cpi','ipc','inflation','inflación','core inflation','inflación subyacente','unemployment','desempleo','nonfarm payroll','nfp','jobless claims','strait of hormuz','estrecho de ormuz','oil embargo','war ','guerra ','conflict escalation','escalada del conflicto','sanctions','sanciones','military strike','ataque militar','nuclear','recession','recesión','financial crisis','default','bank failure','market crash'];
+const MED_IMPACT_KW=['pmi','manufacturing','manufactura','retail sales','ventas minoristas','consumer confidence','confianza del consumidor','trade balance','balanza comercial','current account','cuenta corriente','industrial production','producción industrial','housing starts','building permits','crude oil','oil prices','precio del petróleo','wti','brent','opec','opep','bond yield','rendimiento del bono','yield curve','risk off','risk on','flight to safety','refugio seguro','breakout','ruptura','moving average','media móvil','200-day','dma de 200','cot report','commitment of traders'];
+function detectImpact(title,description){
+  const text=((title||'')+' '+(description||'')).toLowerCase();
+  if(HIGH_IMPACT_KW.some(kw=>text.includes(kw)))return'high';
+  if(MED_IMPACT_KW.some(kw=>text.includes(kw)))return'med';
+  return'low';
+}
+function tsToLocalTime(ts){
+  if(!ts)return'--:--';
+  const ms=ts<1e10?ts*1000:ts,d=new Date(ms);
+  if(isNaN(d))return'--:--';
+  return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
 }
 
-function tsToLocalTime(ts) {
-  if (!ts) return '--:--';
-  const ms = ts < 1e10 ? ts * 1000 : ts;
-  const d = new Date(ms);
-  if (isNaN(d)) return '--:--';
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SENTIMENT SCORING — lee campo precalculado del backend
-// ─────────────────────────────────────────────────────────────────────────────
-function scoreSentiment(article) {
-  // 1. Campo sentiment precalculado por el backend (fuente de verdad principal)
-  if (article && article.sentiment) {
-    const s = article.sentiment.toLowerCase();
-    if (s === 'bull' || s === 'alcista')  return 'bull';
-    if (s === 'bear' || s === 'bajista')  return 'bear';
-    if (s === 'mixed' || s === 'mixto')   return 'mixed';
-    return 'neut';
-  }
-  // 2. Patrón estructurado en ai_headline: "→ DIVISA alcista/bajista"
-  const hl = ((article && article.ai_headline) || (article && article.title) || '').toLowerCase();
-  const m = hl.match(/→\s*(?:\w+\s+)?(alcista|bajista|neutral|neutro|mixto)\s*$/);
-  if (m) {
-    const w = m[1];
-    if (w === 'alcista') return 'bull';
-    if (w === 'bajista') return 'bear';
-    if (w === 'mixto')   return 'mixed';
-    return 'neut';
-  }
-  // 3. Fallback keywords
-  const BULL_KW = ['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
-  const BEAR_KW = ['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
-  let b = 0, r = 0;
-  BULL_KW.forEach(k => { if (hl.includes(k)) b++; });
-  BEAR_KW.forEach(k => { if (hl.includes(k)) r++; });
-  if (b > r) return 'bull';
-  if (r > b) return 'bear';
-  return 'neut';
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPUTE SENTIMENT — v5.4: lógica institucional revisada
+// ═══════════════════════════════════════════════════════════════════════════════
+// SENTIMENT SCORING — v5.5
 //
-// CAMBIOS respecto a v5.3:
-//  A) Zona "mixto" explícita: cuando bull y bear están dentro del ±20% el uno
-//     del otro Y ambos tienen peso suficiente → muestra "Mixto" (naranja) en
-//     lugar de "?" — esto es más informativo para el operador
-//  B) Umbral de confianza reducido: de 55% → 35%. El "?" sólo aparece cuando
-//     la cobertura es muy escasa (total < 0.8) O el score dominante es
-//     prácticamente igual al segundo (diff < 5% del total)
-//  C) Zona neutral ampliada solo para artículos "neut": si todos los artículos
-//     son neutrales se muestra "Neut" directamente sin barra
-//  D) Barra de sentimiento: para "mixto" usa degradado verde-rojo dividido por
-//     el ratio bull/(bull+bear), más informativo que una barra centrada
-//  E) El "?" se reserva exclusivamente para: cobertura insuficiente
-//     (total ponderado < 0.8) o señal completamente indiferenciada
-//  F) Tooltip mejorado: incluye ratio bull/bear y la lógica aplicada
-// ─────────────────────────────────────────────────────────────────────────────
-const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const IMPACT_WEIGHTS  = { high: 3, med: 1.5, low: 0.5 };
-const DECAY_HALFLIFE  = 24; // horas
+// FIX CRÍTICO: validación de divisa en el patrón final "→ DIVISA sentimiento"
+//
+// Problema raíz: el backend Groq a veces escribe "→ USD alcista" en un artículo
+// etiquetado como EUR o NZD, porque el redactor describió el movimiento desde
+// la perspectiva del USD. Esto genera sentiment="bull" incorrecto para EUR/NZD.
+//
+// Solución: si la DIVISA en el patrón ≠ cur del artículo, aplicar:
+//   - "→ USD alcista" en artículo EUR/NZD/GBP/AUD/CAD/CHF/JPY → bear (USD sube = resto cae)
+//   - "→ USD bajista" → bull
+//   - Cross ≠ USD: usar el sentimiento tal como está (la base del par ya fue asignada)
+// ═══════════════════════════════════════════════════════════════════════════════
+const MAJORS_VS_USD = new Set(['EUR','GBP','AUD','NZD','CAD','CHF','JPY']);
+
+// Patrón final: "→ [DIVISA] [sentimiento]" — admite variantes sin divisa explícita
+const FINAL_PATTERN_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
+const SENT_WORD_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
+
+/**
+ * scoreSentiment(article)
+ *
+ * Prioridad:
+ *  1. Campo `sentiment` del backend (si es válido y no es producto de mala etiqueta)
+ *     → validado contra el patrón del ai_headline para detectar etiquetas cruzadas
+ *  2. Patrón final en ai_headline con validación de divisa
+ *  3. Keywords fallback
+ */
+function scoreSentiment(article) {
+  const cur     = (article.cur || '').toUpperCase();
+  const hl      = ((article.ai_headline || article.title || '')).toLowerCase();
+  const hlOrig  = (article.ai_headline || article.title || '');
+
+  // ── Extraer patrón final del ai_headline ──────────────────────────────────
+  const m = hlOrig.match(FINAL_PATTERN_RE);
+  let patternSent = null;   // sentimiento en bull/bear/neut/mixed
+  let patternCur  = null;   // divisa mencionada en el patrón (puede ser undefined)
+
+  if (m) {
+    patternCur  = m[1] ? m[1].toUpperCase() : null;
+    patternSent = SENT_WORD_MAP[m[2].toLowerCase()] || 'neut';
+
+    // FIX: si la divisa en el patrón es diferente a cur del artículo
+    if (patternCur && patternCur !== cur) {
+      // Caso: "→ USD alcista" en artículo de divisa no-USD
+      if (patternCur === 'USD' && MAJORS_VS_USD.has(cur)) {
+        // USD sube → el artículo (EUR/NZD/etc.) es bajista
+        patternSent = patternSent === 'bull' ? 'bear'
+                    : patternSent === 'bear' ? 'bull'
+                    : patternSent; // neut/mixed sin inversión
+      }
+      // Caso: divisa cruzada (ej. "→ GBP alcista" en artículo EUR)
+      // No invertimos — la asignación de cur ya maneja el protagonista del par
+    }
+
+    // Validar contra campo `sentiment` del backend:
+    // Si el backend dice "bull" pero el patrón (corregido) dice "bear" → usar patrón
+    if (article.sentiment) {
+      const backendSent = article.sentiment.toLowerCase();
+      const mapped = {bull:'bull',bear:'bear',alcista:'bull',bajista:'bear',mixed:'mixed',mixto:'mixed'}[backendSent] || 'neut';
+      // Solo usar backend si coincide con patrón o si no hay patrón
+      if (m && patternSent !== mapped && patternCur) {
+        // Patrón con divisa explícita tiene precedencia sobre backend
+        return patternSent;
+      }
+      return mapped;
+    }
+
+    return patternSent;
+  }
+
+  // ── Sin patrón estructurado: usar backend o keywords ──────────────────────
+  if (article.sentiment) {
+    const s = article.sentiment.toLowerCase();
+    if (s==='bull'||s==='alcista')  return 'bull';
+    if (s==='bear'||s==='bajista')  return 'bear';
+    if (s==='mixed'||s==='mixto')   return 'mixed';
+    return 'neut';
+  }
+
+  // Fallback keywords
+  const BULL_KW=['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
+  const BEAR_KW=['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
+  let b=0,r=0;
+  BULL_KW.forEach(k=>{if(hl.includes(k))b++;});
+  BEAR_KW.forEach(k=>{if(hl.includes(k))r++;});
+  if(b>r)return'bull';if(r>b)return'bear';return'neut';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPUTE SENTIMENT — v5.5 (nivel institucional)
+//
+// CAMBIOS vs v5.4:
+//  A) diffRatio = |bull-bear| / (bull+bear)   ← sobre peso DIRECCIONAL, no total
+//     → elimina la dilución artificial del neut que hacía que EUR pareciera Mixto
+//  B) Umbral Mixto: 15% (era 20%) sobre bullBear
+//     → EUR: 0.194 > 0.15 → Bear ✓
+//  C) Barra rediseñada: siempre refleja el ratio bull/(bull+bear) en toda su anchura
+//     → Bear: barra roja de 0 a (bear/bullBear)*100% — visualmente intuitivo
+//     → Bull: barra verde de 0 a (bull/bullBear)*100%
+//     → Mixto: degradado con punto de corte en bullPct%
+//  D) Badge de baja cobertura: si total < 1.5 → opacity 0.50 + label "~Bear/~Bull"
+//  E) Tooltip detallado: bull%, bear%, artículos, edad media ponderada
+// ═══════════════════════════════════════════════════════════════════════════════
+const CURRENCIES   = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const IMPACT_W     = { high:3, med:1.5, low:0.5 };
+const DECAY_H      = 24; // vida media del decay
 
 function computeSentiment(articles) {
   const nowMs = Date.now();
   const body  = document.getElementById('sentiment-body');
   if (!body) return;
 
+  // Acumuladores por divisa
   const acc = {};
-  CURRENCIES.forEach(c => { acc[c] = { bull: 0, bear: 0, neut: 0, count: 0 }; });
+  CURRENCIES.forEach(c => { acc[c] = { bull:0, bear:0, neut:0, wSum:0, count:0 }; });
 
   articles.forEach(a => {
     if (!acc[a.cur]) return;
-    const s     = scoreSentiment(a);
-    const impW  = IMPACT_WEIGHTS[a.impact] || 0.5;
-    const ageH  = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts * 1000 : a.ts)) / 3_600_000 : 0;
-    const decW  = Math.exp(-ageH / DECAY_HALFLIFE);
-    const w     = impW * decW;
-    // "mixed" reparte peso entre bull y bear (señal contradictoria)
+    const s    = scoreSentiment(a);
+    const impW = IMPACT_W[a.impact] || 0.5;
+    const ageH = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts*1000 : a.ts)) / 3_600_000 : 0;
+    const decW = Math.exp(-ageH / DECAY_H);
+    const w    = impW * decW;
+
+    // 'mixed' contribuye 50% a cada lado (señal bimodal real)
     if (s === 'mixed') {
       acc[a.cur].bull += w * 0.5;
       acc[a.cur].bear += w * 0.5;
+    } else if (s === 'bull') {
+      acc[a.cur].bull += w;
+    } else if (s === 'bear') {
+      acc[a.cur].bear += w;
     } else {
-      const key = (s === 'neut') ? 'neut' : s;
-      acc[a.cur][key] += w;
+      acc[a.cur].neut += w;
     }
+    acc[a.cur].wSum  += w;
     acc[a.cur].count += 1;
   });
 
   body.innerHTML = '';
 
   CURRENCIES.forEach(cur => {
-    const { bull, bear, neut, count } = acc[cur];
-    const total = bull + bear + neut;
+    const { bull, bear, neut, wSum, count } = acc[cur];
+    const flag      = flagImg(cur, 16);
+    const bullBear  = bull + bear;   // peso direccional total
+    const total     = bullBear + neut;
 
-    const flag = flagImg(cur, 16);
-
-    // ── Sin cobertura ──────────────────────────────────────────────────────
-    if (total < 0.05 || count === 0) {
-      body.innerHTML += _sentRow(flag, cur, 'nodata', '—', 50, 0, count,
-        'Sin cobertura en el período', 1);
+    // ── Sin datos ───────────────────────────────────────────────────────────
+    if (count === 0 || total < 0.05) {
+      body.innerHTML += _row(flag, cur, '—', 'nodata', 0, 0, count, 'Sin cobertura', 0.4);
       return;
     }
 
-    const bullBear = bull + bear;  // peso directional total
-    const bullPct  = bullBear > 0 ? bull / bullBear : 0.5;
-    const bearPct  = bullBear > 0 ? bear / bullBear : 0.5;
-    const diff     = Math.abs(bull - bear);
-    const diffRatio = total > 0 ? diff / total : 0;
-
-    // ── Todos neutrales ────────────────────────────────────────────────────
-    if (bull < 0.05 && bear < 0.05) {
-      body.innerHTML += _sentRow(flag, cur, 'neut', 'Neut', 50, 0, count,
-        `Sin señal direccional · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)}`, 1);
+    // ── Solo neutrales (sin señal direccional) ──────────────────────────────
+    if (bullBear < 0.05) {
+      const tip = `Sin señal direccional · neut=${neut.toFixed(2)} · n=${count}`;
+      body.innerHTML += _row(flag, cur, 'Neut', 'neut', 50, 50, count, tip, 0.65);
       return;
     }
 
-    // ── Señal demasiado débil para afirmar dirección ───────────────────────
-    // Criterio: diff < 5% del total ponderado Y cobertura baja
-    if (diffRatio < 0.05 && total < 1.5) {
-      const tooltip = `Señal insuficiente · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
-      body.innerHTML += _sentRow(flag, cur, 'nodata', '?', 50, 0, count, tooltip, total < 0.8 ? 0.45 : 0.7);
+    // FIX A+B: diffRatio sobre bullBear (no total) + umbral 15%
+    const diff      = Math.abs(bull - bear);
+    const diffRatio = diff / bullBear;   // ← FIX A: denominador = bullBear
+
+    // Cobertura baja → reducir opacidad y añadir "~" al label
+    const lowCov    = total < 1.5;
+    const opacity   = lowCov ? 0.52 : 1.0;
+    const prefix    = lowCov ? '~' : '';
+
+    // Ratio para la barra — siempre sobre bullBear
+    const bullPct   = Math.round((bull / bullBear) * 100);  // FIX C
+    const bearPct   = 100 - bullPct;
+
+    // ── Señal Mixta: diff < 15% de bullBear ─────────────────────────────────
+    if (diffRatio < 0.15) {  // FIX B: umbral 15% (era 20%)
+      const tip = `Mixto · bull=${bull.toFixed(1)} (${bullPct}%) bear=${bear.toFixed(1)} (${bearPct}%) · n=${count}`;
+      body.innerHTML += _rowMixed(flag, cur, bullPct, count, tip, opacity);
       return;
     }
 
-    // ── Señal mixta: bull y bear están dentro del ±20% entre sí ──────────
-    // Condición: ambos tienen peso relevante Y ninguno domina claramente
-    if (bull > 0.1 && bear > 0.1 && diffRatio < 0.20) {
-      // Barra: gradient muestra proporción bull/bear
-      const bullBarPct = Math.round(bullPct * 100);
-      const tooltip = `Mixto · bull=${bull.toFixed(1)} (${Math.round(bullPct*100)}%) bear=${bear.toFixed(1)} (${Math.round(bearPct*100)}%) · n=${count}`;
-      body.innerHTML += _sentRowMixed(flag, cur, bullBarPct, count, tooltip, 1);
-      return;
-    }
-
-    // ── Dirección clara ────────────────────────────────────────────────────
-    let label, cls, barWidth;
+    // ── Dirección clara ──────────────────────────────────────────────────────
     if (bull >= bear) {
-      cls      = 'bull';
-      label    = 'Bull';
-      // Barra: 50% base + escalado por dominancia sobre el total ponderado
-      barWidth = Math.min(98, Math.round(50 + (bull / total) * 50));
+      const tip = `Bull · ${bullPct}% bull · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
+      body.innerHTML += _row(flag, cur, prefix+'Bull', 'bull', bullPct, bullPct, count, tip, opacity);
     } else {
-      cls      = 'bear';
-      label    = 'Bear';
-      barWidth = Math.max(2, Math.round(50 - (bear / total) * 50));
+      const tip = `Bear · ${bearPct}% bear · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
+      body.innerHTML += _row(flag, cur, prefix+'Bear', 'bear', bearPct, bearPct, count, tip, opacity);
     }
-
-    const tooltip = `${label} · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
-    body.innerHTML += _sentRow(flag, cur, cls, label, barWidth, 0, count, tooltip, 1);
   });
 }
 
-/** Construye una fila de sentimiento estándar */
-function _sentRow(flag, cur, cls, labelText, barWidth, _unused, count, tooltip, opacity) {
-  return `<div class="sent-row" title="${esc(tooltip)}" style="opacity:${opacity}">
+/**
+ * _row — fila estándar (Bull/Bear/Neut/nodata)
+ * barPct: porcentaje de anchura de la barra (0–100), relativo a bullBear
+ */
+function _row(flag, cur, label, cls, barPct, _unused, count, tip, opacity) {
+  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
-    <div class="sent-bar-wrap"><div class="sent-bar ${cls}" style="width:${barWidth}%"></div></div>
-    <span class="sent-count">${count}</span>
-    <span class="sent-label ${cls}">${labelText}</span>
+    <div class="sent-track"><div class="sent-fill ${cls}" style="width:${Math.min(100,barPct)}%"></div></div>
+    <span class="sent-count">${count||''}</span>
+    <span class="sent-label ${cls}">${label}</span>
   </div>`;
 }
 
-/** Fila mixta: barra con degradado bull/bear proporcional */
-function _sentRowMixed(flag, cur, bullPct, count, tooltip, opacity) {
-  // bullPct = porcentaje de la parte bull (0-100)
-  const barStyle = `background:linear-gradient(90deg,var(--green) ${bullPct}%,var(--red) ${bullPct}%);width:80%`;
-  return `<div class="sent-row" title="${esc(tooltip)}" style="opacity:${opacity}">
+/**
+ * _rowMixed — barra con degradado verde/rojo proporcional al ratio bull/bear
+ * bullPct: porcentaje de la parte bull (0–100)
+ */
+function _rowMixed(flag, cur, bullPct, count, tip, opacity) {
+  // CSS custom property para el punto de corte del gradient
+  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
-    <div class="sent-bar-wrap"><div class="sent-bar" style="${barStyle}"></div></div>
-    <span class="sent-count">${count}</span>
+    <div class="sent-track">
+      <div class="sent-fill mixed" style="width:85%;--bull-pct:${bullPct}%"></div>
+    </div>
+    <span class="sent-count">${count||''}</span>
     <span class="sent-label mixed">Mixto</span>
   </div>`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// COVERAGE
+// ═══════════════════════════════════════════════════════════════════════════════
+function renderCoverage(articles) {
+  const body = document.getElementById('coverage-body');
+  if (!body) return;
+  const counts={},highC={};
+  CURRENCIES.forEach(c=>{counts[c]=0;highC[c]=0;});
+  (articles||[]).forEach(a=>{
+    if(counts[a.cur]!==undefined){counts[a.cur]++;if(a.impact==='high')highC[a.cur]++;}
+  });
+  const maxN=Math.max(...Object.values(counts),1);
+  body.innerHTML=CURRENCIES.map(cur=>{
+    const n=counts[cur]||0,h=highC[cur]||0;
+    const pct=Math.round((n/maxN)*100);
+    const col=n===0?'var(--text-dim)':n>=4?'var(--green)':n>=2?'var(--blue)':'var(--orange)';
+    const hBadge=h>0?`<span class="cov-badge" style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);color:var(--red);">${h}▲</span>`:'<span style="width:22px;display:inline-block;"></span>';
+    return `<div class="cov-row">
+      <span class="cov-cur">${flagImg(cur,14)} ${cur}</span>
+      <div class="cov-track"><div class="cov-fill" style="width:${pct}%;background:${col};"></div></div>
+      <span class="cov-count">${n}</span>
+      ${hBadge}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // UPCOMING EVENTS
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 async function loadUpcomingEvents() {
   const container = document.getElementById('upcoming-events');
   try {
-    const res = await fetch('calendar-data/calendar.json?_=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const todayISO    = new Date().toISOString().split('T')[0];
-    const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-    const allEvents   = data.events || [];
-    const highMed     = (e) => ['high','medium'].includes((e.impact || '').toLowerCase());
-    let todayEvents   = allEvents.filter(e => e.dateISO === todayISO && highMed(e));
-    const useTomorrow = todayEvents.length === 0;
-    const upcoming    = useTomorrow
-      ? allEvents.filter(e => e.dateISO === tomorrowISO && highMed(e)).slice(0, 8)
-      : todayEvents.slice(0, 8);
-    if (upcoming.length === 0) {
-      container.innerHTML = '<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';
-      return;
-    }
-    container.innerHTML = '';
-    upcoming.forEach(e => {
-      const imp        = (e.impact||'').toLowerCase();
-      const isTomorrow = (e.dateISO === tomorrowISO);
-      const detail     = [e.currency, e.forecast ? 'Est: '+e.forecast : '', e.previous ? 'Prev: '+e.previous : ''].filter(Boolean).join(' · ');
-      let localTime    = e.timeUTC || '--:--';
-      if (e.timeUTC && e.dateISO) {
-        try {
-          const utcDate = new Date(`${e.dateISO}T${e.timeUTC}:00Z`);
-          if (!isNaN(utcDate.getTime())) localTime = utcDate.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
-        } catch(_) {}
-      }
-      const evCur = (e.currency||'').slice(0,3).toUpperCase();
-      const flag  = flagImg(evCur, 20) || '🌐';
-      container.innerHTML += `<div class="ev-row">
-        <div class="ev-left">
-          <span class="ev-flag" style="display:flex;align-items:center;justify-content:center;">${flag}</span>
-          <span class="ev-time" style="${isTomorrow ? 'color:var(--text-dim)' : ''}">${esc(localTime)}</span>
-        </div>
-        <div class="ev-body">
-          <div class="ev-name">${esc(e.event)}</div>
-          ${detail ? `<div class="ev-detail">${esc(detail)}</div>` : ''}
-        </div>
-        <span class="ev-badge ${imp==='high' ? 'badge-h' : 'badge-m'}">${imp==='high' ? 'Alto' : 'Medio'}</span>
+    const res = await fetch('calendar-data/calendar.json?_='+Date.now());
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const todayISO=new Date().toISOString().split('T')[0];
+    const tomorrowISO=new Date(Date.now()+86400000).toISOString().split('T')[0];
+    const allEvents=data.events||[];
+    const highMed=e=>['high','medium'].includes((e.impact||'').toLowerCase());
+    let todayEv=allEvents.filter(e=>e.dateISO===todayISO&&highMed(e));
+    const useTomorrow=todayEv.length===0;
+    const upcoming=useTomorrow?allEvents.filter(e=>e.dateISO===tomorrowISO&&highMed(e)).slice(0,8):todayEv.slice(0,8);
+    if(!upcoming.length){container.innerHTML='<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';return;}
+    container.innerHTML='';
+    upcoming.forEach(e=>{
+      const imp=(e.impact||'').toLowerCase();
+      const isTomorrow=(e.dateISO===tomorrowISO);
+      const detail=[e.currency,e.forecast?'Est: '+e.forecast:'',e.previous?'Prev: '+e.previous:''].filter(Boolean).join(' · ');
+      let localTime=e.timeUTC||'--:--';
+      if(e.timeUTC&&e.dateISO){try{const ud=new Date(`${e.dateISO}T${e.timeUTC}:00Z`);if(!isNaN(ud.getTime()))localTime=ud.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});}catch(_){}}
+      const evCur=(e.currency||'').slice(0,3).toUpperCase();
+      const flag=flagImg(evCur,20)||'🌐';
+      container.innerHTML+=`<div class="ev-row">
+        <div class="ev-left"><span style="display:flex;align-items:center;justify-content:center;">${flag}</span><span class="ev-time" style="${isTomorrow?'color:var(--text-dim)':''}">${esc(localTime)}</span></div>
+        <div class="ev-body"><div class="ev-name">${esc(e.event)}</div>${detail?`<div class="ev-detail">${esc(detail)}</div>`:''}</div>
+        <span class="ev-badge ${imp==='high'?'badge-h':'badge-m'}">${imp==='high'?'Alto':'Medio'}</span>
       </div>`;
     });
   } catch(err) {
-    container.innerHTML = '<div class="ev-empty">Calendario no disponible.</div>';
+    container.innerHTML='<div class="ev-empty">Calendario no disponible.</div>';
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FEED STATE
-// ─────────────────────────────────────────────────────────────────────────────
-const PAGE       = 30;
-let allArticles  = [];
-let visible      = PAGE;
-let activeFilter = 'ALL';
-let highOnly     = false;
+// ═══════════════════════════════════════════════════════════════════════════════
+// FEED STATE & RENDER
+// ═══════════════════════════════════════════════════════════════════════════════
+const PAGE=30;
+let allArticles=[],visible=PAGE,activeFilter='ALL',highOnly=false;
 
-function renderFeed() {
-  const body    = document.getElementById('feed-body');
-  const loading = document.getElementById('feed-loading');
-  if (loading) loading.remove();
-  body.setAttribute('aria-busy', 'false');
+function renderFeed(){
+  const body=document.getElementById('feed-body');
+  const loading=document.getElementById('feed-loading');
+  if(loading)loading.remove();
+  body.setAttribute('aria-busy','false');
 
-  const filtered = allArticles.filter(a =>
-    (activeFilter === 'ALL' || a.cur === activeFilter) &&
-    (!highOnly || a.impact === 'high')
+  const filtered=allArticles.filter(a=>
+    (activeFilter==='ALL'||a.cur===activeFilter)&&(!highOnly||a.impact==='high')
   );
 
-  if (filtered.length === 0) {
-    body.innerHTML = `<div class="feed-empty">
-      <div class="feed-error-icon">📰</div>
-      <strong>No se encontraron noticias para el filtro actual</strong><br>
-      Consulte directamente:<br>
-      <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> ·
-      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> ·
-      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a>
-    </div>`;
-    document.getElementById('load-more-btn').style.display = 'none';
-    computeSentiment([]);
-    renderCoverage([]);
-    return;
+  if(!filtered.length){
+    body.innerHTML=`<div class="feed-empty"><div class="feed-error-icon">📰</div><strong>No se encontraron noticias para el filtro actual</strong><br>Consulte directamente:<br><a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> · <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> · <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a></div>`;
+    document.getElementById('load-more-btn').style.display='none';
+    computeSentiment([]);renderCoverage([]);return;
   }
 
-  body.innerHTML = '';
-  filtered.slice(0, visible).forEach(a => {
-    const ic       = a.impact === 'high' ? 'impact-high' : a.impact === 'med' ? 'impact-med' : 'impact-low';
-    const headline = a.ai_headline || a.title;
-    body.innerHTML += `<div class="news-row${a.featured ? ' featured' : ''}" onclick="toggleExpand(this)">
+  body.innerHTML='';
+  filtered.slice(0,visible).forEach(a=>{
+    const ic=a.impact==='high'?'impact-high':a.impact==='med'?'impact-med':'impact-low';
+    const headline=a.ai_headline||a.title;
+    body.innerHTML+=`<div class="news-row${a.featured?' featured':''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
       <span class="col-cur">${flagImg(a.cur)}${esc(a.cur)}</span>
       <div class="col-impact ${ic}" aria-label="Impacto ${a.impact}"><div class="impact-dot"></div></div>
@@ -853,95 +771,53 @@ function renderFeed() {
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
-      ${a.ai_headline ? `<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>` : ''}
-      <span style="color:var(--text-secondary)">${esc(a.expand || a.description || a.title)}</span>
-      ${a.link ? `<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>` : ''}
+      ${a.ai_headline?`<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>`:''}
+      <span style="color:var(--text-secondary)">${esc(a.expand||a.description||a.title)}</span>
+      ${a.link?`<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>`:''}
     </div>`;
   });
 
-  document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
-  const aiBadge = document.getElementById('ai-badge');
-  if (aiBadge) {
-    aiBadge.style.display = filtered.slice(0, visible).some(a => a.ai_headline) ? 'inline' : 'none';
-  }
+  document.getElementById('load-more-btn').style.display=filtered.length>visible?'flex':'none';
+  const aiBadge=document.getElementById('ai-badge');
+  if(aiBadge)aiBadge.style.display=filtered.slice(0,visible).some(a=>a.ai_headline)?'inline':'none';
   computeSentiment(filtered);
   renderCoverage(allArticles);
 }
 
-function loadMore()    { visible += PAGE; renderFeed(); }
+function loadMore(){visible+=PAGE;renderFeed();}
+function toggleExpand(row){const was=row.classList.contains('open');document.querySelectorAll('.news-row.open').forEach(r=>r.classList.remove('open'));if(!was)row.classList.add('open');}
+function setFilter(val,btn){document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=val;visible=PAGE;renderFeed();}
+function toggleImpact(btn){btn.classList.toggle('active-green');highOnly=btn.classList.contains('active-green');visible=PAGE;renderFeed();}
 
-function toggleExpand(row) {
-  const was = row.classList.contains('open');
-  document.querySelectorAll('.news-row.open').forEach(r => r.classList.remove('open'));
-  if (!was) row.classList.add('open');
-}
-
-function setFilter(val, btn) {
-  document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeFilter = val; visible = PAGE; renderFeed();
-}
-
-function toggleImpact(btn) {
-  btn.classList.toggle('active-green');
-  highOnly = btn.classList.contains('active-green');
-  visible = PAGE; renderFeed();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// INIT FEED
-// ─────────────────────────────────────────────────────────────────────────────
-async function initFeed() {
-  try {
-    const res = await fetch(`news-data/news.json?v=${Date.now()}`);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data     = await res.json();
-    const articles = data.articles || [];
-
-    if (articles.length > 0) {
-      allArticles = articles
-        .map(a => {
-          const cur = (a.cur && ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(a.cur))
-            ? a.cur
-            : detectCurrencyWithSource(a.title || '', a.expand || '', a.source || '');
-          return {
-            ...a,
-            cur,
-            impact:      a.impact || detectImpact(a.title, a.expand),
-            time:        tsToLocalTime(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
-            ai_headline: a.ai_headline || null,
-            recent:      a.recent !== undefined ? a.recent : true,
-          };
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+async function initFeed(){
+  try{
+    const res=await fetch(`news-data/news.json?v=${Date.now()}`);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const articles=data.articles||[];
+    if(articles.length>0){
+      allArticles=articles
+        .map(a=>{
+          const cur=(a.cur&&['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(a.cur))
+            ?a.cur:detectCurrencyWithSource(a.title||'',a.expand||'',a.source||'');
+          return{...a,cur,impact:a.impact||detectImpact(a.title,a.expand),time:tsToLocalTime(a.ts||(a.datetime?new Date(a.datetime).getTime():null)),ai_headline:a.ai_headline||null,recent:a.recent!==undefined?a.recent:true};
         })
-        .filter(a => {
-          if (a.ai_headline && a.ai_headline.toUpperCase().includes('IRRELEVANTE')) return false;
-          return true;
-        })
-        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-
+        .filter(a=>!(a.ai_headline&&a.ai_headline.toUpperCase().includes('IRRELEVANTE')))
+        .sort((a,b)=>(b.ts||0)-(a.ts||0));
       renderFeed();
       return;
     }
-  } catch(e) {
-    console.warn('news.json no disponible:', e.message);
-  }
+  } catch(e){console.warn('news.json no disponible:',e.message);}
 
-  const feedBody = document.getElementById('feed-body');
-  const loading  = document.getElementById('feed-loading');
-  if (loading) loading.remove();
-  feedBody.setAttribute('aria-busy', 'false');
-  feedBody.innerHTML = `<div class="feed-empty">
-    <div class="feed-error-icon">⚠️</div>
-    <strong>No se pudieron cargar las noticias</strong><br><br>
-    El archivo de noticias no está disponible en este momento.<br><br>
-    <strong>Consulte noticias directamente:</strong><br><br>
-    <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
-    <a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES</a><br>
-    <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br>
-    <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a>
-  </div>`;
-  computeSentiment([]);
-  renderCoverage([]);
+  const feedBody=document.getElementById('feed-body');
+  const loading=document.getElementById('feed-loading');
+  if(loading)loading.remove();
+  feedBody.setAttribute('aria-busy','false');
+  feedBody.innerHTML=`<div class="feed-empty"><div class="feed-error-icon">⚠️</div><strong>No se pudieron cargar las noticias</strong><br><br>El archivo de noticias no está disponible en este momento.<br><br><strong>Consulte noticias directamente:</strong><br><br><a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br><a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES</a><br><a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br><a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a></div>`;
+  computeSentiment([]);renderCoverage([]);
 }
 
 initFeed();
