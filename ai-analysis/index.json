@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-02-27T11:08:38.665659+00:00",
+  "generatedAt": "2026-03-04T12:56:13.355541+00:00",
   "model": "llama-3.3-70b-versatile",
-  "version": "2.6",
+  "version": "4.0",
   "currencies": [
     "USD",
     "EUR",
@@ -13,65 +13,83 @@
     "NZD"
   ],
   "totalGenerated": 8,
+  "totalReused": 0,
   "comtradeHits": 0,
+  "keysUsed": 2,
   "errors": [],
   "results": {
     "USD": {
       "success": true,
-      "wordCount": 206,
-      "generatedAt": "2026-02-27T11:08:07.259461+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 226,
+      "generatedAt": "2026-03-04T12:55:36.587692+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 1
     },
     "EUR": {
       "success": true,
-      "wordCount": 213,
-      "generatedAt": "2026-02-27T11:08:11.793653+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 210,
+      "generatedAt": "2026-03-04T12:55:46.140770+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "GBP": {
       "success": true,
+      "reused": false,
       "wordCount": 234,
-      "generatedAt": "2026-02-27T11:08:16.298243+00:00",
-      "exportDataSource": "fallback"
+      "generatedAt": "2026-03-04T12:55:50.817444+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "JPY": {
       "success": true,
-      "wordCount": 214,
-      "generatedAt": "2026-02-27T11:08:21.004566+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 215,
+      "generatedAt": "2026-03-04T12:55:55.197833+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "AUD": {
       "success": true,
-      "wordCount": 206,
-      "generatedAt": "2026-02-27T11:08:25.283081+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 210,
+      "generatedAt": "2026-03-04T12:55:59.564943+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "CAD": {
       "success": true,
-      "wordCount": 234,
-      "generatedAt": "2026-02-27T11:08:29.598286+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 249,
+      "generatedAt": "2026-03-04T12:56:04.135127+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "CHF": {
       "success": true,
-      "wordCount": 234,
-      "generatedAt": "2026-02-27T11:08:34.352447+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 208,
+      "generatedAt": "2026-03-04T12:56:08.679193+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     },
     "NZD": {
       "success": true,
-      "wordCount": 229,
-      "generatedAt": "2026-02-27T11:08:38.665351+00:00",
-      "exportDataSource": "fallback"
+      "reused": false,
+      "wordCount": 231,
+      "generatedAt": "2026-03-04T12:56:13.355214+00:00",
+      "exportDataSource": "fallback",
+      "keyUsed": 2
     }
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.53,
-    "avg_inflation": 2.24,
-    "avg_unemployment": 4.69,
-    "avg_bond10y": 3.23,
-    "avg_fx_perf_1m": -1.33,
-    "avg_cot": 9587.75
+    "avg_gdp_growth": 0.48,
+    "avg_inflation": 2.26,
+    "avg_unemployment": 4.7,
+    "avg_bond10y": 3.3,
+    "avg_fx_perf_1m": 1.57,
+    "avg_cot": 9454.25
   }
 }

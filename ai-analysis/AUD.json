@@ -2,13 +2,13 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. Aunque el crecimiento del PIB es inferior al promedio global, la inflación se mantiene por encima del objetivo, lo que justifica la postura hawkish del banco central.\n\nLa balanza comercial muestra un superávit de 2.4B USD/mes, gracias a la exportación de minerales metalíferos, combustibles y petróleo, y cereales. Los términos de intercambio favorables también contribuyen a ampliar el excedente. Sin embargo, la cuenta corriente presenta un déficit del 2.3% del PIB, lo que ejerce presión vendedora estructural sobre la divisa.\n\nEl posicionamiento especulativo es muy alcista, con 70K contratos netos, lo que indica un mercado saturado de largos. Aunque la divisa cayó un 3.58% el último mes, lo que podría ser el inicio de una corrección, el régimen global risk-on favorece divisas de alto carry y exportadoras de materias primas, como el AUD. Por eso, cualquier decepción en los datos puede provocar una corrección rápida, pero el carry atractivo y el superávit comercial deberían mantener la presión alcista a corto plazo.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global, lo que genera un carry atractivo para inversores de renta fija internacional. Esta decisión de subir tasas refleja un ciclo restrictivo activo, estructuralmente alcista para la divisa por mayor carry diferencial. Aunque la inflación se mantiene por encima del objetivo, el crecimiento del PIB es superior al promedio global, lo que sugiere una economía resiliente.\n\nLa balanza comercial presenta un superávit de 2.4B USD/mes, con términos de intercambio favorables, lo que indica que los precios de exportación superan a los de importación, ampliando el excedente. Sin embargo, la cuenta corriente muestra un déficit, lo que podría ejercer presión vendedora estructural sobre la divisa. La composición exportadora, liderada por minerales metalíferos, combustibles y petróleo, cereales, explica en parte este superávit comercial.\n\nEl posicionamiento especulativo, con un COT de +64.7K contratos netos, indica una posición alcista extrema, lo que aumenta el riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes muestra una depreciación, el carry atractivo y el superávit comercial podrían seguir apoyando la divisa. En este contexto, cualquier noticia que contradiga las expectativas de crecimiento o inflación podría desencadenar una corrección rápida.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-02-27T11:08:25.283081+00:00",
+  "generatedAt": "2026-03-04T12:55:59.564943+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "dataSnapshot": {
     "interestRate": 3.85,
-    "gdpGrowth": 0.4,
+    "gdpGrowth": 0.8,
     "inflation": 3.8,
     "unemployment": 4.1,
     "currentAccount": -2.3,
@@ -23,18 +23,18 @@
       "cycle_12m": -0.25,
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
-    "cotPositioning": 70260,
-    "fxPerformance1M": -3.5847,
+    "cotPositioning": 64653,
+    "fxPerformance1M": -0.2849,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-02-27"
+    "lastUpdate": "2026-03-04"
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.53,
-    "avg_inflation": 2.24,
-    "avg_unemployment": 4.69,
-    "avg_bond10y": 3.23,
-    "avg_fx_perf_1m": -1.33,
-    "avg_cot": 9587.75
+    "avg_gdp_growth": 0.48,
+    "avg_inflation": 2.26,
+    "avg_unemployment": 4.7,
+    "avg_bond10y": 3.3,
+    "avg_fx_perf_1m": 1.57,
+    "avg_cot": 9454.25
   }
 }
