@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 """
-enrich_news.py — v8
+enrich_news.py — v9
 Soporte para múltiples API keys de Groq con fallback automático.
 
-CAMBIOS v8 (sobre v7):
-  - SYSTEM_PROMPT: añadidas reglas críticas para JPY y tasas:
-      • "Posponer/retrasar/cancelar una subida de tasas = BAJISTA para la divisa"
-      • "Política acomodaticia / tasas reales negativas = BAJISTA (dovish)"
-      • Excepción JPY documentada: risk-off geopolítico puede ser ALCISTA para JPY
-        aunque el BOJ sea dovish (activo refugio)
-      • Regla SNB intervención: si SNB amenaza con intervenir para frenar apreciación
-        → CHF neutral (no alcista), porque la propia intervención limita el alza
-  - score_from_headline(): corregida inversión dovish/hawkish para JPY en contexto
-    de tasas (retraso de alza = bajista)
-  - Sin otros cambios funcionales respecto a v7
+CAMBIOS v9 (sobre v8):
+  CORRECCIÓN CRÍTICA — score_from_headline(headline, cur):
+    El bug raíz: cuando Groq escribe "→ USD alcista" en un artículo etiquetado como
+    EUR, NZD o cualquier otra divisa, score_from_headline() leía "alcista" y devolvía
+    "bull" para esa divisa no-USD. Resultado: EUR con sentiment="bull" aunque el
+    artículo decía claramente que el EUR caía mientras el USD subía.
+
+    Fix: extraer la DIVISA del patrón final "→ [DIVISA] [sentimiento]":
+      - Si DIVISA == cur → sentimiento directo (sin cambio)
+      - Si DIVISA == 'USD' y cur ∈ MAJORS_VS_USD → invertir sentimiento
+        (USD sube = EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan)
+      - Si DIVISA ≠ USD y ≠ cur → usar sentimiento tal como está
+        (cross pairs ya tienen cur correcto por PAIR_PROTAGONIST_MAP)
+      - Si no hay DIVISA en el patrón → comportamiento v8 sin cambio
+
+  CORRECCIÓN SYSTEM_PROMPT — regla explícita de perspectiva:
+    "El titular SIEMPRE debe describir el movimiento desde la perspectiva de la
+     DIVISA ASIGNADA, nunca desde la perspectiva de otra divisa.
+     INCORRECTO: artículo EUR con '→ USD alcista'
+     CORRECTO:   artículo EUR con '→ EUR bajista'"
+    Esto corrige el problema de raíz en Groq, no solo el síntoma.
+
+  Sin otros cambios funcionales respecto a v8.
 """
 
 import os
@@ -42,10 +54,8 @@ MIN_CONTENT_WORDS     = 15
 
 _START_TIME = time.time()
 
-
 def elapsed_min():
     return (time.time() - _START_TIME) / 60.0
-
 
 def timeout_reached():
     return elapsed_min() >= GLOBAL_TIMEOUT_MIN
@@ -67,8 +77,11 @@ CALENDAR_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Divisas que cotizan contra el USD — para la inversión de sentimiento
+MAJORS_VS_USD = {"EUR", "GBP", "AUD", "NZD", "CAD", "CHF", "JPY"}
+
 # ─────────────────────────────────────────────
-# SYSTEM PROMPT — ESTÁNDAR INSTITUCIONAL v8
+# SYSTEM PROMPT — ESTÁNDAR INSTITUCIONAL v9
 # ─────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading.
 Tu tarea es sintetizar noticias económicas y financieras en titulares estructurados para una plataforma profesional.
@@ -76,10 +89,11 @@ Tu tarea es sintetizar noticias económicas y financieras en titulares estructur
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FORMATO OBLIGATORIO DEL TITULAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Evento/dato concreto]: [Mecanismo de transmisión] → [DIVISA] [SENTIMIENTO]
+[Evento/dato concreto]: [Mecanismo de transmisión] → [DIVISA ASIGNADA] [SENTIMIENTO]
 
-Donde SENTIMIENTO es exactamente una de estas cuatro palabras:
-  alcista | bajista | neutral | mixto
+Donde:
+  - DIVISA ASIGNADA es SIEMPRE la divisa indicada en "DIVISA ASIGNADA:" (ej. EUR, NZD)
+  - SENTIMIENTO es exactamente una de estas cuatro palabras: alcista | bajista | neutral | mixto
 
 Longitud: entre 90 y 160 caracteres.
 Idioma: español profesional.
@@ -92,6 +106,29 @@ EJEMPLOS CORRECTOS:
   Petróleo WTI sube 8% por bloqueo del Estrecho de Ormuz: ingresos por exportación de crudo en riesgo → CAD alcista
   BOJ pospone alza de tasas de marzo por volatilidad de mercados: decisión dovish retrasa normalización → JPY bajista
   SNB podría intervenir para frenar apreciación excesiva del franco: techo implícito sobre valorización → CHF neutral
+  EUR/USD cae 0.63% pese a inflación en zona euro: tensiones en Oriente Medio impulsan al USD → EUR bajista
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGLA CRÍTICA DE PERSPECTIVA — NUNCA VIOLAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+El titular SIEMPRE debe describir el movimiento desde la perspectiva de la DIVISA ASIGNADA.
+NUNCA uses otra divisa como sujeto del sentimiento final.
+
+INCORRECTO (artículo EUR, USD como sujeto):
+  "Tensiones en Oriente Medio: aumento de la aversión al riesgo → USD alcista"
+  "Conflicto en Medio Oriente aviva temores: → USD alcista"
+
+CORRECTO (artículo EUR, EUR como sujeto):
+  "Tensiones en Oriente Medio intensifican demanda de refugio: presión vendedora sobre la zona euro → EUR bajista"
+
+INCORRECTO (artículo NZD, USD como sujeto):
+  "Conflicto en Oriente Medio aviva temores de inflación: aumento de precios del petróleo → USD alcista"
+
+CORRECTO (artículo NZD, NZD como sujeto):
+  "Conflicto en Oriente Medio aviva temores de inflación: divisa de riesgo bajo presión vendedora → NZD bajista"
+
+La regla es simple: si el USD sube, el EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan. Escribe siempre
+el impacto SOBRE LA DIVISA ASIGNADA, no sobre el USD u otra divisa.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS ABSOLUTAS — NUNCA VIOLAR
@@ -119,19 +156,17 @@ DOVISH (bajista para la divisa):
   - Recorte de tasas confirmado o anticipado
   - POSPONER, RETRASAR o CANCELAR una subida de tasas previamente esperada
     → Ejemplo: "BOJ podría posponer alza de marzo" → JPY BAJISTA (no alcista)
-    → El retraso de una subida reduce las expectativas de rendimiento → bajista
   - Banco central mantiene tasas sin cambios cuando el mercado esperaba subida
   - Política acomodaticia / tasas reales negativas / condiciones expansivas
 
 EXCEPCIÓN JPY — ACTIVO REFUGIO:
   En contextos de RIESGO GEOPOLÍTICO EXTREMO (guerra, crisis sistémica):
-  - Si el artículo trata PRINCIPALMENTE de la demanda de JPY como refugio seguro → JPY alcista
-  - Si el artículo trata PRINCIPALMENTE de la política del BOJ (dovish/hawkish) → usa la regla normal
-  - Si ambos factores están presentes y se contrarrestan → JPY mixto
+  - Si el artículo trata PRINCIPALMENTE de la demanda de JPY como refugio → JPY alcista
+  - Si el artículo trata PRINCIPALMENTE de la política del BOJ (dovish) → JPY bajista
+  - Si ambos factores están presentes → JPY mixto
 
 REGLA SNB:
-  - Si el SNB AMENAZA con intervenir para FRENAR la apreciación del franco → CHF neutral
-    (la intervención es un techo implícito que limita la subida)
+  - Si el SNB AMENAZA con intervenir para FRENAR la apreciación → CHF neutral
   - Si el franco se aprecia sin mención de intervención → CHF alcista
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -140,11 +175,12 @@ CORRELACIONES MACROECONÓMICAS CLAVE
 PETRÓLEO / ENERGÍA:
   ↑ precio petróleo → CAD alcista (Canadá = mayor exportador de crudo a EEUU)
   ↑ precio petróleo → EUR bajista, JPY bajista (ambos son importadores netos)
-  ↑ precio energía → NOK alcista, RUB alcista (si son mencionados)
+  ↑ precio petróleo → NZD bajista, AUD mixto (Australia exporta pero importa petróleo refinado)
 
 ACTIVOS REFUGIO (risk-off):
   ↑ tensión geopolítica / ↑ volatilidad → JPY alcista, CHF alcista (si no hay intervención SNB)
   ↑ tensión geopolítica → AUD bajista, NZD bajista (divisas de riesgo)
+  ↑ tensión geopolítica → EUR bajista (zona euro importa energía, más vulnerable)
 
 CRECIMIENTO / DATOS MACRO:
   PIB / empleo / PMI por encima de expectativas → alcista
@@ -156,7 +192,7 @@ CRECIMIENTO / DATOS MACRO:
 CASOS ESPECIALES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - Análisis técnico con niveles: incluye el nivel clave, soporte/resistencia y sesgo
-- Pares cruzados (EUR/GBP, GBP/JPY): describe el impacto en la divisa base
+- Pares cruzados (EUR/GBP, GBP/JPY): describe el impacto en la divisa base (DIVISA ASIGNADA)
 - Si el impacto es genuinamente ambiguo según el propio artículo: usa "mixto"
 - Si no hay suficiente información analítica: responde solo: IRRELEVANTE"""
 
@@ -169,19 +205,19 @@ def build_user_prompt(article: dict) -> str:
         f"FUENTE: {article.get('source', '')} ({'español' if lang == 'es' else 'inglés'})\n"
         f"TÍTULO ORIGINAL: {article.get('title', '')}\n"
         f"DESCRIPCIÓN: {(article.get('expand', '') or '')[:500] or 'Sin descripción'}\n\n"
-        f"INSTRUCCIÓN: Sintetiza en un titular SOLO con la información del texto anterior.\n"
-        f"El titular debe describir el impacto sobre {cur} ({CURRENCY_NAMES.get(cur, cur)}).\n"
+        f"INSTRUCCIÓN: Sintetiza en un titular donde el sujeto del sentimiento final\n"
+        f"sea SIEMPRE {cur} ({CURRENCY_NAMES.get(cur, cur)}), nunca otra divisa.\n"
         f"Si el artículo NO trata sobre {cur} ni tiene impacto demostrable en {cur}, "
         f"responde solo: IRRELEVANTE\n\n"
-        f"Titular:"
+        f"Titular (debe terminar en '→ {cur} [alcista|bajista|neutral|mixto]'):"
     )
 
 
 # ─────────────────────────────────────────────
-# SCORING DE SENTIMIENTO — v8
+# SCORING DE SENTIMIENTO — v9
 # ─────────────────────────────────────────────
 SENTIMENT_FINAL_RE = re.compile(
-    r"→\s*(?:\w+\s+)?(alcista|bajista|neutral|mixto)\s*$",
+    r"→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$",
     re.IGNORECASE,
 )
 
@@ -194,7 +230,6 @@ BEAR_KW = [
     "bajista", "dovish", "cae", "caída", "baja", "debilita", "presión",
     "negativo", "por debajo", "sorpresa negativa", "deprecia", "deterioro",
     "recorte de tasas", "recesión",
-    # Patrones que indican postergación de subida (DOVISH) — v8
     "posponer", "pospone", "retrasar", "retrasa", "postergar", "postpone",
     "put off", "hold off", "delay", "pause", "pausar",
     "acomodaticia", "acomodativo", "expansiva", "tasas reales negativas",
@@ -203,14 +238,12 @@ BEAR_KW = [
 MIXED_KW   = ["mixto", "contradictorio", "ambiguo", "señal contradictoria"]
 NEUTRAL_KW = ["neutral", "neutro", "sin impacto"]
 
-# Patrones de postergación de subida (dovish para cualquier divisa) — v8
 POSTPONE_HIKE_RE = re.compile(
     r"\b(posponer?|retrasar?|postergar?|put off|hold off|delay|pause)\b.{0,60}"
     r"\b(alza|hike|subida|rate rise|suba de tasas|raise rates)\b",
     re.IGNORECASE,
 )
 
-# Patrones SNB intervención → neutral (no alcista)
 SNB_INTERVENTION_RE = re.compile(
     r"\b(snb|swiss national bank|banco nacional suizo)\b.{0,80}"
     r"\b(intervenir|intervene|interven|frenar|dampen|curb|limit)\b",
@@ -218,14 +251,20 @@ SNB_INTERVENTION_RE = re.compile(
 )
 
 
-def score_from_headline(headline: str | None) -> str:
+def score_from_headline(headline: str | None, cur: str = "USD") -> str:
     """
-    Extrae el sentimiento del ai_headline.
+    Extrae el sentimiento del ai_headline con validación de divisa cruzada.
+
+    v9: FIX CRÍTICO
+    Si el patrón final menciona una divisa diferente a `cur`:
+      - "→ USD alcista" en artículo EUR/NZD/etc. → invertir → 'bear'
+      - "→ USD bajista" en artículo EUR/NZD/etc. → invertir → 'bull'
+      - Cross sin USD: usar sentimiento tal como está
 
     Prioridad:
-      1. Patrón final estructurado "→ [divisa] alcista/bajista/neutral/mixto"
-      2. Detección de postergación de alza (DOVISH) — v8
-      3. Detección de intervención SNB → neutral — v8
+      1. Patrón final estructurado con validación de divisa
+      2. Detección de postergación de alza (DOVISH)
+      3. Detección de intervención SNB → neutral
       4. Conteo de keywords
     """
     if not headline:
@@ -233,20 +272,38 @@ def score_from_headline(headline: str | None) -> str:
 
     hl = headline.lower()
 
-    # Prioridad 1 — patrón estructurado al final
-    m = SENTIMENT_FINAL_RE.search(hl)
+    # Prioridad 1 — patrón estructurado al final (con divisa opcional)
+    m = SENTIMENT_FINAL_RE.search(headline)  # usar original para mayúsculas
     if m:
-        word = m.group(1).lower()
-        if word == "alcista":  return "bull"
-        if word == "bajista":  return "bear"
-        if word == "mixto":    return "mixed"
-        if word in ("neutral", "neutro"): return "neut"
+        pattern_cur  = m.group(1).upper() if m.group(1) else None
+        pattern_word = m.group(2).lower()
 
-    # Prioridad 2 — postergación de subida = dovish = bajista (v8)
+        # Mapear palabra → sentimiento base
+        base_sent = {
+            "alcista": "bull", "bajista": "bear",
+            "neutral": "neut", "neutro":  "neut",
+            "mixto":   "mixed",
+        }.get(pattern_word, "neut")
+
+        # FIX v9: validación de divisa cruzada
+        if pattern_cur and pattern_cur != cur.upper():
+            if pattern_cur == "USD" and cur.upper() in MAJORS_VS_USD:
+                # USD sube → esta divisa baja (inversión)
+                if base_sent == "bull":
+                    return "bear"
+                elif base_sent == "bear":
+                    return "bull"
+                # neut/mixed → sin inversión
+            # Cross no-USD: confiar en el sentimiento tal como está
+            # (el par ya tiene cur correcto por PAIR_PROTAGONIST_MAP)
+
+        return base_sent
+
+    # Prioridad 2 — postergación de subida = dovish = bajista
     if POSTPONE_HIKE_RE.search(hl):
         return "bear"
 
-    # Prioridad 3 — SNB intervención = neutral (v8)
+    # Prioridad 3 — SNB intervención = neutral
     if SNB_INTERVENTION_RE.search(hl):
         return "neut"
 
@@ -339,21 +396,12 @@ def check_key(api_key: str) -> str:
     try:
         r = requests.post(
             GROQ_URL,
-            json={
-                "model":    GROQ_MODEL,
-                "messages": [{"role": "user", "content": "hi"}],
-                "max_tokens": 1,
-            },
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type":  "application/json",
-            },
+            json={"model": GROQ_MODEL, "messages": [{"role": "user", "content": "hi"}], "max_tokens": 1},
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             timeout=10,
         )
-        if r.status_code == 401:
-            return "invalid"
-        if r.status_code == 429:
-            return "daily_limit" if is_daily_limit_message(r) else "ok"
+        if r.status_code == 401: return "invalid"
+        if r.status_code == 429: return "daily_limit" if is_daily_limit_message(r) else "ok"
         return "ok"
     except Exception:
         return "ok"
@@ -380,18 +428,14 @@ def call_groq(api_key: str, article: dict) -> str | None:
         "max_tokens":  MAX_TOKENS,
         "temperature": TEMPERATURE,
     }
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type":  "application/json",
-    }
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             r = requests.post(GROQ_URL, json=payload, headers=headers, timeout=25)
 
             if r.status_code == 429:
-                if is_daily_limit_message(r):
-                    return "DAILY_LIMIT"
+                if is_daily_limit_message(r): return "DAILY_LIMIT"
                 wait = get_retry_after(r)
                 if wait > SKIP_IF_WAIT_EXCEEDS:
                     print(f"  ⏭️  Retry-After={wait}s muy largo — omitiendo artículo")
@@ -400,14 +444,11 @@ def call_groq(api_key: str, article: dict) -> str | None:
                 time.sleep(wait)
                 continue
 
-            if r.status_code == 401:
-                return "DAILY_LIMIT"
-
+            if r.status_code == 401: return "DAILY_LIMIT"
             r.raise_for_status()
             content = r.json()["choices"][0]["message"]["content"].strip()
 
-            if content.upper() == "IRRELEVANTE":
-                return None
+            if content.upper() == "IRRELEVANTE": return None
 
             content = content.strip('"\'').strip()
             for prefix in ("titular:", "headline:", "síntesis:", "análisis:", "titolo:"):
@@ -418,8 +459,7 @@ def call_groq(api_key: str, article: dict) -> str | None:
 
         except requests.exceptions.Timeout:
             print(f"  ⚠️  Timeout (intento {attempt}/{MAX_RETRIES})")
-            if attempt < MAX_RETRIES:
-                time.sleep(5)
+            if attempt < MAX_RETRIES: time.sleep(5)
         except Exception as e:
             print(f"  ⚠️  Error: {e}")
             return None
@@ -438,7 +478,7 @@ def save_progress(data, articles, now_utc):
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v8 institucional")
+    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v9 institucional")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}  |  Timeout: {GLOBAL_TIMEOUT_MIN} min")
     print("=" * 65)
 
@@ -483,16 +523,26 @@ def main():
     print(f"   Divisas: {dict(sorted(dist.items()))}")
     print(f"   Impacto: high={impact['high']} | med={impact['med']} | low={impact['low']}")
 
-    # Recalcular sentimientos previos con la nueva lógica v8
+    # ── RECALCULAR sentimientos con lógica v9 (fix divisa cruzada) ──────────
     sentiments_recalculated = 0
+    corrections_log = []
     for article in articles:
         if article.get("ai_headline"):
-            new_sentiment = score_from_headline(article["ai_headline"])
-            if article.get("sentiment") != new_sentiment:
-                article["sentiment"] = new_sentiment
+            cur         = article.get("cur", "USD")
+            old_sent    = article.get("sentiment", "neut")
+            new_sent    = score_from_headline(article["ai_headline"], cur)
+            if old_sent != new_sent:
+                article["sentiment"] = new_sent
                 sentiments_recalculated += 1
+                corrections_log.append(
+                    f"    {cur} | {old_sent}→{new_sent} | {article['ai_headline'][:70]}..."
+                )
     if sentiments_recalculated:
-        print(f"   🔄 Sentimientos recalculados (lógica v8): {sentiments_recalculated}")
+        print(f"\n   🔄 Sentimientos corregidos (v9 — fix divisa cruzada): {sentiments_recalculated}")
+        for log in corrections_log[:10]:  # mostrar máx 10
+            print(log)
+        if len(corrections_log) > 10:
+            print(f"    ... y {len(corrections_log)-10} más")
 
     to_process = [(i, a) for i, a in enumerate(articles) if not a.get("ai_headline")]
     print(f"\n🔍 A enriquecer: {len(to_process)}")
@@ -546,7 +596,7 @@ def main():
 
         if result and result != "DAILY_LIMIT":
             articles[article_idx]["ai_headline"] = result
-            articles[article_idx]["sentiment"]   = score_from_headline(result)
+            articles[article_idx]["sentiment"]   = score_from_headline(result, cur)
             enriched += 1
             sentiment_label = articles[article_idx]["sentiment"]
             print(f"  ✅ [{sentiment_label}] {result[:90]}{'...' if len(result) > 90 else ''}")
@@ -565,7 +615,9 @@ def main():
     # Asegurar campo sentiment en todos los artículos
     for article in articles:
         if "sentiment" not in article:
-            article["sentiment"] = score_from_headline(article.get("ai_headline"))
+            article["sentiment"] = score_from_headline(
+                article.get("ai_headline"), article.get("cur", "USD")
+            )
 
     save_progress(data, articles, now_utc)
 
@@ -580,32 +632,32 @@ def main():
 
     print()
     print("=" * 65)
-    print("📊 SENTIMIENTO POR DIVISA (scoring ponderado aplicado en frontend)")
+    print("📊 SENTIMIENTO POR DIVISA (post-fix v9)")
     print("-" * 65)
     for cur in ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]:
         c = sent_by_cur.get(cur, Counter())
         total = sum(c.values())
-        if total == 0:
-            continue
+        if total == 0: continue
         bull  = c.get("bull",  0)
         bear  = c.get("bear",  0)
         neut  = c.get("neut",  0)
         mixed = c.get("mixed", 0)
         dominant = max(c, key=c.get) if c else "neut"
-        dominant_label = {"bull": "ALCISTA", "bear": "BAJISTA", "neut": "NEUTRAL", "mixed": "MIXTO"}.get(dominant, "?")
+        dominant_label = {"bull":"ALCISTA","bear":"BAJISTA","neut":"NEUTRAL","mixed":"MIXTO"}.get(dominant,"?")
         print(f"  {cur:4s}  bull={bull} bear={bear} neut={neut} mixed={mixed}  → {dominant_label}")
 
     print()
     print("📋 RESUMEN ENRIQUECIMIENTO")
-    print(f"   ✅ Enriquecidos:        {enriched}")
-    print(f"   ⛔ No enriquecibles:    {not_enrichable}")
-    print(f"   ⚠️  Error API:          {skipped}")
-    print(f"   ⏭️  Irrelevantes:       {irrelevant}")
+    print(f"   ✅ Enriquecidos:          {enriched}")
+    print(f"   🔄 Sentimientos corregidos: {sentiments_recalculated}")
+    print(f"   ⛔ No enriquecibles:      {not_enrichable}")
+    print(f"   ⚠️  Error API:            {skipped}")
+    print(f"   ⏭️  Irrelevantes:         {irrelevant}")
     if stopped_early:
         print(f"   ⏰ Detenido antes de completar")
-    print(f"   🔑 Keys usadas:        hasta Key {current_key_idx + 1} de {len(available_keys)}")
-    print(f"   ⏱️  Tiempo total:       {elapsed_min():.1f} min")
-    print(f"   💾 Guardado en:        {NEWS_FILE}")
+    print(f"   🔑 Keys usadas:          hasta Key {current_key_idx + 1} de {len(available_keys)}")
+    print(f"   ⏱️  Tiempo total:         {elapsed_min():.1f} min")
+    print(f"   💾 Guardado en:          {NEWS_FILE}")
     print("=" * 65)
 
 
