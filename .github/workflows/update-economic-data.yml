@@ -278,7 +278,9 @@ jobs:
               ToT resolution chain:
                 1. TE list values (all currencies, reject out-of-range).
                    NZD: TE uses base 2002Q2=1000 → raw value saved as NZD_RAW,
-                   normalized by ÷10 to base-~100 (e.g. 1567 → 156.7). Zero extra requests.
+                   normalized by ÷10 to base-~100. Then validated against
+                   institutional bounds (C6: TOT_INSTITUTIONAL_MAX=130).
+                   If normalized > 130, World Bank cross-validation attempted.
                 2. GBP  → ONS API (quarterly, most current)
                 3. EUR  → OECD legacy → OECD new → Germany proxy (from TE list)
                 4. Rest → World Bank (annual, ~2yr lag)
@@ -302,15 +304,35 @@ jobs:
                   else:
                       print(f"  ✗ {curr} [TE list]: {val} out of range → specialist scraper")
 
+              # ── C6: NZD ToT bounds check data-driven ──────────────────────────────
               # NZD: normalize raw TE value (base 2002Q2=1000) by dividing by 10
+              # C6: bounds check post-normalización.
+              # Ningún G8 debería tener ToT > 130 (base ~100).
+              # Si el normalizado sigue fuera de rango → World Bank como validación cruzada.
+              TOT_INSTITUTIONAL_MAX = 130.0  # bound data-driven G8
               if 'NZD' not in data:
                   raw = te_list_data.get('NZD_RAW')
                   if raw is not None and 500.0 <= raw <= 2500.0:
                       normalized = round(raw / 10.0, 2)
                       d = te_list_dates.get('NZD_RAW', str(date.today()))
-                      print(f"  ✓ NZD: TE raw={raw} → normalized {normalized} (÷10, base 2002Q2=1000→~100)")
-                      data['NZD']  = normalized
-                      dates['NZD'] = d
+                      if normalized <= TOT_INSTITUTIONAL_MAX:
+                          print(f"  ✓ NZD: TE raw={raw} → normalized {normalized} (÷10, base 2002Q2=1000→~100)")
+                          data['NZD']  = normalized
+                          dates['NZD'] = d
+                      else:
+                          print(f"  ⚠ NZD: normalized={normalized} > {TOT_INSTITUTIONAL_MAX} (bounds G8)")
+                          print(f"    → Intentando World Bank para validación cruzada...")
+                          wb_val, wb_d = scrape_tot_wb('NZD', timeout=20)
+                          if wb_val is not None:
+                              print(f"    ✓ NZD [World Bank]: {wb_val} — usando WB como fuente primaria")
+                              data['NZD']  = wb_val
+                              dates['NZD'] = wb_d
+                          else:
+                              # Sin validación disponible: usar normalizado con advertencia
+                              print(f"    ⚠ NZD: World Bank no disponible, usando {normalized} con advertencia")
+                              data['NZD']  = normalized
+                              dates['NZD'] = d
+              # ── fin C6 ────────────────────────────────────────────────────────────
 
               missing = [c for c in CURRENCIES if c not in data]
               if not missing:
@@ -500,8 +522,8 @@ jobs:
               return cot
 
           print("="*60)
-          print("ECONOMIC DATA SCRAPER v11.4")
-          print("ToT NZD: TE raw ÷10 (base 2002Q2=1000→~100) — zero extra requests")
+          print("ECONOMIC DATA SCRAPER v11.4 + C6 (institutional ToT bounds)")
+          print("ToT NZD: TE raw ÷10 → bounds check (max 130) → World Bank fallback")
           print("ToT EUR: OECD legacy → OECD new → Germany proxy")
           print("ToT GBP: ONS CTSL → World Bank")
           print("ToT REST: World Bank fallback")
@@ -526,7 +548,7 @@ jobs:
           for curr in CURRENCIES:
               pkg = {
                   'lastUpdate': today,
-                  'source': 'TradingEconomics + ONS (GBP) + OECD (EUR) + WorldBank + COT',
+                  'source': 'TradingEconomics + ONS (GBP) + OECD (EUR) + WorldBank + COT — C6 ToT bounds',
                   'data':   all_data[curr],
                   'dates':  all_dates[curr],
               }
@@ -549,7 +571,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Economic data $(date +'%Y-%m-%d') - v11.3 NZD fix"
+            git commit -m "Economic data $(date +'%Y-%m-%d') - v11.4 C6 ToT bounds"
             git pull --rebase origin main || true
             git push
           fi
