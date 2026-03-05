@@ -1,4 +1,4 @@
-name: Update FX Performance (1M momentum)
+name: Update FX Performance (composite 1M+3M) — C5
 on:
   schedule:
     - cron: '0 7 * * *'
@@ -22,7 +22,7 @@ jobs:
       - name: Create directory
         run: mkdir -p fx-performance
 
-      - name: Fetch 1M FX performance
+      - name: Fetch FX performance composite 1M+3M
         run: |
           python3 << 'EOFPYTHON'
           import requests
@@ -44,27 +44,29 @@ jobs:
           # todas las divisas en cada ejecución.
           yesterday = today - timedelta(days=1)
           date_30d  = yesterday - timedelta(days=30)
+          date_90d  = yesterday - timedelta(days=90)   # C5: ventana 3M
           date_7d   = yesterday - timedelta(days=7)
 
-          today_str = yesterday.isoformat()   # "hoy confiable"
+          today_str = yesterday.isoformat()
           d30_str   = date_30d.isoformat()
+          d90_str   = date_90d.isoformat()             # C5
           d7_str    = date_7d.isoformat()
 
-          print(f"Fetching FX performance: {d30_str} → {today_str} (using yesterday as confirmed ECB date)")
+          # C5: composite 60% 1M + 40% 3M
+          # El campo JSON sigue llamándose fxPerformance1M — index.html no requiere cambios.
+          # Racionale: un movimiento de 1 mes puede ser ruido. La componente de 3 meses
+          # suaviza la señal sin añadir fuentes de datos adicionales.
+          COMPOSITE_WEIGHT_1M = 0.60
+          COMPOSITE_WEIGHT_3M = 0.40
+
+          print(f"Fetching FX performance composite 1M+3M: {d90_str} → {today_str}")
+          print(f"Weights: 1M={COMPOSITE_WEIGHT_1M*100:.0f}% + 3M={COMPOSITE_WEIGHT_3M*100:.0f}%")
 
           def fetch_rate_on_date(currency, date_str, retries=3, backoff=2):
               """
               Fetch USD/{currency} rate on a specific date via Frankfurter.
-              Returns units of currency per 1 USD (i.e. how many JPY/EUR/etc per dollar).
-
-              Frankfurter usa ECB reference rates publicados a las 16:00 CET.
-              Si pedimos la fecha de hoy antes de esa hora, puede devolver
-              el dato del día anterior de forma inconsistente entre divisas.
-              Para evitar este desajuste, las fechas se normalizan en el bloque
-              superior (usando yesterday). Esta función acepta la fecha ya normalizada.
-
-              En caso de día no hábil (fin de semana, festivo), Frankfurter
-              devuelve automáticamente el último dato disponible — lo aceptamos.
+              Returns units of currency per 1 USD.
+              En caso de día no hábil, Frankfurter devuelve el último dato disponible.
               """
               url = f"https://api.frankfurter.app/{date_str}?from=USD&to={currency}"
               for attempt in range(1, retries + 1):
@@ -74,20 +76,18 @@ jobs:
                           data = r.json()
                           rate = data.get('rates', {}).get(currency)
                           if rate:
-                              # Loguear la fecha real devuelta por Frankfurter (puede diferir
-                              # de date_str si ese día no era hábil)
                               actual_date = data.get('date', date_str)
                               if actual_date != date_str:
                                   print(f"  Note: {currency} on {date_str} → Frankfurter returned {actual_date} (non-trading day adjusted)")
                               return float(rate)
-                          print(f"  Warning: {currency} on {date_str}: rate not in response (keys: {list(data.get('rates',{}).keys())})")
+                          print(f"  Warning: {currency} on {date_str}: rate not in response")
                       else:
                           print(f"  Warning: {currency} on {date_str}: HTTP {r.status_code} (attempt {attempt}/{retries})")
                   except Exception as e:
                       print(f"  Warning: {currency} on {date_str}: {e} (attempt {attempt}/{retries})")
 
                   if attempt < retries:
-                      sleep_s = backoff ** (attempt - 1)  # 1s, 2s
+                      sleep_s = backoff ** (attempt - 1)
                       print(f"  Retrying in {sleep_s}s...")
                       time.sleep(sleep_s)
 
@@ -96,14 +96,9 @@ jobs:
 
           def calc_performance(currency, rate_now, rate_before):
               """
-              Calculate % change in currency value (appreciation = positive).
-
-              Si USD/CCY rate baja → moneda se APRECIÓ vs USD → resultado positivo.
-              Si USD/CCY rate sube → moneda se DEPRECIÓ vs USD → resultado negativo.
-
+              % change in currency value (appreciation = positive).
+              Si USD/CCY rate baja → moneda se APRECIÓ → resultado positivo.
               Fórmula: (rate_before / rate_now - 1) * 100
-              Ejemplo: USD/JPY era 158, ahora 145 → yen apreció 8.3% → positivo.
-              Ejemplo: USD/EUR era 0.95, ahora 0.92 → EUR apreció 3.3% → positivo.
               """
               if rate_now is None or rate_before is None:
                   return None
@@ -119,37 +114,53 @@ jobs:
 
               rate_now = fetch_rate_on_date(currency, today_str)
               rate_30d = fetch_rate_on_date(currency, d30_str)
+              rate_90d = fetch_rate_on_date(currency, d90_str)   # C5
               rate_7d  = fetch_rate_on_date(currency, d7_str)
 
               print(f"  Now ({today_str}): {rate_now}")
               print(f"  30d ago ({d30_str}): {rate_30d}")
+              print(f"  90d ago ({d90_str}): {rate_90d}")
               print(f"  7d ago ({d7_str}): {rate_7d}")
 
               perf_1m = calc_performance(currency, rate_now, rate_30d)
+              perf_3m = calc_performance(currency, rate_now, rate_90d)  # C5
               perf_1w = calc_performance(currency, rate_now, rate_7d)
 
+              # C5: Composite 60% 1M + 40% 3M para reducir ruido.
+              # El campo JSON sigue llamándose fxPerformance1M — index.html no cambia.
+              if perf_1m is not None and perf_3m is not None:
+                  perf_composite = round(perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4)
+              elif perf_1m is not None:
+                  perf_composite = perf_1m   # fallback a solo 1M
+              elif perf_3m is not None:
+                  perf_composite = perf_3m   # fallback a solo 3M
+              else:
+                  perf_composite = None
+
               results[currency] = {
-                  'fxPerformance1M': perf_1m,
+                  'fxPerformance1M': perf_composite,     # composite — nombre igual para compatibilidad con index.html
+                  'fxPerformance1M_raw': perf_1m,        # componente 1M pura (debug)
+                  'fxPerformance3M': perf_3m,            # componente 3M (debug)
                   'fxPerformance1W': perf_1w,
                   'rateNow':    rate_now,
                   'rate30dAgo': rate_30d,
+                  'rate90dAgo': rate_90d,
                   'rate7dAgo':  rate_7d,
                   'date': today_str,
-                  'source': 'Frankfurter API (ECB reference rates) — date normalized to yesterday'
+                  'source': 'Frankfurter ECB — composite 60% 1M + 40% 3M (C5)'
               }
 
-              print(f"  1M perf: {perf_1m}%  |  1W perf: {perf_1w}%")
+              print(f"  1M={perf_1m}%  3M={perf_3m}%  composite={perf_composite}%  |  1W={perf_1w}%")
 
           # USD: calculado como inverso ponderado DXY
           # Pesos oficiales del índice DXY (ICE):
           #   EUR 57.6% | JPY 13.6% | GBP 11.9% | CAD 9.1% | CHF 3.6% | AUD 2.1% | NZD 2.1%
-          # El peso igual previo (14.3% por divisa) sobreestimaba JPY/AUD/CAD
-          # y subestimaba EUR. Pesos DXY reales reducen error en ~1pp.
           DXY_WEIGHTS = {
               'EUR': 0.576, 'JPY': 0.136, 'GBP': 0.119,
               'CAD': 0.091, 'CHF': 0.036, 'AUD': 0.021, 'NZD': 0.021
           }
 
+          # USD composite: usar el composite de cada divisa (ya suavizado 1M+3M)
           available_for_usd = [
               c for c in ['EUR', 'JPY', 'GBP', 'CAD', 'CHF', 'AUD', 'NZD']
               if results.get(c, {}).get('fxPerformance1M') is not None
@@ -160,22 +171,25 @@ jobs:
               usd_perf = 0.0
               for c in available_for_usd:
                   perf = results[c]['fxPerformance1M']
-                  w = DXY_WEIGHTS.get(c, 0) / total_w  # renormalizar si falta alguna divisa
-                  usd_perf -= perf * w                  # USD se mueve inverso al resto
+                  w = DXY_WEIGHTS.get(c, 0) / total_w
+                  usd_perf -= perf * w
               usd_perf = round(usd_perf, 4)
-              print(f"\nUSD 1M perf (DXY-weighted, {len(available_for_usd)}/{len(CURRENCIES)} currencies): {usd_perf}%")
+              print(f"\nUSD composite (DXY-weighted, {len(available_for_usd)}/{len(CURRENCIES)} currencies): {usd_perf}%")
           else:
               usd_perf = None
-              print("\nUSD 1M perf: None (no currency data available)")
+              print("\nUSD composite: None (no currency data available)")
 
           results['USD'] = {
               'fxPerformance1M': usd_perf,
+              'fxPerformance1M_raw': usd_perf,
+              'fxPerformance3M': None,
               'fxPerformance1W': None,
               'rateNow':    1.0,
               'rate30dAgo': 1.0,
+              'rate90dAgo': 1.0,
               'rate7dAgo':  1.0,
               'date': today_str,
-              'source': 'Computed as DXY-weighted inverse of currency basket (pesos ICE oficiales)'
+              'source': 'Computed as DXY-weighted inverse of composite basket (C5)'
           }
 
           # Guardar archivos individuales
@@ -187,12 +201,15 @@ jobs:
               if curr in results:
                   with open(f'fx-performance/{curr}.json', 'w') as f:
                       json.dump(results[curr], f, indent=2)
-                  status = '✓' if results[curr]['fxPerformance1M'] is not None else '✗ NULL'
-                  print(f"Saved fx-performance/{curr}.json: 1M={results[curr]['fxPerformance1M']}% [{status}]")
+                  composite = results[curr]['fxPerformance1M']
+                  raw_1m    = results[curr].get('fxPerformance1M_raw')
+                  raw_3m    = results[curr].get('fxPerformance3M')
+                  status = '✓' if composite is not None else '✗ NULL'
+                  print(f"Saved {curr}.json: composite={composite}% [1M={raw_1m}% 3M={raw_3m}%] [{status}]")
 
           # Resumen
           print("\n" + "="*60)
-          print("FX PERFORMANCE SUMMARY (1M, currency appreciation vs USD)")
+          print("FX PERFORMANCE SUMMARY — composite 1M+3M (C5)")
           print(f"Reference date: {today_str} (yesterday = confirmed ECB rate)")
           print("="*60)
           sorted_results = sorted(
@@ -202,13 +219,14 @@ jobs:
           for curr, perf in sorted_results:
               bar = '█' * min(int(abs(perf)), 20)
               sign = '+' if perf >= 0 else ''
-              print(f"  {curr}: {sign}{perf:+.2f}%  {bar}")
+              raw_1m = results[curr].get('fxPerformance1M_raw')
+              raw_3m = results[curr].get('fxPerformance3M')
+              raw_str = f" (1M={raw_1m:+.2f}% 3M={raw_3m:+.2f}%)" if raw_1m is not None and raw_3m is not None else ""
+              print(f"  {curr}: {sign}{perf:+.2f}%{raw_str}  {bar}")
 
-          # Alertar sobre nulls
           nulls = [c for c, d in results.items() if d['fxPerformance1M'] is None]
           if nulls:
               print(f"\n⚠️  NULL results (API failures): {', '.join(nulls)}")
-              print("   Estas divisas no contribuirán a su fxPerformance1M score.")
           else:
               print(f"\n✅ Todas las divisas procesadas correctamente.")
           EOFPYTHON
@@ -221,7 +239,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📈 FX performance update $(date +'%Y-%m-%d') — ECB date normalized, DXY-weighted"
+            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — composite 1M+3M C5"
             git pull --rebase origin main || true
             git push
           fi
