@@ -1,4 +1,4 @@
-name: Update Extended Data (Bonds + Sentiment + Flows + rateMomentum) - v10
+name: Update Extended Data (Bonds + Sentiment + Flows + rateMomentum) - v10 + C2
 
 on:
   schedule:
@@ -18,7 +18,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml --break-system-packages
+        run: pip install requests beautifulsoup4 lxml python-dateutil --break-system-packages
 
       - name: Create directory
         run: mkdir -p extended-data
@@ -108,9 +108,10 @@ jobs:
               except: pass
               return str(date.today())
 
-          # ── v10: rateMomentum — múltiples estrategias ─────────────────────────────
+          # ── C2: rateMomentum — múltiples estrategias + ventana 24M para JPY ──────
           def scrape_rate_momentum():
-              print(f"\n{'='*50}\nRATE MOMENTUM (v10 — TE API guest + FRED + bootstrap)\n{'='*50}")
+              print(f"\n{'='*50}\nRATE MOMENTUM (v10+C2 — TE API guest + FRED + bootstrap)\n{'='*50}")
+              print(f"  C2: JPY usa ventana 24M para capturar ciclo completo BoJ (−0.1%→+0.75%)")
               momentum = {}
               momentum_dates = {}
               momentum_source = {}
@@ -137,9 +138,21 @@ jobs:
                   'Referer': 'https://tradingeconomics.com/',
               }
 
+              # C2: ventana de lookback por divisa.
+              # JPY usa 24M para capturar el ciclo completo BoJ (subió de −0.1% en
+              # ene-2024 a +0.75% en feb-2026). Con 12M la serie FRED JPY tiene lag
+              # y devuelve 0.75%−0.75% = 0.0%, ignorando la normalización completa.
+              TE_LOOKBACK_DAYS = {
+                  'USD': 365, 'EUR': 365, 'GBP': 365,
+                  'JPY': 730,  # C2: 24M para ciclo BoJ completo
+                  'CAD': 365, 'AUD': 365, 'CHF': 365, 'NZD': 365,
+              }
+
               for code, slug in TE_COUNTRY_SLUGS.items():
                   if code in momentum:
                       continue
+                  lookback_days = TE_LOOKBACK_DAYS.get(code, 365)
+                  target_dt_code = today - timedelta(days=lookback_days)
                   try:
                       url = f'https://api.tradingeconomics.com/historical/country/{slug}/indicator/interest-rate?c=guest:guest'
                       r = requests.get(url, headers=TE_API_HEADERS, timeout=15)
@@ -170,21 +183,24 @@ jobs:
                           obs.sort(key=lambda x: x[0])
                           current_dt, current_rate = obs[-1]
 
+                          # C2: usar target_dt_code (puede ser 24M para JPY)
+                          max_diff_days = 90 if lookback_days >= 700 else 60
                           closest_val, closest_diff, closest_dt = None, float('inf'), None
                           for obs_dt, obs_val in obs[:-1]:
-                              diff = abs((obs_dt - target_dt).days)
+                              diff = abs((obs_dt - target_dt_code).days)
                               if diff < closest_diff:
                                   closest_diff, closest_val, closest_dt = diff, obs_val, obs_dt
 
-                          if closest_val is not None and closest_diff <= 60:
+                          if closest_val is not None and closest_diff <= max_diff_days:
                               m_val = round(current_rate - closest_val, 4)
                               momentum[code]        = m_val
                               momentum_dates[code]  = current_dt.strftime('%Y-%m-%d')
-                              momentum_source[code] = 'te-api-guest'
+                              momentum_source[code] = f'te-api-guest-{lookback_days//30}m'
                               direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
-                              print(f"    ✓ {code}: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction} (ref: {closest_dt.strftime('%Y-%m')}, {closest_diff}d)")
+                              window_label = f"{lookback_days//30}M"
+                              print(f"    ✓ {code} [{window_label}]: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction} (ref: {closest_dt.strftime('%Y-%m')}, {closest_diff}d)")
                           else:
-                              print(f"    ⚠️ {code}: 12M target demasiado lejano ({closest_diff}d), {len(obs)} obs disponibles")
+                              print(f"    ⚠️ {code}: {lookback_days//30}M target demasiado lejano ({closest_diff}d), {len(obs)} obs disponibles")
 
                       elif r.status_code == 401:
                           print(f"    ⚠️ {code}: TE API requiere autenticación (401) — saltando estrategia 1")
@@ -207,12 +223,20 @@ jobs:
                   'GBP': 'BOERUKM',
                   'JPY': 'IRSTCB01JPM156N',
               }
+              # C2: ventana de lookback por divisa para FRED.
+              # JPY usa 24M: el ciclo BoJ completo (−0.1%→+0.75%) ocurrió en 24 meses.
+              # Con 12M la diferencia es 0.75%−0.75%=0.0% por el lag de ~3 meses de FRED.
+              FRED_LOOKBACK_MONTHS = {
+                  'USD': 12, 'EUR': 12, 'GBP': 12,
+                  'JPY': 24,  # C2: ciclo BoJ completo requiere ventana 24M
+              }
               fred_candidates = [c for c in CURRENCIES if c not in momentum and c in FRED_SERIES]
               if fred_candidates:
                   print(f"\n  Estrategia 2: FRED CSV para {', '.join(fred_candidates)}")
                   FRED_BASE = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id='
                   for code in fred_candidates:
                       series_id = FRED_SERIES[code]
+                      lookback_months = FRED_LOOKBACK_MONTHS.get(code, 12)
                       try:
                           r = requests.get(f'{FRED_BASE}{series_id}', timeout=15)
                           if r.status_code != 200:
@@ -228,30 +252,34 @@ jobs:
                           if len(rows) < 2:
                               continue
                           latest_dt, current_rate = rows[-1]
-                          target_dt_fred = latest_dt.replace(year=latest_dt.year - 1)
+                          # C2: usar lookback_months específico por divisa
+                          try:
+                              from dateutil.relativedelta import relativedelta
+                              target_dt_fred = latest_dt - relativedelta(months=lookback_months)
+                          except ImportError:
+                              # Fallback sin dateutil (solo para lookback_months múltiplo de 12)
+                              target_dt_fred = latest_dt.replace(year=latest_dt.year - (lookback_months // 12))
+                          # Tolerancia ampliada para ventana 24M (datos mensuales)
+                          max_diff_days = 90 if lookback_months >= 20 else 45
                           closest_val, closest_diff = None, float('inf')
                           for obs_dt, obs_val in rows[:-1]:
                               diff = abs((obs_dt - target_dt_fred).days)
                               if diff < closest_diff:
                                   closest_diff, closest_val = diff, obs_val
-                          if closest_val is not None and closest_diff <= 45:
+                          if closest_val is not None and closest_diff <= max_diff_days:
                               m_val = round(current_rate - closest_val, 4)
                               momentum[code]        = m_val
                               momentum_dates[code]  = latest_dt.strftime('%Y-%m-%d')
-                              momentum_source[code] = 'fred'
+                              momentum_source[code] = f'fred-{lookback_months}m'
                               direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
-                              print(f"    ✓ {code} [FRED {series_id}]: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction}")
+                              print(f"    ✓ {code} [FRED {series_id} {lookback_months}M]: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction}")
+                          else:
+                              print(f"    ⚠️ {code}: ref más cercana a {lookback_months}M dista {closest_diff}d (max {max_diff_days}d)")
                           time.sleep(0.5)
                       except Exception as e:
                           print(f"    ❌ {code}: {e}")
 
               # ── Estrategia 3: Bootstrap con alerta de antigüedad ──────────────────
-              # CORRECCIÓN: El bootstrap hardcodeado puede quedarse desactualizado.
-              # Ahora se emite una advertencia cuando la referencia supera los 400 días,
-              # indicando que BOOTSTRAP_FALLBACK debe actualizarse manualmente.
-              # Nota: los valores son correctos para calcular rateMomentum 12M
-              # (se restan a la tasa actual), pero solo si reflejan la tasa real
-              # de hace ~12 meses. Si cambian las tasas, actualizar estos valores.
               BOOTSTRAP_FALLBACK = {
                   'CAD': (3.00, '2025-02-01'),
                   'AUD': (4.35, '2025-02-01'),
@@ -266,7 +294,6 @@ jobs:
                   for code in bootstrap_candidates:
                       old_rate, old_date_str = BOOTSTRAP_FALLBACK[code]
 
-                      # Verificar antigüedad de la referencia hardcodeada
                       try:
                           ref_date = datetime.strptime(old_date_str, '%Y-%m-%d')
                           age_days = (datetime.today() - ref_date).days
@@ -280,7 +307,6 @@ jobs:
                       except Exception as e:
                           print(f"    ⚠️ {code}: no se pudo verificar antigüedad del bootstrap: {e}")
 
-                      # Leer tasa actual del archivo rates/{code}.json
                       try:
                           rates_path = f'rates/{code}.json'
                           current_rate = None
@@ -335,7 +361,8 @@ jobs:
                   src = momentum_source.get(code, 'none')
                   val = momentum.get(code)
                   val_str = f"{val:+.4f}%" if val is not None else "null"
-                  print(f"    {code}: {src} → {val_str}")
+                  window = "24M" if code == "JPY" else "12M"
+                  print(f"    {code} [{window}]: {src} → {val_str}")
 
               final_missing = [c for c in CURRENCIES if c not in momentum]
               if final_missing:
@@ -381,64 +408,33 @@ jobs:
 
           # ── CONFIDENCE NORMALIZATION ─────────────────────────────────────────────
           def normalize_confidence(value, currency, indicator):
-              """
-              Normaliza índices de confianza a una escala base ~100.
-
-              Divisas con escala nativa diferente a base-100:
-                EUR/GBP  → índice europeo en escala negativa (-30 a +10) → +100
-                JPY      → índice japonés (rango 33-40) → mapeo lineal
-                CHF      → SECO Consumer Climate (rango -40 a +10) → +130
-
-              Divisas que pasan el valor crudo SIN transformar (RAW_PASSTHROUGH):
-                CAD → Conference Board Canada (~40-130, típicamente ~49-100).
-                      El index.html aplica su propia normalización para CAD.
-                NZD → ANZ Business Outlook: balance neto centrado en 0.
-                      El index.html lo re-mapea a base-100.
-                USD → Michigan Consumer Sentiment (~50-100): el index normaliza.
-                AUD → Westpac Consumer Confidence (~80-110): ya cerca de base-100.
-
-              Validación de rango (50-200): solo para divisas normalizadas aquí
-              (EUR, GBP, JPY, CHF). Las de RAW_PASSTHROUGH se excluyen porque
-              sus valores crudos son intencionalmente fuera de ese rango.
-              """
               if value is None:
                   return None
 
               VALID_RANGE = (50, 200)
-
-              # Divisas que pasan el valor crudo al JSON sin transformación aquí.
-              # El index.html se encarga de normalizarlos según su escala nativa.
               RAW_PASSTHROUGH = {'CAD', 'NZD', 'USD', 'AUD'}
 
               result = None
 
               if indicator == 'consumerConfidence':
                   if currency in ('EUR', 'GBP'):
-                      # Escala europea: típicamente -30 a +10 → base 100
                       result = round(value + 100, 2)
                   elif currency == 'JPY':
-                      # Escala japonesa: rango histórico ~33-42
                       result = round(((value - 40) / 10) * 15 + 100, 2)
                   elif currency == 'CHF':
-                      # SECO Consumer Climate: rango -40 a +10 → base 100
                       result = round(value + 130, 2)
                   else:
-                      # CAD, USD, AUD, NZD: pasar crudo
                       result = round(value, 2)
 
               elif indicator == 'businessConfidence':
                   if currency in ('EUR', 'GBP', 'JPY', 'AUD'):
                       result = round(value + 100, 2)
                   else:
-                      # CAD (Ivey PMI ~50), NZD (ANZ net balance), USD (ISM ~52):
-                      # pasar crudo — el index.html normaliza según la divisa.
                       result = round(value, 2)
 
               else:
                   result = value
 
-              # Validación de rango: solo para divisas que normalizamos aquí.
-              # RAW_PASSTHROUGH se excluye para no rechazar valores legítimos.
               if result is not None and currency not in RAW_PASSTHROUGH:
                   if not (VALID_RANGE[0] <= result <= VALID_RANGE[1]):
                       print(f"    ⚠️ {currency} {indicator} normalizado fuera de rango: {result} (raw={value}) → null")
@@ -565,7 +561,6 @@ jobs:
                           elif val is not None:
                               print(f"  ⚠️ EUR GEUGB10Y={val}% fuera de rango esperado (2.0-4.5%) — descartando")
 
-                  # Fallback: búsqueda por texto "euro area" en la página de bonds
                   for row in soup.find_all('tr'):
                       cells = row.find_all('td')
                       if len(cells) < 3: continue
@@ -627,14 +622,12 @@ jobs:
               print(f"\n{'='*50}\nBOND YIELDS (EUR via /bonds market page — GEUGB10Y EA aggregate)\n{'='*50}")
               data, dates = {}, {}
 
-              # EUR: siempre intentar primero desde /bonds para obtener el agregado EA
               eur_val, eur_dt = _fetch_eur_bond_from_market_page()
               if eur_val is not None:
                   data['EUR']  = eur_val
                   dates['EUR'] = eur_dt
               time.sleep(1)
 
-              # Resto de divisas: desde country-list
               try:
                   r = requests.get(TE_URLS['bond10y'], headers=HEADERS, timeout=20)
                   if r.status_code == 429:
@@ -656,7 +649,7 @@ jobs:
                           if len(cols) < 2: continue
                           ctry = cols[0].get_text(strip=True)
                           for code, names in BOND_COUNTRY_MAP.items():
-                              if code == 'EUR': continue   # EUR ya cargado desde /bonds
+                              if code == 'EUR': continue
                               if any(n.lower() in ctry.lower() for n in names):
                                   val = clean_num(cols[actual_idx].get_text(strip=True))
                                   dt  = parse_te_date(cols[date_idx].get_text(strip=True)) if date_idx and len(cols) > date_idx else str(date.today())
@@ -666,7 +659,6 @@ jobs:
                                       dates[code] = dt
                                       print(f"  ✓ {code}: {val}% ({dt})")
                                   elif val is not None:
-                                      # CORRECCIÓN: loguear explícitamente cuando se rechaza un valor
                                       print(f"  ✗ {code}: {val}% rechazado (fuera de rango esperado {min_v}-{max_v}%)")
                                   break
 
@@ -696,19 +688,12 @@ jobs:
                           dates[code] = dt
                       time.sleep(1)
 
-              # CORRECCIÓN: Validación cruzada EUR bond
-              # Verificar que se obtuvo el agregado EA (GEUGB10Y ~2.5-3.0%)
-              # y no el yield alemán/Bund (~2.3-2.5%) que puede filtrarse en scrapers genéricos
               if 'EUR' in data:
                   eur_yield = data['EUR']
                   if eur_yield < 2.3:
                       print(f"\n  ⚠️ EUR bond10y={eur_yield}% SOSPECHOSAMENTE BAJO")
-                      print(f"     Posible captura del Bund alemán en lugar del agregado EA (GEUGB10Y)")
-                      print(f"     El yield EA oficial suele estar 15-25bp por encima del Bund")
-                      print(f"     Revisar el scraper de /bonds si este valor persiste")
                   elif eur_yield > 3.5:
                       print(f"\n  ⚠️ EUR bond10y={eur_yield}% SOSPECHOSAMENTE ALTO para zona euro")
-                      print(f"     Rango esperado: 2.0-3.5%. Revisar fuente del dato.")
                   else:
                       print(f"\n  ✓ EUR bond10y={eur_yield}% dentro del rango esperado para EA aggregate")
               else:
@@ -740,7 +725,7 @@ jobs:
                   all_dates[c][key] = dt.get(c, str(date.today()))
               time.sleep(2)
 
-          # 3. rateMomentum
+          # 3. rateMomentum (con C2: JPY 24M)
           rate_momentum, rate_momentum_dates, momentum_source = scrape_rate_momentum()
           for c in CURRENCIES:
               all_data[c]['rateMomentum']  = rate_momentum.get(c)
@@ -751,7 +736,7 @@ jobs:
           for curr in CURRENCIES:
               pkg = {
                   'lastUpdate': str(date.today()),
-                  'source': 'TradingEconomics — v10: rateMomentum via TE API guest + FRED + bootstrap',
+                  'source': 'TradingEconomics — v10+C2: rateMomentum JPY 24M via TE API+FRED+bootstrap',
                   'rateMomentumStrategy': momentum_source.get(curr, 'none'),
                   'data':   all_data[curr],
                   'dates':  all_dates[curr]
@@ -771,7 +756,8 @@ jobs:
               if rm is not None:
                   direction = '↑' if rm > 0.001 else ('↓' if rm < -0.001 else '→')
                   src = momentum_source.get(curr, 'unknown')
-                  extras.append(f"rateMomentum={rm:+.4f}% {direction} [{src}]")
+                  window = "24M" if curr == "JPY" else "12M"
+                  extras.append(f"rateMomentum={rm:+.4f}% {direction} [{src}] [{window}]")
               cc = all_data[curr].get('consumerConfidence')
               if cc is not None:
                   extras.append(f"consumerConfidence={cc}")
@@ -780,7 +766,7 @@ jobs:
               if missing:
                   print(f"   Missing: {', '.join(missing)}")
 
-          print("\n✅ COMPLETE — v10")
+          print("\n✅ COMPLETE — v10+C2 (JPY rateMomentum 24M)")
           EOFPYTHON
 
       - name: Commit and push
@@ -791,7 +777,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v10 rateMomentum TE API+FRED+bootstrap"
+            git commit -m "📊 Extended data $(date +'%Y-%m-%d') — v10+C2 JPY rateMomentum 24M"
             git pull --rebase origin main || true
             git push
           fi
