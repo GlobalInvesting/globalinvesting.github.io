@@ -53,214 +53,575 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{
-    --bg-primary:#0b0e14;
-    --bg-secondary:#13171f;
-    --bg-card:#1a1f2e;
-    --bg-elevated:#20253a;
-    --text-primary:#e1e4e8;
-    --text-secondary:#8b949e;
-    --text-tertiary:#6e7681;
-    --text-dim:#6b7585;
-    --border:#30363d;
-    --border-hover:#484f58;
-    --blue:#1e88e5;
-    --blue-dim:rgba(30,136,229,0.1);
-    --green:#26a69a;
-    --red:#ef5350;
-    --orange:#e0a020;
+  /* ═══════════════════════════════════════════════════════
+     RESET & ROOT — idéntico a index.html
+  ═══════════════════════════════════════════════════════ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary:   #0b0e14;
+    --bg-secondary: #13171f;
+    --bg-card:      #1a1f2e;
+    --bg-elevated:  #20253a;
+    --text-primary:   #e1e4e8;
+    --text-secondary: #8b949e;
+    --text-tertiary:  #6e7681;
+    --text-dim:       #6b7585;
+    --border:       #30363d;
+    --border-hover: #484f58;
+    --blue:         #1e88e5;
+    --blue-dim:     rgba(30,136,229,0.1);
+    --green:        #26a69a;
+    --red:          #ef5350;
+    --orange:       #e0a020;
   }
-  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased;}
 
-  .header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:1.25rem 2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
-  .header-content{max-width:1800px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;}
-  .header-brand{flex:1;}
-  .header-nav{flex:1;display:flex;justify-content:center;}
-  .header-info-block{flex:1;display:flex;justify-content:flex-end;align-items:center;}
-  .brand-title{font-size:1.125rem;font-weight:700;letter-spacing:-0.02em;color:var(--text-primary);}
-  .brand-title a{color:inherit;text-decoration:none;}
-  .brand-title a:hover{color:var(--blue);}
-  .brand-subtitle{font-size:0.75rem;color:var(--text-tertiary);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;}
-  .page-nav-links{display:flex;align-items:center;gap:1.5rem;}
-  .page-nav-links a{color:var(--text-secondary);text-decoration:none;font-size:0.875rem;font-weight:500;transition:color 0.2s;}
-  .page-nav-links a:hover{color:var(--text-primary);}
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-  .nav-tabs{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;gap:0.5rem;max-width:1800px;margin:0 auto;overflow-x:auto;}
-  .nav-tab{padding:1rem 1.5rem;background:transparent;border:none;color:var(--text-secondary);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s ease;white-space:nowrap;text-decoration:none;display:flex;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;}
-  .nav-tab:hover{color:var(--text-primary);}
-  .nav-tab.active{color:var(--text-primary);border-bottom-color:var(--blue);}
+  /* ═══════════════════════════════════════════════════════
+     HEADER — estructura de 3 columnas igual que index.html
+  ═══════════════════════════════════════════════════════ */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
 
-  .page-wrap{max-width:1800px;margin:0 auto;padding:2rem;}
-  .page-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.75rem;}
-  .page-title{font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-primary);}
+  .header-content {
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+  /* Columna 1: brand */
+  .header-brand { flex: 1; }
 
-  .filter-bar{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;}
-  .filter-btn{font-size:.72rem;font-weight:500;padding:.25rem .7rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .15s;font-family:inherit;}
-  .filter-btn:hover{border-color:var(--border-hover);color:var(--text-primary);}
-  .filter-btn.active{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);font-weight:600;}
-  .filter-btn.active-green{background:rgba(38,166,154,.1);border-color:var(--green);color:var(--green);font-weight:600;}
-  .filter-sep{width:1px;height:16px;background:var(--border);margin:0 .15rem;}
+  .brand-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .brand-title a { color: inherit; text-decoration: none; }
+  .brand-title a:hover { color: var(--blue); }
 
-  .layout-cols{display:grid;grid-template-columns:1fr 268px;gap:1rem;align-items:start;}
+  .brand-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
 
-  /* ── NEWS PANEL ── */
-  .news-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .panel-header{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.5rem .75rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
-  .news-row{display:grid;grid-template-columns:36px 60px 60px 1fr 52px;gap:0;padding:.42rem .75rem;border-bottom:1px solid rgba(48,54,61,.6);cursor:pointer;transition:background .1s;align-items:center;}
-  .news-row:last-child{border-bottom:none;}
-  .news-row:hover{background:var(--bg-elevated);}
-  .news-row.featured{background:rgba(30,136,229,.05);border-left:2px solid var(--blue);}
-  .news-row.featured:hover{background:rgba(30,136,229,.08);}
-  .col-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
-  .col-cur{font-size:.68rem;font-weight:600;color:var(--text-secondary);white-space:nowrap;display:flex;align-items:center;gap:.3rem;}
-  .col-impact{display:flex;align-items:center;}
-  .impact-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .impact-high .impact-dot{background:var(--red);}
-  .impact-med .impact-dot{background:var(--orange);}
-  .impact-low .impact-dot{background:var(--text-dim);}
-  .col-title{font-size:.78rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 .75rem;font-weight:400;}
-  .news-row.featured .col-title{font-weight:500;}
-  .col-source{font-size:.62rem;color:var(--text-dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .news-expand{display:none;grid-column:1/-1;padding:.6rem .75rem .75rem 1.5rem;border-bottom:1px solid rgba(48,54,61,.6);font-size:.75rem;color:var(--text-secondary);line-height:1.65;background:rgba(255,255,255,.01);border-left:2px solid var(--border);}
-  .news-row.open + .news-expand{display:block;}
-  .load-more{display:flex;align-items:center;justify-content:center;padding:.7rem;font-size:.72rem;color:var(--text-secondary);cursor:pointer;transition:color .15s;gap:.35rem;border-top:1px solid var(--border);background:var(--bg-secondary);}
-  .load-more:hover{color:var(--blue);}
-  .feed-empty{padding:2.5rem 1.5rem;text-align:center;color:var(--text-secondary);font-size:.82rem;line-height:1.7;}
-  .feed-empty a{color:var(--blue);text-decoration:none;}
-  .feed-empty a:hover{text-decoration:underline;}
-  .feed-error-icon{font-size:2rem;margin-bottom:.75rem;}
+  /* Columna 2: nav-links centrado */
+  .page-nav-links {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .page-nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .page-nav-links a:hover { color: var(--text-primary); }
 
-  /* ── SIDEBAR ── */
-  .sidebar{display:flex;flex-direction:column;gap:1rem;}
-  .s-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .s-header{padding:.55rem 1rem;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-  .s-title{font-size:.7rem;font-weight:600;color:var(--text-secondary);}
-  .s-sub{font-size:.62rem;color:var(--text-dim);}
+  /* Columna 3: info / status */
+  .header-info {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
 
-  /* ── SENTIMENT ROWS — v5.5.1 ── */
-  .sent-row{display:flex;align-items:center;gap:.55rem;padding:.48rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);cursor:default;transition:background .12s;}
-  .sent-row:last-child{border-bottom:none;}
-  .sent-row:hover{background:rgba(255,255,255,.02);}
-  .sent-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:50px;flex-shrink:0;display:flex;align-items:center;gap:.28rem;}
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-  .sent-track{flex:1;height:4px;background:rgba(48,54,61,.8);border-radius:2px;overflow:hidden;position:relative;}
-  .sent-fill{height:100%;border-radius:2px;transition:width .35s ease;}
-  .sent-fill.bull {background:var(--green);}
-  .sent-fill.bear {background:var(--red);}
-  .sent-fill.neut {background:var(--text-dim);}
-  .sent-fill.nodata{background:transparent;}
-  .sent-fill.mixed{background:linear-gradient(90deg,var(--green) var(--bull-pct),var(--red) var(--bull-pct));}
+  /* Punto animado verde (live) */
+  .status-live {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  .sent-count{font-size:.58rem;color:var(--text-dim);width:18px;text-align:right;flex-shrink:0;}
-  .sent-label{font-size:.62rem;font-weight:700;width:38px;text-align:right;flex-shrink:0;letter-spacing:.01em;}
-  .sent-label.bull  {color:var(--green);}
-  .sent-label.bear  {color:var(--red);}
-  .sent-label.neut  {color:var(--text-dim);}
-  .sent-label.mixed {color:var(--orange);}
-  .sent-label.nodata{color:var(--text-tertiary);font-weight:400;}
+  /* ═══════════════════════════════════════════════════════
+     NAV TABS — igual que index.html
+  ═══════════════════════════════════════════════════════ */
+  .nav-tabs {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0.5rem;
+    max-width: 1800px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
 
-  /* ── COVERAGE ── */
-  .cov-row{display:flex;align-items:center;gap:.55rem;padding:.45rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
-  .cov-row:last-child{border-bottom:none;}
-  .cov-cur{font-size:.68rem;font-weight:600;color:var(--text-primary);width:50px;flex-shrink:0;display:flex;align-items:center;gap:.28rem;}
-  .cov-track{flex:1;height:3px;background:rgba(48,54,61,.8);border-radius:2px;overflow:hidden;}
-  .cov-fill{height:100%;border-radius:2px;}
-  .cov-count{font-size:.6rem;color:var(--text-dim);width:18px;text-align:right;}
-  .cov-badge{font-size:.55rem;font-weight:700;padding:.07rem .28rem;border-radius:2px;flex-shrink:0;}
+  .nav-tab {
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+  }
+  .nav-tab:hover  { color: var(--text-primary); }
+  .nav-tab.active { color: var(--text-primary); border-bottom-color: var(--blue); }
 
-  /* ── EVENTS ── */
-  .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.5);}
-  .ev-row:last-child{border-bottom:none;}
-  .ev-left{display:flex;flex-direction:column;align-items:center;gap:.2rem;width:42px;flex-shrink:0;padding-top:.1rem;}
-  .ev-time{font-size:.63rem;color:var(--blue);font-weight:600;white-space:nowrap;}
-  .ev-body{flex:1;}
-  .ev-name{font-size:.72rem;color:var(--text-primary);font-weight:500;line-height:1.3;}
-  .ev-detail{font-size:.62rem;color:var(--text-dim);margin-top:.1rem;}
-  .ev-badge{font-size:.58rem;font-weight:600;padding:.12rem .35rem;border-radius:3px;flex-shrink:0;align-self:flex-start;margin-top:.1rem;text-transform:uppercase;}
-  .badge-h{background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.2);color:var(--red);}
-  .badge-m{background:rgba(224,160,32,.07);border:1px solid rgba(224,160,32,.2);color:var(--orange);}
-  .ev-empty{padding:.85rem 1rem;font-size:.72rem;color:var(--text-dim);}
+  /* ═══════════════════════════════════════════════════════
+     PAGE CONTENT
+  ═══════════════════════════════════════════════════════ */
+  .page-wrap {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
 
-  .footer{margin-top:4rem;padding:2rem;text-align:center;border-top:1px solid var(--border);color:var(--text-tertiary);font-size:0.75rem;}
+  .page-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .page-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
 
-  @media(max-width:1200px){.layout-cols{grid-template-columns:1fr;}}
-  @media(max-width:768px){
-    .header{padding:.75rem 1rem;}
-    .header-content{flex-direction:column;align-items:flex-start;gap:.5rem;}
-    .header-brand .brand-title{font-size:1rem;}
-    .header-nav{display:none;}
-    .header-info-block{width:100%;}
-    .nav-tabs{padding:0 .25rem;gap:0;scrollbar-width:none;-ms-overflow-style:none;}
-    .nav-tabs::-webkit-scrollbar{display:none;}
-    .nav-tab{padding:.7rem .85rem;font-size:.73rem;}
-    .page-wrap{padding:.75rem .75rem 3rem;}
-    .page-title-row{margin-bottom:1rem;padding-bottom:.6rem;}
-    .page-title{font-size:.9rem;}
-    .filter-bar{gap:.2rem;}
-    .filter-btn{font-size:.67rem;padding:.2rem .5rem;}
-    .filter-sep{display:none;}
-    .panel-header{display:grid;grid-template-columns:28px 1fr 42px;padding:.4rem .65rem;gap:0;align-items:center;}
-    .panel-header span:nth-child(1),.panel-header span:nth-child(2),.panel-header span:nth-child(5){display:none;}
-    .panel-header span:nth-child(3){grid-column:1;text-align:center;}
-    .panel-header span:nth-child(4){grid-column:2;padding:0 .5rem;}
-    .panel-header::after{content:'Hora';grid-column:3;font-size:.63rem;font-weight:600;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;text-align:right;}
-    .news-row{display:grid;grid-template-columns:28px 1fr 42px;padding:.5rem .65rem;gap:0;align-items:center;}
-    .col-cur{display:none;}
-    .col-source{display:none;}
-    .col-impact{grid-column:1;display:flex;align-items:center;justify-content:center;}
-    .impact-dot{width:8px;height:8px;}
-    .col-title{grid-column:2;padding:0 .5rem;font-size:.77rem;white-space:normal;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-    .col-time{grid-column:3;font-size:.63rem;text-align:right;white-space:nowrap;}
-    .news-expand{grid-column:1/-1;padding:.5rem .65rem .65rem;font-size:.73rem;}
-    .sidebar{gap:.75rem;margin-top:.75rem;}
-    .load-more{font-size:.75rem;padding:.85rem;}
+  /* ═══════════════════════════════════════════════════════
+     FILTER BAR
+  ═══════════════════════════════════════════════════════ */
+  .filter-bar {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .filter-btn {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .filter-btn:hover  { border-color: var(--border-hover); color: var(--text-primary); }
+  .filter-btn.active { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); font-weight: 600; }
+  .filter-btn.active-green { background: rgba(38,166,154,.1); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 0.15rem; }
+
+  /* ═══════════════════════════════════════════════════════
+     LAYOUT 2 COLUMNAS
+  ═══════════════════════════════════════════════════════ */
+  .layout-cols {
+    display: grid;
+    grid-template-columns: 1fr 268px;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     NEWS PANEL
+  ═══════════════════════════════════════════════════════ */
+  .news-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: grid;
+    grid-template-columns: 36px 60px 60px 1fr 52px;
+    gap: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.63rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .news-row {
+    display: grid;
+    grid-template-columns: 36px 60px 60px 1fr 52px;
+    gap: 0;
+    padding: 0.42rem 0.75rem;
+    border-bottom: 1px solid rgba(48,54,61,.6);
+    cursor: pointer;
+    transition: background 0.1s;
+    align-items: center;
+  }
+  .news-row:last-child  { border-bottom: none; }
+  .news-row:hover       { background: var(--bg-elevated); }
+  .news-row.featured    { background: rgba(30,136,229,.05); border-left: 2px solid var(--blue); }
+  .news-row.featured:hover { background: rgba(30,136,229,.08); }
+
+  .col-time   { font-size: 0.68rem; color: var(--text-dim); white-space: nowrap; }
+  .col-cur    { font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; display: flex; align-items: center; gap: 0.3rem; }
+  .col-impact { display: flex; align-items: center; }
+  .impact-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .impact-high .impact-dot { background: var(--red); }
+  .impact-med  .impact-dot { background: var(--orange); }
+  .impact-low  .impact-dot { background: var(--text-dim); }
+
+  .col-title {
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.75rem;
+    font-weight: 400;
+  }
+  .news-row.featured .col-title { font-weight: 500; }
+  .col-source { font-size: 0.62rem; color: var(--text-dim); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .news-expand {
+    display: none;
+    grid-column: 1 / -1;
+    padding: 0.6rem 0.75rem 0.75rem 1.5rem;
+    border-bottom: 1px solid rgba(48,54,61,.6);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    background: rgba(255,255,255,.01);
+    border-left: 2px solid var(--border);
+  }
+  .news-row.open + .news-expand { display: block; }
+
+  .load-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s;
+    gap: 0.35rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+  .load-more:hover { color: var(--blue); }
+
+  .feed-empty {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+  .feed-empty a { color: var(--blue); text-decoration: none; }
+  .feed-empty a:hover { text-decoration: underline; }
+  .feed-error-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+  /* ═══════════════════════════════════════════════════════
+     SIDEBAR
+  ═══════════════════════════════════════════════════════ */
+  .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+  .s-panel  { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .s-header {
+    padding: 0.55rem 1rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .s-title { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); }
+  .s-sub   { font-size: 0.62rem; color: var(--text-dim); }
+
+  /* ── Sentiment rows ── */
+  .sent-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.48rem 1rem;
+    border-bottom: 1px solid rgba(48,54,61,.5);
+    cursor: default;
+    transition: background 0.12s;
+  }
+  .sent-row:last-child { border-bottom: none; }
+  .sent-row:hover { background: rgba(255,255,255,.02); }
+  .sent-cur {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.28rem;
+  }
+  .sent-track  { flex: 1; height: 4px; background: rgba(48,54,61,.8); border-radius: 2px; overflow: hidden; position: relative; }
+  .sent-fill   { height: 100%; border-radius: 2px; transition: width 0.35s ease; }
+  .sent-fill.bull   { background: var(--green); }
+  .sent-fill.bear   { background: var(--red); }
+  .sent-fill.neut   { background: var(--text-dim); }
+  .sent-fill.nodata { background: transparent; }
+  .sent-fill.mixed  { background: linear-gradient(90deg, var(--green) var(--bull-pct), var(--red) var(--bull-pct)); }
+  .sent-count { font-size: 0.58rem; color: var(--text-dim); width: 18px; text-align: right; flex-shrink: 0; }
+  .sent-label { font-size: 0.62rem; font-weight: 700; width: 38px; text-align: right; flex-shrink: 0; letter-spacing: 0.01em; }
+  .sent-label.bull   { color: var(--green); }
+  .sent-label.bear   { color: var(--red); }
+  .sent-label.neut   { color: var(--text-dim); }
+  .sent-label.mixed  { color: var(--orange); }
+  .sent-label.nodata { color: var(--text-tertiary); font-weight: 400; }
+
+  /* ── Coverage ── */
+  .cov-row { display: flex; align-items: center; gap: 0.55rem; padding: 0.45rem 1rem; border-bottom: 1px solid rgba(48,54,61,.5); }
+  .cov-row:last-child { border-bottom: none; }
+  .cov-cur   { font-size: 0.68rem; font-weight: 600; color: var(--text-primary); width: 50px; flex-shrink: 0; display: flex; align-items: center; gap: 0.28rem; }
+  .cov-track { flex: 1; height: 3px; background: rgba(48,54,61,.8); border-radius: 2px; overflow: hidden; }
+  .cov-fill  { height: 100%; border-radius: 2px; }
+  .cov-count { font-size: 0.6rem; color: var(--text-dim); width: 18px; text-align: right; }
+  .cov-badge { font-size: 0.55rem; font-weight: 700; padding: 0.07rem 0.28rem; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── Events ── */
+  .ev-row { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.55rem 1rem; border-bottom: 1px solid rgba(48,54,61,.5); }
+  .ev-row:last-child { border-bottom: none; }
+  .ev-left { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; width: 42px; flex-shrink: 0; padding-top: 0.1rem; }
+  .ev-time { font-size: 0.63rem; color: var(--blue); font-weight: 600; white-space: nowrap; }
+  .ev-body { flex: 1; }
+  .ev-name { font-size: 0.72rem; color: var(--text-primary); font-weight: 500; line-height: 1.3; }
+  .ev-detail { font-size: 0.62rem; color: var(--text-dim); margin-top: 0.1rem; }
+  .ev-badge { font-size: 0.58rem; font-weight: 600; padding: 0.12rem 0.35rem; border-radius: 3px; flex-shrink: 0; align-self: flex-start; margin-top: 0.1rem; text-transform: uppercase; }
+  .badge-h { background: rgba(239,83,80,.08); border: 1px solid rgba(239,83,80,.2); color: var(--red); }
+  .badge-m { background: rgba(224,160,32,.07); border: 1px solid rgba(224,160,32,.2); color: var(--orange); }
+  .ev-empty { padding: 0.85rem 1rem; font-size: 0.72rem; color: var(--text-dim); }
+
+  /* ═══════════════════════════════════════════════════════
+     FOOTER
+  ═══════════════════════════════════════════════════════ */
+  .footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     RESPONSIVE — mismo breakpoint que index.html
+  ═══════════════════════════════════════════════════════ */
+  @media (max-width: 1200px) {
+    .layout-cols { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    /* Header mobile — igual que index.html */
+    .header { padding: 0.75rem 1rem; }
+
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    /* brand */
+    .header-brand .brand-title { font-size: 1rem; }
+
+    /* nav-links: visible y wrapping en mobile */
+    .page-nav-links {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+    }
+    .page-nav-links a { white-space: nowrap; }
+
+    /* info block */
+    .header-info {
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      font-size: 0.75rem;
+    }
+
+    /* nav tabs */
+    .nav-tabs {
+      padding: 0 0.25rem;
+      gap: 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-tab { padding: 0.7rem 0.85rem; font-size: 0.73rem; }
+
+    /* page content */
+    .page-wrap { padding: 0.75rem 0.75rem 3rem; }
+    .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
+    .page-title { font-size: 0.9rem; }
+
+    /* filter bar */
+    .filter-bar { gap: 0.2rem; }
+    .filter-btn { font-size: 0.67rem; padding: 0.2rem 0.5rem; }
+    .filter-sep { display: none; }
+
+    /* panel header mobile — 3 cols */
+    .panel-header {
+      display: grid;
+      grid-template-columns: 28px 1fr 42px;
+      padding: 0.4rem 0.65rem;
+      gap: 0;
+      align-items: center;
+    }
+    .panel-header span:nth-child(1),
+    .panel-header span:nth-child(2),
+    .panel-header span:nth-child(5) { display: none; }
+    .panel-header span:nth-child(3) { grid-column: 1; text-align: center; }
+    .panel-header span:nth-child(4) { grid-column: 2; padding: 0 0.5rem; }
+    .panel-header::after {
+      content: 'Hora';
+      grid-column: 3;
+      font-size: 0.63rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-align: right;
+    }
+
+    /* news row mobile — 3 cols */
+    .news-row {
+      display: grid;
+      grid-template-columns: 28px 1fr 42px;
+      padding: 0.5rem 0.65rem;
+      gap: 0;
+      align-items: center;
+    }
+    .col-cur    { display: none; }
+    .col-source { display: none; }
+    .col-impact { grid-column: 1; display: flex; align-items: center; justify-content: center; }
+    .impact-dot { width: 8px; height: 8px; }
+    .col-title  {
+      grid-column: 2;
+      padding: 0 0.5rem;
+      font-size: 0.77rem;
+      white-space: normal;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .col-time { grid-column: 3; font-size: 0.63rem; text-align: right; white-space: nowrap; }
+    .news-expand { grid-column: 1 / -1; padding: 0.5rem 0.65rem 0.65rem; font-size: 0.73rem; }
+
+    .sidebar    { gap: 0.75rem; margin-top: 0.75rem; }
+    .load-more  { font-size: 0.75rem; padding: 0.85rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════
+     HEADER — 3 columnas, mismo que index.html
+═══════════════════════════════════════════════════════ -->
 <div class="header">
   <div class="header-content">
+
+    <!-- Col 1: Brand -->
     <div class="header-brand">
       <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
       <div class="brand-subtitle">Dashboard Profesional</div>
     </div>
-    <div class="header-nav">
-      <div class="page-nav-links">
-        <a href="about.html">Acerca de</a>
-        <a href="terms.html">Términos</a>
-        <a href="privacy.html">Privacidad</a>
-        <a href="contact.html">Contacto</a>
-        <a href="about.html#recursos">Guías</a>
-      </div>
+
+    <!-- Col 2: Nav links centrado -->
+    <div class="page-nav-links">
+      <a href="about.html">Acerca de</a>
+      <a href="terms.html">Términos</a>
+      <a href="privacy.html">Privacidad</a>
+      <a href="contact.html">Contacto</a>
+      <a href="about.html#recursos">Guías</a>
     </div>
-    <div class="header-info-block">
-      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;color:var(--text-secondary);">
-        <div class="live-dot"></div>
+
+    <!-- Col 3: Status info -->
+    <div class="header-info">
+      <div class="info-item">
+        <div class="status-live"></div>
         <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
       </div>
     </div>
+
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     NAV TABS — mismo que index.html
+═══════════════════════════════════════════════════════ -->
 <div class="nav-tabs">
-  <a href="index.html" class="nav-tab">Resumen de Divisas</a>
-  <a href="index.html?tab=heatmap" class="nav-tab">Mapa de Calor</a>
-  <a href="index.html?tab=trends" class="nav-tab">Tendencias Históricas</a>
+  <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
+  <a href="index.html?tab=heatmap"  class="nav-tab">Mapa de Calor</a>
+  <a href="index.html?tab=trends"   class="nav-tab">Tendencias Históricas</a>
   <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
-  <a href="index.html?tab=alerts" class="nav-tab">Mejores Pares</a>
-  <a href="news.html" class="nav-tab active">Noticias</a>
+  <a href="index.html?tab=alerts"   class="nav-tab">Mejores Pares</a>
+  <a href="news.html"               class="nav-tab active">Noticias</a>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════ -->
 <main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
   </div>
 
+  <!-- Filter bar -->
   <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
     <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
     <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
@@ -275,7 +636,10 @@
     <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
   </div>
 
+  <!-- 2-column layout -->
   <div class="layout-cols">
+
+    <!-- Main feed -->
     <section aria-label="Feed de noticias forex">
       <div class="news-panel">
         <div class="panel-header" aria-hidden="true">
@@ -294,6 +658,7 @@
       </div>
     </section>
 
+    <!-- Sidebar -->
     <aside aria-label="Panel lateral">
       <div class="sidebar">
         <div class="s-panel">
@@ -321,9 +686,13 @@
         </div>
       </div>
     </aside>
-  </div>
+
+  </div><!-- /.layout-cols -->
 </main>
 
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
 <div class="footer">
   <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
@@ -347,19 +716,21 @@
     Dashboard v5.5.1
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
-    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
-    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Términos</a>
+    <a href="about.html"  style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
+    <a href="terms.html"  style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Términos</a>
     <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Privacidad</a>
     <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Contacto</a>
     <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;">Guías</a>
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT — sin cambios funcionales
+═══════════════════════════════════════════════════════ -->
 <script>
 'use strict';
-// ═══════════════════════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 const now = new Date();
@@ -367,9 +738,7 @@ const _tsH = document.getElementById('ts-header');
 if (_tsH) _tsH.textContent = now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
 document.getElementById('year').textContent = now.getFullYear();
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FLAGS
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── FLAGS ─────────────────────────────────────────────────────────────────────
 const FLAG_CODES = {
   USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz',
   US:'us',EU:'eu',UK:'gb',JP:'jp',AU:'au',CA:'ca',CH:'ch',NZ:'nz',
@@ -382,9 +751,7 @@ function flagImg(cur,px=16){
   return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CURRENCY DETECTION
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── CURRENCY DETECTION ────────────────────────────────────────────────────────
 const PAIR_PROTAGONIST_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
@@ -432,9 +799,7 @@ function detectCurrencyWithSource(title,expand,source){
   return SOURCE_CURRENCY_MAP[source]||'USD';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// IMPACT DETECTION
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── IMPACT DETECTION ──────────────────────────────────────────────────────────
 const HIGH_IMPACT_KW=['rate decision','rate hike','rate cut','interest rate','tasa de interés','decisión de tasas','monetary policy','política monetaria','fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb meeting','hawkish','dovish','quantitative easing','tapering','gdp','pib','cpi','ipc','inflation','inflación','core inflation','inflación subyacente','unemployment','desempleo','nonfarm payroll','nfp','jobless claims','strait of hormuz','estrecho de ormuz','oil embargo','war ','guerra ','conflict escalation','escalada del conflicto','sanctions','sanciones','military strike','ataque militar','nuclear','recession','recesión','financial crisis','default','bank failure','market crash'];
 const MED_IMPACT_KW=['pmi','manufacturing','manufactura','retail sales','ventas minoristas','consumer confidence','confianza del consumidor','trade balance','balanza comercial','current account','cuenta corriente','industrial production','producción industrial','housing starts','building permits','crude oil','oil prices','precio del petróleo','wti','brent','opec','opep','bond yield','rendimiento del bono','yield curve','risk off','risk on','flight to safety','refugio seguro','breakout','ruptura','moving average','media móvil','200-day','dma de 200','cot report','commitment of traders'];
 function detectImpact(title,description){
@@ -450,46 +815,30 @@ function tsToLocalTime(ts){
   return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SENTIMENT SCORING — v5.5.1
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── SENTIMENT ─────────────────────────────────────────────────────────────────
 const MAJORS_VS_USD = new Set(['EUR','GBP','AUD','NZD','CAD','CHF','JPY']);
 const FINAL_PATTERN_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
 const SENT_WORD_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
 
 function scoreSentiment(article) {
   const cur     = (article.cur || '').toUpperCase();
-  const hl      = ((article.ai_headline || article.title || '')).toLowerCase();
   const hlOrig  = (article.ai_headline || article.title || '');
-
+  const hl      = hlOrig.toLowerCase();
   const m = hlOrig.match(FINAL_PATTERN_RE);
-  let patternSent = null;
-  let patternCur  = null;
-
+  let patternSent = null, patternCur = null;
   if (m) {
     patternCur  = m[1] ? m[1].toUpperCase() : null;
     patternSent = SENT_WORD_MAP[m[2].toLowerCase()] || 'neut';
-
-    if (patternCur && patternCur !== cur) {
-      if (patternCur === 'USD' && MAJORS_VS_USD.has(cur)) {
-        patternSent = patternSent === 'bull' ? 'bear'
-                    : patternSent === 'bear' ? 'bull'
-                    : patternSent;
-      }
-    }
-
+    if (patternCur && patternCur !== cur && patternCur === 'USD' && MAJORS_VS_USD.has(cur))
+      patternSent = patternSent === 'bull' ? 'bear' : patternSent === 'bear' ? 'bull' : patternSent;
     if (article.sentiment) {
       const backendSent = article.sentiment.toLowerCase();
       const mapped = {bull:'bull',bear:'bear',alcista:'bull',bajista:'bear',mixed:'mixed',mixto:'mixed'}[backendSent] || 'neut';
-      if (m && patternSent !== mapped && patternCur) {
-        return patternSent;
-      }
+      if (m && patternSent !== mapped && patternCur) return patternSent;
       return mapped;
     }
-
     return patternSent;
   }
-
   if (article.sentiment) {
     const s = article.sentiment.toLowerCase();
     if (s==='bull'||s==='alcista')  return 'bull';
@@ -497,7 +846,6 @@ function scoreSentiment(article) {
     if (s==='mixed'||s==='mixto')   return 'mixed';
     return 'neut';
   }
-
   const BULL_KW=['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
   const BEAR_KW=['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
   let b=0,r=0;
@@ -506,104 +854,47 @@ function scoreSentiment(article) {
   if(b>r)return'bull';if(r>b)return'bear';return'neut';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// COMPUTE SENTIMENT — v5.5.1
-//
-// CAMBIO vs v5.5: decay diferenciado por impacto del artículo.
-//   high: vida media 8h  → resolución intradiaria correcta cuando hay señales
-//         contradictorias del mismo día (caso CHF con artículos ForexLive vs ActionForex)
-//   med:  vida media 16h → equilibrio entre recencia y contexto
-//   low:  vida media 28h → artículos de baja señal aportan como contexto de fondo
-//
-// Con DECAY_H=24 fijo, un artículo HIGH de hace 8h tenía peso e^(-8/24)=0.72
-// vs uno reciente a 1.0 — diferencia insuficiente para resolver contradicciones intradiarias.
-// Con DECAY_H=8 para HIGH, ese mismo artículo tiene peso e^(-1)=0.37 — resolución clara.
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── COMPUTE SENTIMENT ────────────────────────────────────────────────────────
 const CURRENCIES   = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 const IMPACT_W     = { high:3, med:1.5, low:0.5 };
-
-// v5.5.1: decay diferenciado por impacto
 const DECAY_H_BY_IMPACT = { high: 8, med: 16, low: 28 };
 
 function computeSentiment(articles) {
   const nowMs = Date.now();
   const body  = document.getElementById('sentiment-body');
   if (!body) return;
-
   const acc = {};
   CURRENCIES.forEach(c => { acc[c] = { bull:0, bear:0, neut:0, wSum:0, count:0 }; });
-
   articles.forEach(a => {
     if (!acc[a.cur]) return;
     const s    = scoreSentiment(a);
     const impW = IMPACT_W[a.impact] || 0.5;
     const ageH = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts*1000 : a.ts)) / 3_600_000 : 0;
-
-    // v5.5.1: decay según impacto del artículo
     const decayH = DECAY_H_BY_IMPACT[a.impact] || 16;
-    const decW   = Math.exp(-ageH / decayH);
-    const w      = impW * decW;
-
-    if (s === 'mixed') {
-      acc[a.cur].bull += w * 0.5;
-      acc[a.cur].bear += w * 0.5;
-    } else if (s === 'bull') {
-      acc[a.cur].bull += w;
-    } else if (s === 'bear') {
-      acc[a.cur].bear += w;
-    } else {
-      acc[a.cur].neut += w;
-    }
+    const w      = impW * Math.exp(-ageH / decayH);
+    if (s === 'mixed') { acc[a.cur].bull += w*0.5; acc[a.cur].bear += w*0.5; }
+    else if (s === 'bull') acc[a.cur].bull += w;
+    else if (s === 'bear') acc[a.cur].bear += w;
+    else                   acc[a.cur].neut += w;
     acc[a.cur].wSum  += w;
     acc[a.cur].count += 1;
   });
-
   body.innerHTML = '';
-
   CURRENCIES.forEach(cur => {
     const { bull, bear, neut, wSum, count } = acc[cur];
-    const flag      = flagImg(cur, 16);
-    const bullBear  = bull + bear;
-    const total     = bullBear + neut;
-
-    if (count === 0 || total < 0.05) {
-      body.innerHTML += _row(flag, cur, '—', 'nodata', 0, 0, count, 'Sin cobertura', 0.4);
-      return;
-    }
-
-    if (bullBear < 0.05) {
-      const tip = `Sin señal direccional · neut=${neut.toFixed(2)} · n=${count}`;
-      body.innerHTML += _row(flag, cur, 'Neut', 'neut', 50, 50, count, tip, 0.65);
-      return;
-    }
-
-    const diff      = Math.abs(bull - bear);
-    const diffRatio = diff / bullBear;
-
-    const lowCov  = total < 1.5;
-    const opacity = lowCov ? 0.52 : 1.0;
-    const prefix  = lowCov ? '~' : '';
-
-    const bullPct = Math.round((bull / bullBear) * 100);
-    const bearPct = 100 - bullPct;
-
-    if (diffRatio < 0.15) {
-      const tip = `Mixto · bull=${bull.toFixed(1)} (${bullPct}%) bear=${bear.toFixed(1)} (${bearPct}%) · n=${count}`;
-      body.innerHTML += _rowMixed(flag, cur, bullPct, count, tip, opacity);
-      return;
-    }
-
-    if (bull >= bear) {
-      const tip = `Bull · ${bullPct}% bull · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
-      body.innerHTML += _row(flag, cur, prefix+'Bull', 'bull', bullPct, bullPct, count, tip, opacity);
-    } else {
-      const tip = `Bear · ${bearPct}% bear · bull=${bull.toFixed(1)} bear=${bear.toFixed(1)} neut=${neut.toFixed(1)} · n=${count}`;
-      body.innerHTML += _row(flag, cur, prefix+'Bear', 'bear', bearPct, bearPct, count, tip, opacity);
-    }
+    const flag = flagImg(cur, 16);
+    const bullBear = bull + bear, total = bullBear + neut;
+    if (count === 0 || total < 0.05) { body.innerHTML += _row(flag,cur,'—','nodata',0,0,count,'Sin cobertura',0.4); return; }
+    if (bullBear < 0.05) { body.innerHTML += _row(flag,cur,'Neut','neut',50,50,count,`Sin señal · neut=${neut.toFixed(2)}`,0.65); return; }
+    const diff = Math.abs(bull-bear), diffRatio = diff/bullBear;
+    const lowCov = total < 1.5, opacity = lowCov ? 0.52 : 1.0, prefix = lowCov ? '~' : '';
+    const bullPct = Math.round((bull/bullBear)*100), bearPct = 100-bullPct;
+    if (diffRatio < 0.15) { body.innerHTML += _rowMixed(flag,cur,bullPct,count,`Mixto · ${bullPct}% bull`,opacity); return; }
+    if (bull >= bear) body.innerHTML += _row(flag,cur,prefix+'Bull','bull',bullPct,bullPct,count,`Bull ${bullPct}%`,opacity);
+    else              body.innerHTML += _row(flag,cur,prefix+'Bear','bear',bearPct,bearPct,count,`Bear ${bearPct}%`,opacity);
   });
 }
-
-function _row(flag, cur, label, cls, barPct, _unused, count, tip, opacity) {
+function _row(flag,cur,label,cls,barPct,_u,count,tip,opacity){
   return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
     <div class="sent-track"><div class="sent-fill ${cls}" style="width:${Math.min(100,barPct)}%"></div></div>
@@ -611,21 +902,16 @@ function _row(flag, cur, label, cls, barPct, _unused, count, tip, opacity) {
     <span class="sent-label ${cls}">${label}</span>
   </div>`;
 }
-
-function _rowMixed(flag, cur, bullPct, count, tip, opacity) {
+function _rowMixed(flag,cur,bullPct,count,tip,opacity){
   return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
     <span class="sent-cur">${flag} ${cur}</span>
-    <div class="sent-track">
-      <div class="sent-fill mixed" style="width:85%;--bull-pct:${bullPct}%"></div>
-    </div>
+    <div class="sent-track"><div class="sent-fill mixed" style="width:85%;--bull-pct:${bullPct}%"></div></div>
     <span class="sent-count">${count||''}</span>
     <span class="sent-label mixed">Mixto</span>
   </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// COVERAGE
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── COVERAGE ──────────────────────────────────────────────────────────────────
 function renderCoverage(articles) {
   const body = document.getElementById('coverage-body');
   if (!body) return;
@@ -649,9 +935,7 @@ function renderCoverage(articles) {
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// UPCOMING EVENTS
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── UPCOMING EVENTS ───────────────────────────────────────────────────────────
 async function loadUpcomingEvents() {
   const container = document.getElementById('upcoming-events');
   try {
@@ -686,9 +970,7 @@ async function loadUpcomingEvents() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FEED STATE & RENDER
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── FEED STATE & RENDER ───────────────────────────────────────────────────────
 const PAGE=30;
 let allArticles=[],visible=PAGE,activeFilter='ALL',highOnly=false;
 
@@ -697,17 +979,14 @@ function renderFeed(){
   const loading=document.getElementById('feed-loading');
   if(loading)loading.remove();
   body.setAttribute('aria-busy','false');
-
   const filtered=allArticles.filter(a=>
     (activeFilter==='ALL'||a.cur===activeFilter)&&(!highOnly||a.impact==='high')
   );
-
   if(!filtered.length){
     body.innerHTML=`<div class="feed-empty"><div class="feed-error-icon">📰</div><strong>No se encontraron noticias para el filtro actual</strong><br>Consulte directamente:<br><a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> · <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> · <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a></div>`;
     document.getElementById('load-more-btn').style.display='none';
     computeSentiment([]);renderCoverage([]);return;
   }
-
   body.innerHTML='';
   filtered.slice(0,visible).forEach(a=>{
     const ic=a.impact==='high'?'impact-high':a.impact==='med'?'impact-med':'impact-low';
@@ -725,7 +1004,6 @@ function renderFeed(){
       ${a.link?`<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>`:''}
     </div>`;
   });
-
   document.getElementById('load-more-btn').style.display=filtered.length>visible?'flex':'none';
   const aiBadge=document.getElementById('ai-badge');
   if(aiBadge)aiBadge.style.display=filtered.slice(0,visible).some(a=>a.ai_headline)?'inline':'none';
@@ -738,9 +1016,7 @@ function toggleExpand(row){const was=row.classList.contains('open');document.que
 function setFilter(val,btn){document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=val;visible=PAGE;renderFeed();}
 function toggleImpact(btn){btn.classList.toggle('active-green');highOnly=btn.classList.contains('active-green');visible=PAGE;renderFeed();}
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════════
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function initFeed(){
   try{
     const res=await fetch(`news-data/news.json?v=${Date.now()}`);
