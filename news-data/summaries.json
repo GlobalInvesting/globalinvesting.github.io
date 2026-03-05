@@ -1,97 +1,163 @@
 {
-  "updated_utc": "2026-03-05T00:00:00+00:00",
-  "updated_label": "--:-- UTC",
+  "updated_utc": "2026-03-05T22:11:30.416263+00:00",
+  "updated_label": "22:11 UTC",
   "model": "llama-3.3-70b-versatile",
-  "total_ai": 0,
-  "total_fallback": 8,
+  "total_ai": 8,
+  "total_fallback": 0,
   "summaries": {
     "USD": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
+      "sentiment": "bull",
+      "confidence": 100,
+      "analysis": "El dólar estadounidense se fortalece debido a la aversión al riesgo generada por el conflicto en Irán y la tensión geopolítica en Medio Oriente. Los precios del petróleo y el gas natural suben, impulsando al dólar. Los mercados europeos caen, y los datos de empleo sólidos en EEUU reducen las probabilidades de un recorte de tasas de la Fed.",
+      "drivers": [
+        "Conflicto Irán",
+        "Aversión Riesgo",
+        "Petróleo"
+      ],
       "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "ai_generated": true,
+      "sources": [
+        "InstaForex",
+        "FXStreet ES",
+        "ForexLive",
+        "InvestingLive"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772762470000
     },
     "EUR": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
+      "sentiment": "bear",
+      "confidence": 80,
+      "analysis": "El euro muestra una tendencia bajista debido a la incertidumbre sobre el crecimiento y la inflación en la zona euro, así como a la disminución de expectativas de recortes de tasas del Banco de Inglaterra. Los índices europeos cerraron con fuertes pérdidas, lo que también afectó negativamente al euro. Aunque un patrón de onda en el gráfico de 4 horas del par EUR/USD mantiene una tendencia alcista, la mayoría de las noticias apuntan a una tendencia bajista.",
+      "drivers": [
+        "Guerra Oriente",
+        "Incertidumbre",
+        "BCE Cautelosa"
+      ],
       "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "ai_generated": true,
+      "sources": [
+        "InstaForex",
+        "FXStreet ES",
+        "FXStreet",
+        "InvestingLive"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772736222000
     },
     "GBP": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
-      "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "sentiment": "bear",
+      "confidence": 70,
+      "analysis": "La libra esterlina se debilita frente al dólar estadounidense, con un descenso del 0.25% en GBP/USD a 1.3337. Los datos laborales sólidos en EEUU y las tensiones en Medio Oriente contribuyen a la caída. Aunque se redujeron las expectativas de relajación monetaria del Banco de Inglaterra, lo que debería apoyar a la libra, la tendencia dominante es bajista.",
+      "drivers": [
+        "Tensión Medio Oriente",
+        "Datos laborales EEUU",
+        "Expectativas BoE"
+      ],
+      "upcoming_event": "datos de empleo no agrícola en EEUU",
+      "ai_generated": true,
+      "sources": [
+        "InstaForex",
+        "FXStreet ES",
+        "FXStreet",
+        "InvestMacro"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772735889000
     },
     "JPY": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
-      "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "sentiment": "mixed",
+      "confidence": 50,
+      "analysis": "El yen japonés muestra un comportamiento mixto, con algunas noticias apoyando su fortaleza debido a expectativas de subida de tasas del BoJ en abril, mientras que otras señalan presión alcista en el par USD/JPY con datos laborales sólidos en EEUU y comentarios hawkish del presidente del Fed de Richmond. Los niveles de resistencia en 157.00 y 157.19 son clave para determinar la dirección del par.",
+      "drivers": [
+        "Tasas BoJ",
+        "Datos EEUU",
+        "Comentarios Fed"
+      ],
+      "upcoming_event": "Revisión de política monetaria del BoJ en abril",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "InstaForex",
+        "FXStreet ES",
+        "FXStreet"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772748059000
     },
     "AUD": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
+      "sentiment": "bull",
+      "confidence": 80,
+      "analysis": "El dólar australiano se muestra alcista debido a la inflación interna estable y la postura hawkish del RBA, con un nivel de resistencia en 0.7150. El PIB de Australia también superó estimaciones, creciendo un 0.8% trimestral en Q4 y un 2.6% anual. Sin embargo, la tensión en Medio Oriente podría generar un sentimiento de riesgo y oportunidad de retroceso en AUD/CHF.",
+      "drivers": [
+        "Inflación",
+        "RBA Hawkish",
+        "PIB"
+      ],
       "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "ai_generated": true,
+      "sources": [
+        "BabyPips",
+        "FXStreet",
+        "ActionForex"
+      ],
+      "articles_count": 4,
+      "latest_ts": 1772725232000
     },
     "CAD": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
-      "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "sentiment": "bull",
+      "confidence": 70,
+      "analysis": "El dólar canadiense muestra señales alcistas debido a expectativas de crecimiento económico y superación del potencial para evitar riesgos de desinflación y recortes de tasas. Aunque hay tensiones geopolíticas y signos de inflación persistente, los datos del primer trimestre serán clave para determinar la dirección del CAD.",
+      "drivers": [
+        "Crecimiento",
+        "Inflación",
+        "Tasas"
+      ],
+      "upcoming_event": "Datos del primer trimestre",
+      "ai_generated": true,
+      "sources": [
+        "InstaForex",
+        "FXStreet ES",
+        "FXStreet"
+      ],
+      "articles_count": 3,
+      "latest_ts": 1772740037000
     },
     "CHF": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
+      "sentiment": "bull",
+      "confidence": 70,
+      "analysis": "El franco suizo muestra señales positivas debido al aumento de la inflación suiza en febrero, lo que podría generar presión moderada sobre los precios. Aunque el par USD/CHF se mantiene en un rango estrecho, la resistencia en 0.7812-0.7821 es un nivel clave a superar. La inflación suiza subió 0.6% en febrero, lo que podría apoyar al CHF.",
+      "drivers": [
+        "Inflación",
+        "Resistencia",
+        "Presión"
+      ],
       "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "ai_generated": true,
+      "sources": [
+        "ActionForex",
+        "InvestingLive"
+      ],
+      "articles_count": 2,
+      "latest_ts": 1772724480000
     },
     "NZD": {
-      "sentiment": "neut",
-      "confidence": 0,
-      "analysis": "Análisis en generación. Actualizado 3 veces al día.",
-      "drivers": [],
-      "upcoming_event": null,
-      "ai_generated": false,
-      "sources": [],
-      "articles_count": 0,
-      "latest_ts": 0
+      "sentiment": "mixed",
+      "confidence": 40,
+      "analysis": "El NZD muestra señales mixtas. Un titular indica caída bajo la línea de tendencia con soporte en 0.5834, presión vendedora. Otro menciona empleo no agrícola en EEUU con una lectura suave, presión compradora. La volatilidad lateral mantiene la incertidumbre.",
+      "drivers": [
+        "Presión vendedora",
+        "Empleo EEUU",
+        "Volatilidad"
+      ],
+      "upcoming_event": "Empleo no agrícola en EEUU febrero",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "InvestingLive"
+      ],
+      "articles_count": 2,
+      "latest_ts": 1772732809000
     }
   }
 }
