@@ -531,15 +531,15 @@
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
     <div class="view-toggle" role="group" aria-label="Cambiar vista">
-      <button class="view-btn active" id="btn-headlines" onclick="setView('headlines')">☰ Titulares</button>
-      <button class="view-btn"        id="btn-analysis"  onclick="setView('analysis')">⬛ Por Divisa <span class="ai-tag">AI</span></button>
+      <button class="view-btn" id="btn-headlines" onclick="setView('headlines')">☰ Titulares</button>
+      <button class="view-btn active" id="btn-analysis"  onclick="setView('analysis')">⬛ Por Divisa <span class="ai-tag">AI</span></button>
     </div>
   </div>
 
   <!-- ══════════════════════════
        VISTA 1: TITULARES
   ══════════════════════════ -->
-  <div id="view-headlines" style="display:block">
+  <div id="view-headlines" style="display:none">
     <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
       <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
       <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
@@ -606,7 +606,7 @@
   <!-- ══════════════════════════
        VISTA 2: POR DIVISA
   ══════════════════════════ -->
-  <div id="view-analysis">
+  <div id="view-analysis" style="display:block">
     <div class="analysis-section-label">
       Análisis consolidado AI · 8 divisas principales
       <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
@@ -1033,7 +1033,7 @@ async function initFeed() {
 }
 
 // ── VIEW TOGGLE ──────────────────────────────────────────────────────────────
-let currentView      = 'headlines';
+let currentView      = 'analysis';
 let summariesLoaded  = false;
 
 function setView(view) {
@@ -1216,6 +1216,7 @@ function renderSkeletonCard() {
 
 // ── ARRANQUE ─────────────────────────────────────────────────────────────────
 initFeed();
+loadSummaries();
 loadUpcomingEvents();
 </script>
 </body>
