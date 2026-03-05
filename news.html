@@ -125,9 +125,11 @@
   /* ═══════════════════════════════════════════════════════
      NAV TABS
   ═══════════════════════════════════════════════════════ */
-  .nav-tabs {
+  .nav-tabs-wrap {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
+  }
+  .nav-tabs {
     padding: 0 2rem;
     display: flex;
     gap: 0.5rem;
@@ -167,7 +169,7 @@
   .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
 
   /* ═══════════════════════════════════════════════════════
-     VIEW TOGGLE (Titulares / Análisis por divisa)
+     VIEW TOGGLE
   ═══════════════════════════════════════════════════════ */
   .view-toggle {
     display: flex;
@@ -208,7 +210,7 @@
   .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 0.15rem; }
 
   /* ═══════════════════════════════════════════════════════
-     LAYOUT 2 COLUMNAS (vista titulares)
+     LAYOUT 2 COLUMNAS
   ═══════════════════════════════════════════════════════ */
   .layout-cols { display: grid; grid-template-columns: 1fr 268px; gap: 1rem; align-items: start; }
 
@@ -278,7 +280,7 @@
   .sent-fill.bear   { background: var(--red); }
   .sent-fill.neut   { background: var(--text-dim); }
   .sent-fill.nodata { background: transparent; }
-  .sent-fill.mixed  { background: linear-gradient(90deg, var(--green) var(--bull-pct), var(--red) var(--bull-pct)); }
+  .sent-fill.mixed  { background: linear-gradient(90deg, var(--green) var(--bull-pct, 50%), var(--red) var(--bull-pct, 50%)); }
   .sent-count { font-size: 0.58rem; color: var(--text-dim); width: 18px; text-align: right; flex-shrink: 0; }
   .sent-label { font-size: 0.62rem; font-weight: 700; width: 38px; text-align: right; flex-shrink: 0; letter-spacing: 0.01em; }
   .sent-label.bull   { color: var(--green); }
@@ -306,7 +308,7 @@
   .ev-empty { padding: 0.85rem 1rem; font-size: 0.72rem; color: var(--text-dim); }
 
   /* ═══════════════════════════════════════════════════════
-     CURRENCY ANALYSIS GRID (vista análisis)
+     CURRENCY ANALYSIS GRID
   ═══════════════════════════════════════════════════════ */
   #view-analysis { display: none; }
 
@@ -334,7 +336,6 @@
     gap: 0.75rem;
   }
 
-  /* ── Currency card ── */
   .cur-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -357,7 +358,6 @@
     border-bottom: 1px solid var(--border);
   }
   .cur-id { display: flex; align-items: center; gap: 0.45rem; }
-  .cur-flag { border-radius: 2px; flex-shrink: 0; }
   .cur-code { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.04em; }
   .cur-full-name { font-size: 0.63rem; color: var(--text-dim); font-weight: 400; margin-left: 0.1rem; }
   .head-right { display: flex; align-items: center; gap: 0.6rem; }
@@ -411,7 +411,7 @@
   .foot-ts { font-size: 0.58rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
   .foot-ai { font-size: 0.52rem; font-weight: 700; color: var(--blue); border: 1px solid rgba(30,136,229,.3); border-radius: 2px; padding: 0.05rem 0.22rem; }
 
-  /* Skeleton loader para cards */
+  /* Skeleton */
   .card-skeleton {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -434,13 +434,10 @@
   .sk-line.w85 { width: 85%; }
   .sk-line.w100 { width: 100%; }
 
-  /* No-data card */
   .cur-card.no-data { opacity: 0.5; }
   .no-data-msg { font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 1.2rem 0.9rem; }
 
-  /* ═══════════════════════════════════════════════════════
-     AI BADGE
-  ═══════════════════════════════════════════════════════ */
+  /* AI badge inline */
   .ai-tag {
     font-size: 0.52rem; font-weight: 700; color: var(--blue);
     border: 1px solid rgba(30,136,229,.35); border-radius: 2px;
@@ -458,13 +455,10 @@
   @media (max-width: 1200px) {
     .layout-cols { grid-template-columns: 1fr; }
   }
-
   @media (max-width: 768px) {
     .header { padding: 0.75rem 1rem; }
     .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-    .header-brand .brand-title { font-size: 1rem; }
     .page-nav-links { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
-    .page-nav-links a { white-space: nowrap; }
     .header-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; }
     .nav-tabs { padding: 0 0.25rem; gap: 0; scrollbar-width: none; -ms-overflow-style: none; }
     .nav-tabs::-webkit-scrollbar { display: none; }
@@ -479,7 +473,6 @@
     .panel-header span:nth-child(1), .panel-header span:nth-child(2), .panel-header span:nth-child(5) { display: none; }
     .panel-header span:nth-child(3) { grid-column: 1; text-align: center; }
     .panel-header span:nth-child(4) { grid-column: 2; padding: 0 0.5rem; }
-    .panel-header::after { content: 'Hora'; grid-column: 3; font-size: 0.63rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; text-align: right; }
     .news-row { display: grid; grid-template-columns: 28px 1fr 42px; padding: 0.5rem 0.65rem; gap: 0; align-items: center; }
     .col-cur    { display: none; }
     .col-source { display: none; }
@@ -522,20 +515,21 @@
 </div>
 
 <!-- NAV TABS -->
-<div class="nav-tabs">
-  <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
-  <a href="index.html?tab=heatmap"  class="nav-tab">Mapa de Calor</a>
-  <a href="index.html?tab=trends"   class="nav-tab">Tendencias Históricas</a>
-  <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
-  <a href="index.html?tab=alerts"   class="nav-tab">Mejores Pares</a>
-  <a href="news.html"               class="nav-tab active">Noticias</a>
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
+    <a href="index.html?tab=heatmap"  class="nav-tab">Mapa de Calor</a>
+    <a href="index.html?tab=trends"   class="nav-tab">Tendencias Históricas</a>
+    <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
+    <a href="index.html?tab=alerts"   class="nav-tab">Mejores Pares</a>
+    <a href="news.html"               class="nav-tab active">Noticias</a>
+  </div>
 </div>
 
 <!-- MAIN CONTENT -->
 <main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
-    <!-- Toggle de vista -->
     <div class="view-toggle" role="group" aria-label="Cambiar vista">
       <button class="view-btn active" id="btn-headlines" onclick="setView('headlines')">☰ Titulares</button>
       <button class="view-btn"        id="btn-analysis"  onclick="setView('analysis')">⬛ Por Divisa <span class="ai-tag">AI</span></button>
@@ -546,7 +540,6 @@
        VISTA 1: TITULARES
   ══════════════════════════ -->
   <div id="view-headlines">
-    <!-- Filter bar -->
     <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
       <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
       <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
@@ -562,7 +555,6 @@
     </div>
 
     <div class="layout-cols">
-      <!-- Feed principal -->
       <section aria-label="Feed de noticias forex">
         <div class="news-panel">
           <div class="panel-header" aria-hidden="true">
@@ -581,7 +573,6 @@
         </div>
       </section>
 
-      <!-- Sidebar -->
       <aside aria-label="Panel lateral">
         <div class="sidebar">
           <div class="s-panel">
@@ -613,7 +604,7 @@
   </div><!-- /#view-headlines -->
 
   <!-- ══════════════════════════
-       VISTA 2: ANÁLISIS POR DIVISA
+       VISTA 2: POR DIVISA
   ══════════════════════════ -->
   <div id="view-analysis">
     <div class="analysis-section-label">
@@ -621,7 +612,7 @@
       <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
     </div>
     <div class="currency-grid" id="currency-grid">
-      <!-- Skeletons mientras carga -->
+      <!-- Skeletons iniciales -->
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div></div>
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w55"></div></div></div>
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w85"></div></div></div>
@@ -656,7 +647,7 @@
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
       © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.5.2
+    Dashboard v5.6.0
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html"  style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -667,63 +658,43 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ── UTILS ────────────────────────────────────────────────────────────────────
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-const now = new Date();
+const _now = new Date();
 const _tsH = document.getElementById('ts-header');
-if (_tsH) _tsH.textContent = now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
-document.getElementById('year').textContent = now.getFullYear();
+if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
+document.getElementById('year').textContent = _now.getFullYear();
 
-// ── FLAGS ─────────────────────────────────────────────────────────────────────
+// ── FLAGS ────────────────────────────────────────────────────────────────────
 const FLAG_CODES = {
   USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz',
-  US:'us',EU:'eu',UK:'gb',JP:'jp',AU:'au',CA:'ca',CH:'ch',NZ:'nz',
 };
-const FLAG_SIZES = [[16,12],[20,15],[24,18],[32,24],[40,30],[48,36],[64,48]];
-function nearestFlagSize(px){return FLAG_SIZES.reduce((b,s)=>Math.abs(s[0]-px)<Math.abs(b[0]-px)?s:b);}
-function flagImg(cur,px=16){
-  const code=FLAG_CODES[cur]; if(!code) return '';
-  const [w,h]=nearestFlagSize(px),[w2,h2]=nearestFlagSize(px*2);
-  return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
+function flagImg(cur, px=16) {
+  const code = FLAG_CODES[cur];
+  if (!code) return '';
+  const px2 = px * 2;
+  const h  = Math.round(px  * 0.75);
+  const h2 = Math.round(px2 * 0.75);
+  return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ── CURRENCY DATA ─────────────────────────────────────────────────────────────
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 const CURRENCY_NAMES = {
   USD:'Dólar Estadounidense', EUR:'Euro', GBP:'Libra Esterlina',
   JPY:'Yen Japonés', AUD:'Dólar Australiano', CAD:'Dólar Canadiense',
   CHF:'Franco Suizo', NZD:'Dólar Neozelandés',
 };
-const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const SENT_LABELS = { bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto' };
 
-const SENT_LABELS = {
-  bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto',
-};
+const VALID_CURRENCIES = new Set(CURRENCIES);
 
-// ── VIEW TOGGLE ───────────────────────────────────────────────────────────────
-let currentView = 'headlines';
-let summariesLoaded = false;
-
-function setView(view) {
-  currentView = view;
-  document.getElementById('view-headlines').style.display = view === 'headlines' ? '' : 'none';
-  document.getElementById('view-analysis').style.display  = view === 'analysis'  ? '' : 'none';
-  document.getElementById('btn-headlines').classList.toggle('active', view === 'headlines');
-  document.getElementById('btn-analysis').classList.toggle('active',  view === 'analysis');
-
-  if (view === 'analysis' && !summariesLoaded) {
-    loadSummaries();
-  }
-}
-
-// ── CURRENCY DETECTION (para fallback) ───────────────────────────────────────
-const PAIR_PROTAGONIST_MAP = {
+// ── CURRENCY DETECTION ───────────────────────────────────────────────────────
+const PAIR_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
   'NZD/USD':'NZD','NZDUSD':'NZD','USD/CAD':'CAD','USDCAD':'CAD',
@@ -736,312 +707,426 @@ const PAIR_PROTAGONIST_MAP = {
   'NZD/CAD':'NZD','NZDCAD':'NZD','EUR/NZD':'EUR','EURNZD':'EUR',
 };
 const CUR_SCORE_RULES = [
-  ['USD',[[10,['federal reserve','reserva federal','fomc','powell ','us treasury','tesoro eeuu']],[9,['strait of hormuz','estrecho de ormuz','us military','us navy','us sanctions','us-iran','us iran conflict','us strikes','trump ','white house','pentagon','casa blanca','us forces','fuerzas de eeuu']],[8,['united states','estados unidos','us economy','economía eeuu','us gdp','us cpi','us inflation','us jobs','nonfarm payroll','jobless claims','american economy','wall street']],[5,['usd/','dollar index','dxy ','us dollar','dólar estadounidense','dollar ']],[3,['dow jones','s&p 500','nasdaq','treasury yield']],[1,['dólar ','dollar strength']]]],
-  ['EUR',[[10,['european central bank','banco central europeo','ecb ','bce ','lagarde ','kazaks ','schnabel ','de guindos ']],[8,['eurozone','eurozona','zona euro','euro area','germany gdp','german cpi','ifo index','zew index','economía europea','inflación zona euro','eurozone inflation','eurozone gdp']],[5,['eur/','eur usd','/eur','bund yield']],[3,['euro ']],[1,['european ']]]],
-  ['GBP',[[10,['bank of england','banco de inglaterra','boe ','bailey ','mpc meeting','mpc decision']],[8,['united kingdom','reino unido','britain','uk gdp','uk cpi','uk inflation','british economy']],[5,['gbp/','gbp usd','/gbp','pound sterling','sterling','british pound','libra esterlina']],[3,['ftse ']],[1,['british ']]]],
-  ['JPY',[[10,['bank of japan','banco de japón','boj ','ueda ','himino ','boj meeting','boj decision','boj rate']],[8,['japan gdp','japan cpi','japanese economy','economía japonesa','japón ','japan ']],[5,['jpy/','jpy usd','usd/jpy','/jpy','japanese yen','yen japonés']],[3,['nikkei ']],[1,['yen ']]]],
-  ['AUD',[[10,['reserve bank of australia','rba ','rba meeting','rba decision','rba rate','bullock ']],[8,['australia gdp','australia cpi','australia jobs','australian economy','economía australia']],[5,['aud/','aud usd','usd/aud','/aud','australian dollar','dólar australiano']],[3,['australia ']],[1,['aussie ']]]],
-  ['CAD',[[10,['bank of canada','banco de canadá','boc ','boc meeting','macklem ']],[8,['canada economy','economía canadá','canada gdp','canada cpi','canadian economy']],[5,['cad/','usd/cad','/cad','canadian dollar','dólar canadiense','loonie ']],[3,['crude oil','wti crude','petróleo crudo','brent crude','oil prices','precio del petróleo','crudo wti','opec ','opep ']],[1,['canada ','canadá ']]]],
-  ['CHF',[[10,['swiss national bank','snb ','snb meeting','snb decision','banco nacional suizo']],[8,['switzerland','suiza','swiss economy','swiss gdp']],[5,['chf/','usd/chf','/chf','swiss franc','franco suizo']],[1,['swiss ']]]],
-  ['NZD',[[10,['reserve bank of new zealand','rbnz ','rbnz meeting','rbnz decision','banco de la reserva de nueva zelanda','orr ']],[8,['new zealand gdp','new zealand cpi','new zealand economy','nueva zelanda','nz gdp','nz cpi']],[5,['nzd/','nzd usd','usd/nzd','/nzd','new zealand dollar','dólar neozelandés','kiwi ']],[1,['new zealand ']]]],
+  ['USD',[[10,['federal reserve','reserva federal','fomc','powell']],[9,['strait of hormuz','estrecho de ormuz','us military','us sanctions','us-iran','trump','white house','pentagon','casa blanca']],[8,['united states','estados unidos','us economy','us gdp','us cpi','us inflation','nonfarm payroll','jobless claims','wall street']],[5,['usd/','dollar index','dxy','us dollar','dólar estadounidense']],[3,['dow jones','s&p 500','nasdaq','treasury yield']]]],
+  ['EUR',[[10,['european central bank','banco central europeo','ecb','bce','lagarde','schnabel']],[8,['eurozone','eurozona','zona euro','euro area','germany gdp','german cpi','ifo index','zew index']],[5,['eur/','bund yield']],[3,['euro ']]]],
+  ['GBP',[[10,['bank of england','banco de inglaterra','boe','bailey','mpc meeting','mpc decision']],[8,['united kingdom','reino unido','britain','uk gdp','uk cpi','uk inflation']],[5,['gbp/','pound sterling','sterling','libra esterlina']],[3,['ftse']]]],
+  ['JPY',[[10,['bank of japan','banco de japón','boj','ueda','himino']],[8,['japan gdp','japan cpi','japanese economy','japón','japan']],[5,['jpy/','usd/jpy','japanese yen','yen japonés']],[3,['nikkei']]]],
+  ['AUD',[[10,['reserve bank of australia','rba','bullock']],[8,['australia gdp','australia cpi','australia jobs','australian economy']],[5,['aud/','australian dollar','dólar australiano']],[3,['australia']]]],
+  ['CAD',[[10,['bank of canada','banco de canadá','boc','macklem']],[8,['canada economy','canada gdp','canada cpi','canadian economy']],[5,['cad/','usd/cad','canadian dollar','loonie']],[3,['crude oil','wti crude','petróleo','brent','opec']]]],
+  ['CHF',[[10,['swiss national bank','snb','banco nacional suizo']],[8,['switzerland','suiza','swiss economy','swiss gdp']],[5,['chf/','usd/chf','swiss franc','franco suizo']]]],
+  ['NZD',[[10,['reserve bank of new zealand','rbnz','orr']],[8,['new zealand gdp','new zealand cpi','nueva zelanda']],[5,['nzd/','new zealand dollar','dólar neozelandés','kiwi']]]],
 ];
-const SOURCE_CURRENCY_MAP={'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP','Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD'};
-const TIEBREAK_ORDER=['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+const SOURCE_CUR_MAP = {'Bank of Canada':'CAD','ECB':'EUR','Bank of England':'GBP','Bank of Japan':'JPY','RBA':'AUD','RBNZ':'NZD','SNB':'CHF','Federal Reserve':'USD'};
+const TIEBREAK = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
 
-function detectCurrencyWithSource(title,expand,source){
-  const tc=(title||'').trim(),tu=tc.toUpperCase().replace(/\s+/g,''),tl=tc.toLowerCase();
-  for(const[pair,prot]of Object.entries(PAIR_PROTAGONIST_MAP)){
-    const pn=pair.replace('/','').toUpperCase(),ps=pair.toUpperCase();
-    const ts=tu.substring(0,30);
-    if(ts.includes(pn)||tc.toUpperCase().substring(0,30).includes(ps)) return prot;
+function detectCurrency(title, expand, source) {
+  const tu = (title || '').toUpperCase().replace(/\s+/g,'');
+  for (const [pair, prot] of Object.entries(PAIR_MAP)) {
+    if (tu.startsWith(pair.replace('/','').toUpperCase())) return prot;
   }
-  for(const[pair,prot]of Object.entries(PAIR_PROTAGONIST_MAP)){
-    if(tu.includes(pair.replace('/','').toUpperCase())||tc.toUpperCase().includes(pair.toUpperCase())) return prot;
+  for (const [pair, prot] of Object.entries(PAIR_MAP)) {
+    if (tu.includes(pair.replace('/','').toUpperCase())) return prot;
   }
-  const ft=tl+' '+((expand||'').toLowerCase());
-  const scores={};
-  for(const[cur,tiers]of CUR_SCORE_RULES){
-    let sc=0;
-    for(const[w,kws]of tiers) for(const kw of kws) if(ft.includes(kw)){sc+=w;if(tl.includes(kw))sc+=w*0.5;}
-    scores[cur]=sc;
+  const ft = ((title||'')+' '+(expand||'')).toLowerCase();
+  const scores = {};
+  for (const [cur, tiers] of CUR_SCORE_RULES) {
+    let sc = 0;
+    for (const [w, kws] of tiers) for (const kw of kws) if (ft.includes(kw)) sc += w;
+    scores[cur] = sc;
   }
-  const mx=Math.max(...Object.values(scores));
-  if(mx>0){const ws=Object.entries(scores).filter(([,s])=>s===mx).map(([c])=>c);if(ws.length===1)return ws[0];return TIEBREAK_ORDER.find(c=>ws.includes(c))||ws[0];}
-  return SOURCE_CURRENCY_MAP[source]||'USD';
+  const mx = Math.max(...Object.values(scores));
+  if (mx > 0) {
+    const tops = Object.entries(scores).filter(([,s])=>s===mx).map(([c])=>c);
+    if (tops.length === 1) return tops[0];
+    return TIEBREAK.find(c=>tops.includes(c)) || tops[0];
+  }
+  return SOURCE_CUR_MAP[source] || 'USD';
 }
 
-// ── IMPACT DETECTION ──────────────────────────────────────────────────────────
-const HIGH_IMPACT_KW=['rate decision','rate hike','rate cut','interest rate','tasa de interés','decisión de tasas','monetary policy','política monetaria','fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb meeting','hawkish','dovish','quantitative easing','tapering','gdp','pib','cpi','ipc','inflation','inflación','core inflation','inflación subyacente','unemployment','desempleo','nonfarm payroll','nfp','jobless claims','strait of hormuz','estrecho de ormuz','oil embargo','war ','guerra ','conflict escalation','escalada del conflicto','sanctions','sanciones','military strike','ataque militar','nuclear','recession','recesión','financial crisis','default','bank failure','market crash'];
-const MED_IMPACT_KW=['pmi','manufacturing','manufactura','retail sales','ventas minoristas','consumer confidence','confianza del consumidor','trade balance','balanza comercial','current account','cuenta corriente','industrial production','producción industrial','housing starts','building permits','crude oil','oil prices','precio del petróleo','wti','brent','opec','opep','bond yield','rendimiento del bono','yield curve','risk off','risk on','flight to safety','refugio seguro','breakout','ruptura','moving average','media móvil','200-day','dma de 200','cot report','commitment of traders'];
-function detectImpact(title,description){
-  const text=((title||'')+' '+(description||'')).toLowerCase();
-  if(HIGH_IMPACT_KW.some(kw=>text.includes(kw)))return'high';
-  if(MED_IMPACT_KW.some(kw=>text.includes(kw)))return'med';
-  return'low';
-}
-function tsToLocalTime(ts){
-  if(!ts)return'--:--';
-  const ms=ts<1e10?ts*1000:ts,d=new Date(ms);
-  if(isNaN(d))return'--:--';
-  return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
+// ── IMPACT DETECTION ─────────────────────────────────────────────────────────
+const HIGH_KW = ['rate decision','rate hike','rate cut','interest rate','tasa de interés','monetary policy','fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb','hawkish','dovish','gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','nonfarm payroll','nfp','jobless claims','strait of hormuz','estrecho de ormuz','war ','guerra ','conflict','escalation','sanctions','nuclear','recession','recesión'];
+const MED_KW  = ['pmi','manufacturing','retail sales','consumer confidence','trade balance','industrial production','housing','crude oil','oil prices','wti','brent','opec','bond yield','yield curve','risk off','risk on','breakout','cot report'];
+function detectImpact(title, desc) {
+  const t = ((title||'')+' '+(desc||'')).toLowerCase();
+  if (HIGH_KW.some(k=>t.includes(k))) return 'high';
+  if (MED_KW.some(k=>t.includes(k)))  return 'med';
+  return 'low';
 }
 
-// ── SENTIMENT ─────────────────────────────────────────────────────────────────
-const MAJORS_VS_USD = new Set(['EUR','GBP','AUD','NZD','CAD','CHF','JPY']);
-const FINAL_PATTERN_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
-const SENT_WORD_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
+function tsToLocal(ts) {
+  if (!ts) return '--:--';
+  const ms = ts < 1e10 ? ts * 1000 : ts;
+  const d  = new Date(ms);
+  if (isNaN(d)) return '--:--';
+  return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+}
 
-function scoreSentiment(article) {
-  const cur     = (article.cur || '').toUpperCase();
-  const hlOrig  = (article.ai_headline || article.title || '');
-  const hl      = hlOrig.toLowerCase();
-  const m = hlOrig.match(FINAL_PATTERN_RE);
-  let patternSent = null, patternCur = null;
+// ── SENTIMENT SCORING ─────────────────────────────────────────────────────────
+const FINAL_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
+const SENT_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
+
+function scoreSentiment(a) {
+  const hl   = (a.ai_headline || a.title || '');
+  const m    = hl.match(FINAL_RE);
   if (m) {
-    patternCur  = m[1] ? m[1].toUpperCase() : null;
-    patternSent = SENT_WORD_MAP[m[2].toLowerCase()] || 'neut';
-    if (patternCur && patternCur !== cur && patternCur === 'USD' && MAJORS_VS_USD.has(cur))
-      patternSent = patternSent === 'bull' ? 'bear' : patternSent === 'bear' ? 'bull' : patternSent;
-    if (article.sentiment) {
-      const backendSent = article.sentiment.toLowerCase();
-      const mapped = {bull:'bull',bear:'bear',alcista:'bull',bajista:'bear',mixed:'mixed',mixto:'mixed'}[backendSent] || 'neut';
-      if (m && patternSent !== mapped && patternCur) return patternSent;
-      return mapped;
+    const patCur  = m[1] ? m[1].toUpperCase() : null;
+    let   patSent = SENT_MAP[m[2].toLowerCase()] || 'neut';
+    const cur     = (a.cur || '').toUpperCase();
+    if (patCur && patCur !== cur && patCur === 'USD' && VALID_CURRENCIES.has(cur))
+      patSent = patSent==='bull'?'bear': patSent==='bear'?'bull': patSent;
+    if (a.sentiment) {
+      const bs = a.sentiment.toLowerCase();
+      const bm = {bull:'bull',bear:'bear',alcista:'bull',bajista:'bear',mixed:'mixed',mixto:'mixed'}[bs] || 'neut';
+      if (m && patSent !== bm && patCur) return patSent;
+      return bm;
     }
-    return patternSent;
+    return patSent;
   }
-  if (article.sentiment) {
-    const s = article.sentiment.toLowerCase();
+  if (a.sentiment) {
+    const s = a.sentiment.toLowerCase();
     if (s==='bull'||s==='alcista')  return 'bull';
     if (s==='bear'||s==='bajista')  return 'bear';
     if (s==='mixed'||s==='mixto')   return 'mixed';
     return 'neut';
   }
-  const BULL_KW=['alcista','hawkish','sube','fortalece','soporte','supera','alza','apreciación'];
-  const BEAR_KW=['bajista','dovish','cae','debilita','presión','recorte','caída','deprecia'];
-  let b=0,r=0;
-  BULL_KW.forEach(k=>{if(hl.includes(k))b++;});
-  BEAR_KW.forEach(k=>{if(hl.includes(k))r++;});
-  if(b>r)return'bull';if(r>b)return'bear';return'neut';
+  return 'neut';
 }
 
-// ── COMPUTE SENTIMENT (sidebar) ───────────────────────────────────────────────
-const IMPACT_W     = { high:3, med:1.5, low:0.5 };
-const DECAY_H_BY_IMPACT = { high: 8, med: 16, low: 28 };
+// ── SIDEBAR: SENTIMENT ───────────────────────────────────────────────────────
+const IMP_W  = {high:3, med:1.5, low:0.5};
+const DECAY  = {high:8, med:16, low:28};
 
 function computeSentiment(articles) {
-  const nowMs = Date.now();
-  const body  = document.getElementById('sentiment-body');
+  const body = document.getElementById('sentiment-body');
   if (!body) return;
+  const nowMs = Date.now();
   const acc = {};
-  CURRENCIES.forEach(c => { acc[c] = { bull:0, bear:0, neut:0, wSum:0, count:0 }; });
+  CURRENCIES.forEach(c => { acc[c] = {bull:0,bear:0,neut:0,wSum:0,count:0}; });
+
   articles.forEach(a => {
     if (!acc[a.cur]) return;
     const s    = scoreSentiment(a);
-    const impW = IMPACT_W[a.impact] || 0.5;
-    const ageH = a.ts ? (nowMs - (a.ts < 1e10 ? a.ts*1000 : a.ts)) / 3_600_000 : 0;
-    const decayH = DECAY_H_BY_IMPACT[a.impact] || 16;
-    const w      = impW * Math.exp(-ageH / decayH);
-    if (s === 'mixed') { acc[a.cur].bull += w*0.5; acc[a.cur].bear += w*0.5; }
-    else if (s === 'bull') acc[a.cur].bull += w;
-    else if (s === 'bear') acc[a.cur].bear += w;
-    else                   acc[a.cur].neut += w;
-    acc[a.cur].wSum  += w;
-    acc[a.cur].count += 1;
+    const impW = IMP_W[a.impact] || 0.5;
+    const ageH = a.ts ? (nowMs - (a.ts<1e10?a.ts*1000:a.ts)) / 3_600_000 : 0;
+    const w    = impW * Math.exp(-ageH / (DECAY[a.impact]||16));
+    if (s==='mixed') { acc[a.cur].bull+=w*0.5; acc[a.cur].bear+=w*0.5; }
+    else if (s==='bull') acc[a.cur].bull+=w;
+    else if (s==='bear') acc[a.cur].bear+=w;
+    else                 acc[a.cur].neut+=w;
+    acc[a.cur].wSum+=w; acc[a.cur].count++;
   });
+
   body.innerHTML = '';
   CURRENCIES.forEach(cur => {
-    const { bull, bear, neut, wSum, count } = acc[cur];
+    const {bull,bear,neut,count} = acc[cur];
     const flag = flagImg(cur, 16);
-    const bullBear = bull + bear, total = bullBear + neut;
-    if (count === 0 || total < 0.05) { body.innerHTML += _row(flag,cur,'—','nodata',0,0,count,'Sin cobertura',0.4); return; }
-    if (bullBear < 0.05) { body.innerHTML += _row(flag,cur,'Neut','neut',50,50,count,`Sin señal · neut=${neut.toFixed(2)}`,0.65); return; }
-    const diff = Math.abs(bull-bear), diffRatio = diff/bullBear;
-    const lowCov = total < 1.5, opacity = lowCov ? 0.52 : 1.0, prefix = lowCov ? '~' : '';
-    const bullPct = Math.round((bull/bullBear)*100), bearPct = 100-bullPct;
-    if (diffRatio < 0.15) { body.innerHTML += _rowMixed(flag,cur,bullPct,count,`Mixto · ${bullPct}% bull`,opacity); return; }
-    if (bull >= bear) body.innerHTML += _row(flag,cur,prefix+'Bull','bull',bullPct,bullPct,count,`Bull ${bullPct}%`,opacity);
-    else              body.innerHTML += _row(flag,cur,prefix+'Bear','bear',bearPct,bearPct,count,`Bear ${bearPct}%`,opacity);
+    const bb   = bull+bear, total = bb+neut;
+    if (count===0||total<0.05) { body.innerHTML+=_sentRow(flag,cur,'—','nodata',0,0,'Sin cobertura',0.4); return; }
+    if (bb<0.05)               { body.innerHTML+=_sentRow(flag,cur,'Neut','neut',50,0,'Sin señal',0.65); return; }
+    const diff=Math.abs(bull-bear)/bb, lowCov=total<1.5;
+    const op=lowCov?0.52:1, pfx=lowCov?'~':'';
+    const bullPct=Math.round((bull/bb)*100);
+    if (diff<0.15) { body.innerHTML+=_sentRowMixed(flag,cur,bullPct,count,'Mixto',op); return; }
+    if (bull>=bear) body.innerHTML+=_sentRow(flag,cur,pfx+'Bull','bull',bullPct,count,`Bull ${bullPct}%`,op);
+    else            body.innerHTML+=_sentRow(flag,cur,pfx+'Bear','bear',100-bullPct,count,`Bear ${100-bullPct}%`,op);
   });
 }
-function _row(flag,cur,label,cls,barPct,_u,count,tip,opacity){
-  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
+function _sentRow(flag,cur,label,cls,barPct,count,tip,op){
+  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${op}">
     <span class="sent-cur">${flag} ${cur}</span>
     <div class="sent-track"><div class="sent-fill ${cls}" style="width:${Math.min(100,barPct)}%"></div></div>
     <span class="sent-count">${count||''}</span>
     <span class="sent-label ${cls}">${label}</span>
   </div>`;
 }
-function _rowMixed(flag,cur,bullPct,count,tip,opacity){
-  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${opacity}">
+function _sentRowMixed(flag,cur,bullPct,count,tip,op){
+  return `<div class="sent-row" title="${esc(tip)}" style="opacity:${op}">
     <span class="sent-cur">${flag} ${cur}</span>
-    <div class="sent-track"><div class="sent-fill mixed" style="width:85%;--bull-pct:${bullPct}%"></div></div>
+    <div class="sent-track"><div class="sent-fill mixed" style="--bull-pct:${bullPct}%;width:85%"></div></div>
     <span class="sent-count">${count||''}</span>
     <span class="sent-label mixed">Mixto</span>
   </div>`;
 }
 
-// ── COVERAGE ──────────────────────────────────────────────────────────────────
+// ── SIDEBAR: COVERAGE ────────────────────────────────────────────────────────
 function renderCoverage(articles) {
   const body = document.getElementById('coverage-body');
   if (!body) return;
-  const counts={},highC={};
-  CURRENCIES.forEach(c=>{counts[c]=0;highC[c]=0;});
-  (articles||[]).forEach(a=>{
-    if(counts[a.cur]!==undefined){counts[a.cur]++;if(a.impact==='high')highC[a.cur]++;}
-  });
-  const maxN=Math.max(...Object.values(counts),1);
-  body.innerHTML=CURRENCIES.map(cur=>{
-    const n=counts[cur]||0,h=highC[cur]||0;
-    const pct=Math.round((n/maxN)*100);
+  const cnt={}, hcnt={};
+  CURRENCIES.forEach(c=>{cnt[c]=0;hcnt[c]=0;});
+  (articles||[]).forEach(a=>{if(cnt[a.cur]!==undefined){cnt[a.cur]++;if(a.impact==='high')hcnt[a.cur]++;}});
+  const mx = Math.max(...Object.values(cnt), 1);
+  body.innerHTML = CURRENCIES.map(cur=>{
+    const n=cnt[cur], h=hcnt[cur];
+    const pct=Math.round((n/mx)*100);
     const col=n===0?'var(--text-dim)':n>=4?'var(--green)':n>=2?'var(--blue)':'var(--orange)';
-    const hBadge=h>0?`<span class="cov-badge" style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);color:var(--red);">${h}▲</span>`:'<span style="width:22px;display:inline-block;"></span>';
+    const hb = h>0?`<span class="cov-badge" style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);color:var(--red);">${h}▲</span>`:'<span style="width:22px;display:inline-block;"></span>';
     return `<div class="cov-row">
       <span class="cov-cur">${flagImg(cur,14)} ${cur}</span>
       <div class="cov-track"><div class="cov-fill" style="width:${pct}%;background:${col};"></div></div>
-      <span class="cov-count">${n}</span>
-      ${hBadge}
+      <span class="cov-count">${n}</span>${hb}
     </div>`;
   }).join('');
 }
 
-// ── UPCOMING EVENTS ───────────────────────────────────────────────────────────
+// ── UPCOMING EVENTS ──────────────────────────────────────────────────────────
 async function loadUpcomingEvents() {
-  const container = document.getElementById('upcoming-events');
+  const el = document.getElementById('upcoming-events');
   try {
-    const res = await fetch('calendar-data/calendar.json?_='+Date.now());
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    const todayISO=new Date().toISOString().split('T')[0];
-    const tomorrowISO=new Date(Date.now()+86400000).toISOString().split('T')[0];
-    const allEvents=data.events||[];
-    const highMed=e=>['high','medium'].includes((e.impact||'').toLowerCase());
-    let todayEv=allEvents.filter(e=>e.dateISO===todayISO&&highMed(e));
-    const useTomorrow=todayEv.length===0;
-    const upcoming=useTomorrow?allEvents.filter(e=>e.dateISO===tomorrowISO&&highMed(e)).slice(0,8):todayEv.slice(0,8);
-    if(!upcoming.length){container.innerHTML='<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>';return;}
-    container.innerHTML='';
-    upcoming.forEach(e=>{
-      const imp=(e.impact||'').toLowerCase();
-      const isTomorrow=(e.dateISO===tomorrowISO);
-      const detail=[e.currency,e.forecast?'Est: '+e.forecast:'',e.previous?'Prev: '+e.previous:''].filter(Boolean).join(' · ');
-      let localTime=e.timeUTC||'--:--';
-      if(e.timeUTC&&e.dateISO){try{const ud=new Date(`${e.dateISO}T${e.timeUTC}:00Z`);if(!isNaN(ud.getTime()))localTime=ud.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});}catch(_){}}
-      const evCur=(e.currency||'').slice(0,3).toUpperCase();
-      const flag=flagImg(evCur,20)||'🌐';
-      container.innerHTML+=`<div class="ev-row">
-        <div class="ev-left"><span style="display:flex;align-items:center;justify-content:center;">${flag}</span><span class="ev-time" style="${isTomorrow?'color:var(--text-dim)':''}">${esc(localTime)}</span></div>
+    const r = await fetch('calendar-data/calendar.json?_='+Date.now());
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const data = await r.json();
+    const todayISO = new Date().toISOString().split('T')[0];
+    const tomISO   = new Date(Date.now()+86400000).toISOString().split('T')[0];
+    const hm = e => ['high','medium'].includes((e.impact||'').toLowerCase());
+    let evs = data.events.filter(e=>e.dateISO===todayISO&&hm(e));
+    if (!evs.length) evs = data.events.filter(e=>e.dateISO===tomISO&&hm(e));
+    evs = evs.slice(0,8);
+    if (!evs.length) { el.innerHTML='<div class="ev-empty">Sin eventos de alto/medio impacto próximos.</div>'; return; }
+    el.innerHTML = '';
+    evs.forEach(e=>{
+      const imp = (e.impact||'').toLowerCase();
+      const detail = [e.currency, e.forecast?'Est: '+e.forecast:'', e.previous?'Prev: '+e.previous:''].filter(Boolean).join(' · ');
+      let lt = e.timeUTC||'--:--';
+      if (e.timeUTC&&e.dateISO) { try { const ud=new Date(`${e.dateISO}T${e.timeUTC}:00Z`); if(!isNaN(ud))lt=ud.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false}); } catch(_){} }
+      const flag = flagImg((e.currency||'').slice(0,3).toUpperCase(),20)||'🌐';
+      el.innerHTML+=`<div class="ev-row">
+        <div class="ev-left"><span style="display:flex;align-items:center;justify-content:center;">${flag}</span><span class="ev-time">${esc(lt)}</span></div>
         <div class="ev-body"><div class="ev-name">${esc(e.event)}</div>${detail?`<div class="ev-detail">${esc(detail)}</div>`:''}</div>
         <span class="ev-badge ${imp==='high'?'badge-h':'badge-m'}">${imp==='high'?'Alto':'Medio'}</span>
       </div>`;
     });
-  } catch(err) {
-    container.innerHTML='<div class="ev-empty">Calendario no disponible.</div>';
-  }
+  } catch(_) { el.innerHTML='<div class="ev-empty">Calendario no disponible.</div>'; }
 }
 
-// ── FEED STATE & RENDER ───────────────────────────────────────────────────────
-const PAGE=30;
-let allArticles=[],visible=PAGE,activeFilter='ALL',highOnly=false;
+// ── FEED STATE ───────────────────────────────────────────────────────────────
+const PAGE = 30;
+let allArticles = [];
+let visible     = PAGE;
+let activeFilter= 'ALL';
+let highOnly    = false;
 
-function renderFeed(){
-  const body=document.getElementById('feed-body');
-  const loading=document.getElementById('feed-loading');
-  if(loading)loading.remove();
+// Promesa que se resuelve cuando allArticles está listo
+let articlesReadyResolve;
+const articlesReady = new Promise(res => { articlesReadyResolve = res; });
+
+function renderFeed() {
+  const body    = document.getElementById('feed-body');
+  const loading = document.getElementById('feed-loading');
+  if (loading) loading.remove();
   body.setAttribute('aria-busy','false');
-  const filtered=allArticles.filter(a=>
-    (activeFilter==='ALL'||a.cur===activeFilter)&&(!highOnly||a.impact==='high')
+
+  const filtered = allArticles.filter(a =>
+    (activeFilter==='ALL' || a.cur===activeFilter) && (!highOnly || a.impact==='high')
   );
-  if(!filtered.length){
-    body.innerHTML=`<div class="feed-empty"><div class="feed-error-icon">📰</div><strong>No se encontraron noticias para el filtro actual</strong><br>Consulte directamente:<br><a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> · <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> · <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a></div>`;
-    document.getElementById('load-more-btn').style.display='none';
-    computeSentiment([]);renderCoverage([]);return;
+
+  if (!filtered.length) {
+    body.innerHTML = `<div class="feed-empty">
+      <div class="feed-error-icon">📰</div>
+      <strong>No hay noticias para el filtro actual.</strong><br>
+      Consulte directamente:<br>
+      <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> ·
+      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> ·
+      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a>
+    </div>`;
+    document.getElementById('load-more-btn').style.display = 'none';
+    computeSentiment([]); renderCoverage([]); return;
   }
-  body.innerHTML='';
-  filtered.slice(0,visible).forEach(a=>{
-    const ic=a.impact==='high'?'impact-high':a.impact==='med'?'impact-med':'impact-low';
-    const headline=a.ai_headline||a.title;
-    body.innerHTML+=`<div class="news-row${a.featured?' featured':''}" onclick="toggleExpand(this)">
+
+  body.innerHTML = '';
+  filtered.slice(0, visible).forEach(a => {
+    const ic      = a.impact==='high'?'impact-high': a.impact==='med'?'impact-med':'impact-low';
+    const headline= a.ai_headline || a.title || '';
+    body.innerHTML += `<div class="news-row${a.featured?' featured':''}" onclick="toggleExpand(this)">
       <span class="col-time">${esc(a.time)}</span>
-      <span class="col-cur">${flagImg(a.cur)}${esc(a.cur)}</span>
+      <span class="col-cur">${flagImg(a.cur)} ${esc(a.cur)}</span>
       <div class="col-impact ${ic}" aria-label="Impacto ${a.impact}"><div class="impact-dot"></div></div>
       <span class="col-title" title="${esc(headline)}">${esc(headline)}</span>
       <span class="col-source">${esc(a.source)}</span>
     </div>
     <div class="news-expand">
-      ${a.ai_headline?`<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;opacity:.85;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>`:''}
-      <span style="color:var(--text-secondary)">${esc(a.expand||a.description||a.title)}</span>
+      ${a.ai_headline?`<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>`:''}
+      <span style="color:var(--text-secondary)">${esc(a.expand||a.description||a.title||'')}</span>
       ${a.link?`<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>`:''}
     </div>`;
   });
-  document.getElementById('load-more-btn').style.display=filtered.length>visible?'flex':'none';
-  const aiBadge=document.getElementById('ai-badge');
-  if(aiBadge)aiBadge.style.display=filtered.slice(0,visible).some(a=>a.ai_headline)?'inline':'none';
+
+  document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
+  const aiBadge = document.getElementById('ai-badge');
+  if (aiBadge) aiBadge.style.display = filtered.slice(0,visible).some(a=>a.ai_headline) ? 'inline':'none';
+
   computeSentiment(filtered);
   renderCoverage(allArticles);
 }
 
-function loadMore(){visible+=PAGE;renderFeed();}
-function toggleExpand(row){const was=row.classList.contains('open');document.querySelectorAll('.news-row.open').forEach(r=>r.classList.remove('open'));if(!was)row.classList.add('open');}
-function setFilter(val,btn){document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=val;visible=PAGE;renderFeed();}
-function toggleImpact(btn){btn.classList.toggle('active-green');highOnly=btn.classList.contains('active-green');visible=PAGE;renderFeed();}
+function loadMore()   { visible += PAGE; renderFeed(); }
+function toggleExpand(row) {
+  const was = row.classList.contains('open');
+  document.querySelectorAll('.news-row.open').forEach(r=>r.classList.remove('open'));
+  if (!was) row.classList.add('open');
+}
+function setFilter(val, btn) {
+  document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = val; visible = PAGE; renderFeed();
+}
+function toggleImpact(btn) {
+  btn.classList.toggle('active-green');
+  highOnly = btn.classList.contains('active-green');
+  visible  = PAGE; renderFeed();
+}
 
-// ── CURRENCY ANALYSIS CARDS ───────────────────────────────────────────────────
+// ── INIT FEED ────────────────────────────────────────────────────────────────
+async function initFeed() {
+  try {
+    const res = await fetch(`news-data/news.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const raw  = data.articles || [];
+
+    if (raw.length > 0) {
+      allArticles = raw.map(a => {
+        const cur = (a.cur && VALID_CURRENCIES.has(a.cur))
+          ? a.cur
+          : detectCurrency(a.title||'', a.expand||'', a.source||'');
+        return {
+          ...a,
+          cur,
+          impact:     a.impact || detectImpact(a.title, a.expand),
+          time:       tsToLocal(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
+          ai_headline: a.ai_headline || null,
+        };
+      })
+      .filter(a => {
+        const hl = (a.ai_headline || '').toUpperCase();
+        return !hl.includes('IRRELEVANTE');
+      })
+      .sort((a,b) => (b.ts||0)-(a.ts||0));
+
+      renderFeed();
+      articlesReadyResolve(true);   // ← señal: artículos listos
+      return;
+    }
+
+    // news.json vacío
+    articlesReadyResolve(false);
+    throw new Error('articles array vacío');
+
+  } catch (e) {
+    console.warn('[initFeed] Error:', e.message);
+    articlesReadyResolve(false);
+
+    const body    = document.getElementById('feed-body');
+    const loading = document.getElementById('feed-loading');
+    if (loading) loading.remove();
+    body.setAttribute('aria-busy','false');
+    body.innerHTML = `<div class="feed-empty">
+      <div class="feed-error-icon">⚠️</div>
+      <strong>No se pudieron cargar las noticias.</strong><br><br>
+      Consulte noticias directamente:<br><br>
+      <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
+      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br>
+      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a>
+    </div>`;
+    computeSentiment([]); renderCoverage([]);
+  }
+}
+
+// ── VIEW TOGGLE ──────────────────────────────────────────────────────────────
+let currentView      = 'headlines';
+let summariesLoaded  = false;
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('view-headlines').style.display = view==='headlines' ? '' : 'none';
+  document.getElementById('view-analysis').style.display  = view==='analysis'  ? '' : 'none';
+  document.getElementById('btn-headlines').classList.toggle('active', view==='headlines');
+  document.getElementById('btn-analysis').classList.toggle('active',  view==='analysis');
+
+  if (view === 'analysis' && !summariesLoaded) {
+    loadSummaries();
+  }
+}
+
+// ── CURRENCY ANALYSIS CARDS ──────────────────────────────────────────────────
 async function loadSummaries() {
-  const grid = document.getElementById('currency-grid');
+  const grid  = document.getElementById('currency-grid');
   const updEl = document.getElementById('summaries-updated');
 
+  // Mostrar skeletons mientras carga
+  grid.innerHTML = CURRENCIES.map(()=>`
+    <div class="card-skeleton">
+      <div class="sk-head"><div class="sk-line w40"></div></div>
+      <div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div>
+    </div>`).join('');
+
+  // ── Intentar summaries.json ──────────────────────────────────────────────
+  let summariesOK = false;
   try {
     const res = await fetch(`news-data/summaries.json?v=${Date.now()}`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    const summaries = data.summaries || {};
+    const sums  = data.summaries || {};
 
-    if (updEl && data.updated_label) {
-      updEl.textContent = '· ' + data.updated_label;
-    }
+    // Validar que tenga al menos una divisa con análisis real
+    const hasData = CURRENCIES.some(c => sums[c] && sums[c].articles_count > 0);
+    if (!hasData) throw new Error('summaries.json vacío o sin datos');
+
+    if (updEl && data.updated_label) updEl.textContent = '· ' + data.updated_label;
 
     grid.innerHTML = '';
     CURRENCIES.forEach(cur => {
-      const s = summaries[cur];
-      if (!s) {
-        grid.innerHTML += renderSkeletonCard();
-        return;
-      }
-      grid.innerHTML += renderCurrencyCard(cur, s);
+      const s = sums[cur];
+      grid.innerHTML += s ? renderCurrencyCard(cur, s) : renderSkeletonCard();
     });
 
     summariesLoaded = true;
+    summariesOK = true;
+    console.info('[loadSummaries] Cargado desde summaries.json');
 
   } catch (err) {
-    console.warn('summaries.json no disponible:', err.message);
-    // Fallback: construir desde allArticles si ya están cargados
+    console.warn('[loadSummaries] summaries.json no disponible:', err.message);
+  }
+
+  // ── Fallback: esperar a allArticles y calcular estadístico ───────────────
+  if (!summariesOK) {
+    if (updEl) updEl.textContent = '· calculando desde titulares…';
+
+    // Esperar a que initFeed() resuelva (máx 8s)
+    await Promise.race([
+      articlesReady,
+      new Promise(res => setTimeout(res, 8000))
+    ]);
+
+    grid.innerHTML = '';
+
     if (allArticles.length > 0) {
-      grid.innerHTML = '';
+      if (updEl) updEl.textContent = '· calculado desde titulares (resumen AI pendiente)';
       CURRENCIES.forEach(cur => {
-        const curArts = allArticles.filter(a => a.cur === cur);
-        grid.innerHTML += renderCurrencyCardFromArticles(cur, curArts);
+        const arts = allArticles.filter(a => a.cur === cur);
+        grid.innerHTML += renderCurrencyCardFromArticles(cur, arts);
       });
       summariesLoaded = true;
-      if (updEl) updEl.textContent = '· calculado desde titulares';
+      console.info('[loadSummaries] Fallback estadístico aplicado');
     } else {
-      grid.innerHTML = '<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">⚠️ Análisis no disponible. Intente en el próximo ciclo de actualización.</div>';
+      if (updEl) updEl.textContent = '· sin datos disponibles';
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">
+        ⚠️ Análisis no disponible. El archivo <code>summaries.json</code> no existe aún en el repositorio.<br><br>
+        Ejecuta el workflow de GitHub Actions para generarlo, o espera al próximo ciclo automático.
+      </div>`;
     }
   }
 }
 
 function renderCurrencyCard(cur, s) {
-  const sent      = s.sentiment || 'neut';
-  const conf      = s.confidence || 0;
+  const sent      = (s.sentiment || 'neut').toLowerCase();
+  const conf      = Math.min(100, Math.max(0, parseInt(s.confidence) || 0));
   const analysis  = s.analysis  || 'Sin análisis disponible.';
-  const drivers   = s.drivers   || [];
+  const drivers   = Array.isArray(s.drivers) ? s.drivers : [];
   const upcoming  = s.upcoming_event || null;
-  const sources   = (s.sources || []).join(' · ') || '—';
+  const sources   = Array.isArray(s.sources) ? s.sources.join(' · ') : '—';
   const count     = s.articles_count || 0;
   const isAI      = s.ai_generated !== false;
-
-  const sentLabel = SENT_LABELS[sent] || 'Neutral';
-  const flagHtml  = flagImg(cur, 20);
   const fullName  = CURRENCY_NAMES[cur] || cur;
 
   let latestTime = '';
@@ -1055,72 +1140,68 @@ function renderCurrencyCard(cur, s) {
     : '';
 
   const upcomingHtml = upcoming
-    ? `<div class="card-event"><span class="ev-icon">📅</span><span><span class="ev-label">Próximo</span>${esc(upcoming)}</span></div>`
+    ? `<div class="card-event"><span class="ev-icon">📅</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
     : '';
 
-  const noDataClass = count === 0 ? ' no-data' : '';
-
-  return `<div class="cur-card ${sent}${noDataClass}">
+  return `<div class="cur-card ${sent}${count===0?' no-data':''}">
     <div class="card-head">
       <div class="cur-id">
-        ${flagHtml}
+        ${flagImg(cur,20)}
         <span class="cur-code">${esc(cur)}</span>
         <span class="cur-full-name">${esc(fullName)}</span>
       </div>
       <div class="head-right">
         <span class="src-count">${count} art.</span>
-        <span class="sent-badge ${sent}">${esc(sentLabel)}</span>
+        <span class="sent-badge ${sent}">${esc(SENT_LABELS[sent]||'Neutral')}</span>
       </div>
     </div>
     <div class="conf-bar-wrap">
-      <div class="conf-track">
-        <div class="conf-fill ${sent}" style="width:${Math.min(100,conf)}%"></div>
-      </div>
+      <div class="conf-track"><div class="conf-fill ${sent}" style="width:${conf}%"></div></div>
       <span class="conf-label">${conf}%</span>
     </div>
     <div class="card-body">
-      ${count === 0
+      ${count===0
         ? `<div class="no-data-msg">Sin cobertura en las últimas 72h.</div>`
-        : `<p class="analysis-text">${esc(analysis)}</p>${driversHtml}${upcomingHtml}`
-      }
+        : `<p class="analysis-text">${esc(analysis)}</p>${driversHtml}${upcomingHtml}`}
     </div>
     <div class="card-foot">
       <span class="foot-sources">${esc(sources)}</span>
       <span style="display:flex;align-items:center;gap:.35rem;">
-        ${isAI ? '<span class="foot-ai">AI</span>' : ''}
-        <span class="foot-ts">${latestTime || '--:--'}</span>
+        ${isAI?'<span class="foot-ai">AI</span>':''}
+        <span class="foot-ts">${latestTime||'--:--'}</span>
       </span>
     </div>
   </div>`;
 }
 
-function renderCurrencyCardFromArticles(cur, articles) {
-  // Fallback sin summaries.json: sentimiento estadístico desde artículos
-  const count = articles.length;
-  if (count === 0) {
+function renderCurrencyCardFromArticles(cur, arts) {
+  if (!arts.length) {
     return renderCurrencyCard(cur, {
-      sentiment:'neut', confidence:0, analysis:'Sin cobertura en las últimas 72h.',
-      drivers:[], upcoming_event:null, sources:[], articles_count:0,
+      sentiment:'neut', confidence:0,
+      analysis:'Sin cobertura en las últimas 72h.',
+      drivers:[], upcoming_event:null,
+      sources:[], articles_count:0,
       latest_ts:0, ai_generated:false,
     });
   }
-  const sents = articles.map(a => scoreSentiment(a));
+  const sents = arts.map(a=>scoreSentiment(a));
   const bull  = sents.filter(s=>s==='bull').length;
   const bear  = sents.filter(s=>s==='bear').length;
   const mixed = sents.filter(s=>s==='mixed').length;
-  let dominant = 'neut', conf = 30;
-  if (bull > bear && bull > mixed) { dominant='bull'; conf=Math.round((bull/count)*100); }
-  else if (bear > bull && bear > mixed) { dominant='bear'; conf=Math.round((bear/count)*100); }
-  else if (mixed>0||(bull>0&&bear>0)) { dominant='mixed'; conf=50; }
+  const n     = arts.length;
+  let dominant='neut', conf=30;
+  if (bull>bear&&bull>mixed)        { dominant='bull'; conf=Math.round((bull/n)*100); }
+  else if (bear>bull&&bear>mixed)   { dominant='bear'; conf=Math.round((bear/n)*100); }
+  else if (mixed>0||(bull>0&&bear>0)){ dominant='mixed'; conf=50; }
 
-  const sources = [...new Set(articles.map(a=>a.source).filter(Boolean))].slice(0,3);
-  const latest  = Math.max(...articles.map(a=>a.ts||0));
-  const analysis = `Análisis estadístico basado en ${count} artículos. ${bull} alcistas · ${bear} bajistas · ${mixed} mixtos. El resumen AI estará disponible en el próximo ciclo.`;
+  const sources = [...new Set(arts.map(a=>a.source).filter(Boolean))].slice(0,3);
+  const latest  = Math.max(...arts.map(a=>a.ts||0));
+  const analysis= `Sentimiento basado en ${n} artículos: ${bull} alcistas · ${bear} bajistas · ${mixed} mixtos. El análisis AI consolidado estará disponible en el próximo ciclo del pipeline.`;
 
   return renderCurrencyCard(cur, {
-    sentiment: dominant, confidence: Math.min(95,conf),
-    analysis, drivers: [], upcoming_event: null,
-    sources, articles_count: count, latest_ts: latest, ai_generated: false,
+    sentiment:dominant, confidence:Math.min(95,conf),
+    analysis, drivers:[], upcoming_event:null,
+    sources, articles_count:n, latest_ts:latest, ai_generated:false,
   });
 }
 
@@ -1128,42 +1209,12 @@ function renderSkeletonCard() {
   return `<div class="card-skeleton">
     <div class="sk-head"><div class="sk-line w40"></div></div>
     <div class="sk-body">
-      <div class="sk-line w100"></div>
-      <div class="sk-line w85"></div>
-      <div class="sk-line w70"></div>
+      <div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div>
     </div>
   </div>`;
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-async function initFeed(){
-  try{
-    const res=await fetch(`news-data/news.json?v=${Date.now()}`);
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    const articles=data.articles||[];
-    if(articles.length>0){
-      allArticles=articles
-        .map(a=>{
-          const cur=(a.cur&&['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].includes(a.cur))
-            ?a.cur:detectCurrencyWithSource(a.title||'',a.expand||'',a.source||'');
-          return{...a,cur,impact:a.impact||detectImpact(a.title,a.expand),time:tsToLocalTime(a.ts||(a.datetime?new Date(a.datetime).getTime():null)),ai_headline:a.ai_headline||null,recent:a.recent!==undefined?a.recent:true};
-        })
-        .filter(a=>!(a.ai_headline&&a.ai_headline.toUpperCase().includes('IRRELEVANTE')))
-        .sort((a,b)=>(b.ts||0)-(a.ts||0));
-      renderFeed();
-      return;
-    }
-  } catch(e){console.warn('news.json no disponible:',e.message);}
-
-  const feedBody=document.getElementById('feed-body');
-  const loading=document.getElementById('feed-loading');
-  if(loading)loading.remove();
-  feedBody.setAttribute('aria-busy','false');
-  feedBody.innerHTML=`<div class="feed-empty"><div class="feed-error-icon">⚠️</div><strong>No se pudieron cargar las noticias</strong><br><br>El archivo de noticias no está disponible en este momento.<br><br><strong>Consulte noticias directamente:</strong><br><br><a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br><a href="https://es.investing.com/news/forex-news" target="_blank" rel="noopener">Investing.com ES</a><br><a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br><a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters · Forex</a></div>`;
-  computeSentiment([]);renderCoverage([]);
-}
-
+// ── ARRANQUE ─────────────────────────────────────────────────────────────────
 initFeed();
 loadUpcomingEvents();
 </script>
