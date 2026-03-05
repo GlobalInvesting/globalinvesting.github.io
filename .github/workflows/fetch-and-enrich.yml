@@ -23,22 +23,20 @@ jobs:
         run: pip install feedparser requests python-dateutil
       - name: Create output directories
         run: mkdir -p news-data
-      # ── PASO 1: Fetch RSS ──────────────────────────────────────────────────
       - name: Fetch news from RSS feeds
         run: python scripts/fetch_news.py
-      # ── PASO 2: Enrich con Groq AI (titulares por artículo) ───────────────
       - name: Enrich headlines with Groq AI
         env:
           GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+          GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
         run: python scripts/enrich_news.py
-      # ── PASO 3: Generar análisis consolidado por divisa ────────────────────
       - name: Generate per-currency analysis summaries
         env:
           GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+          GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
         run: python scripts/generate_summaries.py
-      # ── PASO 4: Commit y push ──────────────────────────────────────────────
       - name: Commit updated news data
         run: |
           git config user.name  "github-actions[bot]"
