@@ -310,7 +310,7 @@
   /* ═══════════════════════════════════════════════════════
      CURRENCY ANALYSIS GRID
   ═══════════════════════════════════════════════════════ */
-  #view-analysis { display: none; }
+  #view-analysis { display: none; } /* JS lo muestra con display:block */
 
   .analysis-section-label {
     font-size: 0.65rem;
@@ -539,7 +539,7 @@
   <!-- ══════════════════════════
        VISTA 1: TITULARES
   ══════════════════════════ -->
-  <div id="view-headlines">
+  <div id="view-headlines" style="display:block">
     <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
       <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
       <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
@@ -1038,8 +1038,8 @@ let summariesLoaded  = false;
 
 function setView(view) {
   currentView = view;
-  document.getElementById('view-headlines').style.display = view==='headlines' ? '' : 'none';
-  document.getElementById('view-analysis').style.display  = view==='analysis'  ? '' : 'none';
+  document.getElementById('view-headlines').style.display = view==='headlines' ? 'block' : 'none';
+  document.getElementById('view-analysis').style.display  = view==='analysis'  ? 'block' : 'none';
   document.getElementById('btn-headlines').classList.toggle('active', view==='headlines');
   document.getElementById('btn-analysis').classList.toggle('active',  view==='analysis');
 
