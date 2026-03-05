@@ -2,10 +2,11 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "La política monetaria del Banco de Japón ha tomado un giro hawkish, subiendo las tasas de interés en 0.25pp, lo que puede ejercer presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, este movimiento sugiere un ciclo restrictivo activo, lo que puede ser estructuralmente alcista para la divisa. La inflación y el crecimiento del PIB siguen siendo bajos, lo que puede limitar el alcance de este efecto.\n\nLa cuenta corriente muestra un superávit, lo que indica una demanda estructural de la divisa, aunque la balanza comercial presenta un déficit. La composición exportadora de Japón, liderada por vehículos y maquinaria industrial, puede explicar este déficit, ya que estas exportaciones pueden ser sensibles a los cambios en la demanda global. Sin embargo, la confianza del consumidor y la confianza empresarial siguen siendo altas, lo que puede apoyar la economía.\n\nEl posicionamiento especulativo neto bajista puede ser un factor importante en el mercado, aunque la divisa se ha apreciado un 3.3% en el último mes. Esto puede indicar un posible squeeze de cortos, lo que podría llevar a una mayor apreciación de la divisa. En general, el panorama para la divisa japonesa parece alcista, aunque es importante tener en cuenta los riesgos y las incertidumbres que pueden afectar el mercado.",
+  "analysis": "La política monetaria del Banco de Japón ha sido recientemente ajustada con un aumento en la tasa de interés, lo que sugiere un enfoque más restrictivo y podría generar presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, este movimiento puede ser visto como un paso hacia la normalización de la política monetaria. La inflación en Japón se mantiene por debajo del objetivo, lo que podría influir en las decisiones futuras del banco central.\n\nLa cuenta corriente presenta un superávit, lo que indica una demanda estructural de la divisa. Sin embargo, la balanza comercial muestra un déficit, influenciado por la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial, y equipos eléctricos y electrónicos. La demanda de refugio y la revisión de expectativas de recortes de tasas de la Fed han llevado a un fortalecimiento del dólar estadounidense, presionando al yen hacia la baja.\n\nEl posicionamiento especulativo neto es bajista, con un COT de -26.3K contratos netos. Aunque el rendimiento FX del último mes muestra una apreciación del yen, las noticias recientes indican una corrección y un potencial alcista agotado para el par USD/JPY. La integración de estas señales sugiere que, a corto plazo, el yen podría experimentar presiones bajistas debido a la demanda de refugio y la fortaleza del dólar estadounidense.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-04T12:55:55.197833+00:00",
+  "generatedAt": "2026-03-05T11:07:30.736238+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.75,
     "gdpGrowth": 0.1,
@@ -24,17 +25,23 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -26317,
-    "fxPerformance1M": 3.295,
+    "fxPerformance1M": 2.4809,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-04"
+    "lastUpdate": "2026-03-05",
+    "latestNewsTs": 1772700358.0,
+    "newsHeadlines": [
+      "USD/JPY sube a 157.35: apreciación del dólar estadounidense tras corrección → JP",
+      "USD se fortalece por demanda de refugio y revisión de expectativas de recortes d",
+      "USD/JPY sube 20 pips desde 157.19 con MACD cruzando a positivo: potencial alcist"
+    ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.3,
-    "avg_fx_perf_1m": 1.57,
+    "avg_bond10y": 3.33,
+    "avg_fx_perf_1m": 1.53,
     "avg_cot": 9454.25
   }
 }

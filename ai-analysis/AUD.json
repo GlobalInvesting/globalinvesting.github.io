@@ -2,10 +2,11 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global, lo que genera un carry atractivo para inversores de renta fija internacional. Esta decisión de subir tasas refleja un ciclo restrictivo activo, estructuralmente alcista para la divisa por mayor carry diferencial. Aunque la inflación se mantiene por encima del objetivo, el crecimiento del PIB es superior al promedio global, lo que sugiere una economía resiliente.\n\nLa balanza comercial presenta un superávit de 2.4B USD/mes, con términos de intercambio favorables, lo que indica que los precios de exportación superan a los de importación, ampliando el excedente. Sin embargo, la cuenta corriente muestra un déficit, lo que podría ejercer presión vendedora estructural sobre la divisa. La composición exportadora, liderada por minerales metalíferos, combustibles y petróleo, cereales, explica en parte este superávit comercial.\n\nEl posicionamiento especulativo, con un COT de +64.7K contratos netos, indica una posición alcista extrema, lo que aumenta el riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes muestra una depreciación, el carry atractivo y el superávit comercial podrían seguir apoyando la divisa. En este contexto, cualquier noticia que contradiga las expectativas de crecimiento o inflación podría desencadenar una corrección rápida.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería apoyar a la divisa. La última subida de tasas del banco central refuerza esta tendencia alcista, aunque el ciclo bajista en los últimos 12 meses podría introducir alguna incertidumbre.\n\nLa balanza comercial australiana sigue mostrando un superávit, con una mejora en enero respecto a diciembre, lo que sugiere que las exportaciones de minerales metalíferos, combustibles y petróleo siguen siendo fuertes. Aunque la cuenta corriente presenta un déficit, el superávit en la balanza comercial ayuda a mitigar esta presión vendedora estructural. Las tensiones en Medio Oriente podrían generar un sentimiento de riesgo, lo que podría llevar a un retroceso en algunas parejas de divisas.\n\nEl posicionamiento especulativo en la divisa australiana es extremadamente alcista, con un COT de +64.7K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. La inflación estable y la postura hawkish del banco central apoyan el objetivo a corto plazo en 0.7100. Aunque el rendimiento FX del último mes ha sido positivo, la divisa sigue siendo atractiva en un régimen global risk-on, lo que podría seguir apoyando su valor.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-04T12:55:59.564943+00:00",
+  "generatedAt": "2026-03-05T11:07:35.225992+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.85,
     "gdpGrowth": 0.8,
@@ -24,17 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 64653,
-    "fxPerformance1M": -0.2849,
+    "fxPerformance1M": 0.1176,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-04"
+    "lastUpdate": "2026-03-05",
+    "latestNewsTs": 1772664978.0,
+    "newsHeadlines": [
+      "Balance comercial australiano de enero espera superávit de A$3.9 mil millones: m",
+      "Tensiones en Medio Oriente intensifican sentimiento de riesgo: oportunidad de re",
+      "Inflación interna estable y RBA con postura hawkish: objetivo a corto plazo en 0"
+    ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.3,
-    "avg_fx_perf_1m": 1.57,
+    "avg_bond10y": 3.33,
+    "avg_fx_perf_1m": 1.53,
     "avg_cot": 9454.25
   }
 }

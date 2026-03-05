@@ -2,10 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo se ha vuelto más expansiva, con una tasa de interés del 0.00%, lo que presiona a la baja la divisa debido al menor carry. Aunque la inflación se encuentra por debajo del objetivo, el crecimiento del PIB es inferior al promedio global, lo que sugiere un entorno económico desafiante. La tasa de interés muy por debajo del promedio global la convierte en una divisa probable financiadora de carry trade, lo que puede generar apreciación brusca en episodios de aversión al riesgo.\n\nLa balanza comercial y la cuenta corriente presentan un superávit, lo que genera una demanda estructural de la divisa. Los términos de intercambio favorables y el superávit comercial de 4.6B USD/mes contribuyen a este excedente. Sin embargo, el régimen global risk-on favorece divisas de alto carry y exportadoras de materias primas, lo que puede afectar la dinámica de la divisa.\n\nEl posicionamiento especulativo muestra un sesgo neto alcista, aunque no extremo, con 3.9K contratos netos. El rendimiento FX del último mes ha sido positivo, con una apreciación del 2.26% vs USD. Esto sugiere que la divisa puede seguir apreciando, aunque el menor carry y el ciclo expansivo del banco central pueden ejercer presión a la baja en el mediano plazo.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión a la baja sobre la divisa. Aunque los datos de inflación y crecimiento económico son moderados, la tasa de interés baja podría hacer que la divisa sea menos atractiva para los inversores que buscan rendimientos más altos.\n\nLa balanza comercial de Suiza muestra un superávit de 4.6B USD/mes, lo que se debe en parte a la composición exportadora del país, que incluye productos farmacéuticos y instrumentos de precisión. Los términos de intercambio favorables también contribuyen a este superávit. Sin embargo, la noticia de un aumento del petróleo compensado por la apreciación del franco suizo sugiere que la inflación en Suiza podría ser moderada, lo que podría llevar al banco central a mantener una postura vigilante.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo alcista, con 3.9K contratos netos. La apreciación del franco suizo en el último mes, con un rendimiento FX de +1.62% vs USD, también sugiere que los inversores están buscando refugio en esta divisa. La noticia de que el USD/CHF se mantiene fuerte cerca de 0.7800, debido al conflicto en Irán y la disminución de probabilidades de recorte de tasas de la Fed, podría influir en el comportamiento de la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-04T12:56:08.679193+00:00",
+  "generatedAt": "2026-03-05T11:07:44.177196+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.2,
@@ -24,17 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 3863,
-    "fxPerformance1M": 2.2612,
+    "fxPerformance1M": 1.6195,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-04"
+    "lastUpdate": "2026-03-05",
+    "latestNewsTs": 1772692289.0,
+    "newsHeadlines": [
+      "Aumento del petróleo compensado por apreciación del franco suizo: inflación mode",
+      "USD/CHF se mantiene fuerte cerca de 0.7800: conflicto en Irán y disminución de p",
+      "USD/CHF se mantiene fuerte cerca de 0.7800: disminuyen probabilidades de recorte"
+    ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.3,
-    "avg_fx_perf_1m": 1.57,
+    "avg_bond10y": 3.33,
+    "avg_fx_perf_1m": 1.53,
     "avg_cot": 9454.25
   }
 }
