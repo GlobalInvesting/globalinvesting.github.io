@@ -51,10 +51,10 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /* ═══════════════════════════════════════════════════════
-     RESET & ROOT — idéntico a index.html
+     RESET & ROOT
   ═══════════════════════════════════════════════════════ */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -72,8 +72,11 @@
     --blue:         #1e88e5;
     --blue-dim:     rgba(30,136,229,0.1);
     --green:        #26a69a;
+    --green-dim:    rgba(38,166,154,0.12);
     --red:          #ef5350;
+    --red-dim:      rgba(239,83,80,0.12);
     --orange:       #e0a020;
+    --orange-dim:   rgba(224,160,32,0.08);
   }
 
   body {
@@ -88,7 +91,7 @@
   }
 
   /* ═══════════════════════════════════════════════════════
-     HEADER — estructura de 3 columnas igual que index.html
+     HEADER
   ═══════════════════════════════════════════════════════ */
   .header {
     background: var(--bg-secondary);
@@ -99,7 +102,6 @@
     z-index: 100;
     backdrop-filter: blur(10px);
   }
-
   .header-content {
     max-width: 1800px;
     margin: 0 auto;
@@ -107,74 +109,21 @@
     justify-content: space-between;
     align-items: center;
   }
-
-  /* Columna 1: brand */
   .header-brand { flex: 1; }
-
-  .brand-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-  }
+  .brand-title { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
   .brand-title a { color: inherit; text-decoration: none; }
   .brand-title a:hover { color: var(--blue); }
-
-  .brand-subtitle {
-    font-size: 0.75rem;
-    color: var(--text-tertiary);
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  /* Columna 2: nav-links centrado */
-  .page-nav-links {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .page-nav-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
+  .brand-subtitle { font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+  .page-nav-links { flex: 1; display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
+  .page-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
   .page-nav-links a:hover { color: var(--text-primary); }
-
-  /* Columna 3: info / status */
-  .header-info {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 2rem;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-  }
-
-  .info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  /* Punto animado verde (live) */
-  .status-live {
-    width: 8px;
-    height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-    flex-shrink: 0;
-  }
+  .header-info { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 2rem; font-size: 0.8125rem; color: var(--text-secondary); }
+  .info-item { display: flex; align-items: center; gap: 0.5rem; }
+  .status-live { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
   /* ═══════════════════════════════════════════════════════
-     NAV TABS — igual que index.html
+     NAV TABS
   ═══════════════════════════════════════════════════════ */
   .nav-tabs {
     background: var(--bg-secondary);
@@ -186,7 +135,6 @@
     margin: 0 auto;
     overflow-x: auto;
   }
-
   .nav-tab {
     padding: 1rem 1.5rem;
     background: transparent;
@@ -210,105 +158,78 @@
   /* ═══════════════════════════════════════════════════════
      PAGE CONTENT
   ═══════════════════════════════════════════════════════ */
-  .page-wrap {
-    max-width: 1800px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
+  .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
   .page-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 0.75rem;
   }
-  .page-title {
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--text-primary);
-  }
+  .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
 
   /* ═══════════════════════════════════════════════════════
-     FILTER BAR
+     VIEW TOGGLE (Titulares / Análisis por divisa)
   ═══════════════════════════════════════════════════════ */
-  .filter-bar {
+  .view-toggle {
     display: flex;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    align-items: center;
+    gap: 0.25rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.18rem;
   }
-  .filter-btn {
+  .view-btn {
     font-size: 0.72rem;
     font-weight: 500;
-    padding: 0.25rem 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    padding: 0.3rem 0.75rem;
+    border: none;
+    border-radius: 3px;
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s;
     font-family: inherit;
+    white-space: nowrap;
   }
+  .view-btn.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .view-btn:hover:not(.active) { color: var(--text-primary); }
+
+  /* ═══════════════════════════════════════════════════════
+     FILTER BAR
+  ═══════════════════════════════════════════════════════ */
+  .filter-bar { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+  .filter-btn { font-size: 0.72rem; font-weight: 500; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-family: inherit; }
   .filter-btn:hover  { border-color: var(--border-hover); color: var(--text-primary); }
   .filter-btn.active { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); font-weight: 600; }
   .filter-btn.active-green { background: rgba(38,166,154,.1); border-color: var(--green); color: var(--green); font-weight: 600; }
   .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 0.15rem; }
 
   /* ═══════════════════════════════════════════════════════
-     LAYOUT 2 COLUMNAS
+     LAYOUT 2 COLUMNAS (vista titulares)
   ═══════════════════════════════════════════════════════ */
-  .layout-cols {
-    display: grid;
-    grid-template-columns: 1fr 268px;
-    gap: 1rem;
-    align-items: start;
-  }
+  .layout-cols { display: grid; grid-template-columns: 1fr 268px; gap: 1rem; align-items: start; }
 
   /* ═══════════════════════════════════════════════════════
      NEWS PANEL
   ═══════════════════════════════════════════════════════ */
-  .news-panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
+  .news-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
   .panel-header {
-    display: grid;
-    grid-template-columns: 36px 60px 60px 1fr 52px;
-    gap: 0;
-    padding: 0.5rem 0.75rem;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.63rem;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    display: grid; grid-template-columns: 36px 60px 60px 1fr 52px; gap: 0;
+    padding: 0.5rem 0.75rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    font-size: 0.63rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase;
   }
-
   .news-row {
-    display: grid;
-    grid-template-columns: 36px 60px 60px 1fr 52px;
-    gap: 0;
-    padding: 0.42rem 0.75rem;
-    border-bottom: 1px solid rgba(48,54,61,.6);
-    cursor: pointer;
-    transition: background 0.1s;
-    align-items: center;
+    display: grid; grid-template-columns: 36px 60px 60px 1fr 52px; gap: 0;
+    padding: 0.42rem 0.75rem; border-bottom: 1px solid rgba(48,54,61,.6);
+    cursor: pointer; transition: background 0.1s; align-items: center;
   }
   .news-row:last-child  { border-bottom: none; }
   .news-row:hover       { background: var(--bg-elevated); }
   .news-row.featured    { background: rgba(30,136,229,.05); border-left: 2px solid var(--blue); }
   .news-row.featured:hover { background: rgba(30,136,229,.08); }
-
   .col-time   { font-size: 0.68rem; color: var(--text-dim); white-space: nowrap; }
   .col-cur    { font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; display: flex; align-items: center; gap: 0.3rem; }
   .col-impact { display: flex; align-items: center; }
@@ -316,54 +237,25 @@
   .impact-high .impact-dot { background: var(--red); }
   .impact-med  .impact-dot { background: var(--orange); }
   .impact-low  .impact-dot { background: var(--text-dim); }
-
-  .col-title {
-    font-size: 0.78rem;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 0.75rem;
-    font-weight: 400;
-  }
+  .col-title { font-size: 0.78rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 0.75rem; font-weight: 400; }
   .news-row.featured .col-title { font-weight: 500; }
   .col-source { font-size: 0.62rem; color: var(--text-dim); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
   .news-expand {
-    display: none;
-    grid-column: 1 / -1;
+    display: none; grid-column: 1 / -1;
     padding: 0.6rem 0.75rem 0.75rem 1.5rem;
     border-bottom: 1px solid rgba(48,54,61,.6);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    line-height: 1.65;
-    background: rgba(255,255,255,.01);
-    border-left: 2px solid var(--border);
+    font-size: 0.75rem; color: var(--text-secondary); line-height: 1.65;
+    background: rgba(255,255,255,.01); border-left: 2px solid var(--border);
   }
   .news-row.open + .news-expand { display: block; }
-
   .load-more {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.7rem;
-    font-size: 0.72rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: color 0.15s;
-    gap: 0.35rem;
-    border-top: 1px solid var(--border);
-    background: var(--bg-secondary);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0.7rem; font-size: 0.72rem; color: var(--text-secondary);
+    cursor: pointer; transition: color 0.15s; gap: 0.35rem;
+    border-top: 1px solid var(--border); background: var(--bg-secondary);
   }
   .load-more:hover { color: var(--blue); }
-
-  .feed-empty {
-    padding: 2.5rem 1.5rem;
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.82rem;
-    line-height: 1.7;
-  }
+  .feed-empty { padding: 2.5rem 1.5rem; text-align: center; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.7; }
   .feed-empty a { color: var(--blue); text-decoration: none; }
   .feed-empty a:hover { text-decoration: underline; }
   .feed-error-icon { font-size: 2rem; margin-bottom: 0.75rem; }
@@ -373,39 +265,13 @@
   ═══════════════════════════════════════════════════════ */
   .sidebar { display: flex; flex-direction: column; gap: 1rem; }
   .s-panel  { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-  .s-header {
-    padding: 0.55rem 1rem;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  .s-header { padding: 0.55rem 1rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .s-title { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); }
   .s-sub   { font-size: 0.62rem; color: var(--text-dim); }
-
-  /* ── Sentiment rows ── */
-  .sent-row {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.48rem 1rem;
-    border-bottom: 1px solid rgba(48,54,61,.5);
-    cursor: default;
-    transition: background 0.12s;
-  }
+  .sent-row { display: flex; align-items: center; gap: 0.55rem; padding: 0.48rem 1rem; border-bottom: 1px solid rgba(48,54,61,.5); cursor: default; transition: background 0.12s; }
   .sent-row:last-child { border-bottom: none; }
   .sent-row:hover { background: rgba(255,255,255,.02); }
-  .sent-cur {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    width: 50px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.28rem;
-  }
+  .sent-cur { font-size: 0.68rem; font-weight: 600; color: var(--text-primary); width: 50px; flex-shrink: 0; display: flex; align-items: center; gap: 0.28rem; }
   .sent-track  { flex: 1; height: 4px; background: rgba(48,54,61,.8); border-radius: 2px; overflow: hidden; position: relative; }
   .sent-fill   { height: 100%; border-radius: 2px; transition: width 0.35s ease; }
   .sent-fill.bull   { background: var(--green); }
@@ -420,8 +286,6 @@
   .sent-label.neut   { color: var(--text-dim); }
   .sent-label.mixed  { color: var(--orange); }
   .sent-label.nodata { color: var(--text-tertiary); font-weight: 400; }
-
-  /* ── Coverage ── */
   .cov-row { display: flex; align-items: center; gap: 0.55rem; padding: 0.45rem 1rem; border-bottom: 1px solid rgba(48,54,61,.5); }
   .cov-row:last-child { border-bottom: none; }
   .cov-cur   { font-size: 0.68rem; font-weight: 600; color: var(--text-primary); width: 50px; flex-shrink: 0; display: flex; align-items: center; gap: 0.28rem; }
@@ -429,8 +293,6 @@
   .cov-fill  { height: 100%; border-radius: 2px; }
   .cov-count { font-size: 0.6rem; color: var(--text-dim); width: 18px; text-align: right; }
   .cov-badge { font-size: 0.55rem; font-weight: 700; padding: 0.07rem 0.28rem; border-radius: 2px; flex-shrink: 0; }
-
-  /* ── Events ── */
   .ev-row { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.55rem 1rem; border-bottom: 1px solid rgba(48,54,61,.5); }
   .ev-row:last-child { border-bottom: none; }
   .ev-left { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; width: 42px; flex-shrink: 0; padding-top: 0.1rem; }
@@ -444,144 +306,205 @@
   .ev-empty { padding: 0.85rem 1rem; font-size: 0.72rem; color: var(--text-dim); }
 
   /* ═══════════════════════════════════════════════════════
-     FOOTER
+     CURRENCY ANALYSIS GRID (vista análisis)
   ═══════════════════════════════════════════════════════ */
-  .footer {
-    margin-top: 4rem;
-    padding: 2rem;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    color: var(--text-tertiary);
-    font-size: 0.75rem;
+  #view-analysis { display: none; }
+
+  .analysis-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .analysis-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .currency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 0.75rem;
+  }
+
+  /* ── Currency card ── */
+  .cur-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .cur-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .cur-card.bull  { border-left: 3px solid var(--green); }
+  .cur-card.bear  { border-left: 3px solid var(--red); }
+  .cur-card.neut  { border-left: 3px solid var(--text-dim); }
+  .cur-card.mixed { border-left: 3px solid var(--orange); }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.9rem 0.55rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .cur-id { display: flex; align-items: center; gap: 0.45rem; }
+  .cur-flag { border-radius: 2px; flex-shrink: 0; }
+  .cur-code { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.04em; }
+  .cur-full-name { font-size: 0.63rem; color: var(--text-dim); font-weight: 400; margin-left: 0.1rem; }
+  .head-right { display: flex; align-items: center; gap: 0.6rem; }
+
+  .sent-badge {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 3px;
+  }
+  .sent-badge.bull  { background: var(--green-dim); border: 1px solid rgba(38,166,154,.3); color: var(--green); }
+  .sent-badge.bear  { background: var(--red-dim);   border: 1px solid rgba(239,83,80,.3);  color: var(--red); }
+  .sent-badge.neut  { background: rgba(107,117,133,.1); border: 1px solid rgba(107,117,133,.25); color: var(--text-dim); }
+  .sent-badge.mixed { background: var(--orange-dim); border: 1px solid rgba(224,160,32,.25); color: var(--orange); }
+
+  .src-count { font-size: 0.6rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  .conf-bar-wrap { padding: 0.5rem 0.9rem 0; display: flex; align-items: center; gap: 0.6rem; }
+  .conf-track { flex: 1; height: 3px; background: rgba(48,54,61,.9); border-radius: 2px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .conf-fill.bull  { background: var(--green); }
+  .conf-fill.bear  { background: var(--red); }
+  .conf-fill.neut  { background: var(--text-dim); }
+  .conf-fill.mixed { background: linear-gradient(90deg, var(--green) 50%, var(--red) 50%); }
+  .conf-label { font-size: 0.6rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); width: 30px; text-align: right; flex-shrink: 0; }
+
+  .card-body { padding: 0.65rem 0.9rem 0.7rem; }
+  .analysis-text { font-size: 0.775rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 0.7rem; }
+
+  .drivers { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.65rem; }
+  .driver-chip {
+    font-size: 0.58rem; font-weight: 600; padding: 0.18rem 0.45rem; border-radius: 3px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    color: var(--text-secondary); letter-spacing: 0.03em; text-transform: uppercase;
+  }
+
+  .card-event {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: var(--blue-dim); border: 1px solid rgba(30,136,229,.15);
+    border-radius: 4px; font-size: 0.68rem; color: var(--text-secondary);
+  }
+  .card-event .ev-icon  { font-size: 0.75rem; flex-shrink: 0; }
+  .card-event .ev-label { color: var(--blue); font-weight: 600; margin-right: 0.2rem; }
+
+  .card-foot {
+    padding: 0.4rem 0.9rem;
+    background: rgba(0,0,0,.15);
+    border-top: 1px solid rgba(48,54,61,.5);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .foot-sources { font-size: 0.58rem; color: var(--text-dim); }
+  .foot-ts { font-size: 0.58rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .foot-ai { font-size: 0.52rem; font-weight: 700; color: var(--blue); border: 1px solid rgba(30,136,229,.3); border-radius: 2px; padding: 0.05rem 0.22rem; }
+
+  /* Skeleton loader para cards */
+  .card-skeleton {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    border-left: 3px solid var(--border);
+  }
+  .sk-head { padding: 0.65rem 0.9rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+  .sk-body { padding: 0.65rem 0.9rem 0.7rem; }
+  .sk-line {
+    height: 10px; border-radius: 3px; margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,.04) 50%, var(--bg-elevated) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .sk-line.w40 { width: 40%; }
+  .sk-line.w70 { width: 70%; }
+  .sk-line.w55 { width: 55%; }
+  .sk-line.w85 { width: 85%; }
+  .sk-line.w100 { width: 100%; }
+
+  /* No-data card */
+  .cur-card.no-data { opacity: 0.5; }
+  .no-data-msg { font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 1.2rem 0.9rem; }
+
+  /* ═══════════════════════════════════════════════════════
+     AI BADGE
+  ═══════════════════════════════════════════════════════ */
+  .ai-tag {
+    font-size: 0.52rem; font-weight: 700; color: var(--blue);
+    border: 1px solid rgba(30,136,229,.35); border-radius: 2px;
+    padding: 0.05rem 0.22rem; vertical-align: middle;
   }
 
   /* ═══════════════════════════════════════════════════════
-     RESPONSIVE — mismo breakpoint que index.html
+     FOOTER
+  ═══════════════════════════════════════════════════════ */
+  .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
+
+  /* ═══════════════════════════════════════════════════════
+     RESPONSIVE
   ═══════════════════════════════════════════════════════ */
   @media (max-width: 1200px) {
     .layout-cols { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 768px) {
-    /* Header mobile — igual que index.html */
     .header { padding: 0.75rem 1rem; }
-
-    .header-content {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-
-    /* brand */
+    .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     .header-brand .brand-title { font-size: 1rem; }
-
-    /* nav-links: visible y wrapping en mobile */
-    .page-nav-links {
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 0.5rem 1.25rem;
-    }
+    .page-nav-links { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
     .page-nav-links a { white-space: nowrap; }
-
-    /* info block */
-    .header-info {
-      width: 100%;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 0.5rem 1rem;
-      font-size: 0.75rem;
-    }
-
-    /* nav tabs */
-    .nav-tabs {
-      padding: 0 0.25rem;
-      gap: 0;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
+    .header-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; }
+    .nav-tabs { padding: 0 0.25rem; gap: 0; scrollbar-width: none; -ms-overflow-style: none; }
     .nav-tabs::-webkit-scrollbar { display: none; }
     .nav-tab { padding: 0.7rem 0.85rem; font-size: 0.73rem; }
-
-    /* page content */
     .page-wrap { padding: 0.75rem 0.75rem 3rem; }
     .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
     .page-title { font-size: 0.9rem; }
-
-    /* filter bar */
     .filter-bar { gap: 0.2rem; }
     .filter-btn { font-size: 0.67rem; padding: 0.2rem 0.5rem; }
     .filter-sep { display: none; }
-
-    /* panel header mobile — 3 cols */
-    .panel-header {
-      display: grid;
-      grid-template-columns: 28px 1fr 42px;
-      padding: 0.4rem 0.65rem;
-      gap: 0;
-      align-items: center;
-    }
-    .panel-header span:nth-child(1),
-    .panel-header span:nth-child(2),
-    .panel-header span:nth-child(5) { display: none; }
+    .panel-header { display: grid; grid-template-columns: 28px 1fr 42px; padding: 0.4rem 0.65rem; gap: 0; align-items: center; }
+    .panel-header span:nth-child(1), .panel-header span:nth-child(2), .panel-header span:nth-child(5) { display: none; }
     .panel-header span:nth-child(3) { grid-column: 1; text-align: center; }
     .panel-header span:nth-child(4) { grid-column: 2; padding: 0 0.5rem; }
-    .panel-header::after {
-      content: 'Hora';
-      grid-column: 3;
-      font-size: 0.63rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      text-align: right;
-    }
-
-    /* news row mobile — 3 cols */
-    .news-row {
-      display: grid;
-      grid-template-columns: 28px 1fr 42px;
-      padding: 0.5rem 0.65rem;
-      gap: 0;
-      align-items: center;
-    }
+    .panel-header::after { content: 'Hora'; grid-column: 3; font-size: 0.63rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.06em; text-transform: uppercase; text-align: right; }
+    .news-row { display: grid; grid-template-columns: 28px 1fr 42px; padding: 0.5rem 0.65rem; gap: 0; align-items: center; }
     .col-cur    { display: none; }
     .col-source { display: none; }
     .col-impact { grid-column: 1; display: flex; align-items: center; justify-content: center; }
     .impact-dot { width: 8px; height: 8px; }
-    .col-title  {
-      grid-column: 2;
-      padding: 0 0.5rem;
-      font-size: 0.77rem;
-      white-space: normal;
-      line-height: 1.35;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    .col-title  { grid-column: 2; padding: 0 0.5rem; font-size: 0.77rem; white-space: normal; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .col-time { grid-column: 3; font-size: 0.63rem; text-align: right; white-space: nowrap; }
     .news-expand { grid-column: 1 / -1; padding: 0.5rem 0.65rem 0.65rem; font-size: 0.73rem; }
-
     .sidebar    { gap: 0.75rem; margin-top: 0.75rem; }
     .load-more  { font-size: 0.75rem; padding: 0.85rem; }
+    .currency-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .analysis-text { font-size: 0.73rem; }
+    .view-toggle { margin-left: auto; }
   }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════
-     HEADER — 3 columnas, mismo que index.html
-═══════════════════════════════════════════════════════ -->
+<!-- HEADER -->
 <div class="header">
   <div class="header-content">
-
-    <!-- Col 1: Brand -->
     <div class="header-brand">
       <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
       <div class="brand-subtitle">Dashboard Profesional</div>
     </div>
-
-    <!-- Col 2: Nav links centrado -->
     <div class="page-nav-links">
       <a href="about.html">Acerca de</a>
       <a href="terms.html">Términos</a>
@@ -589,21 +512,16 @@
       <a href="contact.html">Contacto</a>
       <a href="about.html#recursos">Guías</a>
     </div>
-
-    <!-- Col 3: Status info -->
     <div class="header-info">
       <div class="info-item">
         <div class="status-live"></div>
         <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     NAV TABS — mismo que index.html
-═══════════════════════════════════════════════════════ -->
+<!-- NAV TABS -->
 <div class="nav-tabs">
   <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
   <a href="index.html?tab=heatmap"  class="nav-tab">Mapa de Calor</a>
@@ -613,86 +531,111 @@
   <a href="news.html"               class="nav-tab active">Noticias</a>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MAIN CONTENT
-═══════════════════════════════════════════════════════ -->
+<!-- MAIN CONTENT -->
 <main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
+    <!-- Toggle de vista -->
+    <div class="view-toggle" role="group" aria-label="Cambiar vista">
+      <button class="view-btn active" id="btn-headlines" onclick="setView('headlines')">☰ Titulares</button>
+      <button class="view-btn"        id="btn-analysis"  onclick="setView('analysis')">⬛ Por Divisa <span class="ai-tag">AI</span></button>
+    </div>
   </div>
 
-  <!-- Filter bar -->
-  <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
-    <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
-    <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
-    <button class="filter-btn" onclick="setFilter('EUR',this)"><img src="https://flagcdn.com/16x12/eu.png" srcset="https://flagcdn.com/32x24/eu.png 2x" width="16" height="12" alt="EU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> EUR</button>
-    <button class="filter-btn" onclick="setFilter('GBP',this)"><img src="https://flagcdn.com/16x12/gb.png" srcset="https://flagcdn.com/32x24/gb.png 2x" width="16" height="12" alt="GB" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> GBP</button>
-    <button class="filter-btn" onclick="setFilter('JPY',this)"><img src="https://flagcdn.com/16x12/jp.png" srcset="https://flagcdn.com/32x24/jp.png 2x" width="16" height="12" alt="JP" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> JPY</button>
-    <button class="filter-btn" onclick="setFilter('AUD',this)"><img src="https://flagcdn.com/16x12/au.png" srcset="https://flagcdn.com/32x24/au.png 2x" width="16" height="12" alt="AU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> AUD</button>
-    <button class="filter-btn" onclick="setFilter('CAD',this)"><img src="https://flagcdn.com/16x12/ca.png" srcset="https://flagcdn.com/32x24/ca.png 2x" width="16" height="12" alt="CA" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CAD</button>
-    <button class="filter-btn" onclick="setFilter('CHF',this)"><img src="https://flagcdn.com/16x12/ch.png" srcset="https://flagcdn.com/32x24/ch.png 2x" width="16" height="12" alt="CH" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CHF</button>
-    <button class="filter-btn" onclick="setFilter('NZD',this)"><img src="https://flagcdn.com/16x12/nz.png" srcset="https://flagcdn.com/32x24/nz.png 2x" width="16" height="12" alt="NZ" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> NZD</button>
-    <div class="filter-sep" aria-hidden="true"></div>
-    <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
-  </div>
+  <!-- ══════════════════════════
+       VISTA 1: TITULARES
+  ══════════════════════════ -->
+  <div id="view-headlines">
+    <!-- Filter bar -->
+    <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
+      <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
+      <button class="filter-btn" onclick="setFilter('USD',this)"><img src="https://flagcdn.com/16x12/us.png" srcset="https://flagcdn.com/32x24/us.png 2x" width="16" height="12" alt="US" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> USD</button>
+      <button class="filter-btn" onclick="setFilter('EUR',this)"><img src="https://flagcdn.com/16x12/eu.png" srcset="https://flagcdn.com/32x24/eu.png 2x" width="16" height="12" alt="EU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> EUR</button>
+      <button class="filter-btn" onclick="setFilter('GBP',this)"><img src="https://flagcdn.com/16x12/gb.png" srcset="https://flagcdn.com/32x24/gb.png 2x" width="16" height="12" alt="GB" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> GBP</button>
+      <button class="filter-btn" onclick="setFilter('JPY',this)"><img src="https://flagcdn.com/16x12/jp.png" srcset="https://flagcdn.com/32x24/jp.png 2x" width="16" height="12" alt="JP" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> JPY</button>
+      <button class="filter-btn" onclick="setFilter('AUD',this)"><img src="https://flagcdn.com/16x12/au.png" srcset="https://flagcdn.com/32x24/au.png 2x" width="16" height="12" alt="AU" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> AUD</button>
+      <button class="filter-btn" onclick="setFilter('CAD',this)"><img src="https://flagcdn.com/16x12/ca.png" srcset="https://flagcdn.com/32x24/ca.png 2x" width="16" height="12" alt="CA" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CAD</button>
+      <button class="filter-btn" onclick="setFilter('CHF',this)"><img src="https://flagcdn.com/16x12/ch.png" srcset="https://flagcdn.com/32x24/ch.png 2x" width="16" height="12" alt="CH" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CHF</button>
+      <button class="filter-btn" onclick="setFilter('NZD',this)"><img src="https://flagcdn.com/16x12/nz.png" srcset="https://flagcdn.com/32x24/nz.png 2x" width="16" height="12" alt="NZ" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> NZD</button>
+      <div class="filter-sep" aria-hidden="true"></div>
+      <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
+    </div>
 
-  <!-- 2-column layout -->
-  <div class="layout-cols">
+    <div class="layout-cols">
+      <!-- Feed principal -->
+      <section aria-label="Feed de noticias forex">
+        <div class="news-panel">
+          <div class="panel-header" aria-hidden="true">
+            <span>Hora</span>
+            <span>Divisa</span>
+            <span>Imp.</span>
+            <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
+            <span style="text-align:right;">Fuente</span>
+          </div>
+          <div id="feed-body" role="feed" aria-busy="true" aria-label="Noticias forex">
+            <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
+              <div style="margin-bottom:.5rem;">⏳</div>Cargando noticias…
+            </div>
+          </div>
+          <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">↓ Cargar más noticias</div>
+        </div>
+      </section>
 
-    <!-- Main feed -->
-    <section aria-label="Feed de noticias forex">
-      <div class="news-panel">
-        <div class="panel-header" aria-hidden="true">
-          <span>Hora</span>
-          <span>Divisa</span>
-          <span>Imp.</span>
-          <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
-          <span style="text-align:right;">Fuente</span>
-        </div>
-        <div id="feed-body" role="feed" aria-busy="true" aria-label="Noticias forex">
-          <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
-            <div style="margin-bottom:.5rem;">⏳</div>Cargando noticias…
+      <!-- Sidebar -->
+      <aside aria-label="Panel lateral">
+        <div class="sidebar">
+          <div class="s-panel">
+            <div class="s-header">
+              <span class="s-title">Sentimiento 24h</span>
+              <span class="s-sub">ponderado · decay</span>
+            </div>
+            <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
+          </div>
+          <div class="s-panel">
+            <div class="s-header">
+              <span class="s-title">Próximos eventos</span>
+              <span class="s-sub">hoy/mañana · hora local</span>
+            </div>
+            <div id="upcoming-events">
+              <div class="ev-empty">Cargando eventos…</div>
+            </div>
+          </div>
+          <div class="s-panel">
+            <div class="s-header">
+              <span class="s-title">Cobertura por divisa</span>
+              <span class="s-sub">últimas 72h</span>
+            </div>
+            <div id="coverage-body"></div>
           </div>
         </div>
-        <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">↓ Cargar más noticias</div>
-      </div>
-    </section>
+      </aside>
+    </div>
+  </div><!-- /#view-headlines -->
 
-    <!-- Sidebar -->
-    <aside aria-label="Panel lateral">
-      <div class="sidebar">
-        <div class="s-panel">
-          <div class="s-header">
-            <span class="s-title">Sentimiento 24h</span>
-            <span class="s-sub">ponderado · decay</span>
-          </div>
-          <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
-        </div>
-        <div class="s-panel">
-          <div class="s-header">
-            <span class="s-title">Próximos eventos</span>
-            <span class="s-sub">hoy/mañana · hora local</span>
-          </div>
-          <div id="upcoming-events">
-            <div class="ev-empty">Cargando eventos…</div>
-          </div>
-        </div>
-        <div class="s-panel">
-          <div class="s-header">
-            <span class="s-title">Cobertura por divisa</span>
-            <span class="s-sub">últimas 72h</span>
-          </div>
-          <div id="coverage-body"></div>
-        </div>
-      </div>
-    </aside>
+  <!-- ══════════════════════════
+       VISTA 2: ANÁLISIS POR DIVISA
+  ══════════════════════════ -->
+  <div id="view-analysis">
+    <div class="analysis-section-label">
+      Análisis consolidado AI · 8 divisas principales
+      <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+    </div>
+    <div class="currency-grid" id="currency-grid">
+      <!-- Skeletons mientras carga -->
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w55"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w85"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w55"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w70"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w55"></div><div class="sk-line w85"></div></div></div>
+      <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w70"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
+    </div>
+  </div><!-- /#view-analysis -->
 
-  </div><!-- /.layout-cols -->
 </main>
 
-<!-- ═══════════════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
 <div class="footer">
   <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
@@ -713,7 +656,7 @@
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
       © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.5.1
+    Dashboard v5.5.2
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html"  style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -725,7 +668,7 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
-     JAVASCRIPT — sin cambios funcionales
+     JAVASCRIPT
 ═══════════════════════════════════════════════════════ -->
 <script>
 'use strict';
@@ -751,7 +694,35 @@ function flagImg(cur,px=16){
   return `<img src="https://flagcdn.com/${w}x${h}/${code}.png" srcset="https://flagcdn.com/${w2}x${h2}/${code}.png 2x" width="${w}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ── CURRENCY DETECTION ────────────────────────────────────────────────────────
+// ── CURRENCY DATA ─────────────────────────────────────────────────────────────
+const CURRENCY_NAMES = {
+  USD:'Dólar Estadounidense', EUR:'Euro', GBP:'Libra Esterlina',
+  JPY:'Yen Japonés', AUD:'Dólar Australiano', CAD:'Dólar Canadiense',
+  CHF:'Franco Suizo', NZD:'Dólar Neozelandés',
+};
+const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+
+const SENT_LABELS = {
+  bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto',
+};
+
+// ── VIEW TOGGLE ───────────────────────────────────────────────────────────────
+let currentView = 'headlines';
+let summariesLoaded = false;
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('view-headlines').style.display = view === 'headlines' ? '' : 'none';
+  document.getElementById('view-analysis').style.display  = view === 'analysis'  ? '' : 'none';
+  document.getElementById('btn-headlines').classList.toggle('active', view === 'headlines');
+  document.getElementById('btn-analysis').classList.toggle('active',  view === 'analysis');
+
+  if (view === 'analysis' && !summariesLoaded) {
+    loadSummaries();
+  }
+}
+
+// ── CURRENCY DETECTION (para fallback) ───────────────────────────────────────
 const PAIR_PROTAGONIST_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
@@ -854,8 +825,7 @@ function scoreSentiment(article) {
   if(b>r)return'bull';if(r>b)return'bear';return'neut';
 }
 
-// ── COMPUTE SENTIMENT ────────────────────────────────────────────────────────
-const CURRENCIES   = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+// ── COMPUTE SENTIMENT (sidebar) ───────────────────────────────────────────────
 const IMPACT_W     = { high:3, med:1.5, low:0.5 };
 const DECAY_H_BY_IMPACT = { high: 8, med: 16, low: 28 };
 
@@ -1015,6 +985,155 @@ function loadMore(){visible+=PAGE;renderFeed();}
 function toggleExpand(row){const was=row.classList.contains('open');document.querySelectorAll('.news-row.open').forEach(r=>r.classList.remove('open'));if(!was)row.classList.add('open');}
 function setFilter(val,btn){document.querySelectorAll('.filter-btn:not(.impact-btn)').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=val;visible=PAGE;renderFeed();}
 function toggleImpact(btn){btn.classList.toggle('active-green');highOnly=btn.classList.contains('active-green');visible=PAGE;renderFeed();}
+
+// ── CURRENCY ANALYSIS CARDS ───────────────────────────────────────────────────
+async function loadSummaries() {
+  const grid = document.getElementById('currency-grid');
+  const updEl = document.getElementById('summaries-updated');
+
+  try {
+    const res = await fetch(`news-data/summaries.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const summaries = data.summaries || {};
+
+    if (updEl && data.updated_label) {
+      updEl.textContent = '· ' + data.updated_label;
+    }
+
+    grid.innerHTML = '';
+    CURRENCIES.forEach(cur => {
+      const s = summaries[cur];
+      if (!s) {
+        grid.innerHTML += renderSkeletonCard();
+        return;
+      }
+      grid.innerHTML += renderCurrencyCard(cur, s);
+    });
+
+    summariesLoaded = true;
+
+  } catch (err) {
+    console.warn('summaries.json no disponible:', err.message);
+    // Fallback: construir desde allArticles si ya están cargados
+    if (allArticles.length > 0) {
+      grid.innerHTML = '';
+      CURRENCIES.forEach(cur => {
+        const curArts = allArticles.filter(a => a.cur === cur);
+        grid.innerHTML += renderCurrencyCardFromArticles(cur, curArts);
+      });
+      summariesLoaded = true;
+      if (updEl) updEl.textContent = '· calculado desde titulares';
+    } else {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">⚠️ Análisis no disponible. Intente en el próximo ciclo de actualización.</div>';
+    }
+  }
+}
+
+function renderCurrencyCard(cur, s) {
+  const sent      = s.sentiment || 'neut';
+  const conf      = s.confidence || 0;
+  const analysis  = s.analysis  || 'Sin análisis disponible.';
+  const drivers   = s.drivers   || [];
+  const upcoming  = s.upcoming_event || null;
+  const sources   = (s.sources || []).join(' · ') || '—';
+  const count     = s.articles_count || 0;
+  const isAI      = s.ai_generated !== false;
+
+  const sentLabel = SENT_LABELS[sent] || 'Neutral';
+  const flagHtml  = flagImg(cur, 20);
+  const fullName  = CURRENCY_NAMES[cur] || cur;
+
+  let latestTime = '';
+  if (s.latest_ts && s.latest_ts > 0) {
+    const ms = s.latest_ts < 1e10 ? s.latest_ts * 1000 : s.latest_ts;
+    latestTime = new Date(ms).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit',hour12:false});
+  }
+
+  const driversHtml = drivers.length
+    ? `<div class="drivers">${drivers.map(d=>`<span class="driver-chip">${esc(d)}</span>`).join('')}</div>`
+    : '';
+
+  const upcomingHtml = upcoming
+    ? `<div class="card-event"><span class="ev-icon">📅</span><span><span class="ev-label">Próximo</span>${esc(upcoming)}</span></div>`
+    : '';
+
+  const noDataClass = count === 0 ? ' no-data' : '';
+
+  return `<div class="cur-card ${sent}${noDataClass}">
+    <div class="card-head">
+      <div class="cur-id">
+        ${flagHtml}
+        <span class="cur-code">${esc(cur)}</span>
+        <span class="cur-full-name">${esc(fullName)}</span>
+      </div>
+      <div class="head-right">
+        <span class="src-count">${count} art.</span>
+        <span class="sent-badge ${sent}">${esc(sentLabel)}</span>
+      </div>
+    </div>
+    <div class="conf-bar-wrap">
+      <div class="conf-track">
+        <div class="conf-fill ${sent}" style="width:${Math.min(100,conf)}%"></div>
+      </div>
+      <span class="conf-label">${conf}%</span>
+    </div>
+    <div class="card-body">
+      ${count === 0
+        ? `<div class="no-data-msg">Sin cobertura en las últimas 72h.</div>`
+        : `<p class="analysis-text">${esc(analysis)}</p>${driversHtml}${upcomingHtml}`
+      }
+    </div>
+    <div class="card-foot">
+      <span class="foot-sources">${esc(sources)}</span>
+      <span style="display:flex;align-items:center;gap:.35rem;">
+        ${isAI ? '<span class="foot-ai">AI</span>' : ''}
+        <span class="foot-ts">${latestTime || '--:--'}</span>
+      </span>
+    </div>
+  </div>`;
+}
+
+function renderCurrencyCardFromArticles(cur, articles) {
+  // Fallback sin summaries.json: sentimiento estadístico desde artículos
+  const count = articles.length;
+  if (count === 0) {
+    return renderCurrencyCard(cur, {
+      sentiment:'neut', confidence:0, analysis:'Sin cobertura en las últimas 72h.',
+      drivers:[], upcoming_event:null, sources:[], articles_count:0,
+      latest_ts:0, ai_generated:false,
+    });
+  }
+  const sents = articles.map(a => scoreSentiment(a));
+  const bull  = sents.filter(s=>s==='bull').length;
+  const bear  = sents.filter(s=>s==='bear').length;
+  const mixed = sents.filter(s=>s==='mixed').length;
+  let dominant = 'neut', conf = 30;
+  if (bull > bear && bull > mixed) { dominant='bull'; conf=Math.round((bull/count)*100); }
+  else if (bear > bull && bear > mixed) { dominant='bear'; conf=Math.round((bear/count)*100); }
+  else if (mixed>0||(bull>0&&bear>0)) { dominant='mixed'; conf=50; }
+
+  const sources = [...new Set(articles.map(a=>a.source).filter(Boolean))].slice(0,3);
+  const latest  = Math.max(...articles.map(a=>a.ts||0));
+  const analysis = `Análisis estadístico basado en ${count} artículos. ${bull} alcistas · ${bear} bajistas · ${mixed} mixtos. El resumen AI estará disponible en el próximo ciclo.`;
+
+  return renderCurrencyCard(cur, {
+    sentiment: dominant, confidence: Math.min(95,conf),
+    analysis, drivers: [], upcoming_event: null,
+    sources, articles_count: count, latest_ts: latest, ai_generated: false,
+  });
+}
+
+function renderSkeletonCard() {
+  return `<div class="card-skeleton">
+    <div class="sk-head"><div class="sk-line w40"></div></div>
+    <div class="sk-body">
+      <div class="sk-line w100"></div>
+      <div class="sk-line w85"></div>
+      <div class="sk-line w70"></div>
+    </div>
+  </div>`;
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function initFeed(){
