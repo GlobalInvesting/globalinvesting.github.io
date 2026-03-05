@@ -53,9 +53,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* ═══════════════════════════════════════════════════════
-     RESET & ROOT
-  ═══════════════════════════════════════════════════════ */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
@@ -90,9 +87,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ═══════════════════════════════════════════════════════
-     HEADER
-  ═══════════════════════════════════════════════════════ */
   .header {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -122,44 +116,18 @@
   .status-live { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  /* ═══════════════════════════════════════════════════════
-     NAV TABS
-  ═══════════════════════════════════════════════════════ */
-  .nav-tabs-wrap {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-tabs {
-    padding: 0 2rem;
-    display: flex;
-    gap: 0.5rem;
-    max-width: 1800px;
-    margin: 0 auto;
-    overflow-x: auto;
-  }
+  .nav-tabs-wrap { background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+  .nav-tabs { padding: 0 2rem; display: flex; gap: 0.5rem; max-width: 1800px; margin: 0 auto; overflow-x: auto; }
   .nav-tab {
-    padding: 1rem 1.5rem;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.6;
+    padding: 1rem 1.5rem; background: transparent; border: none;
+    color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
+    text-decoration: none; display: flex; align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6;
   }
   .nav-tab:hover  { color: var(--text-primary); }
   .nav-tab.active { color: var(--text-primary); border-bottom-color: var(--blue); }
 
-  /* ═══════════════════════════════════════════════════════
-     PAGE CONTENT
-  ═══════════════════════════════════════════════════════ */
   .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
   .page-title-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -168,40 +136,18 @@
   }
   .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
 
-  /* ═══════════════════════════════════════════════════════
-     VIEW TOGGLE
-  ═══════════════════════════════════════════════════════ */
   .view-toggle {
-    display: flex;
-    gap: 0.25rem;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 0.18rem;
+    display: flex; gap: 0.25rem; background: var(--bg-elevated);
+    border: 1px solid var(--border); border-radius: 5px; padding: 0.18rem;
   }
   .view-btn {
-    font-size: 0.72rem;
-    font-weight: 500;
-    padding: 0.3rem 0.75rem;
-    border: none;
-    border-radius: 3px;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-    white-space: nowrap;
+    font-size: 0.72rem; font-weight: 500; padding: 0.3rem 0.75rem; border: none;
+    border-radius: 3px; background: transparent; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap;
   }
-  .view-btn.active {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-  }
+  .view-btn.active { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
   .view-btn:hover:not(.active) { color: var(--text-primary); }
 
-  /* ═══════════════════════════════════════════════════════
-     FILTER BAR
-  ═══════════════════════════════════════════════════════ */
   .filter-bar { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
   .filter-btn { font-size: 0.72rem; font-weight: 500; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-family: inherit; }
   .filter-btn:hover  { border-color: var(--border-hover); color: var(--text-primary); }
@@ -209,14 +155,8 @@
   .filter-btn.active-green { background: rgba(38,166,154,.1); border-color: var(--green); color: var(--green); font-weight: 600; }
   .filter-sep { width: 1px; height: 16px; background: var(--border); margin: 0 0.15rem; }
 
-  /* ═══════════════════════════════════════════════════════
-     LAYOUT 2 COLUMNAS
-  ═══════════════════════════════════════════════════════ */
   .layout-cols { display: grid; grid-template-columns: 1fr 268px; gap: 1rem; align-items: start; }
 
-  /* ═══════════════════════════════════════════════════════
-     NEWS PANEL
-  ═══════════════════════════════════════════════════════ */
   .news-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
   .panel-header {
     display: grid; grid-template-columns: 36px 60px 60px 1fr 52px; gap: 0;
@@ -262,9 +202,6 @@
   .feed-empty a:hover { text-decoration: underline; }
   .feed-error-icon { font-size: 2rem; margin-bottom: 0.75rem; }
 
-  /* ═══════════════════════════════════════════════════════
-     SIDEBAR
-  ═══════════════════════════════════════════════════════ */
   .sidebar { display: flex; flex-direction: column; gap: 1rem; }
   .s-panel  { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
   .s-header { padding: 0.55rem 1rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -307,41 +244,17 @@
   .badge-m { background: rgba(224,160,32,.07); border: 1px solid rgba(224,160,32,.2); color: var(--orange); }
   .ev-empty { padding: 0.85rem 1rem; font-size: 0.72rem; color: var(--text-dim); }
 
-  /* ═══════════════════════════════════════════════════════
-     CURRENCY ANALYSIS GRID
-  ═══════════════════════════════════════════════════════ */
-  /* #view-analysis: visibilidad controlada 100% por JS via style inline */
-
   .analysis-section-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;
   }
-  .analysis-section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .analysis-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  .currency-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 0.75rem;
-  }
+  .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 0.75rem; }
 
   .cur-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: border-color 0.2s, transform 0.15s;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; transition: border-color 0.2s, transform 0.15s;
   }
   .cur-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
   .cur-card.bull  { border-left: 3px solid var(--green); }
@@ -350,12 +263,8 @@
   .cur-card.mixed { border-left: 3px solid var(--orange); }
 
   .card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.65rem 0.9rem 0.55rem;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.65rem 0.9rem 0.55rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
   }
   .cur-id { display: flex; align-items: center; gap: 0.45rem; }
   .cur-code { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.04em; }
@@ -393,8 +302,7 @@
   }
 
   .card-event {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.4rem 0.6rem;
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem;
     background: var(--blue-dim); border: 1px solid rgba(30,136,229,.15);
     border-radius: 4px; font-size: 0.68rem; color: var(--text-secondary);
   }
@@ -402,8 +310,7 @@
   .card-event .ev-label { color: var(--blue); font-weight: 600; margin-right: 0.2rem; }
 
   .card-foot {
-    padding: 0.4rem 0.9rem;
-    background: rgba(0,0,0,.15);
+    padding: 0.4rem 0.9rem; background: rgba(0,0,0,.15);
     border-top: 1px solid rgba(48,54,61,.5);
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -411,21 +318,13 @@
   .foot-ts { font-size: 0.58rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
   .foot-ai { font-size: 0.52rem; font-weight: 700; color: var(--blue); border: 1px solid rgba(30,136,229,.3); border-radius: 2px; padding: 0.05rem 0.22rem; }
 
-  /* Skeleton */
-  .card-skeleton {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    border-left: 3px solid var(--border);
-  }
+  .card-skeleton { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; border-left: 3px solid var(--border); }
   .sk-head { padding: 0.65rem 0.9rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
   .sk-body { padding: 0.65rem 0.9rem 0.7rem; }
   .sk-line {
     height: 10px; border-radius: 3px; margin-bottom: 0.5rem;
     background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,.04) 50%, var(--bg-elevated) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.6s infinite;
+    background-size: 200% 100%; animation: shimmer 1.6s infinite;
   }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   .sk-line.w40 { width: 40%; }
@@ -437,24 +336,15 @@
   .cur-card.no-data { opacity: 0.5; }
   .no-data-msg { font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 1.2rem 0.9rem; }
 
-  /* AI badge inline */
   .ai-tag {
     font-size: 0.52rem; font-weight: 700; color: var(--blue);
     border: 1px solid rgba(30,136,229,.35); border-radius: 2px;
     padding: 0.05rem 0.22rem; vertical-align: middle;
   }
 
-  /* ═══════════════════════════════════════════════════════
-     FOOTER
-  ═══════════════════════════════════════════════════════ */
   .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
 
-  /* ═══════════════════════════════════════════════════════
-     RESPONSIVE
-  ═══════════════════════════════════════════════════════ */
-  @media (max-width: 1200px) {
-    .layout-cols { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 1200px) { .layout-cols { grid-template-columns: 1fr; } }
   @media (max-width: 768px) {
     .header { padding: 0.75rem 1rem; }
     .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
@@ -491,7 +381,6 @@
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-content">
     <div class="header-brand">
@@ -514,7 +403,6 @@
   </div>
 </div>
 
-<!-- NAV TABS -->
 <div class="nav-tabs-wrap">
   <div class="nav-tabs">
     <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
@@ -526,19 +414,15 @@
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <main class="page-wrap">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
     <div class="view-toggle" role="group" aria-label="Cambiar vista">
-      <button class="view-btn" id="btn-headlines" onclick="setView('headlines')">☰ Titulares</button>
-      <button class="view-btn active" id="btn-analysis"  onclick="setView('analysis')">⬛ Por Divisa <span class="ai-tag">AI</span></button>
+      <button class="view-btn" id="btn-headlines" onclick="setView('headlines')">&#9776; Titulares</button>
+      <button class="view-btn active" id="btn-analysis" onclick="setView('analysis')">&#9635; Por Divisa <span class="ai-tag">AI</span></button>
     </div>
   </div>
 
-  <!-- ══════════════════════════
-       VISTA 1: TITULARES
-  ══════════════════════════ -->
   <div id="view-headlines" style="display:none">
     <div class="filter-bar" role="group" aria-label="Filtrar por divisa">
       <button class="filter-btn active" onclick="setFilter('ALL',this)">Todas</button>
@@ -551,68 +435,50 @@
       <button class="filter-btn" onclick="setFilter('CHF',this)"><img src="https://flagcdn.com/16x12/ch.png" srcset="https://flagcdn.com/32x24/ch.png 2x" width="16" height="12" alt="CH" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> CHF</button>
       <button class="filter-btn" onclick="setFilter('NZD',this)"><img src="https://flagcdn.com/16x12/nz.png" srcset="https://flagcdn.com/32x24/nz.png 2x" width="16" height="12" alt="NZ" style="vertical-align:middle;border-radius:1px;margin-right:3px;"> NZD</button>
       <div class="filter-sep" aria-hidden="true"></div>
-      <button class="filter-btn impact-btn" onclick="toggleImpact(this)">● Alto impacto</button>
+      <button class="filter-btn impact-btn" onclick="toggleImpact(this)">&#9679; Alto impacto</button>
     </div>
 
     <div class="layout-cols">
       <section aria-label="Feed de noticias forex">
         <div class="news-panel">
           <div class="panel-header" aria-hidden="true">
-            <span>Hora</span>
-            <span>Divisa</span>
-            <span>Imp.</span>
+            <span>Hora</span><span>Divisa</span><span>Imp.</span>
             <span style="padding:0 .75rem;">Titular <span id="ai-badge" style="display:none;font-size:.55rem;font-weight:700;color:var(--blue);vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:3px;padding:.06rem .25rem;margin-left:.3rem;">AI</span></span>
             <span style="text-align:right;">Fuente</span>
           </div>
           <div id="feed-body" role="feed" aria-busy="true" aria-label="Noticias forex">
             <div id="feed-loading" style="padding:2rem 1rem;text-align:center;color:var(--text-dim);font-size:.8rem;">
-              <div style="margin-bottom:.5rem;">⏳</div>Cargando noticias…
+              <div style="margin-bottom:.5rem;">&#9203;</div>Cargando noticias&hellip;
             </div>
           </div>
-          <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">↓ Cargar más noticias</div>
+          <div class="load-more" id="load-more-btn" onclick="loadMore()" style="display:none;" role="button" tabindex="0">&#8595; Cargar más noticias</div>
         </div>
       </section>
-
       <aside aria-label="Panel lateral">
         <div class="sidebar">
           <div class="s-panel">
-            <div class="s-header">
-              <span class="s-title">Sentimiento 24h</span>
-              <span class="s-sub">ponderado · decay</span>
-            </div>
+            <div class="s-header"><span class="s-title">Sentimiento 24h</span><span class="s-sub">ponderado &middot; decay</span></div>
             <div id="sentiment-body" aria-label="Sentimiento por divisa"></div>
           </div>
           <div class="s-panel">
-            <div class="s-header">
-              <span class="s-title">Próximos eventos</span>
-              <span class="s-sub">hoy/mañana · hora local</span>
-            </div>
-            <div id="upcoming-events">
-              <div class="ev-empty">Cargando eventos…</div>
-            </div>
+            <div class="s-header"><span class="s-title">Próximos eventos</span><span class="s-sub">hoy/mañana &middot; hora local</span></div>
+            <div id="upcoming-events"><div class="ev-empty">Cargando eventos&hellip;</div></div>
           </div>
           <div class="s-panel">
-            <div class="s-header">
-              <span class="s-title">Cobertura por divisa</span>
-              <span class="s-sub">últimas 72h</span>
-            </div>
+            <div class="s-header"><span class="s-title">Cobertura por divisa</span><span class="s-sub">últimas 72h</span></div>
             <div id="coverage-body"></div>
           </div>
         </div>
       </aside>
     </div>
-  </div><!-- /#view-headlines -->
+  </div>
 
-  <!-- ══════════════════════════
-       VISTA 2: POR DIVISA
-  ══════════════════════════ -->
   <div id="view-analysis" style="display:block">
     <div class="analysis-section-label">
-      Análisis consolidado AI · 8 divisas principales
+      Análisis consolidado AI &middot; 8 divisas principales
       <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
     </div>
     <div class="currency-grid" id="currency-grid">
-      <!-- Skeletons iniciales -->
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div></div>
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w55"></div></div></div>
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w85"></div></div></div>
@@ -622,16 +488,14 @@
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w55"></div><div class="sk-line w85"></div></div></div>
       <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w70"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
     </div>
-  </div><!-- /#view-analysis -->
-
+  </div>
 </main>
 
-<!-- FOOTER -->
 <div class="footer">
-  <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX — DATA-DRIVEN</div>
+  <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
-    Metodología: Modelo cuantitativo basado en datos económicos reales • 21 indicadores ponderados en 6 tiers<br>
-    Tasas &amp; Ciclo Monetario (25%) • FX Momentum &amp; Smart Money (23%) • Crecimiento &amp; Empleo (17%) • Sentimiento de Mercado (16%) • Balance Externo (10%) • Consumo &amp; Salarios (9%)<br>
+    Metodología: Modelo cuantitativo basado en datos económicos reales &bull; 21 indicadores ponderados en 6 tiers<br>
+    Tasas &amp; Ciclo Monetario (25%) &bull; FX Momentum &amp; Smart Money (23%) &bull; Crecimiento &amp; Empleo (17%) &bull; Sentimiento de Mercado (16%) &bull; Balance Externo (10%) &bull; Consumo &amp; Salarios (9%)<br>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
   </div>
   <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;">
@@ -645,9 +509,9 @@
   </div>
   <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
-      © <span id="year"></span> Santiago Plá · Global Investing. Todos los derechos reservados.
+      &copy; <span id="year"></span> Santiago Plá &middot; Global Investing. Todos los derechos reservados.
     </div>
-    Dashboard v5.6.0
+    Dashboard v5.6.1
   </div>
   <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html"  style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
@@ -661,28 +525,20 @@
 <script>
 'use strict';
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
 const _now = new Date();
 const _tsH = document.getElementById('ts-header');
 if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
 document.getElementById('year').textContent = _now.getFullYear();
 
-// ── FLAGS ────────────────────────────────────────────────────────────────────
-const FLAG_CODES = {
-  USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz',
-};
+const FLAG_CODES = { USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz' };
 function flagImg(cur, px=16) {
   const code = FLAG_CODES[cur];
   if (!code) return '';
-  const px2 = px * 2;
-  const h  = Math.round(px  * 0.75);
-  const h2 = Math.round(px2 * 0.75);
+  const px2=px*2, h=Math.round(px*0.75), h2=Math.round(px2*0.75);
   return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
 }
 
-// ── CONSTANTS ────────────────────────────────────────────────────────────────
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
 const CURRENCY_NAMES = {
   USD:'Dólar Estadounidense', EUR:'Euro', GBP:'Libra Esterlina',
@@ -690,10 +546,8 @@ const CURRENCY_NAMES = {
   CHF:'Franco Suizo', NZD:'Dólar Neozelandés',
 };
 const SENT_LABELS = { bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto' };
-
 const VALID_CURRENCIES = new Set(CURRENCIES);
 
-// ── CURRENCY DETECTION ───────────────────────────────────────────────────────
 const PAIR_MAP = {
   'EUR/USD':'EUR','EURUSD':'EUR','GBP/USD':'GBP','GBPUSD':'GBP',
   'USD/JPY':'JPY','USDJPY':'JPY','AUD/USD':'AUD','AUDUSD':'AUD',
@@ -743,7 +597,6 @@ function detectCurrency(title, expand, source) {
   return SOURCE_CUR_MAP[source] || 'USD';
 }
 
-// ── IMPACT DETECTION ─────────────────────────────────────────────────────────
 const HIGH_KW = ['rate decision','rate hike','rate cut','interest rate','tasa de interés','monetary policy','fomc','ecb meeting','boe meeting','boj meeting','rba meeting','rbnz meeting','boc meeting','snb','hawkish','dovish','gdp','pib','cpi','ipc','inflation','inflación','unemployment','desempleo','nonfarm payroll','nfp','jobless claims','strait of hormuz','estrecho de ormuz','war ','guerra ','conflict','escalation','sanctions','nuclear','recession','recesión'];
 const MED_KW  = ['pmi','manufacturing','retail sales','consumer confidence','trade balance','industrial production','housing','crude oil','oil prices','wti','brent','opec','bond yield','yield curve','risk off','risk on','breakout','cot report'];
 function detectImpact(title, desc) {
@@ -761,13 +614,12 @@ function tsToLocal(ts) {
   return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
 }
 
-// ── SENTIMENT SCORING ─────────────────────────────────────────────────────────
 const FINAL_RE = /→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$/i;
 const SENT_MAP = {alcista:'bull',bajista:'bear',neutral:'neut',neutro:'neut',mixto:'mixed'};
 
 function scoreSentiment(a) {
-  const hl   = (a.ai_headline || a.title || '');
-  const m    = hl.match(FINAL_RE);
+  const hl = (a.ai_headline || a.title || '');
+  const m  = hl.match(FINAL_RE);
   if (m) {
     const patCur  = m[1] ? m[1].toUpperCase() : null;
     let   patSent = SENT_MAP[m[2].toLowerCase()] || 'neut';
@@ -792,9 +644,8 @@ function scoreSentiment(a) {
   return 'neut';
 }
 
-// ── SIDEBAR: SENTIMENT ───────────────────────────────────────────────────────
-const IMP_W  = {high:3, med:1.5, low:0.5};
-const DECAY  = {high:8, med:16, low:28};
+const IMP_W = {high:3, med:1.5, low:0.5};
+const DECAY = {high:8, med:16, low:28};
 
 function computeSentiment(articles) {
   const body = document.getElementById('sentiment-body');
@@ -802,7 +653,6 @@ function computeSentiment(articles) {
   const nowMs = Date.now();
   const acc = {};
   CURRENCIES.forEach(c => { acc[c] = {bull:0,bear:0,neut:0,wSum:0,count:0}; });
-
   articles.forEach(a => {
     if (!acc[a.cur]) return;
     const s    = scoreSentiment(a);
@@ -815,12 +665,11 @@ function computeSentiment(articles) {
     else                 acc[a.cur].neut+=w;
     acc[a.cur].wSum+=w; acc[a.cur].count++;
   });
-
   body.innerHTML = '';
   CURRENCIES.forEach(cur => {
     const {bull,bear,neut,count} = acc[cur];
     const flag = flagImg(cur, 16);
-    const bb   = bull+bear, total = bb+neut;
+    const bb = bull+bear, total = bb+neut;
     if (count===0||total<0.05) { body.innerHTML+=_sentRow(flag,cur,'—','nodata',0,0,'Sin cobertura',0.4); return; }
     if (bb<0.05)               { body.innerHTML+=_sentRow(flag,cur,'Neut','neut',50,0,'Sin señal',0.65); return; }
     const diff=Math.abs(bull-bear)/bb, lowCov=total<1.5;
@@ -848,7 +697,6 @@ function _sentRowMixed(flag,cur,bullPct,count,tip,op){
   </div>`;
 }
 
-// ── SIDEBAR: COVERAGE ────────────────────────────────────────────────────────
 function renderCoverage(articles) {
   const body = document.getElementById('coverage-body');
   if (!body) return;
@@ -860,7 +708,7 @@ function renderCoverage(articles) {
     const n=cnt[cur], h=hcnt[cur];
     const pct=Math.round((n/mx)*100);
     const col=n===0?'var(--text-dim)':n>=4?'var(--green)':n>=2?'var(--blue)':'var(--orange)';
-    const hb = h>0?`<span class="cov-badge" style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);color:var(--red);">${h}▲</span>`:'<span style="width:22px;display:inline-block;"></span>';
+    const hb = h>0?`<span class="cov-badge" style="background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);color:var(--red);">${h}&#9650;</span>`:'<span style="width:22px;display:inline-block;"></span>';
     return `<div class="cov-row">
       <span class="cov-cur">${flagImg(cur,14)} ${cur}</span>
       <div class="cov-track"><div class="cov-fill" style="width:${pct}%;background:${col};"></div></div>
@@ -869,7 +717,6 @@ function renderCoverage(articles) {
   }).join('');
 }
 
-// ── UPCOMING EVENTS ──────────────────────────────────────────────────────────
 async function loadUpcomingEvents() {
   const el = document.getElementById('upcoming-events');
   try {
@@ -889,7 +736,7 @@ async function loadUpcomingEvents() {
       const detail = [e.currency, e.forecast?'Est: '+e.forecast:'', e.previous?'Prev: '+e.previous:''].filter(Boolean).join(' · ');
       let lt = e.timeUTC||'--:--';
       if (e.timeUTC&&e.dateISO) { try { const ud=new Date(`${e.dateISO}T${e.timeUTC}:00Z`); if(!isNaN(ud))lt=ud.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false}); } catch(_){} }
-      const flag = flagImg((e.currency||'').slice(0,3).toUpperCase(),20)||'🌐';
+      const flag = flagImg((e.currency||'').slice(0,3).toUpperCase(),20)||'&#127760;';
       el.innerHTML+=`<div class="ev-row">
         <div class="ev-left"><span style="display:flex;align-items:center;justify-content:center;">${flag}</span><span class="ev-time">${esc(lt)}</span></div>
         <div class="ev-body"><div class="ev-name">${esc(e.event)}</div>${detail?`<div class="ev-detail">${esc(detail)}</div>`:''}</div>
@@ -906,7 +753,6 @@ let visible     = PAGE;
 let activeFilter= 'ALL';
 let highOnly    = false;
 
-// Promesa que se resuelve cuando allArticles está listo
 let articlesReadyResolve;
 const articlesReady = new Promise(res => { articlesReadyResolve = res; });
 
@@ -915,14 +761,12 @@ function renderFeed() {
   const loading = document.getElementById('feed-loading');
   if (loading) loading.remove();
   body.setAttribute('aria-busy','false');
-
   const filtered = allArticles.filter(a =>
     (activeFilter==='ALL' || a.cur===activeFilter) && (!highOnly || a.impact==='high')
   );
-
   if (!filtered.length) {
     body.innerHTML = `<div class="feed-empty">
-      <div class="feed-error-icon">📰</div>
+      <div class="feed-error-icon">&#128240;</div>
       <strong>No hay noticias para el filtro actual.</strong><br>
       Consulte directamente:<br>
       <a href="https://www.fxstreet.com/news" target="_blank" rel="noopener">FXStreet</a> ·
@@ -932,7 +776,6 @@ function renderFeed() {
     document.getElementById('load-more-btn').style.display = 'none';
     computeSentiment([]); renderCoverage([]); return;
   }
-
   body.innerHTML = '';
   filtered.slice(0, visible).forEach(a => {
     const ic      = a.impact==='high'?'impact-high': a.impact==='med'?'impact-med':'impact-low';
@@ -947,14 +790,12 @@ function renderFeed() {
     <div class="news-expand">
       ${a.ai_headline?`<div style="font-size:.78rem;font-weight:500;color:var(--text-primary);margin-bottom:.45rem;padding-bottom:.4rem;border-bottom:1px solid rgba(48,54,61,.6);">${esc(a.ai_headline)}<span style="font-size:.58rem;font-weight:700;color:var(--blue);margin-left:.4rem;vertical-align:middle;border:1px solid rgba(30,136,229,.3);border-radius:2px;padding:.05rem .22rem;">AI</span></div>`:''}
       <span style="color:var(--text-secondary)">${esc(a.expand||a.description||a.title||'')}</span>
-      ${a.link?`<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo →</a>`:''}
+      ${a.link?`<br><a href="${esc(a.link)}" target="_blank" rel="noopener" style="color:var(--blue);margin-top:.4rem;display:inline-block;font-size:.7rem;">Leer artículo completo &#8594;</a>`:''}
     </div>`;
   });
-
   document.getElementById('load-more-btn').style.display = filtered.length > visible ? 'flex' : 'none';
   const aiBadge = document.getElementById('ai-badge');
   if (aiBadge) aiBadge.style.display = filtered.slice(0,visible).some(a=>a.ai_headline) ? 'inline':'none';
-
   computeSentiment(filtered);
   renderCoverage(allArticles);
 }
@@ -976,65 +817,49 @@ function toggleImpact(btn) {
   visible  = PAGE; renderFeed();
 }
 
-// ── INIT FEED ────────────────────────────────────────────────────────────────
 async function initFeed() {
   try {
     const res = await fetch(`news-data/news.json?v=${Date.now()}`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const raw  = data.articles || [];
-
     if (raw.length > 0) {
       allArticles = raw.map(a => {
         const cur = (a.cur && VALID_CURRENCIES.has(a.cur))
           ? a.cur
           : detectCurrency(a.title||'', a.expand||'', a.source||'');
-        return {
-          ...a,
-          cur,
-          impact:     a.impact || detectImpact(a.title, a.expand),
-          time:       tsToLocal(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)),
-          ai_headline: a.ai_headline || null,
-        };
+        return { ...a, cur, impact: a.impact || detectImpact(a.title, a.expand), time: tsToLocal(a.ts || (a.datetime ? new Date(a.datetime).getTime() : null)), ai_headline: a.ai_headline || null };
       })
-      .filter(a => {
-        const hl = (a.ai_headline || '').toUpperCase();
-        return !hl.includes('IRRELEVANTE');
-      })
+      .filter(a => { const hl = (a.ai_headline || '').toUpperCase(); return !hl.includes('IRRELEVANTE'); })
       .sort((a,b) => (b.ts||0)-(a.ts||0));
-
       renderFeed();
-      articlesReadyResolve(true);   // ← señal: artículos listos
+      articlesReadyResolve(true);
       return;
     }
-
-    // news.json vacío
     articlesReadyResolve(false);
     throw new Error('articles array vacío');
-
   } catch (e) {
     console.warn('[initFeed] Error:', e.message);
     articlesReadyResolve(false);
-
     const body    = document.getElementById('feed-body');
     const loading = document.getElementById('feed-loading');
     if (loading) loading.remove();
     body.setAttribute('aria-busy','false');
     body.innerHTML = `<div class="feed-empty">
-      <div class="feed-error-icon">⚠️</div>
+      <div class="feed-error-icon">&#9888;&#65039;</div>
       <strong>No se pudieron cargar las noticias.</strong><br><br>
-      Consulte noticias directamente:<br><br>
-      <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a><br>
-      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a><br>
+      <a href="https://www.fxstreet.es/news" target="_blank" rel="noopener">FXStreet ES</a> &nbsp;·&nbsp;
+      <a href="https://www.forexlive.com" target="_blank" rel="noopener">ForexLive</a> &nbsp;·&nbsp;
       <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters</a>
     </div>`;
     computeSentiment([]); renderCoverage([]);
   }
 }
 
-// ── VIEW TOGGLE ──────────────────────────────────────────────────────────────
+// ── VIEW TOGGLE ───────────────────────────────────────────────────────────────
 let currentView      = 'analysis';
-let summariesLoaded  = false;
+let summariesLoaded  = false;  // true solo cuando cargó con datos AI reales
+let summariesLoading = false;  // true mientras la funcion esta ejecutandose
 
 function setView(view) {
   currentView = view;
@@ -1042,35 +867,48 @@ function setView(view) {
   document.getElementById('view-analysis').style.display  = view==='analysis'  ? 'block' : 'none';
   document.getElementById('btn-headlines').classList.toggle('active', view==='headlines');
   document.getElementById('btn-analysis').classList.toggle('active',  view==='analysis');
-
-  if (view === 'analysis' && !summariesLoaded) {
+  // Solo lanzar si no hay una ejecucion en curso
+  if (view === 'analysis' && !summariesLoading) {
     loadSummaries();
   }
 }
 
-// ── CURRENCY ANALYSIS CARDS ──────────────────────────────────────────────────
+// ── CURRENCY ANALYSIS CARDS ───────────────────────────────────────────────────
 async function loadSummaries() {
+  // Guard: evitar doble ejecucion concurrente
+  if (summariesLoading) return;
+  summariesLoading = true;
+
   const grid  = document.getElementById('currency-grid');
   const updEl = document.getElementById('summaries-updated');
 
-  // Mostrar skeletons mientras carga
-  grid.innerHTML = CURRENCIES.map(()=>`
+  // Mostrar skeletons ANTES del fetch
+  grid.innerHTML = CURRENCIES.map(() => `
     <div class="card-skeleton">
       <div class="sk-head"><div class="sk-line w40"></div></div>
-      <div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div>
+      <div class="sk-body">
+        <div class="sk-line w100"></div>
+        <div class="sk-line w85"></div>
+        <div class="sk-line w70"></div>
+      </div>
     </div>`).join('');
 
-  // ── Intentar summaries.json ──────────────────────────────────────────────
+  // Unico fetch de summaries.json
   let summariesOK = false;
   try {
-    const res = await fetch(`news-data/summaries.json?v=${Date.now()}`);
+    const url = `news-data/summaries.json?v=${Date.now()}`;
+    console.log('[loadSummaries] Fetching:', url);
+    const res = await fetch(url);
+    console.log('[loadSummaries] HTTP status:', res.status);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const sums  = data.summaries || {};
 
-    // Validar que tenga al menos una divisa con análisis real
+    const data = await res.json();
+    const sums = data.summaries || {};
+    console.log('[loadSummaries] Divisas recibidas:', Object.keys(sums));
+
+    // Validar que haya al menos una divisa con articulos reales
     const hasData = CURRENCIES.some(c => sums[c] && sums[c].articles_count > 0);
-    if (!hasData) throw new Error('summaries.json vacío o sin datos');
+    if (!hasData) throw new Error('summaries.json sin datos de articulos');
 
     if (updEl && data.updated_label) updEl.textContent = '· ' + data.updated_label;
 
@@ -1082,17 +920,17 @@ async function loadSummaries() {
 
     summariesLoaded = true;
     summariesOK = true;
-    console.info('[loadSummaries] Cargado desde summaries.json');
+    console.info('[loadSummaries] OK — datos AI cargados desde summaries.json');
 
   } catch (err) {
     console.warn('[loadSummaries] summaries.json no disponible:', err.message);
   }
 
-  // ── Fallback: esperar a allArticles y calcular estadístico ───────────────
+  // Fallback estadistico si summaries.json fallo o esta vacio
   if (!summariesOK) {
-    if (updEl) updEl.textContent = '· calculando desde titulares…';
+    if (updEl) updEl.textContent = '· calculando desde titulares...';
 
-    // Esperar a que initFeed() resuelva (máx 8s)
+    // Esperar a que initFeed() termine (max 8s)
     await Promise.race([
       articlesReady,
       new Promise(res => setTimeout(res, 8000))
@@ -1106,16 +944,18 @@ async function loadSummaries() {
         const arts = allArticles.filter(a => a.cur === cur);
         grid.innerHTML += renderCurrencyCardFromArticles(cur, arts);
       });
-      summariesLoaded = true;
-      console.info('[loadSummaries] Fallback estadístico aplicado');
+      console.info('[loadSummaries] Fallback estadistico aplicado');
     } else {
       if (updEl) updEl.textContent = '· sin datos disponibles';
       grid.innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">
-        ⚠️ Análisis no disponible. El archivo <code>summaries.json</code> no existe aún en el repositorio.<br><br>
+        &#9888;&#65039; Análisis no disponible. El archivo <code>summaries.json</code> no existe en el repositorio.<br><br>
         Ejecuta el workflow de GitHub Actions para generarlo, o espera al próximo ciclo automático.
       </div>`;
     }
   }
+
+  // Liberar el flag siempre al terminar (tanto si tuvo exito como si fue fallback)
+  summariesLoading = false;
 }
 
 function renderCurrencyCard(cur, s) {
@@ -1140,7 +980,7 @@ function renderCurrencyCard(cur, s) {
     : '';
 
   const upcomingHtml = upcoming
-    ? `<div class="card-event"><span class="ev-icon">📅</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
+    ? `<div class="card-event"><span class="ev-icon">&#128197;</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
     : '';
 
   return `<div class="cur-card ${sent}${count===0?' no-data':''}">
@@ -1190,14 +1030,12 @@ function renderCurrencyCardFromArticles(cur, arts) {
   const mixed = sents.filter(s=>s==='mixed').length;
   const n     = arts.length;
   let dominant='neut', conf=30;
-  if (bull>bear&&bull>mixed)        { dominant='bull'; conf=Math.round((bull/n)*100); }
-  else if (bear>bull&&bear>mixed)   { dominant='bear'; conf=Math.round((bear/n)*100); }
+  if (bull>bear&&bull>mixed)         { dominant='bull'; conf=Math.round((bull/n)*100); }
+  else if (bear>bull&&bear>mixed)    { dominant='bear'; conf=Math.round((bear/n)*100); }
   else if (mixed>0||(bull>0&&bear>0)){ dominant='mixed'; conf=50; }
-
   const sources = [...new Set(arts.map(a=>a.source).filter(Boolean))].slice(0,3);
   const latest  = Math.max(...arts.map(a=>a.ts||0));
-  const analysis= `Sentimiento basado en ${n} artículos: ${bull} alcistas · ${bear} bajistas · ${mixed} mixtos. El análisis AI consolidado estará disponible en el próximo ciclo del pipeline.`;
-
+  const analysis = `Sentimiento basado en ${n} artículos: ${bull} alcistas · ${bear} bajistas · ${mixed} mixtos. El análisis AI consolidado estará disponible en el próximo ciclo del pipeline.`;
   return renderCurrencyCard(cur, {
     sentiment:dominant, confidence:Math.min(95,conf),
     analysis, drivers:[], upcoming_event:null,
@@ -1214,11 +1052,13 @@ function renderSkeletonCard() {
   </div>`;
 }
 
-// ── ARRANQUE ─────────────────────────────────────────────────────────────────
+// ── ARRANQUE ──────────────────────────────────────────────────────────────────
+// IMPORTANTE: DOMContentLoaded NO llama loadSummaries() directamente.
+// setView('analysis') ya la invoca internamente. Llamarla dos veces
+// causaria race conditions y doble fetch.
 document.addEventListener('DOMContentLoaded', () => {
-  setView('analysis');   // vista inicial forzada — DOM garantizado
+  setView('analysis');
   initFeed();
-  loadSummaries();
   loadUpcomingEvents();
 });
 </script>
