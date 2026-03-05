@@ -1215,10 +1215,12 @@ function renderSkeletonCard() {
 }
 
 // ── ARRANQUE ─────────────────────────────────────────────────────────────────
-setView('analysis');   // vista inicial forzada
-initFeed();
-loadSummaries();
-loadUpcomingEvents();
+document.addEventListener('DOMContentLoaded', () => {
+  setView('analysis');   // vista inicial forzada — DOM garantizado
+  initFeed();
+  loadSummaries();
+  loadUpcomingEvents();
+});
 </script>
 </body>
 </html>
