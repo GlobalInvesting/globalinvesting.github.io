@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-05",
-  "generatedAt": "2026-03-05T02:35:24.443798Z",
+  "generatedAt": "2026-03-05T08:43:20.008785Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -10,19 +10,19 @@
   "rangeTo": "2026-04-04",
   "totalEvents": 194,
   "currencyCounts": {
-    "JPY": 29,
+    "JPY": 30,
     "CHF": 7,
-    "EUR": 20,
+    "EUR": 22,
     "GBP": 9,
-    "USD": 109,
+    "USD": 106,
     "CAD": 8,
     "AUD": 10,
     "NZD": 2
   },
   "impactCounts": {
-    "high": 62,
+    "high": 61,
     "medium": 22,
-    "low": 110
+    "low": 111
   },
   "events": [
     {
@@ -593,7 +593,7 @@
       "flag": "🇯🇵",
       "event": "30-Year JGB Auction",
       "impact": "low",
-      "actual": "",
+      "actual": "3.398%",
       "forecast": "",
       "previous": "3.615%"
     },
@@ -606,7 +606,7 @@
       "flag": "🇨🇭",
       "event": "Unemployment Rate n.s.a.  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "3.2%",
       "forecast": "",
       "previous": "3.2%"
     },
@@ -619,7 +619,7 @@
       "flag": "🇨🇭",
       "event": "Unemployment Rate s.a.  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "3.0%",
       "forecast": "2.9%",
       "previous": "2.9%"
     },
@@ -632,7 +632,7 @@
       "flag": "🇪🇺",
       "event": "HCOB Eurozone Construction PMI (MoM)  (Feb)",
       "impact": "high",
-      "actual": "",
+      "actual": "46.0",
       "forecast": "",
       "previous": "45.3"
     },
@@ -744,19 +744,6 @@
       "date": "5 Mar",
       "dateISO": "2026-03-05",
       "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Trade Balance  (Jan)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "-70.30B"
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
-      "timeUTC": "12:30",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -812,19 +799,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Exports  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "287.30B"
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
-      "timeUTC": "13:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "Import Price Index (MoM)  (Jan)",
       "impact": "medium",
       "actual": "",
@@ -843,19 +817,6 @@
       "actual": "",
       "forecast": "",
       "previous": "0.0%"
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
-      "timeUTC": "13:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Imports  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "357.60B"
     },
     {
       "date": "5 Mar",
@@ -1423,7 +1384,7 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Atlanta Fed GDPNow",
+      "event": "Atlanta Fed GDPNow  (Q1)",
       "impact": "high",
       "actual": "",
       "forecast": "3.0%",
@@ -1817,7 +1778,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "0.1%"
+      "previous": "1.1%"
     },
     {
       "date": "9 Mar",
@@ -1857,6 +1818,19 @@
       "actual": "",
       "forecast": "",
       "previous": "4.2"
+    },
+    {
+      "date": "9 Mar",
+      "dateISO": "2026-03-09",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Eurogroup Meetings",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "9 Mar",
@@ -1972,8 +1946,8 @@
       "event": "GDP (QoQ)  (Q4)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
-      "previous": "0.1%"
+      "forecast": "0.1%",
+      "previous": "-0.6%"
     },
     {
       "date": "9 Mar",
@@ -1986,7 +1960,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "0.2%"
+      "previous": "-2.3%"
     },
     {
       "date": "9 Mar",
@@ -1998,8 +1972,8 @@
       "event": "GDP Capital Expenditure (QoQ)  (Q4)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
-      "previous": "0.2%"
+      "forecast": "0.2%",
+      "previous": "-0.2%"
     },
     {
       "date": "9 Mar",
@@ -2011,8 +1985,8 @@
       "event": "GDP External Demand (QoQ)  (Q4)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
-      "previous": "0.0%"
+      "forecast": "0.0%",
+      "previous": "-0.2%"
     },
     {
       "date": "9 Mar",
@@ -2024,7 +1998,7 @@
       "event": "GDP Price Index (YoY)  (Q4)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "3.4%",
       "previous": "3.4%"
     },
     {
@@ -2037,8 +2011,21 @@
       "event": "GDP Private Consumption (QoQ)  (Q4)",
       "impact": "high",
       "actual": "",
+      "forecast": "0.1%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "9 Mar",
+      "dateISO": "2026-03-09",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "M2 Money Stock (YoY)",
+      "impact": "low",
+      "actual": "",
       "forecast": "",
-      "previous": "0.1%"
+      "previous": "1.6%"
     },
     {
       "date": "9 Mar",
@@ -2129,7 +2116,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "1.1%",
-      "previous": "1.2%"
+      "previous": "0.4%"
     },
     {
       "date": "10 Mar",
@@ -2143,6 +2130,19 @@
       "actual": "",
       "forecast": "",
       "previous": "99.3"
+    },
+    {
+      "date": "10 Mar",
+      "dateISO": "2026-03-10",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECOFIN Meetings",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "10 Mar",
@@ -2177,11 +2177,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Existing Home Sales  (Feb)",
+      "event": "Existing Home Sales (MoM)  (Feb)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "3.91M"
+      "previous": "-8.4%"
     },
     {
       "date": "10 Mar",
@@ -2190,11 +2190,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Existing Home Sales (MoM)  (Feb)",
+      "event": "Existing Home Sales  (Feb)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-8.4%"
+      "previous": "3.91M"
     },
     {
       "date": "10 Mar",
@@ -2271,8 +2271,8 @@
       "event": "Machine Tool Orders (YoY)  (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
-      "previous": "25.3%"
+      "forecast": "25.3%",
+      "previous": "10.6%"
     },
     {
       "date": "11 Mar",
