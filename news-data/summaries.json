@@ -1,499 +1,161 @@
-#!/usr/bin/env python3
-"""
-generate_summaries.py — v2.0
-Genera un bloque de análisis consolidado por divisa a partir de news.json.
-Llama a Groq una vez por divisa (8 llamadas total) y escribe summaries.json.
-
-CAMBIOS v2.0 (sobre v1.0):
-- SYSTEM_PROMPT institucional: análisis accionable, datos concretos obligatorios
-- Prohibición explícita de lenguaje vago
-- Drivers con datos cuantitativos (%, niveles, fechas)
-- Última oración = implicación directa para el par más líquido
-- Confidence calibrado: 100% nunca permitido, escala revisada
-- USER_PROMPT mejorado: contexto de sentimiento pre-calculado incluido
-
-Ejecutar DESPUÉS de enrich_news.py (requiere ai_headline ya generados).
-"""
-
-import os
-import sys
-import json
-import time
-import re
-import requests
-from datetime import datetime, timezone
-from pathlib import Path
-
-# ─────────────────────────────────────────────
-NEWS_FILE      = Path("news-data/news.json")
-SUMMARIES_FILE = Path("news-data/summaries.json")
-GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL     = "llama-3.3-70b-versatile"
-MAX_TOKENS     = 600
-TEMPERATURE    = 0.15   # Más determinista para análisis institucional
-SLEEP_BETWEEN  = 6
-MAX_RETRIES    = 2
-
-CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
-
-CURRENCY_NAMES = {
-    "USD": "Dólar Estadounidense",
-    "EUR": "Euro",
-    "GBP": "Libra Esterlina",
-    "JPY": "Yen Japonés",
-    "AUD": "Dólar Australiano",
-    "CAD": "Dólar Canadiense",
-    "CHF": "Franco Suizo",
-    "NZD": "Dólar Neozelandés",
-}
-
-# Par más líquido de cada divisa (para la implicación accionable final)
-MAIN_PAIR = {
-    "USD": "DXY / EUR/USD",
-    "EUR": "EUR/USD",
-    "GBP": "GBP/USD",
-    "JPY": "USD/JPY",
-    "AUD": "AUD/USD",
-    "CAD": "USD/CAD",
-    "CHF": "USD/CHF",
-    "NZD": "NZD/USD",
-}
-
-# ─────────────────────────────────────────────
-SYSTEM_PROMPT = """Eres un analista senior de divisas en una mesa de trading institucional (tier-1).
-Tu tarea es producir análisis fundamentales de alta calidad para traders profesionales.
-
-═══════════════════════════════════════════════════════
-REGLAS ABSOLUTAS — INCUMPLIRLAS INVALIDA EL ANÁLISIS
-═══════════════════════════════════════════════════════
-
-REGLA 1 — DATOS CONCRETOS OBLIGATORIOS:
-Cada oración del análisis DEBE contener al menos uno de:
-  • Un porcentaje o cifra real mencionada en los titulares (ej: "+2.8% Q4", "4.14%", "0.8% QoQ")
-  • Un nivel de precio real mencionado en los titulares (ej: "1.3337", "$81/bbl", "157.00")
-  • Una fecha o evento específico (ej: "NFP mañana", "reunión BoJ abril", "datos Q1")
-  • El nombre de un banco central, institución o funcionario (ej: "Fed de Richmond", "Ueda", "BCE")
-Si no hay datos suficientes para una oración con dato concreto, omite esa oración.
-
-REGLA 2 — PROHIBICIÓN DE LENGUAJE VAGO:
-NUNCA usar estas frases o equivalentes:
-  ✗ "incertidumbre", "señales mixtas", "podría generar", "se espera que"
-  ✗ "tendencia dominante", "en general", "a grandes rasgos"
-  ✗ "muestra señales positivas/negativas", "apunta a"
-  ✗ cualquier generalización sin dato de respaldo
-
-REGLA 3 — IMPLICACIÓN ACCIONABLE FINAL:
-La ÚLTIMA oración del análisis SIEMPRE debe ser una implicación directa:
-  Formato: "→ [PAR] con sesgo [alcista/bajista/neutral] hacia [nivel] [condición si aplica]."
-  Ejemplo: "→ EUR/USD con sesgo bajista hacia 1.0820 mientras el DXY mantenga 104.50."
-  Ejemplo: "→ USD/JPY con sesgo alcista hacia 158.00 salvo sorpresa dovish en NFP."
-
-REGLA 4 — DRIVERS CON DATO CUANTITATIVO:
-Cada driver DEBE incluir el dato, no solo el concepto:
-  ✗ MAL: "Inflación", "Tasas", "Petróleo"
-  ✓ BIEN: "CPI suizo +0.6% feb", "BoJ pricing abril 68%", "WTI +8.5% a $81"
-Máximo 4 palabras por driver incluyendo el dato.
-
-REGLA 5 — CALIBRACIÓN DE CONFIDENCE:
-  • 85-95: consenso casi absoluto, 5+ titulares en el mismo sentido con datos sólidos
-  • 65-84: mayoría clara (>65% titulares), drivers macroeconómicos confirmados
-  • 45-64: tendencia moderada con contradicciones relevantes
-  • 25-44: señal débil, pocos artículos o datos contradictorios
-  • 0-24:  sin señal útil
-  PROHIBIDO asignar 100% — ningún mercado tiene certeza absoluta.
-  PROHIBIDO asignar >84% con menos de 4 artículos.
-
-═══════════════════════════════════════════════════════
-FORMATO DE RESPUESTA — JSON PURO SIN MARKDOWN
-═══════════════════════════════════════════════════════
 {
-  "sentiment": "bull|bear|neut|mixed",
-  "confidence": 25-95,
-  "analysis": "2-4 oraciones con datos concretos. Última oración = implicación → PAR sesgo nivel.",
-  "drivers": ["Driver +dato", "Driver +dato", "Driver +dato"],
-  "upcoming_event": "Evento concreto con fecha/hora si está en titulares, o null"
+  "updated_utc": "2026-03-05T23:48:49.672124+00:00",
+  "updated_label": "23:48 UTC",
+  "model": "llama-3.3-70b-versatile",
+  "total_ai": 8,
+  "total_fallback": 0,
+  "summaries": {
+    "USD": {
+      "sentiment": "bull",
+      "confidence": 100,
+      "analysis": "El dólar estadounidense se muestra alcista debido a la tensión geopolítica en Medio Oriente y el aumento del precio del petróleo. La administración Trump considera medidas para mitigar el aumento del precio del petróleo y estabilizar el mercado energético. Los precios del petróleo han subido a $80 por barril, lo que aviva temores de inflación y desaceleración económica global. La retirada de los mercados europeos y la aversión al riesgo también benefician al dólar.",
+      "drivers": [
+        "Petroleo",
+        "Trump",
+        "Guerra"
+      ],
+      "upcoming_event": "Posibles recortes de tasas en 4-5 semanas",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "FXStreet ES",
+        "InstaForex"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772770368000
+    },
+    "EUR": {
+      "sentiment": "bear",
+      "confidence": 80,
+      "analysis": "La divisa EUR muestra una tendencia bajista debido a la incertidumbre generada por el conflicto en Medio Oriente y la reacción de los mercados financieros. Los índices europeos han cerrado con fuertes pérdidas y el euro se ha debilitado frente a la libra. El par EUR/USD ha caído a 1.1590.",
+      "drivers": [
+        "Conflicto",
+        "Incertidumbre",
+        "BCE cautelosa"
+      ],
+      "upcoming_event": null,
+      "ai_generated": true,
+      "sources": [
+        "InvestingLive",
+        "FXStreet ES",
+        "FXStreet",
+        "InstaForex"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772736222000
+    },
+    "GBP": {
+      "sentiment": "bear",
+      "confidence": 70,
+      "analysis": "La libra esterlina se debilita frente al dólar estadounidense, con un descenso del 0.25% en GBP/USD a 1.3337, debido a la tensión en Medio Oriente y datos laborales sólidos en EEUU. Aunque hay algunas expectativas de apoyo a la libra por la reducción de expectativas de flexibilización del Banco de Inglaterra, la tendencia dominante es bajista.",
+      "drivers": [
+        "Tensión Medio Oriente",
+        "Datos laborales",
+        "Política monetaria"
+      ],
+      "upcoming_event": "Datos de empleo no agrícola en EEUU",
+      "ai_generated": true,
+      "sources": [
+        "FXStreet ES",
+        "FXStreet",
+        "InstaForex",
+        "InvestMacro"
+      ],
+      "articles_count": 6,
+      "latest_ts": 1772735889000
+    },
+    "JPY": {
+      "sentiment": "bear",
+      "confidence": 70,
+      "analysis": "El yen japonés se muestra débil frente al dólar estadounidense, con un aumento del 0.30% en el par USD/JPY debido a datos laborales sólidos en EEUU y comentarios hawkish del presidente del Fed de Richmond. Aunque hay expectativas de subida de tasas del BoJ en abril, lo que podría apoyar la firmeza del yen, la mayoría de los titulares sugieren una tendencia bajista para la divisa japonesa, con el par USD/JPY probando niveles como 157.19.",
+      "drivers": [
+        "Datos laborales",
+        "Comentarios Fed",
+        "Subida tasas"
+      ],
+      "upcoming_event": "Reunión del BoJ en abril",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "FXStreet",
+        "InstaForex"
+      ],
+      "articles_count": 5,
+      "latest_ts": 1772748059000
+    },
+    "AUD": {
+      "sentiment": "bull",
+      "confidence": 80,
+      "analysis": "El dólar australiano muestra señales alcistas debido a la inflación interna estable y la postura hawkish del RBA, con un nivel de resistencia en 0.7150. Aunque hay tensión en Medio Oriente que podría generar sentimiento de riesgo, la mayoría de los titulares apuntan a un comportamiento alcista del AUD, con un objetivo a corto plazo en 0.7100.",
+      "drivers": [
+        "Inflación",
+        "RBA Hawkish",
+        "Tensión"
+      ],
+      "upcoming_event": null,
+      "ai_generated": true,
+      "sources": [
+        "FXStreet",
+        "BabyPips"
+      ],
+      "articles_count": 3,
+      "latest_ts": 1772725232000
+    },
+    "CAD": {
+      "sentiment": "bull",
+      "confidence": 80,
+      "analysis": "El dólar canadiense muestra una tendencia alcista debido a expectativas de crecimiento y ajustes limitados en el USMCA. Aunque hay tensiones geopolíticas y signos de inflación, el crecimiento canadiense debe superar su potencial para evitar riesgos de desinflación y recortes de tasas. Los datos del primer trimestre serán clave.",
+      "drivers": [
+        "USMCA",
+        "Crecimiento",
+        "Inflación"
+      ],
+      "upcoming_event": "Datos del primer trimestre",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "FXStreet ES",
+        "FXStreet",
+        "InstaForex"
+      ],
+      "articles_count": 4,
+      "latest_ts": 1772752912000
+    },
+    "CHF": {
+      "sentiment": "bull",
+      "confidence": 70,
+      "analysis": "El franco suizo muestra señales alcistas debido al aumento de la inflación suiza en febrero, lo que podría generar presión moderada sobre los precios. Aunque el par USD/CHF se mantiene en un rango de 40 pips con resistencia en 0.7812-0.7821, la tendencia es hacia una posible apreciación del CHF.",
+      "drivers": [
+        "Inflación",
+        "Resistencia",
+        "Precios"
+      ],
+      "upcoming_event": null,
+      "ai_generated": true,
+      "sources": [
+        "ActionForex",
+        "InvestingLive"
+      ],
+      "articles_count": 2,
+      "latest_ts": 1772724480000
+    },
+    "NZD": {
+      "sentiment": "bear",
+      "confidence": 67,
+      "analysis": "El dólar neozelandés (NZD) muestra una tendencia bajista debido a la reducción de tensión geopolítica y la caída bajo la línea de tendencia del canal en NZDUSD, buscando soporte en 0.5834. Sin embargo, la expectativa de un empleo no agrícola suave en EEUU podría ofrecer algún apoyo. La presión vendedora mantiene su influencia.",
+      "drivers": [
+        "Tensión geopolítica",
+        "Canal bajista",
+        "Empleo EEUU"
+      ],
+      "upcoming_event": "Empleo no agrícola en EEUU febrero",
+      "ai_generated": true,
+      "sources": [
+        "ForexLive",
+        "InvestingLive"
+      ],
+      "articles_count": 3,
+      "latest_ts": 1772750138000
+    }
+  }
 }
-
-REGLAS DE SENTIMIENTO:
-  bull:  >60% de señales son positivas para la divisa con respaldo macroeconómico claro
-  bear:  >60% de señales son negativas para la divisa con respaldo macroeconómico claro
-  mixed: señales contradictorias equilibradas con drivers en ambas direcciones
-  neut:  <3 artículos, o sin señal macro relevante identificable"""
-
-
-def build_user_prompt(cur: str, articles: list) -> str:
-    name     = CURRENCY_NAMES.get(cur, cur)
-    main_pair= MAIN_PAIR.get(cur, cur + "/USD")
-
-    # Pre-calcular distribución de sentimiento para dar contexto al modelo
-    sents = [a.get("sentiment", "neut") for a in articles]
-    bull_n = sum(1 for s in sents if s in ("bull", "alcista"))
-    bear_n = sum(1 for s in sents if s in ("bear", "bajista"))
-    neut_n = sum(1 for s in sents if s in ("neut", "neutral", "neutro"))
-    mixed_n= sum(1 for s in sents if s in ("mixed", "mixto"))
-
-    lines = []
-    for a in articles:
-        headline  = a.get("ai_headline") or a.get("title", "")
-        impact    = a.get("impact", "low").upper()
-        sentiment = a.get("sentiment", "neut").upper()
-        source    = a.get("source", "")
-        # Incluir expand si tiene datos concretos (números, %)
-        expand    = a.get("expand", "") or ""
-        extra     = ""
-        if expand and re.search(r'\d+[\.,]\d+|%|\$|USD|EUR|GBP|JPY', expand):
-            extra = f" | Contexto: {expand[:120]}"
-        lines.append(f"[{impact}|{sentiment}] {headline}  ({source}){extra}")
-
-    headlines_block = "\n".join(lines) if lines else "Sin noticias disponibles."
-
-    return (
-        f"DIVISA: {cur} — {name}\n"
-        f"PAR PRINCIPAL: {main_pair}\n"
-        f"DISTRIBUCIÓN DE SENTIMIENTO: {bull_n} alcistas · {bear_n} bajistas · {neut_n} neutros · {mixed_n} mixtos\n"
-        f"TOTAL ARTÍCULOS: {len(articles)}\n\n"
-        f"TITULARES CON CONTEXTO:\n"
-        f"{headlines_block}\n\n"
-        f"INSTRUCCIÓN: Genera el análisis institucional en JSON para {cur}/{main_pair}.\n"
-        f"Recuerda: datos concretos en cada oración, drivers con cifras, última oración = '→ {main_pair} con sesgo...'."
-    )
-
-
-# ─────────────────────────────────────────────
-def load_api_keys() -> list:
-    keys = []
-    for var in ("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3"):
-        k = os.environ.get(var, "").strip()
-        if k:
-            keys.append(k)
-    return keys
-
-
-def mask_key(key: str) -> str:
-    return key[:8] + "..." + key[-4:] if len(key) > 12 else "***"
-
-
-def get_retry_after(response) -> int:
-    for header in ("retry-after", "x-ratelimit-reset-tokens"):
-        val = response.headers.get(header)
-        if val:
-            try:
-                return min(int(float(str(val).lower().replace("s", "").strip())) + 2, 120)
-            except (ValueError, TypeError):
-                pass
-    return 65
-
-
-def is_daily_limit(response) -> bool:
-    try:
-        body = response.json()
-        msg  = str(body.get("error", {}).get("message", "")).lower()
-        return ("per day" in msg or "tpd" in msg) and "per minute" not in msg
-    except Exception:
-        return False
-
-
-def call_groq(api_key: str, cur: str, articles: list) -> dict | None:
-    payload = {
-        "model":       GROQ_MODEL,
-        "messages":    [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user",   "content": build_user_prompt(cur, articles)},
-        ],
-        "max_tokens":  MAX_TOKENS,
-        "temperature": TEMPERATURE,
-    }
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-
-    for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            r = requests.post(GROQ_URL, json=payload, headers=headers, timeout=30)
-
-            if r.status_code == 429:
-                if is_daily_limit(r):
-                    return "DAILY_LIMIT"
-                wait = get_retry_after(r)
-                print(f"    ⏳ Rate limit (intento {attempt}) — esperando {wait}s...")
-                time.sleep(wait)
-                continue
-
-            if r.status_code == 401:
-                return "DAILY_LIMIT"
-
-            r.raise_for_status()
-            raw = r.json()["choices"][0]["message"]["content"].strip()
-
-            # Limpiar posibles backticks de markdown
-            raw = re.sub(r"^```json\s*", "", raw)
-            raw = re.sub(r"```\s*$",    "", raw).strip()
-
-            parsed = json.loads(raw)
-
-            # Validar campos obligatorios
-            required = {"sentiment", "confidence", "analysis", "drivers"}
-            if not required.issubset(parsed.keys()):
-                print(f"    ⚠️  JSON incompleto para {cur}: {list(parsed.keys())}")
-                return None
-
-            # Normalizar y aplicar límites de calibración
-            parsed["sentiment"]  = parsed["sentiment"].lower().strip()
-            raw_conf = int(parsed["confidence"])
-
-            # Forzar límite máximo de 95 y mínimo de 10
-            parsed["confidence"] = max(10, min(95, raw_conf))
-
-            # Si el modelo devolvió 100, loguear la corrección
-            if raw_conf >= 100:
-                print(f"    ⚠️  Confidence={raw_conf} corregido a 95 (límite institucional)")
-                parsed["confidence"] = 95
-
-            # Protección: >84% requiere ≥4 artículos
-            if parsed["confidence"] > 84 and len(articles) < 4:
-                parsed["confidence"] = 75
-                print(f"    ⚠️  Confidence ajustado a 75 (pocos artículos: {len(articles)})")
-
-            parsed["drivers"] = [str(d)[:45] for d in parsed.get("drivers", [])[:4]]
-            parsed["upcoming_event"] = parsed.get("upcoming_event") or None
-
-            return parsed
-
-        except json.JSONDecodeError as e:
-            print(f"    ⚠️  JSON parse error para {cur}: {e}")
-            return None
-        except requests.exceptions.Timeout:
-            print(f"    ⚠️  Timeout (intento {attempt}/{MAX_RETRIES})")
-            if attempt < MAX_RETRIES:
-                time.sleep(8)
-        except Exception as e:
-            print(f"    ⚠️  Error: {e}")
-            return None
-
-    return None
-
-
-def fallback_summary(cur: str, articles: list) -> dict:
-    """Resumen estadístico sin AI cuando Groq no está disponible."""
-    from collections import Counter
-
-    sentiments = [a.get("sentiment", "neut") for a in articles]
-    sent_count = Counter(sentiments)
-
-    bull  = sent_count.get("bull",  0) + sent_count.get("alcista", 0)
-    bear  = sent_count.get("bear",  0) + sent_count.get("bajista", 0)
-    mixed = sent_count.get("mixed", 0) + sent_count.get("mixto",   0)
-    total = len(articles)
-
-    if total == 0:
-        dominant, confidence = "neut", 0
-    elif bull > bear and bull > mixed:
-        dominant   = "bull"
-        confidence = min(75, int((bull / total) * 100))
-    elif bear > bull and bear > mixed:
-        dominant   = "bear"
-        confidence = min(75, int((bear / total) * 100))
-    elif mixed > 0 or (bull > 0 and bear > 0):
-        dominant, confidence = "mixed", 45
-    else:
-        dominant, confidence = "neut", 25
-
-    name = CURRENCY_NAMES.get(cur, cur)
-    pair = MAIN_PAIR.get(cur, cur + "/USD")
-    analysis = (
-        f"Análisis estadístico basado en {total} {'noticia' if total == 1 else 'noticias'} "
-        f"para {name}: {bull} alcistas, {bear} bajistas, {mixed} mixtas. "
-        f"Resumen AI no disponible en este ciclo — consulte titulares individuales para {pair}."
-    )
-
-    sources = list(set(a.get("source", "") for a in articles if a.get("source")))[:3]
-
-    return {
-        "sentiment":       dominant,
-        "confidence":      confidence,
-        "analysis":        analysis,
-        "drivers":         [],
-        "upcoming_event":  None,
-        "ai_generated":    False,
-        "sources":         sources,
-        "articles_count":  total,
-        "latest_ts":       max((a.get("ts", 0) for a in articles), default=0),
-    }
-
-
-def main():
-    now_utc = datetime.now(timezone.utc)
-    print("=" * 65)
-    print(f"📊 generate_summaries.py v2.0 — {GROQ_MODEL}")
-    print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}")
-    print(f"   Modo: análisis institucional con datos concretos")
-    print("=" * 65)
-
-    # Cargar API keys
-    all_keys = load_api_keys()
-    if not all_keys:
-        print("⚠️  Sin GROQ_API_KEY — generando resúmenes con fallback estadístico")
-    else:
-        print(f"🔑 Keys disponibles: {len(all_keys)}")
-        for i, k in enumerate(all_keys, 1):
-            print(f"   Key {i}: {mask_key(k)}")
-
-    current_key_idx = 0
-    use_ai = bool(all_keys)
-
-    # Cargar news.json
-    if not NEWS_FILE.exists():
-        print(f"❌ No se encontró {NEWS_FILE}")
-        sys.exit(1)
-
-    with open(NEWS_FILE, "r", encoding="utf-8") as f:
-        news_data = json.load(f)
-
-    articles = news_data.get("articles", [])
-    print(f"\n📰 Artículos cargados: {len(articles)}")
-
-    # Agrupar por divisa (ordenados por ts desc para priorizar los más recientes)
-    groups = {cur: [] for cur in CURRENCIES}
-    for a in articles:
-        cur = a.get("cur", "")
-        if cur in groups:
-            groups[cur].append(a)
-
-    for cur in CURRENCIES:
-        groups[cur].sort(key=lambda x: x.get("ts", 0), reverse=True)
-
-    print(f"\n   Distribución:")
-    for cur in CURRENCIES:
-        n = len(groups[cur])
-        sents = [a.get("sentiment","?") for a in groups[cur]]
-        bull  = sum(1 for s in sents if s in ("bull","alcista"))
-        bear  = sum(1 for s in sents if s in ("bear","bajista"))
-        print(f"   {cur}: {n} art. ({bull}↑ {bear}↓)")
-
-    # Cargar summaries previos para no perder datos
-    existing_summaries = {}
-    if SUMMARIES_FILE.exists():
-        try:
-            with open(SUMMARIES_FILE, "r", encoding="utf-8") as f:
-                existing_data = json.load(f)
-                existing_summaries = existing_data.get("summaries", {})
-        except Exception:
-            pass
-
-    summaries  = {}
-    generated  = 0
-    fallbacks  = 0
-
-    print(f"\n{'─'*65}")
-    for cur in CURRENCIES:
-        cur_articles = groups[cur]
-        n = len(cur_articles)
-        pair = MAIN_PAIR.get(cur, "")
-        print(f"\n[{cur}] {CURRENCY_NAMES[cur]} ({pair}) — {n} artículo{'s' if n!=1 else ''}")
-
-        if n == 0:
-            summaries[cur] = {
-                "sentiment":      "neut",
-                "confidence":     0,
-                "analysis":       f"Sin cobertura para {CURRENCY_NAMES[cur]} en el ciclo actual.",
-                "drivers":        [],
-                "upcoming_event": None,
-                "ai_generated":   False,
-                "sources":        [],
-                "articles_count": 0,
-                "latest_ts":      0,
-            }
-            fallbacks += 1
-            print(f"  ⚪ Sin artículos")
-            continue
-
-        # Intentar con AI
-        result = None
-        if use_ai and current_key_idx < len(all_keys):
-            result = call_groq(all_keys[current_key_idx], cur, cur_articles)
-
-            if result == "DAILY_LIMIT":
-                print(f"  ⛔ Key {current_key_idx+1} agotada")
-                current_key_idx += 1
-                if current_key_idx < len(all_keys):
-                    print(f"  🔄 Usando Key {current_key_idx+1}")
-                    result = call_groq(all_keys[current_key_idx], cur, cur_articles)
-                    if result == "DAILY_LIMIT":
-                        print(f"  ⛔ Key {current_key_idx+1} también agotada — fallback")
-                        use_ai = False
-                        result = None
-
-        if result and isinstance(result, dict):
-            sources = list(set(a.get("source","") for a in cur_articles if a.get("source")))[:4]
-            latest  = max(a.get("ts",0) for a in cur_articles)
-            summaries[cur] = {
-                **result,
-                "ai_generated":   True,
-                "sources":        sources,
-                "articles_count": n,
-                "latest_ts":      latest,
-            }
-            generated += 1
-            sent_es = {"bull":"ALCISTA","bear":"BAJISTA","neut":"NEUTRAL","mixed":"MIXTO"}.get(
-                result["sentiment"], result["sentiment"].upper()
-            )
-            print(f"  ✅ AI → {sent_es} ({result['confidence']}%) | {len(result['drivers'])} drivers")
-            # Mostrar preview del análisis
-            preview = result['analysis'][:100].replace('\n',' ')
-            print(f"     {preview}...")
-            # Verificar que tiene implicación accionable
-            has_arrow = "→" in result['analysis']
-            if not has_arrow:
-                print(f"     ⚠️  Sin implicación accionable (→) en el análisis")
-        else:
-            fb = fallback_summary(cur, cur_articles)
-            summaries[cur] = fb
-            fallbacks += 1
-            sent_es = {"bull":"ALCISTA","bear":"BAJISTA","neut":"NEUTRAL","mixed":"MIXTO"}.get(
-                fb["sentiment"], fb["sentiment"].upper()
-            )
-            print(f"  📊 Fallback → {sent_es} ({fb['confidence']}%)")
-
-        if use_ai and cur != CURRENCIES[-1]:
-            time.sleep(SLEEP_BETWEEN)
-
-    # Guardar summaries.json
-    SUMMARIES_FILE.parent.mkdir(parents=True, exist_ok=True)
-
-    # Métricas de calidad
-    ai_with_arrow = sum(
-        1 for cur, s in summaries.items()
-        if s.get("ai_generated") and "→" in s.get("analysis","")
-    )
-    ai_with_drivers = sum(
-        1 for cur, s in summaries.items()
-        if s.get("ai_generated") and len(s.get("drivers",[])) >= 2
-    )
-
-    output = {
-        "updated_utc":    now_utc.isoformat(),
-        "updated_label":  now_utc.strftime("%H:%M UTC"),
-        "model":          GROQ_MODEL if use_ai else "fallback",
-        "version":        "2.0",
-        "total_ai":       generated,
-        "total_fallback": fallbacks,
-        "quality": {
-            "with_actionable_implication": ai_with_arrow,
-            "with_quantitative_drivers":   ai_with_drivers,
-        },
-        "summaries": summaries,
-    }
-
-    with open(SUMMARIES_FILE, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
-
-    print(f"\n{'='*65}")
-    print(f"📋 RESUMEN FINAL")
-    print(f"   ✅ Generados con AI:        {generated}")
-    print(f"   📊 Fallback estadístico:    {fallbacks}")
-    print(f"   🎯 Con implicación (→):     {ai_with_arrow}/{generated}")
-    print(f"   📐 Con drivers cuantitativos: {ai_with_drivers}/{generated}")
-    print(f"   💾 Guardado en:             {SUMMARIES_FILE}")
-    print(f"{'='*65}")
-
-
-if __name__ == "__main__":
-    main()
