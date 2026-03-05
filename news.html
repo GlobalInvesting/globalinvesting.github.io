@@ -310,7 +310,7 @@
   /* ═══════════════════════════════════════════════════════
      CURRENCY ANALYSIS GRID
   ═══════════════════════════════════════════════════════ */
-  #view-analysis { display: none; } /* JS lo muestra con display:block */
+  /* #view-analysis: visibilidad controlada 100% por JS via style inline */
 
   .analysis-section-label {
     font-size: 0.65rem;
@@ -1215,6 +1215,7 @@ function renderSkeletonCard() {
 }
 
 // ── ARRANQUE ─────────────────────────────────────────────────────────────────
+setView('analysis');   // vista inicial forzada
 initFeed();
 loadSummaries();
 loadUpcomingEvents();
