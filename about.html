@@ -125,7 +125,7 @@
         <!-- FEED DE NOTICIAS -->
         <div class="section">
             <h2>Feed de Noticias de Mercado</h2>
-            <p>La sección <a href="news.html">Noticias</a> ofrece un feed en tiempo real de noticias económicas y de mercado relevantes para el trading de divisas, con estética de terminal Bloomberg y actualización automática tres veces al día.</p>
+            <p>La sección <a href="news.html">Noticias</a> ofrece un feed en tiempo real de noticias económicas y de mercado relevantes para el trading de divisas, con análisis consolidado AI por divisa y actualización automática tres veces al día.</p>
 
             <h3>Fuentes RSS Integradas</h3>
             <ul>
@@ -133,17 +133,18 @@
                 <li><strong>ForexLive</strong> — Cobertura en tiempo real de bancos centrales y datos económicos.</li>
                 <li><strong>Reuters Business</strong> — Noticias financieras internacionales de referencia.</li>
                 <li><strong>Investing.com</strong> — Cobertura amplia de mercados financieros globales.</li>
+                <li><strong>DailyForex, InstaForex, ActionForex, MyFXBook</strong> — Fuentes especializadas en análisis y señales forex.</li>
                 <li><strong>Bancos Centrales Oficiales</strong> — Comunicados directos de la Fed, BCE, BoE, BoJ, RBA, BoC, SNB y RBNZ.</li>
             </ul>
 
             <h3>Funcionalidades del Feed</h3>
             <ul>
                 <li><strong>Vista "Por Divisa" (predeterminada):</strong> Análisis AI generado diariamente por Groq (llama-3.3-70b-versatile) con resumen de situación, sesgo fundamental y eventos clave para cada una de las 8 divisas principales. Es la vista que aparece al cargar la página.</li>
-                <li><strong>Vista "Titulares":</strong> Feed denso estilo terminal con una fila por noticia. Muestra hora local, divisa afectada, nivel de impacto (Alto / Medio / Bajo), titular enriquecido por IA y fuente. Click en cualquier fila expande el resumen completo.</li>
-                <li><strong>Titulares enriquecidos por IA:</strong> Cada titular pasa por Groq AI para generar una versión más descriptiva y contextualizada. Los titulares clasificados como irrelevantes para forex son filtrados automáticamente.</li>
+                <li><strong>Análisis consolidado con confianza:</strong> Cada divisa muestra un badge de sentimiento (Alcista / Bajista / Neutral / Mixto) con barra de confianza porcentual y conteo de artículos procesados.</li>
+                <li><strong>Drivers clave:</strong> Factores económicos destacados que explican el sesgo fundamental de cada divisa en el período analizado.</li>
                 <li><strong>Detección automática de divisa:</strong> Cada noticia es etiquetada automáticamente con la divisa principal que menciona (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD o GENERAL).</li>
                 <li><strong>Nivel de impacto estimado:</strong> Calculado por palabras clave en el titular. Noticias sobre decisiones de tasas, IPC, NFP o reuniones de bancos centrales se clasifican como Alto Impacto.</li>
-                <li><strong>Filtros en vista Titulares:</strong> Por divisa (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) y por nivel de impacto alto.</li>
+                <li><strong>Timestamp en hora local:</strong> Las marcas de tiempo se convierten automáticamente a la zona horaria del navegador del usuario.</li>
             </ul>
         </div>
 
@@ -266,8 +267,7 @@ Bandas: &lt; 53 = Débil · 53–63 = Neutral · &gt; 63 = Fuerte</pre>
                     <tr><td>Calendario Económico</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>MQL5 RSS → Trading Economics RSS → Investing.com → Fuentes oficiales</td></tr>
                     <tr><td>COT — 8 divisas principales</td><td>Semanal (Viernes ~20:00 UTC)</td><td>CFTC Oficial (<code>financial_lf.htm</code>) — categoría Leveraged Funds</td></tr>
                     <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com</td></tr>
-                    <tr><td>Feed de Noticias + Titulares enriquecidos por IA</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>FXStreet, ForexLive, Reuters, Investing.com, Bancos Centrales Oficiales · Enriquecimiento: Groq AI</td></tr>
-                    <tr><td>Análisis "Por Divisa" en Noticias</td><td>24 horas</td><td>Groq AI (llama-3.3-70b-versatile) con datos económicos actualizados</td></tr>
+                    <tr><td>Feed de Noticias + Análisis AI por divisa</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook · Análisis: Groq AI</td></tr>
                 </tbody>
             </table>
         </div>
