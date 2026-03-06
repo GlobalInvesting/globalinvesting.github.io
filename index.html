@@ -2521,8 +2521,8 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             break;
 
 case 'fx_momentum':
-            // fxPerformance1M: composite 70% 1M + 30% 3M del índice de divisa
-            // Fuente: Yahoo Finance (AUDUSD=X etc.) — C7
+            // fxPerformance1M: composite 90% 1M + 10% 3M del índice de divisa
+            // Fuente: Frankfurter/ECB — C8 (Stooq y Yahoo bloqueados en GitHub Actions)
             // Calibración Mar 2026 (rangos reales de mercado):
             //   composite >3%    → momentum muy fuerte
             //   composite 1–3%   → bullish claro
