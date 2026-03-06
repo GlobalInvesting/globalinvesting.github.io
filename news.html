@@ -343,9 +343,52 @@
 'use strict';
 
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── TIMESTAMP UTILITIES ───────────────────────────────────────────────────────
+/**
+ * Convert a Unix timestamp (ms) to the user's local time string "HH:MM".
+ * Falls back to "--:--" if ts is falsy or invalid.
+ */
+function tsToLocalTime(ts) {
+  if (!ts || ts <= 0) return '--:--';
+  const ms = ts < 1e10 ? ts * 1000 : ts; // normalise seconds vs ms
+  try {
+    return new Date(ms).toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch (e) { return '--:--'; }
+}
+
+/**
+ * Convert a Unix timestamp (ms) to the user's local short date "DD MMM".
+ * e.g. "06 Mar"
+ */
+function tsToLocalDate(ts) {
+  if (!ts || ts <= 0) return '';
+  const ms = ts < 1e10 ? ts * 1000 : ts;
+  try {
+    return new Date(ms).toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'short'
+    });
+  } catch (e) { return ''; }
+}
+
+/**
+ * Convert a UTC ISO string (from summaries.json updated_utc) to local "HH:MM".
+ */
+function utcIsoToLocalTime(isoStr) {
+  if (!isoStr) return '';
+  try {
+    return new Date(isoStr).toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch (e) { return ''; }
+}
+
+// ── HEADER TIMESTAMP ─────────────────────────────────────────────────────────
 const _now = new Date();
 const _tsH = document.getElementById('ts-header');
-if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',hour12:false});
+if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 document.getElementById('year').textContent = _now.getFullYear();
 
 const FLAG_CODES = { USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz' };
@@ -369,7 +412,7 @@ async function loadSummaries() {
   const grid  = document.getElementById('currency-grid');
   const updEl = document.getElementById('summaries-updated');
 
-  // Mostrar skeletons
+  // Show skeletons
   grid.innerHTML = CURRENCIES.map(() => `
     <div class="card-skeleton">
       <div class="sk-head"><div class="sk-line w40"></div></div>
@@ -395,7 +438,13 @@ async function loadSummaries() {
     const hasData = CURRENCIES.some(c => sums[c] && sums[c].articles_count > 0);
     if (!hasData) throw new Error('summaries.json sin datos de articulos');
 
-    if (updEl && data.updated_label) updEl.textContent = '· ' + data.updated_label;
+    // Show the update time converted to user's local timezone
+    if (updEl) {
+      const localTime = data.updated_utc
+        ? utcIsoToLocalTime(data.updated_utc)
+        : (data.updated_label || '');
+      updEl.textContent = localTime ? `· ${localTime} (hora local)` : '';
+    }
 
     grid.innerHTML = '';
     CURRENCIES.forEach(cur => {
@@ -430,11 +479,12 @@ function renderCurrencyCard(cur, s) {
   const isAI      = s.ai_generated !== false;
   const fullName  = CURRENCY_NAMES[cur] || cur;
 
-  let latestTime = '';
-  if (s.latest_ts && s.latest_ts > 0) {
-    const ms = s.latest_ts < 1e10 ? s.latest_ts * 1000 : s.latest_ts;
-    latestTime = new Date(ms).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit',hour12:false});
-  }
+  // ── LOCAL TIME from latest_ts (Unix ms) ──────────────────────────────────
+  // Previously this used s.latest_ts with a manual UTC conversion that
+  // displayed the time in UTC regardless of the user's location.
+  // Now we let the browser convert to local time automatically.
+  const localTime = tsToLocalTime(s.latest_ts);
+  const localDate = tsToLocalDate(s.latest_ts);
 
   const driversHtml = drivers.length
     ? `<div class="drivers">${drivers.map(d=>`<span class="driver-chip">${esc(d)}</span>`).join('')}</div>`
@@ -442,6 +492,11 @@ function renderCurrencyCard(cur, s) {
 
   const upcomingHtml = upcoming
     ? `<div class="card-event"><span class="ev-icon">&#128197;</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
+    : '';
+
+  // Build a tooltip showing both local time and the original UTC reference
+  const timeTitle = s.latest_ts
+    ? `UTC: ${new Date(s.latest_ts < 1e10 ? s.latest_ts * 1000 : s.latest_ts).toISOString().substr(11,5)}`
     : '';
 
   return `<div class="cur-card ${sent}${count===0?' no-data':''}">
@@ -469,7 +524,7 @@ function renderCurrencyCard(cur, s) {
       <span class="foot-sources">${esc(sources)}</span>
       <span style="display:flex;align-items:center;gap:.35rem;">
         ${isAI?'<span class="foot-ai">AI</span>':''}
-        <span class="foot-ts">${latestTime||'--:--'}</span>
+        <span class="foot-ts" title="${esc(timeTitle)}">${localDate ? localDate + ' ' : ''}${localTime}</span>
       </span>
     </div>
   </div>`;
