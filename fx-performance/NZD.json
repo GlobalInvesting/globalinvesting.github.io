@@ -1,13 +1,17 @@
 {
-  "fxPerformance1M": -0.659,
+  "fxPerformance1M": -1.5577,
   "fxPerformance1M_raw": -2.0071,
   "fxPerformance3M": 2.4867,
   "fxPerformance1W": -1.1664,
-  "indexNow": null,
-  "index30dAgo": null,
-  "index90dAgo": null,
-  "index7dAgo": null,
+  "rateNow": 1.689,
+  "rate30dAgo": 1.6551,
+  "rate90dAgo": 1.731,
+  "rate7dAgo": 1.6693,
+  "dateNow": "2026-03-05",
+  "date30d": "2026-02-03",
+  "date90d": "2025-12-05",
+  "date7d": "2026-02-26",
   "date": "2026-03-05",
-  "source": "Frankfurter ECB fallback (Yahoo no disponible) \u2014 composite 70% 1M + 30% 3M (C7)",
-  "sourceType": "frankfurter_fallback"
+  "source": "Frankfurter/ECB \u2014 composite 90% 1M + 10% 3M (C8)",
+  "sourceType": "frankfurter_ecb"
 }
