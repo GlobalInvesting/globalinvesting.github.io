@@ -312,7 +312,7 @@
   <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE ANÁLISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
     Metodología: Modelo cuantitativo basado en datos económicos reales &bull; 21 indicadores ponderados en 6 tiers<br>
-    Tasas &amp; Ciclo Monetario (25%) &bull; FX Momentum &amp; Smart Money (23%) &bull; Crecimiento &amp; Empleo (17%) &bull; Sentimiento de Mercado (16%) &bull; Balance Externo (10%) &bull; Consumo &amp; Salarios (9%)<br>
+    Tasas &amp; Ciclo Monetario (32%) &bull; Crecimiento &amp; Empleo (18%) &bull; Sentimiento de Mercado (19%) &bull; FX Momentum &amp; Smart Money (17%) &bull; Balance Externo (14%) &bull; Consumo &amp; Salarios (8%)<br>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
   </div>
   <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;">
@@ -322,7 +322,7 @@
     macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
     El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
     Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
-    Fuentes de noticias: FXStreet, ForexLive, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
+    Fuentes de noticias: FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
   </div>
   <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
     <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
@@ -480,9 +480,6 @@ function renderCurrencyCard(cur, s) {
   const fullName  = CURRENCY_NAMES[cur] || cur;
 
   // ── LOCAL TIME from latest_ts (Unix ms) ──────────────────────────────────
-  // Previously this used s.latest_ts with a manual UTC conversion that
-  // displayed the time in UTC regardless of the user's location.
-  // Now we let the browser convert to local time automatically.
   const localTime = tsToLocalTime(s.latest_ts);
   const localDate = tsToLocalDate(s.latest_ts);
 
