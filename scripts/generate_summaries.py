@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate_summaries.py — v1.0
+generate_summaries.py — v2.0
 Genera un bloque de análisis consolidado por divisa a partir de news.json.
 Llama a Groq una vez por divisa (8 llamadas total) y escribe summaries.json.
 
@@ -21,9 +21,9 @@ NEWS_FILE      = Path("news-data/news.json")
 SUMMARIES_FILE = Path("news-data/summaries.json")
 GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL     = "llama-3.3-70b-versatile"
-MAX_TOKENS     = 500
-TEMPERATURE    = 0.2
-SLEEP_BETWEEN  = 6      # segundos entre llamadas
+MAX_TOKENS     = 800   # aumentado para análisis más ricos
+TEMPERATURE    = 0.3   # ligeramente más creativo
+SLEEP_BETWEEN  = 6     # segundos entre llamadas
 MAX_RETRIES    = 2
 
 CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
@@ -45,58 +45,125 @@ FLAG_CODES = {
 }
 
 # ─────────────────────────────────────────────
-SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading.
-Tu tarea es sintetizar múltiples titulares de noticias sobre una divisa en un análisis consolidado.
+SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading con más de 15 años de experiencia. Tu especialidad es sintetizar múltiples fuentes de información en análisis accionables, precisos y con contexto macroeconómico profundo.
 
-INSTRUCCIONES:
-- Escribe en español profesional, claro y conciso.
-- El análisis debe tener entre 60 y 130 palabras.
-- Incluye cifras, porcentajes o niveles específicos cuando estén presentes en los titulares.
-- Identifica el sentimiento dominante y su intensidad (confidence 0-100).
-- Lista los 2-4 drivers principales como frases cortas (máx 3 palabras cada una).
-- Si hay un evento económico próximo relevante mencionado en los titulares, inclúyelo en upcoming_event.
-- Si no hay evento próximo relevante, usa null para upcoming_event.
+Tu tarea es leer una serie de titulares y resúmenes de noticias sobre una divisa específica y producir un análisis consolidado de alta calidad.
 
-FORMATO DE RESPUESTA — JSON puro, sin markdown, sin texto extra:
+═══════════════════════════════════════════════
+INSTRUCCIONES DE REDACCIÓN
+═══════════════════════════════════════════════
+
+EXTENSIÓN Y ESTRUCTURA:
+- El campo "analysis" debe tener entre 120 y 200 palabras.
+- Redacta en párrafos fluidos, como un briefing institucional real.
+- Usa un tono profesional pero directo, evitando frases genéricas o vagas.
+
+CONTENIDO OBLIGATORIO — incluye SIEMPRE que los datos estén disponibles:
+1. Contexto macro principal: ¿qué evento o dato está moviendo la divisa hoy?
+2. Niveles técnicos clave: menciona niveles de precio, soportes, resistencias o rangos cuando aparezcan en los titulares (ej: "EUR/USD cotiza en 1.1590, con soporte en 1.1540").
+3. Postura del banco central relevante: hawkish / dovish / en espera, y qué implica para la divisa.
+4. Catalizadores secundarios: flujos de riesgo (risk-on/off), correlaciones con materias primas, datos de empleo, etc.
+5. Perspectiva a corto plazo: ¿qué evento o dato próximo puede cambiar el sesgo?
+
+ESTILO:
+- Cita cifras concretas cuando aparezcan: porcentajes de caída, niveles de precio, variaciones en puntos básicos.
+- Conecta causas con efectos (ej: "el alza del petróleo amplifica las expectativas de inflación, lo que reduce el margen del BCE para recortar tasas").
+- Si hay señales contradictorias, reconócelas explícitamente y explica cuál domina y por qué.
+- No repitas información: si el EUR cayó a 1.1590, mencionarlo una vez con contexto es suficiente.
+
+LO QUE DEBES EVITAR:
+- Frases vacías como "la divisa muestra señales" o "los mercados reaccionaron".
+- Análisis de menos de 3 oraciones sustanciales.
+- Repetir el nombre de la divisa al inicio de cada oración.
+- Listar hechos sin conectarlos causalmente.
+
+═══════════════════════════════════════════════
+FORMATO DE RESPUESTA
+═══════════════════════════════════════════════
+
+JSON puro, sin markdown, sin texto extra:
+
 {
   "sentiment": "bull|bear|neut|mixed",
   "confidence": 0-100,
-  "analysis": "texto del análisis entre 60 y 130 palabras",
-  "drivers": ["Driver 1", "Driver 2", "Driver 3"],
-  "upcoming_event": "Descripción breve del evento próximo o null"
+  "analysis": "análisis completo entre 120 y 200 palabras",
+  "drivers": ["Driver 1", "Driver 2", "Driver 3", "Driver 4"],
+  "upcoming_event": "Descripción breve del evento próximo más relevante, o null"
 }
 
 REGLAS DE SENTIMIENTO:
-- bull: señales predominantemente positivas para la divisa (>60% de titulares alcistas)
-- bear: señales predominantemente negativas para la divisa (>60% de titulares bajistas)
+- bull:  señales predominantemente positivas para la divisa (>60% de titulares alcistas)
+- bear:  señales predominantemente negativas para la divisa (>60% de titulares bajistas)
 - mixed: señales contradictorias o equilibradas entre alcistas y bajistas
-- neut: sin señal clara o cobertura muy limitada (<2 noticias)
+- neut:  sin señal clara o cobertura muy limitada (<2 noticias)
 
-REGLA DE CONFIDENCE:
-- 90-100: consenso absoluto, todos los titulares apuntan al mismo lado
-- 70-89:  mayoría clara con algunos matices
-- 50-69:  tendencia moderada con contradicciones
+REGLA DE CONFIDENCE (refleja consenso entre las fuentes, no la intensidad del movimiento):
+- 90-100: consenso absoluto, todas las fuentes apuntan al mismo lado
+- 70-89:  mayoría clara con algún matiz menor
+- 50-69:  tendencia moderada con contradicciones relevantes
 - 30-49:  señal débil o muy mixta
-- 0-29:   sin señal (usar neut)"""
+- 0-29:   sin señal (usar neut)
+
+REGLA DE DRIVERS (máx. 4, ordenados por importancia):
+- Frases de 2-4 palabras, específicas y concretas
+- Ejemplos buenos: "Petróleo >$80", "BoE hawkish", "NFP positivo", "Risk-off global"
+- Ejemplos malos: "Tensión", "Datos", "Mercado"
+
+REGLA DE UPCOMING_EVENT:
+- Solo incluir si aparece explícitamente en los titulares o es la consecuencia directa de la noticia principal.
+- Formato: "Nombre del evento — fecha/plazo si se menciona"
+- Si no hay ninguno relevante: null"""
 
 
 def build_user_prompt(cur: str, articles: list) -> str:
     name = CURRENCY_NAMES.get(cur, cur)
+
+    # Separar por impacto para dar más peso a los de alto impacto
+    high_impact = [a for a in articles if a.get("impact") == "high"]
+    other       = [a for a in articles if a.get("impact") != "high"]
+
     lines = []
-    for a in articles:
-        headline = a.get("ai_headline") or a.get("title", "")
-        impact   = a.get("impact", "low").upper()
-        sentiment = a.get("sentiment", "neut").upper()
-        source   = a.get("source", "")
-        lines.append(f"[{impact}|{sentiment}] {headline}  ({source})")
+
+    if high_impact:
+        lines.append("── ALTO IMPACTO ──")
+        for a in high_impact:
+            headline  = a.get("ai_headline") or a.get("title", "")
+            sentiment = a.get("sentiment", "neut").upper()
+            source    = a.get("source", "")
+            expand    = a.get("expand", "")
+            # Incluir el resumen expandido si existe, truncado a 200 chars
+            snippet = f" | {expand[:200].strip()}..." if expand and len(expand) > 30 else ""
+            lines.append(f"  [{sentiment}] {headline}  ({source}){snippet}")
+
+    if other:
+        lines.append("── MEDIO/BAJO IMPACTO ──")
+        for a in other:
+            headline  = a.get("ai_headline") or a.get("title", "")
+            sentiment = a.get("sentiment", "neut").upper()
+            source    = a.get("source", "")
+            lines.append(f"  [{sentiment}] {headline}  ({source})")
 
     headlines_block = "\n".join(lines) if lines else "Sin noticias disponibles."
 
+    bull_count  = sum(1 for a in articles if a.get("sentiment") in ("bull", "alcista"))
+    bear_count  = sum(1 for a in articles if a.get("sentiment") in ("bear", "bajista"))
+    mixed_count = sum(1 for a in articles if a.get("sentiment") in ("mixed", "mixto"))
+    neut_count  = len(articles) - bull_count - bear_count - mixed_count
+
+    sentiment_summary = (
+        f"Distribución de sentimiento: {bull_count} alcistas, "
+        f"{bear_count} bajistas, {mixed_count} mixtos, {neut_count} neutrales."
+    )
+
     return (
         f"DIVISA: {cur} — {name}\n"
-        f"NOTICIAS ({len(articles)}):\n"
+        f"TOTAL DE ARTÍCULOS: {len(articles)}\n"
+        f"{sentiment_summary}\n\n"
+        f"TITULARES Y CONTEXTO:\n"
         f"{headlines_block}\n\n"
-        f"Genera el análisis consolidado en JSON para {cur}."
+        f"Genera el análisis consolidado institucional en JSON para {cur}. "
+        f"Recuerda: el campo 'analysis' debe tener entre 120 y 200 palabras, "
+        f"con niveles de precio concretos, postura del banco central y perspectiva a corto plazo."
     )
 
 
@@ -176,12 +243,19 @@ def call_groq(api_key: str, cur: str, articles: list) -> dict | None:
                 print(f"    ⚠️  JSON incompleto para {cur}: {list(parsed.keys())}")
                 return None
 
+            # Validar extensión del análisis
+            word_count = len(parsed.get("analysis", "").split())
+            if word_count < 50:
+                print(f"    ⚠️  Análisis demasiado corto para {cur}: {word_count} palabras")
+                return None
+
             # Normalizar
             parsed["sentiment"]  = parsed["sentiment"].lower().strip()
             parsed["confidence"] = max(0, min(100, int(parsed["confidence"])))
-            parsed["drivers"]    = [str(d)[:40] for d in parsed.get("drivers", [])[:4]]
+            parsed["drivers"]    = [str(d)[:50] for d in parsed.get("drivers", [])[:4]]
             parsed["upcoming_event"] = parsed.get("upcoming_event") or None
 
+            print(f"    📝 Análisis generado: {word_count} palabras")
             return parsed
 
         except json.JSONDecodeError as e:
@@ -252,7 +326,7 @@ def fallback_summary(cur: str, articles: list) -> dict:
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"📊 generate_summaries.py v1.0 — {GROQ_MODEL}")
+    print(f"📊 generate_summaries.py v2.0 — {GROQ_MODEL}")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}")
     print("=" * 65)
 
@@ -307,7 +381,6 @@ def main():
     summaries = {}
     generated  = 0
     fallbacks  = 0
-    reused     = 0
 
     print(f"\n{'─'*65}")
     for cur in CURRENCIES:
@@ -363,7 +436,7 @@ def main():
                 result["sentiment"], result["sentiment"].upper()
             )
             print(f"  ✅ AI → {sent_label} ({result['confidence']}%) | {len(result['drivers'])} drivers")
-            print(f"     {result['analysis'][:80]}...")
+            print(f"     {result['analysis'][:120]}...")
         else:
             # Fallback estadístico
             fb = fallback_summary(cur, cur_articles)
