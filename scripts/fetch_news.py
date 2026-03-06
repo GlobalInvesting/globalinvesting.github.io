@@ -1,24 +1,32 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.2
+fetch_news.py — v5.3
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5.2 (sobre v5.1):
-  NUEVAS FUENTES — cobertura ampliada para divisas con análisis débil:
-    · RBA (oficial)        → AUD directo desde banco central
-    · RBNZ (oficial)       → NZD directo desde banco central
-    · SNB (oficial)        → CHF directo desde banco central
-    · BoJ (oficial)        → JPY directo desde banco central
-    · MarketPulse (OANDA)  → excelente cobertura AUD, CAD, NZD, JPY
-    · Reuters FX           → cobertura institucional todas las divisas
-    · Nasdaq FX News       → análisis USD/EUR/GBP/JPY profundo
-    · ForexLive (analysis) → análisis técnico/fundamental adicional
+CAMBIOS v5.3 (sobre v5.2):
+  NUEVOS FEEDS — Google News RSS vía rss.app (1 feed específico por divisa):
+    · Google News NZD  → "new zealand dollar news" (feed corregido)
+    · Google News AUD  → "Australian dollar news"
+    · Google News USD  → "USdollar news"
+    · Google News CAD  → "canadian dollar news"
+    · Google News CHF  → "swiss franc news"
+    · Google News JPY  → "japanese yen news"
+    · Google News GBP  → "british pound news"
+    · Google News EUR  → "euro currency news"
 
-  AJUSTE DE LÍMITES:
-    · MAX_PER_CUR sube de 6 a 8 para aprovechar mayor volumen de fuentes
-    · GUARANTEED_PER_CUR sube de 2 a 3 para garantizar mínimo útil para Groq
+  CORTOCIRCUITO DE DIVISA:
+    · Los feeds con clave "currency" en su config asignan la divisa directamente,
+      saltando el scoring. Elimina el problema de artículos NZD clasificados como USD.
 
-  Sin cambios en lógica de detección de divisas, scoring ni estructura JSON.
+  AJUSTES DE CALIDAD (auditoría v5.2→v5.3):
+    · CURRENCY_MIN_SCORE sube de 3 a 5 para reducir asignaciones incorrectas.
+    · Nuevo guard: UK housing/Halifax penaliza NZD, AUD, CHF.
+    · Nuevo filtro en is_forex_relevant(): descarta titulares de índices bursátiles
+      europeos (DAX, CAC, EuroStoxx) que no son relevantes para divisas.
+    · SOURCE_CURRENCY ampliado con los nuevos feeds de Google News.
+    · FOREX_SOURCES ampliado con los nuevos feeds de Google News.
+    · FETCH_WORKERS sube de 10 a 14 para los feeds adicionales.
+    · MAX_NEWS sube de 40 a 48 para absorber el mayor volumen de fuentes.
 """
 
 import json
@@ -33,19 +41,19 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 
 # ─────────────────────────────────────────────
-MAX_NEWS              = 40          # ligeramente más para aprovechar nuevas fuentes
+MAX_NEWS              = 48          # v5.3: subido de 40 para absorber nuevos feeds
 MAX_AGE_DAYS          = 4
-GUARANTEED_PER_CUR    = 3           # v5.2: subido de 2 a 3
-MAX_PER_CUR           = 8           # v5.2: subido de 6 a 8
+GUARANTEED_PER_CUR    = 3
+MAX_PER_CUR           = 8
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
 CURRENCIES            = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
 FETCH_TIMEOUT         = 12
-FETCH_WORKERS         = 10          # v5.2: más workers para más feeds
+FETCH_WORKERS         = 14          # v5.3: subido para más feeds en paralelo
 MIN_DESCRIPTION_WORDS = 12
 
-# Umbral mínimo de score para asignar divisa por keywords
-CURRENCY_MIN_SCORE = 3
+# v5.3: subido de 3 a 5 para reducir falsos positivos
+CURRENCY_MIN_SCORE = 5
 
 # ─────────────────────────────────────────────
 # PAR EXPLÍCITO → DIVISA PROTAGONISTA
@@ -122,6 +130,13 @@ EMERGING_MARKET_TITLE_RE = re.compile(
     r"turkish (lira|assets?)|emerging market|"
     r"kospi|nikkei 225|hang seng|shanghai composite|sensex|"
     r"peso mexicano|real brasileiro|lira turca)\b",
+    re.IGNORECASE,
+)
+
+# v5.3: nuevo filtro para índices bursátiles europeos que no son relevantes para divisas
+EQUITY_INDEX_TITLE_RE = re.compile(
+    r"\b(dax|cac 40|eurostoxx|euro stoxx|ibex 35|ftse mib|stoxx 600|aex|"
+    r"bel 20|omx|wig20)\b.{0,40}\b(rises?|falls?|gains?|drops?|points?|higher|lower|climbs?|slides?)\b",
     re.IGNORECASE,
 )
 
@@ -277,10 +292,15 @@ FALSE_POSITIVE_GUARDS = [
         "pattern": re.compile(r"\b(shanghai|shenzhen|hang seng|csi 300|yuan|renminbi|cny)\b", re.IGNORECASE),
         "penalize": {"CAD": 2, "AUD": 1},
     },
+    # v5.3: nuevo guard — UK housing penaliza divisas sin relación directa
+    {
+        "pattern": re.compile(r"\b(halifax|house prices?|housing market uk|uk property|uk housing|dwelling consents)\b", re.IGNORECASE),
+        "penalize": {"NZD": 5, "AUD": 3, "CHF": 3, "CAD": 2},
+    },
 ]
 
 # ─────────────────────────────────────────────
-# FEEDS — v5.2: nuevas fuentes marcadas con [NEW]
+# FEEDS
 # ─────────────────────────────────────────────
 FEEDS = [
     # ── ESPAÑOL ──────────────────────────────────────────────────────────────
@@ -299,7 +319,7 @@ FEEDS = [
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss",                                    "lang": "en" },
     { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/news",                             "lang": "en" },
     { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/centralbank",                      "lang": "en" },
-    { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/analysis",                         "lang": "en" },  # [NEW] análisis técnico/fundamental
+    { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/analysis",                         "lang": "en" },
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/press.html",                        "lang": "en" },
     { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/news",                        "lang": "en" },
     { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
@@ -319,28 +339,31 @@ FEEDS = [
     { "source": "InvestMacro",      "url": "https://investmacro.com/feed/",                                    "lang": "en" },
     { "source": "ForexCrunch",      "url": "https://forexcrunch.com/feed/",                                    "lang": "en" },
 
-    # ── INGLÉS — fuentes nuevas v5.2 ─────────────────────────────────────────
+    # ── INGLÉS — bancos centrales oficiales (v5.2) ───────────────────────────
+    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-speeches.xml",                  "lang": "en" },
+    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",            "lang": "en" },
+    { "source": "RBNZ",             "url": "https://www.rbnz.govt.nz/hub/news/feed",                          "lang": "en" },
+    { "source": "SNB",              "url": "https://www.snb.ch/en/snb/medmit/medienmitteilungen/id/rss",       "lang": "en" },
+    { "source": "Bank of Japan",    "url": "https://www.boj.or.jp/en/about/press/index.htm/rss.xml",           "lang": "en" },
 
-    # Bancos centrales oficiales — fuente primaria, máxima confianza
-    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-speeches.xml",                  "lang": "en" },  # [NEW] AUD — discursos RBA
-    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",            "lang": "en" },  # [NEW] AUD — comunicados RBA
-    { "source": "RBNZ",             "url": "https://www.rbnz.govt.nz/hub/news/feed",                          "lang": "en" },  # [NEW] NZD — banco central oficial
-    { "source": "SNB",              "url": "https://www.snb.ch/en/snb/medmit/medienmitteilungen/id/rss",       "lang": "en" },  # [NEW] CHF — comunicados SNB
-    { "source": "Bank of Japan",    "url": "https://www.boj.or.jp/en/about/press/index.htm/rss.xml",           "lang": "en" },  # [NEW] JPY — banco central oficial
+    # ── INGLÉS — fuentes de análisis (v5.2) ─────────────────────────────────
+    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/feed/",                               "lang": "en" },
+    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/forex/feed/",                         "lang": "en" },
+    { "source": "Reuters FX",       "url": "https://feeds.reuters.com/reuters/currenciesNews",                 "lang": "en" },
+    { "source": "Nasdaq FX",        "url": "https://www.nasdaq.com/feed/rssoutbound?category=currencies",      "lang": "en" },
+    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
+    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
 
-    # MarketPulse (OANDA) — muy fuerte en AUD, CAD, NZD, JPY con análisis macro
-    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/feed/",                               "lang": "en" },  # [NEW] cobertura amplia G8
-    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/forex/feed/",                         "lang": "en" },  # [NEW] forex específico
-
-    # Reuters FX — cobertura institucional de alta calidad
-    { "source": "Reuters FX",       "url": "https://feeds.reuters.com/reuters/currenciesNews",                 "lang": "en" },  # [NEW] cobertura global divisas
-
-    # Nasdaq FX — análisis profundo USD, EUR, JPY
-    { "source": "Nasdaq FX",        "url": "https://www.nasdaq.com/feed/rssoutbound?category=currencies",      "lang": "en" },  # [NEW] análisis divisa institucional
-
-    # FX Empire — buena cobertura AUD/NZD/CHF/JPY
-    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },  # [NEW] G8 cobertura equilibrada
-    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" }, # [NEW] pronósticos por divisa
+    # ── GOOGLE NEWS RSS vía rss.app — 1 feed específico por divisa (v5.3) ───
+    # La clave "currency" cortocircuita detect_currency() y asigna directamente.
+    { "source": "Google News USD",  "url": "https://rss.app/feeds/RECOTepHS5Kq3UCO.xml", "lang": "en", "currency": "USD" },
+    { "source": "Google News EUR",  "url": "https://rss.app/feeds/BEnNdIQr1CkPaw3i.xml", "lang": "en", "currency": "EUR" },
+    { "source": "Google News GBP",  "url": "https://rss.app/feeds/Da00omOyavGEQjJK.xml", "lang": "en", "currency": "GBP" },
+    { "source": "Google News JPY",  "url": "https://rss.app/feeds/fiswoc1JpVIcCuwY.xml", "lang": "en", "currency": "JPY" },
+    { "source": "Google News AUD",  "url": "https://rss.app/feeds/aXeJoqXkQQjm8lQi.xml", "lang": "en", "currency": "AUD" },
+    { "source": "Google News CAD",  "url": "https://rss.app/feeds/cVDaLFQinNqDr5ke.xml", "lang": "en", "currency": "CAD" },
+    { "source": "Google News CHF",  "url": "https://rss.app/feeds/5rQGIwZXa33qQulN.xml", "lang": "en", "currency": "CHF" },
+    { "source": "Google News NZD",  "url": "https://rss.app/feeds/gW8QbLubX7NC8wjK.xml", "lang": "en", "currency": "NZD" },
 ]
 
 # ─────────────────────────────────────────────
@@ -357,7 +380,6 @@ HIGH_IMPACT_KW = [
     "hawkish", "dovish",
     "strait of hormuz", "estrecho de ormuz", "war ", "guerra ",
     "military strike", "ataque militar", "sanctions", "sanciones",
-    # v5.2: añadidos para mejorar detección en comunicados de bancos centrales
     "statement on monetary policy", "minutes of", "board decision",
     "official cash rate", "cash rate target", "policy rate",
     "orr", "bullock", "schlegel", "ueda",
@@ -371,7 +393,6 @@ MED_IMPACT_KW = [
     "pmi manufacturero", "desempleo", "balanza comercial", "ventas minoristas",
     "producción industrial", "confianza del consumidor", "salarios",
     "crude oil", "oil prices", "petróleo", "brent", "wti",
-    # v5.2: métricas específicas de economías pequeñas
     "business nz", "nz biz", "westpac nz", "anz nz",
     "building permits", "dwelling consents", "trade deficit nz",
     "australia business", "australia consumer", "anz australia",
@@ -380,13 +401,22 @@ MED_IMPACT_KW = [
 ]
 
 SOURCE_CURRENCY = {
-    "ECB": "EUR",
+    "ECB":             "EUR",
     "Bank of England": "GBP",
     "Bank of Japan":   "JPY",
     "RBA":             "AUD",
     "RBNZ":            "NZD",
     "SNB":             "CHF",
     "Federal Reserve": "USD",
+    # v5.3: Google News feeds — fallback defensivo (el cortocircuito ya lo maneja)
+    "Google News USD": "USD",
+    "Google News EUR": "EUR",
+    "Google News GBP": "GBP",
+    "Google News JPY": "JPY",
+    "Google News AUD": "AUD",
+    "Google News CAD": "CAD",
+    "Google News CHF": "CHF",
+    "Google News NZD": "NZD",
 }
 
 FOREX_SOURCES = {
@@ -394,8 +424,10 @@ FOREX_SOURCES = {
     "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
     "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
-    "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX",
-    "FX Empire",  # v5.2
+    "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX", "FX Empire",
+    # v5.3: Google News feeds
+    "Google News USD", "Google News EUR", "Google News GBP", "Google News JPY",
+    "Google News AUD", "Google News CAD", "Google News CHF", "Google News NZD",
 }
 
 # ─────────────────────────────────────────────
@@ -425,6 +457,10 @@ def has_real_content(title: str, description: str) -> bool:
 
 
 def is_forex_relevant(title: str, summary: str) -> bool:
+    # v5.3: filtrar índices bursátiles europeos que no son relevantes para divisas
+    if EQUITY_INDEX_TITLE_RE.search(title):
+        return False
+
     if EMERGING_MARKET_TITLE_RE.search(title):
         return False
 
@@ -444,7 +480,6 @@ def is_forex_relevant(title: str, summary: str) -> bool:
         "recession", "recesión", "monetary policy", "política monetaria",
         "yield", "treasury", "gilt", "bond",
         "tariff", "arancel", "oil", "petróleo",
-        # v5.2: keywords adicionales para bancos centrales pequeños
         "official cash rate", "cash rate", "policy rate", "rbnz", "rba",
         "reserve bank", "swiss national", "snb",
     ]
@@ -491,7 +526,7 @@ def detect_currency(title: str, summary: str, source: str = "") -> str | None:
     if best_score >= CURRENCY_MIN_SCORE:
         return best_cur
 
-    # PASO 3: fallback institucional (mayor peso en v5.2 para bancos centrales)
+    # PASO 3: fallback institucional
     if source in SOURCE_CURRENCY:
         return SOURCE_CURRENCY[source]
 
@@ -543,9 +578,17 @@ def entry_id(title: str, source: str) -> str:
 
 def fetch_via_feedparser(feed_cfg: dict):
     ua_map = {
-        "ForexCrunch": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Reuters FX":  "Mozilla/5.0 (compatible; RSSReader/1.0)",
-        "Nasdaq FX":   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "ForexCrunch":    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Reuters FX":     "Mozilla/5.0 (compatible; RSSReader/1.0)",
+        "Nasdaq FX":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Google News USD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News EUR": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News GBP": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News JPY": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News AUD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News CAD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News CHF": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News NZD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
     }
     ua = ua_map.get(feed_cfg.get("source", ""), "Mozilla/5.0 (compatible; ForexNewsBot/2.0)")
     try:
@@ -654,17 +697,18 @@ def main():
     filtered_relevance   = 0
     filtered_no_currency = 0
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.2 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.3 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
     print(f"  Descarga completada.")
 
     for feed_cfg in FEEDS:
-        source  = feed_cfg["source"]
-        lang    = feed_cfg.get("lang", "en")
-        entries = all_entries.get(feed_cfg["url"], [])
-        count   = 0
+        source           = feed_cfg["source"]
+        lang             = feed_cfg.get("lang", "en")
+        forced_currency  = feed_cfg.get("currency")   # v5.3: cortocircuito por divisa
+        entries          = all_entries.get(feed_cfg["url"], [])
+        count            = 0
 
         for entry in entries:
             title   = clean_html(getattr(entry, "title", ""))
@@ -690,7 +734,9 @@ def main():
                 filtered_quality += 1
                 continue
 
-            if not is_forex_relevant(title, summary):
+            # Para feeds con divisa forzada, relajamos is_forex_relevant()
+            # ya que el feed es por definición relevante para esa divisa.
+            if not forced_currency and not is_forex_relevant(title, summary):
                 filtered_relevance += 1
                 continue
 
@@ -705,7 +751,12 @@ def main():
                 continue
             seen_titles.add(title_key)
 
-            cur = detect_currency(title, summary, source)
+            # v5.3: cortocircuito — si el feed declara su divisa, úsala directamente
+            if forced_currency:
+                cur = forced_currency
+            else:
+                cur = detect_currency(title, summary, source)
+
             if cur is None:
                 filtered_no_currency += 1
                 continue
@@ -737,7 +788,8 @@ def main():
                 en_raw += 1
 
         if count > 0:
-            print(f"    [{lang.upper()}] {source}: {count} noticias")
+            tag = f" [{forced_currency}]" if forced_currency else ""
+            print(f"    [{lang.upper()}] {source}{tag}: {count} noticias")
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
@@ -774,9 +826,9 @@ def main():
         max_per_cur=MAX_PER_CUR,
     )
 
-    dist_after   = Counter(a["cur"] for a in articles)
-    impact_after = Counter(a["impact"] for a in articles)
-    recent_count = sum(1 for a in articles if a.get("recent", True))
+    dist_after     = Counter(a["cur"] for a in articles)
+    impact_after   = Counter(a["impact"] for a in articles)
+    recent_count   = sum(1 for a in articles if a.get("recent", True))
     featured_count = sum(1 for a in articles if a.get("featured", False))
     print(f"\n✂️  Selección final ({len(articles)} artículos):")
     print(f"   Distribución: {dict(sorted(dist_after.items()))}")
