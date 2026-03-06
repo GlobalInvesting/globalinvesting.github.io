@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
 """
-enrich_news.py — v9.1
+enrich_news.py — v9.2
 Soporte para múltiples API keys de Groq con fallback automático.
 
-CAMBIOS v9.1 (sobre v9):
-  CORRECCIÓN 1 — REGLA SNB más precisa en SYSTEM_PROMPT:
-    Antes: "SNB amenaza con intervenir → CHF neutral"
-    Ahora: tres estados diferenciados:
-      - SNB interviene activamente para depreciar → CHF bajista
-      - SNB amenaza como techo implícito → CHF mixto
-      - Franco fuerte sin mención de intervención → CHF alcista
-    Evita que Nomura-style articles (fuerza estructural + riesgo intervención)
-    sean clasificados como neutral cuando el correcto es mixto.
+CAMBIOS v9.2 (sobre v9.1):
+  MEJORA 1 — CURRENCY_MACRO_CONTEXT inyectado en build_user_prompt():
+    El perfil macro de cada divisa (mecanismo de transmisión específico)
+    se incluye en el user prompt para que el modelo escriba el mecanismo
+    correcto en el cuerpo del titular, no solo en el sentimiento final.
+    Reduce titulares genéricos como "genera incertidumbre → EUR bajista"
+    a favor de "eleva costes energéticos zona euro → EUR bajista".
 
-  CORRECCIÓN 2 — REGLA DE ESPECIFICIDAD en SYSTEM_PROMPT:
-    Groq generaba titulares genéricos ("importa petróleo refinado") cuando el
-    artículo contenía datos concretos. Nueva regla obliga a incluir cifras,
-    porcentajes o nombres institucionales cuando estén presentes en el texto.
+  MEJORA 2 — Correlación NZD/petróleo más precisa en SYSTEM_PROMPT:
+    Antes: "NZD bajista" de forma simple cuando sube el petróleo.
+    Ahora: NZD bajista por ser divisa de riesgo en entornos risk-off
+    (el mecanismo es el risk-off, no la correlación directa con el crudo).
+    Diferencia importante: petróleo sube por demanda global → NZD puede
+    ser neutral o alcista; petróleo sube por crisis/guerra → NZD bajista.
 
-  CORRECCIÓN 3 — score_from_headline() con detección SNB mejorada:
-    Patrón SNB_INTERVENTION_RE más preciso: distingue intervención activa
-    (bajista) de amenaza como techo (mixto).
-
-  Sin otros cambios funcionales respecto a v9.
+  Sin otros cambios funcionales respecto a v9.1.
 """
 
 import os
@@ -66,6 +62,27 @@ CURRENCY_NAMES = {
     "CHF": "franco suizo",         "NZD": "dólar neozelandés",
 }
 
+# v9.2: Perfil macro de cada divisa — inyectado en el user prompt
+# para anclar el mecanismo de transmisión en el cuerpo del titular
+CURRENCY_MACRO_CONTEXT = {
+    "USD": "Activo refugio global. Se beneficia de risk-off y tensiones geopolíticas. "
+           "Sensible a postura Fed y diferencial de tasas con G10.",
+    "EUR": "Importador neto de energía. Conflicto geopolítico = mayores costes energéticos "
+           "= presión sobre crecimiento eurozona = dilema BCE entre inflación y recesión.",
+    "GBP": "No es activo refugio. Sensible a inflación UK, política del BoE y datos laborales. "
+           "En risk-off cae frente a USD, JPY y CHF.",
+    "JPY": "Activo refugio tradicional pero debilitado por importación de petróleo. "
+           "Driver dominante: diferencial tasas US-JP. Fed hawkish o BoJ dovish = JPY bajista.",
+    "AUD": "Divisa de riesgo correlacionada con commodities (hierro, cobre) y ciclo chino. "
+           "En crisis/guerra cae por risk-off aunque Australia exporta algunos commodities.",
+    "CAD": "Correlacionado con petróleo WTI: Canadá es exportador neto de crudo. "
+           "Petróleo alto = soporte estructural CAD independientemente de postura BoC.",
+    "CHF": "Activo refugio por excelencia. Se aprecia en crisis/guerra/risk-off global. "
+           "SNB puede intervenir para limitar apreciación excesiva.",
+    "NZD": "Divisa de riesgo de alta beta. En crisis/guerra cae por risk-off global, "
+           "no por correlación directa con petróleo. RBNZ y datos domésticos NZ son drivers propios.",
+}
+
 CALENDAR_RE = re.compile(
     r"upcoming event|content type|scheduled date|share this page|"
     r"governing council presents|press release explaining|"
@@ -74,11 +91,10 @@ CALENDAR_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Divisas que cotizan contra el USD
 MAJORS_VS_USD = {"EUR", "GBP", "AUD", "NZD", "CAD", "CHF", "JPY"}
 
 # ─────────────────────────────────────────────
-# SYSTEM PROMPT — ESTÁNDAR INSTITUCIONAL v9.1
+# SYSTEM PROMPT — v9.2
 # ─────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading.
 Tu tarea es sintetizar noticias económicas y financieras en titulares estructurados para una plataforma profesional.
@@ -86,10 +102,10 @@ Tu tarea es sintetizar noticias económicas y financieras en titulares estructur
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FORMATO OBLIGATORIO DEL TITULAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Evento/dato concreto]: [Mecanismo de transmisión] → [DIVISA ASIGNADA] [SENTIMIENTO]
+[Evento/dato concreto]: [Mecanismo de transmisión ESPECÍFICO para esta divisa] → [DIVISA] [SENTIMIENTO]
 
 Donde:
-  - DIVISA ASIGNADA es SIEMPRE la divisa indicada en "DIVISA ASIGNADA:" (ej. EUR, NZD)
+  - DIVISA ASIGNADA es SIEMPRE la divisa indicada en "DIVISA ASIGNADA:"
   - SENTIMIENTO es exactamente una de estas cuatro palabras: alcista | bajista | neutral | mixto
 
 Longitud: entre 90 y 160 caracteres.
@@ -105,47 +121,67 @@ EJEMPLOS CORRECTOS:
   SNB podría intervenir para frenar apreciación excesiva del franco: techo implícito sobre valorización → CHF mixto
   EUR/USD cae 0.63% pese a inflación en zona euro: tensiones en Oriente Medio impulsan al USD → EUR bajista
   PIB de Canadá se contrae 0.6% en Q4 superando pronóstico de caída: debilidad económica presiona al BoC → CAD bajista
+  Conflicto en Irán eleva petróleo a $80: costes energéticos zona euro suben y complican dilema del BCE → EUR bajista
+  Guerra en Oriente Medio provoca risk-off global: divisas de alto riesgo bajo presión vendedora → NZD bajista
+  Petróleo sube 5% por tensiones en Ormuz: soporte estructural para exportaciones canadienses de crudo → CAD alcista
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLA CRÍTICA DE PERSPECTIVA — NUNCA VIOLAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-El titular SIEMPRE debe describir el movimiento desde la perspectiva de la DIVISA ASIGNADA.
+El titular SIEMPRE describe el impacto desde la perspectiva de la DIVISA ASIGNADA.
 NUNCA uses otra divisa como sujeto del sentimiento final.
 
 INCORRECTO (artículo EUR, USD como sujeto):
   "Tensiones en Oriente Medio: aumento de la aversión al riesgo → USD alcista"
-  "Conflicto en Medio Oriente aviva temores: → USD alcista"
 
 CORRECTO (artículo EUR, EUR como sujeto):
-  "Tensiones en Oriente Medio intensifican demanda de refugio: presión vendedora sobre la zona euro → EUR bajista"
+  "Tensiones en Oriente Medio elevan costes energéticos europeos: dilema para el BCE → EUR bajista"
 
 INCORRECTO (artículo NZD, USD como sujeto):
-  "Conflicto en Oriente Medio aviva temores de inflación: aumento de precios del petróleo → USD alcista"
+  "Conflicto en Oriente Medio aviva temores de inflación → USD alcista"
 
 CORRECTO (artículo NZD, NZD como sujeto):
-  "Conflicto en Oriente Medio aviva temores de inflación: divisa de riesgo bajo presión vendedora → NZD bajista"
+  "Conflicto en Oriente Medio desencadena risk-off global: divisa de riesgo bajo presión → NZD bajista"
 
-La regla es simple: si el USD sube, el EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan. Escribe siempre
-el impacto SOBRE LA DIVISA ASIGNADA, no sobre el USD u otra divisa.
+La regla: si el USD sube, el EUR/GBP/AUD/NZD/CAD/CHF/JPY bajan. Escribe SIEMPRE
+el impacto SOBRE LA DIVISA ASIGNADA con su mecanismo específico.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGLA DE MECANISMO ESPECÍFICO — CRÍTICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+El mecanismo en el cuerpo del titular debe ser ESPECÍFICO para la divisa asignada,
+no una descripción genérica del mercado global.
+
+El user prompt incluye el "PERFIL MACRO" de la divisa asignada.
+USA ese perfil para describir el mecanismo correcto.
+
+INCORRECTO (genérico, aplica a cualquier divisa):
+  "Conflicto en Irán genera incertidumbre en mercados → EUR bajista"
+  "Tensión geopolítica pesa sobre los mercados → NZD bajista"
+
+CORRECTO (específico para EUR):
+  "Conflicto en Irán eleva precios energéticos: costes de importación suben en zona euro → EUR bajista"
+
+CORRECTO (específico para NZD):
+  "Conflicto en Irán desencadena aversión al riesgo global: kiwi bajo presión como divisa de alto riesgo → NZD bajista"
+
+CORRECTO (específico para CAD):
+  "Conflicto en Irán impulsa petróleo WTI a $80: soporte para exportaciones canadienses de crudo → CAD alcista"
+
+CORRECTO (específico para JPY):
+  "Conflicto en Irán eleva petróleo y riesgo global: yen enfrenta presión contrapuesta entre refugio y costes de importación → JPY mixto"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLA DE ESPECIFICIDAD — OBLIGATORIA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Si el artículo menciona un porcentaje, precio, nivel o nombre de institución
-concreto, el titular DEBE incluirlo. No uses frases genéricas cuando el texto
-proporciona datos específicos.
+concreto, el titular DEBE incluirlo.
 
-INCORRECTO (genérico, dato disponible):
+INCORRECTO (dato disponible, titular genérico):
   "PIB canadiense se contrae en Q4: debilidad económica presiona al CAD → CAD bajista"
 
-CORRECTO (con dato específico):
-  "PIB de Canadá se contrae 0.6% en Q4 superando pronóstico de caída: debilidad económica presiona al BoC → CAD bajista"
-
-INCORRECTO (genérico, nivel disponible):
-  "USD/JPY retrocede desde máximos: señal de venta confirmada → JPY alcista"
-
-CORRECTO (con nivel específico):
-  "USD/JPY retrocede desde 157.49 con MACD descendente: señal de venta confirma entrada corta → JPY alcista"
+CORRECTO:
+  "PIB de Canadá se contrae 0.6% en Q4: debilidad económica por encima del pronóstico presiona al BoC → CAD bajista"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 REGLAS ABSOLUTAS — NUNCA VIOLAR
@@ -157,7 +193,7 @@ REGLAS ABSOLUTAS — NUNCA VIOLAR
    ibovespa, rand sudafricano), responde únicamente: IRRELEVANTE
 
 3. Nunca confundas el activo cubierto con la divisa afectada:
-   "TSX cae" → el artículo es sobre CAD, no USD
+   "TSX cae" → artículo sobre CAD, no USD
    "Petróleo sube" + CAD asignado → petróleo es exportación clave de Canadá → CAD alcista
    "Petróleo sube" + EUR asignado → Europa importa energía → EUR bajista
 
@@ -178,35 +214,35 @@ DOVISH (bajista para la divisa):
 
 EXCEPCIÓN JPY — ACTIVO REFUGIO:
   En contextos de RIESGO GEOPOLÍTICO EXTREMO (guerra, crisis sistémica):
-  - Si el artículo trata PRINCIPALMENTE de la demanda de JPY como refugio → JPY alcista
-  - Si el artículo trata PRINCIPALMENTE de la política del BOJ (dovish) → JPY bajista
-  - Si ambos factores están presentes → JPY mixto
+  - Artículo trata PRINCIPALMENTE de demanda de JPY como refugio → JPY alcista
+  - Artículo trata PRINCIPALMENTE de política BOJ (dovish) → JPY bajista
+  - Ambos factores presentes → JPY mixto
 
-REGLA SNB — TRES ESTADOS (v9.1):
-  Aplica según el contenido concreto del artículo:
-  - SNB interviene ACTIVAMENTE en el mercado para DEPRECIAR el franco (compra divisas) → CHF bajista
-  - SNB AMENAZA con intervenir como techo implícito a la apreciación, pero el CHF
-    sigue siendo estructuralmente fuerte (inflación baja, flujos de refugio) → CHF mixto
-  - Franco se aprecia sin mención de intervención del SNB → CHF alcista
-
-  EJEMPLO de CHF mixto:
-    Artículo: "Nomura analiza que el CHF está fuerte reduciendo precios de importación.
-               El banco destaca que el SNB podría intervenir para frenar la apreciación."
-    → Titular: "CHF en máximos históricos reduce precios de importación: SNB contempla
-                intervención como techo implícito → CHF mixto"
+REGLA SNB — TRES ESTADOS:
+  - SNB interviene ACTIVAMENTE para DEPRECIAR el franco (compra divisas) → CHF bajista
+  - SNB AMENAZA con intervenir como techo implícito, CHF sigue estructuralmente fuerte → CHF mixto
+  - Franco se aprecia sin mención de intervención SNB → CHF alcista
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CORRELACIONES MACROECONÓMICAS CLAVE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 PETRÓLEO / ENERGÍA:
-  ↑ precio petróleo → CAD alcista (Canadá = mayor exportador de crudo a EEUU)
-  ↑ precio petróleo → EUR bajista, JPY bajista (ambos son importadores netos)
-  ↑ precio petróleo → NZD bajista, AUD mixto (Australia exporta pero importa petróleo refinado)
+  ↑ precio petróleo por crisis/guerra → CAD alcista (exportador neto)
+  ↑ precio petróleo por crisis/guerra → EUR bajista (importador, costes energéticos)
+  ↑ precio petróleo por crisis/guerra → JPY mixto (refugio vs costes importación)
+  ↑ precio petróleo por crisis/guerra → NZD bajista (por risk-off, no por petróleo directamente)
+  ↑ precio petróleo por crisis/guerra → AUD bajista (por risk-off; Australia importa petróleo refinado)
+
+  DISTINCIÓN IMPORTANTE para NZD y AUD:
+  - Petróleo sube por DEMANDA GLOBAL FUERTE (ciclo expansivo) → NZD/AUD pueden ser neutrales o alcistas
+  - Petróleo sube por CRISIS/GUERRA (risk-off) → NZD bajista, AUD bajista
 
 ACTIVOS REFUGIO (risk-off):
   ↑ tensión geopolítica / ↑ volatilidad → JPY alcista, CHF alcista (si no hay intervención SNB)
   ↑ tensión geopolítica → AUD bajista, NZD bajista (divisas de riesgo)
-  ↑ tensión geopolítica → EUR bajista (zona euro importa energía, más vulnerable)
+  ↑ tensión geopolítica → EUR bajista (importador de energía, más vulnerable)
+  ↑ tensión geopolítica → GBP bajista (no es refugio)
+  ↑ tensión geopolítica → USD alcista (refugio global)
 
 CRECIMIENTO / DATOS MACRO:
   PIB / empleo / PMI por encima de expectativas → alcista
@@ -218,30 +254,35 @@ CRECIMIENTO / DATOS MACRO:
 CASOS ESPECIALES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - Análisis técnico con niveles: incluye el nivel clave, soporte/resistencia y sesgo
-- Pares cruzados (EUR/GBP, GBP/JPY): describe el impacto en la divisa base (DIVISA ASIGNADA)
+- Pares cruzados (EUR/GBP, GBP/JPY): describe el impacto en la DIVISA ASIGNADA
 - Si el impacto es genuinamente ambiguo según el propio artículo: usa "mixto"
 - Si no hay suficiente información analítica: responde solo: IRRELEVANTE"""
 
 
 def build_user_prompt(article: dict) -> str:
-    cur  = article.get("cur", "USD")
-    lang = article.get("lang", "en")
+    cur       = article.get("cur", "USD")
+    lang      = article.get("lang", "en")
+    # v9.2: inyectar perfil macro de la divisa
+    macro_ctx = CURRENCY_MACRO_CONTEXT.get(cur, "")
+
     return (
         f"DIVISA ASIGNADA: {cur} — {CURRENCY_NAMES.get(cur, cur)}\n"
+        f"PERFIL MACRO DE {cur}: {macro_ctx}\n"
         f"FUENTE: {article.get('source', '')} ({'español' if lang == 'es' else 'inglés'})\n"
         f"TÍTULO ORIGINAL: {article.get('title', '')}\n"
         f"DESCRIPCIÓN: {(article.get('expand', '') or '')[:500] or 'Sin descripción'}\n\n"
-        f"INSTRUCCIÓN: Sintetiza en un titular donde el sujeto del sentimiento final\n"
-        f"sea SIEMPRE {cur} ({CURRENCY_NAMES.get(cur, cur)}), nunca otra divisa.\n"
-        f"Si el artículo contiene cifras, porcentajes o niveles específicos, inclúyelos en el titular.\n"
-        f"Si el artículo NO trata sobre {cur} ni tiene impacto demostrable en {cur}, "
+        f"INSTRUCCIÓN: Sintetiza en un titular donde:\n"
+        f"  1. El sujeto del sentimiento final es SIEMPRE {cur}, nunca otra divisa.\n"
+        f"  2. El mecanismo usa el PERFIL MACRO de {cur} (no una descripción genérica del mercado).\n"
+        f"  3. Si el texto incluye cifras o niveles específicos, inclúyelos en el titular.\n"
+        f"  4. Si el artículo NO trata sobre {cur} ni tiene impacto demostrable en {cur}, "
         f"responde solo: IRRELEVANTE\n\n"
         f"Titular (debe terminar en '→ {cur} [alcista|bajista|neutral|mixto]'):"
     )
 
 
 # ─────────────────────────────────────────────
-# SCORING DE SENTIMIENTO — v9.1
+# SCORING DE SENTIMIENTO — v9.2 (sin cambios sobre v9.1)
 # ─────────────────────────────────────────────
 SENTIMENT_FINAL_RE = re.compile(
     r"→\s*([A-Z]{3})?\s*(alcista|bajista|neutral|neutro|mixto)\s*$",
@@ -271,15 +312,12 @@ POSTPONE_HIKE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# CORRECCIÓN 3 — v9.1: SNB con dos patrones diferenciados
-# Intervención activa (compra divisas para depreciar CHF) → bajista
 SNB_ACTIVE_INTERVENTION_RE = re.compile(
     r"\b(snb|swiss national bank|banco nacional suizo)\b.{0,80}"
     r"\b(interviene|intervino|intervened|selling francs?|compra(ndo)? divisas|"
     r"fx (purchase|buying)|actively intervening)\b",
     re.IGNORECASE,
 )
-# Amenaza / techo implícito → mixto
 SNB_THREAT_RE = re.compile(
     r"\b(snb|swiss national bank|banco nacional suizo)\b.{0,120}"
     r"\b(podría intervenir|could intervene|may intervene|might intervene|"
@@ -290,18 +328,11 @@ SNB_THREAT_RE = re.compile(
 
 
 def score_from_headline(headline: str | None, cur: str = "USD") -> str:
-    """
-    Extrae el sentimiento del ai_headline con validación de divisa cruzada.
-
-    v9.1: SNB con dos patrones (activo=bear, amenaza=mixed).
-    Resto igual que v9.
-    """
     if not headline:
         return "neut"
 
     hl = headline.lower()
 
-    # Prioridad 1 — patrón estructurado al final (con divisa opcional)
     m = SENTIMENT_FINAL_RE.search(headline)
     if m:
         pattern_cur  = m.group(1).upper() if m.group(1) else None
@@ -313,7 +344,6 @@ def score_from_headline(headline: str | None, cur: str = "USD") -> str:
             "mixto":   "mixed",
         }.get(pattern_word, "neut")
 
-        # FIX: validación de divisa cruzada
         if pattern_cur and pattern_cur != cur.upper():
             if pattern_cur == "USD" and cur.upper() in MAJORS_VS_USD:
                 if base_sent == "bull":
@@ -323,17 +353,14 @@ def score_from_headline(headline: str | None, cur: str = "USD") -> str:
 
         return base_sent
 
-    # Prioridad 2 — postergación de subida = dovish = bajista
     if POSTPONE_HIKE_RE.search(hl):
         return "bear"
 
-    # Prioridad 3 — SNB: intervención activa = bear, amenaza = mixed
     if SNB_ACTIVE_INTERVENTION_RE.search(hl):
         return "bear"
     if SNB_THREAT_RE.search(hl):
         return "mixed"
 
-    # Prioridad 4 — fallback keywords
     bull_score = sum(1 for kw in BULL_KW  if kw in hl)
     bear_score = sum(1 for kw in BEAR_KW  if kw in hl)
     mixed_flag = any(kw in hl for kw in MIXED_KW)
@@ -504,7 +531,7 @@ def save_progress(data, articles, now_utc):
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v9.1 institucional")
+    print(f"🤖 Enriquecedor AI — {GROQ_MODEL}  |  v9.2 institucional")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}  |  Timeout: {GLOBAL_TIMEOUT_MIN} min")
     print("=" * 65)
 
@@ -549,14 +576,14 @@ def main():
     print(f"   Divisas: {dict(sorted(dist.items()))}")
     print(f"   Impacto: high={impact['high']} | med={impact['med']} | low={impact['low']}")
 
-    # Recalcular sentimientos con lógica v9.1
+    # Recalcular sentimientos con lógica v9.2
     sentiments_recalculated = 0
     corrections_log = []
     for article in articles:
         if article.get("ai_headline"):
-            cur         = article.get("cur", "USD")
-            old_sent    = article.get("sentiment", "neut")
-            new_sent    = score_from_headline(article["ai_headline"], cur)
+            cur      = article.get("cur", "USD")
+            old_sent = article.get("sentiment", "neut")
+            new_sent = score_from_headline(article["ai_headline"], cur)
             if old_sent != new_sent:
                 article["sentiment"] = new_sent
                 sentiments_recalculated += 1
@@ -564,7 +591,7 @@ def main():
                     f"    {cur} | {old_sent}→{new_sent} | {article['ai_headline'][:70]}..."
                 )
     if sentiments_recalculated:
-        print(f"\n   🔄 Sentimientos corregidos (v9.1): {sentiments_recalculated}")
+        print(f"\n   🔄 Sentimientos corregidos (v9.2): {sentiments_recalculated}")
         for log in corrections_log[:10]:
             print(log)
         if len(corrections_log) > 10:
@@ -598,7 +625,7 @@ def main():
         ok, reason = is_enrichable(article)
         if not ok:
             not_enrichable += 1
-            article["sentiment"] = "neut"
+            article["sentiment"]   = "neut"
             article["ai_headline"] = None
             print(f"  ⛔ No enriquecible: {reason}")
             continue
@@ -638,7 +665,6 @@ def main():
         if idx < len(to_process) - 1 and not timeout_reached():
             time.sleep(SLEEP_BETWEEN)
 
-    # Asegurar campo sentiment en todos los artículos
     for article in articles:
         if "sentiment" not in article:
             article["sentiment"] = score_from_headline(
@@ -647,7 +673,6 @@ def main():
 
     save_progress(data, articles, now_utc)
 
-    # Estadísticas finales
     sent_by_cur: dict[str, Counter] = {}
     for a in articles:
         cur = a.get("cur", "?")
@@ -658,7 +683,7 @@ def main():
 
     print()
     print("=" * 65)
-    print("📊 SENTIMIENTO POR DIVISA (post-fix v9.1)")
+    print("📊 SENTIMIENTO POR DIVISA (post-fix v9.2)")
     print("-" * 65)
     for cur in ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]:
         c = sent_by_cur.get(cur, Counter())
