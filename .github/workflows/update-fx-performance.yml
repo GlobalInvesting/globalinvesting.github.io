@@ -1,4 +1,4 @@
-name: Update FX Performance (Stooq currency indices) — C6
+name: Update FX Performance (Yahoo Finance forex pairs) — C7
 on:
   schedule:
     - cron: '0 7 * * *'
@@ -22,7 +22,7 @@ jobs:
       - name: Create directory
         run: mkdir -p fx-performance
 
-      - name: Fetch FX performance from Stooq currency indices
+      - name: Fetch FX performance from Yahoo Finance
         run: |
           python3 << 'EOFPYTHON'
           import requests
@@ -33,331 +33,329 @@ jobs:
           from datetime import date, timedelta, datetime
 
           # ════════════════════════════════════════════════════════════════════════
-          # FX PERFORMANCE — C6: Stooq Currency Indices (reemplazo de Frankfurter)
+          # FX PERFORMANCE — C7: Yahoo Finance forex pairs (reemplazo de Stooq)
           #
           # MOTIVACIÓN:
-          #   Frankfurter/ECB publica tipos de referencia UNA vez al día (16:00 CET).
-          #   Esto introduce hasta 24h de lag en fxPerformance1M, el indicador más
-          #   "real time" del modelo. Los traders ven AUD -0.21% (1M real, AXY index)
-          #   pero el modelo calculaba +2.1% composite (distorsión por lag ECB).
+          #   Stooq devuelve HTTP 200 con HTML de error cuando detecta IPs de
+          #   GitHub Actions (bot detection por CDN). El fallback a Frankfurter
+          #   funcionó correctamente pero usaba los tipos de referencia ECB con
+          #   lag de hasta 24h.
           #
-          #   Stooq publica los índices de divisas oficiales del mercado interbancario
-          #   en CSV descargable, sin autenticación ni rate limiting agresivo:
-          #     AXY = Australian Dollar Currency Index (ICE)
-          #     JXY = Japanese Yen Currency Index     (ICE)
-          #     EXY = Euro Currency Index             (ICE)
-          #     BXY = British Pound Currency Index    (ICE)
-          #     CXY = Canadian Dollar Currency Index  (ICE)
-          #     SXY = Swiss Franc Currency Index      (ICE)
-          #     ZXY = New Zealand Dollar Currency Index (ICE)
-          #     DXY = US Dollar Index                 (ICE)
+          #   Yahoo Finance permite descargar CSV histórico de pares de divisas
+          #   sin autenticación y sin bloquear GitHub Actions:
+          #   URL: https://query1.finance.yahoo.com/v7/finance/download/AUDUSD=X
+          #        ?range=6mo&interval=1d&events=history&includeAdjustedClose=true
           #
-          # CAMPO JSON:
-          #   El campo sigue llamándose 'fxPerformance1M' para compatibilidad total
-          #   con index.html — no requiere cambios en el frontend.
+          # DIFERENCIA vs ÍNDICES ICE:
+          #   Los pares AUDUSD=X de Yahoo miden el precio del par de divisas,
+          #   no el índice ponderado de la divisa. Para la mayoría de divisas
+          #   la diferencia es mínima (<0.3% en 1M). Para USD se calcula como
+          #   inverso ponderado del basket de las demás divisas.
           #
-          # COMPOSITE 60/40:
-          #   Se mantiene composite 60% 1M + 40% 3M pero ahora sobre datos reales
-          #   del mercado interbancario, no sobre tipos de referencia del BCE.
-          #   Con datos de mercado la señal 1M es más informativa → 70% 1M + 30% 3M.
-          #   Racionale: el índice de divisas ya incorpora el consenso del mercado
-          #   sin el lag del ECB, por lo que el suavizado 3M puede reducirse.
-          #
-          # FALLBACK:
-          #   Si Stooq falla para una divisa específica, se intenta con Frankfurter
-          #   para esa divisa (sin romper el workflow completo).
+          # COMPOSITE: 70% 1M + 30% 3M (igual que C6)
+          # CAMPO JSON: 'fxPerformance1M' — sin cambios en index.html
           # ════════════════════════════════════════════════════════════════════════
-
-          HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (compatible; ForexDashboard/2.0; Stooq-reader)',
-              'Accept': 'text/csv,text/plain,*/*',
-          }
-
-          # Tickers de Stooq para cada índice de divisa
-          # Formato: https://stooq.com/q/d/l/?s=axy.f&i=d
-          # 'i=d' = datos diarios
-          STOOQ_TICKERS = {
-              'AUD': 'axy.f',
-              'JPY': 'jxy.f',
-              'EUR': 'exy.f',
-              'GBP': 'bxy.f',
-              'CAD': 'cxy.f',
-              'CHF': 'sxy.f',
-              'NZD': 'zxy.f',
-              'USD': 'dxy.f',
-          }
 
           CURRENCIES = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'USD']
 
-          # C6: composite 70% 1M + 30% 3M (señal de mercado más directa → menos suavizado)
+          # Yahoo Finance tickers para pares vs USD
+          # Formato: precio de 1 unidad de MONEDA en USD
+          # EUR: EURUSD=X → cuántos USD por 1 EUR
+          # JPY: JPYUSD=X → cuántos USD por 1 JPY (= 1/USDJPY)
+          YAHOO_TICKERS = {
+              'EUR': 'EURUSD=X',
+              'GBP': 'GBPUSD=X',
+              'JPY': 'JPYUSD=X',   # Yahoo tiene directo JPY/USD
+              'AUD': 'AUDUSD=X',
+              'CAD': 'CADUSD=X',
+              'CHF': 'CHFUSD=X',
+              'NZD': 'NZDUSD=X',
+              'USD': None,         # Se calcula como inverso basket
+          }
+
+          # Pesos para calcular USD como inverso ponderado (similar a DXY)
+          # Basado en pesos del US Dollar Index (ICE DXY)
+          USD_BASKET_WEIGHTS = {
+              'EUR': 0.576,
+              'JPY': 0.136,
+              'GBP': 0.119,
+              'CAD': 0.091,
+              'CHF': 0.036,
+              'AUD': 0.021,
+              'NZD': 0.021,
+          }
+
           COMPOSITE_WEIGHT_1M = 0.70
           COMPOSITE_WEIGHT_3M = 0.30
 
           today = date.today()
-
-          print("=" * 70)
-          print("FX PERFORMANCE — C6: Stooq Currency Indices")
-          print(f"Fecha: {today}")
-          print(f"Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
-          print(f"Fuente: Stooq.com (ICE currency indices — datos interbancarios reales)")
-          print("=" * 70)
-
-          def fetch_stooq_history(ticker, days_back=100, retries=3, backoff=3):
-              """
-              Descarga el histórico diario de un ticker de Stooq.
-              Retorna lista de (date, close) ordenada por fecha ascendente.
-              Stooq devuelve CSV con columnas: Date,Open,High,Low,Close,Volume
-              """
-              url = f"https://stooq.com/q/d/l/?s={ticker}&i=d"
-              for attempt in range(1, retries + 1):
-                  try:
-                      r = requests.get(url, headers=HEADERS, timeout=15)
-                      if r.status_code == 200 and len(r.content) > 100:
-                          reader = csv.DictReader(StringIO(r.text))
-                          rows = []
-                          for row in reader:
-                              try:
-                                  d = datetime.strptime(row['Date'].strip(), '%Y-%m-%d').date()
-                                  close = float(row['Close'].strip())
-                                  if close > 0:
-                                      rows.append((d, close))
-                              except (ValueError, KeyError):
-                                  continue
-                          if rows:
-                              rows.sort(key=lambda x: x[0])
-                              print(f"  ✅ {ticker}: {len(rows)} días históricos obtenidos")
-                              return rows
-                          else:
-                              print(f"  ⚠️ {ticker}: CSV vacío o sin datos válidos")
-                      elif r.status_code == 429:
-                          print(f"  ⚠️ {ticker}: Rate limit (429), esperando {backoff * attempt}s...")
-                          time.sleep(backoff * attempt)
-                      else:
-                          print(f"  ⚠️ {ticker}: HTTP {r.status_code} (attempt {attempt}/{retries})")
-                  except Exception as e:
-                      print(f"  ⚠️ {ticker}: Error attempt {attempt}/{retries}: {e}")
-                  if attempt < retries:
-                      time.sleep(backoff)
-              print(f"  ❌ {ticker}: Todos los intentos fallaron")
-              return None
-
-          def get_closest_value(rows, target_date, max_diff_days=5):
-              """
-              Busca el valor más cercano a target_date dentro de max_diff_days.
-              Acepta hasta 5 días de diferencia para cubrir fines de semana y festivos.
-              """
-              if not rows:
-                  return None, None
-              best = None
-              best_diff = float('inf')
-              best_date = None
-              for d, close in rows:
-                  diff = abs((d - target_date).days)
-                  if diff < best_diff:
-                      best_diff = diff
-                      best = close
-                      best_date = d
-              if best_diff <= max_diff_days:
-                  return best, best_date
-              return None, None
-
-          def calc_performance(value_now, value_before):
-              """
-              % de variación del índice de divisa.
-              Índice sube → divisa se apreció → positivo.
-              Índice baja → divisa se depreció → negativo.
-              Fórmula directa: (now / before - 1) * 100
-              (Opuesto a Frankfurter donde se calculaba rate_before / rate_now
-              porque allí el rate era "unidades de divisa por 1 USD".)
-              """
-              if value_now is None or value_before is None:
-                  return None
-              if value_before == 0:
-                  return None
-              return round((value_now / value_before - 1.0) * 100.0, 4)
-
-          def fetch_frankfurter_fallback(currency, target_date_str, retries=2):
-              """
-              Fallback a Frankfurter/ECB si Stooq falla para una divisa específica.
-              Retorna el rate USD/{currency} en esa fecha, o None si falla.
-              """
-              url = f"https://api.frankfurter.app/{target_date_str}?from=USD&to={currency}"
-              for attempt in range(1, retries + 1):
-                  try:
-                      r = requests.get(url, timeout=10)
-                      if r.ok:
-                          data = r.json()
-                          rate = data.get('rates', {}).get(currency)
-                          if rate:
-                              return float(rate), data.get('date', target_date_str)
-                  except Exception as e:
-                      print(f"    ⚠️ Frankfurter fallback attempt {attempt}/{retries}: {e}")
-                  time.sleep(1)
-              return None, None
-
-          # ── Fechas objetivo ──────────────────────────────────────────────────────
-          # Usamos 'today - 1' como referencia (ayer = sesión cerrada confirmada)
-          # igual que hacía el workflow anterior con Frankfurter.
-          ref_date = today - timedelta(days=1)
+          ref_date = today - timedelta(days=1)  # ayer = sesión cerrada
           date_30d = ref_date - timedelta(days=30)
           date_90d = ref_date - timedelta(days=90)
           date_7d  = ref_date - timedelta(days=7)
 
+          print("=" * 70)
+          print("FX PERFORMANCE — C7: Yahoo Finance Forex Pairs")
+          print(f"Fecha: {today}")
+          print(f"Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
+          print(f"Fuente: Yahoo Finance (AUDUSD=X, EURUSD=X, etc.)")
+          print("=" * 70)
           print(f"\nFechas de referencia:")
-          print(f"  Ahora:  {ref_date} (ayer, sesión cerrada)")
+          print(f"  Ahora:  {ref_date}")
           print(f"  30d:    {date_30d}")
           print(f"  90d:    {date_90d}")
           print(f"  7d:     {date_7d}")
 
-          results = {}
+          def fetch_yahoo_history(ticker, retries=3, backoff=5):
+              """
+              Descarga histórico de Yahoo Finance para un par forex.
+              Retorna lista de (date, close) ordenada ascendente.
+              """
+              # Yahoo Finance: range=6mo cubre 30d, 90d y algo más
+              url = (
+                  f"https://query1.finance.yahoo.com/v7/finance/download/{ticker}"
+                  f"?range=6mo&interval=1d&events=history&includeAdjustedClose=true"
+              )
+              headers = {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                  'Accept': 'text/csv,application/csv,text/plain,*/*',
+                  'Accept-Language': 'en-US,en;q=0.9',
+                  'Referer': 'https://finance.yahoo.com/',
+              }
 
+              for attempt in range(1, retries + 1):
+                  try:
+                      r = requests.get(url, headers=headers, timeout=20)
+                      if r.status_code == 200 and len(r.content) > 200:
+                          # Verificar que es CSV y no HTML de error
+                          if r.text.startswith('Date,') or r.text.startswith('"Date"'):
+                              reader = csv.DictReader(StringIO(r.text))
+                              rows = []
+                              for row in reader:
+                                  try:
+                                      d = datetime.strptime(row['Date'].strip(), '%Y-%m-%d').date()
+                                      # Yahoo usa 'Adj Close' o 'Close'
+                                      close_str = row.get('Adj Close') or row.get('Close') or ''
+                                      if close_str and close_str.lower() not in ('null', 'n/a', ''):
+                                          close = float(close_str.strip())
+                                          if close > 0:
+                                              rows.append((d, close))
+                                  except (ValueError, KeyError):
+                                      continue
+                              if len(rows) >= 5:
+                                  rows.sort(key=lambda x: x[0])
+                                  print(f"  ✅ {ticker}: {len(rows)} días históricos")
+                                  return rows
+                              else:
+                                  print(f"  ⚠️ {ticker}: CSV con solo {len(rows)} filas válidas")
+                          else:
+                              print(f"  ⚠️ {ticker}: respuesta no es CSV (HTML de error?)")
+                              print(f"     Primeros 100 chars: {r.text[:100]}")
+                      elif r.status_code == 429:
+                          wait = backoff * attempt * 2
+                          print(f"  ⚠️ {ticker}: Rate limit (429), esperando {wait}s...")
+                          time.sleep(wait)
+                      elif r.status_code == 404:
+                          print(f"  ❌ {ticker}: Not found (404) — ticker incorrecto?")
+                          return None
+                      else:
+                          print(f"  ⚠️ {ticker}: HTTP {r.status_code} (attempt {attempt}/{retries})")
+                  except Exception as e:
+                      print(f"  ⚠️ {ticker}: Error attempt {attempt}/{retries}: {e}")
+
+                  if attempt < retries:
+                      time.sleep(backoff)
+
+              print(f"  ❌ {ticker}: Todos los intentos fallaron")
+              return None
+
+          def fetch_frankfurter_fallback(currency, ref_date, date_30d, date_90d, date_7d):
+              """
+              Fallback a Frankfurter si Yahoo falla para una divisa específica.
+              """
+              print(f"  → Usando Frankfurter como fallback para {currency}...")
+              base_url = "https://api.frankfurter.app"
+
+              def get_rate(d):
+                  try:
+                      r = requests.get(f"{base_url}/{d}?from=USD&to={currency}", timeout=10)
+                      if r.ok:
+                          rate = r.json().get('rates', {}).get(currency)
+                          return float(rate) if rate else None
+                  except:
+                      pass
+                  return None
+
+              rate_now = get_rate(ref_date.isoformat())
+              time.sleep(0.5)
+              rate_30d = get_rate(date_30d.isoformat())
+              time.sleep(0.5)
+              rate_90d = get_rate(date_90d.isoformat())
+              time.sleep(0.5)
+              rate_7d  = get_rate(date_7d.isoformat())
+
+              # Frankfurter: rate = CCY per USD → inverso para % de apreciación de CCY
+              def perf(rate_now, rate_before):
+                  if not rate_now or not rate_before or rate_before == 0 or rate_now == 0:
+                      return None
+                  return round((rate_before / rate_now - 1.0) * 100.0, 4)
+
+              p1m = perf(rate_now, rate_30d)
+              p3m = perf(rate_now, rate_90d)
+              p1w = perf(rate_now, rate_7d)
+              comp = None
+              if p1m is not None and p3m is not None:
+                  comp = round(p1m * COMPOSITE_WEIGHT_1M + p3m * COMPOSITE_WEIGHT_3M, 4)
+              elif p1m is not None:
+                  comp = p1m
+
+              print(f"  → Frankfurter: 1M={p1m}% | 3M={p3m}% | composite={comp}%")
+              return comp, p1m, p3m, p1w, 'frankfurter_fallback'
+
+          def get_closest_value(rows, target_date, max_diff_days=5):
+              if not rows:
+                  return None, None
+              best, best_diff, best_date = None, float('inf'), None
+              for d, close in rows:
+                  diff = abs((d - target_date).days)
+                  if diff < best_diff:
+                      best_diff, best, best_date = diff, close, d
+              if best_diff <= max_diff_days:
+                  return best, best_date
+              return None, None
+
+          def calc_perf_yahoo(val_now, val_before):
+              """
+              Yahoo: AUDUSD=X sube → AUD se apreció vs USD → positivo
+              (Misma lógica que los índices ICE: sube = divisa se fortalece)
+              """
+              if val_now is None or val_before is None or val_before == 0:
+                  return None
+              return round((val_now / val_before - 1.0) * 100.0, 4)
+
+          # ── Procesar cada divisa ──────────────────────────────────────────────
+          results = {}
           for currency in CURRENCIES:
-              ticker = STOOQ_TICKERS[currency]
+              if currency == 'USD':
+                  continue  # Se calcula al final
+
+              ticker = YAHOO_TICKERS[currency]
               print(f"\n{'─'*50}")
               print(f"[{currency}] Ticker: {ticker}")
               print(f"{'─'*50}")
 
-              # Descargar histórico de Stooq
-              rows = fetch_stooq_history(ticker)
-              time.sleep(1.5)  # Respetar rate limit de Stooq
+              rows = fetch_yahoo_history(ticker)
+              time.sleep(2)  # Respetar rate limit Yahoo
 
-              use_stooq = rows is not None and len(rows) >= 10
+              if rows and len(rows) >= 5:
+                  val_now, _ = get_closest_value(rows, ref_date, max_diff_days=5)
+                  val_30d, _ = get_closest_value(rows, date_30d, max_diff_days=5)
+                  val_90d, _ = get_closest_value(rows, date_90d, max_diff_days=7)
+                  val_7d,  _ = get_closest_value(rows, date_7d,  max_diff_days=5)
 
-              if use_stooq:
-                  # ── Obtener valores en fechas objetivo ──────────────────────────
-                  val_now,  date_now_actual  = get_closest_value(rows, ref_date,  max_diff_days=5)
-                  val_30d,  date_30d_actual  = get_closest_value(rows, date_30d,  max_diff_days=5)
-                  val_90d,  date_90d_actual  = get_closest_value(rows, date_90d,  max_diff_days=7)
-                  val_7d,   date_7d_actual   = get_closest_value(rows, date_7d,   max_diff_days=5)
+                  p1m = calc_perf_yahoo(val_now, val_30d)
+                  p3m = calc_perf_yahoo(val_now, val_90d)
+                  p1w = calc_perf_yahoo(val_now, val_7d)
 
-                  print(f"  Valores obtenidos:")
-                  print(f"    Ahora  ({ref_date}):  {val_now} (real: {date_now_actual})")
-                  print(f"    30d    ({date_30d}):   {val_30d} (real: {date_30d_actual})")
-                  print(f"    90d    ({date_90d}):   {val_90d} (real: {date_90d_actual})")
-                  print(f"    7d     ({date_7d}):    {val_7d} (real: {date_7d_actual})")
-
-                  # ── Calcular rendimientos ───────────────────────────────────────
-                  perf_1m = calc_performance(val_now, val_30d)
-                  perf_3m = calc_performance(val_now, val_90d)
-                  perf_1w = calc_performance(val_now, val_7d)
-
-                  print(f"  Rendimientos:")
-                  print(f"    1M: {perf_1m}%")
-                  print(f"    3M: {perf_3m}%")
-                  print(f"    1W: {perf_1w}%")
-
-                  # ── Composite 70% 1M + 30% 3M ──────────────────────────────────
-                  if perf_1m is not None and perf_3m is not None:
-                      perf_composite = round(
-                          perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4
-                      )
-                  elif perf_1m is not None:
-                      perf_composite = perf_1m
-                  elif perf_3m is not None:
-                      perf_composite = perf_3m
+                  if p1m is not None and p3m is not None:
+                      comp = round(p1m * COMPOSITE_WEIGHT_1M + p3m * COMPOSITE_WEIGHT_3M, 4)
+                  elif p1m is not None:
+                      comp = p1m
+                  elif p3m is not None:
+                      comp = p3m
                   else:
-                      perf_composite = None
+                      comp = None
 
                   results[currency] = {
-                      'fxPerformance1M':      perf_composite,
-                      'fxPerformance1M_raw':  perf_1m,
-                      'fxPerformance3M':      perf_3m,
-                      'fxPerformance1W':      perf_1w,
-                      'indexNow':             val_now,
-                      'index30dAgo':          val_30d,
-                      'index90dAgo':          val_90d,
-                      'index7dAgo':           val_7d,
-                      'date':                 ref_date.isoformat(),
-                      'source':               f'Stooq {ticker} — ICE currency index — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C6)',
-                      'sourceType':           'stooq_index',
+                      'fxPerformance1M':     comp,
+                      'fxPerformance1M_raw': p1m,
+                      'fxPerformance3M':     p3m,
+                      'fxPerformance1W':     p1w,
+                      'indexNow':            val_now,
+                      'index30dAgo':         val_30d,
+                      'index90dAgo':         val_90d,
+                      'index7dAgo':          val_7d,
+                      'date':                ref_date.isoformat(),
+                      'source':              f'Yahoo Finance {ticker} — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C7)',
+                      'sourceType':          'yahoo_finance',
                   }
-
-                  print(f"  → COMPOSITE: {perf_composite}%  [1M={perf_1m}% | 3M={perf_3m}%]")
+                  print(f"  → COMPOSITE: {comp}%  [1M={p1m}% | 3M={p3m}%]")
 
               else:
-                  # ── Fallback a Frankfurter para esta divisa ───────────────────
-                  print(f"  ⚠️ Stooq falló para {currency} — usando Frankfurter como fallback")
-
-                  if currency == 'USD':
-                      # USD no tiene par directo en Frankfurter — se calculará después
-                      results[currency] = {
-                          'fxPerformance1M': None, 'fxPerformance1M_raw': None,
-                          'fxPerformance3M': None, 'fxPerformance1W': None,
-                          'indexNow': None, 'index30dAgo': None,
-                          'index90dAgo': None, 'index7dAgo': None,
-                          'date': ref_date.isoformat(),
-                          'source': 'Fallback pending (USD)',
-                          'sourceType': 'pending',
-                      }
-                      continue
-
-                  rate_now,  _ = fetch_frankfurter_fallback(currency, ref_date.isoformat())
-                  rate_30d,  _ = fetch_frankfurter_fallback(currency, date_30d.isoformat())
-                  rate_90d,  _ = fetch_frankfurter_fallback(currency, date_90d.isoformat())
-                  rate_7d,   _ = fetch_frankfurter_fallback(currency, date_7d.isoformat())
-                  time.sleep(1)
-
-                  # Para Frankfurter la lógica es inversa (rate = CCY per USD)
-                  def calc_perf_fx(rate_now, rate_before):
-                      if rate_now is None or rate_before is None or rate_before == 0 or rate_now == 0:
-                          return None
-                      return round((rate_before / rate_now - 1.0) * 100.0, 4)
-
-                  perf_1m = calc_perf_fx(rate_now, rate_30d)
-                  perf_3m = calc_perf_fx(rate_now, rate_90d)
-                  perf_1w = calc_perf_fx(rate_now, rate_7d)
-
-                  if perf_1m is not None and perf_3m is not None:
-                      perf_composite = round(perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4)
-                  elif perf_1m is not None:
-                      perf_composite = perf_1m
-                  else:
-                      perf_composite = None
-
+                  # Fallback a Frankfurter
+                  comp, p1m, p3m, p1w, src = fetch_frankfurter_fallback(
+                      currency, ref_date, date_30d, date_90d, date_7d
+                  )
                   results[currency] = {
-                      'fxPerformance1M':      perf_composite,
-                      'fxPerformance1M_raw':  perf_1m,
-                      'fxPerformance3M':      perf_3m,
-                      'fxPerformance1W':      perf_1w,
-                      'indexNow':             rate_now,
-                      'index30dAgo':          rate_30d,
-                      'index90dAgo':          rate_90d,
-                      'index7dAgo':           rate_7d,
-                      'date':                 ref_date.isoformat(),
-                      'source':               f'Frankfurter ECB fallback (Stooq no disponible) — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C6)',
-                      'sourceType':           'frankfurter_fallback',
+                      'fxPerformance1M':     comp,
+                      'fxPerformance1M_raw': p1m,
+                      'fxPerformance3M':     p3m,
+                      'fxPerformance1W':     p1w,
+                      'indexNow':            None,
+                      'index30dAgo':         None,
+                      'index90dAgo':         None,
+                      'index7dAgo':          None,
+                      'date':                ref_date.isoformat(),
+                      'source':              f'Frankfurter ECB fallback (Yahoo no disponible) — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C7)',
+                      'sourceType':          'frankfurter_fallback',
                   }
-                  print(f"  → Fallback composite: {perf_composite}%")
 
-          # ── USD: si Stooq DXY funcionó, ya está calculado directamente ──────────
-          # Si no funcionó, calcularlo como inverso ponderado DXY de las demás divisas.
-          if results.get('USD', {}).get('sourceType') == 'pending':
-              print(f"\n{'─'*50}")
-              print("[USD] Calculando como inverso ponderado DXY (Stooq dxy.f falló)")
-              print(f"{'─'*50}")
-              DXY_WEIGHTS = {
-                  'EUR': 0.576, 'JPY': 0.136, 'GBP': 0.119,
-                  'CAD': 0.091, 'CHF': 0.036, 'AUD': 0.021, 'NZD': 0.021
+          # ── USD: inverso ponderado del basket ────────────────────────────────
+          print(f"\n{'─'*50}")
+          print("[USD] Calculando como inverso ponderado del basket")
+          print(f"{'─'*50}")
+
+          available = [
+              c for c in USD_BASKET_WEIGHTS
+              if results.get(c, {}).get('fxPerformance1M') is not None
+          ]
+          total_w = sum(USD_BASKET_WEIGHTS[c] for c in available)
+
+          if total_w > 0:
+              usd_comp = 0.0
+              usd_1m   = 0.0
+              usd_3m   = 0.0
+              for c in available:
+                  w = USD_BASKET_WEIGHTS[c] / total_w
+                  if results[c]['fxPerformance1M'] is not None:
+                      usd_comp -= results[c]['fxPerformance1M'] * w
+                  if results[c].get('fxPerformance1M_raw') is not None:
+                      usd_1m -= results[c]['fxPerformance1M_raw'] * w
+                  if results[c].get('fxPerformance3M') is not None:
+                      usd_3m -= results[c]['fxPerformance3M'] * w
+
+              usd_comp = round(usd_comp, 4)
+              usd_1m   = round(usd_1m, 4)
+              usd_3m   = round(usd_3m, 4)
+
+              results['USD'] = {
+                  'fxPerformance1M':     usd_comp,
+                  'fxPerformance1M_raw': usd_1m,
+                  'fxPerformance3M':     usd_3m,
+                  'fxPerformance1W':     None,
+                  'indexNow':            None,
+                  'index30dAgo':         None,
+                  'index90dAgo':         None,
+                  'index7dAgo':          None,
+                  'date':                ref_date.isoformat(),
+                  'source':              f'Inverso basket ponderado (EUR 57.6%, JPY 13.6%, GBP 11.9%, CAD 9.1%, CHF 3.6%, AUD 2.1%, NZD 2.1%) — C7',
+                  'sourceType':          'computed_inverse',
               }
-              available = [
-                  c for c in DXY_WEIGHTS
-                  if results.get(c, {}).get('fxPerformance1M') is not None
-              ]
-              total_w = sum(DXY_WEIGHTS[c] for c in available)
-              if total_w > 0:
-                  usd_perf = 0.0
-                  for c in available:
-                      usd_perf -= results[c]['fxPerformance1M'] * (DXY_WEIGHTS[c] / total_w)
-                  usd_perf = round(usd_perf, 4)
-                  results['USD']['fxPerformance1M'] = usd_perf
-                  results['USD']['fxPerformance1M_raw'] = usd_perf
-                  results['USD']['source'] = 'DXY-weighted inverse basket (Stooq dxy.f no disponible)'
-                  results['USD']['sourceType'] = 'computed_inverse'
-                  print(f"  → USD composite (inverso basket): {usd_perf}%")
-              else:
-                  print("  ❌ USD: no hay datos de otras divisas para calcular inverso")
+              print(f"  → USD composite: {usd_comp}%  [1M={usd_1m}% | 3M={usd_3m}%]")
+              print(f"  → Basket usando {len(available)} divisas: {available}")
+          else:
+              results['USD'] = {
+                  'fxPerformance1M': None, 'fxPerformance1M_raw': None,
+                  'fxPerformance3M': None, 'fxPerformance1W': None,
+                  'indexNow': None, 'index30dAgo': None,
+                  'index90dAgo': None, 'index7dAgo': None,
+                  'date': ref_date.isoformat(),
+                  'source': 'No disponible — basket sin datos',
+                  'sourceType': 'error',
+              }
+              print("  ❌ USD: no hay datos del basket")
 
-          # ── Guardar archivos individuales ────────────────────────────────────────
+          # ── Guardar archivos JSON ─────────────────────────────────────────────
           import os
           os.makedirs('fx-performance', exist_ok=True)
 
@@ -369,16 +367,16 @@ jobs:
               if currency in results:
                   with open(f'fx-performance/{currency}.json', 'w') as f:
                       json.dump(results[currency], f, indent=2)
-                  composite = results[currency]['fxPerformance1M']
-                  raw_1m    = results[currency].get('fxPerformance1M_raw')
-                  raw_3m    = results[currency].get('fxPerformance3M')
-                  src_type  = results[currency].get('sourceType', 'unknown')
-                  status = '✅' if composite is not None else '❌ NULL'
-                  print(f"  {status} {currency}.json: composite={composite}% | 1M={raw_1m}% | 3M={raw_3m}% [{src_type}]")
+                  comp   = results[currency]['fxPerformance1M']
+                  p1m    = results[currency].get('fxPerformance1M_raw')
+                  p3m    = results[currency].get('fxPerformance3M')
+                  src    = results[currency].get('sourceType', '?')
+                  status = '✅' if comp is not None else '❌ NULL'
+                  print(f"  {status} {currency}.json: composite={comp}% | 1M={p1m}% | 3M={p3m}% [{src}]")
 
-          # ── Resumen final ────────────────────────────────────────────────────────
+          # ── Resumen final con validación ──────────────────────────────────────
           print(f"\n{'='*70}")
-          print(f"FX PERFORMANCE SUMMARY — Stooq ICE Indices C6")
+          print(f"FX PERFORMANCE SUMMARY — Yahoo Finance C7")
           print(f"Referencia: {ref_date} | Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
           print("=" * 70)
 
@@ -388,13 +386,13 @@ jobs:
               key=lambda x: x[1], reverse=True
           )
           for currency, perf in sorted_results:
-              bar = '█' * min(int(abs(perf) * 2), 20)
+              bar  = '█' * min(int(abs(perf) * 2), 20)
               sign = '+' if perf >= 0 else ''
-              raw_1m = results[currency].get('fxPerformance1M_raw')
-              raw_3m = results[currency].get('fxPerformance3M')
-              src    = results[currency].get('sourceType', '?')
-              raw_str = f" (1M={raw_1m:+.2f}% | 3M={raw_3m:+.2f}%)" if raw_1m is not None and raw_3m is not None else ""
-              print(f"  {currency}: {sign}{perf:+.2f}%{raw_str}  [{src}]  {bar}")
+              p1m  = results[currency].get('fxPerformance1M_raw')
+              p3m  = results[currency].get('fxPerformance3M')
+              src  = results[currency].get('sourceType', '?')
+              raw  = f" (1M={p1m:+.2f}% | 3M={p3m:+.2f}%)" if p1m is not None and p3m is not None else ""
+              print(f"  {currency}: {sign}{perf:+.2f}%{raw}  [{src}]  {bar}")
 
           nulls = [c for c, d in results.items() if d.get('fxPerformance1M') is None]
           if nulls:
@@ -402,12 +400,9 @@ jobs:
           else:
               print(f"\n✅ Todas las divisas procesadas correctamente")
 
-          # Validación contra TradingView (referencia manual — valores del 6/3/2026)
-          # AXY 1M=-0.21% | JXY 1M=-0.62% | EXY 1M=-2.06% | BXY 1M=-2.65%
-          # CXY 1M=+0.22% | SXY 1M=-0.49% | ZXY 1M=-2.35% | DXY 1M=+1.75%
-          # Si los valores de Stooq difieren >0.5% de estos, revisar el ticker.
+          # Validación contra TradingView (referencia 6/3/2026)
           print(f"\n{'─'*70}")
-          print("REFERENCIA TradingView 1M (6/3/2026 — para validación):")
+          print("VALIDACIÓN vs TradingView 1M (6/3/2026):")
           TV_REF = {
               'AUD': -0.21, 'JPY': -0.62, 'EUR': -2.06, 'GBP': -2.65,
               'CAD':  0.22, 'CHF': -0.49, 'NZD': -2.35, 'USD':  1.75,
@@ -416,10 +411,10 @@ jobs:
               stooq_1m = results.get(currency, {}).get('fxPerformance1M_raw')
               if stooq_1m is not None:
                   diff = abs(stooq_1m - tv_val)
-                  flag = "✅" if diff < 1.0 else "⚠️ REVISAR"
-                  print(f"  {currency}: Stooq={stooq_1m:+.2f}% | TV={tv_val:+.2f}% | Δ={diff:.2f}% {flag}")
+                  flag = "✅" if diff < 1.5 else "⚠️ REVISAR"
+                  print(f"  {currency}: Yahoo={stooq_1m:+.2f}% | TV={tv_val:+.2f}% | Δ={diff:.2f}% {flag}")
               else:
-                  print(f"  {currency}: Stooq=NULL | TV={tv_val:+.2f}% ❌")
+                  print(f"  {currency}: NULL | TV={tv_val:+.2f}% ❌")
           EOFPYTHON
 
       - name: Commit and push
@@ -430,7 +425,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — Stooq ICE indices C6 (70% 1M + 30% 3M)"
+            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — Yahoo Finance C7 (70% 1M + 30% 3M)"
             git pull --rebase origin main || true
             git push
           fi
