@@ -1958,7 +1958,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '5.2.0-2026-02-26';
+            const DASHBOARD_VERSION = '5.3.0-2026-03-06';
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -2520,32 +2520,36 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             else                   score = 12;  // Recortes agresivos
             break;
 
-        case 'fx_momentum':
-            // fxPerformance1M: % apreciación de la divisa vs USD en los últimos 30 días
-            // Es el indicador más "real time" del modelo — refleja positioning,
-            // flujos institucionales y carry unwind en tiempo casi real.
-            // Calibración basada en distribución histórica de rendimientos mensuales:
-            //   Extremo alcista: >4% (AUD/NZD Feb 2026: +5.7%, +5.0%)
-            //   Fuerte:          2-4% (CHF: +4.1%, JPY: +3.2%)
-            //   Moderado:        1-2% (EUR: +2.0%, CAD: +1.9%)
-            //   Neutral:         0-1%
-            //   Débil:           -1 a 0%
-            //   Muy débil:       < -2% (USD: -2.2%)
-            // La función es asimétrica: castiga pérdidas más que premia ganancias
-            // equivalentes, reflejando que reversión de tendencia tiene información
-            // más fuerte que continuación.
-            if (value > 5.0)       score = 100;
-            else if (value > 3.5)  score = 88 + ((value - 3.5) / 1.5) * 12;
-            else if (value > 2.0)  score = 75 + ((value - 2.0) / 1.5) * 13;
-            else if (value > 1.0)  score = 63 + ((value - 1.0) / 1.0) * 12;
-            else if (value > 0.0)  score = 53 + (value / 1.0) * 10;
+case 'fx_momentum':
+            // fxPerformance1M: composite 70% 1M + 30% 3M del índice de divisa ICE
+            // Fuente: Stooq.com (AXY, JXY, EXY, BXY, CXY, SXY, ZXY, DXY) — C6
+            // Datos interbancarios reales, sin lag ECB de hasta 24h (reemplaza Frankfurter).
+            //
+            // Calibración ajustada para rangos reales de índices ICE (Mar 2026):
+            //   Referencia TradingView 1M:
+            //     DXY +1.75% | AXY −0.21% | JXY −0.62% | EXY −2.06%
+            //     BXY −2.65% | CXY +0.22% | SXY −0.49% | ZXY −2.35%
+            //   Composite 70/30 típico: −0.1% a +0.8% (vs anterior 60/40 Frankfurter)
+            //   La función mantiene asimetría: pérdidas penalizan más que ganancias
+            //   equivalentes (reversión de tendencia = señal fuerte).
+            //
+            // Puntos clave de calibración:
+            //   composite >3%    → momentum muy fuerte (raro — ocurre en rallys fuertes)
+            //   composite 1–3%   → bullish claro
+            //   composite 0–1%   → levemente bullish
+            //   composite −1–0%  → levemente bearish (donde está la mayoría en Mar 2026)
+            //   composite −2––1% → bearish moderado
+            //   composite <−2%   → bearish fuerte (GBP, EUR, NZD en Mar 2026)
+            if (value > 4.0)       score = 100;
+            else if (value > 2.5)  score = 86 + ((value - 2.5) / 1.5) * 14;
+            else if (value > 1.0)  score = 72 + ((value - 1.0) / 1.5) * 14;
+            else if (value > 0.0)  score = 56 + (value / 1.0) * 16;
             else if (value === 0)  score = 50;
-            else if (value > -1.0) score = 38 + ((value + 1.0) / 1.0) * 12; // cae más rápido
-            else if (value > -2.5) score = 20 + ((value + 2.5) / 1.5) * 18;
-            else if (value > -4.0) score = 8  + ((value + 4.0) / 1.5) * 12;
-            else                   score = Math.max(0, 8 + ((value + 5.0) / 1.0) * 8);
+            else if (value > -1.0) score = 36 + ((value + 1.0) / 1.0) * 14;
+            else if (value > -2.0) score = 20 + ((value + 2.0) / 1.0) * 16;
+            else if (value > -3.5) score = 7  + ((value + 3.5) / 1.5) * 13;
+            else                   score = Math.max(0, 7 - ((Math.abs(value) - 3.5) / 1.5) * 7);
             break;
-    }
 
     return Math.max(0, Math.min(100, score));
 };
@@ -5353,7 +5357,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v5.2.0
+        Dashboard v5.3.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
