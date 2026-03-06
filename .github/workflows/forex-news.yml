@@ -7,6 +7,14 @@ on:
     - cron: '30 22 * * 0'   # Domingos 22:30 UTC → antes de apertura semanal
   workflow_dispatch:
 
+# FIX R-01: Concurrency group para evitar race conditions.
+# Si dos ejecuciones solapan (ej: cron + workflow_dispatch), la segunda espera
+# a que termine la primera antes de arrancar. cancel-in-progress: false asegura
+# que la segunda no se cancele, sino que espere su turno.
+concurrency:
+  group: forex-news
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -26,7 +34,8 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install feedparser requests python-dateutil
+        # FIX B-02: Versiones fijadas via requirements.txt para reproducibilidad.
+        run: pip install -r scripts/requirements.txt
 
       - name: Create output directories
         run: mkdir -p news-data
