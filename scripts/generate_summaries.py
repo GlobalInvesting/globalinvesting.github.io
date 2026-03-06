@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-generate_summaries.py — v3.1
+generate_summaries.py — v3.2
 Genera un bloque de análisis consolidado por divisa a partir de news.json.
 Llama a Groq una vez por divisa (8 llamadas total) y escribe summaries.json.
 
-CAMBIOS v3.1 (sobre v3.0):
+CAMBIOS v3.2 (sobre v3.1):
+  CALENDARIO ECONÓMICO — FIX PRINCIPAL:
+    · Lee news-data/calendar.json si existe y extrae los próximos eventos por divisa
+      (solo aquellos cuya fecha+hora UTC es estrictamente futura respecto a now_utc).
+    · Inyecta esos eventos en el prompt de usuario bajo la sección
+      "PRÓXIMOS EVENTOS DEL CALENDARIO (ya verificados como futuros)".
+    · El modelo ya NO necesita inferir si un evento ocurrió o no: recibe
+      explícitamente la lista de eventos pendientes o la indicación de que no hay ninguno.
+    · Post-proceso defensivo: si `upcoming_event` devuelto por el modelo contiene
+      palabras clave de eventos que ya aparecen como ocurridos en el calendario
+      (actual != ""), se fuerza a null.
+
   OBSERVABILIDAD:
-    · Log explícito al final indicando qué divisas cayeron a fallback,
-      en lugar de solo mostrar el conteo total.
+    · Log al inicio indicando cuántos eventos futuros se encontraron por divisa.
+    · Log por divisa si se suprime un upcoming_event obsoleto.
 
-  RATE LIMITING:
-    · SLEEP_BETWEEN sube de 6 a 8 segundos para mayor margen con Groq free tier
-      (~6300 tok/min con 6s estaba al límite; con 8s queda en ~4700 tok/min).
-
-  Sin cambios en lógica de prompts, keys, ni estructura JSON de output.
+  Sin cambios en lógica de prompts base, modelo, keys, rate limiting,
+  ni estructura JSON de output.
 """
 
 import os
@@ -27,13 +35,17 @@ from pathlib import Path
 
 # ─────────────────────────────────────────────
 NEWS_FILE      = Path("news-data/news.json")
+CALENDAR_FILE  = Path("news-data/calendar.json")   # v3.2: leído si existe
 SUMMARIES_FILE = Path("news-data/summaries.json")
 GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL     = "llama-3.3-70b-versatile"
 MAX_TOKENS     = 800
 TEMPERATURE    = 0.3
-SLEEP_BETWEEN  = 8      # v3.1: subido de 6 a 8 para mayor margen con free tier
+SLEEP_BETWEEN  = 8
 MAX_RETRIES    = 2
+
+# Máximo de eventos del calendario a incluir en el prompt por divisa
+MAX_CALENDAR_EVENTS_IN_PROMPT = 4
 
 CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
 
@@ -48,7 +60,6 @@ CURRENCY_NAMES = {
     "NZD": "Dólar Neozelandés",
 }
 
-# Perfil macro de cada divisa — ancla el mecanismo de transmisión correcto
 CURRENCY_MACRO_CONTEXT = {
     "USD": "Activo refugio global y divisa de reserva. Se beneficia de risk-off, tensiones geopolíticas y datos macro sólidos en EEUU. Sensible a postura Fed (hawkish/dovish) y al diferencial de tasas con otras economías G10.",
     "EUR": "Importador neto de energía. Conflicto geopolítico = mayores costes energéticos = presión sobre crecimiento eurozona = dilema BCE entre inflación y recesión. Sensible a spreads de bonos periféricos y postura BCE.",
@@ -59,6 +70,173 @@ CURRENCY_MACRO_CONTEXT = {
     "CHF": "Activo refugio por excelencia. Se aprecia en crisis/guerra/risk-off. SNB puede intervenir para limitar apreciación excesiva — distinguir intervención activa (bajista) de amenaza como techo (mixto).",
     "NZD": "Divisa de riesgo de alta beta. En crisis/guerra cae por risk-off global (no por correlación directa con petróleo). RBNZ y datos domésticos NZ son drivers fundamentales propios.",
 }
+
+# ─────────────────────────────────────────────
+# v3.2: CALENDAR UTILITIES
+# ─────────────────────────────────────────────
+
+def load_upcoming_calendar_events(now_utc: datetime) -> dict:
+    """
+    Lee calendar.json y devuelve un dict {currency: [event_str, ...]}
+    con SOLO los eventos cuya fecha+hora UTC es estrictamente futura.
+
+    Formato esperado de calendar.json (estructura real del proyecto):
+      {
+        "events": [
+          {
+            "dateISO": "2026-03-11",
+            "timeUTC": "12:30",
+            "currency": "USD",
+            "event": "Core CPI (MoM) (Feb)",
+            "impact": "high",
+            "actual": "",        <-- vacío = no ha ocurrido aún
+            "forecast": "0.2%",
+            "previous": "0.3%"
+          }, ...
+        ]
+      }
+
+    Un evento se considera "futuro" cuando:
+      · actual == "" (no hay dato publicado), Y
+      · su datetime UTC (dateISO + timeUTC) > now_utc
+
+    Eventos con actual != "" ya ocurrieron → se excluyen.
+    """
+    upcoming: dict = {cur: [] for cur in CURRENCIES}
+
+    if not CALENDAR_FILE.exists():
+        print("  [calendar] calendar.json no encontrado — se omite sección de próximos eventos")
+        return upcoming
+
+    try:
+        with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+            cal_data = json.load(f)
+    except Exception as e:
+        print(f"  [calendar] Error leyendo calendar.json: {e}")
+        return upcoming
+
+    events = cal_data.get("events", [])
+    total_future = 0
+
+    for ev in events:
+        cur       = ev.get("currency", "").upper()
+        actual    = (ev.get("actual") or "").strip()
+        date_iso  = ev.get("dateISO", "")
+        time_utc  = ev.get("timeUTC", "00:00")
+        event_name = ev.get("event", "")
+        impact    = ev.get("impact", "low")
+        forecast  = (ev.get("forecast") or "").strip()
+
+        # Skip already-published events
+        if actual:
+            continue
+
+        # Skip non-tracked currencies
+        if cur not in CURRENCIES:
+            continue
+
+        # Parse event datetime in UTC
+        try:
+            ev_dt = datetime.strptime(f"{date_iso} {time_utc}", "%Y-%m-%d %H:%M")
+            ev_dt = ev_dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+
+        # Must be strictly in the future
+        if ev_dt <= now_utc:
+            continue
+
+        # Format a concise human-readable string for the prompt
+        # e.g. "Core CPI (MoM) — Mié 11 Mar 12:30 UTC [high] prev: 0.3%"
+        day_name = ev_dt.strftime("%a %d %b")
+        fc_str   = f" prev: {ev.get('previous','')}" if ev.get("previous") else ""
+        if forecast:
+            fc_str = f" prev: {ev.get('previous','')} fcst: {forecast}"
+        entry = f"{event_name} — {day_name} {time_utc} UTC [{impact}]{fc_str}"
+        upcoming[cur].append((ev_dt, entry))
+        total_future += 1
+
+    # Sort by datetime and keep only the nearest MAX_CALENDAR_EVENTS_IN_PROMPT
+    for cur in CURRENCIES:
+        upcoming[cur].sort(key=lambda x: x[0])
+        upcoming[cur] = [e for _, e in upcoming[cur][:MAX_CALENDAR_EVENTS_IN_PROMPT]]
+
+    print(f"  [calendar] {total_future} eventos futuros cargados desde calendar.json")
+    for cur in CURRENCIES:
+        n = len(upcoming[cur])
+        if n:
+            print(f"    {cur}: {n} evento{'s' if n>1 else ''} próximo{'s' if n>1 else ''}")
+
+    return upcoming
+
+
+def build_already_occurred_set(now_utc: datetime) -> set:
+    """
+    Devuelve un set de palabras clave en minúsculas de eventos que ya
+    tienen 'actual' publicado en calendar.json.
+    Se usa como post-proceso defensivo para suprimir upcoming_event obsoletos.
+    """
+    occurred: set = set()
+
+    if not CALENDAR_FILE.exists():
+        return occurred
+
+    try:
+        with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+            cal_data = json.load(f)
+    except Exception:
+        return occurred
+
+    for ev in cal_data.get("events", []):
+        actual = (ev.get("actual") or "").strip()
+        if actual:
+            # Store normalised event name tokens for fuzzy matching
+            name = ev.get("event", "").lower()
+            # Also mark events whose time has passed even if actual is missing
+            try:
+                date_iso = ev.get("dateISO", "")
+                time_utc = ev.get("timeUTC", "00:00")
+                ev_dt = datetime.strptime(f"{date_iso} {time_utc}", "%Y-%m-%d %H:%M")
+                ev_dt = ev_dt.replace(tzinfo=timezone.utc)
+                if ev_dt <= now_utc:
+                    occurred.add(name)
+            except ValueError:
+                if actual:
+                    occurred.add(name)
+
+    return occurred
+
+
+def is_upcoming_event_stale(event_text: str, occurred_set: set) -> bool:
+    """
+    Returns True if the upcoming_event string from the model looks like
+    an event that has already occurred according to the calendar.
+    Uses a simple token overlap heuristic.
+    """
+    if not event_text or not occurred_set:
+        return False
+
+    text_lower = event_text.lower()
+    # Common stale-event signals
+    STALE_PHRASES = [
+        "esta noche", "esta mañana", "esta tarde", "today", "tonight",
+        "this morning", "earlier today",
+    ]
+    for phrase in STALE_PHRASES:
+        if phrase in text_lower:
+            return True
+
+    # Check token overlap with known occurred events
+    text_tokens = set(re.findall(r"[a-z]{3,}", text_lower))
+    for occurred_name in occurred_set:
+        occurred_tokens = set(re.findall(r"[a-z]{3,}", occurred_name))
+        if len(occurred_tokens) >= 2:
+            overlap = text_tokens & occurred_tokens
+            if len(overlap) >= 2:
+                return True
+
+    return False
+
 
 # ─────────────────────────────────────────────
 SYSTEM_PROMPT = """Eres un analista senior de mercados de divisas (FX) de una mesa institucional de trading con más de 15 años de experiencia. Tu especialidad es sintetizar múltiples fuentes de información en análisis accionables, precisos y con contexto macroeconómico profundo.
@@ -116,6 +294,20 @@ REGLA DE DRIVERS
 - PROHIBIDO: drivers de una sola palabra ("Tensión", "Datos", "Mercado", "Guerra").
 
 ═══════════════════════════════════════════════
+REGLA CRÍTICA — UPCOMING_EVENT
+═══════════════════════════════════════════════
+
+El campo "upcoming_event" SOLO debe referenciar eventos de la sección
+"PRÓXIMOS EVENTOS DEL CALENDARIO" que se te proporciona más abajo.
+Esos eventos han sido pre-verificados como FUTUROS (aún no publicados).
+
+- Si la sección de próximos eventos está vacía o marcada como "Sin eventos",
+  devuelve null en upcoming_event.
+- NUNCA inventes un evento que no esté en esa lista.
+- NUNCA menciones eventos que ya hayan ocurrido (NFP de hoy, datos de esta mañana, etc.).
+- Formato: "Nombre del evento — fecha y hora local o UTC si se proporciona"
+
+═══════════════════════════════════════════════
 FORMATO DE RESPUESTA
 ═══════════════════════════════════════════════
 
@@ -140,15 +332,10 @@ REGLA DE CONFIDENCE:
 - 70-89:  mayoría clara con algún matiz menor
 - 50-69:  tendencia moderada con contradicciones relevantes
 - 30-49:  señal débil, mixta, o pocas fuentes disponibles
-- 0-29:   sin señal (usar neut)
-
-REGLA DE UPCOMING_EVENT:
-- Solo incluir si aparece explícitamente en los titulares o es consecuencia directa de la noticia.
-- Formato: "Nombre del evento — fecha/plazo si se menciona"
-- Si no hay ninguno relevante: null"""
+- 0-29:   sin señal (usar neut)"""
 
 
-def build_user_prompt(cur: str, articles: list) -> str:
+def build_user_prompt(cur: str, articles: list, upcoming_events: list) -> str:
     name      = CURRENCY_NAMES.get(cur, cur)
     macro_ctx = CURRENCY_MACRO_CONTEXT.get(cur, "")
 
@@ -177,17 +364,32 @@ def build_user_prompt(cur: str, articles: list) -> str:
 
     headlines_block = "\n".join(lines) if lines else "Sin noticias disponibles."
 
+    # ── v3.2: CALENDAR SECTION ────────────────────────────────────────────────
+    if upcoming_events:
+        calendar_block = "\n".join(f"  · {ev}" for ev in upcoming_events)
+        calendar_section = (
+            f"\nPRÓXIMOS EVENTOS DEL CALENDARIO (ya verificados como futuros, no han ocurrido aún):\n"
+            f"{calendar_block}\n"
+        )
+    else:
+        calendar_section = (
+            "\nPRÓXIMOS EVENTOS DEL CALENDARIO: Sin eventos relevantes pendientes para esta divisa "
+            "en el horizonte inmediato. Devuelve null en upcoming_event.\n"
+        )
+
     return (
         f"DIVISA: {cur} — {name}\n"
         f"PERFIL MACRO DE {cur}: {macro_ctx}\n"
         f"TOTAL ARTÍCULOS: {len(articles)}\n\n"
         f"TITULARES Y DESCRIPCIONES:\n"
-        f"{headlines_block}\n\n"
+        f"{headlines_block}\n"
+        f"{calendar_section}\n"
         f"INSTRUCCIONES ESPECÍFICAS PARA {cur}:\n"
         f"1. Usa el PERFIL MACRO para explicar cómo los eventos globales afectan ESPECÍFICAMENTE al {cur}.\n"
         f"2. Si hay señales contradictorias, identifícalas y explica cuál domina.\n"
         f"3. Al menos 2 drivers deben ser específicos del {cur} o su banco central.\n"
-        f"4. Incluye niveles de precio concretos si aparecen en los titulares o contexto.\n\n"
+        f"4. Incluye niveles de precio concretos si aparecen en los titulares o contexto.\n"
+        f"5. Para upcoming_event: usa SOLO la lista de próximos eventos del calendario de arriba.\n\n"
         f"Genera el análisis consolidado institucional en JSON para {cur}. "
         f"Recuerda: entre 120 y 200 palabras en 'analysis'."
     )
@@ -227,12 +429,12 @@ def is_daily_limit(response) -> bool:
         return False
 
 
-def call_groq(api_key: str, cur: str, articles: list) -> dict | None:
+def call_groq(api_key: str, cur: str, articles: list, upcoming_events: list) -> dict | None:
     payload = {
         "model":       GROQ_MODEL,
         "messages":    [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user",   "content": build_user_prompt(cur, articles)},
+            {"role": "user",   "content": build_user_prompt(cur, articles, upcoming_events)},
         ],
         "max_tokens":  MAX_TOKENS,
         "temperature": TEMPERATURE,
@@ -322,7 +524,7 @@ def fallback_summary(cur: str, articles: list) -> dict:
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"📊 generate_summaries.py v3.1 — {GROQ_MODEL}")
+    print(f"📊 generate_summaries.py v3.2 — {GROQ_MODEL}")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}")
     print(f"   Sleep entre llamadas: {SLEEP_BETWEEN}s")
     print("=" * 65)
@@ -348,6 +550,12 @@ def main():
     articles = news_data.get("articles", [])
     print(f"\n📰 Artículos cargados: {len(articles)}")
 
+    # ── v3.2: load calendar ───────────────────────────────────────────────────
+    print(f"\n📅 Cargando calendario económico...")
+    upcoming_by_currency = load_upcoming_calendar_events(now_utc)
+    occurred_set         = build_already_occurred_set(now_utc)
+    print(f"   Eventos ya ocurridos en caché: {len(occurred_set)}")
+
     groups = {cur: [] for cur in CURRENCIES}
     for a in articles:
         cur = a.get("cur", "")
@@ -357,24 +565,26 @@ def main():
     for cur in CURRENCIES:
         groups[cur].sort(key=lambda x: x.get("ts", 0), reverse=True)
 
-    print(f"\n   Distribución:")
+    print(f"\n   Distribución de artículos:")
     for cur in CURRENCIES:
         n = len(groups[cur])
         high = sum(1 for a in groups[cur] if a.get("impact") == "high")
-        print(f"   {cur}: {n} artículo{'s' if n != 1 else ''} ({high} high)")
+        ev_count = len(upcoming_by_currency.get(cur, []))
+        print(f"   {cur}: {n} artículo{'s' if n != 1 else ''} ({high} high) | {ev_count} eventos próximos")
 
     summaries    = {}
     generated    = 0
     fallbacks    = 0
-    # v3.1: tracking por divisa para log final detallado
     ai_curs      = []
     fallback_curs = []
+    suppressed_events = 0
 
     print(f"\n{'─'*65}")
     for cur in CURRENCIES:
-        cur_articles = groups[cur]
+        cur_articles     = groups[cur]
+        cur_upcoming     = upcoming_by_currency.get(cur, [])
         n = len(cur_articles)
-        print(f"\n[{cur}] {CURRENCY_NAMES[cur]} — {n} artículo{'s' if n!=1 else ''}")
+        print(f"\n[{cur}] {CURRENCY_NAMES[cur]} — {n} artículo{'s' if n!=1 else ''} | {len(cur_upcoming)} próximos eventos")
 
         if n == 0:
             summaries[cur] = {
@@ -395,14 +605,15 @@ def main():
 
         result = None
         if use_ai and current_key_idx < len(all_keys):
-            result = call_groq(all_keys[current_key_idx], cur, cur_articles)
+            # v3.2: pass upcoming_events to call_groq
+            result = call_groq(all_keys[current_key_idx], cur, cur_articles, cur_upcoming)
 
             if result == "DAILY_LIMIT":
                 print(f"  ⛔ Key {current_key_idx+1} agotada")
                 current_key_idx += 1
                 while current_key_idx < len(all_keys):
                     print(f"  🔄 Usando Key {current_key_idx+1}")
-                    result = call_groq(all_keys[current_key_idx], cur, cur_articles)
+                    result = call_groq(all_keys[current_key_idx], cur, cur_articles, cur_upcoming)
                     if result != "DAILY_LIMIT":
                         break
                     print(f"  ⛔ Key {current_key_idx+1} también agotada")
@@ -413,6 +624,20 @@ def main():
                     result = None
 
         if result and isinstance(result, dict):
+            # ── v3.2: post-process — suppress stale upcoming_event ────────────
+            if result.get("upcoming_event"):
+                if is_upcoming_event_stale(result["upcoming_event"], occurred_set):
+                    print(f"  🗑️  upcoming_event suprimido (evento ya ocurrido): "
+                          f"\"{result['upcoming_event'][:60]}\"")
+                    result["upcoming_event"] = None
+                    suppressed_events += 1
+                elif not cur_upcoming:
+                    # Model hallucinated an event when there were none in the calendar
+                    print(f"  🗑️  upcoming_event suprimido (no había eventos en calendario): "
+                          f"\"{result['upcoming_event'][:60]}\"")
+                    result["upcoming_event"] = None
+                    suppressed_events += 1
+
             sources = list(set(a.get("source", "") for a in cur_articles if a.get("source")))[:4]
             latest  = max(a.get("ts", 0) for a in cur_articles)
             summaries[cur] = {
@@ -427,7 +652,8 @@ def main():
             sent_label = {"bull":"ALCISTA","bear":"BAJISTA","neut":"NEUTRAL","mixed":"MIXTO"}.get(
                 result["sentiment"], result["sentiment"].upper()
             )
-            print(f"  ✅ AI → {sent_label} ({result['confidence']}%) | {len(result['drivers'])} drivers")
+            ev_str = f" | próximo: {result['upcoming_event'][:40]}" if result.get("upcoming_event") else " | sin próximo"
+            print(f"  ✅ AI → {sent_label} ({result['confidence']}%) | {len(result['drivers'])} drivers{ev_str}")
             print(f"     {result['analysis'][:120]}...")
         else:
             fb = fallback_summary(cur, cur_articles)
@@ -455,9 +681,10 @@ def main():
 
     print(f"\n{'='*65}")
     print(f"📋 RESUMEN FINAL")
-    print(f"   ✅ Generados con AI:   {generated}/8  {' · '.join(ai_curs) if ai_curs else '—'}")
-    print(f"   📊 Fallback:           {fallbacks}/8  {' · '.join(fallback_curs) if fallback_curs else '—'}")  # v3.1
-    print(f"   💾 Guardado en:        {SUMMARIES_FILE}")
+    print(f"   ✅ Generados con AI:        {generated}/8  {' · '.join(ai_curs) if ai_curs else '—'}")
+    print(f"   📊 Fallback:                {fallbacks}/8  {' · '.join(fallback_curs) if fallback_curs else '—'}")
+    print(f"   🗑️  Upcoming events suprim.: {suppressed_events}")
+    print(f"   💾 Guardado en:             {SUMMARIES_FILE}")
     print(f"{'='*65}")
 
 
