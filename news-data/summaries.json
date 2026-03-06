@@ -1,161 +1,125 @@
 {
-  "updated_utc": "2026-03-06T00:09:51.425636+00:00",
-  "updated_label": "00:09 UTC",
-  "model": "llama-3.3-70b-versatile",
-  "total_ai": 8,
-  "total_fallback": 0,
+  "updated_utc": "2026-03-06T09:32:24.374567+00:00",
+  "updated_label": "09:32 UTC",
+  "model": "fallback",
+  "total_ai": 0,
+  "total_fallback": 8,
   "summaries": {
     "USD": {
       "sentiment": "bull",
-      "confidence": 90,
-      "analysis": "El dólar estadounidense se fortalece debido a la subida del petróleo WTI a $80 por barril, lo que aviva temores de inflación y desaceleración económica global. La administración Trump considera medidas para contener los precios del petróleo, como la liberación de reservas estratégicas. El conflicto en Medio Oriente en su séptimo día mantiene la presión sobre los precios del crudo. El USD se beneficia de la percepción de seguridad y la búsqueda de activos seguros en un entorno de incertidumbre. La Reserva Federal mantiene una postura hawkish, lo que implica que no hay intención de recortar tasas en el corto plazo. La perspectiva a corto plazo sugiere que el USD puede seguir fortaleciéndose si el conflicto en Irán continúa y los precios del petróleo siguen subiendo.",
-      "drivers": [
-        "Petróleo >$80",
-        "Conflicto en Irán",
-        "Trump busca controlar precios"
-      ],
-      "upcoming_event": "Reunión de la OPEP — próximo mes",
-      "ai_generated": true,
+      "confidence": 75,
+      "analysis": "Análisis basado en 8 noticias para Dólar Estadounidense. Señales: 6 alcistas, 2 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
       "sources": [
-        "FXStreet ES",
         "InstaForex",
+        "ForexLive",
         "FXStreet"
       ],
-      "articles_count": 6,
-      "latest_ts": 1772772289000
+      "articles_count": 8,
+      "latest_ts": 1772805005000
     },
     "EUR": {
       "sentiment": "bear",
-      "confidence": 80,
-      "analysis": "La divisa EUR se debilita debido a la escalada del conflicto en Medio Oriente, lo que ha llevado a los inversores a buscar refugio en activos seguros. El par EUR/USD ha caído a 1.1590, con soporte en 1.1540. La postura del Banco Central Europeo (BCE) sigue siendo cautelosa, lo que no ayuda a la divisa. Aunque hay un patrón de onda alcista en el gráfico de 4 horas, la tendencia general es bajista. Los índices europeos también han cerrado con fuertes pérdidas, lo que refleja la incertidumbre sobre el crecimiento y la inflación en la zona euro. A corto plazo, se espera que la divisa siga debilitándose debido a la falta de señales de recuperación en la región.",
-      "drivers": [
-        "Conflicto en Medio Oriente",
-        "BCE cauteloso",
-        "Índices europeos bajistas"
-      ],
+      "confidence": 75,
+      "analysis": "Análisis basado en 8 noticias para Euro. Señales: 1 alcistas, 6 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
       "upcoming_event": null,
-      "ai_generated": true,
+      "ai_generated": false,
       "sources": [
-        "FXStreet ES",
         "InstaForex",
-        "FXStreet",
-        "InvestingLive"
+        "FXStreet ES",
+        "FXStreet"
       ],
-      "articles_count": 6,
-      "latest_ts": 1772736222000
+      "articles_count": 8,
+      "latest_ts": 1772805134000
     },
     "GBP": {
-      "sentiment": "bear",
-      "confidence": 60,
-      "analysis": "La libra esterlina (GBP) se debilita frente al dólar estadounidense, cotizando en 1.3337, con una caída del 0.25% en el día. La tensión en Medio Oriente y los sólidos datos laborales en EEUU han impulsado esta tendencia bajista. Aunque el Banco de Inglaterra ha reducido las expectativas de relajación monetaria, lo que debería apoyar a la libra, la presión sobre el dólar ha disminuido en los últimos días. El par GBP/USD se encuentra cerca de mínimos de tres meses, con soporte en 1.3350. La postura del Banco de Inglaterra se mantiene en espera, sin expectativas de recortes de tasas en marzo. A corto plazo, la publicación de los datos de empleo no agrícola en EEUU puede definir la tendencia, con los traders esperando señales para tomar decisiones.",
-      "drivers": [
-        "Tensión en Medio Oriente",
-        "Datos laborales sólidos en EEUU",
-        "BoE en espera"
-      ],
-      "upcoming_event": "Datos de empleo no agrícola en EEUU — viernes",
-      "ai_generated": true,
-      "sources": [
-        "FXStreet ES",
-        "InstaForex",
-        "FXStreet",
-        "InvestMacro"
-      ],
-      "articles_count": 6,
-      "latest_ts": 1772735889000
-    },
-    "JPY": {
-      "sentiment": "bear",
-      "confidence": 70,
-      "analysis": "El yen japonés se debilita frente al dólar estadounidense, con el par USD/JPY subiendo 0.30% hasta los 157.00, impulsado por datos laborales sólidos en EEUU y comentarios hawkish del presidente del Fed de Richmond. Aunque se espera que el BoJ suba las tasas en abril, lo que podría apoyar la firmeza del yen, la presión alcista en 157.00 y el MACD ascendente sugieren un sesgo bajista para el JPY. El gobernador del BOJ, Ueda, destaca la necesidad de aumentos salariales significativos para alcanzar la meta de inflación, pero esto no tiene una influencia directa en la política monetaria. A corto plazo, el par USD/JPY podría seguir subiendo si se confirman expectativas de subidas de tasas en EEUU, lo que podría llevar al par a superar los 157.19.",
-      "drivers": [
-        "Comentarios hawkish Fed",
-        "Datos laborales sólidos EEUU",
-        "Expectativa subida tasas BoJ"
-      ],
-      "upcoming_event": "Reunión del BoJ en abril",
-      "ai_generated": true,
+      "sentiment": "mixed",
+      "confidence": 50,
+      "analysis": "Análisis basado en 5 noticias para Libra Esterlina. Señales: 2 alcistas, 2 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
       "sources": [
         "InstaForex",
-        "FXStreet",
-        "ForexLive"
+        "FXStreet"
       ],
       "articles_count": 5,
-      "latest_ts": 1772748059000
+      "latest_ts": 1772786715000
+    },
+    "JPY": {
+      "sentiment": "mixed",
+      "confidence": 50,
+      "analysis": "Análisis basado en 3 noticias para Yen Japonés. Señales: 0 alcistas, 1 bajistas, 1 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
+      "sources": [
+        "InstaForex",
+        "ForexLive"
+      ],
+      "articles_count": 3,
+      "latest_ts": 1772778041000
     },
     "AUD": {
       "sentiment": "bull",
-      "confidence": 80,
-      "analysis": "La divisa australiana se mantiene alcista gracias a la inflación interna estable y la postura hawkish del Banco de la Reserva de Australia (RBA). El nivel de 0.7150 actúa como un techo para el alza en el corto plazo. La RBA, con su actitud firme, ofrece un apoyo subyacente al dólar australiano. Aunque la tensión en Medio Oriente genera un sentimiento de riesgo, la economía australiana muestra fortaleza, lo que limita el impacto negativo. Con un objetivo a corto plazo en 0.7100, el AUD parece tener un sesgo alcista. La postura del RBA y la inflación interna persistente son los principales catalizadores de este movimiento. En el contexto de riesgo global, el AUD/CHF presenta una oportunidad de retroceso a corto plazo, pero la tendencia general para el AUD sigue siendo positiva.",
-      "drivers": [
-        "RBA hawkish",
-        "Inflación interna estable",
-        "Tensión en Medio Oriente"
-      ],
+      "confidence": 95,
+      "analysis": "Análisis basado en 3 noticias para Dólar Australiano. Señales: 3 alcistas, 0 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
       "upcoming_event": null,
-      "ai_generated": true,
+      "ai_generated": false,
       "sources": [
-        "FXStreet",
-        "BabyPips"
+        "ForexLive",
+        "FXStreet"
       ],
       "articles_count": 3,
-      "latest_ts": 1772725232000
+      "latest_ts": 1772779520000
     },
     "CAD": {
       "sentiment": "bull",
-      "confidence": 80,
-      "analysis": "El CAD se fortalece debido a la expectativa de renovación del USMCA con ajustes limitados, lo que reduce los riesgos de cola significativos. El crecimiento canadiense debe superar su potencial para evitar riesgos de desinflación y recortes de tasas, según TD Securities. El Banco de Canadá se encuentra en una posición de equilibrio, considerando la incertidumbre comercial, los precios más altos del petróleo y la demanda interna. Aunque el TSX cayó un 1% debido a tensiones geopolíticas y signos de inflación persistente, el sentimiento general es alcista. El CAD cotiza con soporte en 1.33, con resistencia en 1.36. La postura del Banco de Canadá es dovish, pero con un enfoque en el crecimiento y la inflación. A corto plazo, los datos del primer trimestre serán clave para determinar la dirección del CAD.",
-      "drivers": [
-        "USMCA renovación",
-        "Crecimiento canadiense",
-        "BoC dovish"
-      ],
-      "upcoming_event": "Datos del primer trimestre — fin de abril",
-      "ai_generated": true,
+      "confidence": 40,
+      "analysis": "Análisis basado en 5 noticias para Dólar Canadiense. Señales: 2 alcistas, 0 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
       "sources": [
+        "ForexLive",
         "FXStreet ES",
-        "InstaForex",
-        "FXStreet",
-        "ForexLive"
+        "FXStreet"
       ],
-      "articles_count": 4,
-      "latest_ts": 1772752912000
+      "articles_count": 5,
+      "latest_ts": 1772783562000
     },
     "CHF": {
-      "sentiment": "bull",
-      "confidence": 70,
-      "analysis": "El franco suizo (CHF) se mantiene en un rango estrecho contra el dólar estadounidense, con el par USD/CHF cotizando en un rango de 40 pips y enfrentando resistencia en los niveles de 0.7812-0.7821. La inflación suiza subió un 0.6% en febrero, lo que sugiere una presión moderada sobre los precios y podría influir en la postura del Banco Nacional Suizo (BNS). Aunque el BNS ha mantenido una postura dovish en el pasado, el aumento de la inflación podría llevar a una revisión de su política monetaria. A corto plazo, el mercado busca un catalizador para romper el equilibrio actual. La próxima reunión del BNS podría ser un evento clave para determinar el rumbo del CHF, ya que cualquier señal de endurecimiento de la política monetaria podría apoyar al franco suizo.",
-      "drivers": [
-        "Inflación suiza",
-        "BNS dovish",
-        "USD/CHF rango"
-      ],
-      "upcoming_event": "Reunión del Banco Nacional Suizo — fecha no especificada",
-      "ai_generated": true,
+      "sentiment": "mixed",
+      "confidence": 50,
+      "analysis": "Análisis basado en 3 noticias para Franco Suizo. Señales: 1 alcistas, 1 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
       "sources": [
+        "InstaForex",
         "InvestingLive",
         "ActionForex"
       ],
-      "articles_count": 2,
-      "latest_ts": 1772724480000
+      "articles_count": 3,
+      "latest_ts": 1772803000000
     },
     "NZD": {
       "sentiment": "bear",
-      "confidence": 60,
-      "analysis": "El NZD se debilita debido a la reducción de la tensión geopolítica tras los ataques con misiles balísticos de Irán, lo que disminuye la demanda de activos refugio. El par NZDUSD cayó bajo la línea de tendencia del canal, buscando soporte en 0.5834. La volatilidad lateral mantiene la presión vendedora. Aunque se espera una lectura suave en el mercado laboral de EEUU, con 59k empleos no agrícolas para febrero, este dato no parece ser suficiente para revertir la tendencia bajista del NZD. El Banco Central de Nueva Zelanda mantiene una postura dovish, lo que también contribuye a la debilidad de la divisa. A corto plazo, el NZD puede seguir bajo presión hasta que se presente un catalizador que revierta la tendencia actual. La próxima lectura de empleo en EEUU puede ser un evento clave para determinar la dirección futura del NZD.",
-      "drivers": [
-        "Tensión geopolítica",
-        "Volatilidad lateral",
-        "Banco Central dovish"
-      ],
-      "upcoming_event": "Lectura de empleo no agrícola en EEUU — febrero",
-      "ai_generated": true,
+      "confidence": 40,
+      "analysis": "Análisis basado en 5 noticias para Dólar Neozelandés. Señales: 0 alcistas, 2 bajistas, 0 mixtas. Resumen AI no disponible en este ciclo.",
+      "drivers": [],
+      "upcoming_event": null,
+      "ai_generated": false,
       "sources": [
-        "InvestingLive",
+        "InstaForex",
         "ForexLive"
       ],
-      "articles_count": 3,
-      "latest_ts": 1772750138000
+      "articles_count": 5,
+      "latest_ts": 1772799011000
     }
   }
 }
