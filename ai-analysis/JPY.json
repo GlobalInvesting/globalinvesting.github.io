@@ -2,11 +2,11 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "La política monetaria del Banco de Japón ha sido recientemente ajustada con un aumento en la tasa de interés, lo que sugiere un enfoque más restrictivo y podría generar presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, este movimiento puede ser visto como un paso hacia la normalización de la política monetaria. La inflación en Japón se mantiene por debajo del objetivo, lo que podría influir en las decisiones futuras del banco central.\n\nLa cuenta corriente presenta un superávit, lo que indica una demanda estructural de la divisa. Sin embargo, la balanza comercial muestra un déficit, influenciado por la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial, y equipos eléctricos y electrónicos. La demanda de refugio y la revisión de expectativas de recortes de tasas de la Fed han llevado a un fortalecimiento del dólar estadounidense, presionando al yen hacia la baja.\n\nEl posicionamiento especulativo neto es bajista, con un COT de -26.3K contratos netos. Aunque el rendimiento FX del último mes muestra una apreciación del yen, las noticias recientes indican una corrección y un potencial alcista agotado para el par USD/JPY. La integración de estas señales sugiere que, a corto plazo, el yen podría experimentar presiones bajistas debido a la demanda de refugio y la fortaleza del dólar estadounidense.",
+  "analysis": "La política monetaria del Banco de Japón ha sido objeto de atención reciente, ya que acaba de subir las tasas de interés en 0.25 puntos porcentuales, lo que indica un ciclo restrictivo activo y estructuralmente alcista para la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, este movimiento sugiere que el banco central está tomando medidas para controlar la inflación y estimular el crecimiento económico. Sin embargo, la política dovish continúa, como se refleja en las declaraciones del BOJ sobre mantener condiciones monetarias acomodaticias con inflación subyacente acelerándose gradualmente hacia el 2%.\n\nLa balanza comercial de Japón muestra un déficit en bienes, lo que se debe en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial, y equipos eléctricos y electrónicos. Aunque el déficit comercial puede ejercer presión bajista sobre la divisa, el superávit en la cuenta corriente y la entrada neta de flujos de capital sugieren que la demanda estructural de la divisa sigue siendo fuerte.\n\nEl posicionamiento especulativo en la divisa japonesa es netamente bajista, con un saldo de -26.3K contratos netos, lo que sugiere que los inversores están apostando por una depreciación de la divisa. Sin embargo, el rendimiento FX del último mes ha sido positivo, con una apreciación del 2.28% vs el dólar estadounidense, lo que contradice el sesgo especulativo neto bajista. La preocupación del Ministro de Finanzas de Japón por el impacto económico del conflicto US-Irán y la persistencia de la deflación en Japón puede influir en la volatilidad de la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-05T11:07:30.736238+00:00",
+  "generatedAt": "2026-03-06T11:02:47.327909+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
-  "newsCount": 3,
+  "newsCount": 2,
   "dataSnapshot": {
     "interestRate": 0.75,
     "gdpGrowth": 0.1,
@@ -25,14 +25,13 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -26317,
-    "fxPerformance1M": 2.4809,
+    "fxPerformance1M": 2.2779,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-05",
-    "latestNewsTs": 1772700358.0,
+    "lastUpdate": "2026-03-06",
+    "latestNewsTs": 1772778041.0,
     "newsHeadlines": [
-      "USD/JPY sube a 157.35: apreciación del dólar estadounidense tras corrección → JP",
-      "USD se fortalece por demanda de refugio y revisión de expectativas de recortes d",
-      "USD/JPY sube 20 pips desde 157.19 con MACD cruzando a positivo: potencial alcist"
+      "BOJ mantiene condiciones monetarias acomodaticias con inflación subyacente acele",
+      "Ministro de Finanzas de Japón anuncia respuesta ágil a movimientos del mercado: "
     ]
   },
   "globalContext": {
@@ -40,8 +39,8 @@
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.33,
-    "avg_fx_perf_1m": 1.53,
+    "avg_bond10y": 3.37,
+    "avg_fx_perf_1m": 1.38,
     "avg_cot": 9454.25
   }
 }

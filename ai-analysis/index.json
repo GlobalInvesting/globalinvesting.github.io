@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-05T11:07:47.268628+00:00",
+  "generatedAt": "2026-03-06T11:03:10.441249+00:00",
   "model": "llama-3.3-70b-versatile",
   "version": "5.0",
   "currencies": [
@@ -12,8 +12,8 @@
     "CHF",
     "NZD"
   ],
-  "totalGenerated": 7,
-  "totalReused": 1,
+  "totalGenerated": 8,
+  "totalReused": 0,
   "comtradeHits": 0,
   "newsIntegrated": 20,
   "keysUsed": 3,
@@ -22,8 +22,8 @@
     "USD": {
       "success": true,
       "reused": false,
-      "wordCount": 253,
-      "generatedAt": "2026-03-05T11:07:11.955658+00:00",
+      "wordCount": 259,
+      "generatedAt": "2026-03-06T11:02:28.568497+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -31,8 +31,8 @@
     "EUR": {
       "success": true,
       "reused": false,
-      "wordCount": 258,
-      "generatedAt": "2026-03-05T11:07:16.535526+00:00",
+      "wordCount": 219,
+      "generatedAt": "2026-03-06T11:02:32.936732+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -40,8 +40,8 @@
     "GBP": {
       "success": true,
       "reused": false,
-      "wordCount": 256,
-      "generatedAt": "2026-03-05T11:07:26.062510+00:00",
+      "wordCount": 260,
+      "generatedAt": "2026-03-06T11:02:42.848071+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 2
@@ -49,43 +49,47 @@
     "JPY": {
       "success": true,
       "reused": false,
-      "wordCount": 224,
-      "generatedAt": "2026-03-05T11:07:30.736238+00:00",
-      "newsIntegrated": 3,
+      "wordCount": 263,
+      "generatedAt": "2026-03-06T11:02:47.327909+00:00",
+      "newsIntegrated": 2,
       "exportDataSource": "fallback",
       "keyUsed": 2
     },
     "AUD": {
       "success": true,
       "reused": false,
-      "wordCount": 214,
-      "generatedAt": "2026-03-05T11:07:35.225992+00:00",
+      "wordCount": 205,
+      "generatedAt": "2026-03-06T11:02:56.646279+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
-      "keyUsed": 2
+      "keyUsed": 3
     },
     "CAD": {
       "success": true,
       "reused": false,
-      "wordCount": 238,
-      "generatedAt": "2026-03-05T11:07:39.745444+00:00",
+      "wordCount": 291,
+      "generatedAt": "2026-03-06T11:03:01.677606+00:00",
       "newsIntegrated": 2,
       "exportDataSource": "fallback",
-      "keyUsed": 2
+      "keyUsed": 3
     },
     "CHF": {
       "success": true,
       "reused": false,
-      "wordCount": 248,
-      "generatedAt": "2026-03-05T11:07:44.177196+00:00",
-      "newsIntegrated": 3,
+      "wordCount": 233,
+      "generatedAt": "2026-03-06T11:03:06.095225+00:00",
+      "newsIntegrated": 2,
       "exportDataSource": "fallback",
-      "keyUsed": 2
+      "keyUsed": 3
     },
     "NZD": {
       "success": true,
-      "reused": true,
-      "fallback": true
+      "reused": false,
+      "wordCount": 219,
+      "generatedAt": "2026-03-06T11:03:10.440949+00:00",
+      "newsIntegrated": 2,
+      "exportDataSource": "fallback",
+      "keyUsed": 3
     }
   },
   "globalContext": {
@@ -93,8 +97,8 @@
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.33,
-    "avg_fx_perf_1m": 1.53,
+    "avg_bond10y": 3.37,
+    "avg_fx_perf_1m": 1.38,
     "avg_cot": 9454.25
   }
 }

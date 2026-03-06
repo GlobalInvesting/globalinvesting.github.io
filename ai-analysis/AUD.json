@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería apoyar a la divisa. La última subida de tasas del banco central refuerza esta tendencia alcista, aunque el ciclo bajista en los últimos 12 meses podría introducir alguna incertidumbre.\n\nLa balanza comercial australiana sigue mostrando un superávit, con una mejora en enero respecto a diciembre, lo que sugiere que las exportaciones de minerales metalíferos, combustibles y petróleo siguen siendo fuertes. Aunque la cuenta corriente presenta un déficit, el superávit en la balanza comercial ayuda a mitigar esta presión vendedora estructural. Las tensiones en Medio Oriente podrían generar un sentimiento de riesgo, lo que podría llevar a un retroceso en algunas parejas de divisas.\n\nEl posicionamiento especulativo en la divisa australiana es extremadamente alcista, con un COT de +64.7K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. La inflación estable y la postura hawkish del banco central apoyan el objetivo a corto plazo en 0.7100. Aunque el rendimiento FX del último mes ha sido positivo, la divisa sigue siendo atractiva en un régimen global risk-on, lo que podría seguir apoyando su valor.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. La última subida de tasas del RBA refuerza esta tendencia, aunque el ciclo restrictivo puede tener efectos contrarios en el crecimiento económico.\n\nLa balanza comercial australiana presenta un superávit, gracias a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. El régimen global de riesgo favorece a divisas de alto carry y exportadoras de materias primas, lo que beneficia al AUD. La mejora en el ánimo de riesgo en Asia y la debilidad del USD también impulsan al AUD, como se ha visto en las últimas cotizaciones.\n\nEl mercado está saturado de largos, con un COT muy estirado al alza, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos. Aunque las expectativas de subida de tasas del RBA han impulsado al AUD, cualquier cambio en la política monetaria japonesa puede generar incertidumbre y afectar a la divisa australiana. En este contexto, el optimismo en commodities y el ciclo chino también juegan a favor del AUD.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-05T11:07:35.225992+00:00",
+  "generatedAt": "2026-03-06T11:02:56.646279+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -12,7 +12,7 @@
     "gdpGrowth": 0.8,
     "inflation": 3.8,
     "unemployment": 4.1,
-    "currentAccount": -2.3,
+    "currentAccount": -2.9,
     "rateMomentum": -0.5,
     "lastRateDecision": {
       "direction": "SUBIÓ",
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 64653,
-    "fxPerformance1M": 0.1176,
+    "fxPerformance1M": -0.4928,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-05",
-    "latestNewsTs": 1772664978.0,
+    "lastUpdate": "2026-03-06",
+    "latestNewsTs": 1772779520.0,
     "newsHeadlines": [
-      "Balance comercial australiano de enero espera superávit de A$3.9 mil millones: m",
-      "Tensiones en Medio Oriente intensifican sentimiento de riesgo: oportunidad de re",
-      "Inflación interna estable y RBA con postura hawkish: objetivo a corto plazo en 0"
+      "BoJ señaliza mantener tasas bajas: incertidumbre sobre política monetaria japone",
+      "Expectativas de subida de tasas del RBA impulsan al AUD: cotización sube 0.4% a ",
+      "Mejor ánimo de riesgo en Asia y debilidad del USD: optimismo en commodities y ci"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.33,
-    "avg_fx_perf_1m": 1.53,
+    "avg_bond10y": 3.37,
+    "avg_fx_perf_1m": 1.38,
     "avg_cot": 9454.25
   }
 }

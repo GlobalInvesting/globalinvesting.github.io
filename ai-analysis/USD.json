@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que refleja un ciclo expansivo y presiona a la baja la divisa debido al menor carry. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la decisión de bajar tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación. La inflación anual del 2.4% sigue por encima del objetivo, lo que podría generar presión alcista en la divisa si el banco central decide subir tasas en el futuro.\n\nLa balanza comercial muestra un déficit pronunciado de -70.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves sugiere que el déficit comercial se debe en parte a la dependencia de importaciones de bienes. Los precios del gas natural europeo en aumento podrían afectar la competitividad de las exportaciones estadounidenses, aunque los datos sólidos del ISM de servicios y nóminas privadas del ADP sugieren que la economía sigue siendo resiliente.\n\nEl posicionamiento especulativo muestra un sesgo alcista neto, aunque el rendimiento FX del último mes ha sido positivo. La noticia de que los mercados reajustan probabilidades de recorte de tasas de la Fed debido a los datos sólidos del ISM Services y ADP privados podría generar una corrección en la divisa si los inversores ajustan sus expectativas. Sin embargo, el apetito por riesgo sigue siendo alto, lo que podría favorecer a la divisa en el corto plazo.",
+  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la decisión de bajar tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación. La inflación anual de 2.4% sigue siendo una preocupación, pero la desaceleración en la creación de empleos no agrícolas en febrero sugiere que la presión sobre la Fed para subir tasas puede estar disminuyendo.\n\nLa balanza comercial sigue siendo un punto débil, con un déficit pronunciado de 70.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. Sin embargo, el conflicto en Medio Oriente ha elevado los precios del petróleo, lo que ha impulsado al USD como refugio seguro, lo que puede contrarrestar parcialmente la presión vendedora. La composición exportadora de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves sugiere que la economía estadounidense sigue siendo competitiva en sectores clave.\n\nEl posicionamiento especulativo sigue siendo neto alcista, con un COT de +0.8K contratos netos, lo que sugiere que los inversores siguen apostando por la divisa. El rendimiento FX del último mes ha sido positivo, con una apreciación de 2.59% vs USD, lo que refleja la percepción de que la divisa sigue siendo atractiva a pesar de la decisión de bajar tasas. La tensión geopolítica y el riesgo global pueden seguir impulsando al USD como refugio, lo que podría mantener la presión alcista en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-05T11:07:11.955658+00:00",
+  "generatedAt": "2026-03-06T11:02:28.568497+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 850,
-    "fxPerformance1M": 2.7384,
+    "fxPerformance1M": 2.5908,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-05",
-    "latestNewsTs": 1772714479.0,
+    "lastUpdate": "2026-03-06",
+    "latestNewsTs": 1772805005.0,
     "newsHeadlines": [
-      "Precios del gas natural europeo suben por encima de €52/MWh: amenaza de Putin de",
-      "Datos sólidos del ISM de servicios y nóminas privadas del ADP: disminuyen probab",
-      "ISM Services y ADP privados muestran datos sólidos: mercados reajustan probabili"
+      "Conflicto en Medio Oriente eleva petróleo Brent a $85 por barril: tensión geopol",
+      "Conflicto en Medio Oriente eleva petróleo WTI a $81 por barril: tensión geopolít",
+      "Creación de empleos no agrícolas en EEUU se desacelera a 59K en febrero: debilid"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.33,
-    "avg_fx_perf_1m": 1.53,
+    "avg_bond10y": 3.37,
+    "avg_fx_perf_1m": 1.38,
     "avg_cot": 9454.25
   }
 }

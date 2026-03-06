@@ -2,11 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión a la baja sobre la divisa. Aunque los datos de inflación y crecimiento económico son moderados, la tasa de interés baja podría hacer que la divisa sea menos atractiva para los inversores que buscan rendimientos más altos.\n\nLa balanza comercial de Suiza muestra un superávit de 4.6B USD/mes, lo que se debe en parte a la composición exportadora del país, que incluye productos farmacéuticos y instrumentos de precisión. Los términos de intercambio favorables también contribuyen a este superávit. Sin embargo, la noticia de un aumento del petróleo compensado por la apreciación del franco suizo sugiere que la inflación en Suiza podría ser moderada, lo que podría llevar al banco central a mantener una postura vigilante.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo alcista, con 3.9K contratos netos. La apreciación del franco suizo en el último mes, con un rendimiento FX de +1.62% vs USD, también sugiere que los inversores están buscando refugio en esta divisa. La noticia de que el USD/CHF se mantiene fuerte cerca de 0.7800, debido al conflicto en Irán y la disminución de probabilidades de recorte de tasas de la Fed, podría influir en el comportamiento de la divisa en el corto plazo.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión a la baja sobre la divisa. Aunque los mercados de futuros ya descuentan un ciclo bajista, la inflación suiza subió 0.6% en febrero, lo que podría introducir cierta presión moderada sobre los precios.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. La composición exportadora, liderada por productos farmacéuticos y instrumentos de precisión, explica en parte este superávit. Sin embargo, la reciente caída de las reservas de divisas del SNB por tercer mes consecutivo, hasta CHF 710 mil millones, podría indicar intervenciones para frenar la apreciación excesiva del franco.\n\nEl posicionamiento especulativo, con +3.9K contratos netos, muestra un sesgo alcista, aunque moderado. El rendimiento FX del último mes fue de +1.55% vs USD, lo que sugiere una apreciación de la divisa. Aunque el contexto global sugiere un régimen risk-on, lo que favorece divisas de alto carry, el perfil de activo refugio del franco suizo, con superávit de cuenta corriente y deuda contenida, podría generar flujos defensivos hacia la divisa en momentos de tensión global.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-05T11:07:44.177196+00:00",
+  "generatedAt": "2026-03-06T11:03:06.095225+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 3,
+  "newsCount": 2,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.2,
@@ -25,14 +25,13 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 3863,
-    "fxPerformance1M": 1.6195,
+    "fxPerformance1M": 1.5489,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-05",
-    "latestNewsTs": 1772692289.0,
+    "lastUpdate": "2026-03-06",
+    "latestNewsTs": 1772803000.0,
     "newsHeadlines": [
-      "Aumento del petróleo compensado por apreciación del franco suizo: inflación mode",
-      "USD/CHF se mantiene fuerte cerca de 0.7800: conflicto en Irán y disminución de p",
-      "USD/CHF se mantiene fuerte cerca de 0.7800: disminuyen probabilidades de recorte"
+      "Reservas de divisas del SNB caen por tercer mes a CHF 710 mil millones: interven",
+      "Inflación suiza sube 0.6% en febrero: presión moderada sobre precios → CHF alcis"
     ]
   },
   "globalContext": {
@@ -40,8 +39,8 @@
     "avg_gdp_growth": 0.48,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.33,
-    "avg_fx_perf_1m": 1.53,
+    "avg_bond10y": 3.37,
+    "avg_fx_perf_1m": 1.38,
     "avg_cot": 9454.25
   }
 }
