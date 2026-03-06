@@ -355,9 +355,8 @@ def load_news_file() -> dict:
 
 def get_relevant_news(currency: str, news_data: dict, max_items: int = 3) -> list:
     """
-    Filtra y ordena las noticias de alto/medio impacto para una divisa.
-    Prioriza: impacto alto > impacto medio, luego más recientes primero.
-    Excluye noticias con sentiment neutro y sin ai_headline.
+    v5.1 — Sin enrich_news: usa title directamente, solo impact == "high".
+    Eliminados los filtros de ai_headline y sentiment (ya no existen).
     """
     articles = news_data.get("articles", [])
     if not articles:
@@ -366,61 +365,44 @@ def get_relevant_news(currency: str, news_data: dict, max_items: int = 3) -> lis
     relevant = [
         a for a in articles
         if a.get("cur") == currency
-        and a.get("impact") in ("high", "med")
-        and a.get("ai_headline")  # requiere titular enriquecido
-        and a.get("sentiment") in ("bull", "bear", "alcista", "bajista", "mixed", "mixto")
+        and a.get("impact") == "high"       # solo high (antes "high" o "med")
+        and a.get("title", "").strip()      # requiere título no vacío
     ]
 
-    # Ordenar: primero high, luego más recientes
-    relevant.sort(key=lambda x: (
-        0 if x.get("impact") == "high" else 1,
-        -(x.get("ts") or 0)
-    ))
-
+    relevant.sort(key=lambda x: -(x.get("ts") or 0))
     return relevant[:max_items]
 
 
 def format_news_for_prompt(news_items: list, currency: str) -> str:
     """
-    Serializa noticias en formato compacto para el prompt de Groq.
-    - Quita el sufijo "→ XXX alcista/bajista" del ai_headline (Groq no debe
-      reproducir ese texto literal, sino interpretarlo).
-    - No incluye nombre de fuente (para que Groq no lo cite).
-    - Incluye antigüedad en horas para que Groq calibre la relevancia temporal.
+    v5.1 — Usa title directo + expand como contexto adicional.
+    Eliminado SENT_MAP (ya no hay sentiment disponible).
     """
     if not news_items:
-        return f"Sin noticias de alto/medio impacto para {currency} en las últimas 24h."
-
-    SENT_MAP = {
-        "bull": "alcista", "bear": "bajista",
-        "mixed": "mixto",  "neut": "neutral",
-        "alcista": "alcista", "bajista": "bajista",
-        "mixto": "mixto",  "neutral": "neutral",
-    }
+        return f"Sin noticias de alto impacto para {currency} en las últimas 24h."
 
     lines = []
     for a in news_items:
-        imp  = a.get("impact", "low")
-        sent = SENT_MAP.get(a.get("sentiment", "neut"), "neutral")
-        hl   = a.get("ai_headline") or a.get("title", "")
-
-        # Quitar sufijo "→ …" que ya está interpretado — Groq debe inferirlo del contexto
-        if "→" in hl:
-            hl = hl[:hl.rfind("→")].strip()
-        hl = hl.strip(" .:,")
+        title  = (a.get("title") or "").strip()
+        expand = (a.get("expand") or "").strip()
 
         age_label = ""
         ts = a.get("ts")
         if ts:
+            import time
             h = (time.time() - ts / 1000) / 3600
-            if h < 1:
-                age_label = "<1h"
-            elif h < 24:
-                age_label = f"{h:.0f}h"
-            else:
-                age_label = f"{h/24:.0f}d"
+            age_label = "<1h" if h < 1 else (f"{h:.0f}h" if h < 24 else f"{h/24:.0f}d")
 
-        lines.append(f"  • [{imp.upper()}·{sent}·{age_label}] {hl}")
+        line = f"  • [HIGH·{age_label}] {title}"
+
+        # Añadir descripción si aporta contexto más allá del título
+        if expand and len(expand.split()) > 10 and not expand.lower().startswith(title.lower()[:40]):
+            snippet = expand[:150].strip()
+            if not snippet.endswith((".", "…")):
+                snippet += "…"
+            line += f"\n    → {snippet}"
+
+        lines.append(line)
 
     return "\n".join(lines)
 
@@ -1545,7 +1527,7 @@ def main():
                 break
             continue
 
-        # Calcular latestNewsTs para el snapshot — permite detectar noticias nuevas
+ # Calcular latestNewsTs para el snapshot — permite detectar noticias nuevas
         latest_news_ts = 0
         news_headlines = []
         if news_items:
@@ -1553,7 +1535,7 @@ def main():
                 (a.get("ts", 0) or 0) for a in news_items
             ) / 1000  # ms → s
             news_headlines = [
-                (a.get("ai_headline") or a.get("title", ""))[:80]
+                a.get("title", "")[:80]
                 for a in news_items[:3]
             ]
 
