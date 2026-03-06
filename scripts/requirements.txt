@@ -1,0 +1,7 @@
+# FIX B-02: Versiones fijadas para garantizar reproducibilidad entre runs.
+# Actualizar deliberadamente cuando se quiera subir versión; no dejar sin pin.
+#
+# Para actualizar: pip install --upgrade <paquete> && pip freeze | grep <paquete>
+feedparser==6.0.11
+requests==2.32.3
+python-dateutil==2.9.0.post0

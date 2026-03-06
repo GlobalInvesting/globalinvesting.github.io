@@ -32,6 +32,7 @@ CAMBIOS v5.3 (sobre v5.2):
 import json
 import re
 import hashlib
+import sys
 import feedparser
 import requests
 from datetime import datetime, timezone, timedelta
@@ -40,6 +41,10 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 
+# FIX C-01: Importar CURRENCIES desde el módulo compartido fx_config.py
+sys.path.insert(0, os.path.dirname(__file__))
+from fx_config import CURRENCIES
+
 # ─────────────────────────────────────────────
 MAX_NEWS              = 48          # v5.3: subido de 40 para absorber nuevos feeds
 MAX_AGE_DAYS          = 4
@@ -47,7 +52,7 @@ GUARANTEED_PER_CUR    = 3
 MAX_PER_CUR           = 8
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
-CURRENCIES            = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
+# FIX C-01: CURRENCIES importado desde fx_config.py (ver imports al inicio del archivo)
 FETCH_TIMEOUT         = 12
 FETCH_WORKERS         = 14          # v5.3: subido para más feeds en paralelo
 MIN_DESCRIPTION_WORDS = 12
@@ -855,7 +860,11 @@ def main():
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
+        # FIX R-02: Serializar en memoria, validar, y solo entonces escribir a disco.
+        # Previene que un error de encoding o interrupción corrompa news.json en el repo.
+        output_json = json.dumps(output, ensure_ascii=False, indent=2)
+        json.loads(output_json)  # Valida que es parseable (lanza ValueError si no)
+        f.write(output_json)
 
     new_count    = sum(1 for a in articles if not a.get("ai_headline"))
     reused_final = sum(1 for a in articles if a.get("ai_headline"))

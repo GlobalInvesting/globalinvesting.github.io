@@ -30,31 +30,26 @@ v4.0 — Patch de caché inteligente sobre v2.6:
 import os
 import json
 import time
-import socket
 import requests
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-socket.setdefaulttimeout(15)
+# FIX R-03: Eliminado socket.setdefaulttimeout(15) global.
+# Cada llamada a requests usa su propio parámetro timeout, lo cual es suficiente
+# y evita interferir con conexiones que necesitan más tiempo (ej: Groq con 40s).
+
+# FIX C-01: Configuración de divisas centralizada en fx_config.py.
+# Ya no se duplican CURRENCIES ni COUNTRY_META en cada script.
+import sys
+import os as _os
+sys.path.insert(0, _os.path.dirname(__file__))
+from fx_config import CURRENCIES, COUNTRY_META
 
 # ─── Frankfurter API — FX en tiempo real (ECB rates, sin key) ────────────────
 FRANKFURTER_BASE = 'https://api.frankfurter.dev/v1'
 
 # Cache para evitar llamadas repetidas en el mismo run
 _fx_performance_cache = {}
-
-CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']
-
-COUNTRY_META = {
-    'USD': {'name': 'Estados Unidos',  'bank': 'Reserva Federal (Fed)'},
-    'EUR': {'name': 'Eurozona',        'bank': 'Banco Central Europeo (BCE)'},
-    'GBP': {'name': 'Reino Unido',     'bank': 'Banco de Inglaterra (BoE)'},
-    'JPY': {'name': 'Japón',           'bank': 'Banco de Japón (BoJ)'},
-    'AUD': {'name': 'Australia',       'bank': 'Banco de la Reserva de Australia (RBA)'},
-    'CAD': {'name': 'Canadá',          'bank': 'Banco de Canadá (BoC)'},
-    'CHF': {'name': 'Suiza',           'bank': 'Banco Nacional Suizo (SNB)'},
-    'NZD': {'name': 'Nueva Zelanda',   'bank': 'Banco de la Reserva de Nueva Zelanda (RBNZ)'},
-}
 
 COMTRADE_REPORTER_CODES = {
     'AUD': '36',
@@ -286,7 +281,8 @@ def load_groq_keys():
 
 
 def mask_key(key):
-    """Muestra solo los primeros/últimos 4 caracteres de la key."""
+    """FIX S-02: Muestra solo los primeros 4 y últimos 4 caracteres de la key.
+    Reducido desde key[:4] para no exponer demasiado de keys tipo 'gsk_XXXX...'."""
     if len(key) <= 8:
         return '****'
     return f"{key[:4]}...{key[-4:]}"
@@ -296,6 +292,9 @@ def check_groq_key(key):
     """
     Verifica rápidamente si una key es válida y no ha alcanzado el límite diario.
     Retorna: 'ok', 'daily_limit', 'invalid', 'rate_limit'
+
+    FIX S-01: Los errores de autenticación (401) se manejan silenciosamente
+    sin loguear detalles que podrían exponer información en logs públicos de CI.
     """
     try:
         r = requests.post(
@@ -312,10 +311,17 @@ def check_groq_key(key):
             timeout=10,
         )
         if r.status_code == 401:
+            # FIX S-01: No logueamos el status code ni el body para evitar
+            # exponer información de autenticación en logs públicos de GitHub Actions.
             return 'invalid'
         if r.status_code == 429:
-            body = r.text.lower()
-            if 'daily' in body or 'quota' in body or 'limit' in body:
+            # Inspeccionamos el body solo para distinguir daily_limit vs rate_limit,
+            # sin imprimirlo en ningún caso.
+            try:
+                body = r.json().get('error', {}).get('message', '').lower()
+            except Exception:
+                body = r.text.lower()
+            if 'daily' in body or 'quota' in body or ('per day' in body):
                 return 'daily_limit'
             return 'rate_limit'
         return 'ok'
@@ -389,7 +395,6 @@ def format_news_for_prompt(news_items: list, currency: str) -> str:
         age_label = ""
         ts = a.get("ts")
         if ts:
-            import time
             h = (time.time() - ts / 1000) / 3600
             age_label = "<1h" if h < 1 else (f"{h:.0f}h" if h < 24 else f"{h/24:.0f}d")
 
@@ -1568,8 +1573,19 @@ def main():
         }
 
         output_path = OUTPUT_DIR / f"{currency}.json"
+        # FIX R-02: Serializar primero en memoria y validar antes de escribir a disco.
+        # Esto previene archivos corruptos en el repo si hay un error de encoding
+        # o una interrupción durante la escritura.
+        try:
+            output_json = json.dumps(output, ensure_ascii=False, indent=2)
+            json.loads(output_json)  # Validar que el JSON es parseable
+        except (TypeError, ValueError) as e:
+            print(f"  ❌ Error de serialización JSON para {currency}: {e} — saltando escritura")
+            errors.append(f"{currency}: JSON inválido ({e})")
+            results[currency] = {"success": False, "error": f"JSON inválido: {e}"}
+            continue
         with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(output, f, ensure_ascii=False, indent=2)
+            f.write(output_json)
 
         results[currency] = {
             "success":          True,

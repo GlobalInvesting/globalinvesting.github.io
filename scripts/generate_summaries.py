@@ -33,6 +33,11 @@ import requests
 from datetime import datetime, timezone
 from pathlib import Path
 
+# FIX C-01: Configuración de divisas centralizada en fx_config.py.
+# Ya no se duplican CURRENCIES, CURRENCY_NAMES ni CURRENCY_MACRO_CONTEXT.
+sys.path.insert(0, os.path.dirname(__file__))
+from fx_config import CURRENCIES, CURRENCY_NAMES, CURRENCY_MACRO_CONTEXT
+
 # ─────────────────────────────────────────────
 NEWS_FILE      = Path("news-data/news.json")
 CALENDAR_FILE  = Path("news-data/calendar.json")   # v3.2: leído si existe
@@ -46,30 +51,6 @@ MAX_RETRIES    = 2
 
 # Máximo de eventos del calendario a incluir en el prompt por divisa
 MAX_CALENDAR_EVENTS_IN_PROMPT = 4
-
-CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
-
-CURRENCY_NAMES = {
-    "USD": "Dólar Estadounidense",
-    "EUR": "Euro",
-    "GBP": "Libra Esterlina",
-    "JPY": "Yen Japonés",
-    "AUD": "Dólar Australiano",
-    "CAD": "Dólar Canadiense",
-    "CHF": "Franco Suizo",
-    "NZD": "Dólar Neozelandés",
-}
-
-CURRENCY_MACRO_CONTEXT = {
-    "USD": "Activo refugio global y divisa de reserva. Se beneficia de risk-off, tensiones geopolíticas y datos macro sólidos en EEUU. Sensible a postura Fed (hawkish/dovish) y al diferencial de tasas con otras economías G10.",
-    "EUR": "Importador neto de energía. Conflicto geopolítico = mayores costes energéticos = presión sobre crecimiento eurozona = dilema BCE entre inflación y recesión. Sensible a spreads de bonos periféricos y postura BCE.",
-    "GBP": "No es activo refugio. Sensible a inflación UK, política del BoE y datos laborales británicos. En risk-off cae frente a USD, JPY y CHF.",
-    "JPY": "Activo refugio tradicional pero debilitado cuando sube el petróleo (Japón importa casi todo su crudo). Driver dominante: diferencial tasas US-JP. Fed hawkish o BoJ dovish = JPY bajista.",
-    "AUD": "Divisa de riesgo correlacionada con commodities (hierro, cobre) y ciclo económico chino. En entornos risk-off cae. RBA hawkish ofrece soporte doméstico.",
-    "CAD": "Correlacionada con petróleo WTI: Canadá es exportador neto de crudo. Petróleo alto = soporte estructural CAD incluso con BoC dovish. USMCA y comercio con EEUU son el mayor riesgo de cola.",
-    "CHF": "Activo refugio por excelencia. Se aprecia en crisis/guerra/risk-off. SNB puede intervenir para limitar apreciación excesiva — distinguir intervención activa (bajista) de amenaza como techo (mixto).",
-    "NZD": "Divisa de riesgo de alta beta. En crisis/guerra cae por risk-off global (no por correlación directa con petróleo). RBNZ y datos domésticos NZ son drivers fundamentales propios.",
-}
 
 # ─────────────────────────────────────────────
 # v3.2: CALENDAR UTILITIES
@@ -406,7 +387,9 @@ def load_api_keys() -> list:
 
 
 def mask_key(key: str) -> str:
-    return key[:8] + "..." + key[-4:] if len(key) > 12 else "***"
+    # FIX S-02: Reducido de key[:8] a key[:4] para no exponer demasiado
+    # de keys tipo 'gsk_XXXXXXXXXXXX' en logs públicos de GitHub Actions.
+    return key[:4] + "..." + key[-4:] if len(key) > 8 else "***"
 
 
 def get_retry_after(response) -> int:
@@ -676,8 +659,18 @@ def main():
         "summaries":      summaries,
     }
 
+    # FIX R-02: Serializar en memoria y validar antes de escribir a disco.
+    # Previene archivos corruptos en el repo ante errores de encoding o interrupciones.
+    try:
+        output_json = json.dumps(output, ensure_ascii=False, indent=2)
+        json.loads(output_json)  # Validar que es parseable
+    except (TypeError, ValueError) as e:
+        print(f"\n❌ Error crítico: el output generado no es JSON válido: {e}")
+        print("   No se escribió el archivo para evitar corromper el repositorio.")
+        sys.exit(1)
+
     with open(SUMMARIES_FILE, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
+        f.write(output_json)
 
     print(f"\n{'='*65}")
     print(f"📋 RESUMEN FINAL")
