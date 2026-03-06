@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-06",
-  "generatedAt": "2026-03-06T02:33:13.656179Z",
+  "generatedAt": "2026-03-06T08:39:42.008851Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -8,21 +8,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-05",
   "rangeTo": "2026-04-05",
-  "totalEvents": 194,
+  "totalEvents": 193,
   "currencyCounts": {
     "CHF": 5,
     "EUR": 14,
     "GBP": 11,
-    "USD": 109,
-    "JPY": 30,
+    "USD": 113,
+    "JPY": 29,
     "CAD": 11,
-    "AUD": 9,
-    "NZD": 5
+    "AUD": 8,
+    "NZD": 2
   },
   "impactCounts": {
-    "high": 53,
+    "high": 54,
     "medium": 22,
-    "low": 119
+    "low": 117
   },
   "events": [
     {
@@ -385,9 +385,9 @@
       "flag": "🇬🇧",
       "event": "Halifax House Price Index (MoM)  (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.3%",
       "forecast": "0.3%",
-      "previous": "0.7%"
+      "previous": "0.8%"
     },
     {
       "date": "6 Mar",
@@ -398,9 +398,9 @@
       "flag": "🇨🇭",
       "event": "Foreign Reserves (USD)  (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "710.0B",
       "forecast": "",
-      "previous": "711,981.0B"
+      "previous": "712.0B"
     },
     {
       "date": "6 Mar",
@@ -535,6 +535,19 @@
     {
       "date": "6 Mar",
       "dateISO": "2026-03-06",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Waller Speaks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
       "timeUTC": "13:30",
       "country": "USD",
       "currency": "USD",
@@ -594,7 +607,7 @@
       "event": "Manufacturing Payrolls  (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "3K",
       "previous": "5K"
     },
     {
@@ -788,6 +801,19 @@
       "flag": "🇺🇸",
       "event": "FOMC Member Daly Speaks",
       "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "16:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Schmid Speaks",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -1358,11 +1384,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Household Spending (YoY)  (Jan)",
+      "event": "Household Spending (MoM)  (Jan)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-2.6%"
+      "previous": "-2.9%"
     },
     {
       "date": "9 Mar",
@@ -1371,11 +1397,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Household Spending (MoM)  (Jan)",
+      "event": "Household Spending (YoY)  (Jan)",
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-2.9%"
+      "previous": "-2.6%"
     },
     {
       "date": "9 Mar",
@@ -1621,7 +1647,7 @@
       "event": "Existing Home Sales  (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "3.90M",
       "previous": "3.91M"
     },
     {
@@ -1803,7 +1829,7 @@
       "event": "Core CPI (MoM)  (Feb)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.2%",
       "previous": "0.3%"
     },
     {
@@ -1842,7 +1868,7 @@
       "event": "CPI (MoM)  (Feb)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.2%",
       "previous": "0.2%"
     },
     {
@@ -1896,6 +1922,19 @@
       "actual": "",
       "forecast": "",
       "previous": "0.37%"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Bowman Speaks",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "11 Mar",
@@ -2246,7 +2285,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "1,868K"
     },
     {
       "date": "12 Mar",
@@ -2324,7 +2363,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "213K"
     },
     {
       "date": "12 Mar",
@@ -2337,7 +2376,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "215.75K"
     },
     {
       "date": "12 Mar",
@@ -2441,6 +2480,19 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
+      "previous": "-132B"
+    },
+    {
+      "date": "12 Mar",
+      "dateISO": "2026-03-12",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Bowman Speaks",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
       "previous": ""
     },
     {
@@ -2454,7 +2506,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "3.640%"
     },
     {
       "date": "12 Mar",
@@ -2467,7 +2519,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "3.630%"
     },
     {
       "date": "12 Mar",
@@ -2481,71 +2533,6 @@
       "actual": "",
       "forecast": "",
       "previous": ""
-    },
-    {
-      "date": "12 Mar",
-      "dateISO": "2026-03-12",
-      "timeUTC": "21:30",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "Business NZ PMI  (Feb)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "55.2"
-    },
-    {
-      "date": "12 Mar",
-      "dateISO": "2026-03-12",
-      "timeUTC": "21:45",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "External Migration & Visitors  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "7.00%"
-    },
-    {
-      "date": "12 Mar",
-      "dateISO": "2026-03-12",
-      "timeUTC": "21:45",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "Permanent/Long-Term Migration  (Jan)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "2,870"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "02:00",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Thomson Reuters IPSOS PCSI  (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "52.46"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "02:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Thomson Reuters IPSOS PCSI  (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "41.33"
     }
   ]
 }
