@@ -1,49 +1,52 @@
-name: Fetch and Enrich Forex News
+name: Fetch and Generate Forex Summaries
 on:
   schedule:
-  - cron: '0 9 * * *'    # 09:00 UTC → 06:00 MVD
-  - cron: '0 15 * * *'   # 15:00 UTC → 12:00 MVD
-  - cron: '0 23 * * *'   # 23:00 UTC → 20:00 MVD
+    - cron: '0 9 * * *'    # 09:00 UTC → 06:00 MVD
+    - cron: '0 15 * * *'   # 15:00 UTC → 12:00 MVD
+    - cron: '0 23 * * *'   # 23:00 UTC → 20:00 MVD
   workflow_dispatch:
+
 permissions:
   contents: write
+
 jobs:
-  fetch-and-enrich:
+  fetch-and-summarize:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
       - name: Pull latest changes
         run: git pull --rebase origin main
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: pip install feedparser requests python-dateutil
+
       - name: Create output directories
         run: mkdir -p news-data
+
       - name: Fetch news from RSS feeds
         run: python scripts/fetch_news.py
-      - name: Enrich headlines with Groq AI
-        env:
-          GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
-          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-          GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
-        run: python scripts/enrich_news.py
+
       - name: Generate per-currency analysis summaries
         env:
           GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
           GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
         run: python scripts/generate_summaries.py
+
       - name: Commit updated news data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add news-data/news.json news-data/summaries.json
           git diff --cached --quiet && echo "Sin cambios." && exit 0
-          git commit -m "chore: fetch + AI enrich + summaries [$(date -u '+%Y-%m-%d %H:%M') UTC]"
+          git commit -m "chore: fetch + summaries AI [$(date -u '+%Y-%m-%d %H:%M') UTC]"
           for i in 1 2 3; do
             git push && break
             echo "Push rechazado (intento $i), haciendo pull --rebase..."
