@@ -1,12 +1,13 @@
 {
-  "fxPerformance1M": -1.3658,
+  "fxPerformance1M": -1.6159,
   "fxPerformance1M_raw": -2.3663,
   "fxPerformance3M": 0.135,
   "fxPerformance1W": -1.3883,
-  "rateNow": 0.74841,
-  "rate30dAgo": 0.7307,
-  "rate90dAgo": 0.74942,
-  "rate7dAgo": 0.73802,
+  "indexNow": 0.74841,
+  "index30dAgo": 0.7307,
+  "index90dAgo": 0.74942,
+  "index7dAgo": 0.73802,
   "date": "2026-03-05",
-  "source": "Frankfurter ECB \u2014 composite 60% 1M + 40% 3M (C5)"
+  "source": "Frankfurter ECB fallback (Stooq no disponible) \u2014 composite 70% 1M + 30% 3M (C6)",
+  "sourceType": "frankfurter_fallback"
 }
