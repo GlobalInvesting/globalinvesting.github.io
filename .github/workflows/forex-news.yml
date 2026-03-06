@@ -1,9 +1,9 @@
 name: Fetch and Generate Forex Summaries
 on:
   schedule:
-    - cron: '0 9 * * *'    # 09:00 UTC → 06:00 MVD
-    - cron: '0 15 * * *'   # 15:00 UTC → 12:00 MVD
-    - cron: '0 23 * * *'   # 23:00 UTC → 20:00 MVD
+    - cron: '0 6 * * *'    # 06:00 UTC → 03:00 MVD  | Pre-apertura europea
+    - cron: '0 12 * * *'   # 12:00 UTC → 09:00 MVD  | Pre-apertura americana + overlap Europa/NY
+    - cron: '0 21 * * *'   # 21:00 UTC → 18:00 MVD  | Cierre NY + pre-apertura asiática
   workflow_dispatch:
 
 permissions:
