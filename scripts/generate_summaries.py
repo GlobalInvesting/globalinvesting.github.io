@@ -1,24 +1,19 @@
 #!/usr/bin/env python3
 """
-generate_summaries.py — v3.0
+generate_summaries.py — v3.1
 Genera un bloque de análisis consolidado por divisa a partir de news.json.
 Llama a Groq una vez por divisa (8 llamadas total) y escribe summaries.json.
 
-CAMBIOS v3.0 (sobre v2.1):
-  ARQUITECTURA — eliminado enrich_news.py del pipeline:
-    El script ya no depende de ai_headline ni sentiment pre-calculados.
-    Trabaja directamente con title + expand (descripción cruda del RSS).
-    Esto libera todas las keys de Groq para el análisis consolidado,
-    que es el único output visible en el frontend.
+CAMBIOS v3.1 (sobre v3.0):
+  OBSERVABILIDAD:
+    · Log explícito al final indicando qué divisas cayeron a fallback,
+      en lugar de solo mostrar el conteo total.
 
-  INPUT — build_user_prompt() adaptado:
-    Usa title + expand directamente en lugar de ai_headline + sentiment.
-    Incluye el expand completo (hasta 300 chars) como contexto para el modelo.
-    Mantiene separación high-impact vs medio/bajo por campo "impact".
+  RATE LIMITING:
+    · SLEEP_BETWEEN sube de 6 a 8 segundos para mayor margen con Groq free tier
+      (~6300 tok/min con 6s estaba al límite; con 8s queda en ~4700 tok/min).
 
-  KEYS — uso secuencial normal Key 1 → Key 2 → Key 3:
-    Sin reserva de keys. Las 8 llamadas consumen ~800 tokens cada una,
-    muy por debajo del límite diario por key.
+  Sin cambios en lógica de prompts, keys, ni estructura JSON de output.
 """
 
 import os
@@ -37,7 +32,7 @@ GROQ_URL       = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL     = "llama-3.3-70b-versatile"
 MAX_TOKENS     = 800
 TEMPERATURE    = 0.3
-SLEEP_BETWEEN  = 6
+SLEEP_BETWEEN  = 8      # v3.1: subido de 6 a 8 para mayor margen con free tier
 MAX_RETRIES    = 2
 
 CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
@@ -327,9 +322,9 @@ def fallback_summary(cur: str, articles: list) -> dict:
 def main():
     now_utc = datetime.now(timezone.utc)
     print("=" * 65)
-    print(f"📊 generate_summaries.py v3.0 — {GROQ_MODEL}")
+    print(f"📊 generate_summaries.py v3.1 — {GROQ_MODEL}")
     print(f"   {now_utc.strftime('%Y-%m-%d %H:%M UTC')}")
-    print("   Pipeline: fetch_news → generate_summaries (sin enrich)")
+    print(f"   Sleep entre llamadas: {SLEEP_BETWEEN}s")
     print("=" * 65)
 
     all_keys = load_api_keys()
@@ -368,9 +363,12 @@ def main():
         high = sum(1 for a in groups[cur] if a.get("impact") == "high")
         print(f"   {cur}: {n} artículo{'s' if n != 1 else ''} ({high} high)")
 
-    summaries = {}
-    generated = 0
-    fallbacks = 0
+    summaries    = {}
+    generated    = 0
+    fallbacks    = 0
+    # v3.1: tracking por divisa para log final detallado
+    ai_curs      = []
+    fallback_curs = []
 
     print(f"\n{'─'*65}")
     for cur in CURRENCIES:
@@ -391,6 +389,7 @@ def main():
                 "latest_ts":      0,
             }
             fallbacks += 1
+            fallback_curs.append(cur)
             print(f"  ⚪ Sin artículos — resumen vacío")
             continue
 
@@ -424,6 +423,7 @@ def main():
                 "latest_ts":      latest,
             }
             generated += 1
+            ai_curs.append(cur)
             sent_label = {"bull":"ALCISTA","bear":"BAJISTA","neut":"NEUTRAL","mixed":"MIXTO"}.get(
                 result["sentiment"], result["sentiment"].upper()
             )
@@ -433,6 +433,7 @@ def main():
             fb = fallback_summary(cur, cur_articles)
             summaries[cur] = fb
             fallbacks += 1
+            fallback_curs.append(cur)
             print(f"  📊 Fallback → sin análisis AI disponible")
 
         if use_ai and cur != CURRENCIES[-1]:
@@ -454,8 +455,8 @@ def main():
 
     print(f"\n{'='*65}")
     print(f"📋 RESUMEN FINAL")
-    print(f"   ✅ Generados con AI:   {generated}/8")
-    print(f"   📊 Fallback:           {fallbacks}/8")
+    print(f"   ✅ Generados con AI:   {generated}/8  {' · '.join(ai_curs) if ai_curs else '—'}")
+    print(f"   📊 Fallback:           {fallbacks}/8  {' · '.join(fallback_curs) if fallback_curs else '—'}")  # v3.1
     print(f"   💾 Guardado en:        {SUMMARIES_FILE}")
     print(f"{'='*65}")
 
