@@ -1,0 +1,244 @@
+name: Update Central Bank Meetings (cbrates.com)
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Every Monday at 10:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  update-meetings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml --break-system-packages
+
+      - name: Create directory
+        run: mkdir -p meetings-data
+
+      - name: Scrape meeting dates from cbrates.com
+        run: |
+          python3 << 'EOFPYTHON'
+          import requests
+          from bs4 import BeautifulSoup
+          import json
+          import re
+          from datetime import date, datetime
+
+          HEADERS = {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          }
+
+          # Map of keywords that appear in cbrates.com to currency codes
+          BANK_MAP = {
+              'Federal Reserve':          'USD',
+              'FED':                      'USD',
+              'European Central Bank':    'EUR',
+              'ECB':                      'EUR',
+              'Bank of England':          'GBP',
+              'BoE':                      'GBP',
+              'Bank of Japan':            'JPY',
+              'BOJ':                      'JPY',
+              'Reserve Bank of Australia':'AUD',
+              'RBA':                      'AUD',
+              'Bank of Canada':           'CAD',
+              'BoC':                      'CAD',
+              'Swiss National Bank':      'CHF',
+              'SNB':                      'CHF',
+              'Reserve Bank of New Zealand': 'NZD',
+              'RBNZ':                     'NZD',
+          }
+
+          MONTH_MAP = {
+              'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4,
+              'may': 5, 'jun': 6, 'jul': 7, 'aug': 8,
+              'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12
+          }
+
+          def parse_date(month_str, day_str, year):
+              """Parse 'Mar 18' + year into a date object."""
+              month_str = month_str.strip().lower()[:3]
+              month = MONTH_MAP.get(month_str)
+              if not month:
+                  return None
+              try:
+                  day = int(re.search(r'\d+', day_str).group())
+                  return date(year, month, day)
+              except:
+                  return None
+
+          def format_meeting_date(d):
+              """Format date as 'DD Mes' in Spanish."""
+              MONTHS_ES = {
+                  1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr',
+                  5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Ago',
+                  9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
+              }
+              return f"{d.day} {MONTHS_ES[d.month]}"
+
+          print("=" * 60)
+          print("SCRAPING CENTRAL BANK MEETINGS FROM cbrates.com")
+          print("=" * 60)
+
+          try:
+              url = "https://www.cbrates.com/meetings.htm"
+              r = requests.get(url, headers=HEADERS, timeout=20)
+              r.raise_for_status()
+              soup = BeautifulSoup(r.content, 'lxml')
+          except Exception as e:
+              print(f"❌ Failed to fetch cbrates.com: {e}")
+              exit(1)
+
+          today = date.today()
+          current_year = today.year
+          current_month_label = None
+
+          # All future meetings per currency: {currency: [date, date, ...]}
+          future_meetings = {c: [] for c in ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']}
+
+          # Walk through ALL table rows
+          rows = soup.find_all('tr')
+
+          for row in rows:
+              cells = row.find_all('td')
+              if not cells:
+                  continue
+
+              full_text = ' '.join(c.get_text(strip=True) for c in cells)
+
+              # Detect month/year header rows like "March" or "2027"
+              if len(cells) <= 2:
+                  text = cells[-1].get_text(strip=True)
+                  # Year header (e.g. "2027")
+                  m_year = re.match(r'^(\d{4})$', text)
+                  if m_year:
+                      current_year = int(m_year.group(1))
+                      current_month_label = None
+                      continue
+                  # Month header (e.g. "March", "April")
+                  m_month = re.match(r'^(January|February|March|April|May|June|July|August|September|October|November|December)$', text, re.IGNORECASE)
+                  if m_month:
+                      current_month_label = text[:3]
+                      continue
+
+              # Data row: typically 4 cells — [empty, "Feb 03", "Country: Bank / link", "link"]
+              if len(cells) >= 3:
+                  # Cell index 1 has the date like "Feb 03" or "Mar 18"
+                  date_cell = cells[1].get_text(strip=True)
+                  bank_cell = cells[2].get_text(strip=True)
+
+                  # Parse date: "Feb 03", "Mar 18", "Jull 16" (typo on site), etc.
+                  date_match = re.match(r'^([A-Za-z]{3,4})\s+(\d{1,2})$', date_cell.strip())
+                  if not date_match:
+                      continue
+
+                  month_str = date_match.group(1)
+                  day_str   = date_match.group(2)
+                  meeting_date = parse_date(month_str, day_str, current_year)
+
+                  if not meeting_date:
+                      continue
+
+                  # Skip past meetings
+                  if meeting_date < today:
+                      continue
+
+                  # Identify which currency this meeting belongs to
+                  matched_currency = None
+                  for keyword, currency in BANK_MAP.items():
+                      if keyword.lower() in bank_cell.lower():
+                          matched_currency = currency
+                          break
+
+                  if matched_currency:
+                      future_meetings[matched_currency].append(meeting_date)
+                      print(f"  ✓ {matched_currency}: {meeting_date} ({bank_cell[:50]})")
+
+          # Build output: next meeting + all future meetings per currency
+          output = {}
+          for currency, dates_list in future_meetings.items():
+              dates_list.sort()
+              if dates_list:
+                  next_date = dates_list[0]
+                  output[currency] = {
+                      'nextMeeting': format_meeting_date(next_date),
+                      'nextMeetingISO': str(next_date),
+                      'allMeetings': [str(d) for d in dates_list],
+                      'allMeetingsFormatted': [format_meeting_date(d) for d in dates_list]
+                  }
+                  print(f"\n✅ {currency}: next meeting {next_date} ({format_meeting_date(next_date)})")
+                  print(f"   All 2026: {[str(d) for d in dates_list]}")
+              else:
+                  output[currency] = {
+                      'nextMeeting': 'Por definir',
+                      'nextMeetingISO': None,
+                      'allMeetings': [],
+                      'allMeetingsFormatted': []
+                  }
+                  print(f"\n⚠️  {currency}: no future meetings found")
+
+          # Add metadata
+          result = {
+              'lastUpdate': str(today),
+              'source': 'cbrates.com (International Central Banks)',
+              'sourceUrl': 'https://www.cbrates.com/meetings.htm',
+              'meetings': output
+          }
+
+          with open('meetings-data/meetings.json', 'w') as f:
+              json.dump(result, f, indent=2, ensure_ascii=False)
+
+          print(f"\n{'='*60}")
+          print("SUMMARY")
+          print(f"{'='*60}")
+          for currency, data in output.items():
+              print(f"  {currency}: {data['nextMeeting']}")
+
+          missing = [c for c in ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']
+                     if not output.get(c, {}).get('nextMeetingISO')]
+          if missing:
+              print(f"\n⚠️  Missing meetings for: {', '.join(missing)}")
+          else:
+              print(f"\n✅ All 8 currencies have upcoming meeting dates!")
+
+          EOFPYTHON
+
+      - name: Display meetings summary
+        run: |
+          echo ""
+          echo "╔════════════════════════════════════════════════╗"
+          echo "║       CENTRAL BANK MEETINGS SUMMARY           ║"
+          echo "╚════════════════════════════════════════════════╝"
+          echo ""
+          python3 -c "
+          import json
+          with open('meetings-data/meetings.json') as f:
+              data = json.load(f)
+          print(f\"  Source:      {data['source']}\")
+          print(f\"  Last Update: {data['lastUpdate']}\")
+          print()
+          for curr, info in data['meetings'].items():
+              print(f\"  {curr}: {info['nextMeeting']}\")
+              if info.get('allMeetings'):
+                  print(f\"       All: {', '.join(info['allMeetings'])}\")
+          "
+
+      - name: Commit and push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add meetings-data/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📅 Central bank meetings update $(date +'%Y-%m-%d') - cbrates.com"
+            git pull --rebase origin main || true
+            git push
+          fi

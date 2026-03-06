@@ -1,0 +1,358 @@
+name: Update FX Performance (Frankfurter ECB) — C8
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-fx-performance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create directory
+        run: mkdir -p fx-performance
+
+      - name: Fetch FX performance from Frankfurter ECB
+        run: |
+          python3 << 'EOFPYTHON'
+          import requests
+          import json
+          import time
+          from datetime import date, timedelta, datetime
+
+          # ════════════════════════════════════════════════════════════════════════
+          # FX PERFORMANCE — C8: Frankfurter/ECB como fuente principal
+          #
+          # HISTORIA DE VERSIONES:
+          #   C5: Frankfurter 60% 1M + 40% 3M — AUD composite +5.7% (distorsionado)
+          #   C6: Stooq ICE indices 70% 1M + 30% 3M — bloqueado (HTTP 200 + HTML)
+          #   C7: Yahoo Finance 70% 1M + 30% 3M — bloqueado (HTTP 401)
+          #   C8: Frankfurter 90% 1M + 10% 3M — solución definitiva
+          #
+          # POR QUÉ FRANKFURTER ES SUFICIENTE:
+          #   El tipo de referencia ECB difiere <0.3% del precio interbancario
+          #   en ventanas de 30-90 días. Irrelevante para análisis fundamental.
+          #   Stooq/Yahoo bloquean IPs de GitHub Actions con bot detection.
+          #
+          # POR QUÉ 90% 1M + 10% 3M:
+          #   Con 60/40: AUD composite = +2.14% (3M Q4-2025 domina)
+          #   Con 70/30: AUD composite = +2.19% (sigue dominando el 3M)
+          #   Con 90/10: AUD composite = +1.06% (1M real tiene el peso correcto)
+          #   Validación TradingView 6/3/2026:
+          #     AUD 1M Frankfurter = +0.49% vs TV AXY = −0.21% → Δ 0.70% ✅
+          #     CAD 1M Frankfurter = +0.23% vs TV CXY = +0.22% → Δ 0.01% ✅
+          #     GBP 1M Frankfurter = −2.37% vs TV BXY = −2.65% → Δ 0.28% ✅
+          #
+          # CAMPO JSON:
+          #   'fxPerformance1M' = composite (campo leído por index.html)
+          #   'fxPerformance1M_raw' = solo el dato de 1M
+          #   'fxPerformance3M' = solo el dato de 3M
+          #   'fxPerformance1W' = solo el dato de 7 días
+          # ════════════════════════════════════════════════════════════════════════
+
+          CURRENCIES = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'USD']
+
+          # Composite: 90% 1M + 10% 3M
+          # El 1M captura el momentum real; el 3M aporta suavizado mínimo
+          COMPOSITE_WEIGHT_1M = 0.90
+          COMPOSITE_WEIGHT_3M = 0.10
+
+          FRANKFURTER_BASE = 'https://api.frankfurter.app'
+
+          HEADERS = {
+              'User-Agent': 'Mozilla/5.0 (compatible; ForexDashboard/3.0)',
+              'Accept': 'application/json',
+          }
+
+          today    = date.today()
+          ref_date = today - timedelta(days=1)   # ayer = sesión cerrada confirmada
+          date_7d  = ref_date - timedelta(days=7)
+          date_30d = ref_date - timedelta(days=30)
+          date_90d = ref_date - timedelta(days=90)
+
+          print("=" * 70)
+          print("FX PERFORMANCE — C8: Frankfurter/ECB — composite 90% 1M + 10% 3M")
+          print(f"Fecha:     {today}")
+          print(f"Referencia: {ref_date} (ayer, sesión cerrada)")
+          print(f"30d:        {date_30d}")
+          print(f"90d:        {date_90d}")
+          print(f"7d:         {date_7d}")
+          print("=" * 70)
+
+          def fetch_rate(target_date, currency, retries=3, backoff=4):
+              """
+              Obtiene el tipo de cambio USD→CCY en una fecha dada desde Frankfurter.
+              Frankfurter devuelve la fecha válida más cercana si target_date es
+              fin de semana o festivo (el campo 'date' en la respuesta lo indica).
+              Retorna (rate_float, actual_date_str) o (None, None).
+              """
+              url = f"{FRANKFURTER_BASE}/{target_date}?from=USD&to={currency}"
+              for attempt in range(1, retries + 1):
+                  try:
+                      r = requests.get(url, headers=HEADERS, timeout=12)
+                      if r.status_code == 200:
+                          data = r.json()
+                          rate = data.get('rates', {}).get(currency)
+                          actual_date = data.get('date', str(target_date))
+                          if rate and float(rate) > 0:
+                              return float(rate), actual_date
+                          else:
+                              print(f"    ⚠️ {currency} {target_date}: rate vacío en respuesta")
+                      elif r.status_code == 404:
+                          # Fecha fuera de rango histórico
+                          print(f"    ⚠️ {currency} {target_date}: fecha no disponible (404)")
+                          return None, None
+                      elif r.status_code == 429:
+                          wait = backoff * attempt
+                          print(f"    ⚠️ Rate limit, esperando {wait}s...")
+                          time.sleep(wait)
+                      else:
+                          print(f"    ⚠️ {currency} {target_date}: HTTP {r.status_code} (attempt {attempt}/{retries})")
+                  except Exception as e:
+                      print(f"    ⚠️ {currency} {target_date}: {e} (attempt {attempt}/{retries})")
+                  if attempt < retries:
+                      time.sleep(backoff)
+              return None, None
+
+          def calc_perf(rate_now, rate_before):
+              """
+              % de apreciación de la divisa vs USD.
+              Frankfurter: rate = unidades de CCY por 1 USD.
+              Si rate baja (menos CCY por 1 USD) → USD se debilitó → CCY se apreció.
+              Fórmula: (rate_before / rate_now - 1) * 100
+              Positivo = CCY se apreció vs USD.
+              """
+              if rate_now is None or rate_before is None:
+                  return None
+              if rate_now == 0 or rate_before == 0:
+                  return None
+              return round((rate_before / rate_now - 1.0) * 100.0, 4)
+
+          # ── Procesar cada divisa ──────────────────────────────────────────────
+          results = {}
+
+          for currency in CURRENCIES:
+              if currency == 'USD':
+                  continue  # USD se calcula al final como inverso del basket
+
+              print(f"\n{'─'*50}")
+              print(f"[{currency}]")
+              print(f"{'─'*50}")
+
+              rate_now, date_now_actual = fetch_rate(ref_date,  currency)
+              time.sleep(0.4)
+              rate_30d, date_30d_actual = fetch_rate(date_30d,  currency)
+              time.sleep(0.4)
+              rate_90d, date_90d_actual = fetch_rate(date_90d,  currency)
+              time.sleep(0.4)
+              rate_7d,  date_7d_actual  = fetch_rate(date_7d,   currency)
+              time.sleep(0.4)
+
+              print(f"  Rates obtenidos:")
+              print(f"    Ahora  ({ref_date}→{date_now_actual}): {rate_now}")
+              print(f"    30d    ({date_30d}→{date_30d_actual}): {rate_30d}")
+              print(f"    90d    ({date_90d}→{date_90d_actual}): {rate_90d}")
+              print(f"    7d     ({date_7d}→{date_7d_actual}):  {rate_7d}")
+
+              p1m = calc_perf(rate_now, rate_30d)
+              p3m = calc_perf(rate_now, rate_90d)
+              p1w = calc_perf(rate_now, rate_7d)
+
+              print(f"  Rendimientos:")
+              print(f"    1M: {p1m}%  |  3M: {p3m}%  |  1W: {p1w}%")
+
+              # Composite 90/10
+              if p1m is not None and p3m is not None:
+                  comp = round(p1m * COMPOSITE_WEIGHT_1M + p3m * COMPOSITE_WEIGHT_3M, 4)
+              elif p1m is not None:
+                  comp = p1m  # si no hay 3M, usar solo 1M
+              elif p3m is not None:
+                  comp = p3m  # fallback extremo
+              else:
+                  comp = None
+
+              print(f"  → COMPOSITE (90% 1M + 10% 3M): {comp}%")
+
+              results[currency] = {
+                  'fxPerformance1M':     comp,
+                  'fxPerformance1M_raw': p1m,
+                  'fxPerformance3M':     p3m,
+                  'fxPerformance1W':     p1w,
+                  'rateNow':             rate_now,
+                  'rate30dAgo':          rate_30d,
+                  'rate90dAgo':          rate_90d,
+                  'rate7dAgo':           rate_7d,
+                  'dateNow':             date_now_actual,
+                  'date30d':             date_30d_actual,
+                  'date90d':             date_90d_actual,
+                  'date7d':              date_7d_actual,
+                  'date':                ref_date.isoformat(),
+                  'source':              'Frankfurter/ECB — composite 90% 1M + 10% 3M (C8)',
+                  'sourceType':          'frankfurter_ecb',
+              }
+
+          # ── USD: inverso ponderado basket (similar a DXY) ─────────────────────
+          # Pesos aproximados del ICE DXY, normalizados al basket de 7 divisas
+          print(f"\n{'─'*50}")
+          print("[USD] Calculando como inverso ponderado del basket")
+          print(f"{'─'*50}")
+
+          USD_BASKET_WEIGHTS = {
+              'EUR': 0.576,
+              'JPY': 0.136,
+              'GBP': 0.119,
+              'CAD': 0.091,
+              'CHF': 0.036,
+              'AUD': 0.021,
+              'NZD': 0.021,
+          }
+
+          available = [
+              c for c in USD_BASKET_WEIGHTS
+              if results.get(c, {}).get('fxPerformance1M') is not None
+          ]
+          total_w = sum(USD_BASKET_WEIGHTS[c] for c in available)
+
+          if total_w > 0 and available:
+              usd_comp = 0.0
+              usd_1m   = 0.0
+              usd_3m   = 0.0
+              for c in available:
+                  w = USD_BASKET_WEIGHTS[c] / total_w
+                  usd_comp -= results[c]['fxPerformance1M'] * w
+                  if results[c].get('fxPerformance1M_raw') is not None:
+                      usd_1m -= results[c]['fxPerformance1M_raw'] * w
+                  if results[c].get('fxPerformance3M') is not None:
+                      usd_3m -= results[c]['fxPerformance3M'] * w
+
+              usd_comp = round(usd_comp, 4)
+              usd_1m   = round(usd_1m,   4)
+              usd_3m   = round(usd_3m,   4)
+
+              results['USD'] = {
+                  'fxPerformance1M':     usd_comp,
+                  'fxPerformance1M_raw': usd_1m,
+                  'fxPerformance3M':     usd_3m,
+                  'fxPerformance1W':     None,
+                  'rateNow':             None,
+                  'rate30dAgo':          None,
+                  'rate90dAgo':          None,
+                  'rate7dAgo':           None,
+                  'dateNow':             ref_date.isoformat(),
+                  'date30d':             date_30d.isoformat(),
+                  'date90d':             date_90d.isoformat(),
+                  'date7d':              date_7d.isoformat(),
+                  'date':                ref_date.isoformat(),
+                  'source':              'Inverso basket ponderado (EUR 57.6%, JPY 13.6%, GBP 11.9%, CAD 9.1%, CHF 3.6%, AUD 2.1%, NZD 2.1%) — C8',
+                  'sourceType':          'computed_inverse',
+              }
+              print(f"  → USD composite: {usd_comp}%  [1M={usd_1m}% | 3M={usd_3m}%]")
+              print(f"  → Basket: {len(available)} divisas — {available}")
+          else:
+              results['USD'] = {
+                  'fxPerformance1M': None, 'fxPerformance1M_raw': None,
+                  'fxPerformance3M': None, 'fxPerformance1W':     None,
+                  'rateNow': None, 'rate30dAgo': None,
+                  'rate90dAgo': None, 'rate7dAgo': None,
+                  'date': ref_date.isoformat(),
+                  'source': 'No disponible — sin datos del basket',
+                  'sourceType': 'error',
+              }
+              print("  ❌ USD: sin datos suficientes del basket")
+
+          # ── Guardar archivos JSON ─────────────────────────────────────────────
+          import os
+          os.makedirs('fx-performance', exist_ok=True)
+
+          print(f"\n{'='*70}")
+          print("GUARDANDO ARCHIVOS")
+          print(f"{'='*70}")
+
+          for currency in CURRENCIES:
+              if currency in results:
+                  with open(f'fx-performance/{currency}.json', 'w') as f:
+                      json.dump(results[currency], f, indent=2)
+                  comp  = results[currency]['fxPerformance1M']
+                  p1m   = results[currency].get('fxPerformance1M_raw')
+                  p3m   = results[currency].get('fxPerformance3M')
+                  src   = results[currency].get('sourceType', '?')
+                  ok    = '✅' if comp is not None else '❌ NULL'
+                  print(f"  {ok} {currency}.json: composite={comp}% | 1M={p1m}% | 3M={p3m}% [{src}]")
+
+          # ── Resumen ordenado por fortaleza ────────────────────────────────────
+          print(f"\n{'='*70}")
+          print(f"FX PERFORMANCE SUMMARY — Frankfurter C8")
+          print(f"Referencia: {ref_date} | Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
+          print("=" * 70)
+
+          sorted_r = sorted(
+              [(c, d['fxPerformance1M']) for c, d in results.items()
+               if d.get('fxPerformance1M') is not None],
+              key=lambda x: x[1], reverse=True
+          )
+          for currency, perf in sorted_r:
+              bar  = '█' * min(int(abs(perf) * 3), 24)
+              sign = '+' if perf >= 0 else ''
+              p1m  = results[currency].get('fxPerformance1M_raw')
+              p3m  = results[currency].get('fxPerformance3M')
+              src  = results[currency].get('sourceType', '?')
+              raw  = f" (1M={p1m:+.2f}% | 3M={p3m:+.2f}%)" if p1m is not None and p3m is not None else ""
+              print(f"  {currency}: {sign}{perf:+.2f}%{raw}  [{src}]  {bar}")
+
+          nulls = [c for c, d in results.items() if d.get('fxPerformance1M') is None]
+          if nulls:
+              print(f"\n⚠️  Sin datos: {', '.join(nulls)}")
+          else:
+              print(f"\n✅ Todas las divisas procesadas correctamente")
+
+          # ── Validación vs TradingView (referencia manual 6/3/2026) ────────────
+          # Actualizar estos valores periódicamente para validación continua.
+          # Tolerancia aceptable: Δ < 1.0% (diferencia ECB vs interbancario real)
+          TV_REF_1M = {
+              'AUD': -0.21, 'JPY': -0.62, 'EUR': -2.06, 'GBP': -2.65,
+              'CAD':  0.22, 'CHF': -0.49, 'NZD': -2.35, 'USD':  1.75,
+          }
+          print(f"\n{'─'*70}")
+          print("VALIDACIÓN 1M vs TradingView (referencia 6/3/2026 — Δ < 1.0% aceptable):")
+          all_valid = True
+          for currency, tv_val in TV_REF_1M.items():
+              p1m_val = results.get(currency, {}).get('fxPerformance1M_raw')
+              if p1m_val is not None:
+                  diff = abs(p1m_val - tv_val)
+                  flag = "✅" if diff < 1.0 else "⚠️ REVISAR"
+                  if diff >= 1.0:
+                      all_valid = False
+                  print(f"  {currency}: Frankfurter={p1m_val:+.2f}% | TV={tv_val:+.2f}% | Δ={diff:.2f}% {flag}")
+              else:
+                  print(f"  {currency}: NULL | TV={tv_val:+.2f}% ❌")
+                  all_valid = False
+
+          if all_valid:
+              print("\n✅ Todas las divisas dentro de la tolerancia — fuente confiable")
+          else:
+              print("\n⚠️  Algunas divisas fuera de tolerancia — revisar Frankfurter")
+
+          EOFPYTHON
+
+      - name: Commit and push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add fx-performance/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — Frankfurter C8 (90% 1M + 10% 3M)"
+            git pull --rebase origin main || true
+            git push
+          fi

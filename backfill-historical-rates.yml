@@ -1,0 +1,259 @@
+name: 🔍 Monitor Data Health
+
+on:
+  schedule:
+    - cron: '0 11 * * *'   # Todos los días a las 11:00 UTC — después de que todos los workflows diarios terminan
+  workflow_dispatch:
+
+jobs:
+  check-data-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check data health
+        id: health_check
+        run: |
+          python3 -u << 'EOFPYTHON'
+          import json, os, sys
+          from datetime import date, datetime, timedelta
+
+          today     = date.today()
+          yesterday = today - timedelta(days=1)
+          CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
+
+          issues   = []   # (severity, workflow, currency, field, detail)
+          warnings = []
+          ok_count = 0
+
+          def load_json(path):
+              if not os.path.exists(path):
+                  return None
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except Exception as e:
+                  return None
+
+          def check_staleness(last_update_str, max_days, label):
+              """Returns True if data is fresh enough."""
+              if not last_update_str:
+                  return False
+              try:
+                  lu = date.fromisoformat(last_update_str[:10])
+                  return (today - lu).days <= max_days
+              except:
+                  return False
+
+          # ── 1. ECONOMIC DATA ─────────────────────────────────────────────────────
+          CRITICAL_INDICATORS = ['inflation', 'gdpGrowth', 'unemployment', 'termsOfTrade']
+          IMPORTANT_INDICATORS = ['retailSales', 'wageGrowth', 'manufacturingPMI',
+                                  'tradeBalance', 'currentAccount', 'debt']
+
+          for curr in CURRENCIES:
+              data = load_json(f'economic-data/{curr}.json')
+              if data is None:
+                  issues.append(('🔴', 'Update Economic Data', curr, 'archivo', 'economic-data/{curr}.json no existe'))
+                  continue
+
+              if not check_staleness(data.get('lastUpdate'), 2, 'economic'):
+                  issues.append(('🟡', 'Update Economic Data', curr, 'lastUpdate',
+                                 f"datos tienen más de 2 días ({data.get('lastUpdate', 'N/A')})"))
+
+              vals = data.get('data', {})
+              for ind in CRITICAL_INDICATORS:
+                  if vals.get(ind) is None:
+                      issues.append(('🔴', 'Update Economic Data', curr, ind, 'null'))
+              for ind in IMPORTANT_INDICATORS:
+                  if vals.get(ind) is None:
+                      warnings.append(('🟡', 'Update Economic Data', curr, ind, 'null'))
+
+          # ── 2. EXTENDED DATA ─────────────────────────────────────────────────────
+          EXTENDED_FIELDS = ['bond10y', 'consumerConfidence', 'rateMomentum']
+
+          for curr in CURRENCIES:
+              data = load_json(f'extended-data/{curr}.json')
+              if data is None:
+                  issues.append(('🔴', 'Update Extended Data', curr, 'archivo', 'no existe'))
+                  continue
+              if not check_staleness(data.get('lastUpdate'), 2, 'extended'):
+                  issues.append(('🟡', 'Update Extended Data', curr, 'lastUpdate',
+                                 f"datos tienen más de 2 días ({data.get('lastUpdate', 'N/A')})"))
+              vals = data.get('data', {})
+              for field in EXTENDED_FIELDS:
+                  if vals.get(field) is None:
+                      warnings.append(('🟡', 'Update Extended Data', curr, field, 'null'))
+
+          # ── 3. INTEREST RATES ────────────────────────────────────────────────────
+          for curr in CURRENCIES:
+              data = load_json(f'rates/{curr}.json')
+              if data is None:
+                  issues.append(('🔴', 'Update Interest Rates', curr, 'archivo', 'no existe'))
+                  continue
+              if not check_staleness(data.get('lastUpdate'), 2, 'rates'):
+                  issues.append(('🟡', 'Update Interest Rates', curr, 'lastUpdate',
+                                 f"datos tienen más de 2 días ({data.get('lastUpdate', 'N/A')})"))
+              obs = data.get('observations', [])
+              if not obs or obs[0].get('value') is None:
+                  issues.append(('🔴', 'Update Interest Rates', curr, 'rate', 'null'))
+
+          # ── 4. FX PERFORMANCE ────────────────────────────────────────────────────
+          for curr in CURRENCIES + ['USD']:
+              data = load_json(f'fx-performance/{curr}.json')
+              if data is None:
+                  issues.append(('🔴', 'Update FX Performance', curr, 'archivo', 'no existe'))
+                  continue
+              if not check_staleness(data.get('date'), 2, 'fx'):
+                  issues.append(('🟡', 'Update FX Performance', curr, 'date',
+                                 f"datos tienen más de 2 días ({data.get('date', 'N/A')})"))
+              if curr != 'USD' and data.get('fxPerformance1M') is None:
+                  warnings.append(('🟡', 'Update FX Performance', curr, 'fxPerformance1M', 'null'))
+
+          # ── 5. COT DATA ──────────────────────────────────────────────────────────
+          # COT solo se actualiza los viernes — aceptar hasta 8 días de antigüedad
+          for curr in ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']:
+              data = load_json(f'cot-data/{curr}.json')
+              if data is None:
+                  warnings.append(('🟡', 'Update COT Data', curr, 'archivo', 'no existe'))
+                  continue
+              if not check_staleness(data.get('lastUpdate'), 8, 'cot'):
+                  warnings.append(('🟡', 'Update COT Data', curr, 'lastUpdate',
+                                   f"datos tienen más de 8 días ({data.get('lastUpdate', 'N/A')})"))
+
+          usd_cot = load_json('cot-data/USD.json')
+          if usd_cot is None:
+              warnings.append(('🟡', 'Update USD Index COT', 'USD', 'archivo', 'no existe'))
+          elif not check_staleness(usd_cot.get('lastUpdate'), 8, 'cot_usd'):
+              warnings.append(('🟡', 'Update USD Index COT', 'USD', 'lastUpdate',
+                               f"datos tienen más de 8 días ({usd_cot.get('lastUpdate', 'N/A')})"))
+
+          # ── 6. CALENDAR DATA ─────────────────────────────────────────────────────
+          cal = load_json('calendar-data/calendar.json')
+          if cal is None:
+              issues.append(('🔴', 'Update Economic Calendar', '—', 'archivo', 'calendar-data/calendar.json no existe'))
+          else:
+              if not check_staleness(cal.get('lastUpdate'), 1, 'calendar'):
+                  issues.append(('🟡', 'Update Economic Calendar', '—', 'lastUpdate',
+                                 f"datos tienen más de 1 día ({cal.get('lastUpdate', 'N/A')})"))
+              if cal.get('totalEvents', 0) == 0:
+                  warnings.append(('🟡', 'Update Economic Calendar', '—', 'totalEvents', '0 eventos'))
+
+          # ── 7. MEETINGS DATA ─────────────────────────────────────────────────────
+          meet = load_json('meetings-data/meetings.json')
+          if meet is None:
+              warnings.append(('🟡', 'Update Central Bank Meetings', '—', 'archivo', 'no existe'))
+          else:
+              for curr in CURRENCIES:
+                  info = meet.get('meetings', {}).get(curr, {})
+                  if not info.get('nextMeetingISO'):
+                      warnings.append(('🟡', 'Update Central Bank Meetings', curr, 'nextMeeting', 'no definida'))
+
+          # ── 8. AI ANALYSIS ───────────────────────────────────────────────────────
+          ai_missing = []
+          for curr in CURRENCIES:
+              if not os.path.exists(f'ai-analysis/{curr}.json') and not os.path.exists(f'ai-analysis/{curr.lower()}.json'):
+                  ai_missing.append(curr)
+          if ai_missing:
+              warnings.append(('🟡', 'Generate AI Analysis', ', '.join(ai_missing), 'archivo', 'no existe'))
+
+          # ── BUILD SUMMARY ─────────────────────────────────────────────────────────
+          all_issues = issues + warnings
+          critical_count = len(issues)
+          warning_count  = len(warnings)
+
+          print(f"\n{'='*60}")
+          print(f"DATA HEALTH REPORT — {today}")
+          print(f"{'='*60}")
+          print(f"🔴 Críticos: {critical_count}")
+          print(f"🟡 Avisos:   {warning_count}")
+
+          if all_issues:
+              print(f"\n{'─'*60}")
+              current_workflow = None
+              for severity, workflow, curr, field, detail in all_issues:
+                  if workflow != current_workflow:
+                      print(f"\n[{workflow}]")
+                      current_workflow = workflow
+                  print(f"  {severity} {curr} → {field}: {detail}")
+          else:
+              print(f"\n✅ Todo en orden — todos los datos están actualizados y completos")
+
+          print(f"\n{'='*60}")
+
+          # Write GitHub Step Summary
+          summary_path = os.environ.get('GITHUB_STEP_SUMMARY', '')
+          if summary_path:
+              with open(summary_path, 'w') as sf:
+                  sf.write(f"# 🔍 Data Health Report — {today}\n\n")
+
+                  if critical_count == 0 and warning_count == 0:
+                      sf.write("## ✅ Todo en orden\n\nTodos los datos están actualizados y completos.\n")
+                  else:
+                      if critical_count > 0:
+                          sf.write(f"## 🔴 {critical_count} problema(s) crítico(s)\n\n")
+                          sf.write("| Workflow | Moneda | Campo | Detalle |\n")
+                          sf.write("|----------|--------|-------|---------|\n")
+                          for severity, workflow, curr, field, detail in issues:
+                              sf.write(f"| {workflow} | {curr} | `{field}` | {detail} |\n")
+                          sf.write("\n")
+
+                      if warning_count > 0:
+                          sf.write(f"## 🟡 {warning_count} aviso(s)\n\n")
+                          sf.write("| Workflow | Moneda | Campo | Detalle |\n")
+                          sf.write("|----------|--------|-------|---------|\n")
+                          for severity, workflow, curr, field, detail in warnings:
+                              sf.write(f"| {workflow} | {curr} | `{field}` | {detail} |\n")
+                          sf.write("\n")
+
+                  sf.write(f"\n---\n*Generado automáticamente el {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}*\n")
+
+          # Set output for next step
+          with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+              f.write(f"critical_count={critical_count}\n")
+              f.write(f"warning_count={warning_count}\n")
+              # Write issues as compact string for notification
+              if all_issues:
+                  lines = []
+                  for severity, workflow, curr, field, detail in issues[:10]:  # max 10 en el email
+                      lines.append(f"{severity} [{curr}] {field}: {detail}")
+                  f.write(f"issues_summary={'|'.join(lines)}\n")
+              else:
+                  f.write("issues_summary=\n")
+
+          # Exit with error if there are critical issues (makes the run appear as failed in GH)
+          if critical_count > 0:
+              sys.exit(1)
+          EOFPYTHON
+
+      - name: Send email notification on failures
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: "FX Dashboard Monitor <${{ secrets.NOTIFY_EMAIL_FROM }}>"
+          subject: "🔴 FX Dashboard — Datos faltantes (${{ steps.health_check.outputs.critical_count }} críticos)"
+          body: |
+            El monitor de datos del FX Dashboard detectó problemas el ${{ env.TODAY }}.
+
+            Problemas críticos: ${{ steps.health_check.outputs.critical_count }}
+            Avisos: ${{ steps.health_check.outputs.warning_count }}
+
+            Detalle:
+            ${{ steps.health_check.outputs.issues_summary }}
+
+            Revisar el informe completo en GitHub Actions:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          # Nota: si no querés configurar email, podés eliminar este step.
+          # El Job Summary en GitHub ya muestra todo el detalle visual.
