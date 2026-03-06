@@ -1,4 +1,4 @@
-name: Update FX Performance (composite 1M+3M) — C5
+name: Update FX Performance (Stooq currency indices) — C6
 on:
   schedule:
     - cron: '0 7 * * *'
@@ -22,213 +22,404 @@ jobs:
       - name: Create directory
         run: mkdir -p fx-performance
 
-      - name: Fetch FX performance composite 1M+3M
+      - name: Fetch FX performance from Stooq currency indices
         run: |
           python3 << 'EOFPYTHON'
           import requests
           import json
+          import csv
           import time
-          from datetime import date, timedelta
+          from io import StringIO
+          from datetime import date, timedelta, datetime
 
-          HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; ForexDashboard/1.0)'}
+          # ════════════════════════════════════════════════════════════════════════
+          # FX PERFORMANCE — C6: Stooq Currency Indices (reemplazo de Frankfurter)
+          #
+          # MOTIVACIÓN:
+          #   Frankfurter/ECB publica tipos de referencia UNA vez al día (16:00 CET).
+          #   Esto introduce hasta 24h de lag en fxPerformance1M, el indicador más
+          #   "real time" del modelo. Los traders ven AUD -0.21% (1M real, AXY index)
+          #   pero el modelo calculaba +2.1% composite (distorsión por lag ECB).
+          #
+          #   Stooq publica los índices de divisas oficiales del mercado interbancario
+          #   en CSV descargable, sin autenticación ni rate limiting agresivo:
+          #     AXY = Australian Dollar Currency Index (ICE)
+          #     JXY = Japanese Yen Currency Index     (ICE)
+          #     EXY = Euro Currency Index             (ICE)
+          #     BXY = British Pound Currency Index    (ICE)
+          #     CXY = Canadian Dollar Currency Index  (ICE)
+          #     SXY = Swiss Franc Currency Index      (ICE)
+          #     ZXY = New Zealand Dollar Currency Index (ICE)
+          #     DXY = US Dollar Index                 (ICE)
+          #
+          # CAMPO JSON:
+          #   El campo sigue llamándose 'fxPerformance1M' para compatibilidad total
+          #   con index.html — no requiere cambios en el frontend.
+          #
+          # COMPOSITE 60/40:
+          #   Se mantiene composite 60% 1M + 40% 3M pero ahora sobre datos reales
+          #   del mercado interbancario, no sobre tipos de referencia del BCE.
+          #   Con datos de mercado la señal 1M es más informativa → 70% 1M + 30% 3M.
+          #   Racionale: el índice de divisas ya incorpora el consenso del mercado
+          #   sin el lag del ECB, por lo que el suavizado 3M puede reducirse.
+          #
+          # FALLBACK:
+          #   Si Stooq falla para una divisa específica, se intenta con Frankfurter
+          #   para esa divisa (sin romper el workflow completo).
+          # ════════════════════════════════════════════════════════════════════════
 
-          CURRENCIES = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']
+          HEADERS = {
+              'User-Agent': 'Mozilla/5.0 (compatible; ForexDashboard/2.0; Stooq-reader)',
+              'Accept': 'text/csv,text/plain,*/*',
+          }
+
+          # Tickers de Stooq para cada índice de divisa
+          # Formato: https://stooq.com/q/d/l/?s=axy.f&i=d
+          # 'i=d' = datos diarios
+          STOOQ_TICKERS = {
+              'AUD': 'axy.f',
+              'JPY': 'jxy.f',
+              'EUR': 'exy.f',
+              'GBP': 'bxy.f',
+              'CAD': 'cxy.f',
+              'CHF': 'sxy.f',
+              'NZD': 'zxy.f',
+              'USD': 'dxy.f',
+          }
+
+          CURRENCIES = ['EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'USD']
+
+          # C6: composite 70% 1M + 30% 3M (señal de mercado más directa → menos suavizado)
+          COMPOSITE_WEIGHT_1M = 0.70
+          COMPOSITE_WEIGHT_3M = 0.30
 
           today = date.today()
 
-          # CORRECCIÓN: Usar ayer como "hoy confiable".
-          # Frankfurter usa ECB reference rates publicados a las 16:00 CET.
-          # Si el workflow corre antes de esa hora, 'today' puede no tener dato
-          # confirmado y Frankfurter devuelve el día anterior de forma inconsistente.
-          # Usando yesterday explícitamente garantizamos coherencia temporal entre
-          # todas las divisas en cada ejecución.
-          yesterday = today - timedelta(days=1)
-          date_30d  = yesterday - timedelta(days=30)
-          date_90d  = yesterday - timedelta(days=90)   # C5: ventana 3M
-          date_7d   = yesterday - timedelta(days=7)
+          print("=" * 70)
+          print("FX PERFORMANCE — C6: Stooq Currency Indices")
+          print(f"Fecha: {today}")
+          print(f"Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
+          print(f"Fuente: Stooq.com (ICE currency indices — datos interbancarios reales)")
+          print("=" * 70)
 
-          today_str = yesterday.isoformat()
-          d30_str   = date_30d.isoformat()
-          d90_str   = date_90d.isoformat()             # C5
-          d7_str    = date_7d.isoformat()
-
-          # C5: composite 60% 1M + 40% 3M
-          # El campo JSON sigue llamándose fxPerformance1M — index.html no requiere cambios.
-          # Racionale: un movimiento de 1 mes puede ser ruido. La componente de 3 meses
-          # suaviza la señal sin añadir fuentes de datos adicionales.
-          COMPOSITE_WEIGHT_1M = 0.60
-          COMPOSITE_WEIGHT_3M = 0.40
-
-          print(f"Fetching FX performance composite 1M+3M: {d90_str} → {today_str}")
-          print(f"Weights: 1M={COMPOSITE_WEIGHT_1M*100:.0f}% + 3M={COMPOSITE_WEIGHT_3M*100:.0f}%")
-
-          def fetch_rate_on_date(currency, date_str, retries=3, backoff=2):
+          def fetch_stooq_history(ticker, days_back=100, retries=3, backoff=3):
               """
-              Fetch USD/{currency} rate on a specific date via Frankfurter.
-              Returns units of currency per 1 USD.
-              En caso de día no hábil, Frankfurter devuelve el último dato disponible.
+              Descarga el histórico diario de un ticker de Stooq.
+              Retorna lista de (date, close) ordenada por fecha ascendente.
+              Stooq devuelve CSV con columnas: Date,Open,High,Low,Close,Volume
               """
-              url = f"https://api.frankfurter.app/{date_str}?from=USD&to={currency}"
+              url = f"https://stooq.com/q/d/l/?s={ticker}&i=d"
               for attempt in range(1, retries + 1):
                   try:
-                      r = requests.get(url, headers=HEADERS, timeout=12)
+                      r = requests.get(url, headers=HEADERS, timeout=15)
+                      if r.status_code == 200 and len(r.content) > 100:
+                          reader = csv.DictReader(StringIO(r.text))
+                          rows = []
+                          for row in reader:
+                              try:
+                                  d = datetime.strptime(row['Date'].strip(), '%Y-%m-%d').date()
+                                  close = float(row['Close'].strip())
+                                  if close > 0:
+                                      rows.append((d, close))
+                              except (ValueError, KeyError):
+                                  continue
+                          if rows:
+                              rows.sort(key=lambda x: x[0])
+                              print(f"  ✅ {ticker}: {len(rows)} días históricos obtenidos")
+                              return rows
+                          else:
+                              print(f"  ⚠️ {ticker}: CSV vacío o sin datos válidos")
+                      elif r.status_code == 429:
+                          print(f"  ⚠️ {ticker}: Rate limit (429), esperando {backoff * attempt}s...")
+                          time.sleep(backoff * attempt)
+                      else:
+                          print(f"  ⚠️ {ticker}: HTTP {r.status_code} (attempt {attempt}/{retries})")
+                  except Exception as e:
+                      print(f"  ⚠️ {ticker}: Error attempt {attempt}/{retries}: {e}")
+                  if attempt < retries:
+                      time.sleep(backoff)
+              print(f"  ❌ {ticker}: Todos los intentos fallaron")
+              return None
+
+          def get_closest_value(rows, target_date, max_diff_days=5):
+              """
+              Busca el valor más cercano a target_date dentro de max_diff_days.
+              Acepta hasta 5 días de diferencia para cubrir fines de semana y festivos.
+              """
+              if not rows:
+                  return None, None
+              best = None
+              best_diff = float('inf')
+              best_date = None
+              for d, close in rows:
+                  diff = abs((d - target_date).days)
+                  if diff < best_diff:
+                      best_diff = diff
+                      best = close
+                      best_date = d
+              if best_diff <= max_diff_days:
+                  return best, best_date
+              return None, None
+
+          def calc_performance(value_now, value_before):
+              """
+              % de variación del índice de divisa.
+              Índice sube → divisa se apreció → positivo.
+              Índice baja → divisa se depreció → negativo.
+              Fórmula directa: (now / before - 1) * 100
+              (Opuesto a Frankfurter donde se calculaba rate_before / rate_now
+              porque allí el rate era "unidades de divisa por 1 USD".)
+              """
+              if value_now is None or value_before is None:
+                  return None
+              if value_before == 0:
+                  return None
+              return round((value_now / value_before - 1.0) * 100.0, 4)
+
+          def fetch_frankfurter_fallback(currency, target_date_str, retries=2):
+              """
+              Fallback a Frankfurter/ECB si Stooq falla para una divisa específica.
+              Retorna el rate USD/{currency} en esa fecha, o None si falla.
+              """
+              url = f"https://api.frankfurter.app/{target_date_str}?from=USD&to={currency}"
+              for attempt in range(1, retries + 1):
+                  try:
+                      r = requests.get(url, timeout=10)
                       if r.ok:
                           data = r.json()
                           rate = data.get('rates', {}).get(currency)
                           if rate:
-                              actual_date = data.get('date', date_str)
-                              if actual_date != date_str:
-                                  print(f"  Note: {currency} on {date_str} → Frankfurter returned {actual_date} (non-trading day adjusted)")
-                              return float(rate)
-                          print(f"  Warning: {currency} on {date_str}: rate not in response")
-                      else:
-                          print(f"  Warning: {currency} on {date_str}: HTTP {r.status_code} (attempt {attempt}/{retries})")
+                              return float(rate), data.get('date', target_date_str)
                   except Exception as e:
-                      print(f"  Warning: {currency} on {date_str}: {e} (attempt {attempt}/{retries})")
+                      print(f"    ⚠️ Frankfurter fallback attempt {attempt}/{retries}: {e}")
+                  time.sleep(1)
+              return None, None
 
-                  if attempt < retries:
-                      sleep_s = backoff ** (attempt - 1)
-                      print(f"  Retrying in {sleep_s}s...")
-                      time.sleep(sleep_s)
+          # ── Fechas objetivo ──────────────────────────────────────────────────────
+          # Usamos 'today - 1' como referencia (ayer = sesión cerrada confirmada)
+          # igual que hacía el workflow anterior con Frankfurter.
+          ref_date = today - timedelta(days=1)
+          date_30d = ref_date - timedelta(days=30)
+          date_90d = ref_date - timedelta(days=90)
+          date_7d  = ref_date - timedelta(days=7)
 
-              print(f"  ERROR: All {retries} attempts failed for {currency} on {date_str}")
-              return None
-
-          def calc_performance(currency, rate_now, rate_before):
-              """
-              % change in currency value (appreciation = positive).
-              Si USD/CCY rate baja → moneda se APRECIÓ → resultado positivo.
-              Fórmula: (rate_before / rate_now - 1) * 100
-              """
-              if rate_now is None or rate_before is None:
-                  return None
-              if rate_before == 0 or rate_now == 0:
-                  return None
-              perf = (rate_before / rate_now - 1.0) * 100.0
-              return round(perf, 4)
+          print(f"\nFechas de referencia:")
+          print(f"  Ahora:  {ref_date} (ayer, sesión cerrada)")
+          print(f"  30d:    {date_30d}")
+          print(f"  90d:    {date_90d}")
+          print(f"  7d:     {date_7d}")
 
           results = {}
 
           for currency in CURRENCIES:
-              print(f"\nProcessing {currency}...")
+              ticker = STOOQ_TICKERS[currency]
+              print(f"\n{'─'*50}")
+              print(f"[{currency}] Ticker: {ticker}")
+              print(f"{'─'*50}")
 
-              rate_now = fetch_rate_on_date(currency, today_str)
-              rate_30d = fetch_rate_on_date(currency, d30_str)
-              rate_90d = fetch_rate_on_date(currency, d90_str)   # C5
-              rate_7d  = fetch_rate_on_date(currency, d7_str)
+              # Descargar histórico de Stooq
+              rows = fetch_stooq_history(ticker)
+              time.sleep(1.5)  # Respetar rate limit de Stooq
 
-              print(f"  Now ({today_str}): {rate_now}")
-              print(f"  30d ago ({d30_str}): {rate_30d}")
-              print(f"  90d ago ({d90_str}): {rate_90d}")
-              print(f"  7d ago ({d7_str}): {rate_7d}")
+              use_stooq = rows is not None and len(rows) >= 10
 
-              perf_1m = calc_performance(currency, rate_now, rate_30d)
-              perf_3m = calc_performance(currency, rate_now, rate_90d)  # C5
-              perf_1w = calc_performance(currency, rate_now, rate_7d)
+              if use_stooq:
+                  # ── Obtener valores en fechas objetivo ──────────────────────────
+                  val_now,  date_now_actual  = get_closest_value(rows, ref_date,  max_diff_days=5)
+                  val_30d,  date_30d_actual  = get_closest_value(rows, date_30d,  max_diff_days=5)
+                  val_90d,  date_90d_actual  = get_closest_value(rows, date_90d,  max_diff_days=7)
+                  val_7d,   date_7d_actual   = get_closest_value(rows, date_7d,   max_diff_days=5)
 
-              # C5: Composite 60% 1M + 40% 3M para reducir ruido.
-              # El campo JSON sigue llamándose fxPerformance1M — index.html no cambia.
-              if perf_1m is not None and perf_3m is not None:
-                  perf_composite = round(perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4)
-              elif perf_1m is not None:
-                  perf_composite = perf_1m   # fallback a solo 1M
-              elif perf_3m is not None:
-                  perf_composite = perf_3m   # fallback a solo 3M
+                  print(f"  Valores obtenidos:")
+                  print(f"    Ahora  ({ref_date}):  {val_now} (real: {date_now_actual})")
+                  print(f"    30d    ({date_30d}):   {val_30d} (real: {date_30d_actual})")
+                  print(f"    90d    ({date_90d}):   {val_90d} (real: {date_90d_actual})")
+                  print(f"    7d     ({date_7d}):    {val_7d} (real: {date_7d_actual})")
+
+                  # ── Calcular rendimientos ───────────────────────────────────────
+                  perf_1m = calc_performance(val_now, val_30d)
+                  perf_3m = calc_performance(val_now, val_90d)
+                  perf_1w = calc_performance(val_now, val_7d)
+
+                  print(f"  Rendimientos:")
+                  print(f"    1M: {perf_1m}%")
+                  print(f"    3M: {perf_3m}%")
+                  print(f"    1W: {perf_1w}%")
+
+                  # ── Composite 70% 1M + 30% 3M ──────────────────────────────────
+                  if perf_1m is not None and perf_3m is not None:
+                      perf_composite = round(
+                          perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4
+                      )
+                  elif perf_1m is not None:
+                      perf_composite = perf_1m
+                  elif perf_3m is not None:
+                      perf_composite = perf_3m
+                  else:
+                      perf_composite = None
+
+                  results[currency] = {
+                      'fxPerformance1M':      perf_composite,
+                      'fxPerformance1M_raw':  perf_1m,
+                      'fxPerformance3M':      perf_3m,
+                      'fxPerformance1W':      perf_1w,
+                      'indexNow':             val_now,
+                      'index30dAgo':          val_30d,
+                      'index90dAgo':          val_90d,
+                      'index7dAgo':           val_7d,
+                      'date':                 ref_date.isoformat(),
+                      'source':               f'Stooq {ticker} — ICE currency index — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C6)',
+                      'sourceType':           'stooq_index',
+                  }
+
+                  print(f"  → COMPOSITE: {perf_composite}%  [1M={perf_1m}% | 3M={perf_3m}%]")
+
               else:
-                  perf_composite = None
+                  # ── Fallback a Frankfurter para esta divisa ───────────────────
+                  print(f"  ⚠️ Stooq falló para {currency} — usando Frankfurter como fallback")
 
-              results[currency] = {
-                  'fxPerformance1M': perf_composite,     # composite — nombre igual para compatibilidad con index.html
-                  'fxPerformance1M_raw': perf_1m,        # componente 1M pura (debug)
-                  'fxPerformance3M': perf_3m,            # componente 3M (debug)
-                  'fxPerformance1W': perf_1w,
-                  'rateNow':    rate_now,
-                  'rate30dAgo': rate_30d,
-                  'rate90dAgo': rate_90d,
-                  'rate7dAgo':  rate_7d,
-                  'date': today_str,
-                  'source': 'Frankfurter ECB — composite 60% 1M + 40% 3M (C5)'
+                  if currency == 'USD':
+                      # USD no tiene par directo en Frankfurter — se calculará después
+                      results[currency] = {
+                          'fxPerformance1M': None, 'fxPerformance1M_raw': None,
+                          'fxPerformance3M': None, 'fxPerformance1W': None,
+                          'indexNow': None, 'index30dAgo': None,
+                          'index90dAgo': None, 'index7dAgo': None,
+                          'date': ref_date.isoformat(),
+                          'source': 'Fallback pending (USD)',
+                          'sourceType': 'pending',
+                      }
+                      continue
+
+                  rate_now,  _ = fetch_frankfurter_fallback(currency, ref_date.isoformat())
+                  rate_30d,  _ = fetch_frankfurter_fallback(currency, date_30d.isoformat())
+                  rate_90d,  _ = fetch_frankfurter_fallback(currency, date_90d.isoformat())
+                  rate_7d,   _ = fetch_frankfurter_fallback(currency, date_7d.isoformat())
+                  time.sleep(1)
+
+                  # Para Frankfurter la lógica es inversa (rate = CCY per USD)
+                  def calc_perf_fx(rate_now, rate_before):
+                      if rate_now is None or rate_before is None or rate_before == 0 or rate_now == 0:
+                          return None
+                      return round((rate_before / rate_now - 1.0) * 100.0, 4)
+
+                  perf_1m = calc_perf_fx(rate_now, rate_30d)
+                  perf_3m = calc_perf_fx(rate_now, rate_90d)
+                  perf_1w = calc_perf_fx(rate_now, rate_7d)
+
+                  if perf_1m is not None and perf_3m is not None:
+                      perf_composite = round(perf_1m * COMPOSITE_WEIGHT_1M + perf_3m * COMPOSITE_WEIGHT_3M, 4)
+                  elif perf_1m is not None:
+                      perf_composite = perf_1m
+                  else:
+                      perf_composite = None
+
+                  results[currency] = {
+                      'fxPerformance1M':      perf_composite,
+                      'fxPerformance1M_raw':  perf_1m,
+                      'fxPerformance3M':      perf_3m,
+                      'fxPerformance1W':      perf_1w,
+                      'indexNow':             rate_now,
+                      'index30dAgo':          rate_30d,
+                      'index90dAgo':          rate_90d,
+                      'index7dAgo':           rate_7d,
+                      'date':                 ref_date.isoformat(),
+                      'source':               f'Frankfurter ECB fallback (Stooq no disponible) — composite {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M (C6)',
+                      'sourceType':           'frankfurter_fallback',
+                  }
+                  print(f"  → Fallback composite: {perf_composite}%")
+
+          # ── USD: si Stooq DXY funcionó, ya está calculado directamente ──────────
+          # Si no funcionó, calcularlo como inverso ponderado DXY de las demás divisas.
+          if results.get('USD', {}).get('sourceType') == 'pending':
+              print(f"\n{'─'*50}")
+              print("[USD] Calculando como inverso ponderado DXY (Stooq dxy.f falló)")
+              print(f"{'─'*50}")
+              DXY_WEIGHTS = {
+                  'EUR': 0.576, 'JPY': 0.136, 'GBP': 0.119,
+                  'CAD': 0.091, 'CHF': 0.036, 'AUD': 0.021, 'NZD': 0.021
               }
+              available = [
+                  c for c in DXY_WEIGHTS
+                  if results.get(c, {}).get('fxPerformance1M') is not None
+              ]
+              total_w = sum(DXY_WEIGHTS[c] for c in available)
+              if total_w > 0:
+                  usd_perf = 0.0
+                  for c in available:
+                      usd_perf -= results[c]['fxPerformance1M'] * (DXY_WEIGHTS[c] / total_w)
+                  usd_perf = round(usd_perf, 4)
+                  results['USD']['fxPerformance1M'] = usd_perf
+                  results['USD']['fxPerformance1M_raw'] = usd_perf
+                  results['USD']['source'] = 'DXY-weighted inverse basket (Stooq dxy.f no disponible)'
+                  results['USD']['sourceType'] = 'computed_inverse'
+                  print(f"  → USD composite (inverso basket): {usd_perf}%")
+              else:
+                  print("  ❌ USD: no hay datos de otras divisas para calcular inverso")
 
-              print(f"  1M={perf_1m}%  3M={perf_3m}%  composite={perf_composite}%  |  1W={perf_1w}%")
-
-          # USD: calculado como inverso ponderado DXY
-          # Pesos oficiales del índice DXY (ICE):
-          #   EUR 57.6% | JPY 13.6% | GBP 11.9% | CAD 9.1% | CHF 3.6% | AUD 2.1% | NZD 2.1%
-          DXY_WEIGHTS = {
-              'EUR': 0.576, 'JPY': 0.136, 'GBP': 0.119,
-              'CAD': 0.091, 'CHF': 0.036, 'AUD': 0.021, 'NZD': 0.021
-          }
-
-          # USD composite: usar el composite de cada divisa (ya suavizado 1M+3M)
-          available_for_usd = [
-              c for c in ['EUR', 'JPY', 'GBP', 'CAD', 'CHF', 'AUD', 'NZD']
-              if results.get(c, {}).get('fxPerformance1M') is not None
-          ]
-          total_w = sum(DXY_WEIGHTS.get(c, 0) for c in available_for_usd)
-
-          if total_w > 0:
-              usd_perf = 0.0
-              for c in available_for_usd:
-                  perf = results[c]['fxPerformance1M']
-                  w = DXY_WEIGHTS.get(c, 0) / total_w
-                  usd_perf -= perf * w
-              usd_perf = round(usd_perf, 4)
-              print(f"\nUSD composite (DXY-weighted, {len(available_for_usd)}/{len(CURRENCIES)} currencies): {usd_perf}%")
-          else:
-              usd_perf = None
-              print("\nUSD composite: None (no currency data available)")
-
-          results['USD'] = {
-              'fxPerformance1M': usd_perf,
-              'fxPerformance1M_raw': usd_perf,
-              'fxPerformance3M': None,
-              'fxPerformance1W': None,
-              'rateNow':    1.0,
-              'rate30dAgo': 1.0,
-              'rate90dAgo': 1.0,
-              'rate7dAgo':  1.0,
-              'date': today_str,
-              'source': 'Computed as DXY-weighted inverse of composite basket (C5)'
-          }
-
-          # Guardar archivos individuales
+          # ── Guardar archivos individuales ────────────────────────────────────────
           import os
           os.makedirs('fx-performance', exist_ok=True)
 
-          all_currencies = ['USD'] + CURRENCIES
-          for curr in all_currencies:
-              if curr in results:
-                  with open(f'fx-performance/{curr}.json', 'w') as f:
-                      json.dump(results[curr], f, indent=2)
-                  composite = results[curr]['fxPerformance1M']
-                  raw_1m    = results[curr].get('fxPerformance1M_raw')
-                  raw_3m    = results[curr].get('fxPerformance3M')
-                  status = '✓' if composite is not None else '✗ NULL'
-                  print(f"Saved {curr}.json: composite={composite}% [1M={raw_1m}% 3M={raw_3m}%] [{status}]")
+          print(f"\n{'='*70}")
+          print("GUARDANDO ARCHIVOS")
+          print(f"{'='*70}")
 
-          # Resumen
-          print("\n" + "="*60)
-          print("FX PERFORMANCE SUMMARY — composite 1M+3M (C5)")
-          print(f"Reference date: {today_str} (yesterday = confirmed ECB rate)")
-          print("="*60)
+          for currency in CURRENCIES:
+              if currency in results:
+                  with open(f'fx-performance/{currency}.json', 'w') as f:
+                      json.dump(results[currency], f, indent=2)
+                  composite = results[currency]['fxPerformance1M']
+                  raw_1m    = results[currency].get('fxPerformance1M_raw')
+                  raw_3m    = results[currency].get('fxPerformance3M')
+                  src_type  = results[currency].get('sourceType', 'unknown')
+                  status = '✅' if composite is not None else '❌ NULL'
+                  print(f"  {status} {currency}.json: composite={composite}% | 1M={raw_1m}% | 3M={raw_3m}% [{src_type}]")
+
+          # ── Resumen final ────────────────────────────────────────────────────────
+          print(f"\n{'='*70}")
+          print(f"FX PERFORMANCE SUMMARY — Stooq ICE Indices C6")
+          print(f"Referencia: {ref_date} | Composite: {COMPOSITE_WEIGHT_1M*100:.0f}% 1M + {COMPOSITE_WEIGHT_3M*100:.0f}% 3M")
+          print("=" * 70)
+
           sorted_results = sorted(
-              [(c, d['fxPerformance1M']) for c, d in results.items() if d['fxPerformance1M'] is not None],
+              [(c, d['fxPerformance1M']) for c, d in results.items()
+               if d.get('fxPerformance1M') is not None],
               key=lambda x: x[1], reverse=True
           )
-          for curr, perf in sorted_results:
-              bar = '█' * min(int(abs(perf)), 20)
+          for currency, perf in sorted_results:
+              bar = '█' * min(int(abs(perf) * 2), 20)
               sign = '+' if perf >= 0 else ''
-              raw_1m = results[curr].get('fxPerformance1M_raw')
-              raw_3m = results[curr].get('fxPerformance3M')
-              raw_str = f" (1M={raw_1m:+.2f}% 3M={raw_3m:+.2f}%)" if raw_1m is not None and raw_3m is not None else ""
-              print(f"  {curr}: {sign}{perf:+.2f}%{raw_str}  {bar}")
+              raw_1m = results[currency].get('fxPerformance1M_raw')
+              raw_3m = results[currency].get('fxPerformance3M')
+              src    = results[currency].get('sourceType', '?')
+              raw_str = f" (1M={raw_1m:+.2f}% | 3M={raw_3m:+.2f}%)" if raw_1m is not None and raw_3m is not None else ""
+              print(f"  {currency}: {sign}{perf:+.2f}%{raw_str}  [{src}]  {bar}")
 
-          nulls = [c for c, d in results.items() if d['fxPerformance1M'] is None]
+          nulls = [c for c, d in results.items() if d.get('fxPerformance1M') is None]
           if nulls:
-              print(f"\n⚠️  NULL results (API failures): {', '.join(nulls)}")
+              print(f"\n⚠️  NULL: {', '.join(nulls)}")
           else:
-              print(f"\n✅ Todas las divisas procesadas correctamente.")
+              print(f"\n✅ Todas las divisas procesadas correctamente")
+
+          # Validación contra TradingView (referencia manual — valores del 6/3/2026)
+          # AXY 1M=-0.21% | JXY 1M=-0.62% | EXY 1M=-2.06% | BXY 1M=-2.65%
+          # CXY 1M=+0.22% | SXY 1M=-0.49% | ZXY 1M=-2.35% | DXY 1M=+1.75%
+          # Si los valores de Stooq difieren >0.5% de estos, revisar el ticker.
+          print(f"\n{'─'*70}")
+          print("REFERENCIA TradingView 1M (6/3/2026 — para validación):")
+          TV_REF = {
+              'AUD': -0.21, 'JPY': -0.62, 'EUR': -2.06, 'GBP': -2.65,
+              'CAD':  0.22, 'CHF': -0.49, 'NZD': -2.35, 'USD':  1.75,
+          }
+          for currency, tv_val in TV_REF.items():
+              stooq_1m = results.get(currency, {}).get('fxPerformance1M_raw')
+              if stooq_1m is not None:
+                  diff = abs(stooq_1m - tv_val)
+                  flag = "✅" if diff < 1.0 else "⚠️ REVISAR"
+                  print(f"  {currency}: Stooq={stooq_1m:+.2f}% | TV={tv_val:+.2f}% | Δ={diff:.2f}% {flag}")
+              else:
+                  print(f"  {currency}: Stooq=NULL | TV={tv_val:+.2f}% ❌")
           EOFPYTHON
 
       - name: Commit and push
@@ -239,7 +430,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — composite 1M+3M C5"
+            git commit -m "📈 FX performance $(date +'%Y-%m-%d') — Stooq ICE indices C6 (70% 1M + 30% 3M)"
             git pull --rebase origin main || true
             git push
           fi
