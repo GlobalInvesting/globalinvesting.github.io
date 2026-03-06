@@ -1,23 +1,23 @@
 {
-  "lastUpdate": "2026-03-05",
-  "source": "TradingEconomics \u2014 v10: rateMomentum via TE API guest + FRED + bootstrap",
-  "rateMomentumStrategy": "fred",
+  "lastUpdate": "2026-03-06",
+  "source": "TradingEconomics \u2014 v10+C2: rateMomentum JPY 24M via TE API+FRED+bootstrap",
+  "rateMomentumStrategy": "fred-12m",
   "data": {
-    "bond10y": 3.17,
+    "bond10y": 3.13,
     "consumerConfidence": 87.8,
     "businessConfidence": 99.64,
-    "capitalFlows": 26128.79,
+    "capitalFlows": 26059.28,
     "fdi": null,
     "inflationExpectations": 2.6,
     "rateMomentum": -0.75
   },
   "dates": {
-    "bond10y": "2026-03-05",
+    "bond10y": "2026-03-06",
     "consumerConfidence": "2026-02-15",
     "businessConfidence": "2026-02-15",
     "capitalFlows": "2025-12-15",
-    "fdi": "2026-03-05",
+    "fdi": "2026-03-06",
     "inflationExpectations": "2026-01-15",
-    "rateMomentum": "2026-03-04"
+    "rateMomentum": "2026-03-05"
   }
 }
