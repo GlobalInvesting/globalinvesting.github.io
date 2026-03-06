@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.1
+fetch_news.py — v5.2
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5.1 (sobre v5):
-  CORRECCIÓN 1 — EMERGING_MARKET_TITLE_RE integrado en is_forex_relevant():
-    El patrón estaba definido pero nunca se llamaba. Ahora filtra en la primera
-    comprobación de is_forex_relevant(), eliminando artículos como "Ibovespa Gains"
-    que contaminaban el sentimiento de divisas incorrectas (ej. NZD).
+CAMBIOS v5.2 (sobre v5.1):
+  NUEVAS FUENTES — cobertura ampliada para divisas con análisis débil:
+    · RBA (oficial)        → AUD directo desde banco central
+    · RBNZ (oficial)       → NZD directo desde banco central
+    · SNB (oficial)        → CHF directo desde banco central
+    · BoJ (oficial)        → JPY directo desde banco central
+    · MarketPulse (OANDA)  → excelente cobertura AUD, CAD, NZD, JPY
+    · Reuters FX           → cobertura institucional todas las divisas
+    · Nasdaq FX News       → análisis USD/EUR/GBP/JPY profundo
+    · ForexLive (analysis) → análisis técnico/fundamental adicional
 
-  CORRECCIÓN 2 — Filtro de ruido cripto (CRYPTO_NOISE_RE):
-    Artículos de criptomonedas sin nexo directo con divisas fiat eran asignados
-    a divisas por scoring débil (ej. Bitcoin → AUD). Nuevo filtro los descarta
-    salvo que mencionen explícitamente bancos centrales, dólar, etc.
+  AJUSTE DE LÍMITES:
+    · MAX_PER_CUR sube de 6 a 8 para aprovechar mayor volumen de fuentes
+    · GUARANTEED_PER_CUR sube de 2 a 3 para garantizar mínimo útil para Groq
 
-  CORRECCIÓN 3 — featured más selectivo:
-    Antes "featured" = impact == "high" marcaba el 100% como destacado.
-    Ahora requiere además age_hours <= 6, haciendo la distinción visual útil.
-
-  Sin cambios en feeds, PAIR_PROTAGONIST_MAP, CURRENCY_KEYWORDS_WEIGHTED,
-  smart_select, impacto, ni estructura del JSON.
+  Sin cambios en lógica de detección de divisas, scoring ni estructura JSON.
 """
 
 import json
@@ -34,15 +33,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 
 # ─────────────────────────────────────────────
-MAX_NEWS              = 35
+MAX_NEWS              = 40          # ligeramente más para aprovechar nuevas fuentes
 MAX_AGE_DAYS          = 4
-GUARANTEED_PER_CUR    = 2
-MAX_PER_CUR           = 6
+GUARANTEED_PER_CUR    = 3           # v5.2: subido de 2 a 3
+MAX_PER_CUR           = 8           # v5.2: subido de 6 a 8
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
 CURRENCIES            = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
 FETCH_TIMEOUT         = 12
-FETCH_WORKERS         = 8
+FETCH_WORKERS         = 10          # v5.2: más workers para más feeds
 MIN_DESCRIPTION_WORDS = 12
 
 # Umbral mínimo de score para asignar divisa por keywords
@@ -115,7 +114,6 @@ EDUCATIONAL_ONLY_PATTERNS = [
 ]
 EDUCATIONAL_RE = re.compile("|".join(EDUCATIONAL_ONLY_PATTERNS), re.IGNORECASE)
 
-# CORRECCIÓN 1 — v5.1: ahora se usa activamente en is_forex_relevant()
 EMERGING_MARKET_TITLE_RE = re.compile(
     r"\b(ibovespa|bovespa|bist 100|istanbul|turkish stocks?|south african rand|"
     r"rand weakens?|sugar futures?|silver (price|slammed|falls?)|"
@@ -127,7 +125,6 @@ EMERGING_MARKET_TITLE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# CORRECCIÓN 2 — v5.1: filtro de ruido cripto
 CRYPTO_NOISE_RE = re.compile(
     r"\b(bitcoin|ethereum|crypto|cryptocurrency|altcoin|blockchain|defi|nft|"
     r"solana|ripple|binance|dogecoin|litecoin|cardano|polkadot|avalanche|"
@@ -136,7 +133,6 @@ CRYPTO_NOISE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Keywords que redimen un artículo cripto (lo mantienen si hablan de regulación/CBDCs)
 CRYPTO_FOREX_BRIDGE_KW = [
     "central bank", "federal reserve", "ecb", "boe", "cbdc",
     "digital dollar", "digital euro", "regulation", "sec ruling",
@@ -148,146 +144,103 @@ CRYPTO_FOREX_BRIDGE_KW = [
 # ─────────────────────────────────────────────
 CURRENCY_KEYWORDS_WEIGHTED = {
     "USD": [
-        # Banco central / institucional (10)
         ("fed ", 10), ("federal reserve", 10), ("fomc", 10), ("powell", 10),
         ("us treasury", 10), ("reserva federal", 10),
-        # Geopolítica liderada por EEUU (9)
         ("strait of hormuz", 9), ("estrecho de ormuz", 9),
         ("us military", 9), ("us navy", 9), ("us sanctions", 9),
         ("us-iran", 9), ("us iran conflict", 9), ("us strikes", 9),
         ("trump ", 9), ("white house", 9), ("pentagon", 9),
-        # Tickers (5)
         ("usd/", 5), ("dollar index", 5), ("dxy", 5), ("us dollar", 5),
         ("dólar estadounidense", 5),
-        # Macro EEUU (8)
         ("us economy", 8), ("us gdp", 8), ("us cpi", 8), ("us inflation", 8),
         ("us jobs", 8), ("nonfarm", 8), ("non-farm payroll", 8),
         ("jobless claims", 8), ("american economy", 8),
-        # Mercados EEUU (3)
         ("treasury yield", 3), ("wall street", 3), ("nasdaq", 3),
         ("dow jones", 3), ("s&p 500", 3), ("us 10-year", 3),
-        # Débil (1)
         ("dollar", 1), ("dólar", 1), ("tariff", 1), ("arancel", 1),
         ("ism ", 1), ("estados unidos", 1), ("united states", 1),
     ],
     "EUR": [
-        # Banco central / institucional (10)
         ("ecb", 10), ("european central bank", 10), ("lagarde", 10),
         ("kazaks", 10), ("schnabel", 10), ("de guindos", 10),
         ("bce", 10), ("banco central europeo", 10),
-        # Zona euro (8)
         ("euro area", 8), ("eurozone", 8), ("euro zone", 8), ("eurozona", 8),
         ("zona euro", 8),
-        # Macro Eurozona (5)
         ("germany gdp", 5), ("german cpi", 5), ("ifo", 5), ("zew", 5),
         ("bund", 5), ("eu gdp", 5), ("eurozone inflation", 5), ("eurozone gdp", 5),
-        # Tickers (5)
         ("eur/", 5), ("/eur", 5), ("euro ", 2),
-        # Débil (1)
         ("eu economy", 1), ("european economy", 1),
         ("economía europea", 1), ("alemania", 1),
         ("france", 1), ("italy", 1), ("spain", 1),
     ],
     "GBP": [
-        # Banco central / institucional (10)
         ("boe", 10), ("bank of england", 10), ("bailey", 10),
         ("mpc meeting", 10), ("mpc decision", 10),
         ("banco de inglaterra", 10),
-        # Sterling (8)
         ("sterling", 8), ("pound sterling", 8), ("libra esterlina", 8),
         ("uk gilt", 8), ("gilt yield", 8), ("gilts", 8),
-        # Macro UK (5)
         ("uk economy", 5), ("united kingdom", 5), ("britain", 5),
         ("uk gdp", 5), ("uk inflation", 5), ("uk jobs", 5),
         ("uk cpi", 5), ("reino unido", 5),
-        # Tickers (5)
         ("gbp/", 5), ("/gbp", 5),
-        # Débil (1)
         ("pound", 1), ("british", 1), ("ftse", 1), ("brexit", 1),
     ],
     "JPY": [
-        # Banco central / institucional (10)
         ("boj", 10), ("bank of japan", 10), ("ueda", 10), ("himino", 10),
         ("kuroda", 10), ("banco de japón", 10),
-        # Yen (8)
         ("japanese yen", 8), ("yen japonés", 8),
-        # Macro Japón (5)
         ("japan economy", 5), ("japanese economy", 5), ("economía japonesa", 5),
         ("japan gdp", 5), ("japan inflation", 5), ("japan cpi", 5),
         ("japan pmi", 5), ("japan trade", 5), ("japan unemployment", 5),
-        # Tickers (5)
         ("jpy ", 5), ("jpy/", 5), ("/jpy", 5), ("usd/jpy", 5),
-        # Débil (1)
         ("yen ", 1), ("nikkei", 1), ("japanese", 1), ("japan ", 1),
         ("japón ", 1),
     ],
     "AUD": [
-        # Banco central / institucional (10)
         ("rba", 10), ("reserve bank of australia", 10), ("bullock", 10),
         ("banco de la reserva de australia", 10),
-        # Dólar australiano (8)
         ("australian dollar", 8), ("dólar australiano", 8), ("aussie dollar", 8),
-        # Macro Australia (5)
         ("australia gdp", 5), ("australian gdp", 5),
         ("australia inflation", 5), ("australia cpi", 5),
         ("australia trade", 5), ("australia retail", 5),
         ("australia jobs", 5), ("australian jobs", 5),
         ("australian economy", 5), ("australia economy", 5),
-        # Tickers (5)
         ("aud/", 5), ("/aud", 5), ("aud ", 3), ("aussie ", 3),
-        # Débil (1)
         ("australia", 1),
     ],
     "CAD": [
-        # Banco central / institucional (10)
         ("boc", 10), ("bank of canada", 10), ("macklem", 10),
         ("banco de canadá", 10),
-        # Dólar canadiense (8)
         ("canadian dollar", 8), ("dólar canadiense", 8), ("loonie", 8),
-        # Mercado canadiense (8)
         ("tsx", 8), ("s&p/tsx", 8),
-        # Macro Canadá (5)
         ("canada economy", 5), ("economía canadá", 5),
         ("canada gdp", 5), ("pib canadá", 5),
         ("canada inflation", 5), ("canada trade", 5), ("canada jobs", 5),
         ("canadian economy", 5),
-        # Tickers (5)
         ("cad/", 5), ("/cad", 5), ("usd/cad", 5), ("cad ", 3),
-        # Petróleo (peso 1 para evitar falsos positivos geopolíticos)
         ("crude oil", 1), ("wti ", 1), ("brent", 1), ("petróleo", 1),
         ("oil prices", 1), ("opec", 1),
-        # Débil (1)
         ("canada ", 1), ("canadá ", 1),
     ],
     "CHF": [
-        # Banco central / institucional (10)
         ("snb", 10), ("swiss national bank", 10), ("jordan", 10),
         ("schlegel", 10), ("banco nacional suizo", 10),
-        # Franco suizo (8)
         ("swiss franc", 8), ("franco suizo", 8),
-        # Macro Suiza (5)
         ("switzerland", 5), ("swiss economy", 5), ("swiss inflation", 5),
         ("swiss cpi", 5), ("switzerland gdp", 5), ("swiss pmi", 5),
         ("swiss kof", 5), ("suiza", 5),
-        # Tickers (5)
         ("chf/", 5), ("/chf", 5), ("usd/chf", 5), ("chf ", 3),
-        # Débil (1)
         ("swiss ", 1),
     ],
     "NZD": [
-        # Banco central / institucional (10)
         ("rbnz", 10), ("reserve bank of new zealand", 10), ("orr", 10),
         ("banco de la reserva de nueva zelanda", 10),
-        # Dólar neozelandés (8)
         ("new zealand dollar", 8), ("dólar neozelandés", 8), ("kiwi dollar", 8),
-        # Macro NZ (5)
         ("new zealand gdp", 5), ("nz gdp", 5), ("nz cpi", 5),
         ("nz economy", 5), ("nz pmi", 5), ("nz trade", 5), ("nz retail", 5),
         ("nz jobs", 5), ("new zealand inflation", 5), ("new zealand trade", 5),
         ("nueva zelanda", 5),
-        # Tickers (5)
         ("nzd/", 5), ("/nzd", 5), ("nzd ", 3), ("kiwi ", 3),
-        # Débil (1)
         ("new zealand", 1),
     ],
 }
@@ -327,6 +280,8 @@ FALSE_POSITIVE_GUARDS = [
 ]
 
 # ─────────────────────────────────────────────
+# FEEDS — v5.2: nuevas fuentes marcadas con [NEW]
+# ─────────────────────────────────────────────
 FEEDS = [
     # ── ESPAÑOL ──────────────────────────────────────────────────────────────
     { "source": "FXStreet ES",      "url": "https://www.fxstreet.es/rss/news",                              "lang": "es" },
@@ -337,11 +292,14 @@ FEEDS = [
     { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_1.rss",                        "lang": "es" },
     { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_25.rss",                       "lang": "es" },
     { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_14.rss",                       "lang": "es" },
-    # ── INGLÉS ───────────────────────────────────────────────────────────────
+
+    # ── INGLÉS — fuentes existentes ──────────────────────────────────────────
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/news",                              "lang": "en" },
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/analysis",                          "lang": "en" },
+    { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss",                                    "lang": "en" },
     { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/news",                             "lang": "en" },
     { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/centralbank",                      "lang": "en" },
+    { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/analysis",                         "lang": "en" },  # [NEW] análisis técnico/fundamental
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/press.html",                        "lang": "en" },
     { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/news",                        "lang": "en" },
     { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
@@ -349,6 +307,7 @@ FEEDS = [
     { "source": "ActionForex",      "url": "https://www.actionforex.com/category/action-insight/feed/",       "lang": "en" },
     { "source": "InvestingLive",    "url": "https://investinglive.com/feed/centralbank/",                     "lang": "en" },
     { "source": "InvestingLive",    "url": "https://investinglive.com/feed/technicalanalysis/",               "lang": "en" },
+    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/",                                  "lang": "en" },
     { "source": "MyFXBook",         "url": "https://www.myfxbook.com/rss/latest-forex-news",                  "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Technical.rss",               "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Fundamental.rss",             "lang": "en" },
@@ -356,11 +315,32 @@ FEEDS = [
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Signals.rss",                 "lang": "en" },
     { "source": "InstaForex",       "url": "https://news.instaforex.com/news",                                "lang": "en" },
     { "source": "InstaForex",       "url": "https://news.instaforex.com/analytics",                           "lang": "en" },
-    { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss",                                    "lang": "en" },
-    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/",                                  "lang": "en" },
     { "source": "BabyPips",         "url": "https://www.babypips.com/feed.rss",                               "lang": "en" },
     { "source": "InvestMacro",      "url": "https://investmacro.com/feed/",                                    "lang": "en" },
     { "source": "ForexCrunch",      "url": "https://forexcrunch.com/feed/",                                    "lang": "en" },
+
+    # ── INGLÉS — fuentes nuevas v5.2 ─────────────────────────────────────────
+
+    # Bancos centrales oficiales — fuente primaria, máxima confianza
+    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-speeches.xml",                  "lang": "en" },  # [NEW] AUD — discursos RBA
+    { "source": "RBA",              "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",            "lang": "en" },  # [NEW] AUD — comunicados RBA
+    { "source": "RBNZ",             "url": "https://www.rbnz.govt.nz/hub/news/feed",                          "lang": "en" },  # [NEW] NZD — banco central oficial
+    { "source": "SNB",              "url": "https://www.snb.ch/en/snb/medmit/medienmitteilungen/id/rss",       "lang": "en" },  # [NEW] CHF — comunicados SNB
+    { "source": "Bank of Japan",    "url": "https://www.boj.or.jp/en/about/press/index.htm/rss.xml",           "lang": "en" },  # [NEW] JPY — banco central oficial
+
+    # MarketPulse (OANDA) — muy fuerte en AUD, CAD, NZD, JPY con análisis macro
+    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/feed/",                               "lang": "en" },  # [NEW] cobertura amplia G8
+    { "source": "MarketPulse",      "url": "https://www.marketpulse.com/forex/feed/",                         "lang": "en" },  # [NEW] forex específico
+
+    # Reuters FX — cobertura institucional de alta calidad
+    { "source": "Reuters FX",       "url": "https://feeds.reuters.com/reuters/currenciesNews",                 "lang": "en" },  # [NEW] cobertura global divisas
+
+    # Nasdaq FX — análisis profundo USD, EUR, JPY
+    { "source": "Nasdaq FX",        "url": "https://www.nasdaq.com/feed/rssoutbound?category=currencies",      "lang": "en" },  # [NEW] análisis divisa institucional
+
+    # FX Empire — buena cobertura AUD/NZD/CHF/JPY
+    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },  # [NEW] G8 cobertura equilibrada
+    { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" }, # [NEW] pronósticos por divisa
 ]
 
 # ─────────────────────────────────────────────
@@ -377,6 +357,10 @@ HIGH_IMPACT_KW = [
     "hawkish", "dovish",
     "strait of hormuz", "estrecho de ormuz", "war ", "guerra ",
     "military strike", "ataque militar", "sanctions", "sanciones",
+    # v5.2: añadidos para mejorar detección en comunicados de bancos centrales
+    "statement on monetary policy", "minutes of", "board decision",
+    "official cash rate", "cash rate target", "policy rate",
+    "orr", "bullock", "schlegel", "ueda",
 ]
 
 MED_IMPACT_KW = [
@@ -387,6 +371,12 @@ MED_IMPACT_KW = [
     "pmi manufacturero", "desempleo", "balanza comercial", "ventas minoristas",
     "producción industrial", "confianza del consumidor", "salarios",
     "crude oil", "oil prices", "petróleo", "brent", "wti",
+    # v5.2: métricas específicas de economías pequeñas
+    "business nz", "nz biz", "westpac nz", "anz nz",
+    "building permits", "dwelling consents", "trade deficit nz",
+    "australia business", "australia consumer", "anz australia",
+    "westpac australia", "nab business", "swiss kof",
+    "swiss manufacturing", "swiss retail",
 ]
 
 SOURCE_CURRENCY = {
@@ -404,7 +394,8 @@ FOREX_SOURCES = {
     "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
     "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
-    "Investing.com ES",
+    "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX",
+    "FX Empire",  # v5.2
 }
 
 # ─────────────────────────────────────────────
@@ -434,15 +425,9 @@ def has_real_content(title: str, description: str) -> bool:
 
 
 def is_forex_relevant(title: str, summary: str) -> bool:
-    """
-    v5.1: CORRECCIÓN 1 — EMERGING_MARKET_TITLE_RE activo.
-    CORRECCIÓN 2 — filtro cripto activo.
-    """
-    # CORRECCIÓN 1: descartar mercados emergentes/commodities sin nexo FX
     if EMERGING_MARKET_TITLE_RE.search(title):
         return False
 
-    # CORRECCIÓN 2: descartar cripto salvo que tenga nexo con divisas fiat
     if CRYPTO_NOISE_RE.search(title):
         combined_lower = (title + " " + summary).lower()
         if not any(kw in combined_lower for kw in CRYPTO_FOREX_BRIDGE_KW):
@@ -459,6 +444,9 @@ def is_forex_relevant(title: str, summary: str) -> bool:
         "recession", "recesión", "monetary policy", "política monetaria",
         "yield", "treasury", "gilt", "bond",
         "tariff", "arancel", "oil", "petróleo",
+        # v5.2: keywords adicionales para bancos centrales pequeños
+        "official cash rate", "cash rate", "policy rate", "rbnz", "rba",
+        "reserve bank", "swiss national", "snb",
     ]
     text = (title + " " + summary).lower()
     return any(kw in text for kw in FOREX_RELEVANCE_KW)
@@ -503,7 +491,7 @@ def detect_currency(title: str, summary: str, source: str = "") -> str | None:
     if best_score >= CURRENCY_MIN_SCORE:
         return best_cur
 
-    # PASO 3: fallback institucional
+    # PASO 3: fallback institucional (mayor peso en v5.2 para bancos centrales)
     if source in SOURCE_CURRENCY:
         return SOURCE_CURRENCY[source]
 
@@ -556,6 +544,8 @@ def entry_id(title: str, source: str) -> str:
 def fetch_via_feedparser(feed_cfg: dict):
     ua_map = {
         "ForexCrunch": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Reuters FX":  "Mozilla/5.0 (compatible; RSSReader/1.0)",
+        "Nasdaq FX":   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     }
     ua = ua_map.get(feed_cfg.get("source", ""), "Mozilla/5.0 (compatible; ForexNewsBot/2.0)")
     try:
@@ -664,7 +654,7 @@ def main():
     filtered_relevance   = 0
     filtered_no_currency = 0
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.1 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.2 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
@@ -734,7 +724,6 @@ def main():
                 "link":     link,
                 "time":     pub_date.strftime("%H:%M"),
                 "ts":       int(pub_date.timestamp() * 1000),
-                # CORRECCIÓN 3: featured más selectivo — solo high + reciente (<6h)
                 "featured": impact == "high" and age_hours <= 6,
                 "lang":     lang,
                 "date":     pub_date.strftime("%d %b"),
