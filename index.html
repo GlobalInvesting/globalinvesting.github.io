@@ -3279,18 +3279,37 @@ const indicatorTooltips = {
                 const tab = params.get('tab');
                 return ['overview','heatmap','trends','calendar','alerts'].includes(tab) ? tab : 'overview';
             });
-            const [forexRates, setForexRates] = useState({});
-            const [economicData, setEconomicData] = useState({});
-            const [dynamicAlerts, setDynamicAlerts] = useState([]);
-            const [economicCalendar, setEconomicCalendar] = useState({ events: [], lastUpdate: null, source: null, impactCounts: {}, currencyCounts: {} });
+            // ── Cache-primed initial state ──────────────────────────────────────
+            // Lee el caché de localStorage antes del primer render para que los datos
+            // aparezcan inmediatamente al volver desde news.html u otras páginas.
+            const _cachedEcon    = CacheManager.get('all_economic_data');
+            const _cachedCal     = CacheManager.get('economic_calendar');
+            const _cachedHist    = CacheManager.get('historical_data');
+            const _cachedPairs   = CacheManager.get('forex_pair_recommendations');
+            const _cachedRates   = CacheManager.get('forex_rates');
+            const _cachedAI      = CacheManager.get('ai_analysis_Groq');
+            // Si hay caché válido en alguna de las secciones principales, arrancamos
+            // sin pantalla de carga y refrescamos en background lo que haga falta.
+            const _hasAnyCache   = !!(_cachedEcon || _cachedCal || _cachedRates);
+
+            const [forexRates, setForexRates] = useState(_cachedRates || {});
+            const [economicData, setEconomicData] = useState(_cachedEcon || {});
+            const [dynamicAlerts, setDynamicAlerts] = useState(_cachedPairs || []);
+            const [economicCalendar, setEconomicCalendar] = useState(
+                _cachedCal || { events: [], lastUpdate: null, source: null, impactCounts: {}, currencyCounts: {} }
+            );
             const [calFilter, setCalFilter] = useState('all');
             const [calSelectedDate, setCalSelectedDate] = useState(null);
-            const [lastUpdate, setLastUpdate] = useState(null);
-            const [historicalData, setHistoricalData] = useState({});
-            const [aiAnalyses, setAiAnalyses]           = useState(null);
-            const [aiAnalysisReady, setAiAnalysisReady] = useState(false);
-            const [dataLoadingStatus, setDataLoadingStatus] = useState({ status: 'Inicializando...', progress: 0 });
-            const [isLoading, setIsLoading] = useState(true);
+            const [lastUpdate, setLastUpdate] = useState(_cachedRates ? new Date() : null);
+            const [historicalData, setHistoricalData] = useState(_cachedHist || {});
+            const [aiAnalyses, setAiAnalyses]           = useState(_cachedAI || null);
+            const [aiAnalysisReady, setAiAnalysisReady] = useState(!!_cachedAI);
+            const [dataLoadingStatus, setDataLoadingStatus] = useState(
+                _hasAnyCache
+                    ? { status: 'Actualizando datos en segundo plano...', progress: 100 }
+                    : { status: 'Inicializando...', progress: 0 }
+            );
+            const [isLoading, setIsLoading] = useState(!_hasAnyCache);
 
             const chartRefs = useRef({});
 
@@ -4076,6 +4095,59 @@ const hasCOTData = () => {
             
             useEffect(() => {
                 const loadInitialData = async () => {
+                    // ── Estrategia: caché primero, red en segundo plano ─────────────
+                    // Si ya tenemos datos en caché (p.ej. al volver desde news.html),
+                    // mostramos el dashboard inmediatamente y refrescamos en background
+                    // solo los datos que realmente necesiten actualización.
+                    const hasEconCache  = !!CacheManager.get('all_economic_data');
+                    const hasCalCache   = !!CacheManager.get('economic_calendar');
+                    const hasHistCache  = !!CacheManager.get('historical_data');
+                    const hasPairsCache = !!CacheManager.get('forex_pair_recommendations');
+                    const hasAICache    = !!CacheManager.get('ai_analysis_Groq');
+                    const hasRatesCache = !!CacheManager.get('forex_rates');
+                    const hasFullCache  = hasEconCache && hasCalCache && hasRatesCache;
+
+                    if (hasFullCache) {
+                        // ✅ Caché completo: ya mostramos los datos (estado inicializado arriba).
+                        // Solo refrescamos tasas de cambio (expiran cada 60s) y lo que falte.
+                        console.log('⚡ Caché completo — dashboard listo al instante');
+                        setIsLoading(false);
+
+                        // Refresco silencioso de tasas (siempre, expiran en 60s)
+                        fetchForexRates().then(rates => {
+                            setForexRates(rates);
+                            setLastUpdate(new Date());
+                        }).catch(e => console.warn('Background rates refresh failed:', e));
+
+                        // Refresco silencioso del calendario si el caché está próximo a expirar
+                        if (!hasCalCache) {
+                            fetchEconomicCalendar().then(cal => setEconomicCalendar(cal))
+                                .catch(e => console.warn('Background calendar refresh failed:', e));
+                        }
+
+                        // Refresco silencioso de AI si no hay caché
+                        if (!hasAICache) {
+                            fetchAIAnalysis().then(aiData => {
+                                if (aiData && Object.keys(aiData).length > 0) {
+                                    setAiAnalyses(aiData);
+                                    setAiAnalysisReady(true);
+                                    setEconomicData(prev => {
+                                        const updated = { ...prev };
+                                        Object.entries(aiData).forEach(([currency, analysis]) => {
+                                            if (updated[currency] && analysis.lastRateDecision) {
+                                                updated[currency] = { ...updated[currency], _aiLastRateDecision: analysis.lastRateDecision };
+                                            }
+                                        });
+                                        return updated;
+                                    });
+                                }
+                            }).catch(e => console.warn('Background AI refresh failed:', e));
+                        }
+
+                        return; // ← salimos sin bloquear la UI
+                    }
+
+                    // ── Sin caché completo: carga normal con pantalla de progreso ──
                     setIsLoading(true);
 
                     // Timeout máximo global: si en 60s no termina, mostrar error
