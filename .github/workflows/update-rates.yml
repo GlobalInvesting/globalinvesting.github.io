@@ -1,287 +1,43 @@
-name: Update Interest Rates (100% Web Scraping + Dates)
+name: Update Interest Rates (Scraping + Frankfurter validation)
 on:
   schedule:
     - cron: '0 8 * * *'
   workflow_dispatch:
+
+# D-01 FIX: Concurrency group para evitar ejecuciones simultáneas.
+concurrency:
+  group: update-rates
+  cancel-in-progress: false
 
 jobs:
   update-rates:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4 lxml --break-system-packages
-      
+        run: pip install requests beautifulsoup4 lxml --break-system-packages
+
       - name: Create rates directory
         run: mkdir -p rates
-      
-      - name: Fetch all rates via web scraping
-        run: |
-          cat > fetch_rates.py << 'EOFPYTHON'
-          import requests
-          from bs4 import BeautifulSoup
-          import json
-          import re
-          from datetime import date, datetime
-          import time
-          import os
 
-          HEADERS = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          }
+      - name: Fetch and validate rates
+        # D-01 FIX: fetch_rates.py hace exit(1) si detecta:
+        #   - Tasa fuera del rango plausible [-2%, 15%]
+        #   - Cambio > 1pp vs la última observación guardada (inusual entre runs diarios)
+        # Ambos casos hacen fallar el workflow → GitHub Actions notifica por email.
+        # health.json se guarda siempre con el estado de cada divisa para que
+        # el frontend pueda mostrar alertas cuando los datos no son fiables.
+        run: python scripts/fetch_rates.py
 
-          def clean_rate(text):
-              if not text:
-                  return None
-              text = str(text).strip().replace('%', '').replace(',', '.')
-              match = re.search(r'(-?\d+\.?\d*)', text)
-              if match:
-                  try:
-                      val = float(match.group(1))
-                      if -5 <= val <= 25:
-                          return match.group(1)
-                  except:
-                      pass
-              return None
-
-          def parse_reference_date(ref_text):
-              if not ref_text:
-                  return None
-              ref_text = ref_text.strip()
-              month_map = {
-                  'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-                  'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-                  'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-              }
-              match = re.match(r'([A-Za-z]{3})/(\d{2})', ref_text)
-              if match:
-                  mon_str = match.group(1).capitalize()
-                  yr_str  = match.group(2)
-                  mon_num = month_map.get(mon_str)
-                  if mon_num:
-                      year = '20' + yr_str
-                      return f'{year}-{mon_num}-01'
-              return None
-
-          def load_existing_observations(currency):
-              path = f'rates/{currency}.json'
-              if not os.path.exists(path):
-                  return []
-              try:
-                  with open(path) as f:
-                      data = json.load(f)
-                  return data.get('observations', [])
-              except Exception as e:
-                  print(f"    Warning: could not read existing history for {currency}: {e}")
-                  return []
-
-          def merge_observations(existing, new_obs):
-              def month_key(obs):
-                  return obs['date'][:7]
-              def normalise_date(obs):
-                  return obs['date'][:7] + '-01'
-              obs_map = {}
-              for o in existing:
-                  mk = month_key(o)
-                  obs_map[mk] = {'date': normalise_date(o), 'value': o['value']}
-              mk_new = month_key(new_obs)
-              obs_map[mk_new] = {'date': normalise_date(new_obs), 'value': new_obs['value']}
-              sorted_obs = sorted(obs_map.values(), key=lambda x: x['date'], reverse=True)
-              return sorted_obs[:36]
-
-          def fetch_trading_economics():
-              print("\n" + "="*70)
-              print("SOURCE: Trading Economics (Interest Rates + Reference Dates)")
-              print("="*70)
-              try:
-                  url = "https://tradingeconomics.com/country-list/interest-rate?continent=world"
-                  r = requests.get(url, headers=HEADERS, timeout=15)
-                  if r.status_code == 429:
-                      print("  Rate limited, waiting 30s...")
-                      time.sleep(30)
-                      r = requests.get(url, headers=HEADERS, timeout=15)
-                  r.raise_for_status()
-                  soup = BeautifulSoup(r.content, 'lxml')
-                  results = {}
-                  country_map = {
-                      'United States': 'USD',
-                      'Euro Area':     'EUR',
-                      'United Kingdom':'GBP',
-                      'Japan':         'JPY',
-                      'Canada':        'CAD',
-                      'Australia':     'AUD',
-                      'Switzerland':   'CHF',
-                      'New Zealand':   'NZD'
-                  }
-                  table = soup.find('table', {'class': 'table'})
-                  if not table:
-                      print("  ERROR: No table found")
-                      return results
-                  headers_row = table.find('thead')
-                  header_texts = []
-                  if headers_row:
-                      header_texts = [th.get_text(strip=True).lower()
-                                      for th in headers_row.find_all('th')]
-                  last_idx = 1
-                  ref_idx  = 3
-                  if header_texts:
-                      for i, h in enumerate(header_texts):
-                          if 'last' in h:
-                              last_idx = i
-                          if 'reference' in h:
-                              ref_idx = i
-                  print(f"  Column indices → Last={last_idx}, Reference={ref_idx}")
-                  for row in table.find_all('tr')[1:]:
-                      cols = row.find_all('td')
-                      if len(cols) < 2:
-                          continue
-                      country = cols[0].get_text(strip=True)
-                      for country_name, currency in country_map.items():
-                          if country_name.lower() in country.lower():
-                              rate_text = cols[last_idx].get_text(strip=True) if last_idx < len(cols) else ''
-                              rate = clean_rate(rate_text)
-                              ref_text = ''
-                              if ref_idx < len(cols):
-                                  ref_text = cols[ref_idx].get_text(strip=True)
-                              ref_date = parse_reference_date(ref_text)
-                              if rate is not None:
-                                  results[currency] = {
-                                      'rate': rate,
-                                      'ref_date': ref_date,
-                                      'ref_raw': ref_text
-                                  }
-                                  print(f"  OK {currency}: {rate}%  reference={ref_text} → {ref_date}")
-                              break
-                  return results
-              except Exception as e:
-                  print(f"  ERROR: {e}")
-                  return {}
-
-          def fetch_global_rates_fallback(currency):
-              urls = {
-                  'USD': 'central-bank-america/fed-interest-rate.aspx',
-                  'EUR': 'central-bank-europe/ecb-interest-rate.aspx',
-                  'GBP': 'central-bank-england/boe-interest-rate.aspx',
-                  'JPY': 'central-bank-japan/boj-interest-rate.aspx',
-                  'CHF': 'central-bank-switzerland/snb-interest-rate.aspx',
-                  'CAD': 'central-bank-canada/boc-interest-rate.aspx',
-                  'AUD': 'central-bank-australia/rba-interest-rate.aspx',
-                  'NZD': 'central-bank-new-zealand/rbnz-interest-rate.aspx'
-              }
-              if currency not in urls:
-                  return None
-              try:
-                  url = f"https://www.global-rates.com/en/interest-rates/central-banks/{urls[currency]}"
-                  r = requests.get(url, headers=HEADERS, timeout=10)
-                  soup = BeautifulSoup(r.content, 'lxml')
-                  for table in soup.find_all('table'):
-                      rows = table.find_all('tr')
-                      if len(rows) >= 2:
-                          cols = rows[1].find_all('td')
-                          if len(cols) >= 2:
-                              rate = clean_rate(cols[1].get_text(strip=True))
-                              if rate:
-                                  print(f"  OK {currency}: {rate}% (fallback global-rates.com, no ref date)")
-                                  return {'rate': rate, 'ref_date': None, 'ref_raw': ''}
-              except Exception as e:
-                  print(f"    Fallback error for {currency}: {e}")
-              return None
-
-          # ============================================
-          # MAIN
-          # ============================================
-
-          today = str(date.today())
-          today_month_start = date.today().strftime('%Y-%m-01')
-
-          currencies_needed = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'NZD']
-
-          print(f"\nRun date:        {today}")
-          print(f"Fallback date:   {today_month_start}  (used only if Reference column unavailable)")
-
-          final_rates = fetch_trading_economics()
-          time.sleep(1)
-
-          missing = [c for c in currencies_needed if c not in final_rates]
-          if missing:
-              print(f"\nFallback for: {', '.join(missing)}")
-              for currency in missing:
-                  result = fetch_global_rates_fallback(currency)
-                  if result:
-                      final_rates[currency] = result
-                  time.sleep(0.5)
-
-          # ============================================
-          # SAVE
-          # ============================================
-
-          print("\n" + "="*70)
-          print("SAVING WITH HISTORICAL ACCUMULATION (deduplicated by month)")
-          print("="*70)
-
-          for currency in currencies_needed:
-              if currency not in final_rates:
-                  print(f"  SKIP {currency}: no data obtained")
-                  continue
-
-              entry = final_rates[currency]
-              rate_value = entry['rate']
-
-              observation_date = entry['ref_date'] if entry['ref_date'] else today_month_start
-
-              existing_obs = load_existing_observations(currency)
-
-              # Eliminar observaciones posteriores al Reference date (limpia entradas fantasma)
-              if entry['ref_date']:
-                  before_count = len(existing_obs)
-                  existing_obs = [
-                      o for o in existing_obs
-                      if o['date'][:7] <= observation_date[:7]
-                  ]
-                  removed = before_count - len(existing_obs)
-                  if removed > 0:
-                      print(f"  CLEANED {currency}: eliminadas {removed} obs posteriores a {observation_date[:7]}")
-
-              new_observation = {
-                  'value': rate_value,
-                  'date':  observation_date,
-                  'source': 'TradingEconomics'
-              }
-
-              merged_obs = merge_observations(existing_obs, new_observation)
-
-              rate_data = {
-                  'observations':      merged_obs,
-                  'lastUpdate':        observation_date,
-                  'totalObservations': len(merged_obs)
-              }
-
-              with open(f'rates/{currency}.json', 'w') as f:
-                  json.dump(rate_data, f, indent=2)
-
-              print(f"  SAVED {currency}: {rate_value}% | date={observation_date} | history: {len(merged_obs)} obs")
-
-          missing_final = [c for c in currencies_needed if c not in final_rates]
-          if missing_final:
-              print(f"\nMISSING: {', '.join(missing_final)}")
-              exit(1)
-          else:
-              print(f"\nALL CURRENCIES UPDATED OK")
-
-          EOFPYTHON
-          
-          python fetch_rates.py
-      
       - name: Display summary
+        if: always()
         run: |
           echo ""
           echo "========================================"
@@ -298,29 +54,42 @@ jobs:
           obs = data['observations']
           print(f'  Rate:     {obs[0][\"value\"]}%')
           print(f'  Date:     {obs[0][\"date\"]}')
-          print(f'  Updated:  {data[\"lastUpdate\"]}')
           print(f'  History:  {len(obs)} observations')
-          print(f'  Oldest:   {obs[-1][\"date\"]} = {obs[-1][\"value\"]}%')
-          months = [o[\"date\"][:7] for o in obs]
-          dupes = [m for m in set(months) if months.count(m) > 1]
-          if dupes:
-              print(f'  WARNING:  duplicate months found: {dupes}')
-          else:
-              print(f'  Check:    no duplicate months OK')
           "
               echo ""
             fi
           done
-      
+          echo "[Health Status]"
+          if [ -f "rates/health.json" ]; then
+            python3 -c "
+          import json
+          with open('rates/health.json') as f:
+              h = json.load(f)
+          print(f'  Overall: {h[\"overallStatus\"]}')
+          print(f'  Run:     {h[\"runTimestamp\"]}')
+          print(f'  Frankfurter validation: {\"OK\" if h[\"frankfurterOk\"] else \"UNAVAILABLE\"}')
+          for ccy, info in h['currencies'].items():
+              status = info['status']
+              rate = info['rate']
+              src = info['source'] or 'N/A'
+              print(f'  {ccy}: {rate}%  [{status}]  source={src}')
+          if h[\"issues\"]:
+              print(f'  Issues:')
+              for i in h[\"issues\"]:
+                  print(f'    - {i}')
+          "
+          fi
+
       - name: Commit and push
+        if: always()
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add rates/
           if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes to commit"
           else
-            git commit -m "Rates $(date +'%Y-%m-%d') - TradingEconomics scraping"
+            git commit -m "Rates $(date +'%Y-%m-%d') — scraping + validation"
             git pull --rebase origin main || true
             git push
           fi
