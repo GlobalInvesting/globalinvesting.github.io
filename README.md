@@ -2,7 +2,7 @@
 
 Una plataforma integral de grado institucional para el monitoreo y análisis en tiempo real de indicadores económicos fundamentales en los principales pares de divisas. Diseñado para profesionales financieros, traders institucionales y participantes sofisticados del mercado.
 
-![Status](https://img.shields.io/badge/Status-Producción-success) ![License](https://img.shields.io/badge/License-MIT-blue) ![Version](https://img.shields.io/badge/Version-1.0.0-informational)
+![Status](https://img.shields.io/badge/Status-Producción-success) ![License](https://img.shields.io/badge/License-Propietario-red) ![Version](https://img.shields.io/badge/Version-5.6.0-informational)
 
 ## Descripción General
 
@@ -254,63 +254,11 @@ Este software se proporciona "tal cual" sin garantía de ningún tipo, expresa o
 - Cumplimiento WCAG 2.1 AA para accesibilidad
 - Soporte de internacionalización multiidioma
 
-## Guías de Contribución
+## Derechos de Autor
 
-Se agradecen las contribuciones de la comunidad de tecnología financiera y finanzas cuantitativas. Mantenemos altos estándares de calidad de código y documentación.
+© 2026 Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
 
-**Proceso de Contribución**
-
-1. Hacer fork del repositorio a su cuenta
-2. Crear una rama de característica con nomenclatura descriptiva: `feature/nombre-mejora`
-3. Implementar cambios con documentación completa
-4. Asegurar compatibilidad hacia atrás con funcionalidad existente
-5. Enviar pull request con descripción detallada de modificaciones
-6. Esperar revisión de código y atender comentarios
-
-**Estándares de Código**
-
-- Mantener formato y estilo de código consistente
-- Incluir comentarios en línea para lógica compleja
-- Actualizar documentación para reflejar cambios
-- Probar en navegadores soportados antes de enviar
-- Preservar contratos API existentes y estructuras de datos
-
-**Áreas Prioritarias para Contribución**
-
-- Metodologías de cálculo mejoradas y modelos de factores
-- Integraciones de fuentes de datos adicionales
-- Optimizaciones de rendimiento y estrategias de caché
-- Mejoras de accesibilidad (etiquetas ARIA, navegación por teclado)
-- Expansión de pruebas unitarias y cobertura de pruebas
-- Mejoras de seguridad y validación de entrada
-
-## Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT.
-
-```
-Licencia MIT
-
-Copyright (c) 2026 [Santiago Plá/GlobalInvesting]
-
-Se concede permiso, de forma gratuita, a cualquier persona que obtenga una copia
-de este software y los archivos de documentación asociados (el "Software"), para tratar
-el Software sin restricciones, incluidos, entre otros, los derechos
-de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender
-copias del Software, y permitir a las personas a las que se les proporcione el Software
-hacerlo, sujeto a las siguientes condiciones:
-
-El aviso de copyright anterior y este aviso de permiso se incluirán en todas
-las copias o partes sustanciales del Software.
-
-EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
-IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIABILIDAD,
-IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
-AUTORES O TITULARES DE DERECHOS DE AUTOR SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑOS U OTRA
-RESPONSABILIDAD, YA SEA EN UNA ACCIÓN CONTRACTUAL, AGRAVIO O DE OTRO MODO, QUE SURJA DE,
-FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTROS TRATOS EN
-EL SOFTWARE.
-```
+Este software es de uso exclusivo de su autor. No se permite su reproducción, distribución ni modificación sin autorización expresa por escrito.
 
 ## Contacto y Soporte
 
@@ -337,6 +285,12 @@ Este proyecto integra datos y metodologías de varias fuentes:
 
 ## Historial de Versiones
 
+**Versión 5.6.0** (Marzo 2026)
+- FX momentum 1M como indicador dominante (22%)
+- Corrección safe haven CHF: deflación ya no suma puntos de prima
+- Horizonte actualizado a 2-6 semanas
+- Protección de rama main y control de acceso
+
 **Versión 1.0.0** (Febrero 2026)
 - Lanzamiento inicial de producción
 - Marco de análisis fundamental central
@@ -346,4 +300,4 @@ Este proyecto integra datos y metodologías de varias fuentes:
 
 ---
 
-**Desarrollado para análisis financiero de grado institucional | Listo para despliegue en producción | Febrero 2026**
+**© 2026 Santiago Plá Casuriaga · Global Investing**
