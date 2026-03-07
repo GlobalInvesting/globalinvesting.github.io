@@ -795,28 +795,6 @@
             font-weight: 600;
         }
 
-        .momentum-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-            margin-top: 0.35rem;
-            font-size: 0.6rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            opacity: 0.85;
-            cursor: default;
-        }
-        .momentum-badge .mbadge-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .momentum-badge.mb-converge  { color: var(--text-tertiary); }
-        .momentum-badge.mb-diverge-up   { color: #26a69a; }
-        .momentum-badge.mb-diverge-down { color: #ef5350; }
-
         .card-body {
             padding: 1.5rem;
         }
@@ -2262,13 +2240,15 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     
 // ========== TRADING-ORIENTED WEIGHTS ==========
 const TRADING_WEIGHTS = {
-    // Tier 1: Rate Differentials & Monetary Cycle (29%) — lo que mueve el precio
+    // Tier 1: Rate Differentials & Monetary Cycle (22%) — lo que mueve el precio
     // Filosofía v5.1: pesos reflejan qué mueve el precio ahora, no qué describe la economía a LP.
     // En forex: carry > momentum > ciclo monetario > fundamentales estructurales.
-    // v5.4: pesos normalizados — suma total = 1.00 exacto (29+13+17+7+18+16 = 100%)
-    interestRate:          { weight: 0.12, direction: 'higher' },
-    inflation:             { weight: 0.07, direction: 'target' },
-    outlookScore:          { weight: 0.06, direction: 'outlook_direction' },
+    // v5.6: fxPerformance1M sube a 0.22 — único indicador sin lag estructural.
+    //       Pesos reducidos en gdpGrowth (-0.03), interestRate (-0.02), inflation (-0.02),
+    //       outlookScore (-0.01), cotPositioning (-0.02). Suma total = 1.00 exacto.
+    interestRate:          { weight: 0.10, direction: 'higher' },
+    inflation:             { weight: 0.05, direction: 'target' },
+    outlookScore:          { weight: 0.05, direction: 'outlook_direction' },
     rateMomentum:          { weight: 0.04, direction: 'rate_momentum' },
 
     // Tier 2: External Balance (13%) — ya en precio, reducido para evitar overfitting CHF
@@ -2277,8 +2257,8 @@ const TRADING_WEIGHTS = {
     debt:                  { weight: 0.02, direction: 'lower'  },
     termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
 
-    // Tier 3: Growth & Employment (17%) — ciclo que el mercado tradea activamente
-    gdpGrowth:             { weight: 0.09, direction: 'higher' },
+    // Tier 3: Growth & Employment (14%) — ciclo que el mercado tradea activamente
+    gdpGrowth:             { weight: 0.06, direction: 'higher' },
     unemployment:          { weight: 0.05, direction: 'lower'  },
     production:            { weight: 0.03, direction: 'stable' },
 
@@ -2287,16 +2267,17 @@ const TRADING_WEIGHTS = {
     wageGrowth:            { weight: 0.02, direction: 'stable' },
     inflationExpectations: { weight: 0.02, direction: 'target' },
 
-    // Tier 5: Market Sentiment (18%) — huella directa del smart money
+    // Tier 5: Market Sentiment (16%) — huella directa del smart money
     // cotPositioning: señal más directa del posicionamiento institucional
     manufacturingPMI:      { weight: 0.04, direction: 'expansion'       },
-    cotPositioning:        { weight: 0.07, direction: 'moderate_bullish' },
+    cotPositioning:        { weight: 0.05, direction: 'moderate_bullish' },
     consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
     capitalFlows:          { weight: 0.02, direction: 'flows'            },
 
-    // Tier 6: FX Market Momentum (16%) — único indicador 100% forward-looking, libre de lag
-    fxPerformance1M:       { weight: 0.12, direction: 'fx_momentum' },
+    // Tier 6: FX Market Momentum (26%) — único indicador 100% forward-looking, libre de lag
+    // v5.6: subido de 0.12 → 0.22 para reflejar el precio real del mercado en el score.
+    fxPerformance1M:       { weight: 0.22, direction: 'fx_momentum' },
     bond10y:               { weight: 0.04, direction: 'carry_yield' },
 };
     
@@ -3079,68 +3060,6 @@ const adj = combinedFactor * 8;
         contributions,
         dataQuality: parseFloat(dataQuality.toFixed(2))
     };
-};
-
-// ========== MOMENTUM SCORE (corto plazo: FX 1M + COT percentil + Outlook) ==========
-// Solo indicadores forward-looking y sin lag. Horizonte real: 1-4 semanas.
-// No altera el score fundamental — es una señal paralela de divergencia.
-const calculateMomentumScore = (currency, data) => {
-    if (!data) return null;
-
-    let score = 50;  // base neutral
-    let factors = 0;
-
-    // 1. FX 1M — peso dominante (60%). Es el precio real del mercado.
-    const fx1m = data.fxPerformance1M;
-    if (fx1m !== null && fx1m !== undefined) {
-        let fxScore;
-        if (fx1m > 3.0)       fxScore = 95;
-        else if (fx1m > 1.5)  fxScore = 80;
-        else if (fx1m > 0.5)  fxScore = 65;
-        else if (fx1m > 0.0)  fxScore = 55;
-        else if (fx1m > -0.5) fxScore = 45;
-        else if (fx1m > -1.5) fxScore = 32;
-        else if (fx1m > -3.0) fxScore = 18;
-        else                   fxScore = 8;
-        score = score * 0.4 + fxScore * 0.6;
-        factors++;
-    }
-
-    // 2. COT neto — peso 25%. Posicionamiento institucional real.
-    const cot = data.cotPositioning;
-    if (cot !== null && cot !== undefined) {
-        let cotScore;
-        if (cot > 60000)       cotScore = 88;
-        else if (cot > 25000)  cotScore = 75;
-        else if (cot > 5000)   cotScore = 62;
-        else if (cot > -5000)  cotScore = 50;
-        else if (cot > -25000) cotScore = 38;
-        else if (cot > -60000) cotScore = 25;
-        else                    cotScore = 12;
-        score = score * 0.75 + cotScore * 0.25;
-        factors++;
-    }
-
-    // 3. Outlook BC — peso 15%. Sesgo hawkish/dovish reciente.
-    const outlook = data.outlook;
-    if (outlook && outlook !== 'Calculando...') {
-        const outlookScore = outlook === 'Hawkish' ? 80
-                           : outlook === 'Dovish'  ? 20
-                           : 50;
-        score = score * 0.85 + outlookScore * 0.15;
-        factors++;
-    }
-
-    if (factors === 0) return null;
-    return parseFloat(score.toFixed(1));
-};
-
-// Retorna la divergencia entre momentum y score fundamental.
-// >10: mercado más fuerte que fundamentales (momentum lidera)
-// <-10: mercado más débil que fundamentales (posible reversión o modelo rezagado)
-const getDivergence = (fundamentalScore, momentumScore) => {
-    if (momentumScore === null || fundamentalScore === null) return null;
-    return parseFloat((momentumScore - fundamentalScore).toFixed(1));
 };
 
         const clearDashboardCache = () => {
@@ -4542,7 +4461,7 @@ const DataHealthCheck = ({ economicData }) => {
         <div className="section-header">
             <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
             <div className="section-meta">
-                Ordenadas por fortaleza fundamental · Horizonte 1-3 meses · Score momentum: FX 1M + COT + Outlook · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
+                Ordenadas por fortaleza fundamental · Horizonte 1-3 meses · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
             </div>
         </div>
         
@@ -4578,34 +4497,6 @@ const DataHealthCheck = ({ economicData }) => {
                                         {strength}
                                     </div>
                                     <div className="strength-label">Fortaleza</div>
-                                    {(() => {
-                                        const mScore = calculateMomentumScore(country.code, data);
-                                        const div = getDivergence(strength, mScore);
-                                        if (div === null) return null;
-                                        const absDiv = Math.abs(div);
-                                        if (absDiv < 8) {
-                                            return (
-                                                <div className="momentum-badge mb-converge" title={`Momentum ${mScore} · Divergencia ${div > 0 ? '+' : ''}${div} pts`}>
-                                                    <span className="mbadge-dot" style={{background:'var(--text-tertiary)'}}></span>
-                                                    Convergente
-                                                </div>
-                                            );
-                                        } else if (div > 0) {
-                                            return (
-                                                <div className="momentum-badge mb-diverge-up" title={`Momentum ${mScore} · Mercado ${div} pts por encima del score fundamental`}>
-                                                    <span className="mbadge-dot" style={{background:'#26a69a'}}></span>
-                                                    ↑ Momentum +{div}
-                                                </div>
-                                            );
-                                        } else {
-                                            return (
-                                                <div className="momentum-badge mb-diverge-down" title={`Momentum ${mScore} · Mercado ${Math.abs(div)} pts por debajo del score fundamental`}>
-                                                    <span className="mbadge-dot" style={{background:'#ef5350'}}></span>
-                                                    ↓ Momentum {div}
-                                                </div>
-                                            );
-                                        }
-                                    })()}
                                 </div>
                             </div>
                             <div className="card-body">
