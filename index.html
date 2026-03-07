@@ -3249,7 +3249,7 @@ const indicatorTooltips = {
             const [aiAnalysisReady, setAiAnalysisReady] = useState(false);
             const [dataLoadingStatus, setDataLoadingStatus] = useState({ status: 'Inicializando...', progress: 0 });
             const [isLoading, setIsLoading] = useState(true);
-            const [disclaimerVisible, setDisclaimerVisible] = useState(true); // I-01: banner disclaimer colapsable
+
             const chartRefs = useRef({});
 
             const createCharts = () => {
@@ -4240,12 +4240,11 @@ const DataHealthCheck = ({ economicData }) => {
                                 <div className="brand-subtitle">Dashboard Profesional</div>
                             </div>
 <div className="page-nav-links">
-    <a href="guia-score-fortaleza.html">Metodología</a>
-    <a href="glosario-forex.html">Glosario</a>
-    <a href="guia-cot.html">COT</a>
     <a href="about.html">Acerca de</a>
-    <a href="about.html#recursos">Guías</a>
+    <a href="terms.html">Términos</a>
+    <a href="privacy.html">Privacidad</a>
     <a href="contact.html">Contacto</a>
+    <a href="about.html#recursos">Guías</a>
 </div>
 <div className="header-info">
     <div className="info-item">
@@ -4342,40 +4341,6 @@ const DataHealthCheck = ({ economicData }) => {
                         <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Mejores Pares</button>
                         <a href="news.html" className="nav-tab" style={{textDecoration:'none'}}>Noticias</a>
                     </div>
-
-                    {/* I-01 FIX: Banner de disclaimer visible en el fold inicial, colapsable */}
-                    {disclaimerVisible && (
-                        <div style={{
-                            background: 'rgba(245, 158, 11, 0.08)',
-                            border: '1px solid rgba(245, 158, 11, 0.25)',
-                            borderRadius: '4px',
-                            padding: '0.5rem 1rem',
-                            margin: '0.5rem 0',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            fontSize: '0.75rem',
-                            color: 'var(--text-secondary)',
-                            lineHeight: '1.4',
-                        }}>
-                            <span>
-                                <strong style={{ color: 'var(--orange)' }}>⚠ Aviso:</strong>{' '}
-                                Este dashboard es una herramienta de análisis cuantitativo con fines informativos.
-                                Los scores y rankings <strong>no constituyen asesoramiento financiero</strong>.
-                                El trading forex conlleva riesgo significativo de pérdida de capital.{' '}
-                                <a href="about.html" style={{ color: 'var(--blue)', textDecoration: 'none' }}>Más información</a>
-                            </span>
-                            <button
-                                onClick={() => setDisclaimerVisible(false)}
-                                style={{
-                                    background: 'none', border: 'none', cursor: 'pointer',
-                                    color: 'var(--text-tertiary)', fontSize: '1rem',
-                                    padding: '0 0 0 1rem', lineHeight: 1, flexShrink: 0
-                                }}
-                                title="Cerrar aviso"
-                            >✕</button>
-                        </div>
-                    )}
 
                     <div className="content">
 {activeTab === 'overview' && (
