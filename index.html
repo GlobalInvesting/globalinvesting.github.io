@@ -4127,22 +4127,102 @@ setDynamicAlerts(pairRecommendations);
 
 const DataHealthCheck = ({ economicData }) => {
     const [health, setHealth] = useState(null);
-    
+    // D-01 FIX: estado del health check de tasas de interés
+    const [ratesHealth, setRatesHealth] = useState(null);
+
     useEffect(() => {
         if (Object.keys(economicData).length > 0) {
             const healthStatus = checkDataHealth(economicData);
             setHealth(healthStatus);
         }
     }, [economicData]);
-    
-    if (!health) return null;
-    
-    // No mostrar si todo está bien
-    if (health.healthy && health.warnings.length === 0) return null;
-    
+
+    // D-01 FIX: cargar rates/health.json para detectar problemas de scraping
+    useEffect(() => {
+        const fetchRatesHealth = async () => {
+            try {
+                const url = 'https://globalinvesting.github.io/rates/health.json';
+                const r = await fetch(url, { cache: 'no-cache', mode: 'cors' });
+                if (!r.ok) return;
+                const data = await r.json();
+                // Solo mostrar alerta si hay problemas reales
+                if (data.overallStatus !== 'ok' || (data.issues && data.issues.length > 0)) {
+                    setRatesHealth(data);
+                }
+                // También alertar si alguna divisa usó la fuente de fallback
+                const fallbackCurrencies = Object.entries(data.currencies || {})
+                    .filter(([, info]) => info.status === 'fallback' || info.status === 'missing')
+                    .map(([ccy]) => ccy);
+                if (fallbackCurrencies.length > 0) {
+                    setRatesHealth(data);
+                }
+            } catch (e) {
+                // Si health.json no existe todavía (primer deploy), no mostrar nada
+            }
+        };
+        fetchRatesHealth();
+    }, []);
+
+    if (!health && !ratesHealth) return null;
+    if (health?.healthy && health.warnings.length === 0 && !ratesHealth) return null;
+
+    // Preparar alertas de tasas de interés
+    const ratesIssues   = ratesHealth?.issues   || [];
+    const fallbackCcys  = Object.entries(ratesHealth?.currencies || {})
+        .filter(([, info]) => info.status === 'fallback')
+        .map(([ccy, info]) => `${ccy} (fuente alternativa: ${info.source})`);
+    const missingCcys   = Object.entries(ratesHealth?.currencies || {})
+        .filter(([, info]) => info.status === 'missing')
+        .map(([ccy]) => ccy);
+
     return (
         <div style={{ marginBottom: '1.5rem' }}>
-            {health.issues.length > 0 && (
+            {/* Alerta de tasas de interés — fuente de datos degradada */}
+            {ratesHealth && (ratesIssues.length > 0 || fallbackCcys.length > 0 || missingCcys.length > 0) && (
+                <div className="alert-card alert-warning" style={{ marginBottom: '1rem' }}>
+                    <div className="alert-icon" style={{
+                        background: 'rgba(239, 83, 80, 0.3)',
+                        color: 'var(--red-strong)'
+                    }}>
+                        ⚠️
+                    </div>
+                    <div className="alert-content">
+                        <h3>Alerta: Fiabilidad de Tasas de Interés</h3>
+                        <ul style={{
+                            marginTop: '0.75rem',
+                            paddingLeft: '1.5rem',
+                            fontSize: '0.875rem',
+                            lineHeight: '1.8'
+                        }}>
+                            {ratesIssues.map((issue, i) => (
+                                <li key={`ri-${i}`}>{issue}</li>
+                            ))}
+                            {fallbackCcys.length > 0 && (
+                                <li>Las siguientes divisas usan la fuente secundaria de tasas
+                                    (la fuente primaria no estaba disponible):
+                                    {' '}<strong>{fallbackCcys.join(', ')}</strong>.
+                                    Los valores pueden tener mayor latencia.
+                                </li>
+                            )}
+                            {missingCcys.length > 0 && (
+                                <li>Sin datos de tasas para: <strong>{missingCcys.join(', ')}</strong>.
+                                    {' '}El score de estas divisas puede no ser fiable.
+                                </li>
+                            )}
+                        </ul>
+                        <p style={{
+                            marginTop: '0.75rem',
+                            fontSize: '0.8125rem',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            Última actualización del scraper: {ratesHealth.runDate || 'desconocida'}.
+                            {' '}El sistema intentará actualizarse automáticamente en el próximo ciclo.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {health?.issues?.length > 0 && (
                 <div className="alert-card alert-warning" style={{ marginBottom: '1rem' }}>
                     <div className="alert-icon" style={{ 
                         background: 'rgba(239, 83, 80, 0.3)',
@@ -4174,7 +4254,7 @@ const DataHealthCheck = ({ economicData }) => {
                 </div>
             )}
             
-            {health.warnings.length > 0 && (
+            {health?.warnings?.length > 0 && (
                 <div className="alert-card alert-info" style={{ marginBottom: '1rem' }}>
                     <div className="alert-icon" style={{ 
                         background: 'rgba(255, 111, 0, 0.3)',
