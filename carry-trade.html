@@ -133,11 +133,13 @@
   /* ── Two-column layout ── */
   .content-grid {
     display: grid; grid-template-columns: 1fr 348px;
-    gap: 1.5rem; margin-bottom: 0; align-items: start;
+    gap: 1.5rem; margin-bottom: 0; align-items: stretch;
   }
 
   /* ── Table card ── */
-  .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .ranking-col { display: flex; flex-direction: column; }
+  .ranking-col .table-card { flex: 1; }
+  .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
   .table-card-head {
     padding: 0.65rem 0.9rem; background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -348,7 +350,7 @@
   <div class="content-grid" style="margin-top:1.5rem;">
 
     <!-- Left: pair ranking -->
-    <div>
+    <div class="ranking-col">
       <div class="section-label">
         Ranking de Pares &middot; Carry Trade Score
         <span id="ranking-count"></span>
@@ -358,7 +360,7 @@
           <span class="table-card-title">Pares ordenados por score compuesto</span>
           <span class="table-card-meta">Diferencial m&iacute;nimo 1.5%</span>
         </div>
-        <div id="pair-table">
+        <div id="pair-table" style="flex:1;overflow:auto;">
           <div style="padding:2rem;text-align:center;">
             <div class="sk-line" style="width:80%;margin:0 auto 0.5rem;"></div>
             <div class="sk-line" style="width:60%;margin:0 auto;"></div>
