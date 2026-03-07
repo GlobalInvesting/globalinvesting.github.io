@@ -2731,10 +2731,15 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             // Esta función mide potencial safe haven, no castiga su ausencia.
         }
         if (data.inflation !== null && data.inflation !== undefined) {
-            const dev = Math.abs(data.inflation - 2.0);
-            if (dev < 0.5)      safeHavenScore += 20;
-            else if (dev < 1.0) safeHavenScore += 15;
-            else if (dev < 2.0) safeHavenScore += 10;
+            // v5.6: inflación < 0.5% es deflación técnica — no es estabilidad de precios.
+            // No suma puntos de safe haven: el premio es por precio ESTABLE, no por precio
+            // cayendo. La penalización por deflación ya aplica en calculateInflationStability.
+            if (data.inflation >= 0.5) {
+                const dev = Math.abs(data.inflation - 2.0);
+                if (dev < 0.5)      safeHavenScore += 20;
+                else if (dev < 1.0) safeHavenScore += 15;
+                else if (dev < 2.0) safeHavenScore += 10;
+            }
         }
         if (data.gdp !== null && data.gdp !== undefined) {
             if (data.gdp > 20)      safeHavenScore += 20;
@@ -2979,8 +2984,14 @@ const adj = combinedFactor * 8;
             : 1.0;
 
         const result = Math.max(0, Math.min(5 * regimeCapMultiplier * ownCOTPenalty, adj));
-        console.log(`SafeHavenAdj ${currency}: rateGap=${rateGap.toFixed(2)}, regime=${avgCOT > 0 ? 'risk-on' : 'risk-off'} (avgCOT=${avgCOT.toFixed(0)}), cotPenalty=${ownCOTPenalty.toFixed(2)} → +${result.toFixed(1)}pts`);
-        return result;
+        // v5.6: si la divisa está cayendo en FX 1M, el mercado no la está comprando
+        // como safe haven en este momento — reducir el premio un 30% adicional.
+        // 100% data-driven: usa fxPerformance1M del propio activo, sin hardcodear divisas.
+        const ownFxPenalty = (data.fxPerformance1M !== null && data.fxPerformance1M !== undefined
+                              && data.fxPerformance1M < -0.3) ? 0.7 : 1.0;
+        const finalResult = result * ownFxPenalty;
+        console.log(`SafeHavenAdj ${currency}: rateGap=${rateGap.toFixed(2)}, regime=${avgCOT > 0 ? 'risk-on' : 'risk-off'} (avgCOT=${avgCOT.toFixed(0)}), cotPenalty=${ownCOTPenalty.toFixed(2)}, fxPenalty=${ownFxPenalty} → +${finalResult.toFixed(1)}pts`);
+        return finalResult;
 
     };
 
