@@ -1972,7 +1972,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '5.3.1-2026-03-06';
+            const DASHBOARD_VERSION = '5.6.0-2026-03-07';
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -4472,7 +4472,7 @@ const DataHealthCheck = ({ economicData }) => {
         <div className="section-header">
             <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
             <div className="section-meta">
-                Ordenadas por fortaleza fundamental · Horizonte 1-3 meses · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
+                Ordenadas por fortaleza fundamental · Horizonte 2-6 semanas · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
             </div>
         </div>
         
@@ -4775,7 +4775,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         <thead>
                                             <tr>
                                                 <th></th>
-                                                <TooltipCell title="Síntesis General" tooltip="Índice de fortaleza fundamental (0-100) basado en 21 indicadores ponderados. Horizonte de validez: 1-3 meses. No refleja momentum de corto plazo ni posicionamiento técnico.">
+                                                <TooltipCell title="Síntesis General" tooltip="Índice de fortaleza fundamental (0-100) basado en 21 indicadores ponderados. Horizonte de validez: 2-6 semanas. Incorpora FX momentum 1M como indicador dominante (22%).">
                                                     General<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Síntesis</span>
                                                 </TooltipCell>
                                                 <TooltipCell title="PIB Total" tooltip={indicatorTooltips.gdp}>
@@ -5468,7 +5468,7 @@ const sentiment = getSentiment(strength);
 </div>
 <div style={{ marginBottom: '1rem' }}>
     Metodología: Modelo cuantitativo basado en datos económicos reales • 21 indicadores ponderados en 6 tiers<br/>
-    Tasas &amp; Ciclo Monetario (29%) • Crecimiento &amp; Empleo (17%) • Sentimiento de Mercado (18%) • FX Momentum &amp; Smart Money (16%) • Balance Externo (13%) • Consumo &amp; Salarios (7%)<br/>
+    Tasas &amp; Ciclo Monetario (22%) • Crecimiento &amp; Empleo (14%) • Sentimiento de Mercado (16%) • FX Momentum &amp; Smart Money (26%) • Balance Externo (13%) • Consumo &amp; Salarios (7%)<br/>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
 </div>
 
@@ -5499,7 +5499,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v5.3.1
+        Dashboard v5.6.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
