@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Carry Trade Forex &middot; Diferenciales de Tasas | Global Investing</title>
+<meta name="description" content="Análisis de carry trade para las 8 divisas principales. Diferenciales de tasas reales, momentum de bancos centrales, posicionamiento COT y régimen de riesgo.">
+<meta name="keywords" content="carry trade forex, diferencial de tasas, AUD JPY carry, NZD JPY, tasas de interés forex, banco central forex">
+<meta name="author" content="Santiago Plá Casuriaga · Global Investing">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://globalinvesting.github.io/carry-trade.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
+<meta property="og:title" content="Carry Trade Forex · Diferenciales de Tasas">
+<meta property="og:description" content="Ranking de pares carry trade con datos reales de tasas, bonos 10Y y posicionamiento COT.">
+<meta property="og:url" content="https://globalinvesting.github.io/carry-trade.html">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Carry Trade Forex · Diferenciales de Tasas">
+<meta name="twitter:description" content="Ranking de pares carry trade con datos reales de tasas, bonos 10Y y posicionamiento COT.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary:   #0b0e14;
+    --bg-secondary: #13171f;
+    --bg-card:      #1a1f2e;
+    --bg-elevated:  #20253a;
+    --text-primary:   #e1e4e8;
+    --text-secondary: #8b949e;
+    --text-tertiary:  #6e7681;
+    --text-dim:       #6b7585;
+    --border:       #30363d;
+    --border-hover: #484f58;
+    --blue:         #1e88e5;
+    --blue-dim:     rgba(30,136,229,0.1);
+    --green:        #26a69a;
+    --green-dim:    rgba(38,166,154,0.12);
+    --red:          #ef5350;
+    --red-dim:      rgba(239,83,80,0.12);
+    --orange:       #e0a020;
+    --orange-dim:   rgba(224,160,32,0.08);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Header — idéntico a news.html ── */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-content {
+    max-width: 1800px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .header-brand { flex: 1; }
+  .brand-title { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
+  .brand-title a { color: inherit; text-decoration: none; }
+  .brand-title a:hover { color: var(--blue); }
+  .brand-subtitle { font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+  .page-nav-links { flex: 1; display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
+  .page-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+  .page-nav-links a:hover { color: var(--text-primary); }
+  .header-info { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 2rem; font-size: 0.8125rem; color: var(--text-secondary); }
+  .info-item { display: flex; align-items: center; gap: 0.5rem; }
+  .status-live { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* ── Nav tabs — idéntico a news.html ── */
+  .nav-tabs-wrap { background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+  .nav-tabs { padding: 0 2rem; display: flex; gap: 0.5rem; max-width: 1800px; margin: 0 auto; overflow-x: auto; }
+  .nav-tab {
+    padding: 1rem 1.5rem; background: transparent; border: none;
+    color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap;
+    text-decoration: none; display: flex; align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6;
+  }
+  .nav-tab:hover  { color: var(--text-primary); }
+  .nav-tab.active { color: var(--text-primary); border-bottom-color: var(--blue); }
+
+  /* ── Layout — idéntico a news.html ── */
+  .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
+  .page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 0.75rem;
+  }
+  .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
+  .page-meta  { font-size: 0.75rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  .section-label {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 1rem; margin-top: 0; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-label span { font-size: 0.6rem; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-dim); }
+
+  /* ── Rate strip ── */
+  .rate-strip {
+    display: grid; grid-template-columns: repeat(8, 1fr);
+    gap: 0.5rem; margin-bottom: 2rem;
+  }
+  .rate-cell {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.75rem 0.625rem 0.625rem; text-align: center;
+  }
+  .rate-cell-flag { display: flex; justify-content: center; margin-bottom: 0.4rem; }
+  .rate-cell-code { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 0.3rem; }
+  .rate-cell-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .rate-cell-bar-wrap { height: 3px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden; margin-bottom: 0.3rem; }
+  .rate-cell-bar { height: 100%; border-radius: 2px; }
+  .rate-cell-sub { font-size: 0.6rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Two-column layout ── */
+  .content-grid {
+    display: grid; grid-template-columns: 1fr 348px;
+    gap: 1.5rem; margin-bottom: 0; align-items: start;
+  }
+
+  /* ── Table card ── */
+  .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .table-card-head {
+    padding: 0.65rem 0.9rem; background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .table-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+  .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 0.55rem 0.875rem;
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--text-dim); text-align: left;
+    background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  }
+  thead th.r { text-align: right; }
+  tbody tr { border-bottom: 1px solid rgba(48,54,61,0.5); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.018); }
+  tbody td { padding: 0.6rem 0.875rem; font-size: 0.8rem; vertical-align: middle; }
+  tbody td.r { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; }
+
+  .rank-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 0.65rem; font-weight: 700; color: var(--text-dim); background: var(--bg-elevated);
+  }
+  .rank-num.r1 { background: rgba(210,160,30,0.12); color: #b89020; }
+  .rank-num.r2 { background: rgba(139,148,158,0.12); color: #8b949e; }
+  .rank-num.r3 { background: rgba(140,90,50,0.12);  color: #9a6a38; }
+
+  .pair-id { display: flex; align-items: center; gap: 0.5rem; }
+  .pair-flags { display: flex; align-items: center; gap: 2px; }
+  .pair-slash { font-size: 0.65rem; color: var(--text-dim); margin: 0 1px; }
+  .pair-code  { font-weight: 600; font-size: 0.82rem; }
+  .pair-sub   { font-size: 0.63rem; color: var(--text-dim); margin-top: 0.08rem; }
+
+  .score-tag {
+    display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px;
+    font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  }
+  .sh { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(38,166,154,.2); }
+  .sm { background: rgba(96,125,139,0.12); color: #607d8b; border: 1px solid rgba(96,125,139,.25); }
+  .sl { background: var(--red-dim);    color: var(--red);    border: 1px solid rgba(239,83,80,.2);  }
+
+  .vp { color: var(--green); }
+  .vn { color: var(--red); }
+  .vd { color: var(--text-secondary); }
+
+  .mom-tag { display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; }
+  .mu { color: var(--green); }
+  .md { color: var(--text-secondary); }
+  .mf { color: var(--text-dim); }
+
+  /* ── Side panels ── */
+  .side-col { display: flex; flex-direction: column; gap: 1rem; }
+
+  .info-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .info-panel-head {
+    padding: 0.55rem 0.875rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim);
+  }
+  .info-panel-body { padding: 0.625rem 0.875rem; }
+
+  /* diff-row CSS removed — replaced by spread chart */
+
+  .meeting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.4rem 0; border-bottom: 1px solid rgba(48,54,61,0.4);
+  }
+  .meeting-row:last-child { border-bottom: none; }
+  .meeting-cur  { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 600; }
+  .meeting-date { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); }
+  .meeting-soon { font-size: 0.62rem; font-weight: 700; color: var(--blue); margin-left: 0.3rem; }
+
+  .regime-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.2rem; }
+  .regime-value { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .regime-desc  { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 0.625rem; }
+  .regime-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; }
+  .regime-metric { background: var(--bg-secondary); border-radius: 4px; padding: 0.375rem 0.5rem; }
+  .regime-metric-lbl { font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 0.1rem; }
+  .regime-metric-val { font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; font-weight: 500; }
+
+  /* ── Detail cards grid ── */
+  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+
+  .detail-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .detail-card:hover { border-color: var(--border-hover); }
+
+  .detail-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 0.875rem 0.5rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  }
+  .detail-pair-wrap { display: flex; align-items: center; gap: 0.45rem; }
+  .detail-code { font-size: 0.85rem; font-weight: 700; }
+  .detail-type { font-size: 0.62rem; color: var(--text-dim); margin-top: 0.05rem; }
+  .detail-score { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; }
+
+  .detail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid rgba(48,54,61,0.5); }
+  .detail-metric { padding: 0.5rem 0.625rem; border-right: 1px solid rgba(48,54,61,0.5); }
+  .detail-metric:last-child { border-right: none; }
+  .dm-label { font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 0.12rem; }
+  .dm-val   { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500; }
+
+  .detail-signals { padding: 0.575rem 0.875rem; }
+  .signal-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--text-secondary); padding: 0.175rem 0; }
+  .sig-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .sg { background: var(--green); }
+  .so { background: var(--text-dim); }
+  .sr { background: var(--red); }
+
+  /* ── Skeletons ── */
+  .sk-line {
+    height: 10px; border-radius: 3px; margin-bottom: 0.4rem;
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,.04) 50%, var(--bg-elevated) 75%);
+    background-size: 200% 100%; animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ── Footer — idéntico a news.html ── */
+  .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
+
+  @media (max-width: 1280px) {
+    .content-grid { grid-template-columns: 1fr; }
+    .detail-grid  { grid-template-columns: repeat(2, 1fr); }
+    .rate-strip   { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .header { padding: 0.75rem 1rem; }
+    .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .page-nav-links { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+    .header-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; }
+    .nav-tabs { padding: 0 0.25rem; gap: 0; scrollbar-width: none; -ms-overflow-style: none; }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-tab { padding: 0.7rem 0.85rem; font-size: 0.73rem; }
+    .page-wrap { padding: 0.75rem 0.75rem 3rem; }
+    .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
+    .rate-strip  { grid-template-columns: repeat(4, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-content">
+    <div class="header-brand">
+      <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
+      <div class="brand-subtitle">Dashboard Profesional</div>
+    </div>
+    <div class="page-nav-links">
+      <a href="about.html">Acerca de</a>
+      <a href="terms.html">Términos</a>
+      <a href="privacy.html">Privacidad</a>
+      <a href="contact.html">Contacto</a>
+      <a href="about.html#recursos">Guías</a>
+    </div>
+    <div class="header-info">
+      <div class="info-item">
+        <div class="status-live"></div>
+        <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Nav tabs ── -->
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
+    <a href="index.html?tab=heatmap"  class="nav-tab">Mapa de Calor</a>
+    <a href="index.html?tab=trends"   class="nav-tab">Tendencias Históricas</a>
+    <a href="index.html?tab=calendar" class="nav-tab">Calendario Económico</a>
+    <a href="index.html?tab=alerts"   class="nav-tab">Mejores Pares</a>
+    <a href="news.html"               class="nav-tab">Noticias</a>
+    <a href="carry-trade.html"        class="nav-tab active">Carry Trade</a>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<main class="page-wrap">
+
+  <div class="page-title-row">
+    <h1 class="page-title">Carry Trade &mdash; Análisis de Diferenciales</h1>
+    <span class="page-meta" id="page-meta">Cargando datos...</span>
+  </div>
+
+  <!-- Rate strip -->
+  <div class="section-label">
+    Tasas de Referencia de Bancos Centrales &middot; Score de Carry
+  </div>
+  <div class="rate-strip" id="rate-strip">
+    <div style="grid-column:1/-1;padding:1.5rem 0;">
+      <div class="sk-line" style="width:60%;margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- Detail cards -->
+  <div class="section-label" style="margin-top:0;">An&aacute;lisis Detallado &middot; Top 6 Pares</div>
+  <div class="detail-grid" id="detail-grid">
+    <div style="grid-column:1/-1;padding:1.5rem 0;text-align:center;">
+      <div class="sk-line" style="width:50%;margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- Two-column grid -->
+  <div class="content-grid" style="margin-top:1.5rem;">
+
+    <!-- Left: pair ranking -->
+    <div>
+      <div class="section-label">
+        Ranking de Pares &middot; Carry Trade Score
+        <span id="ranking-count"></span>
+      </div>
+      <div class="table-card">
+        <div class="table-card-head">
+          <span class="table-card-title">Pares ordenados por score compuesto</span>
+          <span class="table-card-meta">Diferencial m&iacute;nimo 1.5%</span>
+        </div>
+        <div id="pair-table">
+          <div style="padding:2rem;text-align:center;">
+            <div class="sk-line" style="width:80%;margin:0 auto 0.5rem;"></div>
+            <div class="sk-line" style="width:60%;margin:0 auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: side panels -->
+    <div class="side-col">
+
+      <div>
+        <div class="section-label">R&eacute;gimen de Mercado</div>
+        <div class="info-panel">
+          <div class="info-panel-head">Indicador Risk-On / Risk-Off</div>
+          <div class="info-panel-body" id="regime-panel">
+            <div class="sk-line" style="width:50%;"></div>
+            <div class="sk-line" style="width:85%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Historial del Spread &middot; Top Par</div>
+        <div class="info-panel">
+          <div class="info-panel-head" id="spread-chart-title">Evolución del diferencial de tasas</div>
+          <div class="info-panel-body" id="spread-chart-panel" style="padding:0.5rem 0.875rem 0.75rem;">
+            <div class="sk-line" style="width:80%;margin-bottom:.5rem;"></div>
+            <div class="sk-line" style="width:60%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Pr&oacute;ximas Reuniones de Bancos Centrales</div>
+        <div class="info-panel">
+          <div class="info-panel-head">Calendario de decisiones de pol&iacute;tica monetaria</div>
+          <div class="info-panel-body" id="meetings-panel">
+            <div class="sk-line" style="width:80%;"></div>
+            <div class="sk-line" style="width:60%;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</main>
+
+<!-- ── Footer — idéntico a news.html ── -->
+<div class="footer">
+  <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE AN&Aacute;LISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
+  <div style="margin-bottom:1rem;">
+    Metodolog&iacute;a: Modelo cuantitativo basado en datos econ&oacute;micos reales &bull; 21 indicadores ponderados en 6 tiers<br>
+    Tasas &amp; Ciclo Monetario (22%) &bull; Crecimiento &amp; Empleo (14%) &bull; Sentimiento de Mercado (16%) &bull; FX Momentum &amp; Smart Money (26%) &bull; Balance Externo (13%) &bull; Consumo &amp; Salarios (7%)<br>
+    Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
+  </div>
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;">
+    <strong>Aviso Legal:</strong><br>
+    Este dashboard es una herramienta de an&aacute;lisis cuantitativo con fines informativos y educativos.
+    Los scores de fortaleza, rankings y recomendaciones de pares son c&aacute;lculos basados en datos
+    macroecon&oacute;micos p&uacute;blicos y no constituyen asesoramiento financiero ni se&ntilde;ales de trading.
+    El trading de divisas (forex) conlleva riesgos significativos de p&eacute;rdida de capital.
+    Consulte con un asesor financiero certificado antes de tomar decisiones de inversi&oacute;n.
+  </div>
+  <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+    <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
+      &copy; <span id="year"></span> Santiago Pl&aacute; Casuriaga &middot; Global Investing. Todos los derechos reservados.
+    </div>
+    Dashboard v5.6.0
+  </div>
+  <div style="margin-top:.5rem;font-size:.75rem;color:var(--text-secondary);">
+    <a href="about.html"   style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Acerca de</a>
+    <a href="terms.html"   style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">T&eacute;rminos</a>
+    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Privacidad</a>
+    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;margin-right:1rem;">Contacto</a>
+    <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;">Gu&iacute;as</a>
+  </div>
+</div>
+
+
+<script>
+'use strict';
+
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const BASE = 'https://globalinvesting.github.io';
+
+// Banderas via flagcdn — mismo patrón que news.html, compatible con Edge
+const FLAG_CODES = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
+function flagImg(cur, px) {
+  px = px || 18;
+  var code = FLAG_CODES[cur];
+  if (!code) return '';
+  var h = Math.round(px * 0.75), px2 = px * 2, h2 = h * 2;
+  return '<img src="https://flagcdn.com/' + px + 'x' + h + '/' + code + '.png"'
+       + ' srcset="https://flagcdn.com/' + px2 + 'x' + h2 + '/' + code + '.png 2x"'
+       + ' width="' + px + '" height="' + h + '" alt="' + cur + '"'
+       + ' style="vertical-align:middle;border-radius:1px;flex-shrink:0;">';
+}
+
+var CURRENCIES = [
+  { code:'USD', name:'Dólar Estadounidense' },
+  { code:'EUR', name:'Euro'                 },
+  { code:'GBP', name:'Libra Esterlina'      },
+  { code:'JPY', name:'Yen Japonés'          },
+  { code:'AUD', name:'Dólar Australiano'    },
+  { code:'CAD', name:'Dólar Canadiense'     },
+  { code:'CHF', name:'Franco Suizo'         },
+  { code:'NZD', name:'Dólar Neozelandés'    },
+];
+
+// Timestamp header
+var _now = new Date();
+var _tsEl = document.getElementById('ts-header');
+if (_tsEl) _tsEl.textContent = _now.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit', hour12:false });
+document.getElementById('year').textContent = _now.getFullYear();
+
+// ── Fetch ─────────────────────────────────────────────────────────────────────
+function fetchJSON(url) {
+  return fetch(url, { cache:'no-cache', mode:'cors' })
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+
+function loadAll() {
+  var currData = {};
+  var promises = CURRENCIES.map(function(c) {
+    return Promise.all([
+      fetchJSON(BASE + '/rates/'         + c.code + '.json').catch(function(){ return null; }),
+      fetchJSON(BASE + '/extended-data/' + c.code + '.json').catch(function(){ return null; }),
+      fetchJSON(BASE + '/cot-data/'      + c.code + '.json').catch(function(){ return null; }),
+      fetchJSON(BASE + '/fx-performance/'+ c.code + '.json').catch(function(){ return null; }),
+    ]).then(function(results) {
+      currData[c.code] = { rates: results[0], extended: results[1], cot: results[2], fxPerf: results[3] };
+    });
+  });
+  return Promise.all(promises).then(function() {
+    return fetchJSON(BASE + '/meetings-data/meetings.json').catch(function(){ return null; });
+  }).then(function(meetings) {
+    return { data: currData, meetings: meetings };
+  });
+}
+
+// ── Extractores ───────────────────────────────────────────────────────────────
+function getRate(d) { try { return parseFloat(d.rates.observations[0].value); } catch(e) { return null; } }
+function getBond(d) { try { return d.extended.data.bond10y;    } catch(e) { return null; } }
+function getMom(d)  { try { return d.extended.data.rateMomentum; } catch(e) { return null; } }
+function getCOT(d)  { try { return d.cot.netPosition;          } catch(e) { return null; } }
+function getFx1M(d) { try { return d.fxPerf.fxPerformance1M;  } catch(e) { return null; } }
+
+// ── Carry Score ───────────────────────────────────────────────────────────────
+function longScore(d) {
+  var rate = getRate(d) || 0;
+  var bond = getBond(d) !== null ? getBond(d) : rate;
+  var mom  = getMom(d)  !== null ? getMom(d)  : 0;
+  var cot  = Math.max(-30000, Math.min(80000, getCOT(d) !== null ? getCOT(d) : 0));
+  var fx1m = getFx1M(d) !== null ? getFx1M(d) : 0;
+  var yld  = Math.min(40, ((rate + bond) / 2) * 4);
+  var momS = Math.max(0, Math.min(25, mom * 3 + 12.5));
+  var cotS = (cot / 80000) * 15;
+  var fxS  = Math.max(0, Math.min(20, fx1m * 2 + 10));
+  return yld + momS + cotS + fxS;
+}
+function shortScore(d) {
+  var rate = getRate(d) || 0;
+  var bond = getBond(d) !== null ? getBond(d) : rate;
+  var mom  = getMom(d)  !== null ? getMom(d)  : 0;
+  var fx1m = getFx1M(d) !== null ? getFx1M(d) : 0;
+  var yld  = Math.min(40, Math.max(0, (4 - (rate + bond) / 2) * 8));
+  var momS = Math.max(0, Math.min(25, -mom * 3 + 12.5));
+  var fxS  = Math.max(0, Math.min(20, -fx1m * 2 + 10));
+  return yld + momS + fxS;
+}
+
+function buildPairs(data) {
+  var pairs = [];
+  var codes = CURRENCIES.map(function(c){ return c.code; });
+  for (var i = 0; i < codes.length; i++) {
+    for (var j = 0; j < codes.length; j++) {
+      if (i === j) continue;
+      var lc = codes[i], sc = codes[j];
+      var lr = getRate(data[lc]), sr = getRate(data[sc]);
+      if (lr === null || sr === null) continue;
+      var diff = lr - sr;
+      if (diff < 1.5) continue;
+      var bl = getBond(data[lc]), bs = getBond(data[sc]);
+      pairs.push({
+        pair: lc + '/' + sc, lc: lc, sc: sc, lr: lr, sr: sr,
+        diff: +diff.toFixed(2),
+        bondDiff: bl !== null && bs !== null ? +(bl - bs).toFixed(2) : null,
+        score: Math.round((longScore(data[lc]) + shortScore(data[sc])) / 2),
+        momL: getMom(data[lc]),
+        fxL:  getFx1M(data[lc]),
+        cotL: getCOT(data[lc]),
+      });
+    }
+  }
+  pairs.sort(function(a, b){ return b.score - a.score; });
+  return pairs.slice(0, 12);
+}
+
+// ── Helpers de presentación ───────────────────────────────────────────────────
+function scoreTag(s) {
+  var cls = s >= 65 ? 'sh' : s >= 45 ? 'sm' : 'sl';
+  return '<span class="score-tag ' + cls + '">' + s + '</span>';
+}
+function rankCls(i) { return i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : ''; }
+
+function fmtPct(v, dec) {
+  dec = dec !== undefined ? dec : 2;
+  if (v === null || v === undefined) return '<span class="vd">N/D</span>';
+  var s = (v > 0 ? '+' : '') + v.toFixed(dec) + '%';
+  return '<span class="' + (v > 0 ? 'vp' : v < 0 ? 'vn' : 'vd') + '">' + s + '</span>';
+}
+function momTag(v) {
+  if (v === null) return '<span class="vd">N/D</span>';
+  var arrow = v > 0 ? '&#9650;' : v < 0 ? '&#9660;' : '&ndash;';
+  var cls   = v > 0 ? 'mu' : v < 0 ? 'md' : 'mf';
+  return '<span class="mom-tag ' + cls + '">' + arrow + ' ' + Math.abs(v).toFixed(2) + '%</span>';
+}
+function sigDot(good) {
+  var cls = good === true ? 'sg' : good === false ? 'sr' : 'so';
+  return '<span class="sig-dot ' + cls + '"></span>';
+}
+
+// ── Render: rate strip ────────────────────────────────────────────────────────
+function renderRateStrip(data) {
+  var maxRate = 0;
+  CURRENCIES.forEach(function(c) { var r = getRate(data[c.code]); if (r && r > maxRate) maxRate = r; });
+  var html = CURRENCIES.map(function(c) {
+    var rate  = getRate(data[c.code]);
+    var score = Math.round(longScore(data[c.code]));
+    var barW  = maxRate > 0 ? Math.round(((rate || 0) / maxRate) * 100) : 0;
+    var color = (rate || 0) >= 3 ? 'var(--green)' : (rate || 0) >= 1 ? 'var(--text-primary)' : 'var(--text-dim)';
+    return '<div class="rate-cell">'
+         + '<div class="rate-cell-flag">' + flagImg(c.code, 20) + '</div>'
+         + '<div class="rate-cell-code">' + c.code + '</div>'
+         + '<div class="rate-cell-value" style="color:' + color + '">' + (rate !== null ? rate.toFixed(2) + '%' : 'N/D') + '</div>'
+         + '<div class="rate-cell-bar-wrap"><div class="rate-cell-bar" style="width:' + barW + '%;background:' + color + '"></div></div>'
+         + '<div class="rate-cell-sub">Score ' + score + '</div>'
+         + '</div>';
+  }).join('');
+  document.getElementById('rate-strip').innerHTML = html;
+}
+
+// ── Render: pair table ────────────────────────────────────────────────────────
+function renderTable(pairs) {
+  document.getElementById('ranking-count').textContent = '· ' + pairs.length + ' pares';
+  var rows = pairs.map(function(p, i) {
+    return '<tr>'
+      + '<td><span class="rank-num ' + rankCls(i) + '">' + (i+1) + '</span></td>'
+      + '<td><div class="pair-id">'
+      + '<div class="pair-flags">' + flagImg(p.lc, 16) + '<span class="pair-slash">/</span>' + flagImg(p.sc, 16) + '</div>'
+      + '<div><div class="pair-code">' + p.lc + '/' + p.sc + '</div><div class="pair-sub">Long ' + p.lc + ' &middot; Short ' + p.sc + '</div></div>'
+      + '</div></td>'
+      + '<td class="r">' + scoreTag(p.score) + '</td>'
+      + '<td class="r"><span class="vp">+' + p.diff + '%</span></td>'
+      + '<td class="r">' + (p.bondDiff !== null ? '<span class="vp">+' + p.bondDiff + '%</span>' : '<span class="vd">N/D</span>') + '</td>'
+      + '<td class="r">' + momTag(p.momL) + '</td>'
+      + '<td class="r">' + fmtPct(p.fxL) + '</td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('pair-table').innerHTML =
+    '<table>'
+    + '<thead><tr>'
+    + '<th style="width:36px">#</th>'
+    + '<th>Par</th>'
+    + '<th class="r">Score</th>'
+    + '<th class="r">Dif. Tasas</th>'
+    + '<th class="r">Dif. Bono 10Y</th>'
+    + '<th class="r">Moment. BC</th>'
+    + '<th class="r">Perf. 1M</th>'
+    + '</tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '</table>';
+}
+
+// ── Render: spread history chart (top pair) ──────────────────────────────────
+function renderSpreadChart(pairs, allRatesData) {
+  var topPair = pairs[0];
+  if (!topPair) return;
+
+  var lcObs = allRatesData[topPair.lc] && allRatesData[topPair.lc].observations ? allRatesData[topPair.lc].observations : [];
+  var scObs = allRatesData[topPair.sc] && allRatesData[topPair.sc].observations ? allRatesData[topPair.sc].observations : [];
+
+  // Build date-indexed lookup for short currency
+  var scMap = {};
+  scObs.forEach(function(o) { scMap[o.date] = parseFloat(o.value) || 0; });
+
+  // Compute spread for each date in long currency history, last 18 months
+  var points = [];
+  lcObs.slice().reverse().forEach(function(o) {
+    var lcRate = parseFloat(o.value) || 0;
+    var scRate = scMap[o.date] !== undefined ? scMap[o.date] : null;
+    if (scRate === null) return;
+    points.push({ date: o.date, spread: +(lcRate - scRate).toFixed(2) });
+  });
+  points = points.slice(-18); // last 18 months
+  if (points.length < 2) return;
+
+  // SVG sparkline
+  var W = 308, H = 72, PAD = 4;
+  var spreads = points.map(function(p){ return p.spread; });
+  var minS = Math.min.apply(null, spreads);
+  var maxS = Math.max.apply(null, spreads);
+  var range = maxS - minS || 0.01;
+
+  function xOf(i) { return PAD + (i / (points.length - 1)) * (W - PAD*2); }
+  function yOf(v) { return H - PAD - ((v - minS) / range) * (H - PAD*2); }
+
+  // Build polyline path
+  var pathD = points.map(function(p, i) {
+    return (i === 0 ? 'M' : 'L') + xOf(i).toFixed(1) + ',' + yOf(p.spread).toFixed(1);
+  }).join(' ');
+
+  // Fill area path
+  var areaD = pathD
+    + ' L' + xOf(points.length-1).toFixed(1) + ',' + (H - PAD)
+    + ' L' + xOf(0).toFixed(1) + ',' + (H - PAD) + ' Z';
+
+  var currentSpread = spreads[spreads.length - 1];
+  var firstSpread   = spreads[0];
+  var trend = currentSpread > firstSpread + 0.1 ? 'ampliando' : currentSpread < firstSpread - 0.1 ? 'comprimiendo' : 'estable';
+  var trendColor = trend === 'ampliando' ? 'var(--green)' : trend === 'comprimiendo' ? 'var(--red)' : 'var(--text-secondary)';
+
+  // X-axis labels: first and last date
+  var labelFirst = points[0].date.slice(0,7);
+  var labelLast  = points[points.length-1].date.slice(0,7);
+
+  // Current/min/max annotations
+  var curY = yOf(currentSpread);
+
+  document.getElementById('spread-chart-title').textContent =
+    topPair.lc + '/' + topPair.sc + ' — Spread histórico de tasas (18M)';
+
+  document.getElementById('spread-chart-panel').innerHTML =
+    // Summary row
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.5rem;">'
+    + '<div>'
+    + '<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem;font-weight:600;color:var(--green)">+' + currentSpread.toFixed(2) + '%</span>'
+    + '<span style="font-size:0.65rem;color:var(--text-dim);margin-left:0.4rem;">actual</span>'
+    + '</div>'
+    + '<div style="font-size:0.68rem;color:' + trendColor + ';font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">' + trend + '</div>'
+    + '</div>'
+
+    // SVG chart
+    + '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" style="overflow:visible;display:block;width:100%;">'
+
+    // Gridlines
+    + '<line x1="' + PAD + '" y1="' + (H/2).toFixed(0) + '" x2="' + (W-PAD) + '" y2="' + (H/2).toFixed(0) + '" stroke="rgba(48,54,61,0.6)" stroke-width="1" stroke-dasharray="3,3"/>'
+
+    // Area fill
+    + '<path d="' + areaD + '" fill="rgba(38,166,154,0.06)" stroke="none"/>'
+
+    // Line
+    + '<polyline points="' + points.map(function(p,i){ return xOf(i).toFixed(1)+','+yOf(p.spread).toFixed(1); }).join(' ') + '"'
+    + ' fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
+
+    // Current value dot
+    + '<circle cx="' + xOf(points.length-1).toFixed(1) + '" cy="' + curY.toFixed(1) + '" r="3" fill="var(--green)"/>'
+
+    // Min/max labels
+    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(maxS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + maxS.toFixed(2) + '</text>'
+    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(minS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + minS.toFixed(2) + '</text>'
+
+    + '</svg>'
+
+    // X axis labels
+    + '<div style="display:flex;justify-content:space-between;margin-top:0.25rem;">'
+    + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelFirst + '</span>'
+    + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelLast + '</span>'
+    + '</div>';
+}
+
+// ── Render: meetings panel ────────────────────────────────────────────────────
+function renderMeetings(meetings) {
+  if (!meetings || !meetings.meetings) {
+    document.getElementById('meetings-panel').innerHTML = '<p style="font-size:.75rem;color:var(--text-dim);">Datos no disponibles.</p>';
+    return;
+  }
+  var today = new Date();
+  var html  = CURRENCIES.map(function(c) {
+    var m = meetings.meetings[c.code];
+    if (!m || !m.nextMeeting) return '';
+    var days     = Math.round((new Date(m.nextMeetingISO) - today) / 86400000);
+    var soonTag  = days <= 14 ? '<span class="meeting-soon">' + days + 'd</span>' : '';
+    return '<div class="meeting-row">'
+         + '<div class="meeting-cur">' + flagImg(c.code, 16) + '<span>' + c.code + '</span></div>'
+         + '<div class="meeting-date">' + esc(m.nextMeeting) + soonTag + '</div>'
+         + '</div>';
+  }).join('');
+  document.getElementById('meetings-panel').innerHTML = html;
+}
+
+// ── Render: regime panel ──────────────────────────────────────────────────────
+function renderRegime(data) {
+  var jpyFx = getFx1M(data['JPY']) || 0;
+  var chfFx = getFx1M(data['CHF']) || 0;
+  var audFx = getFx1M(data['AUD']) || 0;
+  var nzdFx = getFx1M(data['NZD']) || 0;
+  var safes  = (jpyFx + chfFx) / 2;
+  var riskyC = (audFx + nzdFx) / 2;
+  var regime = safes < -0.5 && riskyC > 0.3 ? 'risk-off'
+             : safes >  0.3 && riskyC < -0.5 ? 'risk-on'
+             : 'neutral';
+  var color  = regime === 'risk-on' ? 'var(--green)' : regime === 'risk-off' ? 'var(--red)' : 'var(--text-secondary)';
+  var label  = regime === 'risk-on' ? 'Risk-On' : regime === 'risk-off' ? 'Risk-Off' : 'Neutral';
+  var desc   = regime === 'risk-on'
+    ? 'Entorno favorable para el carry trade. Las divisas de alto rendimiento se aprecian mientras JPY y CHF se debilitan.'
+    : regime === 'risk-off'
+    ? 'Entorno adverso. Los inversores buscan refugio en JPY y CHF, lo que puede erosionar posiciones largas de carry.'
+    : 'Entorno mixto. El carry trade puede funcionar en pares selectivos; se recomienda cautela en el sizing de posiciones.';
+
+  function metricFmt(val, invertedSign) {
+    var positive = invertedSign ? val < 0 : val > 0;
+    return (val > 0 ? '+' : '') + val.toFixed(2) + '%';
+  }
+  function metricColor(val, goodWhenNeg) {
+    // Show contextual carry direction: green = favorable, gray = unfavorable (no red alarm)
+    return (goodWhenNeg ? val < 0 : val > 0) ? 'var(--green)' : 'var(--text-secondary)';
+  }
+
+  document.getElementById('regime-panel').innerHTML =
+    '<div class="regime-label">R&eacute;gimen actual</div>'
+    + '<div class="regime-value" style="color:' + color + '">' + label + '</div>'
+    + '<div class="regime-desc">' + desc + '</div>'
+    + '<div class="regime-grid">'
+    + '<div class="regime-metric"><div class="regime-metric-lbl">JPY 1M</div><div class="regime-metric-val" style="color:' + metricColor(jpyFx, true)  + '">' + metricFmt(jpyFx) + '</div></div>'
+    + '<div class="regime-metric"><div class="regime-metric-lbl">CHF 1M</div><div class="regime-metric-val" style="color:' + metricColor(chfFx, true)  + '">' + metricFmt(chfFx) + '</div></div>'
+    + '<div class="regime-metric"><div class="regime-metric-lbl">AUD 1M</div><div class="regime-metric-val" style="color:' + metricColor(audFx, false) + '">' + metricFmt(audFx) + '</div></div>'
+    + '<div class="regime-metric"><div class="regime-metric-lbl">NZD 1M</div><div class="regime-metric-val" style="color:' + metricColor(nzdFx, false) + '">' + metricFmt(nzdFx) + '</div></div>'
+    + '</div>';
+}
+
+// ── Render: detail cards ──────────────────────────────────────────────────────
+function renderDetailCards(pairs, data) {
+  var top  = pairs.slice(0, 6);
+  var html = top.map(function(p) {
+    var cot   = getCOT(data[p.lc]);
+    var momOk = p.momL !== null && p.momL >= 0;
+    var fxOk  = p.fxL  !== null && p.fxL  > 0;
+    var cotOk = cot !== null && cot < 50000;
+    var cotLabel = cot !== null && cot > 60000
+      ? 'COT estirado — riesgo de corrección'
+      : cot !== null && cot < 0
+      ? 'COT no saturado — posicionamiento favorable'
+      : 'COT en niveles moderados';
+    var momLabel = p.momL !== null && p.momL > 0
+      ? 'Banco central hawkish — ciclo de subidas'
+      : p.momL !== null && p.momL < -1
+      ? 'Banco central dovish — ciclo de bajas'
+      : 'Banco central en pausa';
+    var fxLabel = fxOk
+      ? 'Divisa apreciándose en el &uacute;ltimo mes'
+      : 'Divisa bajo presión en el &uacute;ltimo mes';
+    var scColor = p.score >= 65 ? 'var(--green)' : p.score >= 45 ? '#607d8b' : 'var(--red)';
+    var momColor = momOk ? 'var(--green)' : 'var(--text-secondary)';
+    var fxColor  = fxOk  ? 'var(--green)' : 'var(--red)';
+
+    return '<div class="detail-card">'
+      + '<div class="detail-head">'
+      + '<div class="detail-pair-wrap">'
+      + '<div class="pair-flags">' + flagImg(p.lc, 16) + '<span class="pair-slash">/</span>' + flagImg(p.sc, 16) + '</div>'
+      + '<div><div class="detail-code">' + p.lc + '/' + p.sc + '</div><div class="detail-type">Long ' + p.lc + ' &middot; Short ' + p.sc + '</div></div>'
+      + '</div>'
+      + '<div class="detail-score" style="color:' + scColor + '">' + p.score + '</div>'
+      + '</div>'
+      + '<div class="detail-metrics">'
+      + '<div class="detail-metric"><div class="dm-label">Tasa Long</div><div class="dm-val" style="color:var(--green)">' + p.lr.toFixed(2) + '%</div></div>'
+      + '<div class="detail-metric"><div class="dm-label">Tasa Short</div><div class="dm-val" style="color:var(--text-secondary)">' + p.sr.toFixed(2) + '%</div></div>'
+      + '<div class="detail-metric"><div class="dm-label">Diferencial</div><div class="dm-val">+' + p.diff + '%</div></div>'
+      + '<div class="detail-metric"><div class="dm-label">Bono 10Y Dif.</div><div class="dm-val">' + (p.bondDiff !== null ? '+' + p.bondDiff + '%' : 'N/D') + '</div></div>'
+      + '<div class="detail-metric"><div class="dm-label">Moment. BC</div><div class="dm-val" style="color:' + momColor + '">' + (p.momL !== null ? (p.momL > 0 ? '+' : '') + p.momL.toFixed(2) + '%' : 'N/D') + '</div></div>'
+      + '<div class="detail-metric"><div class="dm-label">Perf. FX 1M</div><div class="dm-val" style="color:' + fxColor + '">' + (p.fxL !== null ? (p.fxL > 0 ? '+' : '') + p.fxL.toFixed(2) + '%' : 'N/D') + '</div></div>'
+      + '</div>'
+      + '<div class="detail-signals">'
+      + '<div class="signal-row">' + sigDot(p.momL !== null && p.momL > 0 ? true : p.momL === 0 ? null : null) + momLabel + '</div>'
+      + '<div class="signal-row">' + sigDot(cotOk ? true : cot !== null && cot < 0 ? true : cot > 60000 ? false : null) + cotLabel + '</div>'
+      + '<div class="signal-row">' + sigDot(fxOk) + fxLabel + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('detail-grid').innerHTML = html;
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  loadAll().then(function(result) {
+    var data     = result.data;
+    var meetings = result.meetings;
+    var pairs    = buildPairs(data);
+
+    // Collect raw observations for spread chart
+    var allRatesData = {};
+    CURRENCIES.forEach(function(c) {
+      allRatesData[c.code] = data[c.code] && data[c.code].rates ? data[c.code].rates : null;
+    });
+
+    renderRateStrip(data);
+    renderTable(pairs);
+    renderSpreadChart(pairs, allRatesData);
+    renderMeetings(meetings);
+    renderRegime(data);
+    renderDetailCards(pairs, data);
+
+    var updated = (meetings && meetings.lastUpdate) ? meetings.lastUpdate : new Date().toISOString().split('T')[0];
+    document.getElementById('page-meta').textContent = 'Datos al ' + updated;
+
+  }).catch(function(err) {
+    console.error('Error cargando datos de carry trade:', err);
+    document.getElementById('page-meta').textContent = 'Error al cargar datos';
+    ['rate-strip','pair-table','spread-chart-panel','meetings-panel','regime-panel','detail-grid'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<p style="padding:1rem;font-size:.78rem;color:var(--text-dim);">No se pudieron cargar los datos. Verifique su conexión e intente nuevamente.</p>';
+    });
+  });
+});
+</script>
+</body>
+</html>
