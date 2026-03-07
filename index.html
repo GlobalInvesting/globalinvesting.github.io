@@ -2347,11 +2347,15 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
                 else                   score = Math.max(0, 40 + value * 20);
             } else {
                 if (indicator === 'tradeBalance') {
-                    if (value > 10000)       score = 100;
-                    else if (value > 2000)   score = 70 + ((value - 2000) / 8000) * 30;
-                    else if (value > 0)      score = 50 + (value / 2000) * 20;
-                    else if (value > -15000) score = 50 + (value / 15000) * 30;
-                    else score = Math.max(0, 20 + ((value + 30000) / 15000) * 20);
+                    // v5.5: valor ya normalizado como %PIB (ver bloque scoringData arriba)
+                    // Rangos reales G8 en %PIB: CHF +0.51%, EUR +0.09%, AUD +0.10%,
+                    // CAD -0.04%, NZD -0.12%, GBP -0.17%, JPY -0.17%, USD -0.24%
+                    if (value > 0.8)        score = 100;
+                    else if (value > 0.3)   score = 75 + ((value - 0.3) / 0.5) * 25;
+                    else if (value > 0.0)   score = 55 + (value / 0.3) * 20;
+                    else if (value > -0.3)  score = 40 + (value / 0.3) * 15;
+                    else if (value > -0.6)  score = 20 + ((value + 0.6) / 0.3) * 20;
+                    else                    score = Math.max(0, 20 + ((value + 0.6) / 0.4) * 20);
                 } else {
                     // currentAccount (%PIB)
                     if (value > 5)        score = 100;
@@ -2468,13 +2472,15 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             break;
 
         case 'flows':
-            // capitalFlows: positive = net inflow → currency demand
-            if (value > 50000)        score = 90 + Math.min((value - 50000) / 100000, 1) * 10;
-            else if (value > 10000)   score = 70 + ((value - 10000) / 40000) * 20;
-            else if (value > 0)       score = 50 + (value / 10000) * 20;
-            else if (value > -10000)  score = 30 + ((value + 10000) / 10000) * 20;
-            else if (value > -50000)  score = 10 + ((value + 50000) / 40000) * 20;
-            else                      score = Math.max(0, 10 - ((Math.abs(value) - 50000) / 100000) * 10);
+            // v5.5: valor ya normalizado como %PIB (ver bloque scoringData arriba)
+            // Rangos reales G8 en %PIB: NZD +1.09%, GBP +0.61%, CHF +0.66%,
+            // AUD +0.31%, EUR +0.15%, USD +0.15%, CAD +0.12%, JPY +0.11%
+            if (value > 1.5)        score = 90 + Math.min((value - 1.5) / 1.0, 1) * 10;
+            else if (value > 0.5)   score = 70 + ((value - 0.5) / 1.0) * 20;
+            else if (value > 0.0)   score = 50 + (value / 0.5) * 20;
+            else if (value > -0.3)  score = 30 + ((value + 0.3) / 0.3) * 20;
+            else if (value > -1.0)  score = 10 + ((value + 1.0) / 0.7) * 20;
+            else                    score = Math.max(0, 10 - ((Math.abs(value) - 1.0) / 1.0) * 10);
             break;
 
         case 'terms_of_trade':
@@ -2518,19 +2524,24 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             // rateMomentum = tasa_actual - tasa_hace_12_meses
             // Positivo = BC subiendo tasas (hawkish cycle) → bullish
             // Negativo = BC recortando → bearish
-            // Escala calibrada para el ciclo actual:
-            //   BoJ +0.5% a +1% en 2025-2026 → fuertemente bullish
-            //   Fed -1% en 2024-2025 → fuertemente bearish
-            //   ECB -1.5% en 2024-2025 → bearish (pero se estabilizó)
-            if (value > 1.5)       score = 100; // Normalización agresiva (BoJ 2026)
-            else if (value > 0.75) score = 85;
-            else if (value > 0.25) score = 72;
-            else if (value > 0.0)  score = 58;
-            else if (value === 0)  score = 50;
-            else if (value > -0.25) score = 42;
-            else if (value > -0.75) score = 30;
-            else if (value > -1.5) score = 18;
-            else                   score = 12;  // Recortes agresivos
+            // v5.5 — Ciclo maduro: si el ciclo acumulado supera 1.5pp en cualquier
+            // dirección, la penalización/premio se reduce un 40%.
+            // Razonamiento: un ciclo de -2.75pp (CAD) ya está descontado por el mercado;
+            // el modelo no debe seguir penalizando como si fuera un ciclo reciente.
+            // Solo afecta CAD (-2.75) y NZD (-3.25) en el contexto actual.
+            {
+                const isMatureCycle = Math.abs(value) > 1.5;
+                const effectiveValue = isMatureCycle ? value * 0.6 : value;
+                if (effectiveValue > 1.5)       score = 100;
+                else if (effectiveValue > 0.75) score = 85;
+                else if (effectiveValue > 0.25) score = 72;
+                else if (effectiveValue > 0.0)  score = 58;
+                else if (effectiveValue === 0)  score = 50;
+                else if (effectiveValue > -0.25) score = 42;
+                else if (effectiveValue > -0.75) score = 30;
+                else if (effectiveValue > -1.5)  score = 18;
+                else                             score = 12;
+            }
             break;
 
 case 'fx_momentum':
@@ -2603,6 +2614,23 @@ if (data.rateMomentum < -1.5 && effectiveOutlook === 'Hawkish') {
 // NZD businessConfidence: ANZ Business Outlook is net balance centred at 0.
 // Re-map to base-100 for uniform scoring: 0→50 (neutral), +100→100, -100→0
 let scoringData = { ...data };
+
+// FIX D-01 v5.5 — Normalizar tradeBalance y capitalFlows como % del PIB
+// Problema: los valores absolutos favorecen sistemáticamente a la Eurozona
+// (20 países, PIB ~$17T) frente a economías pequeñas (NZD, CAD, CHF).
+// Solución: expresar ambos indicadores como porcentaje del PIB local.
+// La función de scoring (case 'balance' y case 'flows') se recalibra abajo.
+// GDP disponible en data.gdp en miles de millones USD (ej: EUR ≈ 16,400).
+if (scoringData.gdp !== null && scoringData.gdp !== undefined && scoringData.gdp > 0) {
+    const gdpM = scoringData.gdp * 1000; // convertir de B a M USD (misma unidad que TB y CF)
+    if (scoringData.tradeBalance !== null && scoringData.tradeBalance !== undefined) {
+        scoringData.tradeBalance = (scoringData.tradeBalance / gdpM) * 100; // ahora en %PIB
+    }
+    if (scoringData.capitalFlows !== null && scoringData.capitalFlows !== undefined) {
+        scoringData.capitalFlows = (scoringData.capitalFlows / gdpM) * 100; // ahora en %PIB
+    }
+}
+
     // fxPerformance1M: si no viene en data (p.ej. primer load antes del GitHub Action),
 // se omite (el loop de scoring lo ignorará por ser null/undefined)
 // No hay fallback: si no hay dato, el modelo funciona sin él (peso 0.07 se normaliza)
@@ -2960,15 +2988,15 @@ const adj = combinedFactor * 8;
     const recessionAdj        = calculateRecessionImpact(data);
     let deficitAdj            = calculateStructuralDeficit(data); // C4: let para permitir ajuste
     // C4: Exención parcial por flujos de capital que financian el déficit estructural.
-    // Cuando capitalFlows > $30B Y tradeBalance < −$30B, los flujos demuestran que
-    // el mercado financia voluntariamente ese déficit (aplica a cualquier divisa con
-    // esos datos, no es una exención hardcodeada para USD).
-    // Reducción proporcional: máximo 24% sobre deficitAdj.
-    if (scoringData.capitalFlows > 30000 && scoringData.tradeBalance < -30000) {
+    // v5.5: umbrales actualizados al sistema normalizado %PIB.
+    // Antes: capitalFlows > $30B y tradeBalance < -$30B (valores absolutos).
+    // Ahora: capitalFlows > +0.10%PIB y tradeBalance < -0.15%PIB.
+    // Lógica igual: cuando los flujos financian voluntariamente el déficit comercial,
+    // reducir la penalización proporcional (máximo 24% sobre deficitAdj).
+    if (scoringData.capitalFlows > 0.10 && scoringData.tradeBalance < -0.15) {
         const flowsRatio = Math.min(scoringData.capitalFlows / Math.abs(scoringData.tradeBalance), 0.6);
         const flowsOffset = flowsRatio * 0.4; // máximo 24% de reducción
         deficitAdj = deficitAdj * (1 - flowsOffset);
-        // USD Mar2026: deficitAdj −11.22 → −8.53 (+2.7 pts al score final)
     }
     const debtAdj             = calculateDebtSustainability(data);
     const inflationStabAdj    = calculateInflationStability(data);
@@ -4430,7 +4458,7 @@ const DataHealthCheck = ({ economicData }) => {
         <div className="section-header">
             <div className="section-title">Resumen de Divisas y Análisis Fundamental</div>
             <div className="section-meta">
-                Ordenadas por fortaleza fundamental · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
+                Ordenadas por fortaleza fundamental · Horizonte 1-3 meses · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
             </div>
         </div>
         
@@ -4733,7 +4761,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         <thead>
                                             <tr>
                                                 <th></th>
-                                                <TooltipCell title="Síntesis General" tooltip="Evaluación global de la fortaleza fundamental de la divisa.">
+                                                <TooltipCell title="Síntesis General" tooltip="Índice de fortaleza fundamental (0-100) basado en 21 indicadores ponderados. Horizonte de validez: 1-3 meses. No refleja momentum de corto plazo ni posicionamiento técnico.">
                                                     General<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Síntesis</span>
                                                 </TooltipCell>
                                                 <TooltipCell title="PIB Total" tooltip={indicatorTooltips.gdp}>
