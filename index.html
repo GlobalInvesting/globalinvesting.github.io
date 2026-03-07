@@ -1171,13 +1171,13 @@
         <p>El dashboard incluye los siguientes indicadores actualizados diariamente: PIB y Crecimiento del PIB, Tasas de Interés de Bancos Centrales (Fed, BCE, BoE, BoJ, RBA, BoC, SNB, RBNZ), Inflación (IPC), Desempleo, Cuenta Corriente, Deuda Pública, Balanza Comercial, Producción Industrial, Ventas Minoristas, Crecimiento Salarial, PMI Manufacturero, Posicionamiento COT (CFTC), Bonos Soberanos 10Y, Confianza del Consumidor, Confianza Empresarial, Flujos de Capital, Expectativas de Inflación y Términos de Intercambio.</p>
 
         <h2>Análisis Fundamental de Divisas</h2>
-        <p>Calculamos un índice de fortaleza fundamental para cada divisa basado en 21 indicadores ponderados en 6 niveles: Tasas y Ciclo Monetario (32%) • FX Momentum y Smart Money (17%) • Crecimiento y Empleo (18%) • Sentimiento de Mercado (19%) • Balance Externo (14%) • Consumo y Salarios (8%).</p>
+        <p>Calculamos un índice de fortaleza fundamental para cada divisa basado en 21 indicadores ponderados en 6 grupos que suman 100%: Tasas y Ciclo Monetario (29%) • FX Momentum y Smart Money (16%) • Crecimiento y Empleo (17%) • Sentimiento de Mercado (18%) • Balance Externo (13%) • Consumo y Salarios (7%).</p>
 
         <h2>Bancos Centrales</h2>
         <p>Monitorizamos la política monetaria de la Reserva Federal de Estados Unidos (Fed), el Banco Central Europeo (BCE), el Banco de Inglaterra (BoE), el Banco de Japón (BoJ), el Banco de la Reserva de Australia (RBA), el Banco de Canadá (BoC), el Banco Nacional Suizo (SNB) y el Banco de la Reserva de Nueva Zelanda (RBNZ).</p>
 
         <h2>Posicionamiento COT — CFTC</h2>
-        <p>El dashboard incorpora datos oficiales del reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission), mostrando el posicionamiento neto especulativo (non-commercial) en los mercados de futuros de divisas de Chicago (CME).</p>
+        <p>El dashboard incorpora datos oficiales del reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission), mostrando el posicionamiento neto de la categoría <strong>Leveraged Funds</strong> (hedge funds y CTAs) en los mercados de futuros de divisas de Chicago (CME). <em>Nota metodológica: se utiliza exclusivamente la categoría Leveraged Funds porque refleja apuestas especulativas puras sobre dirección de divisas. Para JPY y CHF, el posicionamiento puede incluir estrategias de carry unwind con dinámica distinta al resto de divisas del G8.</em></p>
 
         <h2>Calendario Económico Forex</h2>
         <p>Calendario económico con eventos de alto, medio y bajo impacto para todas las divisas principales. Incluye datos reales, estimaciones y valores anteriores para cada publicación económica.</p>
@@ -1439,18 +1439,14 @@ const fetchExtendedData = async (countryCode) => {
     return null;
 };
 
-        // ✅ OUTLOOK 100% DINÁMICO (sin hardcoding)
+        // ✅ OUTLOOK DINÁMICO con validación de última decisión del banco central
         const determineCentralBankOutlook = async (countryCode, economicData) => {
-            // C1: Derivado exclusivamente de rateMomentum. Elimina el feedback
-            // circular vs inflación/GDP/desempleo que ya tienen pesos propios.
+            // C1: Base derivada de rateMomentum (variación 12M de la tasa oficial).
             // Hawkish  = rm > +0.50% → BC subiendo activamente (ej. JPY +0.85%)
             // Dovish   = rm ≤ −0.75% → recortando significativamente (ej. NZD −1.50%)
             // Neutral  = resto (entre −0.75% y +0.50%)
-            // Efecto neto Mar 2026:
-            //   JPY: Neutral → Hawkish (+2.5 pts) ← BoJ subió −0.1%→+0.75% en 24M
-            //   GBP: Hawkish → Neutral (−2.5 pts) ← BoE ha recortado 2 veces
-            //   NZD: Neutral → Dovish  (−2.5 pts) ← RBNZ: recortes más agresivos G8
-            //   CHF: Dovish → Neutral  (+2.5 pts) ← SNB pausó recortes (tasa 0%)
+            // M-01 FIX: validación adicional con lastRateDecision del ai-analysis para
+            // evitar falsos Neutral en BCs que recortaron recientemente pero < 75bp.
             const cacheKey = `outlook_${countryCode}`;
             const cached = CacheManager.get(cacheKey);
             if (cached !== null) return cached;
@@ -1465,6 +1461,22 @@ const fetchExtendedData = async (countryCode) => {
                 outlook = 'Dovish';
             } else {
                 outlook = 'Neutral';
+            }
+
+            // M-01 FIX: Si el outlook base es Neutral, verificar la última decisión real
+            // del banco central para capturar BCs en ciclo activo de recortes < 75bp
+            // (ej. BoE con dos recortes de 25bp = -0.50% → quedaba en Neutral, pero es Dovish)
+            if (outlook === 'Neutral' && economicData._aiLastRateDecision) {
+                const lrd = economicData._aiLastRateDecision;
+                if (lrd.direction === 'BAJÓ' && lrd.delta !== undefined && lrd.delta <= -0.25) {
+                    // BC recortó en la última reunión → bias Dovish aunque rm esté entre -0.75 y 0
+                    outlook = 'Dovish';
+                    console.log(`✓ M-01 outlook upgrade→Dovish for ${countryCode}: last decision was CUT (${lrd.delta}pp)`);
+                } else if (lrd.direction === 'SUBIÓ' && lrd.delta !== undefined && lrd.delta >= 0.25) {
+                    // BC subió en la última reunión → bias Hawkish aunque rm esté entre 0 y +0.50
+                    outlook = 'Hawkish';
+                    console.log(`✓ M-01 outlook upgrade→Hawkish for ${countryCode}: last decision was HIKE (${lrd.delta}pp)`);
+                }
             }
 
             console.log(`✓ C1 rateMomentum outlook for ${countryCode}: ${outlook} (rm=${rm})`);
@@ -1640,9 +1652,12 @@ const fetchAIAnalysis = async () => {
                     const data = await response.json();
                     if (data.analysis) {
                         analyses[currency] = {
-                            text:        data.analysis,
-                            generatedAt: data.generatedAt,
-                            model:       data.model || 'llama-3.3-70b-versatile',
+                            text:             data.analysis,
+                            generatedAt:      data.generatedAt,
+                            model:            data.model || 'llama-3.3-70b-versatile',
+                            // M-01 FIX: extraer lastRateDecision para enriquecer outlookScore
+                            // Permite distinguir BC que pausó tras ciclo agresivo vs BC inactivo
+                            lastRateDecision: data.dataSnapshot?.lastRateDecision || null,
                         };
                     }
                 }
@@ -2225,43 +2240,42 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     
 // ========== TRADING-ORIENTED WEIGHTS ==========
 const TRADING_WEIGHTS = {
-    // Tier 1: Rate Differentials & Monetary Cycle — lo que mueve el precio (0.43)
+    // Tier 1: Rate Differentials & Monetary Cycle (29%) — lo que mueve el precio
     // Filosofía v5.1: pesos reflejan qué mueve el precio ahora, no qué describe la economía a LP.
     // En forex: carry > momentum > ciclo monetario > fundamentales estructurales.
+    // v5.4: pesos normalizados — suma total = 1.00 exacto (29+13+17+7+18+16 = 100%)
     interestRate:          { weight: 0.12, direction: 'higher' },
     inflation:             { weight: 0.07, direction: 'target' },
-    outlookScore:          { weight: 0.07, direction: 'outlook_direction' },
-    rateMomentum:          { weight: 0.06, direction: 'rate_momentum' },
+    outlookScore:          { weight: 0.06, direction: 'outlook_direction' },
+    rateMomentum:          { weight: 0.04, direction: 'rate_momentum' },
 
-    // Tier 2: External Balance (ya en precio — reducido para evitar overfitting CHF)
+    // Tier 2: External Balance (13%) — ya en precio, reducido para evitar overfitting CHF
     currentAccount:        { weight: 0.05, direction: 'higher' },
-    tradeBalance:          { weight: 0.05, direction: 'higher' },
+    tradeBalance:          { weight: 0.04, direction: 'higher' },
     debt:                  { weight: 0.02, direction: 'lower'  },
     termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
 
-    // Tier 3: Growth & Employment (ciclo que el mercado tradea activamente)
-    gdpGrowth:             { weight: 0.10, direction: 'higher' },
+    // Tier 3: Growth & Employment (17%) — ciclo que el mercado tradea activamente
+    gdpGrowth:             { weight: 0.09, direction: 'higher' },
     unemployment:          { weight: 0.05, direction: 'lower'  },
     production:            { weight: 0.03, direction: 'stable' },
 
-    // Tier 4: Consumption & Wages
+    // Tier 4: Consumption & Wages (7%)
     retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.03, direction: 'stable' },
+    wageGrowth:            { weight: 0.02, direction: 'stable' },
     inflationExpectations: { weight: 0.02, direction: 'target' },
 
-    // Tier 5: Market Sentiment — huella directa del smart money
-    // cotPositioning subido de 0.04 → 0.07: es la señal más directa de dónde está el dinero institucional
+    // Tier 5: Market Sentiment (18%) — huella directa del smart money
+    // cotPositioning: señal más directa del posicionamiento institucional
     manufacturingPMI:      { weight: 0.04, direction: 'expansion'       },
     cotPositioning:        { weight: 0.07, direction: 'moderate_bullish' },
     consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
-    capitalFlows:          { weight: 0.03, direction: 'flows'            },
+    capitalFlows:          { weight: 0.02, direction: 'flows'            },
 
-    // Tier 6: FX Market Momentum (0.23) — más peso que v5.0
-    // fxPerformance1M: 0.16 → 0.18 (único indicador 100% forward-looking, libre de lag)
-    // bond10y: 0.04 → 0.05 (carry yield directo — más relevante que la deuda estructural)
+    // Tier 6: FX Market Momentum (16%) — único indicador 100% forward-looking, libre de lag
     fxPerformance1M:       { weight: 0.12, direction: 'fx_momentum' },
-    bond10y:               { weight: 0.05, direction: 'carry_yield' },
+    bond10y:               { weight: 0.04, direction: 'carry_yield' },
 };
     
 // ========== SCORING FUNCTIONS v4.9.5 ==========
@@ -3235,6 +3249,7 @@ const indicatorTooltips = {
             const [aiAnalysisReady, setAiAnalysisReady] = useState(false);
             const [dataLoadingStatus, setDataLoadingStatus] = useState({ status: 'Inicializando...', progress: 0 });
             const [isLoading, setIsLoading] = useState(true);
+            const [disclaimerVisible, setDisclaimerVisible] = useState(true); // I-01: banner disclaimer colapsable
             const chartRefs = useRef({});
 
             const createCharts = () => {
@@ -4050,6 +4065,20 @@ const aiData = await fetchAIAnalysis();
 if (aiData && Object.keys(aiData).length > 0) {
     setAiAnalyses(aiData);
     setAiAnalysisReady(true);
+    // M-01 FIX: inyectar lastRateDecision en economicData para que
+    // determineCentralBankOutlook pueda usarlo en el cálculo del outlookScore
+    setEconomicData(prev => {
+        const updated = { ...prev };
+        Object.entries(aiData).forEach(([currency, analysis]) => {
+            if (updated[currency] && analysis.lastRateDecision) {
+                updated[currency] = {
+                    ...updated[currency],
+                    _aiLastRateDecision: analysis.lastRateDecision,
+                };
+            }
+        });
+        return updated;
+    });
 }
 
                         setDataLoadingStatus({ status: 'Generando recomendaciones de pares...', progress: 98 });
@@ -4211,11 +4240,12 @@ const DataHealthCheck = ({ economicData }) => {
                                 <div className="brand-subtitle">Dashboard Profesional</div>
                             </div>
 <div className="page-nav-links">
+    <a href="guia-score-fortaleza.html">Metodología</a>
+    <a href="glosario-forex.html">Glosario</a>
+    <a href="guia-cot.html">COT</a>
     <a href="about.html">Acerca de</a>
-    <a href="terms.html">Términos</a>
-    <a href="privacy.html">Privacidad</a>
-    <a href="contact.html">Contacto</a>
     <a href="about.html#recursos">Guías</a>
+    <a href="contact.html">Contacto</a>
 </div>
 <div className="header-info">
     <div className="info-item">
@@ -4312,6 +4342,40 @@ const DataHealthCheck = ({ economicData }) => {
                         <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Mejores Pares</button>
                         <a href="news.html" className="nav-tab" style={{textDecoration:'none'}}>Noticias</a>
                     </div>
+
+                    {/* I-01 FIX: Banner de disclaimer visible en el fold inicial, colapsable */}
+                    {disclaimerVisible && (
+                        <div style={{
+                            background: 'rgba(245, 158, 11, 0.08)',
+                            border: '1px solid rgba(245, 158, 11, 0.25)',
+                            borderRadius: '4px',
+                            padding: '0.5rem 1rem',
+                            margin: '0.5rem 0',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-secondary)',
+                            lineHeight: '1.4',
+                        }}>
+                            <span>
+                                <strong style={{ color: 'var(--orange)' }}>⚠ Aviso:</strong>{' '}
+                                Este dashboard es una herramienta de análisis cuantitativo con fines informativos.
+                                Los scores y rankings <strong>no constituyen asesoramiento financiero</strong>.
+                                El trading forex conlleva riesgo significativo de pérdida de capital.{' '}
+                                <a href="about.html" style={{ color: 'var(--blue)', textDecoration: 'none' }}>Más información</a>
+                            </span>
+                            <button
+                                onClick={() => setDisclaimerVisible(false)}
+                                style={{
+                                    background: 'none', border: 'none', cursor: 'pointer',
+                                    color: 'var(--text-tertiary)', fontSize: '1rem',
+                                    padding: '0 0 0 1rem', lineHeight: 1, flexShrink: 0
+                                }}
+                                title="Cerrar aviso"
+                            >✕</button>
+                        </div>
+                    )}
 
                     <div className="content">
 {activeTab === 'overview' && (
@@ -5317,7 +5381,7 @@ const sentiment = getSentiment(strength);
 </div>
 <div style={{ marginBottom: '1rem' }}>
     Metodología: Modelo cuantitativo basado en datos económicos reales • 21 indicadores ponderados en 6 tiers<br/>
-    Tasas &amp; Ciclo Monetario (32%) • Crecimiento &amp; Empleo (18%) • Sentimiento de Mercado (19%) • FX Momentum &amp; Smart Money (17%) • Balance Externo (14%) • Consumo &amp; Salarios (8%)<br/>
+    Tasas &amp; Ciclo Monetario (29%) • Crecimiento &amp; Empleo (17%) • Sentimiento de Mercado (18%) • FX Momentum &amp; Smart Money (16%) • Balance Externo (13%) • Consumo &amp; Salarios (7%)<br/>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
 </div>
 
