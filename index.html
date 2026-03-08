@@ -1620,9 +1620,7 @@ const fetchExtendedData = async (countryCode) => {
         const formatEventTime = (timeUTC, dateISO) => {
             if (!timeUTC || !dateISO) return '';
             try {
-                // Construir fecha UTC completa y convertir a zona local del navegador
                 const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
-                // Verificar que la fecha es válida
                 if (isNaN(utcDatetime.getTime())) return timeUTC;
                 return utcDatetime.toLocaleTimeString('es-ES', {
                     hour: '2-digit',
@@ -1631,6 +1629,19 @@ const fetchExtendedData = async (countryCode) => {
                 });
             } catch {
                 return timeUTC;
+            }
+        };
+
+        // Returns local date label like "8 Mar" derived from UTC timestamp
+        const formatEventDate = (timeUTC, dateISO, fallbackDate) => {
+            if (!timeUTC || !dateISO) return fallbackDate;
+            try {
+                const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
+                if (isNaN(utcDatetime.getTime())) return fallbackDate;
+                const MONTHS_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+                return `${utcDatetime.getDate()} ${MONTHS_ES[utcDatetime.getMonth()]}`;
+            } catch {
+                return fallbackDate;
             }
         };
     
@@ -5027,10 +5038,41 @@ const sentiment = getSentiment(strength);
             const allEvents = (economicCalendar.events || []);
 
             // ── Agrupar eventos por fecha ──────────────────────────────
+            // Group events by LOCAL date (derived from UTC timestamp)
+            // This ensures events at e.g. 03:30 UTC (= 00:30 local UTC-3)
+            // appear on the correct local day, not the UTC day.
+            const MONTHS_ES_CAL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            const getLocalDateKey = (e) => {
+                if (e.timeUTC && e.dateISO) {
+                    try {
+                        const dt = new Date(`${e.dateISO}T${e.timeUTC}:00Z`);
+                        if (!isNaN(dt.getTime())) {
+                            // Use local date as key: YYYY-MM-DD local
+                            const y = dt.getFullYear();
+                            const m = String(dt.getMonth()+1).padStart(2,'0');
+                            const d = String(dt.getDate()).padStart(2,'0');
+                            return `${y}-${m}-${d}`;
+                        }
+                    } catch(err) {}
+                }
+                return e.dateISO || e.date || 'Sin fecha';
+            };
+            const getLocalDateLabel = (e) => {
+                if (e.timeUTC && e.dateISO) {
+                    try {
+                        const dt = new Date(`${e.dateISO}T${e.timeUTC}:00Z`);
+                        if (!isNaN(dt.getTime())) {
+                            return `${dt.getDate()} ${MONTHS_ES_CAL[dt.getMonth()]}`;
+                        }
+                    } catch(err) {}
+                }
+                return e.date || e.dateISO || 'Sin fecha';
+            };
             const dayMap = {};
             allEvents.forEach(e => {
-                const key = e.dateISO || e.date || 'Sin fecha';
-                if (!dayMap[key]) dayMap[key] = { label: e.date || key, dateISO: key, events: [] };
+                const key = getLocalDateKey(e);
+                const label = getLocalDateLabel(e);
+                if (!dayMap[key]) dayMap[key] = { label, dateISO: key, events: [] };
                 dayMap[key].events.push(e);
             });
             const days = Object.values(dayMap).sort((a, b) =>
@@ -5268,7 +5310,7 @@ const sentiment = getSentiment(strength);
                                                 </div>
                                             )}
                                             <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isNext ? 'var(--green)' : (isToday && !isPast ? 'var(--blue)' : 'inherit') }}>
-                                                {event.date}
+                                                {formatEventDate(event.timeUTC || event.time, event.dateISO, event.date)}
                                             </div>
                                             <div>{formatEventTime(event.timeUTC || event.time, event.dateISO)}</div>
                                         </div>
