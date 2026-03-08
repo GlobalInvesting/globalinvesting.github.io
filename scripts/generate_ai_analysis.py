@@ -618,17 +618,29 @@ def fetch_frankfurter_fx(currency: str, days: int = 30) -> float | None:
         past  = today - timedelta(days=days + 5)
 
         if currency == 'USD':
-            url_now  = f"{FRANKFURTER_BASE}/latest?base=EUR&symbols=USD"
-            url_past = f"{FRANKFURTER_BASE}/{past}?base=EUR&symbols=USD"
+            # FIX: usar cesta ponderada equivalente al DXY extendido G8
+            # en lugar del proxy EUR/USD (que sobreestima el rendimiento del USD
+            # cuando EUR y USD se mueven en la misma dirección).
+            # Pesos: EUR 57.6%, JPY 13.6%, GBP 11.9%, CAD 9.1%, CHF 3.6%, AUD 2.1%, NZD 2.1%
+            BASKET = {'EUR': 0.576, 'JPY': 0.136, 'GBP': 0.119,
+                      'CAD': 0.091, 'CHF': 0.036, 'AUD': 0.021, 'NZD': 0.021}
+            symbols = ','.join(BASKET.keys())
+            url_now  = f"{FRANKFURTER_BASE}/latest?base=USD&symbols={symbols}"
+            url_past = f"{FRANKFURTER_BASE}/{past}?base=USD&symbols={symbols}"
             now_data  = fetch_json(url_now,  timeout=8)
             past_data = fetch_json(url_past, timeout=8)
             if now_data and past_data:
-                rate_now  = now_data['rates']['USD']
-                rate_past = past_data['rates']['USD']
-                pct = round((rate_past / rate_now - 1) * 100, 4)
-                _fx_performance_cache[currency] = pct
-                print(f"  💱 Frankfurter USD: {pct:+.2f}% (1M vs EUR proxy)")
-                return pct
+                rates_now  = now_data.get('rates', {})
+                rates_past = past_data.get('rates', {})
+                if all(k in rates_now and k in rates_past for k in BASKET):
+                    # Índice ponderado: caída de las contrapartes = apreciación del USD
+                    idx_now  = sum(rates_now[k]  * w for k, w in BASKET.items())
+                    idx_past = sum(rates_past[k] * w for k, w in BASKET.items())
+                    # USD se apreció si el basket (en USD) bajó (USD compra menos unidades extranjeras)
+                    pct = round((idx_past / idx_now - 1) * 100, 4)
+                    _fx_performance_cache[currency] = pct
+                    print(f"  💱 Frankfurter USD: {pct:+.2f}% (1M cesta ponderada G8 — fix C9)")
+                    return pct
         else:
             symbols   = f"{currency},USD"
             url_now   = f"{FRANKFURTER_BASE}/latest?base=EUR&symbols={symbols}"
