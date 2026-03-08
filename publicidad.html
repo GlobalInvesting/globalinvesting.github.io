@@ -27,6 +27,7 @@
             --red: #ef5350;
             --orange: #e0a020;
         }
+        html, body { overflow-x: hidden; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
@@ -225,6 +226,20 @@
 
         /* ── Responsive ── */
         @media (max-width: 900px) {
+
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .header-nav {
+                flex-wrap: wrap;
+                gap: 0.5rem 1rem;
+                width: 100%;
+            }
+            .header-nav a { font-size: 0.8rem; }
+            .btn-primary { padding: 0.4rem 0.9rem; font-size: 0.8rem; }
+        
             .hero { padding: 3rem 1.5rem 2.5rem; }
             .hero h1 { font-size: 2.1rem; }
             .stats-inner { grid-template-columns: repeat(2, 1fr); }
@@ -248,13 +263,16 @@
 <!-- ── HEADER ────────────────────────────────────────────────────────── -->
 <header class="header">
     <div class="header-inner">
-        <div class="logo">
-            <span class="logo-name">Global Investing</span>
-            <span class="logo-sub">Dashboard Profesional</span>
+        <div class="logo" style="display:flex;align-items:center;">
+            <img src="apple-touch-icon.png" alt="Global Investing" style="width:32px;height:32px;border-radius:6px;margin-right:0.65rem;flex-shrink:0;">
+            <div style="display:flex;flex-direction:column;">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
+            </div>
         </div>
         <nav class="header-nav">
             <a href="index.html">Dashboard</a>
-        <a href="advertise.html">Advertise (EN)</a>
+            <a href="advertise.html">Advertise (EN)</a>
             <a href="about.html">Metodología</a>
             <a href="contact.html">Contacto</a>
             <a href="index.html" class="btn-primary">Open Dashboard →</a>
