@@ -190,7 +190,10 @@ def fetch_ff_xml(target_dates):
         try:
             r = requests.get(url, headers=headers, timeout=20)
             if not r.ok:
-                print(f"  [FF XML] HTTP {r.status_code}")
+                if r.status_code == 404 and 'nextweek' in url:
+                    print(f"  [FF XML] Next week XML not yet available (HTTP 404) — skipping")
+                else:
+                    print(f"  [FF XML] HTTP {r.status_code}")
                 continue
             print(f"  [FF XML] {len(r.content)} bytes")
 
