@@ -262,41 +262,71 @@
   /* ── Footer — idéntico a news.html ── */
   .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
 
+  /* ── Tablet: single column, stretch off ── */
   @media (max-width: 1280px) {
     .content-grid { grid-template-columns: 1fr; align-items: start; }
-    .ranking-col  { height: auto; }
-    .table-card   { height: auto; }
+    .ranking-col  { display: block; height: auto; }
+    .table-card   { height: auto; display: block; }
     .detail-grid  { grid-template-columns: repeat(2, 1fr); }
     .rate-strip   { grid-template-columns: repeat(4, 1fr); }
   }
+
+  /* ── Mobile ── */
   @media (max-width: 768px) {
+    /* Header */
     .header { padding: 0.75rem 1rem; }
     .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     .page-nav-links { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
     .header-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; }
+
+    /* Nav tabs */
     .nav-tabs { padding: 0 0.25rem; gap: 0; scrollbar-width: none; -ms-overflow-style: none; }
     .nav-tabs::-webkit-scrollbar { display: none; }
     .nav-tab { padding: 0.7rem 0.85rem; font-size: 0.73rem; }
+
+    /* Page layout */
     .page-wrap { padding: 0.75rem 0.75rem 3rem; }
     .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
-    /* Rate strip: 4 cols on mobile keeps flags readable */
+    .content-grid { gap: 1rem; }
+
+    /* Rate strip: 4 cols */
     .rate-strip { grid-template-columns: repeat(4, 1fr); gap: 0.375rem; }
-    .rate-cell  { padding: 0.5rem 0.375rem 0.45rem; }
-    .rate-cell-value { font-size: 0.82rem; }
-    /* Table: horizontal scroll, hide less critical columns */
-    .table-card-head { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
-    thead th, tbody td { padding: 0.5rem 0.5rem; }
-    /* Hide Bono 10Y and Perf 1M columns on very small screens */
+    .rate-cell  { padding: 0.5rem 0.25rem 0.4rem; }
+    .rate-cell-flag { margin-bottom: 0.25rem; }
+    .rate-cell-value { font-size: 0.78rem; }
+    .rate-cell-code { font-size: 0.6rem; }
+    .rate-cell-sub  { font-size: 0.55rem; }
+
+    /* Table card: no height stretch, horizontal scroll */
+    .ranking-col { display: block; height: auto; }
+    .table-card  { display: block; height: auto; overflow: hidden; }
+    .table-card-head { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+    #pair-table  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    thead th, tbody td { padding: 0.45rem 0.5rem; font-size: 0.72rem; }
     .col-bond, .col-perf { display: none; }
-    /* Detail grid: single column */
-    .detail-grid { grid-template-columns: 1fr; }
-    /* Detail metrics: 2 cols instead of 3 */
-    .detail-metrics { grid-template-columns: repeat(2, 1fr); }
-    .detail-metric:nth-child(2) { border-right: none; }
-    .detail-metric:nth-child(5) { border-right: none; }
-    /* Side panels full width */
+
+    /* Meeting rows: prevent flag/code from being clipped */
+    .meeting-row { flex-wrap: nowrap; gap: 0.5rem; }
+    .meeting-cur { min-width: 52px; flex-shrink: 0; font-size: 0.72rem; }
+    .meeting-date { font-size: 0.65rem; text-align: right; }
+
+    /* Info panels */
+    .info-panel-body { padding: 0.5rem 0.75rem; }
     .side-col { gap: 0.75rem; }
-    /* Regime metrics grid stays 2-col — fine on mobile */
+
+    /* Regime metrics */
+    .regime-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+    .regime-metric { padding: 0.3rem 0.4rem; }
+    .regime-metric-val { font-size: 0.7rem; }
+
+    /* Detail cards */
+    .detail-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .detail-metrics { grid-template-columns: repeat(2, 1fr); }
+    .detail-metric:nth-child(2n) { border-right: none; }
+    .dm-val { font-size: 0.72rem; }
+
+    /* Spread chart */
+    #spread-chart-panel svg { width: 100% !important; }
   }
 </style>
 </head>
