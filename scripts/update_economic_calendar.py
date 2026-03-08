@@ -107,6 +107,171 @@ def parse_desc_html(raw_desc):
     return actual, forecast, previous, impact
 
 # ════════════════════════════════════════════════════════════════════
+# SOURCE 0: Forex Factory XML (primary — official impact/forecast/previous)
+# https://nfs.faireconomy.media/ff_calendar_thisweek.xml
+# Times in the XML are in US/Eastern (ET). We convert to UTC.
+# Impact values: High → high, Medium → medium, Low → low, Holiday → skip
+# ════════════════════════════════════════════════════════════════════
+
+def fetch_ff_xml(target_dates):
+    """
+    Fetch the Forex Factory weekly XML calendar.
+    Returns a list of event dicts in the same format as all other sources.
+    Only includes the 8 tracked currencies; skips Holiday entries.
+    """
+    FF_URL      = 'https://nfs.faireconomy.media/ff_calendar_thisweek.xml'
+    FF_NEXT_URL = 'https://nfs.faireconomy.media/ff_calendar_nextweek.xml'
+
+    # FF times are US Eastern. We need to convert to UTC.
+    # ET = UTC-5 (EST) or UTC-4 (EDT). We use a simple approach:
+    # parse the 12h time string, combine with the date, then apply ET offset.
+    import datetime as dt_module
+
+    def ff_time_to_utc(time_str, date_obj):
+        """
+        Convert FF time string like '8:30pm' + date to UTC HH:MM and possibly
+        advance the date by 1 day (when ET→UTC crosses midnight).
+        Returns (utc_time_str, utc_date).
+        """
+        if not time_str or time_str.strip().lower() in ('all day', 'tentative', ''):
+            return '', date_obj
+        try:
+            # Parse 12h format
+            t = time_str.strip().lower().replace(' ', '')
+            fmt = '%I:%M%p' if ':' in t else '%I%p'
+            naive = datetime.strptime(t, fmt)
+            # Combine with date
+            naive_dt = dt_module.datetime(
+                date_obj.year, date_obj.month, date_obj.day,
+                naive.hour, naive.minute
+            )
+            # Determine ET offset: EDT (UTC-4) Mar 2nd Sun → Nov 1st Sun, else EST (UTC-5)
+            # Simple rule: DST in effect between 2nd Sun of March and 1st Sun of November
+            def is_edt(d):
+                import calendar
+                # 2nd Sunday of March
+                mar = d.replace(month=3, day=1)
+                first_sun_mar = mar + dt_module.timedelta(days=(6 - mar.weekday()) % 7)
+                dst_start = first_sun_mar + dt_module.timedelta(weeks=1)  # 2nd Sunday
+                # 1st Sunday of November
+                nov = d.replace(month=11, day=1)
+                first_sun_nov = nov + dt_module.timedelta(days=(6 - nov.weekday()) % 7)
+                return dst_start <= d < first_sun_nov
+
+            offset_hours = 4 if is_edt(date_obj) else 5
+            utc_dt = naive_dt + dt_module.timedelta(hours=offset_hours)
+            return utc_dt.strftime('%H:%M'), utc_dt.date()
+        except Exception as e:
+            return '', date_obj
+
+    IMPACT_MAP = {
+        'high':    'high',
+        'medium':  'medium',
+        'low':     'low',
+        'holiday': None,   # skip holidays
+        'non-economic': None,
+    }
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; EconCalendar/1.0)',
+        'Accept': 'application/xml, text/xml, */*',
+    }
+
+    events = []
+    # Fetch this week; also try next week if target_dates extend beyond
+    urls_to_try = [FF_URL]
+    max_date = max(target_dates)
+    # If target range extends more than 7 days from today, also fetch next week
+    if max_date > date.today() + timedelta(days=7):
+        urls_to_try.append(FF_NEXT_URL)
+
+    for url in urls_to_try:
+        print(f"  [FF XML] Fetching: {url}")
+        try:
+            r = requests.get(url, headers=headers, timeout=20)
+            if not r.ok:
+                print(f"  [FF XML] HTTP {r.status_code}")
+                continue
+            print(f"  [FF XML] {len(r.content)} bytes")
+
+            # Parse XML — FF uses windows-1252 encoding declared in header
+            # BeautifulSoup handles this gracefully with lxml-xml
+            content = r.content.decode('windows-1252', errors='replace')
+            soup = BeautifulSoup(content, 'lxml-xml')
+            items = soup.find_all('event')
+            print(f"  [FF XML] {len(items)} events in XML")
+
+            for item in items:
+                try:
+                    # Currency / country
+                    currency_tag = item.find('country')
+                    currency = currency_tag.get_text(strip=True).upper() if currency_tag else ''
+                    if currency not in TRACKED_CURRENCIES:
+                        continue
+
+                    # Impact
+                    impact_tag = item.find('impact')
+                    impact_raw = impact_tag.get_text(strip=True).lower() if impact_tag else 'low'
+                    impact = IMPACT_MAP.get(impact_raw)
+                    if impact is None:
+                        continue  # skip Holiday / Non-Economic
+
+                    # Date  — format: MM-DD-YYYY
+                    date_tag = item.find('date')
+                    date_str = date_tag.get_text(strip=True) if date_tag else ''
+                    try:
+                        event_date = datetime.strptime(date_str, '%m-%d-%Y').date()
+                    except:
+                        continue
+
+                    # Time — format: 12h ET  e.g. "8:30am"
+                    time_tag = item.find('time')
+                    time_raw = time_tag.get_text(strip=True) if time_tag else ''
+                    time_utc, event_date_utc = ff_time_to_utc(time_raw, event_date)
+
+                    if event_date_utc not in target_dates and event_date not in target_dates:
+                        continue
+
+                    # Title
+                    title_tag = item.find('title')
+                    event_name = title_tag.get_text(strip=True) if title_tag else ''
+                    if not event_name:
+                        continue
+
+                    # Forecast / Previous (actual not in FF XML — added later by other sources)
+                    fc_tag   = item.find('forecast')
+                    prev_tag = item.find('previous')
+                    forecast = clean_val(fc_tag.get_text(strip=True))   if fc_tag   else ''
+                    previous = clean_val(prev_tag.get_text(strip=True)) if prev_tag else ''
+
+                    use_date = event_date_utc if event_date_utc in target_dates else event_date
+                    events.append({
+                        'date':     fmt_date(use_date),
+                        'dateISO':  use_date.isoformat(),
+                        'timeUTC':  time_utc,
+                        'country':  currency,
+                        'currency': currency,
+                        'flag':     CURRENCY_FLAGS.get(currency, ''),
+                        'event':    event_name,
+                        'impact':   impact,
+                        'actual':   '',        # FF XML doesn't include actuals
+                        'forecast': forecast,
+                        'previous': previous,
+                        'ff_url':   item.find('url').get_text(strip=True) if item.find('url') else '',
+                    })
+                except Exception as e:
+                    continue
+
+            print(f"  [FF XML] ✅ Parsed {len(events)} tracked-currency events")
+        except Exception as e:
+            import traceback
+            print(f"  [FF XML] Error: {e}")
+            print(traceback.format_exc()[:400])
+
+    return events
+
+
+# ════════════════════════════════════════════════════════════════════
 # SOURCE 1: MQL5 Economic Calendar RSS
 # Times from pubDate are already in UTC (RFC 2822 with timezone info)
 # ════════════════════════════════════════════════════════════════════
@@ -576,8 +741,8 @@ def fetch_official_rss(target_dates):
 # ════════════════════════════════════════════════════════════════════
 
 print("=" * 60)
-print("ECONOMIC CALENDAR SCRAPER v5.1 (EST→UTC fix)")
-print("Sources: MQL5 RSS → TE RSS → Investing.com → Official RSS")
+print("ECONOMIC CALENDAR SCRAPER v6.0 (FF XML primary source)")
+print("Sources: FF XML → [enrich actuals: Investing.com] → MQL5 RSS → TE RSS → Official RSS")
 print("Timezone policy:")
 print("  - MQL5/TE/Official RSS: pubDate normalized to UTC via parsedate_to_datetime")
 print("  - Investing.com: returns EST (UTC-5), converted +5h to UTC before storing")
@@ -599,18 +764,58 @@ all_events  = []
 source_used = None
 fetch_errors = []
 
+# ── Strategy 0: Forex Factory XML (primary source for impact/forecast/previous) ──
+print(f"\n{'='*50}\nSTRATEGY 0: Forex Factory XML\n{'='*50}")
+ff_events = []
+try:
+    ff_events = fetch_ff_xml(target_dates)
+    if len(ff_events) >= 3:
+        all_events  = ff_events
+        source_used = 'Forex Factory'
+        print(f"✅ FF XML: {len(ff_events)} events — using as primary source")
+    else:
+        msg = f"FF XML: only {len(ff_events)} events returned"
+        print(f"⚠️  {msg}")
+        fetch_errors.append(msg)
+except Exception as e:
+    msg = f"FF XML failed: {e}"
+    print(f"❌ {msg}")
+    fetch_errors.append(msg)
+time.sleep(1)
+
 for label, fetcher, args in [
     ("1: MQL5 RSS",      fetch_mql5_rss,           (target_dates,)),
     ("2: TE RSS",        fetch_te_rss,             (target_dates,)),
     ("3: Investing.com", fetch_investing_calendar, (from_date.isoformat(), to_date.isoformat(), target_dates)),
     ("4: Official RSS",  fetch_official_rss,       (target_dates,)),
 ]:
-    if len(all_events) >= 3:
-        break
+    # If FF worked, only run Investing.com to enrich actuals; skip others
+    if len(all_events) >= 3 and label != "3: Investing.com":
+        continue
     print(f"\n{'='*50}\nSTRATEGY {label}\n{'='*50}")
     try:
         result = fetcher(*args)
-        if len(result) >= 3:
+        if len(all_events) >= 3 and label == "3: Investing.com":
+            # Enrich FF events with actuals from Investing.com
+            inv_index = {}
+            for ev in result:
+                if ev.get('actual'):
+                    k = (ev['dateISO'], ev['currency'], ev['event'][:20].lower().strip())
+                    inv_index[k] = ev
+            enriched = 0
+            for ev in all_events:
+                if not ev.get('actual'):
+                    k = (ev['dateISO'], ev['currency'], ev['event'][:20].lower().strip())
+                    if k in inv_index:
+                        ev['actual'] = inv_index[k].get('actual', '')
+                        if not ev.get('forecast'):
+                            ev['forecast'] = inv_index[k].get('forecast', '')
+                        if not ev.get('previous'):
+                            ev['previous'] = inv_index[k].get('previous', '')
+                        enriched += 1
+            print(f"  [Enrich] ✅ Filled actuals for {enriched} events from Investing.com")
+            source_used = 'Forex Factory + Investing.com'
+        elif len(result) >= 3 and len(all_events) < 3:
             all_events  = result
             source_used = label.split(': ', 1)[1]
             print(f"✅ {label}: {len(all_events)} events — using this source")
