@@ -26,8 +26,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { max-width: 100%; }
-  body { max-width: 100%; }
+  /* overflow-x:clip recorta el layout sin crear scroll container — hijos con overflow-x:auto SÍ scrollean.
+     Soportado en todos los browsers modernos (Chrome 90+, Firefox 81+, Safari 16+) */
+  html, body { overflow-x: clip; max-width: 100%; }
 
   :root {
     --bg-primary:   #0b0e14;
@@ -138,7 +139,7 @@
   /* ── Rate strip ── */
   .rate-strip {
     display: grid; grid-template-columns: repeat(8, 1fr);
-    gap: 0.5rem; margin-bottom: 2rem;
+    gap: 0.5rem; margin-bottom: 2rem; min-width: 0;
   }
   .rate-cell {
     background: var(--bg-card); border: 1px solid var(--border);
@@ -157,17 +158,21 @@
     grid-template-columns: 1fr 348px;
     gap: 1.5rem;
     margin-bottom: 0;
-    align-items: start; /* FIX: start en lugar de stretch para que no corte la tabla */
-    max-width: 100%;
+    align-items: start;
+    /* min-width:0 en grid para que las celdas no expandan más que el grid */
+    min-width: 0;
   }
+  /* Todos los hijos de grid deben tener min-width:0 para no romper el layout */
+  .content-grid > * { min-width: 0; }
 
   /* ── Table card ── */
-  .ranking-col { display: flex; flex-direction: column; }
+  .ranking-col { display: flex; flex-direction: column; min-width: 0; }
   .table-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    /* SIN overflow:hidden — crearía un scroll-context que bloquea #pair-table en iOS */
+    min-width: 0;
+    /* SIN overflow: el #pair-table maneja su propio scroll */
   }
   .table-card-head {
     padding: 0.65rem 0.9rem; background: var(--bg-secondary);
@@ -178,14 +183,23 @@
   .table-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
   .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
 
-  /* ── Tabla — contenedor de scroll propio ── */
+  /* ── Tabla — scroll aislado del body ── 
+     Técnica: el wrapper tiene overflow-x:auto con width explícito.
+     El body tiene overflow-x:hidden pero este elemento es el scroll container,
+     no el body — por eso funciona. ── */
   #pair-table {
-    display: block;          /* necesario: overflow-x solo funciona en block containers */
+    display: block;
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
-    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    /* Scrollbar visible en móvil para indicar que hay más contenido */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-hover) transparent;
   }
+  #pair-table::-webkit-scrollbar { height: 4px; }
+  #pair-table::-webkit-scrollbar-track { background: transparent; }
+  #pair-table::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
   table { width: 100%; min-width: 580px; border-collapse: collapse; }
   thead th {
     padding: 0.55rem 0.875rem;
@@ -261,7 +275,7 @@
   .regime-metric-val { font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; font-weight: 500; }
 
   /* ── Detail cards grid ── */
-  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 100%; }
+  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; min-width: 0; }
 
   .detail-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
   .detail-card:hover { border-color: var(--border-hover); }
