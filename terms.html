@@ -20,6 +20,10 @@
         .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
         .brand-title:hover { color: var(--blue); }
+        .brand-wrap { display: flex; flex-direction: column; }
+        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary, #8b949e); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.1rem; }
+        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
+        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
         .nav-links a:hover { color: var(--text-primary); }
@@ -57,14 +61,19 @@
 <body>
     <div class="header">
         <div class="header-content">
+                    <div class="brand-wrap">
             <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
+            <span class="brand-subtitle">Dashboard Profesional</span>
+        </div>
             <div class="nav-links">
                 <a href="index.html">Dashboard</a>
                 <a href="about.html">Acerca de</a>
+                <a href="publicidad.html">Publicidad</a>
                 <a href="terms.html" class="active">Términos</a>
                 <a href="privacy.html">Privacidad</a>
                 <a href="contact.html">Contacto</a>
                 <a href="about.html#recursos">Guías</a>
+                <a href="en.html" class="lang-switch">EN</a>
             </div>
         </div>
     </div>
