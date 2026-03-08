@@ -5237,7 +5237,7 @@ const sentiment = getSentiment(strength);
                             {filteredEvents.map((event, index) => {
                                 const isToday = event.dateISO === todayISO;
                                 const hasActual = !!(event.actual && event.actual !== '');
-                                // Past: has actual data; Next: first future event today
+                                // Compute event timestamp in UTC for past/next logic
                                 const nowMs = Date.now();
                                 let eventMs = null;
                                 if (event.dateISO && (event.timeUTC || event.time)) {
@@ -5245,9 +5245,10 @@ const sentiment = getSentiment(strength);
                                     const d = new Date(`${event.dateISO}T${t}:00Z`);
                                     if (!isNaN(d.getTime())) eventMs = d.getTime();
                                 }
+                                // isPast: has actual OR event time already passed
                                 const isPast = hasActual || (eventMs !== null && eventMs < nowMs);
-                                // isNext: today, not past, and first such event in the list
-                                const isNext = isToday && !isPast && !hasActual &&
+                                // isNext: first upcoming event with known time — no isToday dependency
+                                const isNext = !isPast && !hasActual && eventMs !== null &&
                                     filteredEvents.slice(0, index).every(e => {
                                         const ta = e.timeUTC || e.time;
                                         if (!ta || !e.dateISO) return true;
@@ -5257,7 +5258,7 @@ const sentiment = getSentiment(strength);
                                 const eventClass = `calendar-event${isPast ? ' is-past' : ''}${isNext ? ' is-next' : ''}`;
                                 return (
                                     <div key={index} className={eventClass} style={{
-                                        borderLeft: isNext ? '' : (isToday && !isPast ? '3px solid var(--blue)' : 'none'),
+                                        borderLeft: isNext ? '' : (!isPast && isToday ? '3px solid var(--blue)' : 'none'),
                                     }}>
                                         <div className="event-time">
                                             {isNext && (
