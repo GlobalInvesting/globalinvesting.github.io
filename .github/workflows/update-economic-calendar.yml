@@ -2,9 +2,21 @@ name: Update Economic Calendar - v6 (FF XML primary source)
 
 on:
   schedule:
+    # Asia session: 00:00, 02:00 UTC (JPY, AUD, NZD data)
     - cron: '0 0 * * *'
+    - cron: '0 2 * * *'
+    # Europe open: 06:00, 08:00, 10:00 UTC (EUR, GBP, CHF data)
+    - cron: '0 6 * * *'
     - cron: '0 8 * * *'
+    - cron: '0 10 * * *'
+    # US session: 12:00, 13:00, 14:00, 15:00, 16:00, 17:00, 18:00 UTC (USD, CAD data)
+    - cron: '0 12 * * *'
+    - cron: '0 13 * * *'
+    - cron: '0 14 * * *'
+    - cron: '0 15 * * *'
     - cron: '0 16 * * *'
+    - cron: '0 17 * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch:
 
 # FIX P-01: Lógica Python extraída a scripts/update_economic_calendar.py.
