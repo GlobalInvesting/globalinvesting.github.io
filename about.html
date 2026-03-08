@@ -17,19 +17,18 @@
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
         .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
         .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 3rem; }
-        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
         .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
         .brand-title:hover { color: var(--blue); }
-        .brand-wrap { display: flex; flex-direction: column; }
-        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary, #8b949e); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.1rem; }
-        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
-        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .brand-wrap { display: flex; flex-direction: column; gap: 0.1rem; }
+        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; color: var(--text-secondary); text-decoration: none; }
+        .lang-switch:hover { border-color: var(--blue); color: var(--blue) !important; }
+        .nav-links { display: flex; gap: 1.25rem; flex-wrap: nowrap; align-items: center; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; white-space: nowrap; }
         .nav-links a:hover { color: var(--text-primary); }
         .nav-links a.active { color: var(--text-primary); }
-        .lang-switch { padding: 0.25rem 0.6rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
-        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
+
         h1 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); }
         h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
         h3 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary); }

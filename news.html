@@ -108,11 +108,12 @@
   .brand-title a { color: inherit; text-decoration: none; }
   .brand-title a:hover { color: var(--blue); }
   .brand-subtitle { font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
-  .page-nav-links { flex: 1; display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
-  .page-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+  .page-nav-links { display: flex; justify-content: flex-start; align-items: center; gap: 1.25rem; flex-wrap: nowrap; }
+  .page-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
   .page-nav-links a:hover { color: var(--text-primary); }
-        .lang-switch { padding: 0.25rem 0.6rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
-        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
+  .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; color: var(--text-secondary); }
+  .lang-switch:hover { border-color: var(--blue); color: var(--blue) !important; }
+      
   .header-info { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 2rem; font-size: 0.8125rem; color: var(--text-secondary); }
   .info-item { display: flex; align-items: center; gap: 0.5rem; }
   .status-live { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
