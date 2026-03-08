@@ -202,8 +202,14 @@
     <p>En el ejemplo anterior, si el precio sube de <code>1.08500</code> a <code>1.08510</code>, el par se movió <strong>+1 pip</strong>. Si sube a <code>1.08600</code>, se movió <strong>+10 pips</strong>. Si sube a <code>1.09500</code>, se movió <strong>+100 pips</strong> (también llamado una <em>figura</em> o <em>big figure</em>).</p>
 
     <div class="box box-blue">
-        <div class="box-title">💡 Excepción: pares con JPY</div>
-        <p>Para todos los pares que incluyen el yen japonés (USD/JPY, EUR/JPY, GBP/JPY…), el pip está en el <strong>segundo decimal</strong> porque el yen cotiza en una escala ~100× mayor. Ejemplo: USD/JPY sube de <code>149.50</code> a <code>149.51</code> = +1 pip.</p>
+        <div class="box-title">Excepción: pares con JPY</div>
+        <p>Para todos los pares que incluyen el yen japonés (USD/JPY, EUR/JPY, GBP/JPY, CHF/JPY…), la convención es diferente porque el yen cotiza en una escala aproximadamente 100 veces mayor que otras divisas principales. Un euro vale ~1.08 dólares, pero ~160 yenes — de ahí que el precio tenga menos decimales.</p>
+        <p style="margin-top:0.75rem;">La estructura es:</p>
+        <ul style="margin: 0.5rem 0 0.75rem 1.25rem; line-height: 2;">
+            <li>El <strong>pip es el 2.º decimal</strong> — USD/JPY sube de <code>149.50</code> a <code>149.51</code> = <strong>+1 pip</strong></li>
+            <li>El <strong>pipette es el 3.er decimal</strong> — USD/JPY en <code>149.503</code>, el <code>3</code> es el pipette</li>
+        </ul>
+        <p>Una subida de USD/JPY de <code>149.50</code> a <code>150.50</code> equivale a <strong>100 pips</strong> (una figura), igual que en cualquier otro par. El valor monetario por pip varía porque el precio nominal es mucho mayor — esto se desarrolla en la sección de cálculo de valor más abajo.</p>
     </div>
 
     <!-- ═══════════════════════════════════════════════ -->
