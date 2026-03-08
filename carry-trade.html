@@ -60,13 +60,16 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── Header — idéntico a news.html ── */
+  /* ── Header — sticky, igual que index.html ── */
   .header {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
     padding: 1.25rem 2rem;
-    position: sticky; top: 0; z-index: 100;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   .header-content {
     max-width: 1800px; margin: 0 auto;
@@ -85,9 +88,25 @@
   .status-live { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  /* ── Nav tabs — idéntico a news.html ── */
-  .nav-tabs-wrap { background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
-  .nav-tabs { padding: 0 2rem; display: flex; gap: 0.5rem; max-width: 1800px; margin: 0 auto; overflow-x: auto; }
+  /* ── Nav tabs — sticky, igual que index.html ── */
+  .nav-tabs-wrap {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 73px; /* altura del header */
+    z-index: 99;
+  }
+  .nav-tabs {
+    padding: 0 2rem;
+    display: flex;
+    gap: 0.5rem;
+    max-width: 1800px;
+    margin: 0 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
   .nav-tab {
     padding: 1rem 1.5rem; background: transparent; border: none;
     color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; cursor: pointer;
@@ -98,7 +117,7 @@
   .nav-tab:hover  { color: var(--text-primary); }
   .nav-tab.active { color: var(--text-primary); border-bottom-color: var(--blue); }
 
-  /* ── Layout — idéntico a news.html ── */
+  /* ── Layout ── */
   .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
   .page-title-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -133,14 +152,22 @@
 
   /* ── Two-column layout ── */
   .content-grid {
-    display: grid; grid-template-columns: 1fr 348px;
-    gap: 1.5rem; margin-bottom: 0; align-items: stretch; max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 348px;
+    gap: 1.5rem;
+    margin-bottom: 0;
+    align-items: start; /* FIX: start en lugar de stretch para que no corte la tabla */
+    max-width: 100%;
   }
 
-  /* ── Table card ── */
+  /* ── Table card — FIX: sin height fijo ── */
   .ranking-col { display: flex; flex-direction: column; }
-  .ranking-col .table-card { flex: 1; }
-  .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
+  .table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden; /* el scroll va en #pair-table, no aquí */
+  }
   .table-card-head {
     padding: 0.65rem 0.9rem; background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -149,18 +176,25 @@
   .table-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
   .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
 
-  table { width: 100%; min-width: 560px; border-collapse: collapse; }
+  /* ── Tabla — scroll horizontal independiente ── */
+  #pair-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { width: 100%; min-width: 580px; border-collapse: collapse; }
   thead th {
     padding: 0.55rem 0.875rem;
     font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
     color: var(--text-dim); text-align: left;
     background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    white-space: nowrap;
   }
   thead th.r { text-align: right; }
   tbody tr { border-bottom: 1px solid rgba(48,54,61,0.5); transition: background 0.12s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: rgba(255,255,255,0.018); }
-  tbody td { padding: 0.6rem 0.875rem; font-size: 0.8rem; vertical-align: middle; }
+  tbody td { padding: 0.6rem 0.875rem; font-size: 0.8rem; vertical-align: middle; white-space: nowrap; }
   tbody td.r { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; }
 
   .rank-num {
@@ -204,8 +238,6 @@
     font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-dim);
   }
   .info-panel-body { padding: 0.625rem 0.875rem; }
-
-  /* diff-row CSS removed — replaced by spread chart */
 
   .meeting-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -260,37 +292,32 @@
   }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-  /* ── Footer — idéntico a news.html ── */
+  /* ── Footer ── */
   .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
 
-  /* ── Tablet: single column, stretch off ── */
+  /* ── Tablet ── */
   @media (max-width: 1280px) {
     .content-grid { grid-template-columns: 1fr; align-items: start; }
-    .ranking-col  { display: block; height: auto; }
-    .table-card   { height: auto; display: block; }
     .detail-grid  { grid-template-columns: repeat(2, 1fr); }
     .rate-strip   { grid-template-columns: repeat(4, 1fr); }
   }
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    /* Header */
     .header { padding: 0.75rem 1rem; }
     .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
     .page-nav-links { justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
     .header-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 0.5rem 1rem; font-size: 0.75rem; }
 
-    /* Nav tabs */
-    .nav-tabs { padding: 0 0.25rem; gap: 0; scrollbar-width: none; -ms-overflow-style: none; }
-    .nav-tabs::-webkit-scrollbar { display: none; }
+    /* Nav tabs sticky — ajustar top al nuevo header height en móvil */
+    .nav-tabs-wrap { top: 0; position: sticky; }
+    .nav-tabs { padding: 0 0.25rem; gap: 0; }
     .nav-tab { padding: 0.7rem 0.85rem; font-size: 0.73rem; }
 
-    /* Page layout */
     .page-wrap { padding: 0.75rem 0.75rem 3rem; }
     .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
     .content-grid { gap: 1rem; }
 
-    /* Rate strip: 4 cols */
     .rate-strip { grid-template-columns: repeat(4, 1fr); gap: 0.375rem; }
     .rate-cell  { padding: 0.5rem 0.25rem 0.4rem; }
     .rate-cell-flag { margin-bottom: 0.25rem; }
@@ -298,35 +325,26 @@
     .rate-cell-code { font-size: 0.6rem; }
     .rate-cell-sub  { font-size: 0.55rem; }
 
-    /* Table card: no height stretch, horizontal scroll */
-    .ranking-col { display: block; height: auto; }
-    .table-card  { display: block; height: auto; overflow: visible; }
     .table-card-head { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-    #pair-table  { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
     thead th, tbody td { padding: 0.45rem 0.5rem; font-size: 0.72rem; }
     .col-bond, .col-perf { display: none; }
 
-    /* Meeting rows: prevent flag/code from being clipped */
     .meeting-row { flex-wrap: nowrap; gap: 0.5rem; }
     .meeting-cur { min-width: 52px; flex-shrink: 0; font-size: 0.72rem; }
     .meeting-date { font-size: 0.65rem; text-align: right; white-space: nowrap; }
 
-    /* Info panels */
     .info-panel-body { padding: 0.5rem 0.75rem; }
     .side-col { gap: 0.75rem; }
 
-    /* Regime metrics */
     .regime-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
     .regime-metric { padding: 0.3rem 0.4rem; }
     .regime-metric-val { font-size: 0.7rem; }
 
-    /* Detail cards */
     .detail-grid { grid-template-columns: 1fr; gap: 0.75rem; }
     .detail-metrics { grid-template-columns: repeat(2, 1fr); }
     .detail-metric:nth-child(2n) { border-right: none; }
     .dm-val { font-size: 0.72rem; }
 
-    /* Spread chart */
     #spread-chart-panel { overflow: hidden; }
     #spread-chart-panel svg { max-width: 100%; height: auto; }
   }
@@ -357,7 +375,7 @@
   </div>
 </div>
 
-<!-- ── Nav tabs ── -->
+<!-- ── Nav tabs — sticky igual que index ── -->
 <div class="nav-tabs-wrap">
   <div class="nav-tabs">
     <a href="index.html"              class="nav-tab">Resumen de Divisas</a>
@@ -410,7 +428,8 @@
           <span class="table-card-title">Pares ordenados por score compuesto</span>
           <span class="table-card-meta">Diferencial m&iacute;nimo 1.5%</span>
         </div>
-        <div id="pair-table" style="flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <!-- FIX: overflow-x:auto en el wrapper de la tabla, no en la card -->
+        <div id="pair-table">
           <div style="padding:2rem;text-align:center;">
             <div class="sk-line" style="width:80%;margin:0 auto 0.5rem;"></div>
             <div class="sk-line" style="width:60%;margin:0 auto;"></div>
@@ -458,10 +477,9 @@
     </div>
   </div>
 
-
 </main>
 
-<!-- ── Footer — idéntico a news.html ── -->
+<!-- ── Footer ── -->
 <div class="footer">
   <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE AN&Aacute;LISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
@@ -500,7 +518,6 @@ const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 const BASE = 'https://globalinvesting.github.io';
 
-// Banderas via flagcdn — mismo patrón que news.html, compatible con Edge
 const FLAG_CODES = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz' };
 function flagImg(cur, px) {
   px = px || 18;
@@ -659,7 +676,9 @@ function renderRateStrip(data) {
 
 // ── Render: pair table ────────────────────────────────────────────────────────
 function renderTable(pairs) {
-  document.getElementById('ranking-count').textContent = '· ' + pairs.length + ' pares';
+  var countEl = document.getElementById('ranking-count');
+  if (countEl) countEl.textContent = '· ' + pairs.length + ' pares';
+
   var rows = pairs.map(function(p, i) {
     return '<tr>'
       + '<td><span class="rank-num ' + rankCls(i) + '">' + (i+1) + '</span></td>'
@@ -674,6 +693,7 @@ function renderTable(pairs) {
       + '<td class="r col-perf">' + fmtPct(p.fxL) + '</td>'
       + '</tr>';
   }).join('');
+
   document.getElementById('pair-table').innerHTML =
     '<table>'
     + '<thead><tr>'
@@ -697,11 +717,9 @@ function renderSpreadChart(pairs, allRatesData) {
   var lcObs = allRatesData[topPair.lc] && allRatesData[topPair.lc].observations ? allRatesData[topPair.lc].observations : [];
   var scObs = allRatesData[topPair.sc] && allRatesData[topPair.sc].observations ? allRatesData[topPair.sc].observations : [];
 
-  // Build date-indexed lookup for short currency
   var scMap = {};
   scObs.forEach(function(o) { scMap[o.date] = parseFloat(o.value) || 0; });
 
-  // Compute spread for each date in long currency history, last 18 months
   var points = [];
   lcObs.slice().reverse().forEach(function(o) {
     var lcRate = parseFloat(o.value) || 0;
@@ -709,10 +727,9 @@ function renderSpreadChart(pairs, allRatesData) {
     if (scRate === null) return;
     points.push({ date: o.date, spread: +(lcRate - scRate).toFixed(2) });
   });
-  points = points.slice(-18); // last 18 months
+  points = points.slice(-18);
   if (points.length < 2) return;
 
-  // SVG sparkline
   var W = 308, H = 72, PAD = 4;
   var spreads = points.map(function(p){ return p.spread; });
   var minS = Math.min.apply(null, spreads);
@@ -722,12 +739,10 @@ function renderSpreadChart(pairs, allRatesData) {
   function xOf(i) { return PAD + (i / (points.length - 1)) * (W - PAD*2); }
   function yOf(v) { return H - PAD - ((v - minS) / range) * (H - PAD*2); }
 
-  // Build polyline path
   var pathD = points.map(function(p, i) {
     return (i === 0 ? 'M' : 'L') + xOf(i).toFixed(1) + ',' + yOf(p.spread).toFixed(1);
   }).join(' ');
 
-  // Fill area path
   var areaD = pathD
     + ' L' + xOf(points.length-1).toFixed(1) + ',' + (H - PAD)
     + ' L' + xOf(0).toFixed(1) + ',' + (H - PAD) + ' Z';
@@ -737,18 +752,17 @@ function renderSpreadChart(pairs, allRatesData) {
   var trend = currentSpread > firstSpread + 0.1 ? 'ampliando' : currentSpread < firstSpread - 0.1 ? 'comprimiendo' : 'estable';
   var trendColor = trend === 'ampliando' ? 'var(--green)' : trend === 'comprimiendo' ? 'var(--red)' : 'var(--text-secondary)';
 
-  // X-axis labels: first and last date
   var labelFirst = points[0].date.slice(0,7);
   var labelLast  = points[points.length-1].date.slice(0,7);
-
-  // Current/min/max annotations
   var curY = yOf(currentSpread);
 
-  document.getElementById('spread-chart-title').textContent =
-    topPair.lc + '/' + topPair.sc + ' — Spread histórico de tasas (18M)';
+  var titleEl = document.getElementById('spread-chart-title');
+  if (titleEl) titleEl.textContent = topPair.lc + '/' + topPair.sc + ' — Spread histórico de tasas (18M)';
 
-  document.getElementById('spread-chart-panel').innerHTML =
-    // Summary row
+  var panelEl = document.getElementById('spread-chart-panel');
+  if (!panelEl) return;
+
+  panelEl.innerHTML =
     '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.5rem;">'
     + '<div>'
     + '<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem;font-weight:600;color:var(--green)">+' + currentSpread.toFixed(2) + '%</span>'
@@ -756,30 +770,15 @@ function renderSpreadChart(pairs, allRatesData) {
     + '</div>'
     + '<div style="font-size:0.68rem;color:' + trendColor + ';font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">' + trend + '</div>'
     + '</div>'
-
-    // SVG chart
     + '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" style="overflow:visible;display:block;width:100%;">'
-
-    // Gridlines
     + '<line x1="' + PAD + '" y1="' + (H/2).toFixed(0) + '" x2="' + (W-PAD) + '" y2="' + (H/2).toFixed(0) + '" stroke="rgba(48,54,61,0.6)" stroke-width="1" stroke-dasharray="3,3"/>'
-
-    // Area fill
     + '<path d="' + areaD + '" fill="rgba(38,166,154,0.06)" stroke="none"/>'
-
-    // Line
     + '<polyline points="' + points.map(function(p,i){ return xOf(i).toFixed(1)+','+yOf(p.spread).toFixed(1); }).join(' ') + '"'
     + ' fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
-
-    // Current value dot
     + '<circle cx="' + xOf(points.length-1).toFixed(1) + '" cy="' + curY.toFixed(1) + '" r="3" fill="var(--green)"/>'
-
-    // Min/max labels
     + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(maxS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + maxS.toFixed(2) + '</text>'
     + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(minS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + minS.toFixed(2) + '</text>'
-
     + '</svg>'
-
-    // X axis labels
     + '<div style="display:flex;justify-content:space-between;margin-top:0.25rem;">'
     + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelFirst + '</span>'
     + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelLast + '</span>'
@@ -788,22 +787,31 @@ function renderSpreadChart(pairs, allRatesData) {
 
 // ── Render: meetings panel ────────────────────────────────────────────────────
 function renderMeetings(meetings) {
+  var panelEl = document.getElementById('meetings-panel');
+  if (!panelEl) return;
+
   if (!meetings || !meetings.meetings) {
-    document.getElementById('meetings-panel').innerHTML = '<p style="font-size:.75rem;color:var(--text-dim);">Datos no disponibles.</p>';
+    panelEl.innerHTML = '<p style="font-size:.75rem;color:var(--text-dim);">Datos no disponibles.</p>';
     return;
   }
   var today = new Date();
   var html  = CURRENCIES.map(function(c) {
     var m = meetings.meetings[c.code];
     if (!m || !m.nextMeeting) return '';
-    var days     = Math.round((new Date(m.nextMeetingISO) - today) / 86400000);
-    var soonTag  = days <= 14 ? '<span class="meeting-soon">' + days + 'd</span>' : '';
+    var days = Math.round((new Date(m.nextMeetingISO || m.nextMeeting) - today) / 86400000);
+    var soonTag = (days >= 0 && days <= 14) ? '<span class="meeting-soon">' + days + 'd</span>' : '';
     return '<div class="meeting-row">'
          + '<div class="meeting-cur">' + flagImg(c.code, 16) + '<span>' + c.code + '</span></div>'
          + '<div class="meeting-date">' + esc(m.nextMeeting) + soonTag + '</div>'
          + '</div>';
   }).join('');
-  document.getElementById('meetings-panel').innerHTML = html;
+
+  // Si todas las filas están vacías, mostrar mensaje
+  if (!html.replace(/\s/g, '')) {
+    panelEl.innerHTML = '<p style="font-size:.75rem;color:var(--text-dim);">Sin fechas confirmadas.</p>';
+    return;
+  }
+  panelEl.innerHTML = html;
 }
 
 // ── Render: regime panel ──────────────────────────────────────────────────────
@@ -825,16 +833,17 @@ function renderRegime(data) {
     ? 'Entorno adverso. Los inversores buscan refugio en JPY y CHF, lo que puede erosionar posiciones largas de carry.'
     : 'Entorno mixto. El carry trade puede funcionar en pares selectivos; se recomienda cautela en el sizing de posiciones.';
 
-  function metricFmt(val, invertedSign) {
-    var positive = invertedSign ? val < 0 : val > 0;
+  function metricFmt(val) {
     return (val > 0 ? '+' : '') + val.toFixed(2) + '%';
   }
   function metricColor(val, goodWhenNeg) {
-    // Show contextual carry direction: green = favorable, gray = unfavorable (no red alarm)
     return (goodWhenNeg ? val < 0 : val > 0) ? 'var(--green)' : 'var(--text-secondary)';
   }
 
-  document.getElementById('regime-panel').innerHTML =
+  var panelEl = document.getElementById('regime-panel');
+  if (!panelEl) return;
+
+  panelEl.innerHTML =
     '<div class="regime-label">R&eacute;gimen actual</div>'
     + '<div class="regime-value" style="color:' + color + '">' + label + '</div>'
     + '<div class="regime-desc">' + desc + '</div>'
@@ -888,7 +897,7 @@ function renderDetailCards(pairs, data) {
       + '<div class="detail-metric"><div class="dm-label">Perf. FX 1M</div><div class="dm-val" style="color:' + fxColor + '">' + (p.fxL !== null ? (p.fxL > 0 ? '+' : '') + p.fxL.toFixed(2) + '%' : 'N/D') + '</div></div>'
       + '</div>'
       + '<div class="detail-signals">'
-      + '<div class="signal-row">' + sigDot(p.momL !== null && p.momL > 0 ? true : p.momL === 0 ? null : null) + momLabel + '</div>'
+      + '<div class="signal-row">' + sigDot(p.momL !== null && p.momL > 0 ? true : null) + momLabel + '</div>'
       + '<div class="signal-row">' + sigDot(cotOk ? true : cot !== null && cot < 0 ? true : cot > 60000 ? false : null) + cotLabel + '</div>'
       + '<div class="signal-row">' + sigDot(fxOk) + fxLabel + '</div>'
       + '</div>'
@@ -904,7 +913,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var meetings = result.meetings;
     var pairs    = buildPairs(data);
 
-    // Collect raw observations for spread chart
     var allRatesData = {};
     CURRENCIES.forEach(function(c) {
       allRatesData[c.code] = data[c.code] && data[c.code].rates ? data[c.code].rates : null;
@@ -918,11 +926,13 @@ document.addEventListener('DOMContentLoaded', function() {
     renderDetailCards(pairs, data);
 
     var updated = (meetings && meetings.lastUpdate) ? meetings.lastUpdate : new Date().toISOString().split('T')[0];
-    document.getElementById('page-meta').textContent = 'Datos al ' + updated;
+    var metaEl = document.getElementById('page-meta');
+    if (metaEl) metaEl.textContent = 'Datos al ' + updated;
 
   }).catch(function(err) {
     console.error('Error cargando datos de carry trade:', err);
-    document.getElementById('page-meta').textContent = 'Error al cargar datos';
+    var metaEl = document.getElementById('page-meta');
+    if (metaEl) metaEl.textContent = 'Error al cargar datos';
     ['rate-strip','pair-table','spread-chart-panel','meetings-panel','regime-panel','detail-grid'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.innerHTML = '<p style="padding:1rem;font-size:.78rem;color:var(--text-dim);">No se pudieron cargar los datos. Verifique su conexión e intente nuevamente.</p>';
