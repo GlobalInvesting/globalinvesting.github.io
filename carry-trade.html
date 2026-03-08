@@ -26,7 +26,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { overflow-x: hidden; max-width: 100%; }
+  html { max-width: 100%; }
+  body { max-width: 100%; }
 
   :root {
     --bg-primary:   #0b0e14;
@@ -160,26 +161,29 @@
     max-width: 100%;
   }
 
-  /* ── Table card — FIX: sin height fijo ── */
+  /* ── Table card ── */
   .ranking-col { display: flex; flex-direction: column; }
   .table-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
-    overflow: hidden; /* el scroll va en #pair-table, no aquí */
+    /* SIN overflow:hidden — crearía un scroll-context que bloquea #pair-table en iOS */
   }
   .table-card-head {
     padding: 0.65rem 0.9rem; background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
+    border-radius: 8px 8px 0 0;
     display: flex; align-items: center; justify-content: space-between;
   }
   .table-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
   .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
 
-  /* ── Tabla — scroll horizontal independiente ── */
+  /* ── Tabla — contenedor de scroll propio ── */
   #pair-table {
+    display: block;          /* necesario: overflow-x solo funciona en block containers */
     width: 100%;
     overflow-x: auto;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
   }
   table { width: 100%; min-width: 580px; border-collapse: collapse; }
