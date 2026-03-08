@@ -249,8 +249,8 @@ def fetch_ff_xml(target_dates):
 
                     use_date = event_date_utc if event_date_utc in target_dates else event_date
                     events.append({
-                        'date':     fmt_date(use_date),
-                        'dateISO':  use_date.isoformat(),
+                        'date':     fmt_date(event_date),   # original ET date for display
+                        'dateISO':  use_date.isoformat(),   # UTC date for sorting/logic
                         'timeUTC':  time_utc,
                         'country':  currency,
                         'currency': currency,
@@ -860,7 +860,7 @@ def sort_key(ev):
 
 unique_events.sort(key=sort_key)
 
-# Filter: keep future + yesterday-with-actual
+# Filter: keep today + future always; yesterday only if has actual
 final_events = []
 for ev in unique_events:
     try:
