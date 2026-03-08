@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Investing | Professional Forex Fundamental Analysis Dashboard</title>
+    <meta name="description" content="Professional forex fundamental analysis dashboard. Real-time economic data for USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD — 21 weighted indicators, COT positioning, carry trade analysis and AI-generated insights.">
+    <meta name="keywords" content="forex fundamental analysis, currency strength dashboard, COT positioning, carry trade, central bank rates, economic indicators forex, USD EUR GBP JPY analysis">
+    <meta name="author" content="Santiago Plá Casuriaga">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/en.html">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://globalinvesting.github.io/en.html">
+    <meta property="og:title" content="Global Investing | Professional Forex Fundamental Analysis">
+    <meta property="og:description" content="Real-time fundamental analysis for G8 currencies. 21 macro indicators, official CFTC COT data, carry trade rankings and AI-powered narrative analysis.">
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Global Investing | Forex Fundamental Dashboard">
+    <meta name="twitter:description" content="21 macro indicators, COT positioning, carry trade rankings. Real-time fundamental analysis.">
+    <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
+    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/" />
+    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html" />
+    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Global Investing Forex Fundamental Dashboard",
+      "url": "https://globalinvesting.github.io/",
+      "description": "Professional forex fundamental analysis dashboard with 21 real-time economic indicators, CFTC COT data and AI-generated analysis for G8 currencies.",
+      "applicationCategory": "FinanceApplication",
+      "inLanguage": ["es-ES", "en"],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "creator": { "@type": "Person", "name": "Santiago Plá Casuriaga" }
+    }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0b0e14;
+            --bg2: #13171f;
+            --card: #1a1f2e;
+            --elevated: #20253a;
+            --border: #30363d;
+            --text: #e1e4e8;
+            --muted: #8b949e;
+            --dim: #6e7681;
+            --blue: #1e88e5;
+            --green: #26a69a;
+            --red: #ef5350;
+            --orange: #e0a020;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 2rem;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { display: flex; flex-direction: column; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+        .logo-sub { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .header-nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .header-nav a:hover { color: var(--text); }
+        .lang-switch {
+            display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;
+            color: var(--muted); padding: 0.3rem 0.75rem; border: 1px solid var(--border);
+            border-radius: 4px; text-decoration: none; transition: all 0.2s;
+        }
+        .lang-switch:hover { color: var(--text); border-color: var(--blue); }
+        .btn-primary {
+            background: var(--blue); color: #fff; padding: 0.55rem 1.25rem;
+            border-radius: 5px; font-weight: 600; font-size: 0.875rem;
+            text-decoration: none; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #1565c0; }
+
+        /* ── Hero ── */
+        .hero {
+            max-width: 1100px; margin: 0 auto;
+            padding: 5rem 2rem 4rem;
+            display: grid; grid-template-columns: 1fr 420px; gap: 4rem; align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(38,166,154,0.1); border: 1px solid rgba(38,166,154,0.25);
+            color: var(--green); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+        .hero-badge::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        .hero h1 {
+            font-size: 3rem; font-weight: 700; letter-spacing: -0.03em;
+            line-height: 1.15; margin-bottom: 1.25rem; color: var(--text);
+        }
+        .hero h1 span { color: var(--blue); }
+        .hero p {
+            font-size: 1.1rem; color: var(--muted); line-height: 1.75;
+            margin-bottom: 2rem; max-width: 480px;
+        }
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn-secondary {
+            background: transparent; color: var(--text); padding: 0.65rem 1.4rem;
+            border: 1px solid var(--border); border-radius: 5px; font-weight: 500;
+            font-size: 0.9rem; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+        .btn-large { padding: 0.75rem 1.75rem; font-size: 1rem; }
+
+        /* ── Hero card (live rates preview) ── */
+        .hero-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.25rem; overflow: hidden;
+        }
+        .hero-card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+        }
+        .hero-card-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .live-dot { display: flex; align-items: center; gap: 0.35rem; font-size: 0.7rem; color: var(--green); font-weight: 500; }
+        .live-dot::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        .rate-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.55rem 0; border-bottom: 1px solid rgba(48,54,61,0.5);
+        }
+        .rate-row:last-child { border-bottom: none; }
+        .rate-pair { display: flex; align-items: center; gap: 0.6rem; }
+        .rate-code { font-size: 0.8rem; font-weight: 700; color: var(--text); letter-spacing: 0.04em; }
+        .rate-name { font-size: 0.7rem; color: var(--dim); }
+        .rate-data { text-align: right; }
+        .rate-value { font-size: 0.85rem; font-weight: 600; font-family: 'Courier New', monospace; color: var(--text); }
+        .rate-pct { font-size: 0.7rem; font-weight: 500; }
+        .up { color: var(--green); }
+        .down { color: var(--red); }
+        .score-pill {
+            font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem;
+            border-radius: 3px; letter-spacing: 0.04em;
+        }
+        .strong { background: rgba(38,166,154,0.15); color: var(--green); border: 1px solid rgba(38,166,154,0.3); }
+        .neutral { background: rgba(139,148,158,0.12); color: var(--muted); border: 1px solid var(--border); }
+        .weak { background: rgba(239,83,80,0.12); color: var(--red); border: 1px solid rgba(239,83,80,0.25); }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            padding: 1.25rem 2rem;
+        }
+        .stats-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
+        }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--blue); margin-bottom: 0.2rem; }
+        .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+        /* ── Features ── */
+        .section { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+        .section-label {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--blue); margin-bottom: 0.75rem;
+        }
+        .section-title { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; }
+        .section-sub { font-size: 1rem; color: var(--muted); max-width: 560px; line-height: 1.75; margin-bottom: 3rem; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+        .feature-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem; transition: border-color 0.2s, transform 0.2s;
+        }
+        .feature-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+        .feature-title { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+        .feature-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+        /* ── Data sources ── */
+        .sources-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 3rem 2rem; }
+        .sources-inner { max-width: 1100px; margin: 0 auto; }
+        .sources-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem; }
+        .source-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 6px; padding: 1.25rem 1rem; text-align: center;
+        }
+        .source-name { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+        .source-desc { font-size: 0.75rem; color: var(--muted); }
+
+        /* ── Methodology ── */
+        .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+        .method-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .method-table th { background: var(--elevated); padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--border); }
+        .method-table td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--muted); }
+        .method-table td:first-child { color: var(--text); font-weight: 500; }
+        .method-right { display: flex; flex-direction: column; gap: 1rem; }
+        .method-box {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.25rem;
+        }
+        .method-box-title { font-size: 0.8rem; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem; }
+        .method-box p { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+        .band { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-size: 0.85rem; }
+        .band-bar { width: 40px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+
+        /* ── Institutional section ── */
+        .institutional { background: linear-gradient(135deg, #0d1829 0%, #0b0e14 100%); border-top: 1px solid var(--border); padding: 4rem 2rem; }
+        .institutional-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .institutional h2 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; }
+        .institutional p { color: var(--muted); line-height: 1.75; margin-bottom: 1.5rem; }
+        .check-list { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+        .check-list li { display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.9rem; color: var(--muted); }
+        .check-list li::before { content: '–'; color: var(--blue); font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+        .inst-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.75rem; }
+        .inst-card-title { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
+        .inst-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 0.875rem; }
+        .inst-row:last-child { border-bottom: none; }
+        .inst-row span:first-child { color: var(--muted); }
+        .inst-row span:last-child { color: var(--text); font-weight: 500; }
+
+        /* ── CTA ── */
+        .cta { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; text-align: center; }
+        .cta h2 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 1rem; }
+        .cta p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto 2rem; line-height: 1.75; }
+        .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        /* ── Footer ── */
+        .footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 2rem; text-align: center; }
+        .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text); }
+        .footer-copy { font-size: 0.8rem; color: var(--dim); }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem 2.5rem; gap: 2.5rem; }
+            .hero h1 { font-size: 2.2rem; }
+            .stats-inner { grid-template-columns: repeat(3, 1fr); }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .sources-grid { grid-template-columns: 1fr 1fr; }
+            .method-grid { grid-template-columns: 1fr; }
+            .institutional-inner { grid-template-columns: 1fr; gap: 2rem; }
+        }
+        @media (max-width: 600px) {
+            .header-nav { gap: 0.75rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .sources-grid { grid-template-columns: 1fr 1fr; }
+            .section-title { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────── -->
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">
+            <span class="logo-name">Global Investing</span>
+            <span class="logo-sub">Forex Fundamental Dashboard</span>
+        </div>
+        <nav class="header-nav">
+            <a href="index.html">Dashboard</a>
+            <a href="carry-trade.html">Carry Trade</a>
+            <a href="news.html">News</a>
+            <a href="about.html">Methodology</a>
+            <a href="index.html" class="lang-switch">ES</a>
+            <a href="index.html" class="btn-primary">Open Dashboard →</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ── HERO ───────────────────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="hero-text">
+        <div class="hero-badge">Real-Time · G8 Currencies · No Registration</div>
+        <h1>Professional <span>Forex Fundamental</span> Analysis for G8 Currencies</h1>
+        <p>A quantitative framework for G8 currencies — 21 macro indicators, official CFTC COT positioning, carry trade rankings and AI-generated narratives. Built for traders and analysts who think in fundamentals.</p>
+        <div class="hero-actions">
+            <a href="index.html" class="btn-primary btn-large">Open Dashboard →</a>
+            <a href="about.html" class="btn-secondary btn-large">Read Methodology</a>
+        </div>
+    </div>
+    <div class="hero-card">
+        <div class="hero-card-header">
+            <span class="hero-card-title">Strength Scores — G8</span>
+            <span class="live-dot">Updated daily</span>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">USD</div><div class="rate-name">US Dollar · Fed 3.75%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct up">+1.64%</span>
+                <span class="score-pill strong">Strong</span>
+            </div>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">GBP</div><div class="rate-name">British Pound · BoE 3.75%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct down">-2.52%</span>
+                <span class="score-pill neutral">Neutral</span>
+            </div>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">EUR</div><div class="rate-name">Euro · ECB 2.15%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct down">-2.04%</span>
+                <span class="score-pill neutral">Neutral</span>
+            </div>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">AUD</div><div class="rate-name">Australian Dollar · RBA 3.85%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct up">+0.25%</span>
+                <span class="score-pill strong">Strong</span>
+            </div>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">JPY</div><div class="rate-name">Japanese Yen · BoJ 0.75%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct down">-0.90%</span>
+                <span class="score-pill weak">Weak</span>
+            </div>
+        </div>
+        <div class="rate-row">
+            <div class="rate-pair">
+                <div><div class="rate-code">CHF</div><div class="rate-name">Swiss Franc · SNB 0.00%</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="rate-pct down">-0.50%</span>
+                <span class="score-pill neutral">Neutral</span>
+            </div>
+        </div>
+        <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border);font-size:0.68rem;color:var(--dim);">
+            FX Performance 1M vs USD weighted basket · Data: 2026-03-06
+        </div>
+    </div>
+</section>
+
+<!-- ── STATS BAR ───────────────────────────────────────────────────────── -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat"><div class="stat-value">8</div><div class="stat-label">G8 Currencies</div></div>
+        <div class="stat"><div class="stat-value">21</div><div class="stat-label">Weighted Indicators</div></div>
+        <div class="stat"><div class="stat-value">60s</div><div class="stat-label">FX Rate Refresh</div></div>
+        <div class="stat"><div class="stat-value">3×</div><div class="stat-label">Daily News Updates</div></div>
+        <div class="stat"><div class="stat-value">Open</div><div class="stat-label">No Account Required</div></div>
+    </div>
+</div>
+
+<!-- ── FEATURES ───────────────────────────────────────────────────────── -->
+<section class="section">
+    <div class="section-label">What's Inside</div>
+    <h2 class="section-title">Everything a fundamental forex trader needs</h2>
+    <p class="section-sub">Built around one core principle: weights should reflect what moves price now, not what best describes the economy in the long run.</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            
+            <div class="feature-title">Fundamental Strength Score (0–100)</div>
+            <div class="feature-desc">Quantitative index aggregating 21 macro indicators across 6 thematic tiers. Three interpretive bands: &lt;53 Weak · 53–63 Neutral · &gt;63 Strong. Auto-normalised for missing data.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">Economic Heatmap</div>
+            <div class="feature-desc">21-column matrix for all 8 currencies showing real values, colour-coded by strength and publication date per cell. Instantly identify the leading and lagging economies.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">FX Performance 1M</div>
+            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). The only 100% lag-free indicator in the model — captures institutional flows in near real time. Weight: 12%.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">COT Positioning (CFTC)</div>
+            <div class="feature-desc">Weekly net positions from the official CFTC Leveraged Funds report (Futures Only). Contrarian logic built in: extreme positions penalise the score instead of amplifying it. Weight: 7%.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">Carry Trade Analysis</div>
+            <div class="feature-desc">Dedicated page with rate strip, ranked pair table, 18-month spread history chart, central bank meeting calendar and live Risk-On / Risk-Off regime indicator.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">AI-Generated Narratives</div>
+            <div class="feature-desc">Daily fundamental analysis per currency generated by Groq AI (llama-3.3-70b-versatile) using live macro data and latest news. Informational only — not trading signals.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">Economic Calendar</div>
+            <div class="feature-desc">Real publication data (actual, estimate, previous) for upcoming economic events. Times auto-converted to the user's local timezone. Updated 3× daily.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">Real-Time News Feed</div>
+            <div class="feature-desc">RSS feeds from FXStreet, ForexLive, Reuters, Investing.com and all 8 central banks. Auto-tagged by currency and estimated impact level. Updated every 8 hours.</div>
+        </div>
+        <div class="feature-card">
+            
+            <div class="feature-title">Pair Recommendations</div>
+            <div class="feature-desc">LONG/SHORT suggestions based on score differentials. Three confidence levels: High (&gt;20pt), Medium (12–20pt), Low (&lt;12pt). Data quality percentage shown per pair.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ── DATA SOURCES ────────────────────────────────────────────────────── -->
+<div class="sources-section">
+    <div class="sources-inner">
+        <div class="section-label" style="margin-bottom:0.5rem;">Data Integrity</div>
+        <h2 class="section-title" style="margin-bottom:0.5rem;">Official sources only. Open box, not black box.</h2>
+        <p style="color:var(--muted);max-width:580px;line-height:1.7;margin-bottom:0;">Every data point has a declared source. Every weight has a documented rationale. The methodology is fully public in the <a href="about.html" style="color:var(--blue);">About page</a>.</p>
+        <div class="sources-grid">
+            <div class="source-card">
+                <div class="source-name">CFTC.gov</div>
+                <div class="source-desc">Official COT — Leveraged Funds, Futures Only</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">Frankfurter / ECB</div>
+                <div class="source-desc">FX rates & FX Performance 1M calculation</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">Trading Economics</div>
+                <div class="source-desc">21 macro indicators per currency (GDP, CPI, etc.)</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">cbrates.com</div>
+                <div class="source-desc">Central bank meeting dates & decisions</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">FXStreet · ForexLive</div>
+                <div class="source-desc">Forex-specific news feeds (RSS)</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">Reuters · Investing.com</div>
+                <div class="source-desc">International financial news</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">8 Central Banks</div>
+                <div class="source-desc">Direct press releases: Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ</div>
+            </div>
+            <div class="source-card">
+                <div class="source-name">Groq AI</div>
+                <div class="source-desc">llama-3.3-70b-versatile — narrative generation only</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── METHODOLOGY OVERVIEW ────────────────────────────────────────────── -->
+<section class="section">
+    <div class="section-label">Methodology</div>
+    <h2 class="section-title">6-tier scoring model — fully documented</h2>
+    <p class="section-sub">The scoring hierarchy mirrors how the forex market actually prices currencies: carry > momentum > monetary cycle > structural fundamentals.</p>
+    <div class="method-grid">
+        <table class="method-table">
+            <thead>
+                <tr><th>Tier</th><th>Weight</th><th>Key Indicators</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>T1 · Rates & Monetary Cycle</td><td>~32%</td><td>Interest rate, Inflation, CB Outlook, Rate Momentum</td></tr>
+                <tr><td>T2 · External Balance</td><td>~14%</td><td>Trade Balance, Current Account, Debt, ToT</td></tr>
+                <tr><td>T3 · Growth & Employment</td><td>~18%</td><td>GDP Growth, Unemployment, Industrial Production</td></tr>
+                <tr><td>T4 · FX Momentum & Smart Money</td><td>~19%</td><td>FX Performance 1M, COT Positioning</td></tr>
+                <tr><td>T5 · Market Sentiment</td><td>~9%</td><td>Manufacturing PMI, 10Y Sovereign Bond</td></tr>
+                <tr><td>T6 · Consumption & Wages</td><td>~8%</td><td>Retail Sales, Consumer Confidence, Wage Growth</td></tr>
+            </tbody>
+        </table>
+        <div class="method-right">
+            <div class="method-box">
+                <div class="method-box-title">Score Interpretation</div>
+                <div class="band"><div class="band-bar" style="background:var(--green)"></div><span style="color:var(--text);font-weight:600;">&gt; 63</span><span style="color:var(--muted);font-size:0.85rem;">— Strong / Bullish bias</span></div>
+                <div class="band"><div class="band-bar" style="background:var(--muted)"></div><span style="color:var(--text);font-weight:600;">53 – 63</span><span style="color:var(--muted);font-size:0.85rem;">— Neutral / Mixed</span></div>
+                <div class="band"><div class="band-bar" style="background:var(--red)"></div><span style="color:var(--text);font-weight:600;">&lt; 53</span><span style="color:var(--muted);font-size:0.85rem;">— Weak / Bearish bias</span></div>
+            </div>
+            <div class="method-box">
+                <div class="method-box-title">Pair Confidence</div>
+                <p>Score differential &gt;20pt → High confidence<br>12–20pt → Medium confidence<br>&lt;12pt → Low confidence<br><br>Pair quality % reflects completeness of available indicators.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── INSTITUTIONAL ───────────────────────────────────────────────────── -->
+<div class="institutional">
+    <div class="institutional-inner">
+        <div>
+            <div class="section-label" style="margin-bottom:0.75rem;">For Institutions & Professional Traders</div>
+            <h2>Why use Global Investing as a reference tool</h2>
+            <p>The dashboard is designed to be a transparent, auditable complement to internal analysis systems — not a black box. Every weight, every source and every calculation method is publicly documented.</p>
+            <ul class="check-list">
+                <li>Official data sources only: CFTC, ECB, Trading Economics, central bank websites</li>
+                <li>Open-box methodology — full weight documentation in the About page</li>
+                <li>Robust legal framework: explicit non-advisory disclaimers, risk acknowledgement, GDPR compliance</li>
+                <li>Automated infrastructure with 11 GitHub Actions workflows and data health monitoring</li>
+                <li>Intelligent cache system: AI analysis regenerates on data change, not on a fixed timer</li>
+                <li>Contrarian COT logic: extreme positioning penalises score — no trend-chasing bias</li>
+                <li>Accessible without registration — suitable for team-wide distribution</li>
+            </ul>
+        </div>
+        <div class="inst-card">
+            <div class="inst-card-title">Current Data Snapshot — March 2026</div>
+            <div class="inst-row"><span>Fed Funds Rate</span><span>3.75% (–0.75pp in 12M)</span></div>
+            <div class="inst-row"><span>ECB Deposit Rate</span><span>2.15%</span></div>
+            <div class="inst-row"><span>BoE Bank Rate</span><span>3.75%</span></div>
+            <div class="inst-row"><span>BoJ Policy Rate</span><span>0.75%</span></div>
+            <div class="inst-row"><span>RBA Cash Rate</span><span>3.85%</span></div>
+            <div class="inst-row"><span>BoC Overnight Rate</span><span>2.25%</span></div>
+            <div class="inst-row"><span>SNB Policy Rate</span><span>0.00%</span></div>
+            <div class="inst-row"><span>RBNZ OCR</span><span>2.25%</span></div>
+            <div class="inst-row"><span>Next Fed meeting</span><span>18 March 2026</span></div>
+            <div class="inst-row"><span>Next ECB meeting</span><span>19 March 2026</span></div>
+            <div class="inst-row"><span>COT last update</span><span>2026-03-07 (CFTC)</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────── -->
+<section class="cta">
+    <h2>A rigorous starting point for G8 currency analysis</h2>
+    <p>Real-time data, updated automatically. No account required.</p>
+    <div class="cta-actions">
+        <a href="index.html" class="btn-primary btn-large">Open Dashboard →</a>
+        <a href="carry-trade.html" class="btn-secondary btn-large">Carry Trade Analysis</a>
+        <a href="news.html" class="btn-secondary btn-large">News Feed</a>
+    </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────── -->
+<footer class="footer">
+    <div class="footer-links">
+        <a href="index.html">Dashboard (ES)</a>
+        <a href="about.html">Methodology</a>
+        <a href="carry-trade.html">Carry Trade</a>
+        <a href="news.html">News</a>
+        <a href="guia-cot.html">COT Guide</a>
+        <a href="guia-bancos-centrales.html">Central Banks</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="contact.html">Contact</a>
+    </div>
+    <p class="footer-copy">© <span id="yr"></span> Santiago Plá Casuriaga · Global Investing. All rights reserved. · This site does not provide financial advice. All content is for informational purposes only.</p>
+</footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
