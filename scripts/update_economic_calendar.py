@@ -249,9 +249,10 @@ def fetch_ff_xml(target_dates):
 
                     use_date = event_date_utc if event_date_utc in target_dates else event_date
                     events.append({
-                        'date':     fmt_date(event_date),   # original ET date for display
-                        'dateISO':  use_date.isoformat(),   # UTC date for sorting/logic
-                        'timeUTC':  time_utc,
+                        'date':     fmt_date(event_date),        # ET date label for display
+                        'dateISO':  event_date.isoformat(),      # ET date for frontend grouping/tabs
+                        'timeUTC':  time_utc,                    # UTC time for conversion to local
+                        'sortKey':  f"{use_date.isoformat()}T{time_utc or '00:00'}",  # UTC for sorting
                         'country':  currency,
                         'currency': currency,
                         'flag':     CURRENCY_FLAGS.get(currency, ''),
@@ -855,6 +856,8 @@ for ev in all_events:
 
 # Sort by dateISO + timeUTC
 def sort_key(ev):
+    if ev.get('sortKey'):
+        return ev['sortKey']
     t = ev.get('timeUTC') or '00:00'
     return ev['dateISO'] + 'T' + (t if re.match(r'\d{2}:\d{2}', t) else '00:00')
 
