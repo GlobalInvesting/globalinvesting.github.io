@@ -1172,6 +1172,45 @@
         padding: 1rem;
     }
 }
+
+        /* ── Calendar event states ─────────────────────────────── */
+        .calendar-event.is-past {
+            opacity: 0.48;
+        }
+        .calendar-event.is-past .event-title {
+            text-decoration: line-through;
+            text-decoration-color: var(--text-tertiary);
+        }
+        .calendar-event.is-past .event-impact {
+            opacity: 0.5;
+        }
+        .calendar-event.is-next {
+            background: rgba(30, 136, 229, 0.06);
+            border-left: 3px solid var(--green) !important;
+        }
+        .next-marker {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.2rem;
+        }
+        .next-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(0.75); }
+        }
     </style>
 </head>
 <body>
@@ -5197,14 +5236,37 @@ const sentiment = getSentiment(strength);
                         <div className="calendar-container">
                             {filteredEvents.map((event, index) => {
                                 const isToday = event.dateISO === todayISO;
-                                const hasActual = event.actual && event.actual !== '';
+                                const hasActual = !!(event.actual && event.actual !== '');
+                                // Past: has actual data; Next: first future event today
+                                const nowMs = Date.now();
+                                let eventMs = null;
+                                if (event.dateISO && (event.timeUTC || event.time)) {
+                                    const t = event.timeUTC || event.time;
+                                    const d = new Date(`${event.dateISO}T${t}:00Z`);
+                                    if (!isNaN(d.getTime())) eventMs = d.getTime();
+                                }
+                                const isPast = hasActual || (eventMs !== null && eventMs < nowMs);
+                                // isNext: today, not past, and first such event in the list
+                                const isNext = isToday && !isPast && !hasActual &&
+                                    filteredEvents.slice(0, index).every(e => {
+                                        const ta = e.timeUTC || e.time;
+                                        if (!ta || !e.dateISO) return true;
+                                        const d2 = new Date(`${e.dateISO}T${ta}:00Z`);
+                                        return isNaN(d2.getTime()) || d2.getTime() < nowMs || !!(e.actual && e.actual !== '');
+                                    });
+                                const eventClass = `calendar-event${isPast ? ' is-past' : ''}${isNext ? ' is-next' : ''}`;
                                 return (
-                                    <div key={index} className="calendar-event" style={{
-                                        borderLeft: isToday ? '3px solid var(--blue)' : 'none',
-                                        opacity: hasActual ? 0.78 : 1,
+                                    <div key={index} className={eventClass} style={{
+                                        borderLeft: isNext ? '' : (isToday && !isPast ? '3px solid var(--blue)' : 'none'),
                                     }}>
                                         <div className="event-time">
-                                            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isToday ? 'var(--blue)' : 'inherit' }}>
+                                            {isNext && (
+                                                <div className="next-marker">
+                                                    <div className="next-dot"></div>
+                                                    Próximo
+                                                </div>
+                                            )}
+                                            <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isNext ? 'var(--green)' : (isToday && !isPast ? 'var(--blue)' : 'inherit') }}>
                                                 {event.date}
                                             </div>
                                             <div>{formatEventTime(event.timeUTC || event.time, event.dateISO)}</div>
