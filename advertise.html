@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertise | Global Investing — Forex Fundamental Dashboard</title>
+    <meta name="description" content="Reach a qualified audience of forex traders and financial analysts. Sponsorship and advertising opportunities on Global Investing's forex fundamental analysis dashboard.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/advertise.html">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0b0e14;
+            --bg2: #13171f;
+            --card: #1a1f2e;
+            --elevated: #20253a;
+            --border: #30363d;
+            --text: #e1e4e8;
+            --muted: #8b949e;
+            --dim: #6e7681;
+            --blue: #1e88e5;
+            --green: #26a69a;
+            --red: #ef5350;
+            --orange: #e0a020;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 2rem;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { display: flex; flex-direction: column; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+        .logo-sub { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .header-nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .header-nav a:hover { color: var(--text); }
+        .btn-primary {
+            background: var(--blue); color: #fff; padding: 0.55rem 1.25rem;
+            border-radius: 5px; font-weight: 600; font-size: 0.875rem;
+            text-decoration: none; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #1565c0; }
+
+        /* ── Hero ── */
+        .hero {
+            max-width: 1100px; margin: 0 auto;
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+        }
+        .page-label {
+            display: inline-block;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--blue); margin-bottom: 1rem;
+        }
+        .hero h1 {
+            font-size: 2.75rem; font-weight: 700; letter-spacing: -0.03em;
+            line-height: 1.15; margin-bottom: 1.25rem;
+        }
+        .hero h1 span { color: var(--blue); }
+        .hero p {
+            font-size: 1.05rem; color: var(--muted); line-height: 1.8;
+            max-width: 620px; margin: 0 auto 2.5rem;
+        }
+        .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-secondary {
+            background: transparent; color: var(--text); padding: 0.65rem 1.4rem;
+            border: 1px solid var(--border); border-radius: 5px; font-weight: 500;
+            font-size: 0.9rem; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+        .btn-large { padding: 0.75rem 1.75rem; font-size: 1rem; }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+        }
+        .stats-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+        }
+        .stat { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--blue); margin-bottom: 0.2rem; }
+        .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+        .stat-note { font-size: 0.7rem; color: var(--dim); margin-top: 0.15rem; }
+
+        /* ── Sections ── */
+        .section { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+        .section-label {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--blue); margin-bottom: 0.75rem;
+        }
+        .section-title { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.9rem; }
+        .section-sub { font-size: 0.975rem; color: var(--muted); max-width: 580px; line-height: 1.8; margin-bottom: 2.5rem; }
+
+        /* ── Audience grid ── */
+        .audience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
+        .audience-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem;
+        }
+        .audience-card-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+        .audience-card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+        /* ── Why advertise ── */
+        .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .why-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start;
+        }
+        .why-number {
+            font-size: 1.5rem; font-weight: 700; color: var(--blue);
+            line-height: 1; flex-shrink: 0; min-width: 2rem;
+        }
+        .why-content-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+        .why-content-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+        /* ── Formats ── */
+        .formats-section {
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 4rem 2rem;
+        }
+        .formats-inner { max-width: 1100px; margin: 0 auto; }
+        .formats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+        .format-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.75rem; display: flex; flex-direction: column;
+        }
+        .format-card.featured { border-color: var(--blue); }
+        .format-badge {
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            background: rgba(30,136,229,0.15); color: var(--blue); border: 1px solid rgba(30,136,229,0.3);
+            padding: 0.2rem 0.6rem; border-radius: 3px; align-self: flex-start; margin-bottom: 1rem;
+        }
+        .format-title { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 0.6rem; }
+        .format-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; flex: 1; }
+        .format-details { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.5rem; }
+        .format-details li { font-size: 0.8rem; color: var(--dim); padding-left: 0.75rem; position: relative; }
+        .format-details li::before { content: '–'; position: absolute; left: 0; color: var(--blue); }
+        .format-cta {
+            font-size: 0.85rem; font-weight: 600; color: var(--blue);
+            text-decoration: none; border: 1px solid rgba(30,136,229,0.4);
+            border-radius: 4px; padding: 0.5rem 1rem; text-align: center;
+            transition: all 0.2s; margin-top: auto;
+        }
+        .format-cta:hover { background: rgba(30,136,229,0.1); }
+
+        /* ── Ideal partners ── */
+        .partners-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+        .partner-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem;
+        }
+        .partner-type { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 0.5rem; }
+        .partner-title { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+        .partner-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+        /* ── Editorial policy ── */
+        .policy-section {
+            background: linear-gradient(135deg, #0d1829 0%, #0b0e14 100%);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 4rem 2rem;
+        }
+        .policy-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+        .policy-box {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.5rem;
+        }
+        .policy-box-title { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+        .policy-row { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 0.875rem; align-items: flex-start; }
+        .policy-row:last-child { border-bottom: none; }
+        .policy-icon { color: var(--green); font-weight: 700; flex-shrink: 0; }
+        .policy-icon.no { color: var(--red); }
+        .policy-text { color: var(--muted); line-height: 1.55; }
+
+        /* ── Contact CTA ── */
+        .contact-section { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+        .contact-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 3rem; text-align: center;
+        }
+        .contact-card h2 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; }
+        .contact-card p { color: var(--muted); max-width: 500px; margin: 0 auto 2rem; line-height: 1.75; font-size: 0.975rem; }
+        .contact-email {
+            display: inline-block; font-size: 1.05rem; font-weight: 600;
+            color: var(--blue); text-decoration: none; border-bottom: 1px solid rgba(30,136,229,0.4);
+            padding-bottom: 0.1rem; transition: border-color 0.2s;
+        }
+        .contact-email:hover { border-color: var(--blue); }
+        .contact-note { font-size: 0.8rem; color: var(--dim); margin-top: 1.5rem; }
+
+        /* ── Footer ── */
+        .footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 2rem; text-align: center; }
+        .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text); }
+        .footer-copy { font-size: 0.8rem; color: var(--dim); }
+
+        /* ── Dividers ── */
+        .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .hero { padding: 3rem 1.5rem 2.5rem; }
+            .hero h1 { font-size: 2.1rem; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .audience-grid { grid-template-columns: 1fr 1fr; }
+            .why-grid { grid-template-columns: 1fr; }
+            .formats-grid { grid-template-columns: 1fr; }
+            .partners-grid { grid-template-columns: 1fr; }
+            .policy-inner { grid-template-columns: 1fr; gap: 2rem; }
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.75rem; }
+            .audience-grid { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .section-title { font-size: 1.6rem; }
+            .header-nav { gap: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── HEADER ────────────────────────────────────────────────────────── -->
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">
+            <span class="logo-name">Global Investing</span>
+            <span class="logo-sub">Forex Fundamental Dashboard</span>
+        </div>
+        <nav class="header-nav">
+            <a href="index.html">Dashboard</a>
+        <a href="publicidad.html">Publicidad (ES)</a>
+            <a href="en.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="index.html" class="btn-primary">Open Dashboard →</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ── HERO ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="page-label">Partnerships &amp; Advertising</div>
+    <h1>Reach a <span>qualified forex audience</span><br>at the point of analysis</h1>
+    <p>Global Investing is a professional-grade fundamental analysis dashboard for G8 currencies. Our audience reads macro data, studies central bank decisions and evaluates trade setups — not casual browsing.</p>
+    <div class="hero-actions">
+        <a href="mailto:globalinvestingmarkets@gmail.com?subject=Partnership%20Inquiry" class="btn-primary btn-large">Get in Touch</a>
+        <a href="#formats" class="btn-secondary btn-large">View Ad Formats</a>
+    </div>
+</section>
+
+<!-- ── AUDIENCE STATS ────────────────────────────────────────────────── -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat">
+            <div class="stat-value">G8</div>
+            <div class="stat-label">Currencies Covered</div>
+            <div class="stat-note">USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">21</div>
+            <div class="stat-label">Macro Indicators</div>
+            <div class="stat-note">Per currency, updated daily</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">Daily</div>
+            <div class="stat-label">Return Visits</div>
+            <div class="stat-note">Traders check data every session</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Finance Audience</div>
+            <div class="stat-note">No general-interest traffic</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── AUDIENCE PROFILE ──────────────────────────────────────────────── -->
+<section class="section">
+    <div class="section-label">Audience Profile</div>
+    <h2 class="section-title">Who reads Global Investing</h2>
+    <p class="section-sub">The dashboard attracts an intentional audience: people who seek out fundamental data, not passive scrollers. Every page — from the scoring methodology to the COT analysis — requires active engagement.</p>
+
+    <div class="audience-grid">
+        <div class="audience-card">
+            <div class="audience-card-title">Active Forex Traders</div>
+            <div class="audience-card-desc">Retail and semi-professional traders who incorporate macro fundamentals into their process. They use the strength scores and carry rankings to qualify setups and manage directional bias across sessions.</div>
+        </div>
+        <div class="audience-card">
+            <div class="audience-card-title">Macro Analysts &amp; Researchers</div>
+            <div class="audience-card-desc">Financial professionals who need a fast, structured overview of G8 macro conditions — GDP, inflation, rates, COT positioning — without building their own data infrastructure.</div>
+        </div>
+        <div class="audience-card">
+            <div class="audience-card-title">Finance Students &amp; CFA/CMT Candidates</div>
+            <div class="audience-card-desc">Advanced students using the dashboard as a practical reference alongside academic study. The methodology documentation and educational guides make it a credible supplement to formal training.</div>
+        </div>
+    </div>
+
+    <div class="section-label" style="margin-top:1rem;">Why this audience converts</div>
+    <div class="why-grid">
+        <div class="why-card">
+            <div class="why-number">01</div>
+            <div>
+                <div class="why-content-title">High intent, active decision-making</div>
+                <div class="why-content-desc">Visitors arrive looking for specific data to inform real financial decisions. This is a fundamentally different mindset from entertainment or general news consumption — and it correlates directly with openness to relevant financial products and services.</div>
+            </div>
+        </div>
+        <div class="why-card">
+            <div class="why-number">02</div>
+            <div>
+                <div class="why-content-title">No general-interest dilution</div>
+                <div class="why-content-desc">Every page — the scoring dashboard, carry trade analysis, COT positioning, economic calendar — requires prior knowledge to interpret. The content itself acts as a natural audience filter. There is no lifestyle or entertainment traffic.</div>
+            </div>
+        </div>
+        <div class="why-card">
+            <div class="why-number">03</div>
+            <div>
+                <div class="why-content-title">Daily return frequency</div>
+                <div class="why-content-desc">Forex traders check macro conditions before each session. The dashboard is designed as a daily tool, not a one-time reference — meaning ad exposure compounds with each visit rather than relying on one-time acquisition.</div>
+            </div>
+        </div>
+        <div class="why-card">
+            <div class="why-number">04</div>
+            <div>
+                <div class="why-content-title">Bilingual reach — ES + EN</div>
+                <div class="why-content-desc">The dashboard and educational guides are in Spanish; the landing page is in English. This creates a rare dual-market audience: Latin American and Spanish traders on one side, and the broader international English-speaking forex community on the other.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── AD FORMATS ────────────────────────────────────────────────────── -->
+<div class="formats-section" id="formats">
+    <div class="formats-inner">
+        <div class="section-label">Ad Formats</div>
+        <h2 class="section-title">Three ways to reach our audience</h2>
+        <p class="section-sub">All formats are discussed directly — no intermediary platform. Placements, copy and scheduling are agreed case by case to ensure relevance for both audience and advertiser.</p>
+
+        <div class="formats-grid">
+            <div class="format-card">
+                <div class="format-title">Display Sponsorship</div>
+                <div class="format-desc">Static or animated banner placements integrated into the dashboard layout. Available in the main dashboard, carry trade page, news feed and educational guides.</div>
+                <ul class="format-details">
+                    <li>Header banner (1100×90px)</li>
+                    <li>Sidebar card (300×250px)</li>
+                    <li>In-content placement between sections</li>
+                    <li>Monthly or quarterly terms</li>
+                </ul>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Display%20Sponsorship%20Inquiry" class="format-cta">Enquire</a>
+            </div>
+
+            <div class="format-card featured">
+                <div class="format-badge">Recommended</div>
+                <div class="format-title">Featured Partner</div>
+                <div class="format-desc">A dedicated "Supported by" mention in the header and footer across all pages, plus a highlighted card in the dashboard with a short description and direct link. High-visibility, low-intrusion format suited to brokers and platforms that want brand recognition without disruptive advertising.</div>
+                <ul class="format-details">
+                    <li>Site-wide header attribution</li>
+                    <li>Partner card on dashboard homepage</li>
+                    <li>Mention in the About / Methodology page</li>
+                    <li>Exclusive — one partner at a time</li>
+                </ul>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Featured%20Partner%20Inquiry" class="format-cta">Enquire</a>
+            </div>
+
+            <div class="format-card">
+                <div class="format-title">Content Partnership</div>
+                <div class="format-desc">Co-produced analytical content — a dedicated guide, market report or methodology article — published under the Global Investing editorial framework with clear partner attribution. Suitable for institutions that want to demonstrate analytical credibility to a sophisticated audience.</div>
+                <ul class="format-details">
+                    <li>Branded educational guide or report</li>
+                    <li>Permanent URL on the site</li>
+                    <li>Linked from relevant dashboard sections</li>
+                    <li>Editorial independence maintained</li>
+                </ul>
+                <a href="mailto:globalinvestingmarkets@gmail.com?subject=Content%20Partnership%20Inquiry" class="format-cta">Enquire</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── IDEAL PARTNERS ────────────────────────────────────────────────── -->
+<section class="section">
+    <div class="section-label">Ideal Partners</div>
+    <h2 class="section-title">Who is a good fit</h2>
+    <p class="section-sub">We prioritise partnerships with organisations whose offering is genuinely relevant to the audience. Contextual alignment — not volume — is the basis for every conversation.</p>
+
+    <div class="partners-grid">
+        <div class="partner-card">
+            <div class="partner-type">Brokers &amp; Trading Platforms</div>
+            <div class="partner-title">Forex and CFD brokers, prop firms, copy-trading platforms</div>
+            <div class="partner-desc">The clearest audience fit. Visitors are already in the process of forming a directional view on a currency pair — a moment of high commercial relevance for any trading platform. Particularly suited to brokers with a fundamental or macro-oriented value proposition.</div>
+        </div>
+        <div class="partner-card">
+            <div class="partner-type">Financial Data &amp; Tools</div>
+            <div class="partner-title">Data providers, charting platforms, screening tools</div>
+            <div class="partner-desc">Traders who use fundamental dashboards also use professional charting and data tools. Complementary, non-competing products from TradingView-type platforms to Bloomberg Terminal alternative services are a natural fit for this audience.</div>
+        </div>
+        <div class="partner-card">
+            <div class="partner-type">Education &amp; Certification</div>
+            <div class="partner-title">CFA, CMT, financial courses, trading academies</div>
+            <div class="partner-desc">The educational guides on COT analysis, carry trade, central bank frameworks and the scoring methodology attract an audience already invested in structured learning. Programmes that build on this foundation — rather than starting from scratch — convert well.</div>
+        </div>
+        <div class="partner-card">
+            <div class="partner-type">Financial Institutions</div>
+            <div class="partner-title">Banks, asset managers, FX desks looking for brand visibility</div>
+            <div class="partner-desc">Institutional visibility among an engaged, analytically sophisticated audience. Suitable for institutions building brand recognition in the retail-to-professional pipeline — research desks, wealth management arms or FX advisory services targeting active traders.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ── EDITORIAL POLICY ──────────────────────────────────────────────── -->
+<div class="policy-section">
+    <div class="policy-inner">
+        <div>
+            <div class="section-label">Editorial Independence</div>
+            <h2 class="section-title" style="font-size:1.75rem;">What we will and will not do</h2>
+            <p style="color:var(--muted);line-height:1.8;margin-bottom:1.5rem;font-size:0.95rem;">The analytical credibility of Global Investing is its primary asset — and the reason this audience exists. We maintain a strict separation between editorial content and commercial relationships.</p>
+            <p style="color:var(--muted);line-height:1.8;font-size:0.95rem;">Advertisers do not influence the strength scores, the methodology, the news selection or any analytical content on the site. This is non-negotiable and disclosed to users.</p>
+        </div>
+        <div>
+            <div class="policy-box">
+                <div class="policy-box-title">Editorial policy</div>
+                <div class="policy-row">
+                    <span class="policy-icon">+</span>
+                    <span class="policy-text">Clear "sponsored" or "partner" labelling on all paid placements</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon">+</span>
+                    <span class="policy-text">Contextual relevance requirement — partners must be relevant to the audience</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon">+</span>
+                    <span class="policy-text">Content partnerships published with full partner attribution</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon">+</span>
+                    <span class="policy-text">Right to decline any partnership that creates a conflict of interest</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon no">–</span>
+                    <span class="policy-text">No editorial influence over scoring, rankings or analytical content</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon no">–</span>
+                    <span class="policy-text">No undisclosed paid mentions or implied endorsements</span>
+                </div>
+                <div class="policy-row">
+                    <span class="policy-icon no">–</span>
+                    <span class="policy-text">No partnerships with unregulated or non-compliant financial services</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── CONTACT CTA ───────────────────────────────────────────────────── -->
+<section class="contact-section">
+    <div class="contact-card">
+        <h2>Start a conversation</h2>
+        <p>Send a brief description of your organisation and the type of partnership you have in mind. We will respond within 2 business days.</p>
+        <a href="mailto:globalinvestingmarkets@gmail.com?subject=Partnership%20Inquiry%20—%20Global%20Investing" class="contact-email">globalinvestingmarkets@gmail.com</a>
+        <p class="contact-note">For institutional enquiries, please include your organisation name, website and a brief description of the partnership you are proposing.</p>
+    </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────────── -->
+<footer class="footer">
+    <div class="footer-links">
+        <a href="index.html">Dashboard</a>
+        <a href="publicidad.html">Publicidad (ES)</a>
+        <a href="en.html">About (EN)</a>
+        <a href="about.html">Metodología</a>
+        <a href="carry-trade.html">Carry Trade</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="contact.html">Contact</a>
+    </div>
+    <p class="footer-copy">© <span id="yr"></span> Santiago Plá Casuriaga · Global Investing. All content is for informational purposes only and does not constitute financial advice.</p>
+</footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
