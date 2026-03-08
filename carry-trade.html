@@ -26,6 +26,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { overflow-x: hidden; max-width: 100%; }
 
   :root {
     --bg-primary:   #0b0e14;
@@ -133,7 +134,7 @@
   /* ── Two-column layout ── */
   .content-grid {
     display: grid; grid-template-columns: 1fr 348px;
-    gap: 1.5rem; margin-bottom: 0; align-items: stretch;
+    gap: 1.5rem; margin-bottom: 0; align-items: stretch; max-width: 100%;
   }
 
   /* ── Table card ── */
@@ -224,7 +225,7 @@
   .regime-metric-val { font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; font-weight: 500; }
 
   /* ── Detail cards grid ── */
-  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; max-width: 100%; }
 
   .detail-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
   .detail-card:hover { border-color: var(--border-hover); }
@@ -299,16 +300,16 @@
 
     /* Table card: no height stretch, horizontal scroll */
     .ranking-col { display: block; height: auto; }
-    .table-card  { display: block; height: auto; overflow: hidden; }
+    .table-card  { display: block; height: auto; overflow: visible; }
     .table-card-head { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-    #pair-table  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #pair-table  { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
     thead th, tbody td { padding: 0.45rem 0.5rem; font-size: 0.72rem; }
     .col-bond, .col-perf { display: none; }
 
     /* Meeting rows: prevent flag/code from being clipped */
     .meeting-row { flex-wrap: nowrap; gap: 0.5rem; }
     .meeting-cur { min-width: 52px; flex-shrink: 0; font-size: 0.72rem; }
-    .meeting-date { font-size: 0.65rem; text-align: right; }
+    .meeting-date { font-size: 0.65rem; text-align: right; white-space: nowrap; }
 
     /* Info panels */
     .info-panel-body { padding: 0.5rem 0.75rem; }
@@ -326,7 +327,8 @@
     .dm-val { font-size: 0.72rem; }
 
     /* Spread chart */
-    #spread-chart-panel svg { width: 100% !important; }
+    #spread-chart-panel { overflow: hidden; }
+    #spread-chart-panel svg { max-width: 100%; height: auto; }
   }
 </style>
 </head>
