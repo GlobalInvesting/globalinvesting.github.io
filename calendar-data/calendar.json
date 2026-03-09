@@ -1,28 +1,28 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T01:01:41.498545Z",
+  "generatedAt": "2026-03-09T01:03:14.753964Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
-  "source": "Investing.com",
+  "source": "ForexFactory XML",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-03-07",
   "rangeTo": "2026-04-08",
-  "totalEvents": 157,
+  "totalEvents": 160,
   "currencyCounts": {
     "JPY": 33,
     "EUR": 19,
     "CHF": 1,
-    "USD": 64,
+    "USD": 66,
     "AUD": 7,
     "GBP": 16,
-    "CAD": 10,
+    "CAD": 11,
     "NZD": 7
   },
   "impactCounts": {
     "high": 28,
-    "medium": 15,
-    "low": 114
+    "medium": 14,
+    "low": 118
   },
   "events": [
     {
@@ -249,12 +249,12 @@
     {
       "date": "9 Mar",
       "dateISO": "2026-03-09",
-      "timeUTC": "10:00",
+      "timeUTC": "10:15",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Eurogroup Meetings",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -1345,11 +1345,37 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "Building Permits",
+      "impact": "low",
+      "actual": "",
+      "forecast": "1.41M",
+      "previous": "1.45M"
+    },
+    {
+      "date": "12 Mar",
+      "dateISO": "2026-03-12",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "Continuing Jobless Claims",
       "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": "1,868K"
+    },
+    {
+      "date": "12 Mar",
+      "dateISO": "2026-03-12",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Housing Starts",
+      "impact": "low",
+      "actual": "",
+      "forecast": "1.34M",
+      "previous": "1.40M"
     },
     {
       "date": "12 Mar",
@@ -1441,6 +1467,19 @@
       "actual": "",
       "forecast": "-0.6%",
       "previous": "2.0%"
+    },
+    {
+      "date": "12 Mar",
+      "dateISO": "2026-03-12",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Trade Balance",
+      "impact": "low",
+      "actual": "",
+      "forecast": "-1.2B",
+      "previous": "-1.3B"
     },
     {
       "date": "12 Mar",
