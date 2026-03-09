@@ -657,7 +657,10 @@ print("  - All timeUTC fields are UTC — frontend converts to user local timezo
 print("=" * 60)
 
 today      = date.today()
-from_date  = today - timedelta(days=1)
+# Fetch from 2 days ago so users in any timezone (UTC-12 to UTC+14)
+# always see at least the current local day even when the server clock
+# has already rolled over to the next UTC date.
+from_date  = today - timedelta(days=2)
 to_date    = today + timedelta(days=30)
 
 target_dates = set()
@@ -724,14 +727,19 @@ def sort_key(ev):
 
 unique_events.sort(key=sort_key)
 
-# Filter: keep future + yesterday-with-actual
+# Filter: keep future events + last 2 days (to cover UTC-12 to UTC+14).
+# Events from 2 days ago are kept only if they have an actual value;
+# yesterday and today are always kept so any user timezone sees their
+# current day regardless of when the GitHub Actions UTC clock ran.
 final_events = []
 for ev in unique_events:
     try:
         ev_date = date.fromisoformat(ev['dateISO'])
-        if ev_date >= today:
+        if ev_date >= today - timedelta(days=1):
+            # Keep yesterday+today+future unconditionally
             final_events.append(ev)
-        elif ev_date >= today - timedelta(days=1) and ev.get('actual'):
+        elif ev_date >= today - timedelta(days=2) and ev.get('actual'):
+            # Keep 2 days ago only if it already has an actual reading
             final_events.append(ev)
     except: pass
 
