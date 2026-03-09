@@ -17,8 +17,13 @@ Frankfurter tiene datos históricos completos desde 1999. Límite: ~1 req/seg.
 import json
 import os
 import time
-import urllib.request
+import requests
 from datetime import date, datetime, timedelta
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (compatible; ForexDashboard/3.0)',
+    'Accept': 'application/json',
+}
 
 FX_OUT_DIR = "fx-history"
 BASE_CURRENCY = "USD"
@@ -30,18 +35,24 @@ END_DATE   = date.today()
 os.makedirs(FX_OUT_DIR, exist_ok=True)
 
 
-def fetch_rates(target_date):
-    """Fetch rates for a specific date from Frankfurter API."""
+def fetch_rates(target_date, retries=3, backoff=5):
+    """Fetch rates for a specific date from Frankfurter API. Retries on failure."""
     url = f"https://api.frankfurter.app/{target_date.isoformat()}?base={BASE_CURRENCY}"
-    try:
-        with urllib.request.urlopen(url, timeout=15) as r:
-            d = json.loads(r.read())
-        rates = d.get("rates", {})
-        rates["USD"] = 1.0
-        return rates, d.get("date", target_date.isoformat())
-    except Exception as e:
-        print(f"  ERROR {target_date}: {e}")
-        return None, None
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            r.raise_for_status()
+            d = r.json()
+            rates = d.get("rates", {})
+            rates["USD"] = 1.0
+            return rates, d.get("date", target_date.isoformat())
+        except Exception as e:
+            if attempt < retries:
+                print(f"  RETRY {attempt}/{retries} for {target_date}: {e}")
+                time.sleep(backoff * attempt)
+            else:
+                print(f"  ERROR {target_date} after {retries} attempts: {e}")
+                return None, None
 
 
 def get_mondays(start, end):
