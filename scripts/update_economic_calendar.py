@@ -1252,6 +1252,56 @@ if events_needing_actual:
     else:
         print("  [Actuals] No actual values retrieved from Investing.com HTML")
 
+# ── STEP 3b-pre: Remove timezone-shift duplicates ────────────────────────────
+# FF JSON uses local time → event appears on Mar 9 with no time (timeUTC="")
+# FF XML uses UTC → same event appears on Mar 10 at 00:01 UTC
+# Rule: if two events have same (currency, normalized_name) and dates differ by
+# exactly 1 day, and ONE has no time (timeUTC==""), keep the one WITH a time.
+from collections import defaultdict
+name_cur_groups = defaultdict(list)
+for k, ev in list(merged_values.items()):
+    key = (ev['currency'], normalize_name(ev['event']))
+    name_cur_groups[key].append((k, ev))
+
+tz_dupes_removed = 0
+for key, items in name_cur_groups.items():
+    if len(items) < 2:
+        continue
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            k_a, ev_a = items[i]
+            k_b, ev_b = items[j]
+            if k_a not in merged_values or k_b not in merged_values:
+                continue
+            try:
+                d_a = date.fromisoformat(ev_a['dateISO'])
+                d_b = date.fromisoformat(ev_b['dateISO'])
+            except Exception:
+                continue
+            diff = abs((d_a - d_b).days)
+            if diff != 1:
+                continue
+            has_time_a = bool(ev_a.get('timeUTC', '').strip())
+            has_time_b = bool(ev_b.get('timeUTC', '').strip())
+            if has_time_a == has_time_b:
+                continue  # both have time or both lack it — not a TZ dupe
+            # One has no time, one has a time → TZ duplicate
+            # Keep the one with a time (it has UTC time from FF XML)
+            # Also merge actual/forecast/previous from whichever has them
+            keep_k   = k_a if has_time_a else k_b
+            drop_k   = k_b if has_time_a else k_a
+            keep_ev  = dict(merged_values[keep_k])
+            drop_ev  = merged_values[drop_k]
+            for field in ('actual', 'forecast', 'previous'):
+                if not keep_ev.get(field) and drop_ev.get(field):
+                    keep_ev[field] = drop_ev[field]
+            merged_values[keep_k] = keep_ev
+            del merged_values[drop_k]
+            tz_dupes_removed += 1
+
+if tz_dupes_removed:
+    print(f"  [TZ-dedup] Removed {tz_dupes_removed} timezone-shift duplicates")
+
 # ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
 # "GDP QoQ" vs "GDP Capital Expenditure QoQ" → keep both (short has ≤4 tokens but NOT contained since extra words differ)
