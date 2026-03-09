@@ -5035,12 +5035,39 @@ const sentiment = getSentiment(strength);
                 (a.dateISO || '').localeCompare(b.dateISO || '')
             );
 
-            // Día seleccionado: por defecto el primero disponible (hoy o futuro)
-            const todayISO = new Date().toISOString().split('T')[0];
-            const defaultDay = days.find(d => d.dateISO >= todayISO) || days[0];
+            // Use LOCAL date (not UTC) to avoid off-by-one day across timezones
+            const _now = new Date();
+            const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
+            const defaultDay = days.find(d => d.dateISO >= todayISO) || days[days.length - 1];
             const activeDateISO = calSelectedDate || (defaultDay && defaultDay.dateISO) || null;
             const activeDayIdx = days.findIndex(d => d.dateISO === activeDateISO);
             const activeDay = days[activeDayIdx] || null;
+
+            // Week grouping: group days by ISO week (Mon-Sun) for the week selector
+            const getWeekKey = (iso) => {
+                const d = new Date(iso + 'T12:00:00Z');
+                const day = d.getUTCDay() || 7;
+                const monday = new Date(d);
+                monday.setUTCDate(d.getUTCDate() - (day - 1));
+                return monday.toISOString().split('T')[0];
+            };
+            const weekMap = {};
+            days.forEach(day => {
+                const wk = getWeekKey(day.dateISO);
+                if (!weekMap[wk]) weekMap[wk] = [];
+                weekMap[wk].push(day);
+            });
+            const weeks = Object.keys(weekMap).sort();
+            const activeWeekKey = activeDay ? getWeekKey(activeDay.dateISO) : weeks[weeks.length - 1];
+            const daysInActiveWeek = weekMap[activeWeekKey] || [];
+
+            // Week label: "3 Mar – 7 Mar"
+            const fmtWeekLabel = (wk) => {
+                const wDays = weekMap[wk];
+                if (!wDays || !wDays.length) return wk;
+                const first = wDays[0].label, last = wDays[wDays.length-1].label;
+                return first === last ? first : `${first} – ${last}`;
+            };
 
             const goToPrev = () => {
                 if (activeDayIdx > 0) setCalSelectedDate(days[activeDayIdx - 1].dateISO);
@@ -5082,6 +5109,46 @@ const sentiment = getSentiment(strength);
 
             return (
                 <>
+                    {/* ── Selector de semana ─────────────────────────────── */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginBottom: '0.5rem',
+                        overflowX: 'auto',
+                        scrollbarWidth: 'none',
+                        paddingBottom: '2px',
+                    }}>
+                        {weeks.map(wk => {
+                            const isActiveWk = wk === activeWeekKey;
+                            return (
+                                <button
+                                    key={wk}
+                                    onClick={() => {
+                                        const wkDays = weekMap[wk];
+                                        if (!wkDays || !wkDays.length) return;
+                                        // Select today's day if it's in this week, otherwise first day
+                                        const todayInWk = wkDays.find(d => d.dateISO === todayISO);
+                                        setCalSelectedDate((todayInWk || wkDays[0]).dateISO);
+                                    }}
+                                    style={{
+                                        padding: '0.35rem 0.75rem',
+                                        background: isActiveWk ? 'var(--blue)' : 'var(--bg-secondary)',
+                                        border: `1px solid ${isActiveWk ? 'var(--blue)' : 'var(--border)'}`,
+                                        borderRadius: '20px',
+                                        color: isActiveWk ? '#fff' : 'var(--text-secondary)',
+                                        cursor: 'pointer',
+                                        fontSize: '0.75rem',
+                                        fontWeight: isActiveWk ? 600 : 400,
+                                        whiteSpace: 'nowrap',
+                                        flexShrink: 0,
+                                        transition: 'all 0.15s',
+                                    }}
+                                >{fmtWeekLabel(wk)}</button>
+                            );
+                        })}
+                    </div>
+
                     {/* ── Barra de navegación de días ───────────────────── */}
                     <div style={{
                         display: 'flex',
@@ -5114,14 +5181,14 @@ const sentiment = getSentiment(strength);
                             ‹
                         </button>
 
-                        {/* Pestañas de días — scrollable */}
+                        {/* Pestañas de días — solo los días de la semana activa */}
                         <div style={{
                             display: 'flex',
                             overflowX: 'auto',
                             flex: 1,
                             scrollbarWidth: 'none',
                         }}>
-                            {days.map((day, idx) => {
+                            {daysInActiveWeek.map((day) => {
                                 const isActive = day.dateISO === activeDateISO;
                                 const isToday  = day.dateISO === todayISO;
                                 const highCount = day.events.filter(e => e.impact === 'high').length;
@@ -5149,7 +5216,14 @@ const sentiment = getSentiment(strength);
                                         }}
                                     >
                                             <span>{day.label}</span>
-    {/* Bloque de puntitos eliminado */}
+    {highCount > 0 && (
+        <span style={{
+            fontSize: '0.6rem',
+            color: 'var(--red)',
+            fontWeight: 700,
+            lineHeight: 1,
+        }}>{'●'.repeat(Math.min(highCount, 3))}</span>
+    )}
 </button>
                                 );
                             })}
