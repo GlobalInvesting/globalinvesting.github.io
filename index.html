@@ -756,6 +756,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
+
+
         .card-header {
             background: var(--bg-card);
             padding: 1.25rem 1.5rem;
@@ -4647,6 +4649,25 @@ const DataHealthCheck = ({ economicData }) => {
                     const sentiment = getSentiment(strength);
                     const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
 
+                    // Compact date formatter — same logic as heatmap tooltips
+                    const fmtD = (ds) => {
+                        if (!ds) return null;
+                        try {
+                            const d = new Date(ds);
+                            const diff = Math.ceil((new Date() - d) / 86400000);
+                            if (diff <= 0) return 'Hoy';
+                            if (diff === 1) return 'Ayer';
+                            if (diff <= 7) return `${diff}d`;
+                            if (diff <= 60) return `${Math.floor(diff/7)}sem`;
+                            return d.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+                        } catch { return null; }
+                    };
+                    // titleWithDate: appends date to native title tooltip if available
+                    const td = (label, dateStr) => {
+                        const d = fmtD(dateStr);
+                        return d ? `${label} · Dato: ${d}` : label;
+                    };
+
                     return (
                         <div key={country.code} className="currency-card">
                             <div className="card-header">
@@ -4689,7 +4710,7 @@ const DataHealthCheck = ({ economicData }) => {
                                 </div>
 
                                 <div className="metrics-grid">
-                                    <div className="metric">
+                                    <div className="metric" title={td('Crecimiento PIB anual', data.gdpGrowthDate)}>
                                         <div className="metric-label">Crecimiento PIB</div>
                                         <div className="metric-value" style={{ 
                                             color: data.gdpGrowth !== null && data.gdpGrowth > 1.8 ? 'var(--green-strong)' : 
@@ -4699,7 +4720,7 @@ const DataHealthCheck = ({ economicData }) => {
                                             {formatValue(data.gdpGrowth)}%
                                         </div>
                                     </div>
-                                    <div className="metric">
+                                    <div className="metric" title={td('Inflación IPC', data.inflationDate)}>
                                         <div className="metric-label">Inflación</div>
                                         <div className="metric-value" style={{ 
                                             color: data.inflation !== null && data.inflation >= 1.8 && data.inflation <= 2.5 ? 'var(--green-strong)' : 
@@ -4709,7 +4730,7 @@ const DataHealthCheck = ({ economicData }) => {
                                             {formatValue(data.inflation)}%
                                         </div>
                                     </div>
-                                    <div className="metric">
+                                    <div className="metric" title={td('Tasa de desempleo', data.unemploymentDate)}>
                                         <div className="metric-label">Desempleo</div>
                                         <div className="metric-value" style={{ 
                                             color: data.unemployment !== null && data.unemployment < 3.5 ? 'var(--green-strong)' : 
@@ -4719,7 +4740,7 @@ const DataHealthCheck = ({ economicData }) => {
                                             {formatValue(data.unemployment)}%
                                         </div>
                                     </div>
-                                    <div className="metric">
+                                    <div className="metric" title={td('Cuenta Corriente % del PIB', data.currentAccountDate)}>
                                         <div className="metric-label">Cuenta Corriente</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.currentAccount !== null && data.currentAccount > 2 ? 'var(--green-strong)' : 
@@ -4731,7 +4752,7 @@ const DataHealthCheck = ({ economicData }) => {
                                                 : 'N/D'}
                                         </div>
                                     </div>
-                                    <div className="metric">
+                                    <div className="metric" title={td('Balanza Comercial en miles de millones USD', data.tradeBalanceDate)}>
                                         <div className="metric-label">Balanza Comercial</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.tradeBalance !== null && data.tradeBalance > 1000 ? 'var(--green-strong)' : 
@@ -4744,7 +4765,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         </div>
                                     </div>
                                     
-                                    <div className="metric">
+                                    <div className="metric" title={td('Ventas Minoristas MoM', data.retailSalesDate)}>
                                         <div className="metric-label">Ventas Minoristas</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.retailSales !== null && data.retailSales > 0.5 ? 'var(--green-strong)' : 
@@ -4757,7 +4778,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         </div>
                                     </div>
 
-                                    <div className="metric">
+                                    <div className="metric" title={td('Crecimiento Salarial YoY', data.wageGrowthDate)}>
                                         <div className="metric-label">Crecimiento Salarial</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.wageGrowth !== null && data.wageGrowth >= 2.5 && data.wageGrowth <= 4.5 ? 'var(--green-strong)' : 
@@ -4768,7 +4789,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         </div>
                                     </div>
 
-                                    <div className="metric">
+                                    <div className="metric" title={td('PMI Manufacturero — >50 expansión', data.manufacturingPMIDate)}>
                                         <div className="metric-label">PMI Manufacturero</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.manufacturingPMI !== null && data.manufacturingPMI > 50 ? 'var(--green-strong)' : 
@@ -4779,7 +4800,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         </div>
                                     </div>
 
-                                    <div className="metric">
+                                    <div className="metric" title={td('COT Positioning — contratos netos institucionales (CFTC)', data.cotDate)}>
                                         <div className="metric-label">COT Positioning</div>
                                         <div className="metric-value metric-value-small" style={{ 
                                             color: data.cotPositioning !== null && data.cotPositioning > 10000 ? 'var(--green-strong)' : 
@@ -4792,77 +4813,78 @@ const DataHealthCheck = ({ economicData }) => {
                                                 : 'N/A'}
                                         </div>
                                     </div>
-<div className="metric">
-    <div className="metric-label">Bono 10Y</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.bond10y !== null && data.bond10y > 4.0 ? 'var(--green-strong)' :
-               data.bond10y !== null && data.bond10y < 1.5 ? 'var(--red-strong)' :
-               'var(--text-primary)'
-    }}>
-        {data.bond10y !== null && data.bond10y !== undefined
-            ? `${formatValue(data.bond10y, 2)}%` : 'N/D'}
-    </div>
-</div>
 
-<div className="metric">
-    <div className="metric-label">Conf. Consumidor</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.consumerConfidence !== null && data.consumerConfidence > 100 ? 'var(--green-strong)' :
-               data.consumerConfidence !== null && data.consumerConfidence < 95 ? 'var(--red-strong)' :
-               'var(--text-primary)'
-    }}>
-        {formatValue(data.consumerConfidence, 1)}
-    </div>
-</div>
+                                    <div className="metric" title={td('Yield Bono Soberano 10 años', data.bond10yDate)}>
+                                        <div className="metric-label">Bono 10Y</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.bond10y !== null && data.bond10y > 4.0 ? 'var(--green-strong)' :
+                                                   data.bond10y !== null && data.bond10y < 1.5 ? 'var(--red-strong)' :
+                                                   'var(--text-primary)'
+                                        }}>
+                                            {data.bond10y !== null && data.bond10y !== undefined
+                                                ? `${formatValue(data.bond10y, 2)}%` : 'N/D'}
+                                        </div>
+                                    </div>
 
-<div className="metric">
-    <div className="metric-label">Conf. Empresarial</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.businessConfidence !== null && data.businessConfidence > 100 ? 'var(--green-strong)' :
-               data.businessConfidence !== null && data.businessConfidence < 95 ? 'var(--red-strong)' :
-               'var(--text-primary)'
-    }}>
-        {formatValue(data.businessConfidence, 1)}
-    </div>
-</div>
+                                    <div className="metric" title={td('Confianza del Consumidor', data.consumerConfidenceDate)}>
+                                        <div className="metric-label">Conf. Consumidor</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.consumerConfidence !== null && data.consumerConfidence > 100 ? 'var(--green-strong)' :
+                                                   data.consumerConfidence !== null && data.consumerConfidence < 95 ? 'var(--red-strong)' :
+                                                   'var(--text-primary)'
+                                        }}>
+                                            {formatValue(data.consumerConfidence, 1)}
+                                        </div>
+                                    </div>
 
-<div className="metric">
-    <div className="metric-label">Flujos Capital</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.capitalFlows !== null && data.capitalFlows > 5000 ? 'var(--green-strong)' :
-               data.capitalFlows !== null && data.capitalFlows < -5000 ? 'var(--red-strong)' :
-               'var(--text-primary)'
-    }}>
-        {data.capitalFlows !== null && data.capitalFlows !== undefined
-            ? `${data.capitalFlows > 0 ? '+' : ''}${(data.capitalFlows / 1000).toFixed(1)}B`
-            : 'N/D'}
-    </div>
-</div>
+                                    <div className="metric" title={td('Confianza Empresarial', data.businessConfidenceDate)}>
+                                        <div className="metric-label">Conf. Empresarial</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.businessConfidence !== null && data.businessConfidence > 100 ? 'var(--green-strong)' :
+                                                   data.businessConfidence !== null && data.businessConfidence < 95 ? 'var(--red-strong)' :
+                                                   'var(--text-primary)'
+                                        }}>
+                                            {formatValue(data.businessConfidence, 1)}
+                                        </div>
+                                    </div>
 
-<div className="metric">
-    <div className="metric-label">Exp. Inflación</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.inflationExpectations !== null && data.inflationExpectations >= 1.8 && data.inflationExpectations <= 2.5
-            ? 'var(--green-strong)'
-            : data.inflationExpectations !== null && data.inflationExpectations > 3.5
-            ? 'var(--red-strong)' : 'var(--text-primary)'
-    }}>
-        {data.inflationExpectations !== null && data.inflationExpectations !== undefined
-            ? `${formatValue(data.inflationExpectations, 1)}%` : 'N/D'}
-    </div>
-</div>
+                                    <div className="metric" title={td('Flujos de Capital en miles de millones USD', data.capitalFlowsDate)}>
+                                        <div className="metric-label">Flujos Capital</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.capitalFlows !== null && data.capitalFlows > 5000 ? 'var(--green-strong)' :
+                                                   data.capitalFlows !== null && data.capitalFlows < -5000 ? 'var(--red-strong)' :
+                                                   'var(--text-primary)'
+                                        }}>
+                                            {data.capitalFlows !== null && data.capitalFlows !== undefined
+                                                ? `${data.capitalFlows > 0 ? '+' : ''}${(data.capitalFlows / 1000).toFixed(1)}B`
+                                                : 'N/D'}
+                                        </div>
+                                    </div>
 
-<div className="metric">
-    <div className="metric-label">Términos Intercambio</div>
-    <div className="metric-value metric-value-small" style={{
-        color: data.termsOfTrade !== null && data.termsOfTrade >= 103 ? 'var(--green-strong)' :
-               data.termsOfTrade !== null && data.termsOfTrade < 97  ? 'var(--red-strong)' :
-               'var(--text-primary)'
-    }}>
-        {data.termsOfTrade !== null && data.termsOfTrade !== undefined
-            ? formatValue(data.termsOfTrade, 1) : 'N/D'}
-    </div>
-</div>
+                                    <div className="metric" title={td('Expectativas de Inflación a 5 años', data.inflationExpectationsDate)}>
+                                        <div className="metric-label">Exp. Inflación</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.inflationExpectations !== null && data.inflationExpectations >= 1.8 && data.inflationExpectations <= 2.5
+                                                ? 'var(--green-strong)'
+                                                : data.inflationExpectations !== null && data.inflationExpectations > 3.5
+                                                ? 'var(--red-strong)' : 'var(--text-primary)'
+                                        }}>
+                                            {data.inflationExpectations !== null && data.inflationExpectations !== undefined
+                                                ? `${formatValue(data.inflationExpectations, 1)}%` : 'N/D'}
+                                        </div>
+                                    </div>
+
+                                    <div className="metric" title={td('Términos de Intercambio (índice base 100)', data.termsOfTradeDate)}>
+                                        <div className="metric-label">Términos Intercambio</div>
+                                        <div className="metric-value metric-value-small" style={{
+                                            color: data.termsOfTrade !== null && data.termsOfTrade >= 103 ? 'var(--green-strong)' :
+                                                   data.termsOfTrade !== null && data.termsOfTrade < 97  ? 'var(--red-strong)' :
+                                                   'var(--text-primary)'
+                                        }}>
+                                            {data.termsOfTrade !== null && data.termsOfTrade !== undefined
+                                                ? formatValue(data.termsOfTrade, 1) : 'N/D'}
+                                        </div>
+                                    </div>
                                 </div>
 
 <div className="analysis-section">
