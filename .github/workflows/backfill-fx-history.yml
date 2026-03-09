@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
       - name: Run FX history backfill
         run: python3 scripts/backfill_fx_history.py
 
