@@ -105,9 +105,13 @@ def scrape_rate_momentum():
     print(f"\n{'='*50}\nRATE MOMENTUM (v10+C2+C7 — TE API guest + FRED + bootstrap actualizado)\n{'='*50}")
     print(f"  C2: JPY usa ventana 24M para capturar ciclo completo BoJ (−0.1%→+0.75%)")
     print(f"  C7: Bootstrap actualizado con tasas reales por divisa (2024-2026)")
+    print(f"  v5.10: rateMomentum24M calculado para todas las divisas (FIX-A del modelo)")
     momentum = {}
     momentum_dates = {}
     momentum_source = {}
+    # v5.10 FIX-A: parallel 24M momentum dict — se exporta como rateMomentum24M en el JSON.
+    # Permite al modelo JS usar max(rm12, rm24*0.6) para divisas en ciclo gradual (ej. BoJ).
+    momentum24 = {}
 
     today     = datetime.today()
     target_dt = today - timedelta(days=365)
@@ -259,6 +263,23 @@ def scrape_rate_momentum():
                     momentum_source[code] = f'fred-{lookback_months}m'
                     direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
                     print(f"    ✓ {code} [FRED {series_id} {lookback_months}M]: {current_rate}% - {closest_val}% = {m_val:+.4f}% {direction}")
+
+                    # v5.10 FIX-A: calcular también rm24 desde la misma serie FRED
+                    # (solo si no es JPY que ya usa 24M como base)
+                    if code != 'JPY' and code not in momentum24:
+                        try:
+                            from dateutil.relativedelta import relativedelta as _rd
+                            target_24m = latest_dt - _rd(months=24)
+                        except ImportError:
+                            target_24m = latest_dt.replace(year=latest_dt.year - 2)
+                        val24, diff24 = None, float('inf')
+                        for obs_dt, obs_val in rows[:-1]:
+                            d = abs((obs_dt - target_24m).days)
+                            if d < diff24:
+                                diff24, val24 = d, obs_val
+                        if val24 is not None and diff24 <= 120:
+                            momentum24[code] = round(current_rate - val24, 4)
+                            print(f"    ✓ {code} [FRED 24M rm24]: {current_rate}% - {val24}% = {momentum24[code]:+.4f}%")
                 else:
                     print(f"    ⚠️ {code}: ref más cercana a {lookback_months}M dista {closest_diff}d (max {max_diff_days}d)")
                 time.sleep(0.5)
@@ -287,6 +308,22 @@ def scrape_rate_momentum():
         'AUD': ( 4.35, '2025-03-15', '12M'),  # C7: pausa RBA mar-2025
         'CHF': ( 1.50, '2024-03-15', '12M'),  # C7: antes del primer recorte SNB
         'NZD': ( 5.50, '2024-03-15', '12M'),  # C7: antes de recortes RBNZ
+    }
+
+    # v5.10 FIX-A: tasas de referencia a 24M para calcular rateMomentum24M en
+    # divisas que el script principal maneja con ventana 12M.
+    # Estas referencias son la tasa real vigente hace ~24 meses (verificadas vs FRED/BCs).
+    # JPY omitido: su rateMomentum ya usa ventana 24M como base, rm24 = rm12.
+    # PRÓXIMA REVISIÓN: Sep-2026 (junto con BOOTSTRAP_FALLBACK).
+    BOOTSTRAP_FALLBACK_24M = {
+        # (old_rate_24m_pct, old_date_str)
+        'CAD': ( 5.00, '2024-03-15'),  # BoC en máximo ciclo subidas
+        'AUD': ( 4.35, '2024-03-15'),  # RBA en pausa pre-cortes
+        'CHF': ( 1.75, '2024-03-15'),  # SNB antes del primer recorte
+        'NZD': ( 5.50, '2024-03-15'),  # RBNZ en máximo ciclo subidas
+        'USD': ( 5.50, '2024-03-15'),  # Fed en máximo ciclo subidas
+        'EUR': ( 4.50, '2024-03-15'),  # BCE en máximo ciclo subidas
+        'GBP': ( 5.25, '2024-03-15'),  # BoE en máximo ciclo subidas
     }
 
     bootstrap_candidates = [c for c in CURRENCIES if c not in momentum and c in BOOTSTRAP_FALLBACK]
@@ -333,6 +370,13 @@ def scrape_rate_momentum():
                 direction = '↑' if m_val > 0.001 else ('↓' if m_val < -0.001 else '→')
                 print(f"    ✓ {code} [bootstrap C7 {window_label}]: {current_rate}% - {old_rate}% ({old_date_str}) = {m_val:+.4f}% {direction}")
 
+                # v5.10 FIX-A: calcular rm24 usando BOOTSTRAP_FALLBACK_24M si disponible
+                if code not in momentum24 and code in BOOTSTRAP_FALLBACK_24M:
+                    old24, date24 = BOOTSTRAP_FALLBACK_24M[code]
+                    m24 = round(current_rate - old24, 4)
+                    momentum24[code] = m24
+                    print(f"    ✓ {code} [bootstrap 24M rm24]: {current_rate}% - {old24}% ({date24}) = {m24:+.4f}%")
+
             except Exception as e:
                 print(f"    ❌ {code} bootstrap: {e}")
 
@@ -359,15 +403,38 @@ def scrape_rate_momentum():
             except Exception as e:
                 print(f"    ✗ {code}: {e}")
 
+    # ── Estrategia 4: Archivo anterior (fallback rm24) ───────────────────
+    # También recupera rateMomentum24M previo para divisas que no lo pudieron
+    # calcular en tiempo real en esta ejecución.
+    still_missing24 = [c for c in CURRENCIES if c not in momentum24 and c != 'JPY']
+    if still_missing24:
+        for code in still_missing24:
+            try:
+                path = f'extended-data/{code}.json'
+                if os.path.exists(path):
+                    with open(path) as f:
+                        prev = json.load(f)
+                    prev24 = prev.get('data', {}).get('rateMomentum24M')
+                    if prev24 is not None:
+                        momentum24[code] = prev24
+            except Exception:
+                pass
+
+    # JPY: rm24 = rm12 porque su ventana base ya es 24M
+    if 'JPY' in momentum:
+        momentum24['JPY'] = momentum['JPY']
+
     # ── Resumen ───────────────────────────────────────────────────────────
     print(f"\n  Resumen rateMomentum:")
     for code in CURRENCIES:
         src = momentum_source.get(code, 'none')
         val = momentum.get(code)
-        val_str = f"{val:+.4f}%" if val is not None else "null"
+        val24 = momentum24.get(code)
+        val_str  = f"{val:+.4f}%" if val is not None else "null"
+        val24_str = f"{val24:+.4f}%" if val24 is not None else "null"
         window = "24M" if code == "JPY" else "12M"
         direction = ('↑' if val > 0.001 else ('↓' if val < -0.001 else '→')) if val is not None else '?'
-        print(f"    {code} [{window}]: {src} → {val_str} {direction}")
+        print(f"    {code} [{window}]: {src} → {val_str} {direction}  |  rm24={val24_str}")
 
     final_missing = [c for c in CURRENCIES if c not in momentum]
     if final_missing:
@@ -375,7 +442,13 @@ def scrape_rate_momentum():
     else:
         print(f"\n  ✅ rateMomentum completo para todas las divisas")
 
-    return momentum, momentum_dates, momentum_source
+    missing24 = [c for c in CURRENCIES if c not in momentum24]
+    if missing24:
+        print(f"  ⚠️  rateMomentum24M sin datos para: {', '.join(missing24)}")
+    else:
+        print(f"  ✅ rateMomentum24M completo para todas las divisas")
+
+    return momentum, momentum_dates, momentum_source, momentum24
 
 # ── CAPITAL FLOWS ────────────────────────────────────────────────────────
 def parse_capital_flows_row(cols):
@@ -730,18 +803,19 @@ for key, url in {k: v for k, v in TE_URLS.items() if k != 'bond10y'}.items():
         all_dates[c][key] = dt.get(c, str(date.today()))
     time.sleep(2)
 
-# 3. rateMomentum (C2+C7: JPY 24M + bootstrap actualizado)
-rate_momentum, rate_momentum_dates, momentum_source = scrape_rate_momentum()
+# 3. rateMomentum (C2+C7: JPY 24M + bootstrap actualizado) + rateMomentum24M (v5.10 FIX-A)
+rate_momentum, rate_momentum_dates, momentum_source, momentum24 = scrape_rate_momentum()
 for c in CURRENCIES:
-    all_data[c]['rateMomentum']  = rate_momentum.get(c)
-    all_dates[c]['rateMomentum'] = rate_momentum_dates.get(c, str(date.today()))
+    all_data[c]['rateMomentum']    = rate_momentum.get(c)
+    all_data[c]['rateMomentum24M'] = momentum24.get(c)       # v5.10 FIX-A
+    all_dates[c]['rateMomentum']   = rate_momentum_dates.get(c, str(date.today()))
 
 # ── GUARDAR RESULTADOS ────────────────────────────────────────────────────
 print(f"\n{'='*50}\nSAVING RESULTS\n{'='*50}")
 for curr in CURRENCIES:
     pkg = {
         'lastUpdate': str(date.today()),
-        'source': 'TradingEconomics — v10+C2+C7: rateMomentum JPY 24M + bootstrap actualizado 2024-2026',
+        'source': 'TradingEconomics — v10+C2+C7+v5.10: rateMomentum JPY 24M + rm24 todas las divisas',
         'rateMomentumStrategy': momentum_source.get(curr, 'none'),
         'data':   all_data[curr],
         'dates':  all_dates[curr]
