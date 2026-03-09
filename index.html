@@ -1622,7 +1622,9 @@ const fetchExtendedData = async (countryCode) => {
             try {
                 const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
                 if (isNaN(utcDatetime.getTime())) return timeUTC;
-                return utcDatetime.toLocaleTimeString('es-ES', {
+                // Use undefined locale so the browser respects the user's
+                // actual system locale AND timezone (not Europe/Madrid from 'es-ES').
+                return utcDatetime.toLocaleTimeString(undefined, {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
@@ -5037,7 +5039,9 @@ const sentiment = getSentiment(strength);
             );
 
             // Día seleccionado: por defecto el primero disponible (hoy o futuro)
-            const todayISO = new Date().toISOString().split('T')[0];
+            // Use local date (not UTC) so the tab matches the user's actual calendar day.
+            const _now = new Date();
+            const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
             const defaultDay = days.find(d => d.dateISO >= todayISO) || days[0];
             const activeDateISO = calSelectedDate || (defaultDay && defaultDay.dateISO) || null;
             const activeDayIdx = days.findIndex(d => d.dateISO === activeDateISO);
