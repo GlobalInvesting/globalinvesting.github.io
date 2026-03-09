@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Investing | Professional Forex Fundamental Analysis Dashboard</title>
-    <meta name="description" content="Professional forex fundamental analysis dashboard. Real-time economic data for USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD — 21 weighted indicators, COT positioning, carry trade analysis and AI-generated insights.">
+    <meta name="description" content="Professional forex fundamental analysis dashboard. Real-time economic data for USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD — 20 weighted indicators, COT positioning, carry trade analysis and AI-generated insights.">
     <meta name="keywords" content="forex fundamental analysis, currency strength dashboard, COT positioning, carry trade, central bank rates, economic indicators forex, USD EUR GBP JPY analysis">
     <meta name="author" content="Santiago Plá Casuriaga">
     <meta name="robots" content="index, follow">
@@ -410,12 +410,12 @@
         <div class="feature-card">
             
             <div class="feature-title">FX Performance 1M</div>
-            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). Basket-corrected composite (v5.9): each currency is measured against the other 7 rather than USD alone, eliminating USD-bias. Composition: 70% 1M return + 20% 1W return + 10% 3M return. The only 100% lag-free indicator — captures institutional flows in near real time. Weight: 28% (highest individual weight in the model).</div>
+            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). Basket-corrected composite (v5.9): each currency is measured against the other 7 rather than USD alone, eliminating USD-bias. Composition: 70% 1M return + 20% 1W return + 10% 3M return. The only 100% lag-free indicator — captures institutional flows in near real time. Weight: 8% (confirmator, not driver — v6.0 rebalance).</div>
         </div>
         <div class="feature-card">
             
             <div class="feature-title">COT Positioning (CFTC)</div>
-            <div class="feature-desc">Weekly net positions from the official CFTC Leveraged Funds report (Futures Only). Contrarian logic built in: extreme positions penalise the score instead of amplifying it. Price confirmation filter (v5.7): COT score is attenuated when extreme positioning is not confirmed by recent price action. Weight: 5%.</div>
+            <div class="feature-desc">Weekly net positions from the official CFTC Leveraged Funds report (Futures Only). Contrarian logic built in: extreme positions penalise the score instead of amplifying it. Price confirmation filter (v5.7): COT score is attenuated when extreme positioning is not confirmed by recent price action. Weight: 6%.</div>
         </div>
         <div class="feature-card">
             
@@ -499,12 +499,12 @@
                 <tr><th>Tier</th><th>Weight</th><th>Key Indicators</th></tr>
             </thead>
             <tbody>
-                <tr><td>T1 · FX Momentum & Smart Money</td><td><strong>28%</strong></td><td>FX Performance 1M basket-corrected (28%) — composite: 70% 1M + 20% 1W + 10% 3M, USD-bias eliminated</td></tr>
-                <tr><td>T2 · Rates & Monetary Cycle</td><td>21%</td><td>Interest Rate (7%), Inflation (5%), CB Outlook (5%), Rate Momentum (4%) — with rate cycle haircut v5.8</td></tr>
-                <tr><td>T3 · Market Sentiment</td><td>19%</td><td>COT Positioning (5%), Manufacturing PMI (4%), Consumer Confidence (3%), 10Y Bond Yield (3%), Capital Flows (2%), Business Confidence (2%)</td></tr>
-                <tr><td>T4 · External Balance</td><td>13%</td><td>Current Account (5%), Trade Balance (4%), Public Debt (2%), Terms of Trade (2%)</td></tr>
-                <tr><td>T5 · Growth & Employment</td><td>12%</td><td>GDP Growth (6%), Unemployment (4%), Industrial Production (2%)</td></tr>
-                <tr><td>T6 · Consumption & Wages</td><td>7%</td><td>Retail Sales (3%), Wage Growth (2%), Inflation Expectations (2%)</td></tr>
+                <tr><td>T1 · Monetary Policy</td><td><strong>29%</strong></td><td>Interest Rate (10%), Rate Momentum (7%), Inflation (7%), CB Outlook (5%) — hawkish-pause boost v6.1 + rate cycle haircut</td></tr>
+                <tr><td>T2 · External Balance</td><td>19%</td><td>Current Account (7%), Trade Balance (4%), Public Debt (4%), Terms of Trade (4%)</td></tr>
+                <tr><td>T3 · Market Sentiment</td><td>18%</td><td>COT Positioning (6%), Manufacturing PMI (5%), Consumer Confidence (3%), Business Confidence (3%), Capital Flows (1%)</td></tr>
+                <tr><td>T4 · Growth & Employment</td><td>16%</td><td>GDP Growth (7%), Unemployment (5%), Industrial Production (4%)</td></tr>
+                <tr><td>T5 · FX Confirmator</td><td>12%</td><td>FX Performance 1M basket-corrected (8%), 10Y Bond Yield (4%) — confirmator not driver (v6.0)</td></tr>
+                <tr><td>T6 · Consumption & Wages</td><td>6%</td><td>Retail Sales (3%), Wage Growth (3%)</td></tr>
             </tbody>
         </table>
         <div class="method-right">

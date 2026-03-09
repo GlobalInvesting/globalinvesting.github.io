@@ -102,8 +102,8 @@
 
     <div class="section">
         <h2>¿Qué es un score de fortaleza fundamental?</h2>
-        <p>Un score de fortaleza fundamental es un <strong>índice cuantitativo</strong> que agrega múltiples indicadores económicos en un único valor numérico. En lugar de revisar manualmente el PIB, la inflación, las tasas de interés y otros 18 indicadores para cada una de las 8 divisas principales, el modelo hace ese trabajo y entrega un resumen.</p>
-        <p>En el dashboard de Global Investing, el score va de <strong>0 a 100 puntos</strong> y se calcula a partir de 21 indicadores económicos ponderados según su relevancia para el trading de divisas. No todos los indicadores pesan igual: la tasa de interés tiene más peso que la producción industrial, porque en forex el carry trade y los diferenciales de tasas son los principales motores de movimiento de precio.</p>
+        <p>Un score de fortaleza fundamental es un <strong>índice cuantitativo</strong> que agrega múltiples indicadores económicos en un único valor numérico. En lugar de revisar manualmente el PIB, la inflación, las tasas de interés y otros 17 indicadores para cada una de las 8 divisas principales, el modelo hace ese trabajo y entrega un resumen.</p>
+        <p>En el dashboard de Global Investing, el score va de <strong>0 a 100 puntos</strong> y se calcula a partir de 20 indicadores económicos ponderados según su relevancia para el trading de divisas. No todos los indicadores pesan igual: la tasa de interés tiene más peso que la producción industrial, porque en forex el carry trade y los diferenciales de tasas son los principales motores de movimiento de precio.</p>
 
         <div class="highlight-box">
             <p><strong>Principio clave:</strong> El score no mide si una economía es "buena" en términos absolutos. Mide cuán favorable es el entorno macroeconómico actual para que esa divisa se aprecie frente a sus pares. Una economía puede ser sólida estructuralmente pero tener un score bajo si su banco central está en ciclo de recortes agresivos.</p>
@@ -169,17 +169,17 @@
         <h2>Los componentes del score: qué pesa más y por qué</h2>
         <p>El score no es un promedio simple. Cada indicador tiene un peso asignado según su capacidad histórica para explicar los movimientos de precio en el mercado forex. Los componentes más importantes son:</p>
 
-        <h3>1. Tasa de interés (7%)</h3>
+        <h3>1. Tasa de interés (10%)</h3>
         <p>El diferencial de tasas entre dos países es el motor principal del carry trade, que mueve billones de dólares diariamente. Una divisa con tasa del 4.5% atrae capital frente a una con tasa del 0.1%, lo que genera demanda sostenida. El modelo aplica un <em>haircut de ciclo</em>: si el banco central está en un ciclo de recortes activos, el score de tasa se atenúa proporcionalmente, ya que el mercado descuenta esos recortes futuros antes de que se produzcan.</p>
 
-        <h3>2. FX Performance 1M (28%)</h3>
-        <p>El rendimiento real de la divisa en los últimos 30 días, calculado como un <strong>composite ponderado</strong>: 70% rendimiento mensual puro + 20% rendimiento semanal + 10% rendimiento trimestral. El peso del 20% en la semana añade sensibilidad al momentum más reciente (2-6 semanas), mientras que el 10% trimestral provee contexto de tendencia. Es el indicador de mayor peso individual del modelo porque sintetiza el juicio colectivo del mercado sobre todos los demás factores — sin lag de publicación.</p>
+        <h3>2. FX Performance 1M (8%) — Confirmador</h3>
+        <p>El rendimiento real de la divisa en los últimos 30 días, calculado como un <strong>composite ponderado</strong>: 70% rendimiento mensual puro + 20% rendimiento semanal + 10% rendimiento trimestral. A partir de v6.0, actúa como <strong>confirmador</strong> (peso 8%), no como driver: cuando los fundamentales son sólidos y el precio confirma la dirección, añade convicción al score. El peso anterior (28%) invertía la causalidad — los fundamentales causan el precio, no al revés.</p>
         <p><em>Nota v5.9:</em> El ajuste de safe haven para CHF y JPY se atenúa automáticamente si su rendimiento FX 1M es negativo. Si el mercado no está comprando esa divisa como refugio en este momento, el modelo no le otorga el premio de safe haven aunque sus fundamentales estructurales sean sólidos.</p>
 
         <h3>3. Perspectiva del banco central (5%)</h3>
         <p>Una escala de 0 a 100 que refleja el sesgo del banco central: hawkish (restrictivo, propenso a subir tasas), neutral, o dovish (acomodaticio, propenso a recortar tasas). Este componente captura la <em>dirección</em> de la política monetaria, no solo el nivel actual.</p>
 
-        <h3>4. Posicionamiento COT (5%)</h3>
+        <h3>4. Posicionamiento COT (6%)</h3>
         <p>Los datos del Commitment of Traders de la CFTC muestran el posicionamiento neto de los Leveraged Funds (hedge funds y CTAs) en los futuros de divisas de Chicago. Es la huella directa del smart money. Posiciones extremas netas en una dirección son una señal contrarian importante.</p>
         <p><em>Nota v5.7:</em> El modelo aplica automáticamente un <strong>filtro de confirmación de precio</strong>: si el posicionamiento institucional extremo (>30K contratos netos) no está siendo confirmado por el movimiento real del precio en el último mes, el score COT se atenúa proporcionalmente. Esto corrige el retraso inherente del reporte COT (hasta 3 días hábiles) y el hecho de que refleja posiciones acumuladas, no flujos recientes.</p>
 
