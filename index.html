@@ -4053,6 +4053,7 @@ const getHeatmapColor = (value, type) => {
             break;
 
         case 'manufacturingPMI':
+        case 'servicesPMI':
             if (value > 52)       { intensity = Math.min((value - 50) / 10, 1); isPositive = true;  }
             else if (value >= 50) { intensity = 0.3;  isPositive = true;  }
             else if (value >= 48) { intensity = 0.4;  isPositive = false; }
