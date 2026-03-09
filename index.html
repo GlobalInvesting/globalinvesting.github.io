@@ -2256,9 +2256,25 @@ for (let country of countries) {
                     if (fxPerfResponse.ok) {
                         const fxPerfData = await fxPerfResponse.json();
                         if (fxPerfData.fxPerformance1M !== null && fxPerfData.fxPerformance1M !== undefined) {
-                            economicData[country.code].fxPerformance1M = fxPerfData.fxPerformance1M;
+                            // v5.9: composite recalibrado — 70% 1M_raw + 20% 1W + 10% 3M
+                            // Razón: el composite anterior (90% 1M + 10% 3M) usaba el 1M_raw
+                            // ya inflado por el 3M desde el script Python. Al incluir 1W
+                            // con peso 20% se captura el momentum reciente (2-6 semanas)
+                            // y se reduce el sesgo de safe-haven histórico en CHF y AUD.
+                            const raw1M  = fxPerfData.fxPerformance1M_raw ?? fxPerfData.fxPerformance1M;
+                            const fx1W   = fxPerfData.fxPerformance1W;
+                            const fx3M   = fxPerfData.fxPerformance3M ?? raw1M;
+                            let newComposite;
+                            if (fx1W !== null && fx1W !== undefined) {
+                                // Todos los períodos disponibles: 70% 1M + 20% 1W + 10% 3M
+                                newComposite = 0.70 * raw1M + 0.20 * fx1W + 0.10 * fx3M;
+                            } else {
+                                // Sin 1W (USD usa basket inverso): 90% 1M_raw + 10% 3M
+                                newComposite = 0.90 * raw1M + 0.10 * fx3M;
+                            }
+                            economicData[country.code].fxPerformance1M = parseFloat(newComposite.toFixed(4));
                             economicData[country.code].fxPerformance1MDate = fxPerfData.date || new Date().toISOString();
-                            console.log(`✅ FX perf 1M (pre-cache) for ${country.code}: ${fxPerfData.fxPerformance1M}%`);
+                            console.log(`✅ FX perf 1M (pre-cache) for ${country.code}: ${newComposite.toFixed(4)}% (raw1M=${raw1M?.toFixed(3)}, 1W=${fx1W?.toFixed(3)}, 3M=${fx3M?.toFixed(3)})`);
                         }
                     }
                 } catch (error) {
@@ -2295,6 +2311,7 @@ const TRADING_WEIGHTS = {
     // En forex: carry > momentum > ciclo monetario > fundamentales estructurales.
     // v5.6: fxPerformance1M sube a 0.22 — único indicador sin lag estructural.
     // v5.8: fxPerformance1M sube a 0.28. interestRate baja de 0.10 → 0.07.
+    // v5.9: composite recalibrado (70% 1M_raw + 20% 1W + 10% 3M) — más sensible al momentum reciente.
     //       Razón: con avg_rate G8 en 2.34%, el rate score de divisas en ciclo de recortes
     //       (GBP 3.75% con -0.25pp, NZD 2.25% con -3.25pp) inflaba el score vs lo que el
     //       mercado ya ha descontado. FX captura exactamente ese descuento forward.
@@ -2861,10 +2878,14 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         if (regime === 'risk-on')  multiplier = safeHavenScore > 70 ? 1.1 : 0.7;
         // Rango: 0 a +10 pts — la función solo premia safe haven genuino, no penaliza su ausencia.
         // Las penalizaciones negativas ya vienen de calculateStructuralDeficit y scoreIndicator.
-                // C3: Cap reducido 10→6. Data-driven: solo limita el techo para que economías
+        // C3: Cap reducido 10→6. Data-driven: solo limita el techo para que economías
         // macro-débiles (CHF base=47.3) no superen a economías genuinamente más fuertes.
-        // Con cap 6: CHF pasa de ~60.7 a ~55.8 (base 47.3 + adj ~5.5 + low_rate ~3.0).
-        return Math.max(0, Math.min(6, ((safeHavenScore * multiplier) / 100) * 12 - 4));
+        // v5.9: también aplica penalización del 35% si fxPerformance1M < 0 (el mercado
+        // no está comprando esta divisa como safe haven en el período relevante).
+        const rawResult = Math.max(0, Math.min(6, ((safeHavenScore * multiplier) / 100) * 12 - 4));
+        const fxPenaltySH = (data.fxPerformance1M !== null && data.fxPerformance1M !== undefined
+                              && data.fxPerformance1M < 0.0) ? 0.65 : 1.0;
+        return rawResult * fxPenaltySH;
     };
 
     // 2. Commodity Exposure — dynamic
@@ -3087,11 +3108,12 @@ const adj = combinedFactor * 8;
             : 1.0;
 
         const result = Math.max(0, Math.min(5 * regimeCapMultiplier * ownCOTPenalty, adj));
-        // v5.6: si la divisa está cayendo en FX 1M, el mercado no la está comprando
-        // como safe haven en este momento — reducir el premio un 30% adicional.
-        // 100% data-driven: usa fxPerformance1M del propio activo, sin hardcodear divisas.
+        // v5.9: umbral bajado de -0.3% → 0.0% y penalización subida de 30% → 35%.
+        // Si la divisa tiene FX negativo en cualquier magnitud, el mercado NO la está
+        // comprando como safe haven ahora mismo — aunque sus fundamentales sean sólidos.
+        // Ej: CHF con 1M=-0.21% (nuevo composite) no merece premio safe haven completo.
         const ownFxPenalty = (data.fxPerformance1M !== null && data.fxPerformance1M !== undefined
-                              && data.fxPerformance1M < -0.3) ? 0.7 : 1.0;
+                              && data.fxPerformance1M < 0.0) ? 0.65 : 1.0;
         const finalResult = result * ownFxPenalty;
         console.log(`SafeHavenAdj ${currency}: rateGap=${rateGap.toFixed(2)}, regime=${avgCOT > 0 ? 'risk-on' : 'risk-off'} (avgCOT=${avgCOT.toFixed(0)}), cotPenalty=${ownCOTPenalty.toFixed(2)}, fxPenalty=${ownFxPenalty} → +${finalResult.toFixed(1)}pts`);
         return finalResult;

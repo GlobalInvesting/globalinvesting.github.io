@@ -169,11 +169,12 @@
         <h2>Los componentes del score: qué pesa más y por qué</h2>
         <p>El score no es un promedio simple. Cada indicador tiene un peso asignado según su capacidad histórica para explicar los movimientos de precio en el mercado forex. Los componentes más importantes son:</p>
 
-        <h3>1. Tasa de interés (10%)</h3>
-        <p>El diferencial de tasas entre dos países es el motor principal del carry trade, que mueve billones de dólares diariamente. Una divisa con tasa del 4.5% atrae capital frente a una con tasa del 0.1%, lo que genera demanda sostenida.</p>
+        <h3>1. Tasa de interés (7%)</h3>
+        <p>El diferencial de tasas entre dos países es el motor principal del carry trade, que mueve billones de dólares diariamente. Una divisa con tasa del 4.5% atrae capital frente a una con tasa del 0.1%, lo que genera demanda sostenida. El modelo aplica un <em>haircut de ciclo</em>: si el banco central está en un ciclo de recortes activos, el score de tasa se atenúa proporcionalmente, ya que el mercado descuenta esos recortes futuros antes de que se produzcan.</p>
 
-        <h3>2. FX Performance 1M (22%)</h3>
-        <p>El rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento de los grandes jugadores institucionales, los flujos de carry unwind y las expectativas del mercado sobre política monetaria futura. Es el indicador de mayor peso individual del modelo porque sintetiza el juicio colectivo del mercado sobre todos los demás factores.</p>
+        <h3>2. FX Performance 1M (28%)</h3>
+        <p>El rendimiento real de la divisa en los últimos 30 días, calculado como un <strong>composite ponderado</strong>: 70% rendimiento mensual puro + 20% rendimiento semanal + 10% rendimiento trimestral. El peso del 20% en la semana añade sensibilidad al momentum más reciente (2-6 semanas), mientras que el 10% trimestral provee contexto de tendencia. Es el indicador de mayor peso individual del modelo porque sintetiza el juicio colectivo del mercado sobre todos los demás factores — sin lag de publicación.</p>
+        <p><em>Nota v5.9:</em> El ajuste de safe haven para CHF y JPY se atenúa automáticamente si su rendimiento FX 1M es negativo. Si el mercado no está comprando esa divisa como refugio en este momento, el modelo no le otorga el premio de safe haven aunque sus fundamentales estructurales sean sólidos.</p>
 
         <h3>3. Perspectiva del banco central (5%)</h3>
         <p>Una escala de 0 a 100 que refleja el sesgo del banco central: hawkish (restrictivo, propenso a subir tasas), neutral, o dovish (acomodaticio, propenso a recortar tasas). Este componente captura la <em>dirección</em> de la política monetaria, no solo el nivel actual.</p>

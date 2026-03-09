@@ -125,7 +125,7 @@
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;53 Débil · 53–63 Neutral · &gt;63 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
-                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 22%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real. Es el indicador de mayor peso individual del modelo.</li>
+                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 28%:</strong> Rendimiento de la divisa calculado como composite ponderado: 70% rendimiento mensual + 20% rendimiento semanal + 10% rendimiento trimestral. El peso semanal añade sensibilidad al momentum reciente (2-6 semanas), capturando posicionamiento institucional y flujos de carry en tiempo casi real. Es el indicador de mayor peso individual del modelo.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
@@ -236,7 +236,7 @@
                     <tr style="background: rgba(38,166,154,0.07);">
                         <td rowspan="2"><strong>Tier 6 — ~26%</strong><br/>FX Momentum &amp; Smart Money</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
-                        <td><strong>22%</strong></td>
+                        <td><strong>28%</strong></td>
                         <td>Rendimiento real de la divisa vs USD en los últimos 30 días. Mayor peso individual del modelo — único indicador sin lag estructural.</td>
                     </tr>
                     <tr style="background: rgba(38,166,154,0.07);">
