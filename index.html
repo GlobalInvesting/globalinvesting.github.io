@@ -1021,7 +1021,9 @@
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 6px;
-            overflow: hidden;
+            overflow-y: auto;
+            max-height: 520px;
+            scroll-behavior: smooth;
         }
 
         .calendar-event {
@@ -3824,6 +3826,22 @@ const indicatorTooltips = {
             );
             const [calFilter, setCalFilter] = useState('all');
             const [calSelectedDate, setCalSelectedDate] = useState(null);
+            const calendarContainerRef = React.useRef(null);
+            const nextEventRef = React.useRef(null);
+            // Auto-scroll to next event when active date, filter, or tab changes
+            React.useEffect(() => {
+                if (activeTab !== 'calendar') return;
+                // setTimeout lets the calendar DOM render before measuring
+                const timer = setTimeout(() => {
+                    if (nextEventRef.current && calendarContainerRef.current) {
+                        const container = calendarContainerRef.current;
+                        const el = nextEventRef.current;
+                        const elTop = el.offsetTop - container.offsetTop;
+                        container.scrollTop = Math.max(0, elTop - 16);
+                    }
+                }, 50);
+                return () => clearTimeout(timer);
+            }, [calSelectedDate, calFilter, activeTab]);
             const [lastUpdate, setLastUpdate] = useState(_cachedRates ? new Date() : null);
             const [historicalData, setHistoricalData] = useState(_cachedHist || {});
             const [aiAnalyses, setAiAnalyses]           = useState(_cachedAI || null);
@@ -5871,7 +5889,7 @@ const sentiment = getSentiment(strength);
                             No hay eventos con ese filtro para este día.
                         </div>
                     ) : (
-                        <div className="calendar-container">
+                        <div className="calendar-container" ref={calendarContainerRef}>
                             {filteredEvents.map((event, index) => {
                                 const isToday = event.dateISO === todayISO;
                                 const hasActual = !!(event.actual && event.actual !== '');
@@ -5917,7 +5935,7 @@ const sentiment = getSentiment(strength);
                                     }
                                 }
                                 return (
-                                    <div key={index} className={eventClass} style={{
+                                    <div key={index} className={eventClass} ref={isNext ? nextEventRef : null} style={{
                                         borderLeft: isNext ? '' : (!isPast && isToday ? '3px solid var(--blue)' : 'none'),
                                     }}>
                                         <div className="event-time">
