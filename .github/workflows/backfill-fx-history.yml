@@ -1,0 +1,39 @@
+name: Backfill FX History (Ejecución única)
+
+# Manual trigger only — run once to populate fx-history/ with weekly rates since 2024-01-01
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Escribe "confirmar" para ejecutar el backfill (~110 requests a Frankfurter)'
+        required: true
+        default: 'confirmar'
+
+jobs:
+  backfill-fx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run FX history backfill
+        run: python3 scripts/backfill_fx_history.py
+
+      - name: Commit and push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add fx-history/
+          if git diff --staged --quiet; then
+            echo "No new FX history files to commit"
+          else
+            COUNT=$(git diff --staged --name-only | wc -l)
+            git commit -m "Backfill FX history: $COUNT weekly snapshots ($(date +'%Y-%m-%d'))"
+            git pull --rebase origin main || true
+            git push
+          fi
