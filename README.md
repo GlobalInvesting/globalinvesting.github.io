@@ -1,303 +1,207 @@
 # Dashboard de Análisis Fundamental Forex
 
-Una plataforma integral de grado institucional para el monitoreo y análisis en tiempo real de indicadores económicos fundamentales en los principales pares de divisas. Diseñado para profesionales financieros, traders institucionales y participantes sofisticados del mercado.
+Plataforma cuantitativa de análisis fundamental para las 8 divisas principales del G8 (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD). Agrega 22 indicadores macroeconómicos en un score de fortaleza 0–100, con mapa de calor interactivo, análisis de carry trade, posicionamiento COT institucional y calendario económico en tiempo real.
 
-![Status](https://img.shields.io/badge/Status-Producción-success) ![License](https://img.shields.io/badge/License-Propietario-red) ![Version](https://img.shields.io/badge/Version-5.6.0-informational)
+![Status](https://img.shields.io/badge/Status-Producción-success) ![License](https://img.shields.io/badge/License-Propietario-red) ![Version](https://img.shields.io/badge/Version-6.3.0-informational)
 
-## Descripción General
+---
 
-Este dashboard proporciona herramientas de análisis fundamental de grado profesional para el mercado de divisas, integrando datos de mercado en tiempo real con indicadores macroeconómicos completos. La plataforma emplea metodologías cuantitativas para evaluar la fortaleza de divisas y el valor relativo en las monedas G10.
+## Características principales
 
-### Capacidades Clave
+- **Score de Fortaleza Fundamental (0–100)** — 22 indicadores ponderados en 6 tiers. Bandas: `>60` Alcista · `50–60` Neutral · `<50` Bajista
+- **Mapa de Calor de Indicadores** — 22 métricas con codificación por color, fecha de publicación por celda y columna de score con sticky scroll
+- **Carry Trade** — Ranking de pares por diferencial de tasas, historial de spread 18 meses y régimen Risk-On/Risk-Off en vivo
+- **COT Institucional** — Posicionamiento neto Leveraged Funds (CFTC), actualización semanal, lógica contrarian integrada
+- **Calendario Económico** — Scraping automático desde Investing.com con actuals, forecasts y previous. Horarios convertidos a zona local del usuario
+- **ESI Proxy** — Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8 relativos (v6.3)
+- **PMI Servicios** — Cobertura del sector servicios (>70% del PIB en G8) como indicador adelantado (v6.2)
+- **Análisis AI** — Narrativa fundamental por divisa generada con Groq/LLaMA
+- **Recomendaciones de Pares** — LONG/SHORT con tres niveles de confianza (Alta >20pt · Media 12–20pt · Baja <12pt)
 
-**Evaluación de Fortaleza de Divisas**
-- Metodología de puntuación cuantitativa (escala 0-100) basada en nueve indicadores fundamentales
-- Clasificación en tiempo real en categorías de sentimiento alcista, bajista o neutral
-- Ranking sistemático de divisas por fortaleza fundamental
-- Integración de postura de política del banco central y orientación futura
+---
 
-**Inteligencia Macroeconómica**
-- Cobertura de ocho divisas principales: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD
-- Seguimiento completo de crecimiento del PIB, inflación, empleo y métricas de balance externo
-- Monitoreo de política de bancos centrales incluyendo tasas de interés y calendarios de reuniones
-- Tipos de cambio en vivo con intervalos de actualización de 60 segundos
+## Modelo de Scoring — 22 Indicadores en 6 Tiers
 
-**Análisis Visual**
-- Visualización de mapa de calor de indicadores económicos con métricas de fortaleza codificadas por color
-- Interfaz intuitiva para evaluación rápida de dinámicas entre divisas
-- Tooltips interactivos proporcionando información contextual sobre cada indicador
-- Diseño responsivo optimizado para dispositivos de escritorio y tabletas
+| Tier | Peso | Indicadores |
+|------|------|-------------|
+| T1 · Política Monetaria | **29%** | Tasa de Interés (10%), Momentum de Tasas (7%), Inflación (7%), Outlook BC (5%) |
+| T2 · Balance Externo | **19%** | Cuenta Corriente (7%), Balanza Comercial (4%), Deuda Pública (4%), Términos de Intercambio (4%) |
+| T3 · Sentimiento de Mercado | **21%** | COT Positioning (6%), PMI Servicios (4%), ESI Proxy (4%), PMI Manufacturero (3%), Confianza Consumidor (2%), Confianza Empresarial (2%), Flujos de Capital (0%) |
+| T4 · Crecimiento y Empleo | **16%** | PIB Crecimiento (7%), Desempleo (5%), Producción Industrial (4%) |
+| T5 · FX Confirmador | **11%** | FX Performance 1M basket-corrected (8%), Bono 10Y (3%) |
+| T6 · Consumo y Salarios | **4%** | Ventas Minoristas (3%), Crecimiento Salarial (1%) |
+| **Total** | **100%** | **22 indicadores** |
 
-## Arquitectura Técnica
+### Principio de causalidad
 
-**Framework Frontend**
-- React 18 para arquitectura basada en componentes
-- Implementación en JavaScript puro sin dependencias de compilación
-- Diseño de aplicación de una sola página para rendimiento óptimo
+Los fundamentales causan el precio; el precio no debe ser el mayor peso del modelo. `fxPerformance1M` actúa como **confirmador** (8%), no como driver (era 28% hasta v5.x). Si los fundamentales son sólidos y el precio confirma → convicción. Si divergen → señal de alerta.
 
-**Infraestructura de Datos**
-- Integración de API RESTful para tipos de cambio
-- Motor de procesamiento y cálculo de datos del lado del cliente
-- Mecanismos de actualización automática para integridad de datos en tiempo real
-- Provisiones de datos de respaldo para escenarios de indisponibilidad de API
+### Ajustes contextuales (±15 pts máximo)
 
-**Entorno de Hosting**
-- Despliegue de sitio estático compatible con GitHub Pages, Netlify, Vercel
-- No se requieren dependencias del lado del servidor
-- Soporta cifrado SSL/TLS
-- Capacidad de distribución CDN global
+| Ajuste | Condición | Efecto |
+|--------|-----------|--------|
+| Safe Haven dinámico | COT extremo + régimen Risk-Off | Prima proporcional para CHF y JPY |
+| Hawkish Pause Boost (v6.1) | `bcOutlook=Hawkish` y `rateMomentum ≈ 0` | `rm efectivo = +0.3` (pausa activa ≠ inacción) |
+| Stagflation Risk (v6.1) | `inflation < 2.5%` + `production < -0.5%` + `rateMomentum < -0.5` | Penalización 0 a −5 pts |
+| Rate Cycle Haircut | Inicio de ciclo de cortes | Descuento proporcional al ritmo de bajadas |
 
-## Instrucciones de Despliegue
+---
 
-### Despliegue Estándar
+## Fuentes de Datos
 
-La aplicación está diseñada como un archivo HTML independiente que no requiere compilación o proceso de construcción.
+| Dato | Fuente | Frecuencia |
+|------|--------|------------|
+| Tipos de cambio FX | ExchangeRate-API / Open ER / Frankfurter/ECB (cascada 6 proveedores) | 60 segundos |
+| Indicadores económicos (20) | Trading Economics (scraping automatizado) | Diaria |
+| COT Positioning | CFTC oficial (Leveraged Funds, Futures Only) | Semanal (viernes) |
+| Calendario económico | Investing.com (HTML POST, ventana 28d pasado + 30d futuro) | 3 veces/día |
+| Análisis AI | Groq API (LLaMA) | Por cambio de datos |
+| Outlook BC | Scraping comunicados bancos centrales | Diaria |
 
-```bash
-# Clonar repositorio
-git clone https://github.com/GlobalInvesting/forex-dashboard.git
+---
 
-# Navegar al directorio
-cd forex-dashboard
+## Arquitectura técnica
 
-# Desplegar en servidor web o abrir localmente
-# No se requieren dependencias adicionales
+**Frontend:** React 18 via Babel CDN — sin proceso de compilación. Aplicación de un único archivo HTML con JSONs estáticos como backend.
+
+**Backend de datos:** 11 GitHub Actions workflows en Python que actualizan los JSON del repositorio automáticamente:
+
+- `update-economic-data` — 22 indicadores por divisa desde Trading Economics
+- `update-calendar` — Calendario económico desde Investing.com
+- `update-cot` — Reporte CFTC semanal (Leveraged Funds)
+- `update-rates` — Tasas de política monetaria y momentum 12 meses
+- `update-fx-performance` — Rendimiento FX basket-corrected vs G8
+- `update-ai-analysis` — Narrativas fundamentales por divisa (Groq)
+- `update-news` — Noticias forex desde fuentes RSS
+- `update-meetings` — Calendario de reuniones de bancos centrales
+- `update-cot-data` — Series históricas COT para gráficos
+- `update-extended-data` — Términos de intercambio, deuda pública
+- `update-sitemap` — Sitemap automático
+
+**Caché:** Los datos económicos se almacenan en `localStorage` con clave `DASHBOARD_VERSION`. Cada nueva versión invalida el caché automáticamente al detectar un cambio de versión.
+
+---
+
+## Estructura del proyecto
+
+```
+/
+├── index.html                  # Dashboard principal (React + Babel)
+├── about.html                  # Metodología completa en español
+├── en.html                     # Landing page en inglés
+├── carry-trade.html            # Análisis y ranking carry trade
+├── news.html                   # Noticias forex agregadas
+├── contact.html                # FAQ y contacto
+├── guia-score-fortaleza.html   # Guía del modelo de scoring
+├── guia-cot.html               # Guía COT
+├── guia-bancos-centrales.html  # Guía de bancos centrales
+├── guia-calendario-economico.html
+├── guia-carry-trade.html
+├── guia-pips.html
+├── glosario-forex.html
+├── tecnico-vs-fundamental.html
+├── economic-data/              # JSONs de indicadores por divisa
+├── calendar-data/              # calendar.json (Investing.com)
+├── rates/                      # Historial tasas de política
+├── cot-data/                   # Posicionamiento COT por divisa
+├── fx-performance/             # Rendimiento FX basket-corrected
+├── meetings-data/              # Calendario reuniones BC
+├── news-data/                  # Noticias scrapeadas
+├── ai-analysis/                # Análisis AI por divisa
+├── extended-data/              # Términos de intercambio, deuda
+└── scripts/                    # Scripts Python de actualización
+    ├── update_economic_data.py
+    ├── update_economic_calendar.py
+    ├── update_cot.py
+    └── ...
 ```
 
-### Despliegue en GitHub Pages
+---
 
-1. Navegar a Configuración del repositorio
-2. Acceder a la sección Pages
-3. Configurar rama fuente: `main`
-4. Establecer directorio: `/ (root)`
-5. Confirmar despliegue
-6. Acceder vía: `https://globalinvesting.github.io/`
+## Despliegue
 
-### Entorno de Desarrollo Local
+### GitHub Pages (producción)
 
 ```bash
-# Servidor HTTP Python
+git clone https://github.com/GlobalInvesting/globalinvesting.github.io.git
+# Subir cambios a main → GitHub Pages despliega automáticamente
+# URL: https://globalinvesting.github.io/
+```
+
+### Local
+
+```bash
+# Python
 python -m http.server 8000
 
-# Servidor HTTP Node.js
+# Node.js
 npx http-server -p 8000
 
 # Acceder en http://localhost:8000
 ```
 
-## Fuentes de Datos y Metodología
-
-### Datos de Mercado
-
-| Categoría | Fuente | Frecuencia de Actualización | Cobertura |
-|----------|--------|------------------|----------|
-| Tipos FX | ExchangeRate-API | 60 segundos | Pares principales vs USD |
-| Indicadores Económicos | Publicaciones de Bancos Centrales | 24 horas | Divisas G10 |
-| Tasas de Política | Anuncios de Autoridades Monetarias | Impulsado por eventos | Decisiones de bancos centrales |
-
-### Proveedores de Datos Primarios
-
-- Sistema de Reserva Federal (Estados Unidos)
-- Banco Central Europeo (Eurozona)
-- Banco de Inglaterra (Reino Unido)
-- Banco de Japón (Japón)
-- Banco de la Reserva de Australia (Australia)
-- Banco de Canadá (Canadá)
-- Banco Nacional Suizo (Suiza)
-- Banco de la Reserva de Nueva Zelanda (Nueva Zelanda)
-
-### Metodología Cuantitativa
-
-La puntuación de fortaleza fundamental emplea un modelo multifactorial ponderado que incorpora:
-
-**Dinámicas de Crecimiento** (ponderación 20%)
-- Tasa de crecimiento del PIB real relativa a promedios históricos
-- Tendencias de producción industrial
-- Indicadores de impulso económico
-
-**Postura de Política Monetaria** (ponderación 25%)
-- Diferencial de tasa de política versus promedio global
-- Orientación futura del banco central
-- Cálculos de tasa de interés real
-
-**Estabilidad de Precios** (ponderación 15%)
-- Desviación del Índice de Precios al Consumidor del objetivo del 2%
-- Tendencias de inflación subyacente
-- Expectativas de inflación
-
-**Condiciones del Mercado Laboral** (ponderación 15%)
-- Tasa de desempleo versus estimaciones de tasa natural
-- Tendencias de crecimiento del empleo
-- Indicadores de presión salarial
-
-**Balance Externo** (ponderación 25%)
-- Saldo de cuenta corriente como porcentaje del PIB
-- Balanza comercial en términos absolutos
-- Dinámicas de flujo de capital
-
-**Posición Fiscal** (ponderación 10%)
-- Ratio deuda pública-PIB
-- Tendencias de déficit fiscal
-- Calificaciones crediticias
-
-Las puntuaciones se normalizan en una escala de 0-100 con ajustes de ponderación dinámica basados en el régimen de mercado y las condiciones de volatilidad.
-
-## Configuración y Personalización
-
-### Configuración de Actualización de Datos
-
-Modificar intervalos de actualización en el código:
-
-```javascript
-// Línea 860: Intervalo de actualización de tipos FX (milisegundos)
-const ratesInterval = setInterval(fetchForexRates, 60000);
-
-// Línea 861: Intervalo de actualización de datos económicos (milisegundos)
-const fundamentalInterval = setInterval(loadEconomicData, 86400000);
-```
-
-### Actualizaciones de Datos Económicos
-
-Actualizar el objeto `baseEconomicData` con las últimas publicaciones estadísticas:
-
-```javascript
-const baseEconomicData = {
-    USD: { 
-        gdp: 29.18,          // Trillones USD
-        gdpGrowth: 1.8,      // % Anual
-        interestRate: 4.25,  // Tasa de política %
-        inflation: 3.4,      // IPC Anual %
-        unemployment: 4.2,   // % de fuerza laboral
-        currentAccount: -3.9, // % del PIB
-        debt: 126.5,         // % del PIB
-        tradeBalance: -68.2, // Miles de Millones USD
-        production: 1.6      // Producción industrial Anual %
-    },
-    // Divisas adicionales...
-};
-```
-
-### Personalización de Indicadores
-
-Modificar indicadores mostrados actualizando:
-1. Definiciones de tooltip en el objeto `indicatorTooltips`
-2. Estructura de encabezado de tabla en componente de mapa de calor
-3. Lógica de renderizado de celdas de datos en cuerpo de tabla
-
-## Matriz de Compatibilidad de Navegadores
-
-| Navegador | Versión Mínima | Estado | Notas |
-|---------|----------------|--------|-------|
-| Google Chrome | 90+ | Totalmente Soportado | Recomendado para rendimiento óptimo |
-| Mozilla Firefox | 88+ | Totalmente Soportado | Todas las características funcionales |
-| Safari | 14+ | Soportado | Posibles diferencias visuales menores |
-| Microsoft Edge | 90+ | Totalmente Soportado | Versiones basadas en Chromium |
-| Mobile Safari | 14+ | Limitado | Optimizado para tableta, soporte de teléfono mínimo |
-| Chrome Mobile | 90+ | Limitado | Optimizado para tableta, soporte de teléfono mínimo |
-
-## Divulgación de Riesgos y Descargos de Responsabilidad
-
-**AVISO LEGAL IMPORTANTE**
-
-Este software se proporciona solo con fines informativos y educativos y NO constituye:
-- Asesoramiento financiero o recomendaciones de inversión
-- Señales de trading u orientación sobre timing de mercado
-- Servicios de asesoría de inversión profesional
-- Una oferta o solicitud para comprar o vender instrumentos financieros
-
-**Advertencias de Riesgo**
-
-El trading de divisas conlleva un alto nivel de riesgo y puede no ser adecuado para todos los inversores. Los riesgos clave incluyen:
-
-- **Riesgo de Mercado**: Los valores de las divisas pueden fluctuar significativamente debido a condiciones económicas, políticas y de mercado
-- **Riesgo de Apalancamiento**: El trading con margen puede resultar en pérdidas que excedan la inversión inicial
-- **Riesgo de Liquidez**: Las condiciones del mercado pueden impedir la ejecución a precios deseados
-- **Riesgo Operacional**: Las fallas tecnológicas pueden afectar la precisión o disponibilidad de datos
-- **Riesgo País**: La inestabilidad política y económica puede afectar los valores de las divisas
-
-**Responsabilidades del Usuario**
-
-Los usuarios de esta plataforma son únicamente responsables de:
-- Realizar investigación independiente y debida diligencia
-- Consultar con asesores financieros licenciados antes de tomar decisiones de inversión
-- Entender que el rendimiento pasado no garantiza resultados futuros
-- Asegurar el cumplimiento con leyes y regulaciones aplicables en su jurisdicción
-- Verificar la precisión de los datos de fuentes primarias
-
-**Sin Garantía**
-
-Este software se proporciona "tal cual" sin garantía de ningún tipo, expresa o implícita. Los desarrolladores no hacen representaciones con respecto a la precisión, integridad o puntualidad de la información proporcionada.
-
-## Mejoras Planificadas
-
-**Fase 1: Expansión de Datos**
-- Integración de divisas adicionales G10 y de mercados emergentes
-- Datos de series temporales históricas con análisis de tendencias
-- Integración de calendario económico con evaluación de impacto de eventos
-- Análisis mejorado de comunicaciones de bancos centrales
-
-**Fase 2: Mejora de Análisis**
-- Capacidades avanzadas de gráficos con superposiciones técnicas
-- Matrices de correlación entre pares de divisas
-- Métricas de volatilidad y análisis implícita vs realizada
-- Indicadores de sentimiento de múltiples fuentes de datos
-
-**Fase 3: Experiencia de Usuario**
-- Diseños de dashboard personalizables y vistas guardadas
-- Sistema de alertas para publicaciones económicas significativas
-- Funcionalidad de exportación (CSV, PDF, Excel)
-- Acceso API para recuperación programática de datos
-
-**Fase 4: Móvil y Accesibilidad**
-- Optimización de diseño móvil responsivo
-- Implementación de Aplicación Web Progresiva (PWA)
-- Cumplimiento WCAG 2.1 AA para accesibilidad
-- Soporte de internacionalización multiidioma
-
-## Derechos de Autor
-
-© 2026 Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
-
-Este software es de uso exclusivo de su autor. No se permite su reproducción, distribución ni modificación sin autorización expresa por escrito.
-
-## Contacto y Soporte
-
-**Soporte Técnico**
-- Seguimiento de Problemas: https://github.com/GlobalInvesting/forex-dashboard/issues
-- Foro de Discusión: https://github.com/GlobalInvesting/forex-dashboard/discussions
-
-**Consultas Profesionales**
-- GitHub: [@GlobalInvesting](https://github.com/GlobalInvesting/)
-- Email: globalinvestingmarkets@gmail.com
-- LinkedIn: https://www.linkedin.com/in/santiago-pla-casuriaga/
-
-**Preocupaciones de Seguridad**
-Para problemas relacionados con la seguridad, por favor contacte directamente a globalinvestingmarkets@gmail.com en lugar de abrir problemas públicos.
-
-## Agradecimientos
-
-Este proyecto integra datos y metodologías de varias fuentes:
-
-- Datos de tipos de cambio proporcionados por ExchangeRate-API
-- Estadísticas económicas procedentes de publicaciones de bancos centrales y agencias estadísticas
-- Marco analítico informado por metodologías de investigación institucional
-- Construido sobre tecnologías de código abierto incluyendo React y estándares web modernos
-
-## Historial de Versiones
-
-**Versión 5.6.0** (Marzo 2026)
-- FX momentum 1M como indicador dominante (22%)
-- Corrección safe haven CHF: deflación ya no suma puntos de prima
-- Horizonte actualizado a 2-6 semanas
-- Protección de rama main y control de acceso
-
-**Versión 1.0.0** (Febrero 2026)
-- Lanzamiento inicial de producción
-- Marco de análisis fundamental central
-- Integración de datos en tiempo real
-- Visualización de mapa de calor
-- Cobertura de ocho divisas principales
+No requiere compilación ni dependencias externas. Compatible con cualquier servidor estático (GitHub Pages, Netlify, Vercel, Apache, Nginx).
 
 ---
 
-**© 2026 Santiago Plá Casuriaga · Global Investing**
+## Compatibilidad de navegadores
+
+| Navegador | Versión mínima | Estado |
+|-----------|----------------|--------|
+| Google Chrome | 90+ | ✅ Totalmente soportado (recomendado) |
+| Mozilla Firefox | 88+ | ✅ Totalmente soportado |
+| Microsoft Edge | 90+ | ✅ Totalmente soportado |
+| Safari | 14+ | ✅ Soportado |
+| Mobile Safari / Chrome Mobile | 14+ / 90+ | ⚠️ Optimizado para tableta |
+
+---
+
+## Historial de versiones
+
+**v6.3.0** (Marzo 2026)
+- ESI Proxy (`economicSurprise`) — 22.º indicador, peso 4%. Arquitectura híbrida: (A) actuals vs forecast del calendario económico, (B) z-scores G8 relativos como respaldo
+- Umbrales de sentimiento corregidos: `>60` Alcista · `50–60` Neutral · `<50` Bajista (antes >63 / 53–63 / <53)
+- `DASHBOARD_VERSION` como constante única para invalidación automática de caché en todos los archivos
+
+**v6.2.0** (Marzo 2026)
+- PMI Servicios (`servicesPMI`) — 21.º indicador, peso 4%. Sector servicios representa >70% del PIB en G8
+- Pipeline del calendario económico migrado a Investing.com como fuente única
+- Deduplicación semántica y filtro de ruido en el calendario (eventos sin actuals/forecasts/previous excluidos)
+
+**v6.1.0** (Marzo 2026)
+- Hawkish Pause Boost: `bcOutlook=Hawkish` + `rateMomentum ≈ 0` → trato como ciclo hawkish leve (corrige subestimación de JPY/BOJ)
+- Stagflation Risk: penalización cuando inflación baja coincide con contracción industrial y momentum negativo
+- Umbral Hawkish bajado de `rm > 0.50%` a `rm > 0.20%` (+0.25pp en 12M = al menos un hike)
+
+**v6.0.0** (Marzo 2026)
+- Rebalanceo fundamental: `fxPerformance1M` 28% → 8% (confirmador, no driver)
+- `interestRate` 7% → 10%, `rateMomentum` 4% → 7%
+- Eliminado `inflationExpectations` (redundante con `inflation` + `rateMomentum`)
+- Badge de "Score estructural" para divisas con fundamentales sólidos pero momentum débil
+
+**v5.x** (Febrero–Marzo 2026)
+- Sistema COT con lógica contrarian y filtro de confirmación de precio (v5.7)
+- Análisis AI por divisa con Groq/LLaMA
+- Recomendaciones de pares con niveles de confianza (Alta / Media / Baja)
+- Safe haven dinámico proporcional al régimen de riesgo global (CHF/JPY)
+- FX Performance basket-corrected vs G8 — elimina sesgo USD (v5.9)
+- 11 GitHub Actions workflows de actualización automática
+
+---
+
+## Aviso legal
+
+Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos exclusivamente. Los scores, rankings y recomendaciones de pares son cálculos basados en datos macroeconómicos públicos y **no constituyen asesoramiento financiero ni señales de trading**. El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital. Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
+
+---
+
+## Contacto
+
+- **GitHub:** [@GlobalInvesting](https://github.com/GlobalInvesting/)
+- **Email:** globalinvestingmarkets@gmail.com
+- **LinkedIn:** [santiago-pla-casuriaga](https://www.linkedin.com/in/santiago-pla-casuriaga/)
+
+---
+
+**© 2026 Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.**
+Este software es de uso exclusivo de su autor. No se permite su reproducción, distribución ni modificación sin autorización expresa por escrito.
