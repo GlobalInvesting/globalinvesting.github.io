@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T13:18:50.943944Z",
+  "generatedAt": "2026-03-09T14:02:31.444597Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "ForexFactory XML",
@@ -8,20 +8,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-08",
   "rangeTo": "2026-04-08",
-  "totalEvents": 82,
+  "totalEvents": 83,
   "currencyCounts": {
     "JPY": 12,
+    "USD": 29,
     "EUR": 15,
     "CHF": 1,
     "AUD": 4,
     "GBP": 12,
-    "USD": 28,
     "NZD": 3,
     "CAD": 7
   },
   "impactCounts": {
     "high": 10,
-    "medium": 6,
+    "medium": 7,
     "low": 66
   },
   "events": [
@@ -63,6 +63,19 @@
       "actual": "",
       "forecast": "3.19T",
       "previous": "2.70T"
+    },
+    {
+      "date": "9 Mar",
+      "dateISO": "2026-03-09",
+      "timeUTC": "",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "President Trump Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "9 Mar",
