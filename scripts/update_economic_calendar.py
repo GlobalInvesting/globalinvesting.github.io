@@ -77,7 +77,7 @@ def clean_val(v):
 def parse_desc_html(raw_desc):
     """
     Parse actual/forecast/previous/impact from description field.
-    Handles both MQL5 HTML format and plain text format.
+    Handles HTML format and plain text format.
     """
     actual = forecast = previous = impact = ''
     if not raw_desc: return actual, forecast, previous, impact
@@ -108,483 +108,10 @@ def parse_desc_html(raw_desc):
 
 
 # ════════════════════════════════════════════════════════════════════
-# SOURCE 0: ForexFactory (nfs.faireconomy.media)
-# - JSON endpoint: has actual, forecast, previous, full week
-# - XML endpoint: fallback, has forecast + previous only
-# - Times are in GMT (UTC)
-# - Impact: 'Holiday', 'Low', 'Medium', 'High'
-# ════════════════════════════════════════════════════════════════════
-
-def _parse_ff_time(time_str):
-    """Convert FF time string '2:00am', '10:30pm' → 'HH:MM' UTC string."""
-    if not time_str or time_str.lower() in ('all day', 'tentative', ''):
-        return ''
-    try:
-        ts = time_str.strip().upper().replace('AM', ' AM').replace('PM', ' PM')
-        for tfmt in ['%I:%M %p', '%I %p']:
-            try:
-                t = datetime.strptime(ts.strip(), tfmt)
-                return t.strftime('%H:%M')
-            except Exception:
-                pass
-    except Exception:
-        pass
-    return ''
-
-def _parse_ff_date(date_str):
-    """Parse FF date string into a date object.
-    Handles: MM-DD-YYYY, YYYY-MM-DD, ISO with T, and FF JSON full format
-    e.g. 'Sun Mar 08 2026 00:00:00 GMT+0000' or '2026-03-08T00:00:00+00:00'
-    """
-    if not date_str:
-        return None
-    # Try simple formats first
-    for fmt in ['%m-%d-%Y', '%Y-%m-%d', '%d-%m-%Y']:
-        try:
-            return datetime.strptime(date_str, fmt).date()
-        except Exception:
-            pass
-    # ISO with time component: "2026-03-08T00:00:00+00:00" or "2026-03-08T00:00:00Z"
-    try:
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
-    except Exception:
-        pass
-    # FF JSON full format: "Sun Mar 08 2026 00:00:00 GMT+0000"
-    try:
-        # Strip timezone part "GMT+0000" or "GMT-0500"
-        clean = re.sub(r'\s+GMT[+-]\d{4}$', '', date_str.strip())
-        return datetime.strptime(clean, '%a %b %d %Y %H:%M:%S').date()
-    except Exception:
-        pass
-    # Try just extracting YYYY-MM-DD from the string
-    m = re.search(r'(\d{4})-(\d{2})-(\d{2})', date_str)
-    if m:
-        try:
-            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
-        except Exception:
-            pass
-    return None
-
-def fetch_forexfactory_xml(target_dates):
-    """
-    Fetches ForexFactory weekly calendar.
-    Strategy: tries JSON first (has actual values), then XML as fallback.
-    JSON URL: https://nfs.faireconomy.media/ff_calendar_thisweek.json
-    XML URL:  https://nfs.faireconomy.media/ff_calendar_thisweek.xml
-    Times are GMT (UTC). Impact mapped: Low/Medium/High.
-    """
-    IMPACT_MAP = {'Holiday': None, 'Low': 'low', 'Medium': 'medium', 'High': 'high'}
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; economic-calendar-bot/1.0)',
-        'Accept': 'application/json, application/xml, text/xml, */*',
-    }
-
-    # ── Try JSON first (has actual values) ──────────────────────────
-    json_urls = [
-        'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
-        'https://www.forexfactory.com/ff_calendar_thisweek.json',
-    ]
-    for url in json_urls:
-        print(f"  [FF] Fetching JSON: {url}")
-        try:
-            r = requests.get(url, headers=headers, timeout=20)
-            if not r.ok:
-                print(f"  [FF] HTTP {r.status_code}")
-                continue
-            print(f"  [FF] Got {len(r.content)} bytes")
-            items = r.json()
-            if not isinstance(items, list) or not items:
-                print(f"  [FF] Empty or invalid JSON")
-                continue
-
-            print(f"  [FF] {len(items)} events in JSON")
-            if items:
-                sample = items[0]
-                print(f"  [FF] Sample keys: {list(sample.keys())[:8]}")
-                print(f"  [FF] Sample date={sample.get('date','?')!r} country={sample.get('country','?')!r} impact={sample.get('impact','?')!r}")
-            events = []
-            skip_date = skip_cur = skip_imp = 0
-            for item in items:
-                try:
-                    # FF JSON uses 'country' with country name (e.g. "Japan"), not 'currency'
-                    country_raw = str(item.get('country', item.get('currency', ''))).strip()
-                    currency = resolve_currency(country_raw)
-                    if not currency:
-                        # Try direct currency code match
-                        c = country_raw.upper()
-                        currency = c if c in TRACKED_CURRENCIES else None
-                    if not currency:
-                        skip_cur += 1
-                        continue
-
-                    impact_raw = str(item.get('impact', 'Low')).capitalize()
-                    impact = IMPACT_MAP.get(impact_raw)
-                    if impact is None:
-                        skip_imp += 1
-                        continue
-
-                    event_name = str(item.get('title', item.get('name', ''))).strip()
-                    if not event_name:
-                        continue
-
-                    date_str = str(item.get('date', ''))
-                    event_date = _parse_ff_date(date_str)
-                    if not event_date:
-                        skip_date += 1
-                        continue
-                    # FF covers the current week — expand the window by ±7 days to be safe
-                    extended = target_dates | {today - timedelta(days=i) for i in range(1, 8)}
-                    if event_date not in extended:
-                        skip_date += 1
-                        continue
-
-                    time_utc = _parse_ff_time(str(item.get('time', '')))
-
-                    actual   = clean_val(str(item.get('actual',   '') or ''))
-                    forecast = clean_val(str(item.get('forecast', '') or ''))
-                    previous = clean_val(str(item.get('previous', '') or ''))
-
-                    events.append({
-                        'date':     fmt_date(event_date),
-                        'dateISO':  event_date.isoformat(),
-                        'timeUTC':  time_utc,
-                        'country':  currency,
-                        'currency': currency,
-                        'flag':     CURRENCY_FLAGS.get(currency, ''),
-                        'event':    event_name,
-                        'impact':   impact,
-                        'actual':   actual,
-                        'forecast': forecast,
-                        'previous': previous,
-                    })
-                except Exception as _ie:
-                    print(f"  [FF] Item error: {_ie}")
-                    continue
-
-            print(f"  [FF] Skipped: date={skip_date} cur={skip_cur} impact={skip_imp}")
-            if events:
-                print(f"  [FF] ✅ Parsed {len(events)} events from JSON (with actuals)")
-                return events
-            print(f"  [FF] 0 events parsed from JSON")
-
-        except Exception as e:
-            print(f"  [FF] JSON error: {e}")
-            continue
-
-    # ── Fallback: XML (no actual values) ────────────────────────────
-    xml_urls = [
-        'https://nfs.faireconomy.media/ff_calendar_thisweek.xml',
-        'https://www.forexfactory.com/ff_calendar_thisweek.xml',
-    ]
-    for url in xml_urls:
-        print(f"  [FF] Fetching XML: {url}")
-        try:
-            r = requests.get(url, headers=headers, timeout=20)
-            if not r.ok:
-                print(f"  [FF] HTTP {r.status_code}")
-                continue
-            print(f"  [FF] Got {len(r.content)} bytes")
-
-            items = []
-            for parser in ['lxml-xml', 'lxml', 'html.parser']:
-                soup = BeautifulSoup(r.text, parser)
-                items = soup.find_all('event')
-                if items:
-                    print(f"  [FF] {len(items)} <event> tags (parser: {parser})")
-                    break
-
-            if not items:
-                print(f"  [FF] No <event> tags found")
-                continue
-
-            events = []
-            for item in items:
-                try:
-                    cur_tag = item.find('currency') or item.find('country')
-                    if not cur_tag:
-                        continue
-                    currency = cur_tag.get_text(strip=True).upper()
-                    if currency not in TRACKED_CURRENCIES:
-                        continue
-
-                    imp_tag = item.find('impact')
-                    impact_raw = imp_tag.get_text(strip=True) if imp_tag else 'Low'
-                    impact = IMPACT_MAP.get(impact_raw)
-                    if impact is None:
-                        continue
-
-                    title_tag = item.find('title') or item.find('name')
-                    event_name = title_tag.get_text(strip=True) if title_tag else ''
-                    if not event_name:
-                        continue
-
-                    date_tag = item.find('date')
-                    time_tag = item.find('time')
-                    event_date = _parse_ff_date(date_tag.get_text(strip=True) if date_tag else '')
-                    if not event_date or event_date not in target_dates:
-                        continue
-
-                    time_utc = _parse_ff_time(time_tag.get_text(strip=True) if time_tag else '')
-
-                    fc_tag   = item.find('forecast')
-                    prev_tag = item.find('previous')
-                    forecast = clean_val(fc_tag.get_text(strip=True))  if fc_tag  else ''
-                    previous = clean_val(prev_tag.get_text(strip=True)) if prev_tag else ''
-
-                    events.append({
-                        'date':     fmt_date(event_date),
-                        'dateISO':  event_date.isoformat(),
-                        'timeUTC':  time_utc,
-                        'country':  currency,
-                        'currency': currency,
-                        'flag':     CURRENCY_FLAGS.get(currency, ''),
-                        'event':    event_name,
-                        'impact':   impact,
-                        'actual':   '',
-                        'forecast': forecast,
-                        'previous': previous,
-                    })
-                except Exception:
-                    continue
-
-            if events:
-                print(f"  [FF] ✅ Parsed {len(events)} events from XML (no actuals)")
-                return events
-            print(f"  [FF] 0 events parsed from {len(items)} tags")
-
-        except Exception as e:
-            print(f"  [FF] XML error: {e}")
-            continue
-
-    return []
-
-# ════════════════════════════════════════════════════════════════════
-# SOURCE 1: MQL5 Economic Calendar RSS
-# Times from pubDate are already in UTC (RFC 2822 with timezone info)
-# ════════════════════════════════════════════════════════════════════
-
-def fetch_mql5_rss(target_dates):
-    events = []
-    from_str = min(target_dates).isoformat()
-    to_str   = max(target_dates).isoformat()
-
-    urls = [
-        f"https://calendar.mql5.com/en/economic_calendar/rss?from={from_str}&to={to_str}",
-        f"https://calendar.mql5.com/en/economic_calendar/rss?currencies=USD,EUR,GBP,JPY,AUD,CAD,CHF,NZD",
-        "https://calendar.mql5.com/en/economic_calendar/rss",
-    ]
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; RSS reader/2.0)',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-    }
-
-    for url in urls:
-        print(f"  [MQL5] Fetching: {url}")
-        try:
-            r = requests.get(url, headers=headers, timeout=25)
-            if r.status_code == 429:
-                print("  [MQL5] Rate limited, waiting 20s...")
-                time.sleep(20)
-                r = requests.get(url, headers=headers, timeout=25)
-            if not r.ok:
-                print(f"  [MQL5] HTTP {r.status_code}")
-                continue
-
-            print(f"  [MQL5] Got {len(r.content)} bytes")
-            for parser in ['lxml-xml', 'lxml', 'html.parser']:
-                soup = BeautifulSoup(r.text, parser)
-                items = soup.find_all('item')
-                if items:
-                    print(f"  [MQL5] {len(items)} items (parser: {parser})")
-                    break
-
-            if not items:
-                continue
-
-            batch = []
-            for item in items:
-                try:
-                    title_tag = item.find('title')
-                    if not title_tag: continue
-                    title_text = title_tag.get_text(strip=True)
-
-                    currency = ''
-                    event_name = title_text
-                    if ':' in title_text:
-                        prefix, rest = title_text.split(':', 1)
-                        prefix = prefix.strip().upper()
-                        rest = rest.strip()
-                        if prefix in TRACKED_CURRENCIES:
-                            currency = prefix
-                            event_name = rest
-                        else:
-                            c = resolve_currency(prefix)
-                            if c: currency, event_name = c, rest
-
-                    if not currency:
-                        cat = item.find('category')
-                        if cat: currency = clean_val(cat.get_text(strip=True)).upper()
-
-                    if currency not in TRACKED_CURRENCIES: continue
-
-                    # pubDate includes timezone info → parsedate_to_datetime
-                    # normalizes to UTC automatically
-                    pub = item.find('pubDate')
-                    event_date = None
-                    time_str = ''
-                    if pub:
-                        try:
-                            dt = parsedate_to_datetime(pub.get_text(strip=True))
-                            # Convert to UTC if it has timezone info
-                            if dt.tzinfo is not None:
-                                import datetime as dt_module
-                                dt = dt.astimezone(dt_module.timezone.utc)
-                            event_date = dt.date()
-                            time_str = dt.strftime('%H:%M')
-                        except: pass
-
-                    if not event_date or event_date not in target_dates: continue
-
-                    desc_tag = item.find('description')
-                    desc_raw = ''
-                    if desc_tag:
-                        desc_raw = str(desc_tag.string) if desc_tag.string else desc_tag.get_text()
-
-                    actual, forecast, previous, desc_impact = parse_desc_html(desc_raw)
-
-                    impact = ''
-                    imp_tag = item.find(re.compile(r'importance', re.I))
-                    if imp_tag:
-                        try:
-                            iv = int(imp_tag.get_text(strip=True))
-                            impact = 'high' if iv >= 3 else 'medium' if iv == 2 else 'low'
-                        except: pass
-                    if not impact:
-                        impact = desc_impact if desc_impact else classify_impact_kw(event_name)
-
-                    batch.append({
-                        'date': fmt_date(event_date),
-                        'dateISO': event_date.isoformat(),
-                        'timeUTC': time_str,
-                        'country': currency, 'currency': currency,
-                        'flag': CURRENCY_FLAGS.get(currency, ''),
-                        'event': event_name,
-                        'impact': impact,
-                        'actual': actual,
-                        'forecast': forecast,
-                        'previous': previous,
-                    })
-                except: continue
-
-            if batch:
-                print(f"  [MQL5] ✅ Parsed {len(batch)} events")
-                return batch
-
-        except Exception as e:
-            print(f"  [MQL5] Error: {e}")
-            continue
-
-    return events
-
-# ════════════════════════════════════════════════════════════════════
-# SOURCE 2: Trading Economics RSS
-# Times from pubDate include timezone → normalized to UTC
-# ════════════════════════════════════════════════════════════════════
-
-def fetch_te_rss(target_dates):
-    events = []
-    urls = [
-        "https://tradingeconomics.com/calendar/rss",
-        "https://tradingeconomics.com/rss/calendar.aspx",
-    ]
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; RSS/2.0)',
-        'Accept': 'application/rss+xml, application/xml, text/xml',
-    }
-    for url in urls:
-        print(f"  [TE RSS] Fetching: {url}")
-        try:
-            r = requests.get(url, headers=headers, timeout=20)
-            if not r.ok:
-                print(f"  [TE RSS] HTTP {r.status_code}")
-                continue
-            print(f"  [TE RSS] Got {len(r.content)} bytes")
-
-            for parser in ['lxml-xml', 'lxml']:
-                soup = BeautifulSoup(r.text, parser)
-                items = soup.find_all('item')
-                if items: break
-
-            print(f"  [TE RSS] {len(items)} items")
-            batch = []
-            for item in items:
-                try:
-                    title_tag = item.find('title')
-                    if not title_tag: continue
-                    title = title_tag.get_text(strip=True)
-
-                    currency = ''
-                    event_name = title
-                    for sep in [' - ', ': ', ' | ']:
-                        if sep in title:
-                            parts = title.split(sep, 1)
-                            c = resolve_currency(parts[0].strip())
-                            if c:
-                                currency, event_name = c, parts[1].strip()
-                                break
-                    if not currency:
-                        cat = item.find('category')
-                        if cat: currency = resolve_currency(cat.get_text(strip=True)) or ''
-                    if currency not in TRACKED_CURRENCIES: continue
-
-                    pub = item.find('pubDate')
-                    event_date = None
-                    time_str = ''
-                    if pub:
-                        try:
-                            dt = parsedate_to_datetime(pub.get_text(strip=True))
-                            if dt.tzinfo is not None:
-                                import datetime as dt_module
-                                dt = dt.astimezone(dt_module.timezone.utc)
-                            event_date = dt.date()
-                            time_str = dt.strftime('%H:%M')
-                        except: pass
-                    if not event_date or event_date not in target_dates: continue
-
-                    desc_tag = item.find('description')
-                    desc_raw = str(desc_tag.string) if (desc_tag and desc_tag.string) else (desc_tag.get_text() if desc_tag else '')
-                    actual, forecast, previous, imp = parse_desc_html(desc_raw)
-                    impact = imp if imp else classify_impact_kw(event_name)
-
-                    batch.append({
-                        'date': fmt_date(event_date),
-                        'dateISO': event_date.isoformat(),
-                        'timeUTC': time_str,
-                        'country': currency, 'currency': currency,
-                        'flag': CURRENCY_FLAGS.get(currency, ''),
-                        'event': event_name,
-                        'impact': impact,
-                        'actual': actual,
-                        'forecast': forecast,
-                        'previous': previous,
-                    })
-                except: continue
-
-            if batch:
-                print(f"  [TE RSS] ✅ Parsed {len(batch)} events")
-                return batch
-        except Exception as e:
-            print(f"  [TE RSS] Error: {e}")
-    return events
-
-# ════════════════════════════════════════════════════════════════════
-# SOURCE 3: Investing.com
-# IMPORTANT: Investing.com returns times in EST (UTC-5) regardless of
-# the timeZone parameter sent in the POST request.
+# SOURCE: Investing.com
+# IMPORTANT: Investing.com HTML POST returns times in EST (UTC-5).
+# JSON API returns UTC ISO strings directly.
 # We convert EST → UTC by adding 5 hours before storing.
-# Verification: ECB Lagarde stored as 03:30 EST → 08:30 UTC
-#               Frontend (UTC-3) shows 05:30 ✅
 # ════════════════════════════════════════════════════════════════════
 
 def est_to_utc(time_str, event_date):
@@ -606,135 +133,6 @@ def est_to_utc(time_str, event_date):
         return utc_str, event_date
     except:
         return time_str, event_date
-
-def fetch_investing_html_actuals(from_str, to_str):
-    """
-    Fetches actual values from Investing.com HTML POST endpoint for a date range.
-    Returns a dict: (dateISO, timeUTC, currency) → {actual, forecast, previous, event_name}
-    This endpoint works from GitHub Actions and returns eventActual_ cells for past events.
-    Times returned are EST (UTC-5) and are converted to UTC automatically.
-    """
-    url = 'https://www.investing.com/economic-calendar/Service/getCalendarFilteredData'
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                      'Chrome/121.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://www.investing.com/economic-calendar/',
-        'Origin': 'https://www.investing.com',
-    }
-    post_data = [
-        ('dateFrom', from_str), ('dateTo', to_str),
-        ('timeZone', '0'), ('timeFilter', 'timeRemain'),
-        ('currentTab', 'custom'), ('limit_from', '0'),
-    ]
-    for cid in [5, 72, 4, 35, 25, 6, 12, 43]:  # USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD
-        post_data.append(('country[]', str(cid)))
-
-    try:
-        r = requests.post(url, headers=headers, data=post_data, timeout=25)
-        if not r.ok:
-            print(f"  [Inv HTML] HTTP {r.status_code}")
-            return {}
-        resp = r.json()
-        html_data = resp.get('data', '') if isinstance(resp, dict) else ''
-        if not html_data:
-            return {}
-
-        soup = BeautifulSoup(html_data, 'lxml')
-        rows = soup.find_all('tr', {'id': re.compile('eventRowId_')})
-        print(f"  [Inv HTML] Found {len(rows)} rows for {from_str} → {to_str}")
-        # Debug: sample first row to diagnose actual cell detection
-        if rows:
-            r0 = rows[0]
-            act_td = r0.find("td", id=re.compile("eventActual_"))
-            print(f"  [Inv HTML] Sample actual cell: {act_td}")
-            print(f"  [Inv HTML] Sample row attrs: data-currency={repr(r0.get('data-currency'))} data-event-datetime={repr(r0.get('data-event-datetime'))}")
-
-        results = {}  # (dateISO, timeUTC, currency) → event dict
-        _dbg_no_actual = 0
-        _dbg_no_currency = 0
-        _dbg_no_name = 0
-        _dbg_ok = 0
-        for row in rows:
-            try:
-                dt_str = row.get('data-event-datetime', '')
-                if not dt_str:
-                    continue
-                dt_norm = dt_str.strip().replace('T', ' ')
-                event_date = None
-                for fmt in ['%Y/%m/%d %H:%M:%S', '%Y-%m-%d %H:%M:%S',
-                            '%Y/%m/%d %H:%M',    '%Y-%m-%d %H:%M']:
-                    try:
-                        event_date = datetime.strptime(dt_norm[:19], fmt).date()
-                        break
-                    except Exception:
-                        pass
-                if event_date is None:
-                    continue
-
-                m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}):(\d{2})', dt_norm)
-                raw_time_est = f"{m_t.group(1)}:{m_t.group(2)}" if m_t else ''
-                time_utc, event_date = est_to_utc(raw_time_est, event_date)
-
-                currency = row.attrs.get('data-currency', '') or ''
-                # Fallback: read from the currency <td> if attr missing
-                if not currency or currency not in TRACKED_CURRENCIES:
-                    cur_td = row.find('td', class_=re.compile(r'flagCur|currency'))
-                    if cur_td:
-                        currency = cur_td.get_text(strip=True).upper()
-                if currency not in TRACKED_CURRENCIES:
-                    _dbg_no_currency += 1
-                    continue
-
-                # Find event name td — avoid actual/forecast/prev cells that also have 'event' in class
-                ev_td = None
-                for _td in row.find_all('td'):
-                    _cls = ' '.join(_td.get('class', []))
-                    if 'event' in _cls and not any(x in _cls for x in ('actual', 'forecast', 'prev', 'sentiment')):
-                        ev_td = _td
-                        break
-                event_name = ''
-                if ev_td:
-                    a = ev_td.find('a')
-                    event_name = (a or ev_td).get_text(strip=True)
-                    event_name = re.sub(r'\s+[A-Z]{3}/\d+$', '', event_name).strip()
-                if not event_name:
-                    _dbg_no_name += 1
-                    continue
-
-                def gcell(pat, _row=row):  # default arg binds row at definition time
-                    td = _row.find('td', id=re.compile(pat))
-                    return clean_val(td.get_text(strip=True)) if td else ''
-
-                actual   = gcell(r'eventActual_')
-                forecast = gcell(r'eventForecast_')
-                previous = gcell(r'eventPrevious_')
-
-                if not actual:
-                    _dbg_no_actual += 1
-                    continue  # Only store rows that have an actual value
-
-                _dbg_ok += 1
-                slot = (event_date.isoformat(), time_utc, currency)
-                results[slot] = {
-                    'actual':   actual,
-                    'forecast': forecast,
-                    'previous': previous,
-                    'event':    event_name,
-                }
-            except Exception as _row_err:
-                print(f"  [Inv HTML] Row error: {_row_err}")
-
-        print(f"  [Inv HTML] Skip breakdown: no_currency={_dbg_no_currency} no_name={_dbg_no_name} no_actual={_dbg_no_actual} stored={_dbg_ok}")
-        print(f"  [Inv HTML] Extracted {len(results)} events with actual values")
-        return results
-
-    except Exception as e:
-        print(f"  [Inv HTML] Failed: {e}")
-        return {}
-
 def fetch_investing_calendar(from_str, to_str, target_dates):
     """
     Fetches calendar via Investing.com JSON API (Next.js __NEXT_DATA__).
@@ -967,72 +365,16 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
     except Exception as e:
         print(f"  [Investing] HTML fallback error: {e}")
         return []
-
-# ════════════════════════════════════════════════════════════════════
-# SOURCE 4: Official Government / Central Bank RSS
-# pubDate includes timezone → normalized to UTC
-# ════════════════════════════════════════════════════════════════════
-
-def fetch_official_rss(target_dates):
-    feeds = [
-        ('USD', 'https://www.bls.gov/feed/bls_latest.rss'),
-        ('USD', 'https://www.federalreserve.gov/feeds/press_all.xml'),
-        ('EUR', 'https://www.ecb.europa.eu/rss/press.html'),
-        ('GBP', 'https://www.bankofengland.co.uk/rss/publications'),
-        ('CAD', 'https://www150.statcan.gc.ca/n1/rss/new-nouveau.xml'),
-    ]
-    headers = {'User-Agent': 'Mozilla/5.0 (compatible; RSS/2.0)',
-               'Accept': 'application/rss+xml, application/xml, text/xml'}
-    events = []
-    for currency, url in feeds:
-        try:
-            print(f"  [Official] {currency}: {url}")
-            r = requests.get(url, headers=headers, timeout=15)
-            if not r.ok: continue
-            print(f"  [Official] {currency}: {len(r.content)} bytes")
-            soup = BeautifulSoup(r.text, 'lxml-xml')
-            items = soup.find_all('item')
-            print(f"  [Official] {currency}: {len(items)} items")
-            for item in items:
-                title_tag = item.find('title')
-                if not title_tag: continue
-                event_name = title_tag.get_text(strip=True)
-                pub = item.find('pubDate')
-                event_date = time_str = None
-                if pub:
-                    try:
-                        dt = parsedate_to_datetime(pub.get_text(strip=True))
-                        if dt.tzinfo is not None:
-                            import datetime as dt_module
-                            dt = dt.astimezone(dt_module.timezone.utc)
-                        event_date = dt.date()
-                        time_str = dt.strftime('%H:%M')
-                    except: pass
-                if not event_date or event_date not in target_dates: continue
-                events.append({
-                    'date': fmt_date(event_date),
-                    'dateISO': event_date.isoformat(),
-                    'timeUTC': time_str or '',
-                    'country': currency, 'currency': currency,
-                    'flag': CURRENCY_FLAGS.get(currency, ''),
-                    'event': event_name,
-                    'impact': classify_impact_kw(event_name),
-                    'actual': '', 'forecast': '', 'previous': '',
-                })
-        except Exception as e:
-            print(f"  [Official] {currency} error: {e}")
-    return events
-
 # ════════════════════════════════════════════════════════════════════
 # MAIN
 # ════════════════════════════════════════════════════════════════════
 
 print("=" * 60)
-print("ECONOMIC CALENDAR SCRAPER v5.2 (accumulative merge)")
-print("Sources: ForexFactory XML → MQL5 RSS → TE RSS → Investing.com → Official RSS")
+print("ECONOMIC CALENDAR SCRAPER v6.4 (Investing.com only)")
+print("Source: Investing.com (JSON API + HTML POST fallback)")
 print("Timezone policy:")
-print("  - MQL5/TE/Official RSS: pubDate normalized to UTC via parsedate_to_datetime")
-print("  - Investing.com: returns EST (UTC-5), converted +5h to UTC before storing")
+print("  - Investing.com JSON API: returns UTC ISO strings directly")
+print("  - Investing.com HTML POST: returns EST (UTC-5), converted +5h to UTC")
 print("  - All timeUTC fields are UTC — frontend converts to user local timezone")
 print("=" * 60)
 
@@ -1074,42 +416,67 @@ except FileNotFoundError:
 except Exception as _e:
     print(f"  [Base] Could not load previous calendar: {_e}")
 
-# ── STEP 2: Fetch fresh data from live sources ───────────────────────────────
+# ── STEP 2: Fetch from Investing.com — única fuente (v6.3) ───────────────────
+# Investing.com devuelve actual + forecast + previous en una sola llamada.
+# Se hacen DOS pasadas:
+#   Pasada A: últimos 28 días (para obtener actuals de eventos publicados)
+#   Pasada B: próximos 30 días (para obtener forecast de eventos futuros)
+# No hay matching ni enriquecimiento separado — todo viene de la misma fuente.
+# ─────────────────────────────────────────────────────────────────────────────
 all_events  = []
 source_used = None
 fetch_errors = []
 
-for label, fetcher, args in [
-    ("0: ForexFactory XML", fetch_forexfactory_xml,   (target_dates,)),
-    ("1: MQL5 RSS",         fetch_mql5_rss,           (target_dates,)),
-    ("2: TE RSS",           fetch_te_rss,             (target_dates,)),
-    ("3: Investing.com",    fetch_investing_calendar, (from_date.isoformat(), to_date.isoformat(), target_dates)),
-    ("4: Official RSS",     fetch_official_rss,       (target_dates,)),
-]:
-    if len(all_events) >= 3:
-        break
-    print(f"\n{'='*50}\nSTRATEGY {label}\n{'='*50}")
-    try:
-        result = fetcher(*args)
-        if len(result) >= 3:
-            all_events  = result
-            source_used = label.split(': ', 1)[1]
-            print(f"✅ {label}: {len(all_events)} events — using this source")
-        else:
-            msg = f"{label}: only {len(result)} events returned"
-            print(f"⚠️  {msg}")
-            fetch_errors.append(msg)
-            if result:
-                for ev in result:
-                    if ev not in all_events:
-                        all_events.append(ev)
-                if not source_used:
-                    source_used = label.split(': ', 1)[1] + ' (partial)'
-    except Exception as e:
-        msg = f"{label} failed: {e}"
-        print(f"❌ {msg}")
-        fetch_errors.append(msg)
-    time.sleep(2)
+past_from = (today - timedelta(days=28)).isoformat()
+past_to   = today.isoformat()
+future_to = to_date.isoformat()
+
+print(f"\n{'='*50}")
+print(f"SOURCE: Investing.com (past: {past_from}→{past_to} + future: {past_to}→{future_to})")
+print(f"{'='*50}")
+
+# Pasada A: pasado con actuals
+inv_past = []
+try:
+    inv_past = fetch_investing_calendar(past_from, past_to, target_dates)
+    has_actuals = sum(1 for e in inv_past if e.get('actual'))
+    print(f"✅ Investing.com past: {len(inv_past)} events ({has_actuals} with actuals)")
+except Exception as e:
+    print(f"❌ Investing.com past failed: {e}")
+    fetch_errors.append(f"Investing.com past: {e}")
+
+# Pasada B: futuro con forecasts
+inv_future = []
+try:
+    inv_future = fetch_investing_calendar(past_to, future_to, target_dates)
+    print(f"✅ Investing.com future: {len(inv_future)} events")
+except Exception as e:
+    print(f"❌ Investing.com future failed: {e}")
+    fetch_errors.append(f"Investing.com future: {e}")
+
+# Combinar ambas pasadas — past wins on actuals, future adds upcoming events
+combined_by_key = {}
+for ev in inv_future:
+    k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+    combined_by_key[k] = ev
+for ev in inv_past:
+    k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+    if k in combined_by_key:
+        # Past wins on actuals/previous, keep future forecast if not overridden
+        existing = dict(combined_by_key[k])
+        if ev.get('actual'):   existing['actual']   = ev['actual']
+        if ev.get('previous'): existing['previous'] = ev['previous']
+        if ev.get('forecast'): existing['forecast'] = ev['forecast']
+        combined_by_key[k] = existing
+    else:
+        combined_by_key[k] = ev
+
+all_events = list(combined_by_key.values())
+if all_events:
+    source_used = 'Investing.com'
+    print(f"\n  [Combined] {len(inv_past)} past + {len(inv_future)} future → {len(all_events)} unique events")
+else:
+    print("⛔ Investing.com returned no events")
 
 if not all_events and not base_events:
     print(f"\n{'='*50}")
@@ -1117,24 +484,20 @@ if not all_events and not base_events:
     print("=" * 50)
 
 # ── STEP 3: Build final event list ────────────────────────────────────────────
-# Strategy: if we got fresh events from a live source, use ONLY those (avoids
-# mixing base duplicates). Only fall back to base if fresh fetch failed entirely.
 if all_events:
-    # Start from full historical base, then overwrite with fresh data
-    # This preserves all past events AND updates forecasts/actuals with latest data
-    merged_values = dict(base_events)  # copy full history
+    # Merge with base — fresh Investing.com data always wins
+    merged_values = dict(base_events)
     fresh_added = fresh_updated = 0
     for ev in all_events:
         k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
         if k in merged_values:
-            existing = merged_values[k]
-            # Update: fresh data wins on forecast/previous; actual only updates if fresh has one
-            updated = dict(existing)
+            updated = dict(merged_values[k])
+            # Fresh source wins on all fields
             if ev.get('forecast'): updated['forecast'] = ev['forecast']
             if ev.get('previous'): updated['previous'] = ev['previous']
             if ev.get('actual'):   updated['actual']   = ev['actual']
-            # Always update impact and event name from fresh source
-            updated['impact'] = ev['impact']
+            updated['impact']   = ev['impact']
+            updated['timeUTC']  = ev.get('timeUTC', updated.get('timeUTC', ''))
             merged_values[k] = updated
             fresh_updated += 1
         else:
@@ -1142,115 +505,11 @@ if all_events:
             fresh_added += 1
     print(f"  [Merge] base={len(base_events)} + fresh={len(all_events)} → {len(merged_values)} total "
           f"(added={fresh_added}, updated={fresh_updated})")
+    actuals_count = sum(1 for ev in merged_values.values() if ev.get('actual'))
+    print(f"  [Actuals] {actuals_count} events have actual values")
 else:
-    # Fresh failed — use base as fallback
     merged_values = base_events
     print(f"  [Merge] Fresh failed — using base only: {len(base_events)} events")
-
-# ── STEP 3a: Enrich actuals from Investing.com HTML POST ─────────────────────
-# FF JSON/XML have no 'actual' field. We use Investing.com's HTML POST endpoint
-# which: (a) works from GitHub Actions, (b) returns eventActual_ cells for past
-# events. Matching uses (dateISO, timeUTC, currency) slot — exact match when
-# there's only one event in the slot, name similarity as tiebreaker otherwise.
-events_needing_actual = [ev for ev in merged_values.values()
-                         if not ev.get('actual') and
-                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=28) and
-                         date.fromisoformat(ev['dateISO']) <= today]
-if events_needing_actual:
-    enrich_from = (today - timedelta(days=28)).isoformat()  # v6.3: 7→28 días
-    enrich_to   = today.isoformat()
-    print(f"\n  [Actuals] Using Investing.com HTML POST for actuals "
-          f"({len(events_needing_actual)} events need actual, {enrich_from} → {enrich_to})...")
-
-    inv_slots = fetch_investing_html_actuals(enrich_from, enrich_to)
-
-    if inv_slots:
-        enriched = 0
-
-        # Normalize event name for fuzzy matching
-        def _norm(s):
-            s = re.sub(r'\s*\([^)]*\)', '', s).lower()
-            return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
-
-        # Build lookup: (dateISO, currency) → list of (key, ev) for FF events needing actual
-        ff_by_date_cur = {}
-        for k, ev in merged_values.items():
-            if ev.get('actual'):
-                continue
-            dc = (ev['dateISO'], ev['currency'])
-            ff_by_date_cur.setdefault(dc, []).append((k, ev))
-
-        # Also build a ±1 day lookup so EST→UTC date shifts don't break matching
-        ff_by_date_cur_ext = {}
-        for k, ev in merged_values.items():
-            if ev.get('actual'):
-                continue
-            d = date.fromisoformat(ev['dateISO'])
-            for delta in [-1, 0, 1]:
-                dc = ((d + timedelta(days=delta)).isoformat(), ev['currency'])
-                ff_by_date_cur_ext.setdefault(dc, []).append((k, ev))
-
-        print(f"  [Actuals] FF slots available: {len(ff_by_date_cur)} date+currency combos, "
-              f"Inv actuals: {len(inv_slots)}")
-
-        # Print a sample of inv_slots for debugging
-        sample_inv = list(inv_slots.items())[:5]
-        for slot, d in sample_inv:
-            print(f"  [Actuals] Inv sample: {slot} → {d['event']!r} actual={d['actual']!r}")
-
-        used_keys = set()
-        for (inv_date, inv_time, inv_cur), inv_data in inv_slots.items():
-            # Try exact date first, then ±1 day
-            candidates = ff_by_date_cur.get((inv_date, inv_cur), [])
-            if not candidates:
-                candidates = ff_by_date_cur_ext.get((inv_date, inv_cur), [])
-
-            # Filter out already-used keys
-            candidates = [(k, ev) for k, ev in candidates if k not in used_keys]
-            if not candidates:
-                continue
-
-            inv_words = _norm(inv_data.get('event', ''))
-
-            if len(candidates) == 1:
-                k, ev = candidates[0]
-                # Accept if name overlap ≥ 1 word or name is very short
-                ff_words = _norm(ev['event'])
-                score = len(inv_words & ff_words) / max(len(inv_words | ff_words), 1)
-                if score >= 0.2 or len(inv_words) <= 2:
-                    updated = dict(ev)
-                    updated['actual'] = inv_data['actual']
-                    if inv_data.get('forecast') and not updated.get('forecast'):
-                        updated['forecast'] = inv_data['forecast']
-                    if inv_data.get('previous') and not updated.get('previous'):
-                        updated['previous'] = inv_data['previous']
-                    merged_values[k] = updated
-                    used_keys.add(k)
-                    enriched += 1
-            else:
-                # Multiple candidates — pick best name match
-                best_k, best_ev, best_score = None, None, 0.0
-                for k, ev in candidates:
-                    ff_words = _norm(ev['event'])
-                    if not inv_words or not ff_words:
-                        continue
-                    score = len(inv_words & ff_words) / max(len(inv_words | ff_words), 1)
-                    if score > best_score:
-                        best_score, best_k, best_ev = score, k, ev
-                if best_k and best_score >= 0.25:
-                    updated = dict(best_ev)
-                    updated['actual'] = inv_data['actual']
-                    if inv_data.get('forecast') and not updated.get('forecast'):
-                        updated['forecast'] = inv_data['forecast']
-                    if inv_data.get('previous') and not updated.get('previous'):
-                        updated['previous'] = inv_data['previous']
-                    merged_values[best_k] = updated
-                    used_keys.add(best_k)
-                    enriched += 1
-
-        print(f"  [Actuals] Enriched {enriched} / {len(events_needing_actual)} events")
-    else:
-        print("  [Actuals] No actual values retrieved from Investing.com HTML")
 
 # ── STEP 3b-pre: Remove timezone-shift duplicates ────────────────────────────
 def normalize_name(name):
@@ -1392,8 +651,8 @@ output = {
     'source':         source_used if data_ok else None,
     'errorMessage':   None    if data_ok else (
         'No se pudieron obtener datos de ninguna fuente. '
-        'Por favor consulte directamente: forexfactory.com, '
-        'investing.com/economic-calendar, o tradingeconomics.com/calendar'
+        'Por favor consulte directamente: '
+        'investing.com/economic-calendar o tradingeconomics.com/calendar'
     ),
     'fetchErrors':    fetch_errors if not data_ok else [],
     'rangeFrom':      (all_dates_final[0] if all_dates_final else from_date.isoformat()),
