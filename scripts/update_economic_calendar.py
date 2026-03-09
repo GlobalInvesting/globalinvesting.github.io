@@ -607,6 +607,108 @@ def est_to_utc(time_str, event_date):
     except:
         return time_str, event_date
 
+def fetch_investing_html_actuals(from_str, to_str):
+    """
+    Fetches actual values from Investing.com HTML POST endpoint for a date range.
+    Returns a dict: (dateISO, timeUTC, currency) → {actual, forecast, previous, event_name}
+    This endpoint works from GitHub Actions and returns eventActual_ cells for past events.
+    Times returned are EST (UTC-5) and are converted to UTC automatically.
+    """
+    url = 'https://www.investing.com/economic-calendar/Service/getCalendarFilteredData'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                      'Chrome/121.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer': 'https://www.investing.com/economic-calendar/',
+        'Origin': 'https://www.investing.com',
+    }
+    post_data = [
+        ('dateFrom', from_str), ('dateTo', to_str),
+        ('timeZone', '0'), ('timeFilter', 'timeRemain'),
+        ('currentTab', 'custom'), ('limit_from', '0'),
+    ]
+    for cid in [5, 72, 4, 35, 25, 6, 12, 43]:  # USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD
+        post_data.append(('country[]', str(cid)))
+
+    try:
+        r = requests.post(url, headers=headers, data=post_data, timeout=25)
+        if not r.ok:
+            print(f"  [Inv HTML] HTTP {r.status_code}")
+            return {}
+        resp = r.json()
+        html_data = resp.get('data', '') if isinstance(resp, dict) else ''
+        if not html_data:
+            return {}
+
+        soup = BeautifulSoup(html_data, 'lxml')
+        rows = soup.find_all('tr', {'id': re.compile('eventRowId_')})
+        print(f"  [Inv HTML] Found {len(rows)} rows for {from_str} → {to_str}")
+
+        results = {}  # (dateISO, timeUTC, currency) → event dict
+        for row in rows:
+            try:
+                dt_str = row.get('data-event-datetime', '')
+                if not dt_str:
+                    continue
+                dt_norm = dt_str.strip().replace('T', ' ')
+                event_date = None
+                for fmt in ['%Y/%m/%d %H:%M:%S', '%Y-%m-%d %H:%M:%S',
+                            '%Y/%m/%d %H:%M',    '%Y-%m-%d %H:%M']:
+                    try:
+                        event_date = datetime.strptime(dt_norm[:19], fmt).date()
+                        break
+                    except Exception:
+                        pass
+                if event_date is None:
+                    continue
+
+                m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}):(\d{2})', dt_norm)
+                raw_time_est = f"{m_t.group(1)}:{m_t.group(2)}" if m_t else ''
+                time_utc, event_date = est_to_utc(raw_time_est, event_date)
+
+                currency = row.get('data-currency', '').strip().upper()
+                if currency not in TRACKED_CURRENCIES:
+                    continue
+
+                ev_td = row.find('td', class_=re.compile('event'))
+                event_name = ''
+                if ev_td:
+                    a = ev_td.find('a')
+                    event_name = (a or ev_td).get_text(strip=True)
+                    event_name = re.sub(r'\s+[A-Z]{3}/\d+$', '', event_name).strip()
+                if not event_name:
+                    continue
+
+                def gcell(pat):
+                    td = row.find('td', id=re.compile(pat))
+                    return clean_val(td.get_text(strip=True)) if td else ''
+
+                actual   = gcell(r'eventActual_')
+                forecast = gcell(r'eventForecast_')
+                previous = gcell(r'eventPrevious_')
+
+                if not actual:
+                    continue  # Only store rows that have an actual value
+
+                slot = (event_date.isoformat(), time_utc, currency)
+                results[slot] = {
+                    'actual':   actual,
+                    'forecast': forecast,
+                    'previous': previous,
+                    'event':    event_name,
+                }
+            except Exception:
+                continue
+
+        print(f"  [Inv HTML] Extracted {len(results)} events with actual values")
+        return results
+
+    except Exception as e:
+        print(f"  [Inv HTML] Failed: {e}")
+        return {}
+
 def fetch_investing_calendar(from_str, to_str, target_dates):
     """
     Fetches calendar via Investing.com JSON API (Next.js __NEXT_DATA__).
@@ -1019,104 +1121,76 @@ else:
     merged_values = base_events
     print(f"  [Merge] Fresh failed — using base only: {len(base_events)} events")
 
-# ── STEP 3a: Enrich actuals from ForexFactory HTML ──────────────────────────
-# FF JSON/XML have no 'actual' field. FF HTML (forexfactory.com/calendar) DOES
-# have actuals and uses the EXACT same event names — so key matching is perfect.
+# ── STEP 3a: Enrich actuals from Investing.com HTML POST ─────────────────────
+# FF JSON/XML have no 'actual' field. We use Investing.com's HTML POST endpoint
+# which: (a) works from GitHub Actions, (b) returns eventActual_ cells for past
+# events. Matching uses (dateISO, timeUTC, currency) slot — exact match when
+# there's only one event in the slot, name similarity as tiebreaker otherwise.
 events_needing_actual = [ev for ev in merged_values.values()
                          if not ev.get('actual') and
                          date.fromisoformat(ev['dateISO']) >= today - timedelta(days=2) and
                          date.fromisoformat(ev['dateISO']) <= today]
 if events_needing_actual:
-    print(f"\n  [Actuals] Scraping ForexFactory HTML for actuals "
-          f"({len(events_needing_actual)} events, "
-          f"{today - timedelta(days=2)} → {today})...")
-    try:
-        ff_html_url = 'https://www.forexfactory.com/calendar'
-        ff_headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                          'Chrome/121.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://www.forexfactory.com/',
-        }
-        r_ff = requests.get(ff_html_url, headers=ff_headers, timeout=30)
+    enrich_from = (today - timedelta(days=2)).isoformat()
+    enrich_to   = today.isoformat()
+    print(f"\n  [Actuals] Using Investing.com HTML POST for actuals "
+          f"({len(events_needing_actual)} events need actual, {enrich_from} → {enrich_to})...")
+
+    inv_slots = fetch_investing_html_actuals(enrich_from, enrich_to)
+
+    if inv_slots:
         enriched = 0
-        if r_ff.ok:
-            soup_ff = BeautifulSoup(r_ff.text, 'lxml')
-            # FF calendar table rows have class "calendar__row"
-            ff_rows = soup_ff.find_all('tr', class_=re.compile(r'calendar__row'))
-            print(f"  [Actuals FF] Found {len(ff_rows)} calendar rows in HTML")
+        # Build a reverse index: (dateISO, timeUTC, currency) → [merged_keys]
+        # so we can find FF events that match a given Investing slot
+        slot_to_keys = {}
+        for k, ev in merged_values.items():
+            if ev.get('actual'):
+                continue
+            slot = (ev['dateISO'], ev.get('timeUTC', ''), ev['currency'])
+            slot_to_keys.setdefault(slot, []).append(k)
 
-            # Build lookup: (dateISO, currency, event_name[:25]) → actual
-            ff_actuals = {}
-            current_date_ff = None
-            for row in ff_rows:
-                # Date cell appears on the first row of each day
-                date_td = row.find('td', class_=re.compile(r'calendar__date'))
-                if date_td:
-                    date_text = re.sub(r'\s+', ' ', date_td.get_text()).strip()
-                    for yr in [today.year, today.year - 1]:
-                        for fmt in ['%a %b %d %Y', '%A %b %d %Y']:
-                            try:
-                                current_date_ff = datetime.strptime(
-                                    f"{date_text} {yr}", fmt
-                                ).date()
-                                break
-                            except Exception:
-                                pass
-                        if current_date_ff:
-                            break
+        for slot, inv_data in inv_slots.items():
+            matching_keys = slot_to_keys.get(slot, [])
 
-                if current_date_ff is None:
-                    continue
-                # Only look at today and yesterday
-                if not (today - timedelta(days=2) <= current_date_ff <= today):
-                    continue
+            if len(matching_keys) == 1:
+                # Unique slot match — assign directly
+                k = matching_keys[0]
+                updated = dict(merged_values[k])
+                updated['actual'] = inv_data['actual']
+                if inv_data.get('forecast') and not updated.get('forecast'):
+                    updated['forecast'] = inv_data['forecast']
+                if inv_data.get('previous') and not updated.get('previous'):
+                    updated['previous'] = inv_data['previous']
+                merged_values[k] = updated
+                enriched += 1
 
-                cur_td  = row.find('td', class_=re.compile(r'calendar__currency'))
-                evt_td  = row.find('td', class_=re.compile(r'calendar__event'))
-                act_td  = row.find('td', class_=re.compile(r'calendar__actual'))
-
-                if not cur_td or not evt_td or not act_td:
-                    continue
-
-                currency = cur_td.get_text(strip=True).upper()
-                if currency not in TRACKED_CURRENCIES:
-                    continue
-
-                # Event title is in a span with class calendar__event-title
-                evt_span = evt_td.find('span', class_=re.compile(r'calendar__event-title'))
-                event_name = (evt_span or evt_td).get_text(strip=True)
-                if not event_name:
-                    continue
-
-                actual_raw = act_td.get_text(strip=True)
-                actual = clean_val(actual_raw)
-                if not actual or actual in ('—', '-'):
-                    continue
-
-                key = (current_date_ff.isoformat(), currency, event_name[:25].lower().strip())
-                ff_actuals[key] = actual
-
-            print(f"  [Actuals FF] Extracted {len(ff_actuals)} actual values from FF HTML")
-
-            # Apply — exact key match since FF HTML uses same event names as FF JSON/XML
-            for k, ev in list(merged_values.items()):
-                if ev.get('actual'):
-                    continue
-                if k in ff_actuals:
-                    updated = dict(ev)
-                    updated['actual'] = ff_actuals[k]
-                    merged_values[k] = updated
+            elif len(matching_keys) > 1:
+                # Multiple FF events in same slot — find best name match
+                def _norm(s):
+                    s = re.sub(r'\s*\([^)]*\)', '', s).lower()
+                    return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
+                inv_words = _norm(inv_data.get('event', ''))
+                best_k, best_score = None, 0.0
+                for k in matching_keys:
+                    ff_words = _norm(merged_values[k]['event'])
+                    if not inv_words or not ff_words:
+                        continue
+                    score = len(inv_words & ff_words) / max(len(inv_words), len(ff_words))
+                    if score > best_score:
+                        best_score, best_k = score, k
+                if best_k and best_score >= 0.3:
+                    updated = dict(merged_values[best_k])
+                    updated['actual'] = inv_data['actual']
+                    if inv_data.get('forecast') and not updated.get('forecast'):
+                        updated['forecast'] = inv_data['forecast']
+                    if inv_data.get('previous') and not updated.get('previous'):
+                        updated['previous'] = inv_data['previous']
+                    merged_values[best_k] = updated
                     enriched += 1
 
-            print(f"  [Actuals FF] Enriched {enriched} events with actual values")
-        else:
-            print(f"  [Actuals FF] HTTP {r_ff.status_code} — skipping enrichment")
-    except Exception as _ae:
-        import traceback
-        print(f"  [Actuals FF] Failed: {_ae}")
-        print(f"  [Actuals FF] {traceback.format_exc()[:500]}")
+        print(f"  [Actuals] Enriched {enriched} / {len(events_needing_actual)} events")
+    else:
+        print("  [Actuals] No actual values retrieved from Investing.com HTML")
 
 # ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
