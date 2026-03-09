@@ -1019,83 +1019,104 @@ else:
     merged_values = base_events
     print(f"  [Merge] Fresh failed — using base only: {len(base_events)} events")
 
-# ── STEP 3a: Enrich actuals from Investing.com ───────────────────────────────
-# FF XML has no actuals. After merging, fetch today's events from Investing.com
-# (which DOES return actuals for events that already published today/yesterday)
-# and patch them into our merged set.
+# ── STEP 3a: Enrich actuals from ForexFactory HTML ──────────────────────────
+# FF JSON/XML have no 'actual' field. FF HTML (forexfactory.com/calendar) DOES
+# have actuals and uses the EXACT same event names — so key matching is perfect.
 events_needing_actual = [ev for ev in merged_values.values()
                          if not ev.get('actual') and
                          date.fromisoformat(ev['dateISO']) >= today - timedelta(days=2) and
                          date.fromisoformat(ev['dateISO']) <= today]
 if events_needing_actual:
-    print(f"\n  [Actuals] Fetching Investing.com to fill actuals for "
-          f"{len(events_needing_actual)} events (today/yesterday without actual)...")
+    print(f"\n  [Actuals] Scraping ForexFactory HTML for actuals "
+          f"({len(events_needing_actual)} events, "
+          f"{today - timedelta(days=2)} → {today})...")
     try:
-        investing_recent = fetch_investing_calendar(
-            (today - timedelta(days=2)).isoformat(),
-            today.isoformat(),
-            {today - timedelta(days=i) for i in range(3)}
-        )
+        ff_html_url = 'https://www.forexfactory.com/calendar'
+        ff_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                          'Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://www.forexfactory.com/',
+        }
+        r_ff = requests.get(ff_html_url, headers=ff_headers, timeout=30)
         enriched = 0
+        if r_ff.ok:
+            soup_ff = BeautifulSoup(r_ff.text, 'lxml')
+            # FF calendar table rows have class "calendar__row"
+            ff_rows = soup_ff.find_all('tr', class_=re.compile(r'calendar__row'))
+            print(f"  [Actuals FF] Found {len(ff_rows)} calendar rows in HTML")
 
-        # Build a lookup: (dateISO, timeUTC, currency) → [inv_ev, ...]
-        # Investing.com times are already UTC. Match slot exactly.
-        from collections import defaultdict as _dd
-        inv_by_slot = _dd(list)
-        for inv_ev in investing_recent:
-            if inv_ev.get('actual'):
-                slot = (inv_ev['dateISO'], inv_ev.get('timeUTC',''), inv_ev['currency'])
-                inv_by_slot[slot].append(inv_ev)
+            # Build lookup: (dateISO, currency, event_name[:25]) → actual
+            ff_actuals = {}
+            current_date_ff = None
+            for row in ff_rows:
+                # Date cell appears on the first row of each day
+                date_td = row.find('td', class_=re.compile(r'calendar__date'))
+                if date_td:
+                    date_text = re.sub(r'\s+', ' ', date_td.get_text()).strip()
+                    for yr in [today.year, today.year - 1]:
+                        for fmt in ['%a %b %d %Y', '%A %b %d %Y']:
+                            try:
+                                current_date_ff = datetime.strptime(
+                                    f"{date_text} {yr}", fmt
+                                ).date()
+                                break
+                            except Exception:
+                                pass
+                        if current_date_ff:
+                            break
 
-        for k, ev in list(merged_values.items()):
-            if ev.get('actual'):
-                continue
-            slot = (ev['dateISO'], ev.get('timeUTC',''), ev['currency'])
-            candidates = inv_by_slot.get(slot, [])
+                if current_date_ff is None:
+                    continue
+                # Only look at today and yesterday
+                if not (today - timedelta(days=2) <= current_date_ff <= today):
+                    continue
 
-            if len(candidates) == 1:
-                # Exact unique slot match — assign actual directly
-                inv_ev = candidates[0]
-                updated = dict(ev)
-                updated['actual'] = inv_ev['actual']
-                if inv_ev.get('forecast') and not ev.get('forecast'):
-                    updated['forecast'] = inv_ev['forecast']
-                if inv_ev.get('previous') and not ev.get('previous'):
-                    updated['previous'] = inv_ev['previous']
-                merged_values[k] = updated
-                enriched += 1
-            elif len(candidates) > 1:
-                # Multiple events in same slot — use name similarity as tiebreaker
-                def _norm(s):
-                    s = re.sub(r'\s*\([^)]*\)', '', s).lower()
-                    return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
-                words_ev = _norm(ev['event'])
-                best_match = None
-                best_score = 0.0
-                for cand in candidates:
-                    words_c = _norm(cand['event'])
-                    if not words_ev or not words_c:
-                        continue
-                    score = len(words_ev & words_c) / max(len(words_ev), len(words_c))
-                    if score > best_score:
-                        best_score = score
-                        best_match = cand
-                if best_match and best_score >= 0.3:
+                cur_td  = row.find('td', class_=re.compile(r'calendar__currency'))
+                evt_td  = row.find('td', class_=re.compile(r'calendar__event'))
+                act_td  = row.find('td', class_=re.compile(r'calendar__actual'))
+
+                if not cur_td or not evt_td or not act_td:
+                    continue
+
+                currency = cur_td.get_text(strip=True).upper()
+                if currency not in TRACKED_CURRENCIES:
+                    continue
+
+                # Event title is in a span with class calendar__event-title
+                evt_span = evt_td.find('span', class_=re.compile(r'calendar__event-title'))
+                event_name = (evt_span or evt_td).get_text(strip=True)
+                if not event_name:
+                    continue
+
+                actual_raw = act_td.get_text(strip=True)
+                actual = clean_val(actual_raw)
+                if not actual or actual in ('—', '-'):
+                    continue
+
+                key = (current_date_ff.isoformat(), currency, event_name[:25].lower().strip())
+                ff_actuals[key] = actual
+
+            print(f"  [Actuals FF] Extracted {len(ff_actuals)} actual values from FF HTML")
+
+            # Apply — exact key match since FF HTML uses same event names as FF JSON/XML
+            for k, ev in list(merged_values.items()):
+                if ev.get('actual'):
+                    continue
+                if k in ff_actuals:
                     updated = dict(ev)
-                    updated['actual'] = best_match['actual']
-                    if best_match.get('forecast') and not ev.get('forecast'):
-                        updated['forecast'] = best_match['forecast']
-                    if best_match.get('previous') and not ev.get('previous'):
-                        updated['previous'] = best_match['previous']
+                    updated['actual'] = ff_actuals[k]
                     merged_values[k] = updated
                     enriched += 1
 
-        print(f"  [Actuals] Enriched {enriched} events with actual values from Investing.com")
-        print(f"  [Actuals] Investing slots available: {len(inv_by_slot)}, FF events needing actual: {len(events_needing_actual)}")
+            print(f"  [Actuals FF] Enriched {enriched} events with actual values")
+        else:
+            print(f"  [Actuals FF] HTTP {r_ff.status_code} — skipping enrichment")
     except Exception as _ae:
         import traceback
-        print(f"  [Actuals] Investing.com enrichment failed: {_ae}")
-        print(f"  [Actuals] {traceback.format_exc()[:300]}")
+        print(f"  [Actuals FF] Failed: {_ae}")
+        print(f"  [Actuals FF] {traceback.format_exc()[:500]}")
 
 # ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
