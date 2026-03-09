@@ -1253,6 +1253,11 @@ if events_needing_actual:
         print("  [Actuals] No actual values retrieved from Investing.com HTML")
 
 # ── STEP 3b-pre: Remove timezone-shift duplicates ────────────────────────────
+def normalize_name(name):
+    n = re.sub(r'\s*\([^)]*\)', '', name)
+    n = re.sub(r'[^a-z0-9 ]', '', n.lower())
+    n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)\b', '', n)
+    return re.sub(r'\s+', ' ', n).strip()
 # FF JSON uses local time → event appears on Mar 9 with no time (timeUTC="")
 # FF XML uses UTC → same event appears on Mar 10 at 00:01 UTC
 # Rule: if two events have same (currency, normalized_name) and dates differ by
@@ -1306,11 +1311,6 @@ if tz_dupes_removed:
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
 # "GDP QoQ" vs "GDP Capital Expenditure QoQ" → keep both (short has ≤4 tokens but NOT contained since extra words differ)
 # "3-Month Bill Auction" vs "6-Month Bill Auction" → keep both (different events in same slot)
-def normalize_name(name):
-    n = re.sub(r'\s*\([^)]*\)', '', name)
-    n = re.sub(r'[^a-z0-9 ]', '', n.lower())
-    n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)\b', '', n)
-    return re.sub(r'\s+', ' ', n).strip()
 
 def score_event(ev):
     s = 0
