@@ -3071,14 +3071,31 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
     let compA = null;
     if (calendarEvents && Array.isArray(calendarEvents) && calendarEvents.length > 0) {
         const EVENT_INDICATOR_MAP = [
-            { keywords: ['cpi y/y', 'cpi yoy', 'consumer price index y'],  key: 'inflation',       invert: false },
-            { keywords: ['gdp', 'gross domestic product'],                  key: 'gdpGrowth',       invert: false },
-            { keywords: ['unemployment rate'],                              key: 'unemployment',    invert: true  },
-            { keywords: ['nonfarm payrolls', 'employment change'],          key: 'unemployment',    invert: true  },
-            { keywords: ['retail sales'],                                   key: 'retailSales',     invert: false },
-            { keywords: ['manufacturing pmi'],                              key: 'manufacturingPMI',invert: false },
-            { keywords: ['services pmi', 'service pmi', 'composite pmi'],  key: 'servicesPMI',     invert: false },
-            { keywords: ['industrial production'],                          key: 'production',      invert: false },
+            // CPI / Inflación
+            { keywords: ['cpi y/y', 'cpi yoy', 'consumer price index y', 'cpi annual', 'inflation rate yoy'],
+              key: 'inflation', invert: false },
+            // GDP
+            { keywords: ['gdp q/q', 'gdp qoq', 'gross domestic product q', 'gdp growth', 'prelim gdp'],
+              key: 'gdpGrowth', invert: false },
+            // Desempleo
+            { keywords: ['unemployment rate'],
+              key: 'unemployment', invert: true },
+            // Nóminas / empleo (excluir "unemployment rate" que ya está arriba)
+            { keywords: ['nonfarm payrolls', 'employment change'],
+              key: 'unemployment', invert: true },
+            // Ventas minoristas
+            { keywords: ['retail sales'],
+              key: 'retailSales', invert: false },
+            // PMI Manufacturero
+            { keywords: ['manufacturing pmi', 'manufacturing index', 'markit manufacturing', 'ism manufacturing'],
+              key: 'manufacturingPMI', invert: false },
+            // PMI Servicios
+            { keywords: ['services pmi', 'service pmi', 'composite pmi', 'services index', 'ism services',
+                         'markit services', 'markit composite'],
+              key: 'servicesPMI', invert: false },
+            // Producción industrial
+            { keywords: ['industrial production', 'factory output', 'manufacturing production'],
+              key: 'production', invert: false },
         ];
 
         const parseNum = (s) => {
@@ -3092,7 +3109,7 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 28);
         const relevant = calendarEvents.filter(e => {
             if (e.currency !== currency) return false;
-            if (!['high','medium'].includes(e.impact)) return false;
+            // Note: no impact filter — Investing.com marks many important events as 'low'
             const hasActual   = e.actual   && e.actual.trim()   !== '';
             const hasForecast = e.forecast && e.forecast.trim() !== '';
             const hasPrevious = e.previous && e.previous.trim() !== '';
