@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T02:40:35.322205Z",
+  "generatedAt": "2026-03-09T02:45:58.859539Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "ForexFactory XML",
@@ -8,10 +8,10 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-08",
   "rangeTo": "2026-04-08",
-  "totalEvents": 86,
+  "totalEvents": 87,
   "currencyCounts": {
     "JPY": 12,
-    "GBP": 13,
+    "GBP": 14,
     "AUD": 7,
     "EUR": 15,
     "CHF": 1,
@@ -22,7 +22,7 @@
   "impactCounts": {
     "high": 11,
     "medium": 5,
-    "low": 70
+    "low": 71
   },
   "events": [
     {
@@ -427,6 +427,19 @@
       "actual": "",
       "forecast": "-9%",
       "previous": "-10%"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
+      "timeUTC": "",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "MPC Member Breeden Speaks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "11 Mar",
