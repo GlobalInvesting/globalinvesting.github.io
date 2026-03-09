@@ -700,9 +700,9 @@ source_used = None
 fetch_errors = []
 
 for label, fetcher, args in [
-    ("1: Investing.com", fetch_investing_calendar, (from_date.isoformat(), to_date.isoformat(), target_dates)),
-    ("2: MQL5 RSS",      fetch_mql5_rss,           (target_dates,)),
-    ("3: TE RSS",        fetch_te_rss,             (target_dates,)),
+    ("1: MQL5 RSS",      fetch_mql5_rss,           (target_dates,)),
+    ("2: TE RSS",        fetch_te_rss,             (target_dates,)),
+    ("3: Investing.com", fetch_investing_calendar, (from_date.isoformat(), to_date.isoformat(), target_dates)),
     ("4: Official RSS",  fetch_official_rss,       (target_dates,)),
 ]:
     if len(all_events) >= 3:
