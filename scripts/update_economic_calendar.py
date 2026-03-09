@@ -645,6 +645,11 @@ def fetch_investing_html_actuals(from_str, to_str):
         soup = BeautifulSoup(html_data, 'lxml')
         rows = soup.find_all('tr', {'id': re.compile('eventRowId_')})
         print(f"  [Inv HTML] Found {len(rows)} rows for {from_str} → {to_str}")
+        # Debug: sample first row to diagnose actual cell detection
+        if rows:
+            r0 = rows[0]
+            act_td = r0.find("td", id=re.compile("eventActual_"))
+            print(f"  [Inv HTML] Sample actual cell: {act_td}")
 
         results = {}  # (dateISO, timeUTC, currency) → event dict
         for row in rows:
@@ -699,8 +704,8 @@ def fetch_investing_html_actuals(from_str, to_str):
                     'previous': previous,
                     'event':    event_name,
                 }
-            except Exception:
-                continue
+            except Exception as _row_err:
+                print(f"  [Inv HTML] Row error: {_row_err}")
 
         print(f"  [Inv HTML] Extracted {len(results)} events with actual values")
         return results
@@ -1128,10 +1133,10 @@ else:
 # there's only one event in the slot, name similarity as tiebreaker otherwise.
 events_needing_actual = [ev for ev in merged_values.values()
                          if not ev.get('actual') and
-                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=2) and
+                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=7) and
                          date.fromisoformat(ev['dateISO']) <= today]
 if events_needing_actual:
-    enrich_from = (today - timedelta(days=2)).isoformat()
+    enrich_from = (today - timedelta(days=7)).isoformat()
     enrich_to   = today.isoformat()
     print(f"\n  [Actuals] Using Investing.com HTML POST for actuals "
           f"({len(events_needing_actual)} events need actual, {enrich_from} → {enrich_to})...")
