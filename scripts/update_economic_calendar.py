@@ -108,36 +108,130 @@ def parse_desc_html(raw_desc):
 
 
 # ════════════════════════════════════════════════════════════════════
-# SOURCE 0: ForexFactory XML (nfs.faireconomy.media)
-# - Free, no auth required, covers the full current week
+# SOURCE 0: ForexFactory (nfs.faireconomy.media)
+# - JSON endpoint: has actual, forecast, previous, full week
+# - XML endpoint: fallback, has forecast + previous only
 # - Times are in GMT (UTC)
-# - Has forecast + previous but NOT actual values
 # - Impact: 'Holiday', 'Low', 'Medium', 'High'
 # ════════════════════════════════════════════════════════════════════
 
+def _parse_ff_time(time_str):
+    """Convert FF time string '2:00am', '10:30pm' → 'HH:MM' UTC string."""
+    if not time_str or time_str.lower() in ('all day', 'tentative', ''):
+        return ''
+    try:
+        ts = time_str.strip().upper().replace('AM', ' AM').replace('PM', ' PM')
+        for tfmt in ['%I:%M %p', '%I %p']:
+            try:
+                t = datetime.strptime(ts.strip(), tfmt)
+                return t.strftime('%H:%M')
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return ''
+
+def _parse_ff_date(date_str):
+    """Parse FF date string into a date object. Tries MM-DD-YYYY, YYYY-MM-DD, DD-MM-YYYY."""
+    for fmt in ['%m-%d-%Y', '%Y-%m-%d', '%d-%m-%Y']:
+        try:
+            return datetime.strptime(date_str, fmt).date()
+        except Exception:
+            pass
+    return None
+
 def fetch_forexfactory_xml(target_dates):
     """
-    Fetches the ForexFactory weekly XML calendar.
-    URL: https://nfs.faireconomy.media/ff_calendar_thisweek.xml
+    Fetches ForexFactory weekly calendar.
+    Strategy: tries JSON first (has actual values), then XML as fallback.
+    JSON URL: https://nfs.faireconomy.media/ff_calendar_thisweek.json
+    XML URL:  https://nfs.faireconomy.media/ff_calendar_thisweek.xml
     Times are GMT (UTC). Impact mapped: Low/Medium/High.
-    No actual values — those come from the accumulative merge with previous JSON.
     """
     IMPACT_MAP = {'Holiday': None, 'Low': 'low', 'Medium': 'medium', 'High': 'high'}
-    # Currency name → ISO code
-    CURRENCY_MAP = {
-        'USD': 'USD', 'EUR': 'EUR', 'GBP': 'GBP', 'JPY': 'JPY',
-        'AUD': 'AUD', 'CAD': 'CAD', 'CHF': 'CHF', 'NZD': 'NZD',
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (compatible; economic-calendar-bot/1.0)',
+        'Accept': 'application/json, application/xml, text/xml, */*',
     }
-    urls = [
+
+    # ── Try JSON first (has actual values) ──────────────────────────
+    json_urls = [
+        'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
+        'https://www.forexfactory.com/ff_calendar_thisweek.json',
+    ]
+    for url in json_urls:
+        print(f"  [FF] Fetching JSON: {url}")
+        try:
+            r = requests.get(url, headers=headers, timeout=20)
+            if not r.ok:
+                print(f"  [FF] HTTP {r.status_code}")
+                continue
+            print(f"  [FF] Got {len(r.content)} bytes")
+            items = r.json()
+            if not isinstance(items, list) or not items:
+                print(f"  [FF] Empty or invalid JSON")
+                continue
+
+            print(f"  [FF] {len(items)} events in JSON")
+            events = []
+            for item in items:
+                try:
+                    currency = str(item.get('currency', '')).upper()
+                    if currency not in TRACKED_CURRENCIES:
+                        continue
+
+                    impact_raw = str(item.get('impact', 'Low')).capitalize()
+                    impact = IMPACT_MAP.get(impact_raw)
+                    if impact is None:
+                        continue
+
+                    event_name = str(item.get('title', item.get('name', ''))).strip()
+                    if not event_name:
+                        continue
+
+                    date_str = str(item.get('date', ''))
+                    event_date = _parse_ff_date(date_str)
+                    if not event_date or event_date not in target_dates:
+                        continue
+
+                    time_utc = _parse_ff_time(str(item.get('time', '')))
+
+                    actual   = clean_val(str(item.get('actual',   '') or ''))
+                    forecast = clean_val(str(item.get('forecast', '') or ''))
+                    previous = clean_val(str(item.get('previous', '') or ''))
+
+                    events.append({
+                        'date':     fmt_date(event_date),
+                        'dateISO':  event_date.isoformat(),
+                        'timeUTC':  time_utc,
+                        'country':  currency,
+                        'currency': currency,
+                        'flag':     CURRENCY_FLAGS.get(currency, ''),
+                        'event':    event_name,
+                        'impact':   impact,
+                        'actual':   actual,
+                        'forecast': forecast,
+                        'previous': previous,
+                    })
+                except Exception:
+                    continue
+
+            if events:
+                print(f"  [FF] ✅ Parsed {len(events)} events from JSON (with actuals)")
+                return events
+            print(f"  [FF] 0 events parsed from JSON")
+
+        except Exception as e:
+            print(f"  [FF] JSON error: {e}")
+            continue
+
+    # ── Fallback: XML (no actual values) ────────────────────────────
+    xml_urls = [
         'https://nfs.faireconomy.media/ff_calendar_thisweek.xml',
         'https://www.forexfactory.com/ff_calendar_thisweek.xml',
     ]
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; economic-calendar-bot/1.0)',
-        'Accept': 'application/xml, text/xml, */*',
-    }
-    for url in urls:
-        print(f"  [FF] Fetching: {url}")
+    for url in xml_urls:
+        print(f"  [FF] Fetching XML: {url}")
         try:
             r = requests.get(url, headers=headers, timeout=20)
             if not r.ok:
@@ -145,6 +239,7 @@ def fetch_forexfactory_xml(target_dates):
                 continue
             print(f"  [FF] Got {len(r.content)} bytes")
 
+            items = []
             for parser in ['lxml-xml', 'lxml', 'html.parser']:
                 soup = BeautifulSoup(r.text, parser)
                 items = soup.find_all('event')
@@ -159,7 +254,6 @@ def fetch_forexfactory_xml(target_dates):
             events = []
             for item in items:
                 try:
-                    # Currency
                     cur_tag = item.find('currency') or item.find('country')
                     if not cur_tag:
                         continue
@@ -167,56 +261,26 @@ def fetch_forexfactory_xml(target_dates):
                     if currency not in TRACKED_CURRENCIES:
                         continue
 
-                    # Impact
                     imp_tag = item.find('impact')
                     impact_raw = imp_tag.get_text(strip=True) if imp_tag else 'Low'
                     impact = IMPACT_MAP.get(impact_raw)
-                    if impact is None:  # skip Holidays
+                    if impact is None:
                         continue
 
-                    # Event name
                     title_tag = item.find('title') or item.find('name')
                     event_name = title_tag.get_text(strip=True) if title_tag else ''
                     if not event_name:
                         continue
 
-                    # Date + time — FF XML uses: <date>03-09-2026</date> <time>2:00am</time>
                     date_tag = item.find('date')
                     time_tag = item.find('time')
-                    date_str = date_tag.get_text(strip=True) if date_tag else ''
-                    time_str = time_tag.get_text(strip=True) if time_tag else ''
-
-                    event_date = None
-                    time_utc = ''
-
-                    # Parse date: MM-DD-YYYY or YYYY-MM-DD
-                    for fmt in ['%m-%d-%Y', '%Y-%m-%d', '%d-%m-%Y']:
-                        try:
-                            event_date = datetime.strptime(date_str, fmt).date()
-                            break
-                        except Exception:
-                            pass
-
+                    event_date = _parse_ff_date(date_tag.get_text(strip=True) if date_tag else '')
                     if not event_date or event_date not in target_dates:
                         continue
 
-                    # Parse time: "2:00am", "10:30pm", "All Day", "Tentative"
-                    if time_str and time_str.lower() not in ('all day', 'tentative', ''):
-                        try:
-                            # normalize: "2:00am" → "2:00 AM"
-                            ts = time_str.strip().upper().replace('AM', ' AM').replace('PM', ' PM')
-                            for tfmt in ['%I:%M %p', '%I %p']:
-                                try:
-                                    t = datetime.strptime(ts.strip(), tfmt)
-                                    time_utc = t.strftime('%H:%M')
-                                    break
-                                except Exception:
-                                    pass
-                        except Exception:
-                            pass
+                    time_utc = _parse_ff_time(time_tag.get_text(strip=True) if time_tag else '')
 
-                    # Forecast / Previous
-                    fc_tag  = item.find('forecast')
+                    fc_tag   = item.find('forecast')
                     prev_tag = item.find('previous')
                     forecast = clean_val(fc_tag.get_text(strip=True))  if fc_tag  else ''
                     previous = clean_val(prev_tag.get_text(strip=True)) if prev_tag else ''
@@ -238,12 +302,12 @@ def fetch_forexfactory_xml(target_dates):
                     continue
 
             if events:
-                print(f"  [FF] ✅ Parsed {len(events)} events")
+                print(f"  [FF] ✅ Parsed {len(events)} events from XML (no actuals)")
                 return events
             print(f"  [FF] 0 events parsed from {len(items)} tags")
 
         except Exception as e:
-            print(f"  [FF] Error: {e}")
+            print(f"  [FF] XML error: {e}")
             continue
 
     return []
