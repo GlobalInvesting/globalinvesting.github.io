@@ -1176,7 +1176,6 @@
         /* ── Calendar event states ─────────────────────────────── */
         .calendar-event.is-past {
             opacity: 0.48;
-            border-bottom: none;
         }
         .calendar-event.is-past .event-title {
             color: var(--text-secondary);
@@ -1185,6 +1184,7 @@
             opacity: 0.5;
         }
         .calendar-event.is-next {
+            background: rgba(30, 136, 229, 0.06);
             border-left: 3px solid var(--green) !important;
         }
         .next-marker {
@@ -1621,9 +1621,7 @@ const fetchExtendedData = async (countryCode) => {
             try {
                 const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
                 if (isNaN(utcDatetime.getTime())) return timeUTC;
-                // Use undefined locale so the browser respects the user's
-                // actual system locale AND timezone (not Europe/Madrid from 'es-ES').
-                return utcDatetime.toLocaleTimeString(undefined, {
+                return utcDatetime.toLocaleTimeString('es-ES', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
@@ -5038,9 +5036,7 @@ const sentiment = getSentiment(strength);
             );
 
             // Día seleccionado: por defecto el primero disponible (hoy o futuro)
-            // Use local date (not UTC) so the tab matches the user's actual calendar day.
-            const _now = new Date();
-            const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
+            const todayISO = new Date().toISOString().split('T')[0];
             const defaultDay = days.find(d => d.dateISO >= todayISO) || days[0];
             const activeDateISO = calSelectedDate || (defaultDay && defaultDay.dateISO) || null;
             const activeDayIdx = days.findIndex(d => d.dateISO === activeDateISO);
