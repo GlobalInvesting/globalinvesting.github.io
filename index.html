@@ -2188,6 +2188,8 @@ setDataLoadingStatus({
 
     economicData[country.code].manufacturingPMI = data.manufacturingPMI !== undefined ? data.manufacturingPMI : null;
     economicData[country.code].manufacturingPMIDate = dates.manufacturingPMI || scrapedData.lastUpdate;
+    economicData[country.code].servicesPMI = data.servicesPMI !== undefined ? data.servicesPMI : null;
+    economicData[country.code].servicesPMIDate = dates.servicesPMI || scrapedData.lastUpdate;
 
     // ── NUEVO: Terms of Trade ──────────────────────────────────────────────
     // Índice donde 100 = período base. Sube = exportaciones ganan valor vs importaciones.
@@ -2420,15 +2422,16 @@ const TRADING_WEIGHTS = {
 
     // Tier 4: Consumo y Salarios (6%)
     retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.03, direction: 'stable' },
+    wageGrowth:            { weight: 0.02, direction: 'stable' },
 
     // Tier 5: Sentimiento de Mercado (18%) — posicionamiento real del smart money
     // v6.0: cotPositioning sube 0.05 → 0.06. manufacturingPMI sube 0.04 → 0.05.
-    manufacturingPMI:      { weight: 0.05, direction: 'expansion'       },
+    manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
+    servicesPMI:           { weight: 0.04, direction: 'expansion'       },  // v6.2: servicios >75% PIB en USD/GBP/EUR
     cotPositioning:        { weight: 0.06, direction: 'moderate_bullish' },
     consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
     businessConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
-    capitalFlows:          { weight: 0.01, direction: 'flows'            },
+    capitalFlows:          { weight: 0.00, direction: 'flows'            },
 
     // Tier 6: FX Momentum como CONFIRMADOR (12%) — confirma o alerta divergencia, no driver
     // v6.0: fxPerformance1M baja 0.28 → 0.08. Razón: causalidad invertida — el precio pasado
@@ -3492,7 +3495,7 @@ const checkDataHealth = (economicData) => {
         ];
         const importantIndicators = [
             'currentAccount', 'debt', 'tradeBalance', 'production',
-            'retailSales', 'wageGrowth', 'manufacturingPMI', 'cotPositioning'
+            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'cotPositioning'
         ];
         const supplementaryIndicators = [
             'bond10y', 'consumerConfidence', 'businessConfidence',
@@ -3614,6 +3617,7 @@ const indicatorTooltips = {
     wageGrowth: "Tasa de crecimiento anual de los salarios nominales. Es un indicador clave de presiones inflacionarias de segunda ronda: salarios altos → mayor poder adquisitivo → mayor gasto → inflación de demanda. 2.5–4.5% = rango saludable, compatible con el objetivo de inflación del 2% y productividad normal → positivo. >5% = presiones salariales que pueden desanclar expectativas de inflación → BC bajo presión hawkish. <2% = deflación salarial, poder adquisitivo estancado → negativo para consumo y crecimiento. Los bancos centrales monitorizan el crecimiento salarial con especial atención como señal de inflación persistente. Fuente: Trading Economics.",
 
     manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via Trading Economics.",
+    servicesPMI: "Purchasing Managers Index del sector servicios (bancos, seguros, turismo, salud, tecnología). Peso: 4% en el score v6.2 — mayor que manufacturero (3%) porque servicios representa >75% del PIB en USD, GBP y EUR. La misma escala que el PMI Manufacturero: >50 = expansión, <50 = contracción. En economías post-industriales, este indicador anticipa inflación de servicios (componente más pegajoso del IPC) y empleo, los dos factores que más pesan en las decisiones de política monetaria de la Fed, el BCE y el BOE. Fuente: S&P Global via Trading Economics.",
 
     cotPositioning: "Posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Fuente: reporte Futures Only (financial_lf.htm) — excluye opciones para reflejar únicamente presión directa sobre el precio. Valores positivos = el smart money especulativo tiene posición neta larga → sesgo alcista institucional. Valores negativos = posición corta neta → sesgo bajista. >80K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-80K = bajista extremo, posible rebote contrarian. Los Leveraged Funds son el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas, sin mandatos de cobertura ni posiciones pasivas. Fuente: CFTC oficial (cftc.gov/dea/futures/financial_lf.htm), actualización viernes.",
 
@@ -3841,6 +3845,7 @@ const updateCellTooltipPos = (e) => {
         'retailSales': 'Ventas Minoristas',
         'wageGrowth': 'Crecimiento Salarial',
         'manufacturingPMI': 'PMI Manufacturero',
+        'servicesPMI': 'PMI Servicios',
         'cotPositioning': 'COT Positioning',
         'bond10y': 'Bono 10Y',
         'consumerConfidence': 'Conf. Consumidor',
@@ -3904,7 +3909,7 @@ const updateCellTooltipPos = (e) => {
                 <span className="cell-value">{value > 0 && type === 'currentAccount' ? '+' : ''}{formatValue(value)}%</span>
             ) : type === 'tradeBalance' ? (
                 <span className="cell-value">{value > 0 ? '+' : ''}{(value / 1000).toFixed(1)}B</span>
-            ) : type === 'manufacturingPMI' ? (
+            ) : type === 'manufacturingPMI' || type === 'servicesPMI' ? (
                 <span className="cell-value">{formatValue(value, 1)}</span>
             ) : type === 'cotPositioning' ? (
                 value !== null && value !== undefined ? (
@@ -4291,6 +4296,20 @@ if (economicData[currency]?.outlook && country) {
         }
     }
 
+    // 7b. ANÁLISIS DE ACTIVIDAD DE SERVICIOS (v6.2)
+    if (data.servicesPMI !== null && data.servicesPMI !== undefined) {
+        const svcStr = fmt(data.servicesPMI, 1);
+        if (data.servicesPMI > 55) {
+            analysis.push(`Sector servicios en fuerte expansión (PMI ${svcStr}) — principal driver de empleo e inflación subyacente.`);
+        } else if (data.servicesPMI > 50) {
+            analysis.push(`Servicios en expansión (PMI ${svcStr}) sostiene el ciclo económico y la inflación subyacente.`);
+        } else if (data.servicesPMI < 45) {
+            analysis.push(`Contracción severa en servicios (PMI ${svcStr}) señala deterioro en empleo y consumo.`);
+        } else {
+            analysis.push(`Servicios en zona de contracción (PMI ${svcStr}), presión sobre el crecimiento del sector terciario.`);
+        }
+    }
+
 // 8. ANÁLISIS DE POSICIONAMIENTO ESPECULATIVO (COT)
 if (data.cotPositioning !== null && data.cotPositioning !== undefined) {
     const cotK = (data.cotPositioning / 1000).toFixed(1);
@@ -4405,7 +4424,7 @@ const getSortedCountries = () => {
         const indicators = [
             'gdpGrowth', 'interestRate', 'inflation', 'unemployment',
             'currentAccount', 'debt', 'tradeBalance', 'production',
-            'retailSales', 'wageGrowth', 'manufacturingPMI', 'cotPositioning',
+            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'cotPositioning',
             'bond10y', 'consumerConfidence', 'businessConfidence',
             'capitalFlows', 'inflationExpectations'
         ];
@@ -5227,6 +5246,9 @@ const DataHealthCheck = ({ economicData }) => {
 <TooltipCell title="PMI Manufacturero" tooltip={indicatorTooltips.manufacturingPMI}>
     PMI Manufacturero<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice</span>
 </TooltipCell>
+<TooltipCell title="PMI Servicios" tooltip={indicatorTooltips.servicesPMI}>
+    PMI Servicios<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice</span>
+</TooltipCell>
 <TooltipCell title="Posicionamiento COT" tooltip={indicatorTooltips.cotPositioning}>
     COT Positioning<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Net Contratos</span>
 </TooltipCell>
@@ -5287,6 +5309,7 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.retailSales} type="retailSales" currency={country.code} indicator="retailSales" lastUpdate={data.retailSalesDate} />
 <HeatmapCell value={data.wageGrowth} type="wageGrowth" currency={country.code} indicator="wageGrowth" lastUpdate={data.wageGrowthDate} />
 <HeatmapCell value={data.manufacturingPMI} type="manufacturingPMI" currency={country.code} indicator="manufacturingPMI" lastUpdate={data.manufacturingPMIDate} />
+<HeatmapCell value={data.servicesPMI} type="servicesPMI" currency={country.code} indicator="servicesPMI" lastUpdate={data.servicesPMIDate} />
 <HeatmapCell value={data.cotPositioning} type="cotPositioning" currency={country.code} indicator="cotPositioning" lastUpdate={data.cotPositioningDate} />
 <HeatmapCell value={data.bond10y} type="bond10y" currency={country.code} indicator="bond10y" lastUpdate={data.bond10yDate} />
 <HeatmapCell value={data.consumerConfidence} type="consumerConfidence" currency={country.code} indicator="consumerConfidence" lastUpdate={data.consumerConfidenceDate} />
@@ -6030,7 +6053,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v6.1.0
+        Dashboard v6.2.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
