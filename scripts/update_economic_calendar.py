@@ -108,7 +108,7 @@ def parse_desc_html(raw_desc):
 
 
 # ════════════════════════════════════════════════════════════════════
-# SOURCE 0: ForexFactory XML (nfs.faireconomy.media)
+# SOURCE 0: ForexFactory XML (cdn-nfs.faireconomy.media)
 # - Free, no auth required, covers the full current week
 # - Times are in GMT (UTC)
 # - Has forecast + previous but NOT actual values
@@ -118,7 +118,7 @@ def parse_desc_html(raw_desc):
 def fetch_forexfactory_xml(target_dates):
     """
     Fetches the ForexFactory weekly XML calendar.
-    URL: https://nfs.faireconomy.media/ff_calendar_thisweek.xml
+    URL: https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.xml
     Times are GMT (UTC). Impact mapped: Low/Medium/High.
     No actual values — those come from the accumulative merge with previous JSON.
     """
@@ -129,7 +129,7 @@ def fetch_forexfactory_xml(target_dates):
         'AUD': 'AUD', 'CAD': 'CAD', 'CHF': 'CHF', 'NZD': 'NZD',
     }
     urls = [
-        'https://nfs.faireconomy.media/ff_calendar_thisweek.xml',
+        'https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.xml',
         'https://www.forexfactory.com/ff_calendar_thisweek.xml',
     ]
     headers = {
@@ -891,7 +891,78 @@ for ev in all_events:
     k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
     merged[k] = ev             # overwrite: fresh data wins
 
-unique_events = list(merged.values())
+# ── STEP 3b: Smart dedup — collapse same-slot events from different sources ──
+# Multiple sources name the same event differently, e.g.:
+#   "Japan Leading Index MoM" vs "Leading Index (MoM) (Jan)" vs "Leading Index"
+# Strategy: group by (dateISO, timeUTC, currency), then within each group
+# keep only events that are NOT a substring of another in the same group.
+# If an event has actual/forecast data, it takes priority.
+def normalize_name(name):
+    """Lowercase, remove punctuation, parenthetical suffixes like (Jan), (Feb), (Q4)."""
+    n = re.sub(r'\s*\([^)]*\)', '', name)   # strip (Jan), (YoY), (Q4) etc.
+    n = re.sub(r'[^a-z0-9 ]', '', n.lower())
+    n = re.sub(r'(japan|us|u s|uk|u k|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)', '', n)
+    return re.sub(r'\s+', ' ', n).strip()
+
+def score_event(ev):
+    """Higher score = better representative. Prefer: has actual > has forecast > longer name."""
+    s = 0
+    if ev.get('actual'):   s += 100
+    if ev.get('forecast'): s += 10
+    if ev.get('previous'): s += 5
+    s += len(ev.get('event', ''))
+    return s
+
+# Group by slot: (dateISO, timeUTC, currency)
+from collections import defaultdict
+slot_groups = defaultdict(list)
+for ev in merged.values():
+    slot = (ev['dateISO'], ev.get('timeUTC', ''), ev['currency'])
+    slot_groups[slot].append(ev)
+
+deduped = []
+for slot, group in slot_groups.items():
+    if len(group) == 1:
+        deduped.append(group[0])
+        continue
+
+    # For each pair, check if one name is a normalized substring of another
+    normed = [normalize_name(ev['event']) for ev in group]
+    dominated = set()
+    for i in range(len(group)):
+        for j in range(len(group)):
+            if i == j or i in dominated: continue
+            # If name[i] is contained in name[j], i is dominated by j
+            if normed[i] and normed[j] and normed[i] in normed[j]:
+                dominated.add(i)
+
+    survivors = [ev for idx, ev in enumerate(group) if idx not in dominated]
+    if not survivors:
+        survivors = group  # fallback: keep all
+
+    # Among survivors, if still >1, keep best-scored only if names are very similar
+    survivors.sort(key=score_event, reverse=True)
+
+    # Final pass: if two survivors share >70% of words, keep only the best
+    final_survivors = [survivors[0]]
+    for ev in survivors[1:]:
+        n_new = set(normalize_name(ev['event']).split())
+        is_dup = False
+        for kept in final_survivors:
+            n_kept = set(normalize_name(kept['event']).split())
+            if not n_new or not n_kept: continue
+            overlap = len(n_new & n_kept) / max(len(n_new), len(n_kept))
+            if overlap >= 0.7:
+                is_dup = True
+                break
+        if not is_dup:
+            final_survivors.append(ev)
+
+    deduped.extend(final_survivors)
+
+print(f"  [Dedup] {len(merged)} merged → {len(deduped)} after smart dedup")
+
+unique_events = deduped
 
 # Sort by dateISO + timeUTC
 def sort_key(ev):
