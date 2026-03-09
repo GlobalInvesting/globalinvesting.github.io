@@ -183,7 +183,7 @@
     </div>
     <div class="term">
         <div class="term-title">FX Performance 1M</div>
-        <div class="term-def">En el contexto del dashboard de Global Investing, es el rendimiento real de cada divisa frente al USD en los últimos 30 días, calculado con tasas de referencia del BCE (Frankfurter API). Tiene un peso del 12% en el modelo como parte del grupo FX Momentum y Smart Money (16% total), siendo el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento institucional, los flujos de carry y las expectativas de política monetaria. El indicador de mayor peso individual es la tasa de interés (7%), que comparte esta posición.</div>
+        <div class="term-def">En el contexto del dashboard de Global Investing, es el rendimiento de cada divisa calculado como composite basket-corrected (v5.9): cada moneda se mide contra la canasta de las otras 7, eliminando el sesgo que genera medir todo contra USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. Tiene un peso del 28% en el modelo — es el indicador de mayor peso individual — como parte del grupo FX Momentum y Smart Money (28% total). Es el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento institucional, los flujos de carry y las expectativas de política monetaria.</div>
     </div>
 
     <h2 id="G">G</h2>
@@ -287,7 +287,7 @@
     <h2 id="T">T</h2>
     <div class="term">
         <div class="term-title">Tasa de Interés</div>
-        <div class="term-def">Costo del dinero fijado por el banco central de un país. Es el componente de mayor peso del bloque monetario en el modelo de scoring de Global Investing (10%). Forma parte del grupo Tasas y Ciclo Monetario (~24% total) y es el principal motor del carry trade. Un aumento de tasas suele apreciar la divisa; un recorte suele depreciarla, asumiendo que el movimiento no haya sido ya descontado por el mercado.</div>
+        <div class="term-def">Costo del dinero fijado por el banco central de un país. Es el componente de mayor peso del bloque monetario en el modelo de scoring de Global Investing (7%). Forma parte del grupo Tasas y Ciclo Monetario (21% total) y es el principal motor del carry trade. Un aumento de tasas suele apreciar la divisa; un recorte suele depreciarla, asumiendo que el movimiento no haya sido ya descontado por el mercado.</div>
     </div>
     <div class="term">
         <div class="term-title">Términos de Intercambio</div>

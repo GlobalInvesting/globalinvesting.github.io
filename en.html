@@ -410,7 +410,7 @@
         <div class="feature-card">
             
             <div class="feature-title">FX Performance 1M</div>
-            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). The only 100% lag-free indicator in the model — captures institutional flows in near real time. Weight: 28% (highest individual weight in the model).</div>
+            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). Basket-corrected composite (v5.9): each currency is measured against the other 7 rather than USD alone, eliminating USD-bias. Composition: 70% 1M return + 20% 1W return + 10% 3M return. The only 100% lag-free indicator — captures institutional flows in near real time. Weight: 28% (highest individual weight in the model).</div>
         </div>
         <div class="feature-card">
             
@@ -499,12 +499,12 @@
                 <tr><th>Tier</th><th>Weight</th><th>Key Indicators</th></tr>
             </thead>
             <tbody>
-                <tr><td>T1 · Rates & Monetary Cycle</td><td>~32%</td><td>Interest rate, Inflation, CB Outlook, Rate Momentum</td></tr>
-                <tr><td>T2 · External Balance</td><td>~14%</td><td>Trade Balance, Current Account, Debt, ToT</td></tr>
-                <tr><td>T3 · Growth & Employment</td><td>~18%</td><td>GDP Growth, Unemployment, Industrial Production</td></tr>
-                <tr><td>T4 · FX Momentum & Smart Money</td><td>~19%</td><td>FX Performance 1M, COT Positioning</td></tr>
-                <tr><td>T5 · Market Sentiment</td><td>~11%</td><td>Manufacturing PMI, 10Y Sovereign Bond</td></tr>
-                <tr><td>T6 · Consumption & Wages</td><td>~8%</td><td>Retail Sales, Consumer Confidence, Wage Growth</td></tr>
+                <tr><td>T1 · FX Momentum & Smart Money</td><td><strong>28%</strong></td><td>FX Performance 1M basket-corrected (28%) — composite: 70% 1M + 20% 1W + 10% 3M, USD-bias eliminated</td></tr>
+                <tr><td>T2 · Rates & Monetary Cycle</td><td>21%</td><td>Interest Rate (7%), Inflation (5%), CB Outlook (5%), Rate Momentum (4%) — with rate cycle haircut v5.8</td></tr>
+                <tr><td>T3 · Market Sentiment</td><td>19%</td><td>COT Positioning (5%), Manufacturing PMI (4%), Consumer Confidence (3%), 10Y Bond Yield (3%), Capital Flows (2%), Business Confidence (2%)</td></tr>
+                <tr><td>T4 · External Balance</td><td>13%</td><td>Current Account (5%), Trade Balance (4%), Public Debt (2%), Terms of Trade (2%)</td></tr>
+                <tr><td>T5 · Growth & Employment</td><td>12%</td><td>GDP Growth (6%), Unemployment (4%), Industrial Production (2%)</td></tr>
+                <tr><td>T6 · Consumption & Wages</td><td>7%</td><td>Retail Sales (3%), Wage Growth (2%), Inflation Expectations (2%)</td></tr>
             </tbody>
         </table>
         <div class="method-right">
