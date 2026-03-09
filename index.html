@@ -2424,15 +2424,16 @@ const TRADING_WEIGHTS = {
 
     // Tier 4: Consumo y Salarios (6%)
     retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.02, direction: 'stable' },
+    wageGrowth:            { weight: 0.01, direction: 'stable' },  // v6.3: 0.02→0.01
 
     // Tier 5: Sentimiento de Mercado (18%) — posicionamiento real del smart money
     // v6.0: cotPositioning sube 0.05 → 0.06. manufacturingPMI sube 0.04 → 0.05.
     manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
-    servicesPMI:           { weight: 0.04, direction: 'expansion'       },  // v6.2: servicios >75% PIB en USD/GBP/EUR
+    servicesPMI:           { weight: 0.04, direction: 'expansion'       },
     cotPositioning:        { weight: 0.06, direction: 'moderate_bullish' },
-    consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
-    businessConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
+    consumerConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
+    businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
+    economicSurprise:      { weight: 0.04, direction: 'surprise'        },  // v6.3: ESI proxy nuevo
     capitalFlows:          { weight: 0.00, direction: 'flows'            },
 
     // Tier 6: FX Momentum como CONFIRMADOR (12%) — confirma o alerta divergencia, no driver
@@ -2442,7 +2443,7 @@ const TRADING_WEIGHTS = {
     //       +convicción marginal. Si divergen = alerta, no penalización masiva del score.
     //       bond10y sube 0.03 → 0.04: yield diferencial real más relevante que FX lag.
     fxPerformance1M:       { weight: 0.08, direction: 'fx_momentum' },
-    bond10y:               { weight: 0.04, direction: 'carry_yield' },
+    bond10y:               { weight: 0.03, direction: 'carry_yield' },  // v6.3: 0.04→0.03
 };
     
 // ========== SCORING FUNCTIONS v4.9.5 ==========
@@ -2696,6 +2697,14 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             else if (value >= 2.0) score = 50 + ((value - 2.0) / 1.0) * 20;
             else if (value >= 0.5) score = 20 + ((value - 0.5) / 1.5) * 30;
             else                   score = Math.max(0, value * 40);
+            break;
+
+        case 'surprise':
+            // economicSurprise: ya calculado en escala 0-100, neutral=50.
+            // >50 = datos por encima del consenso (sorpresa positiva para la divisa).
+            // <50 = datos por debajo del consenso (sorpresa negativa).
+            // El valor se pasa directamente al sistema de ponderación.
+            score = value;
             break;
 
         case 'sentiment_index':
@@ -2977,6 +2986,128 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         scoringData.consumerConfidence = Math.round((50 + (raw - 40) * (65 / 90)) * 10) / 10;
     }
 }
+
+// ── v6.3: ECONOMIC SURPRISE INDEX (ESI) PROXY ────────────────────────────────
+// Mide si los datos recientes de una divisa SUPERARON o DECEPCIONARON expectativas.
+// Es el gap metodológico más importante vs modelos institucionales (Citi ESI, Bloomberg).
+//
+// Arquitectura híbrida (2 componentes):
+//
+// COMPONENTE A (60%): Calendar actual-vs-forecast
+//   Fuente: calendar-data/calendar.json (ForexFactory)
+//   Cuando un dato económico se publica, compara actual vs forecast del consenso.
+//   Si actual > forecast (para indicadores positivos) → sorpresa positiva.
+//   Disponibilidad: solo cuando el dato ya fue publicado (actual !== '').
+//
+// COMPONENTE B (40%): G8 relative z-score
+//   Mide si la divisa está por encima o debajo del promedio G8 en indicadores clave.
+//   Siempre disponible, capta sorpresas relativas entre pares.
+//   Ejemplo: USD inflación 2.4% vs G8 promedio 1.9% → relativo positivo.
+//
+// El ESI resultante (0-100, neutral=50) se inyecta en scoringData y se pondera
+// al 4% en TRADING_WEIGHTS — impacto máximo ±2 pts en el score total.
+// ─────────────────────────────────────────────────────────────────────────────
+{
+    // — Componente B: G8 z-score relativo —
+    const ESI_INDICATORS = [
+        { key: 'gdpGrowth',       invert: false },
+        { key: 'inflation',       invert: false },  // higher = hawkish pressure = positive
+        { key: 'manufacturingPMI',invert: false },
+        { key: 'servicesPMI',     invert: false },
+        { key: 'unemployment',    invert: true  },  // lower = better
+        { key: 'retailSales',     invert: false },
+        { key: 'production',      invert: false },
+    ];
+
+    const g8Vals = {}; // { indicator: [values across G8] }
+    ESI_INDICATORS.forEach(({ key }) => {
+        g8Vals[key] = Object.values(allEconomicData)
+            .map(d => d[key])
+            .filter(v => v !== null && v !== undefined && !isNaN(v));
+    });
+
+    const zScores = [];
+    ESI_INDICATORS.forEach(({ key, invert }) => {
+        const val = data[key];
+        const vals = g8Vals[key];
+        if (val === null || val === undefined || vals.length < 4) return;
+        const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+        const std  = Math.sqrt(vals.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / vals.length);
+        if (std === 0) return;
+        const z = (val - mean) / std;
+        zScores.push(invert ? -z : z);
+    });
+
+    const compB = zScores.length > 0
+        ? Math.max(0, Math.min(100, 50 + (zScores.reduce((a, b) => a + b, 0) / zScores.length) * 18))
+        : 50;
+
+    // — Componente A: Calendar actual-vs-forecast —
+    // Accede a calendarData si está disponible en el scope global (cargado en loadCalendar)
+    let compA = null;
+    if (typeof calendarData !== 'undefined' && calendarData && calendarData.events) {
+        const EVENT_INDICATOR_MAP = [
+            { keywords: ['cpi y/y', 'cpi yoy', 'consumer price index y'],  key: 'inflation',       invert: false },
+            { keywords: ['gdp', 'gross domestic product'],                  key: 'gdpGrowth',       invert: false },
+            { keywords: ['unemployment rate'],                              key: 'unemployment',    invert: true  },
+            { keywords: ['nonfarm payrolls', 'employment change'],          key: 'unemployment',    invert: true  },
+            { keywords: ['retail sales'],                                   key: 'retailSales',     invert: false },
+            { keywords: ['manufacturing pmi'],                              key: 'manufacturingPMI',invert: false },
+            { keywords: ['services pmi', 'service pmi', 'composite pmi'],  key: 'servicesPMI',     invert: false },
+            { keywords: ['industrial production'],                          key: 'production',      invert: false },
+        ];
+
+        const parseNum = (s) => {
+            if (!s || s.trim() === '') return null;
+            const clean = s.replace('%','').replace(/[KkMmBbTt].*/, '').trim();
+            const n = parseFloat(clean);
+            return isNaN(n) ? null : n;
+        };
+
+        // Use last 4 weeks of events for this currency with actual filled
+        const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 28);
+        const relevant = calendarData.events.filter(e => {
+            if (e.currency !== currency) return false;
+            if (!['high','medium'].includes(e.impact)) return false;
+            const hasActual   = e.actual   && e.actual.trim()   !== '';
+            const hasForecast = e.forecast && e.forecast.trim() !== '';
+            const hasPrevious = e.previous && e.previous.trim() !== '';
+            // Use actual-vs-forecast if available, else forecast-vs-previous (forward signal)
+            return (hasActual && hasForecast) || (hasForecast && hasPrevious);
+        });
+
+        const surprises = [];
+        relevant.forEach(e => {
+            const name = e.event.toLowerCase();
+            const mapping = EVENT_INDICATOR_MAP.find(m =>
+                m.keywords.some(kw => name.includes(kw))
+            );
+            if (!mapping) return;
+
+            const hasActual = e.actual && e.actual.trim() !== '';
+            const refVal    = parseNum(hasActual ? e.actual   : e.forecast);
+            const baseVal   = parseNum(hasActual ? e.forecast : e.previous);
+            if (refVal === null || baseVal === null) return;
+
+            const delta   = refVal - baseVal;
+            const isBeat  = mapping.invert ? delta < 0 : delta > 0;
+            surprises.push(isBeat ? 1 : (delta === 0 ? 0.5 : 0));
+        });
+
+        if (surprises.length >= 2) {
+            const beatRate = surprises.reduce((a, b) => a + b, 0) / surprises.length;
+            compA = Math.max(0, Math.min(100, 50 + (beatRate - 0.5) * 100));
+        }
+    }
+
+    // — Combine A + B —
+    const esiScore = compA !== null
+        ? compA * 0.60 + compB * 0.40   // Calendar data available
+        : compB;                          // Fallback: z-score only
+
+    scoringData.economicSurprise = Math.round(esiScore * 10) / 10;
+}
+// ── END ESI ──────────────────────────────────────────────────────────────────
 
     Object.keys(TRADING_WEIGHTS).forEach(indicator => {
         const value = scoringData[indicator];
@@ -3500,7 +3631,7 @@ const checkDataHealth = (economicData) => {
         ];
         const importantIndicators = [
             'currentAccount', 'debt', 'tradeBalance', 'production',
-            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'cotPositioning'
+            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'economicSurprise', 'cotPositioning'
         ];
         const supplementaryIndicators = [
             'bond10y', 'consumerConfidence', 'businessConfidence',
@@ -3623,6 +3754,7 @@ const indicatorTooltips = {
 
     manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via Trading Economics.",
     servicesPMI: "Purchasing Managers Index del sector servicios (bancos, seguros, turismo, salud, tecnología). Peso: 4% en el score v6.2 — mayor que manufacturero (3%) porque servicios representa >75% del PIB en USD, GBP y EUR. La misma escala que el PMI Manufacturero: >50 = expansión, <50 = contracción. En economías post-industriales, este indicador anticipa inflación de servicios (componente más pegajoso del IPC) y empleo, los dos factores que más pesan en las decisiones de política monetaria de la Fed, el BCE y el BOE. Fuente: S&P Global via Trading Economics.",
+    economicSurprise: "Economic Surprise Index (ESI) Proxy — mide si los datos macroeconómicos recientes superaron o decepcionaron las expectativas del consenso. Score >50 = los datos publicados estuvieron por encima de lo esperado (sorpresa positiva, bullish para la divisa). Score <50 = datos peores de lo esperado (sorpresa negativa, bearish). Calculado con arquitectura híbrida: (A) cuando hay datos publicados, compara el valor real vs el pronóstico del consenso en el calendario económico; (B) como respaldo, mide la posición relativa de la divisa en 7 indicadores clave dentro del G8 mediante z-scores. Peso: 4% en v6.3. Es el factor que más falta en los modelos fundamentales que solo leen niveles — el mercado ya tiene el nivel descontado, lo que mueve el precio es la desviación vs expectativas. Fuente: ForexFactory calendar + cálculo interno G8.",
 
     cotPositioning: "Posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Fuente: reporte Futures Only (financial_lf.htm) — excluye opciones para reflejar únicamente presión directa sobre el precio. Valores positivos = el smart money especulativo tiene posición neta larga → sesgo alcista institucional. Valores negativos = posición corta neta → sesgo bajista. >80K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-80K = bajista extremo, posible rebote contrarian. Los Leveraged Funds son el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas, sin mandatos de cobertura ni posiciones pasivas. Fuente: CFTC oficial (cftc.gov/dea/futures/financial_lf.htm), actualización viernes.",
 
@@ -3851,6 +3983,7 @@ const updateCellTooltipPos = (e) => {
         'wageGrowth': 'Crecimiento Salarial',
         'manufacturingPMI': 'PMI Manufacturero',
         'servicesPMI': 'PMI Servicios',
+        'economicSurprise': 'ESI Proxy',
         'cotPositioning': 'COT Positioning',
         'bond10y': 'Bono 10Y',
         'consumerConfidence': 'Conf. Consumidor',
@@ -3915,6 +4048,8 @@ const updateCellTooltipPos = (e) => {
             ) : type === 'tradeBalance' ? (
                 <span className="cell-value">{value > 0 ? '+' : ''}{(value / 1000).toFixed(1)}B</span>
             ) : type === 'manufacturingPMI' || type === 'servicesPMI' ? (
+                <span className="cell-value">{formatValue(value, 1)}</span>
+            ) : type === 'economicSurprise' ? (
                 <span className="cell-value">{formatValue(value, 1)}</span>
             ) : type === 'cotPositioning' ? (
                 value !== null && value !== undefined ? (
@@ -4063,6 +4198,15 @@ const getHeatmapColor = (value, type) => {
             else if (value >= 50) { intensity = 0.3;  isPositive = true;  }
             else if (value >= 48) { intensity = 0.4;  isPositive = false; }
             else { intensity = Math.min((50 - value) / 10, 1); isPositive = false; }
+            break;
+
+        case 'economicSurprise':
+            // 50 = neutral (G8 average), >50 = positive surprise, <50 = negative
+            if (value > 65)       { intensity = Math.min((value - 50) / 30, 1); isPositive = true;  }
+            else if (value > 52)  { intensity = 0.35; isPositive = true;  }
+            else if (value >= 48) { intensity = 0.2;  isPositive = true;  } // near neutral
+            else if (value >= 35) { intensity = 0.35; isPositive = false; }
+            else { intensity = Math.min((50 - value) / 30, 1); isPositive = false; }
             break;
 
         case 'cotPositioning':
@@ -4430,7 +4574,7 @@ const getSortedCountries = () => {
         const indicators = [
             'gdpGrowth', 'interestRate', 'inflation', 'unemployment',
             'currentAccount', 'debt', 'tradeBalance', 'production',
-            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'cotPositioning',
+            'retailSales', 'wageGrowth', 'manufacturingPMI', 'servicesPMI', 'economicSurprise', 'cotPositioning',
             'bond10y', 'consumerConfidence', 'businessConfidence',
             'capitalFlows', 'inflationExpectations'
         ];
@@ -5255,6 +5399,9 @@ const DataHealthCheck = ({ economicData }) => {
 <TooltipCell title="PMI Servicios" tooltip={indicatorTooltips.servicesPMI}>
     PMI Servicios<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice</span>
 </TooltipCell>
+<TooltipCell title="ESI Proxy" tooltip={indicatorTooltips.economicSurprise}>
+    ESI Proxy<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>0-100</span>
+</TooltipCell>
 <TooltipCell title="Posicionamiento COT" tooltip={indicatorTooltips.cotPositioning}>
     COT Positioning<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Net Contratos</span>
 </TooltipCell>
@@ -5316,6 +5463,7 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.wageGrowth} type="wageGrowth" currency={country.code} indicator="wageGrowth" lastUpdate={data.wageGrowthDate} />
 <HeatmapCell value={data.manufacturingPMI} type="manufacturingPMI" currency={country.code} indicator="manufacturingPMI" lastUpdate={data.manufacturingPMIDate} />
 <HeatmapCell value={data.servicesPMI} type="servicesPMI" currency={country.code} indicator="servicesPMI" lastUpdate={data.servicesPMIDate} />
+<HeatmapCell value={data.economicSurprise} type="economicSurprise" currency={country.code} indicator="economicSurprise" lastUpdate={data.economicSurpriseDate} />
 <HeatmapCell value={data.cotPositioning} type="cotPositioning" currency={country.code} indicator="cotPositioning" lastUpdate={data.cotPositioningDate} />
 <HeatmapCell value={data.bond10y} type="bond10y" currency={country.code} indicator="bond10y" lastUpdate={data.bond10yDate} />
 <HeatmapCell value={data.consumerConfidence} type="consumerConfidence" currency={country.code} indicator="consumerConfidence" lastUpdate={data.consumerConfidenceDate} />
@@ -6059,7 +6207,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v6.2.0
+        Dashboard v6.3.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
