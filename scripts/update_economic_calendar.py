@@ -349,21 +349,51 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
         print(f"  [Investing HTML] ✅ Parsed {len(events)} events")
         return events
 
-    # ── Run Strategy A, fall back to B ────────────────────────────────
+    # ── Run Strategy A (JSON API), enrich/fallback with Strategy B (HTML POST) ──
+    # JSON API only returns ~30 events from page state — not enough for ESI Component A.
+    # HTML POST returns 200+ with full actuals. Always run both and keep the richer one.
+    json_events = []
+    html_events = []
+
     try:
-        events = fetch_via_json_api()
-        if events:
-            return events
-        print("  [Investing] JSON API returned 0 events, trying HTML fallback")
+        json_events = fetch_via_json_api()
+        print(f"  [Investing] JSON API: {len(json_events)} events")
     except Exception as e:
         import traceback
         print(f"  [Investing] JSON API error: {e}")
         print(f"  [Investing] {traceback.format_exc()[:400]}")
 
-    try:
-        return fetch_via_html_post()
-    except Exception as e:
-        print(f"  [Investing] HTML fallback error: {e}")
+    # Run HTML POST if JSON returned < 50 events (likely incomplete) OR as enrichment
+    if len(json_events) < 50:
+        try:
+            html_events = fetch_via_html_post()
+            print(f"  [Investing] HTML POST: {len(html_events)} events")
+        except Exception as e:
+            print(f"  [Investing] HTML fallback error: {e}")
+
+    # Use whichever source has more events; merge actuals from JSON into HTML result
+    if len(html_events) >= len(json_events):
+        # HTML POST has more coverage — use as base, enrich actuals from JSON
+        json_by_key = {}
+        for ev in json_events:
+            k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+            json_by_key[k] = ev
+        merged = []
+        for ev in html_events:
+            k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+            if k in json_by_key and json_by_key[k].get('actual') and not ev.get('actual'):
+                updated = dict(ev)
+                updated['actual'] = json_by_key[k]['actual']
+                merged.append(updated)
+            else:
+                merged.append(ev)
+        print(f"  [Investing] Using HTML POST ({len(html_events)} events) as primary source")
+        return merged
+    elif json_events:
+        print(f"  [Investing] Using JSON API ({len(json_events)} events) as primary source")
+        return json_events
+    else:
+        print("  [Investing] Both sources failed — returning empty")
         return []
 # ════════════════════════════════════════════════════════════════════
 # MAIN
