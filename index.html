@@ -1494,45 +1494,66 @@ const fetchExtendedData = async (countryCode) => {
 
         // ✅ OUTLOOK DINÁMICO con validación de última decisión del banco central
         const determineCentralBankOutlook = async (countryCode, economicData) => {
-            // C1: Base derivada de rateMomentum (variación 12M de la tasa oficial).
-            // Hawkish  = rm > +0.50% → BC subiendo activamente (ej. JPY +0.85%)
-            // Dovish   = rm ≤ −0.75% → recortando significativamente (ej. NZD −1.50%)
-            // Neutral  = resto (entre −0.75% y +0.50%)
-            // M-01 FIX: validación adicional con lastRateDecision del ai-analysis para
-            // evitar falsos Neutral en BCs que recortaron recientemente pero < 75bp.
+            // v5.10 — tres mejoras data-driven derivadas de rates/ (fuente autoritativa):
+            //
+            // FIX-A: rateMomentum efectivo = max(rm_12M, rm_24M × 0.6)
+            //   Captura ciclos graduales de subidas (ej. BoJ: 12M=+0.25 pero 24M=+0.85).
+            //   El factor 0.6 evita que el histórico largo domine sobre la señal reciente.
+            //   Solo aplica en dirección hawkish para no exagerar dovishness.
+            //
+            // FIX-B: threshold Dovish -0.75 → -0.80
+            //   Evita que BCs en pausa queden clasificados como Dovish por estar exactamente
+            //   en el límite (ej. USD rm=-0.75 con Fed pausada → correctamente Neutral).
+            //
+            // FIX-C: M-01 se activa con rm < -0.20 (antes solo cuando outlook=Neutral)
+            //   Captura BCs que iniciaron ciclo de recortes pero rm_12M no llega a -0.80
+            //   (ej. RBA con 1 corte: rm=-0.25, lastDecision=CUT → correctamente Dovish).
+
             const cacheKey = `outlook_${countryCode}`;
             const cached = CacheManager.get(cacheKey);
             if (cached !== null) return cached;
 
-            const rm = economicData.rateMomentum;
+            const rm12 = economicData.rateMomentum;
+            const rm24 = economicData.rateMomentum24M ?? null;
+
+            // FIX-A: composite rm — usa 24M solo para amplificar señal hawkish
+            // Si rm12 es positivo y hay rm24 disponible, toma el mayor (con descuento 0.6 en 24M)
+            let rm = rm12;
+            if (rm12 !== null && rm24 !== null && rm12 >= 0 && rm24 > 0) {
+                rm = Math.max(rm12, rm24 * 0.6);
+            }
+
             let outlook;
             if (rm === undefined || rm === null || isNaN(rm)) {
                 outlook = 'Neutral';
             } else if (rm > 0.50) {
                 outlook = 'Hawkish';
-            } else if (rm <= -0.75) {
+            } else if (rm <= -0.80) {                          // FIX-B: -0.75 → -0.80
                 outlook = 'Dovish';
             } else {
                 outlook = 'Neutral';
             }
 
-            // M-01 FIX: Si el outlook base es Neutral, verificar la última decisión real
-            // del banco central para capturar BCs en ciclo activo de recortes < 75bp
-            // (ej. BoE con dos recortes de 25bp = -0.50% → quedaba en Neutral, pero es Dovish)
-            if (outlook === 'Neutral' && economicData._aiLastRateDecision) {
+            // FIX-C: M-01 — si rm < -0.20 Y última decisión fue un corte → Dovish
+            // (antes solo disparaba cuando outlook base era Neutral)
+            if (outlook !== 'Hawkish' && rm12 !== null && rm12 < -0.20 && economicData._aiLastRateDecision) {
                 const lrd = economicData._aiLastRateDecision;
                 if (lrd.direction === 'BAJÓ' && lrd.delta !== undefined && lrd.delta <= -0.25) {
-                    // BC recortó en la última reunión → bias Dovish aunque rm esté entre -0.75 y 0
                     outlook = 'Dovish';
-                    console.log(`✓ M-01 outlook upgrade→Dovish for ${countryCode}: last decision was CUT (${lrd.delta}pp)`);
-                } else if (lrd.direction === 'SUBIÓ' && lrd.delta !== undefined && lrd.delta >= 0.25) {
-                    // BC subió en la última reunión → bias Hawkish aunque rm esté entre 0 y +0.50
-                    outlook = 'Hawkish';
-                    console.log(`✓ M-01 outlook upgrade→Hawkish for ${countryCode}: last decision was HIKE (${lrd.delta}pp)`);
+                    console.log(`✓ M-01 outlook→Dovish for ${countryCode}: rm=${rm12}, last CUT ${lrd.delta}pp`);
                 }
             }
 
-            console.log(`✓ C1 rateMomentum outlook for ${countryCode}: ${outlook} (rm=${rm})`);
+            // M-01 hawkish: si rm entre 0 y +0.50 Y última decisión fue subida → Hawkish
+            if (outlook === 'Neutral' && economicData._aiLastRateDecision) {
+                const lrd = economicData._aiLastRateDecision;
+                if (lrd.direction === 'SUBIÓ' && lrd.delta !== undefined && lrd.delta >= 0.25) {
+                    outlook = 'Hawkish';
+                    console.log(`✓ M-01 outlook→Hawkish for ${countryCode}: last HIKE ${lrd.delta}pp`);
+                }
+            }
+
+            console.log(`✓ v5.10 outlook for ${countryCode}: ${outlook} (rm12=${rm12}, rm_eff=${rm?.toFixed(2)})`);
             CacheManager.set(cacheKey, outlook, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
             return outlook;
         };
@@ -2217,7 +2238,9 @@ try {
         economicData[country.code].inflationExpectationsDate = dt.inflationExpectations || lastUpd;
         // rateMomentum: tasa_actual - tasa_hace_12_meses (scrapeado en update-extended-data.yml v7)
         // Positivo = BC subiendo tasas (hawkish momentum), negativo = recortando (dovish momentum)
-        economicData[country.code].rateMomentum = d.rateMomentum ?? null;
+        // v5.10: también cargamos rm24M para capturar ciclos graduales (ej. BoJ 2024-2026)
+        economicData[country.code].rateMomentum    = d.rateMomentum    ?? null;
+        economicData[country.code].rateMomentum24M = d.rateMomentum24M ?? null;
         economicData[country.code].rateMomentumDate = dt.rateMomentum || lastUpd;
 
         console.log(`✅ Extended data loaded for ${country.code}`);
