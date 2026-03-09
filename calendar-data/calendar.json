@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T01:52:35.087341Z",
+  "generatedAt": "2026-03-09T02:19:35.135941Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "ForexFactory XML",
@@ -8,21 +8,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-08",
   "rangeTo": "2026-04-08",
-  "totalEvents": 79,
+  "totalEvents": 86,
   "currencyCounts": {
     "JPY": 12,
+    "GBP": 13,
+    "AUD": 7,
     "EUR": 15,
     "CHF": 1,
-    "AUD": 4,
-    "GBP": 11,
-    "USD": 26,
+    "USD": 28,
     "NZD": 3,
     "CAD": 7
   },
   "impactCounts": {
-    "high": 10,
-    "medium": 4,
-    "low": 65
+    "high": 11,
+    "medium": 5,
+    "low": 70
   },
   "events": [
     {
@@ -63,6 +63,32 @@
       "actual": "",
       "forecast": "3.19T",
       "previous": "2.70T"
+    },
+    {
+      "date": "9 Mar",
+      "dateISO": "2026-03-09",
+      "timeUTC": "",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BRC Retail Sales Monitor y/y",
+      "impact": "low",
+      "actual": "",
+      "forecast": "2.1%",
+      "previous": "2.3%"
+    },
+    {
+      "date": "9 Mar",
+      "dateISO": "2026-03-09",
+      "timeUTC": "",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "NAB Business Confidence",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3"
     },
     {
       "date": "9 Mar",
@@ -366,6 +392,45 @@
     {
       "date": "11 Mar",
       "dateISO": "2026-03-11",
+      "timeUTC": "",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CPI m/m",
+      "impact": "high",
+      "actual": "",
+      "forecast": "0.3%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
+      "timeUTC": "",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Inflation Expectations",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "5.0%"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
+      "timeUTC": "",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "RICS House Price Balance",
+      "impact": "low",
+      "actual": "",
+      "forecast": "-9%",
+      "previous": "-10%"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
       "timeUTC": "07:00",
       "country": "EUR",
       "currency": "EUR",
@@ -505,6 +570,19 @@
       "actual": "",
       "forecast": "",
       "previous": "5.0%"
+    },
+    {
+      "date": "12 Mar",
+      "dateISO": "2026-03-12",
+      "timeUTC": "",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "NAB Quarterly Business Confidence",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "2"
     },
     {
       "date": "12 Mar",
@@ -726,6 +804,19 @@
       "actual": "",
       "forecast": "",
       "previous": "1.7%"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Durable Goods Orders m/m",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "0.5%",
+      "previous": "-1.4%"
     },
     {
       "date": "13 Mar",
