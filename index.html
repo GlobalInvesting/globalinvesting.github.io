@@ -2290,13 +2290,16 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     
 // ========== TRADING-ORIENTED WEIGHTS ==========
 const TRADING_WEIGHTS = {
-    // Tier 1: Rate Differentials & Monetary Cycle (22%) — lo que mueve el precio
+    // Tier 1: Rate Differentials & Monetary Cycle (20%) — lo que mueve el precio
     // Filosofía v5.1: pesos reflejan qué mueve el precio ahora, no qué describe la economía a LP.
     // En forex: carry > momentum > ciclo monetario > fundamentales estructurales.
     // v5.6: fxPerformance1M sube a 0.22 — único indicador sin lag estructural.
-    //       Pesos reducidos en gdpGrowth (-0.03), interestRate (-0.02), inflation (-0.02),
-    //       outlookScore (-0.01), cotPositioning (-0.02). Suma total = 1.00 exacto.
-    interestRate:          { weight: 0.10, direction: 'higher' },
+    // v5.8: fxPerformance1M sube a 0.28. interestRate baja de 0.10 → 0.07.
+    //       Razón: con avg_rate G8 en 2.34%, el rate score de divisas en ciclo de recortes
+    //       (GBP 3.75% con -0.25pp, NZD 2.25% con -3.25pp) inflaba el score vs lo que el
+    //       mercado ya ha descontado. FX captura exactamente ese descuento forward.
+    //       bond10y también reducido 0.04 → 0.03 para mantener suma total = 1.00.
+    interestRate:          { weight: 0.07, direction: 'higher' },
     inflation:             { weight: 0.05, direction: 'target' },
     outlookScore:          { weight: 0.05, direction: 'outlook_direction' },
     rateMomentum:          { weight: 0.04, direction: 'rate_momentum' },
@@ -2307,10 +2310,10 @@ const TRADING_WEIGHTS = {
     debt:                  { weight: 0.02, direction: 'lower'  },
     termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
 
-    // Tier 3: Growth & Employment (14%) — ciclo que el mercado tradea activamente
+    // Tier 3: Growth & Employment (12%) — ciclo que el mercado tradea activamente
     gdpGrowth:             { weight: 0.06, direction: 'higher' },
-    unemployment:          { weight: 0.05, direction: 'lower'  },
-    production:            { weight: 0.03, direction: 'stable' },
+    unemployment:          { weight: 0.04, direction: 'lower'  },
+    production:            { weight: 0.02, direction: 'stable' },
 
     // Tier 4: Consumption & Wages (7%)
     retailSales:           { weight: 0.03, direction: 'stable' },
@@ -2325,10 +2328,12 @@ const TRADING_WEIGHTS = {
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
     capitalFlows:          { weight: 0.02, direction: 'flows'            },
 
-    // Tier 6: FX Market Momentum (26%) — único indicador 100% forward-looking, libre de lag
+    // Tier 6: FX Market Momentum (31%) — único indicador 100% forward-looking, libre de lag
     // v5.6: subido de 0.12 → 0.22 para reflejar el precio real del mercado en el score.
-    fxPerformance1M:       { weight: 0.22, direction: 'fx_momentum' },
-    bond10y:               { weight: 0.04, direction: 'carry_yield' },
+    // v5.8: subido de 0.22 → 0.28. El mercado ya descuenta futuros recortes de tasa;
+    //       el rate score miraba al pasado mientras el FX mira al futuro.
+    fxPerformance1M:       { weight: 0.28, direction: 'fx_momentum' },
+    bond10y:               { weight: 0.03, direction: 'carry_yield' },
 };
     
 // ========== SCORING FUNCTIONS v4.9.5 ==========
@@ -2391,6 +2396,18 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
                     else if (value >= 2.5) score = 70 + ((value - 2.5) / 1.5) * 30;
                     else if (value >= 0.5) score = 30 + ((value - 0.5) / 2.0) * 40;
                     else                   score = (value / 0.5) * 30;
+
+                    // ── Rate Cycle Haircut (v5.8) ─────────────────────────────────
+                    // Si el BC está en ciclo de recortes, el mercado ya ha descontado
+                    // tasas futuras más bajas. El rate score actual sobrevalora el carry
+                    // disponible hacia adelante. Reducción proporcional al ritmo de recortes,
+                    // máximo 35% (para ciclos de -3pp o más como NZD -3.25pp).
+                    // No afecta a JYP/CHF (safe-haven path) ni a ciclos de subidas.
+                    const rateMomForHaircut = scoringDataExplicit?.rateMomentum ?? null;
+                    if (rateMomForHaircut !== null && rateMomForHaircut < 0) {
+                        const haircut = Math.min(Math.abs(rateMomForHaircut) / 3.0, 1.0) * 0.35;
+                        score = score * (1 - haircut);
+                    }
                 }
             } else if (indicator === 'gdpGrowth') {
                 if (value >= 2.5)      score = 100;
