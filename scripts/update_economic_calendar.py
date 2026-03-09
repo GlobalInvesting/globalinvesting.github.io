@@ -262,11 +262,22 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
         rows = soup.find_all('tr', {'id': re.compile('eventRowId_')})
         print(f"  [Investing HTML] Found {len(rows)} rows")
 
+        # Debug: print first row structure to diagnose parsing issues
+        if rows:
+            r0 = rows[0]
+            print(f"  [Investing HTML] Sample row attrs: data-currency={repr(r0.attrs.get('data-currency'))} "
+                  f"data-event-datetime={repr(r0.attrs.get('data-event-datetime'))}")
+            tds = r0.find_all('td')
+            if tds:
+                print(f"  [Investing HTML] TD classes sample: {[' '.join(td.get('class',[])) for td in tds[:6]]}")
+
         events = []
+        _dbg_no_date = _dbg_no_cur = _dbg_no_name = _dbg_out_range = 0
         for row in rows:
             try:
                 dt_str = row.get('data-event-datetime', '')
                 if not dt_str:
+                    _dbg_no_date += 1
                     continue
                 dt_norm = dt_str.strip().replace('T', ' ')
                 event_date = None
@@ -278,6 +289,7 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
                     except Exception:
                         pass
                 if event_date is None:
+                    _dbg_no_date += 1
                     continue
 
                 m_t = re.search(r'\d{4}[-/]\d{2}[-/]\d{2}[ T](\d{2}):(\d{2})', dt_norm)
@@ -286,10 +298,17 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
 
                 extended_dates = target_dates | {max(target_dates) + timedelta(days=1)}
                 if event_date not in extended_dates:
+                    _dbg_out_range += 1
                     continue
 
-                currency = row.get('data-currency', '').strip().upper()
+                currency = row.attrs.get('data-currency', '') or ''
+                # Fallback: read from the currency <td> if attr missing
+                if not currency or currency not in TRACKED_CURRENCIES:
+                    cur_td = row.find('td', class_=re.compile(r'flagCur|currency'))
+                    if cur_td:
+                        currency = cur_td.get_text(strip=True).upper()
                 if currency not in TRACKED_CURRENCIES:
+                    _dbg_no_cur += 1
                     continue
 
                 # Impact: check data-img on row for bull count
@@ -310,7 +329,13 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
                 elif any(x in combined for x in ['bull2', '2bull', 'mediumimpact', 'medium impact', 'orangeicon']):
                     impact = 'medium'
 
-                ev_td = row.find('td', class_=re.compile('event'))
+                # Find event name td — avoid actual/forecast/prev cells that also have 'event' in class
+                ev_td = None
+                for _td in row.find_all('td'):
+                    _cls = ' '.join(_td.get('class', []))
+                    if 'event' in _cls and not any(x in _cls for x in ('actual', 'forecast', 'prev', 'sentiment')):
+                        ev_td = _td
+                        break
                 event_name = ''
                 if ev_td:
                     a = ev_td.find('a')
@@ -346,7 +371,9 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
             except Exception:
                 continue
 
-        print(f"  [Investing HTML] ✅ Parsed {len(events)} events")
+        print(f"  [Investing HTML] ✅ Parsed {len(events)} events "
+              f"(skipped: no_date={_dbg_no_date}, out_range={_dbg_out_range}, "
+              f"no_currency={_dbg_no_cur}, no_name={_dbg_no_name})")
         return events
 
     # ── Run Strategy A (JSON API), enrich/fallback with Strategy B (HTML POST) ──
@@ -706,7 +733,20 @@ for slot, group in slot_groups.items():
 
 print(f"  [Dedup] {len(merged_values)} → {len(deduped)} after dedup")
 
-unique_events = deduped
+# ── Filter noise: remove events with no time AND no actual/forecast/previous data ──
+# These are "X Speaks" / ceremonial events with no economic signal value
+def has_economic_data(ev):
+    return (ev.get('timeUTC', '').strip() or
+            ev.get('actual', '').strip() or
+            ev.get('forecast', '').strip() or
+            ev.get('previous', '').strip())
+
+before_filter = len(deduped)
+unique_events = [ev for ev in deduped if has_economic_data(ev)]
+removed_noise = before_filter - len(unique_events)
+if removed_noise:
+    print(f"  [Filter] Removed {removed_noise} no-time/no-data noise events")
+
 
 # Sort by dateISO + timeUTC
 def sort_key(ev):
