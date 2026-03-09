@@ -132,10 +132,35 @@ def _parse_ff_time(time_str):
     return ''
 
 def _parse_ff_date(date_str):
-    """Parse FF date string into a date object. Tries MM-DD-YYYY, YYYY-MM-DD, DD-MM-YYYY."""
+    """Parse FF date string into a date object.
+    Handles: MM-DD-YYYY, YYYY-MM-DD, ISO with T, and FF JSON full format
+    e.g. 'Sun Mar 08 2026 00:00:00 GMT+0000' or '2026-03-08T00:00:00+00:00'
+    """
+    if not date_str:
+        return None
+    # Try simple formats first
     for fmt in ['%m-%d-%Y', '%Y-%m-%d', '%d-%m-%Y']:
         try:
             return datetime.strptime(date_str, fmt).date()
+        except Exception:
+            pass
+    # ISO with time component: "2026-03-08T00:00:00+00:00" or "2026-03-08T00:00:00Z"
+    try:
+        return datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
+    except Exception:
+        pass
+    # FF JSON full format: "Sun Mar 08 2026 00:00:00 GMT+0000"
+    try:
+        # Strip timezone part "GMT+0000" or "GMT-0500"
+        clean = re.sub(r'\s+GMT[+-]\d{4}$', '', date_str.strip())
+        return datetime.strptime(clean, '%a %b %d %Y %H:%M:%S').date()
+    except Exception:
+        pass
+    # Try just extracting YYYY-MM-DD from the string
+    m = re.search(r'(\d{4})-(\d{2})-(\d{2})', date_str)
+    if m:
+        try:
+            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
         except Exception:
             pass
     return None
@@ -948,39 +973,51 @@ if not all_events and not base_events:
     print("⛔ ALL SOURCES FAILED AND NO BASE DATA — saving empty calendar")
     print("=" * 50)
 
-# ── STEP 3: Merge — fresh data overwrites base, base fills in past days ───────
-# Fresh events override base events (same key) so actuals/forecasts update.
-merged = dict(base_events)   # start with everything from the previous JSON
-for ev in all_events:
-    k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
-    merged[k] = ev             # overwrite: fresh data wins
+# ── STEP 3: Build final event list ────────────────────────────────────────────
+# Strategy: if we got fresh events from a live source, use ONLY those (avoids
+# mixing base duplicates). Only fall back to base if fresh fetch failed entirely.
+if all_events:
+    # Fresh source worked — use it directly, no base mixing
+    merged_values = {(ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip()): ev
+                     for ev in all_events}
+    print(f"  [Merge] Using fresh-only: {len(all_events)} events from {source_used}")
+else:
+    # Fresh failed — use base as fallback
+    merged_values = base_events
+    print(f"  [Merge] Fresh failed — using base only: {len(base_events)} events")
 
-# ── STEP 3b: Smart dedup — collapse same-slot events from different sources ──
-# Multiple sources name the same event differently, e.g.:
-#   "Japan Leading Index MoM" vs "Leading Index (MoM) (Jan)" vs "Leading Index"
-# Strategy: group by (dateISO, timeUTC, currency), then within each group
-# keep only events that are NOT a substring of another in the same group.
-# If an event has actual/forecast data, it takes priority.
+# ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
+# "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
+# "GDP QoQ" vs "GDP Capital Expenditure QoQ" → keep both (short has ≤4 tokens but NOT contained since extra words differ)
+# "3-Month Bill Auction" vs "6-Month Bill Auction" → keep both (different events in same slot)
 def normalize_name(name):
-    """Lowercase, remove punctuation, parenthetical suffixes like (Jan), (Feb), (Q4)."""
-    n = re.sub(r'\s*\([^)]*\)', '', name)   # strip (Jan), (YoY), (Q4) etc.
+    n = re.sub(r'\s*\([^)]*\)', '', name)
     n = re.sub(r'[^a-z0-9 ]', '', n.lower())
-    n = re.sub(r'(japan|us|u s|uk|u k|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)', '', n)
+    n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)\b', '', n)
     return re.sub(r'\s+', ' ', n).strip()
 
 def score_event(ev):
-    """Higher score = better representative. Prefer: has actual > has forecast > longer name."""
     s = 0
-    if ev.get('actual'):   s += 100
-    if ev.get('forecast'): s += 10
-    if ev.get('previous'): s += 5
+    if ev.get('actual'):   s += 1000
+    if ev.get('forecast'): s += 100
+    if ev.get('previous'): s += 10
     s += len(ev.get('event', ''))
     return s
 
-# Group by slot: (dateISO, timeUTC, currency)
+def are_true_duplicates(name_a, name_b):
+    """Only deduplicate if one name is clearly a short alias contained in the other (≤4 tokens)."""
+    na, nb = normalize_name(name_a), normalize_name(name_b)
+    if not na or not nb or na == nb:
+        return na == nb
+    short, long_ = (na, nb) if len(na) <= len(nb) else (nb, na)
+    tokens = short.split()
+    if len(tokens) > 4:
+        return False  # too specific — likely a distinct event, not just an alias
+    return short in long_
+
 from collections import defaultdict
 slot_groups = defaultdict(list)
-for ev in merged.values():
+for ev in merged_values.values():
     slot = (ev['dateISO'], ev.get('timeUTC', ''), ev['currency'])
     slot_groups[slot].append(ev)
 
@@ -990,41 +1027,19 @@ for slot, group in slot_groups.items():
         deduped.append(group[0])
         continue
 
-    # For each pair, check if one name is a normalized substring of another
-    normed = [normalize_name(ev['event']) for ev in group]
     dominated = set()
     for i in range(len(group)):
         for j in range(len(group)):
-            if i == j or i in dominated: continue
-            # If name[i] is contained in name[j], i is dominated by j
-            if normed[i] and normed[j] and normed[i] in normed[j]:
-                dominated.add(i)
+            if i == j or i in dominated:
+                continue
+            if are_true_duplicates(group[i]['event'], group[j]['event']):
+                if score_event(group[i]) <= score_event(group[j]):
+                    dominated.add(i)
 
     survivors = [ev for idx, ev in enumerate(group) if idx not in dominated]
-    if not survivors:
-        survivors = group  # fallback: keep all
+    deduped.extend(survivors if survivors else group)
 
-    # Among survivors, if still >1, keep best-scored only if names are very similar
-    survivors.sort(key=score_event, reverse=True)
-
-    # Final pass: if two survivors share >70% of words, keep only the best
-    final_survivors = [survivors[0]]
-    for ev in survivors[1:]:
-        n_new = set(normalize_name(ev['event']).split())
-        is_dup = False
-        for kept in final_survivors:
-            n_kept = set(normalize_name(kept['event']).split())
-            if not n_new or not n_kept: continue
-            overlap = len(n_new & n_kept) / max(len(n_new), len(n_kept))
-            if overlap >= 0.7:
-                is_dup = True
-                break
-        if not is_dup:
-            final_survivors.append(ev)
-
-    deduped.extend(final_survivors)
-
-print(f"  [Dedup] {len(merged)} merged → {len(deduped)} after smart dedup")
+print(f"  [Dedup] {len(merged_values)} → {len(deduped)} after dedup")
 
 unique_events = deduped
 
@@ -1044,9 +1059,8 @@ for ev in unique_events:
     except Exception:
         pass
 
-print(f"\n  [Merge] base={len(base_events)} + fresh={len(all_events)} → "
-      f"merged={len(merged)} → final={len(final_events)}")
-print(f"  [Merge] Dates in final: {sorted(set(e['dateISO'] for e in final_events))[:7]}")
+print(f"\n  [Result] fresh={len(all_events)} → deduped={len(deduped)} → final={len(final_events)}")
+print(f"  [Dates] {sorted(set(e['dateISO'] for e in final_events))[:7]}")
 
 # ── STEP 4: Stats and save ─────────────────────────────────────────────────
 currency_counts = {}
