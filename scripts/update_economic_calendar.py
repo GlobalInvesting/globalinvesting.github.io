@@ -677,7 +677,13 @@ def fetch_investing_html_actuals(from_str, to_str):
                 if currency not in TRACKED_CURRENCIES:
                     continue
 
-                ev_td = row.find('td', class_=re.compile('event'))
+                # Find event name td — avoid actual/forecast/prev cells that also have 'event' in class
+                ev_td = None
+                for _td in row.find_all('td'):
+                    _cls = ' '.join(_td.get('class', []))
+                    if 'event' in _cls and not any(x in _cls for x in ('actual', 'forecast', 'prev', 'sentiment')):
+                        ev_td = _td
+                        break
                 event_name = ''
                 if ev_td:
                     a = ev_td.find('a')
@@ -686,8 +692,8 @@ def fetch_investing_html_actuals(from_str, to_str):
                 if not event_name:
                     continue
 
-                def gcell(pat):
-                    td = row.find('td', id=re.compile(pat))
+                def gcell(pat, _row=row):  # default arg binds row at definition time
+                    td = _row.find('td', id=re.compile(pat))
                     return clean_val(td.get_text(strip=True)) if td else ''
 
                 actual   = gcell(r'eventActual_')
