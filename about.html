@@ -182,68 +182,95 @@
             <h2>Metodología Cuantitativa</h2>
 
             <h3>Filosofía del Modelo</h3>
-            <p>El modelo está diseñado con una premisa central: <strong>los pesos deben reflejar qué mueve el precio ahora, no qué describe mejor la economía a largo plazo</strong>. En forex, el orden de prioridad es: carry &gt; momentum &gt; ciclo monetario &gt; fundamentales estructurales.</p>
-            <p>Los fundamentales estructurales como la deuda pública baja o el superávit de cuenta corriente son señales permanentes que el mercado ya tiene en precio. Lo que mueve el precio en un horizonte de trading son los diferenciales de tasa, el posicionamiento institucional (COT) y el momentum real (<code>fxPerformance1M</code>).</p>
+            <p>El modelo está diseñado con una premisa central: <strong>los fundamentales CAUSAN el precio; el precio no debe ser el mayor peso del modelo</strong>. En forex, el orden de prioridad es: carry &gt; ciclo monetario &gt; balance externo &gt; crecimiento. Un modelo que pondere el precio pasado más que cualquier fundamental comete una inversión de causalidad: premia lo que ya está en el mercado, no lo que lo moverá.</p>
+            <p>En v6.0 se corrigió esta inversión: <code>fxPerformance1M</code> pasó de ser el indicador de mayor peso (28%) a operar como <strong>confirmador</strong> (8%). Si los fundamentales son fuertes Y el precio confirma → +convicción. Si divergen → señal de alerta, no destrucción del score. El peso liberado se redistribuyó hacia <code>interestRate</code> (+3%), <code>rateMomentum</code> (+3%), <code>gdpGrowth</code> (+1%) y <code>currentAccount</code> (+2%), que son los drivers reales del precio a 2-6 semanas.</p>
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 6%), que sí es un indicador de flujo relevante para el trading.</p>
 
-            <h3>Sistema de Ponderación — 21 Indicadores en 6 Tiers</h3>
+            <h3>Cambios en v6.1 (marzo 2026) — Precisión Hawkish Pause + Stagflation</h3>
+            <ul>
+                <li><strong>FIX-6 — Hawkish Pause Boost en rateMomentum:</strong> Un banco central con <code>bcOutlook=Hawkish</code> y <code>rateMomentum ≈ 0</code> está en pausa hawkish, no en posición neutral. Ejemplo: el BOJ subió tasas en 2024-2025 y pausó con <code>rm12=0.0</code> — esto es radicalmente distinto a un BC inactivo con <code>rm=0</code>. Fix: si <code>bcOutlook=Hawkish</code> Y <code>rm ∈ [-0.25, +0.5]</code>, se usa <code>rm efectivo=+0.3</code> (mild hawkish), que da score 72 en lugar de 50 en el componente. Con peso 7%, el impacto en el score total es ≈ +1.5 pts — quirúrgico. 100% data-driven: usa los campos <code>bcOutlook</code> (scrapeado) y <code>rateMomentum</code> (calculado) que ya existen en el modelo.</li>
+                <li><strong>FIX-7 — Stagflation Risk (ajuste contextual nuevo):</strong> El modelo sin este ajuste puntuaba inflación 1.9% (cerca del target) altamente, ignorando que esa inflación baja en contexto de contracción industrial es señal de debilidad macroeconómica, no de salud. Nuevo ajuste contextual que activa cuando se cumplen 3 condiciones simultáneas: <code>inflation &lt; 2.5%</code> + <code>production &lt; -0.5%</code> + <code>rateMomentum &lt; -0.5</code>. Penalización progresiva: 0 a −5 pts según severidad de cada componente. Afecta únicamente EUR (−1.4 pts: infl 1.9, prod −1.3, rm −0.75) y CHF (−4.3 pts: infl 0.1, prod −3.3, rm −1.5) en el contexto actual. El resto del G8 no activa el trigger. 100% data-driven: usa indicadores ya presentes en el modelo.</li>
+            </ul>
+
+            <h3>Cambios en v6.0 (marzo 2026) — Rebalanceo Fundamental</h3>
+            <ul>
+                <li><strong>CORE — fxPerformance1M: 28% → 8% (Confirmador):</strong> El cambio más importante de la historia del modelo. Con 28% de peso, el FX performance podía mover el score total hasta 25.7 puntos solo, convirtiendo un modelo fundamental en un momentum tracker. Tres distorsiones eliminadas: (1) <em>Momentum chase</em> — se premiaba lo que ya estaba en el precio; (2) <em>Mean reversion ignorada</em> — a 2-6 semanas, divisas que subieron mucho tienden a consolidar; (3) <em>Causalidad invertida</em> — los fundamentales causan el precio, no al revés. FX ahora opera como confirmador: si los fundamentales son fuertes Y el precio confirma → +convicción marginal.</li>
+                <li><strong>interestRate: 7% → 10%:</strong> El carry es el factor #1 documentado en la literatura de forex. Recupera su peso correcto.</li>
+                <li><strong>rateMomentum: 4% → 7%:</strong> La dirección del banco central es más predictiva que el nivel de tasas. Un BC que recorta activamente (NZD -3.25pp, CAD -2.75pp) merece mayor penalización que uno en pausa.</li>
+                <li><strong>currentAccount: 5% → 7%:</strong> Flujos reales que determinan demanda estructural de la divisa.</li>
+                <li><strong>gdpGrowth: 6% → 7%, debt: 2% → 4%, termsOfTrade: 2% → 4%:</strong> Fundamentales cíclicos y estructurales recuperan peso correcto.</li>
+                <li><strong>inflationExpectations eliminado (2% → 0%):</strong> Indicador redundante con <code>inflation</code> + <code>rateMomentum</code>. La señal ya está capturada con mayor precisión por esos dos indicadores.</li>
+                <li><strong>Badge ESTRUCTURAL: umbral 42 → 55:</strong> El badge ahora solo activa en scores medio-altos (≥55) donde el aviso de "fortaleza de balance sheet vs momentum" es operativamente relevante. A 45.7 (NZD) el score bajo ya es autoexplicativo — el badge generaba contradicción visual.</li>
+            </ul>
+
+            <h3>Cambios en v5.11 (marzo 2026)</h3>
+            <ul>
+                <li><strong>FIX-1 — Inflación asimétrica:</strong> La inflación real &lt;1% ahora recibe penalización 2× más agresiva que la inflación alta equivalente. Una inflación de 0.1% señala que el banco central carece de margen hawkish convencional → bearish estructural. Score: 0.1% → ~3 pts (antes ~63 pts).</li>
+                <li><strong>FIX-2 — Zona de riesgo deflacionario:</strong> El ajuste contextual <em>Inflation Stability</em> ahora penaliza el rango 0–1% (−1.5 a −4 pts) además de la deflación técnica (&lt;0%). La penalización se intensifica si el BC está simultáneamente en ciclo de recortes.</li>
+                <li><strong>FIX-3 — Haircut de ciclo al safe haven premium:</strong> La función <em>Low-Rate Safe Haven Adj</em> ahora aplica un haircut de hasta 40% cuando el BC está en ciclo bajista activo (<code>rateMomentum &lt; 0</code>). Un safe haven con BC recortando es carry-bearish, no neutral.</li>
+                <li><strong>FIX-4 — Cuenta corriente relativa al G8:</strong> El score de <code>currentAccount</code> ahora se calcula en función de la posición relativa dentro de la distribución G8 (z-score normalizado, mediana y stdDev en tiempo real). Elimina la ventaja permanente de economías estructuralmente superavitarias — el mercado ya descuenta ese nivel.</li>
+                <li><strong>FIX-5 — Badge contextual "Score estructural":</strong> Las tarjetas de divisa muestran un badge ⚑ cuando el score es elevado pero las señales de momentum son débiles (tasa ≤ 0.5% o ciclo ≤ −1.0pp). El badge es 100% data-driven y distingue fortaleza de balance sheet de señal operativa de momentum.</li>
+            </ul>
+
+            <h3>Sistema de Ponderación v6.0 — 20 Indicadores en 6 Tiers</h3>
             <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
                 <thead>
-                    <tr><th>Tier</th><th>Indicador</th><th>Peso</th><th>Razón</th></tr>
+                    <tr><th>Tier</th><th>Indicador</th><th>Peso v6.0</th><th>Razón</th></tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td rowspan="4"><strong>Tier 1 — 21%</strong><br/>Tasas &amp; Ciclo Monetario</td>
-                        <td>Tasa de Interés</td><td>7%</td><td>Nivel actual de tasa y diferencial de carry trade. Rate cycle haircut v5.8: se atenúa si el BC ya inició ciclo de recortes.</td>
+                        <td rowspan="4"><strong>Tier 1 — 29%</strong><br/>Tasas &amp; Ciclo Monetario</td>
+                        <td>Tasa de Interés</td><td><strong>10%</strong></td><td>El carry es el factor #1 documentado en forex. Rate cycle haircut: se atenúa si el BC ya inició ciclo de recortes.</td>
                     </tr>
-                    <tr><td>Inflación</td><td>5%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%.</td></tr>
+                    <tr><td>Inflación</td><td><strong>7%</strong></td><td>Define el mandato del BC y la política monetaria. Penalización asimétrica para deflación (&lt;1%).</td></tr>
                     <tr><td>Perspectiva del BC (Outlook Score)</td><td>5%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
-                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>4%</td><td>Variación de la tasa respecto a hace 12 meses.</td></tr>
+                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td><strong>7%</strong></td><td>Variación acumulada de la tasa respecto a hace 12 meses. La dirección del BC es más predictiva que el nivel.</td></tr>
 
                     <tr>
-                        <td rowspan="4"><strong>Tier 2 — 13%</strong><br/>Balance Externo</td>
-                        <td>Cuenta Corriente</td><td>5%</td><td>Demanda estructural de divisa por flujos reales.</td>
+                        <td rowspan="4"><strong>Tier 2 — 19%</strong><br/>Balance Externo</td>
+                        <td>Cuenta Corriente</td><td><strong>7%</strong></td><td>Flujos reales que determinan la demanda estructural de la divisa. Z-score relativo al G8 (v5.11).</td>
                     </tr>
                     <tr><td>Balanza Comercial</td><td>4%</td><td>Flujos comerciales mensuales, normalizados como % del PIB.</td></tr>
-                    <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal.</td></tr>
-                    <tr><td>Términos de Intercambio</td><td>2%</td><td>Ratio precio exportaciones/importaciones (base 100).</td></tr>
+                    <tr><td>Deuda Pública</td><td><strong>4%</strong></td><td>Sostenibilidad fiscal y riesgo soberano.</td></tr>
+                    <tr><td>Términos de Intercambio</td><td><strong>4%</strong></td><td>Ratio precio exportaciones/importaciones. Especialmente relevante para divisas commodity (AUD, CAD, NZD).</td></tr>
 
                     <tr>
-                        <td rowspan="3"><strong>Tier 3 — 12%</strong><br/>Crecimiento &amp; Empleo</td>
-                        <td>Crecimiento PIB</td><td>6%</td><td>Momentum económico fundamental.</td>
+                        <td rowspan="3"><strong>Tier 3 — 16%</strong><br/>Crecimiento &amp; Empleo</td>
+                        <td>Crecimiento PIB</td><td><strong>7%</strong></td><td>Momentum económico fundamental del ciclo.</td>
                     </tr>
-                    <tr><td>Desempleo</td><td>4%</td><td>Salud del mercado laboral.</td></tr>
-                    <tr><td>Producción Industrial</td><td>2%</td><td>Actividad del sector real.</td></tr>
+                    <tr><td>Desempleo</td><td><strong>5%</strong></td><td>Salud del mercado laboral y dual mandate (Fed, RBA).</td></tr>
+                    <tr><td>Producción Industrial</td><td><strong>4%</strong></td><td>Actividad del sector real, indicador leading del ciclo.</td></tr>
 
                     <tr>
-                        <td rowspan="3"><strong>Tier 4 — 7%</strong><br/>Consumo &amp; Salarios</td>
+                        <td rowspan="2"><strong>Tier 4 — 6%</strong><br/>Consumo &amp; Salarios</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>2%</td><td>Presiones inflacionarias laborales.</td></tr>
-                    <tr><td>Expectativas de Inflación</td><td>2%</td><td>Credibilidad del banco central.</td></tr>
+                    <tr><td>Crecimiento Salarial</td><td><strong>3%</strong></td><td>Presiones inflacionarias laborales (salario real = salario − inflación).</td></tr>
 
                     <tr>
-                        <td rowspan="6"><strong>Tier 5 — 19%</strong><br/>Sentimiento de Mercado</td>
-                        <td><strong>COT Positioning</strong></td><td><strong>5%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Filtro de confirmación de precio v5.7: el score se atenúa si el posicionamiento extremo no está confirmado por el precio reciente.</td>
+                        <td rowspan="5"><strong>Tier 5 — 18%</strong><br/>Sentimiento de Mercado</td>
+                        <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial.</td>
                     </tr>
-                    <tr><td>PMI Manufacturero</td><td>4%</td><td>Indicador adelantado de actividad industrial.</td></tr>
+                    <tr><td>PMI Manufacturero</td><td><strong>5%</strong></td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>Bono Soberano 10Y</td><td>3%</td><td>Carry yield directo y expectativas de tasas futuras.</td></tr>
-                    <tr><td>Flujos de Capital</td><td>2%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB.</td></tr>
-                    <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
+                    <tr><td>Confianza Empresarial</td><td>3%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
+                    <tr><td>Flujos de Capital</td><td>1%</td><td>Cuenta financiera de la balanza de pagos.</td></tr>
 
                     <tr style="background: rgba(38,166,154,0.07);">
-                        <td rowspan="2"><strong>Tier 6 — 28%</strong><br/>FX Momentum &amp; Smart Money</td>
+                        <td rowspan="2"><strong>Tier 6 — 12%</strong><br/>FX Confirmador</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
-                        <td><strong>28%</strong></td>
-                        <td>Composite basket-corrected (v5.9): cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% 1M + 20% 1S + 10% 3M. Único indicador sin lag estructural — mayor peso individual del modelo.</td>
+                        <td><strong>8%</strong></td>
+                        <td>Confirmador, no driver. Composite basket-corrected (v5.9): 70% 1M + 20% 1S + 10% 3M. Si fundamentales fuertes + precio confirma → +convicción marginal. Si divergen → señal de alerta.</td>
+                    </tr>
+                    <tr style="background: rgba(38,166,154,0.07);">
+                        <td>Bono Soberano 10Y</td><td><strong>4%</strong></td><td>Yield diferencial real y expectativas de tasas futuras (spread bono − tasa política).</td>
                     </tr>
 
                     <tr style="background: rgba(38,166,154,0.12);">
                         <td><strong>Total</strong></td>
-                        <td><strong>21 Indicadores</strong></td>
+                        <td><strong>20 Indicadores</strong></td>
                         <td><strong>100%</strong></td>
                         <td>El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</td>
                     </tr>
@@ -344,7 +371,7 @@ Bandas: &lt; 53 = Débil · 53–63 = Neutral · &gt; 63 = Fuerte</pre>
                 <a href="contact.html" style="color: var(--text-secondary); text-decoration: none;">Contacto</a> &middot;
                 <a href="en.html" style="color: var(--text-secondary); text-decoration: none; padding: 0.15rem 0.45rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem;">EN</a>
             </p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v5.9.0</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v6.1.0</p>
         </div>
     </div>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
