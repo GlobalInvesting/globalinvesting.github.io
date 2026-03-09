@@ -1039,7 +1039,7 @@ print("=" * 60)
 import sys
 
 today     = date.today()
-from_date = today - timedelta(days=2)
+from_date = today - timedelta(days=28)  # v6.3: extendido de 2→28 días para acumular actuals del ESI
 to_date   = today + timedelta(days=30)
 
 target_dates = set()
@@ -1154,10 +1154,10 @@ else:
 # there's only one event in the slot, name similarity as tiebreaker otherwise.
 events_needing_actual = [ev for ev in merged_values.values()
                          if not ev.get('actual') and
-                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=7) and
+                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=28) and
                          date.fromisoformat(ev['dateISO']) <= today]
 if events_needing_actual:
-    enrich_from = (today - timedelta(days=7)).isoformat()
+    enrich_from = (today - timedelta(days=28)).isoformat()  # v6.3: 7→28 días
     enrich_to   = today.isoformat()
     print(f"\n  [Actuals] Using Investing.com HTML POST for actuals "
           f"({len(events_needing_actual)} events need actual, {enrich_from} → {enrich_to})...")
