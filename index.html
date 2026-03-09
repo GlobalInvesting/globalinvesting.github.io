@@ -3072,19 +3072,26 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
     if (calendarEvents && Array.isArray(calendarEvents) && calendarEvents.length > 0) {
         const EVENT_INDICATOR_MAP = [
             // CPI / Inflación
-            { keywords: ['cpi y/y', 'cpi yoy', 'consumer price index y', 'cpi annual', 'inflation rate yoy'],
+            // CPI / Inflación — cubre YoY y MoM (ambas variantes de Investing.com)
+            { keywords: ['cpi y/y', 'cpi yoy', 'cpi (yoy)', 'consumer price index y', 'cpi annual',
+                         'inflation rate yoy', 'inflation rate (yoy)', 'cpi m/m', 'cpi (mom)',
+                         'cpi (m/m)', 'consumer price index (m'],
               key: 'inflation', invert: false },
-            // GDP
-            { keywords: ['gdp q/q', 'gdp qoq', 'gross domestic product q', 'gdp growth', 'prelim gdp'],
+            // GDP — cubre QoQ, Annualized, 3M/3M y variantes GBP/JPY
+            { keywords: ['gdp q/q', 'gdp qoq', 'gdp (qoq)', 'gdp annualized', 'gdp annualized (qoq)',
+                         'gross domestic product q', 'gdp growth', 'prelim gdp',
+                         'monthly gdp', 'gdp private consumption', 'gdp price index'],
               key: 'gdpGrowth', invert: false },
             // Desempleo
-            { keywords: ['unemployment rate'],
+            { keywords: ['unemployment rate', 'unemployment rate ('],
               key: 'unemployment', invert: true },
-            // Nóminas / empleo (excluir "unemployment rate" que ya está arriba)
-            { keywords: ['nonfarm payrolls', 'employment change'],
+            // Nóminas / empleo
+            { keywords: ['nonfarm payrolls', 'private nonfarm payrolls', 'employment change',
+                         'employment cost index', 'change in nonfarm'],
               key: 'unemployment', invert: true },
             // Ventas minoristas
-            { keywords: ['retail sales'],
+            { keywords: ['retail sales', 'core retail sales', 'retail control',
+                         'brc retail sales'],
               key: 'retailSales', invert: false },
             // PMI Manufacturero
             { keywords: ['manufacturing pmi', 'manufacturing index', 'markit manufacturing', 'ism manufacturing'],
@@ -3094,7 +3101,8 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
                          'markit services', 'markit composite'],
               key: 'servicesPMI', invert: false },
             // Producción industrial
-            { keywords: ['industrial production', 'factory output', 'manufacturing production'],
+            { keywords: ['industrial production', 'factory output', 'manufacturing production',
+                         'germany industrial production', 'industrial production (mom)'],
               key: 'production', invert: false },
         ];
 
@@ -3791,7 +3799,7 @@ const indicatorTooltips = {
 
     manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via Trading Economics.",
     servicesPMI: "Purchasing Managers Index del sector servicios (bancos, seguros, turismo, salud, tecnología). Peso: 4% en el score v6.2 — mayor que manufacturero (3%) porque servicios representa >75% del PIB en USD, GBP y EUR. La misma escala que el PMI Manufacturero: >50 = expansión, <50 = contracción. En economías post-industriales, este indicador anticipa inflación de servicios (componente más pegajoso del IPC) y empleo, los dos factores que más pesan en las decisiones de política monetaria de la Fed, el BCE y el BOE. Fuente: S&P Global via Trading Economics.",
-    economicSurprise: "Economic Surprise Index (ESI) Proxy — mide si los datos macroeconómicos recientes superaron o decepcionaron las expectativas del consenso. Score >50 = los datos publicados estuvieron por encima de lo esperado (sorpresa positiva, bullish para la divisa). Score <50 = datos peores de lo esperado (sorpresa negativa, bearish). Calculado con arquitectura híbrida: (A) cuando hay datos publicados, compara el valor real vs el pronóstico del consenso en el calendario económico; (B) como respaldo, mide la posición relativa de la divisa en 7 indicadores clave dentro del G8 mediante z-scores. Peso: 4% en v6.3. Es el factor que más falta en los modelos fundamentales que solo leen niveles — el mercado ya tiene el nivel descontado, lo que mueve el precio es la desviación vs expectativas. Fuente: ForexFactory calendar + cálculo interno G8.",
+    economicSurprise: "Economic Surprise Index (ESI) Proxy — mide si los datos macroeconómicos recientes superaron o decepcionaron las expectativas del consenso. Score >50 = los datos publicados estuvieron por encima de lo esperado (sorpresa positiva, bullish para la divisa). Score <50 = datos peores de lo esperado (sorpresa negativa, bearish). Calculado con arquitectura híbrida: (A) cuando hay datos publicados, compara el valor real vs el pronóstico del consenso en el calendario económico; (B) como respaldo, mide la posición relativa de la divisa en 7 indicadores clave dentro del G8 mediante z-scores. Peso: 4% en v6.3. Es el factor que más falta en los modelos fundamentales que solo leen niveles — el mercado ya tiene el nivel descontado, lo que mueve el precio es la desviación vs expectativas. Fuente: Investing.com calendar + cálculo interno G8.",
 
     cotPositioning: "Posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Fuente: reporte Futures Only (financial_lf.htm) — excluye opciones para reflejar únicamente presión directa sobre el precio. Valores positivos = el smart money especulativo tiene posición neta larga → sesgo alcista institucional. Valores negativos = posición corta neta → sesgo bajista. >80K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-80K = bajista extremo, posible rebote contrarian. Los Leveraged Funds son el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas, sin mandatos de cobertura ni posiciones pasivas. Fuente: CFTC oficial (cftc.gov/dea/futures/financial_lf.htm), actualización viernes.",
 
