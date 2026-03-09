@@ -91,14 +91,13 @@ jobs:
                       warnings.append(('🟡', 'Update Extended Data', curr, field, 'null'))
 
           # ── 3. INTEREST RATES ────────────────────────────────────────────────────
+          # Las tasas solo cambian en reuniones de banco central (cada 6-8 semanas).
+          # No chequeamos frescura por días — solo que el archivo existe y tiene valor.
           for curr in CURRENCIES:
               data = load_json(f'rates/{curr}.json')
               if data is None:
                   issues.append(('🔴', 'Update Interest Rates', curr, 'archivo', 'no existe'))
                   continue
-              if not check_staleness(data.get('lastUpdate'), 2, 'rates'):
-                  issues.append(('🟡', 'Update Interest Rates', curr, 'lastUpdate',
-                                 f"datos tienen más de 2 días ({data.get('lastUpdate', 'N/A')})"))
               obs = data.get('observations', [])
               if not obs or obs[0].get('value') is None:
                   issues.append(('🔴', 'Update Interest Rates', curr, 'rate', 'null'))
@@ -154,7 +153,18 @@ jobs:
                   if not info.get('nextMeetingISO'):
                       warnings.append(('🟡', 'Update Central Bank Meetings', curr, 'nextMeeting', 'no definida'))
 
-          # ── 8. AI ANALYSIS ───────────────────────────────────────────────────────
+          # ── 8. NEWS DATA ─────────────────────────────────────────────────────────
+          news = load_json('news-data/news.json')
+          if news is None:
+              issues.append(('🔴', 'Update News', '—', 'archivo', 'news-data/news.json no existe'))
+          else:
+              if not check_staleness(news.get('updated_utc'), 1, 'news'):
+                  issues.append(('🟡', 'Update News', '—', 'updated_utc',
+                                 f"datos tienen más de 1 día ({news.get('updated_utc', 'N/A')[:10]})"))
+              if news.get('total', 0) == 0:
+                  warnings.append(('🟡', 'Update News', '—', 'total', '0 noticias'))
+
+          # ── 9. AI ANALYSIS ───────────────────────────────────────────────────────
           ai_missing = []
           for curr in CURRENCIES:
               if not os.path.exists(f'ai-analysis/{curr}.json') and not os.path.exists(f'ai-analysis/{curr.lower()}.json'):
