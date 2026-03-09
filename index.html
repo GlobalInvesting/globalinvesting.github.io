@@ -5328,6 +5328,28 @@ const sentiment = getSentiment(strength);
                                         return isNaN(d2.getTime()) || d2.getTime() < nowMs || !!(e.actual && e.actual !== '');
                                     });
                                 const eventClass = `calendar-event${isPast ? ' is-past' : ''}${isNext ? ' is-next' : ''}`;
+
+                                // Determine actual color: green = beat, red = miss, neutral = no comparison
+                                const parseNumeric = (s) => {
+                                    if (!s) return null;
+                                    const n = parseFloat(String(s).replace(/[%TBMKk,]/g, ''));
+                                    return isNaN(n) ? null : n;
+                                };
+                                let actualColor = 'var(--green-strong)';
+                                if (hasActual) {
+                                    const aNum = parseNumeric(event.actual);
+                                    const fNum = parseNumeric(event.forecast || event.previous);
+                                    if (aNum !== null && fNum !== null) {
+                                        // For most indicators: higher actual = green (beat). Exception: unemployment, CPI miss.
+                                        const evLower = (event.event || '').toLowerCase();
+                                        const lowerIsBetter = /unemploy|claims|inflation expectation|cpi|ppi|deficit/i.test(evLower);
+                                        const beat = lowerIsBetter ? aNum < fNum : aNum > fNum;
+                                        const miss = lowerIsBetter ? aNum > fNum : aNum < fNum;
+                                        if (beat) actualColor = 'var(--green-strong)';
+                                        else if (miss) actualColor = 'var(--red-strong)';
+                                        else actualColor = 'var(--text-secondary)';
+                                    }
+                                }
                                 return (
                                     <div key={index} className={eventClass} style={{
                                         borderLeft: isNext ? '' : (!isPast && isToday ? '3px solid var(--blue)' : 'none'),
@@ -5355,7 +5377,7 @@ const sentiment = getSentiment(strength);
                                                 fontSize: '0.75rem',
                                                 color: 'var(--text-tertiary)'
                                             }}>
-                                                <span>Real: <strong style={{ color: event.actual ? 'var(--green-strong)' : 'var(--text-tertiary)' }}>{event.actual || '—'}</strong></span>
+                                                <span>Real: <strong style={{ color: hasActual ? actualColor : 'var(--text-tertiary)' }}>{event.actual || '—'}</strong></span>
                                                 <span>Est: <strong style={{ color: 'var(--text-secondary)' }}>{event.forecast || '—'}</strong></span>
                                                 <span>Ant: <strong>{event.previous || '—'}</strong></span>
                                             </div>
