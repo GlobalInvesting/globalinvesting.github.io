@@ -1617,21 +1617,18 @@ const fetchExtendedData = async (countryCode) => {
             return 'Por confirmar';
         };
 
-        const formatEventTime = (timeUTC, dateISO, sortKey) => {
-            // Use sortKey (full UTC datetime) when available — most accurate
-            // sortKey format: "YYYY-MM-DDTHH:MM" (UTC)
-            const src = sortKey || (timeUTC && dateISO ? `${dateISO}T${timeUTC}` : null);
-            if (!src) return timeUTC || '';
+        const formatEventTime = (timeUTC, dateISO) => {
+            if (!timeUTC || !dateISO) return '';
             try {
-                const utcDatetime = new Date(src.length <= 16 ? src + ':00Z' : src);
-                if (isNaN(utcDatetime.getTime())) return timeUTC || '';
+                const utcDatetime = new Date(`${dateISO}T${timeUTC}:00Z`);
+                if (isNaN(utcDatetime.getTime())) return timeUTC;
                 return utcDatetime.toLocaleTimeString('es-ES', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
                 });
             } catch {
-                return timeUTC || '';
+                return timeUTC;
             }
         };
 
@@ -5240,14 +5237,9 @@ const sentiment = getSentiment(strength);
                                 const isToday = event.dateISO === todayISO;
                                 const hasActual = !!(event.actual && event.actual !== '');
                                 // Compute event timestamp in UTC for past/next logic
-                                // Use sortKey (UTC) if available, else fallback to dateISO+timeUTC
                                 const nowMs = Date.now();
                                 let eventMs = null;
-                                const sk = event.sortKey;
-                                if (sk) {
-                                    const d = new Date(sk.length === 16 ? sk + ':00Z' : sk + 'Z');
-                                    if (!isNaN(d.getTime())) eventMs = d.getTime();
-                                } else if (event.dateISO && (event.timeUTC || event.time)) {
+                                if (event.dateISO && (event.timeUTC || event.time)) {
                                     const t = event.timeUTC || event.time;
                                     const d = new Date(`${event.dateISO}T${t}:00Z`);
                                     if (!isNaN(d.getTime())) eventMs = d.getTime();
@@ -5277,7 +5269,7 @@ const sentiment = getSentiment(strength);
                                             <div style={{ fontWeight: 600, fontSize: '0.875rem', color: isNext ? 'var(--green)' : (isToday && !isPast ? 'var(--blue)' : 'inherit') }}>
                                                 {event.date}
                                             </div>
-                                            <div>{formatEventTime(event.timeUTC || event.time, event.dateISO, event.sortKey)}</div>
+                                            <div>{formatEventTime(event.timeUTC || event.time, event.dateISO)}</div>
                                         </div>
                                         <div className="event-details">
                                             <div className="event-title">{event.event}</div>
