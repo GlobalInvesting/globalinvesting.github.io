@@ -2,18 +2,18 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión a la baja sobre la divisa. Aunque los mercados de futuros ya descuentan un ciclo bajista, la inflación suiza subió 0.6% en febrero, lo que podría introducir cierta presión moderada sobre los precios.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. La composición exportadora, liderada por productos farmacéuticos y instrumentos de precisión, explica en parte este superávit. Sin embargo, la reciente caída de las reservas de divisas del SNB por tercer mes consecutivo, hasta CHF 710 mil millones, podría indicar intervenciones para frenar la apreciación excesiva del franco.\n\nEl posicionamiento especulativo, con +3.9K contratos netos, muestra un sesgo alcista, aunque moderado. El rendimiento FX del último mes fue de +1.55% vs USD, lo que sugiere una apreciación de la divisa. Aunque el contexto global sugiere un régimen risk-on, lo que favorece divisas de alto carry, el perfil de activo refugio del franco suizo, con superávit de cuenta corriente y deuda contenida, podría generar flujos defensivos hacia la divisa en momentos de tensión global.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión bajista sobre la divisa. Aunque los mercados de futuros ya descuentan un entorno de bajos tipos de interés, la reciente renovación del acuerdo de swap de divisas entre el Banco Nacional Suizo y el Bank of Korea podría proporcionar cierta estabilidad a la divisa.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. Esto se debe en parte a la composición exportadora del país, que se centra en productos farmacéuticos, instrumentos de precisión y piedras preciosas. La cuenta corriente también muestra un superávit del 5.1% del PIB, lo que indica una demanda estructural de la divisa.\n\nEl posicionamiento especulativo en la divisa suiza es ligeramente alcista, con 4.5K contratos netos. Aunque el rendimiento FX del último mes ha sido positivo, con una apreciación del 0.70% vs USD, el mercado parece estar buscando un catalizador definitivo para romper la estrecha banda de 40 pips en la que se encuentra el par USDCHF. La renovación del acuerdo de swap de divisas con el Bank of Korea podría ser un factor de estabilidad en este contexto.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-06T11:03:06.095225+00:00",
+  "generatedAt": "2026-03-09T08:39:58.334211+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 2,
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.2,
     "inflation": 0.1,
     "unemployment": 3.2,
     "currentAccount": 5.1,
-    "rateMomentum": -0.5,
+    "rateMomentum": -1.5,
     "lastRateDecision": {
       "direction": "BAJÓ",
       "delta": -0.25,
@@ -24,23 +24,24 @@
       "cycle_12m": -0.5,
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
-    "cotPositioning": 3863,
-    "fxPerformance1M": 1.5489,
+    "cotPositioning": 4456,
+    "fxPerformance1M": 0.6988,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-06",
-    "latestNewsTs": 1772803000.0,
+    "lastUpdate": "2026-03-09",
+    "latestNewsTs": 1773034326.0,
     "newsHeadlines": [
-      "Reservas de divisas del SNB caen por tercer mes a CHF 710 mil millones: interven",
-      "Inflación suiza sube 0.6% en febrero: presión moderada sobre precios → CHF alcis"
+      "Bank of Korea, Swiss National Bank renew currency swap pact",
+      "Top crypto news this week: Pi Network, Polkadot, US inflation data",
+      "USDCHF Technical Analysis: \"Swissie\" grinds within tight 40-Pip range"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.48,
+    "avg_gdp_growth": 0.46,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.37,
-    "avg_fx_perf_1m": 1.38,
-    "avg_cot": 9454.25
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 0.37,
+    "avg_cot": 4098.88
   }
 }

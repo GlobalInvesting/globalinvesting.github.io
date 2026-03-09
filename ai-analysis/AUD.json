@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. La última subida de tasas del RBA refuerza esta tendencia, aunque el ciclo restrictivo puede tener efectos contrarios en el crecimiento económico.\n\nLa balanza comercial australiana presenta un superávit, gracias a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. El régimen global de riesgo favorece a divisas de alto carry y exportadoras de materias primas, lo que beneficia al AUD. La mejora en el ánimo de riesgo en Asia y la debilidad del USD también impulsan al AUD, como se ha visto en las últimas cotizaciones.\n\nEl mercado está saturado de largos, con un COT muy estirado al alza, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos. Aunque las expectativas de subida de tasas del RBA han impulsado al AUD, cualquier cambio en la política monetaria japonesa puede generar incertidumbre y afectar a la divisa australiana. En este contexto, el optimismo en commodities y el ciclo chino también juegan a favor del AUD.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. Aunque los mercados ya descuentan un ciclo bajista en el largo plazo, la última decisión de subir tasas refuerza la postura hawkish del banco central.\n\nLa balanza comercial australiana presenta un superávit, gracias principalmente a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. Sin embargo, la cuenta corriente muestra un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La caída del par AUD/CAD por debajo de 0.9500, impulsada por el fortalecimiento del Dólar canadiense debido a los precios del petróleo en alza, refleja la intensa presión de venta que enfrenta el cruce.\n\nEl posicionamiento especulativo en el mercado está muy cargado al alza, con un COT de +54.6K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción en los datos. Aunque el rendimiento FX del último mes muestra una depreciación del 0.84% vs USD, la tasa de interés alta y el superávit comercial deberían seguir apoyando a la divisa. La recuperación parcial del dólar australiano en el mercado sugiere que los inversores están atentos a cualquier señal de cambio en el sentimiento del mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-06T11:02:56.646279+00:00",
+  "generatedAt": "2026-03-09T08:39:44.378686+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -24,24 +24,24 @@
       "cycle_12m": -0.25,
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
-    "cotPositioning": 64653,
-    "fxPerformance1M": -0.4928,
+    "cotPositioning": 54635,
+    "fxPerformance1M": -0.8378,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-06",
-    "latestNewsTs": 1772779520.0,
+    "lastUpdate": "2026-03-09",
+    "latestNewsTs": 1773027571.0,
     "newsHeadlines": [
-      "BoJ señaliza mantener tasas bajas: incertidumbre sobre política monetaria japone",
-      "Expectativas de subida de tasas del RBA impulsan al AUD: cotización sube 0.4% a ",
-      "Mejor ánimo de riesgo en Asia y debilidad del USD: optimismo en commodities y ci"
+      "AUD/CAD cae por debajo de 0.9500 mientras los precios del petróleo en aumento fo",
+      "AUD/CAD slumps below 0.9500 as boiling oil prices strengthen Canadian Dollar",
+      "Australian dollar reccovers somewhat. What we're watching."
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.48,
+    "avg_gdp_growth": 0.46,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.37,
-    "avg_fx_perf_1m": 1.38,
-    "avg_cot": 9454.25
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 0.37,
+    "avg_cot": 4098.88
   }
 }

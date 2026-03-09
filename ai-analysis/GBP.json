@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "La política monetaria del Banco de Inglaterra se ha vuelto más expansiva, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, el ciclo bajista en 12M y la reciente decisión de bajar tasas sugieren que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación. La inflación anual del 3.0% sigue siendo un desafío, pero el crecimiento del PIB del 0.1% anual es inferior al promedio global.\n\nLa balanza comercial y la cuenta corriente del Reino Unido siguen siendo un desafío, con un déficit en bienes y una cuenta corriente en rojo. La composición exportadora del país, con un enfoque en maquinaria industrial y productos farmacéuticos, no ha sido suficiente para generar un superávit comercial. El conflicto en Medio Oriente y el aumento en los precios energéticos pueden empeorar la situación de la balanza de pagos en el Reino Unido, lo que podría presionar a la baja la divisa.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 40K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción en los datos. La consolidación de GBP/USD en 1.3341-1.3352 y la resistencia clave para crecimiento hacia 1.3437-1.3465 dependen de los datos laborales. La caída del dólar estadounidense antes del anuncio de empleo no agrícola en EE UU ha permitido a la libra esterlina subir marginalmente a 1.3365, pero el mercado sigue siendo sensible a cualquier noticia que pueda afectar la divisa.",
+  "analysis": "El Banco de Inglaterra acaba de bajar las tasas de interés en 0.25pp, lo que sugiere un ciclo expansivo, aunque esto presiona a la baja la divisa debido al menor carry. La tasa de interés actual de 3.75% sigue estando por encima del promedio global, aunque la decisión de bajar tasas indica una postura más dovish. La inflación anual de 3.0% y el crecimiento del PIB de 0.1% anual también influyen en la decisión del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones del país, como maquinaria industrial y productos farmacéuticos, no han sido suficientes para compensar el déficit en bienes. La noticia de que el GBP/USD se deprecia tras registrar modestas ganancias en la sesión anterior, cotizando alrededor de 1.3300, refleja la aversión al riesgo y el aumento del dólar estadounidense.\n\nEl posicionamiento especulativo muestra una posición alcista extrema, con 34.5K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación de 2.55% vs USD, aunque la noticia de que el pound esterlina retrocede mientras el dólar estadounidense gana terreno por el aumento de la aversión al riesgo sugiere que el mercado puede estar cambiando su tendencia.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-06T11:02:42.848071+00:00",
+  "generatedAt": "2026-03-09T08:39:35.467691+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -24,24 +24,24 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": 40151,
-    "fxPerformance1M": 2.9817,
+    "cotPositioning": 34506,
+    "fxPerformance1M": 2.547,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-06",
-    "latestNewsTs": 1772786715.0,
+    "lastUpdate": "2026-03-09",
+    "latestNewsTs": 1773034689.0,
     "newsHeadlines": [
-      "Consolidación de GBP/USD en 1.3341–1.3352: resistencia clave para crecimiento ha",
-      "Conflicto en Medio Oriente eleva precios energéticos: incertidumbre global y pos",
-      "Antes del anuncio de empleo no agrícola en EE UU, el dólar estadounidense cae: l"
+      "Pound Sterling Price News and Forecast: GBP/USD weakens as safe-haven demand lif",
+      "La Libra esterlina retrocede mientras el Dólar estadounidense gana terreno por e",
+      "Pound Sterling declines as US Dollar gains on increased risk aversion"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.48,
+    "avg_gdp_growth": 0.46,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.37,
-    "avg_fx_perf_1m": 1.38,
-    "avg_cot": 9454.25
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 0.37,
+    "avg_cot": 4098.88
   }
 }

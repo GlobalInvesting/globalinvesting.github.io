@@ -2,16 +2,16 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la decisión de bajar tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación. La inflación anual de 2.4% sigue siendo una preocupación, pero la desaceleración en la creación de empleos no agrícolas en febrero sugiere que la presión sobre la Fed para subir tasas puede estar disminuyendo.\n\nLa balanza comercial sigue siendo un punto débil, con un déficit pronunciado de 70.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. Sin embargo, el conflicto en Medio Oriente ha elevado los precios del petróleo, lo que ha impulsado al USD como refugio seguro, lo que puede contrarrestar parcialmente la presión vendedora. La composición exportadora de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves sugiere que la economía estadounidense sigue siendo competitiva en sectores clave.\n\nEl posicionamiento especulativo sigue siendo neto alcista, con un COT de +0.8K contratos netos, lo que sugiere que los inversores siguen apostando por la divisa. El rendimiento FX del último mes ha sido positivo, con una apreciación de 2.59% vs USD, lo que refleja la percepción de que la divisa sigue siendo atractiva a pesar de la decisión de bajar tasas. La tensión geopolítica y el riesgo global pueden seguir impulsando al USD como refugio, lo que podría mantener la presión alcista en el corto plazo.",
+  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Esto se produce en un contexto de inflación por encima del objetivo y crecimiento del PIB superior al promedio global. Aunque la tasa de interés sigue estando por encima del promedio global, la decisión de bajar tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación.\n\nLa balanza comercial de Estados Unidos muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones, como maquinaria industrial y equipos eléctricos, no parecen ser suficientes para compensar el déficit en bienes. En este contexto, la subida de los precios del petróleo y la escasez de materias primas, como el mineral de hierro, pueden afectar negativamente la cuenta corriente y, por ende, la divisa.\n\nEl posicionamiento especulativo neto bajista, según el COT, y el rendimiento FX negativo en el último mes sugieren que los inversores están apostando por una depreciación de la divisa. Aunque la confianza del consumidor y la confianza empresarial siguen siendo relativamente altas, la incertidumbre geopolítica y la volatilidad en los mercados de commodities pueden seguir presionando a la baja la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-06T11:02:28.568497+00:00",
+  "generatedAt": "2026-03-09T08:39:26.681786+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.75,
     "gdpGrowth": 1.4,
     "inflation": 2.4,
-    "unemployment": 4.3,
+    "unemployment": 4.4,
     "currentAccount": -3.9,
     "rateMomentum": -0.69,
     "lastRateDecision": {
@@ -24,24 +24,24 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": 850,
-    "fxPerformance1M": 2.5908,
+    "cotPositioning": -4547,
+    "fxPerformance1M": -1.8118,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-06",
-    "latestNewsTs": 1772805005.0,
+    "lastUpdate": "2026-03-09",
+    "latestNewsTs": 1773053672.0,
     "newsHeadlines": [
-      "Conflicto en Medio Oriente eleva petróleo Brent a $85 por barril: tensión geopol",
-      "Conflicto en Medio Oriente eleva petróleo WTI a $81 por barril: tensión geopolít",
-      "Creación de empleos no agrícolas en EEUU se desacelera a 59K en febrero: debilid"
+      "Iron Ore Hits 5-Week High",
+      "Indian Rupee Falls to Record Low",
+      "Oil Prices Surpass $110 Amid Supply Disruptions"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.48,
+    "avg_gdp_growth": 0.46,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.37,
-    "avg_fx_perf_1m": 1.38,
-    "avg_cot": 9454.25
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 0.37,
+    "avg_cot": 4098.88
   }
 }
