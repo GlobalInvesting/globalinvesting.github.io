@@ -3009,20 +3009,23 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         // Fórmula: 50 + (raw - 40) * (65 / 90)
         scoringData.consumerConfidence = Math.round((50 + (raw - 40) * (65 / 90)) * 10) / 10;
     }
+}
 
-    // ── v6.3: ESI PROXY (inside calculateStrength) ─────────────────────────
+// ── v6.3: ECONOMIC SURPRISE INDEX (ESI) PROXY ────────────────────────────────
+// Defined as a standalone function so it can be called from inside calculateStrength.
+const calculateESI = (currency, data, allEconomicData, calendarEvents) => {
     // — Componente B: G8 z-score relativo —
     const ESI_INDICATORS = [
         { key: 'gdpGrowth',       invert: false },
-        { key: 'inflation',       invert: false },  // higher = hawkish pressure = positive
+        { key: 'inflation',       invert: false },
         { key: 'manufacturingPMI',invert: false },
         { key: 'servicesPMI',     invert: false },
-        { key: 'unemployment',    invert: true  },  // lower = better
+        { key: 'unemployment',    invert: true  },
         { key: 'retailSales',     invert: false },
         { key: 'production',      invert: false },
     ];
 
-    const g8Vals = {}; // { indicator: [values across G8] }
+    const g8Vals = {};
     ESI_INDICATORS.forEach(({ key }) => {
         g8Vals[key] = Object.values(allEconomicData)
             .map(d => d[key])
@@ -3046,17 +3049,15 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         : 50;
 
     // — Componente A: Calendar actual-vs-forecast —
-    // Usa calendarEvents pasado como parámetro desde el componente React
     let compA = null;
     if (calendarEvents && Array.isArray(calendarEvents) && calendarEvents.length > 0) {
         const EVENT_INDICATOR_MAP = [
-            // CPI / Inflación
-            // CPI / Inflación — cubre YoY y MoM (ambas variantes de Investing.com)
+            // CPI — YoY y MoM (ambas variantes de Investing.com)
             { keywords: ['cpi y/y', 'cpi yoy', 'cpi (yoy)', 'consumer price index y', 'cpi annual',
                          'inflation rate yoy', 'inflation rate (yoy)', 'cpi m/m', 'cpi (mom)',
                          'cpi (m/m)', 'consumer price index (m'],
               key: 'inflation', invert: false },
-            // GDP — cubre QoQ, Annualized, 3M/3M y variantes GBP/JPY
+            // GDP — QoQ, Annualized, 3M/3M y variantes GBP/JPY
             { keywords: ['gdp q/q', 'gdp qoq', 'gdp (qoq)', 'gdp annualized', 'gdp annualized (qoq)',
                          'gross domestic product q', 'gdp growth', 'prelim gdp',
                          'monthly gdp', 'gdp private consumption', 'gdp price index'],
@@ -3069,8 +3070,7 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
                          'employment cost index', 'change in nonfarm'],
               key: 'unemployment', invert: true },
             // Ventas minoristas
-            { keywords: ['retail sales', 'core retail sales', 'retail control',
-                         'brc retail sales'],
+            { keywords: ['retail sales', 'core retail sales', 'retail control', 'brc retail sales'],
               key: 'retailSales', invert: false },
             // PMI Manufacturero
             { keywords: ['manufacturing pmi', 'manufacturing index', 'markit manufacturing', 'ism manufacturing'],
@@ -3092,8 +3092,6 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             return isNaN(n) ? null : n;
         };
 
-        // Use last 4 weeks of events — only actual vs forecast (real surprises, not forecasts)
-        const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 28);
         const relevant = calendarEvents.filter(e => {
             if (e.currency !== currency) return false;
             const hasActual   = e.actual   && e.actual.trim()   !== '';
@@ -3126,10 +3124,14 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
 
     // — Combine A + B —
     const esiScore = compA !== null
-        ? compA * 0.60 + compB * 0.40   // Calendar data available
-        : compB;                          // Fallback: z-score only
+        ? compA * 0.60 + compB * 0.40
+        : compB;
 
-    scoringData.economicSurprise = Math.round(esiScore * 10) / 10;
+    return Math.round(esiScore * 10) / 10;
+};
+// ── END ESI ──────────────────────────────────────────────────────────────────
+
+    scoringData.economicSurprise = calculateESI(currency, data, allEconomicData, calendarEvents);
 
     Object.keys(TRADING_WEIGHTS).forEach(indicator => {
         const value = scoringData[indicator];
