@@ -670,6 +670,31 @@ while d <= to_date:
 
 print(f"\nTarget: {from_date} → {to_date} ({len(target_dates)} days)\n")
 
+# ── PERSIST RECENT PAST EVENTS FROM PREVIOUS RUN ─────────────────────
+# Investing.com API does not return past dates even when requested.
+# Carry forward yesterday from the previous JSON so users in any
+# timezone always see at least the current local day.
+CALENDAR_PATH = 'calendar-data/calendar.json'
+prev_events = []
+try:
+    with open(CALENDAR_PATH, encoding='utf-8') as _f:
+        _prev = json.load(_f)
+    cutoff = today - timedelta(days=2)
+    for _ev in _prev.get('events', []):
+        try:
+            _d = date.fromisoformat(_ev['dateISO'])
+            if cutoff <= _d < today:
+                prev_events.append(_ev)
+        except Exception:
+            pass
+    if prev_events:
+        print(f"  [Persist] Carrying forward {len(prev_events)} past events from previous run")
+except FileNotFoundError:
+    print("  [Persist] No previous calendar.json — starting fresh")
+except Exception as _e:
+    print(f"  [Persist] Could not load previous calendar: {_e}")
+# ─────────────────────────────────────────────────────────────────────
+
 all_events  = []
 source_used = None
 fetch_errors = []
@@ -712,6 +737,10 @@ if not all_events:
         print(f"   • {e}")
     print("=" * 50)
 
+# Merge persisted past events (they won't come from the API for past dates)
+for _ev in prev_events:
+    all_events.append(_ev)
+
 # Deduplicate
 seen = set()
 unique_events = []
@@ -727,19 +756,14 @@ def sort_key(ev):
 
 unique_events.sort(key=sort_key)
 
-# Filter: keep future events + last 2 days (to cover UTC-12 to UTC+14).
-# Events from 2 days ago are kept only if they have an actual value;
-# yesterday and today are always kept so any user timezone sees their
-# current day regardless of when the GitHub Actions UTC clock ran.
+# Filter: keep yesterday + today + future (covers all timezones UTC-12→+14).
+# Events older than yesterday are dropped — prev_events already carries
+# the relevant window from the previous run.
 final_events = []
 for ev in unique_events:
     try:
         ev_date = date.fromisoformat(ev['dateISO'])
         if ev_date >= today - timedelta(days=1):
-            # Keep yesterday+today+future unconditionally
-            final_events.append(ev)
-        elif ev_date >= today - timedelta(days=2) and ev.get('actual'):
-            # Keep 2 days ago only if it already has an actual reading
             final_events.append(ev)
     except: pass
 
