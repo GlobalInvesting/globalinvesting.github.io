@@ -459,6 +459,18 @@
             padding-left: 1.5rem;
             min-width: 200px;
             border-right: 2px solid var(--border);
+            position: sticky;
+            left: 0;
+            z-index: 3;
+            background: var(--bg-card);
+        }
+
+        .heatmap-table th:nth-child(2) {
+            position: sticky;
+            left: 200px;
+            z-index: 3;
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
         }
 
         .heatmap-table th:last-child {
@@ -479,6 +491,17 @@
             background: var(--bg-card);
             padding-left: 1.5rem;
             border-right: 2px solid var(--border);
+            position: sticky;
+            left: 0;
+            z-index: 2;
+        }
+
+        .heatmap-table td:nth-child(2) {
+            position: sticky;
+            left: 200px;
+            z-index: 2;
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
         }
 
         .heatmap-table td:last-child {
@@ -493,7 +516,7 @@
     background: var(--bg-elevated);
 }
 
-.heatmap-table tbody tr:hover td:not(:first-child) {
+.heatmap-table tbody tr:hover td:not(:first-child):not(:nth-child(2)) {
     color: var(--text-primary) !important;
 }
 
@@ -501,7 +524,8 @@
     color: var(--text-primary) !important;
 }
 
-        .heatmap-table tbody tr:hover td:first-child {
+        .heatmap-table tbody tr:hover td:first-child,
+        .heatmap-table tbody tr:hover td:nth-child(2) {
             background: var(--bg-elevated);
         }
 
@@ -1947,7 +1971,7 @@ const generateForexPairRecommendations = (economicData, forexRates) => {
     const strengthScores = {};
     countries.forEach(country => {
         const data = economicData[country.code] || {};
-        const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
+        const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
         strengthScores[country.code] = {
             score: strengthObj.score,
             dataQuality: strengthObj.dataQuality,
@@ -2386,7 +2410,7 @@ for (let country of countries) {
 //   Régimen 2021 (avg ~0.3%): threshold = max(1.0, −1.2) = 1.0% → solo 0-1% califica
 //   Régimen 2026 (avg ~3.5%): threshold = max(1.0, 2.0) = 2.0%  → CHF/JPY califican ✓
 
-const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}) => {
+const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}, calendarEvents = null) => {
     if (!data) return { 
         score: 50, 
         confidence: { lower: 40, upper: 60 }, 
@@ -3043,9 +3067,9 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         : 50;
 
     // — Componente A: Calendar actual-vs-forecast —
-    // Accede a calendarData si está disponible en el scope global (cargado en loadCalendar)
+    // Usa calendarEvents pasado como parámetro desde el componente React
     let compA = null;
-    if (typeof calendarData !== 'undefined' && calendarData && calendarData.events) {
+    if (calendarEvents && Array.isArray(calendarEvents) && calendarEvents.length > 0) {
         const EVENT_INDICATOR_MAP = [
             { keywords: ['cpi y/y', 'cpi yoy', 'consumer price index y'],  key: 'inflation',       invert: false },
             { keywords: ['gdp', 'gross domestic product'],                  key: 'gdpGrowth',       invert: false },
@@ -3066,7 +3090,7 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
 
         // Use last 4 weeks of events for this currency with actual filled
         const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 28);
-        const relevant = calendarData.events.filter(e => {
+        const relevant = calendarEvents.filter(e => {
             if (e.currency !== currency) return false;
             if (!['high','medium'].includes(e.impact)) return false;
             const hasActual   = e.actual   && e.actual.trim()   !== '';
@@ -4292,7 +4316,7 @@ if (economicData[currency]?.outlook && country) {
 }
     
     // ✅ CORRECCIÓN: Obtener objeto y extraer score
-    const strengthObj = calculateStrength(currency, data, forexRates, economicData);
+    const strengthObj = calculateStrength(currency, data, forexRates, economicData, (economicCalendar||{}).events||null);
     const strength = strengthObj.score;
     const sentiment = getSentiment(strength);
 
@@ -4559,8 +4583,8 @@ const getSortedCountries = () => {
         const dataB = economicData[b.code] || {};
         
         // Primero: Ordenar por strength score
-        const strengthObjA = calculateStrength(a.code, dataA, forexRates, economicData);
-        const strengthObjB = calculateStrength(b.code, dataB, forexRates, economicData);
+        const strengthObjA = calculateStrength(a.code, dataA, forexRates, economicData, (economicCalendar||{}).events||null);
+        const strengthObjB = calculateStrength(b.code, dataB, forexRates, economicData, (economicCalendar||{}).events||null);
         
         const scoreA = strengthObjA.score || 50;
         const scoreB = strengthObjB.score || 50;
@@ -5010,7 +5034,7 @@ const DataHealthCheck = ({ economicData }) => {
             <div className="currency-grid">
                 {getSortedCountries().map(country => {
                     const data = economicData[country.code] || {};
-                    const strengthObj = calculateStrength(country.code, data, forexRates, economicData);
+                    const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
                     const strength = strengthObj.score;
                     const sentiment = getSentiment(strength);
                     const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
@@ -5399,9 +5423,6 @@ const DataHealthCheck = ({ economicData }) => {
 <TooltipCell title="PMI Servicios" tooltip={indicatorTooltips.servicesPMI}>
     PMI Servicios<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice</span>
 </TooltipCell>
-<TooltipCell title="ESI Proxy" tooltip={indicatorTooltips.economicSurprise}>
-    ESI Proxy<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>0-100</span>
-</TooltipCell>
 <TooltipCell title="Posicionamiento COT" tooltip={indicatorTooltips.cotPositioning}>
     COT Positioning<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Net Contratos</span>
 </TooltipCell>
@@ -5423,12 +5444,15 @@ const DataHealthCheck = ({ economicData }) => {
 <TooltipCell title="Términos de Intercambio" tooltip={indicatorTooltips.termsOfTrade}>
     Términos de Intercambio<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Índice base 100</span>
 </TooltipCell>
+<TooltipCell title="ESI Proxy" tooltip={indicatorTooltips.economicSurprise}>
+    ESI Proxy<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>0-100</span>
+</TooltipCell>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {getSortedCountries().map(country => {
                                                 const data = economicData[country.code] || {};
-                                                const strengthObj = calculateStrength(country.code, data, forexRates, economicData);  // ✅
+                                                const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);  // ✅
 const strength = strengthObj.score;  // ✅
 const sentiment = getSentiment(strength);
                                                 const overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
@@ -5463,7 +5487,6 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.wageGrowth} type="wageGrowth" currency={country.code} indicator="wageGrowth" lastUpdate={data.wageGrowthDate} />
 <HeatmapCell value={data.manufacturingPMI} type="manufacturingPMI" currency={country.code} indicator="manufacturingPMI" lastUpdate={data.manufacturingPMIDate} />
 <HeatmapCell value={data.servicesPMI} type="servicesPMI" currency={country.code} indicator="servicesPMI" lastUpdate={data.servicesPMIDate} />
-<HeatmapCell value={data.economicSurprise} type="economicSurprise" currency={country.code} indicator="economicSurprise" lastUpdate={data.economicSurpriseDate} />
 <HeatmapCell value={data.cotPositioning} type="cotPositioning" currency={country.code} indicator="cotPositioning" lastUpdate={data.cotPositioningDate} />
 <HeatmapCell value={data.bond10y} type="bond10y" currency={country.code} indicator="bond10y" lastUpdate={data.bond10yDate} />
 <HeatmapCell value={data.consumerConfidence} type="consumerConfidence" currency={country.code} indicator="consumerConfidence" lastUpdate={data.consumerConfidenceDate} />
@@ -5471,6 +5494,7 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.capitalFlows} type="capitalFlows" currency={country.code} indicator="capitalFlows" lastUpdate={data.capitalFlowsDate} />
 <HeatmapCell value={data.inflationExpectations} type="inflationExpectations" currency={country.code} indicator="inflationExpectations" lastUpdate={data.inflationExpectationsDate} />
 <HeatmapCell value={data.termsOfTrade} type="termsOfTrade" currency={country.code} indicator="termsOfTrade" lastUpdate={data.termsOfTradeDate} />
+<HeatmapCell value={data.economicSurprise} type="economicSurprise" currency={country.code} indicator="economicSurprise" lastUpdate={data.economicSurpriseDate} />
                                                     </tr>
                                                 );
                                             })}
