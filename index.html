@@ -3105,16 +3105,13 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             return isNaN(n) ? null : n;
         };
 
-        // Use last 4 weeks of events for this currency with actual filled
+        // Use last 4 weeks of events — only actual vs forecast (real surprises, not forecasts)
         const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 28);
         const relevant = calendarEvents.filter(e => {
             if (e.currency !== currency) return false;
-            // Note: no impact filter — Investing.com marks many important events as 'low'
             const hasActual   = e.actual   && e.actual.trim()   !== '';
             const hasForecast = e.forecast && e.forecast.trim() !== '';
-            const hasPrevious = e.previous && e.previous.trim() !== '';
-            // Use actual-vs-forecast if available, else forecast-vs-previous (forward signal)
-            return (hasActual && hasForecast) || (hasForecast && hasPrevious);
+            return hasActual && hasForecast;
         });
 
         const surprises = [];
@@ -3125,17 +3122,16 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             );
             if (!mapping) return;
 
-            const hasActual = e.actual && e.actual.trim() !== '';
-            const refVal    = parseNum(hasActual ? e.actual   : e.forecast);
-            const baseVal   = parseNum(hasActual ? e.forecast : e.previous);
+            const refVal  = parseNum(e.actual);
+            const baseVal = parseNum(e.forecast);
             if (refVal === null || baseVal === null) return;
 
-            const delta   = refVal - baseVal;
-            const isBeat  = mapping.invert ? delta < 0 : delta > 0;
+            const delta  = refVal - baseVal;
+            const isBeat = mapping.invert ? delta < 0 : delta > 0;
             surprises.push(isBeat ? 1 : (delta === 0 ? 0.5 : 0));
         });
 
-        if (surprises.length >= 2) {
+        if (surprises.length >= 1) {
             const beatRate = surprises.reduce((a, b) => a + b, 0) / surprises.length;
             compA = Math.max(0, Math.min(100, 50 + (beatRate - 0.5) * 100));
         }
