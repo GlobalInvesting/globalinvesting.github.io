@@ -124,7 +124,7 @@
             <ul>
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
-                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 20 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;53 Débil · 53–63 Neutral · &gt;63 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
+                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 22 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;50 Débil · 50–60 Neutral · &gt;60 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
                 <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected (v5.9): cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. A partir de v6.0 actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
@@ -186,6 +186,16 @@
             <p>En v6.0 se corrigió esta inversión: <code>fxPerformance1M</code> pasó de ser el indicador de mayor peso (28%) a operar como <strong>confirmador</strong> (8%). Si los fundamentales son fuertes Y el precio confirma → +convicción. Si divergen → señal de alerta, no destrucción del score. El peso liberado se redistribuyó hacia <code>interestRate</code> (+3%), <code>rateMomentum</code> (+3%), <code>gdpGrowth</code> (+1%) y <code>currentAccount</code> (+2%), que son los drivers reales del precio a 2-6 semanas.</p>
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 7%), que sí es un indicador de flujo relevante para el trading.</p>
 
+            
+            <h3>Cambios en v6.3 (marzo 2026) — ESI Proxy + Umbrales</h3>
+            <ul>
+                <li><strong>ESI Proxy (Economic Surprise Index):</strong> 22.º indicador del modelo (peso 4%). Arquitectura híbrida: Componente A compara actuals vs forecast del calendario económico (Investing.com); Componente B mide la posición relativa de cada divisa en el G8 mediante z-scores. Cuando el Componente A tiene datos, pondera 60/40 con B; si no hay actuals disponibles, opera solo con B (neutro=50). El ESI captura el gap metodológico más importante vs modelos institucionales: el mercado ya tiene el nivel en precio — lo que mueve el par es la sorpresa vs expectativas.</li>
+                <li><strong>Umbrales de sentimiento actualizados:</strong> &gt;60 = Alcista · 50–60 = Neutral · &lt;50 = Bajista. La frontera de 50 es semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;53) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
+            </ul>
+            <h3>Cambios en v6.2 (marzo 2026) — PMI Servicios</h3>
+            <ul>
+                <li><strong>PMI Servicios (<code>servicesPMI</code>):</strong> 21.º indicador del modelo (peso 4%). Scrapeado automáticamente desde Investing.com junto con PMI Manufacturero. Score &gt;50 = expansión del sector servicios (bullish); &lt;50 = contracción (bearish). Diferencial de peso respecto a PMI Manufacturero: los servicios representan &gt;70% del PIB en economías G8, lo que justifica peso equivalente al manufacturero. El Tier 3 (Sentimiento de Mercado) sube de 14% a 18% con esta adición.</li>
+            </ul>
             <h3>Cambios en v6.1 (marzo 2026) — Precisión Hawkish Pause + Stagflation</h3>
             <ul>
                 <li><strong>FIX-6 — Hawkish Pause Boost en rateMomentum:</strong> Un banco central con <code>bcOutlook=Hawkish</code> y <code>rateMomentum ≈ 0</code> está en pausa hawkish, no en posición neutral. Ejemplo: el BOJ subió tasas en 2024-2025 y pausó con <code>rm12=0.0</code> — esto es radicalmente distinto a un BC inactivo con <code>rm=0</code>. Fix: si <code>bcOutlook=Hawkish</code> Y <code>rm ∈ [-0.25, +0.5]</code>, se usa <code>rm efectivo=+0.3</code> (mild hawkish), que da score 72 en lugar de 50 en el componente. Con peso 7%, el impacto en el score total es ≈ +1.5 pts — quirúrgico. 100% data-driven: usa los campos <code>bcOutlook</code> (scrapeado) y <code>rateMomentum</code> (calculado) que ya existen en el modelo.</li>
@@ -212,7 +222,7 @@
                 <li><strong>FIX-5 — Badge contextual "Score estructural":</strong> Las tarjetas de divisa muestran un badge ⚑ cuando el score es elevado pero las señales de momentum son débiles (tasa ≤ 0.5% o ciclo ≤ −1.0pp). El badge es 100% data-driven y distingue fortaleza de balance sheet de señal operativa de momentum.</li>
             </ul>
 
-            <h3>Sistema de Ponderación — 20 Indicadores en 6 Tiers (v6.1)</h3>
+            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers (v6.3)</h3>
             <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
@@ -251,7 +261,9 @@
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>5%</td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>Confianza Empresarial</td><td>3%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
+                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>4%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish. v6.2.</td></tr>
+                    <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas. v6.3.</td></tr>
+                    <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
                     <tr><td>Flujos de Capital</td><td>1%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB.</td></tr>
                     <tr>
                         <td rowspan="2"><strong>Tier 6 — 12%</strong><br/>FX Confirmador</td>
@@ -264,7 +276,7 @@
                         <td>Carry yield directo y expectativas de tasas futuras.</td>
                     </tr>
                     <tr>
-                        <td><strong>20 Indicadores</strong></td>
+                        <td><strong>22 Indicadores</strong></td>
                         <td><strong>100%</strong></td>
                         <td>El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</td>
                     </tr>
@@ -277,7 +289,7 @@
 cappedAdj       = clamp(totalAdj, −15, +15)
 normalizedScore = clamp(baseScore + cappedAdj, 0, 100)
 
-Bandas: &lt; 53 = Débil · 53–63 = Neutral · &gt; 63 = Fuerte</pre>
+Bandas: &lt; 50 = Débil · 50–60 = Neutral · &gt; 60 = Fuerte</pre>
         </div>
 
         <!-- RECOMENDACIONES DE PARES -->
@@ -291,7 +303,7 @@ Bandas: &lt; 53 = Débil · 53–63 = Neutral · &gt; 63 = Fuerte</pre>
                     <tr><td><strong>Dirección</strong></td><td>LONG (Comprar) o SHORT (Vender)</td><td>Acción recomendada sobre el par</td></tr>
                     <tr><td><strong>Diferencial</strong></td><td>Score fuerte − Score débil</td><td>Mayor diferencial = mayor divergencia fundamental</td></tr>
                     <tr><td><strong>Confianza</strong></td><td>Alta (&gt;20 pts) / Media (12–20 pts) / Baja (&lt;12 pts)</td><td>Basada en amplitud del diferencial</td></tr>
-                    <tr><td><strong>Calidad de Datos</strong></td><td>% de los 20 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
+                    <tr><td><strong>Calidad de Datos</strong></td><td>% de los 22 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
                 </tbody>
             </table>
         </div>
@@ -365,7 +377,7 @@ Bandas: &lt; 53 = Débil · 53–63 = Neutral · &gt; 63 = Fuerte</pre>
                 <a href="contact.html" style="color: var(--text-secondary); text-decoration: none;">Contacto</a> &middot;
                 <a href="en.html" style="color: var(--text-secondary); text-decoration: none; padding: 0.15rem 0.45rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem;">EN</a>
             </p>
-            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v6.1.0</p>
+            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-tertiary, #6e7681);">Dashboard v6.3.0</p>
         </div>
     </div>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
