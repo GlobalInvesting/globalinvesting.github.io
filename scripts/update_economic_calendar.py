@@ -1166,52 +1166,86 @@ if events_needing_actual:
 
     if inv_slots:
         enriched = 0
-        # Build a reverse index: (dateISO, timeUTC, currency) → [merged_keys]
-        # so we can find FF events that match a given Investing slot
-        slot_to_keys = {}
+
+        # Normalize event name for fuzzy matching
+        def _norm(s):
+            s = re.sub(r'\s*\([^)]*\)', '', s).lower()
+            return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
+
+        # Build lookup: (dateISO, currency) → list of (key, ev) for FF events needing actual
+        ff_by_date_cur = {}
         for k, ev in merged_values.items():
             if ev.get('actual'):
                 continue
-            slot = (ev['dateISO'], ev.get('timeUTC', ''), ev['currency'])
-            slot_to_keys.setdefault(slot, []).append(k)
+            dc = (ev['dateISO'], ev['currency'])
+            ff_by_date_cur.setdefault(dc, []).append((k, ev))
 
-        for slot, inv_data in inv_slots.items():
-            matching_keys = slot_to_keys.get(slot, [])
+        # Also build a ±1 day lookup so EST→UTC date shifts don't break matching
+        ff_by_date_cur_ext = {}
+        for k, ev in merged_values.items():
+            if ev.get('actual'):
+                continue
+            d = date.fromisoformat(ev['dateISO'])
+            for delta in [-1, 0, 1]:
+                dc = ((d + timedelta(days=delta)).isoformat(), ev['currency'])
+                ff_by_date_cur_ext.setdefault(dc, []).append((k, ev))
 
-            if len(matching_keys) == 1:
-                # Unique slot match — assign directly
-                k = matching_keys[0]
-                updated = dict(merged_values[k])
-                updated['actual'] = inv_data['actual']
-                if inv_data.get('forecast') and not updated.get('forecast'):
-                    updated['forecast'] = inv_data['forecast']
-                if inv_data.get('previous') and not updated.get('previous'):
-                    updated['previous'] = inv_data['previous']
-                merged_values[k] = updated
-                enriched += 1
+        print(f"  [Actuals] FF slots available: {len(ff_by_date_cur)} date+currency combos, "
+              f"Inv actuals: {len(inv_slots)}")
 
-            elif len(matching_keys) > 1:
-                # Multiple FF events in same slot — find best name match
-                def _norm(s):
-                    s = re.sub(r'\s*\([^)]*\)', '', s).lower()
-                    return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
-                inv_words = _norm(inv_data.get('event', ''))
-                best_k, best_score = None, 0.0
-                for k in matching_keys:
-                    ff_words = _norm(merged_values[k]['event'])
+        # Print a sample of inv_slots for debugging
+        sample_inv = list(inv_slots.items())[:5]
+        for slot, d in sample_inv:
+            print(f"  [Actuals] Inv sample: {slot} → {d['event']!r} actual={d['actual']!r}")
+
+        used_keys = set()
+        for (inv_date, inv_time, inv_cur), inv_data in inv_slots.items():
+            # Try exact date first, then ±1 day
+            candidates = ff_by_date_cur.get((inv_date, inv_cur), [])
+            if not candidates:
+                candidates = ff_by_date_cur_ext.get((inv_date, inv_cur), [])
+
+            # Filter out already-used keys
+            candidates = [(k, ev) for k, ev in candidates if k not in used_keys]
+            if not candidates:
+                continue
+
+            inv_words = _norm(inv_data.get('event', ''))
+
+            if len(candidates) == 1:
+                k, ev = candidates[0]
+                # Accept if name overlap ≥ 1 word or name is very short
+                ff_words = _norm(ev['event'])
+                score = len(inv_words & ff_words) / max(len(inv_words | ff_words), 1)
+                if score >= 0.2 or len(inv_words) <= 2:
+                    updated = dict(ev)
+                    updated['actual'] = inv_data['actual']
+                    if inv_data.get('forecast') and not updated.get('forecast'):
+                        updated['forecast'] = inv_data['forecast']
+                    if inv_data.get('previous') and not updated.get('previous'):
+                        updated['previous'] = inv_data['previous']
+                    merged_values[k] = updated
+                    used_keys.add(k)
+                    enriched += 1
+            else:
+                # Multiple candidates — pick best name match
+                best_k, best_ev, best_score = None, None, 0.0
+                for k, ev in candidates:
+                    ff_words = _norm(ev['event'])
                     if not inv_words or not ff_words:
                         continue
-                    score = len(inv_words & ff_words) / max(len(inv_words), len(ff_words))
+                    score = len(inv_words & ff_words) / max(len(inv_words | ff_words), 1)
                     if score > best_score:
-                        best_score, best_k = score, k
-                if best_k and best_score >= 0.3:
-                    updated = dict(merged_values[best_k])
+                        best_score, best_k, best_ev = score, k, ev
+                if best_k and best_score >= 0.25:
+                    updated = dict(best_ev)
                     updated['actual'] = inv_data['actual']
                     if inv_data.get('forecast') and not updated.get('forecast'):
                         updated['forecast'] = inv_data['forecast']
                     if inv_data.get('previous') and not updated.get('previous'):
                         updated['previous'] = inv_data['previous']
                     merged_values[best_k] = updated
+                    used_keys.add(best_k)
                     enriched += 1
 
         print(f"  [Actuals] Enriched {enriched} / {len(events_needing_actual)} events")
