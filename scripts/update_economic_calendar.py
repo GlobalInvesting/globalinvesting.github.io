@@ -201,13 +201,19 @@ def fetch_forexfactory_xml(target_dates):
             if items:
                 sample = items[0]
                 print(f"  [FF] Sample keys: {list(sample.keys())[:8]}")
-                print(f"  [FF] Sample date={sample.get('date','?')!r} currency={sample.get('currency','?')!r} impact={sample.get('impact','?')!r}")
+                print(f"  [FF] Sample date={sample.get('date','?')!r} country={sample.get('country','?')!r} impact={sample.get('impact','?')!r}")
             events = []
             skip_date = skip_cur = skip_imp = 0
             for item in items:
                 try:
-                    currency = str(item.get('currency', '')).upper()
-                    if currency not in TRACKED_CURRENCIES:
+                    # FF JSON uses 'country' with country name (e.g. "Japan"), not 'currency'
+                    country_raw = str(item.get('country', item.get('currency', ''))).strip()
+                    currency = resolve_currency(country_raw)
+                    if not currency:
+                        # Try direct currency code match
+                        c = country_raw.upper()
+                        currency = c if c in TRACKED_CURRENCIES else None
+                    if not currency:
                         skip_cur += 1
                         continue
 
@@ -1031,37 +1037,65 @@ if events_needing_actual:
             {today - timedelta(days=i) for i in range(3)}
         )
         enriched = 0
+
+        # Build a lookup: (dateISO, timeUTC, currency) → [inv_ev, ...]
+        # Investing.com times are already UTC. Match slot exactly.
+        from collections import defaultdict as _dd
+        inv_by_slot = _dd(list)
         for inv_ev in investing_recent:
-            if not inv_ev.get('actual'):
+            if inv_ev.get('actual'):
+                slot = (inv_ev['dateISO'], inv_ev.get('timeUTC',''), inv_ev['currency'])
+                inv_by_slot[slot].append(inv_ev)
+
+        for k, ev in list(merged_values.items()):
+            if ev.get('actual'):
                 continue
-            # Match by (dateISO, currency) and fuzzy name
-            for k, ev in list(merged_values.items()):
-                if (ev['dateISO'] != inv_ev['dateISO'] or
-                        ev['currency'] != inv_ev['currency'] or
-                        ev.get('actual')):
-                    continue
-                # Name similarity: normalize and check overlap
+            slot = (ev['dateISO'], ev.get('timeUTC',''), ev['currency'])
+            candidates = inv_by_slot.get(slot, [])
+
+            if len(candidates) == 1:
+                # Exact unique slot match — assign actual directly
+                inv_ev = candidates[0]
+                updated = dict(ev)
+                updated['actual'] = inv_ev['actual']
+                if inv_ev.get('forecast') and not ev.get('forecast'):
+                    updated['forecast'] = inv_ev['forecast']
+                if inv_ev.get('previous') and not ev.get('previous'):
+                    updated['previous'] = inv_ev['previous']
+                merged_values[k] = updated
+                enriched += 1
+            elif len(candidates) > 1:
+                # Multiple events in same slot — use name similarity as tiebreaker
                 def _norm(s):
                     s = re.sub(r'\s*\([^)]*\)', '', s).lower()
-                    return re.sub(r'[^a-z0-9 ]', ' ', s).split()
-                words_a = set(_norm(ev['event']))
-                words_b = set(_norm(inv_ev['event']))
-                if not words_a or not words_b:
-                    continue
-                overlap = len(words_a & words_b) / max(len(words_a), len(words_b))
-                if overlap >= 0.5:
+                    return set(re.sub(r'[^a-z0-9 ]', ' ', s).split())
+                words_ev = _norm(ev['event'])
+                best_match = None
+                best_score = 0.0
+                for cand in candidates:
+                    words_c = _norm(cand['event'])
+                    if not words_ev or not words_c:
+                        continue
+                    score = len(words_ev & words_c) / max(len(words_ev), len(words_c))
+                    if score > best_score:
+                        best_score = score
+                        best_match = cand
+                if best_match and best_score >= 0.3:
                     updated = dict(ev)
-                    updated['actual'] = inv_ev['actual']
-                    if inv_ev.get('forecast') and not ev.get('forecast'):
-                        updated['forecast'] = inv_ev['forecast']
-                    if inv_ev.get('previous') and not ev.get('previous'):
-                        updated['previous'] = inv_ev['previous']
+                    updated['actual'] = best_match['actual']
+                    if best_match.get('forecast') and not ev.get('forecast'):
+                        updated['forecast'] = best_match['forecast']
+                    if best_match.get('previous') and not ev.get('previous'):
+                        updated['previous'] = best_match['previous']
                     merged_values[k] = updated
                     enriched += 1
-                    break
+
         print(f"  [Actuals] Enriched {enriched} events with actual values from Investing.com")
+        print(f"  [Actuals] Investing slots available: {len(inv_by_slot)}, FF events needing actual: {len(events_needing_actual)}")
     except Exception as _ae:
+        import traceback
         print(f"  [Actuals] Investing.com enrichment failed: {_ae}")
+        print(f"  [Actuals] {traceback.format_exc()[:300]}")
 
 # ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
