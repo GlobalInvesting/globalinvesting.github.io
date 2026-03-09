@@ -198,16 +198,23 @@ def fetch_forexfactory_xml(target_dates):
                 continue
 
             print(f"  [FF] {len(items)} events in JSON")
+            if items:
+                sample = items[0]
+                print(f"  [FF] Sample keys: {list(sample.keys())[:8]}")
+                print(f"  [FF] Sample date={sample.get('date','?')!r} currency={sample.get('currency','?')!r} impact={sample.get('impact','?')!r}")
             events = []
+            skip_date = skip_cur = skip_imp = 0
             for item in items:
                 try:
                     currency = str(item.get('currency', '')).upper()
                     if currency not in TRACKED_CURRENCIES:
+                        skip_cur += 1
                         continue
 
                     impact_raw = str(item.get('impact', 'Low')).capitalize()
                     impact = IMPACT_MAP.get(impact_raw)
                     if impact is None:
+                        skip_imp += 1
                         continue
 
                     event_name = str(item.get('title', item.get('name', ''))).strip()
@@ -216,7 +223,13 @@ def fetch_forexfactory_xml(target_dates):
 
                     date_str = str(item.get('date', ''))
                     event_date = _parse_ff_date(date_str)
-                    if not event_date or event_date not in target_dates:
+                    if not event_date:
+                        skip_date += 1
+                        continue
+                    # FF covers the current week — expand the window by ±7 days to be safe
+                    extended = target_dates | {today - timedelta(days=i) for i in range(1, 8)}
+                    if event_date not in extended:
+                        skip_date += 1
                         continue
 
                     time_utc = _parse_ff_time(str(item.get('time', '')))
@@ -238,9 +251,11 @@ def fetch_forexfactory_xml(target_dates):
                         'forecast': forecast,
                         'previous': previous,
                     })
-                except Exception:
+                except Exception as _ie:
+                    print(f"  [FF] Item error: {_ie}")
                     continue
 
+            print(f"  [FF] Skipped: date={skip_date} cur={skip_cur} impact={skip_imp}")
             if events:
                 print(f"  [FF] ✅ Parsed {len(events)} events from JSON (with actuals)")
                 return events
@@ -902,30 +917,24 @@ print(f"\nTarget: {from_date} → {to_date} ({len(target_dates)} days)\n")
 
 CALENDAR_PATH = 'calendar-data/calendar.json'
 
-# ── STEP 1: Load the existing JSON as the base ──────────────────────────────
-# The key insight: Investing.com only returns events from TODAY onwards.
-# So we MUST preserve events from previous runs for earlier days of the week.
-# Strategy: start with all events from the existing JSON that are still
-# within our display window (>= yesterday), then OVERWRITE/ADD with fresh
-# data fetched now (for today and future).  Fresh data takes priority so
-# actual values and forecasts get updated in real time.
-base_events = {}   # key → event dict  (key = dateISO+currency+event[:25])
+# ── STEP 1: Load the existing JSON as the base (full historical accumulation) ──
+# All past events are preserved indefinitely in the JSON.
+# Fresh data from live sources will OVERWRITE matching events (updating actuals/forecasts).
+base_events = {}   # key → event dict
 try:
     with open(CALENDAR_PATH, encoding='utf-8') as _f:
         _prev = json.load(_f)
-    keep_from = today - timedelta(days=1)
     kept = 0
     for _ev in _prev.get('events', []):
         try:
-            _d = date.fromisoformat(_ev['dateISO'])
-            if _d >= keep_from:
-                _k = (_ev['dateISO'], _ev['currency'], _ev['event'][:25].lower().strip())
-                base_events[_k] = _ev
-                kept += 1
+            _k = (_ev['dateISO'], _ev['currency'], _ev['event'][:25].lower().strip())
+            base_events[_k] = _ev
+            kept += 1
         except Exception:
             pass
+    all_dates = sorted(set(e['dateISO'] for e in base_events.values()))
     print(f"  [Base] Loaded {kept} events from previous JSON "
-          f"(dates: {sorted(set(e['dateISO'] for e in base_events.values()))[:5]})")
+          f"(dates: {all_dates[:3]}...{all_dates[-3:] if len(all_dates) > 3 else ''})")
 except FileNotFoundError:
     print("  [Base] No previous calendar.json — starting fresh")
 except Exception as _e:
@@ -977,14 +986,82 @@ if not all_events and not base_events:
 # Strategy: if we got fresh events from a live source, use ONLY those (avoids
 # mixing base duplicates). Only fall back to base if fresh fetch failed entirely.
 if all_events:
-    # Fresh source worked — use it directly, no base mixing
-    merged_values = {(ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip()): ev
-                     for ev in all_events}
-    print(f"  [Merge] Using fresh-only: {len(all_events)} events from {source_used}")
+    # Start from full historical base, then overwrite with fresh data
+    # This preserves all past events AND updates forecasts/actuals with latest data
+    merged_values = dict(base_events)  # copy full history
+    fresh_added = fresh_updated = 0
+    for ev in all_events:
+        k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
+        if k in merged_values:
+            existing = merged_values[k]
+            # Update: fresh data wins on forecast/previous; actual only updates if fresh has one
+            updated = dict(existing)
+            if ev.get('forecast'): updated['forecast'] = ev['forecast']
+            if ev.get('previous'): updated['previous'] = ev['previous']
+            if ev.get('actual'):   updated['actual']   = ev['actual']
+            # Always update impact and event name from fresh source
+            updated['impact'] = ev['impact']
+            merged_values[k] = updated
+            fresh_updated += 1
+        else:
+            merged_values[k] = ev
+            fresh_added += 1
+    print(f"  [Merge] base={len(base_events)} + fresh={len(all_events)} → {len(merged_values)} total "
+          f"(added={fresh_added}, updated={fresh_updated})")
 else:
     # Fresh failed — use base as fallback
     merged_values = base_events
     print(f"  [Merge] Fresh failed — using base only: {len(base_events)} events")
+
+# ── STEP 3a: Enrich actuals from Investing.com ───────────────────────────────
+# FF XML has no actuals. After merging, fetch today's events from Investing.com
+# (which DOES return actuals for events that already published today/yesterday)
+# and patch them into our merged set.
+events_needing_actual = [ev for ev in merged_values.values()
+                         if not ev.get('actual') and
+                         date.fromisoformat(ev['dateISO']) >= today - timedelta(days=2) and
+                         date.fromisoformat(ev['dateISO']) <= today]
+if events_needing_actual:
+    print(f"\n  [Actuals] Fetching Investing.com to fill actuals for "
+          f"{len(events_needing_actual)} events (today/yesterday without actual)...")
+    try:
+        investing_recent = fetch_investing_calendar(
+            (today - timedelta(days=2)).isoformat(),
+            today.isoformat(),
+            {today - timedelta(days=i) for i in range(3)}
+        )
+        enriched = 0
+        for inv_ev in investing_recent:
+            if not inv_ev.get('actual'):
+                continue
+            # Match by (dateISO, currency) and fuzzy name
+            for k, ev in list(merged_values.items()):
+                if (ev['dateISO'] != inv_ev['dateISO'] or
+                        ev['currency'] != inv_ev['currency'] or
+                        ev.get('actual')):
+                    continue
+                # Name similarity: normalize and check overlap
+                def _norm(s):
+                    s = re.sub(r'\s*\([^)]*\)', '', s).lower()
+                    return re.sub(r'[^a-z0-9 ]', ' ', s).split()
+                words_a = set(_norm(ev['event']))
+                words_b = set(_norm(inv_ev['event']))
+                if not words_a or not words_b:
+                    continue
+                overlap = len(words_a & words_b) / max(len(words_a), len(words_b))
+                if overlap >= 0.5:
+                    updated = dict(ev)
+                    updated['actual'] = inv_ev['actual']
+                    if inv_ev.get('forecast') and not ev.get('forecast'):
+                        updated['forecast'] = inv_ev['forecast']
+                    if inv_ev.get('previous') and not ev.get('previous'):
+                        updated['previous'] = inv_ev['previous']
+                    merged_values[k] = updated
+                    enriched += 1
+                    break
+        print(f"  [Actuals] Enriched {enriched} events with actual values from Investing.com")
+    except Exception as _ae:
+        print(f"  [Actuals] Investing.com enrichment failed: {_ae}")
 
 # ── STEP 3b: Conservative dedup — only remove true aliases (same event, different source name) ──
 # "Japan Leading Index MoM" == "Leading Index (MoM) (Jan)" → deduplicate (short alias ≤4 tokens contained in longer)
@@ -1050,17 +1127,13 @@ def sort_key(ev):
 
 unique_events.sort(key=sort_key)
 
-# Final filter: keep yesterday + today + future (covers all timezones UTC-12→+14)
-final_events = []
-for ev in unique_events:
-    try:
-        if date.fromisoformat(ev['dateISO']) >= today - timedelta(days=1):
-            final_events.append(ev)
-    except Exception:
-        pass
+# Keep ALL events (full history + future) — no date cutoff
+# Display window is controlled by the frontend, not the scraper
+final_events = unique_events
 
-print(f"\n  [Result] fresh={len(all_events)} → deduped={len(deduped)} → final={len(final_events)}")
-print(f"  [Dates] {sorted(set(e['dateISO'] for e in final_events))[:7]}")
+print(f"\n  [Result] fresh={len(all_events)} → merged={len(merged_values)} → deduped={len(deduped)} → final={len(final_events)}")
+all_dates_final = sorted(set(e['dateISO'] for e in final_events))
+print(f"  [Dates] {all_dates_final[:4]}...{all_dates_final[-4:] if len(all_dates_final) > 4 else ''}")
 
 # ── STEP 4: Stats and save ─────────────────────────────────────────────────
 currency_counts = {}
@@ -1084,7 +1157,7 @@ output = {
         'investing.com/economic-calendar, o tradingeconomics.com/calendar'
     ),
     'fetchErrors':    fetch_errors if not data_ok else [],
-    'rangeFrom':      from_date.isoformat(),
+    'rangeFrom':      (all_dates_final[0] if all_dates_final else from_date.isoformat()),
     'rangeTo':        to_date.isoformat(),
     'totalEvents':    len(final_events),
     'currencyCounts': currency_counts,
