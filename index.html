@@ -1962,7 +1962,7 @@ const generateHistoricalData = async (currentData, setDataLoadingStatus) => {
     return historical;
 };
 
-const generateForexPairRecommendations = (economicData, forexRates) => {
+const generateForexPairRecommendations = (economicData, forexRates, calendarEvents = null) => {
     const cacheKey = 'forex_pair_recommendations';
     const cached = CacheManager.get(cacheKey);
     if (cached !== null) return cached;
@@ -1971,7 +1971,7 @@ const generateForexPairRecommendations = (economicData, forexRates) => {
     const strengthScores = {};
     countries.forEach(country => {
         const data = economicData[country.code] || {};
-        const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
+        const strengthObj = calculateStrength(country.code, data, forexRates, economicData, calendarEvents);
         strengthScores[country.code] = {
             score: strengthObj.score,
             dataQuality: strengthObj.dataQuality,
@@ -4764,7 +4764,7 @@ if (aiData && Object.keys(aiData).length > 0) {
 }
 
                         setDataLoadingStatus({ status: 'Generando recomendaciones de pares...', progress: 98 });
-                        const pairRecommendations = generateForexPairRecommendations(loadedData, rates);
+                        const pairRecommendations = generateForexPairRecommendations(loadedData, rates, calendarResult?.events || null);
 setDynamicAlerts(pairRecommendations);
 
                         setDataLoadingStatus({ status: 'Completado', progress: 100 });
