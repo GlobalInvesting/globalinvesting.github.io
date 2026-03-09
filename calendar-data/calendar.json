@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T03:19:32.701075Z",
+  "generatedAt": "2026-03-09T03:24:46.794406Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "ForexFactory XML",
@@ -8,13 +8,13 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-08",
   "rangeTo": "2026-04-08",
-  "totalEvents": 87,
+  "totalEvents": 82,
   "currencyCounts": {
     "JPY": 12,
-    "GBP": 14,
-    "AUD": 7,
     "EUR": 15,
     "CHF": 1,
+    "AUD": 4,
+    "GBP": 12,
     "USD": 28,
     "NZD": 3,
     "CAD": 7
@@ -22,7 +22,7 @@
   "impactCounts": {
     "high": 11,
     "medium": 5,
-    "low": 71
+    "low": 66
   },
   "events": [
     {
@@ -63,32 +63,6 @@
       "actual": "",
       "forecast": "3.19T",
       "previous": "2.70T"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "BRC Retail Sales Monitor y/y",
-      "impact": "low",
-      "actual": "",
-      "forecast": "2.1%",
-      "previous": "2.3%"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "NAB Business Confidence",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "3"
     },
     {
       "date": "9 Mar",
@@ -406,32 +380,6 @@
       "date": "11 Mar",
       "dateISO": "2026-03-11",
       "timeUTC": "",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "MI Inflation Expectations",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "5.0%"
-    },
-    {
-      "date": "11 Mar",
-      "dateISO": "2026-03-11",
-      "timeUTC": "",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "RICS House Price Balance",
-      "impact": "low",
-      "actual": "",
-      "forecast": "-9%",
-      "previous": "-10%"
-    },
-    {
-      "date": "11 Mar",
-      "dateISO": "2026-03-11",
-      "timeUTC": "",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
@@ -583,19 +531,6 @@
       "actual": "",
       "forecast": "",
       "previous": "5.0%"
-    },
-    {
-      "date": "12 Mar",
-      "dateISO": "2026-03-12",
-      "timeUTC": "",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "NAB Quarterly Business Confidence",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "2"
     },
     {
       "date": "12 Mar",
