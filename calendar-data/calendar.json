@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-09",
-  "generatedAt": "2026-03-09T20:04:16.217017Z",
+  "generatedAt": "2026-03-09T20:14:57.787419Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
   "source": "Investing.com",
@@ -8,11 +8,11 @@
   "fetchErrors": [],
   "rangeFrom": "2026-03-08",
   "rangeTo": "2026-04-08",
-  "totalEvents": 100,
+  "totalEvents": 93,
   "currencyCounts": {
-    "JPY": 20,
-    "USD": 33,
-    "EUR": 20,
+    "JPY": 15,
+    "USD": 32,
+    "EUR": 19,
     "CHF": 1,
     "AUD": 4,
     "GBP": 12,
@@ -20,9 +20,9 @@
     "CAD": 7
   },
   "impactCounts": {
-    "high": 10,
+    "high": 9,
     "medium": 13,
-    "low": 77
+    "low": 71
   },
   "events": [
     {
@@ -84,19 +84,6 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Leading Indicators",
-      "impact": "low",
-      "actual": "",
-      "forecast": "113.0%",
-      "previous": "110.2%"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "05:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
       "event": "Japan Coincident Indicator MoM",
       "impact": "low",
       "actual": "2.5%",
@@ -123,37 +110,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Economy Watchers Sentiment",
-      "impact": "low",
-      "actual": "",
-      "forecast": "48.1",
-      "previous": "47.6"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "06:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
       "event": "Japan Economy Watchers Current Index",
       "impact": "low",
       "actual": "48.9",
       "forecast": "48.1",
       "previous": "47.6"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "07:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "German Factory Orders m/m",
-      "impact": "low",
-      "actual": "",
-      "forecast": "-4.2%",
-      "previous": "7.8%"
     },
     {
       "date": "9 Mar",
@@ -344,19 +305,6 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Household Spending y/y",
-      "impact": "low",
-      "actual": "",
-      "forecast": "2.3%",
-      "previous": "-2.6%"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "23:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
       "event": "Japan Household Spending MoM",
       "impact": "medium",
       "actual": "",
@@ -388,32 +336,6 @@
       "actual": "",
       "forecast": "3.4%",
       "previous": "3.4%"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Final GDP q/q",
-      "impact": "low",
-      "actual": "",
-      "forecast": "0.3%",
-      "previous": "0.1%"
-    },
-    {
-      "date": "9 Mar",
-      "dateISO": "2026-03-09",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "M2 Money Stock y/y",
-      "impact": "low",
-      "actual": "",
-      "forecast": "1.5%",
-      "previous": "1.6%"
     },
     {
       "date": "9 Mar",
@@ -1220,19 +1142,6 @@
       "actual": "",
       "forecast": "0.4%",
       "previous": "0.4%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Prelim GDP q/q",
-      "impact": "high",
-      "actual": "",
-      "forecast": "1.4%",
-      "previous": "1.4%"
     },
     {
       "date": "13 Mar",
