@@ -580,15 +580,75 @@ def score_event(ev):
     return s
 
 def are_true_duplicates(name_a, name_b):
-    """Only deduplicate if one name is clearly a short alias contained in the other (≤4 tokens)."""
-    na, nb = normalize_name(name_a), normalize_name(name_b)
-    if not na or not nb or na == nb:
-        return na == nb
+    """Deduplica si los nombres comparten suficiente contenido semántico.
+    Estrategia dual:
+    1. Alias corto: un nombre (≤4 tokens) está contenido en el otro,
+       siempre que no haya palabras diferenciadores (core, 3-month, etc.)
+    2. Solapamiento semántico: comparten ≥2 palabras clave de contenido (no stopwords)
+    """
+    def _norm(name):
+        n = re.sub(r'\s*\([^)]*\)', '', name)
+        n = re.sub(r'[^a-z0-9]+', ' ', n.lower())   # reemplazar con espacio, no eliminar
+        n = re.sub(r'\bgross domestic product\b', 'gdp', n)
+        n = re.sub(r'\bconsumer price index\b', 'cpi', n)
+        n = re.sub(r'\bpurchasing managers\b', 'pmi', n)
+        n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)\b', '', n)
+        return re.sub(r'\s+', ' ', n).strip()
+
+    STOPWORDS = {'a', 'an', 'the', 'of', 'in', 'on', 'at', 'to', 'by', 'or',
+                 'mm', 'qoq', 'yoy', 'mom', 'q', 'y', 'm', 'sa', 'nsa',
+                 'rate', 'change', 'data', 'flash', 'final', 'prelim',
+                 'preliminary', 'revised', 'report', 'survey', 'release',
+                 'monthly', 'quarterly', 'annual', 'weekly', 'current',
+                 'total', 'net', 'new', 'all', 'index'}
+    # Palabras que diferencian eventos aunque el resto del nombre se solape
+    DIFFERENTIATORS = {'core', 'headline', 'underlying', 'trimmed', 'ex', 'excluding',
+                       'external', 'domestic', 'capital', 'expenditure', 'capacity',
+                       '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '12', '30'}
+
+    na, nb = _norm(name_a), _norm(name_b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+
+    # Helper: palabras de contenido (sin stopwords)
+    def content_words(s):
+        return {w for w in s.split() if w not in STOPWORDS and len(w) > 2}
+
+    def all_words(s):
+        """Todas las palabras incluyendo números cortos (para diferenciadores)."""
+        return {w for w in s.split() if w not in STOPWORDS}
+
+    words_a = content_words(na)
+    words_b = content_words(nb)
+    # Diferenciadores: incluir números cortos (1,2,3...) usando all_words
+    all_a = all_words(na)
+    all_b = all_words(nb)
+    diff_a = all_a & DIFFERENTIATORS
+    diff_b = all_b & DIFFERENTIATORS
+    if diff_a - diff_b or diff_b - diff_a:
+        return False
+
+    # Estrategia 1: alias corto contenido en el nombre largo
     short, long_ = (na, nb) if len(na) <= len(nb) else (nb, na)
-    tokens = short.split()
-    if len(tokens) > 4:
-        return False  # too specific — likely a distinct event, not just an alias
-    return short in long_
+    tokens_short = short.split()
+    if len(tokens_short) <= 4 and short in long_:
+        return True
+
+    # Estrategia 2: solapamiento semántico
+    if not words_a or not words_b:
+        return False
+    overlap = words_a & words_b
+    min_len = min(len(words_a), len(words_b))
+    # Nombre muy corto (1-2 palabras útiles): basta 1 palabra si ≥80% match
+    if min_len <= 2 and len(overlap) >= 1 and len(overlap) / max(min_len, 1) >= 0.8:
+        return True
+    # Caso general: ≥2 palabras y ≥60% del nombre más corto
+    if len(overlap) >= 2 and len(overlap) / max(min_len, 1) >= 0.6:
+        return True
+
+    return False
 
 from collections import defaultdict
 slot_groups = defaultdict(list)
