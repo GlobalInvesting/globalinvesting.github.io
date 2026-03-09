@@ -263,17 +263,41 @@ def calculate_score(currency, econ_data, fx_data, cot_data, ext_data, all_econ):
             "businessConfidence": ed.get("businessConfidence"),
         })
 
-    # Extended data
+    # Extended data — BUG FIX: values are nested inside ["data"] subkey
     if ext_data:
-        data["termsOfTrade"] = ext_data.get("termsOfTrade")
-        data["capitalFlows"] = ext_data.get("capitalFlows")
-        data["bond10y"]      = ext_data.get("bond10y")
-        data["outlookScore"] = ext_data.get("outlookScore")
+        ext = ext_data.get("data", {})
+        data["bond10y"]           = ext.get("bond10y")
+        data["capitalFlows"]      = ext.get("capitalFlows")
+        data["consumerConfidence"]= ext.get("consumerConfidence")
+        data["businessConfidence"]= ext.get("businessConfidence")
+        # rateMomentum: prefer ext-data (12M calculated) over rates-history fallback
+        data["_rm_ext"]           = ext.get("rateMomentum")
+        data["_rm24_ext"]         = ext.get("rateMomentum24M")
+
+    # termsOfTrade: comes from economic-data, already loaded above (correct)
 
     # Policy rate and momentum
-    rate, momentum = get_rate_and_momentum(currency)
-    data["interestRate"]  = rate
-    data["rateMomentum"]  = momentum
+    rate, momentum_rates = get_rate_and_momentum(currency)
+    data["interestRate"] = rate
+    # Use ext rateMomentum if available (more precise), fall back to rates-history
+    data["rateMomentum"] = data.pop("_rm_ext", None) or momentum_rates
+
+    # outlookScore: derive from rateMomentum24M + rateMomentum (mirrors index.html logic)
+    # index.html: Hawkish=90, Neutral=50, Dovish=10
+    rm12  = data["rateMomentum"] or 0
+    rm24  = data.pop("_rm24_ext", None) or rm12
+    # Replicate FIX-A composite: use 24M only to amplify hawkish signal
+    rm_composite = rm24 if rm24 >= 0.25 else rm12
+    if rm_composite >= 0.25:
+        outlook_str = "Hawkish"
+    elif rm_composite <= -0.80:
+        outlook_str = "Dovish"
+    elif rm12 < -0.20:
+        outlook_str = "Dovish"
+    else:
+        outlook_str = "Neutral"
+    # Map to numeric score (matches index.html case 'outlook_direction')
+    data["outlookScore"] = {"Hawkish": 90, "Neutral": 50, "Dovish": 10}[outlook_str]
 
     # COT
     if cot_data:
@@ -287,11 +311,13 @@ def calculate_score(currency, econ_data, fx_data, cot_data, ext_data, all_econ):
     data["economicSurprise"] = data.get("economicSurprise", 50)
 
     # Build all_data dict for cross-sectional normalization
+    # BUG FIX: include interestRate so the median-relative scoring works correctly
     all_data = {}
     for cur in CURRENCIES:
-        ed2 = load_json(f"{ECON_DIR}/{cur}.json").get("data", {})
-        ext2 = load_json(f"{EXT_DIR}/{cur}.json") if os.path.exists(f"{EXT_DIR}/{cur}.json") else {}
-        all_data[cur] = {**ed2, **ext2}
+        ed2   = load_json(f"{ECON_DIR}/{cur}.json").get("data", {})
+        ext2  = load_json(f"{EXT_DIR}/{cur}.json").get("data", {}) if os.path.exists(f"{EXT_DIR}/{cur}.json") else {}
+        rate2, _ = get_rate_and_momentum(cur)
+        all_data[cur] = {**ed2, **ext2, "interestRate": rate2}
 
     # Score each indicator
     weighted_sum = 0.0
