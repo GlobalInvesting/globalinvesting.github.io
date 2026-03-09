@@ -27,6 +27,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Generate historical score snapshots
+        run: python3 scripts/generate_historical_scores.py
+
       - name: Run backtest
         run: |
           MIN_DIFF="${{ github.event.inputs.min_diff || '12' }}"
@@ -37,7 +43,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add backtest-results/
+          git add backtest-results/ scores-history/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
