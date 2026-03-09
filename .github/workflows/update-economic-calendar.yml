@@ -1,4 +1,4 @@
-name: Update Economic Calendar - v6 (FF XML primary source)
+name: Update Economic Calendar - v7 (Investing.com JSON API primary source)
 
 on:
   schedule:
@@ -49,7 +49,7 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to calendar data"
           else
-            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v6.0 FF XML"
+            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v7.0 Investing.com"
             git pull --rebase origin main || true
             git push
           fi
