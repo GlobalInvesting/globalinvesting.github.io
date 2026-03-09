@@ -38,6 +38,7 @@ TRADING_ECONOMICS_URLS = {
     'retailSales':      'https://tradingeconomics.com/country-list/retail-sales-mom',
     'wageGrowth':       'https://tradingeconomics.com/country-list/wage-growth',
     'manufacturingPMI': 'https://tradingeconomics.com/country-list/manufacturing-pmi',
+    'servicesPMI':      'https://tradingeconomics.com/country-list/services-pmi',
     'termsOfTrade':     'https://tradingeconomics.com/country-list/terms-of-trade',
 }
 
@@ -51,6 +52,7 @@ INDICATOR_PAGES = {
     'retailSales':      'retail-sales',
     'wageGrowth':       'wage-growth',
     'manufacturingPMI': 'manufacturing-pmi',
+    'servicesPMI':      'services-pmi',
     'production':       'industrial-production',
 }
 
@@ -538,7 +540,7 @@ for curr in CURRENCIES:
     }
     with open(f'economic-data/{curr}.json', 'w') as f:
         json.dump(pkg, f, indent=2)
-    missing = [k for k in ['retailSales','wageGrowth','manufacturingPMI','termsOfTrade']
+    missing = [k for k in ['retailSales','wageGrowth','manufacturingPMI','servicesPMI','termsOfTrade']
                if all_data[curr].get(k) is None]
     tot    = all_data[curr].get('termsOfTrade')
     status = '✓' if not missing else '⚠'
