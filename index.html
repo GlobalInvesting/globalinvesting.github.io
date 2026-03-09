@@ -3590,7 +3590,8 @@ const calculateCotContrarianAdj = (data, countryObj) => {
             upper: parseFloat(confidenceInterval.upper.toFixed(1))
         },
         contributions,
-        dataQuality: parseFloat(dataQuality.toFixed(2))
+        dataQuality: parseFloat(dataQuality.toFixed(2)),
+        scoringData
     };
 };
 
@@ -5494,7 +5495,7 @@ const sentiment = getSentiment(strength);
 <HeatmapCell value={data.capitalFlows} type="capitalFlows" currency={country.code} indicator="capitalFlows" lastUpdate={data.capitalFlowsDate} />
 <HeatmapCell value={data.inflationExpectations} type="inflationExpectations" currency={country.code} indicator="inflationExpectations" lastUpdate={data.inflationExpectationsDate} />
 <HeatmapCell value={data.termsOfTrade} type="termsOfTrade" currency={country.code} indicator="termsOfTrade" lastUpdate={data.termsOfTradeDate} />
-<HeatmapCell value={data.economicSurprise} type="economicSurprise" currency={country.code} indicator="economicSurprise" lastUpdate={data.economicSurpriseDate} />
+<HeatmapCell value={(strengthObj.scoringData || {}).economicSurprise ?? null} type="economicSurprise" currency={country.code} indicator="economicSurprise" lastUpdate={data.lastUpdate} />
                                                     </tr>
                                                 );
                                             })}
