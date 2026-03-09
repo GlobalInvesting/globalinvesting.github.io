@@ -4301,8 +4301,8 @@ const getSentiment = (strength) => {
     
     // Bandas fijas escala 0–100
     // < 53 = Débil · 53–62 = Neutral · > 62 = Fuerte
-    if (numStrength > 63) return 'alcista';
-    if (numStrength < 53) return 'bajista';
+    if (numStrength > 60) return 'alcista';
+    if (numStrength < 50) return 'bajista';
     return 'neutral';
 };
 
