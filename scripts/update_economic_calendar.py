@@ -650,6 +650,7 @@ def fetch_investing_html_actuals(from_str, to_str):
             r0 = rows[0]
             act_td = r0.find("td", id=re.compile("eventActual_"))
             print(f"  [Inv HTML] Sample actual cell: {act_td}")
+            print(f"  [Inv HTML] Sample row attrs: data-currency={repr(r0.get('data-currency'))} data-event-datetime={repr(r0.get('data-event-datetime'))}")
 
         results = {}  # (dateISO, timeUTC, currency) → event dict
         _dbg_no_actual = 0
@@ -677,7 +678,12 @@ def fetch_investing_html_actuals(from_str, to_str):
                 raw_time_est = f"{m_t.group(1)}:{m_t.group(2)}" if m_t else ''
                 time_utc, event_date = est_to_utc(raw_time_est, event_date)
 
-                currency = row.get('data-currency', '').strip().upper()
+                currency = row.attrs.get('data-currency', '') or ''
+                # Fallback: read from the currency <td> if attr missing
+                if not currency or currency not in TRACKED_CURRENCIES:
+                    cur_td = row.find('td', class_=re.compile(r'flagCur|currency'))
+                    if cur_td:
+                        currency = cur_td.get_text(strip=True).upper()
                 if currency not in TRACKED_CURRENCIES:
                     _dbg_no_currency += 1
                     continue
