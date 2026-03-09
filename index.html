@@ -3009,29 +3009,8 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         // Fórmula: 50 + (raw - 40) * (65 / 90)
         scoringData.consumerConfidence = Math.round((50 + (raw - 40) * (65 / 90)) * 10) / 10;
     }
-}
 
-// ── v6.3: ECONOMIC SURPRISE INDEX (ESI) PROXY ────────────────────────────────
-// Mide si los datos recientes de una divisa SUPERARON o DECEPCIONARON expectativas.
-// Es el gap metodológico más importante vs modelos institucionales (Citi ESI, Bloomberg).
-//
-// Arquitectura híbrida (2 componentes):
-//
-// COMPONENTE A (60%): Calendar actual-vs-forecast
-//   Fuente: calendar-data/calendar.json (ForexFactory)
-//   Cuando un dato económico se publica, compara actual vs forecast del consenso.
-//   Si actual > forecast (para indicadores positivos) → sorpresa positiva.
-//   Disponibilidad: solo cuando el dato ya fue publicado (actual !== '').
-//
-// COMPONENTE B (40%): G8 relative z-score
-//   Mide si la divisa está por encima o debajo del promedio G8 en indicadores clave.
-//   Siempre disponible, capta sorpresas relativas entre pares.
-//   Ejemplo: USD inflación 2.4% vs G8 promedio 1.9% → relativo positivo.
-//
-// El ESI resultante (0-100, neutral=50) se inyecta en scoringData y se pondera
-// al 4% en TRADING_WEIGHTS — impacto máximo ±2 pts en el score total.
-// ─────────────────────────────────────────────────────────────────────────────
-{
+    // ── v6.3: ESI PROXY (inside calculateStrength) ─────────────────────────
     // — Componente B: G8 z-score relativo —
     const ESI_INDICATORS = [
         { key: 'gdpGrowth',       invert: false },
@@ -3151,8 +3130,6 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
         : compB;                          // Fallback: z-score only
 
     scoringData.economicSurprise = Math.round(esiScore * 10) / 10;
-}
-// ── END ESI ──────────────────────────────────────────────────────────────────
 
     Object.keys(TRADING_WEIGHTS).forEach(indicator => {
         const value = scoringData[indicator];
