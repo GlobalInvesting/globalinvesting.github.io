@@ -648,7 +648,7 @@ def fetch_official_rss(target_dates):
 # ════════════════════════════════════════════════════════════════════
 
 print("=" * 60)
-print("ECONOMIC CALENDAR SCRAPER v5.1 (EST→UTC fix)")
+print("ECONOMIC CALENDAR SCRAPER v5.2 (accumulative merge)")
 print("Sources: MQL5 RSS → TE RSS → Investing.com → Official RSS")
 print("Timezone policy:")
 print("  - MQL5/TE/Official RSS: pubDate normalized to UTC via parsedate_to_datetime")
@@ -656,12 +656,11 @@ print("  - Investing.com: returns EST (UTC-5), converted +5h to UTC before stori
 print("  - All timeUTC fields are UTC — frontend converts to user local timezone")
 print("=" * 60)
 
-today      = date.today()
-# Fetch from 2 days ago so users in any timezone (UTC-12 to UTC+14)
-# always see at least the current local day even when the server clock
-# has already rolled over to the next UTC date.
-from_date  = today - timedelta(days=2)
-to_date    = today + timedelta(days=30)
+import sys
+
+today     = date.today()
+from_date = today - timedelta(days=2)
+to_date   = today + timedelta(days=30)
 
 target_dates = set()
 d = from_date
@@ -670,31 +669,38 @@ while d <= to_date:
 
 print(f"\nTarget: {from_date} → {to_date} ({len(target_dates)} days)\n")
 
-# ── PERSIST RECENT PAST EVENTS FROM PREVIOUS RUN ─────────────────────
-# Investing.com API does not return past dates even when requested.
-# Carry forward yesterday from the previous JSON so users in any
-# timezone always see at least the current local day.
 CALENDAR_PATH = 'calendar-data/calendar.json'
-prev_events = []
+
+# ── STEP 1: Load the existing JSON as the base ──────────────────────────────
+# The key insight: Investing.com only returns events from TODAY onwards.
+# So we MUST preserve events from previous runs for earlier days of the week.
+# Strategy: start with all events from the existing JSON that are still
+# within our display window (>= yesterday), then OVERWRITE/ADD with fresh
+# data fetched now (for today and future).  Fresh data takes priority so
+# actual values and forecasts get updated in real time.
+base_events = {}   # key → event dict  (key = dateISO+currency+event[:25])
 try:
     with open(CALENDAR_PATH, encoding='utf-8') as _f:
         _prev = json.load(_f)
-    cutoff = today - timedelta(days=2)
+    keep_from = today - timedelta(days=1)
+    kept = 0
     for _ev in _prev.get('events', []):
         try:
             _d = date.fromisoformat(_ev['dateISO'])
-            if cutoff <= _d < today:
-                prev_events.append(_ev)
+            if _d >= keep_from:
+                _k = (_ev['dateISO'], _ev['currency'], _ev['event'][:25].lower().strip())
+                base_events[_k] = _ev
+                kept += 1
         except Exception:
             pass
-    if prev_events:
-        print(f"  [Persist] Carrying forward {len(prev_events)} past events from previous run")
+    print(f"  [Base] Loaded {kept} events from previous JSON "
+          f"(dates: {sorted(set(e['dateISO'] for e in base_events.values()))[:5]})")
 except FileNotFoundError:
-    print("  [Persist] No previous calendar.json — starting fresh")
+    print("  [Base] No previous calendar.json — starting fresh")
 except Exception as _e:
-    print(f"  [Persist] Could not load previous calendar: {_e}")
-# ─────────────────────────────────────────────────────────────────────
+    print(f"  [Base] Could not load previous calendar: {_e}")
 
+# ── STEP 2: Fetch fresh data from live sources ───────────────────────────────
 all_events  = []
 source_used = None
 fetch_errors = []
@@ -730,24 +736,19 @@ for label, fetcher, args in [
         fetch_errors.append(msg)
     time.sleep(2)
 
-if not all_events:
+if not all_events and not base_events:
     print(f"\n{'='*50}")
-    print("⛔ ALL SOURCES FAILED — saving empty calendar with error status")
-    for e in fetch_errors:
-        print(f"   • {e}")
+    print("⛔ ALL SOURCES FAILED AND NO BASE DATA — saving empty calendar")
     print("=" * 50)
 
-# Merge persisted past events (they won't come from the API for past dates)
-for _ev in prev_events:
-    all_events.append(_ev)
-
-# Deduplicate
-seen = set()
-unique_events = []
+# ── STEP 3: Merge — fresh data overwrites base, base fills in past days ───────
+# Fresh events override base events (same key) so actuals/forecasts update.
+merged = dict(base_events)   # start with everything from the previous JSON
 for ev in all_events:
     k = (ev['dateISO'], ev['currency'], ev['event'][:25].lower().strip())
-    if k not in seen:
-        seen.add(k); unique_events.append(ev)
+    merged[k] = ev             # overwrite: fresh data wins
+
+unique_events = list(merged.values())
 
 # Sort by dateISO + timeUTC
 def sort_key(ev):
@@ -756,18 +757,20 @@ def sort_key(ev):
 
 unique_events.sort(key=sort_key)
 
-# Filter: keep yesterday + today + future (covers all timezones UTC-12→+14).
-# Events older than yesterday are dropped — prev_events already carries
-# the relevant window from the previous run.
+# Final filter: keep yesterday + today + future (covers all timezones UTC-12→+14)
 final_events = []
 for ev in unique_events:
     try:
-        ev_date = date.fromisoformat(ev['dateISO'])
-        if ev_date >= today - timedelta(days=1):
+        if date.fromisoformat(ev['dateISO']) >= today - timedelta(days=1):
             final_events.append(ev)
-    except: pass
+    except Exception:
+        pass
 
-# Stats
+print(f"\n  [Merge] base={len(base_events)} + fresh={len(all_events)} → "
+      f"merged={len(merged)} → final={len(final_events)}")
+print(f"  [Merge] Dates in final: {sorted(set(e['dateISO'] for e in final_events))[:7]}")
+
+# ── STEP 4: Stats and save ─────────────────────────────────────────────────
 currency_counts = {}
 impact_counts   = {'high': 0, 'medium': 0, 'low': 0}
 for ev in final_events:
@@ -775,7 +778,6 @@ for ev in final_events:
     currency_counts[c] = currency_counts.get(c, 0) + 1
     impact_counts[ev.get('impact','low')] = impact_counts.get(ev.get('impact','low'), 0) + 1
 
-import sys
 data_ok = len(final_events) >= 5
 
 output = {
@@ -798,12 +800,12 @@ output = {
     'events':         final_events,
 }
 
-with open('calendar-data/calendar.json', 'w', encoding='utf-8') as f:
+with open(CALENDAR_PATH, 'w', encoding='utf-8') as f:
     json.dump(output, f, indent=2, ensure_ascii=False)
 
 print(f"\n{'='*60}")
 if data_ok:
-    print(f"✅ SAVED: calendar-data/calendar.json")
+    print(f"✅ SAVED: {CALENDAR_PATH}")
     print(f"   Source:  {source_used}")
     print(f"   Total:   {len(final_events)} events")
     print(f"   Impact:  {impact_counts}")
