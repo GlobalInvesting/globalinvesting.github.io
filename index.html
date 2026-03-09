@@ -810,6 +810,33 @@
             font-weight: 600;
         }
 
+        /* v5.11 FIX-5: Score context badge — distingue score estructural de momentum */
+        .score-context-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: help;
+            border: 1px solid;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+        .score-context-badge.structural {
+            color: #b07a00;
+            background: rgba(176, 122, 0, 0.10);
+            border-color: rgba(176, 122, 0, 0.30);
+        }
+        .score-context-badge.momentum {
+            color: var(--green);
+            background: rgba(38, 166, 154, 0.08);
+            border-color: rgba(38, 166, 154, 0.28);
+        }
+
         .card-body {
             padding: 1.5rem;
         }
@@ -2365,51 +2392,52 @@ const calculateStrength = (currency, data = null, forexRates = {}, allEconomicDa
     
 // ========== TRADING-ORIENTED WEIGHTS ==========
 const TRADING_WEIGHTS = {
-    // Tier 1: Rate Differentials & Monetary Cycle (20%) — lo que mueve el precio
-    // Filosofía v5.1: pesos reflejan qué mueve el precio ahora, no qué describe la economía a LP.
-    // En forex: carry > momentum > ciclo monetario > fundamentales estructurales.
-    // v5.6: fxPerformance1M sube a 0.22 — único indicador sin lag estructural.
-    // v5.8: fxPerformance1M sube a 0.28. interestRate baja de 0.10 → 0.07.
-    // v5.9: composite basket-corrected — elimina sesgo USD, alinea rankings con índices de divisas (DXY, CXY, AXY).
-    //       Razón: con avg_rate G8 en 2.34%, el rate score de divisas en ciclo de recortes
-    //       (GBP 3.75% con -0.25pp, NZD 2.25% con -3.25pp) inflaba el score vs lo que el
-    //       mercado ya ha descontado. FX captura exactamente ese descuento forward.
-    //       bond10y también reducido 0.04 → 0.03 para mantener suma total = 1.00.
-    interestRate:          { weight: 0.07, direction: 'higher' },
-    inflation:             { weight: 0.05, direction: 'target' },
+    // Tier 1: Política Monetaria (29%) — el driver #1 real del forex a 2-6 semanas
+    // v6.0: rebalanceo fundamental. Filosofía: los fundamentales CAUSAN el precio;
+    //       el precio NO debe ser el mayor peso del modelo (era 28% → baja a 8%).
+    //       interestRate sube 0.07 → 0.10: el carry es el factor #1 en forex.
+    //       rateMomentum sube 0.04 → 0.07: la DIRECCIÓN del BC es más predictiva que el nivel.
+    //       outlookScore mantiene 0.05: señal forward del BC.
+    //       inflation sube 0.05 → 0.07: define el mandato y la política monetaria.
+    interestRate:          { weight: 0.10, direction: 'higher' },
+    inflation:             { weight: 0.07, direction: 'target' },
     outlookScore:          { weight: 0.05, direction: 'outlook_direction' },
-    rateMomentum:          { weight: 0.04, direction: 'rate_momentum' },
+    rateMomentum:          { weight: 0.07, direction: 'rate_momentum' },
 
-    // Tier 2: External Balance (13%) — ya en precio, reducido para evitar overfitting CHF
-    currentAccount:        { weight: 0.05, direction: 'higher' },
+    // Tier 2: Balance Externo (19%) — flujos reales que mueven la divisa estructuralmente
+    // v6.0: currentAccount sube 0.05 → 0.07. debt sube 0.02 → 0.04. termsOfTrade sube 0.02 → 0.04.
+    //       inflationExpectations eliminado (redundante con inflation + rateMomentum).
+    currentAccount:        { weight: 0.07, direction: 'higher' },
     tradeBalance:          { weight: 0.04, direction: 'higher' },
-    debt:                  { weight: 0.02, direction: 'lower'  },
-    termsOfTrade:          { weight: 0.02, direction: 'terms_of_trade' },
+    debt:                  { weight: 0.04, direction: 'lower'  },
+    termsOfTrade:          { weight: 0.04, direction: 'terms_of_trade' },
 
-    // Tier 3: Growth & Employment (12%) — ciclo que el mercado tradea activamente
-    gdpGrowth:             { weight: 0.06, direction: 'higher' },
-    unemployment:          { weight: 0.04, direction: 'lower'  },
-    production:            { weight: 0.02, direction: 'stable' },
+    // Tier 3: Crecimiento y Empleo (16%) — ciclo económico que el mercado tradea activamente
+    // v6.0: gdpGrowth sube 0.06 → 0.07. unemployment sube 0.04 → 0.05. production sube 0.02 → 0.04.
+    gdpGrowth:             { weight: 0.07, direction: 'higher' },
+    unemployment:          { weight: 0.05, direction: 'lower'  },
+    production:            { weight: 0.04, direction: 'stable' },
 
-    // Tier 4: Consumption & Wages (7%)
+    // Tier 4: Consumo y Salarios (6%)
     retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.02, direction: 'stable' },
-    inflationExpectations: { weight: 0.02, direction: 'target' },
+    wageGrowth:            { weight: 0.03, direction: 'stable' },
 
-    // Tier 5: Market Sentiment (16%) — huella directa del smart money
-    // cotPositioning: señal más directa del posicionamiento institucional
-    manufacturingPMI:      { weight: 0.04, direction: 'expansion'       },
-    cotPositioning:        { weight: 0.05, direction: 'moderate_bullish' },
+    // Tier 5: Sentimiento de Mercado (18%) — posicionamiento real del smart money
+    // v6.0: cotPositioning sube 0.05 → 0.06. manufacturingPMI sube 0.04 → 0.05.
+    manufacturingPMI:      { weight: 0.05, direction: 'expansion'       },
+    cotPositioning:        { weight: 0.06, direction: 'moderate_bullish' },
     consumerConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
-    businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },
-    capitalFlows:          { weight: 0.02, direction: 'flows'            },
+    businessConfidence:    { weight: 0.03, direction: 'sentiment_index'  },
+    capitalFlows:          { weight: 0.01, direction: 'flows'            },
 
-    // Tier 6: FX Market Momentum (31%) — único indicador 100% forward-looking, libre de lag
-    // v5.6: subido de 0.12 → 0.22 para reflejar el precio real del mercado en el score.
-    // v5.8: subido de 0.22 → 0.28. El mercado ya descuenta futuros recortes de tasa;
-    //       el rate score miraba al pasado mientras el FX mira al futuro.
-    fxPerformance1M:       { weight: 0.28, direction: 'fx_momentum' },
-    bond10y:               { weight: 0.03, direction: 'carry_yield' },
+    // Tier 6: FX Momentum como CONFIRMADOR (12%) — confirma o alerta divergencia, no driver
+    // v6.0: fxPerformance1M baja 0.28 → 0.08. Razón: causalidad invertida — el precio pasado
+    //       no debe ser el mayor peso de un modelo fundamental (momentum chase + mean reversion
+    //       ignorada). FX ahora es confirmador: fundamentales fuertes + precio confirma =
+    //       +convicción marginal. Si divergen = alerta, no penalización masiva del score.
+    //       bond10y sube 0.03 → 0.04: yield diferencial real más relevante que FX lag.
+    fxPerformance1M:       { weight: 0.08, direction: 'fx_momentum' },
+    bond10y:               { weight: 0.04, direction: 'carry_yield' },
 };
     
 // ========== SCORING FUNCTIONS v4.9.5 ==========
@@ -2504,11 +2532,47 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
                     else                    score = Math.max(0, 20 + ((value + 0.6) / 0.4) * 20);
                 } else {
                     // currentAccount (%PIB)
-                    if (value > 5)        score = 100;
-                    else if (value > 0)   score = 70 + (value / 5) * 30;
-                    else if (value > -3)  score = 50 + (value / 3) * 20;
-                    else if (value > -4)  score = 25 + ((value + 4) / 1) * 5;
-                    else                  score = Math.max(15, 25 - ((value + 4) / -3) * 10);
+                    // v5.11 FIX-4 — Score relativo a la mediana cross-sectional del G8.
+                    // Problema anterior: CA > 5% siempre daba score=100. Como Suiza estructuralmente
+                    // tiene CA > 5%, siempre recibía el máximo independientemente del contexto.
+                    // Solución: calcular el score en función de la posición relativa dentro del G8
+                    // usando la mediana y desviación estándar de las CAs disponibles.
+                    // Esto es 100% data-driven: no hay hardcoding de valores históricos.
+                    //
+                    // Resultado: una CA de +5.1% con mediana G8 de +0.5% es bullish,
+                    // pero solo moderadamente — ya está "en precio". Si la mediana sube a +4%
+                    // (todos mejoran), el +5.1% de CHF ya no es tan diferencial.
+                    //
+                    // Fallback: si allEconomicData no está disponible, usa la escala absoluta anterior.
+                    const caVals = allEconomicData
+                        ? Object.values(allEconomicData)
+                            .map(d => d.currentAccount)
+                            .filter(v => v !== null && v !== undefined && !isNaN(v))
+                        : [];
+                    if (caVals.length >= 4) {
+                        // Mediana y stdDev del G8 en tiempo real
+                        const sorted = [...caVals].sort((a, b) => a - b);
+                        const mid = Math.floor(sorted.length / 2);
+                        const caMedian = sorted.length % 2 === 0
+                            ? (sorted[mid - 1] + sorted[mid]) / 2
+                            : sorted[mid];
+                        const caStdDev = Math.sqrt(
+                            caVals.reduce((sum, v) => sum + Math.pow(v - caMedian, 2), 0) / caVals.length
+                        );
+                        // Score: posición en z-scores normalizados a 0-100
+                        // z=0 (mediana G8) → 55, z=+2 → 95, z=-2 → 15
+                        // Cap: z > +2.5 → 100 (para evitar que outliers extremos dominen)
+                        const safeStdDev = Math.max(caStdDev, 1.0); // evitar div/0
+                        const z = (value - caMedian) / safeStdDev;
+                        score = Math.max(0, Math.min(100, 55 + z * 20));
+                    } else {
+                        // Fallback absoluto (sin datos suficientes del G8)
+                        if (value > 5)        score = 100;
+                        else if (value > 0)   score = 70 + (value / 5) * 30;
+                        else if (value > -3)  score = 50 + (value / 3) * 20;
+                        else if (value > -4)  score = 25 + ((value + 4) / 1) * 5;
+                        else                  score = Math.max(15, 25 - ((value + 4) / -3) * 10);
+                    }
                 }
             }
             break;
@@ -2546,26 +2610,47 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
 
         case 'target':
             // inflation & inflationExpectations: objetivo 1.8-2.5%
-            // Para inflationExpectations >3.5%: en lugar de penalizar solo,
-            // considerar que expectativas altas = BC mantendrá tasas altas = hawkish implícito.
-            // La penalización se suaviza para reflejar que el mercado ya lo descuenta en la divisa.
+            //
+            // v5.11 FIX-1 — Penalización ASIMÉTRICA para deflación real (inflation only):
+            // Una inflación de 0.1% NO es el opuesto simétrico de una inflación de 3.9%.
+            // Deflación activa (<1%) señala que el BC carece de margen hawkish convencional
+            // y tiene incentivo estructural para mantener tasas bajas o recortarlas → bearish.
+            // Inflación alta (>2.5%) coexiste con tasas altas y ciclos hawkish → señal distinta.
+            //
+            // Curva asimétrica para inflation:
+            //   0.1%  → score ~7  (deflación técnica: BC sin margen, bearish estructural)
+            //   0.5%  → score ~18 (zona de riesgo deflacionario)
+            //   1.0%  → score ~35 (por debajo del objetivo pero sin riesgo deflacionario)
+            //   1.8%  → score 100 (zona objetivo perfecta)
+            //   2.5%  → score 100 (zona objetivo perfecta)
+            //   3.5%  → score 50  (moderadamente elevada)
+            //   4.5%  → score ~0  (descontrolada)
+            //
+            // inflationExpectations mantiene su lógica original (sin la asimetría deflacionaria,
+            // ya que las expectativas bajas son menos bearish que la inflación real baja).
             if (indicator === 'inflationExpectations' && value > 3.5) {
                 // Expectativas altas: señal mixta. Penaliza menos que inflación real alta.
-                // >3.5%: score 45-55 (neutral-leve negativo, no catastrófico)
-                // >5.0%: score 35 (preocupante pero ya priceado en tasas altas)
                 if (value > 5.0)       score = Math.max(30, 45 - ((value - 5.0) / 2.0) * 15);
-                else if (value > 4.0)  score = 45 - ((value - 4.0) / 1.0) * 10;  // 35-45
-                else                   score = 55 - ((value - 3.5) / 0.5) * 10;  // 45-55
+                else if (value > 4.0)  score = 45 - ((value - 4.0) / 1.0) * 10;
+                else                   score = 55 - ((value - 3.5) / 0.5) * 10;
+            } else if (indicator === 'inflation' && value < 1.0) {
+                // FIX-1: zona deflacionaria — penalidad 2× más agresiva que el lado alto.
+                // Escala: 0.0% → 0, 0.5% → ~18, 1.0% → ~35 (continúa en siguiente tramo).
+                // Razón: <1% implica que el BC no puede subir tasas sin comprometer crecimiento.
+                // La pendiente (50/1.0) duplica la del lado alcista ((100-70)/0.8 ≈ 37.5/1.0).
+                score = Math.max(0, value * 35);
             } else if (value >= 1.8 && value <= 2.5) {
                 score = 100;
             } else if (value > 2.5 && value <= 3.5) {
                 score = 70 - ((value - 2.5) / 1.0) * 20;
             } else if (value > 3.5) {
-                // Inflación real >3.5%: sí penaliza fuerte (diferente a expectativas)
+                // Inflación real >3.5%: penaliza fuerte
                 score = Math.max(0, 50 - ((value - 3.5) / 2.0) * 50);
             } else if (value >= 1.0) {
-                score = 70 + ((value - 1.0) / 0.8) * 30;
+                // 1.0% → 1.8%: subida progresiva hacia el objetivo
+                score = 35 + ((value - 1.0) / 0.8) * 65;
             } else {
+                // inflationExpectations < 1.0%: curva original, más suave
                 score = Math.max(0, 70 - ((1.0 - value) / 1.0) * 70);
             }
             break;
@@ -2711,14 +2796,28 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             // Razonamiento: un ciclo de -2.75pp (CAD) ya está descontado por el mercado;
             // el modelo no debe seguir penalizando como si fuera un ciclo reciente.
             // Solo afecta CAD (-2.75) y NZD (-3.25) en el contexto actual.
+            //
+            // v6.0 FIX-6 — Hawkish Pause Boost (100% data-driven):
+            // Un BC con bcOutlook=Hawkish y rateMomentum ≈ 0 está en PAUSA HAWKISH,
+            // no en posición neutral. Ejemplo: BOJ subió tasas en 2024-2025 y pausó
+            // con rm12=0.0 — es radicalmente distinto a un BC inactivo con rm=0.
+            // Solución: si bcOutlook=Hawkish Y rm ∈ [-0.25, +0.5], usar rm efectivo=+0.3
+            // (mild hawkish), lo que da score 72 en lugar de 50 (+22pts en componente).
+            // Con peso 7%, el impacto en el score total es ≈ +1.5 pts — quirúrgico.
+            // Ambos campos (bcOutlook y rateMomentum) son scraped 100% data-driven.
             {
-                const isMatureCycle = Math.abs(value) > 1.5;
-                const effectiveValue = isMatureCycle ? value * 0.6 : value;
-                if (effectiveValue > 1.5)       score = 100;
-                else if (effectiveValue > 0.75) score = 85;
-                else if (effectiveValue > 0.25) score = 72;
-                else if (effectiveValue > 0.0)  score = 58;
-                else if (effectiveValue === 0)  score = 50;
+                // FIX-6: hawkish pause detection
+                const outlookCtx = scoringDataExplicit?.bcOutlook ?? currencyCtx?.outlook ?? null;
+                const isHawkishPause = outlookCtx === 'Hawkish' && value >= -0.25 && value <= 0.5;
+                const rawValue = isHawkishPause ? 0.3 : value; // treat pause as mild hawkish
+
+                const isMatureCycle = Math.abs(rawValue) > 1.5;
+                const effectiveValue = isMatureCycle ? rawValue * 0.6 : rawValue;
+                if (effectiveValue > 1.5)        score = 100;
+                else if (effectiveValue > 0.75)  score = 85;
+                else if (effectiveValue > 0.25)  score = 72;
+                else if (effectiveValue > 0.0)   score = 58;
+                else if (effectiveValue === 0)   score = 50;
                 else if (effectiveValue > -0.25) score = 42;
                 else if (effectiveValue > -0.75) score = 30;
                 else if (effectiveValue > -1.5)  score = 18;
@@ -3023,6 +3122,13 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
     };
 
     // 7. Inflation Stability — dynamic
+    // v5.11 FIX-2: Extended deflation risk zone 0–1%.
+    // El ajuste contextual original solo penalizaba inflación < 0 (deflación técnica).
+    // El rango 0–1% es "zona de riesgo deflacionario": el BC pierde margen hawkish,
+    // las expectativas de inflación se anclan a la baja y los activos reales se aprecian.
+    // Penalización progresiva: 0.1% → −3.8pts, 0.5% → −2.5pts, 1.0% → −1.5pts (desvanece).
+    // No se duplica con FIX-1: FIX-1 ajusta el score bruto del indicador (5% peso),
+    // este ajuste opera en el espacio de ajustes contextuales post-normalización.
     const calculateInflationStability = (data) => {
         if (data.inflation === null || data.inflation === undefined) return 0;
         if (data.inflation > 4.0) {
@@ -3031,6 +3137,17 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
             return Math.max(pen, -6);
         }
         if (data.inflation < 0) return data.inflation * -1.5;
+        // FIX-2: zona de riesgo deflacionario (0% ≤ inf < 1.0%)
+        // Escala lineal: 0.0% → -4pts, 1.0% → 0pts (desvanece suavemente).
+        // Se intensifica si el BC ya está en ciclo de recortes (rateMomentum < -0.5):
+        // la combinación deflación + ciclo bajista es doblemente bearish.
+        if (data.inflation >= 0 && data.inflation < 1.0) {
+            const basePen = -((1.0 - data.inflation) / 1.0) * 4;
+            // Intensificador: si rateMomentum indica ciclo de recortes activo
+            const rm = data.rateMomentum ?? null;
+            const cycleMult = (rm !== null && rm < -0.5) ? 1.4 : 1.0;
+            return Math.max(basePen * cycleMult, -6);
+        }
         return 0;
     };
 
@@ -3073,8 +3190,12 @@ const calculateCotContrarianAdj = (data, countryObj) => {
     //   - Cuenta corriente superavitaria (> 1%): demanda estructural de la divisa
     //   - Deuda/CA ratio favorable: la divisa tiene respaldo de balance exterior
     // Cuanto más se cumplen estas condiciones, mayor el premio de safe haven.
-    // Calibración: CHF (tasa 0%, CA +10%) debería recibir +12 a +15 pts
-    //              JPY (tasa 0.75%, CA +3.5%) debería recibir +8 a +10 pts
+    //
+    // v5.11 FIX-3 — Rate-cycle haircut en el safe haven premium:
+    // Si el BC está en ciclo de recortes activo (rateMomentum < 0), el premio de safe haven
+    // se reduce. Razón: un safe haven con BC recortando es carry-bearish, no solo neutral.
+    // El mercado penaliza la combinación tasa-baja + ciclo-bajista doblemente.
+    // Haircut máximo del 40% para ciclos agresivos (−1.5pp+), preservando el premio base.
     const calculateLowRateSafeHavenAdj = (currency, data, allEconomicData) => {
         if (data.interestRate === null || data.interestRate === undefined) return 0;
 
@@ -3123,7 +3244,18 @@ const calculateCotContrarianAdj = (data, countryObj) => {
         // Con cap +8: CHF/JPY siguen premiados en risk-off y contexto neutral,
         // pero cuando el mercado favorece divisas de mayor rendimiento (risk-on),
         // el fxPerformance1M (peso 0.14) puede compensar y reflejar la realidad.
-const adj = combinedFactor * 8;
+        const adj = combinedFactor * 8;
+
+        // FIX-3 v5.11: Rate-cycle haircut — BC en ciclo de recortes activo
+        // Si rateMomentum < 0 (BC recortando), el premio safe haven se reduce.
+        // Un safe haven que además está bajando tasas no es carry-neutral, es carry-bearish.
+        // Haircut: lineal entre 0 (rm=0) y 40% (rm≤-1.5pp), luego cap.
+        // Solo en dirección dovish — ciclos hawkish no afectan esta función.
+        const rm = data.rateMomentum ?? null;
+        const rateCycleHaircut = (rm !== null && rm < 0)
+            ? Math.min(Math.abs(rm) / 1.5, 1.0) * 0.40
+            : 0;
+        const adjAfterCycleHaircut = adj * (1 - rateCycleHaircut);
 
         // Régimen de riesgo — doble señal: COT promedio + FX momentum cross-sectional
         const cotValues = Object.values(allEconomicData)
@@ -3156,7 +3288,7 @@ const adj = combinedFactor * 8;
 
         const regimeCapMultiplier = cotRegimeMult * fxRegimeMult;
 
-// Si el propio COT de la divisa es muy bajista, el mercado contradice
+        // Si el propio COT de la divisa es muy bajista, el mercado contradice
         // el safe haven premium → reducirlo proporcionalmente.
         // Lógica: si los institucionales están vendiendo esta divisa agresivamente
         // (-42K CHF), el modelo no puede darle un premio de safe haven máximo.
@@ -3166,7 +3298,7 @@ const adj = combinedFactor * 8;
             ? Math.max(0.3, 1.0 + (ownCOT + 25000) / 100000)  // 0.3x a 1.0x según extremo
             : 1.0;
 
-        const result = Math.max(0, Math.min(5 * regimeCapMultiplier * ownCOTPenalty, adj));
+        const result = Math.max(0, Math.min(5 * regimeCapMultiplier * ownCOTPenalty, adjAfterCycleHaircut));
         // v5.9: umbral bajado de -0.3% → 0.0% y penalización subida de 30% → 35%.
         // Si la divisa tiene FX negativo en cualquier magnitud, el mercado NO la está
         // comprando como safe haven ahora mismo — aunque sus fundamentales sean sólidos.
@@ -3174,16 +3306,57 @@ const adj = combinedFactor * 8;
         const ownFxPenalty = (data.fxPerformance1M !== null && data.fxPerformance1M !== undefined
                               && data.fxPerformance1M < 0.0) ? 0.65 : 1.0;
         const finalResult = result * ownFxPenalty;
-        console.log(`SafeHavenAdj ${currency}: rateGap=${rateGap.toFixed(2)}, regime=${avgCOT > 0 ? 'risk-on' : 'risk-off'} (avgCOT=${avgCOT.toFixed(0)}), cotPenalty=${ownCOTPenalty.toFixed(2)}, fxPenalty=${ownFxPenalty} → +${finalResult.toFixed(1)}pts`);
+        console.log(`SafeHavenAdj ${currency}: rateGap=${rateGap.toFixed(2)}, cycleHaircut=${(rateCycleHaircut*100).toFixed(0)}%, regime=${avgCOT > 0 ? 'risk-on' : 'risk-off'} (avgCOT=${avgCOT.toFixed(0)}), cotPenalty=${ownCOTPenalty.toFixed(2)}, fxPenalty=${ownFxPenalty} → +${finalResult.toFixed(1)}pts`);
         return finalResult;
 
     };
 
-// Apply contextual adjustments
+    // 8d. Stagflation Risk — v6.0 FIX-7 (100% data-driven)
+    // Detecta el régimen de estanflación: inflación baja/cayendo + contracción industrial
+    // + BC ya recortando. Esta combinación es bearish para la divisa porque:
+    //   1. El BC tiene mandato de subir tasas si hay inflación — pero no la hay
+    //   2. La actividad real se contrae — no hay crecimiento que atraiga capital
+    //   3. El BC ya está cortando — el carry se reduce activamente
+    // El modelo sin este ajuste puntúa inflación 1.9% (cerca del target) altamente,
+    // ignorando que esa inflación baja en contexto de contracción es señal de debilidad,
+    // no de salud macroeconómica.
+    //
+    // Trigger (3 condiciones simultáneas, todas data-driven):
+    //   inflation < 2.5%   → precios por debajo o acercándose al piso del target
+    //   production < -0.5% → contracción industrial real
+    //   rateMomentum < -0.5 → BC ya inició ciclo de recortes
+    //
+    // Severidad: función de cuán extremas son las 3 condiciones (0 a -5 pts)
+    // Afecta EUR (infl 1.9, prod -1.3, rm -0.75) y CHF (infl 0.1, prod -3.3, rm -1.5)
+    // No afecta: AUD (prod +1.6%), USD (prod +0.7%), CAD (prod +1.0%), GBP (rm -0.25),
+    //            NZD (rm -3.25 pero prod -0.7 leve — no llega al umbral combinado)
+    const calculateStagflationRisk = (data) => {
+        if (data.inflation === null || data.inflation === undefined) return 0;
+        if (data.production === null || data.production === undefined) return 0;
+        if (data.rateMomentum === null || data.rateMomentum === undefined) return 0;
+
+        const infl = data.inflation;
+        const prod = data.production;
+        const rm   = data.rateMomentum;
+
+        // Las 3 condiciones deben cumplirse simultáneamente
+        if (infl >= 2.5 || prod >= -0.5 || rm >= -0.5) return 0;
+
+        // Severidad por componente (0 a 1.0 cada uno)
+        const prodSeverity  = Math.min(Math.abs(prod + 0.5) / 2.0, 1.0);  // -0.5→0, -2.5→1
+        const inflSeverity  = Math.max(0, (2.5 - infl) / 2.5);             // 2.5→0, 0→1
+        const cycleSeverity = Math.min(Math.abs(rm  + 0.5) / 2.0, 1.0);   // -0.5→0, -2.5→1
+
+        const combined = (prodSeverity * 0.40) + (inflSeverity * 0.35) + (cycleSeverity * 0.25);
+        return Math.max(-5.0, -combined * 5.0);
+    };
+
+
     const safeHavenAdj        = calculateSafeHavenScore(currency, data, allEconomicData);
     const commodityAdj        = calculateCommodityScore(currency, data, allEconomicData);
     const carryAdj            = calculateCarryPremium(data, allEconomicData);
     const recessionAdj        = calculateRecessionImpact(data);
+    const stagflationAdj      = calculateStagflationRisk(data); // v6.0 FIX-7
     let deficitAdj            = calculateStructuralDeficit(data); // C4: let para permitir ajuste
     // C4: Exención parcial por flujos de capital que financian el déficit estructural.
     // v5.5: umbrales actualizados al sistema normalizado %PIB.
@@ -3220,6 +3393,7 @@ const adj = combinedFactor * 8;
     contributions['commodity_exposure']      = commodityAdj;
     contributions['carry_premium']           = carryAdj;
     contributions['recession_impact']        = recessionAdj;
+    contributions['stagflation_risk']        = stagflationAdj;
     contributions['structural_deficit']      = deficitAdj;
     contributions['debt_sustainability']     = debtAdj;
     contributions['inflation_stability']     = inflationStabAdj;
@@ -3234,7 +3408,7 @@ const adj = combinedFactor * 8;
     const totalAdj = safeHavenAdj + commodityAdj + carryAdj +
                      recessionAdj + deficitAdj + debtAdj + inflationStabAdj +
                      lowRateSafeHavenAdj + yieldCurveAdj + cotContrarianAdj +
-                     cotMomentumDivergence;
+                     cotMomentumDivergence + stagflationAdj; // v6.0 FIX-7
     const cappedAdj = Math.max(-15, Math.min(15, totalAdj));
     const normalizedScore = Math.max(0, Math.min(100, baseScore + cappedAdj));
 
@@ -4672,6 +4846,34 @@ const DataHealthCheck = ({ economicData }) => {
                     const sentiment = getSentiment(strength);
                     const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
 
+                    // FIX-5 v5.11: Score context badge — 100% data-driven, sin hardcoding de divisas.
+                    // Activa badge "Score estructural" cuando el score es moderado/alto PERO las
+                    // señales de momentum son débiles (tasa baja + ciclo bajista).
+                    // Esto avisa al usuario que el score refleja solidez de balance sheet,
+                    // no momentum operativo a 2-6 semanas.
+                    const scoreContextBadge = (() => {
+                        const ir = data.interestRate ?? null;
+                        const rm = data.rateMomentum ?? null;
+                        const fx = data.fxPerformance1M ?? null;
+                        const cot = data.cotPositioning ?? null;
+                        // Criterio 1: score relevante (no es un outlier bajista claro)
+                        const scoreRelevant = strength >= 55; // v6.0: badge solo activa en scores medio-altos (>=55), no en outliers bajistas
+                        // Criterio 2: señales de momentum monetario débiles
+                        // Tasa ≤ 0.5% (zero-bound) O ciclo de recortes ≤ −1.0pp
+                        const weakMonetary = (ir !== null && ir <= 0.5) || (rm !== null && rm <= -1.0);
+                        // Criterio 3: momento de precio también débil (FX y/o COT no confirman)
+                        const weakMomentum = (fx !== null && fx < 0.5) && (cot === null || cot < 20000);
+                        if (scoreRelevant && weakMonetary && weakMomentum) {
+                            return { type: 'structural', label: '⚑ Estructural', title: 'Score elevado por indicadores macroeconómicos estructurales (CA, deuda/PIB) — señal de momentum operativo débil: tasa baja o en ciclo de recortes. El score refleja solidez de balance sheet, no divergencia de momentum a 2–6 semanas.' };
+                        }
+                        // Badge momentum: confirmación positiva cruzada (FX + COT alineados)
+                        const strongMomentum = (fx !== null && fx > 1.5) && (cot !== null && cot > 15000);
+                        if (scoreRelevant && strongMomentum && !weakMonetary) {
+                            return { type: 'momentum', label: '✓ Momentum', title: 'FX momentum y posicionamiento COT alineados — señal de momentum operativo confirmada.' };
+                        }
+                        return null;
+                    })();
+
                     // Compact date formatter — same logic as heatmap tooltips
                     const fmtD = (ds) => {
                         if (!ds) return null;
@@ -4710,6 +4912,14 @@ const DataHealthCheck = ({ economicData }) => {
                                         {strength}
                                     </div>
                                     <div className="strength-label">Fortaleza</div>
+                                    {scoreContextBadge && (
+                                        <div
+                                            className={`score-context-badge ${scoreContextBadge.type}`}
+                                            title={scoreContextBadge.title}
+                                        >
+                                            {scoreContextBadge.label}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="card-body">
@@ -5820,7 +6030,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v5.9.0
+        Dashboard v6.1.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
