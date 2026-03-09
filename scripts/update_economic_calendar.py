@@ -108,7 +108,7 @@ def parse_desc_html(raw_desc):
 
 
 # ════════════════════════════════════════════════════════════════════
-# SOURCE 0: ForexFactory XML (cdn-nfs.faireconomy.media)
+# SOURCE 0: ForexFactory XML (nfs.faireconomy.media)
 # - Free, no auth required, covers the full current week
 # - Times are in GMT (UTC)
 # - Has forecast + previous but NOT actual values
@@ -118,7 +118,7 @@ def parse_desc_html(raw_desc):
 def fetch_forexfactory_xml(target_dates):
     """
     Fetches the ForexFactory weekly XML calendar.
-    URL: https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.xml
+    URL: https://nfs.faireconomy.media/ff_calendar_thisweek.xml
     Times are GMT (UTC). Impact mapped: Low/Medium/High.
     No actual values — those come from the accumulative merge with previous JSON.
     """
@@ -129,7 +129,7 @@ def fetch_forexfactory_xml(target_dates):
         'AUD': 'AUD', 'CAD': 'CAD', 'CHF': 'CHF', 'NZD': 'NZD',
     }
     urls = [
-        'https://cdn-nfs.faireconomy.media/ff_calendar_thisweek.xml',
+        'https://nfs.faireconomy.media/ff_calendar_thisweek.xml',
         'https://www.forexfactory.com/ff_calendar_thisweek.xml',
     ]
     headers = {
