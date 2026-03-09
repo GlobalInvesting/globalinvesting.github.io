@@ -1553,7 +1553,9 @@ const fetchExtendedData = async (countryCode) => {
             let outlook;
             if (rm === undefined || rm === null || isNaN(rm)) {
                 outlook = 'Neutral';
-            } else if (rm > 0.50) {
+            } else if (rm > 0.20) {                           // v6.2: 0.50 → 0.20 (data-driven)
+                // +0.25pp en 12M = mínimo 1 hike ejecutado = ciclo hawkish.
+                // En el G8 actual solo JPY tiene rm > 0 — el ajuste es quirúrgico.
                 outlook = 'Hawkish';
             } else if (rm <= -0.80) {                          // FIX-B: -0.75 → -0.80
                 outlook = 'Dovish';
@@ -2921,6 +2923,9 @@ if (scoringData.gdp !== null && scoringData.gdp !== undefined && scoringData.gdp
 
 if (effectiveOutlook) {
     scoringData.outlookScore = effectiveOutlook;
+    // FIX-6 fix: inyectar bcOutlook en scoringData para que scoreIndicator
+    // pueda leerlo via scoringDataExplicit?.bcOutlook (currencyCtx es string, no objeto)
+    scoringData.bcOutlook = effectiveOutlook;
 }
     if (currency === 'NZD' && scoringData.businessConfidence !== null && scoringData.businessConfidence !== undefined) {
         scoringData.businessConfidence = Math.max(0, Math.min(100, (scoringData.businessConfidence / 100) * 50 + 50));
