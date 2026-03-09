@@ -1,19 +1,20 @@
 {
   "lastUpdate": "2026-03-09",
-  "source": "TradingEconomics \u2014 v10+C2+C7: rateMomentum JPY 24M + bootstrap actualizado 2024-2026",
+  "source": "TradingEconomics \u2014 v10+C2+C7+v5.10: rateMomentum JPY 24M + rm24 todas las divisas",
   "rateMomentumStrategy": "bootstrap-C7-12M",
   "data": {
-    "bond10y": 0.397,
+    "bond10y": 0.415,
     "consumerConfidence": 100.0,
     "businessConfidence": 104.0,
-    "capitalFlows": 5939.64,
+    "capitalFlows": 5960.9,
     "fdi": 925711.0,
     "inflationExpectations": 0.74,
-    "rateMomentum": -1.5
+    "rateMomentum": -1.5,
+    "rateMomentum24M": -1.75
   },
   "dates": {
     "bond10y": "2026-03-09",
-    "consumerConfidence": "2026-01-15",
+    "consumerConfidence": "2026-02-15",
     "businessConfidence": "2026-02-15",
     "capitalFlows": "2025-09-15",
     "fdi": "2024-12-15",
