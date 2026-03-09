@@ -652,6 +652,10 @@ def fetch_investing_html_actuals(from_str, to_str):
             print(f"  [Inv HTML] Sample actual cell: {act_td}")
 
         results = {}  # (dateISO, timeUTC, currency) → event dict
+        _dbg_no_actual = 0
+        _dbg_no_currency = 0
+        _dbg_no_name = 0
+        _dbg_ok = 0
         for row in rows:
             try:
                 dt_str = row.get('data-event-datetime', '')
@@ -675,6 +679,7 @@ def fetch_investing_html_actuals(from_str, to_str):
 
                 currency = row.get('data-currency', '').strip().upper()
                 if currency not in TRACKED_CURRENCIES:
+                    _dbg_no_currency += 1
                     continue
 
                 # Find event name td — avoid actual/forecast/prev cells that also have 'event' in class
@@ -690,6 +695,7 @@ def fetch_investing_html_actuals(from_str, to_str):
                     event_name = (a or ev_td).get_text(strip=True)
                     event_name = re.sub(r'\s+[A-Z]{3}/\d+$', '', event_name).strip()
                 if not event_name:
+                    _dbg_no_name += 1
                     continue
 
                 def gcell(pat, _row=row):  # default arg binds row at definition time
@@ -701,8 +707,10 @@ def fetch_investing_html_actuals(from_str, to_str):
                 previous = gcell(r'eventPrevious_')
 
                 if not actual:
+                    _dbg_no_actual += 1
                     continue  # Only store rows that have an actual value
 
+                _dbg_ok += 1
                 slot = (event_date.isoformat(), time_utc, currency)
                 results[slot] = {
                     'actual':   actual,
@@ -713,6 +721,7 @@ def fetch_investing_html_actuals(from_str, to_str):
             except Exception as _row_err:
                 print(f"  [Inv HTML] Row error: {_row_err}")
 
+        print(f"  [Inv HTML] Skip breakdown: no_currency={_dbg_no_currency} no_name={_dbg_no_name} no_actual={_dbg_no_actual} stored={_dbg_ok}")
         print(f"  [Inv HTML] Extracted {len(results)} events with actual values")
         return results
 
