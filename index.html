@@ -1176,6 +1176,7 @@
         /* ── Calendar event states ─────────────────────────────── */
         .calendar-event.is-past {
             opacity: 0.48;
+            border-bottom: none;
         }
         .calendar-event.is-past .event-title {
             text-decoration: line-through;
@@ -1185,7 +1186,6 @@
             opacity: 0.5;
         }
         .calendar-event.is-next {
-            background: rgba(30, 136, 229, 0.06);
             border-left: 3px solid var(--green) !important;
         }
         .next-marker {
@@ -5280,18 +5280,16 @@ const sentiment = getSentiment(strength);
                                             <div className="event-country">
                                                 <span className="flag-emoji">{event.flag}</span> {event.country || event.currency}
                                             </div>
-                                            {(event.actual || event.forecast || event.previous) && (
-                                                <div style={{
-                                                    display: 'flex', gap: '0.75rem',
-                                                    marginTop: '0.25rem',
-                                                    fontSize: '0.75rem',
-                                                    color: 'var(--text-tertiary)'
-                                                }}>
-                                                    {event.actual   && <span>Real: <strong style={{ color: 'var(--green-strong)' }}>{event.actual}</strong></span>}
-                                                    {event.forecast && <span>Est: <strong style={{ color: 'var(--text-secondary)' }}>{event.forecast}</strong></span>}
-                                                    {event.previous && <span>Ant: {event.previous}</span>}
-                                                </div>
-                                            )}
+                                            <div style={{
+                                                display: 'flex', gap: '0.75rem',
+                                                marginTop: '0.35rem',
+                                                fontSize: '0.75rem',
+                                                color: 'var(--text-tertiary)'
+                                            }}>
+                                                <span>Real: <strong style={{ color: event.actual ? 'var(--green-strong)' : 'var(--text-tertiary)' }}>{event.actual || '—'}</strong></span>
+                                                <span>Est: <strong style={{ color: 'var(--text-secondary)' }}>{event.forecast || '—'}</strong></span>
+                                                <span>Ant: <strong>{event.previous || '—'}</strong></span>
+                                            </div>
                                         </div>
                                         <div className={`event-impact impact-${event.impact}`}>
                                             {event.impact === 'high'   ? 'Alto Impacto' :
