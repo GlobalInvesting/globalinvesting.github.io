@@ -169,19 +169,20 @@
         <h2>Los componentes del score: qué pesa más y por qué</h2>
         <p>El score no es un promedio simple. Cada indicador tiene un peso asignado según su capacidad histórica para explicar los movimientos de precio en el mercado forex. Los componentes más importantes son:</p>
 
-        <h3>1. Tasa de interés (12%)</h3>
+        <h3>1. Tasa de interés (10%)</h3>
         <p>El diferencial de tasas entre dos países es el motor principal del carry trade, que mueve billones de dólares diariamente. Una divisa con tasa del 4.5% atrae capital frente a una con tasa del 0.1%, lo que genera demanda sostenida.</p>
 
-        <h3>2. FX Performance 1M (12%)</h3>
-        <p>El rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento de los grandes jugadores institucionales, los flujos de carry unwind y las expectativas del mercado sobre política monetaria futura. Junto con la tasa de interés, es el indicador de mayor peso individual del modelo (ambos al 12%).</p>
+        <h3>2. FX Performance 1M (22%)</h3>
+        <p>El rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento de los grandes jugadores institucionales, los flujos de carry unwind y las expectativas del mercado sobre política monetaria futura. Es el indicador de mayor peso individual del modelo porque sintetiza el juicio colectivo del mercado sobre todos los demás factores.</p>
 
-        <h3>3. Perspectiva del banco central (7%)</h3>
+        <h3>3. Perspectiva del banco central (5%)</h3>
         <p>Una escala de 0 a 100 que refleja el sesgo del banco central: hawkish (restrictivo, propenso a subir tasas), neutral, o dovish (acomodaticio, propenso a recortar tasas). Este componente captura la <em>dirección</em> de la política monetaria, no solo el nivel actual.</p>
 
-        <h3>4. Posicionamiento COT (7%)</h3>
+        <h3>4. Posicionamiento COT (5%)</h3>
         <p>Los datos del Commitment of Traders de la CFTC muestran el posicionamiento neto de los Leveraged Funds (hedge funds y CTAs) en los futuros de divisas de Chicago. Es la huella directa del smart money. Posiciones extremas netas en una dirección son una señal contrarian importante.</p>
+        <p><em>Nota v5.7:</em> El modelo aplica automáticamente un <strong>filtro de confirmación de precio</strong>: si el posicionamiento institucional extremo (>30K contratos netos) no está siendo confirmado por el movimiento real del precio en el último mes, el score COT se atenúa proporcionalmente. Esto corrige el retraso inherente del reporte COT (hasta 3 días hábiles) y el hecho de que refleja posiciones acumuladas, no flujos recientes.</p>
 
-        <h3>5. Crecimiento del PIB (9%)</h3>
+        <h3>5. Crecimiento del PIB (6%)</h3>
         <p>No el nivel del PIB, sino su tasa de crecimiento. Una economía que acelera su crecimiento atrae inversión extranjera directa y de cartera, generando demanda de la divisa local.</p>
 
         <div class="highlight-box">

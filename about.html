@@ -125,7 +125,7 @@
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;53 Débil · 53–63 Neutral · &gt;63 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
-                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 12%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real.</li>
+                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 22%:</strong> Rendimiento real de la divisa frente al USD en los últimos 30 días. Es el único indicador 100% forward-looking del modelo: libre de lag de publicación, captura posicionamiento especulativo, flujos institucionales y carry unwind en tiempo casi real. Es el indicador de mayor peso individual del modelo.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 6%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 7%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
@@ -195,53 +195,53 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td rowspan="4"><strong>Tier 1 — ~32%</strong><br/>Tasas &amp; Ciclo Monetario</td>
-                        <td>Tasa de Interés</td><td>12%</td><td>Nivel actual de tasa y diferencial de carry trade.</td>
+                        <td rowspan="4"><strong>Tier 1 — ~24%</strong><br/>Tasas &amp; Ciclo Monetario</td>
+                        <td>Tasa de Interés</td><td>10%</td><td>Nivel actual de tasa y diferencial de carry trade.</td>
                     </tr>
-                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%.</td></tr>
-                    <tr><td>Perspectiva del BC (Outlook Score)</td><td>7%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
-                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>6%</td><td>Variación de la tasa respecto a hace 12 meses.</td></tr>
+                    <tr><td>Inflación</td><td>5%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%.</td></tr>
+                    <tr><td>Perspectiva del BC (Outlook Score)</td><td>5%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
+                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>4%</td><td>Variación de la tasa respecto a hace 12 meses.</td></tr>
 
                     <tr>
-                        <td rowspan="4"><strong>Tier 2 — ~14%</strong><br/>Balance Externo</td>
-                        <td>Balanza Comercial</td><td>5%</td><td>Flujos comerciales mensuales en millones USD.</td>
+                        <td rowspan="4"><strong>Tier 2 — ~13%</strong><br/>Balance Externo</td>
+                        <td>Balanza Comercial</td><td>4%</td><td>Flujos comerciales mensuales, normalizados como % del PIB.</td>
                     </tr>
                     <tr><td>Cuenta Corriente</td><td>5%</td><td>Demanda estructural de divisa por flujos reales.</td></tr>
                     <tr><td>Deuda Pública</td><td>2%</td><td>Sostenibilidad fiscal.</td></tr>
                     <tr><td>Términos de Intercambio</td><td>2%</td><td>Ratio precio exportaciones/importaciones (base 100).</td></tr>
 
                     <tr>
-                        <td rowspan="3"><strong>Tier 3 — ~18%</strong><br/>Crecimiento &amp; Empleo</td>
-                        <td>Crecimiento PIB</td><td>10%</td><td>Momentum económico fundamental.</td>
+                        <td rowspan="3"><strong>Tier 3 — ~14%</strong><br/>Crecimiento &amp; Empleo</td>
+                        <td>Crecimiento PIB</td><td>6%</td><td>Momentum económico fundamental.</td>
                     </tr>
                     <tr><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral.</td></tr>
                     <tr><td>Producción Industrial</td><td>3%</td><td>Actividad del sector real.</td></tr>
 
                     <tr>
-                        <td rowspan="3"><strong>Tier 4 — ~8%</strong><br/>Consumo &amp; Salarios</td>
+                        <td rowspan="3"><strong>Tier 4 — ~7%</strong><br/>Consumo &amp; Salarios</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>3%</td><td>Presiones inflacionarias laborales.</td></tr>
+                    <tr><td>Crecimiento Salarial</td><td>2%</td><td>Presiones inflacionarias laborales.</td></tr>
                     <tr><td>Expectativas de Inflación</td><td>2%</td><td>Credibilidad del banco central.</td></tr>
 
                     <tr>
-                        <td rowspan="5"><strong>Tier 5 — ~19%</strong><br/>Sentimiento de Mercado</td>
-                        <td><strong>COT Positioning</strong></td><td><strong>7%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial.</td>
+                        <td rowspan="5"><strong>Tier 5 — ~16%</strong><br/>Sentimiento de Mercado</td>
+                        <td><strong>COT Positioning</strong></td><td><strong>5%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Incluye filtro de confirmación de precio v5.7.</td>
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>4%</td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>Flujos de Capital</td><td>3%</td><td>Cuenta financiera de la balanza de pagos.</td></tr>
+                    <tr><td>Flujos de Capital</td><td>2%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
 
                     <tr style="background: rgba(38,166,154,0.07);">
-                        <td rowspan="2"><strong>Tier 6 — ~17%</strong><br/>FX Momentum &amp; Smart Money</td>
+                        <td rowspan="2"><strong>Tier 6 — ~26%</strong><br/>FX Momentum &amp; Smart Money</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
-                        <td><strong>12%</strong></td>
-                        <td>Rendimiento real de la divisa vs USD en los últimos 30 días. Mayor peso individual del modelo junto a la tasa de interés.</td>
+                        <td><strong>22%</strong></td>
+                        <td>Rendimiento real de la divisa vs USD en los últimos 30 días. Mayor peso individual del modelo — único indicador sin lag estructural.</td>
                     </tr>
                     <tr style="background: rgba(38,166,154,0.07);">
                         <td>Bono Soberano 10Y</td>
-                        <td><strong>5%</strong></td>
+                        <td><strong>4%</strong></td>
                         <td>Carry yield directo y expectativas de tasas futuras.</td>
                     </tr>
 

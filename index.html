@@ -2564,6 +2564,42 @@ const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringD
             else {
                 score = Math.min(80, 20 + ((Math.abs(value) - 200000) / 100000) * 30);
             }
+
+            // ── COT Price Confirmation Check (v5.7) ─────────────────────────
+            // El COT tiene hasta 3 días de retraso y refleja posiciones acumuladas,
+            // no cambios recientes. Cuando el posicionamiento institucional extremo
+            // NO está siendo confirmado por el movimiento de precio real (fxPerformance1M),
+            // se reduce el score COT proporcionalmente a la divergencia.
+            //
+            // 100% data-driven: usa fxPerformance1M del propio activo, sin hardcodear divisas.
+            //
+            // Casos que activan la corrección:
+            //   · COT bullish extremo (>30K) + precio débil o bajando (<+1.0% en 1M):
+            //     el smart money está largo pero el mercado no confirma → atenuar señal bullish
+            //   · COT bajista extremo (<-30K) + precio fuerte o subiendo (>-1.0% en 1M):
+            //     el smart money está corto pero el precio resiste → atenuar señal bearish
+            //
+            // Reducción máxima: 30% del score bruto.
+            // El impacto sobre el score total es < 1.5 pts (peso COT = 5%).
+            // Diseño conservador: atenúa, no elimina. La señal COT sigue presente.
+            {
+                const fxConf = scoringDataExplicit?.fxPerformance1M ?? null;
+                if (fxConf !== null) {
+                    if (value > 30000 && fxConf < 1.0) {
+                        // COT bullish, precio no confirma con fuerza
+                        const cotExtremeness = Math.min((value - 30000) / 70000, 1.0);
+                        const priceWeakness  = Math.min((1.0 - fxConf) / 3.0, 1.0);
+                        const discount = 1 - (cotExtremeness * priceWeakness * 0.30);
+                        score = score * discount;
+                    } else if (value < -30000 && fxConf > -1.0) {
+                        // COT bajista, precio no confirma con caída
+                        const cotExtremeness = Math.min((Math.abs(value) - 30000) / 70000, 1.0);
+                        const priceWeakness  = Math.min((fxConf + 1.0) / 3.0, 1.0);
+                        const discount = 1 - (cotExtremeness * priceWeakness * 0.30);
+                        score = score * discount;
+                    }
+                }
+            }
             break;
 
         case 'outlook_direction':

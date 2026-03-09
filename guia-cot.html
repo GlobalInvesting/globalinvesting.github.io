@@ -179,13 +179,15 @@
 
     <div class="section">
         <h2>Cómo el dashboard incorpora el COT en el score</h2>
-        <p>En el modelo de fortaleza fundamental de Global Investing, el COT tiene un peso del <strong>7%</strong> sobre el score total, dentro del Tier 5 (Sentimiento de Mercado). No es el componente de mayor peso, pero sí uno de los más diferenciadores porque:</p>
+        <p>En el modelo de fortaleza fundamental de Global Investing, el COT tiene un peso del <strong>5%</strong> sobre el score total, dentro del Tier 5 (Sentimiento de Mercado). No es el componente de mayor peso, pero sí uno de los más diferenciadores porque:</p>
 
         <ul>
             <li><strong>Es el único indicador de posicionamiento real:</strong> Todos los demás son indicadores económicos rezagados. El COT refleja dónde está apostando el dinero institucional en este momento.</li>
             <li><strong>Es de fuente oficial:</strong> Los datos vienen directamente de la CFTC, no de encuestas ni estimaciones.</li>
             <li><strong>Tiene lógica contrarian incorporada:</strong> Posiciones extremas no suman al score en la dirección del posicionamiento, sino que aplican un ajuste negativo — porque las posiciones extremas son señal de saturación, no de momentum.</li>
         </ul>
+
+        <p><strong>Filtro de confirmación de precio (v5.7):</strong> El COT tiene hasta 3 días hábiles de retraso y refleja posiciones acumuladas, no flujos recientes. Cuando el posicionamiento institucional extremo (>30.000 contratos netos en cualquier dirección) no está siendo confirmado por el movimiento de precio real de la divisa en el último mes, el modelo atenúa el score COT proporcionalmente a la divergencia. La reducción máxima es del 30% del score bruto, lo que equivale a menos de 1.5 puntos sobre el score total. El objetivo es corregir el lag inherente del reporte, no eliminar la señal.</p>
 
         <p>Adicionalmente, el modelo aplica una penalización específica cuando el posicionamiento COT contradice el perfil de safe haven de una divisa. Por ejemplo, si CHF tiene una posición neta negativa extrema en Leveraged Funds (muchos vendidos en franco suizo) pero al mismo tiempo hay alta volatilidad en los mercados de renta variable, el modelo reduce el ajuste negativo del COT porque el franco tiene un rol de refugio que puede activarse con independencia del posicionamiento especulativo.</p>
 
