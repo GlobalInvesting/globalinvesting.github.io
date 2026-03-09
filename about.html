@@ -190,7 +190,7 @@
             <h3>Cambios en v6.3 (marzo 2026) — ESI Proxy + Umbrales</h3>
             <ul>
                 <li><strong>ESI Proxy (Economic Surprise Index):</strong> 22.º indicador del modelo (peso 4%). Arquitectura híbrida: Componente A compara actuals vs forecast del calendario económico (Investing.com); Componente B mide la posición relativa de cada divisa en el G8 mediante z-scores. Cuando el Componente A tiene datos, pondera 60/40 con B; si no hay actuals disponibles, opera solo con B (neutro=50). El ESI captura el gap metodológico más importante vs modelos institucionales: el mercado ya tiene el nivel en precio — lo que mueve el par es la sorpresa vs expectativas.</li>
-                <li><strong>Umbrales de sentimiento actualizados:</strong> &gt;60 = Alcista · 50–60 = Neutral · &lt;50 = Bajista. La frontera de 50 es semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;53) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
+                <li><strong>Umbrales de sentimiento actualizados:</strong> &gt;60 = Alcista · 50–60 = Neutral · &lt;50 = Bajista. La frontera de 50 es semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;50) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
             </ul>
             <h3>Cambios en v6.2 (marzo 2026) — PMI Servicios</h3>
             <ul>
@@ -260,7 +260,7 @@
                         <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Filtro de confirmación de precio v5.7.</td>
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>5%</td><td>Indicador adelantado de actividad industrial.</td></tr>
-                    <tr><td>Confianza del Consumidor</td><td>3%</td><td>Índice adelantado del gasto privado.</td></tr>
+                    <tr><td>Confianza del Consumidor</td><td>2%</td><td>Índice adelantado del gasto privado.</td></tr>
                     <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>4%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish. v6.2.</td></tr>
                     <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas. v6.3.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
