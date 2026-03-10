@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-10",
-  "generatedAt": "2026-03-10T11:08:07.086345Z",
+  "generatedAt": "2026-03-10T13:09:17.704669Z",
   "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
   "status": "ok",
   "source": "Trading Economics (Playwright)",
@@ -8,10 +8,10 @@
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-09",
-  "totalEvents": 1905,
+  "totalEvents": 1913,
   "currencyCounts": {
     "AUD": 156,
-    "CAD": 143,
+    "CAD": 151,
     "CHF": 44,
     "EUR": 209,
     "GBP": 207,
@@ -20,8 +20,8 @@
     "USD": 858
   },
   "impactCounts": {
-    "low": 1208,
-    "medium": 559,
+    "low": 1213,
+    "medium": 562,
     "high": 138
   },
   "events": [
@@ -21471,7 +21471,7 @@
       "flag": "🇺🇸",
       "event": "ADP Employment Change Weekly",
       "impact": "low",
-      "actual": "",
+      "actual": "15.5K",
       "forecast": "",
       "previous": "12.75K"
     },
@@ -21484,7 +21484,7 @@
       "flag": "🇺🇸",
       "event": "Redbook YoY (MAR/07)",
       "impact": "low",
-      "actual": "",
+      "actual": "6.2%",
       "forecast": "",
       "previous": "7%"
     },
@@ -23006,7 +23006,7 @@
       "event": "Housing Starts (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "230.0K",
       "previous": "238K"
     },
     {
@@ -23019,7 +23019,7 @@
       "event": "Inflation Rate YoY (FEB)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.1%",
       "previous": "2.3%"
     },
     {
@@ -23032,7 +23032,7 @@
       "event": "Core Inflation Rate YoY (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.4%",
       "previous": "2.6%"
     },
     {
@@ -23045,7 +23045,7 @@
       "event": "Inflation Rate MoM (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.1%",
       "previous": "0%"
     },
     {
@@ -23058,7 +23058,7 @@
       "event": "Core Inflation Rate MoM (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.2%",
       "previous": "0.2%"
     },
     {
@@ -23071,7 +23071,7 @@
       "event": "CPI Common YoY (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.6%",
       "previous": "2.7%"
     },
     {
@@ -23084,7 +23084,7 @@
       "event": "CPI Median YoY (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.4%",
       "previous": "2.5%"
     },
     {
@@ -23097,7 +23097,7 @@
       "event": "CPI Trimmed-Mean YoY (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.3%",
       "previous": "2.4%"
     },
     {
@@ -23293,7 +23293,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "15.5K"
     },
     {
       "date": "17 Mar",
@@ -23319,7 +23319,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "6.2%"
     },
     {
       "date": "17 Mar",
@@ -24789,6 +24789,110 @@
       "actual": "",
       "forecast": "-26",
       "previous": "-28"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "New Housing Price Index MoM (FEB)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "-0.3%",
+      "previous": "-0.4%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales Ex Autos MoM (JAN)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "0.2%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales MoM Final (JAN)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "1.5%",
+      "previous": "-0.4%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "PPI MoM (FEB)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "0.4%",
+      "previous": "2.7%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "PPI YoY (FEB)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "5.5%",
+      "previous": "5.4%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Raw Materials Prices MoM (FEB)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "0.2%",
+      "previous": "7.7%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Raw Materials Prices YoY (FEB)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "8.6%",
+      "previous": "8%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Retail Sales YoY (JAN)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "1.0%",
+      "previous": "0%"
     }
   ]
 }
