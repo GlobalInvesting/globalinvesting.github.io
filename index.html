@@ -5693,12 +5693,46 @@ const sentiment = getSentiment(strength);
         {(() => {
             const allEvents = (economicCalendar.events || []);
 
-            // ── Agrupar eventos por fecha ──────────────────────────────
+            // ── Agrupar eventos por fecha LOCAL del usuario ───────────
+            // Los eventos tienen dateISO+timeUTC en UTC.
+            // Convertimos cada evento a fecha local antes de agrupar,
+            // para que un evento 2026-03-10T00:01Z aparezca el 9 Mar
+            // en UTC-3 (Montevideo), no el 10 Mar.
+            const MONTH_ES_CAL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            const getLocalDateKey = (e) => {
+                const t = e.timeUTC || e.time;
+                if (t && e.dateISO && /^\d{2}:\d{2}$/.test(t)) {
+                    const d = new Date(`${e.dateISO}T${t}:00Z`);
+                    if (!isNaN(d.getTime())) {
+                        const yy = d.getFullYear();
+                        const mm = String(d.getMonth()+1).padStart(2,'0');
+                        const dd = String(d.getDate()).padStart(2,'0');
+                        return `${yy}-${mm}-${dd}`;
+                    }
+                }
+                return e.dateISO || e.date || 'Sin fecha';
+            };
             const dayMap = {};
             allEvents.forEach(e => {
-                const key = e.dateISO || e.date || 'Sin fecha';
-                if (!dayMap[key]) dayMap[key] = { label: e.date || key, dateISO: key, events: [] };
+                const key = getLocalDateKey(e);
+                if (!dayMap[key]) {
+                    const d = new Date(key + 'T12:00:00');
+                    const label = `${d.getDate()} ${MONTH_ES_CAL[d.getMonth()]}`;
+                    dayMap[key] = { label, dateISO: key, events: [] };
+                }
                 dayMap[key].events.push(e);
+            });
+            // Ordenar eventos dentro de cada día por hora local
+            Object.values(dayMap).forEach(day => {
+                day.events.sort((a, b) => {
+                    const ta = a.timeUTC || a.time || '';
+                    const tb = b.timeUTC || b.time || '';
+                    if (!ta) return 1;
+                    if (!tb) return -1;
+                    const da = new Date(`${a.dateISO}T${ta}:00Z`);
+                    const db = new Date(`${b.dateISO}T${tb}:00Z`);
+                    return da - db;
+                });
             });
             const days = Object.values(dayMap).sort((a, b) =>
                 (a.dateISO || '').localeCompare(b.dateISO || '')
@@ -5991,21 +6025,13 @@ const sentiment = getSentiment(strength);
                                 }
                                 // isPast: has actual OR event time already passed
                                 const isPast = hasActual || (eventMs !== null && eventMs < nowMs);
-                                // isNext: first upcoming event with known time — no isToday dependency
+                                // isNext: first upcoming event with known time
+                                // dateISO+timeUTC already correct UTC — no offset hack needed
                                 const isNext = !isPast && !hasActual && eventMs !== null &&
                                     filteredEvents.slice(0, index).every(e => {
                                         const ta = e.timeUTC || e.time;
                                         if (!ta || !e.dateISO) return true;
-                                        const ha = parseInt(ta.split(':')[0], 10);
-                                        let d2;
-                                        if (!isNaN(ha) && ha < 4) {
-                                            const next2 = new Date(`${e.dateISO}T12:00:00Z`);
-                                            next2.setUTCDate(next2.getUTCDate() + 1);
-                                            const nextISO2 = next2.toISOString().slice(0, 10);
-                                            d2 = new Date(`${nextISO2}T${ta}:00Z`);
-                                        } else {
-                                            d2 = new Date(`${e.dateISO}T${ta}:00Z`);
-                                        }
+                                        const d2 = new Date(`${e.dateISO}T${ta}:00Z`);
                                         return isNaN(d2.getTime()) || d2.getTime() < nowMs || !!(e.actual && e.actual !== '');
                                     });
                                 const eventClass = `calendar-event${isPast ? ' is-past' : ''}${isNext ? ' is-next' : ''}`;
