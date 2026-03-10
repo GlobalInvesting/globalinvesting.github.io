@@ -33,18 +33,22 @@ COUNTRY_TO_CURRENCY = {
 
 HIGH_KW = [
     'interest rate', 'rate decision', 'fed funds', 'bank rate', 'policy rate',
-    'gdp', 'gross domestic product', 'cpi', 'consumer price', 'inflation',
-    'nonfarm payrolls', 'nonfarm', 'employment change', 'claimant count',
-    'unemployment rate', 'jobless rate', 'unemployment claims',
+    'gdp', 'gross domestic product', 'cpi', 'consumer price index',
+    'nonfarm payrolls', 'nonfarm payroll',
+    'unemployment rate', 'jobless rate',
     'fomc', 'ecb', 'boe', 'boj', 'rba', 'boc', 'snb', 'rbnz',
-    'monetary policy', 'retail sales', 'pmi', 'purchasing managers',
+    'monetary policy statement', 'retail sales',
     'trade balance', 'current account',
 ]
 MED_KW = [
+    'employment change', 'claimant count', 'unemployment claims',
+    'inflation', 'consumer price', 'pmi', 'purchasing managers',
     'manufacturing', 'industrial production', 'factory orders',
     'housing', 'building permits', 'consumer confidence', 'business confidence',
     'ppi', 'producer price', 'wage', 'earnings', 'ism', 'durable goods',
     'job openings', 'jolts', 'import price', 'export price', 'services pmi',
+    'nfib', 'small business', 'existing home', 'new home', 'pending home',
+    'adp', 'redbook',
 ]
 
 MONTH_ES = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',
@@ -402,9 +406,10 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
         except Exception as e:
             print(f"  [Investing] HTML fallback error: {e}")
 
-    # Use whichever source has more events; merge actuals from JSON into HTML result
+    # Use whichever source has more events; merge actuals+impact from JSON into HTML result
     if len(html_events) >= len(json_events):
-        # HTML POST has more coverage — use as base, enrich actuals from JSON
+        # HTML POST has more coverage — use as base, enrich with JSON API data
+        # JSON API is the authoritative source for impact (importance field is exact)
         json_by_key = {}
         for ev in json_events:
             k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
@@ -412,9 +417,13 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
         merged = []
         for ev in html_events:
             k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
-            if k in json_by_key and json_by_key[k].get('actual') and not ev.get('actual'):
+            if k in json_by_key:
                 updated = dict(ev)
-                updated['actual'] = json_by_key[k]['actual']
+                # Always inherit impact from JSON API — it maps directly from Investing's importance field
+                updated['impact'] = json_by_key[k]['impact']
+                # Inherit actual if JSON has it and HTML doesn't
+                if json_by_key[k].get('actual') and not ev.get('actual'):
+                    updated['actual'] = json_by_key[k]['actual']
                 merged.append(updated)
             else:
                 merged.append(ev)
@@ -856,6 +865,40 @@ for group_key, group in boundary_groups.items():
 if boundary_merged:
     deduped = [ev for ev in deduped if id(ev) not in boundary_dominated]
     print(f"  [Boundary-dedup] Merged {boundary_merged} cross-day duplicate events")
+
+
+# ── STEP 3c: Same-day semantic dedup (different timeUTC, same event name) ────────
+# Catches cases like "ADP Weekly Employment Change" (08:00) vs "ADP Employment Change Weekly" (10:15)
+# that come from different scrape passes with slightly different names and times.
+# Group by (dateISO, currency, normalized_name) regardless of time.
+semantic_groups = defaultdict(list)
+for ev in deduped:
+    norm = normalize_name(ev['event'])
+    semantic_groups[(ev['dateISO'], ev['currency'], norm)].append(ev)
+
+semantic_dominated = set()
+semantic_merged = 0
+for group_key, group in semantic_groups.items():
+    if len(group) < 2:
+        continue
+    # Check if all events in the group are true duplicates of each other
+    # (same normalized name guarantees this)
+    # Keep the one with the most data, inherit best impact
+    best = max(group, key=score_event)
+    impact_rank = {'high': 3, 'medium': 2, 'low': 1}
+    best_impact = max(group, key=lambda e: impact_rank.get(e.get('impact', 'low'), 1))
+    best['impact'] = best_impact['impact']
+    for ev in group:
+        for field in ('actual', 'forecast', 'previous'):
+            if not best.get(field) and ev.get(field):
+                best[field] = ev[field]
+        if ev is not best:
+            semantic_dominated.add(id(ev))
+    semantic_merged += len(group) - 1
+
+if semantic_merged:
+    deduped = [ev for ev in deduped if id(ev) not in semantic_dominated]
+    print(f"  [Semantic-dedup] Merged {semantic_merged} same-day duplicate events")
 
 
 # ── Filter noise: remove events with no time AND no actual/forecast/previous data ──
