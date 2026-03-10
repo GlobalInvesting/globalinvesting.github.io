@@ -558,8 +558,28 @@ if all_events:
             merged_values[k] = updated
             fresh_updated += 1
         else:
-            merged_values[k] = ev
-            fresh_added += 1
+            # Try adjacent date (day-boundary events: 23:50 Mar9 ↔ 00:50 Mar10)
+            matched_boundary = False
+            try:
+                ev_date = date.fromisoformat(ev['dateISO'])
+                for delta in (-1, 1):
+                    adj_date = (ev_date + timedelta(days=delta)).isoformat()
+                    k_adj = (adj_date, ev['currency'], ev['event'][:25].lower().strip())
+                    if k_adj in merged_values:
+                        updated = dict(merged_values[k_adj])
+                        if ev.get('forecast'): updated['forecast'] = ev['forecast']
+                        if ev.get('previous'): updated['previous'] = ev['previous']
+                        if ev.get('actual'):   updated['actual']   = ev['actual']
+                        if ev.get('timeUTC'):  updated['timeUTC']  = ev['timeUTC']
+                        merged_values[k_adj] = updated
+                        fresh_updated += 1
+                        matched_boundary = True
+                        break
+            except Exception:
+                pass
+            if not matched_boundary:
+                merged_values[k] = ev
+                fresh_added += 1
     print(f"  [Merge] base={len(base_events)} + fresh={len(all_events)} → {len(merged_values)} total "
           f"(added={fresh_added}, updated={fresh_updated})")
     actuals_count = sum(1 for ev in merged_values.values() if ev.get('actual'))
@@ -605,7 +625,32 @@ for key, items in name_cur_groups.items():
             has_time_a = bool(ev_a.get('timeUTC', '').strip())
             has_time_b = bool(ev_b.get('timeUTC', '').strip())
             if has_time_a == has_time_b:
-                continue  # both have time or both lack it — not a TZ dupe
+                # Both have times — check if it's a day-boundary shift (e.g. 23:50 Mar9 vs 00:50 Mar10)
+                # This happens when past-pass and future-pass store same event with slightly different UTC hours
+                if has_time_a and has_time_b:
+                    try:
+                        h_a = int(ev_a['timeUTC'].split(':')[0])
+                        h_b = int(ev_b['timeUTC'].split(':')[0])
+                        # One is late night (>= 22h) and other is early morning (<= 2h), dates differ by 1
+                        is_boundary = (h_a >= 22 and h_b <= 2) or (h_b >= 22 and h_a <= 2)
+                        if not is_boundary:
+                            continue
+                        # Merge: keep the one with actual data, or the earlier date version
+                        has_actual_a = bool(ev_a.get('actual', '').strip())
+                        has_actual_b = bool(ev_b.get('actual', '').strip())
+                        keep_k  = k_a if (has_actual_a or d_a < d_b) else k_b
+                        drop_k  = k_b if keep_k == k_a else k_a
+                        keep_ev = dict(merged_values[keep_k])
+                        drop_ev = merged_values[drop_k]
+                        for field in ('actual', 'forecast', 'previous'):
+                            if not keep_ev.get(field) and drop_ev.get(field):
+                                keep_ev[field] = drop_ev[field]
+                        merged_values[keep_k] = keep_ev
+                        del merged_values[drop_k]
+                        tz_dupes_removed += 1
+                    except Exception:
+                        pass
+                continue  # not a TZ dupe in the no-time case
             # One has no time, one has a time → TZ duplicate
             # Keep the one with a time (it has UTC time from FF XML)
             # Also merge actual/forecast/previous from whichever has them
