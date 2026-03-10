@@ -3072,36 +3072,58 @@ const calculateESI = (currency, data, allEconomicData, calendarEvents) => {
     let compA = null;
     if (calendarEvents && Array.isArray(calendarEvents) && calendarEvents.length > 0) {
         const EVENT_INDICATOR_MAP = [
-            // CPI — YoY y MoM (ambas variantes de Investing.com)
-            { keywords: ['cpi y/y', 'cpi yoy', 'cpi (yoy)', 'consumer price index y', 'cpi annual',
-                         'inflation rate yoy', 'inflation rate (yoy)', 'cpi m/m', 'cpi (mom)',
-                         'cpi (m/m)', 'consumer price index (m'],
+            // CPI / Inflación — Investing.com + Trading Economics
+            { keywords: [
+                'cpi y/y', 'cpi yoy', 'cpi (yoy)', 'consumer price index y', 'cpi annual',
+                'inflation rate yoy', 'inflation rate (yoy)', 'cpi m/m', 'cpi (mom)',
+                'cpi (m/m)', 'consumer price index (m',
+                // Trading Economics: 'Inflation Rate YoY (DEC)', 'Consumer Price Index (DEC)'
+                'inflation rate yoy', 'consumer price index',
+              ],
               key: 'inflation', invert: false },
-            // GDP — QoQ, Annualized, 3M/3M y variantes GBP/JPY
-            { keywords: ['gdp q/q', 'gdp qoq', 'gdp (qoq)', 'gdp annualized', 'gdp annualized (qoq)',
-                         'gross domestic product q', 'gdp growth', 'prelim gdp',
-                         'monthly gdp', 'gdp private consumption', 'gdp price index'],
+            // GDP — QoQ, Annualized, 3M/3M y variantes GBP/JPY + Trading Economics
+            { keywords: [
+                'gdp q/q', 'gdp qoq', 'gdp (qoq)', 'gdp annualized', 'gdp annualized (qoq)',
+                'gross domestic product q', 'gdp growth', 'prelim gdp',
+                'monthly gdp', 'gdp private consumption', 'gdp price index',
+                // Trading Economics: 'GDP Growth Rate QoQ Flash (Q4)', 'GDP Growth Rate QoQ Final (Q3)'
+                'gdp growth rate',
+              ],
               key: 'gdpGrowth', invert: false },
             // Desempleo
             { keywords: ['unemployment rate', 'unemployment rate ('],
               key: 'unemployment', invert: true },
-            // Nóminas / empleo
-            { keywords: ['nonfarm payrolls', 'private nonfarm payrolls', 'employment change',
-                         'employment cost index', 'change in nonfarm'],
+            // Nóminas / empleo — Investing.com + Trading Economics
+            { keywords: [
+                'nonfarm payrolls', 'private nonfarm payrolls', 'employment change',
+                'employment cost index', 'change in nonfarm',
+                // Trading Economics: 'Non Farm Payrolls (DEC)', 'Average Hourly Earnings MoM (DEC)'
+                'non farm payrolls', 'average hourly earnings',
+                // Bonus: jolts como proxy de demanda laboral (bullish = más vacantes = mercado laboral tenso)
+                'jolts job openings', 'initial jobless claims',
+              ],
               key: 'unemployment', invert: true },
             // Ventas minoristas
-            { keywords: ['retail sales', 'core retail sales', 'retail control', 'brc retail sales'],
+            { keywords: [
+                'retail sales', 'core retail sales', 'retail control', 'brc retail sales',
+              ],
               key: 'retailSales', invert: false },
             // PMI Manufacturero
-            { keywords: ['manufacturing pmi', 'manufacturing index', 'markit manufacturing', 'ism manufacturing'],
+            { keywords: [
+                'manufacturing pmi', 'manufacturing index', 'markit manufacturing', 'ism manufacturing',
+              ],
               key: 'manufacturingPMI', invert: false },
             // PMI Servicios
-            { keywords: ['services pmi', 'service pmi', 'composite pmi', 'services index', 'ism services',
-                         'markit services', 'markit composite'],
+            { keywords: [
+                'services pmi', 'service pmi', 'composite pmi', 'services index', 'ism services',
+                'markit services', 'markit composite',
+              ],
               key: 'servicesPMI', invert: false },
             // Producción industrial
-            { keywords: ['industrial production', 'factory output', 'manufacturing production',
-                         'germany industrial production', 'industrial production (mom)'],
+            { keywords: [
+                'industrial production', 'factory output', 'manufacturing production',
+                'germany industrial production', 'industrial production (mom)',
+              ],
               key: 'production', invert: false },
         ];
 
@@ -3880,15 +3902,8 @@ const indicatorTooltips = {
                         if (ev.actual && ev.actual !== '') continue;
                         const t = ev.timeUTC || ev.time;
                         if (!t || !ev.dateISO) continue;
-                        const h = parseInt(t.split(':')[0], 10);
-                        let d;
-                        if (!isNaN(h) && h < 4) {
-                            const nx = new Date(`${ev.dateISO}T12:00:00Z`);
-                            nx.setUTCDate(nx.getUTCDate() + 1);
-                            d = new Date(`${nx.toISOString().slice(0,10)}T${t}:00Z`);
-                        } else {
-                            d = new Date(`${ev.dateISO}T${t}:00Z`);
-                        }
+                        // Trading Economics: dateISO is always the real UTC date. No offset needed.
+                        const d = new Date(`${ev.dateISO}T${t}:00Z`);
                         if (isNaN(d.getTime())) continue;
                         const diff = d.getTime() - nowMs;
                         if (diff > -300000 && diff < 900000) return 120000; // event within window → poll every 2 min
@@ -5969,19 +5984,9 @@ const sentiment = getSentiment(strength);
                                 let eventMs = null;
                                 if (event.dateISO && (event.timeUTC || event.time)) {
                                     const t = event.timeUTC || event.time;
-                                    const h = parseInt(t.split(':')[0], 10);
-                                    // Events with timeUTC 00:00-03:59 were stored on the PREVIOUS calendar day
-                                    // by the scraper (late-night Asia/Pacific). We must use dateISO+1 to get
-                                    // the real UTC timestamp for past/next calculations.
-                                    let d;
-                                    if (!isNaN(h) && h < 4) {
-                                        const next = new Date(`${event.dateISO}T12:00:00Z`);
-                                        next.setUTCDate(next.getUTCDate() + 1);
-                                        const nextISO = next.toISOString().slice(0, 10);
-                                        d = new Date(`${nextISO}T${t}:00Z`);
-                                    } else {
-                                        d = new Date(`${event.dateISO}T${t}:00Z`);
-                                    }
+                                    // Trading Economics: dateISO is always the real UTC date.
+                                    // No offset correction needed (TE scraper converts UTC-3 → UTC correctly).
+                                    const d = new Date(`${event.dateISO}T${t}:00Z`);
                                     if (!isNaN(d.getTime())) eventMs = d.getTime();
                                 }
                                 // isPast: has actual OR event time already passed
