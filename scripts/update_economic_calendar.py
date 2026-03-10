@@ -188,6 +188,10 @@ def fetch_investing_calendar(from_str, to_str, target_dates):
                         dt = datetime.fromisoformat(time_iso.replace('Z', '+00:00'))
                         event_date = dt.date()
                         time_utc = dt.strftime('%H:%M')
+                        # Events at 00:00–03:59 UTC belong to the PREVIOUS calendar day
+                        # (they are late-night Asia/Pacific events: 20:00-23:59 local Investing.com display)
+                        if dt.hour < 4:
+                            event_date = event_date - timedelta(days=1)
                     else:
                         try:
                             event_date = date.fromisoformat(date_key)
@@ -553,7 +557,10 @@ if all_events:
             if ev.get('forecast'): updated['forecast'] = ev['forecast']
             if ev.get('previous'): updated['previous'] = ev['previous']
             if ev.get('actual'):   updated['actual']   = ev['actual']
-            updated['impact']   = ev['impact']
+            # Keep highest impact (fresh data sometimes downgrades it after publication)
+            impact_rank = {'high': 3, 'medium': 2, 'low': 1}
+            if impact_rank.get(ev['impact'], 1) > impact_rank.get(updated.get('impact', 'low'), 1):
+                updated['impact'] = ev['impact']
             updated['timeUTC']  = ev.get('timeUTC', updated.get('timeUTC', ''))
             merged_values[k] = updated
             fresh_updated += 1
@@ -570,7 +577,11 @@ if all_events:
                         if ev.get('forecast'): updated['forecast'] = ev['forecast']
                         if ev.get('previous'): updated['previous'] = ev['previous']
                         if ev.get('actual'):   updated['actual']   = ev['actual']
-                        if ev.get('timeUTC'):  updated['timeUTC']  = ev['timeUTC']
+                        # Keep highest impact
+                        impact_rank = {'high': 3, 'medium': 2, 'low': 1}
+                        if impact_rank.get(ev.get('impact','low'), 1) > impact_rank.get(updated.get('impact','low'), 1):
+                            updated['impact'] = ev['impact']
+                        # Do NOT overwrite timeUTC — keep the existing (correct) time
                         merged_values[k_adj] = updated
                         fresh_updated += 1
                         matched_boundary = True
@@ -824,14 +835,21 @@ boundary_dominated = set()
 for group_key, group in boundary_groups.items():
     if len(group) < 2:
         continue
-    # Find best event (has actual > has forecast > longer name)
-    best = max(group, key=score_event)
+    # Always keep the EARLIER-date event (the one with h>=22, i.e. still on day N)
+    # The later-date event (h<=2, day N+1) has the correct impact from the future pass,
+    # but wrong date. Merge data from all into the earliest-date event.
+    group_sorted = sorted(group, key=lambda e: (e['dateISO'], e.get('timeUTC', '')))
+    canonical = group_sorted[0]  # earliest date = correct date to show
+    # Inherit best impact (high > medium > low) from any entry in group
+    impact_rank = {'high': 3, 'medium': 2, 'low': 1}
+    best_impact = max(group, key=lambda e: impact_rank.get(e.get('impact', 'low'), 1))
+    canonical['impact'] = best_impact['impact']
+    # Merge actual/forecast/previous from all entries
     for ev in group:
-        if ev is not best:
-            # Merge data into best
-            for field in ('actual', 'forecast', 'previous'):
-                if not best.get(field) and ev.get(field):
-                    best[field] = ev[field]
+        for field in ('actual', 'forecast', 'previous'):
+            if not canonical.get(field) and ev.get(field):
+                canonical[field] = ev[field]
+        if ev is not canonical:
             boundary_dominated.add(id(ev))
     boundary_merged += len(group) - 1
 
