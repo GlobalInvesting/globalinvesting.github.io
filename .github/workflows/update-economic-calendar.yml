@@ -2,16 +2,31 @@ name: Update Economic Calendar - v7 (Investing.com JSON API primary source)
 
 on:
   schedule:
-    # Asia session: 00:00, 02:00 UTC (JPY, AUD, NZD data)
+    # Asia session (JPY, AUD, NZD): dense coverage 23:00-05:00 UTC
+    - cron: '0 23 * * *'
+    - cron: '30 23 * * *'
     - cron: '0 0 * * *'
+    - cron: '30 0 * * *'
+    - cron: '0 1 * * *'
     - cron: '0 2 * * *'
-    # Europe open: 06:00, 08:00, 10:00 UTC (EUR, GBP, CHF data)
+    - cron: '0 3 * * *'
+    - cron: '0 4 * * *'
+    - cron: '0 5 * * *'
+    # Europe session (EUR, GBP, CHF): 06:00-11:00 UTC
     - cron: '0 6 * * *'
+    - cron: '30 6 * * *'
+    - cron: '0 7 * * *'
+    - cron: '30 7 * * *'
     - cron: '0 8 * * *'
+    - cron: '30 8 * * *'
+    - cron: '0 9 * * *'
     - cron: '0 10 * * *'
-    # US session: 12:00, 13:00, 14:00, 15:00, 16:00, 17:00, 18:00 UTC (USD, CAD data)
+    - cron: '0 11 * * *'
+    # US session (USD, CAD): 12:00-18:00 UTC
     - cron: '0 12 * * *'
+    - cron: '30 12 * * *'
     - cron: '0 13 * * *'
+    - cron: '30 13 * * *'
     - cron: '0 14 * * *'
     - cron: '0 15 * * *'
     - cron: '0 16 * * *'
