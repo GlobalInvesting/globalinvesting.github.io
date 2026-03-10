@@ -1,4 +1,4 @@
-name: Update Economic Calendar v9
+name: Update Economic Calendar v11 (Trading Economics)
 
 on:
   schedule:
@@ -23,7 +23,7 @@ on:
     - cron: '5 17 * * *'
     - cron: '35 17 * * *'
     - cron: '5 18 * * *'
-    # Late updates / API catches (20:00–22:30 UTC)
+    # Late / API updates
     - cron: '5 20 * * *'
     - cron: '5 22 * * *'
     - cron: '35 22 * * *'
@@ -32,7 +32,7 @@ on:
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -46,14 +46,24 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install requests beautifulsoup4 lxml playwright
+          # Instalar Chromium solo si lo necesitamos (fallback)
+          # Se instala siempre para tener el fallback listo
+          playwright install chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libnss3 libatk-bridge2.0-0 libdrm2 libxcomposite1 \
+            libxdamage1 libxrandr2 libgbm1 libxshmfence1 \
+            libasound2t64 2>/dev/null || \
+          sudo apt-get install -y -qq \
+            libnss3 libatk-bridge2.0-0 libdrm2 libxcomposite1 \
+            libxdamage1 libxrandr2 libgbm1 libxshmfence1 || true
 
       - name: Create output directory
         run: mkdir -p calendar-data
 
       - name: Run calendar scraper
-        env:
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python3 -u scripts/update_economic_calendar.py
 
       - name: Commit and push if changed
@@ -64,7 +74,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "✅ No changes to commit"
           else
-            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v9.0"
+            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — Trading Economics v11"
             git pull --rebase origin main || true
             git push
           fi
