@@ -5649,7 +5649,8 @@ const sentiment = getSentiment(strength);
             // Use LOCAL date (not UTC) to avoid off-by-one day across timezones
             const _now = new Date();
             const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
-            const defaultDay = days.find(d => d.dateISO >= todayISO) || days[days.length - 1];
+            // defaultDay: prefer today's local date if it exists in calendar, else first future day
+            const defaultDay = days.find(d => d.dateISO === todayISO) || days.find(d => d.dateISO >= todayISO) || days[days.length - 1];
             const activeDateISO = calSelectedDate || (defaultDay && defaultDay.dateISO) || null;
             const activeDayIdx = days.findIndex(d => d.dateISO === activeDateISO);
             const activeDay = days[activeDayIdx] || null;
@@ -5925,7 +5926,19 @@ const sentiment = getSentiment(strength);
                                 let eventMs = null;
                                 if (event.dateISO && (event.timeUTC || event.time)) {
                                     const t = event.timeUTC || event.time;
-                                    const d = new Date(`${event.dateISO}T${t}:00Z`);
+                                    const h = parseInt(t.split(':')[0], 10);
+                                    // Events with timeUTC 00:00-03:59 were stored on the PREVIOUS calendar day
+                                    // by the scraper (late-night Asia/Pacific). We must use dateISO+1 to get
+                                    // the real UTC timestamp for past/next calculations.
+                                    let d;
+                                    if (!isNaN(h) && h < 4) {
+                                        const next = new Date(`${event.dateISO}T12:00:00Z`);
+                                        next.setUTCDate(next.getUTCDate() + 1);
+                                        const nextISO = next.toISOString().slice(0, 10);
+                                        d = new Date(`${nextISO}T${t}:00Z`);
+                                    } else {
+                                        d = new Date(`${event.dateISO}T${t}:00Z`);
+                                    }
                                     if (!isNaN(d.getTime())) eventMs = d.getTime();
                                 }
                                 // isPast: has actual OR event time already passed
@@ -5935,7 +5948,16 @@ const sentiment = getSentiment(strength);
                                     filteredEvents.slice(0, index).every(e => {
                                         const ta = e.timeUTC || e.time;
                                         if (!ta || !e.dateISO) return true;
-                                        const d2 = new Date(`${e.dateISO}T${ta}:00Z`);
+                                        const ha = parseInt(ta.split(':')[0], 10);
+                                        let d2;
+                                        if (!isNaN(ha) && ha < 4) {
+                                            const next2 = new Date(`${e.dateISO}T12:00:00Z`);
+                                            next2.setUTCDate(next2.getUTCDate() + 1);
+                                            const nextISO2 = next2.toISOString().slice(0, 10);
+                                            d2 = new Date(`${nextISO2}T${ta}:00Z`);
+                                        } else {
+                                            d2 = new Date(`${e.dateISO}T${ta}:00Z`);
+                                        }
                                         return isNaN(d2.getTime()) || d2.getTime() < nowMs || !!(e.actual && e.actual !== '');
                                     });
                                 const eventClass = `calendar-event${isPast ? ' is-past' : ''}${isNext ? ' is-next' : ''}`;
