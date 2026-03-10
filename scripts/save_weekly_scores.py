@@ -261,6 +261,7 @@ def calculate_score(currency, econ_data, fx_data, cot_data, ext_data, all_econ):
             "servicesPMI":        ed.get("servicesPMI"),
             "consumerConfidence": ed.get("consumerConfidence"),
             "businessConfidence": ed.get("businessConfidence"),
+            "termsOfTrade":       ed.get("termsOfTrade"),  # BUG FIX: was missing
         })
 
     # Extended data — BUG FIX: values are nested inside ["data"] subkey
