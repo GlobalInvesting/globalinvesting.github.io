@@ -1,9 +1,9 @@
 {
   "lastUpdate": "2026-03-10",
-  "generatedAt": "2026-03-10T02:50:50.896134Z",
+  "generatedAt": "2026-03-10T03:02:12.336038Z",
   "timezoneNote": "All timeUTC fields are UTC. Frontend converts to user local timezone.",
   "status": "ok",
-  "source": "Investing.com only",
+  "source": "Base cache only",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-12-10",
@@ -20,9 +20,9 @@
     "CHF": 11
   },
   "impactCounts": {
-    "high": 70,
-    "medium": 67,
-    "low": 154
+    "high": 74,
+    "medium": 77,
+    "low": 140
   },
   "events": [
     {
@@ -46,7 +46,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "BoE Gov Bailey Speaks",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -59,7 +59,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "ECB President Lagarde Speaks",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -319,7 +319,7 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Trade Balance  (Sep)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "0.15B",
       "forecast": "-4.40B",
       "previous": "-6.43B"
@@ -371,7 +371,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "30-Year Bond Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "4.773%",
       "forecast": "",
       "previous": "4.694%"
@@ -670,7 +670,7 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Tankan Big Manufacturing Outlook Index  (Q4)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "15",
       "forecast": "13",
       "previous": "12"
@@ -709,7 +709,7 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "PPI (MoM)  (Nov)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "-0.5%",
       "forecast": "0.1%",
       "previous": "-0.3%"
@@ -852,7 +852,7 @@
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "Westpac Consumer Sentiment  (Dec)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "-9.0%",
       "forecast": "",
       "previous": "12.8%"
@@ -995,7 +995,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Redbook (YoY)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "6.2%",
       "forecast": "",
       "previous": "5.7%"
@@ -1047,7 +1047,7 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Westpac Consumer Sentiment  (Q4)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "96.5",
       "forecast": "",
       "previous": "90.9"
@@ -1086,7 +1086,7 @@
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "Westpac Consumer Sentiment  (Feb)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "-2.6%",
       "forecast": "",
       "previous": "-1.7%"
@@ -1112,7 +1112,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "BRC Retail Sales Monitor (YoY)  (Jan)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "2.3%",
       "forecast": "1.3%",
       "previous": "1.0%"
@@ -1151,7 +1151,7 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "SECO Consumer Climate  (Q1)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "-30",
       "forecast": "-30",
       "previous": "-37"
@@ -1320,7 +1320,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "NFIB Small Business Optimism  (Jan)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "99.3",
       "forecast": "99.8",
       "previous": "99.5"
@@ -1398,7 +1398,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "3-Year Note Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "3.518%",
       "forecast": "",
       "previous": "3.609%"
@@ -1593,7 +1593,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "10-Year Note Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "4.177%",
       "forecast": "",
       "previous": "4.173%"
@@ -1788,7 +1788,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Existing Home Sales  (Jan)",
-      "impact": "low",
+      "impact": "high",
       "actual": "3.91M",
       "forecast": "4.16M",
       "previous": "4.27M"
@@ -1827,7 +1827,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "30-Year Bond Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "4.750%",
       "forecast": "",
       "previous": "4.825%"
@@ -1918,7 +1918,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Trade Balance  (Dec)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "12.6B",
       "forecast": "11.8B",
       "previous": "9.3B"
@@ -2464,7 +2464,7 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "PPI (MoM)  (Feb)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "0.1%",
       "forecast": "0.1%",
       "previous": "0.2%"
@@ -2503,7 +2503,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Italy Producer Price Index (PPI) MoM",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "-0.7%"
@@ -2555,7 +2555,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "NFIB Small Business Optimism  (Feb)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "99.8",
       "previous": "99.3"
@@ -2594,7 +2594,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "U.S. Redbook YoY",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": "7.0%"
@@ -2607,7 +2607,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "U.S. Existing Home Sales MoM",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "3.89M",
       "previous": "-8.4%"
@@ -2659,7 +2659,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "U.S. API Weekly Crude Oil Stock",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": "5.600M"
@@ -2672,7 +2672,7 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Japan Producer Price Index (PPI) YoY",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "2.2%",
       "previous": "2.3%"
@@ -2737,7 +2737,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "German Final CPI m/m",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "0.2%",
       "previous": "0.2%"
@@ -2906,7 +2906,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "10-Year Note Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": "4.177%"
@@ -3010,7 +3010,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Italian Quarterly Unemployment Rate",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "6.1%",
       "previous": "6.1%"
@@ -3036,7 +3036,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "BOE Gov Bailey Speaks",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -3101,7 +3101,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Building Permits  (Jan)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "1.410M",
       "previous": "1.455M"
@@ -3114,7 +3114,7 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Building Permits (MoM)  (Jan)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "-0.6%",
       "previous": "6.8%"
@@ -3192,7 +3192,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "30-Year Bond Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": "4.750%"
@@ -3270,7 +3270,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Industrial Production m/m",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "0.3%",
       "previous": "-0.9%"
@@ -3283,7 +3283,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "French Final CPI m/m",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "0.7%",
       "previous": "0.7%"
@@ -3309,7 +3309,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Italian Industrial Production m/m",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "0.4%",
       "previous": "-0.4%"
@@ -3322,7 +3322,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Consumer Inflation Expectations",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "3.5%"
@@ -3699,7 +3699,7 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "PPI (MoM)  (Feb)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "-0.2%"
@@ -3751,7 +3751,7 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Reuters Tankan Index  (Mar)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "13"
@@ -3803,7 +3803,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "PPI (MoM)  (Feb)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "0.5%"
