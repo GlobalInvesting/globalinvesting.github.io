@@ -2,9 +2,9 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda se ha vuelto más expansiva, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Aunque la inflación se mantiene por encima del objetivo, el ciclo bajista en 12 meses y la decisión de bajar tasas sugieren que el banco central está priorizando el crecimiento económico. La tasa de interés actual de 2.25% se encuentra ligeramente por debajo del promedio global, lo que podría afectar el atractivo de la divisa para los inversores.\n\nLa balanza comercial y la cuenta corriente de Nueva Zelanda presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Sin embargo, los términos de intercambio favorables y el crecimiento de las exportaciones de productos lácteos y carne podrían mitigar esta presión. La noticia de que los futuros de maíz han alcanzado un máximo de 9 meses podría influir en los precios de las commodities y, por lo tanto, en la balanza comercial de Nueva Zelanda.\n\nEl posicionamiento especulativo neto bajista y el rendimiento FX positivo del último mes sugieren que la divisa podría experimentar una corrección. Aunque la confianza del consumidor y la confianza empresarial son relativamente altas, la noticia de que las acciones de Hong Kong están bajo presión podría influir en la percepción de riesgo y afectar la divisa. En este contexto, es probable que la divisa siga experimentando presión a la baja en el corto plazo.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Aunque la inflación se encuentra por encima del objetivo, el ciclo bajista en 12 meses y la tasa de interés por debajo del promedio global sugieren una presión bajista sobre la divisa. La decisión del banco central de bajar tasas puede estar relacionada con la incertidumbre sobre una posible recesión, como se menciona en algunos análisis, que sugieren prepararse para cualquier escenario.\n\nLa balanza comercial y la cuenta corriente presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de leche y productos lácteos, carne y cereales son fundamentales para la economía, y cualquier variación en los precios de estos productos puede influir en la balanza comercial. Aunque no hay noticias significativas sobre macroeconomicos para el día, la expectativa sobre la CPI en Estados Unidos puede influir en el comportamiento de la divisa, como se menciona en algunos análisis de FX.\n\nEl posicionamiento especulativo neto bajista y el rendimiento FX positivo en el último mes sugieren una apreciación de la divisa, aunque el ciclo expansivo del banco central y la presión bajista estructural pueden limitar esta tendencia. La confianza del consumidor y la confianza empresarial pueden influir en la economía, aunque no hay noticias significativas al respecto. En resumen, la divisa se encuentra en una situación compleja, con presiones bajistas y alcistas que pueden influir en su comportamiento a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-09T08:40:03.025798+00:00",
+  "generatedAt": "2026-03-10T08:36:55.209305+00:00",
   "exportComposition": "Principales exportaciones: leche y productos lácteos, carne y despojos comestibles, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
     },
     "cotPositioning": -10295,
-    "fxPerformance1M": 2.3197,
+    "fxPerformance1M": 2.291,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-09",
-    "latestNewsTs": 1773052272.0,
+    "lastUpdate": "2026-03-10",
+    "latestNewsTs": 1773120360.0,
     "newsHeadlines": [
-      "Japan Leading Index Rises to Multi-Year Peak",
-      "Corn Futures Hit 9-Month High",
-      "Hong Kong Shares Under Pressure to Start the Week"
+      "Worried About How a Recession Might Affect Your Retirement Savings? Here's What ",
+      "FX Watch: NZD/USD and USD/CHF Setups If U.S. CPI Meets Expectations",
+      "What to Pay Attention to on March 10? Analysis of Fundamental Events for Beginne"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.46,
+    "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 0.37,
+    "avg_bond10y": 3.42,
+    "avg_fx_perf_1m": 0.31,
     "avg_cot": 4098.88
   }
 }

@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra acaba de bajar las tasas de interés en 0.25pp, lo que sugiere un ciclo expansivo, aunque esto presiona a la baja la divisa debido al menor carry. La tasa de interés actual de 3.75% sigue estando por encima del promedio global, aunque la decisión de bajar tasas indica una postura más dovish. La inflación anual de 3.0% y el crecimiento del PIB de 0.1% anual también influyen en la decisión del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones del país, como maquinaria industrial y productos farmacéuticos, no han sido suficientes para compensar el déficit en bienes. La noticia de que el GBP/USD se deprecia tras registrar modestas ganancias en la sesión anterior, cotizando alrededor de 1.3300, refleja la aversión al riesgo y el aumento del dólar estadounidense.\n\nEl posicionamiento especulativo muestra una posición alcista extrema, con 34.5K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación de 2.55% vs USD, aunque la noticia de que el pound esterlina retrocede mientras el dólar estadounidense gana terreno por el aumento de la aversión al riesgo sugiere que el mercado puede estar cambiando su tendencia.",
+  "analysis": "La política monetaria del Banco de Inglaterra ha sido recientemente expansiva, con una bajada de tasas de 0.25pp, lo que sugiere un ciclo bajista en los próximos meses. Esto, unido a la inflación por encima del objetivo y un crecimiento del PIB inferior al promedio global, puede ejercer presión a la baja sobre la divisa. Aunque la tasa de interés sigue siendo superior a la del promedio global, el menor carry puede afectar negativamente a la libra esterlina.\n\nLa balanza comercial del Reino Unido muestra un déficit en bienes, lo que puede ser un factor estructural que presiona a la baja la divisa. La composición exportadora del país, con un enfoque en maquinaria industrial y productos farmacéuticos, puede ser sensible a los cambios en la demanda global. Las noticias recientes sobre la guerra en Irán han reavivado la demanda del dólar, lo que ha llevado a la libra esterlina a retroceder, aunque la caída parece limitada.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +34.5K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación del 2.48% vs el dólar. Sin embargo, las preocupaciones geopolíticas y la demanda del dólar pueden afectar negativamente a la libra esterlina en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-09T08:39:35.467691+00:00",
+  "generatedAt": "2026-03-10T08:36:27.285677+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 34506,
-    "fxPerformance1M": 2.547,
+    "fxPerformance1M": 2.4843,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-09",
-    "latestNewsTs": 1773034689.0,
+    "lastUpdate": "2026-03-10",
+    "latestNewsTs": 1773120703.0,
     "newsHeadlines": [
-      "Pound Sterling Price News and Forecast: GBP/USD weakens as safe-haven demand lif",
-      "La Libra esterlina retrocede mientras el Dólar estadounidense gana terreno por e",
-      "Pound Sterling declines as US Dollar gains on increased risk aversion"
+      "Pound Sterling Price News and Forecast: GBP/USD attracts some sellers amid geopo",
+      "La Libra esterlina retrocede a medida que las preocupaciones por la guerra en Ir",
+      "Pound Sterling edges lower as USD benefits from Iran war concerns"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.46,
+    "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 0.37,
+    "avg_bond10y": 3.42,
+    "avg_fx_perf_1m": 0.31,
     "avg_cot": 4098.88
   }
 }

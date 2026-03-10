@@ -2,9 +2,9 @@
   "currency": "EUR",
   "country": "Eurozona",
   "bank": "Banco Central Europeo (BCE)",
-  "analysis": "La política monetaria del Banco Central Europeo ha tomado un giro dovish, con una reducción de tasas de 0.25pp, lo que presiona a la baja la divisa. Esto se debe a que el menor carry diferencial reduce la atracción de inversores extranjeros, aunque la inflación se mantiene cerca del objetivo del 2%. La tasa de interés actual de 2.15% es inferior al promedio global, lo que puede afectar la competitividad de la divisa.\n\nLa balanza comercial de la Eurozona muestra un superávit de 14.6B USD/mes, gracias a la composición exportadora de maquinaria industrial, vehículos y autopartes, que se benefician de los términos de intercambio favorables. Esto sugiere que la demanda estructural de la divisa se mantiene, aunque la confianza del consumidor y la producción industrial muestran signos de debilidad. Las noticias recientes sobre la guerra en Medio Oriente y la incertidumbre en los mercados financieros han llevado a una mayor volatilidad en la pareja EUR/USD.\n\nEl posicionamiento especulativo en la divisa es netamente alcista, con 29.6K contratos netos, lo que puede indicar un riesgo de corrección si los fundamentos no confirman las expectativas. El rendimiento FX del último mes ha sido negativo, con una depreciación del 1.86% vs USD, lo que puede ser un catalizador para una posible corrección. Las noticias de una posible guerra en Medio Oriente y la incertidumbre en los mercados financieros pueden influir en la volatilidad de la pareja EUR/USD en el corto plazo.",
+  "analysis": "La política monetaria del Banco Central Europeo ha tomado un giro a la baja, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Esto se debe a que el menor carry diferencial reduce la atracción de inversores extranjeros, aunque la inflación se mantiene cerca del objetivo del 2%. La economía de la eurozona sigue en un ciclo bajista, con un crecimiento del PIB anual del 0.2%, inferior al promedio global.\n\nLa balanza comercial sigue mostrando un superávit, gracias a las exportaciones de maquinaria industrial, vehículos y autopartes, que se benefician de términos de intercambio favorables. La guerra en Oriente Próximo ha generado preocupaciones sobre las interrupciones en el flujo de bienes, lo que ha hecho que el par EUR/USD caiga por debajo de 1.1600. Esto refleja la incertidumbre en los mercados y la sensibilidad de la divisa a los factores geopolíticos.\n\nEl posicionamiento especulativo sigue mostrando un sesgo alcista, con 29.6K contratos netos, aunque el rendimiento FX del último mes ha sido negativo, con una depreciación del 1.89% vs USD. La volatilidad en los mercados y las noticias sobre la guerra en Oriente Próximo han generado un entorno desafiante para los traders, lo que puede llevar a una mayor incertidumbre en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-09T08:39:31.109275+00:00",
+  "generatedAt": "2026-03-10T08:36:22.868024+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, vehículos y autopartes, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 29632,
-    "fxPerformance1M": -1.8589,
+    "fxPerformance1M": -1.8945,
     "fxSource": "static",
-    "lastUpdate": "2026-03-09",
-    "latestNewsTs": 1773026100.0,
+    "lastUpdate": "2026-03-10",
+    "latestNewsTs": 1773123070.0,
     "newsHeadlines": [
-      "EUR/USD Weekly Forecast: Middle East war to take its toll on monetary polices",
-      "Overview of the EUR/USD Pair. Weekly Preview. Complete Uncertainty",
-      "Trading Recommendations and Analysis for EUR/USD on March 9. Dollar Struggles to"
+      "EUR/USD cae justo por debajo de 1.1600 en medio de la guerra en Oriente Próximo",
+      "Overview of the EUR/USD Pair. March 10. New Week – New Shock",
+      "Trading Recommendations and Analysis for EUR/USD on March 10. A Difficult Day fo"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.46,
+    "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 0.37,
+    "avg_bond10y": 3.42,
+    "avg_fx_perf_1m": 0.31,
     "avg_cot": 4098.88
   }
 }

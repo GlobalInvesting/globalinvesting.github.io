@@ -2,9 +2,9 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión bajista sobre la divisa. Aunque los mercados de futuros ya descuentan un entorno de bajos tipos de interés, la reciente renovación del acuerdo de swap de divisas entre el Banco Nacional Suizo y el Bank of Korea podría proporcionar cierta estabilidad a la divisa.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. Esto se debe en parte a la composición exportadora del país, que se centra en productos farmacéuticos, instrumentos de precisión y piedras preciosas. La cuenta corriente también muestra un superávit del 5.1% del PIB, lo que indica una demanda estructural de la divisa.\n\nEl posicionamiento especulativo en la divisa suiza es ligeramente alcista, con 4.5K contratos netos. Aunque el rendimiento FX del último mes ha sido positivo, con una apreciación del 0.70% vs USD, el mercado parece estar buscando un catalizador definitivo para romper la estrecha banda de 40 pips en la que se encuentra el par USDCHF. La renovación del acuerdo de swap de divisas con el Bank of Korea podría ser un factor de estabilidad en este contexto.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto puede generar presión bajista sobre la divisa, aunque en episodios de aversión al riesgo, la divisa puede apreciarse bruscamente. La inflación se mantiene baja, en 0.1% anual, lo que justifica la postura del banco central.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. La cuenta corriente también presenta un superávit del 5.1% del PIB, lo que genera demanda estructural de la divisa. La noticia de que el franco suizo se ha fortalecido frente a otras divisas debido a la crisis en Irán y la venta de bonos gubernamentales por temores a la inflación, refuerza la idea de que la divisa puede beneficiarse de flujos defensivos en momentos de tensión global.\n\nEl posicionamiento especulativo, con +4.5K contratos netos, muestra un sesgo alcista, aunque no es extremo. El rendimiento FX del último mes ha sido positivo, con una apreciación del 0.29% frente al dólar. La noticia de que el par USDCHF se encuentra atrapado entre las medias móviles de 100 y 200 horas puede influir en el comportamiento a corto plazo de la divisa. En general, la combinación de factores estructurales y noticias recientes sugiere que la divisa puede mantener su valor en un contexto de incertidumbre global.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-09T08:39:58.334211+00:00",
+  "generatedAt": "2026-03-10T08:36:50.526086+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 4456,
-    "fxPerformance1M": 0.6988,
+    "fxPerformance1M": 0.2919,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-09",
-    "latestNewsTs": 1773034326.0,
+    "lastUpdate": "2026-03-10",
+    "latestNewsTs": 1773079449.0,
     "newsHeadlines": [
-      "Bank of Korea, Swiss National Bank renew currency swap pact",
-      "Top crypto news this week: Pi Network, Polkadot, US inflation data",
-      "USDCHF Technical Analysis: \"Swissie\" grinds within tight 40-Pip range"
+      "USDCHF Technicals: USDCHF trapped between 100-hour and 200-hour moving averages",
+      "Swiss Franc Rises As Iran Crisis Deepens",
+      "Investors Offload Bonds on Inflation Fears as Dollar, Swiss Franc Gain"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.46,
+    "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 0.37,
+    "avg_bond10y": 3.42,
+    "avg_fx_perf_1m": 0.31,
     "avg_cot": 4098.88
   }
 }

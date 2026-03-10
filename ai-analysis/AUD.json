@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto genera un carry atractivo para inversores de renta fija internacional, lo que debería ejercer presión alcista sobre la divisa. Aunque los mercados ya descuentan un ciclo bajista en el largo plazo, la última decisión de subir tasas refuerza la postura hawkish del banco central.\n\nLa balanza comercial australiana presenta un superávit, gracias principalmente a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. Sin embargo, la cuenta corriente muestra un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La caída del par AUD/CAD por debajo de 0.9500, impulsada por el fortalecimiento del Dólar canadiense debido a los precios del petróleo en alza, refleja la intensa presión de venta que enfrenta el cruce.\n\nEl posicionamiento especulativo en el mercado está muy cargado al alza, con un COT de +54.6K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción en los datos. Aunque el rendimiento FX del último mes muestra una depreciación del 0.84% vs USD, la tasa de interés alta y el superávit comercial deberían seguir apoyando a la divisa. La recuperación parcial del dólar australiano en el mercado sugiere que los inversores están atentos a cualquier señal de cambio en el sentimiento del mercado.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia ha sido recientemente ajustada con un aumento en las tasas de interés, lo que ha generado una presión alcista sobre la divisa. Esto se debe a que la tasa de interés en Australia es significativamente superior al promedio global, lo que la hace atractiva para los inversores de renta fija internacional. Aunque los mercados de futuros ya descuentan un posible ajuste en las tasas, las declaraciones del vicegobernador del RBA, Andrew Hauser, sugieren que la respuesta depende del tamaño y la persistencia del shock de precios, lo cual es muy incierto.\n\nLa balanza comercial de Australia muestra un superávit en bienes, lo que se debe en gran medida a las exportaciones de minerales metalíferos, combustibles y petróleo. Sin embargo, la volatilidad en los precios del petróleo y en Oriente Medio es un desafío genuino, según Hauser. Esto podría afectar la cuenta corriente y la balanza comercial, aunque por ahora el impacto es incierto.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +54.6K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. La noticia de que el dólar australiano cedió parte de sus ganancias anteriores debido a la presión de la caída del petróleo refleja esta incertidumbre. En este contexto, cualquier cambio en la política monetaria o en los precios del petróleo podría tener un impacto significativo en la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-09T08:39:44.378686+00:00",
+  "generatedAt": "2026-03-10T08:36:36.309055+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 54635,
-    "fxPerformance1M": -0.8378,
+    "fxPerformance1M": -0.086,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-09",
-    "latestNewsTs": 1773027571.0,
+    "lastUpdate": "2026-03-10",
+    "latestNewsTs": 1773132260.0,
     "newsHeadlines": [
-      "AUD/CAD cae por debajo de 0.9500 mientras los precios del petróleo en aumento fo",
-      "AUD/CAD slumps below 0.9500 as boiling oil prices strengthen Canadian Dollar",
-      "Australian dollar reccovers somewhat. What we're watching."
+      "Australian Dollar Ends 2-Session Gains",
+      "Hauser del RBA: La respuesta depende del tamaño y la persistencia del shock de p",
+      "RBA policymaker Hauser says oil price and Middle East volatility is a \"genuine c"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.46,
+    "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 0.37,
+    "avg_bond10y": 3.42,
+    "avg_fx_perf_1m": 0.31,
     "avg_cot": 4098.88
   }
 }
