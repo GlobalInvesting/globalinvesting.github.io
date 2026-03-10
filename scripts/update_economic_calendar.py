@@ -590,9 +590,24 @@ else:
 
 # ── STEP 3b-pre: Remove timezone-shift duplicates ────────────────────────────
 def normalize_name(name):
-    n = re.sub(r'\s*\([^)]*\)', '', name)
-    n = re.sub(r'[^a-z0-9 ]', '', n.lower())
-    n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand)\b', '', n)
+    n = name.lower()
+    # Preserve YoY/MoM/QoQ distinctions BEFORE stripping (e.g. "PPI (YoY)" vs "PPI (MoM)")
+    n = re.sub(r'\(\s*(y/?o?y|m/?o?m|q/?o?q)\s*\)', lambda m: ' ' + m.group(1).replace('/',''), n)
+    # Also normalize inline variants without parentheses: y/y → yoy, m/m → mom, q/q → qoq
+    n = re.sub(r'\by/y\b', 'yoy', n)
+    n = re.sub(r'\bm/m\b', 'mom', n)
+    n = re.sub(r'\bq/q\b', 'qoq', n)
+    n = re.sub(r'\s*\([^)]*\)', '', n)           # remove remaining parenthetical content
+    n = re.sub(r'[^a-z0-9 ]', ' ', n)            # non-alphanumeric → space
+    n = re.sub(r'\b[ymq]\b', '', n)              # remove single-letter artifacts
+    # Remove country/noise words
+    n = re.sub(r'\b(japan|us|uk|germany|german|france|french|eurozone|euro area|australia|canada|swiss|switzerland|new zealand|final|prelim|preliminary|gross domestic product)\b', '', n)
+    n = re.sub(r'\b(in jpy|in usd|in eur|in gbp)\b', '', n)
+    # For names with >=3 meaningful tokens, strip YoY/MoM/QoQ (they're just variants of same indicator)
+    tokens = [t for t in n.split() if t and t not in ('yoy','mom','qoq','yy','mm','qq')]
+    if len(tokens) >= 3:
+        n = re.sub(r'\b(yoy|mom|qoq|yy|mm|qq)\b', '', n)
+    n = n.replace('gdp', '').replace('cpi', '')
     return re.sub(r'\s+', ' ', n).strip()
 # FF JSON uses local time → event appears on Mar 9 with no time (timeUTC="")
 # FF XML uses UTC → same event appears on Mar 10 at 00:01 UTC
@@ -777,6 +792,53 @@ for slot, group in slot_groups.items():
     deduped.extend(survivors if survivors else group)
 
 print(f"  [Dedup] {len(merged_values)} → {len(deduped)} after dedup")
+
+# ── STEP 3b-post: Cross-day boundary dedup ────────────────────────────────────
+# Events at 22:00-23:59 on day N and 00:00-02:00 on day N+1 are the same event
+# stored with different UTC times from past vs future scrape passes.
+# Group by (currency, normalized_name) across consecutive days in the boundary window.
+boundary_groups = defaultdict(list)
+for ev in deduped:
+    h_str = ev.get('timeUTC', '')
+    try:
+        h = int(h_str.split(':')[0]) if h_str else -1
+    except Exception:
+        h = -1
+    # Normalize: late-night events (>=22h) treated as "day N boundary",
+    # early-morning (<=2h) treated as "day N-1 boundary" → use previous date as group key
+    if h >= 22:
+        anchor_date = ev['dateISO']
+    elif h <= 2:
+        try:
+            anchor_date = (date.fromisoformat(ev['dateISO']) - timedelta(days=1)).isoformat()
+        except Exception:
+            anchor_date = ev['dateISO']
+    else:
+        anchor_date = None  # Not a boundary event
+    if anchor_date:
+        norm = normalize_name(ev['event'])
+        boundary_groups[(ev['currency'], anchor_date, norm)].append(ev)
+
+boundary_merged = 0
+boundary_dominated = set()
+for group_key, group in boundary_groups.items():
+    if len(group) < 2:
+        continue
+    # Find best event (has actual > has forecast > longer name)
+    best = max(group, key=score_event)
+    for ev in group:
+        if ev is not best:
+            # Merge data into best
+            for field in ('actual', 'forecast', 'previous'):
+                if not best.get(field) and ev.get(field):
+                    best[field] = ev[field]
+            boundary_dominated.add(id(ev))
+    boundary_merged += len(group) - 1
+
+if boundary_merged:
+    deduped = [ev for ev in deduped if id(ev) not in boundary_dominated]
+    print(f"  [Boundary-dedup] Merged {boundary_merged} cross-day duplicate events")
+
 
 # ── Filter noise: remove events with no time AND no actual/forecast/previous data ──
 # These are "X Speaks" / ceremonial events with no economic signal value
