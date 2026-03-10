@@ -1,0 +1,90 @@
+name: Fetch Historical Economic Data (Playwright)
+
+# Ejecutar manualmente o programado una vez a la semana para mantener el historial actualizado.
+# El primer run tardará ~30-40 min (104 URLs × ~20s).
+# Runs posteriores con --skip-existing son mucho más rápidos.
+on:
+  workflow_dispatch:
+    inputs:
+      currency:
+        description: 'Divisa a scrapear (vacío = todas)'
+        required: false
+        default: ''
+      indicator:
+        description: 'Indicador a scrapear (vacío = todos)'
+        required: false
+        default: ''
+      skip_existing:
+        description: 'Saltar indicadores con datos existentes (true/false)'
+        required: false
+        default: 'false'
+  schedule:
+    # Todos los lunes a las 05:00 UTC (antes del update-economic-data diario)
+    - cron: '0 5 * * 1'
+
+jobs:
+  fetch-historical-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install playwright --break-system-packages
+          pip install requests python-dateutil --break-system-packages
+
+      - name: Install Chromium via Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Create output directory
+        run: mkdir -p economic-data-history
+
+      - name: Build CLI args
+        id: args
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.currency }}" ]; then
+            ARGS="$ARGS --currency ${{ github.event.inputs.currency }}"
+          fi
+          if [ -n "${{ github.event.inputs.indicator }}" ]; then
+            ARGS="$ARGS --indicator ${{ github.event.inputs.indicator }}"
+          fi
+          if [ "${{ github.event.inputs.skip_existing }}" = "true" ]; then
+            ARGS="$ARGS --skip-existing"
+          fi
+          # Scheduled runs: siempre usar skip-existing para solo actualizar datos nuevos
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="$ARGS --skip-existing"
+          fi
+          echo "cli_args=$ARGS" >> $GITHUB_OUTPUT
+          echo "Args: $ARGS"
+
+      - name: Run historical scraper
+        run: |
+          python3 -u scripts/fetch_historical_econ_data.py ${{ steps.args.outputs.cli_args }}
+
+      - name: Show summary
+        run: |
+          python3 -u scripts/fetch_historical_econ_data.py --summary
+
+      - name: Commit and push historical data
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add economic-data-history/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            COUNT=$(git diff --staged --name-only | wc -l)
+            git commit -m "Historical econ data update $(date +'%Y-%m-%d') — $COUNT files"
+            git pull --rebase origin main || true
+            git push
+          fi
