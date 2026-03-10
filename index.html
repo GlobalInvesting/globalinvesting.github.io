@@ -3869,6 +3869,49 @@ const indicatorTooltips = {
                 }, 50);
                 return () => clearTimeout(timer);
             }, [calSelectedDate, calFilter, activeTab]);
+
+            // Dynamic polling: refresh calendar JSON when an event is imminent (< 15 min) or just passed (< 5 min)
+            React.useEffect(() => {
+                let pollTimer = null;
+                const getNextPollDelay = () => {
+                    const events = (economicCalendar && economicCalendar.events) || [];
+                    const nowMs = Date.now();
+                    for (const ev of events) {
+                        if (ev.actual && ev.actual !== '') continue;
+                        const t = ev.timeUTC || ev.time;
+                        if (!t || !ev.dateISO) continue;
+                        const h = parseInt(t.split(':')[0], 10);
+                        let d;
+                        if (!isNaN(h) && h < 4) {
+                            const nx = new Date(`${ev.dateISO}T12:00:00Z`);
+                            nx.setUTCDate(nx.getUTCDate() + 1);
+                            d = new Date(`${nx.toISOString().slice(0,10)}T${t}:00Z`);
+                        } else {
+                            d = new Date(`${ev.dateISO}T${t}:00Z`);
+                        }
+                        if (isNaN(d.getTime())) continue;
+                        const diff = d.getTime() - nowMs;
+                        if (diff > -300000 && diff < 900000) return 120000; // event within window → poll every 2 min
+                    }
+                    return 300000; // no imminent event → check every 5 min
+                };
+                const schedulePoll = () => {
+                    const delay = getNextPollDelay();
+                    pollTimer = setTimeout(async () => {
+                        try {
+                            CacheManager.clear('economic_calendar');
+                            const fresh = await fetchEconomicCalendar();
+                            if (fresh && fresh.events && fresh.events.length > 0) {
+                                setEconomicCalendar(fresh);
+                            }
+                        } catch(e) { /* silent */ }
+                        schedulePoll();
+                    }, delay);
+                };
+                schedulePoll();
+                return () => { if (pollTimer) clearTimeout(pollTimer); };
+            }, []);
+
             const [lastUpdate, setLastUpdate] = useState(_cachedRates ? new Date() : null);
             const [historicalData, setHistoricalData] = useState(_cachedHist || {});
             const [aiAnalyses, setAiAnalyses]           = useState(_cachedAI || null);
