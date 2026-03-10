@@ -2021,7 +2021,7 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const weakReasons = getTopContributions(weakData.contributions, false);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
+            const confidence = spreadStrength > 25 ? 'Alta' : spreadStrength > 18 ? 'Media' : 'Baja'; // v6.4: umbrales subidos por backtest (≥18→Sharpe 0.85, HR 55%)
 
             // Momentum confirmation filter (backtest-derived):
             // If the pair already moved >2% AGAINST the fundamental signal in the last month,
@@ -2030,6 +2030,8 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const weakFx   = (economicData[weakCurr]   || {}).fxPerformance1M ?? null;
             const pairMom1M = (strongFx !== null && weakFx !== null) ? strongFx - weakFx : null;
             const momentumOpposing = pairMom1M !== null && pairMom1M < -2.0;
+            // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
+            const jpyAsShort = weakCurr === 'JPY';
 
             recommendations.push({
                 type: 'long',
@@ -2047,7 +2049,8 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
                 weakReasons: weakReasons,
                 pairMom1M: pairMom1M,
                 momentumOpposing: momentumOpposing,
-                priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0)
+                jpyAsShort: jpyAsShort,
+                priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0)
             });
         });
     });
@@ -2064,13 +2067,15 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const strongReasons = getTopContributions(strongData.contributions, true);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const confidence = spreadStrength > 20 ? 'Alta' : spreadStrength > 12 ? 'Media' : 'Baja';
+            const confidence = spreadStrength > 25 ? 'Alta' : spreadStrength > 18 ? 'Media' : 'Baja'; // v6.4: umbrales subidos por backtest (≥18→Sharpe 0.85, HR 55%)
 
             // Momentum confirmation filter (same logic as LONG, reversed direction for SHORT)
             const strongFxS = (economicData[strongCurr] || {}).fxPerformance1M ?? null;
             const weakFxS   = (economicData[weakCurr]   || {}).fxPerformance1M ?? null;
             const pairMom1MS = (strongFxS !== null && weakFxS !== null) ? weakFxS - strongFxS : null;
             const momentumOpposingS = pairMom1MS !== null && pairMom1MS < -2.0;
+            // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
+            const jpyAsShortS = weakCurr === 'JPY';
 
             recommendations.push({
                 type: 'short',
@@ -2088,7 +2093,8 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
                 strongReasons: strongReasons,
                 pairMom1M: pairMom1MS,
                 momentumOpposing: momentumOpposingS,
-                priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0)
+                jpyAsShort: jpyAsShortS,
+                priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0)
             });
         });
     });
@@ -2096,8 +2102,9 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
     // Ordenar por prioridad y tomar top 8
     recommendations.sort((a, b) => b.priority - a.priority);
     
-    const longRecs = recommendations.filter(r => r.type === 'long').slice(0, 4);
-    const shortRecs = recommendations.filter(r => r.type === 'short').slice(0, 4);
+    // v6.4: solo mostrar Media y Alta — Baja tiene Sharpe ~0.35 y HR ~47% según backtest
+    const longRecs = recommendations.filter(r => r.type === 'long' && r.confidence !== 'Baja').slice(0, 4);
+    const shortRecs = recommendations.filter(r => r.type === 'short' && r.confidence !== 'Baja').slice(0, 4);
     
     const finalRecommendations = [...longRecs, ...shortRecs];
 
@@ -6099,7 +6106,7 @@ const sentiment = getSentiment(strength);
     <div>
         <div className="section-header">
             <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
-            <div className="section-meta">Basado en diferenciales de fortaleza fundamental</div>
+            <div className="section-meta">Basado en diferenciales de fortaleza fundamental · Horizonte estimado: 2–3 semanas · Solo se muestran señales con confianza Media o Alta</div>
         </div>
         
         <div style={{ 
@@ -6148,6 +6155,19 @@ const sentiment = getSentiment(strength);
                                         cursor: 'help'
                                     }}>
                                         ⚠ Momento adverso
+                                    </span>
+                                )}
+                                {rec.jpyAsShort && (
+                                    <span title="El JPY se mueve principalmente por apetito de riesgo global (risk-on/off), no por fundamentales macro. El backtest muestra HR 20-40% cuando el JPY es la divisa corta. Confirmar con sentimiento de mercado antes de operar." style={{
+                                        fontSize: '0.75rem',
+                                        background: 'rgba(100, 160, 255, 0.12)',
+                                        color: '#7eb3ff',
+                                        border: '1px solid rgba(100, 160, 255, 0.25)',
+                                        borderRadius: '4px',
+                                        padding: '2px 7px',
+                                        cursor: 'help'
+                                    }}>
+                                        ℹ JPY: risk sentiment
                                     </span>
                                 )}
                             </div>
