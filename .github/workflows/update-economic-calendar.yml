@@ -1,62 +1,70 @@
-name: Update Economic Calendar - v8 (Finnhub primary)
+name: Update Economic Calendar v9
 
 on:
   schedule:
-    # Asia session — JPY, AUD, NZD (00:00–05:00 UTC)
-    - cron: '0 0 * * *'
-    - cron: '30 1 * * *'
-    - cron: '0 3 * * *'
-    - cron: '30 4 * * *'
-    # Europe session — EUR, GBP, CHF (06:00–11:00 UTC)
-    - cron: '0 6 * * *'
-    - cron: '30 7 * * *'
-    - cron: '0 9 * * *'
-    - cron: '30 10 * * *'
-    # US session — USD, CAD (12:00–18:00 UTC)
-    - cron: '0 12 * * *'
-    - cron: '0 13 * * *'
-    - cron: '0 14 * * *'
-    - cron: '0 15 * * *'
-    - cron: '0 16 * * *'
-    - cron: '0 17 * * *'
-    - cron: '0 18 * * *'
-    # Late US / API updates (20:00–22:00 UTC)
-    - cron: '0 20 * * *'
-    - cron: '0 22 * * *'
+    # Asia session (JPY, AUD, NZD) — 00:00–05:30 UTC
+    - cron: '5 0 * * *'
+    - cron: '35 1 * * *'
+    - cron: '5 3 * * *'
+    - cron: '35 4 * * *'
+    # Europe open (EUR, GBP, CHF) — 06:00–11:00 UTC
+    - cron: '5 6 * * *'
+    - cron: '35 7 * * *'
+    - cron: '5 9 * * *'
+    - cron: '35 10 * * *'
+    # US session (USD, CAD) — 12:00–18:30 UTC
+    - cron: '5 12 * * *'
+    - cron: '35 12 * * *'
+    - cron: '5 13 * * *'
+    - cron: '35 13 * * *'
+    - cron: '5 14 * * *'
+    - cron: '5 15 * * *'
+    - cron: '5 16 * * *'
+    - cron: '5 17 * * *'
+    - cron: '35 17 * * *'
+    - cron: '5 18 * * *'
+    # Late updates / API catches (20:00–22:30 UTC)
+    - cron: '5 20 * * *'
+    - cron: '5 22 * * *'
+    - cron: '35 22 * * *'
   workflow_dispatch:
 
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml
+        run: pip install requests
 
-      - name: Create directory
+      - name: Create output directory
         run: mkdir -p calendar-data
 
-      - name: Update economic calendar
+      - name: Run calendar scraper
         env:
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
         run: python3 -u scripts/update_economic_calendar.py
 
-      - name: Commit and push
+      - name: Commit and push if changed
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add calendar-data/
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes to calendar data"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add calendar-data/calendar.json
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit"
           else
-            git commit -m "📅 Economic calendar $(date +'%Y-%m-%d %H:%M') UTC — v8.0 Finnhub"
+            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v9.0"
             git pull --rebase origin main || true
             git push
           fi
