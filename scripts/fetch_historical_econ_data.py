@@ -1,51 +1,33 @@
 #!/usr/bin/env python3
 """
-fetch_historical_econ_data.py
-─────────────────────────────
-Scraper de datos históricos económicos desde Trading Economics usando
-Playwright + Chromium para simular un navegador real.
+fetch_historical_econ_data.py  —  v2.0
+───────────────────────────────────────
+Scraper de datos históricos económicos desde Trading Economics con
+Playwright + Chromium. Simula un navegador real y extrae la serie
+histórica completa de cada indicador.
 
-Descarga series históricas completas (2020–hoy) para los 13 indicadores
-del modelo de scoring forex v6.3, para las 8 divisas G10.
-
-SALIDA:
-  economic-data-history/{CURRENCY}/{indicator}.json
-  Formato:
-    {
-      "currency": "USD",
-      "indicator": "gdpGrowth",
-      "source": "TradingEconomics (Playwright)",
-      "fetched": "2026-03-10",
-      "observations": [
-        {"date": "2024-12-15", "value": 2.3},
-        ...
-      ]
-    }
+ESTRATEGIA DE EXTRACCIÓN (cascada):
+  1. Highcharts JS eval  → window.Highcharts.charts[i].series[0].data
+     (datos del gráfico cargados en memoria, más completos)
+  2. Click pestaña "Historical" → tabla visible → scraping HTML
+     (tabla iec-drilldown-table que TE oculta hasta que se hace clic)
+  3. Interceptar XHR/fetch con datos JSON o CSV del gráfico
 
 USO LOCAL:
-  pip install playwright
-  playwright install chromium
+  pip install playwright && playwright install chromium
   python3 scripts/fetch_historical_econ_data.py
   python3 scripts/fetch_historical_econ_data.py --currency USD
-  python3 scripts/fetch_historical_econ_data.py --indicator gdpGrowth
-  python3 scripts/fetch_historical_econ_data.py --currency USD --indicator inflation
+  python3 scripts/fetch_historical_econ_data.py --currency USD --indicator gdpGrowth
+  python3 scripts/fetch_historical_econ_data.py --summary
 
-USO EN GITHUB ACTIONS:
-  Ver .github/workflows/fetch-historical-econ-data.yml
+VER WORKFLOW: .github/workflows/fetch-historical-econ-data.yml
 """
 
-import json
-import os
-import re
-import sys
-import time
-import random
-import argparse
-import csv
+import json, os, re, sys, time, random, argparse, csv
 from datetime import date, datetime
 from io import StringIO
 
-# ─── Configuración ────────────────────────────────────────────────────────────
+# ─── Configuración ─────────────────────────────────────────────────────────
 
 CURRENCIES = ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "CHF", "NZD"]
 
@@ -60,24 +42,22 @@ COUNTRY_SLUGS = {
     "NZD": "new-zealand",
 }
 
-# Indicadores del modelo v6.3 y sus slugs en Trading Economics
 INDICATORS = {
-    "gdpGrowth":         "gdp-growth-rate",
-    "inflation":         "inflation-rate",
-    "unemployment":      "unemployment-rate",
-    "currentAccount":    "current-account-to-gdp",
-    "production":        "industrial-production",
-    "tradeBalance":      "balance-of-trade",
-    "retailSales":       "retail-sales",
-    "wageGrowth":        "wage-growth",
-    "manufacturingPMI":  "manufacturing-pmi",
-    "servicesPMI":       "services-pmi",
-    "bond10y":           "government-bond-yield",
-    "consumerConfidence":"consumer-confidence",
-    "businessConfidence":"business-confidence",
+    "gdpGrowth":          "gdp-growth-rate",
+    "inflation":          "inflation-rate",
+    "unemployment":       "unemployment-rate",
+    "currentAccount":     "current-account-to-gdp",
+    "production":         "industrial-production",
+    "tradeBalance":       "balance-of-trade",
+    "retailSales":        "retail-sales",
+    "wageGrowth":         "wage-growth",
+    "manufacturingPMI":   "manufacturing-pmi",
+    "servicesPMI":        "services-pmi",
+    "bond10y":            "government-bond-yield",
+    "consumerConfidence": "consumer-confidence",
+    "businessConfidence": "business-confidence",
 }
 
-# Frecuencia esperada de cada indicador (para parseo de fechas)
 INDICATOR_FREQ = {
     "gdpGrowth":          "quarterly",
     "inflation":          "monthly",
@@ -94,10 +74,20 @@ INDICATOR_FREQ = {
     "businessConfidence": "monthly",
 }
 
+COT_SLUGS = {
+    "EUR": "euro-fx-cftc-net-speculative-positions",
+    "GBP": "british-pound-cftc-net-speculative-positions",
+    "JPY": "japanese-yen-cftc-net-speculative-positions",
+    "AUD": "australian-dollar-cftc-net-speculative-positions",
+    "CAD": "canadian-dollar-cftc-net-speculative-positions",
+    "CHF": "swiss-franc-cftc-net-speculative-positions",
+    "NZD": "new-zealand-dollar-cftc-net-speculative-positions",
+}
+
 OUTPUT_DIR = "economic-data-history"
 TE_BASE    = "https://tradingeconomics.com"
 
-# ─── Helpers ──────────────────────────────────────────────────────────────────
+# ─── Helpers ───────────────────────────────────────────────────────────────
 
 def ensure_dirs():
     for cur in CURRENCIES:
@@ -112,35 +102,51 @@ def load_existing(currency, indicator):
 
 def save_observations(currency, indicator, observations):
     path = f"{OUTPUT_DIR}/{currency}/{indicator}.json"
-    data = {
+    pkg  = {
         "currency":     currency,
         "indicator":    indicator,
-        "source":       "TradingEconomics (Playwright/Chromium)",
+        "source":       "TradingEconomics via Playwright/Chromium",
         "fetched":      date.today().isoformat(),
-        "observations": observations,
+        "observations": sorted(observations, key=lambda o: o["date"]),
     }
     with open(path, "w") as f:
-        json.dump(data, f, indent=2)
-    print(f"    ✓ Saved {len(observations)} obs → {path}")
+        json.dump(pkg, f, indent=2)
+    print(f"    \u2713 Saved {len(observations)} obs \u2192 {path}")
+
+def merge_observations(existing_obs, new_obs):
+    merged = {o["date"]: o["value"] for o in existing_obs}
+    for o in new_obs:
+        if o.get("date") and o.get("value") is not None:
+            merged[o["date"]] = o["value"]
+    return [{"date": d, "value": v} for d, v in sorted(merged.items())]
 
 def clean_num(text):
     if not text:
         return None
-    text = str(text).strip().replace(",", "").replace("%", "").replace(" ", "")
-    m = re.search(r"(-?\d+\.?\d*)", text)
+    s = str(text).strip().replace(",", "").replace("%", "").replace(" ", "")
+    m = re.search(r"(-?\d+\.?\d*)", s)
     return float(m.group(1)) if m else None
 
 def parse_te_date(date_text, freq="monthly"):
-    """
-    Parsea fechas de Trading Economics a formato ISO YYYY-MM-DD.
-    TE usa formatos como: 'Mar/25', 'Q4/24', '2024', 'Mar 2025'
-    """
     if not date_text:
         return None
-    date_text = date_text.strip()
+    t = str(date_text).strip()
 
-    # 'Mar/25' o 'Mar/2025'
-    m = re.match(r"^([A-Za-z]{3})[/\s](\d{2,4})$", date_text)
+    # ISO: '2024-03' or '2024-03-15'
+    m = re.match(r"^(\d{4})-(\d{2})(?:-\d{2})?$", t)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-15"
+
+    # Timestamp ms (Highcharts): 1704067200000
+    if re.match(r"^\d{10,13}$", t):
+        ts = int(t)
+        if ts > 9999999999:
+            ts //= 1000
+        dt = datetime.utcfromtimestamp(ts)
+        return dt.strftime("%Y-%m-15")
+
+    # 'Mar/25' or 'Mar/2025' or 'Mar 2025'
+    m = re.match(r"^([A-Za-z]{3})[/\s](\d{2,4})$", t)
     if m:
         yr = m.group(2)
         if len(yr) == 2:
@@ -151,27 +157,22 @@ def parse_te_date(date_text, freq="monthly"):
         except ValueError:
             pass
 
-    # 'Q4/24' o 'Q4 2024'
-    m = re.match(r"Q(\d)[/\s](\d{2,4})", date_text)
+    # 'Q4/24' or 'Q4 2024'
+    m = re.match(r"Q(\d)[/\s](\d{2,4})", t)
     if m:
         q  = int(m.group(1))
         yr = m.group(2)
         if len(yr) == 2:
             yr = "20" + yr
-        month = (q - 1) * 3 + 2  # Q1→Feb, Q2→May, Q3→Aug, Q4→Nov
+        month = (q - 1) * 3 + 2
         return f"{yr}-{month:02d}-15"
 
-    # Año solo: '2024'
-    if re.match(r"^\d{4}$", date_text):
-        return f"{date_text}-06-15"
+    # Year only: '2024'
+    if re.match(r"^\d{4}$", t):
+        return f"{t}-06-15"
 
-    # ISO completo: '2024-03-15'
-    m = re.match(r"^(\d{4}-\d{2}-\d{2})$", date_text)
-    if m:
-        return m.group(1)
-
-    # 'March 2025' o 'March/2025'
-    m = re.match(r"^([A-Za-z]+)[/\s](\d{4})$", date_text)
+    # 'March 2025'
+    m = re.match(r"^([A-Za-z]+)[/\s](\d{4})$", t)
     if m:
         try:
             dt = datetime.strptime(f"{m.group(1)} {m.group(2)}", "%B %Y")
@@ -181,39 +182,24 @@ def parse_te_date(date_text, freq="monthly"):
 
     return None
 
-def merge_observations(existing_obs, new_obs):
-    """
-    Combina observaciones existentes con nuevas, eliminando duplicados por fecha.
-    Las nuevas sobreescriben las existentes en caso de conflicto.
-    """
-    merged = {o["date"]: o["value"] for o in existing_obs}
-    for o in new_obs:
-        if o.get("date") and o.get("value") is not None:
-            merged[o["date"]] = o["value"]
-    return [{"date": d, "value": v} for d, v in sorted(merged.items())]
+def random_delay(mn=2.5, mx=5.5):
+    time.sleep(random.uniform(mn, mx))
 
-def random_delay(min_s=2.0, max_s=5.0):
-    """Delay aleatorio para simular comportamiento humano."""
-    time.sleep(random.uniform(min_s, max_s))
+# ─── Browser setup ─────────────────────────────────────────────────────────
 
-# ─── Playwright scraper ───────────────────────────────────────────────────────
-
-def create_browser_context(playwright):
-    """
-    Crea un contexto de Chromium con configuración anti-detección.
-    """
+def create_context(playwright):
     browser = playwright.chromium.launch(
         headless=True,
         args=[
             "--no-sandbox",
             "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
             "--disable-blink-features=AutomationControlled",
-            "--disable-infobars",
-            "--window-size=1366,768",
+            "--window-size=1440,900",
         ],
     )
-    context = browser.new_context(
-        viewport={"width": 1366, "height": 768},
+    ctx = browser.new_context(
+        viewport={"width": 1440, "height": 900},
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -223,593 +209,419 @@ def create_browser_context(playwright):
         timezone_id="America/New_York",
         extra_http_headers={
             "Accept-Language": "en-US,en;q=0.9",
-            "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "DNT":             "1",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "DNT": "1",
         },
     )
-    # Ocultar webdriver flag
-    context.add_init_script("""
+    ctx.add_init_script("""
         Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
-        Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
-        Object.defineProperty(navigator, 'languages', {get: () => ['en-US', 'en']});
+        Object.defineProperty(navigator, 'plugins',   {get: () => [1,2,3,4,5]});
+        Object.defineProperty(navigator, 'languages', {get: () => ['en-US','en']});
+        window.chrome = {runtime: {}};
     """)
-    return browser, context
+    return browser, ctx
 
+# ─── Estrategia 1: Highcharts JS eval ──────────────────────────────────────
 
-def try_csv_download(page, url):
-    """
-    Intenta descargar el CSV histórico directamente desde la página TE.
-    TE expone un botón de descarga que apunta a /chart-data o similar.
-    Retorna lista de {date, value} o None.
-    """
-    observations = []
+JS_HC = """() => {
+    try {
+        if (!window.Highcharts || !window.Highcharts.charts) return null;
+        const charts = window.Highcharts.charts.filter(c => c);
+        if (!charts.length) return null;
+        let best = null, bestLen = 0;
+        for (const chart of charts) {
+            for (const s of (chart.series || [])) {
+                const pts = s.data || s.points || [];
+                if (pts.length > bestLen) {
+                    bestLen = pts.length;
+                    const xAxis = chart.xAxis && chart.xAxis[0];
+                    best = { pts, categories: xAxis ? xAxis.categories : null };
+                }
+            }
+        }
+        if (!best || bestLen < 3) return null;
+        return best.pts.map((p, i) => ({
+            x: p.x !== undefined ? p.x : null,
+            y: p.y !== undefined ? p.y : (p.options ? p.options.y : null),
+            label: best.categories ? best.categories[i] : null,
+        }));
+    } catch(e) { return null; }
+}"""
+
+def extract_highcharts(page):
     try:
-        # Buscar el enlace de descarga CSV en la página
-        # TE usa un botón con texto 'Download' o un <a> con href que contiene 'download'
-        download_links = page.locator("a[href*='download'], a[href*='csv'], button:has-text('Download')")
-        count = download_links.count()
-        if count > 0:
-            # Interceptar la descarga
-            with page.expect_download(timeout=15000) as download_info:
-                download_links.first.click()
-            download = download_info.value
-            csv_path = f"/tmp/te_download_{random.randint(1000,9999)}.csv"
-            download.save_as(csv_path)
-            with open(csv_path) as f:
-                content = f.read()
-            os.unlink(csv_path)
-            observations = parse_csv_content(content)
-            if observations:
-                print(f"      → CSV download: {len(observations)} rows")
-                return observations
-    except Exception as e:
-        print(f"      → CSV download failed: {e}")
-    return None
-
-
-def try_chart_data_api(page, country_slug, indicator_slug):
-    """
-    TE expone datos del gráfico via endpoint /chart-data o API interna.
-    Interceptamos las requests XHR para capturar los datos JSON del gráfico.
-    """
-    observations = []
-    captured = []
-
-    def handle_response(response):
-        url = response.url
-        # TE carga datos del chart via endpoints como:
-        # /chart-data?s=...&d1=...&d2=...
-        # /api/...
-        # o via tradingeconomics.com/embed
-        if any(kw in url for kw in ["chart-data", "/api/", "chartdata", "embed?s="]):
-            try:
-                body = response.json()
-                if isinstance(body, list) and len(body) > 5:
-                    captured.append(body)
-                elif isinstance(body, dict):
-                    # Buscar arrays de datos dentro del dict
-                    for k, v in body.items():
-                        if isinstance(v, list) and len(v) > 5:
-                            captured.append(v)
-            except Exception:
-                pass
-
-    page.on("response", handle_response)
-
-    # Hacer scroll para activar la carga lazy del gráfico
-    page.evaluate("window.scrollTo(0, 400)")
-    page.wait_for_timeout(2000)
-    page.evaluate("window.scrollTo(0, 800)")
-    page.wait_for_timeout(2000)
-
-    page.remove_listener("response", handle_response)
-
-    # Procesar datos capturados
-    for data_array in captured:
-        obs = parse_chart_json(data_array)
+        pts = page.evaluate(JS_HC)
+        if not pts or len(pts) < 3:
+            return []
+        obs = []
+        for p in pts:
+            # Use label if available (string date), else timestamp
+            raw = p.get("label") or (str(int(p["x"])) if p.get("x") is not None else None)
+            dt  = parse_te_date(raw) if raw else None
+            val = clean_num(p.get("y"))
+            if dt and val is not None:
+                obs.append({"date": dt, "value": val})
         if obs:
-            observations.extend(obs)
-            print(f"      → XHR chart data: {len(obs)} rows")
-            return observations
-
-    return None
-
-
-def parse_csv_content(content):
-    """Parsea el contenido CSV de TE."""
-    observations = []
-    try:
-        reader = csv.DictReader(StringIO(content))
-        for row in reader:
-            # TE CSV tiene columnas: Date, Value (o similar)
-            date_val = row.get("Date") or row.get("date") or row.get("Reference")
-            value_raw = row.get("Value") or row.get("value") or row.get("Actual") or row.get("Last")
-            if not date_val or not value_raw:
-                # Intentar con la primera y segunda columna
-                keys = list(row.keys())
-                if len(keys) >= 2:
-                    date_val  = row[keys[0]]
-                    value_raw = row[keys[1]]
-            dt    = parse_te_date(date_val)
-            value = clean_num(value_raw)
-            if dt and value is not None:
-                observations.append({"date": dt, "value": value})
+            print(f"      \u2192 Highcharts: {len(obs)} pts")
+        return obs
     except Exception as e:
-        print(f"      → CSV parse error: {e}")
-    return observations
+        print(f"      \u2192 Highcharts error: {e}")
+        return []
 
+# ─── Estrategia 2: Click Historical tab → tabla ────────────────────────────
 
-def parse_chart_json(data_array):
-    """
-    Parsea el array JSON del gráfico de TE.
-    Formato típico: [["2024-01-01", 2.3], ...] o [{"Date":"...","Value":...}, ...]
-    """
-    observations = []
-    if not data_array:
-        return observations
+HIST_TAB_SELS = [
+    "a[href='#historical']",
+    "a:has-text('Historical')",
+    "li:has-text('Historical') > a",
+    ".nav-tabs a:has-text('Historical')",
+    "a[data-toggle='tab']:has-text('Historical')",
+    "#historical-tab",
+    "a[href*='historical']",
+]
 
-    for item in data_array:
+def click_historical_tab(page):
+    for sel in HIST_TAB_SELS:
         try:
-            if isinstance(item, (list, tuple)) and len(item) >= 2:
-                dt    = parse_te_date(str(item[0]))
-                value = clean_num(str(item[1]))
-            elif isinstance(item, dict):
-                dt    = parse_te_date(item.get("Date") or item.get("date") or item.get("DateTime") or "")
-                value = clean_num(item.get("Value") or item.get("value") or item.get("Last") or item.get("Close") or "")
-            else:
-                continue
-
-            if dt and value is not None:
-                observations.append({"date": dt, "value": value})
+            loc = page.locator(sel).first
+            if loc.count() > 0:
+                loc.click(force=True)
+                page.wait_for_timeout(1500)
+                print(f"      \u2192 Clicked: {sel}")
+                return True
         except Exception:
-            continue
+            pass
+    return False
 
-    return observations
-
-
-def scrape_table_from_page(page, indicator, freq):
-    """
-    Extrae la tabla de datos históricos visible en la página TE.
-    TE muestra la historia completa en una tabla con columnas: Date, Actual/Value, Previous, etc.
-    """
-    observations = []
+def scrape_table(page, freq):
+    obs = []
     try:
-        # Esperar a que cargue alguna tabla o contenido relevante
-        page.wait_for_selector("table, #ctl00_ContentPlaceHolder1_ctl00_GridViewCalendar, .table", timeout=10000)
+        # Force all tables visible via JS
+        page.evaluate("""
+            document.querySelectorAll('table, .tab-pane, [class*="historical"]').forEach(el => {
+                el.style.display = el.tagName === 'TABLE' ? 'table' : '';
+                el.style.visibility = 'visible';
+                el.style.opacity = '1';
+                let p = el.parentElement;
+                while (p && p !== document.body) {
+                    if (getComputedStyle(p).display === 'none') p.style.display = '';
+                    p = p.parentElement;
+                }
+            });
+        """)
+        page.wait_for_timeout(600)
 
-        # Extraer todas las tablas
         tables = page.query_selector_all("table")
         for table in tables:
             rows = table.query_selector_all("tr")
-            if len(rows) < 3:
+            if len(rows) < 4:
                 continue
+            header_cells = rows[0].query_selector_all("th, td")
+            headers = [c.inner_text().strip().lower() for c in header_cells]
 
-            # Detectar headers
-            header_row = rows[0]
-            headers = [th.inner_text().strip().lower() for th in header_row.query_selector_all("th, td")]
-
-            # Buscar columnas de fecha y valor
-            date_col  = next((i for i, h in enumerate(headers) if any(k in h for k in ["date", "reference", "period", "month", "quarter"])), None)
-            value_col = next((i for i, h in enumerate(headers) if any(k in h for k in ["actual", "value", "last", "close"])), None)
-
-            if date_col is None or value_col is None:
-                # Intentar por posición: col 0 = date, col 1 = value
-                if len(headers) >= 2:
-                    date_col, value_col = 0, 1
-                else:
-                    continue
+            date_col  = next((i for i, h in enumerate(headers) if any(k in h for k in
+                ["date","reference","period","release","month","quarter","year"])), 0)
+            value_col = next((i for i, h in enumerate(headers) if any(k in h for k in
+                ["actual","value","last","close","previous"])), 1)
 
             count = 0
             for row in rows[1:]:
                 cells = row.query_selector_all("td")
                 if len(cells) <= max(date_col, value_col):
                     continue
-                date_text  = cells[date_col].inner_text().strip()
-                value_text = cells[value_col].inner_text().strip()
-                dt    = parse_te_date(date_text, freq)
-                value = clean_num(value_text)
-                if dt and value is not None and dt >= "2020-01-01":
-                    observations.append({"date": dt, "value": value})
+                dt  = parse_te_date(cells[date_col].inner_text().strip(), freq)
+                val = clean_num(cells[value_col].inner_text().strip())
+                if dt and val is not None and dt >= "2015-01-01":
+                    obs.append({"date": dt, "value": val})
                     count += 1
 
-            if count > 3:
-                print(f"      → Table scrape: {count} rows (headers: {headers[:4]})")
-                return observations
-
+            if count >= 4:
+                print(f"      \u2192 Table: {count} rows")
+                return obs
     except Exception as e:
-        print(f"      → Table scrape error: {e}")
-    return observations
+        print(f"      \u2192 Table error: {e}")
+    return obs
 
+# ─── Estrategia 3: XHR intercept ──────────────────────────────────────────
 
-def scrape_from_embed_url(page, country_slug, indicator_slug):
-    """
-    TE tiene un endpoint embed con datos JSON:
-    https://tradingeconomics.com/embed/?s=usaurtot&v=202403131513V20230410&type=line
-    pero el parámetro 's' es un código interno. Lo intentamos vía la URL principal.
-    También intentamos el endpoint de datos del gráfico directamente.
-    """
-    # Intentar el endpoint de descarga histórica de TE
-    # Formato: /united-states/gdp-growth-rate#chart -> botón Download -> CSV
-    observations = []
-
-    # Navegar al tab 'Chart' que suele tener más historia
-    try:
-        chart_tab = page.locator("a[href*='#chart'], a:has-text('Chart'), #chart")
-        if chart_tab.count() > 0:
-            chart_tab.first.click()
-            page.wait_for_timeout(2000)
-    except Exception:
-        pass
-
-    # Buscar y hacer clic en botón de descarga
-    download_selectors = [
-        "a[href*='.csv']",
-        "a:has-text('Download')",
-        "a:has-text('CSV')",
-        "button:has-text('Download')",
-        "i.fa-download",
-        ".download-button",
-    ]
-    for sel in download_selectors:
+def setup_xhr(page):
+    captured = []
+    def handle(response):
+        url = response.url
+        if "tradingeconomics.com" not in url:
+            return
+        if not any(k in url for k in ["chart","data","series","embed","download",".csv",".json","historical","indicator"]):
+            return
+        ct = response.headers.get("content-type", "")
         try:
-            btn = page.locator(sel)
-            if btn.count() > 0:
-                with page.expect_download(timeout=12000) as dl:
-                    btn.first.click()
-                download = dl.value
-                csv_path = f"/tmp/te_{country_slug}_{indicator_slug}.csv"
-                download.save_as(csv_path)
-                with open(csv_path) as f:
-                    content = f.read()
-                os.unlink(csv_path)
-                obs = parse_csv_content(content)
-                if obs:
-                    print(f"      → Download button ({sel}): {len(obs)} rows")
-                    return obs
+            if "json" in ct:
+                body = response.json()
+                if body:
+                    captured.append(("json", body))
+            elif any(x in ct for x in ["csv","text/plain","octet-stream"]):
+                body = response.text()
+                if body and len(body) > 50:
+                    captured.append(("csv", body))
         except Exception:
             pass
+    page.on("response", handle)
+    return captured
 
-    return observations
+def parse_xhr(captured):
+    for dtype, body in captured:
+        obs = []
+        if dtype == "json":
+            arr = body if isinstance(body, list) else next(
+                (v for v in body.values() if isinstance(v, list) and len(v) > 5), None
+            ) if isinstance(body, dict) else None
+            if arr:
+                for item in arr:
+                    if isinstance(item, (list, tuple)) and len(item) >= 2:
+                        dt  = parse_te_date(str(item[0]))
+                        val = clean_num(item[1])
+                    elif isinstance(item, dict):
+                        dt  = parse_te_date(item.get("Date") or item.get("date") or item.get("DateTime") or "")
+                        val = clean_num(item.get("Value") or item.get("value") or item.get("Last") or item.get("Actual") or "")
+                    else:
+                        continue
+                    if dt and val is not None:
+                        obs.append({"date": dt, "value": val})
+                if len(obs) >= 4:
+                    print(f"      \u2192 XHR JSON: {len(obs)} pts")
+                    return obs
+        elif dtype == "csv":
+            try:
+                reader = csv.DictReader(StringIO(body))
+                for row in reader:
+                    keys = list(row.keys())
+                    dk = next((k for k in keys if any(x in k.lower() for x in ["date","reference","period"])), keys[0] if keys else None)
+                    vk = next((k for k in keys if any(x in k.lower() for x in ["actual","value","last","close"])), keys[1] if len(keys)>1 else None)
+                    if dk and vk:
+                        dt  = parse_te_date(row[dk])
+                        val = clean_num(row[vk])
+                        if dt and val is not None:
+                            obs.append({"date": dt, "value": val})
+                if len(obs) >= 4:
+                    print(f"      \u2192 XHR CSV: {len(obs)} pts")
+                    return obs
+            except Exception:
+                pass
+    return []
 
+# ─── Scraper por página ────────────────────────────────────────────────────
 
-def scrape_indicator_page(context, country_slug, indicator_slug, currency, indicator, freq):
-    """
-    Scraping principal de una página de indicador en Trading Economics.
-    Estrategia en cascada:
-      1. XHR intercept (chart data API)
-      2. Botón de descarga CSV
-      3. Tabla HTML visible
-    """
+def scrape_page(ctx, country_slug, indicator_slug, freq, retries=2):
     url = f"{TE_BASE}/{country_slug}/{indicator_slug}"
-    print(f"    → {url}")
+    print(f"    \u2192 {url}")
 
-    page = context.new_page()
-    observations = []
+    for attempt in range(retries + 1):
+        if attempt > 0:
+            print(f"      \u2192 Retry {attempt}/{retries}")
+            random_delay(5, 10)
 
-    try:
-        # Configurar intercepción XHR antes de navegar
-        captured_xhr = []
+        page = ctx.new_page()
+        captured = setup_xhr(page)
+        obs = []
 
-        def on_response(response):
-            url_r = response.url
-            if any(kw in url_r for kw in [
-                "chart-data", "chartdata", "/api/", "embed?s=",
-                "download", ".csv", "getdata", "series"
-            ]):
-                ct = response.headers.get("content-type", "")
-                if "json" in ct:
-                    try:
-                        body = response.json()
-                        captured_xhr.append(("json", body))
-                    except Exception:
-                        pass
-                elif "csv" in ct or "text/plain" in ct:
-                    try:
-                        body = response.text()
-                        captured_xhr.append(("csv", body))
-                    except Exception:
-                        pass
-
-        page.on("response", on_response)
-
-        # Navegar a la página
-        page.goto(url, wait_until="domcontentloaded", timeout=30000)
-        random_delay(2.0, 4.0)
-
-        # Scroll para activar carga lazy
-        for scroll_y in [300, 600, 1000]:
-            page.evaluate(f"window.scrollTo(0, {scroll_y})")
-            page.wait_for_timeout(800)
-
-        # 1. Procesar XHR capturados
-        for data_type, body in captured_xhr:
-            if data_type == "json":
-                if isinstance(body, list):
-                    obs = parse_chart_json(body)
-                    if len(obs) > 5:
-                        observations = obs
-                        break
-                elif isinstance(body, dict):
-                    for k, v in body.items():
-                        if isinstance(v, list) and len(v) > 5:
-                            obs = parse_chart_json(v)
-                            if len(obs) > 5:
-                                observations = obs
-                                break
-            elif data_type == "csv":
-                obs = parse_csv_content(body)
-                if len(obs) > 5:
-                    observations = obs
-                    break
-
-        if observations:
-            print(f"      ✓ XHR: {len(observations)} observations")
-        
-        # 2. Intentar descarga CSV
-        if not observations:
-            obs = scrape_from_embed_url(page, country_slug, indicator_slug)
-            if obs:
-                observations = obs
-
-        # 3. Scraping de tabla HTML
-        if not observations:
-            obs = scrape_table_from_page(page, indicator, freq)
-            if obs:
-                observations = obs
-
-        # 4. Intentar navegar a la URL con #chart o ?g=10 para ampliar historia
-        if len(observations) < 10:
-            for suffix in ["?g=10", "?g=5", "#chart"]:
-                try:
-                    page.goto(url + suffix, wait_until="domcontentloaded", timeout=20000)
-                    random_delay(2.0, 3.5)
-                    for scroll_y in [400, 800]:
-                        page.evaluate(f"window.scrollTo(0, {scroll_y})")
-                        page.wait_for_timeout(600)
-                    # Reintentar XHR
-                    for data_type, body in captured_xhr:
-                        if data_type == "json" and isinstance(body, list):
-                            obs = parse_chart_json(body)
-                            if len(obs) > len(observations):
-                                observations = obs
-                    if len(observations) >= 10:
-                        break
-                except Exception:
-                    pass
-
-    except Exception as e:
-        print(f"      ✗ Page error: {e}")
-    finally:
-        page.remove_listener("response", on_response) if 'on_response' in dir() else None
-        page.close()
-
-    return observations
-
-
-# ─── Scraper COT histórico ────────────────────────────────────────────────────
-
-def scrape_cot_history(context):
-    """
-    Scraping del historial de posicionamiento COT/CFTC desde Trading Economics.
-    Guarda en economic-data-history/{CURRENCY}/cotPositioning.json
-    """
-    COT_SLUGS = {
-        "EUR": "euro-fx-cftc-net-speculative-positions",
-        "GBP": "british-pound-cftc-net-speculative-positions",
-        "JPY": "japanese-yen-cftc-net-speculative-positions",
-        "AUD": "australian-dollar-cftc-net-speculative-positions",
-        "CAD": "canadian-dollar-cftc-net-speculative-positions",
-        "CHF": "swiss-franc-cftc-net-speculative-positions",
-        "NZD": "new-zealand-dollar-cftc-net-speculative-positions",
-    }
-
-    print("\n── COT/CFTC Positioning History ──")
-    for currency, slug in COT_SLUGS.items():
-        existing = load_existing(currency, "cotPositioning")
-        existing_obs = existing.get("observations", []) if existing else []
-
-        url = f"{TE_BASE}/cot/{slug}"
-        print(f"  {currency}: {url}")
-
-        page = context.new_page()
-        observations = []
-        captured_xhr = []
-
-        def on_response(response):
-            if any(kw in response.url for kw in ["chart-data", "/api/", "embed", "download", ".csv"]):
-                try:
-                    ct = response.headers.get("content-type", "")
-                    if "json" in ct:
-                        captured_xhr.append(("json", response.json()))
-                    elif "csv" in ct or "text" in ct:
-                        captured_xhr.append(("csv", response.text()))
-                except Exception:
-                    pass
-
-        page.on("response", on_response)
         try:
-            page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            random_delay(2.0, 4.0)
-            for y in [300, 600, 1000]:
+            page.goto(url, wait_until="domcontentloaded", timeout=35000)
+            page.wait_for_timeout(2000)
+
+            # Progressive scroll to trigger lazy loads
+            for y in [200, 500, 900, 1300]:
                 page.evaluate(f"window.scrollTo(0, {y})")
-                page.wait_for_timeout(700)
+                page.wait_for_timeout(500)
 
-            for dtype, body in captured_xhr:
-                if dtype == "json" and isinstance(body, list):
-                    obs = parse_chart_json(body)
-                    if len(obs) > len(observations):
-                        observations = obs
-                elif dtype == "csv":
-                    obs = parse_csv_content(body)
-                    if len(obs) > len(observations):
-                        observations = obs
+            # Wait for Highcharts to initialize
+            try:
+                page.wait_for_function(
+                    "() => window.Highcharts && window.Highcharts.charts && "
+                    "window.Highcharts.charts.filter(c=>c).length > 0",
+                    timeout=8000
+                )
+            except Exception:
+                pass  # continue without Highcharts
 
-            if not observations:
-                observations = scrape_table_from_page(page, "cotPositioning", "weekly")
+            # Strategy 1: Highcharts
+            obs = extract_highcharts(page)
+            if len(obs) >= 10:
+                break
+
+            # Strategy 2: Click Historical tab, then Highcharts + table
+            click_historical_tab(page)
+            page.wait_for_timeout(2000)
+
+            obs2 = extract_highcharts(page)
+            if len(obs2) > len(obs):
+                obs = obs2
+
+            if len(obs) < 10:
+                table_obs = scrape_table(page, freq)
+                if len(table_obs) > len(obs):
+                    obs = table_obs
+
+            # Strategy 3: XHR
+            if len(obs) < 5:
+                xhr_obs = parse_xhr(captured)
+                if len(xhr_obs) > len(obs):
+                    obs = xhr_obs
+
+            if len(obs) >= 5:
+                break
 
         except Exception as e:
-            print(f"    ✗ {e}")
+            print(f"      \u2717 Error (attempt {attempt+1}): {e}")
         finally:
             page.close()
 
-        if observations:
-            final_obs = merge_observations(existing_obs, observations)
-            save_observations(currency, "cotPositioning", final_obs)
+    # Deduplicate and filter
+    seen = set()
+    result = []
+    for o in obs:
+        if o["date"] >= "2015-01-01" and o["date"] not in seen:
+            seen.add(o["date"])
+            result.append(o)
+    return sorted(result, key=lambda o: o["date"])
+
+
+# ─── COT histórico ─────────────────────────────────────────────────────────
+
+def scrape_cot_all(ctx):
+    print("\n\u2500\u2500 COT/CFTC Positioning History \u2500\u2500")
+    for currency, slug in COT_SLUGS.items():
+        existing     = load_existing(currency, "cotPositioning")
+        existing_obs = existing.get("observations", []) if existing else []
+        url = f"{TE_BASE}/cot/{slug}"
+        print(f"\n  {currency}: {url}")
+        page = ctx.new_page()
+        captured = setup_xhr(page)
+        obs = []
+        try:
+            page.goto(url, wait_until="domcontentloaded", timeout=35000)
+            page.wait_for_timeout(2000)
+            for y in [300, 700, 1100]:
+                page.evaluate(f"window.scrollTo(0, {y})")
+                page.wait_for_timeout(500)
+            try:
+                page.wait_for_function(
+                    "() => window.Highcharts && window.Highcharts.charts && "
+                    "window.Highcharts.charts.filter(c=>c).length > 0",
+                    timeout=8000
+                )
+            except Exception:
+                pass
+            obs = extract_highcharts(page)
+            if len(obs) < 5:
+                click_historical_tab(page)
+                page.wait_for_timeout(1500)
+                obs2 = extract_highcharts(page)
+                if len(obs2) > len(obs):
+                    obs = obs2
+            if len(obs) < 5:
+                obs = scrape_table(page, "weekly") or obs
+            if len(obs) < 5:
+                obs = parse_xhr(captured) or obs
+        except Exception as e:
+            print(f"    \u2717 {e}")
+        finally:
+            page.close()
+
+        obs = [o for o in obs if o["date"] >= "2015-01-01"]
+        if obs:
+            final = merge_observations(existing_obs, obs)
+            save_observations(currency, "cotPositioning", final)
         else:
-            print(f"    ✗ No COT data for {currency}")
+            print(f"    \u2717 No COT data for {currency}")
+        random_delay(4, 8)
 
-        random_delay(3.0, 6.0)
 
+# ─── Runner ────────────────────────────────────────────────────────────────
 
-# ─── Función principal ────────────────────────────────────────────────────────
-
-def run_scraper(currencies=None, indicators=None, skip_existing=False):
-    """
-    Ejecuta el scraping completo para las combinaciones de divisas/indicadores.
-    
-    Args:
-        currencies:     lista de divisas a scrapear (None = todas)
-        indicators:     lista de indicadores a scrapear (None = todos)
-        skip_existing:  si True, salta pares que ya tienen datos
-    """
+def run(currencies=None, indicators=None, skip_existing=False):
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        print("ERROR: Playwright no está instalado.")
-        print("Ejecuta: pip install playwright && playwright install chromium")
+        print("ERROR: pip install playwright && playwright install chromium")
         sys.exit(1)
 
     ensure_dirs()
+    target_cur = currencies  or CURRENCIES
+    target_ind = indicators  or list(INDICATORS.keys())
+    total      = len(target_cur) * len(target_ind)
+    done = errors = 0
 
-    target_currencies  = currencies  or CURRENCIES
-    target_indicators  = indicators  or list(INDICATORS.keys())
-
-    total  = len(target_currencies) * len(target_indicators)
-    done   = 0
-    errors = 0
-
-    print("=" * 60)
-    print("HISTORICAL ECON DATA SCRAPER — Playwright/Chromium")
-    print(f"Divisas: {target_currencies}")
-    print(f"Indicadores: {target_indicators}")
-    print(f"Total URLs: {total}")
-    print("=" * 60)
+    print("=" * 62)
+    print("HISTORICAL ECON DATA SCRAPER v2.0 \u2014 Playwright/Chromium")
+    print(f"Divisas:     {target_cur}")
+    print(f"Indicadores: {target_ind}")
+    print(f"Total URLs:  {total}")
+    print("=" * 62)
 
     with sync_playwright() as pw:
-        browser, context = create_browser_context(pw)
-
+        browser, ctx = create_context(pw)
         try:
-            for currency in target_currencies:
-                country_slug = COUNTRY_SLUGS[currency]
-                print(f"\n{'─'*50}")
-                print(f"  {currency} ({country_slug})")
-                print(f"{'─'*50}")
-
-                for indicator in target_indicators:
-                    indicator_slug = INDICATORS[indicator]
-                    freq           = INDICATOR_FREQ[indicator]
-                    done          += 1
+            for currency in target_cur:
+                country = COUNTRY_SLUGS[currency]
+                print(f"\n{'─'*52}")
+                print(f"  {currency}  ({country})")
+                print(f"{'─'*52}")
+                for indicator in target_ind:
+                    slug = INDICATORS[indicator]
+                    freq = INDICATOR_FREQ[indicator]
+                    done += 1
                     print(f"\n  [{done}/{total}] {currency}/{indicator}")
-
-                    # Cargar datos existentes para merge incremental
-                    existing = load_existing(currency, indicator)
+                    existing     = load_existing(currency, indicator)
                     existing_obs = existing.get("observations", []) if existing else []
-
                     if skip_existing and len(existing_obs) >= 20:
-                        print(f"    → Skip (ya tiene {len(existing_obs)} obs)")
+                        print(f"    \u2192 Skip ({len(existing_obs)} obs existentes)")
                         continue
-
-                    observations = scrape_indicator_page(
-                        context, country_slug, indicator_slug,
-                        currency, indicator, freq
-                    )
-
-                    if observations:
-                        # Filtrar: solo datos desde 2020
-                        observations = [o for o in observations if o["date"] >= "2020-01-01"]
-                        # Merge con existentes
-                        final_obs = merge_observations(existing_obs, observations)
-                        save_observations(currency, indicator, final_obs)
+                    new_obs = scrape_page(ctx, country, slug, freq)
+                    if new_obs:
+                        final = merge_observations(existing_obs, new_obs)
+                        save_observations(currency, indicator, final)
                     else:
                         errors += 1
-                        print(f"    ✗ Sin datos para {currency}/{indicator}")
-
-                    # Pausa entre requests para no ser detectado
-                    random_delay(3.0, 7.0)
-
-                # Pausa mayor entre divisas
-                random_delay(5.0, 10.0)
-
-            # Scraping COT histórico
-            scrape_cot_history(context)
-
+                        print(f"    \u2717 Sin datos para {currency}/{indicator}")
+                    random_delay(3.5, 7.0)
+                random_delay(6, 12)
+            scrape_cot_all(ctx)
         finally:
-            context.close()
+            ctx.close()
             browser.close()
 
-    print("\n" + "=" * 60)
-    print(f"COMPLETADO: {done} URLs procesadas, {errors} errores")
-    print(f"Datos guardados en: {OUTPUT_DIR}/")
-    print("=" * 60)
+    print("\n" + "=" * 62)
+    print(f"COMPLETADO \u2014 {done} URLs | {errors} errores")
+    print("=" * 62)
 
 
-def build_summary():
-    """
-    Genera un resumen de los datos disponibles en economic-data-history/.
-    """
-    print("\n── Resumen de datos históricos disponibles ──")
+def show_summary():
+    print("\n\u2500\u2500 Resumen economic-data-history/ \u2500\u2500")
+    all_ind = list(INDICATORS.keys()) + ["cotPositioning"]
     for currency in CURRENCIES:
         print(f"\n  {currency}:")
-        for indicator in list(INDICATORS.keys()) + ["cotPositioning"]:
-            path = f"{OUTPUT_DIR}/{currency}/{indicator}.json"
+        for ind in all_ind:
+            path = f"{OUTPUT_DIR}/{currency}/{ind}.json"
             if os.path.exists(path):
                 with open(path) as f:
                     d = json.load(f)
                 obs = d.get("observations", [])
                 if obs:
                     dates = sorted(o["date"] for o in obs)
-                    print(f"    {indicator:25s}: {len(obs):4d} obs  [{dates[0]} → {dates[-1]}]")
+                    print(f"    {ind:25s}: {len(obs):4d} obs  [{dates[0]} \u2192 {dates[-1]}]")
                 else:
-                    print(f"    {indicator:25s}: VACÍO")
+                    print(f"    {ind:25s}: vacío")
             else:
-                print(f"    {indicator:25s}: NO EXISTE")
+                print(f"    {ind:25s}: \u2014")
 
-
-# ─── Entry point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Scraper histórico de datos económicos desde Trading Economics (Playwright)"
-    )
-    parser.add_argument(
-        "--currency", "-c",
-        nargs="+",
-        choices=CURRENCIES,
-        help="Divisas a scrapear (default: todas)"
-    )
-    parser.add_argument(
-        "--indicator", "-i",
-        nargs="+",
-        choices=list(INDICATORS.keys()),
-        help="Indicadores a scrapear (default: todos)"
-    )
-    parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        help="Saltar indicadores que ya tienen ≥20 observaciones"
-    )
-    parser.add_argument(
-        "--summary",
-        action="store_true",
-        help="Solo mostrar resumen de datos disponibles (sin scrapear)"
-    )
+    parser = argparse.ArgumentParser(description="Scraper histórico TE (Playwright)")
+    parser.add_argument("--currency",  "-c", nargs="+", choices=CURRENCIES)
+    parser.add_argument("--indicator", "-i", nargs="+", choices=list(INDICATORS.keys()))
+    parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument("--summary",       action="store_true")
     args = parser.parse_args()
-
     if args.summary:
-        build_summary()
+        show_summary()
     else:
-        run_scraper(
-            currencies=args.currency,
-            indicators=args.indicator,
-            skip_existing=args.skip_existing,
-        )
+        run(currencies=args.currency, indicators=args.indicator, skip_existing=args.skip_existing)
