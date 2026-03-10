@@ -457,7 +457,7 @@
         .heatmap-table th:first-child {
             text-align: left;
             padding-left: 1.5rem;
-            min-width: 200px;
+            min-width: 160px;
             border-right: 2px solid var(--border);
             position: sticky;
             left: 0;
@@ -466,11 +466,7 @@
         }
 
         .heatmap-table th:nth-child(2) {
-            position: sticky;
-            left: 200px;
-            z-index: 3;
-            background: var(--bg-card);
-            border-right: 2px solid var(--border);
+            /* scrolls with table — not sticky */
         }
 
         .heatmap-table th:last-child {
@@ -497,11 +493,7 @@
         }
 
         .heatmap-table td:nth-child(2) {
-            position: sticky;
-            left: 200px;
-            z-index: 2;
-            background: var(--bg-card);
-            border-right: 2px solid var(--border);
+            /* scrolls with table — not sticky */
         }
 
         .heatmap-table td:last-child {
@@ -516,7 +508,7 @@
     background: var(--bg-elevated);
 }
 
-.heatmap-table tbody tr:hover td:not(:first-child):not(:nth-child(2)) {
+.heatmap-table tbody tr:hover td:not(:first-child) {
     color: var(--text-primary) !important;
 }
 
@@ -524,8 +516,7 @@
     color: var(--text-primary) !important;
 }
 
-        .heatmap-table tbody tr:hover td:first-child,
-        .heatmap-table tbody tr:hover td:nth-child(2) {
+        .heatmap-table tbody tr:hover td:first-child {
             background: var(--bg-elevated);
         }
 
