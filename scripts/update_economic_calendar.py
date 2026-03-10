@@ -438,7 +438,7 @@ print("=" * 60)
 import sys
 
 today     = date.today()
-from_date = today - timedelta(days=28)  # v6.3: extendido de 2→28 días para acumular actuals del ESI
+from_date = today - timedelta(days=90)  # v6.4: extendido de 28→90 días para ESI más robusto (3 meses de sorpresas)
 to_date   = today + timedelta(days=30)
 
 target_dates = set()
@@ -484,7 +484,7 @@ all_events  = []
 source_used = None
 fetch_errors = []
 
-past_from = (today - timedelta(days=28)).isoformat()
+past_from = (today - timedelta(days=90)).isoformat()
 past_to   = today.isoformat()
 future_to = to_date.isoformat()
 
