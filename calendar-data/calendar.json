@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-10",
-  "generatedAt": "2026-03-10T09:54:43.055544Z",
+  "generatedAt": "2026-03-10T11:08:07.086345Z",
   "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
   "status": "ok",
   "source": "Trading Economics (Playwright)",
@@ -8,20 +8,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-09",
-  "totalEvents": 1903,
+  "totalEvents": 1905,
   "currencyCounts": {
     "AUD": 156,
     "CAD": 143,
     "CHF": 44,
-    "EUR": 208,
-    "GBP": 206,
+    "EUR": 209,
+    "GBP": 207,
     "JPY": 219,
     "NZD": 69,
     "USD": 858
   },
   "impactCounts": {
     "low": 1208,
-    "medium": 557,
+    "medium": 559,
     "high": 138
   },
   "events": [
@@ -21458,7 +21458,7 @@
       "flag": "🇺🇸",
       "event": "NFIB Business Optimism Index (FEB)",
       "impact": "low",
-      "actual": "",
+      "actual": "98.8",
       "forecast": "99.1",
       "previous": "99.3"
     },
@@ -21537,7 +21537,7 @@
       "event": "API Crude Oil Stock Change (MAR/06)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "1.4M",
       "previous": "5.6M"
     },
     {
@@ -23123,7 +23123,7 @@
       "event": "Industrial Production MoM (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.3%",
       "previous": "0.7%"
     },
     {
@@ -23136,7 +23136,7 @@
       "event": "Capacity Utilization (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "76.0%",
       "previous": "76.2%"
     },
     {
@@ -23149,7 +23149,7 @@
       "event": "Industrial Production YoY (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.1%",
       "previous": "2.3%"
     },
     {
@@ -23162,7 +23162,7 @@
       "event": "Manufacturing Production MoM (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.2%",
       "previous": "0.6%"
     },
     {
@@ -23175,7 +23175,7 @@
       "event": "Manufacturing Production YoY (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.0%",
       "previous": "2.4%"
     },
     {
@@ -23331,7 +23331,7 @@
       "event": "NAHB Housing Market Index (MAR)",
       "impact": "medium",
       "actual": "",
-      "forecast": "42",
+      "forecast": "32",
       "previous": "36"
     },
     {
@@ -23344,7 +23344,7 @@
       "event": "Pending Home Sales MoM (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.2%",
       "previous": "-0.8%"
     },
     {
@@ -23357,7 +23357,7 @@
       "event": "Pending Home Sales YoY (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "1.0%",
       "previous": "-0.4%"
     },
     {
@@ -23384,7 +23384,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "4.664%"
     },
     {
       "date": "17 Mar",
@@ -23656,7 +23656,7 @@
       "event": "PPI MoM (FEB)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.3%",
       "previous": "0.5%"
     },
     {
@@ -23669,7 +23669,7 @@
       "event": "Core PPI MoM (FEB)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.5%",
       "previous": "0.8%"
     },
     {
@@ -23695,7 +23695,7 @@
       "event": "PPI (FEB)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "152.6",
       "previous": "152.174"
     },
     {
@@ -23734,7 +23734,7 @@
       "event": "BoC Interest Rate Decision",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.25%",
       "previous": "2.25%"
     },
     {
@@ -23747,7 +23747,7 @@
       "event": "Factory Orders MoM (JAN)",
       "impact": "medium",
       "actual": "",
-      "forecast": "-0.5%",
+      "forecast": "0.5%",
       "previous": "-0.7%"
     },
     {
@@ -24618,7 +24618,7 @@
       "event": "New Home Sales (JAN)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.73M",
       "previous": "0.745M"
     },
     {
@@ -24631,7 +24631,7 @@
       "event": "New Home Sales MoM (JAN)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "-0.9%",
       "previous": "-1.7%"
     },
     {
@@ -24763,6 +24763,32 @@
       "actual": "",
       "forecast": "€8.9B",
       "previous": "€14.6B"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Balance of Trade (JAN)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "€1.5B",
+      "previous": "€12.6B"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "11:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "CBI Industrial Trends Orders (MAR)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "-26",
+      "previous": "-28"
     }
   ]
 }
