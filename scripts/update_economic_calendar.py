@@ -869,11 +869,28 @@ if boundary_merged:
 
 # ── STEP 3c: Same-day semantic dedup (different timeUTC, same event name) ────────
 # Catches cases like "ADP Weekly Employment Change" (08:00) vs "ADP Employment Change Weekly" (10:15)
-# that come from different scrape passes with slightly different names and times.
-# Group by (dateISO, currency, normalized_name) regardless of time.
+# Uses aggressive normalization: removes stopwords (incl. "weekly"), expands GDP/CPI, sorts words.
+def normalize_for_dedup(name):
+    n = name.lower().strip()
+    # Normalize yoy/mom/qoq variants BEFORE removing parens so they survive as differentiators
+    n = re.sub(r'\(yoy\)', 'yoy', n); n = re.sub(r'\(mom\)', 'mom', n); n = re.sub(r'\(qoq\)', 'qoq', n)
+    n = re.sub(r'\by/y\b', 'yoy', n); n = re.sub(r'\bm/m\b', 'mom', n); n = re.sub(r'\bq/q\b', 'qoq', n)
+    n = re.sub(r'\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|q[1-4]|\d{4})\b', '', n)
+    n = re.sub(r'\([^)]*\)', '', n)
+    n = re.sub(r'\bgross domestic product\b', 'gdp', n)
+    n = re.sub(r'\bconsumer price index\b', 'cpi', n)
+    n = re.sub(r'\bpurchasing managers\b', 'pmi', n)
+    n = re.sub(r'\b(japan|japanese|us|uk|germany|german|france|french|eurozone|euro area|australia|australian|canada|canadian|swiss|switzerland|new zealand|u\.s\.)\b', '', n)
+    sw = {'a','an','the','of','in','on','at','to','by','or','mm','rate','change',
+          'data','flash','final','prelim','preliminary','revised','report','survey',
+          'release','monthly','quarterly','annual','weekly','current','total','net',
+          'new','all','index','q','y','m','sa','nsa'}
+    words = [w for w in re.sub(r'[^a-z0-9 ]', ' ', n).split() if w not in sw and len(w) > 1]
+    return ' '.join(sorted(words))
+
 semantic_groups = defaultdict(list)
 for ev in deduped:
-    norm = normalize_name(ev['event'])
+    norm = normalize_for_dedup(ev['event'])
     semantic_groups[(ev['dateISO'], ev['currency'], norm)].append(ev)
 
 semantic_dominated = set()
@@ -881,9 +898,6 @@ semantic_merged = 0
 for group_key, group in semantic_groups.items():
     if len(group) < 2:
         continue
-    # Check if all events in the group are true duplicates of each other
-    # (same normalized name guarantees this)
-    # Keep the one with the most data, inherit best impact
     best = max(group, key=score_event)
     impact_rank = {'high': 3, 'medium': 2, 'low': 1}
     best_impact = max(group, key=lambda e: impact_rank.get(e.get('impact', 'low'), 1))
