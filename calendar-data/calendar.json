@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-10",
-  "generatedAt": "2026-03-10T16:10:00.544699Z",
+  "generatedAt": "2026-03-10T17:05:01.982836Z",
   "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
   "status": "ok",
   "source": "Trading Economics (Playwright)",
@@ -8,7 +8,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-09",
-  "totalEvents": 1913,
+  "totalEvents": 1915,
   "currencyCounts": {
     "AUD": 156,
     "CAD": 151,
@@ -17,10 +17,10 @@
     "GBP": 207,
     "JPY": 219,
     "NZD": 69,
-    "USD": 858
+    "USD": 860
   },
   "impactCounts": {
-    "low": 1213,
+    "low": 1215,
     "medium": 562,
     "high": 138
   },
@@ -24893,6 +24893,32 @@
       "actual": "",
       "forecast": "1.0%",
       "previous": "0%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Baker Hughes Oil Rig Count (MAR/20)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Baker Hughes Total Rigs Count (MAR/20)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     }
   ]
 }
