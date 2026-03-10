@@ -2,19 +2,18 @@
 generate_historical_scores.py
 ─────────────────────────────
 Generates historical score snapshots for every date in fx-history/.
-Uses the actual policy rate and momentum available at each historical date,
-combined with current economic/COT/FX data (known static proxy limitation).
 
-This produces a meaningful retrospective backtest because:
-- interestRate    (weight 10%): historically accurate per date
-- rateMomentum    (weight 7%):  historically accurate per date
-- outlookScore    (weight 5%):  historically accurate per date (derived from rates)
-- fxPerformance1M (weight 8%): historically accurate per date (reconstructed from fx-history/)
-- All other indicators: current data as static proxy (documented look-ahead bias)
+MODO DE DATOS (en orden de prioridad):
+  1. economic-data-history/{CURRENCY}/{indicator}.json  → serie histórica real
+     (generada por fetch_historical_econ_data.py con Playwright)
+  2. Fallback: valor actual de economic-data/{CURRENCY}.json (proxy estático)
 
-The interestRate + rateMomentum + outlookScore + fxPerformance1M = 30% of the model varies correctly.
-For weekly backtesting, the pair *differentials* are what matter — and rate cycles
-do capture the dominant macro regime changes correctly.
+Indicadores con datos históricamente precisos:
+  - interestRate    (10%): rates/ con historial mensual
+  - rateMomentum    ( 7%): derivado de rates/
+  - outlookScore    ( 5%): derivado de rates/
+  - fxPerformance1M ( 8%): reconstruido desde fx-history/
+  - Todos los demás (70%): economic-data-history/ si existe, sino proxy estático
 """
 
 import json
@@ -29,13 +28,100 @@ from save_weekly_scores import (
     TRADING_WEIGHTS, score_indicator, normalize
 )
 
-SCORES_DIR = "scores-history"
-FX_HIST_DIR = "fx-history"
+SCORES_DIR   = "scores-history"
+FX_HIST_DIR  = "fx-history"
+HIST_ECON_DIR = "economic-data-history"   # salida de fetch_historical_econ_data.py
 
 os.makedirs(SCORES_DIR, exist_ok=True)
 
-MIN_PAIR_DIFF  = 12.0   # minimum score differential for active pairs
-MIN_PAIR_DIFF_HIGH = 20.0  # high-confidence threshold
+MIN_PAIR_DIFF      = 12.0   # minimum score differential for active pairs
+MIN_PAIR_DIFF_HIGH = 20.0   # high-confidence threshold
+
+
+# ─── Historical economic data loader ─────────────────────────────────────────
+
+# Cache global: {currency: {indicator: [(date_str, value), ...]}}
+_HIST_CACHE = {}
+
+def _load_hist_series(currency, indicator):
+    """
+    Carga y cachea la serie histórica de economic-data-history/{currency}/{indicator}.json.
+    Retorna lista ordenada de (date_str, value) o None si no existe.
+    """
+    key = f"{currency}/{indicator}"
+    if key in _HIST_CACHE:
+        return _HIST_CACHE[key]
+
+    path = f"{HIST_ECON_DIR}/{currency}/{indicator}.json"
+    if not os.path.exists(path):
+        _HIST_CACHE[key] = None
+        return None
+
+    try:
+        with open(path) as f:
+            d = json.load(f)
+        obs = d.get("observations", [])
+        # Ordenar por fecha ascendente
+        series = sorted(
+            [(o["date"], o["value"]) for o in obs if o.get("date") and o.get("value") is not None],
+            key=lambda x: x[0]
+        )
+        _HIST_CACHE[key] = series if series else None
+        return _HIST_CACHE[key]
+    except Exception:
+        _HIST_CACHE[key] = None
+        return None
+
+
+def get_indicator_at_date(currency, indicator, target_date_str):
+    """
+    Devuelve el valor de un indicador para una divisa en una fecha dada.
+    Usa la serie histórica si existe; de lo contrario retorna None (el caller
+    usará el valor estático actual como fallback).
+
+    Lógica: devuelve el valor más reciente disponible en o antes de target_date.
+    Esto replica cómo un trader vería el dato en ese momento (dato con lag de publicación).
+    """
+    series = _load_hist_series(currency, indicator)
+    if not series:
+        return None
+
+    target = target_date_str
+    best_value = None
+    for date_str, value in series:
+        if date_str <= target:
+            best_value = value
+        else:
+            break  # ordenado, podemos parar
+
+    return best_value
+
+
+def has_hist_data(currency, indicator):
+    """Retorna True si existe serie histórica para este par divisa/indicador."""
+    return _load_hist_series(currency, indicator) is not None
+
+
+def log_data_sources(snap_date):
+    """Log en el primer snapshot qué indicadores usan datos históricos vs proxy."""
+    if snap_date != sorted([
+        f.replace(".json", "") for f in os.listdir(FX_HIST_DIR) if f.endswith(".json")
+    ])[0]:
+        return  # Solo loguear una vez
+
+    HISTORICAL_INDICATORS = [
+        "gdpGrowth", "inflation", "unemployment", "currentAccount",
+        "production", "tradeBalance", "retailSales", "wageGrowth",
+        "manufacturingPMI", "servicesPMI", "bond10y",
+        "consumerConfidence", "businessConfidence", "cotPositioning",
+    ]
+    print("\n  ── Fuentes de datos para el backtest ──")
+    for cur in CURRENCIES:
+        hist_count = sum(1 for ind in HISTORICAL_INDICATORS if has_hist_data(cur, ind))
+        total      = len(HISTORICAL_INDICATORS)
+        status     = "✓ histórico" if hist_count == total else f"⚠ {hist_count}/{total} histórico"
+        print(f"    {cur}: {status}")
+    print()
 
 
 def get_rate_at_date(currency, target_date_str):
@@ -142,66 +228,74 @@ def get_fx_perf_at_date(currency, snap_date_str):
 
 def calculate_score_at_date(currency, snap_date, econ_data, fx_data, cot_data, ext_data, all_econ):
     """
-    Calculate score using historically accurate rate data for snap_date.
-    All other indicators use current data as proxy.
+    Calculate score using historically accurate data for snap_date.
+
+    Prioridad por indicador:
+      - interestRate, rateMomentum, outlookScore: siempre desde rates/ (histórico preciso)
+      - fxPerformance1M: reconstruido desde fx-history/ (histórico preciso)
+      - demás indicadores: economic-data-history/ si existe, sino proxy estático actual
     """
     data = {}
 
-    # Economic indicators (static proxy)
-    if econ_data:
-        ed = econ_data.get("data", {})
-        data.update({
-            "gdpGrowth":          ed.get("gdpGrowth"),
-            "inflation":          ed.get("inflation"),
-            "unemployment":       ed.get("unemployment"),
-            "currentAccount":     ed.get("currentAccount"),
-            "tradeBalance":       ed.get("tradeBalance"),
-            "debt":               ed.get("debt"),
-            "production":         ed.get("production"),
-            "retailSales":        ed.get("retailSales"),
-            "wageGrowth":         ed.get("wageGrowth"),
-            "manufacturingPMI":   ed.get("manufacturingPMI"),
-            "servicesPMI":        ed.get("servicesPMI"),
-            "termsOfTrade":       ed.get("termsOfTrade"),
-        })
+    # ── Indicadores económicos: histórico si existe, proxy si no ──────────────
+    ECON_INDICATORS = [
+        "gdpGrowth", "inflation", "unemployment", "currentAccount",
+        "tradeBalance", "debt", "production", "retailSales",
+        "wageGrowth", "manufacturingPMI", "servicesPMI", "termsOfTrade",
+    ]
+    EXT_INDICATORS = [
+        "bond10y", "capitalFlows", "consumerConfidence", "businessConfidence",
+    ]
 
-    # Extended data — read from ["data"] subkey (bug fix applied)
-    if ext_data:
-        ext = ext_data.get("data", {})
-        data["bond10y"]           = ext.get("bond10y")
-        data["capitalFlows"]      = ext.get("capitalFlows")
-        data["consumerConfidence"]= ext.get("consumerConfidence")
-        data["businessConfidence"]= ext.get("businessConfidence")
+    # Cargar base estática (fallback)
+    static_econ = econ_data.get("data", {}) if econ_data else {}
+    static_ext  = ext_data.get("data", {})  if ext_data  else {}
 
-    # HISTORICALLY ACCURATE: policy rate and momentum at snap_date
+    for ind in ECON_INDICATORS:
+        hist_val = get_indicator_at_date(currency, ind, snap_date)
+        data[ind] = hist_val if hist_val is not None else static_econ.get(ind)
+
+    for ind in EXT_INDICATORS:
+        hist_val = get_indicator_at_date(currency, ind, snap_date)
+        data[ind] = hist_val if hist_val is not None else static_ext.get(ind)
+
+    # COT: histórico si existe, proxy actual si no
+    cot_hist = get_indicator_at_date(currency, "cotPositioning", snap_date)
+    if cot_hist is not None:
+        data["cotPositioning"] = cot_hist
+    elif cot_data:
+        data["cotPositioning"] = cot_data.get("netPosition")
+
+    # ── HISTÓRICAMENTE PRECISO: tasa de interés y momentum ────────────────────
     rate, momentum = get_rate_at_date(currency, snap_date)
     data["interestRate"] = rate
     data["rateMomentum"] = momentum
 
-    # outlookScore derived from historical momentum
-    rm24_ext = ext_data.get("data", {}).get("rateMomentum24M") if ext_data else None
+    # outlookScore derivado del momentum histórico
+    rm24_ext = static_ext.get("rateMomentum24M")
     data["outlookScore"] = derive_outlook(momentum, rm24_ext)
 
-    # COT (static proxy — only current snapshot available)
-    if cot_data:
-        data["cotPositioning"] = cot_data.get("netPosition")
-
-    # fxPerformance1M: reconstruct historically from fx-history/
-    # Rate stored as units of foreign per 1 USD → lower value = stronger currency
+    # ── HISTÓRICAMENTE PRECISO: FX performance 1M ─────────────────────────────
     data["fxPerformance1M"] = get_fx_perf_at_date(currency, snap_date)
 
-    data["economicSurprise"] = 50  # neutral placeholder
+    data["economicSurprise"] = 50  # placeholder neutral
 
-    # Build all_data for cross-sectional normalization
-    # Include interestRate at each historical date for correct median-relative scoring
+    # ── Cross-sectional normalization: all_data con tasas históricas ──────────
     all_data = {}
     for cur in CURRENCIES:
-        ed2   = load_json(f"{ECON_DIR}/{cur}.json").get("data", {})
-        ext2  = load_json(f"{EXT_DIR}/{cur}.json").get("data", {}) if os.path.exists(f"{EXT_DIR}/{cur}.json") else {}
+        ed2  = load_json(f"{ECON_DIR}/{cur}.json").get("data", {})
+        ext2 = load_json(f"{EXT_DIR}/{cur}.json").get("data", {}) if os.path.exists(f"{EXT_DIR}/{cur}.json") else {}
         rate2, _ = get_rate_at_date(cur, snap_date)
-        all_data[cur] = {**ed2, **ext2, "interestRate": rate2}
 
-    # Score each indicator
+        # Para normalización cross-sectional, usar histórico si existe
+        merged = {**ed2, **ext2, "interestRate": rate2}
+        for ind in ECON_INDICATORS + EXT_INDICATORS:
+            hist_val = get_indicator_at_date(cur, ind, snap_date)
+            if hist_val is not None:
+                merged[ind] = hist_val
+        all_data[cur] = merged
+
+    # ── Score ponderado ────────────────────────────────────────────────────────
     weighted_sum = 0.0
     total_weight = 0.0
     contributions = {}
@@ -212,16 +306,20 @@ def calculate_score_at_date(currency, snap_date, econ_data, fx_data, cot_data, e
         if w == 0:
             continue
         val = data.get(key)
-        s = score_indicator(key, val, all_data, currency)
+        s   = score_indicator(key, val, all_data, currency)
         contributions[key] = {
-            "value": val,
-            "score": s,
-            "weight": w,
+            "value":        val,
+            "score":        s,
+            "weight":       w,
             "contribution": round(s * w, 4) if s is not None else None,
+            "source":       "historical" if (
+                key in ECON_INDICATORS + EXT_INDICATORS + ["cotPositioning"]
+                and get_indicator_at_date(currency, key, snap_date) is not None
+            ) else "proxy",
         }
         if s is not None:
-            weighted_sum += s * w
-            total_weight += w
+            weighted_sum        += s * w
+            total_weight        += w
             indicators_with_data += 1
 
     score = round(weighted_sum / total_weight, 2) if total_weight > 0 else 50
@@ -273,6 +371,9 @@ def main():
     print(f"Date range: {fx_dates[0]} → {fx_dates[-1]}")
     print()
 
+    # Loguear qué indicadores tienen datos históricos reales
+    log_data_sources(fx_dates[0])
+
     all_snapshots = []
     skipped = 0
 
@@ -311,10 +412,15 @@ def main():
     # Save all.json
     history_data = {
         "generated":  date.today().isoformat(),
-        "version":    "v6.3-retrospective-fixed",
+        "version":    "v6.3-retrospective-full",
         "snapshots":  all_snapshots,
-        "note":       "interestRate (10%), rateMomentum (7%), outlookScore (5%) are historically accurate. "
-                      "Other indicators (78%) use current data as proxy — minor look-ahead bias.",
+        "note":       (
+            "interestRate (10%), rateMomentum (7%), outlookScore (5%), fxPerformance1M (8%) "
+            "son siempre históricamente precisos. "
+            "GDP, inflación, PMIs, desempleo, COT y demás indicadores usan "
+            "economic-data-history/ si está disponible (fetch_historical_econ_data.py), "
+            "de lo contrario proxy estático actual."
+        ),
     }
     with open(f"{SCORES_DIR}/all.json", "w") as f:
         json.dump(history_data, f, indent=2)
