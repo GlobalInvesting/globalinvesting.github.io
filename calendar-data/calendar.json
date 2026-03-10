@@ -1,26 +1,26 @@
 {
   "lastUpdate": "2026-03-10",
-  "generatedAt": "2026-03-10T08:04:25.364805Z",
+  "generatedAt": "2026-03-10T09:54:43.055544Z",
   "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
   "status": "ok",
-  "source": "Base cache only",
+  "source": "Trading Economics (Playwright)",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-09",
-  "totalEvents": 1901,
+  "totalEvents": 1903,
   "currencyCounts": {
     "AUD": 156,
     "CAD": 143,
     "CHF": 44,
-    "EUR": 207,
-    "GBP": 205,
+    "EUR": 208,
+    "GBP": 206,
     "JPY": 219,
     "NZD": 69,
     "USD": 858
   },
   "impactCounts": {
-    "low": 1206,
+    "low": 1208,
     "medium": 557,
     "high": 138
   },
@@ -24737,6 +24737,32 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "07:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Public Sector Net Borrowing Ex Banks (FEB)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "£-10.0B",
+      "previous": "£30.4B"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Current Account s.a (JAN)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "€8.9B",
+      "previous": "€14.6B"
     }
   ]
 }
