@@ -674,7 +674,13 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
 
             data = resp.json()
             gnews_articles = data.get("articles", [])
-            print(f"  [GNews] {cur}: status=200, totalArticles={data.get('totalArticles','?')}, articles_returned={len(gnews_articles)}")
+            # Debug: mostrar keys del response y primer artículo si existe
+            print(f"  [GNews] {cur}: status=200, totalArticles={data.get('totalArticles','?')}, articles_returned={len(gnews_articles)}, keys={list(data.keys())}")
+            if gnews_articles:
+                first = gnews_articles[0]
+                print(f"  [GNews] {cur}: primer artículo keys={list(first.keys())}, title={first.get('title','')[:80]}, date={first.get('publishedAt','')}")
+            else:
+                print(f"  [GNews] {cur}: response body = {str(data)[:300]}")
             count = 0
 
             for item in gnews_articles:
