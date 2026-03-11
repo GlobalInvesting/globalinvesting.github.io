@@ -41,6 +41,8 @@ jobs:
         run: mkdir -p news-data
 
       - name: Fetch news from RSS feeds
+        env:
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
         run: python scripts/fetch_news.py
 
       - name: Generate per-currency analysis summaries
