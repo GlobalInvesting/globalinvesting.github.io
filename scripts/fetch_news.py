@@ -3,16 +3,15 @@
 fetch_news.py — v5.6
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5.6 (sobre v5.5):
-  GOOGLE NEWS → GNEWS API:
-    · news.google.com RSS bloqueado en GitHub Actions (403 desde IPs de datacenter).
-    · Reemplazado por GNews API (https://gnews.io) — plan gratuito: 100 req/día.
-    · 3 ejecuciones/día × 8 divisas = 24 requests — margen del 76% sobre el límite.
-    · Requiere secret GNEWS_API_KEY en GitHub Actions (Settings → Secrets).
-    · Si la key no está configurada, el script continúa sin GNews (no falla).
-    · fetch_gnews() corre secuencialmente tras fetch_all_feeds() (no en paralelo
-      para no saturar el rate limit de la API).
-    · Deduplicación por título normalizado contra artículos RSS ya procesados.
+CAMBIOS v5.7 (sobre v5.6):
+  GNEWS → NEWSDATA.IO:
+    · GNews plan gratuito tiene 12h de delay — inutilizable para noticias FX.
+    · Reemplazado por NewsData.io (https://newsdata.io) — plan gratuito:
+      200 créditos/día, sin delay, artículos en tiempo real.
+    · 3 ejecuciones/día × 8 divisas = 24 créditos — margen del 88% sobre límite.
+    · Requiere secret NEWSDATA_API_KEY en GitHub Actions (Settings → Secrets).
+    · Si la key no está configurada, el script continúa sin NewsData (no falla).
+    · fetch_newsdata() corre secuencialmente con 2s entre queries.
 
 CAMBIOS v5.4 (sobre v5.3):
   CALIDAD DE FUENTES:
@@ -353,30 +352,31 @@ FEEDS = [
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
 
-    # ── GOOGLE NEWS vía GNews API — 1 query por divisa (v5.6) ───────────────
-    # GNews API: https://gnews.io — plan gratuito: 100 requests/día.
-    # NO van en FEEDS (usa JSON, no RSS). Se procesan por fetch_gnews() en main().
-    # Las queries están definidas en GNEWS_QUERIES más abajo.
+    # ── GOOGLE NEWS vía NewsData.io API — 1 query por divisa (v5.7) ──────────
+    # NewsData.io: plan gratuito: 200 créditos/día, sin delay.
+    # NO van en FEEDS (usa JSON, no RSS). Se procesan por fetch_newsdata() en main().
+    # Las queries están definidas en NEWSDATA_QUERIES más abajo.
 ]
 
 # ─────────────────────────────────────────────
-# GNEWS API — configuración (v5.6)
+# NEWSDATA.IO API — configuración (v5.7)
+# Reemplaza GNews — plan gratuito: 200 créditos/día, sin delay.
+# 3 ejecuciones × 8 divisas × 1 crédito = 24 créditos/día (12% del límite).
+# Registro: https://newsdata.io
 # ─────────────────────────────────────────────
-GNEWS_API_KEY_ENV = "GNEWS_API_KEY"          # nombre del secret en GitHub Actions
-GNEWS_MAX_PER_QUERY = 5                       # artículos por divisa (plan free: max 10)
-GNEWS_LANG = "en"
-GNEWS_COUNTRY = "us"
-GNEWS_BASE_URL = "https://gnews.io/api/v4/search"
+NEWSDATA_API_KEY_ENV  = "NEWSDATA_API_KEY"
+NEWSDATA_MAX_RESULTS  = 5                    # por query (plan free: max 10)
+NEWSDATA_BASE_URL     = "https://newsdata.io/api/1/news"
 
-GNEWS_QUERIES = {
-    "USD": "US dollar OR federal reserve OR FOMC forex",
-    "EUR": "euro OR ECB OR \"european central bank\" forex",
-    "GBP": "british pound OR sterling OR \"bank of england\" forex",
-    "JPY": "japanese yen OR \"bank of japan\" OR BOJ forex",
-    "AUD": "australian dollar OR RBA OR \"reserve bank of australia\" forex",
-    "CAD": "canadian dollar OR \"bank of canada\" OR BOC forex",
-    "CHF": "swiss franc OR SNB OR \"swiss national bank\" forex",
-    "NZD": "new zealand dollar OR RBNZ forex",
+NEWSDATA_QUERIES = {
+    "USD": "US dollar OR federal reserve OR FOMC",
+    "EUR": "euro OR ECB OR european central bank",
+    "GBP": "british pound OR sterling OR bank of england",
+    "JPY": "japanese yen OR bank of japan OR BOJ",
+    "AUD": "australian dollar OR RBA OR reserve bank australia",
+    "CAD": "canadian dollar OR bank of canada",
+    "CHF": "swiss franc OR SNB OR swiss national bank",
+    "NZD": "new zealand dollar OR RBNZ",
 }
 
 # ─────────────────────────────────────────────
@@ -421,15 +421,15 @@ SOURCE_CURRENCY = {
     "RBNZ":            "NZD",
     "SNB":             "CHF",
     "Federal Reserve": "USD",
-    # v5.6: GNews — divisa ya asignada en fetch_gnews(), esto es fallback defensivo
-    "GNews USD": "USD",
-    "GNews EUR": "EUR",
-    "GNews GBP": "GBP",
-    "GNews JPY": "JPY",
-    "GNews AUD": "AUD",
-    "GNews CAD": "CAD",
-    "GNews CHF": "CHF",
-    "GNews NZD": "NZD",
+    # v5.7: NewsData — divisa ya asignada en fetch_newsdata(), esto es fallback defensivo
+    "NewsData USD": "USD",
+    "NewsData EUR": "EUR",
+    "NewsData GBP": "GBP",
+    "NewsData JPY": "JPY",
+    "NewsData AUD": "AUD",
+    "NewsData CAD": "CAD",
+    "NewsData CHF": "CHF",
+    "NewsData NZD": "NZD",
 }
 
 FOREX_SOURCES = {
@@ -438,9 +438,9 @@ FOREX_SOURCES = {
     "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
     "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX", "FX Empire",
-    # v5.6: GNews API
-    "GNews USD", "GNews EUR", "GNews GBP", "GNews JPY",
-    "GNews AUD", "GNews CAD", "GNews CHF", "GNews NZD",
+    # v5.7: NewsData API
+    "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
+    "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
 }
 
 # ─────────────────────────────────────────────
@@ -630,71 +630,67 @@ def fetch_all_feeds(feeds: list) -> dict:
     return results
 
 
-def fetch_gnews(api_key: str, now_utc: datetime) -> list:
+def fetch_newsdata(api_key: str, now_utc: datetime) -> list:
     """
-    v5.6: Consulta GNews API por cada divisa en GNEWS_QUERIES.
-    Devuelve lista de artículos en el mismo formato que raw_articles.
-    Consume 8 requests por ejecución (1 por divisa).
-    Plan gratuito: 100 requests/día → cubre 12 ejecuciones/día con margen.
+    v5.7: Consulta NewsData.io por cada divisa en NEWSDATA_QUERIES.
+    Plan gratuito: 200 créditos/día, sin delay — artículos en tiempo real.
+    Consume 8 créditos por ejecución (1 por divisa).
     """
     if not api_key:
-        print("  [GNews] GNEWS_API_KEY no configurada — omitiendo")
+        print("  [NewsData] NEWSDATA_API_KEY no configurada — omitiendo")
         return []
 
     cutoff = now_utc - timedelta(days=MAX_AGE_DAYS)
     articles = []
-    seen_gnews_titles = set()
+    seen_newsdata_titles = set()
 
-    for cur, query in GNEWS_QUERIES.items():
+    for cur, query in NEWSDATA_QUERIES.items():
         try:
             params = {
-                "q":        query,
-                "lang":     GNEWS_LANG,
-                "country":  GNEWS_COUNTRY,
-                "max":      GNEWS_MAX_PER_QUERY,
                 "apikey":   api_key,
-                "sortby":   "publishedAt",
+                "q":        query,
+                "language": "en",
+                "size":     NEWSDATA_MAX_RESULTS,
+                "category": "business",
             }
             resp = requests.get(
-                GNEWS_BASE_URL,
+                NEWSDATA_BASE_URL,
                 params=params,
                 timeout=FETCH_TIMEOUT,
             )
 
-            if resp.status_code == 403:
-                print(f"  [GNews] API key inválida o plan agotado (403): {resp.text[:200]}")
+            if resp.status_code == 401:
+                print(f"  [NewsData] API key inválida (401)")
                 break
             if resp.status_code == 429:
-                print(f"  [GNews] 429 recibido — body: {resp.text[:300]}")
-                print(f"  [GNews] Headers: {dict(resp.headers)}")
+                print(f"  [NewsData] Rate limit alcanzado (429) — parando consultas")
                 break
             if resp.status_code != 200:
-                print(f"  [GNews] {cur}: error {resp.status_code} — {resp.text[:200]}")
+                print(f"  [NewsData] {cur}: error {resp.status_code} — {resp.text[:150]}")
                 continue
 
             data = resp.json()
-            gnews_articles = data.get("articles", [])
-            # Debug: mostrar keys del response y primer artículo si existe
-            print(f"  [GNews] {cur}: status=200, totalArticles={data.get('totalArticles','?')}, articles_returned={len(gnews_articles)}, keys={list(data.keys())}")
-            if gnews_articles:
-                first = gnews_articles[0]
-                print(f"  [GNews] {cur}: primer artículo keys={list(first.keys())}, title={first.get('title','')[:80]}, date={first.get('publishedAt','')}")
-            else:
-                print(f"  [GNews] {cur}: response body = {str(data)[:300]}")
+            if data.get("status") != "success":
+                print(f"  [NewsData] {cur}: status={data.get('status')} — {str(data)[:150]}")
+                continue
+
+            results = data.get("results", [])
             count = 0
 
-            for item in gnews_articles:
+            for item in results:
                 title   = clean_html(item.get("title", ""))
-                summary = clean_html(item.get("description", "") or item.get("content", ""))
-                link    = item.get("url", "")
-                source  = item.get("source", {}).get("name", "GNews")
+                summary = clean_html(
+                    item.get("description", "") or
+                    item.get("content", "") or ""
+                )
+                link = item.get("link", "")
 
                 if not title or len(title) < 15:
                     continue
 
-                # Parse date — GNews usa ISO 8601
+                # NewsData usa pubDate: "2026-03-11 12:30:00"
                 pub_date = now_utc
-                raw_date = item.get("publishedAt", "")
+                raw_date = item.get("pubDate", "")
                 if raw_date:
                     try:
                         pub_date = dateparser.parse(raw_date)
@@ -714,11 +710,11 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
 
                 norm_title = normalize_title(title)
                 title_key  = norm_title[:60]
-                if title_key in seen_gnews_titles:
+                if title_key in seen_newsdata_titles:
                     continue
-                seen_gnews_titles.add(title_key)
+                seen_newsdata_titles.add(title_key)
 
-                nid = entry_id(title, f"GNews {cur}")
+                nid       = entry_id(title, f"NewsData {cur}")
                 impact    = detect_impact(title, summary)
                 expand    = summary[:350] + ("..." if len(summary) > 350 else "")
                 age_hours = (now_utc - pub_date).total_seconds() / 3600
@@ -729,7 +725,7 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
                     "impact":   impact,
                     "title":    title,
                     "expand":   expand,
-                    "source":   f"GNews {cur}",
+                    "source":   f"NewsData {cur}",
                     "link":     link,
                     "time":     pub_date.strftime("%H:%M"),
                     "ts":       int(pub_date.timestamp() * 1000),
@@ -742,22 +738,16 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
                 count += 1
 
             if count > 0:
-                print(f"    [GNews] {cur}: {count} artículos")
+                print(f"    [NewsData] {cur}: {count} artículos")
+            else:
+                print(f"  [NewsData] {cur}: 0 artículos (total API: {data.get('totalResults','?')})")
 
-            time.sleep(2)  # v5.6: evitar burst rate limit de GNews
+            time.sleep(2)  # evitar burst rate limit
 
-        except requests.exceptions.Timeout:
-            print(f"  [GNews] {cur}: timeout")
-        except requests.exceptions.RequestException as e:
-            print(f"  [GNews] {cur}: request error — {e}")
         except Exception as e:
-            import traceback
-            print(f"  [GNews] {cur}: excepción — {e}")
-            print(f"  [GNews] {cur}: {traceback.format_exc()[:400]}")
+            print(f"  [NewsData] {cur}: excepción — {e}")
 
     return articles
-
-
 def load_previous_headlines() -> dict:
     if not os.path.exists(OUTPUT_FILE):
         return {}
@@ -831,21 +821,21 @@ def main():
     filtered_no_currency = 0
     instaforex_count     = 0          # v5.4: contador para cap de InstaForex
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.6 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.7 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
     print(f"  Descarga completada.")
 
-    # v5.6: GNews API — fetch separado, resultados se añaden a raw_articles al final
-    gnews_api_key = os.environ.get(GNEWS_API_KEY_ENV, "").strip()
-    gnews_articles = []
-    if gnews_api_key:
-        print(f"  Consultando GNews API ({len(GNEWS_QUERIES)} divisas)...")
-        gnews_articles = fetch_gnews(gnews_api_key, now_utc)
-        print(f"  GNews: {len(gnews_articles)} artículos obtenidos")
+    # v5.7: NewsData API — fetch separado, resultados se añaden a raw_articles al final
+    newsdata_api_key = os.environ.get(NEWSDATA_API_KEY_ENV, "").strip()
+    newsdata_articles = []
+    if newsdata_api_key:
+        print(f"  Consultando NewsData.io API ({len(NEWSDATA_QUERIES)} divisas)...")
+        newsdata_articles = fetch_newsdata(newsdata_api_key, now_utc)
+        print(f"  NewsData: {len(newsdata_articles)} artículos obtenidos")
     else:
-        print(f"  [GNews] GNEWS_API_KEY no configurada — omitiendo")
+        print(f"  [NewsData] NEWSDATA_API_KEY no configurada — omitiendo")
 
     for feed_cfg in FEEDS:
         source           = feed_cfg["source"]
@@ -943,9 +933,9 @@ def main():
             tag = f" [{forced_currency}]" if forced_currency else ""
             print(f"    [{lang.upper()}] {source}{tag}: {count} noticias")
 
-    # v5.6: añadir artículos de GNews con deduplicación por título
-    gnews_added = 0
-    for a in gnews_articles:
+    # v5.7: añadir artículos de NewsData con deduplicación por título
+    newsdata_added = 0
+    for a in newsdata_articles:
         if a["id"] in seen_ids:
             continue
         title_key = normalize_title(a["title"])[:60]
@@ -955,9 +945,9 @@ def main():
         seen_titles.add(title_key)
         raw_articles.append(a)
         en_raw += 1
-        gnews_added += 1
-    if gnews_added:
-        print(f"    [GNews] {gnews_added} artículos añadidos (tras deduplicación)")
+        newsdata_added += 1
+    if newsdata_added:
+        print(f"    [NewsData] {newsdata_added} artículos añadidos (tras deduplicación)")
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
