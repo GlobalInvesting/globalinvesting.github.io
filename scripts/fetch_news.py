@@ -661,13 +661,14 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
             )
 
             if resp.status_code == 403:
-                print(f"  [GNews] API key inválida o plan agotado (403)")
+                print(f"  [GNews] API key inválida o plan agotado (403): {resp.text[:200]}")
                 break
             if resp.status_code == 429:
-                print(f"  [GNews] Rate limit alcanzado (429) — parando consultas")
+                print(f"  [GNews] 429 recibido — body: {resp.text[:300]}")
+                print(f"  [GNews] Headers: {dict(resp.headers)}")
                 break
             if resp.status_code != 200:
-                print(f"  [GNews] {cur}: error {resp.status_code}")
+                print(f"  [GNews] {cur}: error {resp.status_code} — {resp.text[:200]}")
                 continue
 
             data = resp.json()
