@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "La política monetaria del Banco de Inglaterra ha sido recientemente expansiva, con una bajada de tasas de 0.25pp, lo que sugiere un ciclo bajista en los próximos meses. Esto, unido a la inflación por encima del objetivo y un crecimiento del PIB inferior al promedio global, puede ejercer presión a la baja sobre la divisa. Aunque la tasa de interés sigue siendo superior a la del promedio global, el menor carry puede afectar negativamente a la libra esterlina.\n\nLa balanza comercial del Reino Unido muestra un déficit en bienes, lo que puede ser un factor estructural que presiona a la baja la divisa. La composición exportadora del país, con un enfoque en maquinaria industrial y productos farmacéuticos, puede ser sensible a los cambios en la demanda global. Las noticias recientes sobre la guerra en Irán han reavivado la demanda del dólar, lo que ha llevado a la libra esterlina a retroceder, aunque la caída parece limitada.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +34.5K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación del 2.48% vs el dólar. Sin embargo, las preocupaciones geopolíticas y la demanda del dólar pueden afectar negativamente a la libra esterlina en el corto plazo.",
+  "analysis": "La política monetaria del Banco de Inglaterra ha tomado un giro dovish, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Esto se debe a que el menor carry diferencial reduce la atracción de inversores extranjeros, aunque la tasa de interés sigue siendo 1.41pp por encima del promedio global. La inflación, por encima del objetivo, y el crecimiento del PIB, inferior al promedio global, sugieren que el banco central está intentando estimular la economía.\n\nLa balanza comercial y la cuenta corriente también muestran un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de maquinaria industrial, productos farmacéuticos y equipos eléctricos y electrónicos no han sido suficientes para compensar el déficit en bienes. Los precios del petróleo, que han subido debido a las tensiones en Medio Oriente, también han afectado negativamente la balanza comercial.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 34.5K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes ha sido positivo, con una apreciación del 1.99% vs USD, el mercado está saturado de largos y cualquier noticia negativa podría provocar una corrección rápida. La reunión de los líderes del G7 para discutir la coordinación energética y la esperanza de un fin a la guerra en Irán han generado cierta expectativa en el mercado, lo que ha impulsado al par GBP/USD a niveles superiores a 1.3485.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-10T08:36:27.285677+00:00",
+  "generatedAt": "2026-03-11T08:36:06.829733+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 34506,
-    "fxPerformance1M": 2.4843,
+    "fxPerformance1M": 1.9914,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-10",
-    "latestNewsTs": 1773120703.0,
+    "lastUpdate": "2026-03-11",
+    "latestNewsTs": 1773192257.0,
     "newsHeadlines": [
-      "Pound Sterling Price News and Forecast: GBP/USD attracts some sellers amid geopo",
-      "La Libra esterlina retrocede a medida que las preocupaciones por la guerra en Ir",
-      "Pound Sterling edges lower as USD benefits from Iran war concerns"
+      "Pound Sterling gains traction against softer USD; eyes US CPI report for fresh i",
+      "G7 to discuss energy coordination as Mid East tensions lift oil prices: 1400 GMT",
+      "GBP/USD Price Forecast: Bulls look to seize control amid hopes for end to Iran w"
     ]
   },
   "globalContext": {
@@ -41,7 +41,7 @@
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
     "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.31,
+    "avg_fx_perf_1m": 0.04,
     "avg_cot": 4098.88
   }
 }

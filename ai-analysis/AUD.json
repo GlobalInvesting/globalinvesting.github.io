@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia ha sido recientemente ajustada con un aumento en las tasas de interés, lo que ha generado una presión alcista sobre la divisa. Esto se debe a que la tasa de interés en Australia es significativamente superior al promedio global, lo que la hace atractiva para los inversores de renta fija internacional. Aunque los mercados de futuros ya descuentan un posible ajuste en las tasas, las declaraciones del vicegobernador del RBA, Andrew Hauser, sugieren que la respuesta depende del tamaño y la persistencia del shock de precios, lo cual es muy incierto.\n\nLa balanza comercial de Australia muestra un superávit en bienes, lo que se debe en gran medida a las exportaciones de minerales metalíferos, combustibles y petróleo. Sin embargo, la volatilidad en los precios del petróleo y en Oriente Medio es un desafío genuino, según Hauser. Esto podría afectar la cuenta corriente y la balanza comercial, aunque por ahora el impacto es incierto.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con un COT de +54.6K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. La noticia de que el dólar australiano cedió parte de sus ganancias anteriores debido a la presión de la caída del petróleo refleja esta incertidumbre. En este contexto, cualquier cambio en la política monetaria o en los precios del petróleo podría tener un impacto significativo en la divisa.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés de 3.85%, significativamente superior al promedio global de 2.34%. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ejerce presión alcista sobre la divisa. La última subida de tasas de 0.25pp confirma este ciclo restrictivo, lo que debería mantener la divisa con tendencia alcista.\n\nLa balanza comercial de Australia muestra un superávit en bienes, gracias a sus principales exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. Aunque la cuenta corriente presenta un déficit, el superávit comercial y los términos de intercambio favorables ayudan a mitigar este efecto. La noticia de un bullish breakout en el par AUD/USD por encima de 0.7140 sugiere que el mercado está confiado en la divisa australiana, lo que se refleja en su reciente rally.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con 54.6K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. La reciente subida del par AUD/JPY a un máximo récord por encima de 113.00, impulsada por las apuestas de subida de tasas del Banco de la Reserva de Australia, refuerza la tendencia alcista de la divisa. Sin embargo, este extremo posicionamiento alcista también aumenta el riesgo de una corrección si los datos futuros no cumplen con las expectativas del mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-10T08:36:36.309055+00:00",
+  "generatedAt": "2026-03-11T08:36:15.820104+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 54635,
-    "fxPerformance1M": -0.086,
+    "fxPerformance1M": -1.2342,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-10",
-    "latestNewsTs": 1773132260.0,
+    "lastUpdate": "2026-03-11",
+    "latestNewsTs": 1773209100.0,
     "newsHeadlines": [
-      "Australian Dollar Ends 2-Session Gains",
-      "Hauser del RBA: La respuesta depende del tamaño y la persistencia del shock de p",
-      "RBA policymaker Hauser says oil price and Middle East volatility is a \"genuine c"
+      "Chart alert: AUD/USD bullish breakout (finally) above 0.7140, new bullish impuls",
+      "The central bank bonanza returns next week",
+      "AUD/JPY rallies to fresh record high, above mid-113.00s on RBA rate hike bets an"
     ]
   },
   "globalContext": {
@@ -41,7 +41,7 @@
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
     "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.31,
+    "avg_fx_perf_1m": 0.04,
     "avg_cot": 4098.88
   }
 }

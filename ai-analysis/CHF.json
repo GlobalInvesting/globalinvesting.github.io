@@ -2,11 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global. Esto puede generar presión bajista sobre la divisa, aunque en episodios de aversión al riesgo, la divisa puede apreciarse bruscamente. La inflación se mantiene baja, en 0.1% anual, lo que justifica la postura del banco central.\n\nLa balanza comercial suiza muestra un superávit de 4.6B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. La cuenta corriente también presenta un superávit del 5.1% del PIB, lo que genera demanda estructural de la divisa. La noticia de que el franco suizo se ha fortalecido frente a otras divisas debido a la crisis en Irán y la venta de bonos gubernamentales por temores a la inflación, refuerza la idea de que la divisa puede beneficiarse de flujos defensivos en momentos de tensión global.\n\nEl posicionamiento especulativo, con +4.5K contratos netos, muestra un sesgo alcista, aunque no es extremo. El rendimiento FX del último mes ha sido positivo, con una apreciación del 0.29% frente al dólar. La noticia de que el par USDCHF se encuentra atrapado entre las medias móviles de 100 y 200 horas puede influir en el comportamiento a corto plazo de la divisa. En general, la combinación de factores estructurales y noticias recientes sugiere que la divisa puede mantener su valor en un contexto de incertidumbre global.",
+  "analysis": "La política monetaria del Banco Nacional Suizo ha sido recientemente expansiva, con una disminución de 0.25pp en las tasas de interés, lo que sitúa la tasa en 0.00%, significativamente por debajo del promedio global. Esto sugiere que el banco central está adoptando una postura dovish, lo que podría ejercer presión a la baja sobre la divisa. Aunque los mercados de futuros ya descuentan este movimiento, la inflación anual del 0.1% y el crecimiento del PIB del 0.2% indican que la economía suiza aún requiere estímulos.\n\nLa balanza comercial y la cuenta corriente de Suiza muestran un superávit, lo que genera una demanda estructural de la divisa. Los términos de intercambio favorables y el superávit comercial de 4.7B USD/mes sugieren que los precios de exportación superan a los de importación, ampliando el excedente. La composición exportadora, liderada por productos farmacéuticos y instrumentos de precisión, explica en parte este superávit.\n\nEl posicionamiento especulativo, con +4.5K contratos netos, indica un sesgo alcista, aunque el rendimiento FX del último mes muestra una depreciación del -0.02% vs USD. La noticia de que el par USDCHF se encuentra atrapado entre las medias móviles de 100 y 200 horas introduce incertidumbre de corto plazo, ya que el alza inicial no se ha consolidado. Esto sugiere que el mercado está esperando señales de confirmación para seguir la tendencia.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-10T08:36:50.526086+00:00",
+  "generatedAt": "2026-03-11T08:36:30.089545+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 3,
+  "newsCount": 1,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.2,
@@ -25,14 +25,12 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 4456,
-    "fxPerformance1M": 0.2919,
+    "fxPerformance1M": -0.0239,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-10",
+    "lastUpdate": "2026-03-11",
     "latestNewsTs": 1773079449.0,
     "newsHeadlines": [
-      "USDCHF Technicals: USDCHF trapped between 100-hour and 200-hour moving averages",
-      "Swiss Franc Rises As Iran Crisis Deepens",
-      "Investors Offload Bonds on Inflation Fears as Dollar, Swiss Franc Gain"
+      "USDCHF Technicals: USDCHF trapped between 100-hour and 200-hour moving averages"
     ]
   },
   "globalContext": {
@@ -41,7 +39,7 @@
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
     "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.31,
+    "avg_fx_perf_1m": 0.04,
     "avg_cot": 4098.88
   }
 }

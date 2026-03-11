@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "La política monetaria del Banco de Japón ha tomado un giro hawkish con el reciente aumento de tasas, lo que ejerce presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, este movimiento sugiere que el banco central está dispuesto a tomar medidas para controlar la inflación y estimular el crecimiento económico. La decisión de subir tasas puede ser vista como un intento de fortalecer la divisa y atraer inversión extranjera.\n\nLa balanza comercial de Japón se ve afectada por la composición de sus exportaciones, que se centran en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. La caída de los precios del petróleo ha ayudado a reducir los costos de importación, lo que puede tener un impacto positivo en la cuenta corriente. Sin embargo, las preocupaciones sobre el suministro de petróleo pueden contrarrestar cualquier beneficio potencial, como se ha visto en la reciente caída del rendimiento del bono japonés a 10 años.\n\nEl posicionamiento especulativo en el mercado de divisas muestra una posición corta extrema en el yen japonés, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. La atracción de nuevos vendedores en el par USD/JPY después de un modesto repunte en la sesión asiática hacia el vecindario de 158.00 y su posterior caída, refleja la indecisión del mercado. La revisión al alza del PIB del cuarto trimestre puede ser un catalizador para un posible cambio en la tendencia.",
+  "analysis": "La política monetaria del Banco de Japón ha sido objeto de atención en los últimos días, ya que se espera que mantenga las tasas de interés en 0.75% en su próxima reunión, según una encuesta de Reuters. Aunque el banco central subió las tasas recientemente, lo que podría generar presión alcista sobre la divisa, la incertidumbre sobre su próxima decisión ha debilitado ligeramente el yen. La tasa de interés del Japón sigue estando por debajo del promedio global, lo que podría hacer que la divisa sea financiadora de carry trade en épocas de aversión al riesgo.\n\nLa balanza comercial del Japón ha registrado un déficit en bienes, lo que se debe en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Aunque la cuenta corriente muestra un superávit, la debilidad del yen podría ser un factor que influya en la demanda de estos productos en el exterior. La producción industrial y el PMI manufacturero han mostrado signos de expansión, lo que podría ser un factor positivo para la divisa.\n\nEl posicionamiento especulativo en la divisa es muy cargado a la baja, con un COT de -34.2K contratos netos, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. La apreciación del yen en el último mes ha sido mayor que la del promedio de las divisas principales, lo que podría ser un signo de que el mercado está empezando a cambiar su percepción sobre la divisa. Sin embargo, la incertidumbre sobre la política monetaria del Banco de Japón sigue siendo un factor de riesgo para la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-10T08:36:31.920975+00:00",
+  "generatedAt": "2026-03-11T08:36:11.464537+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -34225,
-    "fxPerformance1M": 1.7014,
+    "fxPerformance1M": 0.726,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-10",
-    "latestNewsTs": 1773132817.0,
+    "lastUpdate": "2026-03-11",
+    "latestNewsTs": 1773204183.0,
     "newsHeadlines": [
-      "Japan 10Y Yield Falls as Oil Prices Drop",
-      "Los toros del Yen japonés parecen vacilantes ya que las preocupaciones sobre el ",
-      "Japanese Yen bulls seem hesitant as Oil supply concerns counter upward revision "
+      "BoJ to raise rates by end-June with expectations unchanged by Middle East war — ",
+      "BOJ not expected to raise interest rates next week - poll",
+      "Japanese Yen weakens below 158.50 on BoJ policy uncertainty, US CPI in focus"
     ]
   },
   "globalContext": {
@@ -41,7 +41,7 @@
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
     "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.31,
+    "avg_fx_perf_1m": 0.04,
     "avg_cot": 4098.88
   }
 }
