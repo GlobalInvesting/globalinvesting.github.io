@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.5
+fetch_news.py — v5.6
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5.5 (sobre v5.4):
-  GOOGLE NEWS — FEED NATIVO:
-    · Reemplaza los 8 feeds de rss.app por los feeds RSS nativos de Google News.
-    · URL: news.google.com/rss/search?q=...&hl=en&gl=US&ceid=US:en
-    · Sin intermediario — elimina dependencia de rss.app y sus límites de plan gratuito.
-    · Queries optimizadas por divisa incluyendo nombre del banco central para
-      aumentar relevancia (ej: "japanese yen bank of japan forex").
-    · User-Agent actualizado a Chrome/122 para mayor compatibilidad con Google.
+CAMBIOS v5.6 (sobre v5.5):
+  GOOGLE NEWS → GNEWS API:
+    · news.google.com RSS bloqueado en GitHub Actions (403 desde IPs de datacenter).
+    · Reemplazado por GNews API (https://gnews.io) — plan gratuito: 100 req/día.
+    · 3 ejecuciones/día × 8 divisas = 24 requests — margen del 76% sobre el límite.
+    · Requiere secret GNEWS_API_KEY en GitHub Actions (Settings → Secrets).
+    · Si la key no está configurada, el script continúa sin GNews (no falla).
+    · fetch_gnews() corre secuencialmente tras fetch_all_feeds() (no en paralelo
+      para no saturar el rate limit de la API).
+    · Deduplicación por título normalizado contra artículos RSS ya procesados.
 
 CAMBIOS v5.4 (sobre v5.3):
   CALIDAD DE FUENTES:
@@ -350,27 +352,31 @@ FEEDS = [
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
 
-    # ── GOOGLE NEWS RSS nativo — 1 feed por divisa (v5.5) ───────────────────
-    # Feed oficial de Google News, sin intermediario (reemplaza rss.app).
-    # La clave "currency" cortocircuita detect_currency() y asigna directamente.
-    # hl=en&gl=US&ceid=US:en fuerza resultados en inglés para mayor cobertura.
-    { "source": "Google News USD",  "lang": "en", "currency": "USD",
-      "url": "https://news.google.com/rss/search?q=US+dollar+federal+reserve+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News EUR",  "lang": "en", "currency": "EUR",
-      "url": "https://news.google.com/rss/search?q=euro+ECB+european+central+bank+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News GBP",  "lang": "en", "currency": "GBP",
-      "url": "https://news.google.com/rss/search?q=british+pound+sterling+bank+of+england+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News JPY",  "lang": "en", "currency": "JPY",
-      "url": "https://news.google.com/rss/search?q=japanese+yen+bank+of+japan+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News AUD",  "lang": "en", "currency": "AUD",
-      "url": "https://news.google.com/rss/search?q=australian+dollar+reserve+bank+australia+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News CAD",  "lang": "en", "currency": "CAD",
-      "url": "https://news.google.com/rss/search?q=canadian+dollar+bank+of+canada+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News CHF",  "lang": "en", "currency": "CHF",
-      "url": "https://news.google.com/rss/search?q=swiss+franc+swiss+national+bank+forex&hl=en&gl=US&ceid=US:en" },
-    { "source": "Google News NZD",  "lang": "en", "currency": "NZD",
-      "url": "https://news.google.com/rss/search?q=new+zealand+dollar+RBNZ+forex&hl=en&gl=US&ceid=US:en" },
+    # ── GOOGLE NEWS vía GNews API — 1 query por divisa (v5.6) ───────────────
+    # GNews API: https://gnews.io — plan gratuito: 100 requests/día.
+    # NO van en FEEDS (usa JSON, no RSS). Se procesan por fetch_gnews() en main().
+    # Las queries están definidas en GNEWS_QUERIES más abajo.
 ]
+
+# ─────────────────────────────────────────────
+# GNEWS API — configuración (v5.6)
+# ─────────────────────────────────────────────
+GNEWS_API_KEY_ENV = "GNEWS_API_KEY"          # nombre del secret en GitHub Actions
+GNEWS_MAX_PER_QUERY = 5                       # artículos por divisa (plan free: max 10)
+GNEWS_LANG = "en"
+GNEWS_COUNTRY = "us"
+GNEWS_BASE_URL = "https://gnews.io/api/v4/search"
+
+GNEWS_QUERIES = {
+    "USD": "US dollar OR federal reserve OR FOMC forex",
+    "EUR": "euro OR ECB OR \"european central bank\" forex",
+    "GBP": "british pound OR sterling OR \"bank of england\" forex",
+    "JPY": "japanese yen OR \"bank of japan\" OR BOJ forex",
+    "AUD": "australian dollar OR RBA OR \"reserve bank of australia\" forex",
+    "CAD": "canadian dollar OR \"bank of canada\" OR BOC forex",
+    "CHF": "swiss franc OR SNB OR \"swiss national bank\" forex",
+    "NZD": "new zealand dollar OR RBNZ forex",
+}
 
 # ─────────────────────────────────────────────
 HIGH_IMPACT_KW = [
@@ -414,15 +420,15 @@ SOURCE_CURRENCY = {
     "RBNZ":            "NZD",
     "SNB":             "CHF",
     "Federal Reserve": "USD",
-    # v5.3: Google News feeds — fallback defensivo (el cortocircuito ya lo maneja)
-    "Google News USD": "USD",
-    "Google News EUR": "EUR",
-    "Google News GBP": "GBP",
-    "Google News JPY": "JPY",
-    "Google News AUD": "AUD",
-    "Google News CAD": "CAD",
-    "Google News CHF": "CHF",
-    "Google News NZD": "NZD",
+    # v5.6: GNews — divisa ya asignada en fetch_gnews(), esto es fallback defensivo
+    "GNews USD": "USD",
+    "GNews EUR": "EUR",
+    "GNews GBP": "GBP",
+    "GNews JPY": "JPY",
+    "GNews AUD": "AUD",
+    "GNews CAD": "CAD",
+    "GNews CHF": "CHF",
+    "GNews NZD": "NZD",
 }
 
 FOREX_SOURCES = {
@@ -431,9 +437,9 @@ FOREX_SOURCES = {
     "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
     "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX", "FX Empire",
-    # v5.3: Google News feeds
-    "Google News USD", "Google News EUR", "Google News GBP", "Google News JPY",
-    "Google News AUD", "Google News CAD", "Google News CHF", "Google News NZD",
+    # v5.6: GNews API
+    "GNews USD", "GNews EUR", "GNews GBP", "GNews JPY",
+    "GNews AUD", "GNews CAD", "GNews CHF", "GNews NZD",
 }
 
 # ─────────────────────────────────────────────
@@ -587,14 +593,6 @@ def fetch_via_feedparser(feed_cfg: dict):
         "ForexCrunch":    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         "Reuters FX":     "Mozilla/5.0 (compatible; RSSReader/1.0)",
         "Nasdaq FX":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Google News USD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News EUR": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News GBP": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News JPY": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News AUD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News CAD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News CHF": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Google News NZD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     }
     ua = ua_map.get(feed_cfg.get("source", ""), "Mozilla/5.0 (compatible; ForexNewsBot/2.0)")
     try:
@@ -629,6 +627,118 @@ def fetch_all_feeds(feeds: list) -> dict:
             except Exception:
                 results[feed_cfg["url"]] = []
     return results
+
+
+def fetch_gnews(api_key: str, now_utc: datetime) -> list:
+    """
+    v5.6: Consulta GNews API por cada divisa en GNEWS_QUERIES.
+    Devuelve lista de artículos en el mismo formato que raw_articles.
+    Consume 8 requests por ejecución (1 por divisa).
+    Plan gratuito: 100 requests/día → cubre 12 ejecuciones/día con margen.
+    """
+    if not api_key:
+        print("  [GNews] GNEWS_API_KEY no configurada — omitiendo")
+        return []
+
+    cutoff = now_utc - timedelta(days=MAX_AGE_DAYS)
+    articles = []
+    seen_gnews_titles = set()
+
+    for cur, query in GNEWS_QUERIES.items():
+        try:
+            params = {
+                "q":        query,
+                "lang":     GNEWS_LANG,
+                "country":  GNEWS_COUNTRY,
+                "max":      GNEWS_MAX_PER_QUERY,
+                "apikey":   api_key,
+                "sortby":   "publishedAt",
+            }
+            resp = requests.get(
+                GNEWS_BASE_URL,
+                params=params,
+                timeout=FETCH_TIMEOUT,
+            )
+
+            if resp.status_code == 403:
+                print(f"  [GNews] API key inválida o plan agotado (403)")
+                break
+            if resp.status_code == 429:
+                print(f"  [GNews] Rate limit alcanzado (429) — parando consultas")
+                break
+            if resp.status_code != 200:
+                print(f"  [GNews] {cur}: error {resp.status_code}")
+                continue
+
+            data = resp.json()
+            gnews_articles = data.get("articles", [])
+            count = 0
+
+            for item in gnews_articles:
+                title   = clean_html(item.get("title", ""))
+                summary = clean_html(item.get("description", "") or item.get("content", ""))
+                link    = item.get("url", "")
+                source  = item.get("source", {}).get("name", "GNews")
+
+                if not title or len(title) < 15:
+                    continue
+
+                # Parse date — GNews usa ISO 8601
+                pub_date = now_utc
+                raw_date = item.get("publishedAt", "")
+                if raw_date:
+                    try:
+                        pub_date = dateparser.parse(raw_date)
+                        if pub_date.tzinfo is None:
+                            pub_date = pub_date.replace(tzinfo=timezone.utc)
+                        pub_date = pub_date.astimezone(timezone.utc)
+                    except Exception:
+                        pass
+
+                if pub_date < cutoff:
+                    continue
+
+                if is_calendar_entry(title, summary):
+                    continue
+                if not has_real_content(title, summary):
+                    continue
+
+                norm_title = normalize_title(title)
+                title_key  = norm_title[:60]
+                if title_key in seen_gnews_titles:
+                    continue
+                seen_gnews_titles.add(title_key)
+
+                nid = entry_id(title, f"GNews {cur}")
+                impact    = detect_impact(title, summary)
+                expand    = summary[:350] + ("..." if len(summary) > 350 else "")
+                age_hours = (now_utc - pub_date).total_seconds() / 3600
+
+                articles.append({
+                    "id":       nid,
+                    "cur":      cur,
+                    "impact":   impact,
+                    "title":    title,
+                    "expand":   expand,
+                    "source":   f"GNews {cur}",
+                    "link":     link,
+                    "time":     pub_date.strftime("%H:%M"),
+                    "ts":       int(pub_date.timestamp() * 1000),
+                    "featured": impact == "high" and age_hours <= 6,
+                    "lang":     "en",
+                    "date":     pub_date.strftime("%d %b"),
+                    "datetime": pub_date.isoformat(),
+                    "recent":   age_hours <= 24,
+                })
+                count += 1
+
+            if count > 0:
+                print(f"    [GNews] {cur}: {count} artículos")
+
+        except Exception as e:
+            print(f"  [GNews] {cur}: excepción — {e}")
+
+    return articles
 
 
 def load_previous_headlines() -> dict:
@@ -704,11 +814,21 @@ def main():
     filtered_no_currency = 0
     instaforex_count     = 0          # v5.4: contador para cap de InstaForex
 
-    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.3 — {len(FEEDS)} feeds")
+    print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.6 — {len(FEEDS)} feeds")
 
     print(f"  Descargando en paralelo (workers={FETCH_WORKERS})...")
     all_entries = fetch_all_feeds(FEEDS)
     print(f"  Descarga completada.")
+
+    # v5.6: GNews API — fetch separado, resultados se añaden a raw_articles al final
+    gnews_api_key = os.environ.get(GNEWS_API_KEY_ENV, "").strip()
+    gnews_articles = []
+    if gnews_api_key:
+        print(f"  Consultando GNews API ({len(GNEWS_QUERIES)} divisas)...")
+        gnews_articles = fetch_gnews(gnews_api_key, now_utc)
+        print(f"  GNews: {len(gnews_articles)} artículos obtenidos")
+    else:
+        print(f"  [GNews] GNEWS_API_KEY no configurada — omitiendo")
 
     for feed_cfg in FEEDS:
         source           = feed_cfg["source"]
@@ -805,6 +925,22 @@ def main():
         if count > 0:
             tag = f" [{forced_currency}]" if forced_currency else ""
             print(f"    [{lang.upper()}] {source}{tag}: {count} noticias")
+
+    # v5.6: añadir artículos de GNews con deduplicación por título
+    gnews_added = 0
+    for a in gnews_articles:
+        if a["id"] in seen_ids:
+            continue
+        title_key = normalize_title(a["title"])[:60]
+        if title_key in seen_titles:
+            continue
+        seen_ids.add(a["id"])
+        seen_titles.add(title_key)
+        raw_articles.append(a)
+        en_raw += 1
+        gnews_added += 1
+    if gnews_added:
+        print(f"    [GNews] {gnews_added} artículos añadidos (tras deduplicación)")
 
     print(f"\n📦 Total artículos recopilados: {len(raw_articles)}")
     print(f"   ES: {es_raw} | EN: {en_raw}")
