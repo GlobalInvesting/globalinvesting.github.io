@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-generate_summaries.py — v3.2
+generate_summaries.py — v3.3
 Genera un bloque de análisis consolidado por divisa a partir de news.json.
 Llama a Groq una vez por divisa (8 llamadas total) y escribe summaries.json.
 
-CAMBIOS v3.2 (sobre v3.1):
+CAMBIOS v3.3 (sobre v3.2):
+  EXTENSIÓN DEL ANÁLISIS:
+    · Mínimo de palabras en "analysis" subido de 120 a 150 (máximo se
+      mantiene en 200). Permite incluir niveles técnicos, mecanismo de
+      transmisión y perspectiva forward sin truncar.
+    · Validación de rechazo subida de 80 a 120 palabras para alinearse.
   CALENDARIO ECONÓMICO — FIX PRINCIPAL:
     · Lee news-data/calendar.json si existe y extrae los próximos eventos por divisa
       (solo aquellos cuya fecha+hora UTC es estrictamente futura respecto a now_utc).
@@ -229,7 +234,7 @@ INSTRUCCIONES DE REDACCIÓN
 ═══════════════════════════════════════════════
 
 EXTENSIÓN Y ESTRUCTURA:
-- El campo "analysis" debe tener entre 120 y 200 palabras.
+- El campo "analysis" debe tener entre 150 y 200 palabras.
 - Redacta en párrafos fluidos, como un briefing institucional real.
 - Usa un tono profesional pero directo, evitando frases genéricas o vagas.
 
@@ -297,7 +302,7 @@ JSON puro, sin markdown, sin texto extra:
 {
   "sentiment": "bull|bear|neut|mixed",
   "confidence": 0-100,
-  "analysis": "análisis completo entre 120 y 200 palabras",
+  "analysis": "análisis completo entre 150 y 200 palabras",
   "drivers": ["Driver específico 1", "Driver específico 2", "Driver 3", "Driver 4"],
   "upcoming_event": "Descripción breve del evento próximo más relevante, o null"
 }
@@ -372,7 +377,7 @@ def build_user_prompt(cur: str, articles: list, upcoming_events: list) -> str:
         f"4. Incluye niveles de precio concretos si aparecen en los titulares o contexto.\n"
         f"5. Para upcoming_event: usa SOLO la lista de próximos eventos del calendario de arriba.\n\n"
         f"Genera el análisis consolidado institucional en JSON para {cur}. "
-        f"Recuerda: entre 120 y 200 palabras en 'analysis'."
+        f"Recuerda: entre 150 y 200 palabras en 'analysis'."
     )
 
 
@@ -453,7 +458,7 @@ def call_groq(api_key: str, cur: str, articles: list, upcoming_events: list) -> 
                 return None
 
             word_count = len(parsed.get("analysis", "").split())
-            if word_count < 80:
+            if word_count < 120:  # v3.3: subido de 80 para alinearse con mínimo 150 del prompt
                 print(f"    ⚠️  Análisis demasiado corto para {cur}: {word_count} palabras — reintentando")
                 return None
 
