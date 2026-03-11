@@ -25,6 +25,7 @@ import json
 import re
 import hashlib
 import sys
+import time
 import feedparser
 import requests
 from datetime import datetime, timezone, timedelta
@@ -735,6 +736,8 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
 
             if count > 0:
                 print(f"    [GNews] {cur}: {count} artículos")
+
+            time.sleep(2)  # v5.6: evitar burst rate limit de GNews
 
         except Exception as e:
             print(f"  [GNews] {cur}: excepción — {e}")
