@@ -1,32 +1,22 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.3
+fetch_news.py — v5.5
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
-CAMBIOS v5.3 (sobre v5.2):
-  NUEVOS FEEDS — Google News RSS vía rss.app (1 feed específico por divisa):
-    · Google News NZD  → "new zealand dollar news" (feed corregido)
-    · Google News AUD  → "Australian dollar news"
-    · Google News USD  → "USdollar news"
-    · Google News CAD  → "canadian dollar news"
-    · Google News CHF  → "swiss franc news"
-    · Google News JPY  → "japanese yen news"
-    · Google News GBP  → "british pound news"
-    · Google News EUR  → "euro currency news"
+CAMBIOS v5.5 (sobre v5.4):
+  GOOGLE NEWS — FEED NATIVO:
+    · Reemplaza los 8 feeds de rss.app por los feeds RSS nativos de Google News.
+    · URL: news.google.com/rss/search?q=...&hl=en&gl=US&ceid=US:en
+    · Sin intermediario — elimina dependencia de rss.app y sus límites de plan gratuito.
+    · Queries optimizadas por divisa incluyendo nombre del banco central para
+      aumentar relevancia (ej: "japanese yen bank of japan forex").
+    · User-Agent actualizado a Chrome/122 para mayor compatibilidad con Google.
 
-  CORTOCIRCUITO DE DIVISA:
-    · Los feeds con clave "currency" en su config asignan la divisa directamente,
-      saltando el scoring. Elimina el problema de artículos NZD clasificados como USD.
-
-  AJUSTES DE CALIDAD (auditoría v5.2→v5.3):
-    · CURRENCY_MIN_SCORE sube de 3 a 5 para reducir asignaciones incorrectas.
-    · Nuevo guard: UK housing/Halifax penaliza NZD, AUD, CHF.
-    · Nuevo filtro en is_forex_relevant(): descarta titulares de índices bursátiles
-      europeos (DAX, CAC, EuroStoxx) que no son relevantes para divisas.
-    · SOURCE_CURRENCY ampliado con los nuevos feeds de Google News.
-    · FOREX_SOURCES ampliado con los nuevos feeds de Google News.
-    · FETCH_WORKERS sube de 10 a 14 para los feeds adicionales.
-    · MAX_NEWS sube de 40 a 48 para absorber el mayor volumen de fuentes.
+CAMBIOS v5.4 (sobre v5.3):
+  CALIDAD DE FUENTES:
+    · FXStreet ES eliminado — duplicaba contenido de FXStreet EN traducido.
+    · InstaForex penalizado: impacto forzado a "low" y cap de 2 artículos
+      por ejecución (INSTAFOREX_MAX). Pasa a fallback de último recurso.
 """
 
 import json
@@ -52,6 +42,7 @@ GUARANTEED_PER_CUR    = 3
 MAX_PER_CUR           = 8
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
+INSTAFOREX_MAX        = 2           # v5.4: InstaForex limitado a 2 artículos por ejecución
 # FIX C-01: CURRENCIES importado desde fx_config.py (ver imports al inicio del archivo)
 FETCH_TIMEOUT         = 12
 FETCH_WORKERS         = 14          # v5.3: subido para más feeds en paralelo
@@ -309,7 +300,7 @@ FALSE_POSITIVE_GUARDS = [
 # ─────────────────────────────────────────────
 FEEDS = [
     # ── ESPAÑOL ──────────────────────────────────────────────────────────────
-    { "source": "FXStreet ES",      "url": "https://www.fxstreet.es/rss/news",                              "lang": "es" },
+    # v5.4: FXStreet ES eliminado — duplicaba contenido de FXStreet EN traducido
     { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/forexnews.xml",                "lang": "es" },
     { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",        "lang": "es" },
     { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",      "lang": "es" },
@@ -359,16 +350,26 @@ FEEDS = [
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
 
-    # ── GOOGLE NEWS RSS vía rss.app — 1 feed específico por divisa (v5.3) ───
+    # ── GOOGLE NEWS RSS nativo — 1 feed por divisa (v5.5) ───────────────────
+    # Feed oficial de Google News, sin intermediario (reemplaza rss.app).
     # La clave "currency" cortocircuita detect_currency() y asigna directamente.
-    { "source": "Google News USD",  "url": "https://rss.app/feeds/RECOTepHS5Kq3UCO.xml", "lang": "en", "currency": "USD" },
-    { "source": "Google News EUR",  "url": "https://rss.app/feeds/BEnNdIQr1CkPaw3i.xml", "lang": "en", "currency": "EUR" },
-    { "source": "Google News GBP",  "url": "https://rss.app/feeds/Da00omOyavGEQjJK.xml", "lang": "en", "currency": "GBP" },
-    { "source": "Google News JPY",  "url": "https://rss.app/feeds/fiswoc1JpVIcCuwY.xml", "lang": "en", "currency": "JPY" },
-    { "source": "Google News AUD",  "url": "https://rss.app/feeds/aXeJoqXkQQjm8lQi.xml", "lang": "en", "currency": "AUD" },
-    { "source": "Google News CAD",  "url": "https://rss.app/feeds/cVDaLFQinNqDr5ke.xml", "lang": "en", "currency": "CAD" },
-    { "source": "Google News CHF",  "url": "https://rss.app/feeds/5rQGIwZXa33qQulN.xml", "lang": "en", "currency": "CHF" },
-    { "source": "Google News NZD",  "url": "https://rss.app/feeds/gW8QbLubX7NC8wjK.xml", "lang": "en", "currency": "NZD" },
+    # hl=en&gl=US&ceid=US:en fuerza resultados en inglés para mayor cobertura.
+    { "source": "Google News USD",  "lang": "en", "currency": "USD",
+      "url": "https://news.google.com/rss/search?q=US+dollar+federal+reserve+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News EUR",  "lang": "en", "currency": "EUR",
+      "url": "https://news.google.com/rss/search?q=euro+ECB+european+central+bank+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News GBP",  "lang": "en", "currency": "GBP",
+      "url": "https://news.google.com/rss/search?q=british+pound+sterling+bank+of+england+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News JPY",  "lang": "en", "currency": "JPY",
+      "url": "https://news.google.com/rss/search?q=japanese+yen+bank+of+japan+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News AUD",  "lang": "en", "currency": "AUD",
+      "url": "https://news.google.com/rss/search?q=australian+dollar+reserve+bank+australia+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News CAD",  "lang": "en", "currency": "CAD",
+      "url": "https://news.google.com/rss/search?q=canadian+dollar+bank+of+canada+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News CHF",  "lang": "en", "currency": "CHF",
+      "url": "https://news.google.com/rss/search?q=swiss+franc+swiss+national+bank+forex&hl=en&gl=US&ceid=US:en" },
+    { "source": "Google News NZD",  "lang": "en", "currency": "NZD",
+      "url": "https://news.google.com/rss/search?q=new+zealand+dollar+RBNZ+forex&hl=en&gl=US&ceid=US:en" },
 ]
 
 # ─────────────────────────────────────────────
@@ -425,7 +426,7 @@ SOURCE_CURRENCY = {
 }
 
 FOREX_SOURCES = {
-    "FXStreet ES", "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
+    "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
     "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
     "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
@@ -586,14 +587,14 @@ def fetch_via_feedparser(feed_cfg: dict):
         "ForexCrunch":    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         "Reuters FX":     "Mozilla/5.0 (compatible; RSSReader/1.0)",
         "Nasdaq FX":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Google News USD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News EUR": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News GBP": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News JPY": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News AUD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News CAD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News CHF": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
-        "Google News NZD": "Mozilla/5.0 (compatible; ForexNewsBot/2.0)",
+        "Google News USD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News EUR": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News GBP": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News JPY": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News AUD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News CAD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News CHF": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Google News NZD": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     }
     ua = ua_map.get(feed_cfg.get("source", ""), "Mozilla/5.0 (compatible; ForexNewsBot/2.0)")
     try:
@@ -701,6 +702,7 @@ def main():
     filtered_quality     = 0
     filtered_relevance   = 0
     filtered_no_currency = 0
+    instaforex_count     = 0          # v5.4: contador para cap de InstaForex
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.3 — {len(FEEDS)} feeds")
 
@@ -767,6 +769,14 @@ def main():
                 continue
 
             impact    = detect_impact(title, summary)
+
+            # v5.4: InstaForex — forzar impacto low y limitar a INSTAFOREX_MAX artículos
+            if source == "InstaForex":
+                impact = "low"
+                if instaforex_count >= INSTAFOREX_MAX:
+                    continue
+                instaforex_count += 1
+
             expand    = summary[:350] + ("..." if len(summary) > 350 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
 
