@@ -674,6 +674,7 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
 
             data = resp.json()
             gnews_articles = data.get("articles", [])
+            print(f"  [GNews] {cur}: status=200, totalArticles={data.get('totalArticles','?')}, articles_returned={len(gnews_articles)}")
             count = 0
 
             for item in gnews_articles:
@@ -739,8 +740,14 @@ def fetch_gnews(api_key: str, now_utc: datetime) -> list:
 
             time.sleep(2)  # v5.6: evitar burst rate limit de GNews
 
+        except requests.exceptions.Timeout:
+            print(f"  [GNews] {cur}: timeout")
+        except requests.exceptions.RequestException as e:
+            print(f"  [GNews] {cur}: request error — {e}")
         except Exception as e:
+            import traceback
             print(f"  [GNews] {cur}: excepción — {e}")
+            print(f"  [GNews] {cur}: {traceback.format_exc()[:400]}")
 
     return articles
 
