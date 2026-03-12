@@ -5457,23 +5457,6 @@ const sentiment = getSentiment(strength);
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
 </div>
 
-    <div style={{
-        background: 'var(--bg-card)',
-        padding: '1rem',
-        borderRadius: '6px',
-        border: '1px solid var(--border)',
-        marginTop: '1rem',
-        fontSize: '0.8125rem',
-        lineHeight: '1.6'
-    }}>
-        <strong>Aviso Legal:</strong><br/>
-        Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
-        Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
-        macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
-        El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
-        Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
-    </div>
-
     <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
         <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
             padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
@@ -5491,9 +5474,8 @@ const sentiment = getSentiment(strength);
                 fontSize: '0.7rem', color: 'var(--text-secondary)', lineHeight: '1.5',
                 margin: '0 0 0.5rem 0', padding: '0 1rem', opacity: 0.75
             }}>
-                ⚠️ <strong style={{ color: 'var(--text-primary)' }}>Aviso de Riesgo:</strong>{' '}
-                Contenido exclusivamente informativo. No constituye asesoramiento financiero, de inversión, legal ni fiscal.
-                El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores.
+                <strong style={{ color: 'var(--text-primary)' }}>Aviso Legal:</strong>{' '}
+                Contenido exclusivamente informativo y educativo basado en datos macroeconómicos públicos. No constituye asesoramiento financiero, de inversión, legal ni fiscal. El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores. Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
             </p>
             <div style={{
                 display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
