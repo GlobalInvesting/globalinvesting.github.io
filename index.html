@@ -2285,7 +2285,7 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const weakReasons = getTopContributions(weakData.contributions, false);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const confidence = spreadStrength > 25 ? 'Alta' : spreadStrength > 18 ? 'Media' : 'Baja'; // v6.4: umbrales subidos por backtest (≥18→Sharpe 0.85, HR 55%)
+            const confidence = spreadStrength >= 20 ? 'Alta' : 'Baja'; // v6.5 backtest: diff≥20→HR 49.8% Sharpe +0.46, diff<20→HR 41-44% Sharpe negativo
 
             // Momentum confirmation filter (backtest-derived):
             // If the pair already moved >2% AGAINST the fundamental signal in the last month,
@@ -2331,7 +2331,7 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const strongReasons = getTopContributions(strongData.contributions, true);
 
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
-            const confidence = spreadStrength > 25 ? 'Alta' : spreadStrength > 18 ? 'Media' : 'Baja'; // v6.4: umbrales subidos por backtest (≥18→Sharpe 0.85, HR 55%)
+            const confidence = spreadStrength >= 20 ? 'Alta' : 'Baja'; // v6.5 backtest: diff≥20→HR 49.8% Sharpe +0.46, diff<20→HR 41-44% Sharpe negativo
 
             // Momentum confirmation filter for SHORT (par = WEAK/STRONG, ej: GBP/AUD).
             // El par cae cuando el strong sube más que el weak → CONFIRMA el SHORT.
@@ -2371,8 +2371,8 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
     recommendations.sort((a, b) => b.priority - a.priority);
     
     // v6.4: solo mostrar Media y Alta — Baja tiene Sharpe ~0.35 y HR ~47% según backtest
-    const longRecs = recommendations.filter(r => r.type === 'long' && r.confidence !== 'Baja').slice(0, 4);
-    const shortRecs = recommendations.filter(r => r.type === 'short' && r.confidence !== 'Baja').slice(0, 4);
+    const longRecs = recommendations.filter(r => r.type === 'long' && r.confidence === 'Alta').slice(0, 4); // v6.5: solo Alta (diff≥20), backtest HR 49.8% Sharpe +0.46
+    const shortRecs = recommendations.filter(r => r.type === 'short' && r.confidence === 'Alta').slice(0, 4); // v6.5: solo Alta (diff≥20)
     
     const finalRecommendations = [...longRecs, ...shortRecs];
 
@@ -5223,7 +5223,7 @@ const sentiment = getSentiment(strength);
     <div>
         <div className="section-header">
             <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
-            <div className="section-meta">Basado en diferenciales de fortaleza fundamental · Horizonte estimado: 2–3 semanas · Solo se muestran señales con confianza Media o Alta</div>
+            <div className="section-meta">Basado en diferenciales de fortaleza fundamental · Horizonte estimado: 2–6 semanas · Solo señales con diferencial ≥20 pts (backtest: HR 49.8%, Sharpe +0.46)</div>
         </div>
         
         <div style={{ 
@@ -5255,11 +5255,25 @@ const sentiment = getSentiment(strength);
                                 <span className={`sentiment-badge sentiment-${rec.type === 'long' ? 'alcista' : 'bajista'}`}>
                                     {rec.direction} - {rec.actionText}
                                 </span>
-                                <span style={{ 
-                                    fontSize: '0.875rem', 
-                                    color: 'var(--text-secondary)' 
-                                }}>
-                                    Confianza: {rec.confidence}
+                                <span
+                                    title={`Diferencial: ${rec.spread != null ? rec.spread.toFixed(1) : '?'} pts · Backtest 115 semanas: diff≥20 → Hit Rate 49.8%, Sharpe +0.46, retorno acum. +38% · diff<20 → Sharpe negativo, excluidas`}
+                                    style={{ 
+                                        fontSize: '0.8rem',
+                                        fontWeight: 600,
+                                        padding: '2px 8px',
+                                        borderRadius: '4px',
+                                        cursor: 'help',
+                                        background: rec.confidence === 'Alta'
+                                            ? 'rgba(34, 197, 94, 0.15)'
+                                            : 'rgba(156, 163, 175, 0.15)',
+                                        color: rec.confidence === 'Alta'
+                                            ? 'var(--green-strong)'
+                                            : 'var(--text-tertiary)',
+                                        border: rec.confidence === 'Alta'
+                                            ? '1px solid rgba(34, 197, 94, 0.3)'
+                                            : '1px solid rgba(156, 163, 175, 0.2)',
+                                    }}>
+                                    {rec.confidence === 'Alta' ? '✓ Señal confirmada' : 'Señal débil'}
                                 </span>
                                 {rec.momentumOpposing && (
                                     <span title={rec.type === 'short'
