@@ -380,25 +380,51 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "@id": "https://globalinvesting.github.io/carry-trade.html#app",
-  "url": "https://globalinvesting.github.io/carry-trade.html",
-  "name": "Carry Trade Forex — Diferenciales de Tasas",
-  "description": "Análisis de carry trade para las 8 divisas principales. Diferenciales de tasas reales y datos de bancos centrales.",
-  "applicationCategory": "FinanceApplication",
-  "operatingSystem": "Web Browser",
-  "inLanguage": "es",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "@id": "https://globalinvesting.github.io/#organization",
-    "name": "Global Investing",
-    "url": "https://globalinvesting.github.io"
-  }
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://globalinvesting.github.io/carry-trade.html#app",
+      "url": "https://globalinvesting.github.io/carry-trade.html",
+      "name": "Carry Trade Forex — Diferenciales de Tasas",
+      "description": "Análisis de carry trade para las 8 divisas principales. Diferenciales de tasas reales y datos de bancos centrales.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web Browser",
+      "inLanguage": "es",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://globalinvesting.github.io/#organization",
+        "name": "Global Investing",
+        "url": "https://globalinvesting.github.io"
+      }
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://globalinvesting.github.io/carry-trade.html#dataset",
+      "name": "Diferenciales de Tasas de Interés — Carry Trade Forex",
+      "description": "Tasas de interés actualizadas de 8 bancos centrales (Fed, BCE, BoE, BoJ, RBA, BoC, SNB, RBNZ), diferenciales de carry trade y clasificación de pares por rentabilidad potencial.",
+      "url": "https://globalinvesting.github.io/carry-trade.html",
+      "inLanguage": "es",
+      "license": "https://github.com/GlobalInvesting/globalinvesting.github.io/blob/main/LICENSE",
+      "isAccessibleForFree": true,
+      "creator": {
+        "@type": "Organization",
+        "@id": "https://globalinvesting.github.io/#organization",
+        "name": "Global Investing"
+      },
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://globalinvesting.github.io/rates/summary.json"
+      },
+      "temporalCoverage": "P1D",
+      "variableMeasured": ["Tasa de interés por divisa", "Diferencial de carry", "Posicionamiento COT"]
+    }
+  ]
 }
 </script>
 </head>

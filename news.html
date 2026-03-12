@@ -48,6 +48,28 @@
           { "@type": "ListItem", "position": 2, "name": "Noticias", "item": "https://globalinvesting.github.io/news.html" }
         ]
       }
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://globalinvesting.github.io/news.html#dataset",
+      "name": "Análisis de Sentimiento Forex — Noticias en Tiempo Real",
+      "description": "Resúmenes generados por IA con análisis de sentimiento para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD, actualizados diariamente desde FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex y MyFXBook.",
+      "url": "https://globalinvesting.github.io/news.html",
+      "inLanguage": "es",
+      "license": "https://github.com/GlobalInvesting/globalinvesting.github.io/blob/main/LICENSE",
+      "isAccessibleForFree": true,
+      "creator": {
+        "@type": "Organization",
+        "@id": "https://globalinvesting.github.io/#organization",
+        "name": "Global Investing"
+      },
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://globalinvesting.github.io/news-data/summaries.json"
+      },
+      "temporalCoverage": "P1D",
+      "variableMeasured": ["Sentimiento de mercado", "Confianza analítica", "Drivers fundamentales por divisa"]
     }
   ]
 }

@@ -4752,6 +4752,21 @@ const sentiment = getSentiment(strength);
                     <div className="chart-wrapper">
                         <canvas id={`chart-${country.code}`} role="img" aria-label={`Gráfico de tasas de interés históricas para ${country.name} (${country.code}). Datos de los últimos 12 meses.`}></canvas>
                     </div>
+                    {(() => {
+                        const hd = historicalData[country.code];
+                        if (!hd || !hd.labels || !hd.rates) return null;
+                        return (
+                            <table style={{position:'absolute',width:'1px',height:'1px',padding:0,margin:'-1px',overflow:'hidden',clip:'rect(0,0,0,0)',whiteSpace:'nowrap',border:0}} aria-label={`Datos tabulares: tasas de interés históricas ${country.code}`}>
+                                <caption style={{position:'absolute',width:'1px',height:'1px',overflow:'hidden'}}>{`Tasas de interés históricas — ${country.name} (${country.code}), últimos 12 meses`}</caption>
+                                <thead><tr><th scope="col">Fecha</th><th scope="col">Tasa de interés (%)</th></tr></thead>
+                                <tbody>
+                                    {hd.labels.map((label, i) => (
+                                        <tr key={i}><td>{label}</td><td>{hd.rates[i] != null ? Number(hd.rates[i]).toFixed(2) : '—'}</td></tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        );
+                    })()}
                 </div>
             );
         });
