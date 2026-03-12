@@ -2118,8 +2118,9 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
         }));
     };
 
-    // Ordenar divisas por fortaleza
+    // Ordenar divisas por fortaleza (guard: null scores → 50 como placeholder)
     const sortedCurrencies = Object.entries(strengthScores)
+        .filter(([, data]) => data.score !== null && data.score !== undefined)
         .sort((a, b) => b[1].score - a[1].score);
 
     const recommendations = [];
@@ -3304,9 +3305,12 @@ const getHeatmapColor = (value, type) => {
 };
 
 const getSentiment = (strength) => {
-    const numStrength = typeof strength === 'object' && strength.score !== undefined 
+    // FIX: typeof null === 'object' in JS, so we must guard against null explicitly
+    const numStrength = strength !== null && typeof strength === 'object' && strength.score !== undefined 
         ? strength.score 
         : (typeof strength === 'string' ? parseFloat(strength) : strength);
+    // If numStrength is null/undefined/NaN, return neutral instead of crashing
+    if (numStrength === null || numStrength === undefined || isNaN(numStrength)) return 'neutral';
     
     // Bandas fijas escala 0–100
     // < 50 = Débil · 50–60 = Neutral · > 60 = Fuerte
