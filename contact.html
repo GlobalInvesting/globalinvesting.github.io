@@ -203,18 +203,19 @@
             </ul>
         </div>
 
-        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
             <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-            <p style="margin-top: 0.5rem;">
-                <a href="index.html">Dashboard</a> |
-                <a href="about.html">Acerca de</a> |
-                <a href="terms.html">Términos de Servicio</a> |
-                <a href="privacy.html">Política de Privacidad</a> |
-                <a href="contact.html">Contacto</a> |
-                <a href="about.html#recursos">Guías</a>
-            </p>
-        </div>
-    </div>
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.4rem 1rem; margin-top:0.75rem; font-size:0.8rem;">
+                <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
+                <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
+                <a href="about.html#recursos" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
+                <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
+                <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
+                <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
+                <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
+            </div>
+            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.4.0</p>
+        </div></div>
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
         // Email construido en runtime para evitar obfuscación de Cloudflare

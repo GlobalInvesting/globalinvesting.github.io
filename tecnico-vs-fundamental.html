@@ -25,7 +25,7 @@
         .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
         .brand-title:hover { color: var(--blue); }
         .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
         .nav-links a:hover { color: var(--text-primary); }
         .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
         .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
@@ -201,13 +201,16 @@
 
 <footer class="footer">
     <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-    <p style="margin-top:0.5rem;">
-        <a href="index.html">Dashboard</a> |
-        <a href="about.html">Acerca de</a> |
-        <a href="terms.html">Términos</a> |
-        <a href="privacy.html">Privacidad</a> |
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:0.5rem;font-size:0.8rem;">
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">Acerca de</a>
+        <a href="publicidad.html">Publicidad</a>
+        <a href="about.html#recursos">Guías</a>
+        <a href="terms.html">Términos</a>
+        <a href="privacy.html">Privacidad</a>
         <a href="contact.html">Contacto</a>
-    </p>
+        <a href="en.html" style="padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;">EN</a>
+    </div>
     <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
 </footer>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
