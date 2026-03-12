@@ -1783,7 +1783,10 @@ const fetchStrengthScores = async () => {
 
     const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const validate = (data) =>
-        data && data.scores && CURRENCIES.every(c => data.scores[c] !== undefined);
+        data && data.scores &&
+        CURRENCIES.every(c => data.scores[c] !== undefined &&
+                               data.scores[c] !== null &&
+                               typeof data.scores[c].score === 'number');
 
     // ── Primary: latest.json ──────────────────────────────────────────────────
     try {
@@ -1828,21 +1831,30 @@ const fetchStrengthScores = async () => {
 
 // Returns score object from engine. If no data available, returns a neutral placeholder.
 const getStrength = (currency) => {
-    if (_precomputedScores && _precomputedScores[currency]) {
-        const s = _precomputedScores[currency];
+    // Guard: s must be a non-null object with a numeric score — rejects null entries
+    // and stale cache payloads from before v6.4 that had a different structure.
+    const s = _precomputedScores && _precomputedScores[currency];
+    if (s && typeof s === 'object' && typeof s.score === 'number') {
         return {
             score:         s.score,
             confidence:    s.confidence    || { lower: s.score - 5, upper: s.score + 5 },
             contributions: s.contributions || {},
             dataQuality:   s.dataQuality   ?? 1,
             scoringData:   s.scoringData   || {},
-            bcOutlook:     s.bcOutlook,
+            bcOutlook:     s.bcOutlook     || null,
             contextualAdj: s.contextualAdj || {},
             _stale:        !!(_scoresDataDate && (Date.now() - new Date(_scoresDataDate) > 48*3600*1000)),
             _dataDate:     _scoresDataDate
         };
     }
-    // No scores available at all — return a visible placeholder so UI doesn't crash
+    // Stale/corrupt cache entry — invalidate and trigger background refresh
+    if (_precomputedScores && _precomputedScores[currency] !== undefined) {
+        console.warn(`[scores] Invalid entry for ${currency} — clearing scores cache`);
+        _precomputedScores = null;
+        try { localStorage.removeItem('forex_dashboard_strength_scores_latest'); } catch(e) {}
+        fetchStrengthScores().catch(e => console.warn('[scores] Background reload failed:', e));
+    }
+    // No scores available — return placeholder so UI never crashes
     return {
         score: null,
         confidence: { lower: null, upper: null },
@@ -2227,7 +2239,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '6.4.0-2026-03-12';
+            const DASHBOARD_VERSION = '6.4.1-2026-03-12';  // bump: fix null scores cache crash
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
