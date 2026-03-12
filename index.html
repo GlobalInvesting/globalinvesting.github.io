@@ -829,27 +829,42 @@
         .score-context-badge {
             display: inline-flex;
             align-items: center;
-            gap: 3px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.58rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             cursor: help;
-            border: 1px solid;
-            margin-top: 4px;
+            margin-top: 6px;
             white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s ease;
+        }
+        .score-context-badge:hover {
+            opacity: 0.8;
         }
         .score-context-badge.structural {
-            color: #b07a00;
-            background: rgba(176, 122, 0, 0.10);
-            border-color: rgba(176, 122, 0, 0.30);
+            color: #e6a817;
+            background: rgba(230, 168, 23, 0.08);
+            border: 1px solid rgba(230, 168, 23, 0.22);
         }
         .score-context-badge.momentum {
-            color: var(--green);
-            background: rgba(38, 166, 154, 0.08);
-            border-color: rgba(38, 166, 154, 0.28);
+            color: #26a69a;
+            background: rgba(38, 166, 154, 0.10);
+            border: 1px solid rgba(38, 166, 154, 0.25);
+            box-shadow: 0 0 6px rgba(38, 166, 154, 0.08);
+        }
+        .score-context-badge.momentum::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #26a69a;
+            box-shadow: 0 0 4px rgba(38, 166, 154, 0.7);
+            flex-shrink: 0;
         }
 
         .card-body {
@@ -5170,7 +5185,7 @@ const DataHealthCheck = ({ economicData }) => {
                         if (scoreRelevant && strongMomentum && !weakMonetary) {
                             const fxStr = fx !== null ? `FX +${fx.toFixed(1)}% (1M)` : 'FX positivo';
                             const cotStr = cot !== null ? `COT largo neto ${cot > 0 ? '+' : ''}${Math.round(cot / 1000)}K` : 'COT confirmado';
-                            return { type: 'momentum', label: '✓ Momentum', title: `${fxStr} · ${cotStr} — señal de momentum operativo confirmada.` };
+                            return { type: 'momentum', label: 'Momentum', title: `${fxStr} · ${cotStr} — señal de momentum operativo confirmada.` };
                         }
                         return null;
                     })();
