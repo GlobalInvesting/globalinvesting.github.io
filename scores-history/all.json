@@ -1,0 +1,114 @@
+{
+  "snapshots": [
+    {
+      "date": "2026-03-12",
+      "scores": {
+        "USD": {
+          "score": 68.6,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "EUR": {
+          "score": 57.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "GBP": {
+          "score": 54.2,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "JPY": {
+          "score": 61.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Hawkish"
+        },
+        "AUD": {
+          "score": 78.8,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "CAD": {
+          "score": 50.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "CHF": {
+          "score": 59.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "NZD": {
+          "score": 47.3,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        }
+      },
+      "ranking": [
+        "AUD",
+        "USD",
+        "JPY",
+        "CHF",
+        "EUR",
+        "GBP",
+        "CAD",
+        "NZD"
+      ],
+      "signals": [
+        {
+          "pair": "AUD/NZD",
+          "long": "AUD",
+          "short": "NZD",
+          "spread": 31.5,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "AUD/CAD",
+          "long": "AUD",
+          "short": "CAD",
+          "spread": 28.7,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "AUD/GBP",
+          "long": "AUD",
+          "short": "GBP",
+          "spread": 24.6,
+          "confidence": "Media"
+        },
+        {
+          "pair": "USD/NZD",
+          "long": "USD",
+          "short": "NZD",
+          "spread": 21.3,
+          "confidence": "Media"
+        },
+        {
+          "pair": "USD/CAD",
+          "long": "USD",
+          "short": "CAD",
+          "spread": 18.5,
+          "confidence": "Media"
+        },
+        {
+          "pair": "USD/GBP",
+          "long": "USD",
+          "short": "GBP",
+          "spread": 14.4,
+          "confidence": "Media"
+        },
+        {
+          "pair": "JPY/NZD",
+          "long": "JPY",
+          "short": "NZD",
+          "spread": 13.8,
+          "confidence": "Media"
+        }
+      ],
+      "fx_rates": {}
+    }
+  ],
+  "lastUpdate": "2026-03-12",
+  "modelVersion": "6.4.0",
+  "totalSnapshots": 1
+}
