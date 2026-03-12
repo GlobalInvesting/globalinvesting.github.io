@@ -25,6 +25,7 @@
     
     <!-- Hreflang para SEO multiidioma (futuro) -->
     <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/" />
+    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html" />
     <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/" />
     
     <!-- Open Graph / Facebook OPTIMIZADO -->
@@ -164,9 +165,134 @@
 }
 </script>
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565"
-     crossorigin="anonymous"></script>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         GDPR COOKIE CONSENT — carga AdSense solo con consentimiento explícito
+         WCAG 2.1 AA compliant: foco automático, ESC para cerrar, roles ARIA
+         ═══════════════════════════════════════════════════════════════════ -->
+    <style>
+      #gdpr-banner {
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999;
+        background: #1a1f2e; border-top: 2px solid #2e75b6;
+        padding: 14px 20px; display: flex; flex-wrap: wrap;
+        align-items: center; gap: 12px; font-family: Arial, sans-serif;
+        font-size: 13px; color: #d0d6e8; box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+      }
+      #gdpr-banner p { margin: 0; flex: 1 1 300px; line-height: 1.5; }
+      #gdpr-banner a { color: #5b9bd5; }
+      #gdpr-banner .gdpr-btns { display: flex; gap: 8px; flex-shrink: 0; }
+      #gdpr-banner button {
+        padding: 8px 18px; border-radius: 4px; border: none;
+        cursor: pointer; font-size: 13px; font-weight: 600;
+      }
+      #gdpr-accept { background: #2e75b6; color: #fff; }
+      #gdpr-accept:hover { background: #1f5a9a; }
+      #gdpr-reject { background: transparent; color: #d0d6e8; border: 1px solid #4a5568 !important; }
+      #gdpr-reject:hover { background: #2d3748; }
+      @media (max-width: 600px) {
+        #gdpr-banner { flex-direction: column; }
+        #gdpr-banner .gdpr-btns { width: 100%; }
+        #gdpr-banner button { flex: 1; }
+      }
+    </style>
+    <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
+      <p>
+        <strong id="gdpr-title">🍪 Cookies y Privacidad</strong><br>
+        <span id="gdpr-desc">Usamos cookies propias y de terceros (Google AdSense) para mostrar publicidad relevante.
+        Puedes aceptar todas las cookies o rechazar las no esenciales.
+        Consulta nuestra <a href="/privacy.html">Política de Privacidad</a> y <a href="/terms.html">Términos de Uso</a>.</span>
+      </p>
+      <div class="gdpr-btns">
+        <button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
+        <button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
+      </div>
+    </div>
+    <script>
+    (function() {
+      'use strict';
+      var CONSENT_KEY = 'gdpr_consent_v1';
+      var ADSENSE_CLIENT = 'ca-pub-7977942731354565';
+
+      function loadAdSense() {
+        if (document.getElementById('adsense-script')) return;
+        var s = document.createElement('script');
+        s.id = 'adsense-script';
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
+        document.head.appendChild(s);
+      }
+
+      function loadAdSenseNonPersonalized() {
+        if (document.getElementById('adsense-script')) return;
+        var s = document.createElement('script');
+        s.id = 'adsense-script';
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        // Modo sin personalización (GDPR compliant sin consentimiento)
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
+        s.setAttribute('data-ad-channel', 'non-personalized');
+        document.head.appendChild(s);
+        // Forzar modo no personalizado en AdSense
+        (window.adsbygoogle = window.adsbygoogle || []).push({ params: { google_npa: '1' } });
+      }
+
+      function applyConsent(choice) {
+        localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: choice, ts: Date.now() }));
+        var banner = document.getElementById('gdpr-banner');
+        if (banner) { banner.hidden = true; }
+        if (choice === 'accepted') {
+          loadAdSense();
+        } else {
+          loadAdSenseNonPersonalized();
+        }
+      }
+
+      function init() {
+        try {
+          var stored = localStorage.getItem(CONSENT_KEY);
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            // Consentimiento válido por 13 meses (GDPR recomendación)
+            if (parsed && parsed.ts && (Date.now() - parsed.ts) < 13 * 30 * 24 * 3600 * 1000) {
+              if (parsed.v === 'accepted') loadAdSense();
+              else loadAdSenseNonPersonalized();
+              return;
+            }
+          }
+        } catch(e) {}
+
+        // Mostrar banner
+        var banner = document.getElementById('gdpr-banner');
+        if (banner) {
+          banner.hidden = false;
+          // Foco automático para accesibilidad (WCAG 2.1 SC 2.4.3)
+          setTimeout(function() {
+            var btn = document.getElementById('gdpr-accept');
+            if (btn) btn.focus();
+          }, 100);
+        }
+
+        document.getElementById('gdpr-accept').addEventListener('click', function() {
+          applyConsent('accepted');
+        });
+        document.getElementById('gdpr-reject').addEventListener('click', function() {
+          applyConsent('rejected');
+        });
+        // ESC para cerrar sin aceptar (rechaza implícitamente)
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && banner && !banner.hidden) {
+            applyConsent('rejected');
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1301,7 +1427,9 @@
         <p>Datos obtenidos de: Trading Economics, FRED (Federal Reserve Economic Data), CFTC (Commitment of Traders), Frankfurter/ECB API, bancos centrales nacionales y Investing.com.</p>
     </div>
 
-    <div id="root"></div>
+    <!-- Skip navigation link (WCAG 2.4.1) -->
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
+    <div id="root" id="main-content" role="main" aria-label="Dashboard de Análisis Fundamental Forex"></div>
 
     <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
@@ -2869,6 +2997,9 @@ const indicatorTooltips = {
                             console.warn(`Canvas not found for ${country.code}`);
                             return;
                         }
+                        // Accesibilidad: describir gráfico para screen readers
+                        canvas.setAttribute('role', 'img');
+                        canvas.setAttribute('aria-label', `Gráfico de tasas de interés históricas para ${country.code}. Use la tabla de datos debajo para acceso accesible.`);
 
                         const ctx = canvas.getContext('2d');
                         const data = historicalData[country.code];
@@ -4598,7 +4729,7 @@ const sentiment = getSentiment(strength);
                         {country.code} - Tendencias 12 Meses
                     </div>
                     <div className="chart-wrapper">
-                        <canvas id={`chart-${country.code}`}></canvas>
+                        <canvas id={`chart-${country.code}`} role="img" aria-label={`Gráfico de tasas de interés históricas para ${country.name} (${country.code}). Datos de los últimos 12 meses.`}></canvas>
                     </div>
                 </div>
             );
@@ -5446,5 +5577,29 @@ ReactDOM.render(
     document.getElementById('root')
 );
 </script>
+
+<!-- ═══════════════════════════════════════════════════
+     AVISO DE RIESGO FINANCIERO — visible en todas las páginas
+     Requerido por ESMA MiFID II para contenido de inversión
+     ═══════════════════════════════════════════════════ -->
+<footer role="contentinfo" aria-label="Aviso legal y descargo de responsabilidad" style="
+  background:#0d1117; border-top:1px solid #21262d; padding:12px 20px;
+  font-family:Arial,sans-serif; font-size:11px; color:#8b949e;
+  text-align:center; line-height:1.6; margin-top:0;">
+  <p style="margin:0 0 4px 0;">
+    <strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong>
+    Este sitio es exclusivamente informativo y educativo. Ningún contenido constituye asesoramiento financiero, de inversión, legal ni fiscal.
+    Los datos económicos mostrados pueden contener errores o retrasos inherentes a las fuentes de datos.
+    Las señales generadas por el modelo de scoring son herramientas analíticas, no recomendaciones de trading.
+    <strong>Opere con responsabilidad. El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores.</strong>
+  </p>
+  <p style="margin:0;">
+    Fuentes: <a href="https://fred.stlouisfed.org/" style="color:#58a6ff;" target="_blank" rel="noopener">FRED (St. Louis Fed)</a> ·
+    <a href="https://www.cftc.gov/" style="color:#58a6ff;" target="_blank" rel="noopener">CFTC</a> ·
+    Trading Economics · <a href="https://www.frankfurter.app/" style="color:#58a6ff;" target="_blank" rel="noopener">Frankfurter/ECB</a> ·
+    <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> ·
+    <a href="/terms.html" style="color:#58a6ff;">Términos</a>
+  </p>
+</footer>
 </body>
 </html>

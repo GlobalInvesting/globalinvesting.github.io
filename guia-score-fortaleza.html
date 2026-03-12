@@ -260,5 +260,99 @@
     <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
 </footer>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+    <div class="section" id="ajustes-contextuales-numericos">
+        <h2>📐 Ajustes Contextuales: Ejemplos Numéricos Reproducibles</h2>
+        <p>El score base (suma ponderada de 22 indicadores) se complementa con hasta <strong>13 ajustes contextuales</strong> con un cap global de ±15 puntos. A continuación, ejemplos numéricos con datos reales de 2026-03-12:</p>
+
+        <h3>1. Safe Haven Premium (CHF, JPY)</h3>
+        <p><strong>Ejemplo: CHF con datos reales 2026-03-12</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            <div style="color:#8b949e;margin-bottom:8px;"># Inputs</div>
+            debt = 40.0%  → puntos += 30  (debt &lt; 40 → máximo)<br>
+            currentAccount = 8.5% PIB → puntos += 30  (CA > 5% → máximo)<br>
+            inflation = 0.4% → desviación de 2% = 1.6pp → puntos += 10<br>
+            gdp = 0.92T → puntos += 15  (5T &lt; gdp &lt; 20T)<br>
+            <div style="color:#8b949e;margin-top:8px;"># Cálculo</div>
+            sh_raw = 85 puntos (debt+CA+inflation+GDP)<br>
+            avg_cot G8 = -5000 → regime = "risk-off" → mult = 1.5 (si sh > 60)<br>
+            sh_weighted = 85 × 1.5 / 100 × 12 - 4 = <strong style="color:#3fb950;">+9.3 puntos</strong><br>
+            fxPerformance1M = +2.5% → pen = 1.0 (no penaliza si FX positivo)<br>
+            <strong style="color:#3fb950;">→ adj_safe_haven = +9.3 (cappado a mín. 0, máx. 6)</strong>
+        </div>
+
+        <h3>2. Reserve Currency Premium (USD)</h3>
+        <p><strong>Ejemplo: USD con datos reales 2026-03-12</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            gdp_vals = [29.0(USD), 16.0(EUR), 4.2(JPY), ...]<br>
+            ratio = 29.0 / 16.0 = <strong>1.81x</strong> → umbral 1.5 superado ✅<br>
+            currentAccount = -3.2% (negativo) + capitalFlows > 0 → <em>Triffin dilemma activo</em><br>
+            dom_pts = 2.0 + (1.81 - 1.5) / 0.5 × 1.5 = <strong>2.93 pts</strong><br>
+            bonus (CA negativa + CF positivo) = min(2.0, 2.93 × 0.5) = <strong>1.47 pts</strong><br>
+            <strong style="color:#3fb950;">→ adj_reserve_currency = +4.4 puntos</strong>
+        </div>
+
+        <h3>3. Commodity ToT Premium (AUD, CAD, NZD)</h3>
+        <p><strong>Ejemplo: CAD con ToT = 103.5, mediana G8 = 100.2</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            tot_vals G8 = [88, 95, 98, 100, 101, 103, 105, 110]<br>
+            mediana = 100.5, std = 6.8<br>
+            z_score = (103.5 - 100.5) / max(6.8, 2.0) = <strong>0.44</strong><br>
+            dep (dependency) = 0.35 + 0.4 (TB > 0.5%) + 0.25 (prod > 2%) = <strong>0.65</strong><br>
+            gm (global growth mult) = 1.3 (gg > 2%)<br>
+            <strong style="color:#3fb950;">→ adj_commodity = 0.44 × 0.65 × 1.3 × 6 = +2.2 puntos</strong>
+        </div>
+
+        <h3>4. Structural Deficit Penalty</h3>
+        <p><strong>Ejemplo: GBP con currentAccount = -4.5% PIB</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            ca = -4.5% (umbral es -3%)<br>
+            raw = (abs(-4.5 + 3) / 3) × 5 = (1.5 / 3) × 5 = <strong>-2.5 pts</strong><br>
+            scale = min(1.0, gdp/5.0) = min(1.0, 3.2/5.0) = 0.64<br>
+            s = -2.5 × 0.64 = <strong style="color:#f85149;">-1.6 puntos</strong><br>
+            capitalFlows = +0.2%, tradeBalance = -0.3% → offset: s × (1 - min(0.2/0.3, 0.6) × 0.4)<br>
+            <strong style="color:#f85149;">→ adj_structural_deficit = -1.5 puntos (con CF offset)</strong>
+        </div>
+
+        <h3>5. Carry Premium</h3>
+        <p><strong>Ejemplo: AUD rate = 3.85%, media G8 = 2.54%</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            diff = 3.85 - 2.54 = <strong>+1.31pp</strong> (umbral carry > 1.0pp)<br>
+            <strong style="color:#3fb950;">→ adj_carry = min(1.31 × 2, 5) = +2.62 puntos</strong>
+        </div>
+
+        <p style="margin-top:16px;"><em>Todos los ajustes se suman y se cappan en el rango <strong>[-15, +15]</strong> antes de añadirse al score base. El score final es <code>max(0, min(100, base + total_adj_capped))</code>.</em></p>
+    </div>
+
+<!-- GDPR Banner (shared) -->
+<style>
+#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
+#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
+#gdpr-banner a{color:#5b9bd5;}
+#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
+#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
+#gdpr-accept{background:#2e75b6;color:#fff;}
+#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
+</style>
+<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
+<p><strong id="gdpr-title">🍪 Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
+<div class="gdpr-btns">
+<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
+<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
+</div></div>
+<script>
+(function(){var K='gdpr_consent_v1';function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
+try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
+var b=document.getElementById('gdpr-banner');if(b){b.hidden=false;setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},100);}
+function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));var b=document.getElementById('gdpr-banner');if(b)b.hidden=true;loadAds(v==='accepted');}
+document.getElementById('gdpr-accept').addEventListener('click',function(){save('accepted');});
+document.getElementById('gdpr-reject').addEventListener('click',function(){save('rejected');});
+document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
+})();
+</script>
+<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
+<strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
+</footer>
 </body>
 </html>

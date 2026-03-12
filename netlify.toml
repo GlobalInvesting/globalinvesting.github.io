@@ -1,0 +1,77 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# netlify.toml — Configuración de despliegue para Netlify
+# Alternativa: Si se usa Cloudflare Pages, las cabeceras se definen en _headers
+# ─────────────────────────────────────────────────────────────────────────────
+
+[build]
+  publish = "."
+
+# ── Cabeceras de seguridad globales ──────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com pagead2.googlesyndication.com partner.googleadservices.com tpc.googlesyndication.com;
+      style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+      font-src fonts.gstatic.com;
+      img-src 'self' data: https: flagcdn.com;
+      connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org sdmx.oecd.org;
+      frame-src googleads.g.doubleclick.net tpc.googlesyndication.com;
+      frame-ancestors 'self';
+      upgrade-insecure-requests
+    """
+
+# ── Cache para datos JSON dinámicos ──────────────────────────────────────────
+[[headers]]
+  for = "/strength-scores/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=300"
+
+[[headers]]
+  for = "/economic-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
+
+[[headers]]
+  for = "/cot-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=3600"
+
+[[headers]]
+  for = "/rates/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
+
+[[headers]]
+  for = "/ai-analysis/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=300"
+
+[[headers]]
+  for = "/fx-history/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# ── Assets estáticos — cache largo ───────────────────────────────────────────
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# ── Redirects ─────────────────────────────────────────────────────────────────
+[[redirects]]
+  from = "http://globalinvesting.github.io/*"
+  to = "https://globalinvesting.github.io/:splat"
+  status = 301
+  force = true
