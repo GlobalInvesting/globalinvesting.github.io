@@ -196,7 +196,7 @@
     </style>
     <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
       <p>
-        <strong id="gdpr-title">🍪 Cookies y Privacidad</strong><br>
+        <strong id="gdpr-title">Cookies y Privacidad</strong><br>
         <span id="gdpr-desc">Usamos cookies propias y de terceros (Google AdSense) para mostrar publicidad relevante.
         Puedes aceptar todas las cookies o rechazar las no esenciales.
         Consulta nuestra <a href="/privacy.html">Política de Privacidad</a> y <a href="/terms.html">Términos de Uso</a>.</span>
@@ -1864,14 +1864,14 @@ const fetchExtendedData = async (countryCode) => {
             const today = new Date();
             const events = [];
             const economicEvents = [
-                { country: 'USD', event: 'IPC (Inflación)', impact: 'high', dayOfMonth: 12, time: '14:30', flag: '🇺🇸' },
-                { country: 'EUR', event: 'PIB Preliminar', impact: 'high', dayOfMonth: 30, time: '11:00', flag: '🇪🇺', quarterly: true },
-                { country: 'GBP', event: 'IPC UK', impact: 'high', dayOfMonth: 18, time: '08:00', flag: '🇬🇧' },
-                { country: 'JPY', event: 'IPC Japón', impact: 'high', dayOfMonth: 22, time: '00:30', flag: '🇯🇵' },
-                { country: 'AUD', event: 'Decisión Tasa RBA', impact: 'high', dayOfMonth: 4, time: '04:30', flag: '🇦🇺', everyMonth: true },
-                { country: 'CAD', event: 'IPC Canadá', impact: 'high', dayOfMonth: 20, time: '14:30', flag: '🇨🇦' },
-                { country: 'CHF', event: 'IPC Suiza', impact: 'medium', dayOfMonth: 6, time: '09:30', flag: '🇨🇭' },
-                { country: 'NZD', event: 'PIB Trimestral', impact: 'high', dayOfMonth: 19, time: '21:45', flag: '🇳🇿', quarterly: true }
+                { country: 'USD', event: 'IPC (Inflación)', impact: 'high', dayOfMonth: 12, time: '14:30', flag: 'USD' },
+                { country: 'EUR', event: 'PIB Preliminar', impact: 'high', dayOfMonth: 30, time: '11:00', flag: 'EUR', quarterly: true },
+                { country: 'GBP', event: 'IPC UK', impact: 'high', dayOfMonth: 18, time: '08:00', flag: 'GBP' },
+                { country: 'JPY', event: 'IPC Japón', impact: 'high', dayOfMonth: 22, time: '00:30', flag: 'JPY' },
+                { country: 'AUD', event: 'Decisión Tasa RBA', impact: 'high', dayOfMonth: 4, time: '04:30', flag: 'AUD', everyMonth: true },
+                { country: 'CAD', event: 'IPC Canadá', impact: 'high', dayOfMonth: 20, time: '14:30', flag: 'CAD' },
+                { country: 'CHF', event: 'IPC Suiza', impact: 'medium', dayOfMonth: 6, time: '09:30', flag: 'CHF' },
+                { country: 'NZD', event: 'PIB Trimestral', impact: 'high', dayOfMonth: 19, time: '21:45', flag: 'NZD', quarterly: true }
             ];
 
             for (let monthOffset = 0; monthOffset <= 1; monthOffset++) {
@@ -2840,14 +2840,14 @@ const isCacheStale = (economicData) => {
         }
 
         const countries = [
-            { code: 'USD', name: 'Estados Unidos', currency: 'Dólar Estadounidense', flag: '🇺🇸', centralBank: 'Reserva Federal', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'EUR', name: 'Eurozona', currency: 'Euro', flag: '🇪🇺', centralBank: 'Banco Central Europeo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'GBP', name: 'Reino Unido', currency: 'Libra Esterlina', flag: '🇬🇧', centralBank: 'Banco de Inglaterra', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'JPY', name: 'Japón', currency: 'Yen Japonés', flag: '🇯🇵', centralBank: 'Banco de Japón', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'AUD', name: 'Australia', currency: 'Dólar Australiano', flag: '🇦🇺', centralBank: 'Banco de la Reserva de Australia', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'CAD', name: 'Canadá', currency: 'Dólar Canadiense', flag: '🇨🇦', centralBank: 'Banco de Canadá', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'CHF', name: 'Suiza', currency: 'Franco Suizo', flag: '🇨🇭', centralBank: 'Banco Nacional Suizo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'NZD', name: 'Nueva Zelanda', currency: 'Dólar Neozelandés', flag: '🇳🇿', centralBank: 'Banco de la Reserva de Nueva Zelanda', nextMeeting: 'Por definir', outlook: 'Calculando...' }
+            { code: 'USD', name: 'Estados Unidos', currency: 'Dólar Estadounidense', flag: 'USD', centralBank: 'Reserva Federal', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'EUR', name: 'Eurozona', currency: 'Euro', flag: 'EUR', centralBank: 'Banco Central Europeo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'GBP', name: 'Reino Unido', currency: 'Libra Esterlina', flag: 'GBP', centralBank: 'Banco de Inglaterra', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'JPY', name: 'Japón', currency: 'Yen Japonés', flag: 'JPY', centralBank: 'Banco de Japón', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'AUD', name: 'Australia', currency: 'Dólar Australiano', flag: 'AUD', centralBank: 'Banco de la Reserva de Australia', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'CAD', name: 'Canadá', currency: 'Dólar Canadiense', flag: 'CAD', centralBank: 'Banco de Canadá', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'CHF', name: 'Suiza', currency: 'Franco Suizo', flag: 'CHF', centralBank: 'Banco Nacional Suizo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'NZD', name: 'Nueva Zelanda', currency: 'Dólar Neozelandés', flag: 'NZD', centralBank: 'Banco de la Reserva de Nueva Zelanda', nextMeeting: 'Por definir', outlook: 'Calculando...' }
         ];
 
 const indicatorTooltips = {
@@ -3190,7 +3190,7 @@ const updateCellTooltipPos = (e) => {
             }
             
             tooltip.innerHTML = `
-                <span class="tooltip-date">📅 ${formatDate(lastUpdate)}</span>
+                <span class="tooltip-date">${formatDate(lastUpdate)}</span>
                 <span class="tooltip-indicator">${currency} - ${indicatorNames[indicator] || indicator}</span>
             `;
             tooltip.style.left = `${tooltipPosition.x}px`;
@@ -3872,7 +3872,7 @@ const hasCOTData = () => {
                     const globalTimeout = setTimeout(() => {
                         setIsLoading(false);
                         setDataLoadingStatus({
-                            status: '⚠️ Tiempo de carga agotado. Algunos datos pueden no estar disponibles.',
+                            status: 'Tiempo de carga agotado. Algunos datos pueden no estar disponibles.',
                             progress: 100
                         });
                     }, 60000);
@@ -3928,7 +3928,7 @@ setDynamicAlerts(pairRecommendations);
                         console.error('Error loading initial data:', error);
                         clearTimeout(globalTimeout);
                         setDataLoadingStatus({
-                            status: `⚠️ Error al cargar datos: ${error.message}. Intenta limpiar el caché.`,
+                            status: `Error al cargar datos: ${error.message}. Intenta limpiar el caché.`,
                             progress: 100
                         });
                         setIsLoading(false);
@@ -4020,7 +4020,6 @@ const DataHealthCheck = ({ economicData }) => {
                         background: 'rgba(239, 83, 80, 0.3)',
                         color: 'var(--red-strong)'
                     }}>
-                        ⚠️
                     </div>
                     <div className="alert-content">
                         <h3>Alerta: Fiabilidad de Tasas de Interés</h3>
@@ -4064,7 +4063,6 @@ const DataHealthCheck = ({ economicData }) => {
                         background: 'rgba(239, 83, 80, 0.3)',
                         color: 'var(--red-strong)'
                     }}>
-                        ⚠️
                     </div>
                     <div className="alert-content">
                         <h3>Problemas de Calidad de Datos Detectados</h3>
@@ -4096,7 +4094,7 @@ const DataHealthCheck = ({ economicData }) => {
                         background: 'rgba(255, 111, 0, 0.3)',
                         color: 'var(--orange)'
                     }}>
-                        ℹ️
+                        
                     </div>
                     <div className="alert-content">
                         <h3>Avisos de Calidad de Datos</h3>
@@ -4183,7 +4181,7 @@ const DataHealthCheck = ({ economicData }) => {
     return (
         <div className="info-item" title="El workflow de scores no ha corrido hoy. Mostrando el último snapshot disponible.">
             <span style={{background:'#f59e0b',color:'#000',borderRadius:'4px',padding:'2px 7px',fontSize:'11px',fontWeight:600}}>
-                ⚠ Scores: datos del {label}
+                Scores: datos del {label}
             </span>
         </div>
     );
@@ -4258,7 +4256,7 @@ const DataHealthCheck = ({ economicData }) => {
                         // Criterio 3: momento de precio también débil (FX y/o COT no confirman)
                         const weakMomentum = (fx !== null && fx < 0.5) && (cot === null || cot < 20000);
                         if (scoreRelevant && weakMonetary && weakMomentum) {
-                            return { type: 'structural', label: '⚑ Estructural', title: 'Score elevado por indicadores macroeconómicos estructurales (CA, deuda/PIB) — señal de momentum operativo débil: tasa baja o en ciclo de recortes. El score refleja solidez de balance sheet, no divergencia de momentum a 2–6 semanas.' };
+                            return { type: 'structural', label: 'Estructural', title: 'Score elevado por indicadores macroeconómicos estructurales (CA, deuda/PIB) — señal de momentum operativo débil: tasa baja o en ciclo de recortes. El score refleja solidez de balance sheet, no divergencia de momentum a 2–6 semanas.' };
                         }
                         // Badge momentum: confirmación positiva cruzada (FX + COT alineados)
                         const strongMomentum = (fx !== null && fx > 1.5) && (cot !== null && cot > 15000);
@@ -4726,7 +4724,7 @@ const sentiment = getSentiment(strength);
     color: 'var(--text-secondary)',
     lineHeight: '1.6'
 }}>
-    <strong style={{ color: 'var(--green-strong)' }}>✅ Datos reales:</strong>{' '}
+    <strong style={{ color: 'var(--green-strong)' }}>Datos reales:</strong>{' '}
     La línea de <strong>Tasa de Interés</strong> refleja datos históricos reales
     obtenidos desde <strong>Investing.com</strong> (decisiones oficiales de cada banco central)
     y actualizados diariamente via Trading Economics.
@@ -4798,8 +4796,8 @@ const sentiment = getSentiment(strength);
                     : 'Calendario estimado (scraping en proceso)'}
                 {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
                     <span style={{ marginLeft: '1rem' }}>
-                        🔴 {economicCalendar.impactCounts.high} alto
-                        {economicCalendar.impactCounts.medium > 0 && ` · 🟠 ${economicCalendar.impactCounts.medium} medio`}
+                        {economicCalendar.impactCounts.high} alto
+                        {economicCalendar.impactCounts.medium > 0 && ` · ${economicCalendar.impactCounts.medium} medio`}
                     </span>
                 )}
             </div>
@@ -4907,7 +4905,7 @@ const sentiment = getSentiment(strength);
                         background: 'var(--bg-secondary)',
                         borderRadius: '6px', border: '1px solid var(--border)'
                     }}>
-                        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
+                        
                         <div style={{ fontWeight: 600, color: 'var(--orange)', marginBottom: '0.75rem' }}>
                             Datos del calendario no disponibles
                         </div>
@@ -5041,7 +5039,7 @@ const sentiment = getSentiment(strength);
             color: 'var(--red)',
             fontWeight: 700,
             lineHeight: 1,
-        }}>{'●'.repeat(Math.min(highCount, 3))}</span>
+        }}>{' ●'.repeat(Math.min(highCount, 3)).trim()}</span>
     )}
 </button>
                                 );
@@ -5095,8 +5093,8 @@ const sentiment = getSentiment(strength);
                                 }}
                             >
                                 {f === 'all'    ? 'Todos'    :
-                                 f === 'high'   ? '🔴 Alto'  :
-                                 f === 'medium' ? '🟠 Medio' : '⚪ Bajo'}
+                                 f === 'high'   ? 'Alto'  :
+                                 f === 'medium' ? 'Medio' : 'Bajo'}
                             </button>
                         ))}
                         <span style={{
@@ -5273,7 +5271,7 @@ const sentiment = getSentiment(strength);
                                             ? '1px solid rgba(34, 197, 94, 0.3)'
                                             : '1px solid rgba(156, 163, 175, 0.2)',
                                     }}>
-                                    {rec.confidence === 'Alta' ? '✓ Señal confirmada' : 'Señal débil'}
+                                    {rec.confidence === 'Alta' ? 'Señal confirmada' : 'Señal débil'}
                                 </span>
                                 {rec.momentumOpposing && (
                                     <span title={rec.type === 'short'
@@ -5288,7 +5286,7 @@ const sentiment = getSentiment(strength);
                                         padding: '2px 7px',
                                         cursor: 'help'
                                     }}>
-                                        ⚠ Precio divergente
+                                        Precio divergente
                                     </span>
                                 )}
                                 {rec.jpyAsShort && (
@@ -5301,7 +5299,7 @@ const sentiment = getSentiment(strength);
                                         padding: '2px 7px',
                                         cursor: 'help'
                                     }}>
-                                        ℹ JPY: risk sentiment
+                                        JPY: risk sentiment
                                     </span>
                                 )}
                             </div>
@@ -5489,7 +5487,7 @@ const sentiment = getSentiment(strength);
             lineHeight: '1.6',
             color: 'var(--text-secondary)'
         }}>
-            <strong style={{ color: 'var(--text-primary)' }}>⚠️ Aviso Importante:</strong> Estas recomendaciones están basadas exclusivamente en análisis fundamental y no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos significativos. Considere análisis técnico, gestión de riesgo y consulte con un asesor financiero antes de operar.
+            <strong style={{ color: 'var(--text-primary)' }}>Aviso Importante:</strong> Estas recomendaciones están basadas exclusivamente en análisis fundamental y no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos significativos. Considere análisis técnico, gestión de riesgo y consulte con un asesor financiero antes de operar.
         </div>
     </div>
 }
@@ -5580,7 +5578,7 @@ class ErrorBoundary extends React.Component {
                                 color: 'var(--red-strong)',
                                 fontSize: '2rem'
                             }}>
-                                💥
+                                
                             </div>
                             <div className="alert-content">
                                 <h3>El Dashboard ha Encontrado un Error</h3>
@@ -5626,7 +5624,7 @@ ReactDOM.render(
 );
 </script>
 <footer role="contentinfo" aria-label="Aviso legal" id="risk-footer" style="display:none;background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
 
