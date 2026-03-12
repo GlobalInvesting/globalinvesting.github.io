@@ -134,7 +134,7 @@
     flex-wrap: wrap; gap: 0.75rem;
   }
   .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
-  .page-meta  { font-size: 0.75rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .page-meta  { font-size: 0.75rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 
   .section-label {
     font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -149,15 +149,17 @@
     gap: 0.5rem; margin-bottom: 2rem; min-width: 0;
   }
   .rate-cell {
-    background: var(--bg-card); border: 1px solid var(--border);
+    background: var(--bg-secondary); border: 1px solid var(--border);
     border-radius: 6px; padding: 0.75rem 0.625rem 0.625rem; text-align: center;
+    transition: border-color 0.2s ease;
   }
+  .rate-cell:hover { border-color: var(--border-hover); }
   .rate-cell-flag { display: flex; justify-content: center; margin-bottom: 0.4rem; }
   .rate-cell-code { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: var(--text-secondary); margin-bottom: 0.3rem; }
-  .rate-cell-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .rate-cell-value { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
   .rate-cell-bar-wrap { height: 3px; background: var(--bg-elevated); border-radius: 2px; overflow: hidden; margin-bottom: 0.3rem; }
   .rate-cell-bar { height: 100%; border-radius: 2px; }
-  .rate-cell-sub { font-size: 0.6rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .rate-cell-sub { font-size: 0.6rem; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
 
   /* ── Two-column layout ── */
   .content-grid {
@@ -188,7 +190,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .table-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
-  .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .table-card-meta  { font-size: 0.65rem; color: var(--text-dim); }
 
   /* ── Tabla — scroll aislado del body ── 
      Técnica: el wrapper tiene overflow-x:auto con width explícito.
@@ -220,7 +222,7 @@
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: rgba(255,255,255,0.018); }
   tbody td { padding: 0.6rem 0.875rem; font-size: 0.8rem; vertical-align: middle; white-space: nowrap; }
-  tbody td.r { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; }
+  tbody td.r { text-align: right; font-size: 0.775rem; font-variant-numeric: tabular-nums; }
 
   .rank-num {
     display: inline-flex; align-items: center; justify-content: center;
@@ -239,7 +241,7 @@
 
   .score-tag {
     display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px;
-    font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; font-weight: 700; font-variant-numeric: tabular-nums;
   }
   .sh { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(38,166,154,.2); }
   .sm { background: rgba(96,125,139,0.12); color: #607d8b; border: 1px solid rgba(96,125,139,.25); }
@@ -249,7 +251,7 @@
   .vn { color: var(--red); }
   .vd { color: var(--text-secondary); }
 
-  .mom-tag { display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; }
+  .mom-tag { display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.7rem; font-variant-numeric: tabular-nums; }
   .mu { color: var(--green); }
   .md { color: var(--text-secondary); }
   .mf { color: var(--text-dim); }
@@ -270,7 +272,7 @@
   }
   .meeting-row:last-child { border-bottom: none; }
   .meeting-cur  { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 600; }
-  .meeting-date { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); }
+  .meeting-date { font-size: 0.7rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
   .meeting-soon { font-size: 0.62rem; font-weight: 700; color: var(--blue); margin-left: 0.3rem; }
 
   .regime-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.2rem; }
@@ -279,31 +281,31 @@
   .regime-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; }
   .regime-metric { background: var(--bg-secondary); border-radius: 4px; padding: 0.375rem 0.5rem; }
   .regime-metric-lbl { font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 0.1rem; }
-  .regime-metric-val { font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; font-weight: 500; }
+  .regime-metric-val { font-size: 0.775rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 
   /* ── Detail cards grid ── */
   .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; min-width: 0; }
 
-  .detail-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .detail-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color 0.2s; }
   .detail-card:hover { border-color: var(--border-hover); }
 
   .detail-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0.6rem 0.875rem 0.5rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+    padding: 0.6rem 0.875rem 0.5rem; background: var(--bg-card); border-bottom: 1px solid var(--border);
   }
   .detail-pair-wrap { display: flex; align-items: center; gap: 0.45rem; }
-  .detail-code { font-size: 0.85rem; font-weight: 700; }
-  .detail-type { font-size: 0.62rem; color: var(--text-dim); margin-top: 0.05rem; }
-  .detail-score { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: 700; }
+  .detail-code { font-size: 0.9rem; font-weight: 700; letter-spacing: -0.01em; }
+  .detail-type { font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.05rem; }
+  .detail-score { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
   .detail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid rgba(48,54,61,0.5); }
   .detail-metric { padding: 0.5rem 0.625rem; border-right: 1px solid rgba(48,54,61,0.5); }
   .detail-metric:last-child { border-right: none; }
-  .dm-label { font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 0.12rem; }
-  .dm-val   { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500; }
+  .dm-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-tertiary); margin-bottom: 0.12rem; }
+  .dm-val   { font-size: 0.8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-  .detail-signals { padding: 0.575rem 0.875rem; }
-  .signal-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: var(--text-secondary); padding: 0.175rem 0; }
+  .detail-signals { padding: 0.625rem 0.875rem; }
+  .signal-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-secondary); padding: 0.2rem 0; }
   .sig-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .sg { background: var(--green); }
   .so { background: var(--text-dim); }
@@ -792,7 +794,7 @@ function renderSpreadChart(pairs, allRatesData) {
   panelEl.innerHTML =
     '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.5rem;">'
     + '<div>'
-    + '<span style="font-family:JetBrains Mono,monospace;font-size:1.1rem;font-weight:600;color:var(--green)">+' + currentSpread.toFixed(2) + '%</span>'
+    + '<span style="font-size:1.1rem;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;letter-spacing:-0.02em">+' + currentSpread.toFixed(2) + '%</span>'
     + '<span style="font-size:0.65rem;color:var(--text-dim);margin-left:0.4rem;">actual</span>'
     + '</div>'
     + '<div style="font-size:0.68rem;color:' + trendColor + ';font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">' + trend + '</div>'
@@ -803,12 +805,12 @@ function renderSpreadChart(pairs, allRatesData) {
     + '<polyline points="' + points.map(function(p,i){ return xOf(i).toFixed(1)+','+yOf(p.spread).toFixed(1); }).join(' ') + '"'
     + ' fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
     + '<circle cx="' + xOf(points.length-1).toFixed(1) + '" cy="' + curY.toFixed(1) + '" r="3" fill="var(--green)"/>'
-    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(maxS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + maxS.toFixed(2) + '</text>'
-    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(minS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="JetBrains Mono,monospace">' + minS.toFixed(2) + '</text>'
+    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(maxS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="Inter,system-ui,sans-serif">' + maxS.toFixed(2) + '</text>'
+    + '<text x="' + (W - PAD + 4) + '" y="' + (yOf(minS)+3).toFixed(0) + '" font-size="8" fill="var(--text-dim)" font-family="Inter,system-ui,sans-serif">' + minS.toFixed(2) + '</text>'
     + '</svg>'
     + '<div style="display:flex;justify-content:space-between;margin-top:0.25rem;">'
-    + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelFirst + '</span>'
-    + '<span style="font-size:0.58rem;color:var(--text-dim);font-family:JetBrains Mono,monospace;">' + labelLast + '</span>'
+    + '<span style="font-size:0.6rem;color:var(--text-tertiary);">' + labelFirst + '</span>'
+    + '<span style="font-size:0.6rem;color:var(--text-tertiary);">' + labelLast + '</span>'
     + '</div>';
 }
 
