@@ -1764,52 +1764,95 @@ const fetchExtendedData = async (countryCode) => {
             });
         };
 
-// ── STRENGTH SCORES — v6.4 hybrid loader ─────────────────────────────────────
-// Primary: reads strength-scores/latest.json generated daily by calculate_scores.py
-// Fallback: returns null → calculateStrength() JS runs as before
-let _precomputedScores = null;  // module-level cache
+// ── STRENGTH SCORES — engine loader ──────────────────────────────────────────
+// Source of truth: strength-scores/latest.json — generated daily at 08:30 UTC
+// by calculate_scores.py in the private engine repo.
+// Fallback: strength-scores/all.json (last available snapshot) with stale badge.
+// No scoring logic lives in this file.
+let _precomputedScores = null;   // active scores payload
+let _scoresDataDate   = null;   // ISO date string of the loaded snapshot
 
 const fetchStrengthScores = async () => {
     const cacheKey = 'strength_scores_latest';
     const cached = CacheManager.get(cacheKey);
-    if (cached !== null) { _precomputedScores = cached; return cached; }
+    if (cached !== null) {
+        _precomputedScores = cached.scores;
+        _scoresDataDate    = cached.date;
+        return cached;
+    }
+
+    const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+    const validate = (data) =>
+        data && data.scores && CURRENCIES.every(c => data.scores[c] !== undefined);
+
+    // ── Primary: latest.json ──────────────────────────────────────────────────
     try {
-        const url = 'https://globalinvesting.github.io/strength-scores/latest.json';
+        const url  = 'https://globalinvesting.github.io/strength-scores/latest.json';
         const resp = await fetchWithTimeout(url, { cache: 'no-cache', mode: 'cors' }, 5000);
-        if (!resp.ok) throw new Error('strength-scores/latest.json not available');
+        if (!resp.ok) throw new Error('latest.json not available');
         const data = await resp.json();
-        // Validate: must have scores for all 8 currencies and a recent timestamp
-        const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-        const hasAll = currencies.every(c => data.scores && data.scores[c] !== undefined);
-        if (!hasAll) throw new Error('Incomplete scores payload');
-        const ageMs = Date.now() - new Date(data.lastUpdate).getTime();
-        if (ageMs > 48 * 3600 * 1000) console.warn('[scores] Data is >48h old, using anyway');
-        CacheManager.set(cacheKey, data, 3600); // cache 1h
-        _precomputedScores = data;
-        console.log(`[scores] Loaded precomputed v${data.modelVersion} (${data.lastUpdate})`);
-        return data;
+        if (!validate(data)) throw new Error('Incomplete scores payload');
+        const payload = { scores: data.scores, date: data.lastUpdate, stale: false, version: data.modelVersion };
+        CacheManager.set(cacheKey, payload, 3600);
+        _precomputedScores = payload.scores;
+        _scoresDataDate    = payload.date;
+        console.log(`[scores] Loaded v${data.modelVersion} (${data.lastUpdate})`);
+        return payload;
     } catch (e) {
-        console.warn('[scores] Fallback to JS model:', e.message);
+        console.warn('[scores] latest.json failed, trying all.json:', e.message);
+    }
+
+    // ── Fallback: most recent snapshot from all.json ──────────────────────────
+    try {
+        const url  = 'https://globalinvesting.github.io/strength-scores/all.json';
+        const resp = await fetchWithTimeout(url, { cache: 'no-cache', mode: 'cors' }, 5000);
+        if (!resp.ok) throw new Error('all.json not available');
+        const allData = await resp.json();
+        // all.json is an array of snapshots sorted ascending — take the last valid one
+        const snapshots = Array.isArray(allData) ? allData : (allData.snapshots || []);
+        const last = [...snapshots].reverse().find(s => validate(s));
+        if (!last) throw new Error('No valid snapshot in all.json');
+        const payload = { scores: last.scores, date: last.date || last.lastUpdate, stale: true, version: last.modelVersion };
+        CacheManager.set(cacheKey, payload, 1800); // shorter cache when stale
+        _precomputedScores = payload.scores;
+        _scoresDataDate    = payload.date;
+        console.warn(`[scores] Using stale snapshot from ${payload.date}`);
+        return payload;
+    } catch (e) {
+        console.error('[scores] All sources failed:', e.message);
         _precomputedScores = null;
+        _scoresDataDate    = null;
         return null;
     }
 };
 
-// Wrapper: returns precomputed score object if available, else calls calculateStrength()
-const getStrength = (currency, data, forexRates, allEconomicData, calendarEvents) => {
-    if (_precomputedScores && _precomputedScores.scores && _precomputedScores.scores[currency]) {
-        const s = _precomputedScores.scores[currency];
+// Returns score object from engine. If no data available, returns a neutral placeholder.
+const getStrength = (currency) => {
+    if (_precomputedScores && _precomputedScores[currency]) {
+        const s = _precomputedScores[currency];
         return {
-            score:        s.score,
-            confidence:   s.confidence || { lower: s.score - 5, upper: s.score + 5 },
+            score:         s.score,
+            confidence:    s.confidence    || { lower: s.score - 5, upper: s.score + 5 },
             contributions: s.contributions || {},
-            dataQuality:  s.dataQuality || 1,
-            scoringData:  s.scoringData || {},
-            bcOutlook:    s.bcOutlook,
-            contextualAdj: s.contextualAdj || {}
+            dataQuality:   s.dataQuality   ?? 1,
+            scoringData:   s.scoringData   || {},
+            bcOutlook:     s.bcOutlook,
+            contextualAdj: s.contextualAdj || {},
+            _stale:        !!(_scoresDataDate && (Date.now() - new Date(_scoresDataDate) > 48*3600*1000)),
+            _dataDate:     _scoresDataDate
         };
     }
-    return calculateStrength(currency, data, forexRates, allEconomicData, calendarEvents);
+    // No scores available at all — return a visible placeholder so UI doesn't crash
+    return {
+        score: null,
+        confidence: { lower: null, upper: null },
+        contributions: {},
+        dataQuality: 0,
+        scoringData: {},
+        bcOutlook: null,
+        contextualAdj: {},
+        _unavailable: true
+    };
 };
 
 const fetchAIAnalysis = async () => {
@@ -2027,7 +2070,7 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
     const strengthScores = {};
     countries.forEach(country => {
         const data = economicData[country.code] || {};
-        const strengthObj = getStrength(country.code, data, forexRates, economicData, calendarEvents);
+        const strengthObj = getStrength(country.code);
         strengthScores[country.code] = {
             score: strengthObj.score,
             dataQuality: strengthObj.dataQuality,
@@ -2404,7 +2447,7 @@ setDataLoadingStatus({ status: 'Procesando outlook de bancos centrales...', prog
 for (let country of countries) {
     const outlook = await determineCentralBankOutlook(country.code, economicData[country.code]);
     const nextMeeting = await fetchCentralBankMeetings(country.code);
-    // Asignar al objeto global (para calculateStrength que lo usa vía countries.find)
+    // Asignar al objeto global (para acceso desde getStrength vía countries.find)
     country.outlook = outlook;
     country.nextMeeting = nextMeeting;
     // TAMBIÉN guardar en economicData para que React detecte el cambio y re-renderice
@@ -2490,490 +2533,6 @@ for (let country of countries) {
             setEconomicData(economicData);
             return economicData;
         };
-
-// Ejemplos:
-//   Régimen 2022 (avg ~4.5%): threshold = max(1.0, 3.0) = 3.0%  → CHF 1.4% califica ✓
-//   Régimen 2021 (avg ~0.3%): threshold = max(1.0, −1.2) = 1.0% → solo 0-1% califica
-//   Régimen 2026 (avg ~3.5%): threshold = max(1.0, 2.0) = 2.0%  → CHF/JPY califican ✓
-
-const calculateStrength = (currency, data = null, forexRates = {}, allEconomicData = {}, calendarEvents = null) => {
-    if (!data) return { 
-        score: 50, 
-        confidence: { lower: 40, upper: 60 }, 
-        contributions: {}, 
-        dataQuality: 0 
-    };
-    
-// ========== TRADING-ORIENTED WEIGHTS ==========
-const TRADING_WEIGHTS = {
-    // Tier 1: Política Monetaria (29%) — el driver #1 real del forex a 2-6 semanas
-    // v6.0: rebalanceo fundamental. Filosofía: los fundamentales CAUSAN el precio;
-    //       el precio NO debe ser el mayor peso del modelo (era 28% → baja a 8%).
-    //       interestRate sube 0.07 → 0.10: el carry es el factor #1 en forex.
-    //       rateMomentum sube 0.04 → 0.07: la DIRECCIÓN del BC es más predictiva que el nivel.
-    //       outlookScore mantiene 0.05: señal forward del BC.
-    //       inflation sube 0.05 → 0.07: define el mandato y la política monetaria.
-    interestRate:          { weight: 0.10, direction: 'higher' },
-    inflation:             { weight: 0.07, direction: 'target' },
-    outlookScore:          { weight: 0.05, direction: 'outlook_direction' },
-    rateMomentum:          { weight: 0.07, direction: 'rate_momentum' },
-
-    // Tier 2: Balance Externo (19%) — flujos reales que mueven la divisa estructuralmente
-    // v6.0: currentAccount sube 0.05 → 0.07. debt sube 0.02 → 0.04. termsOfTrade sube 0.02 → 0.04.
-    //       inflationExpectations eliminado (redundante con inflation + rateMomentum).
-    currentAccount:        { weight: 0.07, direction: 'higher' },
-    tradeBalance:          { weight: 0.04, direction: 'higher' },
-    debt:                  { weight: 0.04, direction: 'lower'  },
-    termsOfTrade:          { weight: 0.04, direction: 'terms_of_trade' },
-
-    // Tier 3: Crecimiento y Empleo (16%) — ciclo económico que el mercado tradea activamente
-    // v6.0: gdpGrowth sube 0.06 → 0.07. unemployment sube 0.04 → 0.05. production sube 0.02 → 0.04.
-    gdpGrowth:             { weight: 0.07, direction: 'higher' },
-    unemployment:          { weight: 0.05, direction: 'lower'  },
-    production:            { weight: 0.04, direction: 'stable' },
-
-    // Tier 6: Consumo y Salarios (4%)
-    retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.00, direction: 'stable' },  // v6.4: 0.01→0.00 (peso cedido a servicesPMI; wageGrowth ya está capturado indirectamente vía inflation y laborales)
-
-    // Tier 3: Sentimiento de Mercado (21%) — posicionamiento real del smart money
-    // v6.0: cotPositioning sube 0.05 → 0.06. manufacturingPMI sube 0.04 → 0.05.
-    manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
-    servicesPMI:           { weight: 0.05, direction: 'expansion'       },  // v6.4: 0.04→0.05 (servicios >70% PIB G8, driver dominante BoE/ECB; wageGrowth baja 0.01→0.00 para mantener suma 100%)
-    cotPositioning:        { weight: 0.06, direction: 'moderate_bullish' },
-    consumerConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
-    businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
-    economicSurprise:      { weight: 0.04, direction: 'surprise'        },  // v6.3: ESI proxy nuevo
-    capitalFlows:          { weight: 0.00, direction: 'flows'            },
-
-    // Tier 6: FX Momentum como CONFIRMADOR (12%) — confirma o alerta divergencia, no driver
-    // v6.0: fxPerformance1M baja 0.28 → 0.08. Razón: causalidad invertida — el precio pasado
-    //       no debe ser el mayor peso de un modelo fundamental (momentum chase + mean reversion
-    //       ignorada). FX ahora es confirmador: fundamentales fuertes + precio confirma =
-    //       +convicción marginal. Si divergen = alerta, no penalización masiva del score.
-    //       bond10y sube 0.03 → 0.04: yield diferencial real más relevante que FX lag.
-    fxPerformance1M:       { weight: 0.08, direction: 'fx_momentum' },
-    bond10y:               { weight: 0.03, direction: 'carry_yield' },  // v6.3: 0.04→0.03
-};
-    
-// ========== SCORING FUNCTIONS v4.9.5 ==========
-const scoreIndicator = (value, indicator, currencyCtx, allEconomicData, scoringDataExplicit) => {
-    // currencyCtx: código de divisa (e.g. 'JPY', 'CHF') para overrides data-driven
-    const config = TRADING_WEIGHTS[indicator];
-    if (!config) return 0;
-    let score = 0;
-
-    // ── Helpers internos ─────────────────────────────────────────────────
-    // isSafeHavenFunder: divisas cuya fortaleza estructural viene de tasas BAJAS
-    // (financiadoras de carry trade). Se determina dinámicamente: si la tasa es
-    // < 1.5% Y la cuenta corriente del país es superavitaria, se activa el override.
-    // No hardcodeamos 'CHF' o 'JPY' — se detecta por los datos.
-    // La lógica: si alguien tiene tasa casi nula pero el mercado le compra la divisa,
-    // es porque hay prima de safe haven que el modelo clásico no captura.
-    const isSafeHavenFunder = (
-    indicator === 'interestRate' &&
-    value !== null && value !== undefined &&
-    value <= safeHavenThreshold &&  // P-4 v4.9.6 — relativo al régimen
-    currencyCtx !== null && currencyCtx !== undefined
-);
-
-    switch (config.direction) {
-
-         case 'higher':
-            if (indicator === 'interestRate') {
-                if (isSafeHavenFunder) {
-                    // P-3 v4.9.6 — Factor de régimen + corrección por normalización activa
-                    let riskRegime = 'neutral';
-                    if (allEconomicData && typeof allEconomicData === 'object') {
-                        const cotValues = Object.values(allEconomicData)
-                            .map(d => d.cotPositioning)
-                            .filter(v => v !== null && v !== undefined && !isNaN(v));
-                        if (cotValues.length >= 3) {
-                            const avgCOT = cotValues.reduce((a, b) => a + b, 0) / cotValues.length;
-                            riskRegime = avgCOT > 5000  ? 'risk-on'
-                                       : avgCOT < -5000 ? 'risk-off'
-                                       : 'neutral';
-                        }
-                    }
-                    const regimeFactor = riskRegime === 'risk-off' ? 1.0
-                                       : riskRegime === 'risk-on'  ? 0.65
-                                       : 0.85;
-
-                    // CORRECCIÓN v5.0.4: Si rateMomentum indica normalización activa (BC subiendo tasas),
-                    // el score de interestRate mejora parcialmente hacia la escala estándar.
-                    const rateMomentumVal = scoringDataExplicit?.rateMomentum ?? null;
-                    if (rateMomentumVal !== null && rateMomentumVal > 0.3) {
-                        const blendFactor = Math.min((rateMomentumVal - 0.3) / 1.2, 0.4);
-                        const standardScore = 30 + ((value - 0.5) / 2.0) * 40;
-                        const safeHavenScore = (72 - (value / 1.5) * 17) * regimeFactor;
-                        score = safeHavenScore * (1 - blendFactor) + standardScore * blendFactor;
-                    } else {
-                        score = (72 - (value / 1.5) * 17) * regimeFactor;
-                    }
-                } else {
-                    // Lógica estándar para divisas no-safe-haven
-                    if (value >= 4.0)      score = 100;
-                    else if (value >= 2.5) score = 70 + ((value - 2.5) / 1.5) * 30;
-                    else if (value >= 0.5) score = 30 + ((value - 0.5) / 2.0) * 40;
-                    else                   score = (value / 0.5) * 30;
-
-                    // ── Rate Cycle Haircut (v5.8) ─────────────────────────────────
-                    // Si el BC está en ciclo de recortes, el mercado ya ha descontado
-                    // tasas futuras más bajas. El rate score actual sobrevalora el carry
-                    // disponible hacia adelante. Reducción proporcional al ritmo de recortes,
-                    // máximo 35% (para ciclos de -3pp o más como NZD -3.25pp).
-                    // No afecta a JYP/CHF (safe-haven path) ni a ciclos de subidas.
-                    const rateMomForHaircut = scoringDataExplicit?.rateMomentum ?? null;
-                    if (rateMomForHaircut !== null && rateMomForHaircut < 0) {
-                        const haircut = Math.min(Math.abs(rateMomForHaircut) / 3.0, 1.0) * 0.35;
-                        score = score * (1 - haircut);
-                    }
-                }
-            } else if (indicator === 'gdpGrowth') {
-                if (value >= 2.5)      score = 100;
-                else if (value >= 1.5) score = 70 + ((value - 1.5) / 1.0) * 30;
-                else if (value >= 0.5) score = 40 + ((value - 0.5) / 1.0) * 30;
-                else if (value >= 0)   score = (value / 0.5) * 40;
-                else                   score = Math.max(0, 40 + value * 20);
-            } else {
-                if (indicator === 'tradeBalance') {
-                    // v5.5: valor ya normalizado como %PIB (ver bloque scoringData arriba)
-                    // Rangos reales G8 en %PIB: CHF +0.51%, EUR +0.09%, AUD +0.10%,
-                    // CAD -0.04%, NZD -0.12%, GBP -0.17%, JPY -0.17%, USD -0.24%
-                    if (value > 0.8)        score = 100;
-                    else if (value > 0.3)   score = 75 + ((value - 0.3) / 0.5) * 25;
-                    else if (value > 0.0)   score = 55 + (value / 0.3) * 20;
-                    else if (value > -0.3)  score = 40 + (value / 0.3) * 15;
-                    else if (value > -0.6)  score = 20 + ((value + 0.6) / 0.3) * 20;
-                    else                    score = Math.max(0, 20 + ((value + 0.6) / 0.4) * 20);
-                } else {
-                    // currentAccount (%PIB)
-                    // v5.11 FIX-4 — Score relativo a la mediana cross-sectional del G8.
-                    // Problema anterior: CA > 5% siempre daba score=100. Como Suiza estructuralmente
-                    // tiene CA > 5%, siempre recibía el máximo independientemente del contexto.
-                    // Solución: calcular el score en función de la posición relativa dentro del G8
-                    // usando la mediana y desviación estándar de las CAs disponibles.
-                    // Esto es 100% data-driven: no hay hardcoding de valores históricos.
-                    //
-                    // Resultado: una CA de +5.1% con mediana G8 de +0.5% es bullish,
-                    // pero solo moderadamente — ya está "en precio". Si la mediana sube a +4%
-                    // (todos mejoran), el +5.1% de CHF ya no es tan diferencial.
-                    //
-                    // Fallback: si allEconomicData no está disponible, usa la escala absoluta anterior.
-                    const caVals = allEconomicData
-                        ? Object.values(allEconomicData)
-                            .map(d => d.currentAccount)
-                            .filter(v => v !== null && v !== undefined && !isNaN(v))
-                        : [];
-                    if (caVals.length >= 4) {
-                        // Mediana y stdDev del G8 en tiempo real
-                        const sorted = [...caVals].sort((a, b) => a - b);
-                        const mid = Math.floor(sorted.length / 2);
-                        const caMedian = sorted.length % 2 === 0
-                            ? (sorted[mid - 1] + sorted[mid]) / 2
-                            : sorted[mid];
-                        const caStdDev = Math.sqrt(
-                            caVals.reduce((sum, v) => sum + Math.pow(v - caMedian, 2), 0) / caVals.length
-                        );
-                        // Score: posición en z-scores normalizados a 0-100
-                        // z=0 (mediana G8) → 55, z=+2 → 95, z=-2 → 15
-                        // Cap: z > +2.5 → 100 (para evitar que outliers extremos dominen)
-                        const safeStdDev = Math.max(caStdDev, 1.0); // evitar div/0
-                        const z = (value - caMedian) / safeStdDev;
-                        score = Math.max(0, Math.min(100, 55 + z * 20));
-                    } else {
-                        // Fallback absoluto (sin datos suficientes del G8)
-                        if (value > 5)        score = 100;
-                        else if (value > 0)   score = 70 + (value / 5) * 30;
-                        else if (value > -3)  score = 50 + (value / 3) * 20;
-                        else if (value > -4)  score = 25 + ((value + 4) / 1) * 5;
-                        else                  score = Math.max(15, 25 - ((value + 4) / -3) * 10);
-                    }
-                }
-            }
-            break;
-
-        case 'lower':
-            if (indicator === 'debt') {
-                // Corrección para deuda japonesa/alta en economías con características
-                // especiales. Data-driven: si la deuda es extrema (>150%) pero la
-                // cuenta corriente es superavitaria (>2%), el riesgo soberano real
-                // es mucho menor que el que sugiere la ratio bruta.
-                // Esto captura la realidad de Japón (deuda ~260% pero superávit CC,
-                // deuda 90% doméstica) sin hardcodear el nombre del país.
-                // scoringData.currentAccount se accede via closure de calculateStrength.
-                const currentAccountVal = scoringDataExplicit?.currentAccount ?? null;
-                const hasSurplus = (currentAccountVal !== null && currentAccountVal > 2.0);
-
-                if (hasSurplus && value > 150) {
-                    // Deuda alta pero con superávit de CA → penalidad reducida
-                    // El superávit implica financiación doméstica y menor riesgo de
-                    // rollover → cap en 35 (no cero) incluso para deudas extremas
-                    score = Math.max(35, 60 - ((value - 150) / 200) * 25);
-                } else if (value < 40)       score = 100;
-                else if (value < 60)  score = 80 - ((value - 40) / 20) * 20;
-                else if (value < 90)  score = 60 - ((value - 60) / 30) * 20;
-                else if (value < 150) score = 40 - ((value - 90) / 60) * 25;
-                else                  score = Math.max(0, 15 - ((value - 150) / 100) * 15);
-            } else {
-                // unemployment
-                if (value < 3.0)      score = 100;
-                else if (value < 4.0) score = 80 + ((4.0 - value) / 1.0) * 20;
-                else if (value < 6.0) score = 50 + ((6.0 - value) / 2.0) * 30;
-                else                  score = Math.max(0, 50 - ((value - 6.0) / 4.0) * 50);
-            }
-            break;
-
-        case 'target':
-            // inflation & inflationExpectations: objetivo 1.8-2.5%
-            //
-            // v5.11 FIX-1 — Penalización ASIMÉTRICA para deflación real (inflation only):
-            // Una inflación de 0.1% NO es el opuesto simétrico de una inflación de 3.9%.
-            // Deflación activa (<1%) señala que el BC carece de margen hawkish convencional
-            // y tiene incentivo estructural para mantener tasas bajas o recortarlas → bearish.
-            // Inflación alta (>2.5%) coexiste con tasas altas y ciclos hawkish → señal distinta.
-            //
-            // Curva asimétrica para inflation:
-            //   0.1%  → score ~7  (deflación técnica: BC sin margen, bearish estructural)
-            //   0.5%  → score ~18 (zona de riesgo deflacionario)
-            //   1.0%  → score ~35 (por debajo del objetivo pero sin riesgo deflacionario)
-            //   1.8%  → score 100 (zona objetivo perfecta)
-            //   2.5%  → score 100 (zona objetivo perfecta)
-            //   3.5%  → score 50  (moderadamente elevada)
-            //   4.5%  → score ~0  (descontrolada)
-            //
-            // inflationExpectations mantiene su lógica original (sin la asimetría deflacionaria,
-            // ya que las expectativas bajas son menos bearish que la inflación real baja).
-            if (indicator === 'inflationExpectations' && value > 3.5) {
-                // Expectativas altas: señal mixta. Penaliza menos que inflación real alta.
-                if (value > 5.0)       score = Math.max(30, 45 - ((value - 5.0) / 2.0) * 15);
-                else if (value > 4.0)  score = 45 - ((value - 4.0) / 1.0) * 10;
-                else                   score = 55 - ((value - 3.5) / 0.5) * 10;
-            } else if (indicator === 'inflation' && value < 1.0) {
-                // FIX-1: zona deflacionaria — penalidad 2× más agresiva que el lado alto.
-                // Escala: 0.0% → 0, 0.5% → ~18, 1.0% → ~35 (continúa en siguiente tramo).
-                // Razón: <1% implica que el BC no puede subir tasas sin comprometer crecimiento.
-                // La pendiente (50/1.0) duplica la del lado alcista ((100-70)/0.8 ≈ 37.5/1.0).
-                score = Math.max(0, value * 35);
-            } else if (value >= 1.8 && value <= 2.5) {
-                score = 100;
-            } else if (value > 2.5 && value <= 3.5) {
-                score = 70 - ((value - 2.5) / 1.0) * 20;
-            } else if (value > 3.5) {
-                // Inflación real >3.5%: penaliza fuerte
-                score = Math.max(0, 50 - ((value - 3.5) / 2.0) * 50);
-            } else if (value >= 1.0) {
-                // 1.0% → 1.8%: subida progresiva hacia el objetivo
-                score = 35 + ((value - 1.0) / 0.8) * 65;
-            } else {
-                // inflationExpectations < 1.0%: curva original, más suave
-                score = Math.max(0, 70 - ((1.0 - value) / 1.0) * 70);
-            }
-            break;
-
-        case 'expansion':
-            // manufacturingPMI
-            if (value > 52)      score = 80 + Math.min((value - 52) / 8, 1) * 20;
-            else if (value >= 50) score = 60 + ((value - 50) / 2) * 20;
-            else if (value >= 48) score = 40 + ((value - 48) / 2) * 20;
-            else                  score = Math.max(0, 40 - ((48 - value) / 10) * 40);
-            break;
-
-        case 'stable':
-            if (indicator === 'production') {
-                if (value > 1.5)       score = 100;
-                else if (value > 0.5)  score = 70 + ((value - 0.5) / 1.0) * 30;
-                else if (value > 0)    score = 40 + (value / 0.5) * 30;
-                else if (value > -1.0) score = 20 + ((value + 1.0) / 1.0) * 20;
-                else                   score = Math.max(0, 20 + ((value + 2.0) / 1.0) * 20);
-            } else if (indicator === 'retailSales') {
-                if (value > 0.5)       score = 100;
-                else if (value > 0)    score = 60 + (value / 0.5) * 40;
-                else if (value > -0.5) score = 40 + ((value + 0.5) / 0.5) * 20;
-                else                   score = Math.max(0, 40 + ((value + 1.0) / 0.5) * 40);
-            } else if (indicator === 'wageGrowth') {
-                if (value >= 2.5 && value <= 4.5) score = 100;
-                else if (value > 4.5 && value <= 6.0) score = 70 + ((6.0 - value) / 1.5) * 30;
-                else if (value > 6.0) score = Math.max(0, 70 - ((value - 6.0) / 2.0) * 70);
-                else if (value >= 1.5) score = 40 + ((value - 1.5) / 1.0) * 60;
-                else score = Math.max(0, 40 - ((1.5 - value) / 1.5) * 40);
-            }
-            break;
-
-        case 'carry_yield':
-            // bond10y: higher yield = more carry attractive
-            if (value >= 4.5)      score = 90 + Math.min((value - 4.5) / 2, 1) * 10;
-            else if (value >= 3.0) score = 70 + ((value - 3.0) / 1.5) * 20;
-            else if (value >= 2.0) score = 50 + ((value - 2.0) / 1.0) * 20;
-            else if (value >= 0.5) score = 20 + ((value - 0.5) / 1.5) * 30;
-            else                   score = Math.max(0, value * 40);
-            break;
-
-        case 'surprise':
-            // economicSurprise: ya calculado en escala 0-100, neutral=50.
-            // >50 = datos por encima del consenso (sorpresa positiva para la divisa).
-            // <50 = datos por debajo del consenso (sorpresa negativa).
-            // El valor se pasa directamente al sistema de ponderación.
-            score = value;
-            break;
-
-        case 'sentiment_index':
-            // consumerConfidence, businessConfidence: base 100
-            if (value > 110)      score = 90 + Math.min((value - 110) / 20, 1) * 10;
-            else if (value > 100) score = 70 + ((value - 100) / 10) * 20;
-            else if (value >= 95) score = 50 + ((value - 95) / 5) * 20;
-            else if (value >= 85) score = 20 + ((value - 85) / 10) * 30;
-            else                  score = Math.max(0, 20 - ((85 - value) / 15) * 20);
-            break;
-
-        case 'flows':
-            // v5.5: valor ya normalizado como %PIB (ver bloque scoringData arriba)
-            // Rangos reales G8 en %PIB: NZD +1.09%, GBP +0.61%, CHF +0.66%,
-            // AUD +0.31%, EUR +0.15%, USD +0.15%, CAD +0.12%, JPY +0.11%
-            if (value > 1.5)        score = 90 + Math.min((value - 1.5) / 1.0, 1) * 10;
-            else if (value > 0.5)   score = 70 + ((value - 0.5) / 1.0) * 20;
-            else if (value > 0.0)   score = 50 + (value / 0.5) * 20;
-            else if (value > -0.3)  score = 30 + ((value + 0.3) / 0.3) * 20;
-            else if (value > -1.0)  score = 10 + ((value + 1.0) / 0.7) * 20;
-            else                    score = Math.max(0, 10 - ((Math.abs(value) - 1.0) / 1.0) * 10);
-            break;
-
-        case 'terms_of_trade':
-            if (value >= 110)      score = 90 + Math.min((value - 110) / 20, 1) * 10;
-            else if (value >= 103) score = 70 + ((value - 103) / 7) * 20;
-            else if (value >= 100) score = 55 + ((value - 100) / 3) * 15;
-            else if (value >= 95)  score = 35 + ((value - 95) / 5) * 20;
-            else if (value >= 85)  score = 10 + ((value - 85) / 10) * 25;
-            else                   score = Math.max(0, 10 - ((85 - value) / 10) * 10);
-            break;
-
-        case 'moderate_bullish':
-            // cotPositioning — con lógica contrarian para extremos
-            // Umbrales calibrados para futures-only (financial_lf.htm):
-            // Los valores netos son ~40-50% menores que en futures+options.
-            // El contrarian penalty ahora empieza en 80K (antes 30K en combined).
-            if (value > 200000) {
-                score = Math.max(20, 60 - ((value - 200000) / 100000) * 30);
-            } else if (value > 80000)       score = 85 - ((value - 80000) / 120000) * 25;
-            else if (value > 40000)  score = 95 - ((value - 40000) / 40000) * 10;
-            else if (value > 15000)  score = 100 - ((value - 15000) / 25000) * 5;
-            else if (value > 0)      score = 70 + (value / 15000) * 30;
-            else if (value === 0)    score = 50;
-            else if (value > -15000) score = 30 + ((value + 15000) / 15000) * 20;
-            else if (value > -40000) score = 15 + ((value + 40000) / 25000) * 15;
-            else if (value > -80000) score = 5  + ((value + 80000) / 40000) * 10;
-            else if (value > -200000) score = Math.max(5, 5 - ((Math.abs(value) - 80000) / 120000) * 5);
-            else {
-                score = Math.min(80, 20 + ((Math.abs(value) - 200000) / 100000) * 30);
-            }
-
-            // ── COT Price Confirmation Check (v5.7) ─────────────────────────
-            // El COT tiene hasta 3 días de retraso y refleja posiciones acumuladas,
-            // no cambios recientes. Cuando el posicionamiento institucional extremo
-            // NO está siendo confirmado por el movimiento de precio real (fxPerformance1M),
-            // se reduce el score COT proporcionalmente a la divergencia.
-            //
-            // 100% data-driven: usa fxPerformance1M del propio activo, sin hardcodear divisas.
-            //
-            // Casos que activan la corrección:
-            //   · COT bullish extremo (>30K) + precio débil o bajando (<+1.0% en 1M):
-            //     el smart money está largo pero el mercado no confirma → atenuar señal bullish
-            //   · COT bajista extremo (<-30K) + precio fuerte o subiendo (>-1.0% en 1M):
-            //     el smart money está corto pero el precio resiste → atenuar señal bearish
-            //
-            // Reducción máxima: 30% del score bruto.
-            // El impacto sobre el score total es < 1.5 pts (peso COT = 5%).
-            // Diseño conservador: atenúa, no elimina. La señal COT sigue presente.
-            {
-                const fxConf = scoringDataExplicit?.fxPerformance1M ?? null;
-                if (fxConf !== null) {
-                    if (value > 30000 && fxConf < 1.0) {
-                        // COT bullish, precio no confirma con fuerza
-                        const cotExtremeness = Math.min((value - 30000) / 70000, 1.0);
-                        const priceWeakness  = Math.min((1.0 - fxConf) / 3.0, 1.0);
-                        const discount = 1 - (cotExtremeness * priceWeakness * 0.30);
-                        score = score * discount;
-                    } else if (value < -30000 && fxConf > -1.0) {
-                        // COT bajista, precio no confirma con caída
-                        const cotExtremeness = Math.min((Math.abs(value) - 30000) / 70000, 1.0);
-                        const priceWeakness  = Math.min((fxConf + 1.0) / 3.0, 1.0);
-                        const discount = 1 - (cotExtremeness * priceWeakness * 0.30);
-                        score = score * discount;
-                    }
-                }
-            }
-            break;
-
-        case 'outlook_direction':
-            if (value === 'Hawkish')      score = 90;
-            else if (value === 'Neutral') score = 50;
-            else if (value === 'Dovish')  score = 10;
-            else score = 50;
-            break;
-
-        case 'rate_momentum':
-            // rateMomentum = tasa_actual - tasa_hace_12_meses
-            // Positivo = BC subiendo tasas (hawkish cycle) → bullish
-            // Negativo = BC recortando → bearish
-            // v5.5 — Ciclo maduro: si el ciclo acumulado supera 1.5pp en cualquier
-            // dirección, la penalización/premio se reduce un 40%.
-            // Razonamiento: un ciclo de -2.75pp (CAD) ya está descontado por el mercado;
-            // el modelo no debe seguir penalizando como si fuera un ciclo reciente.
-            // Solo afecta CAD (-2.75) y NZD (-3.25) en el contexto actual.
-            //
-            // v6.0 FIX-6 — Hawkish Pause Boost (100% data-driven):
-            // Un BC con bcOutlook=Hawkish y rateMomentum ≈ 0 está en PAUSA HAWKISH,
-            // no en posición neutral. Ejemplo: BOJ subió tasas en 2024-2025 y pausó
-            // con rm12=0.0 — es radicalmente distinto a un BC inactivo con rm=0.
-            // Solución: si bcOutlook=Hawkish Y rm ∈ [-0.25, +0.5], usar rm efectivo=+0.3
-            // (mild hawkish), lo que da score 72 en lugar de 50 (+22pts en componente).
-            // Con peso 7%, el impacto en el score total es ≈ +1.5 pts — quirúrgico.
-            // Ambos campos (bcOutlook y rateMomentum) son scraped 100% data-driven.
-            {
-                // FIX-6: hawkish pause detection
-                const outlookCtx = scoringDataExplicit?.bcOutlook ?? currencyCtx?.outlook ?? null;
-                const isHawkishPause = outlookCtx === 'Hawkish' && value >= -0.25 && value <= 0.5;
-                const rawValue = isHawkishPause ? 0.3 : value; // treat pause as mild hawkish
-
-                const isMatureCycle = Math.abs(rawValue) > 1.5;
-                const effectiveValue = isMatureCycle ? rawValue * 0.6 : rawValue;
-                if (effectiveValue > 1.5)        score = 100;
-                else if (effectiveValue > 0.75)  score = 85;
-                else if (effectiveValue > 0.25)  score = 72;
-                else if (effectiveValue > 0.0)   score = 58;
-                else if (effectiveValue === 0)   score = 50;
-                else if (effectiveValue > -0.25) score = 42;
-                else if (effectiveValue > -0.75) score = 30;
-                else if (effectiveValue > -1.5)  score = 18;
-                else                             score = 12;
-            }
-            break;
-
-case 'fx_momentum':
-            // fxPerformance1M: composite 90% 1M + 10% 3M del índice de divisa
-            // Fuente: Frankfurter/ECB — C8 (Stooq y Yahoo bloqueados en GitHub Actions)
-            // Calibración Mar 2026 (rangos reales de mercado):
-            //   composite >3%    → momentum muy fuerte
-            //   composite 1–3%   → bullish claro
-            //   composite 0–1%   → levemente bullish
-            //   composite −1–0%  → levemente bearish
-            //   composite −2––1% → bearish moderado
-            //   composite <−2%   → bearish fuerte (GBP, EUR, NZD en Mar 2026)
-            if (value > 4.0)       score = 100;
-            else if (value > 2.5)  score = 86 + ((value - 2.5) / 1.5) * 14;
-            else if (value > 1.0)  score = 72 + ((value - 1.0) / 1.5) * 14;
-            else if (value > 0.0)  score = 56 + (value / 1.0) * 16;
-            else if (value === 0)  score = 50;
-            else if (value > -1.0) score = 36 + ((value + 1.0) / 1.0) * 14;
-            else if (value > -2.0) score = 20 + ((value + 2.0) / 1.0) * 16;
-            else if (value > -3.5) score = 7  + ((value + 3.5) / 1.5) * 13;
-            else                   score = Math.max(0, 7 - ((Math.abs(value) - 3.5) / 1.5) * 7);
-            break;
-
-    } // ← CIERRE DEL SWITCH (este era el token faltante que rompía Babel)
-
-    return Math.max(0, Math.min(100, score));
-};
 
     // ========== SCORING LOOP ==========
     let weightedScoreSum = 0;   // Suma de (score_i * weight_i)
@@ -3098,7 +2657,7 @@ if (currency === 'CAD' && scoringData.consumerConfidence !== null && scoringData
 }
 
 // ── v6.3: ECONOMIC SURPRISE INDEX (ESI) PROXY ────────────────────────────────
-// Defined as a standalone function so it can be called from inside calculateStrength.
+// ESI proxy — called from scoring context
 const calculateESI = (currency, data, allEconomicData, calendarEvents) => {
     // — Componente B: G8 z-score relativo —
     const ESI_INDICATORS = [
@@ -4614,7 +4173,7 @@ if (economicData[currency]?.outlook && country) {
 }
     
     // ✅ CORRECCIÓN: Obtener objeto y extraer score
-    const strengthObj = getStrength(currency, data, forexRates, economicData, (economicCalendar||{}).events||null);
+    const strengthObj = getStrength(currency);
     const strength = strengthObj.score;
     const sentiment = getSentiment(strength);
 
@@ -4881,8 +4440,8 @@ const getSortedCountries = () => {
         const dataB = economicData[b.code] || {};
         
         // Primero: Ordenar por strength score
-        const strengthObjA = getStrength(a.code, dataA, forexRates, economicData, (economicCalendar||{}).events||null);
-        const strengthObjB = getStrength(b.code, dataB, forexRates, economicData, (economicCalendar||{}).events||null);
+        const strengthObjA = getStrength(a.code);
+        const strengthObjB = getStrength(b.code);
         
         const scoreA = strengthObjA.score || 50;
         const scoreB = strengthObjB.score || 50;
@@ -5303,6 +4862,19 @@ const DataHealthCheck = ({ economicData }) => {
         <span>Actualizado <strong>{lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</strong> (hora local)</span>
     </div>
 )}
+{_scoresDataDate && (() => {
+    const d = new Date(_scoresDataDate);
+    const isStale = (Date.now() - d) > 20 * 3600 * 1000;
+    if (!isStale) return null;
+    const label = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    return (
+        <div className="info-item" title="El workflow de scores no ha corrido hoy. Mostrando el último snapshot disponible.">
+            <span style={{background:'#f59e0b',color:'#000',borderRadius:'4px',padding:'2px 7px',fontSize:'11px',fontWeight:600}}>
+                ⚠ Scores: datos del {label}
+            </span>
+        </div>
+    );
+})()}
 </div>
 
                         </div>
@@ -5338,7 +4910,7 @@ const DataHealthCheck = ({ economicData }) => {
             <div className="currency-grid">
                 {getSortedCountries().map(country => {
                     const data = economicData[country.code] || {};
-                    const strengthObj = getStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
+                    const strengthObj = getStrength(country.code);
                     const strength = strengthObj.score;
                     const sentiment = getSentiment(strength);
                     const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
@@ -5758,7 +5330,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         <tbody>
                                             {getSortedCountries().map(country => {
                                                 const data = economicData[country.code] || {};
-                                                const strengthObj = getStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);  // ✅
+                                                const strengthObj = getStrength(country.code);  // ✅
 const strength = strengthObj.score;  // ✅
 const sentiment = getSentiment(strength);
                                                 const overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
