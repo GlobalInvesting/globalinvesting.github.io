@@ -5487,6 +5487,14 @@ const sentiment = getSentiment(strength);
         Dashboard v6.4.0
         </div>
         <div style={{ marginTop: '0.75rem' }}>
+            <p style={{
+                fontSize: '0.7rem', color: 'var(--text-secondary)', lineHeight: '1.5',
+                margin: '0 0 0.5rem 0', padding: '0 1rem', opacity: 0.75
+            }}>
+                ⚠️ <strong style={{ color: 'var(--text-primary)' }}>Aviso de Riesgo:</strong>{' '}
+                Contenido exclusivamente informativo. No constituye asesoramiento financiero, de inversión, legal ni fiscal.
+                El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores.
+            </p>
             <div style={{
                 display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
                 gap: '0.4rem 1rem', fontSize: '0.75rem', color: 'var(--text-secondary)'
@@ -5594,28 +5602,5 @@ ReactDOM.render(
 );
 </script>
 
-<!-- ═══════════════════════════════════════════════════
-     AVISO DE RIESGO FINANCIERO — visible en todas las páginas
-     Requerido por ESMA MiFID II para contenido de inversión
-     ═══════════════════════════════════════════════════ -->
-<footer role="contentinfo" aria-label="Aviso legal y descargo de responsabilidad" style="
-  background:#0d1117; border-top:1px solid #21262d; padding:12px 20px;
-  font-family:Arial,sans-serif; font-size:11px; color:#8b949e;
-  text-align:center; line-height:1.6; margin-top:0;">
-  <p style="margin:0 0 4px 0;">
-    <strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong>
-    Este sitio es exclusivamente informativo y educativo. Ningún contenido constituye asesoramiento financiero, de inversión, legal ni fiscal.
-    Los datos económicos mostrados pueden contener errores o retrasos inherentes a las fuentes de datos.
-    Las señales generadas por el modelo de scoring son herramientas analíticas, no recomendaciones de trading.
-    <strong>Opere con responsabilidad. El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores.</strong>
-  </p>
-  <p style="margin:0;">
-    Fuentes: <a href="https://fred.stlouisfed.org/" style="color:#58a6ff;" target="_blank" rel="noopener">FRED (St. Louis Fed)</a> ·
-    <a href="https://www.cftc.gov/" style="color:#58a6ff;" target="_blank" rel="noopener">CFTC</a> ·
-    Trading Economics · <a href="https://www.frankfurter.app/" style="color:#58a6ff;" target="_blank" rel="noopener">Frankfurter/ECB</a> ·
-    <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> ·
-    <a href="/terms.html" style="color:#58a6ff;">Términos</a>
-  </p>
-</footer>
 </body>
 </html>
