@@ -2761,7 +2761,12 @@ const indicatorTooltips = {
             const _cachedEcon    = CacheManager.get('all_economic_data');
             const _cachedCal     = CacheManager.get('economic_calendar');
             const _cachedHist    = CacheManager.get('historical_data');
-            const _cachedPairs   = CacheManager.get('forex_pair_recommendations');
+            const _cachedPairsRaw = CacheManager.get('forex_pair_recommendations');
+            // Validate cached pairs — reject stale entries where strength/weakness are null
+            // (generated before fix v6.4.1 when scores could be null)
+            const _cachedPairs = Array.isArray(_cachedPairsRaw) &&
+                _cachedPairsRaw.every(r => typeof r.strength === 'number' && typeof r.weakness === 'number')
+                ? _cachedPairsRaw : null;
             const _cachedRates   = CacheManager.get('forex_rates');
             const _cachedAI      = CacheManager.get('ai_analysis_Groq');
             // Si hay caché válido en alguna de las secciones principales, arrancamos
@@ -5105,7 +5110,7 @@ const sentiment = getSentiment(strength);
                                 fontWeight: 700,
                                 color: rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'
                             }}>
-                                {rec.spread.toFixed(1)}
+                                {rec.spread != null ? rec.spread.toFixed(1) : '—'}
                             </div>
                             <div style={{ 
                                 fontSize: '0.75rem', 
@@ -5139,7 +5144,7 @@ const sentiment = getSentiment(strength);
                                     fontWeight: 700,
                                     color: 'var(--green-strong)'
                                 }}>
-                                    {rec.strength.toFixed(1)}
+                                    {rec.strength != null ? rec.strength.toFixed(1) : '—'}
                                 </div>
                             </div>
                             <div style={{ 
@@ -5200,7 +5205,7 @@ const sentiment = getSentiment(strength);
                                     fontWeight: 700,
                                     color: 'var(--red-strong)'
                                 }}>
-                                    {rec.weakness.toFixed(1)}
+                                    {rec.weakness != null ? rec.weakness.toFixed(1) : '—'}
                                 </div>
                             </div>
                             <div style={{ 
@@ -5251,9 +5256,9 @@ const sentiment = getSentiment(strength);
                         }}>
                             <strong style={{ color: 'var(--text-primary)' }}>Análisis:</strong> 
                             {rec.type === 'long' ? (
-                                <span> {rec.strongCurrency} muestra fundamentos superiores con un índice de fortaleza de {rec.strength.toFixed(1)} puntos, superando a {rec.weakCurrency} ({rec.weakness.toFixed(1)}) por un diferencial de {rec.spread.toFixed(1)} puntos. Este diferencial sugiere una oportunidad de compra (LONG) en {rec.pair}.</span>
+                                <span> {rec.strongCurrency} muestra fundamentos superiores con un índice de fortaleza de {rec.strength != null ? rec.strength.toFixed(1) : '—'} puntos, superando a {rec.weakCurrency} ({rec.weakness != null ? rec.weakness.toFixed(1) : '—'}) por un diferencial de {rec.spread != null ? rec.spread.toFixed(1) : '—'} puntos. Este diferencial sugiere una oportunidad de compra (LONG) en {rec.pair}.</span>
                             ) : (
-                                <span> {rec.weakCurrency} registra debilidad fundamental con {rec.weakness.toFixed(1)} puntos frente a la fortaleza de {rec.strongCurrency} ({rec.strength.toFixed(1)}), generando un diferencial de {rec.spread.toFixed(1)} puntos. Esto indica una oportunidad de venta (SHORT) en {rec.pair}.</span>
+                                <span> {rec.weakCurrency} registra debilidad fundamental con {rec.weakness != null ? rec.weakness.toFixed(1) : '—'} puntos frente a la fortaleza de {rec.strongCurrency} ({rec.strength != null ? rec.strength.toFixed(1) : '—'}), generando un diferencial de {rec.spread != null ? rec.spread.toFixed(1) : '—'} puntos. Esto indica una oportunidad de venta (SHORT) en {rec.pair}.</span>
                             )}
                         </div>
 
