@@ -4172,7 +4172,12 @@ const DataHealthCheck = ({ economicData }) => {
 )}
 {_scoresDataDate && (() => {
     const d = new Date(_scoresDataDate);
-    const isStale = (Date.now() - d) > 20 * 3600 * 1000;
+    // Compare by calendar day to avoid false positives: date-only strings like
+    // "2026-03-12" are parsed as midnight UTC, which appears >20h old for UTC-3 users.
+    const today = new Date();
+    const dataDay  = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isStale  = (todayDay - dataDay) >= 2 * 24 * 3600 * 1000; // 2+ calendar days old
     if (!isStale) return null;
     const label = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
     return (
@@ -5574,10 +5579,11 @@ ReactDOM.render(
     <ErrorBoundary>
         <ForexDashboard />
     </ErrorBoundary>,
-    document.getElementById('root')
+    document.getElementById('root'),
+    () => { var f = document.getElementById('risk-footer'); if (f) f.style.display = ''; }
 );
 </script>
-<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
+<footer role="contentinfo" aria-label="Aviso legal" id="risk-footer" style="display:none;background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
 <strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
