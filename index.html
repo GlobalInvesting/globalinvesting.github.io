@@ -1864,14 +1864,14 @@ const fetchExtendedData = async (countryCode) => {
             const today = new Date();
             const events = [];
             const economicEvents = [
-                { country: 'USD', event: 'IPC (Inflación)', impact: 'high', dayOfMonth: 12, time: '14:30', flag: 'USD' },
-                { country: 'EUR', event: 'PIB Preliminar', impact: 'high', dayOfMonth: 30, time: '11:00', flag: 'EUR', quarterly: true },
-                { country: 'GBP', event: 'IPC UK', impact: 'high', dayOfMonth: 18, time: '08:00', flag: 'GBP' },
-                { country: 'JPY', event: 'IPC Japón', impact: 'high', dayOfMonth: 22, time: '00:30', flag: 'JPY' },
-                { country: 'AUD', event: 'Decisión Tasa RBA', impact: 'high', dayOfMonth: 4, time: '04:30', flag: 'AUD', everyMonth: true },
-                { country: 'CAD', event: 'IPC Canadá', impact: 'high', dayOfMonth: 20, time: '14:30', flag: 'CAD' },
-                { country: 'CHF', event: 'IPC Suiza', impact: 'medium', dayOfMonth: 6, time: '09:30', flag: 'CHF' },
-                { country: 'NZD', event: 'PIB Trimestral', impact: 'high', dayOfMonth: 19, time: '21:45', flag: 'NZD', quarterly: true }
+                { country: 'USD', event: 'IPC (Inflación)', impact: 'high', dayOfMonth: 12, time: '14:30', flag: '🇺🇸' },
+                { country: 'EUR', event: 'PIB Preliminar', impact: 'high', dayOfMonth: 30, time: '11:00', flag: '🇪🇺', quarterly: true },
+                { country: 'GBP', event: 'IPC UK', impact: 'high', dayOfMonth: 18, time: '08:00', flag: '🇬🇧' },
+                { country: 'JPY', event: 'IPC Japón', impact: 'high', dayOfMonth: 22, time: '00:30', flag: '🇯🇵' },
+                { country: 'AUD', event: 'Decisión Tasa RBA', impact: 'high', dayOfMonth: 4, time: '04:30', flag: '🇦🇺', everyMonth: true },
+                { country: 'CAD', event: 'IPC Canadá', impact: 'high', dayOfMonth: 20, time: '14:30', flag: '🇨🇦' },
+                { country: 'CHF', event: 'IPC Suiza', impact: 'medium', dayOfMonth: 6, time: '09:30', flag: '🇨🇭' },
+                { country: 'NZD', event: 'PIB Trimestral', impact: 'high', dayOfMonth: 19, time: '21:45', flag: '🇳🇿', quarterly: true }
             ];
 
             for (let monthOffset = 0; monthOffset <= 1; monthOffset++) {
@@ -2840,14 +2840,14 @@ const isCacheStale = (economicData) => {
         }
 
         const countries = [
-            { code: 'USD', name: 'Estados Unidos', currency: 'Dólar Estadounidense', flag: 'USD', centralBank: 'Reserva Federal', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'EUR', name: 'Eurozona', currency: 'Euro', flag: 'EUR', centralBank: 'Banco Central Europeo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'GBP', name: 'Reino Unido', currency: 'Libra Esterlina', flag: 'GBP', centralBank: 'Banco de Inglaterra', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'JPY', name: 'Japón', currency: 'Yen Japonés', flag: 'JPY', centralBank: 'Banco de Japón', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'AUD', name: 'Australia', currency: 'Dólar Australiano', flag: 'AUD', centralBank: 'Banco de la Reserva de Australia', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'CAD', name: 'Canadá', currency: 'Dólar Canadiense', flag: 'CAD', centralBank: 'Banco de Canadá', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'CHF', name: 'Suiza', currency: 'Franco Suizo', flag: 'CHF', centralBank: 'Banco Nacional Suizo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
-            { code: 'NZD', name: 'Nueva Zelanda', currency: 'Dólar Neozelandés', flag: 'NZD', centralBank: 'Banco de la Reserva de Nueva Zelanda', nextMeeting: 'Por definir', outlook: 'Calculando...' }
+            { code: 'USD', name: 'Estados Unidos', currency: 'Dólar Estadounidense', flag: '🇺🇸', centralBank: 'Reserva Federal', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'EUR', name: 'Eurozona', currency: 'Euro', flag: '🇪🇺', centralBank: 'Banco Central Europeo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'GBP', name: 'Reino Unido', currency: 'Libra Esterlina', flag: '🇬🇧', centralBank: 'Banco de Inglaterra', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'JPY', name: 'Japón', currency: 'Yen Japonés', flag: '🇯🇵', centralBank: 'Banco de Japón', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'AUD', name: 'Australia', currency: 'Dólar Australiano', flag: '🇦🇺', centralBank: 'Banco de la Reserva de Australia', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'CAD', name: 'Canadá', currency: 'Dólar Canadiense', flag: '🇨🇦', centralBank: 'Banco de Canadá', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'CHF', name: 'Suiza', currency: 'Franco Suizo', flag: '🇨🇭', centralBank: 'Banco Nacional Suizo', nextMeeting: 'Por definir', outlook: 'Calculando...' },
+            { code: 'NZD', name: 'Nueva Zelanda', currency: 'Dólar Neozelandés', flag: '🇳🇿', centralBank: 'Banco de la Reserva de Nueva Zelanda', nextMeeting: 'Por definir', outlook: 'Calculando...' }
         ];
 
 const indicatorTooltips = {
@@ -5251,27 +5251,7 @@ const sentiment = getSentiment(strength);
                                 gap: '1rem' 
                             }}>
                                 <span className={`sentiment-badge sentiment-${rec.type === 'long' ? 'alcista' : 'bajista'}`}>
-                                    {rec.direction} - {rec.actionText}
-                                </span>
-                                <span
-                                    title={`Diferencial: ${rec.spread != null ? rec.spread.toFixed(1) : '?'} pts · Backtest 115 semanas: diff≥20 → Hit Rate 49.8%, Sharpe +0.46, retorno acum. +38% · diff<20 → Sharpe negativo, excluidas`}
-                                    style={{ 
-                                        fontSize: '0.8rem',
-                                        fontWeight: 600,
-                                        padding: '2px 8px',
-                                        borderRadius: '4px',
-                                        cursor: 'help',
-                                        background: rec.confidence === 'Alta'
-                                            ? 'rgba(34, 197, 94, 0.15)'
-                                            : 'rgba(156, 163, 175, 0.15)',
-                                        color: rec.confidence === 'Alta'
-                                            ? 'var(--green-strong)'
-                                            : 'var(--text-tertiary)',
-                                        border: rec.confidence === 'Alta'
-                                            ? '1px solid rgba(34, 197, 94, 0.3)'
-                                            : '1px solid rgba(156, 163, 175, 0.2)',
-                                    }}>
-                                    {rec.confidence === 'Alta' ? 'Señal confirmada' : 'Señal débil'}
+                                    {rec.direction}
                                 </span>
                                 {rec.momentumOpposing && (
                                     <span title={rec.type === 'short'
@@ -5286,7 +5266,7 @@ const sentiment = getSentiment(strength);
                                         padding: '2px 7px',
                                         cursor: 'help'
                                     }}>
-                                        Precio divergente
+                                        Div. precio
                                     </span>
                                 )}
                                 {rec.jpyAsShort && (
@@ -5299,7 +5279,7 @@ const sentiment = getSentiment(strength);
                                         padding: '2px 7px',
                                         cursor: 'help'
                                     }}>
-                                        JPY: risk sentiment
+                                        JPY risk-off
                                     </span>
                                 )}
                             </div>
