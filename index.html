@@ -5456,31 +5456,27 @@ const sentiment = getSentiment(strength);
     Política Monetaria (29%) • Balance Externo (19%) • Crecimiento &amp; Empleo (16%) • Sentimiento de Mercado (21%) • FX Confirmador (11%) • Consumo &amp; Salarios (4%)<br/>
     Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
 </div>
-
-    <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-        <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
-            padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
-            borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
-        }}>
-            Limpiar Caché y Recargar Datos
-        </button>
-        <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-            © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
-        </div>
-        Dashboard v6.4.0
-        </div>
-        <div style={{ marginTop: '0.75rem' }}>
-            <p style={{
-                fontSize: '0.7rem', color: 'var(--text-secondary)', lineHeight: '1.5',
-                margin: '0 0 0.5rem 0', padding: '0 1rem', opacity: 0.75
-            }}>
-                <strong style={{ color: 'var(--text-primary)' }}>Aviso Legal:</strong>{' '}
-                Contenido exclusivamente informativo y educativo basado en datos macroeconómicos públicos. No constituye asesoramiento financiero, de inversión, legal ni fiscal. El trading de divisas implica un alto nivel de riesgo y puede no ser adecuado para todos los inversores. Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
-            </p>
-            <div style={{
-                display: 'flex', flexWrap: 'wrap', justifyContent: 'center',
-                gap: '0.4rem 1rem', fontSize: '0.75rem', color: 'var(--text-secondary)'
-            }}>
+<div style={{ background: 'var(--bg-card)', padding: '1rem', borderRadius: '6px', border: '1px solid var(--border)', marginTop: '1rem', fontSize: '0.8125rem', lineHeight: '1.6' }}>
+    <strong>Aviso Legal:</strong><br/>
+    Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
+    Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
+    macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
+    El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
+    Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
+</div>
+<div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+    <button onClick={() => window.clearForexCache && window.clearForexCache()} style={{
+        padding: '10px 20px', background: 'var(--blue)', color: 'white', border: 'none',
+        borderRadius: '6px', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600
+    }}>
+        Limpiar Caché y Recargar Datos
+    </button>
+    <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+        © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
+    </div>
+    Dashboard v6.4.0
+</div>
+<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.4rem 1rem', marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
     <a href="about.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Acerca de</a>
     <a href="publicidad.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Publicidad</a>
     <a href="about.html#recursos" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Guías</a>
@@ -5489,8 +5485,6 @@ const sentiment = getSentiment(strength);
     <a href="contact.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Contacto</a>
     <a href="en.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', padding: '0.2rem 0.5rem', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>EN</a>
 </div>
-
-    </div>
 </div>
                     </div>
                 </div>
@@ -5583,6 +5577,10 @@ ReactDOM.render(
     document.getElementById('root')
 );
 </script>
+<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
+<strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
+</footer>
 
 </body>
 </html>
