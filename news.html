@@ -260,6 +260,7 @@
 </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
 
 <div class="header">
   <div class="header-content">
@@ -295,7 +296,7 @@
   </div>
 </div>
 
-<main class="page-wrap">
+<main class="page-wrap" id="main-content" role="main">
   <div class="page-title-row">
     <h1 class="page-title">Noticias de Mercado</h1>
   </div>
@@ -405,7 +406,7 @@ function flagImg(cur, px=16) {
   const code = FLAG_CODES[cur];
   if (!code) return '';
   const px2=px*2, h=Math.round(px*0.75), h2=Math.round(px2*0.75);
-  return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;">`;
+  return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;" loading="lazy">`;
 }
 
 const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];

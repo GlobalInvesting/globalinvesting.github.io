@@ -376,8 +376,34 @@
     #spread-chart-panel svg { max-width: 100%; height: auto; }
   }
 </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://globalinvesting.github.io/carry-trade.html#app",
+  "url": "https://globalinvesting.github.io/carry-trade.html",
+  "name": "Carry Trade Forex — Diferenciales de Tasas",
+  "description": "Análisis de carry trade para las 8 divisas principales. Diferenciales de tasas reales y datos de bancos centrales.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web Browser",
+  "inLanguage": "es",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://globalinvesting.github.io/#organization",
+    "name": "Global Investing",
+    "url": "https://globalinvesting.github.io"
+  }
+}
+</script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
 
 <!-- ── Header ── -->
 <div class="header">
@@ -416,7 +442,7 @@
 </div>
 
 <!-- ── Content ── -->
-<main class="page-wrap">
+<main class="page-wrap" id="main-content" role="main">
 
   <div class="page-title-row">
     <h1 class="page-title">Carry Trade &mdash; Análisis de Diferenciales</h1>
@@ -553,7 +579,7 @@ function flagImg(cur, px) {
   var code = FLAG_CODES[cur];
   if (!code) return '';
   var h = Math.round(px * 0.75), px2 = px * 2, h2 = h * 2;
-  return '<img src="https://flagcdn.com/' + px + 'x' + h + '/' + code + '.png"'
+  return '<img src="https://flagcdn.com/' + px + 'x' + h + '/' + code + '.png" loading="lazy"'
        + ' srcset="https://flagcdn.com/' + px2 + 'x' + h2 + '/' + code + '.png 2x"'
        + ' width="' + px + '" height="' + h + '" alt="' + cur + '"'
        + ' style="vertical-align:middle;border-radius:1px;flex-shrink:0;">';
