@@ -1,0 +1,11 @@
+# ZAP Scan Rules — Supresiones para globalinvesting.github.io
+# Formato: ID<TAB>IGNORE/WARN/FAIL<TAB>URL regex<TAB>Alert name
+# Ref: https://www.zaproxy.org/docs/alerts/
+
+# AdSense carga third-party scripts — informativo, no crítico
+10098	IGNORE	.*pagead2.googlesyndication.*	Cross-Domain JavaScript Source File Inclusion
+# GitHub Pages no permite configurar headers custom — will be fixed with Netlify
+10038	WARN	.*globalinvesting.github.io.*	Content Security Policy (CSP) Header Not Set
+10020	WARN	.*globalinvesting.github.io.*	Missing Anti-clickjacking Header
+# Google Fonts — fuente externa conocida y segura
+10098	IGNORE	.*fonts.googleapis.*	Cross-Domain JavaScript Source File Inclusion
