@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "La política monetaria del Banco de Inglaterra ha tomado un giro dovish, con una reducción de 0.25pp en la tasa de interés, lo que presiona a la baja la divisa. Esto se debe a que el menor carry diferencial reduce la atracción de inversores extranjeros, aunque la tasa de interés sigue siendo 1.41pp por encima del promedio global. La inflación, por encima del objetivo, y el crecimiento del PIB, inferior al promedio global, sugieren que el banco central está intentando estimular la economía.\n\nLa balanza comercial y la cuenta corriente también muestran un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de maquinaria industrial, productos farmacéuticos y equipos eléctricos y electrónicos no han sido suficientes para compensar el déficit en bienes. Los precios del petróleo, que han subido debido a las tensiones en Medio Oriente, también han afectado negativamente la balanza comercial.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 34.5K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes ha sido positivo, con una apreciación del 1.99% vs USD, el mercado está saturado de largos y cualquier noticia negativa podría provocar una corrección rápida. La reunión de los líderes del G7 para discutir la coordinación energética y la esperanza de un fin a la guerra en Irán han generado cierta expectativa en el mercado, lo que ha impulsado al par GBP/USD a niveles superiores a 1.3485.",
+  "analysis": "La decisión del Banco de Inglaterra de bajar las tasas de interés en 0.25pp hasta un 3.75% introduce una presión bajista sobre la divisa, aunque sigue siendo 1.41pp por encima del promedio global. Esto se debe a que el menor carry diferencial reduce la atracción para los inversores extranjeros. Aunque los datos de inflación siguen por encima del objetivo, el crecimiento del PIB es inferior al promedio global, lo que sugiere que el banco central está priorizando el estímulo económico.\n\nLa balanza comercial y la cuenta corriente presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de maquinaria industrial, productos farmacéuticos y equipos eléctricos y electrónicos son fundamentales para la economía, pero no han sido suficientes para compensar el déficit en bienes. La noticia de que el mercado inmobiliario del Reino Unido se está enfriando, con una caída en el índice de precios, puede influir en la confianza del consumidor y, por ende, en la economía en general.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con 34.5K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. La noticia de que las apuestas por recortes de tasas del Banco de Inglaterra están disminuyendo ha impulsado al alza la libra esterlina, lo que se refleja en el rendimiento FX del último mes, que ha sido positivo. Sin embargo, este optimismo puede ser efímero si los datos económicos no confirman las expectativas.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-11T08:36:06.829733+00:00",
+  "generatedAt": "2026-03-12T08:35:23.528077+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
@@ -13,7 +13,7 @@
     "inflation": 3.0,
     "unemployment": 5.2,
     "currentAccount": -2.2,
-    "rateMomentum": -0.25,
+    "rateMomentum": -0.75,
     "lastRateDecision": {
       "direction": "BAJÓ",
       "delta": -0.25,
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 34506,
-    "fxPerformance1M": 1.9914,
+    "fxPerformance1M": 1.2326,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-11",
-    "latestNewsTs": 1773192257.0,
+    "lastUpdate": "2026-03-12",
+    "latestNewsTs": 1773274849.0,
     "newsHeadlines": [
-      "Pound Sterling gains traction against softer USD; eyes US CPI report for fresh i",
-      "G7 to discuss energy coordination as Mid East tensions lift oil prices: 1400 GMT",
-      "GBP/USD Price Forecast: Bulls look to seize control amid hopes for end to Iran w"
+      "UK housing market cools as RICS price gauge falls to -12",
+      "EUR/GBP Plummets: Fading BoE Rate-Cut Bets Propel Pound Sterling Higher",
+      "GBP/USD Defies Gravity: Steady at 1.34 Amidst Oil Shock and Scorching US Inflati"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.04,
+    "avg_bond10y": 3.47,
+    "avg_fx_perf_1m": -0.32,
     "avg_cot": 4098.88
   }
 }

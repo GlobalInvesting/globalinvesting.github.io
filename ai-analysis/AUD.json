@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés de 3.85%, significativamente superior al promedio global de 2.34%. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ejerce presión alcista sobre la divisa. La última subida de tasas de 0.25pp confirma este ciclo restrictivo, lo que debería mantener la divisa con tendencia alcista.\n\nLa balanza comercial de Australia muestra un superávit en bienes, gracias a sus principales exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. Aunque la cuenta corriente presenta un déficit, el superávit comercial y los términos de intercambio favorables ayudan a mitigar este efecto. La noticia de un bullish breakout en el par AUD/USD por encima de 0.7140 sugiere que el mercado está confiado en la divisa australiana, lo que se refleja en su reciente rally.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con 54.6K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. La reciente subida del par AUD/JPY a un máximo récord por encima de 113.00, impulsada por las apuestas de subida de tasas del Banco de la Reserva de Australia, refuerza la tendencia alcista de la divisa. Sin embargo, este extremo posicionamiento alcista también aumenta el riesgo de una corrección si los datos futuros no cumplen con las expectativas del mercado.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto se debe a la decisión reciente de subir tasas en 0.25pp, lo que confirma el ciclo alcista de la divisa. Aunque los mercados de futuros ya descuentan un recorte adicional en marzo, las declaraciones del gobernador sugieren que el banco central sigue siendo hawkish, lo que podría mantener la presión alcista sobre la divisa.\n\nLa balanza comercial australiana muestra un superávit, gracias a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. La rally del Aussie se ha visto impulsada por señales de un RBA más activo en la lucha contra la inflación, así como por una mayor demanda de energía y una debilidad del dólar estadounidense. Esto ha llevado a una mayor confianza en la divisa, a pesar de la cuenta corriente en déficit.\n\nEl posicionamiento especulativo en la divisa es extremadamente alcista, con 54.6K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes ha sido negativo, las expectativas de que el RBA suba las tasas de interés nuevamente en marzo han mantenido la presión alcista sobre la divisa. La rally del Aussie sigue ganando tracción, lo que podría llevar a una mayor volatilidad en el mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-11T08:36:15.820104+00:00",
+  "generatedAt": "2026-03-12T08:35:32.378904+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -13,7 +13,7 @@
     "inflation": 3.8,
     "unemployment": 4.1,
     "currentAccount": -2.9,
-    "rateMomentum": -0.5,
+    "rateMomentum": -0.25,
     "lastRateDecision": {
       "direction": "SUBIÓ",
       "delta": 0.25,
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 54635,
-    "fxPerformance1M": -1.2342,
+    "fxPerformance1M": -2.5029,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-11",
-    "latestNewsTs": 1773209100.0,
+    "lastUpdate": "2026-03-12",
+    "latestNewsTs": 1773296656.0,
     "newsHeadlines": [
-      "Chart alert: AUD/USD bullish breakout (finally) above 0.7140, new bullish impuls",
-      "The central bank bonanza returns next week",
-      "AUD/JPY rallies to fresh record high, above mid-113.00s on RBA rate hike bets an"
+      "RBA: March hike back in focus – Standard Chartered",
+      "While the World Panics, the Aussie Is Rallying. What’s Up With That?!",
+      "AUD/JPY rally accelerates, GBP/AUD falls as RBA turns more activist on inflation"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.04,
+    "avg_bond10y": 3.47,
+    "avg_fx_perf_1m": -0.32,
     "avg_cot": 4098.88
   }
 }

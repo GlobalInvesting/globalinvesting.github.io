@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11T08:36:34.510308+00:00",
+  "generatedAt": "2026-03-12T08:35:51.609876+00:00",
   "model": "llama-3.3-70b-versatile",
   "version": "5.0",
   "currencies": [
@@ -15,15 +15,15 @@
   "totalGenerated": 8,
   "totalReused": 0,
   "comtradeHits": 0,
-  "newsIntegrated": 22,
+  "newsIntegrated": 24,
   "keysUsed": 2,
   "errors": [],
   "results": {
     "USD": {
       "success": true,
       "reused": false,
-      "wordCount": 247,
-      "generatedAt": "2026-03-11T08:35:57.949098+00:00",
+      "wordCount": 227,
+      "generatedAt": "2026-03-12T08:35:14.190117+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -31,8 +31,8 @@
     "EUR": {
       "success": true,
       "reused": false,
-      "wordCount": 244,
-      "generatedAt": "2026-03-11T08:36:02.348578+00:00",
+      "wordCount": 240,
+      "generatedAt": "2026-03-12T08:35:18.896719+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -40,8 +40,8 @@
     "GBP": {
       "success": true,
       "reused": false,
-      "wordCount": 243,
-      "generatedAt": "2026-03-11T08:36:06.829733+00:00",
+      "wordCount": 239,
+      "generatedAt": "2026-03-12T08:35:23.528077+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -49,8 +49,8 @@
     "JPY": {
       "success": true,
       "reused": false,
-      "wordCount": 271,
-      "generatedAt": "2026-03-11T08:36:11.464537+00:00",
+      "wordCount": 232,
+      "generatedAt": "2026-03-12T08:35:27.877674+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -58,8 +58,8 @@
     "AUD": {
       "success": true,
       "reused": false,
-      "wordCount": 226,
-      "generatedAt": "2026-03-11T08:36:15.820104+00:00",
+      "wordCount": 225,
+      "generatedAt": "2026-03-12T08:35:32.378904+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 1
@@ -67,8 +67,8 @@
     "CAD": {
       "success": true,
       "reused": false,
-      "wordCount": 251,
-      "generatedAt": "2026-03-11T08:36:25.550719+00:00",
+      "wordCount": 253,
+      "generatedAt": "2026-03-12T08:35:42.362189+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 2
@@ -76,17 +76,17 @@
     "CHF": {
       "success": true,
       "reused": false,
-      "wordCount": 220,
-      "generatedAt": "2026-03-11T08:36:30.089545+00:00",
-      "newsIntegrated": 1,
+      "wordCount": 247,
+      "generatedAt": "2026-03-12T08:35:46.922090+00:00",
+      "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 2
     },
     "NZD": {
       "success": true,
       "reused": false,
-      "wordCount": 248,
-      "generatedAt": "2026-03-11T08:36:34.509927+00:00",
+      "wordCount": 240,
+      "generatedAt": "2026-03-12T08:35:51.609536+00:00",
       "newsIntegrated": 3,
       "exportDataSource": "fallback",
       "keyUsed": 2
@@ -97,8 +97,8 @@
     "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.04,
+    "avg_bond10y": 3.47,
+    "avg_fx_perf_1m": -0.32,
     "avg_cot": 4098.88
   }
 }

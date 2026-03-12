@@ -2,9 +2,9 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda se ha vuelto más expansiva, con una reducción de 0.25pp en la tasa de interés, lo que ha presionado a la baja la divisa. Esto se debe a que el menor carry diferencial hace que la divisa sea menos atractiva para los inversores. Aunque la inflación se encuentra por encima del objetivo, el crecimiento del PIB es superior al promedio global, lo que sugiere que la economía sigue siendo resiliente.\n\nLa balanza comercial de Nueva Zelanda se encuentra en déficit, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de leche y productos lácteos, carne y despojos comestibles, y cereales son fundamentales para la economía, y cualquier cambio en la demanda global o los precios de estas commodities puede afectar la balanza comercial. La noticia de que el NZD/USD permanece por debajo de 0.5950 debido a un aumento en la aversión al riesgo sugiere que la divisa sigue siendo vulnerable a los movimientos del mercado global.\n\nEl posicionamiento especulativo neto bajista, con -10.3K contratos netos, y el rendimiento FX del último mes de +1.51% vs USD, sugiere que el mercado sigue siendo cauteloso con respecto a la divisa. La noticia de que Wall Street se recupera mientras el petróleo se corrige puede ser una oportunidad o una trampa, lo que introduce incertidumbre en el mercado y puede afectar la divisa. En este contexto, es probable que la divisa siga siendo volátil en el corto plazo.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que ha generado presión bajista sobre la divisa. Esto se debe a que el menor carry reduce la atracción de inversores extranjeros, aunque la tasa de interés sigue siendo ligeramente inferior al promedio global. La inflación anual del 3.1% sigue por encima del objetivo, lo que podría sugerir que el banco central podría reconsiderar su postura en el futuro.\n\nLa balanza comercial de Nueva Zelanda muestra un déficit, influenciado por las exportaciones de leche y productos lácteos, carne y despojos comestibles, y cereales. La situación en el Medio Oriente, con noticias de ataques con drones en instalaciones energéticas de Omán, ha aumentado la aversión al riesgo y debilitado la divisa, como se ha visto en la caída del par NZD/USD hacia 0.5900. La reanudación de los bookings de contenedores por parte de CMA CGM en los puertos del Golfo podría ser un indicador de mejoras en el comercio regional.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -10.3K contratos netos, lo que sugiere que los inversores están apostando por una debilidad adicional de la divisa. Aunque el rendimiento FX del último mes ha sido positivo, con una apreciación del 1.33% frente al dólar estadounidense, la situación geopolítica y la política monetaria expansiva podrían seguir ejerciendo presión sobre la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-11T08:36:34.509927+00:00",
+  "generatedAt": "2026-03-12T08:35:51.609536+00:00",
   "exportComposition": "Principales exportaciones: leche y productos lácteos, carne y despojos comestibles, cereales",
   "newsCount": 3,
   "dataSnapshot": {
@@ -13,7 +13,7 @@
     "inflation": 3.1,
     "unemployment": 5.4,
     "currentAccount": -5.7,
-    "rateMomentum": -3.25,
+    "rateMomentum": -1.5,
     "lastRateDecision": {
       "direction": "BAJÓ",
       "delta": -0.25,
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
     },
     "cotPositioning": -10295,
-    "fxPerformance1M": 1.5066,
+    "fxPerformance1M": 1.3301,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-11",
-    "latestNewsTs": 1773197086.0,
+    "lastUpdate": "2026-03-12",
+    "latestNewsTs": 1773291190.0,
     "newsHeadlines": [
-      "NZD/USD remains below 0.5950 due to increased risk aversion",
-      "The U.S. Treasury sold $58 billion of 3 year notes at a high yield of 3.579%",
-      "Wall Street recovers as Oil corrects, opportunity or trap? – Dow Jones and US In"
+      "NZD/USD falls to near 0.5900 as risk aversion increases on Middle East war",
+      "Drone strikes hit Oman energy facility, vessels evacuate Mina Al Fahal terminal",
+      "Reuters says that Global shipper CMA CGM resumes bookings from Gulf ports"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.04,
+    "avg_bond10y": 3.47,
+    "avg_fx_perf_1m": -0.32,
     "avg_cot": 4098.88
   }
 }

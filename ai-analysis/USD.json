@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Esto se produce en un contexto en el que la inflación se mantiene por encima del objetivo, aunque se espera que el índice de precios al consumidor (CPI) se mantenga estable en febrero, según las expectativas. La decisión de la Fed de bajar tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación.\n\nLa balanza comercial de Estados Unidos muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. Las exportaciones de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves son fundamentales para entender el origen de este déficit. Aunque el déficit comercial es un factor de presión a la baja, la cuenta corriente también muestra un déficit, lo que sugiere que la economía estadounidense depende en parte de la inversión extranjera.\n\nEl posicionamiento especulativo neto es bajista, con -4.5K contratos netos, lo que sugiere que los inversores están apostando por una depreciación de la divisa. La expectativa de que el CPI se mantenga estable en febrero y la debilidad del dólar ante la publicación de este dato sugieren que el mercado está preparado para una posible continuación de la tendencia a la baja. Sin embargo, la entrada neta de capital y el rendimiento del bono a 10 años sugieren que la economía estadounidense sigue siendo atractiva para los inversores.",
+  "analysis": "La Reserva Federal acaba de bajar las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Esto se produce en un contexto de inflación anual del 2.4%, por encima del objetivo, y un crecimiento del PIB del 1.4% anual, superior al promedio global. Aunque los datos estructurales apuntan a una economía en expansión, la decisión de bajar tasas sugiere que el banco central está priorizando el crecimiento sobre la lucha contra la inflación.\n\nLa balanza comercial muestra un déficit pronunciado de -70.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves no son suficientes para compensar el déficit. Además, los precios del petróleo siguen siendo un factor clave en la economía, y los temores sobre la oferta de crudo están impulsando sus precios, lo que podría afectar la demanda de divisas.\n\nEl posicionamiento especulativo neto es bajista, con -4.5K contratos netos, y el rendimiento FX del último mes es de -1.05% vs USD, lo que indica una depreciación de la divisa. Aunque el oro ha mantenido pérdidas modestas debido a la reducción de las apuestas sobre recortes de tasas de la Fed, lo que ha impulsado los rendimientos de los bonos estadounidenses y la divisa, el panorama a corto plazo sigue siendo incierto.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-11T08:35:57.949098+00:00",
+  "generatedAt": "2026-03-12T08:35:14.190117+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": -4547,
-    "fxPerformance1M": -0.7346,
+    "fxPerformance1M": -1.0506,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-11",
-    "latestNewsTs": 1773208800.0,
+    "lastUpdate": "2026-03-12",
+    "latestNewsTs": 1773296014.0,
     "newsHeadlines": [
-      "US CPI set to hold steady at 2.4% YoY in February",
-      "Dollar Weakens Ahead of February CPI, Last Clean Inflation Read Before Iran War",
-      "Gold bulls seem hesitant despite Middle East tensions and softer USD; US CPI awa"
+      "Oil: Supply shock fears offset IEA release – Commerzbank",
+      "Gold sticks to modest losses as reduced Fed rate cut bets boost US bond yields a",
+      "Oil prices continue to be the tail that is wagging the dog"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 0.49,
     "avg_inflation": 2.26,
     "avg_unemployment": 4.7,
-    "avg_bond10y": 3.42,
-    "avg_fx_perf_1m": 0.04,
+    "avg_bond10y": 3.47,
+    "avg_fx_perf_1m": -0.32,
     "avg_cot": 4098.88
   }
 }
