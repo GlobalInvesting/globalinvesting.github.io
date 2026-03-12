@@ -2844,6 +2844,9 @@ const indicatorTooltips = {
                     : { status: 'Inicializando...', progress: 0 }
             );
             const [isLoading, setIsLoading] = useState(!_hasAnyCache);
+            // scoresVersion: incrementado cada vez que _precomputedScores se carga/actualiza,
+            // forzando un re-render para que getSortedCountries() y getStrength() usen los nuevos datos.
+            const [scoresVersion, setScoresVersion] = useState(0);
 
             const chartRefs = useRef({});
 
@@ -3679,7 +3682,7 @@ const hasCOTData = () => {
                         setIsLoading(false);
 
                         // Refresco silencioso de scores precalculados
-                        fetchStrengthScores().catch(e => console.warn('Background scores refresh failed:', e));
+                        fetchStrengthScores().then(() => setScoresVersion(v => v + 1)).catch(e => console.warn('Background scores refresh failed:', e));
 
                         // Refresco silencioso de tasas (siempre, expiran en 60s)
                         fetchForexRates().then(rates => {
@@ -3730,6 +3733,7 @@ const hasCOTData = () => {
                     try {
                         setDataLoadingStatus({ status: 'Cargando scores precalculados...', progress: 5 });
                         await fetchStrengthScores();  // loads _precomputedScores; null = JS fallback
+                        setScoresVersion(v => v + 1); // trigger re-render so getStrength() uses loaded scores
 
                         setDataLoadingStatus({ status: 'Cargando tipos de cambio...', progress: 10 });
                         const rates = await fetchForexRates();
