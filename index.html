@@ -2236,29 +2236,49 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
 
     // Función auxiliar para extraer top contribuciones
     const getTopContributions = (contributions, isPositive) => {
-        const entries = Object.entries(contributions)
-            .filter(([key, val]) => isPositive ? val > 0 : val < 0)
-            .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
-            .slice(0, 3);
-        
         const labels = {
-            'interestRate': 'Tasa de Interés',
-            'currentAccount': 'Cuenta Corriente',
-            'tradeBalance': 'Balanza Comercial',
-            'gdpGrowth': 'Crecimiento PIB',
-            'inflation': 'Inflación',
-            'unemployment': 'Desempleo',
-            'safe_haven_score': 'Safe Haven',
-            'carry_premium': 'Carry Premium',
+            'interestRate':       'Tasa de Interés',
+            'inflation':          'Inflación',
+            'outlookScore':       'Perspectiva BC',
+            'rateMomentum':       'Momentum de Tasas',
+            'currentAccount':     'Cuenta Corriente',
+            'tradeBalance':       'Balanza Comercial',
+            'debt':               'Deuda Pública',
+            'termsOfTrade':       'Términos de Intercambio',
+            'gdpGrowth':          'Crecimiento PIB',
+            'unemployment':       'Desempleo',
+            'production':         'Producción Industrial',
+            'retailSales':        'Ventas al Retail',
+            'wageGrowth':         'Crecimiento Salarial',
+            'manufacturingPMI':   'PMI Manufactura',
+            'servicesPMI':        'PMI Servicios',
+            'cotPositioning':     'Posicionamiento COT',
+            'consumerConfidence': 'Confianza Consumidor',
+            'businessConfidence': 'Confianza Empresarial',
+            'economicSurprise':   'Sorpresa Económica',
+            'capitalFlows':       'Flujos de Capital',
+            'fxPerformance1M':    'Performance FX 1M',
+            'bond10y':            'Bono 10 años',
+            'safe_haven_score':   'Safe Haven',
+            'carry_premium':      'Carry Premium',
             'commodity_exposure': 'Exposición Commodities',
-            'debt_sustainability': 'Sostenibilidad Deuda',
-            'cotPositioning': 'Posicionamiento COT',
-            'reserve_currency': 'Prima Divisa Reserva'
+            'debt_sustainability':'Sostenibilidad Deuda',
+            'reserve_currency':   'Prima Divisa Reserva'
         };
-        
+
+        // Para fortalezas: top 3 contribuidores más altos
+        // Para debilidades: bottom 3 contribuidores más bajos (los más rezagados vs sus pares)
+        const nonZeroEntries = Object.entries(contributions).filter(([, val]) => val > 0);
+        let entries;
+        if (isPositive) {
+            entries = nonZeroEntries.sort((a, b) => b[1] - a[1]).slice(0, 3);
+        } else {
+            entries = nonZeroEntries.sort((a, b) => a[1] - b[1]).slice(0, 3);
+        }
+
         return entries.map(([key, val]) => ({
             factor: labels[key] || key,
-            impact: val.toFixed(1)
+            impact: isPositive ? `+${val.toFixed(1)}` : val.toFixed(1)
         }));
     };
 
@@ -5221,7 +5241,7 @@ const sentiment = getSentiment(strength);
     <div>
         <div className="section-header">
             <div className="section-title">Mejores Pares de Divisas - Análisis Fundamental</div>
-            <div className="section-meta">Basado en diferenciales de fortaleza fundamental · Horizonte estimado: 2–6 semanas · Solo señales con diferencial ≥20 pts (backtest: HR 49.8%, Sharpe +0.46)</div>
+            <div className="section-meta">Basado en diferenciales de fortaleza fundamental · Horizonte estimado: 2–6 semanas · Solo señales con diferencial ≥20 pts</div>
         </div>
         
         <div style={{ 
@@ -5317,7 +5337,7 @@ const sentiment = getSentiment(strength);
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.05em'
                                 }}>
-                                    Fortaleza: {rec.strongCurrency}
+                                    Principales impulsores: {rec.strongCurrency}
                                 </div>
                                 <div style={{ 
                                     fontSize: '1rem', 
@@ -5347,7 +5367,7 @@ const sentiment = getSentiment(strength);
                                                 color: 'var(--green-strong)',
                                                 fontWeight: 600 
                                             }}>
-                                                +{reason.impact}
+                                                {reason.impact}
                                             </span>
                                         </div>
                                     ))
@@ -5378,7 +5398,7 @@ const sentiment = getSentiment(strength);
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.05em'
                                 }}>
-                                    Debilidad: {rec.weakCurrency}
+                                    Indicadores rezagados: {rec.weakCurrency}
                                 </div>
                                 <div style={{ 
                                     fontSize: '1rem', 
