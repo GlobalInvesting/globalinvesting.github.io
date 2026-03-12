@@ -1283,7 +1283,7 @@
         <p>El dashboard incluye los siguientes indicadores actualizados diariamente: PIB y Crecimiento del PIB, Tasas de Interés de Bancos Centrales (Fed, BCE, BoE, BoJ, RBA, BoC, SNB, RBNZ), Inflación (IPC), Desempleo, Cuenta Corriente, Deuda Pública, Balanza Comercial, Producción Industrial, Ventas Minoristas, Crecimiento Salarial, PMI Manufacturero, Posicionamiento COT (CFTC), Bonos Soberanos 10Y, Confianza del Consumidor, Confianza Empresarial, Flujos de Capital, Expectativas de Inflación y Términos de Intercambio.</p>
 
         <h2>Análisis Fundamental de Divisas</h2>
-        <p>Calculamos un índice de fortaleza fundamental para cada divisa basado en 22 indicadores ponderados en 6 grupos que suman 100%: Política Monetaria (29%) • Balance Externo (19%) • Crecimiento y Empleo (16%) • Sentimiento de Mercado (21%) • FX Confirmador (11%) • Consumo y Salarios (4%).</p>
+        <p>Calculamos un índice de fortaleza fundamental para cada divisa basado en 22 indicadores ponderados en 6 grupos que suman 100%: Política Monetaria (29%) • Balance Externo (19%) • Crecimiento y Empleo (16%) • Sentimiento de Mercado (22%) • FX Confirmador (11%) • Consumo (3%). El modelo incluye ajustes contextuales data-driven: safe haven premium, carry premium, ToT momentum para divisas commodity (AUD/CAD/NZD), prima de divisa de reserva para el USD, y detección de ciclos recesivos.</p>
 
         <h2>Bancos Centrales</h2>
         <p>Monitorizamos la política monetaria de la Reserva Federal de Estados Unidos (Fed), el Banco Central Europeo (BCE), el Banco de Inglaterra (BoE), el Banco de Japón (BoJ), el Banco de la Reserva de Australia (RBA), el Banco de Canadá (BoC), el Banco Nacional Suizo (SNB) y el Banco de la Reserva de Nueva Zelanda (RBNZ).</p>
@@ -2005,7 +2005,8 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             'carry_premium': 'Carry Premium',
             'commodity_exposure': 'Exposición Commodities',
             'debt_sustainability': 'Sostenibilidad Deuda',
-            'cotPositioning': 'Posicionamiento COT'
+            'cotPositioning': 'Posicionamiento COT',
+            'reserve_currency': 'Prima Divisa Reserva'
         };
         
         return entries.map(([key, val]) => ({
@@ -2135,7 +2136,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '6.3.0-2026-03-09';
+            const DASHBOARD_VERSION = '6.4.0-2026-03-12';
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -2485,12 +2486,12 @@ const TRADING_WEIGHTS = {
 
     // Tier 6: Consumo y Salarios (4%)
     retailSales:           { weight: 0.03, direction: 'stable' },
-    wageGrowth:            { weight: 0.01, direction: 'stable' },  // v6.3: 0.02→0.01
+    wageGrowth:            { weight: 0.00, direction: 'stable' },  // v6.4: 0.01→0.00 (peso cedido a servicesPMI; wageGrowth ya está capturado indirectamente vía inflation y laborales)
 
     // Tier 3: Sentimiento de Mercado (21%) — posicionamiento real del smart money
     // v6.0: cotPositioning sube 0.05 → 0.06. manufacturingPMI sube 0.04 → 0.05.
     manufacturingPMI:      { weight: 0.03, direction: 'expansion'       },
-    servicesPMI:           { weight: 0.04, direction: 'expansion'       },
+    servicesPMI:           { weight: 0.05, direction: 'expansion'       },  // v6.4: 0.04→0.05 (servicios >70% PIB G8, driver dominante BoE/ECB; wageGrowth baja 0.01→0.00 para mantener suma 100%)
     cotPositioning:        { weight: 0.06, direction: 'moderate_bullish' },
     consumerConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
     businessConfidence:    { weight: 0.02, direction: 'sentiment_index'  },  // v6.3: 0.03→0.02
@@ -3276,23 +3277,88 @@ const calculateESI = (currency, data, allEconomicData, calendarEvents) => {
         return rawResult * fxPenaltySH;
     };
 
-    // 2. Commodity Exposure — dynamic
+    // 2. Commodity Exposure — dynamic v6.4 (ToT Momentum proxy)
+    // ─────────────────────────────────────────────────────────────────────
+    // Corrección P1 del informe de auditoría (12-mar-2026):
+    // El modelo anterior ignoraba el canal commodities para CAD/AUD/NZD porque
+    // no tenía acceso a WTI/Brent/Iron Ore directamente. La solución 100% data-driven
+    // es usar termsOfTrade (ToT) como proxy del precio de commodities:
+    //   · ToT alto relativo al G8 → los commodities que exporta el país valen más
+    //     que los que importa → superávit implícito de términos de intercambio → bullish
+    //   · ToT bajo relativo al G8 → los commodities importados son caros (JPY, EUR
+    //     importadores de energía) → presión sobre la cuenta corriente → bearish
+    //
+    // Para CAD: ToT 102 (neutro G8=103), pero con crecimiento de producción +1.0%
+    //   → el modelo detecta que no hay ventaja estructural extra actualmente.
+    //   Cuando WTI sube bruscamente el ToT de CAD sube por encima de 108 → premio automático.
+    //
+    // Para AUD: ToT 116 (muy por encima del G8) → premio máximo (+6 pts).
+    //   Captura el efecto hierro/cobre en tiempo real desde los datos de Trading Economics.
+    //
+    // Algoritmo:
+    //   1. Calcular mediana ToT del G8 en tiempo real (cross-sectional, data-driven)
+    //   2. ToT z-score de la divisa vs el G8
+    //   3. Multiplicar por dependency factor (producción + tradeBalance)
+    //   4. Modular por crecimiento global (demanda de commodities)
+    //   5. Cap ±8 puntos (proportional al peso total del ajuste contextual ±15)
     const calculateCommodityScore = (currency, data, allEconomicData) => {
+        // Solo aplica a commodity exporters estructurales
         if (!['AUD', 'CAD', 'NZD'].includes(currency)) return 0;
-        let dep = 0;
-        if (data.tradeBalance !== null && data.tradeBalance > 1000)
-            dep = Math.min(data.tradeBalance / 10000, 1.0);
-        if (data.production !== null && data.production !== undefined) {
-            if (data.production > 2.0) dep += 0.3;
-            else if (data.production > 0.5) dep += 0.15;
+
+        // ── Paso 1: ToT relativo al G8 ──────────────────────────────────
+        const totVals = Object.values(allEconomicData)
+            .map(d => d.termsOfTrade)
+            .filter(v => v !== null && v !== undefined && !isNaN(v) && v > 50 && v < 200);
+
+        const totCurrent = data.termsOfTrade;
+        let totZScore = 0;
+        if (totCurrent !== null && totCurrent !== undefined && totVals.length >= 4) {
+            const sortedToT = [...totVals].sort((a, b) => a - b);
+            const midT = Math.floor(sortedToT.length / 2);
+            const totMedian = sortedToT.length % 2 === 0
+                ? (sortedToT[midT - 1] + sortedToT[midT]) / 2
+                : sortedToT[midT];
+            const totStd = Math.sqrt(
+                totVals.reduce((s, v) => s + Math.pow(v - totMedian, 2), 0) / totVals.length
+            );
+            totZScore = totStd > 0 ? (totCurrent - totMedian) / Math.max(totStd, 2.0) : 0;
         }
+
+        // ── Paso 2: Dependency factor (cuánto depende la economía de commodities) ──
+        // Combinación de tradeBalance (ya normalizado como %PIB) y producción industrial.
+        // dep = 0 (sin dependencia) → 1.0 (alta dependencia)
+        let dep = 0.35; // base mínima para los 3 commodity exporters G8
+        // tradeBalance ya está en %PIB (normalizado en scoringData arriba)
+        const tbPct = data.tradeBalance;
+        if (tbPct !== null && tbPct !== undefined) {
+            if (tbPct > 0.5)       dep += 0.4;
+            else if (tbPct > 0.0)  dep += 0.2;
+            else if (tbPct > -0.3) dep += 0.0;
+            else                   dep -= 0.1; // déficit comercial = menos dependencia de exports
+        }
+        if (data.production !== null && data.production !== undefined) {
+            if (data.production > 2.0)      dep += 0.25;
+            else if (data.production > 0.5) dep += 0.10;
+        }
+        dep = Math.min(dep, 1.0);
+
+        // ── Paso 3: Crecimiento global como modulador de demanda ──────────
         const growthRates = Object.values(allEconomicData)
             .map(d => d.gdpGrowth).filter(v => v !== null && v !== undefined && !isNaN(v));
         const globalGrowth = growthRates.length > 0
-            ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length : 1.5;
-        if (globalGrowth > 2.5) return dep * 3;
-        if (globalGrowth > 1.5) return 0;
-        return -(dep * 5);
+            ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length : 1.0;
+        // Si el crecimiento global es débil, los commodities tienen menos demanda estructural
+        const growthMult = globalGrowth > 2.0 ? 1.3
+                         : globalGrowth > 1.0 ? 1.0
+                         : globalGrowth > 0.0 ? 0.7
+                         : 0.4;
+
+        // ── Paso 4: Score final ──────────────────────────────────────────
+        // totZScore × dep × growthMult → puntos adicionales
+        // z=+1 (ToT 1 stddev arriba del G8), dep=0.8, growthMult=1.0 → ~4.8 pts
+        // z=+2 (ToT 2 stddev arriba, como AUD), dep=0.85, growthMult=1.0 → ~8.5 → cap 8
+        const rawAdj = totZScore * dep * growthMult * 6;
+        return Math.max(-8, Math.min(8, rawAdj));
     };
 
     // 3. Carry Trade Premium — dynamic
@@ -3349,6 +3415,67 @@ const calculateESI = (currency, data, allEconomicData, calendarEvents) => {
         if (data.gdpGrowth !== null && data.gdpGrowth < 1.0) s -= 2;
         if (data.currentAccount !== null && data.currentAccount > 2.0) s += 2;
         return Math.max(s, -8);
+    };
+
+    // 6b. Reserve Currency Premium — 100% data-driven (v6.4)
+    // ─────────────────────────────────────────────────────────────────────
+    // Corrección P2 del informe de auditoría (12-mar-2026):
+    // El USD tiene un "exorbitant privilege" (Eichengreen) que hace que su déficit
+    // de cuenta corriente sea parcialmente financiado automáticamente por la demanda
+    // global de activos denominados en dólares (Treasuries, reservas de BCs).
+    // El modelo anterior penalizaba el déficit de CA de USD igual que el de NZD,
+    // lo cual produce una subestimación sistemática del USD.
+    //
+    // Solución 100% data-driven:
+    //   El premium se detecta usando 2 señales observables:
+    //   1. GDP nominal relativo al G8: la mayor economía suele emitir la divisa
+    //      de reserva. Si el GDP es >3× el promedio G8, el factor se activa.
+    //   2. CA deficit financing: si la CA es negativa pero los flujos de capital
+    //      son positivos (financiación voluntaria del déficit), reducir la penalización.
+    //      Esto es lo que ocurre con USD — el mundo voluntariamente financia su déficit.
+    //
+    // El premium se aplica como reducción de la penalización de CA y deuda,
+    // NO como puntos extra. Es una corrección de sesgo, no una bonificación.
+    // Máximo: +5 puntos. Solo activa si GDP es el mayor del G8 por margen significativo.
+    const calculateReserveCurrencyPremium = (currency, data, allEconomicData) => {
+        if (data.gdp === null || data.gdp === undefined) return 0;
+
+        // ── Factor 1: ¿Es la mayor economía del G8 por margen significativo? ──
+        const gdpVals = Object.values(allEconomicData)
+            .map(d => d.gdp)
+            .filter(v => v !== null && v !== undefined && !isNaN(v) && v > 0);
+        if (gdpVals.length < 4) return 0;
+
+        const gdpSorted = [...gdpVals].sort((a, b) => b - a);
+        const gdpMax    = gdpSorted[0];
+        const gdpSecond = gdpSorted[1] || gdpMax;
+
+        // Solo la economía dominante recibe el premium
+        // La dominancia se mide como: gdp_actual / gdp_segundo_mayor
+        // Si el ratio es > 1.5 (50% más grande que el segundo), activa el premium.
+        // En 2026: USD ~$29T, EUR ~$16T → ratio ≈ 1.81 → activa
+        const dominanceRatio = data.gdp === gdpMax ? data.gdp / Math.max(gdpSecond, 1) : 0;
+        if (dominanceRatio < 1.5) return 0; // No es suficientemente dominante
+
+        // ── Factor 2: ¿El déficit CA está siendo financiado por flujos de capital? ──
+        // Si CA es negativa Y capitalFlows es positiva → financiación voluntaria activa
+        // Esto captura el "Triffin dilemma": el emisor de la divisa de reserva
+        // DEBE tener déficit CA (provee la divisa al mundo), y el mundo la demanda.
+        const ca = data.currentAccount;
+        const cf = data.capitalFlows; // ya normalizado como %PIB en scoringData
+        const hasFinancedDeficit = (ca !== null && ca < 0) && (cf !== null && cf > 0);
+
+        // ── Premium calculation ──────────────────────────────────────────
+        // Base premium por dominancia: ratio 1.5 → base 2pts, ratio 1.8 → ~2.8pts, ratio 2.5+ → cap 5pts
+        // Fórmula: 2 pts base para cualquier economía dominante (>1.5× segunda mayor)
+        // + escala proporcional al margen de dominancia adicional
+        const dominancePts = Math.min(5, 2.0 + (dominanceRatio - 1.5) / 0.5 * 1.5);
+
+        // Bonus por financiación activa del déficit (señal más fuerte del premium)
+        const financingBonus = hasFinancedDeficit ? Math.min(2, dominancePts * 0.5) : 0;
+
+        const totalPremium = dominancePts + financingBonus;
+        return Math.min(5, totalPremium);
     };
 
     // 7. Inflation Stability — dynamic
@@ -3604,6 +3731,7 @@ const calculateCotContrarianAdj = (data, countryObj) => {
     const lowRateSafeHavenAdj = calculateLowRateSafeHavenAdj(currency, data, allEconomicData);
     const yieldCurveAdj       = calculateYieldCurveAdj(data);
     const cotContrarianAdj    = calculateCotContrarianAdj(data, countryObj);
+    const reserveCurrencyAdj  = calculateReserveCurrencyPremium(currency, scoringData, allEconomicData); // v6.4 P2
 
     // COT Contrarian Override para momentum divergente
     const cotMomentumDivergence = (() => {
@@ -3630,6 +3758,7 @@ const calculateCotContrarianAdj = (data, countryObj) => {
     contributions['yield_curve_proxy']       = yieldCurveAdj;
     contributions['cot_contrarian']          = cotContrarianAdj;
     contributions['cot_momentum_divergence'] = cotMomentumDivergence;
+    contributions['reserve_currency']        = reserveCurrencyAdj; // v6.4
 
     // ── ESCALA 0–100 CON BANDAS FIJAS ────────────────────────────────────
     // Los ajustes contextuales operan en el mismo espacio que el score base.
@@ -3638,7 +3767,7 @@ const calculateCotContrarianAdj = (data, countryObj) => {
     const totalAdj = safeHavenAdj + commodityAdj + carryAdj +
                      recessionAdj + deficitAdj + debtAdj + inflationStabAdj +
                      lowRateSafeHavenAdj + yieldCurveAdj + cotContrarianAdj +
-                     cotMomentumDivergence + stagflationAdj; // v6.0 FIX-7
+                     cotMomentumDivergence + stagflationAdj + reserveCurrencyAdj; // v6.4: +reserveCurrencyAdj
     const cappedAdj = Math.max(-15, Math.min(15, totalAdj));
     const normalizedScore = Math.max(0, Math.min(100, baseScore + cappedAdj));
 
