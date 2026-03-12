@@ -341,6 +341,24 @@
             <strong style="color:#3fb950;">→ adj_carry = min(1.31 × 2, 5) = +2.62 puntos</strong>
         </div>
 
+        <h3>6. Corrección Hawkish-Pause (FIX-6)</h3>
+        <p>Cuando un banco central está en <em>pausa hawkish</em> — mantiene tasas sin subirlas pero con sesgo restrictivo — el momentum de tasas (<code>rateMomentum</code>) tiende a ser ≈ 0, subestimando la postura real del banco. FIX-6 corrige esto.</p>
+        <p><strong>Ejemplo: JPY en pausa hawkish — datos reales 2026-03-12</strong></p>
+        <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
+            rateMomentum_raw  = <strong>+0.05</strong>  (variación de tasa últimos 12 meses ≈ 0)<br>
+            bcOutlook         = <strong>Hawkish</strong>  (rm12 &ge; 0.25 por rm24 o señal del BoJ)<br>
+            Condición FIX-6   = outlook == "Hawkish" <strong>AND</strong> −0.25 &le; rm_raw &le; 0.50<br>
+            <br>
+            eff_rm = 0.3  <span style="color:#8b949e;"># boost aplicado en lugar de 0.05</span><br>
+            <br>
+            Score PM sin FIX-6: rateMomentum_raw = 0.05  → contribución ≈ <strong style="color:#f85149;">+1.2 pts</strong><br>
+            Score PM con FIX-6: eff_rm = 0.30            → contribución ≈ <strong style="color:#3fb950;">+6.8 pts</strong><br>
+            <strong style="color:#3fb950;">→ Δ score base ≈ +5.6 puntos por corrección hawkish-pause</strong>
+        </div>
+        <p style="margin-top:8px;font-size:0.9rem;color:var(--text-secondary, #8b949e);">
+            <strong>Sin FIX-6</strong>, una divisa con banco central hawkish en pausa quedaría subvalorada frente a una con banco central dovish activo que acaba de recortar tasas. La corrección garantiza que el sesgo forward del banco central tenga peso real en el score aunque no haya habido movimiento de tasas reciente.
+        </p>
+
         <p style="margin-top:16px;"><em>Todos los ajustes se suman y se cappan en el rango <strong>[-15, +15]</strong> antes de añadirse al score base. El score final es <code>max(0, min(100, base + total_adj_capped))</code>.</em></p>
     </div>
 

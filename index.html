@@ -3287,7 +3287,7 @@ const TooltipCell = ({ children, tooltip, title }) => {
     const handleMouseMove  = (e) => { if (showTooltip) updatePosition(e); };
 
     return (
-        <th className="tooltip-header">
+        <th scope="col" className="tooltip-header">
             {children}
             <span
                 className="tooltip-icon"
@@ -4214,6 +4214,18 @@ const DataHealthCheck = ({ economicData }) => {
                 Ordenadas por fortaleza fundamental · Horizonte 2-6 semanas · Actualizado {lastUpdate ? lastUpdate.toLocaleDateString('es-ES') : ''}
             </div>
         </div>
+
+        {/* Región aria-live: anuncia a lectores de pantalla cuando los scores se actualizan */}
+        <div
+            aria-live="polite"
+            aria-atomic="false"
+            aria-relevant="text"
+            style={{position:'absolute',width:'1px',height:'1px',padding:0,margin:'-1px',overflow:'hidden',clip:'rect(0,0,0,0)',whiteSpace:'nowrap',border:0}}
+        >
+            {!isLoading && Object.keys(economicData).length > 0
+                ? `Scores actualizados. Ranking actual: ${getSortedCountries().map(c => `${c.code} ${Math.round(getStrength(c.code).score)}`).join(', ')}.`
+                : isLoading ? 'Cargando datos de fortaleza de divisas...' : ''}
+        </div>
         
         {Object.keys(economicData).length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
@@ -4568,10 +4580,11 @@ const DataHealthCheck = ({ economicData }) => {
                                     <div className="section-title">Mapa de Calor de Indicadores Económicos</div>
                                 </div>
                                 <div className="heatmap-container">
-                                    <table className="heatmap-table">
+                                    <table className="heatmap-table" role="grid" aria-label="Mapa de calor de indicadores económicos — 8 divisas principales, 22 indicadores">
+                                        <caption style={{position:'absolute',width:'1px',height:'1px',padding:0,margin:'-1px',overflow:'hidden',clip:'rect(0,0,0,0)',whiteSpace:'nowrap',border:0}}>Indicadores macroeconómicos para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD. Cada celda muestra el valor actual del indicador; el color indica fortaleza relativa (verde = favorable, rojo = desfavorable).</caption>
                                         <thead>
                                             <tr>
-                                                <th></th>
+                                                <th scope="col">Divisa</th>
                                                 <TooltipCell title="Síntesis General" tooltip="Índice de fortaleza fundamental (0-100) basado en 22 indicadores ponderados. Horizonte de validez: 2-6 semanas. FX momentum 1M basket-adjusted actúa como confirmador (8%).">
                                                     General<br/><span style={{fontSize: '0.6rem', fontWeight: 400, color: 'var(--text-tertiary)'}}>Síntesis</span>
                                                 </TooltipCell>
@@ -4650,7 +4663,7 @@ const sentiment = getSentiment(strength);
                                                 
                                                 return (
                                                     <tr key={country.code}>
-                                                        <td>
+                                                        <td scope="row">
                                                             <div className="country-cell">
                                                                 <span className="country-flag flag-emoji">{country.flag}</span>
                                                                 <div className="country-info">
