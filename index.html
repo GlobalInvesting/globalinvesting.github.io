@@ -2069,10 +2069,14 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
             const avgQuality = (strongData.dataQuality + weakData.dataQuality) / 2;
             const confidence = spreadStrength > 25 ? 'Alta' : spreadStrength > 18 ? 'Media' : 'Baja'; // v6.4: umbrales subidos por backtest (≥18→Sharpe 0.85, HR 55%)
 
-            // Momentum confirmation filter (same logic as LONG, reversed direction for SHORT)
+            // Momentum confirmation filter for SHORT (par = WEAK/STRONG, ej: GBP/AUD).
+            // El par cae cuando el strong sube más que el weak → CONFIRMA el SHORT.
+            // Adverso = el par SUBE (strong cayó vs weak), es decir strongFx - weakFx < -2%.
+            // FIX v6.5: fórmula anterior (weakFx - strongFx) estaba invertida y generaba
+            // falsos positivos en señales confirmadas por precio (ej: GBP/AUD SHORT).
             const strongFxS = (economicData[strongCurr] || {}).fxPerformance1M ?? null;
             const weakFxS   = (economicData[weakCurr]   || {}).fxPerformance1M ?? null;
-            const pairMom1MS = (strongFxS !== null && weakFxS !== null) ? weakFxS - strongFxS : null;
+            const pairMom1MS = (strongFxS !== null && weakFxS !== null) ? strongFxS - weakFxS : null;
             const momentumOpposingS = pairMom1MS !== null && pairMom1MS < -2.0;
             // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
             const jpyAsShortS = weakCurr === 'JPY';
@@ -5164,7 +5168,9 @@ const DataHealthCheck = ({ economicData }) => {
                         // Badge momentum: confirmación positiva cruzada (FX + COT alineados)
                         const strongMomentum = (fx !== null && fx > 1.5) && (cot !== null && cot > 15000);
                         if (scoreRelevant && strongMomentum && !weakMonetary) {
-                            return { type: 'momentum', label: '✓ Momentum', title: 'FX momentum y posicionamiento COT alineados — señal de momentum operativo confirmada.' };
+                            const fxStr = fx !== null ? `FX +${fx.toFixed(1)}% (1M)` : 'FX positivo';
+                            const cotStr = cot !== null ? `COT largo neto ${cot > 0 ? '+' : ''}${Math.round(cot / 1000)}K` : 'COT confirmado';
+                            return { type: 'momentum', label: '✓ Momentum', title: `${fxStr} · ${cotStr} — señal de momentum operativo confirmada.` };
                         }
                         return null;
                     })();
@@ -6145,7 +6151,10 @@ const sentiment = getSentiment(strength);
                                     Confianza: {rec.confidence}
                                 </span>
                                 {rec.momentumOpposing && (
-                                    <span title={`El precio se movió ${rec.pairMom1M?.toFixed(1)}% en contra de la señal fundamental el último mes. El backtest muestra que estas señales tienen menor fiabilidad.`} style={{
+                                    <span title={rec.type === 'short'
+                                        ? `El par subió +${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal SHORT — el strong cayó frente al débil. El backtest muestra HR ~29% en estas condiciones. Considerar esperar confirmación de precio.`
+                                        : `El par cayó -${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal LONG — el strong cayó frente al débil. El backtest muestra HR ~29% en estas condiciones. Considerar esperar confirmación de precio.`
+                                    } style={{
                                         fontSize: '0.75rem',
                                         background: 'rgba(245, 158, 11, 0.15)',
                                         color: '#f59e0b',
@@ -6154,7 +6163,7 @@ const sentiment = getSentiment(strength);
                                         padding: '2px 7px',
                                         cursor: 'help'
                                     }}>
-                                        ⚠ Momento adverso
+                                        ⚠ Precio divergente
                                     </span>
                                 )}
                                 {rec.jpyAsShort && (
