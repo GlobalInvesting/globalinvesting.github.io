@@ -1,9 +1,45 @@
 {
   "currency": "USD",
   "indicator": "gdpGrowth",
-  "source": "Training knowledge + official sources (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Eurostat, BLS, ONS)",
-  "fetched": "2026-03-10",
+  "source": "WorldBank:NY.GDP.MKTP.KD.ZG",
+  "fetched": "2026-03-12",
   "observations": [
+    {
+      "date": "2015-06-15",
+      "value": 2.9456
+    },
+    {
+      "date": "2016-06-15",
+      "value": 1.8195
+    },
+    {
+      "date": "2017-06-15",
+      "value": 2.4576
+    },
+    {
+      "date": "2018-06-15",
+      "value": 2.9665
+    },
+    {
+      "date": "2019-06-15",
+      "value": 2.5838
+    },
+    {
+      "date": "2020-06-15",
+      "value": -2.163
+    },
+    {
+      "date": "2021-06-15",
+      "value": 6.0551
+    },
+    {
+      "date": "2022-06-15",
+      "value": 2.5124
+    },
+    {
+      "date": "2023-06-15",
+      "value": 2.8876
+    },
     {
       "date": "2024-01-15",
       "value": 1.6
@@ -11,6 +47,10 @@
     {
       "date": "2024-04-15",
       "value": 3.0
+    },
+    {
+      "date": "2024-06-15",
+      "value": 2.793
     },
     {
       "date": "2024-07-15",
