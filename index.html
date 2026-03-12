@@ -1764,6 +1764,54 @@ const fetchExtendedData = async (countryCode) => {
             });
         };
 
+// ── STRENGTH SCORES — v6.4 hybrid loader ─────────────────────────────────────
+// Primary: reads strength-scores/latest.json generated daily by calculate_scores.py
+// Fallback: returns null → calculateStrength() JS runs as before
+let _precomputedScores = null;  // module-level cache
+
+const fetchStrengthScores = async () => {
+    const cacheKey = 'strength_scores_latest';
+    const cached = CacheManager.get(cacheKey);
+    if (cached !== null) { _precomputedScores = cached; return cached; }
+    try {
+        const url = 'https://globalinvesting.github.io/strength-scores/latest.json';
+        const resp = await fetchWithTimeout(url, { cache: 'no-cache', mode: 'cors' }, 5000);
+        if (!resp.ok) throw new Error('strength-scores/latest.json not available');
+        const data = await resp.json();
+        // Validate: must have scores for all 8 currencies and a recent timestamp
+        const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+        const hasAll = currencies.every(c => data.scores && data.scores[c] !== undefined);
+        if (!hasAll) throw new Error('Incomplete scores payload');
+        const ageMs = Date.now() - new Date(data.lastUpdate).getTime();
+        if (ageMs > 48 * 3600 * 1000) console.warn('[scores] Data is >48h old, using anyway');
+        CacheManager.set(cacheKey, data, 3600); // cache 1h
+        _precomputedScores = data;
+        console.log(`[scores] Loaded precomputed v${data.modelVersion} (${data.lastUpdate})`);
+        return data;
+    } catch (e) {
+        console.warn('[scores] Fallback to JS model:', e.message);
+        _precomputedScores = null;
+        return null;
+    }
+};
+
+// Wrapper: returns precomputed score object if available, else calls calculateStrength()
+const getStrength = (currency, data, forexRates, allEconomicData, calendarEvents) => {
+    if (_precomputedScores && _precomputedScores.scores && _precomputedScores.scores[currency]) {
+        const s = _precomputedScores.scores[currency];
+        return {
+            score:        s.score,
+            confidence:   s.confidence || { lower: s.score - 5, upper: s.score + 5 },
+            contributions: s.contributions || {},
+            dataQuality:  s.dataQuality || 1,
+            scoringData:  s.scoringData || {},
+            bcOutlook:    s.bcOutlook,
+            contextualAdj: s.contextualAdj || {}
+        };
+    }
+    return calculateStrength(currency, data, forexRates, allEconomicData, calendarEvents);
+};
+
 const fetchAIAnalysis = async () => {
     const cacheKey = 'ai_analysis_Groq';
     const cached = CacheManager.get(cacheKey);
@@ -1979,7 +2027,7 @@ const generateForexPairRecommendations = (economicData, forexRates, calendarEven
     const strengthScores = {};
     countries.forEach(country => {
         const data = economicData[country.code] || {};
-        const strengthObj = calculateStrength(country.code, data, forexRates, economicData, calendarEvents);
+        const strengthObj = getStrength(country.code, data, forexRates, economicData, calendarEvents);
         strengthScores[country.code] = {
             score: strengthObj.score,
             dataQuality: strengthObj.dataQuality,
@@ -4566,7 +4614,7 @@ if (economicData[currency]?.outlook && country) {
 }
     
     // ✅ CORRECCIÓN: Obtener objeto y extraer score
-    const strengthObj = calculateStrength(currency, data, forexRates, economicData, (economicCalendar||{}).events||null);
+    const strengthObj = getStrength(currency, data, forexRates, economicData, (economicCalendar||{}).events||null);
     const strength = strengthObj.score;
     const sentiment = getSentiment(strength);
 
@@ -4833,8 +4881,8 @@ const getSortedCountries = () => {
         const dataB = economicData[b.code] || {};
         
         // Primero: Ordenar por strength score
-        const strengthObjA = calculateStrength(a.code, dataA, forexRates, economicData, (economicCalendar||{}).events||null);
-        const strengthObjB = calculateStrength(b.code, dataB, forexRates, economicData, (economicCalendar||{}).events||null);
+        const strengthObjA = getStrength(a.code, dataA, forexRates, economicData, (economicCalendar||{}).events||null);
+        const strengthObjB = getStrength(b.code, dataB, forexRates, economicData, (economicCalendar||{}).events||null);
         
         const scoreA = strengthObjA.score || 50;
         const scoreB = strengthObjB.score || 50;
@@ -4914,6 +4962,9 @@ const hasCOTData = () => {
                         console.log('⚡ Caché completo — dashboard listo al instante');
                         setIsLoading(false);
 
+                        // Refresco silencioso de scores precalculados
+                        fetchStrengthScores().catch(e => console.warn('Background scores refresh failed:', e));
+
                         // Refresco silencioso de tasas (siempre, expiran en 60s)
                         fetchForexRates().then(rates => {
                             setForexRates(rates);
@@ -4961,6 +5012,9 @@ const hasCOTData = () => {
                     }, 60000);
 
                     try {
+                        setDataLoadingStatus({ status: 'Cargando scores precalculados...', progress: 5 });
+                        await fetchStrengthScores();  // loads _precomputedScores; null = JS fallback
+
                         setDataLoadingStatus({ status: 'Cargando tipos de cambio...', progress: 10 });
                         const rates = await fetchForexRates();
                         setForexRates(rates);
@@ -5284,7 +5338,7 @@ const DataHealthCheck = ({ economicData }) => {
             <div className="currency-grid">
                 {getSortedCountries().map(country => {
                     const data = economicData[country.code] || {};
-                    const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
+                    const strengthObj = getStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);
                     const strength = strengthObj.score;
                     const sentiment = getSentiment(strength);
                     const rate = country.code === 'USD' ? 1 : (forexRates[country.code] || 1);
@@ -5704,7 +5758,7 @@ const DataHealthCheck = ({ economicData }) => {
                                         <tbody>
                                             {getSortedCountries().map(country => {
                                                 const data = economicData[country.code] || {};
-                                                const strengthObj = calculateStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);  // ✅
+                                                const strengthObj = getStrength(country.code, data, forexRates, economicData, (economicCalendar||{}).events||null);  // ✅
 const strength = strengthObj.score;  // ✅
 const sentiment = getSentiment(strength);
                                                 const overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
@@ -6550,7 +6604,7 @@ const sentiment = getSentiment(strength);
         <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             © {new Date().getFullYear()} Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.
         </div>
-        Dashboard v6.3.0
+        Dashboard v6.4.0
         </div>
         <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
             <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
