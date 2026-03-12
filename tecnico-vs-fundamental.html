@@ -231,13 +231,23 @@
 <button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
 </div></div>
 <script>
-(function(){var K='gdpr_consent_v1';function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
-try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
-var b=document.getElementById('gdpr-banner');if(b){b.hidden=false;setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},100);}
-function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));var b=document.getElementById('gdpr-banner');if(b)b.hidden=true;loadAds(v==='accepted');}
-document.getElementById('gdpr-accept').addEventListener('click',function(){save('accepted');});
-document.getElementById('gdpr-reject').addEventListener('click',function(){save('rejected');});
+(function(){
+var K='gdpr_consent_v1';
+function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
+function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
+function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
+// Event delegation — funciona aunque scripts externos re-renderizen el DOM
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
+  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
+},true);
 document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
+function init(){
+  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
+  var b=document.getElementById('gdpr-banner');
+  if(b){b.hidden=false;b.style.display='';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
 })();
 </script>
 <footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">

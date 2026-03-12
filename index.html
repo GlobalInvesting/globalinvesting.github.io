@@ -228,18 +228,24 @@
         s.id = 'adsense-script';
         s.async = true;
         s.crossOrigin = 'anonymous';
-        // Modo sin personalización (GDPR compliant sin consentimiento)
         s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_CLIENT;
         s.setAttribute('data-ad-channel', 'non-personalized');
         document.head.appendChild(s);
-        // Forzar modo no personalizado en AdSense
         (window.adsbygoogle = window.adsbygoogle || []).push({ params: { google_npa: '1' } });
+      }
+
+      function hideBanner() {
+        var banner = document.getElementById('gdpr-banner');
+        if (banner) {
+          // Usar tanto hidden como display:none para máxima compatibilidad
+          banner.hidden = true;
+          banner.style.display = 'none';
+        }
       }
 
       function applyConsent(choice) {
         localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: choice, ts: Date.now() }));
-        var banner = document.getElementById('gdpr-banner');
-        if (banner) { banner.hidden = true; }
+        hideBanner();
         if (choice === 'accepted') {
           loadAdSense();
         } else {
@@ -247,12 +253,33 @@
         }
       }
 
+      // EVENT DELEGATION en document.body — funciona aunque React re-renderice el DOM
+      // Se registra una sola vez y captura clicks en los botones por su id
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'gdpr-accept') {
+          e.preventDefault();
+          e.stopPropagation();
+          applyConsent('accepted');
+        } else if (e.target && e.target.id === 'gdpr-reject') {
+          e.preventDefault();
+          e.stopPropagation();
+          applyConsent('rejected');
+        }
+      }, true); // useCapture=true: captura en fase de captura antes que React
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          var banner = document.getElementById('gdpr-banner');
+          if (banner && !banner.hidden) applyConsent('rejected');
+        }
+      });
+
       function init() {
         try {
           var stored = localStorage.getItem(CONSENT_KEY);
           if (stored) {
             var parsed = JSON.parse(stored);
-            // Consentimiento válido por 13 meses (GDPR recomendación)
+            // Consentimiento válido 13 meses
             if (parsed && parsed.ts && (Date.now() - parsed.ts) < 13 * 30 * 24 * 3600 * 1000) {
               if (parsed.v === 'accepted') loadAdSense();
               else loadAdSenseNonPersonalized();
@@ -265,31 +292,20 @@
         var banner = document.getElementById('gdpr-banner');
         if (banner) {
           banner.hidden = false;
-          // Foco automático para accesibilidad (WCAG 2.1 SC 2.4.3)
+          banner.style.display = '';
           setTimeout(function() {
             var btn = document.getElementById('gdpr-accept');
             if (btn) btn.focus();
-          }, 100);
+          }, 300);
         }
-
-        document.getElementById('gdpr-accept').addEventListener('click', function() {
-          applyConsent('accepted');
-        });
-        document.getElementById('gdpr-reject').addEventListener('click', function() {
-          applyConsent('rejected');
-        });
-        // ESC para cerrar sin aceptar (rechaza implícitamente)
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && banner && !banner.hidden) {
-            applyConsent('rejected');
-          }
-        });
       }
 
+      // Esperar siempre a DOMContentLoaded para leer localStorage correctamente
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
-        init();
+        // Ya cargado — pequeño delay para que React no tape el estado del banner
+        setTimeout(init, 0);
       }
     })();
     </script>
