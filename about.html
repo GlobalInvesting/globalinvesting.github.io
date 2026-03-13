@@ -336,13 +336,13 @@ Bandas: &lt; 50 = Débil · 50–60 = Neutral · &gt; 60 = Fuerte</pre>
                 <thead><tr><th>Tipo de Dato</th><th>Frecuencia</th><th>Fuente</th></tr></thead>
                 <tbody>
                     <tr><td>Tipos de Cambio</td><td>60 segundos</td><td>APIs de Forex (6 proveedores en cascada)</td></tr>
-                    <tr><td>Indicadores Económicos base</td><td>24 horas (06:00 UTC)</td><td>Trading Economics</td></tr>
-                    <tr><td>Indicadores Extendidos (bonos, confianza, flujos)</td><td>24 horas (06:30 UTC)</td><td>Trading Economics</td></tr>
-                    <tr><td>Tasas de Interés (actual)</td><td>24 horas (08:00 UTC)</td><td>Trading Economics</td></tr>
+                    <tr><td>Indicadores Económicos base</td><td>24 horas (06:00 UTC)</td><td>FRED (St. Louis Fed), OECD, World Bank, IMF</td></tr>
+                    <tr><td>Indicadores Extendidos (bonos, confianza, flujos)</td><td>24 horas (06:30 UTC)</td><td>FRED (St. Louis Fed), World Bank</td></tr>
+                    <tr><td>Tasas de Interés (actual)</td><td>24 horas (08:00 UTC)</td><td>global-rates.com, FRED (St. Louis Fed)</td></tr>
                     <tr><td>Histórico de Tasas (24+ meses)</td><td>Acumulación diaria</td><td>Investing.com (decisiones oficiales de cada banco central)</td></tr>
                     <tr><td>FX Performance 1M</td><td>24 horas (07:00 UTC)</td><td>Frankfurter API (ECB)</td></tr>
                     <tr><td>Análisis de IA por divisa (Dashboard)</td><td>24 horas</td><td>Groq AI (llama-3.3-70b-versatile)</td></tr>
-                    <tr><td>Calendario Económico</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>MQL5 RSS → Trading Economics RSS → Investing.com → Fuentes oficiales</td></tr>
+                    <tr><td>Calendario Económico</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>MQL5 RSS → Investing.com → Fuentes oficiales</td></tr>
                     <tr><td>COT — 8 divisas principales</td><td>Semanal (Viernes ~20:00 UTC)</td><td>CFTC Oficial (<code>financial_lf.htm</code>) — categoría Leveraged Funds</td></tr>
                     <tr><td>Próximas Reuniones de Bancos Centrales</td><td>Semanal (Lunes 10:00 UTC)</td><td>cbrates.com</td></tr>
                     <tr><td>Feed de Noticias + Análisis AI por divisa</td><td>3× al día (00:00, 08:00, 16:00 UTC)</td><td>FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook · Análisis: Groq AI</td></tr>

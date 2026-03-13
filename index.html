@@ -17,7 +17,7 @@
     
     <!-- SEO Meta Tags OPTIMIZADOS -->
     <title>Dashboard Forex | Análisis Fundamental en Tiempo Real 2026</title>
-    <meta name="description" content="Dashboard profesional de análisis fundamental forex 2026 con 22 indicadores económicos en tiempo real, datos de bancos centrales Trading Economics CFTC, rankings de fortaleza USD EUR GBP JPY AUD CAD CHF NZD. Herramienta para traders.">
+    <meta name="description" content="Dashboard profesional de análisis fundamental forex 2026 con 22 indicadores económicos en tiempo real, datos de bancos centrales FRED OECD CFTC, rankings de fortaleza USD EUR GBP JPY AUD CAD CHF NZD. Herramienta para traders.">
     <meta name="keywords" content="dashboard forex 2026, análisis fundamental forex, indicadores económicos tiempo real, fortaleza divisas USD EUR GBP, datos bancos centrales, tasas interés forex, PIB inflación desempleo, trading forex herramientas, análisis técnico fundamental, COT positioning forex, carry trade calculator, forex strength meter, currency analysis dashboard, central bank rates live">
     <meta name="author" content="Santiago Plá Casuriaga">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -43,7 +43,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://globalinvesting.github.io/">
     <meta name="twitter:title" content="Dashboard Forex Profesional | Análisis Fundamental Tiempo Real">
-    <meta name="twitter:description" content="Herramienta: 22 indicadores económicos en tiempo real para USD EUR GBP JPY AUD CAD CHF NZD. Datos Trading Economics, CFTC, Frankfurter/ECB.">
+    <meta name="twitter:description" content="Herramienta: 22 indicadores económicos en tiempo real para USD EUR GBP JPY AUD CAD CHF NZD. Datos FRED, OECD, CFTC, Frankfurter/ECB.">
     <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
     <meta name="twitter:image:alt" content="Dashboard Forex - Indicadores Económicos en Tiempo Real">
     <meta name="twitter:creator" content="@GlobalInvesting">
@@ -1440,7 +1440,7 @@
         <p>Análisis automático de los mejores pares de divisas para operar basado en diferenciales de fortaleza fundamental, incluyendo recomendaciones de posiciones largas (LONG) y cortas (SHORT) con nivel de confianza.</p>
 
         <h2>Fuentes de Datos</h2>
-        <p>Datos obtenidos de: Trading Economics, FRED (Federal Reserve Economic Data), CFTC (Commitment of Traders), Frankfurter/ECB API, bancos centrales nacionales y Investing.com.</p>
+        <p>Datos obtenidos de: FRED (Federal Reserve Economic Data), OECD, World Bank, IMF, CFTC (Commitment of Traders), Frankfurter/ECB API, bancos centrales nacionales y Investing.com.</p>
     </div>
 
     <!-- Skip navigation link (WCAG 2.4.1) -->
@@ -1568,7 +1568,7 @@ const fetchWithRetry = async (url, options = {}, maxRetries = 3) => {
 
         // ========== FALLBACK FUNCTIONS REMOVED ==========
         // All data now comes from GitHub Pages scraped JSON files
-        // These functions are no longer needed as we use Trading Economics scraping
+        // These functions are no longer needed (legacy scraping removed)
 
 const fetchWorldBankData = async (countryCode, indicator) => {
     const cacheKey = `scraped_${countryCode}_${indicator}`;
@@ -1662,7 +1662,7 @@ const fetchInterestRate = async (country) => {
             }
 
 // Alpha Vantage eliminado — rates/USD.json se genera diariamente
-// desde el workflow de GitHub Actions (Trading Economics scraping).
+// desde el workflow de GitHub Actions.
 // Si llegamos aquí, el archivo rates/USD.json no estaba disponible.
 if (country.code === 'USD') {
     console.warn('rates/USD.json no disponible — sin fallback para USD');
@@ -2099,7 +2099,7 @@ const fetchEconomicCalendar = async () => {
         lastUpdate: null,
         source: null,
         status: 'error',
-        errorMessage: 'No se pudieron obtener datos del calendario. Consulte directamente forexfactory.com, investing.com/economic-calendar o tradingeconomics.com/calendar',
+        errorMessage: 'No se pudieron obtener datos del calendario. Consulte directamente forexfactory.com o investing.com/economic-calendar',
         impactCounts: {},
         currencyCounts: {},
     };
@@ -2871,45 +2871,45 @@ const isCacheStale = (economicData) => {
         ];
 
 const indicatorTooltips = {
-    gdp: "Producto Interno Bruto total del país expresado en trillones de dólares estadounidenses. Representa el valor de todos los bienes y servicios producidos en un año. Es una medida del tamaño absoluto de la economía — no de su dinamismo. Una economía grande (USA ~28T) tiene mayor influencia global en flujos de capital y confianza en su moneda. Fuente: Trading Economics / Banco Mundial.",
+    gdp: "Producto Interno Bruto total del país expresado en trillones de dólares estadounidenses. Representa el valor de todos los bienes y servicios producidos en un año. Es una medida del tamaño absoluto de la economía — no de su dinamismo. Una economía grande (USA ~28T) tiene mayor influencia global en flujos de capital y confianza en su moneda. Fuente: FRED / Banco Mundial.",
 
-    gdpGrowth: "Tasa de variación anual del PIB real, ajustada por inflación. Mide la velocidad a la que crece (o se contrae) la economía. >2.5% = expansión robusta, señal positiva para la divisa ya que atrae inversión y presiona al banco central a mantener o subir tasas. 1–2.5% = crecimiento moderado, neutral. <1% = estancamiento, presión dovish sobre el BC. Negativo = recesión técnica, señal muy negativa para la divisa. Fuente: Trading Economics.",
+    gdpGrowth: "Tasa de variación anual del PIB real, ajustada por inflación. Mide la velocidad a la que crece (o se contrae) la economía. >2.5% = expansión robusta, señal positiva para la divisa ya que atrae inversión y presiona al banco central a mantener o subir tasas. 1–2.5% = crecimiento moderado, neutral. <1% = estancamiento, presión dovish sobre el BC. Negativo = recesión técnica, señal muy negativa para la divisa. Fuente: FRED / OECD.",
 
     interestRate: "Tasa de política monetaria fijada por el banco central del país. Es el indicador más importante para el forex: determina el 'carry' de la divisa, es decir, el rendimiento que obtiene un inversor por mantener activos en esa moneda. Tasas altas atraen capital extranjero → demanda de la divisa → apreciación. Tasas bajas reducen el atractivo relativo → presión bajista. El diferencial de tasas entre dos países es el principal driver de los pares de divisas en el corto-medio plazo. Fuente: FRED / bancos centrales nacionales.",
 
-    inflation: "Variación anual del Índice de Precios al Consumidor (IPC). Mide cuánto suben los precios para los hogares. El objetivo universal de la mayoría de bancos centrales es ~2%. Por encima del objetivo → BC sube tasas (hawkish) → positivo para la divisa a corto plazo, pero erosiona poder adquisitivo. Muy por encima (>4%) → señal de economía recalentada o crisis de oferta → negativo estructural. Por debajo (deflación) → BC baja tasas (dovish) → negativo para la divisa. La inflación es el mandato principal de los bancos centrales modernos. Fuente: Trading Economics.",
+    inflation: "Variación anual del Índice de Precios al Consumidor (IPC). Mide cuánto suben los precios para los hogares. El objetivo universal de la mayoría de bancos centrales es ~2%. Por encima del objetivo → BC sube tasas (hawkish) → positivo para la divisa a corto plazo, pero erosiona poder adquisitivo. Muy por encima (>4%) → señal de economía recalentada o crisis de oferta → negativo estructural. Por debajo (deflación) → BC baja tasas (dovish) → negativo para la divisa. La inflación es el mandato principal de los bancos centrales modernos. Fuente: FRED / OECD.",
 
-    unemployment: "Porcentaje de la fuerza laboral activa que busca empleo y no lo encuentra. Es el segundo mandato de muchos bancos centrales (junto a inflación). <3.5% = pleno empleo, economía sobrecalentada, BC bajo presión para subir tasas → hawkish. 3.5–6% = zona de equilibrio, dependiendo del país. >6% = mercado laboral débil, BC bajo presión dovish → negativo para la divisa. Un desempleo bajo suele combinarse con crecimiento salarial, que a su vez alimenta inflación. Fuente: Trading Economics.",
+    unemployment: "Porcentaje de la fuerza laboral activa que busca empleo y no lo encuentra. Es el segundo mandato de muchos bancos centrales (junto a inflación). <3.5% = pleno empleo, economía sobrecalentada, BC bajo presión para subir tasas → hawkish. 3.5–6% = zona de equilibrio, dependiendo del país. >6% = mercado laboral débil, BC bajo presión dovish → negativo para la divisa. Un desempleo bajo suele combinarse con crecimiento salarial, que a su vez alimenta inflación. Fuente: FRED / OECD.",
 
-    currentAccount: "Saldo de la balanza por cuenta corriente como porcentaje del PIB. Incluye comercio de bienes, servicios, rentas e inversión. Superávit (positivo) = el país exporta más de lo que importa y recibe más rentas de las que paga → demanda estructural de la divisa para pagar esas exportaciones → positivo a largo plazo. Déficit (negativo) = el país consume más de lo que produce, necesita financiación externa → presión vendedora estructural sobre la divisa. Especialmente relevante para divisas como AUD, NZD y CAD donde el comercio de commodities domina. Fuente: Trading Economics.",
+    currentAccount: "Saldo de la balanza por cuenta corriente como porcentaje del PIB. Incluye comercio de bienes, servicios, rentas e inversión. Superávit (positivo) = el país exporta más de lo que importa y recibe más rentas de las que paga → demanda estructural de la divisa para pagar esas exportaciones → positivo a largo plazo. Déficit (negativo) = el país consume más de lo que produce, necesita financiación externa → presión vendedora estructural sobre la divisa. Especialmente relevante para divisas como AUD, NZD y CAD donde el comercio de commodities domina. Fuente: FRED / OECD.",
 
-    debt: "Deuda pública acumulada del gobierno como porcentaje del PIB. <60% = finanzas públicas sanas, margen fiscal para estímulos → positivo. 60–90% = zona de vigilancia, sostenible si el crecimiento es estable. >90% = carga elevada que limita la política fiscal y puede presionar al BC a monetizar deuda → negativo estructural. >150% = zona de riesgo soberano, aunque países con superávit en cuenta corriente y deuda mayormente doméstica (como Japón) tienen menor riesgo real de default. La relación deuda/crecimiento es clave: deuda alta con crecimiento fuerte es más manejable. Fuente: Trading Economics / FMI.",
+    debt: "Deuda pública acumulada del gobierno como porcentaje del PIB. <60% = finanzas públicas sanas, margen fiscal para estímulos → positivo. 60–90% = zona de vigilancia, sostenible si el crecimiento es estable. >90% = carga elevada que limita la política fiscal y puede presionar al BC a monetizar deuda → negativo estructural. >150% = zona de riesgo soberano, aunque países con superávit en cuenta corriente y deuda mayormente doméstica (como Japón) tienen menor riesgo real de default. La relación deuda/crecimiento es clave: deuda alta con crecimiento fuerte es más manejable. Fuente: IMF / World Bank.",
 
-    tradeBalance: "Diferencia mensual entre exportaciones e importaciones de bienes y servicios, expresada en miles de millones USD. Superávit (positivo) = el país vende más al exterior de lo que compra → entrada neta de divisas → demanda de la moneda local → positivo. Déficit (negativo) = el país compra más del exterior → salida neta de divisas → presión bajista sobre la moneda. EE.UU. históricamente tiene un déficit comercial masivo, pero el dólar se sostiene por su estatus de moneda de reserva global. Para AUD, CAD y NZD, la balanza comercial fluctúa fuertemente con los precios de commodities. Fuente: Trading Economics.",
+    tradeBalance: "Diferencia mensual entre exportaciones e importaciones de bienes y servicios, expresada en miles de millones USD. Superávit (positivo) = el país vende más al exterior de lo que compra → entrada neta de divisas → demanda de la moneda local → positivo. Déficit (negativo) = el país compra más del exterior → salida neta de divisas → presión bajista sobre la moneda. EE.UU. históricamente tiene un déficit comercial masivo, pero el dólar se sostiene por su estatus de moneda de reserva global. Para AUD, CAD y NZD, la balanza comercial fluctúa fuertemente con los precios de commodities. Fuente: FRED / OECD.",
 
-    production: "Variación porcentual en el volumen de producción del sector industrial (manufactura, minería, energía). Para la mayoría de divisas el dato es mensual (MoM — mes sobre mes); para NZD es trimestral (QoQ) ya que Statistics New Zealand publica con esa frecuencia. >1.5% = expansión industrial fuerte, señal de demanda robusta y empleo sostenido → positivo. >0% = expansión moderada, neutral-positivo. Negativo = contracción industrial → anticipa debilidad económica y posible presión dovish. Especialmente relevante para divisas industriales como EUR (Alemania) y JPY (manufactura de precisión). Fuente: Trading Economics.",
+    production: "Variación porcentual en el volumen de producción del sector industrial (manufactura, minería, energía). Para la mayoría de divisas el dato es mensual (MoM — mes sobre mes); para NZD es trimestral (QoQ) ya que Statistics New Zealand publica con esa frecuencia. >1.5% = expansión industrial fuerte, señal de demanda robusta y empleo sostenido → positivo. >0% = expansión moderada, neutral-positivo. Negativo = contracción industrial → anticipa debilidad económica y posible presión dovish. Especialmente relevante para divisas industriales como EUR (Alemania) y JPY (manufactura de precisión). Fuente: FRED / OECD.",
 
-    retailSales: "Variación mensual (MoM) en el valor de las ventas del sector minorista. Es el principal indicador del consumo privado, que representa el 60–70% del PIB en economías desarrolladas. >0.5% = consumo robusto → señal de confianza del consumidor y economía activa → positivo para la divisa. 0–0.5% = crecimiento moderado, neutral. Negativo = contracción del gasto privado → anticipa desaceleración económica → negativo. Las ventas minoristas son un indicador adelantado: cuando los consumidores recortan gastos, la recesión suele seguir en 2–3 trimestres. Fuente: Trading Economics.",
+    retailSales: "Variación mensual (MoM) en el valor de las ventas del sector minorista. Es el principal indicador del consumo privado, que representa el 60–70% del PIB en economías desarrolladas. >0.5% = consumo robusto → señal de confianza del consumidor y economía activa → positivo para la divisa. 0–0.5% = crecimiento moderado, neutral. Negativo = contracción del gasto privado → anticipa desaceleración económica → negativo. Las ventas minoristas son un indicador adelantado: cuando los consumidores recortan gastos, la recesión suele seguir en 2–3 trimestres. Fuente: FRED / OECD.",
 
-    wageGrowth: "Tasa de crecimiento anual de los salarios nominales. Es un indicador clave de presiones inflacionarias de segunda ronda: salarios altos → mayor poder adquisitivo → mayor gasto → inflación de demanda. 2.5–4.5% = rango saludable, compatible con el objetivo de inflación del 2% y productividad normal → positivo. >5% = presiones salariales que pueden desanclar expectativas de inflación → BC bajo presión hawkish. <2% = deflación salarial, poder adquisitivo estancado → negativo para consumo y crecimiento. Los bancos centrales monitorizan el crecimiento salarial con especial atención como señal de inflación persistente. Fuente: Trading Economics.",
+    wageGrowth: "Tasa de crecimiento anual de los salarios nominales. Es un indicador clave de presiones inflacionarias de segunda ronda: salarios altos → mayor poder adquisitivo → mayor gasto → inflación de demanda. 2.5–4.5% = rango saludable, compatible con el objetivo de inflación del 2% y productividad normal → positivo. >5% = presiones salariales que pueden desanclar expectativas de inflación → BC bajo presión hawkish. <2% = deflación salarial, poder adquisitivo estancado → negativo para consumo y crecimiento. Los bancos centrales monitorizan el crecimiento salarial con especial atención como señal de inflación persistente. Fuente: FRED / OECD.",
 
-    manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via Trading Economics.",
-    servicesPMI: "Purchasing Managers Index del sector servicios (bancos, seguros, turismo, salud, tecnología). Peso: 4% en el score v6.2 — mayor que manufacturero (3%) porque servicios representa >75% del PIB en USD, GBP y EUR. La misma escala que el PMI Manufacturero: >50 = expansión, <50 = contracción. En economías post-industriales, este indicador anticipa inflación de servicios (componente más pegajoso del IPC) y empleo, los dos factores que más pesan en las decisiones de política monetaria de la Fed, el BCE y el BOE. Fuente: S&P Global via Trading Economics.",
+    manufacturingPMI: "Purchasing Managers Index del sector manufacturero. Encuesta mensual a directores de compras sobre nuevos pedidos, producción, empleo, inventarios y plazos de entrega. Escala: >50 = expansión (más empresas reportan mejora que deterioro), <50 = contracción. >55 = expansión fuerte, señal positiva para la divisa. 50–55 = expansión moderada. 45–50 = contracción leve, precaución. <45 = contracción severa, señal negativa clara. Es un indicador adelantado muy seguido por los mercados porque se publica muy rápidamente (primer día hábil del mes siguiente) y anticipa actividad económica real. Fuente: S&P Global / JMFA via FRED.",
+    servicesPMI: "Purchasing Managers Index del sector servicios (bancos, seguros, turismo, salud, tecnología). Peso: 4% en el score v6.2 — mayor que manufacturero (3%) porque servicios representa >75% del PIB en USD, GBP y EUR. La misma escala que el PMI Manufacturero: >50 = expansión, <50 = contracción. En economías post-industriales, este indicador anticipa inflación de servicios (componente más pegajoso del IPC) y empleo, los dos factores que más pesan en las decisiones de política monetaria de la Fed, el BCE y el BOE. Fuente: S&P Global via FRED.",
     economicSurprise: "Economic Surprise Index (ESI) Proxy — mide si los datos macroeconómicos recientes superaron o decepcionaron las expectativas del consenso. Score >50 = los datos publicados estuvieron por encima de lo esperado (sorpresa positiva, bullish para la divisa). Score <50 = datos peores de lo esperado (sorpresa negativa, bearish). Calculado con arquitectura híbrida: (A) cuando hay datos publicados, compara el valor real vs el pronóstico del consenso en el calendario económico; (B) como respaldo, mide la posición relativa de la divisa en 7 indicadores clave dentro del G8 mediante z-scores. Peso: 4% en v6.3. Es el factor que más falta en los modelos fundamentales que solo leen niveles — el mercado ya tiene el nivel descontado, lo que mueve el precio es la desviación vs expectativas. Fuente: Investing.com calendar + cálculo interno G8.",
 
     cotPositioning: "Posicionamiento neto de la categoría Leveraged Funds (hedge funds y CTAs) según el reporte Commitment of Traders (COT) publicado semanalmente por la CFTC (Commodity Futures Trading Commission) de EE.UU. Calcula: contratos largos (bullish) menos contratos cortos (bearish) en los mercados de futuros de divisas de Chicago (CME). Fuente: reporte Futures Only (financial_lf.htm) — excluye opciones para reflejar únicamente presión directa sobre el precio. Valores positivos = el smart money especulativo tiene posición neta larga → sesgo alcista institucional. Valores negativos = posición corta neta → sesgo bajista. >80K = posicionamiento alcista extremo, posible saturación y riesgo de reversal. <-80K = bajista extremo, posible rebote contrarian. Los Leveraged Funds son el único grupo cuya posición refleja apuestas especulativas puras sobre dirección de divisas, sin mandatos de cobertura ni posiciones pasivas. Fuente: CFTC oficial (cftc.gov/dea/futures/financial_lf.htm), actualización viernes.",
 
-    consumerConfidence: "Índice que mide el optimismo o pesimismo de los hogares sobre su situación económica actual y futura. Varía por país: USA usa el índice de Michigan Consumer Sentiment (escala ~50–100); Eurozona, UK, AUD, CAD usan índices propios base 100. >100 (o equivalente) = los consumidores se sienten optimistas → mayor disposición al gasto, inversión, endeudamiento → positivo para crecimiento y divisa. <95 = pesimismo → contracción del consumo privado anticipada → negativo. Es un indicador adelantado del ciclo económico: la confianza cae antes de que los datos duros (PIB, ventas) lo reflejen. Fuente: Trading Economics.",
+    consumerConfidence: "Índice que mide el optimismo o pesimismo de los hogares sobre su situación económica actual y futura. Varía por país: USA usa el índice de Michigan Consumer Sentiment (escala ~50–100); Eurozona, UK, AUD, CAD usan índices propios base 100. >100 (o equivalente) = los consumidores se sienten optimistas → mayor disposición al gasto, inversión, endeudamiento → positivo para crecimiento y divisa. <95 = pesimismo → contracción del consumo privado anticipada → negativo. Es un indicador adelantado del ciclo económico: la confianza cae antes de que los datos duros (PIB, ventas) lo reflejen. Fuente: FRED / OECD.",
 
-    bond10y: "Rendimiento (yield) del bono soberano del gobierno a 10 años. Refleja las expectativas de mercado sobre tasas de interés futuras e inflación a largo plazo. Para EUR se usa el yield oficial de la Zona Euro (GEUGB10Y — agregado publicado directamente por Trading Economics), que refleja el costo de financiamiento soberano del conjunto de la eurozona. Yield alto (>4%) = el mercado espera tasas altas sostenidas → carry atractivo → entrada de capital extranjero → positivo para la divisa. Yield bajo (<1%) = expectativas de tasas bajas o deflación → poco atractivo de carry. El 'yield spread' entre dos países (ej. USA 10Y vs DEU 10Y) es uno de los drivers más potentes de los grandes flujos de capital institucional en forex. Una curva invertida (10Y < tasa de política) señala que el mercado anticipa recortes futuros → bearish implícito. Fuente: Trading Economics / bancos centrales.",
+    bond10y: "Rendimiento (yield) del bono soberano del gobierno a 10 años. Refleja las expectativas de mercado sobre tasas de interés futuras e inflación a largo plazo. Para EUR se usa el yield oficial de la Zona Euro (agregado IRLTLT01EZM156N via FRED), que refleja el costo de financiamiento soberano del conjunto de la eurozona. Yield alto (>4%) = el mercado espera tasas altas sostenidas → carry atractivo → entrada de capital extranjero → positivo para la divisa. Yield bajo (<1%) = expectativas de tasas bajas o deflación → poco atractivo de carry. El 'yield spread' entre dos países (ej. USA 10Y vs DEU 10Y) es uno de los drivers más potentes de los grandes flujos de capital institucional en forex. Una curva invertida (10Y < tasa de política) señala que el mercado anticipa recortes futuros → bearish implícito. Fuente: FRED / bancos centrales.",
 
-    businessConfidence: "Índice que mide el sentimiento de los directivos y empresarios sobre las condiciones actuales y perspectivas futuras del negocio. Varía por país: Eurozona usa el ESI de la Comisión Europea (base 100); NZD usa el ANZ Business Outlook (balance neto, centrado en 0); USA y CAD usan variantes del ISM o Ivey PMI. >100 (o equivalente positivo) = las empresas esperan expandir producción, contratar personal e invertir → positivo para crecimiento económico y divisa. <100 = perspectivas de contracción. Es un predictor adelantado de inversión empresarial y empleo, que a su vez impacta en consumo, producción e inflación. Los mercados lo usan para anticipar el ciclo económico con 2–4 trimestres de antelación. Fuente: Trading Economics / organismos estadísticos nacionales.",
+    businessConfidence: "Índice que mide el sentimiento de los directivos y empresarios sobre las condiciones actuales y perspectivas futuras del negocio. Varía por país: Eurozona usa el ESI de la Comisión Europea (base 100); NZD usa el ANZ Business Outlook (balance neto, centrado en 0); USA y CAD usan variantes del ISM o Ivey PMI. >100 (o equivalente positivo) = las empresas esperan expandir producción, contratar personal e invertir → positivo para crecimiento económico y divisa. <100 = perspectivas de contracción. Es un predictor adelantado de inversión empresarial y empleo, que a su vez impacta en consumo, producción e inflación. Los mercados lo usan para anticipar el ciclo económico con 2–4 trimestres de antelación. Fuente: FRED / OECD / organismos estadísticos nacionales.",
 
-    capitalFlows: "Flujos netos de capital de la cuenta financiera de la balanza de pagos. El valor se muestra en miles de millones USD (B = billion). Positivo (entrada neta) = inversores extranjeros están comprando activos del país (bonos, acciones, inversión directa) → demanda estructural de la divisa → presión alcista. Negativo (salida neta) = el capital abandona el país → presión vendedora sobre la divisa. Es la contraparte financiera de la cuenta corriente: un déficit comercial suele financiarse con entradas de capital. Flujos grandes (>$20B o <-$20B) pueden mover significativamente los tipos de cambio. Fuente: Trading Economics / bancos centrales.",
+    capitalFlows: "Flujos netos de capital de la cuenta financiera de la balanza de pagos. El valor se muestra en miles de millones USD (B = billion). Positivo (entrada neta) = inversores extranjeros están comprando activos del país (bonos, acciones, inversión directa) → demanda estructural de la divisa → presión alcista. Negativo (salida neta) = el capital abandona el país → presión vendedora sobre la divisa. Es la contraparte financiera de la cuenta corriente: un déficit comercial suele financiarse con entradas de capital. Flujos grandes (>$20B o <-$20B) pueden mover significativamente los tipos de cambio. Fuente: FRED / bancos centrales.",
 
-    inflationExpectations: "Expectativas de inflación a 1–2 años derivadas de encuestas a consumidores, empresas o del mercado de bonos (breakeven inflation). Son distintas de la inflación actual y tienen un rol especial en la política monetaria: si las expectativas se 'desanclan' del objetivo del 2%, el BC se ve forzado a actuar agresivamente para preservar su credibilidad. 1.8–2.5% = bien ancladas, zona ideal → banco central no necesita actuar → positivo para estabilidad de la divisa. >3% = expectativas desancladas al alza → presión para subir tasas → hawkish implícito. <1.5% = riesgo deflacionario → presión para bajar tasas → dovish. Los mercados de bonos (TIPS en USA, OATi en Francia) ofrecen una medida de mercado de las expectativas de inflación en tiempo real. Fuente: Trading Economics.",
+    inflationExpectations: "Expectativas de inflación a 1–2 años derivadas de encuestas a consumidores, empresas o del mercado de bonos (breakeven inflation). Son distintas de la inflación actual y tienen un rol especial en la política monetaria: si las expectativas se 'desanclan' del objetivo del 2%, el BC se ve forzado a actuar agresivamente para preservar su credibilidad. 1.8–2.5% = bien ancladas, zona ideal → banco central no necesita actuar → positivo para estabilidad de la divisa. >3% = expectativas desancladas al alza → presión para subir tasas → hawkish implícito. <1.5% = riesgo deflacionario → presión para bajar tasas → dovish. Los mercados de bonos (TIPS en USA, OATi en Francia) ofrecen una medida de mercado de las expectativas de inflación en tiempo real. Fuente: FRED / World Bank.",
 
-    termsOfTrade: "Índice de términos de intercambio: ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un valor >100 significa que el país recibe más valor por sus exportaciones de lo que paga por sus importaciones → mejora la cuenta corriente → positivo para la divisa. Un valor <100 implica lo contrario: el país paga más por lo que importa de lo que recibe por lo que exporta → deterioro del balance externo → negativo. Especialmente relevante para AUD, CAD y NZD (economías exportadoras de commodities como mineral de hierro, petróleo y productos lácteos): cuando sube el precio del hierro o el petróleo, sus términos de intercambio mejoran y sus divisas se aprecian. Para EUR se calcula como ratio de los índices de precios de exportación e importación extrazona (ambos de Eurostat vía Trading Economics, base 2015=100). Fuente: Trading Economics."
+    termsOfTrade: "Índice de términos de intercambio: ratio entre el precio de las exportaciones y el precio de las importaciones (base 100). Un valor >100 significa que el país recibe más valor por sus exportaciones de lo que paga por sus importaciones → mejora la cuenta corriente → positivo para la divisa. Un valor <100 implica lo contrario: el país paga más por lo que importa de lo que recibe por lo que exporta → deterioro del balance externo → negativo. Especialmente relevante para AUD, CAD y NZD (economías exportadoras de commodities como mineral de hierro, petróleo y productos lácteos): cuando sube el precio del hierro o el petróleo, sus términos de intercambio mejoran y sus divisas se aprecian. Para EUR se calcula como ratio de los índices de precios de exportación e importación extrazona (ambos de Eurostat vía FRED, base 2015=100). Fuente: FRED / Eurostat."
 };
 
         // ========== COMPONENTE PRINCIPAL ==========
@@ -2973,7 +2973,7 @@ const indicatorTooltips = {
                         if (ev.actual && ev.actual !== '') continue;
                         const t = ev.timeUTC || ev.time;
                         if (!t || !ev.dateISO) continue;
-                        // Trading Economics: dateISO is always the real UTC date. No offset needed.
+                        // dateISO is always the real UTC date. No offset needed.
                         const d = new Date(`${ev.dateISO}T${t}:00Z`);
                         if (isNaN(d.getTime())) continue;
                         const diff = d.getTime() - nowMs;
@@ -4747,7 +4747,7 @@ const sentiment = getSentiment(strength);
     <strong style={{ color: 'var(--green-strong)' }}>Datos reales:</strong>{' '}
     La línea de <strong>Tasa de Interés</strong> refleja datos históricos reales
     obtenidos desde <strong>Investing.com</strong> (decisiones oficiales de cada banco central)
-    y actualizados diariamente via Trading Economics.
+    y actualizados diariamente via fuentes oficiales.
 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(500px, 100%), 1fr))', gap: '1.5rem' }}>
@@ -4812,7 +4812,7 @@ const sentiment = getSentiment(strength);
             <div className="section-title">Calendario Económico</div>
             <div className="section-meta">
                 {economicCalendar.source && economicCalendar.source !== 'fallback-generator'
-                    ? `Fuente: Trading Economics • Actualizado ${economicCalendar.lastUpdate || ''}`
+                    ? `Fuente: MQL5/Investing.com • Actualizado ${economicCalendar.lastUpdate || ''}`
                     : 'Calendario estimado (scraping en proceso)'}
                 {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
                     <span style={{ marginLeft: '1rem' }}>
@@ -4938,7 +4938,7 @@ const sentiment = getSentiment(strength);
                             {' · '}
                             <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Investing.com</a>
                             {' · '}
-                            <a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>TradingEconomics</a>
+                            <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Investing.com</a>
                         </div>
                     </div>
                 );
@@ -5151,7 +5151,7 @@ const sentiment = getSentiment(strength);
                                 let eventMs = null;
                                 if (event.dateISO && (event.timeUTC || event.time)) {
                                     const t = event.timeUTC || event.time;
-                                    // Trading Economics: dateISO is always the real UTC date.
+                                    // dateISO is always the real UTC date.
                                     // No offset correction needed (TE scraper converts UTC-3 → UTC correctly).
                                     const d = new Date(`${event.dateISO}T${t}:00Z`);
                                     if (!isNaN(d.getTime())) eventMs = d.getTime();
@@ -5499,7 +5499,7 @@ const sentiment = getSentiment(strength);
 <div style={{ marginBottom: '1rem' }}>
     Metodología: Modelo cuantitativo basado en datos económicos reales • 22 indicadores ponderados en 6 tiers<br/>
     Política Monetaria (29%) • Balance Externo (19%) • Crecimiento &amp; Empleo (16%) • Sentimiento de Mercado (21%) • FX Confirmador (11%) • Consumo &amp; Salarios (4%)<br/>
-    Datos actualizados diariamente desde Trading Economics, Frankfurter/ECB y CFTC
+    Datos actualizados diariamente desde FRED (St. Louis Fed), Frankfurter/ECB y CFTC
 </div>
 <div style={{ background: 'var(--bg-card)', padding: '1rem', borderRadius: '6px', border: '1px solid var(--border)', marginTop: '1rem', fontSize: '0.8125rem', lineHeight: '1.6' }}>
     <strong>Aviso Legal:</strong><br/>
