@@ -8,7 +8,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-12",
-  "totalEvents": 500,
+  "totalEvents": 477,
   "currencyCounts": {
     "AUD": 46,
     "CAD": 42,
@@ -17,12 +17,12 @@
     "GBP": 58,
     "JPY": 58,
     "NZD": 26,
-    "USD": 202
+    "USD": 179
   },
   "impactCounts": {
-    "low": 279,
-    "medium": 173,
-    "high": 48
+    "low": 269,
+    "medium": 170,
+    "high": 38
   },
   "events": [
     {
@@ -678,71 +678,6 @@
     {
       "date": "27 Feb",
       "dateISO": "2026-02-27",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA 30-Year Mortgage Rate",
-      "impact": "low",
-      "actual": "6.09%",
-      "forecast": "",
-      "previous": "6.09%"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA Mortgage Applications (WoW)",
-      "impact": "low",
-      "actual": "11.0%",
-      "forecast": "",
-      "previous": "0.4%"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA Purchase Index",
-      "impact": "low",
-      "actual": "158.9",
-      "forecast": "",
-      "previous": "149.7"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Mortgage Market Index",
-      "impact": "low",
-      "actual": "377.5",
-      "forecast": "",
-      "previous": "340.2"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "13:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Mortgage Refinance Index",
-      "impact": "low",
-      "actual": "1,637.5",
-      "forecast": "",
-      "previous": "1,432.9"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
       "timeUTC": "13:30",
       "country": "GBP",
       "currency": "GBP",
@@ -804,19 +739,6 @@
       "actual": "",
       "forecast": "",
       "previous": ""
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "14:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "ADP Nonfarm Employment Change (Feb)",
-      "impact": "high",
-      "actual": "63K",
-      "forecast": "50K",
-      "previous": "11K"
     },
     {
       "date": "27 Feb",
@@ -1267,19 +1189,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "ISM Manufacturing PMI (Feb)",
-      "impact": "high",
-      "actual": "52.4",
-      "forecast": "51.7",
-      "previous": "52.6"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "16:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "ISM Manufacturing Prices (Feb)",
       "impact": "high",
       "actual": "70.5",
@@ -1358,19 +1267,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "ISM Non-Manufacturing PMI (Feb)",
-      "impact": "high",
-      "actual": "56.1",
-      "forecast": "53.5",
-      "previous": "53.8"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "16:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "ISM Non-Manufacturing Prices (Feb)",
       "impact": "high",
       "actual": "63.0",
@@ -1436,19 +1332,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Crude Oil Inventories",
-      "impact": "high",
-      "actual": "3.475M",
-      "forecast": "3.000M",
-      "previous": "15.989M"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "16:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "EIA Refinery Crude Runs (WoW)",
       "impact": "low",
       "actual": "0.180M",
@@ -1467,19 +1350,6 @@
       "actual": "-0.019M",
       "forecast": "",
       "previous": "0.412M"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "16:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Cushing Crude Oil Inventories",
-      "impact": "medium",
-      "actual": "1.564M",
-      "forecast": "",
-      "previous": "0.881M"
     },
     {
       "date": "27 Feb",
@@ -1688,19 +1558,6 @@
       "actual": "550",
       "forecast": "",
       "previous": "551"
-    },
-    {
-      "date": "27 Feb",
-      "dateISO": "2026-02-27",
-      "timeUTC": "20:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Beige Book",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "27 Feb",
@@ -3005,71 +2862,6 @@
     {
       "date": "13 Mar",
       "dateISO": "2026-03-13",
-      "timeUTC": "11:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA 30-Year Mortgage Rate",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "6.19%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "11:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA Mortgage Applications (WoW)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "3.2%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "11:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "MBA Purchase Index",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "171.3"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "11:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Mortgage Market Index",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "389.6"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "11:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Mortgage Refinance Index",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "1,646.3"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
       "timeUTC": "11:30",
       "country": "USD",
       "currency": "USD",
@@ -3893,19 +3685,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Crude Oil Inventories",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "3.824M"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "EIA Refinery Crude Runs (WoW)",
       "impact": "low",
       "actual": "",
@@ -3924,19 +3703,6 @@
       "actual": "",
       "forecast": "",
       "previous": "0.661M"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Cushing Crude Oil Inventories",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "0.117M"
     },
     {
       "date": "13 Mar",
@@ -4197,58 +3963,6 @@
       "actual": "",
       "forecast": "",
       "previous": "3.0%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "18:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Economic Projections",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "18:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Statement",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "18:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Interest Rate Decision",
-      "impact": "high",
-      "actual": "",
-      "forecast": "3.75%",
-      "previous": "3.75%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "18:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Press Conference",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "13 Mar",
@@ -5484,19 +5198,6 @@
       "actual": "",
       "forecast": "",
       "previous": "48.307K"
-    },
-    {
-      "date": "27 Mar",
-      "dateISO": "2026-03-27",
-      "timeUTC": "12:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "ADP Nonfarm Employment Change (Mar)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": "63K"
     },
     {
       "date": "27 Mar",
