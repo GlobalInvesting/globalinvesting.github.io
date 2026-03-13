@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-03-13T03:52:37.178422Z",
+  "runTimestamp": "2026-03-13T04:00:06.732291Z",
   "runDate": "2026-03-13",
   "frankfurterOk": true,
   "currencies": {
@@ -18,13 +18,11 @@
       "issues": []
     },
     "GBP": {
-      "status": "warning",
+      "status": "ok",
       "rate": "3.75",
       "source": "global-rates.com",
       "date": "2026-03-01",
-      "issues": [
-        "GBP: rate changed 3.75% vs previous 0.25% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?"
-      ]
+      "issues": []
     },
     "JPY": {
       "status": "ok",
@@ -34,13 +32,11 @@
       "issues": []
     },
     "CAD": {
-      "status": "warning",
+      "status": "ok",
       "rate": "2.25",
       "source": "global-rates.com",
       "date": "2026-03-01",
-      "issues": [
-        "CAD: rate changed 2.25% vs previous 5.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
-      ]
+      "issues": []
     },
     "AUD": {
       "status": "ok",
@@ -64,10 +60,7 @@
       "issues": []
     }
   },
-  "issues": [
-    "GBP: rate changed 3.75% vs previous 0.25% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?",
-    "CAD: rate changed 2.25% vs previous 5.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
-  ],
+  "issues": [],
   "warnings": [],
-  "overallStatus": "degraded"
+  "overallStatus": "ok"
 }
