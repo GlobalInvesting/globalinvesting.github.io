@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-13",
-  "generatedAt": "2026-03-13T09:52:36.769985Z",
+  "generatedAt": "2026-03-13T11:05:14.828738Z",
   "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
   "status": "ok",
   "source": "Trading Economics (Playwright)",
@@ -8,19 +8,19 @@
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-12",
-  "totalEvents": 1919,
+  "totalEvents": 1920,
   "currencyCounts": {
     "AUD": 157,
     "CAD": 152,
     "CHF": 44,
-    "EUR": 209,
+    "EUR": 210,
     "GBP": 208,
     "JPY": 220,
     "NZD": 69,
     "USD": 860
   },
   "impactCounts": {
-    "low": 1219,
+    "low": 1220,
     "medium": 562,
     "high": 138
   },
@@ -22537,9 +22537,9 @@
       "flag": "🇪🇺",
       "event": "Industrial Production MoM (JAN)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-1.5%",
       "forecast": "0.9%",
-      "previous": "-1.4%"
+      "previous": "-0.6%"
     },
     {
       "date": "13 Mar",
@@ -22550,9 +22550,9 @@
       "flag": "🇪🇺",
       "event": "Industrial Production YoY (JAN)",
       "impact": "low",
-      "actual": "",
+      "actual": "-1.2%",
       "forecast": "1.5%",
-      "previous": "1.2%"
+      "previous": "2.2%"
     },
     {
       "date": "13 Mar",
@@ -23214,7 +23214,7 @@
       "event": "RBA Interest Rate Decision",
       "impact": "high",
       "actual": "",
-      "forecast": "3.85%",
+      "forecast": "4.1%",
       "previous": "3.85%"
     },
     {
@@ -23943,7 +23943,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "3.600%"
     },
     {
       "date": "18 Mar",
@@ -24967,6 +24967,19 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Baker Hughes Total Rigs Count (MAR/20)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "10:10",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "EU-Bonds Auction",
       "impact": "low",
       "actual": "",
       "forecast": "",
