@@ -1,13 +1,13 @@
 {
-  "runTimestamp": "2026-03-13T03:46:44.714313Z",
+  "runTimestamp": "2026-03-13T03:52:37.178422Z",
   "runDate": "2026-03-13",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
       "status": "ok",
-      "rate": "3.64",
-      "source": "FRED-CSV:FEDFUNDS",
-      "date": "2026-02-01",
+      "rate": "3.75",
+      "source": "global-rates.com",
+      "date": "2026-03-01",
       "issues": []
     },
     "EUR": {
@@ -19,45 +19,45 @@
     },
     "GBP": {
       "status": "warning",
-      "rate": "0.25",
-      "source": "FRED-CSV:BOERUKM",
-      "date": "2017-01-01",
+      "rate": "3.75",
+      "source": "global-rates.com",
+      "date": "2026-03-01",
       "issues": [
-        "GBP: rate changed 0.25% vs previous 3.75% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?"
+        "GBP: rate changed 3.75% vs previous 0.25% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?"
       ]
     },
     "JPY": {
       "status": "ok",
-      "rate": "0.3",
-      "source": "FRED-CSV:IRSTCB01JPM156N",
-      "date": "2023-12-01",
+      "rate": "0.75",
+      "source": "global-rates.com",
+      "date": "2026-03-01",
       "issues": []
     },
     "CAD": {
       "status": "warning",
-      "rate": "5.25",
-      "source": "FRED-CSV:IRSTCB01CAM156N",
-      "date": "2023-12-01",
+      "rate": "2.25",
+      "source": "global-rates.com",
+      "date": "2026-03-01",
       "issues": [
-        "CAD: rate changed 5.25% vs previous 2.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
+        "CAD: rate changed 2.25% vs previous 5.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
       ]
     },
     "AUD": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "3.85",
       "source": "global-rates.com",
       "date": "2026-03-01",
       "issues": []
     },
     "CHF": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "0.00",
       "source": "global-rates.com",
       "date": "2026-03-01",
       "issues": []
     },
     "NZD": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "2.25",
       "source": "global-rates.com",
       "date": "2026-03-01",
@@ -65,8 +65,8 @@
     }
   },
   "issues": [
-    "GBP: rate changed 0.25% vs previous 3.75% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?",
-    "CAD: rate changed 5.25% vs previous 2.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
+    "GBP: rate changed 3.75% vs previous 0.25% (\u0394=3.50pp > 1.0pp). Central bank meeting or scraping error?",
+    "CAD: rate changed 2.25% vs previous 5.25% (\u0394=3.00pp > 1.0pp). Central bank meeting or scraping error?"
   ],
   "warnings": [],
   "overallStatus": "degraded"
