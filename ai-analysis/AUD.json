@@ -2,17 +2,17 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto se debe a la decisión reciente de subir tasas en 0.25pp, lo que confirma el ciclo alcista de la divisa. Aunque los mercados de futuros ya descuentan un recorte adicional en marzo, las declaraciones del gobernador sugieren que el banco central sigue siendo hawkish, lo que podría mantener la presión alcista sobre la divisa.\n\nLa balanza comercial australiana muestra un superávit, gracias a las exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. La rally del Aussie se ha visto impulsada por señales de un RBA más activo en la lucha contra la inflación, así como por una mayor demanda de energía y una debilidad del dólar estadounidense. Esto ha llevado a una mayor confianza en la divisa, a pesar de la cuenta corriente en déficit.\n\nEl posicionamiento especulativo en la divisa es extremadamente alcista, con 54.6K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. Aunque el rendimiento FX del último mes ha sido negativo, las expectativas de que el RBA suba las tasas de interés nuevamente en marzo han mantenido la presión alcista sobre la divisa. La rally del Aussie sigue ganando tracción, lo que podría llevar a una mayor volatilidad en el mercado.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto ha llevado a una presión alcista sobre la divisa, aunque el ciclo de tasas en 12 meses ha sido bajista. La inflación anual del 3.2% y el crecimiento del PIB del 1.4% justifican esta postura del banco central. Los mercados de futuros ya descuentan un recorte adicional en marzo, coherente con las declaraciones del gobernador que anticipan aproximadamente 100pb de bajadas este año, aunque esto podría cambiar según las expectativas de los economistas.\n\nLa balanza comercial de Australia muestra un superávit de 44810390.0B USD/mes, con términos de intercambio favorables, lo que sugiere que los precios de exportación superan a los de importación. Sin embargo, la cuenta corriente presenta un déficit del 1.8% del PIB, lo que podría ejercer presión vendedora estructural sobre la divisa. La composición exportadora de minerales metalíferos, combustibles y petróleo, y cereales explica en parte este superávit comercial.\n\nEl posicionamiento especulativo en el mercado es muy alcista, con 54.6K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. Aunque los economistas esperan que el RBA suba la tasa de interés a 4.10% en marzo y posiblemente a 4.35% más adelante, la divisa ha depreciado un 2.04% en el último mes frente al dólar estadounidense, lo que podría ser el inicio de un cierre de posiciones largas.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-12T08:35:32.378904+00:00",
+  "generatedAt": "2026-03-13T08:33:49.096191+00:00",
   "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.85,
-    "gdpGrowth": 0.8,
-    "inflation": 3.8,
-    "unemployment": 4.1,
-    "currentAccount": -2.9,
+    "gdpGrowth": 1.3734,
+    "inflation": 3.1616,
+    "unemployment": 4.1049,
+    "currentAccount": -1.8167,
     "rateMomentum": -0.25,
     "lastRateDecision": {
       "direction": "SUBIÓ",
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
     "cotPositioning": 54635,
-    "fxPerformance1M": -2.5029,
+    "fxPerformance1M": -2.036,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-12",
-    "latestNewsTs": 1773296656.0,
+    "lastUpdate": "2026-03-13",
+    "latestNewsTs": 1773363742.0,
     "newsHeadlines": [
-      "RBA: March hike back in focus – Standard Chartered",
-      "While the World Panics, the Aussie Is Rallying. What’s Up With That?!",
-      "AUD/JPY rally accelerates, GBP/AUD falls as RBA turns more activist on inflation"
+      "Australian Dollar rises as markets price in March RBA rate hike",
+      "RBA to raise cash rate to 4.10% on March 17 - Reuters poll",
+      "Reuters poll: RBA seen raising cash rate to 4.10% on March 17, then 4.35% by end"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.49,
-    "avg_inflation": 2.26,
-    "avg_unemployment": 4.7,
-    "avg_bond10y": 3.47,
-    "avg_fx_perf_1m": -0.32,
+    "avg_interest_rate": 2.33,
+    "avg_gdp_growth": 0.91,
+    "avg_inflation": 2.37,
+    "avg_unemployment": 4.87,
+    "avg_bond10y": 3.38,
+    "avg_fx_perf_1m": -0.2,
     "avg_cot": 4098.88
   }
 }
