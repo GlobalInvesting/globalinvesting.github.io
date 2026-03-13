@@ -1,11 +1,11 @@
 {
   "currency": "JPY",
   "lastUpdate": "2026-03-13",
-  "source": "FRED:IRLTLT01JPM156N | FRED:JPNLOLITONOSTSAM | FRED:CSCICP03JPM665S | FRED:JPNB6BLTT02STSAQ | IMF:WEO:GGXWDG_NGDP | WorldBank:GDP | WorldBank:GDP.ZG | FRED:CPALTT01JPM659N | FRED:JPNPROINDMISMEI | WorldBank:Retail | WorldBank:ToT:JP | FRED:XTEXVA01JPM664S | FRED:LRHUTTTTJPM156S | WorldBank:GNI.pc.growth",
+  "source": "FRED:IRLTLT01JPM156N | FRED:JPNLOLITONOSTSAM | FRED:CSCICP03JPM665S | FRED:JPNB6BLTT02STSAQ | IMF:WEO:GGXWDG_NGDP | WorldBank:GDP | WorldBank:GDP.ZG | WorldBank:inflation | FRED:JPNPROINDMISMEI | WorldBank:Retail | WorldBank:ToT:JP | FRED:XTEXVA01JPM664S | FRED:LRHUTTTTJPM156S | WorldBank:GNI.pc.growth",
   "data": {
     "gdp": 4027597523550.58,
     "gdpGrowth": 0.1043,
-    "inflation": -0.5,
+    "inflation": 2.7385,
     "unemployment": 2.6,
     "debt": 222.2,
     "currentAccount": 5.296,
@@ -24,7 +24,7 @@
   "dates": {
     "gdp": "2024-06-15",
     "gdpGrowth": "2024-06-15",
-    "inflation": "2021-06-01",
+    "inflation": "2024-06-15",
     "unemployment": "2025-12-01",
     "debt": "2030-06-15",
     "currentAccount": "2024-10-01",
