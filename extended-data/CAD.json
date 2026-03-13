@@ -1,13 +1,13 @@
 {
   "lastUpdate": "2026-03-13",
   "source": "FRED + WorldBank + Frankfurter \u2014 v12.0 (sin Trading Economics)",
-  "rateMomentumStrategy": "fred-csv-12m",
+  "rateMomentumStrategy": "previous-file",
   "data": {
     "bond10y": 3.4015,
     "consumerConfidence": 101.9,
-    "businessConfidence": null,
+    "businessConfidence": 41.73,
     "capitalFlows": -0.64,
-    "inflationExpectations": 129.1809,
+    "inflationExpectations": 2.3153,
     "fdi": 2.8103,
     "rateMomentum": 0.75,
     "rateMomentum24M": 4.75
@@ -15,7 +15,7 @@
   "dates": {
     "bond10y": "2026-01-01",
     "consumerConfidence": "2017-12-01",
-    "businessConfidence": "2026-03-13",
+    "businessConfidence": "2024-01-01",
     "capitalFlows": "2024-10-01",
     "inflationExpectations": "2025-03-01",
     "fdi": "2024-06-15",
