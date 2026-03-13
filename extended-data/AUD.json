@@ -1,24 +1,24 @@
 {
-  "lastUpdate": "2026-03-12",
-  "source": "TradingEconomics \u2014 v10+C2+C7+v5.10: rateMomentum JPY 24M + rm24 todas las divisas",
+  "lastUpdate": "2026-03-13",
+  "source": "FRED + WorldBank + Frankfurter \u2014 v12.0 (sin Trading Economics)",
   "rateMomentumStrategy": "rates-history-12m",
   "data": {
-    "bond10y": 4.935,
-    "consumerConfidence": 90.5,
-    "businessConfidence": 99.0,
-    "capitalFlows": 5740.13,
-    "fdi": 81000.0,
-    "inflationExpectations": 5.2,
+    "bond10y": null,
+    "consumerConfidence": null,
+    "businessConfidence": null,
+    "capitalFlows": -1.9781,
+    "inflationExpectations": 3.1616,
+    "fdi": 3.0388,
     "rateMomentum": -0.25,
     "rateMomentum24M": -0.5
   },
   "dates": {
-    "bond10y": "2026-03-12",
-    "consumerConfidence": "2026-02-15",
-    "businessConfidence": "2026-02-15",
-    "capitalFlows": "2025-12-15",
-    "fdi": "2024-12-15",
-    "inflationExpectations": "2026-03-15",
+    "bond10y": "2026-03-13",
+    "consumerConfidence": "2026-03-13",
+    "businessConfidence": "2026-03-13",
+    "capitalFlows": "2024-06-15",
+    "inflationExpectations": "2024-06-15",
+    "fdi": "2024-06-15",
     "rateMomentum": "2026-03-01"
   }
 }
