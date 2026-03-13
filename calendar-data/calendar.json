@@ -1,11 +1,14 @@
 {
   "lastUpdate": "2026-03-13",
-  "generatedAt": "2026-03-13T11:05:14.828738Z",
-  "timezoneNote": "All timeUTC are UTC. TE local time (UTC-3) converted by +3h.",
+  "generatedAt": "2026-03-13T11:59:19.713018Z",
+  "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
-  "source": "Trading Economics (Playwright)",
+  "source": "cache",
   "errorMessage": null,
-  "fetchErrors": [],
+  "fetchErrors": [
+    "MQL5 API returned 0 events",
+    "FXStreet returned 0 events"
+  ],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-12",
   "totalEvents": 1920,
