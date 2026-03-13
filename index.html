@@ -3482,12 +3482,13 @@ const getSentiment = (strength) => {
     // If numStrength is null/undefined/NaN, return neutral instead of crashing
     if (numStrength === null || numStrength === undefined || isNaN(numStrength)) return 'neutral';
     
-    // Bandas fijas escala 0–100 — calibradas al estándar de la industria (Bloomberg/DailyFX)
-    // < 50 = Bajista · 50–65 = Neutral (sin convicción clara) · > 65 = Alcista
-    // Umbral alcista: 65 (top ~25% del universo G8 en condiciones normales)
-    // Umbral bajista: 50 (punto neutro del modelo — por debajo indica debilidad neta)
+    // Bandas fijas escala 0–100 — calibradas al estándar de la industria (DailyFX/Reuters/prop desk)
+    // < 45 = Bajista · 45–65 = Neutral (zona sin convicción — no operar) · > 65 = Alcista
+    // Umbral alcista: 65 (top ~25% del universo G8 — convicción alcista real)
+    // Umbral bajista: 45 (convicción bajista real — 50 es neutro matemático, no señal de venta)
+    // Zona 45–65: leve sesgo pero sin divergencia suficiente para señal operativa
     if (numStrength > 65) return 'alcista';
-    if (numStrength < 50) return 'bajista';
+    if (numStrength < 45) return 'bajista';
     return 'neutral';
 };
 
