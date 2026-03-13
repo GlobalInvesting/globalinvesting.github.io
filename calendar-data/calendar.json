@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-13",
-  "generatedAt": "2026-03-13T18:00:57.795025Z",
+  "generatedAt": "2026-03-13T18:57:04.492105Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,7 +8,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-12",
-  "totalEvents": 890,
+  "totalEvents": 894,
   "currencyCounts": {
     "AUD": 74,
     "CAD": 62,
@@ -17,11 +17,11 @@
     "GBP": 112,
     "JPY": 95,
     "NZD": 44,
-    "USD": 378
+    "USD": 382
   },
   "impactCounts": {
-    "low": 506,
-    "medium": 308,
+    "low": 507,
+    "medium": 311,
     "high": 76
   },
   "events": [
@@ -6979,6 +6979,58 @@
       "actual": "57.8",
       "forecast": "54.9",
       "previous": "56.6"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Dallas Fed PCE (Jan)",
+      "impact": "low",
+      "actual": "2.70%",
+      "forecast": "",
+      "previous": "2.20%"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Atlanta Fed GDPNow (Q1)",
+      "impact": "medium",
+      "actual": "2.7%",
+      "forecast": "2.7%",
+      "previous": "2.7%"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. Baker Hughes Oil Rig Count",
+      "impact": "medium",
+      "actual": "412",
+      "forecast": "",
+      "previous": "411"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. Baker Hughes Total Rig Count",
+      "impact": "medium",
+      "actual": "553",
+      "forecast": "",
+      "previous": "551"
     },
     {
       "date": "13 Mar",
