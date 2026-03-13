@@ -2458,7 +2458,7 @@ if (scrapedData.data) {
     const data = scrapedData.data;
     const dates = scrapedData.dates || {}; // ← NUEVO: Leer fechas
     
-    economicData[country.code].gdp = data.gdp ? data.gdp / 1000 : null;
+    economicData[country.code].gdp = data.gdp ? data.gdp / 1e12 : null;
     economicData[country.code].gdpDate = dates.gdp || scrapedData.lastUpdate;
     currentStep++;
     
