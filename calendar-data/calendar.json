@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-13",
-  "generatedAt": "2026-03-13T13:42:00.581520Z",
+  "generatedAt": "2026-03-13T14:02:21.156635Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,7 +8,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-01-01",
   "rangeTo": "2026-04-12",
-  "totalEvents": 2496,
+  "totalEvents": 2503,
   "currencyCounts": {
     "AUD": 208,
     "CAD": 199,
@@ -17,12 +17,12 @@
     "GBP": 271,
     "JPY": 284,
     "NZD": 109,
-    "USD": 1064
+    "USD": 1071
   },
   "impactCounts": {
-    "low": 1490,
-    "medium": 785,
-    "high": 221
+    "low": 1492,
+    "medium": 787,
+    "high": 224
   },
   "events": [
     {
@@ -25982,9 +25982,9 @@
       "flag": "🇺🇸",
       "event": "JOLTs Job Openings (JAN)",
       "impact": "high",
-      "actual": "",
+      "actual": "6.946M",
       "forecast": "6.760M",
-      "previous": "6.542M"
+      "previous": "6.550M"
     },
     {
       "date": "13 Mar",
@@ -25995,8 +25995,8 @@
       "flag": "🇺🇸",
       "event": "Michigan Consumer Expectations Prel (MAR)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "54.7",
+      "actual": "54.1",
+      "forecast": "54.5",
       "previous": "56.6"
     },
     {
@@ -26102,6 +26102,45 @@
       "actual": "",
       "forecast": "",
       "previous": "0.4%"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Michigan Consumer Sentiment (Mar)",
+      "impact": "high",
+      "actual": "55.5",
+      "forecast": "55.0",
+      "previous": "56.6"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Michigan 1-Year Inflation Expectations (Mar)",
+      "impact": "medium",
+      "actual": "3.4%",
+      "forecast": "3.6%",
+      "previous": "3.4%"
+    },
+    {
+      "date": "13 Mar",
+      "dateISO": "2026-03-13",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Michigan Current Conditions (Mar)",
+      "impact": "low",
+      "actual": "57.8",
+      "forecast": "54.9",
+      "previous": "56.6"
     },
     {
       "date": "13 Mar",
@@ -26578,50 +26617,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Michigan Consumer Sentiment Prel (MAR)",
-      "impact": "high",
-      "actual": "",
-      "forecast": "55",
-      "previous": "56.6"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "14:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "JOLTs Job Quits (JAN)",
       "impact": "low",
       "actual": "",
       "forecast": "3.26M",
       "previous": "3.204M"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "14:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Michigan 5 Year Inflation Expectations Prel (MAR)",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "3.4%",
-      "previous": "3.3%"
-    },
-    {
-      "date": "13 Mar",
-      "dateISO": "2026-03-13",
-      "timeUTC": "14:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Michigan Current Conditions Prel (MAR)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "55.2",
-      "previous": "56.6"
     },
     {
       "date": "13 Mar",
@@ -31839,6 +31839,32 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "09:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Composite PMI (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.9"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "09:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Services PMI (Mar)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.7"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "10:00",
       "country": "USD",
       "currency": "USD",
@@ -31860,7 +31886,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "56.6"
+      "previous": "54.1"
     },
     {
       "date": "27 Mar",
@@ -31873,7 +31899,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "56.6"
+      "previous": "55.5"
     },
     {
       "date": "27 Mar",
@@ -31886,7 +31912,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "56.6"
+      "previous": "57.8"
     },
     {
       "date": "27 Mar",
@@ -31952,6 +31978,71 @@
       "actual": "",
       "forecast": "",
       "previous": "70.5"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Non-Manufacturing Business Activity (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "59.9"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Non-Manufacturing Employment (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.8"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Non-Manufacturing New Orders (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "58.6"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Non-Manufacturing PMI (Mar)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "56.1"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Non-Manufacturing Prices (Mar)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "63.0"
     },
     {
       "date": "27 Mar",
