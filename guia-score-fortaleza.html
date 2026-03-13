@@ -283,16 +283,16 @@
 
     <div class="section" id="ajustes-contextuales-numericos">
         <h2>Ajustes Contextuales: Ejemplos Numéricos Reproducibles</h2>
-        <p>El score base (suma ponderada de 22 indicadores) se complementa con hasta <strong>13 ajustes contextuales</strong> con un cap global de ±15 puntos. A continuación, ejemplos numéricos con datos reales de 2026-03-12:</p>
+        <p>El score base (suma ponderada de 22 indicadores) se complementa con hasta <strong>13 ajustes contextuales</strong> con un cap global de ±15 puntos. A continuación, ejemplos numéricos con datos reales de datos recientes:</p>
 
         <h3>1. Safe Haven Premium (CHF, JPY)</h3>
-        <p><strong>Ejemplo: CHF con datos reales 2026-03-12</strong></p>
+        <p><strong>Ejemplo: CHF con datos reales datos recientes</strong></p>
         <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
             <div style="color:#8b949e;margin-bottom:8px;"># Inputs</div>
             debt = 40.0%  → puntos += 30  (debt &lt; 40 → máximo)<br>
             currentAccount = 8.5% PIB → puntos += 30  (CA > 5% → máximo)<br>
             inflation = 0.4% → desviación de 2% = 1.6pp → puntos += 10<br>
-            gdp = 0.92T → puntos += 15  (5T &lt; gdp &lt; 20T)<br>
+            gdp = 0.92T → puntos += 5  (&lt;$1T → economía pequeña)<br>
             <div style="color:#8b949e;margin-top:8px;"># Cálculo</div>
             sh_raw = 85 puntos (debt+CA+inflation+GDP)<br>
             avg_cot G8 = -5000 → regime = "risk-off" → mult = 1.5 (si sh > 60)<br>
@@ -302,7 +302,7 @@
         </div>
 
         <h3>2. Reserve Currency Premium (USD)</h3>
-        <p><strong>Ejemplo: USD con datos reales 2026-03-12</strong></p>
+        <p><strong>Ejemplo: USD con datos reales datos recientes</strong></p>
         <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
             gdp_vals = [29.0(USD), 16.0(EUR), 4.2(JPY), ...]<br>
             ratio = 29.0 / 16.0 = <strong>1.81x</strong> → umbral 1.5 superado<br>
@@ -335,15 +335,15 @@
         </div>
 
         <h3>5. Carry Premium</h3>
-        <p><strong>Ejemplo: AUD rate = 3.85%, media G8 = 2.54%</strong></p>
+        <p><strong>Ejemplo: AUD rate = 3.85%, media G8 = 2.33%</strong></p>
         <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
-            diff = 3.85 - 2.54 = <strong>+1.31pp</strong> (umbral carry > 1.0pp)<br>
-            <strong style="color:#3fb950;">→ adj_carry = min(1.31 × 2, 5) = +2.62 puntos</strong>
+            diff = 3.85 - 2.33 = <strong>+1.52pp</strong> (umbral carry > 1.0pp)<br>
+            <strong style="color:#3fb950;">→ adj_carry = min(1.52 × 2, 5) = +3.04 puntos</strong>
         </div>
 
         <h3>6. Corrección Hawkish-Pause (FIX-6)</h3>
         <p>Cuando un banco central está en <em>pausa hawkish</em> — mantiene tasas sin subirlas pero con sesgo restrictivo — el momentum de tasas (<code>rateMomentum</code>) tiende a ser ≈ 0, subestimando la postura real del banco. FIX-6 corrige esto.</p>
-        <p><strong>Ejemplo: JPY en pausa hawkish — datos reales 2026-03-12</strong></p>
+        <p><strong>Ejemplo: JPY en pausa hawkish — datos reales datos recientes</strong></p>
         <div class="example-box" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin:12px 0;font-family:monospace;font-size:13px;line-height:1.8;">
             rateMomentum_raw  = <strong>+0.05</strong>  (variación de tasa últimos 12 meses ≈ 0)<br>
             bcOutlook         = <strong>Hawkish</strong>  (rm12 &ge; 0.25 por rm24 o señal del BoJ)<br>

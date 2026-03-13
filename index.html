@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
     
     <!-- SEO Meta Tags OPTIMIZADOS -->
-    <title>Dashboard Forex | Análisis Fundamental en Tiempo Real 2026</title>
+    <title>Dashboard Forex | Análisis Fundamental en Tiempo Real</title>
     <meta name="description" content="Dashboard profesional de análisis fundamental forex 2026 con 22 indicadores económicos en tiempo real, datos de bancos centrales FRED OECD CFTC, rankings de fortaleza USD EUR GBP JPY AUD CAD CHF NZD. Herramienta para traders.">
     <meta name="keywords" content="dashboard forex 2026, análisis fundamental forex, indicadores económicos tiempo real, fortaleza divisas USD EUR GBP, datos bancos centrales, tasas interés forex, PIB inflación desempleo, trading forex herramientas, análisis técnico fundamental, COT positioning forex, carry trade calculator, forex strength meter, currency analysis dashboard, central bank rates live">
     <meta name="author" content="Santiago Plá Casuriaga">
@@ -79,7 +79,7 @@
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "inLanguage": "es-ES",
       "datePublished": "2026-02-14",
-      "dateModified": "2026-03-06",
+      "dateModified": "2026-03-13",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -2404,7 +2404,7 @@ const loadAllEconomicData = async (setEconomicData, setDataLoadingStatus) => {
                         const cacheKey = 'all_economic_data';
             // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
             // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-            const DASHBOARD_VERSION = '6.4.1-2026-03-12';  // bump: fix null scores cache crash
+            const DASHBOARD_VERSION = '6.5.0-2026-03-13';  // bump: data fixes + industry threshold
             
             // ✅ Verificar versión del caché
             const cachedVersion = localStorage.getItem('forex_dashboard_version');
@@ -3482,9 +3482,11 @@ const getSentiment = (strength) => {
     // If numStrength is null/undefined/NaN, return neutral instead of crashing
     if (numStrength === null || numStrength === undefined || isNaN(numStrength)) return 'neutral';
     
-    // Bandas fijas escala 0–100
-    // < 50 = Débil · 50–60 = Neutral · > 60 = Fuerte
-    if (numStrength > 60) return 'alcista';
+    // Bandas fijas escala 0–100 — calibradas al estándar de la industria (Bloomberg/DailyFX)
+    // < 50 = Bajista · 50–65 = Neutral (sin convicción clara) · > 65 = Alcista
+    // Umbral alcista: 65 (top ~25% del universo G8 en condiciones normales)
+    // Umbral bajista: 50 (punto neutro del modelo — por debajo indica debilidad neta)
+    if (numStrength > 65) return 'alcista';
     if (numStrength < 50) return 'bajista';
     return 'neutral';
 };

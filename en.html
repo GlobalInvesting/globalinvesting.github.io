@@ -377,7 +377,7 @@
             </div>
         </div>
         <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid var(--border);font-size:0.68rem;color:var(--dim);">
-            FX Performance 1M vs USD weighted basket · Data: 2026-03-06
+            FX Performance 1M vs USD weighted basket · Data: <span id="fx-data-date">latest</span>
         </div>
     </div>
 </section>
@@ -386,7 +386,7 @@
 <div class="stats-bar">
     <div class="stats-inner">
         <div class="stat"><div class="stat-value">8</div><div class="stat-label">G8 Currencies</div></div>
-        <div class="stat"><div class="stat-value">21</div><div class="stat-label">Weighted Indicators</div></div>
+        <div class="stat"><div class="stat-value">22</div><div class="stat-label">Weighted Indicators</div></div>
         <div class="stat"><div class="stat-value">60s</div><div class="stat-label">FX Rate Refresh</div></div>
         <div class="stat"><div class="stat-value">3×</div><div class="stat-label">Daily News Updates</div></div>
         <div class="stat"><div class="stat-value">Open</div><div class="stat-label">No Account Required</div></div>
@@ -542,7 +542,7 @@
             </ul>
         </div>
         <div class="inst-card">
-            <div class="inst-card-title">Current Data Snapshot — March 2026</div>
+            <div class="inst-card-title">Current Data Snapshot — <span id="snap-month"></span></div>
             <div class="inst-row"><span>Fed Funds Rate</span><span>3.75% (–0.75pp in 12M)</span></div>
             <div class="inst-row"><span>ECB Deposit Rate</span><span>2.15%</span></div>
             <div class="inst-row"><span>BoE Bank Rate</span><span>3.75%</span></div>
@@ -551,9 +551,9 @@
             <div class="inst-row"><span>BoC Overnight Rate</span><span>2.25%</span></div>
             <div class="inst-row"><span>SNB Policy Rate</span><span>0.00%</span></div>
             <div class="inst-row"><span>RBNZ OCR</span><span>2.25%</span></div>
-            <div class="inst-row"><span>Next Fed meeting</span><span>18 March 2026</span></div>
-            <div class="inst-row"><span>Next ECB meeting</span><span>19 March 2026</span></div>
-            <div class="inst-row"><span>COT last update</span><span>2026-03-07 (CFTC)</span></div>
+            <div class="inst-row"><span>Next Fed meeting</span><span>See <a href="https://globalinvesting.github.io/#calendar" style="color:var(--accent)">calendar</a></span></div>
+            <div class="inst-row"><span>Next ECB meeting</span><span>See <a href="https://globalinvesting.github.io/#calendar" style="color:var(--accent)">calendar</a></span></div>
+            <div class="inst-row"><span>COT last update</span><span id="cot-date">Fridays (CFTC)</span></div>
         </div>
     </div>
 </div>
@@ -583,7 +583,13 @@
     </div>
     <p class="footer-copy">© <span id="yr"></span> Santiago Plá Casuriaga · Global Investing. All rights reserved. · This site does not provide financial advice. All content is for informational purposes only.</p>
 </footer>
-<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+var _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var _now = new Date();
+if(document.getElementById('snap-month')) document.getElementById('snap-month').textContent = _months[_now.getMonth()] + ' ' + _now.getFullYear();
+if(document.getElementById('fx-data-date')) document.getElementById('fx-data-date').textContent = _now.toISOString().slice(0,10);
+</script>
 <!-- GDPR Banner (shared) -->
 <style>
 #gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}

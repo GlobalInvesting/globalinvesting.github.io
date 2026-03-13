@@ -207,6 +207,22 @@
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 7%), que sí es un indicador de flujo relevante para el trading.</p>
 
             
+            <h3>Cambios en v6.5 (marzo 2026) — Correcciones de datos + Umbrales industria</h3>
+            <ul>
+                <li><strong>FIX — Umbral alcista/bajista calibrado al estándar de la industria:</strong> El umbral alcista se ajustó de &gt;60 a <strong>&gt;65</strong>, alineando el modelo con la práctica de Bloomberg, DailyFX y plataformas institucionales. Con la media G8 en ~61 pts, un umbral de 60 clasificaba como alcista a cualquier divisa por encima del promedio — sin valor diferencial. El nuevo umbral identifica el top ~25% del universo como señal de convicción real. Zona neutral: 50–65. Bajista: &lt;50.</li>
+                <li><strong>FIX — Normalización de Balanza Comercial:</strong> La función de preprocesamiento usaba <code>gdpM = gdp × 1000</code> tratando el PIB como si estuviera en miles de millones, cuando en realidad está en USD nominales. El divisor correcto es <code>gdp / 1.000.000</code> para obtener millones USD. El error producía valores de TB/PIB ≈ 0% para todas las divisas, neutralizando el indicador de peso 4%.</li>
+                <li><strong>FIX — Series de Balanza Comercial en USD:</strong> Las series FRED <code>XTEXVA01XXX664S</code> (moneda local) se reemplazaron por <code>XTEXVA01XXX667S</code> (USD millones) para EUR, GBP, JPY, AUD, CAD, CHF y NZD. Con la serie anterior, el saldo japonés de 500.000M JPY se interpretaba como USD, produciendo un error de 150× en el scoring.</li>
+                <li><strong>FIX — USD Ventas Minoristas:</strong> La serie FRED <code>RSXFS</code> (nivel absoluto en millones USD, ~633.000) se reemplazó por <code>MRTSSM44000USS</code> (variación MoM%, directo). El nivel absoluto producía un score de 100/100 siempre para USD en este indicador de peso 3%.</li>
+                <li><strong>FIX — Umbrales GDP en ajuste Safe Haven:</strong> Los umbrales de tamaño económico en <code>_adj_safe_haven()</code> se corrigieron a USD nominales (20T, 5T, 1T) desde valores relativos que siempre evaluaban como verdaderos dado el tamaño real de las economías G8.</li>
+                <li><strong>CPI EUR y CHF desde calendario:</strong> El pipeline <code>update_pmi_from_calendar.py</code> ahora incluye EUR y CHF en sus fuentes de CPI YoY, eliminando la dependencia de series FRED con lag de varios meses.</li>
+            </ul>
+            <h3>Cambios en v6.4 (marzo 2026) — Commodity ToT + Reserve Currency + Pesos</h3>
+            <ul>
+                <li><strong>P1 — Commodity Score via ToT z-score:</strong> Ajuste contextual data-driven para AUD, CAD y NZD usando el z-score del Terms of Trade vs la mediana G8 como proxy del precio de commodities. Elimina la necesidad de hardcodear precios de WTI/Brent/Iron Ore. Premio automático cuando los commodities del país están en relativa fortaleza (cap ±8 pts).</li>
+                <li><strong>P2 — Reserve Currency Premium data-driven:</strong> El déficit de cuenta corriente del USD se financia automáticamente por la demanda global de activos en dólares (privilegio exorbitante). El ajuste activa cuando la economía tiene ratio PIB/2.ª economía ≥ 1.5× Y el déficit de CA es financiado por flujos de capital positivos. Transferible automáticamente si otra divisa supera al USD en PIB nominal futuro.</li>
+                <li><strong>servicesPMI: 4% → 5%:</strong> Sector servicios &gt;70% del PIB en G8. El peso cedido proviene de <code>wageGrowth</code> (1% → 0%), cuya señal está capturada con mayor precisión por <code>inflation</code> + <code>rateMomentum</code>.</li>
+                <li><strong>FIX-7 — Penalización por score estancado:</strong> Backtest prospectivo reveló que AUD con HR 46.5% como LONG en posición sostenida ≥65 pts sin validación FX requiere descuento de mercado. Penalización gradual 0 a −6 pts cuando el score lleva ≥8 semanas consecutivas sobre 68 pts sin confirmación de fxPerformance1M.</li>
+            </ul>
             <h3>Cambios en v6.3 (marzo 2026) — ESI Proxy + Umbrales</h3>
             <ul>
                 <li><strong>ESI Proxy (Economic Surprise Index):</strong> 22.º indicador del modelo (peso 4%). Arquitectura híbrida: Componente A compara actuals vs forecast del calendario económico (Investing.com); Componente B mide la posición relativa de cada divisa en el G8 mediante z-scores. Cuando el Componente A tiene datos, pondera 60/40 con B; si no hay actuals disponibles, opera solo con B (neutro=50). El ESI captura el gap metodológico más importante vs modelos institucionales: el mercado ya tiene el nivel en precio — lo que mueve el par es la sorpresa vs expectativas.</li>
@@ -242,7 +258,7 @@
                 <li><strong>FIX-5 — Badge contextual "Score estructural":</strong> Las tarjetas de divisa muestran un badge ⚑ cuando el score es elevado pero las señales de momentum son débiles (tasa ≤ 0.5% o ciclo ≤ −1.0pp). El badge es 100% data-driven y distingue fortaleza de balance sheet de señal operativa de momentum.</li>
             </ul>
 
-            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers (v6.3)</h3>
+            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers (v6.5)</h3>
             <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
@@ -271,17 +287,17 @@
                     <tr><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral.</td></tr>
                     <tr><td>Producción Industrial</td><td>4%</td><td>Actividad del sector real.</td></tr>
                     <tr>
-                        <td rowspan="2"><strong>Tier 4 — 4%</strong><br/>Consumo &amp; Salarios</td>
+                        <td rowspan="2"><strong>Tier 4 — 3%</strong><br/>Consumo</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
                     <tr><td>Crecimiento Salarial</td><td>1%</td><td>Presiones inflacionarias laborales.</td></tr>
                     <tr>
-                        <td rowspan="7"><strong>Tier 5 — 21%</strong><br/>Sentimiento de Mercado</td>
+                        <td rowspan="7"><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
                         <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Filtro de confirmación de precio v5.7.</td>
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>3%</td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>2%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>4%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish. v6.2.</td></tr>
+                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish. v6.2. Peso aumentado en v6.4.</td></tr>
                     <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas. v6.3.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
                     <tr><td>Flujos de Capital</td><td>0%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB. Peso vestigial; pendiente de fuente de datos confiable.</td></tr>
@@ -397,7 +413,7 @@ Bandas: &lt; 50 = Débil · 50–60 = Neutral · &gt; 60 = Fuerte</pre>
                 <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
                 <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
             </div>
-            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.4.0</p>
+            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.0</p>
         </div></div>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 <!-- GDPR Banner (shared) -->
