@@ -3044,12 +3044,12 @@ if (!data?.labels || !data?.rates || data.source === 'unavailable') {
                                     labels: data.labels,
 datasets: [
     {
-        label: 'Tasa de Interés % (datos reales - Investing.com)',
+        label: 'Tasa de Interés % (fuente oficial — global-rates.com / FRED)',
         data: data.rates,
         borderColor: '#1e88e5',
         backgroundColor: 'rgba(30, 136, 229, 0.1)',
         yAxisID: 'y',
-        tension: 0.3,
+        tension: 0,
         borderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6
@@ -3093,7 +3093,13 @@ datasets: [
                                                 display: true, 
                                                 text: 'Tasa %', 
                                                 color: '#8b949e' 
-                                            } 
+                                            },
+                                            min: (() => {
+                                                const minVal = Math.min(...(data.rates || [0]));
+                                                // Floor to nearest 0.25 step, with 0.25 padding below
+                                                const floored = Math.floor(minVal * 4) / 4;
+                                                return Math.max(0, floored - 0.25);
+                                            })()
                                         },
                                         x: { 
                                             grid: { color: '#30363d' }, 
