@@ -185,11 +185,10 @@
             <p style="margin:0;color:var(--text-secondary);">Diferencial: 26.3 puntos → <strong>Confianza Alta</strong>. El modelo sugiere una posición LONG en AUD/CAD, porque los fundamentos de Australia son significativamente más fuertes que los de Canadá en este momento.</p>
         </div>
 
-        <p>Los umbrales de confianza para los diferenciales son:</p>
+        <p>El umbral de confianza para los diferenciales es:</p>
         <ul>
-            <li><strong>Mayor a 25 puntos:</strong> Confianza Alta — divergencia fundamental significativa y operacionalmente relevante.</li>
-            <li><strong>18 a 25 puntos:</strong> Confianza Media — divergencia moderada con señal accionable. Sharpe histórico ~0.85, HR ~55%.</li>
-            <li><strong>Menor a 12 puntos:</strong> Confianza Baja — divisas con fundamentos demasiado similares; el diferencial técnico puede dominar.</li>
+            <li><strong>Mayor o igual a 20 puntos:</strong> Confianza Alta — divergencia fundamental significativa. El dashboard muestra únicamente señales que alcanzan este umbral, respaldado por backtesting (HR ~49.8%, Sharpe +0.46).</li>
+            <li><strong>Menor a 20 puntos:</strong> El diferencial entre ambas divisas es demasiado estrecho para constituir una señal con sustento estadístico. Los fundamentos no dan una lectura clara de fortaleza relativa; en ese contexto, el análisis técnico y los eventos del calendario cobran mayor relevancia.</li>
         </ul>
     </div>
 
@@ -245,7 +244,7 @@
         <h2>Resumen: guía de lectura rápida</h2>
         <ol>
             <li><strong>Identifica las divisas en los extremos</strong> — Las que están claramente por encima de 65 y por debajo de 45.</li>
-            <li><strong>Calcula el diferencial</strong> — Score fuerte menos score débil. Mayor a 25 = confianza alta, 18–25 = confianza media.</li>
+            <li><strong>Calcula el diferencial</strong> — Score fuerte menos score débil. Mayor o igual a 20 = confianza alta y señal visible en el dashboard.</li>
             <li><strong>Verifica la calidad de datos</strong> — Preferiblemente 70% o más para ambas divisas del par.</li>
             <li><strong>Considera el contexto macro</strong> — ¿Estamos en risk-on o risk-off? ¿Hay eventos de calendario próximos que puedan alterar el balance?</li>
             <li><strong>Usa el análisis técnico para el timing</strong> — El score indica la dirección, el técnico define el momento y el nivel de entrada.</li>
