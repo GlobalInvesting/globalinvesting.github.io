@@ -2,7 +2,7 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón ha subido las tasas de interés en 0.45 puntos porcentuales, lo que ha generado una presión alcista sobre la divisa japonesa. Aunque la tasa de interés sigue estando por debajo del promedio global, el aumento ha sido visto como un paso hacia un ciclo restrictivo. El gobernador del Banco de Japón, Ueda, ha advertido que una debilidad en el yen podría amplificar la inflación, especialmente con el aumento en los precios del petróleo.\n\nLa balanza comercial de Japón sigue mostrando un superávit, gracias a sus exportaciones de vehículos y maquinaria industrial. Sin embargo, la cuenta corriente también se ha visto afectada por los términos de intercambio desfavorables, lo que ha encarecido las importaciones. Aunque los datos económicos siguen siendo mixtos, la posición especulativa en el mercado sigue siendo muy bajista, lo que podría generar un potencial rebote contrario si los datos mejoran.\n\nEl rendimiento del yen en el último mes ha sido positivo, con una apreciación del 1.12% frente al dólar estadounidense. Esto se ha debido en parte a la combinación de una subida en los precios del petróleo y un aumento en los rendimientos de los bonos estadounidenses. Aunque el mercado sigue estando muy cargado a la baja, cualquier mejora en los datos podría generar un rebote en la divisa japonesa.",
+  "analysis": "El Banco de Japón subió las tasas de interés en 0.25pp en julio de 2025, llevando el tipo al 0.75%, dentro de su ciclo alcista acumulado de +0.25pp en 12 meses. Esta subida ha generado una presión alcista sobre la divisa japonesa. Aunque la tasa de interés sigue estando por debajo del promedio global, el aumento ha sido visto como un paso hacia un ciclo restrictivo. El gobernador del Banco de Japón, Ueda, ha advertido que una debilidad en el yen podría amplificar la inflación, especialmente con el aumento en los precios del petróleo.\n\nLa balanza comercial de Japón sigue mostrando un superávit, gracias a sus exportaciones de vehículos y maquinaria industrial. Sin embargo, la cuenta corriente también se ha visto afectada por los términos de intercambio desfavorables, lo que ha encarecido las importaciones. Aunque los datos económicos siguen siendo mixtos, la posición especulativa en el mercado sigue siendo muy bajista, lo que podría generar un potencial rebote contrario si los datos mejoran.\n\nEl rendimiento del yen en el último mes ha sido positivo, con una apreciación del 1.12% frente al dólar estadounidense. Esto se ha debido en parte a la combinación de una subida en los precios del petróleo y un aumento en los rendimientos de los bonos estadounidenses. Aunque el mercado sigue estando muy cargado a la baja, cualquier mejora en los datos podría generar un rebote en la divisa japonesa.",
   "model": "llama-3.3-70b-versatile",
   "generatedAt": "2026-03-13T08:33:44.546334+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
@@ -16,13 +16,13 @@
     "rateMomentum": 0.45,
     "lastRateDecision": {
       "direction": "SUBIÓ",
-      "delta": 0.45,
+      "delta": 0.25,
       "current_rate": 0.75,
-      "prev_rate": 0.3,
-      "date": "2026-03-01",
+      "prev_rate": 0.5,
+      "date": "2025-07-01",
       "source": "rates_history",
-      "cycle_12m": 0.0,
-      "cycle_label": "estable en los últimos 12 meses"
+      "cycle_12m": 0.25,
+      "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -34225,
     "fxPerformance1M": 1.1247,
