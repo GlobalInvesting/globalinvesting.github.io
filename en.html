@@ -412,12 +412,12 @@
         <div class="feature-card">
             
             <div class="feature-title">FX Performance 1M</div>
-            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). Basket-corrected composite (v5.9): each currency is measured against the other 7 rather than USD alone, eliminating USD-bias. Composition: 70% 1M return + 20% 1W return + 10% 3M return. The only 100% lag-free indicator — captures institutional flows in near real time. Weight: 8% (confirmator, not driver — v6.0 rebalance).</div>
+            <div class="feature-desc">Real 30-day return per currency vs a weighted G8 basket (ECB/Frankfurter data). Basket-corrected composite: each currency is measured against the other 7 rather than USD alone, eliminating USD-bias. Composition: 70% 1M return + 20% 1W return + 10% 3M return. The only 100% lag-free indicator — captures institutional flows in near real time. Weight: 8% (confirmator, not driver).</div>
         </div>
         <div class="feature-card">
             
             <div class="feature-title">COT Positioning (CFTC)</div>
-            <div class="feature-desc">Weekly net positions from the official CFTC Leveraged Funds report (Futures Only). Contrarian logic built in: extreme positions penalise the score instead of amplifying it. Price confirmation filter (v5.7): COT score is attenuated when extreme positioning is not confirmed by recent price action. Weight: 6%.</div>
+            <div class="feature-desc">Weekly net positions from the official CFTC Leveraged Funds report (Futures Only). Contrarian logic built in: extreme positions penalise the score instead of amplifying it. Price confirmation filter: COT score is attenuated when extreme positioning is not confirmed by recent price action. Weight: 6%.</div>
         </div>
         <div class="feature-card">
             
@@ -501,11 +501,11 @@
                 <tr><th>Tier</th><th>Weight</th><th>Key Indicators</th></tr>
             </thead>
             <tbody>
-                <tr><td>T1 · Monetary Policy</td><td><strong>29%</strong></td><td>Interest Rate (10%), Rate Momentum (7%), Inflation (7%), CB Outlook (5%) — hawkish-pause boost v6.1 + rate cycle haircut</td></tr>
+                <tr><td>T1 · Monetary Policy</td><td><strong>29%</strong></td><td>Interest Rate (10%), Rate Momentum (7%), Inflation (7%), CB Outlook (5%) — hawkish-pause boost + rate cycle haircut</td></tr>
                 <tr><td>T2 · External Balance</td><td>19%</td><td>Current Account (7%), Trade Balance (4%), Public Debt (4%), Terms of Trade (4%)</td></tr>
                 <tr><td>T3 · Market Sentiment</td><td>21%</td><td>COT Positioning (6%), Manufacturing PMI (3%), Services PMI (4%), ESI Proxy (4%), Consumer Confidence (2%), Business Confidence (2%), Capital Flows (0%)</td></tr>
                 <tr><td>T4 · Growth & Employment</td><td>16%</td><td>GDP Growth (7%), Unemployment (5%), Industrial Production (4%)</td></tr>
-                <tr><td>T5 · FX Confirmator</td><td>11%</td><td>FX Performance 1M basket-corrected (8%), 10Y Bond Yield (3%) — confirmator not driver (v6.0)</td></tr>
+                <tr><td>T5 · FX Confirmator</td><td>11%</td><td>FX Performance 1M basket-corrected (8%), 10Y Bond Yield (3%) — confirmator not driver</td></tr>
                 <tr><td>T6 · Consumption & Wages</td><td>4%</td><td>Retail Sales (3%), Wage Growth (1%)</td></tr>
             </tbody>
         </table>

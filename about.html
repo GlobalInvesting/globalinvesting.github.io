@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <link rel="canonical" href="https://globalinvesting.github.io/about.html">
     <meta property="og:title" content="Sobre el Modelo | Global Investing Dashboard">
-    <meta property="og:description" content="Metodología completa del modelo de fortaleza fundamental de divisas G8. Pesos, indicadores, ajustes contextuales y changelog de versiones.">
+    <meta property="og:description" content="Metodología completa del modelo de fortaleza fundamental de divisas G8. Pesos, indicadores, ajustes contextuales y fuentes de datos verificadas.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://globalinvesting.github.io/about.html">
     <meta property="og:site_name" content="Global Investing">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Sobre el Modelo | Global Investing Dashboard">
-    <meta name="twitter:description" content="Metodología completa del modelo de fortaleza fundamental de divisas G8. Pesos, indicadores, ajustes contextuales y changelog de versiones.">
+    <meta name="twitter:description" content="Metodología completa del modelo de fortaleza fundamental de divisas G8. Pesos, indicadores, ajustes contextuales y fuentes de datos verificadas.">
     <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/about.html">
     <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
     <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/about.html">
@@ -153,7 +153,7 @@
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 22 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
-                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected (v5.9): cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. A partir de v6.0 actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
+                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected: cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. Actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
@@ -211,62 +211,10 @@
 
             <h3>Filosofía del Modelo</h3>
             <p>El modelo está diseñado con una premisa central: <strong>los fundamentales CAUSAN el precio; el precio no debe ser el mayor peso del modelo</strong>. En forex, el orden de prioridad es: carry &gt; ciclo monetario &gt; balance externo &gt; crecimiento. Un modelo que pondere el precio pasado más que cualquier fundamental comete una inversión de causalidad: premia lo que ya está en el mercado, no lo que lo moverá.</p>
-            <p>En v6.0 se corrigió esta inversión: <code>fxPerformance1M</code> pasó de ser el indicador de mayor peso (28%) a operar como <strong>confirmador</strong> (8%). Si los fundamentales son fuertes Y el precio confirma → +convicción. Si divergen → señal de alerta, no destrucción del score. El peso liberado se redistribuyó hacia <code>interestRate</code> (+3%), <code>rateMomentum</code> (+3%), <code>gdpGrowth</code> (+1%) y <code>currentAccount</code> (+2%), que son los drivers reales del precio a 2-6 semanas.</p>
+            <p><code>fxPerformance1M</code> opera como <strong>confirmador</strong> (8%), no como driver. Si los fundamentales son fuertes Y el precio confirma → +convicción. Si divergen → señal de alerta, no destrucción del score.</p>
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 7%), que sí es un indicador de flujo relevante para el trading.</p>
 
-            
-            <h3>Cambios en v6.5 (marzo 2026) — Correcciones de datos + Umbrales industria</h3>
-            <ul>
-                <li><strong>FIX — Umbral alcista/bajista calibrado al estándar de la industria:</strong> El umbral alcista se ajustó de &gt;60 a <strong>&gt;65</strong>, alineando el modelo con la práctica de Bloomberg, DailyFX y plataformas institucionales. Con la media G8 en ~61 pts, un umbral de 60 clasificaba como alcista a cualquier divisa por encima del promedio — sin valor diferencial. El nuevo umbral identifica el top ~25% del universo como señal de convicción real. Zona neutral: 45–65. Bajista: &lt;45.</li>
-                <li><strong>FIX — Normalización de Balanza Comercial:</strong> La función de preprocesamiento usaba <code>gdpM = gdp × 1000</code> tratando el PIB como si estuviera en miles de millones, cuando en realidad está en USD nominales. El divisor correcto es <code>gdp / 1.000.000</code> para obtener millones USD. El error producía valores de TB/PIB ≈ 0% para todas las divisas, neutralizando el indicador de peso 4%.</li>
-                <li><strong>FIX — Series de Balanza Comercial en USD:</strong> Las series FRED <code>XTEXVA01XXX664S</code> (moneda local) se reemplazaron por <code>XTEXVA01XXX667S</code> (USD millones) para EUR, GBP, JPY, AUD, CAD, CHF y NZD. Con la serie anterior, el saldo japonés de 500.000M JPY se interpretaba como USD, produciendo un error de 150× en el scoring.</li>
-                <li><strong>FIX — USD Ventas Minoristas:</strong> La serie FRED <code>RSXFS</code> (nivel absoluto en millones USD, ~633.000) se reemplazó por <code>MRTSSM44000USS</code> (variación MoM%, directo). El nivel absoluto producía un score de 100/100 siempre para USD en este indicador de peso 3%.</li>
-                <li><strong>FIX — Umbrales GDP en ajuste Safe Haven:</strong> Los umbrales de tamaño económico en <code>_adj_safe_haven()</code> se corrigieron a USD nominales (20T, 5T, 1T) desde valores relativos que siempre evaluaban como verdaderos dado el tamaño real de las economías G8.</li>
-                <li><strong>CPI EUR y CHF desde calendario:</strong> El pipeline <code>update_pmi_from_calendar.py</code> ahora incluye EUR y CHF en sus fuentes de CPI YoY, eliminando la dependencia de series FRED con lag de varios meses.</li>
-            </ul>
-            <h3>Cambios en v6.4 (marzo 2026) — Commodity ToT + Reserve Currency + Pesos</h3>
-            <ul>
-                <li><strong>P1 — Commodity Score via ToT z-score:</strong> Ajuste contextual data-driven para AUD, CAD y NZD usando el z-score del Terms of Trade vs la mediana G8 como proxy del precio de commodities. Elimina la necesidad de hardcodear precios de WTI/Brent/Iron Ore. Premio automático cuando los commodities del país están en relativa fortaleza (cap ±8 pts).</li>
-                <li><strong>P2 — Reserve Currency Premium data-driven:</strong> El déficit de cuenta corriente del USD se financia automáticamente por la demanda global de activos en dólares (privilegio exorbitante). El ajuste activa cuando la economía tiene ratio PIB/2.ª economía ≥ 1.5× Y el déficit de CA es financiado por flujos de capital positivos. Transferible automáticamente si otra divisa supera al USD en PIB nominal futuro.</li>
-                <li><strong>servicesPMI: 4% → 5%:</strong> Sector servicios &gt;70% del PIB en G8. El peso cedido proviene de <code>wageGrowth</code> (1% → 0%), cuya señal está capturada con mayor precisión por <code>inflation</code> + <code>rateMomentum</code>.</li>
-                <li><strong>FIX-7 — Penalización por score estancado:</strong> Backtest prospectivo reveló que AUD con HR 46.5% como LONG en posición sostenida ≥65 pts sin validación FX requiere descuento de mercado. Penalización gradual 0 a −6 pts cuando el score lleva ≥8 semanas consecutivas sobre 68 pts sin confirmación de fxPerformance1M.</li>
-            </ul>
-            <h3>Cambios en v6.3 (marzo 2026) — ESI Proxy + Umbrales</h3>
-            <ul>
-                <li><strong>ESI Proxy (Economic Surprise Index):</strong> 22.º indicador del modelo (peso 4%). Arquitectura híbrida: Componente A compara actuals vs forecast del calendario económico (Investing.com); Componente B mide la posición relativa de cada divisa en el G8 mediante z-scores. Cuando el Componente A tiene datos, pondera 60/40 con B; si no hay actuals disponibles, opera solo con B (neutro=50). El ESI captura el gap metodológico más importante vs modelos institucionales: el mercado ya tiene el nivel en precio — lo que mueve el par es la sorpresa vs expectativas.</li>
-                <li><strong>Umbrales de sentimiento actualizados:</strong> Umbral alcista elevado de &gt;60 a <strong>&gt;65</strong>, bajista de &lt;50 a <strong>&lt;45</strong>. Zona neutral ampliada a 45–65. La frontera de 50 era semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;50) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
-            </ul>
-            <h3>Cambios en v6.2 (marzo 2026) — PMI Servicios</h3>
-            <ul>
-                <li><strong>PMI Servicios (<code>servicesPMI</code>):</strong> 22.º indicador del modelo (peso 5%). Scrapeado automáticamente desde Investing.com junto con PMI Manufacturero. Score &gt;50 = expansión del sector servicios (bullish); &lt;50 = contracción (bearish). Diferencial de peso respecto a PMI Manufacturero: los servicios representan &gt;70% del PIB en economías G8, lo que justifica peso equivalente al manufacturero. El Tier 5 (Sentimiento de Mercado) sube a 22% con las adiciones de v6.2–v6.4.</li>
-            </ul>
-            <h3>Cambios en v6.1 (marzo 2026) — Precisión Hawkish Pause + Stagflation</h3>
-            <ul>
-                <li><strong>FIX-6 — Hawkish Pause Boost en rateMomentum:</strong> Un banco central con <code>bcOutlook=Hawkish</code> y <code>rateMomentum ≈ 0</code> está en pausa hawkish, no en posición neutral. Ejemplo: el BOJ subió tasas en 2024-2025 y pausó con <code>rm12=0.0</code> — esto es radicalmente distinto a un BC inactivo con <code>rm=0</code>. Fix: si <code>bcOutlook=Hawkish</code> Y <code>rm ∈ [-0.25, +0.5]</code>, se usa <code>rm efectivo=+0.3</code> (mild hawkish), que da score 72 en lugar de 50 en el componente. Con peso 7%, el impacto en el score total es ≈ +1.5 pts — quirúrgico. 100% data-driven: usa los campos <code>bcOutlook</code> (scrapeado) y <code>rateMomentum</code> (calculado) que ya existen en el modelo.</li>
-                <li><strong>FIX-7 — Stagflation Risk (ajuste contextual nuevo):</strong> El modelo sin este ajuste puntuaba inflación 1.9% (cerca del target) altamente, ignorando que esa inflación baja en contexto de contracción industrial es señal de debilidad macroeconómica, no de salud. Nuevo ajuste contextual que activa cuando se cumplen 3 condiciones simultáneas: <code>inflation &lt; 2.5%</code> + <code>production &lt; -0.5%</code> + <code>rateMomentum &lt; -0.5</code>. Penalización progresiva: 0 a −5 pts según severidad de cada componente. Afecta únicamente EUR (−1.4 pts: infl 1.9, prod −1.3, rm −0.75) y CHF (−4.3 pts: infl 0.1, prod −3.3, rm −1.5) en el contexto actual. El resto del G8 no activa el trigger. 100% data-driven: usa indicadores ya presentes en el modelo.</li>
-            </ul>
-
-            <h3>Cambios en v6.0 (marzo 2026) — Rebalanceo Fundamental</h3>
-            <ul>
-                <li><strong>CORE — fxPerformance1M: 28% → 8% (Confirmador):</strong> El cambio más importante de la historia del modelo. Con 28% de peso, el FX performance podía mover el score total hasta 25.7 puntos solo, convirtiendo un modelo fundamental en un momentum tracker. Tres distorsiones eliminadas: (1) <em>Momentum chase</em> — se premiaba lo que ya estaba en el precio; (2) <em>Mean reversion ignorada</em> — a 2-6 semanas, divisas que subieron mucho tienden a consolidar; (3) <em>Causalidad invertida</em> — los fundamentales causan el precio, no al revés. FX ahora opera como confirmador: si los fundamentales son fuertes Y el precio confirma → +convicción marginal.</li>
-                <li><strong>interestRate: 7% → 10%:</strong> El carry es el factor #1 documentado en la literatura de forex. Recupera su peso correcto.</li>
-                <li><strong>rateMomentum: 4% → 7%:</strong> La dirección del banco central es más predictiva que el nivel de tasas. Un BC que recorta activamente (NZD -3.25pp, CAD -2.75pp) merece mayor penalización que uno en pausa.</li>
-                <li><strong>currentAccount: 5% → 7%:</strong> Flujos reales que determinan demanda estructural de la divisa.</li>
-                <li><strong>gdpGrowth: 6% → 7%, debt: 2% → 4%, termsOfTrade: 2% → 4%:</strong> Fundamentales cíclicos y estructurales recuperan peso correcto.</li>
-                <li><strong>inflationExpectations eliminado (2% → 0%):</strong> Indicador redundante con <code>inflation</code> + <code>rateMomentum</code>. La señal ya está capturada con mayor precisión por esos dos indicadores.</li>
-                <li><strong>Badge ESTRUCTURAL: umbral 42 → 55:</strong> El badge ahora solo activa en scores medio-altos (≥55) donde el aviso de "fortaleza de balance sheet vs momentum" es operativamente relevante. A 45.7 (NZD) el score bajo ya es autoexplicativo — el badge generaba contradicción visual.</li>
-            </ul>
-
-            <h3>Cambios en v5.11 (marzo 2026)</h3>
-            <ul>
-                <li><strong>FIX-1 — Inflación asimétrica:</strong> La inflación real &lt;1% ahora recibe penalización 2× más agresiva que la inflación alta equivalente. Una inflación de 0.1% señala que el banco central carece de margen hawkish convencional → bearish estructural. Score: 0.1% → ~3 pts (antes ~63 pts).</li>
-                <li><strong>FIX-2 — Zona de riesgo deflacionario:</strong> El ajuste contextual <em>Inflation Stability</em> ahora penaliza el rango 0–1% (−1.5 a −4 pts) además de la deflación técnica (&lt;0%). La penalización se intensifica si el BC está simultáneamente en ciclo de recortes.</li>
-                <li><strong>FIX-3 — Haircut de ciclo al safe haven premium:</strong> La función <em>Low-Rate Safe Haven Adj</em> ahora aplica un haircut de hasta 40% cuando el BC está en ciclo bajista activo (<code>rateMomentum &lt; 0</code>). Un safe haven con BC recortando es carry-bearish, no neutral.</li>
-                <li><strong>FIX-4 — Cuenta corriente relativa al G8:</strong> El score de <code>currentAccount</code> ahora se calcula en función de la posición relativa dentro de la distribución G8 (z-score normalizado, mediana y stdDev en tiempo real). Elimina la ventaja permanente de economías estructuralmente superavitarias — el mercado ya descuenta ese nivel.</li>
-                <li><strong>FIX-5 — Badge contextual "Score estructural":</strong> Las tarjetas de divisa muestran un badge ⚑ cuando el score es elevado pero las señales de momentum son débiles (tasa ≤ 0.5% o ciclo ≤ −1.0pp). El badge es 100% data-driven y distingue fortaleza de balance sheet de señal operativa de momentum.</li>
-            </ul>
-
-            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers (v6.5)</h3>
+            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers</h3>
             <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
@@ -278,8 +226,8 @@
                         <td rowspan="4"><strong>Tier 1 — 29%</strong><br/>Política Monetaria</td>
                         <td>Tasa de Interés</td><td>10%</td><td>Nivel actual de tasa y diferencial de carry trade. Rate cycle haircut: se atenúa si el BC ya inició ciclo de recortes.</td>
                     </tr>
-                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>7%</td><td>Variación de la tasa respecto a hace 12 meses. FIX-6 v6.1: hawkish pause boost — si bcOutlook=Hawkish y rm≈0, se trata como ciclo hawkish leve (evita equiparar pausa activa con inacción).</td></tr>
-                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%. FIX-1: zona &lt;1% usa curva asimétrica agresiva.</td></tr>
+                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>7%</td><td>Variación de la tasa respecto a hace 12 meses. Hawkish pause boost: si bcOutlook=Hawkish y rm≈0, se trata como ciclo hawkish leve.</td></tr>
+                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%. Zona &lt;1% usa curva asimétrica agresiva.</td></tr>
                     <tr><td>Perspectiva del BC (Outlook Score)</td><td>5%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
                     <tr>
                         <td rowspan="4"><strong>Tier 2 — 19%</strong><br/>Balance Externo</td>
@@ -298,22 +246,22 @@
                         <td rowspan="2"><strong>Tier 4 — 3%</strong><br/>Consumo</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Peso cedido a servicesPMI en v6.4.</em></td></tr>
+                    <tr><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Señal capturada por <code>inflation</code> y <code>rateMomentum</code>; peso vestigial.</em></td></tr>
                     <tr>
                         <td rowspan="7"><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
-                        <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Filtro de confirmación de precio v5.7.</td>
+                        <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Incluye filtro de confirmación de precio.</td>
                     </tr>
                     <tr><td>PMI Manufacturero</td><td>3%</td><td>Indicador adelantado de actividad industrial.</td></tr>
                     <tr><td>Confianza del Consumidor</td><td>2%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish. v6.2. Peso aumentado en v6.4.</td></tr>
-                    <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas. v6.3.</td></tr>
+                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish.</td></tr>
+                    <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
                     <tr><td>Flujos de Capital</td><td>0%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB. Peso vestigial; pendiente de fuente de datos confiable.</td></tr>
                     <tr>
                         <td rowspan="2"><strong>Tier 6 — 11%</strong><br/>FX Confirmador</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
                         <td><strong>8%</strong></td>
-                        <td>Composite basket-corrected: 70% 1M + 20% 1S + 10% 3M. Confirmador, no driver (v6.0): los fundamentales causan el precio, no al revés.</td>
+                        <td>Composite basket-corrected: 70% 1M + 20% 1S + 10% 3M. Confirmador, no driver: los fundamentales causan el precio, no al revés.</td>
                     </tr>
                     <tr>
                         <td>Bono Soberano 10Y</td><td>3%</td>
