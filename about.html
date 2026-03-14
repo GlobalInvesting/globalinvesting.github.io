@@ -152,7 +152,7 @@
             <ul>
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
-                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 22 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;50 Débil · 50–60 Neutral · &gt;60 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
+                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 22 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
                 <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected (v5.9): cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. A partir de v6.0 actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
@@ -217,7 +217,7 @@
             
             <h3>Cambios en v6.5 (marzo 2026) — Correcciones de datos + Umbrales industria</h3>
             <ul>
-                <li><strong>FIX — Umbral alcista/bajista calibrado al estándar de la industria:</strong> El umbral alcista se ajustó de &gt;60 a <strong>&gt;65</strong>, alineando el modelo con la práctica de Bloomberg, DailyFX y plataformas institucionales. Con la media G8 en ~61 pts, un umbral de 60 clasificaba como alcista a cualquier divisa por encima del promedio — sin valor diferencial. El nuevo umbral identifica el top ~25% del universo como señal de convicción real. Zona neutral: 50–65. Bajista: &lt;50.</li>
+                <li><strong>FIX — Umbral alcista/bajista calibrado al estándar de la industria:</strong> El umbral alcista se ajustó de &gt;60 a <strong>&gt;65</strong>, alineando el modelo con la práctica de Bloomberg, DailyFX y plataformas institucionales. Con la media G8 en ~61 pts, un umbral de 60 clasificaba como alcista a cualquier divisa por encima del promedio — sin valor diferencial. El nuevo umbral identifica el top ~25% del universo como señal de convicción real. Zona neutral: 45–65. Bajista: &lt;45.</li>
                 <li><strong>FIX — Normalización de Balanza Comercial:</strong> La función de preprocesamiento usaba <code>gdpM = gdp × 1000</code> tratando el PIB como si estuviera en miles de millones, cuando en realidad está en USD nominales. El divisor correcto es <code>gdp / 1.000.000</code> para obtener millones USD. El error producía valores de TB/PIB ≈ 0% para todas las divisas, neutralizando el indicador de peso 4%.</li>
                 <li><strong>FIX — Series de Balanza Comercial en USD:</strong> Las series FRED <code>XTEXVA01XXX664S</code> (moneda local) se reemplazaron por <code>XTEXVA01XXX667S</code> (USD millones) para EUR, GBP, JPY, AUD, CAD, CHF y NZD. Con la serie anterior, el saldo japonés de 500.000M JPY se interpretaba como USD, produciendo un error de 150× en el scoring.</li>
                 <li><strong>FIX — USD Ventas Minoristas:</strong> La serie FRED <code>RSXFS</code> (nivel absoluto en millones USD, ~633.000) se reemplazó por <code>MRTSSM44000USS</code> (variación MoM%, directo). El nivel absoluto producía un score de 100/100 siempre para USD en este indicador de peso 3%.</li>
@@ -234,11 +234,11 @@
             <h3>Cambios en v6.3 (marzo 2026) — ESI Proxy + Umbrales</h3>
             <ul>
                 <li><strong>ESI Proxy (Economic Surprise Index):</strong> 22.º indicador del modelo (peso 4%). Arquitectura híbrida: Componente A compara actuals vs forecast del calendario económico (Investing.com); Componente B mide la posición relativa de cada divisa en el G8 mediante z-scores. Cuando el Componente A tiene datos, pondera 60/40 con B; si no hay actuals disponibles, opera solo con B (neutro=50). El ESI captura el gap metodológico más importante vs modelos institucionales: el mercado ya tiene el nivel en precio — lo que mueve el par es la sorpresa vs expectativas.</li>
-                <li><strong>Umbrales de sentimiento actualizados:</strong> &gt;60 = Alcista · 50–60 = Neutral · &lt;50 = Bajista. La frontera de 50 es semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;50) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
+                <li><strong>Umbrales de sentimiento actualizados:</strong> Umbral alcista elevado de &gt;60 a <strong>&gt;65</strong>, bajista de &lt;50 a <strong>&lt;45</strong>. Zona neutral ampliada a 45–65. La frontera de 50 era semánticamente correcta: en una escala 0-100, cualquier score por debajo de 50 indica más factores negativos que positivos. El umbral anterior (&lt;50) clasificaba incorrectamente como bajistas a divisas con señales mixtas.</li>
             </ul>
             <h3>Cambios en v6.2 (marzo 2026) — PMI Servicios</h3>
             <ul>
-                <li><strong>PMI Servicios (<code>servicesPMI</code>):</strong> 21.º indicador del modelo (peso 4%). Scrapeado automáticamente desde Investing.com junto con PMI Manufacturero. Score &gt;50 = expansión del sector servicios (bullish); &lt;50 = contracción (bearish). Diferencial de peso respecto a PMI Manufacturero: los servicios representan &gt;70% del PIB en economías G8, lo que justifica peso equivalente al manufacturero. El Tier 5 (Sentimiento de Mercado) sube de 18% a 21% con esta adición.</li>
+                <li><strong>PMI Servicios (<code>servicesPMI</code>):</strong> 22.º indicador del modelo (peso 5%). Scrapeado automáticamente desde Investing.com junto con PMI Manufacturero. Score &gt;50 = expansión del sector servicios (bullish); &lt;50 = contracción (bearish). Diferencial de peso respecto a PMI Manufacturero: los servicios representan &gt;70% del PIB en economías G8, lo que justifica peso equivalente al manufacturero. El Tier 5 (Sentimiento de Mercado) sube a 22% con las adiciones de v6.2–v6.4.</li>
             </ul>
             <h3>Cambios en v6.1 (marzo 2026) — Precisión Hawkish Pause + Stagflation</h3>
             <ul>
@@ -298,7 +298,7 @@
                         <td rowspan="2"><strong>Tier 4 — 3%</strong><br/>Consumo</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>1%</td><td>Presiones inflacionarias laborales.</td></tr>
+                    <tr><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Peso cedido a servicesPMI en v6.4.</em></td></tr>
                     <tr>
                         <td rowspan="7"><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
                         <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Filtro de confirmación de precio v5.7.</td>
@@ -333,7 +333,7 @@
 cappedAdj       = clamp(totalAdj, −15, +15)
 normalizedScore = clamp(baseScore + cappedAdj, 0, 100)
 
-Bandas: &lt; 50 = Débil · 50–60 = Neutral · &gt; 60 = Fuerte</pre>
+Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
         </div>
 
         <!-- RECOMENDACIONES DE PARES -->
@@ -421,7 +421,7 @@ Bandas: &lt; 50 = Débil · 50–60 = Neutral · &gt; 60 = Fuerte</pre>
                 <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
                 <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
             </div>
-            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.0</p>
+            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.3</p>
         </div></div>
     <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 <!-- GDPR Banner (shared) -->
