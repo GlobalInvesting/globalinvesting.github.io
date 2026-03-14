@@ -11,10 +11,11 @@
       "issues": []
     },
     "EUR": {
-      "status": "missing",
-      "rate": null,
-      "source": null,
-      "date": null
+      "status": "cached",
+      "rate": "2.0",
+      "source": "cached-file",
+      "date": "2026-03-01",
+      "issues": []
     },
     "GBP": {
       "status": "ok",
@@ -61,5 +62,5 @@
   },
   "issues": [],
   "warnings": [],
-  "overallStatus": "degraded"
+  "overallStatus": "degraded_cached"
 }
