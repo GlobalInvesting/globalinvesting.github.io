@@ -61,6 +61,11 @@
         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
         th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); }
         td { color: var(--text-secondary); }
+        td:empty { border-bottom: none; background: transparent; }
+        @media (max-width: 768px) {
+            table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; font-size: 0.82rem; }
+            th, td { padding: 0.5rem; }
+        }
         code { background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.9em; color: var(--text-secondary); border: 1px solid var(--border); }
         pre { background: var(--bg-secondary); padding: 1rem; border-radius: 6px; border: 1px solid var(--border); font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--text-secondary); overflow-x: auto; margin: 1rem 0; line-height: 1.8; }
 
@@ -153,12 +158,12 @@
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
-                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected: cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. Actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
+                <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8%:</strong> Rendimiento real de cada divisa frente a la canasta de las otras 7 (basket-corrected), eliminando el sesgo USD. Composite ponderado: 70% rendimiento mensual + 20% semanal + 10% trimestral. Opera como confirmador del análisis fundamental, no como driver independiente.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
                 <li><strong>Análisis Fundamental con IA:</strong> Los textos de análisis por divisa son generados por Groq AI (modelo llama-3.3-70b-versatile) con datos económicos actualizados diariamente.</li>
-                <li><strong>Recomendaciones de Pares:</strong> Sugerencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, con factores positivos y negativos detallados por par y nivel de confianza.</li>
+                <li><strong>Señales de Pares:</strong> Divergencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, con factores detallados por par y nivel de confianza. Son indicadores analíticos, no asesoramiento de inversión.</li>
                 <li><strong>Verificación de Calidad de Datos:</strong> Sistema activo que detecta datos desactualizados, indicadores críticos faltantes y completitud por divisa, con alertas diferenciadas por severidad.</li>
             </ul>
         </div>
@@ -178,14 +183,11 @@
                 <li><strong>Bancos Centrales Oficiales</strong> — Comunicados directos de la Fed, BCE, BoE, BoJ, RBA, BoC, SNB y RBNZ.</li>
             </ul>
 
-            <h3>Funcionalidades del Feed</h3>
+            <h3>Funcionalidades</h3>
             <ul>
-                <li><strong>Vista "Por Divisa" (predeterminada):</strong> Análisis AI generado diariamente por Groq (llama-3.3-70b-versatile) con resumen de situación, sesgo fundamental y eventos clave para cada una de las 8 divisas principales. Es la vista que aparece al cargar la página.</li>
-                <li><strong>Análisis consolidado con confianza:</strong> Cada divisa muestra un badge de sentimiento (Alcista / Bajista / Neutral / Mixto) con barra de confianza porcentual y conteo de artículos procesados.</li>
-                <li><strong>Drivers clave:</strong> Factores económicos destacados que explican el sesgo fundamental de cada divisa en el período analizado.</li>
-                <li><strong>Detección automática de divisa:</strong> Cada noticia es etiquetada automáticamente con la divisa principal que menciona (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD o GENERAL).</li>
-                <li><strong>Nivel de impacto estimado:</strong> Calculado por palabras clave en el titular. Noticias sobre decisiones de tasas, IPC, NFP o reuniones de bancos centrales se clasifican como Alto Impacto.</li>
-                <li><strong>Timestamp en hora local:</strong> Las marcas de tiempo se convierten automáticamente a la zona horaria del navegador del usuario.</li>
+                <li><strong>Análisis AI por divisa:</strong> Resumen consolidado generado por Groq AI con sesgo fundamental (Alcista / Bajista / Neutral / Mixto), nivel de confianza porcentual, drivers clave y próximo evento relevante del calendario para cada una de las 8 divisas.</li>
+                <li><strong>Feed de artículos:</strong> Titulares clasificados por divisa con detección automática, nivel de impacto estimado por palabras clave (alto: decisiones de tasas, IPC, NFP; medio: resto) y timestamp en hora local del usuario.</li>
+                <li><strong>Actualización automática:</strong> Tres veces al día (00:00, 08:00, 16:00 UTC).</li>
             </ul>
         </div>
 
@@ -223,52 +225,68 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td rowspan="4"><strong>Tier 1 — 29%</strong><br/>Política Monetaria</td>
+                        <td><strong>Tier 1 — 29%</strong><br/>Política Monetaria</td>
                         <td>Tasa de Interés</td><td>10%</td><td>Nivel actual de tasa y diferencial de carry trade. Rate cycle haircut: se atenúa si el BC ya inició ciclo de recortes.</td>
                     </tr>
-                    <tr><td>Rate Momentum (<code>rateMomentum</code>)</td><td>7%</td><td>Variación de la tasa respecto a hace 12 meses. Hawkish pause boost: si bcOutlook=Hawkish y rm≈0, se trata como ciclo hawkish leve.</td></tr>
-                    <tr><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%. Zona &lt;1% usa curva asimétrica agresiva.</td></tr>
-                    <tr><td>Perspectiva del BC (Outlook Score)</td><td>5%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
                     <tr>
-                        <td rowspan="4"><strong>Tier 2 — 19%</strong><br/>Balance Externo</td>
+                        <td></td><td>Rate Momentum (<code>rateMomentum</code>)</td><td>7%</td><td>Variación de la tasa respecto a hace 12 meses. Hawkish pause boost: si bcOutlook=Hawkish y rm≈0, se trata como ciclo hawkish leve.</td></tr>
+                    <tr>
+                        <td></td><td>Inflación</td><td>7%</td><td>Expectativas de política monetaria; objetivo 1.8–2.5%. Zona &lt;1% usa curva asimétrica agresiva.</td></tr>
+                    <tr>
+                        <td></td><td>Perspectiva del BC (Outlook Score)</td><td>5%</td><td>Dirección de política monetaria: Hawkish=90, Neutral=50, Dovish=10.</td></tr>
+                    <tr>
+                        <td><strong>Tier 2 — 19%</strong><br/>Balance Externo</td>
                         <td>Cuenta Corriente</td><td>7%</td><td>Demanda estructural de divisa por flujos reales. Z-score relativo al G8 dinámico.</td>
                     </tr>
-                    <tr><td>Balanza Comercial</td><td>4%</td><td>Flujos comerciales mensuales, normalizados como % del PIB.</td></tr>
-                    <tr><td>Deuda Pública</td><td>4%</td><td>Sostenibilidad fiscal.</td></tr>
-                    <tr><td>Términos de Intercambio</td><td>4%</td><td>Ratio precio exportaciones/importaciones (base 100).</td></tr>
                     <tr>
-                        <td rowspan="3"><strong>Tier 3 — 16%</strong><br/>Crecimiento &amp; Empleo</td>
+                        <td></td><td>Balanza Comercial</td><td>4%</td><td>Flujos comerciales mensuales, normalizados como % del PIB.</td></tr>
+                    <tr>
+                        <td></td><td>Deuda Pública</td><td>4%</td><td>Sostenibilidad fiscal.</td></tr>
+                    <tr>
+                        <td></td><td>Términos de Intercambio</td><td>4%</td><td>Ratio precio exportaciones/importaciones (base 100).</td></tr>
+                    <tr>
+                        <td><strong>Tier 3 — 16%</strong><br/>Crecimiento &amp; Empleo</td>
                         <td>Crecimiento PIB</td><td>7%</td><td>Momentum económico fundamental.</td>
                     </tr>
-                    <tr><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral.</td></tr>
-                    <tr><td>Producción Industrial</td><td>4%</td><td>Actividad del sector real.</td></tr>
                     <tr>
-                        <td rowspan="2"><strong>Tier 4 — 3%</strong><br/>Consumo</td>
+                        <td></td><td>Desempleo</td><td>5%</td><td>Salud del mercado laboral.</td></tr>
+                    <tr>
+                        <td></td><td>Producción Industrial</td><td>4%</td><td>Actividad del sector real.</td></tr>
+                    <tr>
+                        <td><strong>Tier 4 — 3%</strong><br/>Consumo</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
-                    <tr><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Señal capturada por <code>inflation</code> y <code>rateMomentum</code>; peso vestigial.</em></td></tr>
                     <tr>
-                        <td rowspan="7"><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
+                        <td></td><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Señal capturada por <code>inflation</code> y <code>rateMomentum</code>; peso vestigial.</em></td></tr>
+                    <tr>
+                        <td><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
                         <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Incluye filtro de confirmación de precio.</td>
                     </tr>
-                    <tr><td>PMI Manufacturero</td><td>3%</td><td>Indicador adelantado de actividad industrial.</td></tr>
-                    <tr><td>Confianza del Consumidor</td><td>2%</td><td>Índice adelantado del gasto privado.</td></tr>
-                    <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish.</td></tr>
-                    <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas.</td></tr>
-                    <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
+                    <tr>
+                        <td></td><td>PMI Manufacturero</td><td>3%</td><td>Indicador adelantado de actividad industrial.</td></tr>
+                    <tr>
+                        <td></td><td>Confianza del Consumidor</td><td>2%</td><td>Índice adelantado del gasto privado.</td></tr>
+                    <tr>
+                        <td></td><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish.</td></tr>
+                    <tr>
+                        <td></td><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas.</td></tr>
+                    <tr>
+                        <td></td><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
 
                     <tr>
-                        <td rowspan="2"><strong>Tier 6 — 11%</strong><br/>FX Confirmador</td>
+                        <td><strong>Tier 6 — 11%</strong><br/>FX Confirmador</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
                         <td><strong>8%</strong></td>
                         <td>Composite basket-corrected: 70% 1M + 20% 1S + 10% 3M. Confirmador, no driver: los fundamentales causan el precio, no al revés.</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>Bono Soberano 10Y</td><td>3%</td>
                         <td>Carry yield directo y expectativas de tasas futuras.</td>
                     </tr>
                     <tr>
                         <td><strong>21 Indicadores</strong></td>
+                        <td></td>
                         <td><strong>100%</strong></td>
                         <td>El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</td>
                     </tr>
@@ -286,13 +304,13 @@ Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
 
         <!-- RECOMENDACIONES DE PARES -->
         <div class="section">
-            <h2>Sistema de Recomendaciones de Pares</h2>
-            <h3>Métricas de Cada Recomendación</h3>
+            <h2>Sistema de Señales de Pares</h2>
+            <h3>Métricas de Cada Señal</h3>
             <table>
                 <thead><tr><th>Métrica</th><th>Descripción</th><th>Interpretación</th></tr></thead>
                 <tbody>
-                    <tr><td><strong>Par</strong></td><td>Divisa base / Divisa cotizada</td><td>Estructura del par recomendado</td></tr>
-                    <tr><td><strong>Dirección</strong></td><td>LONG (Comprar) o SHORT (Vender)</td><td>Acción recomendada sobre el par</td></tr>
+                    <tr><td><strong>Par</strong></td><td>Divisa base / Divisa cotizada</td><td>Estructura del par analizado</td></tr>
+                    <tr><td><strong>Dirección</strong></td><td>LONG / SHORT</td><td>Sesgo direccional según el diferencial fundamental</td></tr>
                     <tr><td><strong>Diferencial</strong></td><td>Score fuerte − Score débil</td><td>Mayor diferencial = mayor divergencia fundamental</td></tr>
                     <tr><td><strong>Confianza</strong></td><td>Alta (&gt;25 pts) / Media (18–25 pts) / Baja (&lt;18 pts)</td><td>Basada en amplitud del diferencial</td></tr>
                     <tr><td><strong>Calidad de Datos</strong></td><td>% de los 21 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
@@ -383,7 +401,7 @@ Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
 </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
-<p><strong id="gdpr-title">🍪 Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
+<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
 <button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
 <button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
@@ -410,7 +428,7 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 </script>
 </main>
 <footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
 </body>
