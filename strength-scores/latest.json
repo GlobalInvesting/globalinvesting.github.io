@@ -1,13 +1,13 @@
 {
   "lastUpdate": "2026-03-14",
   "modelVersion": "6.5.3",
-  "checksum": "5741d53541c9a790f19cec4608457595e720602083bf7401d9fb2c31f54e091d",
+  "checksum": "d1e0ae47abe10c1d744482e94a763c524f2d713cbba2bbaf0e7e38fd01ac3f72",
   "scores": {
     "USD": {
-      "score": 68.1,
+      "score": 68.7,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 63.54,
+      "baseScore": 64.13,
       "contextualAdj": {
         "safe_haven": 0.8,
         "commodity": 0.0,
@@ -47,7 +47,7 @@
         "businessConfidence": 0.0,
         "economicSurprise": 2.248,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 6.6677,
+        "fxPerformance1M": 7.2595,
         "bond10y": 2.608
       },
       "scoringData": {
@@ -64,10 +64,10 @@
       }
     },
     "EUR": {
-      "score": 60.3,
+      "score": 59.8,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 59.35,
+      "baseScore": 58.9,
       "contextualAdj": {
         "safe_haven": 0.91,
         "commodity": 0.0,
@@ -107,7 +107,7 @@
         "businessConfidence": 0.892,
         "economicSurprise": 1.9,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.0571,
+        "fxPerformance1M": 0.6132,
         "bond10y": 1.83
       },
       "scoringData": {
@@ -124,10 +124,10 @@
       }
     },
     "GBP": {
-      "score": 60.2,
+      "score": 59.5,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 57.36,
+      "baseScore": 56.68,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -167,7 +167,7 @@
         "businessConfidence": 0.7936,
         "economicSurprise": 1.892,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.723,
+        "fxPerformance1M": 1.0433,
         "bond10y": 2.7
       },
       "scoringData": {
@@ -184,10 +184,10 @@
       }
     },
     "JPY": {
-      "score": 55.1,
+      "score": 54.3,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 53.25,
+      "baseScore": 52.45,
       "contextualAdj": {
         "safe_haven": 0.52,
         "commodity": 0.0,
@@ -227,7 +227,7 @@
         "businessConfidence": 0.0,
         "economicSurprise": 2.292,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.3962,
+        "fxPerformance1M": 0.6012,
         "bond10y": 1.23
       },
       "scoringData": {
@@ -244,12 +244,12 @@
       }
     },
     "AUD": {
-      "score": 81.1,
+      "score": 78.2,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 68.82,
+      "baseScore": 66.19,
       "contextualAdj": {
-        "safe_haven": 0.8,
+        "safe_haven": 0.52,
         "commodity": 7.31,
         "carry_premium": 3.05,
         "recession": 0.0,
@@ -264,7 +264,7 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 1.17,
         "stale_score": 0.0,
-        "totalCapped": 12.33
+        "totalCapped": 12.05
       },
       "contributions": {
         "interestRate": 9.4171,
@@ -282,12 +282,12 @@
         "wageGrowth": 0.0,
         "manufacturingPMI": 2.43,
         "servicesPMI": 4.1,
-        "cotPositioning": 5.6015,
+        "cotPositioning": 5.4328,
         "consumerConfidence": 1.2264,
         "businessConfidence": 0.0,
         "economicSurprise": 2.348,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 6.1519,
+        "fxPerformance1M": 3.6947,
         "bond10y": 2.7045
       },
       "scoringData": {
@@ -304,10 +304,10 @@
       }
     },
     "CAD": {
-      "score": 57.3,
+      "score": 56.4,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 56.92,
+      "baseScore": 56.03,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.37,
@@ -342,12 +342,12 @@
         "wageGrowth": 0.0,
         "manufacturingPMI": 2.1,
         "servicesPMI": 1.7,
-        "cotPositioning": 0.993,
+        "cotPositioning": 1.0012,
         "consumerConfidence": 1.476,
         "businessConfidence": 0.0,
         "economicSurprise": 1.468,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 3.8988,
+        "fxPerformance1M": 3.0004,
         "bond10y": 2.22
       },
       "scoringData": {
@@ -364,10 +364,10 @@
       }
     },
     "CHF": {
-      "score": 61.7,
+      "score": 61.0,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 57.89,
+      "baseScore": 57.2,
       "contextualAdj": {
         "safe_haven": 2.47,
         "commodity": 0.0,
@@ -407,7 +407,7 @@
         "businessConfidence": 0.0,
         "economicSurprise": 1.892,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 2.2012,
+        "fxPerformance1M": 1.5162,
         "bond10y": 0.48
       },
       "scoringData": {
@@ -424,10 +424,10 @@
       }
     },
     "NZD": {
-      "score": 44.3,
+      "score": 43.4,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 48.84,
+      "baseScore": 47.89,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.16,
@@ -467,7 +467,7 @@
         "businessConfidence": 0.0,
         "economicSurprise": 1.96,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.5717,
+        "fxPerformance1M": 0.6219,
         "bond10y": 2.715
       },
       "scoringData": {
@@ -499,42 +499,49 @@
       "pair": "AUD/NZD",
       "long": "AUD",
       "short": "NZD",
-      "spread": 36.8,
-      "confidence": "Alta"
-    },
-    {
-      "pair": "AUD/JPY",
-      "long": "AUD",
-      "short": "JPY",
-      "spread": 26.0,
-      "confidence": "Alta"
-    },
-    {
-      "pair": "AUD/CAD",
-      "long": "AUD",
-      "short": "CAD",
-      "spread": 23.8,
+      "spread": 34.8,
       "confidence": "Alta"
     },
     {
       "pair": "USD/NZD",
       "long": "USD",
       "short": "NZD",
-      "spread": 23.8,
+      "spread": 25.3,
+      "confidence": "Alta"
+    },
+    {
+      "pair": "AUD/JPY",
+      "long": "AUD",
+      "short": "JPY",
+      "spread": 23.9,
+      "confidence": "Alta"
+    },
+    {
+      "pair": "AUD/CAD",
+      "long": "AUD",
+      "short": "CAD",
+      "spread": 21.8,
       "confidence": "Alta"
     },
     {
       "pair": "CHF/NZD",
       "long": "CHF",
       "short": "NZD",
-      "spread": 17.4,
+      "spread": 17.6,
       "confidence": "Media"
     },
     {
       "pair": "USD/JPY",
       "long": "USD",
       "short": "JPY",
-      "spread": 13.0,
+      "spread": 14.4,
+      "confidence": "Media"
+    },
+    {
+      "pair": "USD/CAD",
+      "long": "USD",
+      "short": "CAD",
+      "spread": 12.3,
       "confidence": "Media"
     }
   ],
@@ -560,7 +567,7 @@
       "businessConfidence": 0.0,
       "economicSurprise": 2.248,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 6.6677,
+      "fxPerformance1M": 7.2595,
       "bond10y": 2.608
     },
     "EUR": {
@@ -584,7 +591,7 @@
       "businessConfidence": 0.892,
       "economicSurprise": 1.9,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.0571,
+      "fxPerformance1M": 0.6132,
       "bond10y": 1.83
     },
     "GBP": {
@@ -608,7 +615,7 @@
       "businessConfidence": 0.7936,
       "economicSurprise": 1.892,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.723,
+      "fxPerformance1M": 1.0433,
       "bond10y": 2.7
     },
     "JPY": {
@@ -632,7 +639,7 @@
       "businessConfidence": 0.0,
       "economicSurprise": 2.292,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.3962,
+      "fxPerformance1M": 0.6012,
       "bond10y": 1.23
     },
     "AUD": {
@@ -651,12 +658,12 @@
       "wageGrowth": 0.0,
       "manufacturingPMI": 2.43,
       "servicesPMI": 4.1,
-      "cotPositioning": 5.6015,
+      "cotPositioning": 5.4328,
       "consumerConfidence": 1.2264,
       "businessConfidence": 0.0,
       "economicSurprise": 2.348,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 6.1519,
+      "fxPerformance1M": 3.6947,
       "bond10y": 2.7045
     },
     "CAD": {
@@ -675,12 +682,12 @@
       "wageGrowth": 0.0,
       "manufacturingPMI": 2.1,
       "servicesPMI": 1.7,
-      "cotPositioning": 0.993,
+      "cotPositioning": 1.0012,
       "consumerConfidence": 1.476,
       "businessConfidence": 0.0,
       "economicSurprise": 1.468,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 3.8988,
+      "fxPerformance1M": 3.0004,
       "bond10y": 2.22
     },
     "CHF": {
@@ -704,7 +711,7 @@
       "businessConfidence": 0.0,
       "economicSurprise": 1.892,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 2.2012,
+      "fxPerformance1M": 1.5162,
       "bond10y": 0.48
     },
     "NZD": {
@@ -728,7 +735,7 @@
       "businessConfidence": 0.0,
       "economicSurprise": 1.96,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.5717,
+      "fxPerformance1M": 0.6219,
       "bond10y": 2.715
     }
   },
