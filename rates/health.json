@@ -1,6 +1,6 @@
 {
-  "runTimestamp": "2026-03-13T08:50:57.327918Z",
-  "runDate": "2026-03-13",
+  "runTimestamp": "2026-03-14T08:43:10.378654Z",
+  "runDate": "2026-03-14",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
@@ -11,11 +11,10 @@
       "issues": []
     },
     "EUR": {
-      "status": "ok",
-      "rate": "2.0",
-      "source": "FRED-CSV:ECBDFR",
-      "date": "2026-03-12",
-      "issues": []
+      "status": "missing",
+      "rate": null,
+      "source": null,
+      "date": null
     },
     "GBP": {
       "status": "ok",
@@ -62,5 +61,5 @@
   },
   "issues": [],
   "warnings": [],
-  "overallStatus": "ok"
+  "overallStatus": "degraded"
 }
