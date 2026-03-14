@@ -94,7 +94,7 @@
   "@id": "https://globalinvesting.github.io/about.html",
   "url": "https://globalinvesting.github.io/about.html",
   "name": "Acerca de — Dashboard de Análisis Fundamental Forex",
-  "description": "Plataforma de análisis fundamental forex con metodología basada en 22 indicadores económicos para 8 divisas del G8.",
+  "description": "Plataforma de análisis fundamental forex con metodología basada en 21 indicadores económicos para 8 divisas del G8.",
   "inLanguage": "es",
   "publisher": {
     "@type": "Organization",
@@ -152,7 +152,7 @@
             <ul>
                 <li><strong>Tipos de Cambio en Tiempo Real:</strong> Tasas actualizadas cada 60 segundos vía APIs verificadas en cascada (6 proveedores).</li>
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
-                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 22 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
+                <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
                 <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8% (confirmador):</strong> Composite basket-corrected: cada divisa se mide contra la canasta de las otras 7, eliminando el sesgo USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. Actúa como confirmador, no como driver: los fundamentales causan el precio, no al revés.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
@@ -214,7 +214,7 @@
             <p><code>fxPerformance1M</code> opera como <strong>confirmador</strong> (8%), no como driver. Si los fundamentales son fuertes Y el precio confirma → +convicción. Si divergen → señal de alerta, no destrucción del score.</p>
             <p>El PIB total aparece en el mapa de calor como columna de referencia estructural, pero no forma parte del modelo de scoring: al ser un stock acumulado no captura momentum. En su lugar se utiliza el crecimiento del PIB (Tier 3, peso 7%), que sí es un indicador de flujo relevante para el trading.</p>
 
-            <h3>Sistema de Ponderación — 22 Indicadores en 6 Tiers</h3>
+            <h3>Sistema de Ponderación — 21 Indicadores en 6 Tiers</h3>
             <p>Cada indicador contribuye al score final según su relevancia para el trading de divisas. El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</p>
 
             <table>
@@ -256,7 +256,7 @@
                     <tr><td>PMI Servicios (<code>servicesPMI</code>)</td><td>5%</td><td>Sector servicios (&gt;70% PIB en G8). &gt;50 = expansión bullish.</td></tr>
                     <tr><td>ESI Proxy (<code>economicSurprise</code>)</td><td>4%</td><td>Economic Surprise Index: compara actuals vs forecasts del calendario + z-scores G8. Captura sorpresas vs expectativas.</td></tr>
                     <tr><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
-                    <tr><td>Flujos de Capital</td><td>0%</td><td>Cuenta financiera de la balanza de pagos, normalizada como % del PIB. Peso vestigial; pendiente de fuente de datos confiable.</td></tr>
+
                     <tr>
                         <td rowspan="2"><strong>Tier 6 — 11%</strong><br/>FX Confirmador</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
@@ -268,7 +268,7 @@
                         <td>Carry yield directo y expectativas de tasas futuras.</td>
                     </tr>
                     <tr>
-                        <td><strong>22 Indicadores</strong></td>
+                        <td><strong>21 Indicadores</strong></td>
                         <td><strong>100%</strong></td>
                         <td>El motor normaliza automáticamente dividiendo por el peso total de los indicadores con datos disponibles, de modo que la ausencia de un dato no deflacta artificialmente el score.</td>
                     </tr>
@@ -295,7 +295,7 @@ Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
                     <tr><td><strong>Dirección</strong></td><td>LONG (Comprar) o SHORT (Vender)</td><td>Acción recomendada sobre el par</td></tr>
                     <tr><td><strong>Diferencial</strong></td><td>Score fuerte − Score débil</td><td>Mayor diferencial = mayor divergencia fundamental</td></tr>
                     <tr><td><strong>Confianza</strong></td><td>Alta (&gt;25 pts) / Media (18–25 pts) / Baja (&lt;18 pts)</td><td>Basada en amplitud del diferencial</td></tr>
-                    <tr><td><strong>Calidad de Datos</strong></td><td>% de los 22 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
+                    <tr><td><strong>Calidad de Datos</strong></td><td>% de los 21 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
                 </tbody>
             </table>
         </div>
@@ -410,7 +410,7 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 </script>
 </main>
 <footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+<strong style="color:#c9d1d9;">⚠️ Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
 </body>
