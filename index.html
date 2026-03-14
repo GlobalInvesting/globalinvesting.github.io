@@ -1157,11 +1157,15 @@
             border-radius: 6px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            overflow: hidden;
+            min-width: 0;
         }
 
         .chart-wrapper {
             position: relative;
             height: 400px;
+            width: 100%;
+            overflow: hidden;
         }
 
         /* Calendar económico */
@@ -1349,11 +1353,15 @@
 
     /* Tendencias Históricas */
     .chart-container {
-        padding: 1rem;
+        padding: 0.75rem;
+        overflow: hidden;
+        min-width: 0;
     }
 
     .chart-wrapper {
-        height: 280px;
+        height: 260px;
+        width: 100%;
+        overflow: hidden;
     }
 
     /* Padding general más compacto en móvil */
@@ -3043,7 +3051,7 @@ if (!data?.labels || !data?.rates || data.source === 'unavailable') {
                                     labels: data.labels,
 datasets: [
     {
-        label: 'Tasa de Interés % (fuente oficial — global-rates.com / FRED)',
+        label: 'Tasa de Interés % (global-rates.com / FRED)',
         data: data.rates,
         borderColor: '#1e88e5',
         backgroundColor: 'rgba(30, 136, 229, 0.1)',
@@ -3064,12 +3072,16 @@ datasets: [
                                         intersect: false
                                     },
                                     plugins: {
-                                        legend: { 
-                                            labels: { 
-                                                color: '#e1e4e8', 
-                                                font: { size: 12 },
-                                                padding: 15
-                                            } 
+                                        legend: {
+                                            onClick: null,
+                                            labels: {
+                                                color: '#e1e4e8',
+                                                font: { size: 11 },
+                                                padding: 10,
+                                                boxWidth: 24,
+                                                boxHeight: 2,
+                                                usePointStyle: false
+                                            }
                                         },
                                         title: { 
                                             display: false
