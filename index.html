@@ -1249,20 +1249,6 @@
             border-left: 3px solid var(--blue);
             border-radius: 6px;
             padding: 1.25rem;
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-
-        .alert-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
         }
 
         .alert-warning {
@@ -4004,15 +3990,16 @@ const DataHealthCheck = ({ economicData }) => {
                 const r = await fetch(url, { cache: 'no-cache', mode: 'cors' });
                 if (!r.ok) return;
                 const data = await r.json();
-                // Solo mostrar alerta si hay problemas reales
-                if (data.overallStatus !== 'ok' || (data.issues && data.issues.length > 0)) {
-                    setRatesHealth(data);
+                // 'ok' y 'degraded_cached' no requieren alerta — datos disponibles y válidos
+                const silentStatuses = ['ok', 'degraded_cached'];
+                if (silentStatuses.includes(data.overallStatus) && !(data.issues && data.issues.length > 0)) {
+                    return;
                 }
-                // También alertar si alguna divisa usó la fuente de fallback
-                const fallbackCurrencies = Object.entries(data.currencies || {})
+                // Alertar solo si hay divisas verdaderamente sin datos (missing) o con issues
+                const problematicCurrencies = Object.entries(data.currencies || {})
                     .filter(([, info]) => info.status === 'fallback' || info.status === 'missing')
                     .map(([ccy]) => ccy);
-                if (fallbackCurrencies.length > 0) {
+                if (problematicCurrencies.length > 0 || (data.issues && data.issues.length > 0)) {
                     setRatesHealth(data);
                 }
             } catch (e) {
@@ -4039,11 +4026,6 @@ const DataHealthCheck = ({ economicData }) => {
             {/* Alerta de tasas de interés — fuente de datos degradada */}
             {ratesHealth && (ratesIssues.length > 0 || fallbackCcys.length > 0 || missingCcys.length > 0) && (
                 <div className="alert-card alert-warning" style={{ marginBottom: '1rem' }}>
-                    <div className="alert-icon" style={{
-                        background: 'rgba(239, 83, 80, 0.3)',
-                        color: 'var(--red-strong)'
-                    }}>
-                    </div>
                     <div className="alert-content">
                         <h3>Alerta: Fiabilidad de Tasas de Interés</h3>
                         <ul style={{
@@ -4082,11 +4064,6 @@ const DataHealthCheck = ({ economicData }) => {
 
             {health?.issues?.length > 0 && (
                 <div className="alert-card alert-warning" style={{ marginBottom: '1rem' }}>
-                    <div className="alert-icon" style={{ 
-                        background: 'rgba(239, 83, 80, 0.3)',
-                        color: 'var(--red-strong)'
-                    }}>
-                    </div>
                     <div className="alert-content">
                         <h3>Problemas de Calidad de Datos Detectados</h3>
                         <ul style={{ 
@@ -4113,12 +4090,6 @@ const DataHealthCheck = ({ economicData }) => {
             
             {health?.warnings?.length > 0 && (
                 <div className="alert-card alert-info" style={{ marginBottom: '1rem' }}>
-                    <div className="alert-icon" style={{ 
-                        background: 'rgba(255, 111, 0, 0.3)',
-                        color: 'var(--orange)'
-                    }}>
-                        
-                    </div>
                     <div className="alert-content">
                         <h3>Avisos de Calidad de Datos</h3>
                         <ul style={{ 
@@ -5576,13 +5547,6 @@ class ErrorBoundary extends React.Component {
                     </div>
                     <div className="content">
                         <div className="alert-card alert-warning" style={{ maxWidth: '800px', margin: '2rem auto' }}>
-                            <div className="alert-icon" style={{ 
-                                background: 'rgba(239, 83, 80, 0.3)',
-                                color: 'var(--red-strong)',
-                                fontSize: '2rem'
-                            }}>
-                                
-                            </div>
                             <div className="alert-content">
                                 <h3>El Dashboard ha Encontrado un Error</h3>
                                 <p style={{ marginTop: '1rem', lineHeight: '1.7' }}>
