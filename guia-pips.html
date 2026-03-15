@@ -184,13 +184,13 @@
 
 <header class="header">
     <div class="header-inner">
-        <a href="index.html" class="header-logo">
-            <img src="apple-touch-icon.png" alt="Global Investing" width="36" height="36">
-            <div class="header-brand-text">
+        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
+            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+            <div style="display:flex;flex-direction:column;justify-content:center;">
                 <span class="logo-name">Global Investing</span>
                 <span class="logo-sub">Forex Fundamental Dashboard</span>
             </div>
-        </a>
+        </div>
         <nav class="header-nav">
             <a href="index.html">Dashboard</a>
             <a href="about.html">Acerca de</a>
@@ -617,17 +617,18 @@ function calculatePip() {
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
 
         /* ── Header logo (unified) ── */
+        .logo { display: flex; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* ── Header unified ── */
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
         .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .header-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-        .header-logo img { border-radius: 7px; flex-shrink: 0; }
-        .header-brand-text { display: flex; flex-direction: column; justify-content: center; }
-        .logo-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; }
-        .logo-sub { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
-        .header-nav { display: flex; align-items: center; gap: 1.25rem; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
         .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
         .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
         .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.6rem; flex-wrap: wrap; } .logo-sub { display: none; } }
+        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: wrap; } .logo-sub { display: none; } }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>

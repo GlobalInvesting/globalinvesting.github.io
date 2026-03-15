@@ -287,8 +287,13 @@
 <div class="header">
   <div class="header-content">
     <div class="header-brand">
-      <div class="brand-title"><a href="index.html">Análisis Fundamental Forex</a></div>
-      <div class="brand-subtitle">Dashboard Profesional</div>
+      <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
+        <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+          <span class="logo-name">Global Investing</span>
+          <span class="logo-sub">Forex Fundamental Dashboard</span>
+        </div>
+      </div>
     </div>
     <div class="page-nav-links">
       <a href="about.html">Acerca de</a>
@@ -343,7 +348,7 @@
   <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE AN&Aacute;LISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
   <div style="margin-bottom:1rem;">
     Metodología: Modelo cuantitativo basado en datos económicos reales &bull; 21 indicadores ponderados en 6 tiers<br>
-    Pol&iacute;tica Monetaria (29%) &bull; Balance Externo (19%) &bull; Crecimiento &amp; Empleo (16%) &bull; Sentimiento de Mercado (22%) &bull; FX Confirmador (11%) &bull; Consumo (3%)<br>
+    Pol&iacute;tica Monetaria (29%) &bull; Balance Externo (19%) &bull; Crecimiento &amp; Empleo (16%) &bull; Sentimiento de Mercado (21%) &bull; FX Confirmador (11%) &bull; Consumo &amp; Salarios (4%)<br>
     Datos actualizados diariamente desde FRED (St. Louis Fed), Frankfurter/ECB y CFTC
   </div>
   <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;text-align:center;">
@@ -583,7 +588,12 @@ document.addEventListener('DOMContentLoaded', () => {
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-</style>
+
+        /* ── Header logo (unified) ── */
+        .logo { display: flex; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
