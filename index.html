@@ -2956,6 +2956,14 @@ const indicatorTooltips = {
                 }, 50);
                 return () => clearTimeout(timer);
             }, [calSelectedDate, calFilter, activeTab]);
+            // Scroll active nav-tab into view on tab change
+            React.useEffect(() => {
+                const activeBtn = document.querySelector('.nav-tab.active');
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+                }
+            }, [activeTab]);
+
 
             // Dynamic polling: refresh calendar JSON when an event is imminent (< 15 min) or just passed (< 5 min)
             React.useEffect(() => {
