@@ -182,21 +182,25 @@
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
 
-<div class="header">
-    <div class="header-content">
-            <div class="brand-wrap">
-        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
-        <span class="brand-subtitle">Dashboard Profesional</span>
-    </div>
-        <nav class="nav-links">
+<header class="header">
+    <div class="header-inner">
+        <a href="index.html" class="header-logo">
+            <img src="apple-touch-icon.png" alt="Global Investing" width="36" height="36">
+            <div class="header-brand-text">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
+            </div>
+        </a>
+        <nav class="header-nav">
             <a href="index.html">Dashboard</a>
             <a href="about.html">Acerca de</a>
             <a href="publicidad.html">Publicidad</a>
-            <a href="about.html#recursos">Guías</a>
+            <a href="about.html#recursos" class="active">Guías</a>
+            <a href="contact.html">Contacto</a>
             <a href="en.html" class="lang-switch">EN</a>
         </nav>
     </div>
-</div>
+</header>
 
 <div class="container" id="main-content" role="main">
     <div class="breadcrumb">
@@ -258,31 +262,17 @@
 
     <h3>Fórmula general</h3>
 
-    <p>El cálculo depende de si el USD es la divisa cotizada (la segunda del par) o no.</p>
-
-    <p><strong>Caso 1 — USD como divisa cotizada (EUR/USD, GBP/USD, AUD/USD…)</strong><br>
-    El resultado ya está en dólares, por lo que no es necesario dividir por el precio actual. La fórmula se simplifica a:</p>
-
-    <pre><span class="hl">Valor del pip</span> = Tamaño del pip × Tamaño de la posición
-
-<span class="dim">Ejemplo — EUR/USD, posición de 100.000 unidades:</span>
-Valor del pip = 0.0001 × 100.000 = <span class="hl">$10.00 exactos por pip</span>
-
-Este valor es fijo independientemente del precio del par.</pre>
-
-    <p><strong>Caso 2 — USD como divisa base, o pares cruzados (USD/JPY, USD/CAD, EUR/GBP…)</strong><br>
-    Aquí el resultado de la fórmula queda expresado en la divisa cotizada (JPY, CAD, GBP…), por lo que sí es necesario dividir por el precio actual para convertirlo a USD:</p>
-
     <pre><span class="hl">Valor del pip</span> = (Tamaño del pip ÷ Precio actual) × Tamaño de la posición
 
-<span class="dim">Ejemplo — USD/JPY en 149.50, posición de 100.000 unidades:</span>
-Valor del pip = (0.01 ÷ 149.50) × 100.000 = <span class="hl">≈ $6.69 por pip</span>
+<span class="dim">Ejemplo — EUR/USD en 1.0850, posición de 100.000 unidades:</span>
+Valor del pip = (0.0001 ÷ 1.0850) × 100.000 = <span class="hl">≈ $9.22 por pip</span>
 
-El valor varía con el precio del par.</pre>
+<span class="dim">Ejemplo — USD/JPY en 149.50, posición de 100.000 unidades:</span>
+Valor del pip = (0.01 ÷ 149.50) × 100.000 = <span class="hl">≈ $6.69 por pip</span></pre>
 
     <div class="box box-green">
-        <div class="box-title">Regla práctica para pares XXX/USD</div>
-        <p>Cuando el USD es la divisa cotizada (EUR/USD, GBP/USD, AUD/USD…), el valor del pip es siempre <strong>exactamente $10 por lote estándar</strong>, sin importar el precio actual. Para pares donde el USD es la divisa base (USD/JPY, USD/CAD, USD/CHF…) o para cruces sin USD (EUR/GBP, EUR/JPY…), el valor en dólares varía con el precio y requiere el cálculo completo.</p>
+        <div class="box-title">Atajo para pares XXX/USD</div>
+        <p>Cuando el USD es la divisa cotizada (EUR/USD, GBP/USD, AUD/USD…), el valor del pip es siempre <strong>exactamente $10 por lote estándar</strong>, independiente del precio. No necesitas calcularlo. Para USD/JPY y otros pares donde el USD es la base, el valor varía ligeramente con el precio.</p>
     </div>
 
     <h3>Tamaños de lote y valor por pip</h3>
@@ -519,7 +509,7 @@ El valor varía con el precio del par.</pre>
         <p>
             <strong>1.</strong> Un pip = el cuarto decimal en la mayoría de pares; segundo decimal en pares JPY.<br><br>
             <strong>2.</strong> El pipette (quinto decimal) = 1/10 de pip — útil para spreads precisos, no para gestión de riesgo diaria.<br><br>
-            <strong>3.</strong> El valor de un pip depende del par y el tamaño de la posición. Para pares XXX/USD es fijo ($10 por lote estándar); para otros pares también varía según el precio actual.<br><br>
+            <strong>3.</strong> Un pip no tiene valor fijo: depende del par, el precio y el tamaño de la posición.<br><br>
             <strong>4.</strong> Regla práctica para pares XXX/USD: 1 pip = $10 en lote estándar, $1 en mini, $0.10 en micro.<br><br>
             <strong>5.</strong> El modelo mental correcto: primero el riesgo máximo → luego el stop en pips → finalmente el tamaño del lote.<br><br>
             <strong>6.</strong> En acciones se usan centavos/ticks; en futuros, ticks por contrato. La lógica es la misma; solo cambia la unidad.
@@ -625,7 +615,20 @@ function calculatePip() {
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-</style>
+
+        /* ── Header logo (unified) ── */
+        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .header-logo img { border-radius: 7px; flex-shrink: 0; }
+        .header-brand-text { display: flex; flex-direction: column; justify-content: center; }
+        .logo-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; }
+        .logo-sub { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+        .header-nav { display: flex; align-items: center; gap: 1.25rem; }
+        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
+        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
+        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.6rem; flex-wrap: wrap; } .logo-sub { display: none; } }
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">

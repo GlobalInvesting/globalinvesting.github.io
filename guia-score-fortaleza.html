@@ -101,16 +101,25 @@
 </head>
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-<div class="header">
-    <div class="header-content">
-        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
-        <nav class="nav-links">
+<header class="header">
+    <div class="header-inner">
+        <a href="index.html" class="header-logo">
+            <img src="apple-touch-icon.png" alt="Global Investing" width="36" height="36">
+            <div class="header-brand-text">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
+            </div>
+        </a>
+        <nav class="header-nav">
             <a href="index.html">Dashboard</a>
             <a href="about.html">Acerca de</a>
+            <a href="publicidad.html">Publicidad</a>
+            <a href="about.html#recursos" class="active">Guías</a>
             <a href="contact.html">Contacto</a>
+            <a href="en.html" class="lang-switch">EN</a>
         </nav>
     </div>
-</div>
+</header>
 
 <div class="container" id="main-content" role="main">
     <div class="breadcrumb">
@@ -185,10 +194,11 @@
             <p style="margin:0;color:var(--text-secondary);">Diferencial: 26.3 puntos → <strong>Confianza Alta</strong>. El modelo sugiere una posición LONG en AUD/CAD, porque los fundamentos de Australia son significativamente más fuertes que los de Canadá en este momento.</p>
         </div>
 
-        <p>El umbral de confianza para los diferenciales es:</p>
+        <p>Los umbrales de confianza para los diferenciales son:</p>
         <ul>
-            <li><strong>Mayor o igual a 20 puntos:</strong> Confianza Alta — divergencia fundamental significativa. El dashboard muestra únicamente señales que alcanzan este umbral, respaldado por backtesting (HR ~49.8%, Sharpe +0.46).</li>
-            <li><strong>Menor a 20 puntos:</strong> El diferencial entre ambas divisas es demasiado estrecho para constituir una señal con sustento estadístico. Los fundamentos no dan una lectura clara de fortaleza relativa; en ese contexto, el análisis técnico y los eventos del calendario cobran mayor relevancia.</li>
+            <li><strong>Mayor a 25 puntos:</strong> Confianza Alta — divergencia fundamental significativa y operacionalmente relevante.</li>
+            <li><strong>18 a 25 puntos:</strong> Confianza Media — divergencia moderada con señal accionable. Sharpe histórico ~0.85, HR ~55%.</li>
+            <li><strong>Menor a 12 puntos:</strong> Confianza Baja — divisas con fundamentos demasiado similares; el diferencial técnico puede dominar.</li>
         </ul>
     </div>
 
@@ -244,7 +254,7 @@
         <h2>Resumen: guía de lectura rápida</h2>
         <ol>
             <li><strong>Identifica las divisas en los extremos</strong> — Las que están claramente por encima de 65 y por debajo de 45.</li>
-            <li><strong>Calcula el diferencial</strong> — Score fuerte menos score débil. Mayor o igual a 20 = confianza alta y señal visible en el dashboard.</li>
+            <li><strong>Calcula el diferencial</strong> — Score fuerte menos score débil. Mayor a 25 = confianza alta, 18–25 = confianza media.</li>
             <li><strong>Verifica la calidad de datos</strong> — Preferiblemente 70% o más para ambas divisas del par.</li>
             <li><strong>Considera el contexto macro</strong> — ¿Estamos en risk-on o risk-off? ¿Hay eventos de calendario próximos que puedan alterar el balance?</li>
             <li><strong>Usa el análisis técnico para el timing</strong> — El score indica la dirección, el técnico define el momento y el nivel de entrada.</li>
@@ -296,7 +306,20 @@
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-</style>
+
+        /* ── Header logo (unified) ── */
+        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .header-logo img { border-radius: 7px; flex-shrink: 0; }
+        .header-brand-text { display: flex; flex-direction: column; justify-content: center; }
+        .logo-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; }
+        .logo-sub { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+        .header-nav { display: flex; align-items: center; gap: 1.25rem; }
+        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
+        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
+        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.6rem; flex-wrap: wrap; } .logo-sub { display: none; } }
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
