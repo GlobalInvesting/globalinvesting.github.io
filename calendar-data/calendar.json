@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-15",
-  "generatedAt": "2026-03-15T03:22:23.445728Z",
+  "generatedAt": "2026-03-15T04:18:12.410972Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,19 +8,19 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-14",
-  "totalEvents": 913,
+  "totalEvents": 916,
   "currencyCounts": {
-    "AUD": 75,
+    "AUD": 76,
     "CAD": 63,
     "CHF": 35,
     "EUR": 92,
     "GBP": 113,
-    "JPY": 96,
+    "JPY": 97,
     "NZD": 45,
-    "USD": 394
+    "USD": 395
   },
   "impactCounts": {
-    "low": 517,
+    "low": 520,
     "medium": 319,
     "high": 77
   },
@@ -7503,6 +7503,19 @@
     {
       "date": "16 Mar",
       "dateISO": "2026-03-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "NAHB Housing Market Index (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "37",
+      "previous": "36"
+    },
+    {
+      "date": "16 Mar",
+      "dateISO": "2026-03-16",
       "timeUTC": "15:00",
       "country": "USD",
       "currency": "USD",
@@ -7815,6 +7828,32 @@
     {
       "date": "17 Mar",
       "dateISO": "2026-03-17",
+      "timeUTC": "23:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Reuters Tankan Index (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "13"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "23:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Leading Index (MoM)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.1%"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
       "timeUTC": "23:50",
       "country": "JPY",
       "currency": "JPY",
@@ -7849,7 +7888,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "11.5%",
-      "previous": "-2.5%"
+      "previous": "-2.6%"
     },
     {
       "date": "17 Mar",
@@ -7862,7 +7901,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "-485.0B",
-      "previous": "-1,152.7B"
+      "previous": "-1,163.5B"
     },
     {
       "date": "18 Mar",
