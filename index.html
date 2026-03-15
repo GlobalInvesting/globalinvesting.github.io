@@ -2,13 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
     <meta http-equiv="content-language" content="es">
     <meta name="google-adsense-account" content="ca-pub-7977942731354565">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
@@ -16,10 +9,11 @@
     <meta name="google-site-verification" content="FaJrk8fMNmvhnE6pImDpOW08No9C7fbGzOGX5zJhJ7M" />
     
 <!-- Favicon -->
-
-
-
-
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
     
     <!-- SEO Meta Tags OPTIMIZADOS -->
     <title>Dashboard Forex | Análisis Fundamental en Tiempo Real</title>
@@ -4763,11 +4757,8 @@ const sentiment = getSentiment(strength);
         <div className="section-header">
             <div className="section-title">Calendario Económico</div>
             <div className="section-meta">
-                {economicCalendar.source && economicCalendar.source !== 'fallback-generator'
-                    ? `Fuente: MQL5/Investing.com • Actualizado ${economicCalendar.lastUpdate || ''}`
-                    : 'Calendario estimado (scraping en proceso)'}
                 {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
-                    <span style={{ marginLeft: '1rem' }}>
+                    <span>
                         {economicCalendar.impactCounts.high} alto
                         {economicCalendar.impactCounts.medium > 0 && ` · ${economicCalendar.impactCounts.medium} medio`}
                     </span>

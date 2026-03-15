@@ -1158,5 +1158,13 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 <strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var activeTab = document.querySelector('.nav-tab.active');
+    if (activeTab) {
+        activeTab.scrollIntoView({ inline: 'center', block: 'nearest' });
+    }
+});
+</script>
 </body>
 </html>
