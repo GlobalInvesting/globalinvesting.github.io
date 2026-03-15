@@ -119,21 +119,25 @@
 </head>
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-    <div class="header">
-        <div class="header-content">
-                    <div class="brand-wrap">
-            <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
-            <span class="brand-subtitle">Dashboard Profesional</span>
-        </div>
-            <div class="nav-links">
-                <a href="index.html">Dashboard</a>
-                <a href="about.html" class="active">Acerca de</a>
-                <a href="publicidad.html">Publicidad</a>
-                <a href="about.html#recursos">Guías</a>
-                <a href="en.html" class="lang-switch">EN</a>
+    <header class="header">
+    <div class="header-inner">
+        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
+            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
             </div>
         </div>
+        <nav class="header-nav">
+            <a href="index.html">Dashboard</a>
+            <a href="about.html" class="active">Acerca de</a>
+            <a href="publicidad.html">Publicidad</a>
+            <a href="about.html#recursos">Guías</a>
+            <a href="contact.html">Contacto</a>
+            <a href="en.html" class="lang-switch">EN</a>
+        </nav>
     </div>
+</header>
 
     <div class="container">
         <h1>Acerca de Nuestra Plataforma</h1>
@@ -260,13 +264,13 @@
                     <tr>
                         <td></td><td>Producción Industrial</td><td>4%</td><td>Actividad del sector real.</td></tr>
                     <tr>
-                        <td><strong>Tier 4 — 3%</strong><br/>Consumo</td>
+                        <td><strong>Tier 6 — 3%</strong><br/>Consumo</td>
                         <td>Ventas Minoristas</td><td>3%</td><td>Fortaleza del consumo doméstico.</td>
                     </tr>
                     <tr>
                         <td></td><td>Crecimiento Salarial</td><td>0%</td><td>Presiones inflacionarias laborales. <em>Señal capturada por <code>inflation</code> y <code>rateMomentum</code>; peso vestigial.</em></td></tr>
                     <tr>
-                        <td><strong>Tier 5 — 22%</strong><br/>Sentimiento de Mercado</td>
+                        <td><strong>Tier 4 — 22%</strong><br/>Sentimiento de Mercado</td>
                         <td><strong>COT Positioning</strong></td><td><strong>6%</strong></td><td>Huella directa del smart money (hedge funds y CTAs). Fuente: CFTC Oficial. Incluye filtro de confirmación de precio.</td>
                     </tr>
                     <tr>
@@ -281,7 +285,7 @@
                         <td></td><td>Confianza Empresarial</td><td>2%</td><td>Indicador adelantado de inversión y contrataciones.</td></tr>
 
                     <tr>
-                        <td><strong>Tier 6 — 11%</strong><br/>FX Confirmador</td>
+                        <td><strong>Tier 5 — 11%</strong><br/>FX Confirmador</td>
                         <td>FX Performance 1M (<code>fxPerformance1M</code>)</td>
                         <td><strong>8%</strong></td>
                         <td>Composite basket-corrected: 70% 1M + 20% 1S + 10% 3M. Confirmador, no driver: los fundamentales causan el precio, no al revés.</td>
@@ -406,7 +410,19 @@ Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-</style>
+
+        /* ── Header unified ── */
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
+        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
+        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
