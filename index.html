@@ -1327,19 +1327,18 @@
 
 @media (max-width: 768px) {
     .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
     }
 
     .page-nav-links {
-        /* order: -1; ← eliminado */
-        flex-wrap: wrap;
-        gap: 0.5rem 1.25rem;
+        flex-wrap: nowrap;
+        gap: 0.75rem;
     }
 
     .page-nav-links a {
         white-space: nowrap;
+        font-size: 0.8rem;
     }
 
     .header-info {
