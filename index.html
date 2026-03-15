@@ -2,6 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
     <meta http-equiv="content-language" content="es">
     <meta name="google-adsense-account" content="ca-pub-7977942731354565">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
@@ -9,11 +16,10 @@
     <meta name="google-site-verification" content="FaJrk8fMNmvhnE6pImDpOW08No9C7fbGzOGX5zJhJ7M" />
     
 <!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+
+
+
+
     
     <!-- SEO Meta Tags OPTIMIZADOS -->
     <title>Dashboard Forex | Análisis Fundamental en Tiempo Real</title>
@@ -386,7 +392,7 @@
         }
 
         .brand-title {
-            font-size: 1.1rem;
+            font-size: 1.125rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             color: var(--text-primary);
@@ -465,11 +471,9 @@
             color: var(--blue) !important;
         }
 
-        .nav-tabs-wrap {
+        .nav-tabs {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
-        }
-        .nav-tabs {
             padding: 0 2rem;
             display: flex;
             gap: 0.5rem;
@@ -1327,18 +1331,19 @@
 
 @media (max-width: 768px) {
     .header-content {
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 
     .page-nav-links {
-        flex-wrap: nowrap;
-        gap: 0.75rem;
+        /* order: -1; ← eliminado */
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
     }
 
     .page-nav-links a {
         white-space: nowrap;
-        font-size: 0.8rem;
     }
 
     .header-info {
@@ -4110,12 +4115,9 @@ const DataHealthCheck = ({ economicData }) => {
                     <div className="app-container">
                         <div className="header">
                             <div className="header-content">
-                                <div style={{display:"flex",flexDirection:"row",alignItems:"center"}}>
-                                    <img src="apple-touch-icon.png" alt="Global Investing" style={{width:"40px",height:"40px",borderRadius:"8px",marginRight:"0.75rem",flexShrink:0,display:"block"}} />
-                                    <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
-                                        <div className="brand-title">Global Investing</div>
-                                        <div className="brand-subtitle">Forex Fundamental Dashboard</div>
-                                    </div>
+                                <div>
+                                    <div className="brand-title">Análisis Fundamental Forex</div>
+                                    <div className="brand-subtitle">Dashboard Profesional</div>
                                 </div>
                                 <div className="header-info">
                                     <div className="info-item">
@@ -4142,13 +4144,10 @@ const DataHealthCheck = ({ economicData }) => {
                 <div className="app-container">
                     <div className="header">
                         <div className="header-content">
-                            <div style={{display:"flex",flexDirection:"row",alignItems:"center"}}>
-                                    <img src="apple-touch-icon.png" alt="Global Investing" style={{width:"40px",height:"40px",borderRadius:"8px",marginRight:"0.75rem",flexShrink:0,display:"block"}} />
-                                    <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
-                                        <div className="brand-title">Global Investing</div>
-                                        <div className="brand-subtitle">Forex Fundamental Dashboard</div>
-                                    </div>
-                                </div>
+                            <div>
+                                <div className="brand-title">Análisis Fundamental Forex</div>
+                                <div className="brand-subtitle">Dashboard Profesional</div>
+                            </div>
 <div className="page-nav-links">
     <a href="about.html">Acerca de</a>
     <a href="publicidad.html">Publicidad</a>
@@ -4187,7 +4186,6 @@ const DataHealthCheck = ({ economicData }) => {
                         </div>
                     </div>
 
-                    <div className="nav-tabs-wrap">
                     <div className="nav-tabs">
                         <button className={`nav-tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Resumen de Divisas</button>
                         <button className={`nav-tab ${activeTab === 'heatmap' ? 'active' : ''}`} onClick={() => setActiveTab('heatmap')}>Mapa de Calor</button>
@@ -4196,7 +4194,6 @@ const DataHealthCheck = ({ economicData }) => {
                         <button className={`nav-tab ${activeTab === 'alerts' ? 'active' : ''}`} onClick={() => setActiveTab('alerts')}>Mejores Pares</button>
                         <a href="news.html"        className="nav-tab" style={{textDecoration:'none'}}>Noticias</a>
                         <a href="carry-trade.html" className="nav-tab" style={{textDecoration:'none'}}>Carry Trade</a>
-                    </div>
                     </div>
 
                     <div className="content">
@@ -5511,13 +5508,10 @@ class ErrorBoundary extends React.Component {
                 <div className="app-container">
                     <div className="header">
                         <div className="header-content">
-                            <div style={{display:"flex",flexDirection:"row",alignItems:"center"}}>
-                                    <img src="apple-touch-icon.png" alt="Global Investing" style={{width:"40px",height:"40px",borderRadius:"8px",marginRight:"0.75rem",flexShrink:0,display:"block"}} />
-                                    <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
-                                        <div className="brand-title">Global Investing</div>
-                                        <div className="brand-subtitle">Error del Sistema</div>
-                                    </div>
-                                </div>
+                            <div>
+                                <div className="brand-title">Análisis Fundamental Forex</div>
+                                <div className="brand-subtitle">Error del Sistema</div>
+                            </div>
                         </div>
                     </div>
                     <div className="content">

@@ -2,6 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
     <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/guia-cot.html">
     <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
     <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/guia-cot.html">
@@ -90,25 +97,17 @@
 </head>
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-<header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav">
+<div class="header">
+    <div class="header-content">
+        <a href="index.html" class="brand-title">Análisis Fundamental Forex</a>
+        <nav class="nav-links">
             <a href="index.html">Dashboard</a>
             <a href="about.html">Acerca de</a>
-            <a href="publicidad.html">Publicidad</a>
-            <a href="about.html#recursos" class="active">Guías</a>
+            <a href="about.html#recursos">Guías</a>
             <a href="contact.html">Contacto</a>
-            <a href="en.html" class="lang-switch">EN</a>
         </nav>
     </div>
-</header>
+</div>
 
 <div class="container" id="main-content" role="main">
     <div class="breadcrumb">
@@ -295,21 +294,7 @@
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-
-        /* ── Header logo (unified) ── */
-        .logo { display: flex; }
-        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
-        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-
-        /* ── Header unified ── */
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
-        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
-        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: wrap; } .logo-sub { display: none; } }
-        </style>
+</style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
