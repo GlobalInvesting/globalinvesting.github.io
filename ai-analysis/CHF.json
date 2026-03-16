@@ -2,17 +2,17 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "La política monetaria del Banco Nacional Suizo ha tomado un giro dovish, con una reducción de 0.25pp en la tasa de interés, lo que sitúa la tasa en 0.00%, muy por debajo del promedio global de 2.33%. Esto sugiere que la divisa suiza puede estar bajo presión bajista debido a la menor rentabilidad para los inversores. Aunque los datos de inflación y crecimiento económico no parecen justificar esta decisión, el banco central puede estar buscando estimular la economía. La noticia de que el par USD/CHF avanza hacia 0.7870, con el dólar estadounidense fortaleciéndose ante la preocupación por la inflación, sugiere que la divisa suiza puede seguir debilitándose en el corto plazo.\n\nLa balanza comercial y la cuenta corriente de Suiza muestran un superávit, lo que debería generar demanda estructural de la divisa. Sin embargo, la composición exportadora de Suiza, que se centra en productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales, puede ser sensible a los cambios en la demanda global. Aunque no hay noticias específicas sobre cambios en la demanda de estos productos, es importante considerar cómo los factores externos pueden influir en la balanza comercial y, por ende, en la divisa.\n\nEl posicionamiento especulativo en el mercado de divisas, con un sesgo neto alcista de +4.5K contratos, sugiere que los inversores están apostando por una apreciación de la divisa suiza. Sin embargo, el rendimiento FX del último mes ha sido positivo, con una apreciación de 0.50% versus el dólar estadounidense, lo que puede indicar que el mercado ya ha incorporado esta expectativa. La noticia de que el par USD/CHF puede estar rompiendo su patrón de máximos decrecientes después de la publicación de la inflación en Estados Unidos sugiere que el mercado puede estar preparado para una posible corrección.",
+  "analysis": "El Banco Nacional Suizo ha mantenido una postura dovish, recortando las tasas de interés en 0.25pp, lo que ha generado una presión bajista sobre la divisa. Aunque la economía suiza muestra un crecimiento del PIB del 2.0% anual, superior al promedio global, la inflación se encuentra por debajo del objetivo, lo que justifica la decisión del banco central. La tasa de interés actual de 0.00% se encuentra muy por debajo del promedio global, lo que podría convertir a la divisa en una financiadora de carry trade en episodios de aversión al riesgo.\n\nLa cuenta corriente suiza muestra un superávit del 5.1% del PIB, lo que genera una demanda estructural de la divisa. La composición exportadora de Suiza, liderada por productos farmacéuticos e instrumentos de precisión, también contribuye a este superávit. La noticia de que el par USD/CHF ha caído por debajo de 0.7900 debido a la debilidad del dólar estadounidense en un contexto de reducción de la aversión al riesgo sugiere que la divisa suiza sigue siendo atractiva en momentos de incertidumbre.\n\nEl posicionamiento especulativo en la divisa suiza muestra un sesgo alcista, con 4.3K contratos netos. El rendimiento FX del último mes también ha sido positivo, con una apreciación del 2.26% frente al dólar estadounidense. Aunque la noticia sobre la decisión de capital de UBS puede generar incertidumbre, el perfil de activo refugio de la divisa suiza, combinado con su superávit de cuenta corriente y deuda contenida, sugiere que puede seguir siendo atractiva en momentos de tensión global.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-13T08:34:04.189595+00:00",
+  "generatedAt": "2026-03-16T08:48:10.569246+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.0,
-    "gdpGrowth": 1.3023,
-    "inflation": 0.0343,
-    "unemployment": 4.873,
-    "currentAccount": 7.6891,
+    "gdpGrowth": 2.0,
+    "inflation": 0.1,
+    "unemployment": 3.0,
+    "currentAccount": 5.1,
     "rateMomentum": -0.25,
     "lastRateDecision": {
       "direction": "BAJÓ",
@@ -24,24 +24,24 @@
       "cycle_12m": -0.25,
       "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
     },
-    "cotPositioning": 4456,
-    "fxPerformance1M": 0.5026,
+    "cotPositioning": 4280,
+    "fxPerformance1M": 2.2596,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-13",
-    "latestNewsTs": 1773377897.0,
+    "lastUpdate": "2026-03-16",
+    "latestNewsTs": 1773638149.0,
     "newsHeadlines": [
-      "USD/CHF advances to 0.7870, eyes monthly top as inflation worries lift USD ahead",
-      "Watchlist Update & Trade Case Study on USD/CHF",
-      "USDCHF Technicals: USDCHF trapped between 100-hour and 200-hour moving averages"
+      "USD/CHF slips below 0.7900 as US Dollar weakens on easing risk aversion",
+      "Swiss capital decision looms over UBS",
+      "USDCHF Technicals: There is a key level in the USDCHF I am eyeing. What is it an"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.33,
-    "avg_gdp_growth": 0.91,
-    "avg_inflation": 2.37,
-    "avg_unemployment": 4.87,
-    "avg_bond10y": 3.38,
-    "avg_fx_perf_1m": -0.2,
-    "avg_cot": 4098.88
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.99,
+    "avg_inflation": 2.3,
+    "avg_unemployment": 4.58,
+    "avg_bond10y": 3.39,
+    "avg_fx_perf_1m": 0.82,
+    "avg_cot": -3255.75
   }
 }

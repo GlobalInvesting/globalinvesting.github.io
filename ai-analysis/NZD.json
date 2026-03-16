@@ -2,17 +2,17 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que sitúa la tasa en 2.25%, ligeramente por debajo del promedio global. Este movimiento puede ejercer presión a la baja sobre la divisa, aunque el crecimiento del PIB anual del 1.3% y la inflación del 2.9% sugieren una economía con cierta solidez. La decisión del banco central puede estar influenciada por la necesidad de equilibrar el crecimiento con la estabilidad de precios.\n\nLa balanza comercial de Nueva Zelanda muestra un superávit mensual significativo en bienes, gracias a sus exportaciones de productos como leche, carne y cereales, que se benefician de términos de intercambio favorables. Aunque este superávit comercial es positivo, la cuenta corriente en déficit y la deuda pública del 53% del PIB introducen presiones estructurales sobre la divisa. La confianza del consumidor y la confianza empresarial también juegan un papel importante en la economía, y aunque no hay noticias directamente relevantes en el contexto noticioso, la recuperación de Wall Street y la corrección del petróleo pueden influir en la percepción de riesgo global.\n\nEl posicionamiento especulativo neto bajista, con -10.3K contratos netos, y el rendimiento FX del último mes de +1.70% vs USD, sugieren una dinámica compleja para la divisa. Aunque la demanda de refugio seguro como el silver ha sido moderada, la recuperación de los mercados de acciones y la corrección del petróleo pueden ofrecer oportunidades o trampas para los inversores. En este contexto, la evolución de la divisa dependerá de cómo se desarrollen estos factores y cómo el banco central ajuste su política monetaria para equilibrar el crecimiento y la estabilidad.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con una disminución de 0.25pp en la tasa de interés, lo que ha generado una presión bajista sobre la divisa. Aunque la inflación se encuentra por encima del objetivo, el banco central ha optado por reducir las tasas, lo que sugiere que la preocupación por el crecimiento económico es mayor que la lucha contra la inflación. La noticia de que los aranceles estadounidenses podrían reducir la inflación a corto plazo en Nueva Zelanda, según el RBNZ, podría estar influyendo en esta decisión.\n\nLa balanza comercial de Nueva Zelanda muestra un superávit en bienes, gracias a sus principales exportaciones como leche y productos lácteos, carne y cereales. Sin embargo, la cuenta corriente presenta un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La situación en el Medio Oriente, con la crisis en Irán, también podría estar afectando a los mercados y, por ende, a la economía neozelandesa, como se refleja en la preocupación de los inversores por la volatilidad del mercado y su impacto en los fondos de pensiones como Kiwisaver.\n\nEl posicionamiento especulativo en el mercado de divisas muestra un sesgo neto bajista, con -4.2K contratos netos, lo que sugiere que los inversores están apostando por una depreciación de la divisa. A pesar de esto, el rendimiento FX del último mes ha sido positivo, con una apreciación del 3.60% frente al dólar estadounidense. Esta dinámica podría estar reflejando la incertidumbre en los mercados y la búsqueda de activos seguros, lo que podría continuar en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-13T08:34:09.028798+00:00",
+  "generatedAt": "2026-03-16T08:48:15.267076+00:00",
   "exportComposition": "Principales exportaciones: leche y productos lácteos, carne y despojos comestibles, cereales",
-  "newsCount": 2,
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 2.25,
-    "gdpGrowth": 1.2886,
-    "inflation": 2.9228,
-    "unemployment": 5.076,
-    "currentAccount": -5.4579,
+    "gdpGrowth": -1.1,
+    "inflation": 3.1,
+    "unemployment": 5.4,
+    "currentAccount": -5.7,
     "rateMomentum": -1.5,
     "lastRateDecision": {
       "direction": "BAJÓ",
@@ -24,23 +24,24 @@
       "cycle_12m": -1.5,
       "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
     },
-    "cotPositioning": -10295,
-    "fxPerformance1M": 1.6978,
+    "cotPositioning": -4166,
+    "fxPerformance1M": 3.6042,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-13",
-    "latestNewsTs": 1773327060.0,
+    "lastUpdate": "2026-03-16",
+    "latestNewsTs": 1773618271.0,
     "newsHeadlines": [
-      "Silver (XAG/USD) rejects triangle formation from Iran War – Breakout scenarios",
-      "Wall Street recovers as Oil corrects, opportunity or trap? – Dow Jones and US In"
+      "Reserve Bank of New Zealand (RBNZ) says U.S. tariffs may ease inflation short te",
+      "French President Emmanuel Macron spoke direct with Iranian President Masoud Peze",
+      "The Iran Crisis Is Hitting Kiwisaver Balances But Market Volatility Can Work For"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.33,
-    "avg_gdp_growth": 0.91,
-    "avg_inflation": 2.37,
-    "avg_unemployment": 4.87,
-    "avg_bond10y": 3.38,
-    "avg_fx_perf_1m": -0.2,
-    "avg_cot": 4098.88
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.99,
+    "avg_inflation": 2.3,
+    "avg_unemployment": 4.58,
+    "avg_bond10y": 3.39,
+    "avg_fx_perf_1m": 0.82,
+    "avg_cot": -3255.75
   }
 }

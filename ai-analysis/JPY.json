@@ -2,18 +2,18 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón subió las tasas de interés en 0.25pp en julio de 2025, llevando el tipo al 0.75%, dentro de su ciclo alcista acumulado de +0.25pp en 12 meses. Esta subida ha generado una presión alcista sobre la divisa japonesa. Aunque la tasa de interés sigue estando por debajo del promedio global, el aumento ha sido visto como un paso hacia un ciclo restrictivo. El gobernador del Banco de Japón, Ueda, ha advertido que una debilidad en el yen podría amplificar la inflación, especialmente con el aumento en los precios del petróleo.\n\nLa balanza comercial de Japón sigue mostrando un superávit, gracias a sus exportaciones de vehículos y maquinaria industrial. Sin embargo, la cuenta corriente también se ha visto afectada por los términos de intercambio desfavorables, lo que ha encarecido las importaciones. Aunque los datos económicos siguen siendo mixtos, la posición especulativa en el mercado sigue siendo muy bajista, lo que podría generar un potencial rebote contrario si los datos mejoran.\n\nEl rendimiento del yen en el último mes ha sido positivo, con una apreciación del 1.12% frente al dólar estadounidense. Esto se ha debido en parte a la combinación de una subida en los precios del petróleo y un aumento en los rendimientos de los bonos estadounidenses. Aunque el mercado sigue estando muy cargado a la baja, cualquier mejora en los datos podría generar un rebote en la divisa japonesa.",
+  "analysis": "El Banco de Japón subió las tasas de interés en su última decisión, lo que sugiere un ciclo restrictivo activo y una presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, el aumento reciente puede atraer inversores en busca de un mayor carry diferencial. La inflación en Japón también está por encima del objetivo, lo que puede llevar al banco central a seguir con una política monetaria más restrictiva.\n\nLa cuenta corriente de Japón muestra un superávit, lo que indica una demanda estructural de la divisa. La composición exportadora del país, con un enfoque en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos, sugiere que el superávit comercial se debe en parte a la demanda de estos productos. La escalada de la guerra en Oriente Medio ha impulsado los precios de la energía al alza, lo que puede afectar las importaciones de Japón y su balanza comercial.\n\nEl posicionamiento especulativo en el mercado muestra una posición corta extrema, con un COT de -49K contratos netos. Esto sugiere un potencial rebote contrario si los datos económicos mejoran. La intervención de Tokyo en el mercado de divisas también es un factor a considerar, especialmente si el par USD/JPY se acerca a los 160. La combinación de estos factores puede llevar a una apreciación de la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-13T08:33:44.546334+00:00",
+  "generatedAt": "2026-03-16T08:47:51.984862+00:00",
   "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.75,
-    "gdpGrowth": 0.1043,
-    "inflation": 2.7385,
-    "unemployment": 2.6,
-    "currentAccount": 5.296,
-    "rateMomentum": 0.45,
+    "gdpGrowth": 0.7,
+    "inflation": 3.8,
+    "unemployment": 2.5,
+    "currentAccount": 4.7,
+    "rateMomentum": 0.65,
     "lastRateDecision": {
       "direction": "SUBIÓ",
       "delta": 0.25,
@@ -24,24 +24,24 @@
       "cycle_12m": 0.25,
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
-    "cotPositioning": -34225,
-    "fxPerformance1M": 1.1247,
+    "cotPositioning": -49219,
+    "fxPerformance1M": 2.0106,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-13",
-    "latestNewsTs": 1773341918.0,
+    "lastUpdate": "2026-03-16",
+    "latestNewsTs": 1773640526.0,
     "newsHeadlines": [
-      "USDJPY Technicals. The USDJPY continues the stretch to the 2026 high.",
-      "BoJ’s Ueda warns weak yen could amplify inflation as oil prices rise",
-      "BOJ not expected to raise interest rates next week - poll"
+      "Tokyo intervention looms large as USD/JPY nears 160 mark",
+      "Pronóstico Semanal de Forex – USD/JPY, Petróleo Crudo WTI, Gasolina, Trigo, Índi",
+      "Week Ahead: Central Bank Bonanza!"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.33,
-    "avg_gdp_growth": 0.91,
-    "avg_inflation": 2.37,
-    "avg_unemployment": 4.87,
-    "avg_bond10y": 3.38,
-    "avg_fx_perf_1m": -0.2,
-    "avg_cot": 4098.88
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.99,
+    "avg_inflation": 2.3,
+    "avg_unemployment": 4.58,
+    "avg_bond10y": 3.39,
+    "avg_fx_perf_1m": 0.82,
+    "avg_cot": -3255.75
   }
 }

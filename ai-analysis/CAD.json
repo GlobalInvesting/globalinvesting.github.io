@@ -2,18 +2,18 @@
   "currency": "CAD",
   "country": "Canadá",
   "bank": "Banco de Canadá (BoC)",
-  "analysis": "El Banco de Canadá recortó las tasas de interés 0.25pp en su último movimiento, situando el tipo en 2.25%, tras un ciclo de recortes acumulados desde el pico de 5.25% en 2024. La política más acomodaticia reduce el carry y hace que la inversión en activos canadienses sea menos atractiva relativamente. Aunque la inflación se mantiene por encima del objetivo, el banco central ha optado por una postura dovish, lo que sugiere que está priorizando el crecimiento económico sobre la lucha contra la inflación. Esto se refleja en las expectativas de un aumento en la tasa de desempleo en febrero, según las previsiones de la encuesta de fuerza laboral.\n\nLa balanza comercial canadiense muestra un superávit significativo, gracias a los términos de intercambio favorables y a las exportaciones de combustibles y petróleo, vehículos y autopartes, y maquinaria industrial. Sin embargo, la cuenta corriente presenta un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La confianza del consumidor y la confianza empresarial también están en niveles bajos, lo que podría afectar el crecimiento económico en el futuro.\n\nEl posicionamiento especulativo en el mercado de divisas canadienses es muy estirado a la baja, con un COT de -41K contratos netos, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. La depreciación del CAD en el último mes, con un rendimiento FX de -0.47% vs USD, también refleja la presión bajista sobre la divisa. Aunque se espera una disminución en la inflación en enero, lo que podría apoyar la postura dovish del Banco de Canadá, el mercado está atento a los datos económicos y a las decisiones del banco central para determinar el rumbo de la divisa.",
+  "analysis": "El Banco de Canadá recortó las tasas de interés en 0.25pp, lo que ha generado una presión bajista sobre la divisa canadiense, aunque el crecimiento del PIB anual de 1.5% es superior al promedio global. La inflación se encuentra por debajo del objetivo, lo que podría justificar esta decisión. Sin embargo, la cuenta corriente presenta un déficit del 1.4% del PIB, lo que ejerce presión vendedora estructural sobre la divisa.\n\nLa composición exportadora de Canadá, liderada por combustibles y petróleo, vehículos y autopartes, y maquinaria industrial, explica en parte el déficit comercial. Aunque los términos de intercambio son favorables, el déficit en bienes es significativo. La noticia reciente sobre el acuerdo entre Canadá y los países nórdicos para profundizar la cooperación en defensa y economía podría tener un impacto positivo a largo plazo en la divisa, aunque no es inmediatamente relevante para el mercado de divisas.\n\nEl posicionamiento especulativo en el mercado, con un COT de -37.2K contratos netos, indica una posición corta extrema, lo que sugiere un potencial rebote contrario si los datos económicos mejoran. La noticia sobre el informe de empleo canadiense, que mostró una pérdida de 83,900 empleos, ha afectado negativamente a la divisa canadiense, lo que se refleja en el rendimiento FX del último mes, que aunque es positivo, se encuentra por debajo del promedio de las 8 divisas principales.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-13T08:33:58.987905+00:00",
+  "generatedAt": "2026-03-16T08:48:06.072783+00:00",
   "exportComposition": "Principales exportaciones: combustibles y petróleo, vehículos y autopartes, maquinaria industrial",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 2.25,
-    "gdpGrowth": 1.5548,
-    "inflation": 2.3153,
-    "unemployment": 6.5,
-    "currentAccount": -0.6369,
-    "rateMomentum": 0.75,
+    "gdpGrowth": 1.5,
+    "inflation": 1.1,
+    "unemployment": 6.6,
+    "currentAccount": -1.4,
+    "rateMomentum": -0.5,
     "lastRateDecision": {
       "direction": "BAJÓ",
       "delta": -0.25,
@@ -21,27 +21,27 @@
       "prev_rate": 2.5,
       "date": "2025-10-01",
       "source": "rates_history",
-      "cycle_12m": 0.0,
-      "cycle_label": "estable en los últimos 12 meses"
+      "cycle_12m": -0.5,
+      "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
-    "cotPositioning": -41371,
-    "fxPerformance1M": -0.4717,
+    "cotPositioning": -37159,
+    "fxPerformance1M": 0.7038,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-13",
-    "latestNewsTs": 1773381600.0,
+    "lastUpdate": "2026-03-16",
+    "latestNewsTs": 1773600110.0,
     "newsHeadlines": [
-      "Canada Unemployment Rate set to tick higher in February ahead of BoC rate decisi",
-      "Event Guide: Canada’s CPI Report (February 2026)",
-      "Canada announces the construction of 27 homes and a child care centre in Fernie"
+      "Norden, Canada agree to deepen cooperation in defence, economy",
+      "Soft jobs report weighs on the Canadian dollar. What to look for next",
+      "USDCAD Technicals: The USDCAD continues the run higher. Target area reached."
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.33,
-    "avg_gdp_growth": 0.91,
-    "avg_inflation": 2.37,
-    "avg_unemployment": 4.87,
-    "avg_bond10y": 3.38,
-    "avg_fx_perf_1m": -0.2,
-    "avg_cot": 4098.88
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.99,
+    "avg_inflation": 2.3,
+    "avg_unemployment": 4.58,
+    "avg_bond10y": 3.39,
+    "avg_fx_perf_1m": 0.82,
+    "avg_cot": -3255.75
   }
 }

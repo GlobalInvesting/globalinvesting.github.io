@@ -2,14 +2,14 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal ha recortado las tasas de interés 0.25pp en su último movimiento, situando el tipo en 3.75%, en el marco de un ciclo bajista acumulado de -0.75pp en los últimos 12 meses. Aunque la inflación anual del 2.4% se mantiene ligeramente por encima del objetivo, el débil crecimiento del PIB del 0.4% anual, inferior al promedio global, justifica la postura más acomodaticia. La Reserva Federal sigue atenta a la evolución de los datos antes de decidir el ritmo de futuros recortes.\n\nLa balanza comercial muestra un déficit pronunciado de -54.5B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones de maquinaria industrial, equipos eléctricos y electrónicos, y aeronaves, no parecen ser suficientes para compensar el déficit comercial. La noticia de que Japón está preocupado por el impacto del precio del petróleo y podría tomar medidas en el mercado de divisas, especialmente en el par USD/JPY, puede influir en la dinámica del mercado.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -4.5K contratos netos, lo que podría indicar una posible corrección en el mercado. La depreciación del 1.12% en el último mes vs USD también sugiere una tendencia a la baja. Aunque la noticia sobre la decisión de Estados Unidos de subestimar la voluntad de Irán de disruptar el estrecho de Ormuz puede introducir incertidumbre en el mercado, el panorama general sigue siendo alcista para la divisa debido a la política monetaria restrictiva de la Reserva Federal.",
+  "analysis": "La Reserva Federal ha recortado las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y menor carry, presionando a la baja la divisa. Aunque la tasa de interés sigue siendo alta en comparación con el promedio global, la tendencia a la baja puede afectar la atracción de inversores. La inflación se mantiene por encima del objetivo, lo que podría influir en las decisiones futuras del banco central.\n\nLa balanza comercial muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. Las principales exportaciones, como maquinaria industrial y aeronaves, no han sido suficientes para compensar el déficit. La situación en el Strait of Hormuz y los aumentos en el precio del petróleo podrían influir en la demanda de divisas seguras, aunque de manera táctica, según Brown Brothers Harriman.\n\nEl posicionamiento especulativo neto bajista y el rendimiento FX negativo en el último mes reflejan la debilidad de la divisa. Aunque los mercados están cautelosos debido a la situación en el Strait of Hormuz, la tendencia a la baja en la divisa podría continuar. La confianza del consumidor y la confianza empresarial también podrían influir en la economía y, por ende, en la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-13T08:33:30.813915+00:00",
+  "generatedAt": "2026-03-16T08:47:38.477180+00:00",
   "exportComposition": "Principales exportaciones: maquinaria industrial, equipos eléctricos y electrónicos, aeronaves",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.75,
-    "gdpGrowth": 0.3538,
+    "gdpGrowth": 2.0326,
     "inflation": 2.434,
     "unemployment": 4.4,
     "currentAccount": -4.0902,
@@ -24,24 +24,24 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": -4547,
-    "fxPerformance1M": -1.1246,
+    "cotPositioning": -11683,
+    "fxPerformance1M": -2.0007,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-13",
-    "latestNewsTs": 1773378716.0,
+    "lastUpdate": "2026-03-16",
+    "latestNewsTs": 1773644296.0,
     "newsHeadlines": [
-      "What are the main events for today?",
-      "investingLive Asia-Pacific FX news wrap: Russia gets some oil sanctions relief f",
-      "Poor US decision-making process underestimated Iran’s willingness to disrupt Hor"
+      "USD: Tactical haven support but structural headwinds – BBH",
+      "Markets Cautious as Hormuz Escort Plan Runs Into Resistance",
+      "WTI Oil rises to near $98.00 on Trump threats against Iran export facilities"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.33,
-    "avg_gdp_growth": 0.91,
-    "avg_inflation": 2.37,
-    "avg_unemployment": 4.87,
-    "avg_bond10y": 3.38,
-    "avg_fx_perf_1m": -0.2,
-    "avg_cot": 4098.88
+    "avg_interest_rate": 2.34,
+    "avg_gdp_growth": 0.99,
+    "avg_inflation": 2.3,
+    "avg_unemployment": 4.58,
+    "avg_bond10y": 3.39,
+    "avg_fx_perf_1m": 0.82,
+    "avg_cot": -3255.75
   }
 }
