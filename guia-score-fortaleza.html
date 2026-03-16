@@ -281,6 +281,69 @@
         </ol>
     </div>
 
+    
+    <section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Qué score se considera alcista para una divisa?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Un score por encima de 65 puntos indica fortaleza fundamental con convicción. Entre 45 y 65 es zona neutral. Por debajo de 45 el sesgo es bajista. Estos umbrales están calibrados al estándar de la industria: el top 25% del universo G8 suele quedar por encima de 65.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Con qué frecuencia se actualiza el score?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">El score se recalcula todos los días a las 09:00 UTC, después de que los datos económicos del día anterior ya están disponibles. Los lunes también se guarda un snapshot semanal que alimenta el backtest prospectivo.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Qué diferencial mínimo de score conviene buscar para operar un par?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">El modelo usa 12 puntos de diferencial como umbral mínimo para considerar una señal válida. Con menos de 12 puntos la ventaja fundamental no es suficientemente clara para justificar el riesgo.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿El score reemplaza al análisis técnico?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">No. El score define el sesgo direccional — a qué divisa favorecer estructuralmente — pero no el timing de entrada ni los niveles exactos. La combinación óptima es usar el score para decidir la dirección y el análisis técnico para el momento de entrada.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Por qué el score puede diferir del movimiento reciente del precio?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">El score mide fundamentos, no momentum de precio. Es normal que una divisa con score alto haya tenido semanas de corrección técnica: el mercado puede tardar semanas o meses en reflejar los fundamentos. Cuando el precio confirma la fortaleza fundamental, la señal tiene mayor convicción.</p>
+        </div>
+    </div>
+    </section>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/guia-score-fortaleza.html#faq","mainEntity":[
+    {
+      "@type": "Question",
+      "name": "¿Qué score se considera alcista para una divisa?",
+      "acceptedAnswer": {"@type": "Answer","text": "Un score por encima de 65 puntos indica fortaleza fundamental con convicción. Entre 45 y 65 es zona neutral. Por debajo de 45 el sesgo es bajista. Estos umbrales están calibrados al estándar de la industria: el top 25% del universo G8 suele quedar por encima de 65."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Con qué frecuencia se actualiza el score?",
+      "acceptedAnswer": {"@type": "Answer","text": "El score se recalcula todos los días a las 09:00 UTC, después de que los datos económicos del día anterior ya están disponibles. Los lunes también se guarda un snapshot semanal que alimenta el backtest prospectivo."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué diferencial mínimo de score conviene buscar para operar un par?",
+      "acceptedAnswer": {"@type": "Answer","text": "El modelo usa 12 puntos de diferencial como umbral mínimo para considerar una señal válida. Con menos de 12 puntos la ventaja fundamental no es suficientemente clara para justificar el riesgo."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿El score reemplaza al análisis técnico?",
+      "acceptedAnswer": {"@type": "Answer","text": "No. El score define el sesgo direccional — a qué divisa favorecer estructuralmente — pero no el timing de entrada ni los niveles exactos. La combinación óptima es usar el score para decidir la dirección y el análisis técnico para el momento de entrada."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué el score puede diferir del movimiento reciente del precio?",
+      "acceptedAnswer": {"@type": "Answer","text": "El score mide fundamentos, no momentum de precio. Es normal que una divisa con score alto haya tenido semanas de corrección técnica: el mercado puede tardar semanas o meses en reflejar los fundamentos. Cuando el precio confirma la fortaleza fundamental, la señal tiene mayor convicción."}
+    }
+    ]}
+    </script>
     <h2>Guías relacionadas</h2>
     <div class="related-links">
         <a href="guia-cot.html" class="related-card">
@@ -363,6 +426,17 @@
         .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
             color: var(--text-primary) !important; }
         .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
+        
+        /* ── FAQ Section ── */
+        .faq-section { margin: 3rem 0 2rem; }
+        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
+            color: var(--text-primary); }
+        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
+        .faq-item:last-child { border-bottom: 1px solid var(--border); }
+        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
+            margin: 0 0 0.6rem; line-height: 1.4; }
+        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
+            margin: 0; line-height: 1.7; }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>

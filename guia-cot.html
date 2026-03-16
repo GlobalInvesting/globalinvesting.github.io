@@ -271,6 +271,86 @@
         </ol>
     </div>
 
+    
+    
+    <section class="examples-section">
+    <h2>Cómo leer el COT en la práctica: ejemplos reales</h2>
+    <p>La teoría del COT es clara, pero saber aplicarla requiere ver casos concretos donde la señal funcionó — y donde no.</p>
+
+    <h3>Señal contrarian en EUR: 2022</h3>
+    <p>A mediados de 2022, con el EUR/USD cayendo hacia la paridad, los leveraged funds acumularon posiciones cortas netas en EUR que alcanzaron niveles extremos no vistos en años. El sentimiento era abrumadoramente bajista: la crisis energética europea, la guerra en Ucrania y la agresiva Fed parecían condenar al euro. Sin embargo, desde esos extremos de posicionamiento, el EUR/USD protagonizó un rebote de más de 1.000 pips en los meses siguientes. Los que usaron el extremo de posicionamiento como señal contrarian capturaron ese movimiento.</p>
+
+    <h3>Posicionamiento extremo que NO revirtió: JPY 2022-2023</h3>
+    <p>Un caso importante de fallo: en 2022 y durante gran parte de 2023, los especulativos acumularon posiciones cortas netas en JPY en niveles históricos. La señal contrarian indicaba comprar JPY — pero el par USD/JPY continuó subiendo durante meses adicionales porque el fundamento (diferencial de tasas Fed vs BOJ) seguía intacto. El posicionamiento extremo solo revirtió cuando el BOJ empezó a señalar cambios de política en 2024. Este es el motivo por el que el COT se usa en el dashboard como un factor más dentro de 21 indicadores, no como señal independiente.</p>
+
+    <h3>La señal de GBP en 2023</h3>
+    <p>Durante el primer semestre de 2023, con el Banco de Inglaterra subiendo tasas agresivamente, los leveraged funds pasaron de posiciones cortas extremas a una acumulación progresiva de largos. Este cambio de posicionamiento —de extremo corto a neutral y luego a largo— coincidió con una de las mejores tendencias alcistas del GBP en años. No fue la señal de reversión contrarian clásica, sino el reconocimiento de que el cambio de ciclo del banco central estaba siendo respaldado por posicionamiento institucional creciente.</p>
+
+    <h3>El reporte COT como contexto, no como timing</h3>
+    <p>La forma más robusta de usar el COT es como contexto de riesgo, no como señal de entrada. Si el score fundamental de una divisa es fuerte pero el COT ya está en extremos especulativos largos, el riesgo de corrección es elevado aunque la dirección sea correcta. Si el score es fuerte Y el posicionamiento todavía es neutral o ligeramente corto, significa que los institucionales aún no han comprado esa fortaleza — hay más recorrido disponible con menor riesgo de reversión abrupta.</p>
+    </section>
+    <section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Con qué frecuencia se publica el reporte COT?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">La CFTC publica el reporte todos los viernes a las 15:30 EST, con datos de la semana cerrada el martes anterior. Hay un rezago de tres días hábiles. El dashboard actualiza los datos COT automáticamente cada viernes a las 20:00 UTC.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Qué nivel de posición neta se considera extremo?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">No hay un número absoluto porque varía por divisa y ciclo. Lo que importa es el extremo relativo: si los leveraged funds están en máximos históricos de los últimos 2 años en una divisa, eso es una señal contrarian relevante, independientemente del número absoluto.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Por qué el COT a veces falla como señal contrarian?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">El posicionamiento extremo puede mantenerse durante meses antes de revertir. Un mercado en tendencia fuerte puede tener posicionamiento extremo de forma sostenida. Por eso el dashboard pondera el COT con un 6% del score total y lo combina con otros 20 indicadores fundamentales.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Qué diferencia hay entre Leveraged Funds y Asset Managers en el COT?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Los Leveraged Funds (hedge funds) son los más seguidos como señal contrarian porque son traders especulativos que suelen estar en el lado equivocado en los extremos. Los Asset Managers (fondos de pensiones) tienen posiciones más estructurales y de largo plazo, y no se interpretan igual.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cómo usar el COT junto con el score del dashboard?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">La combinación más útil es buscar divisas donde el score fundamental es fuerte Y el posicionamiento COT no está aún en extremos especulativos largos. Eso significa que el mercado todavía no ha comprado esa fortaleza — hay recorrido disponible.</p>
+        </div>
+    </div>
+    </section>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/guia-cot.html#faq","mainEntity":[
+    {
+      "@type": "Question",
+      "name": "¿Con qué frecuencia se publica el reporte COT?",
+      "acceptedAnswer": {"@type": "Answer","text": "La CFTC publica el reporte todos los viernes a las 15:30 EST, con datos de la semana cerrada el martes anterior. Hay un rezago de tres días hábiles. El dashboard actualiza los datos COT automáticamente cada viernes a las 20:00 UTC."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué nivel de posición neta se considera extremo?",
+      "acceptedAnswer": {"@type": "Answer","text": "No hay un número absoluto porque varía por divisa y ciclo. Lo que importa es el extremo relativo: si los leveraged funds están en máximos históricos de los últimos 2 años en una divisa, eso es una señal contrarian relevante, independientemente del número absoluto."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Por qué el COT a veces falla como señal contrarian?",
+      "acceptedAnswer": {"@type": "Answer","text": "El posicionamiento extremo puede mantenerse durante meses antes de revertir. Un mercado en tendencia fuerte puede tener posicionamiento extremo de forma sostenida. Por eso el dashboard pondera el COT con un 6% del score total y lo combina con otros 20 indicadores fundamentales."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué diferencia hay entre Leveraged Funds y Asset Managers en el COT?",
+      "acceptedAnswer": {"@type": "Answer","text": "Los Leveraged Funds (hedge funds) son los más seguidos como señal contrarian porque son traders especulativos que suelen estar en el lado equivocado en los extremos. Los Asset Managers (fondos de pensiones) tienen posiciones más estructurales y de largo plazo, y no se interpretan igual."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo usar el COT junto con el score del dashboard?",
+      "acceptedAnswer": {"@type": "Answer","text": "La combinación más útil es buscar divisas donde el score fundamental es fuerte Y el posicionamiento COT no está aún en extremos especulativos largos. Eso significa que el mercado todavía no ha comprado esa fortaleza — hay recorrido disponible."}
+    }
+    ]}
+    </script>
     <h2>Guías relacionadas</h2>
     <div class="related-links">
         <a href="guia-score-fortaleza.html" class="related-card">
@@ -353,6 +433,17 @@
         .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
             color: var(--text-primary) !important; }
         .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
+        
+        /* ── FAQ Section ── */
+        .faq-section { margin: 3rem 0 2rem; }
+        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
+            color: var(--text-primary); }
+        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
+        .faq-item:last-child { border-bottom: 1px solid var(--border); }
+        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
+            margin: 0 0 0.6rem; line-height: 1.4; }
+        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
+            margin: 0; line-height: 1.7; }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>

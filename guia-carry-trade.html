@@ -230,6 +230,100 @@
         </ol>
     </div>
 
+    
+    
+    <section class="examples-section">
+    <h2>Ejemplos históricos de carry trade en el G8</h2>
+    <p>Entender el carry trade en abstracto es útil, pero verlo en acción sobre datos reales lo hace mucho más claro. Estos son algunos de los casos más ilustrativos de los últimos años en el universo G8.</p>
+
+    <h3>AUD/JPY 2022-2024: el carry trade clásico moderno</h3>
+    <p>Durante este período el Banco de la Reserva de Australia mantuvo tasas entre 4.10% y 4.35% mientras el Banco de Japón mantenía su política de tasas ultra-bajas en -0.10% a 0.10%. El diferencial llegó a superar los 4 puntos porcentuales. Los inversores de carry compraban AUD y financiaban la posición vendiendo JPY, captando ese diferencial más cualquier movimiento favorable del par. El resultado fue una tendencia alcista sostenida en AUD/JPY que duró más de 18 meses.</p>
+
+    <h3>El carry unwind de agosto 2024</h3>
+    <p>En julio de 2024, el Banco de Japón sorprendió al mercado subiendo tasas a 0.25% y señalizando más subidas. Simultáneamente, el mercado empezó a prever recortes de la Fed. El diferencial de tasas que sostenía el carry trade JPY comenzó a comprimirse rápidamente. En los primeros días de agosto 2024, AUD/JPY cayó más de 10 figuras en cuestión de días — uno de los carry unwinds más violentos en años recientes. Los inversores que tenían carry trades apalancados en pares contra el JPY sufrieron pérdidas significativas en muy poco tiempo.</p>
+
+    <h3>NZD/USD 2023-2025: carry en ciclo de recortes</h3>
+    <p>El RBNZ fue uno de los primeros bancos centrales en subir tasas agresivamente tras la pandemia, llevándolas al 5.50%. Pero cuando empezó su ciclo de recortes en agosto 2024 — el más agresivo del G8, con recortes de 50pb consecutivos — el diferencial frente al USD empezó a comprimirse. El carry trade en NZD se volvió progresivamente menos atractivo, y el par cayó más de 10% desde sus máximos. Este es el ejemplo típico de por qué el rateMomentum (la dirección del banco central) pesa un 7% en el score del dashboard.</p>
+
+    <h3>Cómo identificar el próximo carry trade</h3>
+    <p>La página de Carry Trade del dashboard muestra en tiempo real los diferenciales de tasas entre todas las combinaciones posibles de las 8 divisas G8, ordenados por magnitud. Los pares con mayor diferencial Y donde ambos bancos centrales están en ciclos opuestos (uno subiendo, otro bajando) son los candidatos más sólidos. Cuando además el score fundamental de la divisa de alto rendimiento supera en 15+ puntos a la de bajo rendimiento, la señal tiene respaldo en tres dimensiones: diferencial de tasas, dirección de política monetaria y fortaleza macroeconómica general.</p>
+    </section>
+    
+    <section class="examples-section">
+    <h2>Carry trade en el dashboard: cómo usarlo</h2>
+    <p>La página de Carry Trade del dashboard está diseñada específicamente para identificar oportunidades de diferencial de tasas en tiempo real.</p>
+
+    <h3>Los diferenciales en tiempo real</h3>
+    <p>La tabla principal muestra los diferenciales de tasas entre todas las combinaciones posibles de las 8 divisas G8, ordenados de mayor a menor. Los datos de tasas se actualizan automáticamente cada vez que un banco central toma una decisión — el dashboard usa las tasas de política monetaria oficiales, no estimaciones. El diferencial entre la divisa de mayor tasa y la de menor tasa te da el ingreso teórico anual por pip si mantuvieras una posición de carry abierta.</p>
+
+    <h3>El rateMomentum como filtro de calidad</h3>
+    <p>Un diferencial alto hoy no garantiza que siga siendo alto mañana. Por eso el score de fortaleza incluye el rateMomentum — la variación de tasas en los últimos 12 y 24 meses — como indicador de hacia dónde se mueve el diferencial. Un carry donde la divisa de alto rendimiento tiene rateMomentum positivo (tasas subiendo o estables) y la de bajo rendimiento tiene rateMomentum negativo (tasas bajando) es mucho más robusto que uno donde los diferenciales se están comprimiendo.</p>
+
+    <h3>Cuándo el dashboard señala una oportunidad de carry</h3>
+    <p>La señal más completa es cuando se dan tres condiciones simultáneas: diferencial de tasas superior a 2 puntos porcentuales, score de fortaleza fundamental de la divisa de alto rendimiento mayor en 12+ puntos que la de bajo rendimiento, y posicionamiento COT sin extremos especulativos en la dirección del carry. Cuando las tres condiciones se alinean, el carry tiene respaldo de precio, fundamentos y posicionamiento institucional.</p>
+    </section>
+    <section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cuál es la diferencia mínima de tasas para que el carry trade sea rentable?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">No hay un umbral universal, pero diferencias menores a 1 punto porcentual raramente justifican el riesgo cambiario. Los carries más estudiados históricamente involucran diferenciales de 2 a 5 puntos, como el clásico AUD/JPY o NZD/JPY en épocas de tasas japonesas negativas.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cuándo conviene evitar el carry trade aunque el diferencial sea alto?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">En períodos de alta volatilidad global el carry unwind puede ser brutal y rápido. También conviene reducir exposición cuando el banco central de la divisa de alto rendimiento inicia un ciclo de recortes, porque el diferencial se irá achicando.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿El carry trade funciona mejor en algún período del año?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Históricamente funciona mejor en períodos de baja volatilidad y apetito por el riesgo sostenido. Los períodos de mayor riesgo son los cierres de año fiscal de institucionales japoneses (marzo) y los momentos de estrés bancario global.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cómo afectan las reuniones de bancos centrales al carry trade?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Son el mayor catalizador. Un banco central que sube tasas más de lo esperado fortalece el carry en esa divisa; uno que las recorta lo destruye. El dashboard muestra las próximas reuniones de los 8 bancos centrales para anticipar cambios de política.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿El score del dashboard refleja oportunidades de carry trade?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Sí. El diferencial de tasas tiene un peso del 10% en el score y el rateMomentum (dirección del banco central) tiene un 7%. Las divisas con scores muy divergentes suelen ser las mejores candidatas de carry, especialmente cuando el diferencial es amplio y ambos bancos están en ciclos opuestos.</p>
+        </div>
+    </div>
+    </section>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/guia-carry-trade.html#faq","mainEntity":[
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la diferencia mínima de tasas para que el carry trade sea rentable?",
+      "acceptedAnswer": {"@type": "Answer","text": "No hay un umbral universal, pero diferencias menores a 1 punto porcentual raramente justifican el riesgo cambiario. Los carries más estudiados históricamente involucran diferenciales de 2 a 5 puntos, como el clásico AUD/JPY o NZD/JPY en épocas de tasas japonesas negativas."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuándo conviene evitar el carry trade aunque el diferencial sea alto?",
+      "acceptedAnswer": {"@type": "Answer","text": "En períodos de alta volatilidad global el carry unwind puede ser brutal y rápido. También conviene reducir exposición cuando el banco central de la divisa de alto rendimiento inicia un ciclo de recortes, porque el diferencial se irá achicando."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿El carry trade funciona mejor en algún período del año?",
+      "acceptedAnswer": {"@type": "Answer","text": "Históricamente funciona mejor en períodos de baja volatilidad y apetito por el riesgo sostenido. Los períodos de mayor riesgo son los cierres de año fiscal de institucionales japoneses (marzo) y los momentos de estrés bancario global."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo afectan las reuniones de bancos centrales al carry trade?",
+      "acceptedAnswer": {"@type": "Answer","text": "Son el mayor catalizador. Un banco central que sube tasas más de lo esperado fortalece el carry en esa divisa; uno que las recorta lo destruye. El dashboard muestra las próximas reuniones de los 8 bancos centrales para anticipar cambios de política."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿El score del dashboard refleja oportunidades de carry trade?",
+      "acceptedAnswer": {"@type": "Answer","text": "Sí. El diferencial de tasas tiene un peso del 10% en el score y el rateMomentum (dirección del banco central) tiene un 7%. Las divisas con scores muy divergentes suelen ser las mejores candidatas de carry, especialmente cuando el diferencial es amplio y ambos bancos están en ciclos opuestos."}
+    }
+    ]}
+    </script>
     <h2>Guías relacionadas</h2>
     <div class="related-links">
         <a href="guia-bancos-centrales.html" class="related-card">
@@ -316,6 +410,17 @@
         .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
             color: var(--text-primary) !important; }
         .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
+        
+        /* ── FAQ Section ── */
+        .faq-section { margin: 3rem 0 2rem; }
+        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
+            color: var(--text-primary); }
+        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
+        .faq-item:last-child { border-bottom: 1px solid var(--border); }
+        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
+            margin: 0 0 0.6rem; line-height: 1.4; }
+        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
+            margin: 0; line-height: 1.7; }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
