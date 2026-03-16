@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos Públicos — Feeds RSS y Recursos | Global Investing</title>
+    <meta name="description" content="Feeds RSS y datos públicos del Dashboard de Análisis Fundamental Forex. Subscríbete a las noticias forex, análisis AI y ranking de fortaleza G8 en tiempo real.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/data.html">
+    <meta property="og:title" content="Datos Públicos y RSS — Global Investing">
+    <meta property="og:description" content="Feeds RSS y recursos de datos del dashboard forex fundamental más completo en español.">
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+    <meta property="og:url" content="https://globalinvesting.github.io/data.html">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "DataCatalog",
+      "name": "Global Investing — Datos Públicos Forex",
+      "url": "https://globalinvesting.github.io/data.html",
+      "description": "Feeds RSS y datos de análisis fundamental forex para las 8 divisas G8",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Global Investing",
+        "url": "https://globalinvesting.github.io"
+      },
+      "dataset": [
+        {
+          "@type": "Dataset",
+          "name": "Noticias Forex en Tiempo Real",
+          "description": "Feed RSS con las últimas noticias forex de alto impacto",
+          "url": "https://globalinvesting.github.io/feed.xml",
+          "encodingFormat": "application/rss+xml",
+          "updateFrequency": "3 veces al día"
+        },
+        {
+          "@type": "Dataset",
+          "name": "Análisis Fundamental AI — G8",
+          "description": "Análisis diario por divisa generado con IA sobre datos macroeconómicos",
+          "url": "https://globalinvesting.github.io/feed-analysis.xml",
+          "encodingFormat": "application/rss+xml",
+          "updateFrequency": "Diario"
+        },
+        {
+          "@type": "Dataset",
+          "name": "Ranking de Fortaleza G8",
+          "description": "Score de fortaleza fundamental diario para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD",
+          "url": "https://globalinvesting.github.io/feed-scores.xml",
+          "encodingFormat": "application/rss+xml",
+          "updateFrequency": "Diario"
+        }
+      ]
+    }
+    </script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f1117; --bg-secondary: #1a1d27; --border: rgba(255,255,255,0.08);
+            --text-primary: #e8e6df; --text-secondary: #9b9890; --blue: #4a9eff;
+            --green: #3dd68c; --amber: #f59e0b; --purple: #a78bfa;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+               background: var(--bg); color: var(--text-primary); line-height: 1.7; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+                  padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 900px; margin: 0 auto; display: flex;
+                        justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .logo img { width: 36px; height: 36px; border-radius: 7px; }
+        .logo-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;
+                        font-weight: 500; transition: color 0.2s; }
+        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .lead { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 3rem;
+                max-width: 620px; }
+        h2 { font-size: 1.3rem; font-weight: 700; margin: 2.5rem 0 1rem; }
+        .feed-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                      gap: 1.25rem; margin-bottom: 2.5rem; }
+        .feed-card { background: var(--bg-secondary); border: 1px solid var(--border);
+                     border-radius: 12px; padding: 1.5rem; }
+        .feed-card-type { display: inline-block; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em; color: var(--amber);
+            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 4px; padding: 0.2rem 0.5rem; margin-bottom: 0.75rem; }
+        .feed-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .feed-card p { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem; }
+        .feed-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px;
+                 background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+        .badge.green { background: rgba(61,214,140,0.12); color: var(--green); }
+        .badge.blue  { background: rgba(74,158,255,0.12); color: var(--blue); }
+        .btn-rss { display: inline-flex; align-items: center; gap: 0.4rem;
+                   background: rgba(245,158,11,0.12); color: var(--amber);
+                   border: 1px solid rgba(245,158,11,0.25); border-radius: 8px;
+                   padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 500;
+                   text-decoration: none; transition: background 0.2s; }
+        .btn-rss:hover { background: rgba(245,158,11,0.2); }
+        .code-block { background: var(--bg-secondary); border: 1px solid var(--border);
+                      border-radius: 8px; padding: 1rem 1.25rem; font-family: 'SF Mono', monospace;
+                      font-size: 0.85rem; color: var(--blue); overflow-x: auto;
+                      margin: 0.75rem 0 1.5rem; }
+        .section-desc { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;
+                        max-width: 680px; }
+        .attr-box { background: rgba(167,139,250,0.07); border: 1px solid rgba(167,139,250,0.2);
+                    border-radius: 10px; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+        .attr-box h3 { font-size: 0.95rem; font-weight: 600; color: var(--purple); margin-bottom: 0.5rem; }
+        .attr-box p { font-size: 0.875rem; color: var(--text-secondary); }
+        .attr-box code { background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem;
+                         border-radius: 4px; font-size: 0.85rem; color: var(--text-primary); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0 2rem; }
+        th { text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
+             color: var(--text-secondary); font-weight: 500; font-size: 0.8rem;
+             text-transform: uppercase; letter-spacing: 0.05em; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+             color: var(--text-secondary); vertical-align: top; }
+        td:first-child { color: var(--text-primary); font-weight: 500; font-family: monospace;
+                         font-size: 0.85rem; }
+        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center;
+                  color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { color: var(--text-primary); }
+        @media (max-width: 600px) { .feed-cards { grid-template-columns: 1fr; }
+            h1 { font-size: 1.5rem; } .container { padding: 2rem 1.25rem 4rem; } }
+    </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link" style="position:absolute;left:-9999px">Saltar al contenido</a>
+
+<header class="header" role="banner">
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <img src="apple-touch-icon.png" alt="Global Investing">
+            <div>
+                <div class="logo-name">Global Investing</div>
+                <div class="logo-sub">Forex Fundamental Dashboard</div>
+            </div>
+        </a>
+        <nav class="header-nav" aria-label="Navegación principal">
+            <a href="index.html">Dashboard</a>
+            <a href="about.html">Acerca de</a>
+            <a href="data.html" class="active">Datos</a>
+            <a href="contact.html">Contacto</a>
+            <a href="en.html" class="lang-switch">EN</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main-content" role="main">
+<div class="container">
+    <h1>Datos y Feeds RSS</h1>
+    <p class="lead">El dashboard publica sus datos en tiempo real a través de feeds RSS estándar. Subscríbete para recibir noticias forex, análisis AI y el ranking de fortaleza G8 directamente en tu lector favorito.</p>
+
+    <h2>Feeds RSS disponibles</h2>
+
+    <div class="feed-cards">
+        <div class="feed-card">
+            <div class="feed-card-type">Noticias</div>
+            <h3>Noticias Forex</h3>
+            <p>Las últimas noticias de alto impacto para las 8 divisas G8, con análisis de relevancia fundamental.</p>
+            <div class="feed-meta">
+                <span class="badge green">3× al día</span>
+                <span class="badge">ES · EN</span>
+                <span class="badge">30 items</span>
+            </div>
+            <a href="feed.xml" class="btn-rss">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+                Suscribirse al feed
+            </a>
+        </div>
+
+        <div class="feed-card">
+            <div class="feed-card-type">Análisis</div>
+            <h3>Análisis AI por Divisa</h3>
+            <p>Análisis fundamental generado con IA para cada divisa G8, con datos macro, perspectiva del banco central y exportaciones.</p>
+            <div class="feed-meta">
+                <span class="badge green">Diario</span>
+                <span class="badge">8 divisas</span>
+                <span class="badge blue">AI · v5.0</span>
+            </div>
+            <a href="feed-analysis.xml" class="btn-rss">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+                Suscribirse al feed
+            </a>
+        </div>
+
+        <div class="feed-card">
+            <div class="feed-card-type">Scores</div>
+            <h3>Ranking de Fortaleza G8</h3>
+            <p>Score de fortaleza fundamental diario para las 8 divisas principales con señales de trading activas y perspectiva de bancos centrales.</p>
+            <div class="feed-meta">
+                <span class="badge green">Diario</span>
+                <span class="badge">21 indicadores</span>
+                <span class="badge blue">Modelo v6.5</span>
+            </div>
+            <a href="feed-scores.xml" class="btn-rss">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+                Suscribirse al feed
+            </a>
+        </div>
+    </div>
+
+    <h2>Cómo usar los feeds RSS</h2>
+    <p class="section-desc">Los feeds RSS son un estándar abierto compatible con cualquier lector. Copia la URL del feed y pégala en tu lector favorito.</p>
+
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;">URLs de los feeds</h3>
+    <div class="code-block">https://globalinvesting.github.io/feed.xml</div>
+    <div class="code-block">https://globalinvesting.github.io/feed-analysis.xml</div>
+    <div class="code-block">https://globalinvesting.github.io/feed-scores.xml</div>
+
+    <h3 style="font-size:1rem;font-weight:600;margin:1.5rem 0 0.5rem;">Lectores recomendados</h3>
+    <table>
+        <thead>
+            <tr><th>Lector</th><th>Plataforma</th><th>Descripción</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Feedly</td><td>Web · iOS · Android</td><td>El más popular. Plan gratuito disponible.</td></tr>
+            <tr><td>Inoreader</td><td>Web · iOS · Android</td><td>Potente para organizar muchas fuentes.</td></tr>
+            <tr><td>NetNewsWire</td><td>macOS · iOS</td><td>Gratuito y de código abierto.</td></tr>
+            <tr><td>RSS.app</td><td>Web</td><td>Permite convertir el feed a JSON o Webhook.</td></tr>
+            <tr><td>Zapier / Make</td><td>Automatización</td><td>Conecta el feed RSS a cualquier otra herramienta.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Estructura de los datos</h2>
+    <p class="section-desc">El dashboard publica los siguientes recursos públicos. Cada archivo se actualiza automáticamente con la frecuencia indicada.</p>
+
+    <table>
+        <thead>
+            <tr><th>Recurso</th><th>Frecuencia</th><th>Contenido</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>feed.xml</td><td>3× al día</td><td>Noticias forex recientes con clasificación por divisa e impacto</td></tr>
+            <tr><td>feed-analysis.xml</td><td>Diario</td><td>Análisis AI por divisa con datos macro y perspectiva de banco central</td></tr>
+            <tr><td>feed-scores.xml</td><td>Diario</td><td>Ranking G8 completo con scores individuales y señales activas</td></tr>
+            <tr><td>sitemap.xml</td><td>Diario</td><td>Mapa del sitio para motores de búsqueda</td></tr>
+        </tbody>
+    </table>
+
+    <div class="attr-box">
+        <h3>Condiciones de uso</h3>
+        <p>Los feeds RSS son públicos y de libre uso para consumo personal, investigación y proyectos no comerciales. Si se redistribuye o publica contenido proveniente de estos feeds, se requiere atribución visible con enlace a <code>globalinvesting.github.io</code>. Para uso comercial o integraciones a escala, <a href="contact.html" style="color:var(--purple)">contactanos</a>.</p>
+    </div>
+
+    <h2>Integración con herramientas externas</h2>
+    <p class="section-desc">Los feeds RSS son compatibles con las principales herramientas de automatización. Algunos ejemplos de lo que se puede hacer:</p>
+    <ul style="color:var(--text-secondary);font-size:0.95rem;padding-left:1.5rem;line-height:2;">
+        <li>Recibir una notificación en Telegram cada vez que aparece una noticia de alto impacto para una divisa específica</li>
+        <li>Enviar el ranking semanal G8 por email automáticamente todos los lunes</li>
+        <li>Integrar el análisis AI en un dashboard propio usando RSS.app o un parser estándar</li>
+        <li>Monitorear señales de trading activas con Zapier o Make</li>
+    </ul>
+</div>
+</main>
+
+<footer class="footer" role="contentinfo">
+    <p>© Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
+    <div style="margin-top:0.5rem;display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;font-size:0.8rem;">
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">Acerca de</a>
+        <a href="guia-score-fortaleza.html">Guías</a>
+        <a href="data.html">Datos</a>
+        <a href="terms.html">Términos</a>
+        <a href="privacy.html">Privacidad</a>
+        <a href="contact.html">Contacto</a>
+        <a href="en.html">EN</a>
+    </div>
+    <p style="margin-top:1rem;font-size:0.8rem;">
+        Aviso de Riesgo: Contenido exclusivamente informativo. No constituye asesoramiento financiero.
+        El trading de divisas implica alto riesgo. · <a href="privacy.html">Privacidad</a> · <a href="terms.html">Términos</a>
+    </p>
+</footer>
+</body>
+</html>
