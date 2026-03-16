@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-16",
-  "generatedAt": "2026-03-16T10:11:43.169704Z",
+  "generatedAt": "2026-03-16T11:28:02.025170Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,19 +8,19 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-15",
-  "totalEvents": 913,
+  "totalEvents": 915,
   "currencyCounts": {
     "AUD": 75,
     "CAD": 63,
     "CHF": 35,
-    "EUR": 92,
+    "EUR": 93,
     "GBP": 113,
     "JPY": 96,
     "NZD": 45,
-    "USD": 394
+    "USD": 395
   },
   "impactCounts": {
-    "low": 517,
+    "low": 519,
     "medium": 319,
     "high": 77
   },
@@ -7321,6 +7321,19 @@
     {
       "date": "16 Mar",
       "dateISO": "2026-03-16",
+      "timeUTC": "11:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Reserve Assets Total",
+      "impact": "low",
+      "actual": "2,046.00B",
+      "forecast": "",
+      "previous": "1,987.13B"
+    },
+    {
+      "date": "16 Mar",
+      "dateISO": "2026-03-16",
       "timeUTC": "12:15",
       "country": "CAD",
       "currency": "CAD",
@@ -7497,8 +7510,21 @@
       "event": "Manufacturing Production (MoM) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.1%",
       "previous": "0.6%"
+    },
+    {
+      "date": "16 Mar",
+      "dateISO": "2026-03-16",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "NAHB Housing Market Index (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "37",
+      "previous": "36"
     },
     {
       "date": "16 Mar",
