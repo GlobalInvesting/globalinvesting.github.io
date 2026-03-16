@@ -25,6 +25,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
 <meta property="og:title" content="Carry Trade Forex · Diferenciales de Tasas">
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:description" content="Ranking de pares carry trade con datos reales de tasas, bonos 10Y y posicionamiento COT.">
 <meta property="og:url" content="https://globalinvesting.github.io/carry-trade.html">
 <meta property="og:locale" content="es_ES">
@@ -538,7 +539,19 @@
     <div class="page-nav-links">
       <a href="about.html">Acerca de</a>
       <a href="publicidad.html">Publicidad</a>
-      <a href="about.html#recursos">Guías</a>
+      <div class="nav-dropdown">
+      <a href="guia-score-fortaleza.html">Guías</a>
+      <div class="nav-dropdown-menu">
+          <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+          <a href="guia-carry-trade.html">Carry Trade</a>
+          <a href="guia-cot.html">Reporte COT</a>
+          <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+          <a href="guia-calendario-economico.html">Calendario Económico</a>
+          <a href="guia-pips.html">Pips y Lotaje</a>
+          <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+          <a href="glosario-forex.html">Glosario Forex</a>
+      </div>
+    </div>
       <a href="contact.html">Contacto</a>
       <a href="en.html" class="lang-switch">EN</a>
     </div>
@@ -680,7 +693,7 @@
   <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:.75rem;font-size:.75rem;color:var(--text-secondary);">
     <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
     <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
-    <a href="about.html#recursos" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
+    <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
     <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
     <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
     <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
@@ -1127,7 +1140,33 @@ document.addEventListener('DOMContentLoaded', function() {
 #gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-</style>
+
+        /* ── Guías dropdown ── */
+        .nav-dropdown { position: relative; list-style: none; display: inline-block; }
+        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
+            border-left: 4px solid transparent; border-right: 4px solid transparent;
+            border-top: 4px solid currentColor; transition: transform 0.2s; }
+        .nav-dropdown:hover > a::after,
+        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
+        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
+            right: 0; min-width: 220px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 0.75rem 0 0.4rem; z-index: 200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+        /* Puente invisible que cubre el gap entre trigger y menú */
+        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
+            left: -8px; right: -8px; height: 0.75rem; }
+        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
+            color: var(--text-secondary) !important; font-size: 0.85rem !important;
+            text-decoration: none; white-space: nowrap;
+            transition: background 0.15s, color 0.15s; }
+        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
+            color: var(--text-primary) !important; }
+        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">

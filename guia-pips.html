@@ -185,6 +185,8 @@
   }
 }
 </script>
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+    <meta property="og:image:alt" content="Global Investing — Dashboard de Análisis Fundamental Forex">
 </head>
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
@@ -198,21 +200,33 @@
                 <span class="logo-sub">Forex Fundamental Dashboard</span>
             </div>
         </div>
-        <nav class="header-nav">
-            <a href="index.html">Dashboard</a>
-            <a href="about.html">Acerca de</a>
-            <a href="publicidad.html">Publicidad</a>
-            <a href="about.html#recursos" class="active">Guías</a>
-            <a href="contact.html">Contacto</a>
-            <a href="en.html" class="lang-switch">EN</a>
-        </nav>
+        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="about.html">Acerca de</a></li>
+            <li><a href="publicidad.html">Publicidad</a></li>
+<li class="nav-dropdown">
+            <a href="guia-score-fortaleza.html">Guías</a>
+            <div class="nav-dropdown-menu">
+            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+            <a href="guia-carry-trade.html">Carry Trade</a>
+            <a href="guia-cot.html">Reporte COT</a>
+            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+            <a href="guia-calendario-economico.html">Calendario Económico</a>
+            <a href="guia-pips.html" class="active-guide">Pips y Lotaje</a>
+            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+            <a href="glosario-forex.html">Glosario Forex</a>
+            </div>
+        </li>
+            <li><a href="contact.html">Contacto</a></li>
+            <li><a href="en.html" class="lang-switch">EN</a></li>
+        </ul></nav>
     </div>
 </header>
 
 <div class="container" id="main-content" role="main">
     <div class="breadcrumb">
         <a href="index.html">Inicio</a> ›
-        <a href="about.html#recursos">Guías</a> ›
+        <a href="guia-score-fortaleza.html">Guías</a> ›
         Pips: cómo pensarlos y calcularlos
     </div>
 
@@ -565,7 +579,7 @@ El valor varía con el precio del par.</pre>
         <a href="index.html">Dashboard</a>
         <a href="about.html">Acerca de</a>
         <a href="publicidad.html">Publicidad</a>
-        <a href="about.html#recursos">Guías</a>
+        <a href="guia-score-fortaleza.html">Guías</a>
         <a href="terms.html">Términos</a>
         <a href="privacy.html">Privacidad</a>
         <a href="contact.html">Contacto</a>
@@ -648,6 +662,31 @@ function calculatePip() {
         .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
         .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
         @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
+        
+        /* ── Guías dropdown ── */
+        .nav-dropdown { position: relative; }
+        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
+            border-left: 4px solid transparent; border-right: 4px solid transparent;
+            border-top: 4px solid currentColor; transition: transform 0.2s; }
+        .nav-dropdown:hover > a::after,
+        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
+        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
+            right: 0; min-width: 220px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 0.75rem 0 0.4rem; z-index: 200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+        /* Puente invisible que cubre el gap entre trigger y menú */
+        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
+            left: -8px; right: -8px; height: 0.75rem; }
+        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
+            color: var(--text-secondary) !important; font-size: 0.85rem !important;
+            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
+            color: var(--text-primary) !important; }
+        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
