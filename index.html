@@ -1435,7 +1435,7 @@
         <p>Análisis automático de los mejores pares de divisas para operar basado en diferenciales de fortaleza fundamental, incluyendo recomendaciones de posiciones largas (LONG) y cortas (SHORT) con nivel de confianza.</p>
 
         <h2>Fuentes de Datos</h2>
-        <p>Datos obtenidos de: FRED (Federal Reserve Economic Data), OECD, World Bank, IMF, CFTC (Commitment of Traders), Frankfurter/ECB API, bancos centrales nacionales y Investing.com.</p>
+        <p>Datos obtenidos de: FRED (Federal Reserve Economic Data), OECD, World Bank, IMF, CFTC (Commitment of Traders), Frankfurter/ECB API, BIS Data Portal (WS_CBPOL), bancos centrales nacionales (NY Fed, BCE, BoE, RBA, BoC, BoJ, SNB, RBNZ) e Investing.com.</p>
     </div>
 
     <!-- Skip navigation link (WCAG 2.4.1) -->
@@ -2152,7 +2152,7 @@ const fetchRealHistoricalRates = async (currencyCode) => {
 
         const rates = recent.map(o => parseFloat(o.value));
 
-        const result = { labels, rates, source: 'FRED+Scraping' };
+        const result = { labels, rates, source: 'Bancos Centrales Oficiales + BIS' };
         CacheManager.set(cacheKey, result, CACHE_CONFIG.HISTORICAL_DATA);
         console.log(`✅ Histórico real para ${currencyCode}: ${labels.join(', ')}`);
         return result;
@@ -2870,7 +2870,7 @@ const indicatorTooltips = {
 
     gdpGrowth: "Tasa de variación anual del PIB real, ajustada por inflación. Mide la velocidad a la que crece (o se contrae) la economía. >2.5% = expansión robusta, señal positiva para la divisa ya que atrae inversión y presiona al banco central a mantener o subir tasas. 1–2.5% = crecimiento moderado, neutral. <1% = estancamiento, presión dovish sobre el BC. Negativo = recesión técnica, señal muy negativa para la divisa. Fuente: FRED / OECD.",
 
-    interestRate: "Tasa de política monetaria fijada por el banco central del país. Es el indicador más importante para el forex: determina el 'carry' de la divisa, es decir, el rendimiento que obtiene un inversor por mantener activos en esa moneda. Tasas altas atraen capital extranjero → demanda de la divisa → apreciación. Tasas bajas reducen el atractivo relativo → presión bajista. El diferencial de tasas entre dos países es el principal driver de los pares de divisas en el corto-medio plazo. Fuente: FRED / bancos centrales nacionales.",
+    interestRate: "Tasa de política monetaria fijada por el banco central del país. Es el indicador más importante para el forex: determina el 'carry' de la divisa, es decir, el rendimiento que obtiene un inversor por mantener activos en esa moneda. Tasas altas atraen capital extranjero → demanda de la divisa → apreciación. Tasas bajas reducen el atractivo relativo → presión bajista. El diferencial de tasas entre dos países es el principal driver de los pares de divisas en el corto-medio plazo. Fuente: bancos centrales oficiales (NY Fed, BCE, BoE, RBA, BoC, BoJ, SNB, RBNZ) vía APIs directas + BIS Data Portal.",
 
     inflation: "Variación anual del Índice de Precios al Consumidor (IPC). Mide cuánto suben los precios para los hogares. El objetivo universal de la mayoría de bancos centrales es ~2%. Por encima del objetivo → BC sube tasas (hawkish) → positivo para la divisa a corto plazo, pero erosiona poder adquisitivo. Muy por encima (>4%) → señal de economía recalentada o crisis de oferta → negativo estructural. Por debajo (deflación) → BC baja tasas (dovish) → negativo para la divisa. La inflación es el mandato principal de los bancos centrales modernos. Fuente: FRED / OECD.",
 
@@ -3060,7 +3060,7 @@ if (!data?.labels || !data?.rates || data.source === 'unavailable') {
                                     labels: data.labels,
 datasets: [
     {
-        label: 'Tasa de Interés % (global-rates.com / FRED)',
+        label: 'Tasa de Interés % (bancos centrales oficiales / BIS)',
         data: data.rates,
         borderColor: '#1e88e5',
         backgroundColor: 'rgba(30, 136, 229, 0.1)',
