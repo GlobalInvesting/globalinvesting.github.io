@@ -1,10 +1,10 @@
 {
-  "runTimestamp": "2026-03-17T08:59:41.498977Z",
+  "runTimestamp": "2026-03-17T21:46:21.810149Z",
   "runDate": "2026-03-17",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "3.75",
       "source": "global-rates.com",
       "date": "2026-03-01",
@@ -18,14 +18,16 @@
       "issues": []
     },
     "GBP": {
-      "status": "ok",
-      "rate": "3.75",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
-      "issues": []
+      "status": "warning",
+      "rate": "12",
+      "source": "BoE-CSV",
+      "date": "<Cube FREQ_NAME=\"Daily\" FREQ_CODE=\"D\" FREQ_ORD=\"1\"/><SERIES_COM>Prior to May 2012 the Official Bank rate was published to two decimal places but has since been changed to four decimal places for consistency.</SERIES_COM><SERIES_COM>On the 16th September 1992",
+      "issues": [
+        "GBP: rate changed 12.0% vs previous 3.75% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
+      ]
     },
     "JPY": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "0.75",
       "source": "global-rates.com",
       "date": "2026-03-01",
@@ -34,33 +36,35 @@
     "CAD": {
       "status": "ok",
       "rate": "2.25",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
+      "source": "BoC-Valet",
+      "date": "2026-03-10",
       "issues": []
     },
     "AUD": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "3.85",
       "source": "global-rates.com",
       "date": "2026-03-01",
       "issues": []
     },
     "CHF": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "0.00",
       "source": "global-rates.com",
       "date": "2026-03-01",
       "issues": []
     },
     "NZD": {
-      "status": "ok",
+      "status": "fallback",
       "rate": "2.25",
       "source": "global-rates.com",
       "date": "2026-03-01",
       "issues": []
     }
   },
-  "issues": [],
+  "issues": [
+    "GBP: rate changed 12.0% vs previous 3.75% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
+  ],
   "warnings": [],
-  "overallStatus": "degraded_cached"
+  "overallStatus": "degraded"
 }
