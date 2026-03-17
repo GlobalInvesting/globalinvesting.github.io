@@ -1,20 +1,20 @@
 {
-  "runTimestamp": "2026-03-17T22:32:50.864180Z",
+  "runTimestamp": "2026-03-17T23:00:08.209197Z",
   "runDate": "2026-03-17",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "3.75",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
+      "source": "NYFed-EFFR",
+      "date": "2026-03-16",
       "issues": []
     },
     "EUR": {
-      "status": "cached",
-      "rate": "2.15",
-      "source": "cached-file",
-      "date": "2026-03-01",
+      "status": "ok",
+      "rate": "2",
+      "source": "ECB-SDMX",
+      "date": "2025-06-11",
       "issues": []
     },
     "GBP": {
@@ -62,5 +62,5 @@
   },
   "issues": [],
   "warnings": [],
-  "overallStatus": "degraded_cached"
+  "overallStatus": "ok"
 }
