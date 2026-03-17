@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-03-17T22:22:01.416593Z",
+  "runTimestamp": "2026-03-17T22:32:50.864180Z",
   "runDate": "2026-03-17",
   "frankfurterOk": true,
   "currencies": {
@@ -18,13 +18,11 @@
       "issues": []
     },
     "GBP": {
-      "status": "warning",
+      "status": "ok",
       "rate": "3.75",
       "source": "BoE-CSV",
       "date": "2026-03-16",
-      "issues": [
-        "GBP: rate changed 3.75% vs previous 12.0% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
-      ]
+      "issues": []
     },
     "JPY": {
       "status": "fallback",
@@ -62,9 +60,7 @@
       "issues": []
     }
   },
-  "issues": [
-    "GBP: rate changed 3.75% vs previous 12.0% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
-  ],
+  "issues": [],
   "warnings": [],
-  "overallStatus": "degraded"
+  "overallStatus": "degraded_cached"
 }
