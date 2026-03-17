@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-17",
-  "generatedAt": "2026-03-17T09:04:26.724066Z",
+  "generatedAt": "2026-03-17T11:02:05.621977Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,21 +8,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-16",
-  "totalEvents": 913,
+  "totalEvents": 935,
   "currencyCounts": {
-    "AUD": 75,
+    "AUD": 77,
     "CAD": 63,
     "CHF": 35,
-    "EUR": 91,
-    "GBP": 113,
-    "JPY": 96,
+    "EUR": 97,
+    "GBP": 115,
+    "JPY": 101,
     "NZD": 45,
-    "USD": 395
+    "USD": 402
   },
   "impactCounts": {
-    "low": 519,
-    "medium": 317,
-    "high": 77
+    "low": 530,
+    "medium": 325,
+    "high": 80
   },
   "events": [
     {
@@ -7587,9 +7587,9 @@
       "flag": "🇯🇵",
       "event": "Tertiary Industry Activity Index (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "-9.20",
       "forecast": "",
-      "previous": "8.40"
+      "previous": "8.00"
     },
     {
       "date": "17 Mar",
@@ -7600,7 +7600,7 @@
       "flag": "🇨🇭",
       "event": "PPI (MoM) (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-0.3%",
       "forecast": "0.0%",
       "previous": "-0.2%"
     },
@@ -7613,7 +7613,7 @@
       "flag": "🇨🇭",
       "event": "PPI (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "-2.7%",
       "forecast": "",
       "previous": "-2.2%"
     },
@@ -7626,9 +7626,22 @@
       "flag": "🇪🇺",
       "event": "ZEW Economic Sentiment (Mar)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "24.0",
+      "actual": "-8.5",
+      "forecast": "26.5",
       "previous": "39.4"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "10:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "5-Year Treasury Gilt Auction",
+      "impact": "low",
+      "actual": "4.228%",
+      "forecast": "",
+      "previous": "3.810%"
     },
     {
       "date": "17 Mar",
@@ -7646,32 +7659,6 @@
     {
       "date": "17 Mar",
       "dateISO": "2026-03-17",
-      "timeUTC": "12:00",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "GlobalDairyTrade Price Index",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "5.7%"
-    },
-    {
-      "date": "17 Mar",
-      "dateISO": "2026-03-17",
-      "timeUTC": "12:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Milk Auctions",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "4,301.0"
-    },
-    {
-      "date": "17 Mar",
-      "dateISO": "2026-03-17",
       "timeUTC": "12:15",
       "country": "USD",
       "currency": "USD",
@@ -7681,6 +7668,19 @@
       "actual": "",
       "forecast": "",
       "previous": "15.50K"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Dallas Fed PCE (Jan)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "2.20%"
     },
     {
       "date": "17 Mar",
@@ -7718,7 +7718,7 @@
       "event": "Pending Home Sales (MoM) (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "-1.2%",
+      "forecast": "-0.6%",
       "previous": "-0.8%"
     },
     {
@@ -7733,6 +7733,32 @@
       "actual": "",
       "forecast": "",
       "previous": "70.9"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "15:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "GlobalDairyTrade Price Index",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "5.7%"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Milk Auctions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "4,301.0"
     },
     {
       "date": "17 Mar",
@@ -7763,6 +7789,19 @@
     {
       "date": "17 Mar",
       "dateISO": "2026-03-17",
+      "timeUTC": "18:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
       "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
@@ -7770,7 +7809,7 @@
       "event": "API Weekly Crude Oil Stock",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "-0.600M",
       "previous": "-1.700M"
     },
     {
@@ -7783,7 +7822,7 @@
       "event": "Current Account (QoQ) (Q4)",
       "impact": "medium",
       "actual": "",
-      "forecast": "-4.75B",
+      "forecast": "-4.78B",
       "previous": "-8.37B"
     },
     {
@@ -7811,6 +7850,32 @@
       "actual": "",
       "forecast": "",
       "previous": "-3.50%"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "23:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Reuters Tankan Index (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "13"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "23:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Leading Index (MoM)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.1%"
     },
     {
       "date": "17 Mar",
@@ -7849,7 +7914,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "11.5%",
-      "previous": "-2.6%"
+      "previous": "-2.5%"
     },
     {
       "date": "17 Mar",
@@ -7862,7 +7927,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "-485.0B",
-      "previous": "-1,163.5B"
+      "previous": "-1,152.7B"
     },
     {
       "date": "18 Mar",
@@ -7980,6 +8045,45 @@
       "actual": "",
       "forecast": "0.7%",
       "previous": "-0.8%"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "CPI (YoY) (Feb)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "1.9%",
+      "previous": "1.9%"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "CPI, n.s.a (Feb)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "100.72",
+      "previous": "100.05"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "HICP ex Energy & Food (YoY) (Feb)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "2.3%",
+      "previous": "2.3%"
     },
     {
       "date": "18 Mar",
@@ -8764,6 +8868,19 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
+      "timeUTC": "04:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Industrial Production (MoM) (Jan)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.2%",
+      "previous": "2.2%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
       "timeUTC": "06:30",
       "country": "JPY",
       "currency": "JPY",
@@ -9258,6 +9375,19 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "US Leading Index (MoM) (Jan)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.2%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
       "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
@@ -9280,6 +9410,19 @@
       "actual": "",
       "forecast": "",
       "previous": "3.640%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Atlanta Fed GDPNow (Q1)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.7%",
+      "previous": "2.7%"
     },
     {
       "date": "19 Mar",
@@ -9817,6 +9960,32 @@
     {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
+      "timeUTC": "15:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-12.2"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "3-Month Bill Auction",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.610%"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
       "timeUTC": "17:00",
       "country": "USD",
       "currency": "USD",
@@ -9856,6 +10025,19 @@
     {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
+      "timeUTC": "22:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "S&P Global Manufacturing PMI (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.0"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
       "timeUTC": "23:30",
       "country": "JPY",
       "currency": "JPY",
@@ -9891,6 +10073,45 @@
       "actual": "",
       "forecast": "",
       "previous": "1.5%"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Manufacturing & Services PMI (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "53.90"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "S&P Global Manufacturing PMI (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "53.0"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "S&P Global Services PMI (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "53.8"
     },
     {
       "date": "24 Mar",
@@ -9947,6 +10168,19 @@
     {
       "date": "24 Mar",
       "dateISO": "2026-03-24",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "HCOB Eurozone Manufacturing PMI (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "50.8"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
       "timeUTC": "09:30",
       "country": "GBP",
       "currency": "GBP",
@@ -9969,6 +10203,19 @@
       "actual": "",
       "forecast": "",
       "previous": "53.9"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "09:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "S&P Global Manufacturing PMI (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.7"
     },
     {
       "date": "24 Mar",
@@ -10008,6 +10255,45 @@
       "actual": "",
       "forecast": "",
       "previous": "2.8%"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Manufacturing PMI (Mar)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.6"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Composite PMI (Mar)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.9"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Services PMI (Mar)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.7"
     },
     {
       "date": "24 Mar",
