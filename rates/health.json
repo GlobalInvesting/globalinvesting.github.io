@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-03-17T23:11:16.488999Z",
+  "runTimestamp": "2026-03-17T23:18:32.836849Z",
   "runDate": "2026-03-17",
   "frankfurterOk": true,
   "currencies": {
@@ -25,10 +25,10 @@
       "issues": []
     },
     "JPY": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "0.75",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
+      "source": "BIS-CBPOL",
+      "date": "2026-02-01",
       "issues": []
     },
     "CAD": {
@@ -53,10 +53,10 @@
       "issues": []
     },
     "NZD": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "2.25",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
+      "source": "BIS-CBPOL",
+      "date": "2026-02-01",
       "issues": []
     }
   },
