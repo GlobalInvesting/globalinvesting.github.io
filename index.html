@@ -1408,35 +1408,7 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50%       { opacity: 0.5; transform: scale(0.75); }
         }
-    
-        /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; list-style: none; }
-        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
-            border-left: 4px solid transparent; border-right: 4px solid transparent;
-            border-top: 4px solid currentColor; transition: transform 0.2s; }
-        .nav-dropdown:hover > a::after,
-        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
-        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
-            right: 0; min-width: 220px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.75rem 0 0.4rem; z-index: 200;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-        .nav-dropdown:hover .nav-dropdown-menu,
-        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-        /* Puente invisible que cubre el gap entre trigger y menú */
-        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
-            left: -8px; right: -8px; height: 0.75rem; }
-        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
-            color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
-            color: var(--text-primary) !important; }
-        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        </style>
-    <link rel="alternate" type="application/rss+xml" title="Noticias Forex — Global Investing" href="https://globalinvesting.github.io/feed.xml">
-    <link rel="alternate" type="application/rss+xml" title="Análisis Fundamental AI — Global Investing" href="https://globalinvesting.github.io/feed-analysis.xml">
-    <link rel="alternate" type="application/rss+xml" title="Scores de Fortaleza G8 — Global Investing" href="https://globalinvesting.github.io/feed-scores.xml">
+    </style>
 </head>
 <body>
     <!-- Contenido estático para indexación por buscadores (hidden via CSS cuando React carga) -->
@@ -4185,25 +4157,14 @@ const DataHealthCheck = ({ economicData }) => {
                                         <div className="brand-subtitle">Forex Fundamental Dashboard</div>
                                     </div>
                                 </div>
-<ul className="page-nav-links" style={{listStyle:"none",margin:0,padding:0,display:"flex",alignItems:"center",gap:"1.5rem"}}>
-    <li><a href="about.html">Acerca de</a></li>
-    <li><a href="publicidad.html">Publicidad</a></li>
-<li className="nav-dropdown">
-    <a href="guia-score-fortaleza.html">Guías</a>
-    <div className="nav-dropdown-menu">
-                <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-                <a href="guia-carry-trade.html">Carry Trade</a>
-                <a href="guia-cot.html">Reporte COT</a>
-                <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-                <a href="guia-calendario-economico.html">Calendario Económico</a>
-                <a href="guia-pips.html">Pips y Lotaje</a>
-                <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-                <a href="glosario-forex.html">Glosario Forex</a>
-    </div>
-</li>
-    <li><a href="contact.html">Contacto</a></li>
-    <li><a href="en.html" className="lang-switch">EN</a></li>
-</ul>
+<div className="page-nav-links">
+    <a href="about.html">Acerca de</a>
+    <a href="publicidad.html">Publicidad</a>
+    <a href="about.html#recursos">Guías</a>
+    <a href="contact.html">Contacto</a>
+    <a href="en.html" className="lang-switch">EN</a>
+
+</div>
 <div className="header-info">
 {lastUpdate && (
     <div className="info-item">
@@ -5265,8 +5226,8 @@ const sentiment = getSentiment(strength);
                                 </span>
                                 {rec.momentumOpposing && (
                                     <span title={rec.type === 'short'
-                                        ? `El par subió +${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal SHORT — el strong cayó frente al débil. El backtest muestra HR ~29% en estas condiciones. Considerar esperar confirmación de precio.`
-                                        : `El par cayó -${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal LONG — el strong cayó frente al débil. El backtest muestra HR ~29% en estas condiciones. Considerar esperar confirmación de precio.`
+                                        ? `El par subió +${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal SHORT — el strong cayó frente al débil. La señal FX contradice el diferencial fundamental. El precio se ha movido en contra de la señal en el último mes.`
+                                        : `El par cayó -${Math.abs(rec.pairMom1M ?? 0).toFixed(1)}% el último mes, divergiendo de la señal LONG — el strong cayó frente al débil. La señal FX contradice el diferencial fundamental. El precio se ha movido en contra de la señal en el último mes.`
                                     } style={{
                                         fontSize: '0.75rem',
                                         background: 'rgba(245, 158, 11, 0.15)',
@@ -5280,7 +5241,7 @@ const sentiment = getSentiment(strength);
                                     </span>
                                 )}
                                 {rec.jpyAsShort && (
-                                    <span title="El JPY se mueve principalmente por apetito de riesgo global (risk-on/off), no por fundamentales macro. El backtest muestra HR 20-40% cuando el JPY es la divisa corta. Confirmar con sentimiento de mercado antes de operar." style={{
+                                    <span title="El JPY se mueve principalmente por apetito de riesgo global (risk-on/off), no por fundamentales macro. El JPY se mueve principalmente por apetito de riesgo global, no por fundamentales macro. En entornos de risk-off históricamente se aprecia independientemente de sus fundamentos." style={{
                                         fontSize: '0.75rem',
                                         background: 'rgba(100, 160, 255, 0.12)',
                                         color: '#7eb3ff',
@@ -5514,7 +5475,7 @@ const sentiment = getSentiment(strength);
 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.4rem 1rem', marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
     <a href="about.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Acerca de</a>
     <a href="publicidad.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Publicidad</a>
-    <a href="guia-score-fortaleza.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Guías</a>
+    <a href="about.html#recursos" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Guías</a>
     <a href="terms.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Términos</a>
     <a href="privacy.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Privacidad</a>
     <a href="contact.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Contacto</a>
@@ -5611,7 +5572,7 @@ ReactDOM.render(
 </script>
 <footer role="contentinfo" aria-label="Aviso legal" id="risk-footer" style="display:none;background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
 <strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
-· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
+· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a>
 </footer>
 
 </body>
