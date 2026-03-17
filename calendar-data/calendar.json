@@ -1,19 +1,19 @@
 {
-  "lastUpdate": "2026-03-16",
-  "generatedAt": "2026-03-16T22:40:45.534877Z",
+  "lastUpdate": "2026-03-17",
+  "generatedAt": "2026-03-17T02:47:41.698162Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
-  "rangeTo": "2026-04-15",
-  "totalEvents": 915,
+  "rangeTo": "2026-04-16",
+  "totalEvents": 913,
   "currencyCounts": {
     "AUD": 75,
     "CAD": 63,
     "CHF": 35,
-    "EUR": 93,
+    "EUR": 91,
     "GBP": 113,
     "JPY": 96,
     "NZD": 45,
@@ -21,7 +21,7 @@
   },
   "impactCounts": {
     "low": 519,
-    "medium": 319,
+    "medium": 317,
     "high": 77
   },
   "events": [
@@ -2238,19 +2238,6 @@
     {
       "date": "2 Mar",
       "dateISO": "2026-03-02",
-      "timeUTC": "10:15",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's Elderson Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "2 Mar",
-      "dateISO": "2026-03-02",
       "timeUTC": "10:30",
       "country": "GBP",
       "currency": "GBP",
@@ -2355,19 +2342,6 @@
     {
       "date": "2 Mar",
       "dateISO": "2026-03-02",
-      "timeUTC": "15:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "2 Mar",
-      "dateISO": "2026-03-02",
       "timeUTC": "15:30",
       "country": "CAD",
       "currency": "CAD",
@@ -2452,19 +2426,6 @@
       "flag": "🇬🇧",
       "event": "MPC Member Ramsden Speaks",
       "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "2 Mar",
-      "dateISO": "2026-03-02",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. President Trump Speaks",
-      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -7555,15 +7516,28 @@
     {
       "date": "16 Mar",
       "dateISO": "2026-03-16",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. President Trump Speaks",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "16 Mar",
+      "dateISO": "2026-03-16",
       "timeUTC": "21:45",
       "country": "NZD",
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "FPI (MoM) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "-0.1%",
       "forecast": "",
-      "previous": "2.5%"
+      "previous": "2.1%"
     },
     {
       "date": "17 Mar",
@@ -7574,7 +7548,7 @@
       "flag": "🇳🇿",
       "event": "RBNZ Offshore Holdings (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "57.20%",
       "forecast": "",
       "previous": "56.30%"
     },
