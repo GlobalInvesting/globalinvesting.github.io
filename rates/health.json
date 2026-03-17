@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-03-17T21:46:21.810149Z",
+  "runTimestamp": "2026-03-17T22:22:01.416593Z",
   "runDate": "2026-03-17",
   "frankfurterOk": true,
   "currencies": {
@@ -19,11 +19,11 @@
     },
     "GBP": {
       "status": "warning",
-      "rate": "12",
+      "rate": "3.75",
       "source": "BoE-CSV",
-      "date": "<Cube FREQ_NAME=\"Daily\" FREQ_CODE=\"D\" FREQ_ORD=\"1\"/><SERIES_COM>Prior to May 2012 the Official Bank rate was published to two decimal places but has since been changed to four decimal places for consistency.</SERIES_COM><SERIES_COM>On the 16th September 1992",
+      "date": "2026-03-16",
       "issues": [
-        "GBP: rate changed 12.0% vs previous 3.75% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
+        "GBP: rate changed 3.75% vs previous 12.0% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
       ]
     },
     "JPY": {
@@ -48,10 +48,10 @@
       "issues": []
     },
     "CHF": {
-      "status": "fallback",
+      "status": "ok",
       "rate": "0.00",
-      "source": "global-rates.com",
-      "date": "2026-03-01",
+      "source": "SNB-scraping",
+      "date": "2026-03-17",
       "issues": []
     },
     "NZD": {
@@ -63,7 +63,7 @@
     }
   },
   "issues": [
-    "GBP: rate changed 12.0% vs previous 3.75% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
+    "GBP: rate changed 3.75% vs previous 12.0% (\u0394=8.25pp > 0.75pp). Central bank meeting or scraping error?"
   ],
   "warnings": [],
   "overallStatus": "degraded"
