@@ -1,29 +1,29 @@
 {
   "lastUpdate": "2026-03-18",
-  "generatedAt": "2026-03-18T22:35:33.981802Z",
+  "generatedAt": "2026-03-18T22:42:16.607631Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
-  "source": "investing.com",
+  "source": "investing.com + FXStreet",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-17",
-  "totalEvents": 955,
+  "totalEvents": 962,
   "currencyCounts": {
     "AUD": 84,
     "CAD": 65,
     "CHF": 35,
     "EUR": 93,
     "GBP": 115,
-    "JPY": 104,
+    "JPY": 108,
     "NZD": 46,
-    "USD": 413
+    "USD": 416
   },
   "impactCounts": {
-    "low": 546,
-    "medium": 329,
-    "high": 80
+    "low": 548,
+    "medium": 335,
+    "high": 79
   },
   "events": [
     {
@@ -8393,7 +8393,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "FOMC Economic Projections",
-      "impact": "high",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8423,6 +8423,19 @@
       "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "18:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Interest Rate Projections - 1st year",
+      "impact": "low",
+      "actual": "3.1",
+      "forecast": "",
+      "previous": "3.4"
     },
     {
       "date": "18 Mar",
@@ -8492,15 +8505,28 @@
     {
       "date": "18 Mar",
       "dateISO": "2026-03-18",
-      "timeUTC": "21:45",
-      "country": "NZD",
-      "currency": "NZD",
-      "flag": "🇳🇿",
-      "event": "GDP (QoQ) (Q4)",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Net Long-Term TIC Flows",
       "impact": "medium",
-      "actual": "0.2%",
-      "forecast": "0.5%",
-      "previous": "0.9%"
+      "actual": "15.5",
+      "forecast": "71.6",
+      "previous": "28.0"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "20:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Total Net TIC Flows",
+      "impact": "medium",
+      "actual": "-25.0",
+      "forecast": "",
+      "previous": "44.9"
     },
     {
       "date": "18 Mar",
@@ -8509,11 +8535,24 @@
       "country": "NZD",
       "currency": "NZD",
       "flag": "🇳🇿",
-      "event": "GDP (YoY) (Q4)",
+      "event": "Gross Domestic Product (QoQ)",
+      "impact": "medium",
+      "actual": "0.2",
+      "forecast": "0.4",
+      "previous": "1.1"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "21:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Gross Domestic Product (YoY)",
       "impact": "low",
-      "actual": "1.3%",
-      "forecast": "1.7%",
-      "previous": "1.1%"
+      "actual": "1.3",
+      "forecast": "1.7",
+      "previous": "1.3"
     },
     {
       "date": "18 Mar",
@@ -8592,6 +8631,58 @@
       "actual": "",
       "forecast": "",
       "previous": "385.5B"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Foreign Investment in Japan Stocks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "385.5"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Foreign Bond Investment",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "399.8"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machinery Orders (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "-9.6",
+      "previous": "19.1"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Machinery Orders (YoY)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "10.5",
+      "previous": "16.8"
     },
     {
       "date": "19 Mar",
