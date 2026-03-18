@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """
-update_economic_calendar.py  v12.6 — investing.com + FXStreet
+update_economic_calendar.py  v13.0 — repo público, smart-fetch
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Fuentes (en orden de prioridad):
   A) investing.com API interna — HTML con actuals, sin browser
   B) FXStreet Calendar API   — JSON fallback con actuals
   C) Cache previo            — último recurso
 
-Fix v12.5: ET→UTC conversion con DST dinámico.
-Fix v12.6: chunks de 1 día (en vez de 14) para que cada evento
-  quede en su fecha correcta. investing.com no emite theDay header
-  para cada día en rangos multi-día, lo que colapsaba todos los
-  eventos de una semana en el primer día del chunk.
+v13.0 — Smart-fetch para ejecución horaria en repo público:
+  - MODO SMART: si NO hay eventos de alto impacto en la próxima
+    hora, solo refresca hoy+mañana (ventana corta, rápido).
+  - MODO FULL: si HAY eventos próximos (o es la primera hora del
+    día), refresca ventana completa -60/+30 días.
+  - Fuerza MODO FULL el primer run del día (00:05 UTC) para
+    mantener el histórico y los datos de la semana siguiente.
+  - Sin checkout de repo privado: el script vive en el repo público.
 
 Cero dependencias externas de pago. Sin Playwright.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -719,16 +722,27 @@ def dedup_events(events):
 # ════════════════════════════════════════════════════════════════════════════
 
 print("=" * 65)
-print("ECONOMIC CALENDAR v12.5 — investing.com + FXStreet")
-print("Strategy A: investing.com Economic Calendar (API interna)")
-print("Strategy B: FXStreet Calendar API (fallback — incluye actuals)")
+print("ECONOMIC CALENDAR v13.0 — smart-fetch, repo público")
+print("Strategy A: investing.com (API interna, actuals reales)")
+print("Strategy B: FXStreet Calendar API (fallback con actuals)")
 print("Strategy C: Cache previo (último recurso)")
 print("=" * 65)
 
-today     = date.today()
-from_date = today - timedelta(days=60)
-to_date   = today + timedelta(days=30)
-print(f"\nRange: {from_date} → {to_date}\n")
+now_utc   = datetime.utcnow()
+today     = now_utc.date()
+now_hour  = now_utc.hour
+
+# ── SMART-FETCH: decidir modo según hora y eventos próximos ──────────────────
+# MODO FULL  : primer run del día (hora 0) o forzado → ventana -60/+30 días
+# MODO SMART : resto de horas → ventana hoy ± 2 días (más rápido)
+# Tras cargar el cache, se sube a FULL si hay eventos de alto impacto
+# en la próxima hora (sin actual todavía) → captura el dato en seguida.
+
+FORCE_FULL = (now_hour == 0)          # primer run del día siempre full
+smart_from = today - timedelta(days=2)
+smart_to   = today + timedelta(days=2)
+full_from  = today - timedelta(days=60)
+full_to    = today + timedelta(days=30)
 
 # ── STEP 1: Cargar cache previo ──────────────────────────────────────────────
 print("=" * 50)
@@ -747,9 +761,7 @@ try:
     bd = sorted(set(e['dateISO'] for e in base_events.values()))
     print(f"  Loaded {len(base_events)} events "
           f"({bd[0] if bd else '?'} → {bd[-1] if bd else '?'})")
-    # Limpiar duplicados del cache: si el mismo evento (currency + nombre normalizado)
-    # aparece en varias fechas sin actual, conservar solo la más reciente/futura.
-    # Esto elimina eventos de scraper anterior con fecha incorrecta (ej: FOMC en Mar 13 y Mar 18).
+    # Limpiar duplicados del cache: conservar solo fecha más futura sin actual
     by_name = defaultdict(list)
     for k, ev in list(base_events.items()):
         norm_key = (ev['currency'], normalize_for_dedup(ev['event']))
@@ -758,52 +770,89 @@ try:
     for norm_key, keys in by_name.items():
         if len(keys) <= 1:
             continue
-        # Solo actuar si NINGUNO tiene actual (si hay actual, el evento ocurrió — mantener)
         keys_no_actual = [k for k in keys if not base_events[k].get('actual','').strip()]
         if len(keys_no_actual) <= 1:
             continue
-        # Conservar la fecha más futura (o la más reciente si todas son pasadas)
-        keys_no_actual.sort(key=lambda k: k[0])  # sort by dateISO
-        for k in keys_no_actual[:-1]:  # eliminar todas excepto la última
+        keys_no_actual.sort(key=lambda k: k[0])
+        for k in keys_no_actual[:-1]:
             del base_events[k]
             removed += 1
     if removed:
         print(f"  Cache dedup: removed {removed} stale cross-date duplicates")
 except FileNotFoundError:
     print("  No previous cache — starting fresh")
+    FORCE_FULL = True   # sin cache siempre full
 except Exception as e:
     print(f"  Warning loading cache: {e}")
 
+# ── Detectar eventos de alto impacto en la próxima hora (sin actual) ─────────
+# Si existen → subir a MODO FULL para capturar el dato en cuanto salga
+def has_upcoming_high_impact(cache, now_dt, window_minutes=75):
+    """
+    Retorna True si hay eventos high-impact sin actual en los próximos
+    window_minutes minutos respecto a now_dt (UTC).
+    """
+    cutoff = now_dt + timedelta(minutes=window_minutes)
+    for ev in cache.values():
+        if ev.get('impact') != 'high':
+            continue
+        if ev.get('actual','').strip():
+            continue   # ya tiene dato — no urgente
+        t = ev.get('timeUTC','').strip()
+        d = ev.get('dateISO','').strip()
+        if not t or not d or not re.match(r'\d{2}:\d{2}', t):
+            continue
+        try:
+            ev_dt = datetime.strptime(f"{d}T{t}", "%Y-%m-%dT%H:%M")
+            if now_dt <= ev_dt <= cutoff:
+                return True, ev['event'], ev['currency']
+        except Exception:
+            pass
+    return False, '', ''
+
+if not FORCE_FULL and base_events:
+    upcoming, ev_name, ev_ccy = has_upcoming_high_impact(base_events, now_utc)
+    if upcoming:
+        FORCE_FULL = True
+        print(f"  🔔 Evento próximo detectado: [{ev_ccy}] {ev_name} → MODO FULL")
+    else:
+        print(f"  ✅ Sin eventos próximos → MODO SMART (ventana ±2 días)")
+
+fetch_mode = 'FULL' if FORCE_FULL else 'SMART'
+from_date  = full_from  if FORCE_FULL else smart_from
+to_date    = full_to    if FORCE_FULL else smart_to
+print(f"\nMODE: {fetch_mode}  |  Range: {from_date} → {to_date}  |  UTC now: {now_utc.strftime('%H:%M')}\n")
+
 # ── STEP 2: Fetch ────────────────────────────────────────────────────────────
-print(f"\n{'='*50}\nSTEP 2 — Fetch\n{'='*50}")
+print(f"\n{'='*50}\nSTEP 2 — Fetch ({fetch_mode})\n{'='*50}")
 
 fresh_events  = []
 fetch_method  = ''
 fetch_errors  = []
 
-# Estrategia A: MQL5
+# Estrategia A: investing.com
 print("\n  [Strategy A] investing.com API...")
 try:
-    mql5_events = fetch_investing(from_date, to_date)
-    if mql5_events:
-        fresh_events = mql5_events
+    inv_events = fetch_investing(from_date, to_date)
+    if inv_events:
+        fresh_events = inv_events
         fetch_method = 'investing.com'
         print(f"  ✅ Strategy A: {len(fresh_events)} events")
     else:
-        fetch_errors.append('MQL5 API returned 0 events')
+        fetch_errors.append('investing.com returned 0 events')
         print("  ⚠️  Strategy A: 0 events")
 except Exception as e:
-    fetch_errors.append(f'MQL5 API error: {e}')
+    fetch_errors.append(f'investing.com error: {e}')
     print(f"  ❌ Strategy A failed: {e}")
 
-# Estrategia B: FXStreet (si A insuficiente — FXStreet SÍ tiene actuals)
-if len(fresh_events) < MIN_EVENTS:
-    print(f"\n  [Strategy B] FXStreet Calendar API (fresh={len(fresh_events)} < {MIN_EVENTS})...")
+# Estrategia B: FXStreet (si A insuficiente)
+min_expected = 5 if fetch_mode == 'SMART' else MIN_EVENTS
+if len(fresh_events) < min_expected:
+    print(f"\n  [Strategy B] FXStreet (fresh={len(fresh_events)} < {min_expected})...")
     try:
         fxs_events = fetch_fxstreet(from_date, to_date)
         if fxs_events:
             if fresh_events:
-                # Combinar A + B
                 combined = list(fresh_events)
                 combined.extend(fxs_events)
                 fresh_events = combined
@@ -828,13 +877,15 @@ if not fresh_events:
 print(f"\n{'='*50}\nSTEP 3 — Merge\n{'='*50}")
 if fresh_events:
     merged = dict(base_events)
-    added = updated = 0
+    added = updated = actuals_added = 0
     for ev in fresh_events:
         k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
         if k in merged:
             ex = dict(merged[k])
             for f in ('actual', 'forecast', 'previous', 'timeUTC', 'impact'):
                 if ev.get(f):
+                    if f == 'actual' and not ex.get('actual'):
+                        actuals_added += 1
                     ex[f] = ev[f]
             merged[k] = ex
             updated += 1
@@ -843,7 +894,7 @@ if fresh_events:
             added += 1
     all_events = list(merged.values())
     print(f"  base={len(base_events)} + fresh={len(fresh_events)} → "
-          f"{len(all_events)} (added={added}, updated={updated})")
+          f"{len(all_events)} (added={added}, updated={updated}, new_actuals={actuals_added})")
 else:
     all_events = list(base_events.values())
     print(f"  Using base cache: {len(all_events)}")
@@ -878,19 +929,20 @@ ad = sorted(set(e['dateISO'] for e in final_events))
 data_ok = len(final_events) >= MIN_EVENTS
 
 output = {
-    'lastUpdate':   today.isoformat(),
-    'generatedAt':  datetime.now().isoformat() + 'Z',
-    'timezoneNote': 'All timeUTC are UTC.',
-    'status':       'ok' if data_ok else 'error',
-    'source':       fetch_method,
-    'errorMessage': None if data_ok else 'No fresh data available.',
-    'fetchErrors':  fetch_errors,
-    'rangeFrom':    ad[0] if ad else from_date.isoformat(),
-    'rangeTo':      to_date.isoformat(),
-    'totalEvents':  len(final_events),
+    'lastUpdate':    today.isoformat(),
+    'generatedAt':   datetime.utcnow().isoformat() + 'Z',
+    'fetchMode':     fetch_mode,
+    'timezoneNote':  'All timeUTC are UTC.',
+    'status':        'ok' if data_ok else 'error',
+    'source':        fetch_method,
+    'errorMessage':  None if data_ok else 'No fresh data available.',
+    'fetchErrors':   fetch_errors,
+    'rangeFrom':     ad[0] if ad else from_date.isoformat(),
+    'rangeTo':       full_to.isoformat(),   # siempre mostrar rango completo en metadata
+    'totalEvents':   len(final_events),
     'currencyCounts': cc,
-    'impactCounts': ic,
-    'events':       final_events,
+    'impactCounts':  ic,
+    'events':        final_events,
 }
 
 os.makedirs('calendar-data', exist_ok=True)
@@ -899,16 +951,16 @@ with open(CALENDAR_PATH, 'w', encoding='utf-8') as f:
 
 print(f"\n{'='*65}")
 if data_ok:
-    print(f"✅ SAVED: {CALENDAR_PATH}")
+    print(f"✅ SAVED: {CALENDAR_PATH}  [{fetch_mode}]")
     print(f"   Source:  {fetch_method}")
     print(f"   Total:   {len(final_events)} | Impact: {ic}")
     print(f"   Dates:   {ad[0] if ad else '?'} → {ad[-1] if ad else '?'}")
     print(f"   By currency: {cc}")
     highs = [e for e in final_events if e.get('impact') == 'high'][-8:]
     if highs:
-        print(f"\n   HIGH events (recent):")
+        print(f"\n   HIGH events (recientes):")
         for ev in highs:
-            ac = f" → {ev['actual']}" if ev.get('actual') else ''
+            ac = f" → {ev['actual']}" if ev.get('actual') else ' (pendiente)'
             print(f"   {ev['dateISO']} {(ev.get('timeUTC') or '?'):5} "
                   f"[{ev['currency']}] {ev['event'][:52]}{ac}")
 else:
