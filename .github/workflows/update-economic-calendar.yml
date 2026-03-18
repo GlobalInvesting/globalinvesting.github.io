@@ -1,0 +1,73 @@
+name: Update Economic Calendar v12 (investing.com + FXStreet)
+
+on:
+  schedule:
+    # Asia session (JPY, AUD, NZD) — 00:00–05:30 UTC
+    - cron: '5 0 * * *'
+    - cron: '5 2 * * *'
+    - cron: '5 4 * * *'
+    # Europe open (EUR, GBP, CHF) — 06:00–11:00 UTC
+    - cron: '5 6 * * *'
+    - cron: '5 8 * * *'
+    - cron: '5 10 * * *'
+    # US session (USD, CAD) — 12:00–18:30 UTC
+    # Cadencia cada ~2h: captura releases con offset máx. ~115 min (aceptable para datos fundamentales)
+    - cron: '5 12 * * *'
+    - cron: '5 14 * * *'
+    - cron: '5 16 * * *'
+    - cron: '5 18 * * *'
+    # Late / API updates
+    - cron: '5 22 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-economic-calendar
+  cancel-in-progress: true
+
+jobs:
+  update-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # Reducido: sin Playwright, no necesitamos 20min
+
+    steps:
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
+
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml
+
+      - name: Create output directory
+        run: mkdir -p site/calendar-data
+
+      - name: Run calendar fetcher
+        working-directory: site
+        run: python3 -u ../engine/scripts/update_economic_calendar.py
+
+      - name: Commit and push if changed
+        working-directory: site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add calendar-data/calendar.json
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit"
+          else
+            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v12.4"
+            git pull --rebase origin main || true
+            git push
+          fi
