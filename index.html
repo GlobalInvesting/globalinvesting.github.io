@@ -1411,6 +1411,25 @@
             background: rgba(30, 136, 229, 0.06);
             border-left: 3px solid var(--green) !important;
         }
+        /* Flash cuando llega un nuevo actual en vivo */
+        @keyframes newActualFlash {
+            0%   { background: rgba(76, 175, 80, 0.35); }
+            60%  { background: rgba(76, 175, 80, 0.15); }
+            100% { background: transparent; }
+        }
+        .calendar-event--new-actual {
+            animation: newActualFlash 3s ease-out forwards;
+        }
+        /* Dot pulsante en el header del calendario mientras refresca */
+        .calendar-live-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            margin-left: 6px;
+            vertical-align: middle;
+            animation: pulse 1s ease-in-out infinite;
+        }
         .next-marker {
             display: flex;
             align-items: center;
@@ -1532,7 +1551,7 @@ const fetchWithRetry = async (url, options = {}, maxRetries = 3) => {
             FOREX_RATES: 60000,
             ECONOMIC_DATA: 86400000,
             HISTORICAL_DATA: 604800000,
-            CALENDAR: 3600000,
+            CALENDAR: 120000,          // 2 min — el workflow corre c/10 min, no tiene sentido cachear 1h
             CENTRAL_BANK_OUTLOOK: 604800000,
             ALERTS: 3600000
         };
@@ -2100,6 +2119,7 @@ const fetchEconomicCalendar = async () => {
                         const result = {
                             events: data.events,
                             lastUpdate: data.lastUpdate,
+                            generatedAt: data.generatedAt || null,
                             source: data.source,
                             impactCounts: data.impactCounts || {},
                             currencyCounts: data.currencyCounts || {},
@@ -2991,40 +3011,74 @@ const indicatorTooltips = {
             }, [activeTab]);
 
 
-            // Dynamic polling: refresh calendar JSON when an event is imminent (< 15 min) or just passed (< 5 min)
+            // ── Live polling del calendario ──────────────────────────────────
+            // Zonas de frecuencia según proximidad al próximo evento sin actual:
+            //   HOT  (evento entre -2 min y +15 min) → cada 30 s
+            //   WARM (evento entre +15 min y +60 min) → cada 60 s
+            //   COOL (sin evento próximo)             → cada 5 min
+            // Cuando llega un nuevo actual se hace flash visual en la fila.
+            const [calendarUpdating, setCalendarUpdating] = React.useState(false);
+
             React.useEffect(() => {
                 let pollTimer = null;
+
                 const getNextPollDelay = () => {
                     const events = (economicCalendar && economicCalendar.events) || [];
                     const nowMs = Date.now();
+                    let hotZone = false, warmZone = false;
                     for (const ev of events) {
                         if (ev.actual && ev.actual !== '') continue;
                         const t = ev.timeUTC || ev.time;
                         if (!t || !ev.dateISO) continue;
-                        // dateISO is always the real UTC date. No offset needed.
                         const d = new Date(`${ev.dateISO}T${t}:00Z`);
                         if (isNaN(d.getTime())) continue;
-                        const diff = d.getTime() - nowMs;
-                        if (diff > -300000 && diff < 900000) return 120000; // event within window → poll every 2 min
+                        const diff = d.getTime() - nowMs;          // ms hasta el evento
+                        if (diff > -120000 && diff < 900000) { hotZone = true; break; }   // ±2 min / +15 min
+                        if (diff >= 900000  && diff < 3600000) warmZone = true;            // +15–60 min
                     }
-                    return 300000; // no imminent event → check every 5 min
+                    if (hotZone)  return 30000;   // 30 s
+                    if (warmZone) return 60000;   // 60 s
+                    return 300000;                // 5 min
                 };
+
                 const schedulePoll = () => {
                     const delay = getNextPollDelay();
                     pollTimer = setTimeout(async () => {
                         try {
+                            setCalendarUpdating(true);
                             CacheManager.clear('economic_calendar');
                             const fresh = await fetchEconomicCalendar();
                             if (fresh && fresh.events && fresh.events.length > 0) {
+                                // Detectar filas que recibieron un actual nuevo para flash visual
+                                const prevEvents = (economicCalendar && economicCalendar.events) || [];
+                                const prevActuals = new Set(
+                                    prevEvents.filter(e => e.actual).map(e => `${e.dateISO}|${e.currency}|${e.event}`)
+                                );
+                                const newActuals = fresh.events
+                                    .filter(e => e.actual && !prevActuals.has(`${e.dateISO}|${e.currency}|${e.event}`))
+                                    .map(e => `${e.dateISO}|${e.currency}|${e.event}`);
                                 setEconomicCalendar(fresh);
+                                // Flash en filas nuevas ~100 ms después del render
+                                if (newActuals.length > 0) {
+                                    setTimeout(() => {
+                                        newActuals.forEach(key => {
+                                            const el = document.querySelector(`[data-event-key="${CSS.escape(key)}"]`);
+                                            if (el) {
+                                                el.classList.add('calendar-event--new-actual');
+                                                setTimeout(() => el.classList.remove('calendar-event--new-actual'), 3000);
+                                            }
+                                        });
+                                    }, 120);
+                                }
                             }
                         } catch(e) { /* silent */ }
+                        finally { setCalendarUpdating(false); }
                         schedulePoll();
                     }, delay);
                 };
                 schedulePoll();
                 return () => { if (pollTimer) clearTimeout(pollTimer); };
-            }, []);
+            }, [economicCalendar]);
 
             const [lastUpdate, setLastUpdate] = useState(_cachedRates ? new Date() : null);
             const [historicalData, setHistoricalData] = useState(_cachedHist || {});
@@ -4801,12 +4855,20 @@ const sentiment = getSentiment(strength);
 {activeTab === 'calendar' && (
     <div>
         <div className="section-header">
-            <div className="section-title">Calendario Económico</div>
+            <div className="section-title">
+                Calendario Económico
+                {calendarUpdating && <span className="calendar-live-dot" title="Actualizando..."></span>}
+            </div>
             <div className="section-meta">
                 {economicCalendar.impactCounts && economicCalendar.impactCounts.high > 0 && (
                     <span>
                         {economicCalendar.impactCounts.high} alto
                         {economicCalendar.impactCounts.medium > 0 && ` · ${economicCalendar.impactCounts.medium} medio`}
+                    </span>
+                )}
+                {economicCalendar.generatedAt && (
+                    <span style={{marginLeft:'0.5rem', fontSize:'0.72rem', color:'var(--text-tertiary)'}}>
+                        · act. {new Date(economicCalendar.generatedAt).toLocaleTimeString('es', {hour:'2-digit', minute:'2-digit'})} UTC
                     </span>
                 )}
             </div>
@@ -5180,7 +5242,9 @@ const sentiment = getSentiment(strength);
                                     }
                                 }
                                 return (
-                                    <div key={index} className={eventClass} ref={isNext ? nextEventRef : null} style={{
+                                    <div key={index} className={eventClass} ref={isNext ? nextEventRef : null}
+                                        data-event-key={`${event.dateISO}|${event.currency}|${event.event}`}
+                                        style={{
                                         borderLeft: isNext ? '' : (!isPast && isToday ? '3px solid var(--blue)' : 'none'),
                                     }}>
                                         <div className="event-time">
