@@ -1,6 +1,7 @@
 {
   "lastUpdate": "2026-03-18",
-  "generatedAt": "2026-03-18T19:15:58.356819Z",
+  "generatedAt": "2026-03-18T22:35:33.981802Z",
+  "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
@@ -8,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-17",
-  "totalEvents": 953,
+  "totalEvents": 955,
   "currencyCounts": {
     "AUD": 84,
     "CAD": 65,
-    "CHF": 36,
-    "EUR": 97,
+    "CHF": 35,
+    "EUR": 93,
     "GBP": 115,
-    "JPY": 103,
+    "JPY": 104,
     "NZD": 46,
-    "USD": 407
+    "USD": 413
   },
   "impactCounts": {
-    "low": 542,
-    "medium": 331,
+    "low": 546,
+    "medium": 329,
     "high": 80
   },
   "events": [
@@ -3148,19 +3149,6 @@
     {
       "date": "4 Mar",
       "dateISO": "2026-03-04",
-      "timeUTC": "10:30",
-      "country": "CHF",
-      "currency": "CHF",
-      "flag": "🇨🇭",
-      "event": "SNB Press Conference",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "4 Mar",
-      "dateISO": "2026-03-04",
       "timeUTC": "11:00",
       "country": "EUR",
       "currency": "EUR",
@@ -3300,19 +3288,6 @@
       "actual": "-0.1%",
       "forecast": "-0.1%",
       "previous": "1.1%"
-    },
-    {
-      "date": "4 Mar",
-      "dateISO": "2026-03-04",
-      "timeUTC": "14:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's De Guindos Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "4 Mar",
@@ -3707,19 +3682,6 @@
     {
       "date": "5 Mar",
       "dateISO": "2026-03-05",
-      "timeUTC": "09:50",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's De Guindos Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
       "timeUTC": "10:00",
       "country": "GBP",
       "currency": "GBP",
@@ -3980,32 +3942,6 @@
     {
       "date": "5 Mar",
       "dateISO": "2026-03-05",
-      "timeUTC": "18:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
-      "timeUTC": "19:15",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Member Bowman Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "5 Mar",
-      "dateISO": "2026-03-05",
       "timeUTC": "22:30",
       "country": "USD",
       "currency": "USD",
@@ -4158,19 +4094,6 @@
       "actual": "1.2%",
       "forecast": "1.3%",
       "previous": "1.4%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "11:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "6 Mar",
@@ -4574,19 +4497,6 @@
       "actual": "2.1%",
       "forecast": "3.0%",
       "previous": "3.0%"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "18:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's Schnabel Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "6 Mar",
@@ -5618,19 +5528,6 @@
     {
       "date": "11 Mar",
       "dateISO": "2026-03-11",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Member Bowman Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "11 Mar",
-      "dateISO": "2026-03-11",
       "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
@@ -5835,19 +5732,6 @@
       "actual": "-308.0B",
       "forecast": "-304.4B",
       "previous": "-95.0B"
-    },
-    {
-      "date": "11 Mar",
-      "dateISO": "2026-03-11",
-      "timeUTC": "20:25",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. President Trump Speaks",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "11 Mar",
@@ -8458,7 +8342,7 @@
       "flag": "🇺🇸",
       "event": "Interest Rate Projection - 1st Yr (Q1)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.1%",
       "forecast": "",
       "previous": "3.4%"
     },
@@ -8471,7 +8355,7 @@
       "flag": "🇺🇸",
       "event": "Interest Rate Projection - 2nd Yr (Q1)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.1%",
       "forecast": "",
       "previous": "3.1%"
     },
@@ -8484,7 +8368,7 @@
       "flag": "🇺🇸",
       "event": "Interest Rate Projection - Current (Q1)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.4%",
       "forecast": "",
       "previous": "3.6%"
     },
@@ -8497,7 +8381,7 @@
       "flag": "🇺🇸",
       "event": "Interest Rate Projection - Longer (Q1)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.1%",
       "forecast": "",
       "previous": "3.0%"
     },
@@ -8536,7 +8420,7 @@
       "flag": "🇺🇸",
       "event": "Fed Interest Rate Decision",
       "impact": "high",
-      "actual": "",
+      "actual": "3.75%",
       "forecast": "3.75%",
       "previous": "3.75%"
     },
@@ -8562,9 +8446,9 @@
       "flag": "🇺🇸",
       "event": "US Foreign Buying, T-bonds (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "49.90B",
       "forecast": "",
-      "previous": "-41.60B"
+      "previous": "-27.00B"
     },
     {
       "date": "18 Mar",
@@ -8575,9 +8459,9 @@
       "flag": "🇺🇸",
       "event": "Overall Net Capital Flow (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "-25.00B",
       "forecast": "",
-      "previous": "44.90B"
+      "previous": "113.90B"
     },
     {
       "date": "18 Mar",
@@ -8588,9 +8472,9 @@
       "flag": "🇺🇸",
       "event": "TIC Net Long-Term Transactions (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "15.50B",
       "forecast": "71.6B",
-      "previous": "28.00B"
+      "previous": "96.50B"
     },
     {
       "date": "18 Mar",
@@ -8601,7 +8485,7 @@
       "flag": "🇳🇿",
       "event": "Westpac Consumer Sentiment (Q1)",
       "impact": "medium",
-      "actual": "",
+      "actual": "94.7",
       "forecast": "",
       "previous": "96.5"
     },
@@ -8614,9 +8498,9 @@
       "flag": "🇳🇿",
       "event": "GDP (QoQ) (Q4)",
       "impact": "medium",
-      "actual": "",
+      "actual": "0.2%",
       "forecast": "0.5%",
-      "previous": "1.1%"
+      "previous": "0.9%"
     },
     {
       "date": "18 Mar",
@@ -8627,9 +8511,9 @@
       "flag": "🇳🇿",
       "event": "GDP (YoY) (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "1.3%",
       "forecast": "1.7%",
-      "previous": "1.3%"
+      "previous": "1.1%"
     },
     {
       "date": "18 Mar",
@@ -8640,9 +8524,9 @@
       "flag": "🇳🇿",
       "event": "GDP Annual Average (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.2%",
       "forecast": "",
-      "previous": "-0.5%"
+      "previous": "-0.6%"
     },
     {
       "date": "18 Mar",
@@ -8653,9 +8537,9 @@
       "flag": "🇳🇿",
       "event": "GDP Expenditure (QoQ) (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "0.1%",
       "forecast": "",
-      "previous": "1.3%"
+      "previous": "0.9%"
     },
     {
       "date": "18 Mar",
@@ -8785,7 +8669,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "112.5B"
+      "previous": "112,539.0B"
     },
     {
       "date": "19 Mar",
@@ -8851,6 +8735,19 @@
       "actual": "",
       "forecast": "",
       "previous": "1.3%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "04:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Industrial Production (MoM) (Jan)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.2%",
+      "previous": "-0.1%"
     },
     {
       "date": "19 Mar",
@@ -9020,6 +8917,19 @@
       "actual": "",
       "forecast": "",
       "previous": "3.30%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Summit",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "19 Mar",
@@ -9206,6 +9116,45 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Continuing Jobless Claims",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "1,850K",
+      "previous": "1,850K"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Initial Jobless Claims",
+      "impact": "high",
+      "actual": "",
+      "forecast": "215K",
+      "previous": "213K"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Jobless Claims 4-Week Avg.",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "212.00K"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
       "timeUTC": "13:15",
       "country": "EUR",
       "currency": "EUR",
@@ -9319,6 +9268,58 @@
       "actual": "",
       "forecast": "-0.1%",
       "previous": "-0.2%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Wholesale Inventories (MoM) (Jan)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Natural Gas Storage",
+      "impact": "low",
+      "actual": "",
+      "forecast": "39B",
+      "previous": "-38B"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "4-Week Bill Auction",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.640%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Atlanta Fed GDPNow (Q1)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.7%",
+      "previous": "2.7%"
     },
     {
       "date": "19 Mar",
@@ -9553,6 +9554,32 @@
       "actual": "",
       "forecast": "",
       "previous": "8.0%"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. Baker Hughes Oil Rig Count",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "412"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. Baker Hughes Total Rig Count",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "553"
     },
     {
       "date": "20 Mar",
