@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
-update_economic_calendar.py  v13.0 — repo público, smart-fetch
+update_economic_calendar.py  v13.1 — FXStreet suplementario para actuals de hoy
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Fuentes (en orden de prioridad):
   A) investing.com API interna — HTML con actuals, sin browser
   B) FXStreet Calendar API   — JSON fallback con actuals
   C) Cache previo            — último recurso
 
-v13.0 — Smart-fetch para ejecución horaria en repo público:
+v13.1 — FXStreet siempre corre para hoy como fuente suplementaria:
   - MODO SMART: si NO hay eventos de alto impacto en la próxima
     hora, solo refresca hoy+mañana (ventana corta, rápido).
   - MODO FULL: si HAY eventos próximos (o es la primera hora del
     día), refresca ventana completa -60/+30 días.
-  - Fuerza MODO FULL el primer run del día (00:05 UTC) para
-    mantener el histórico y los datos de la semana siguiente.
+  - FXStreet SIEMPRE corre para hoy como fuente suplementaria:
+    investing.com usa hora ET para sus displays, lo que introduce
+    un lag de hasta 1h respecto a la hora real de publicación.
+    FXStreet usa UTC nativo y publica el actual antes. Al combinar
+    ambas fuentes se captura el dato en el run inmediato posterior.
   - Sin checkout de repo privado: el script vive en el repo público.
 
 Cero dependencias externas de pago. Sin Playwright.
@@ -722,9 +725,9 @@ def dedup_events(events):
 # ════════════════════════════════════════════════════════════════════════════
 
 print("=" * 65)
-print("ECONOMIC CALENDAR v13.0 — smart-fetch, repo público")
+print("ECONOMIC CALENDAR v13.1 — smart-fetch + FXStreet suplementario")
 print("Strategy A: investing.com (API interna, actuals reales)")
-print("Strategy B: FXStreet Calendar API (fallback con actuals)")
+print("Strategy B: FXStreet Calendar API (siempre para hoy + fallback)")
 print("Strategy C: Cache previo (último recurso)")
 print("=" * 65)
 
@@ -830,7 +833,7 @@ fresh_events  = []
 fetch_method  = ''
 fetch_errors  = []
 
-# Estrategia A: investing.com
+# Estrategia A: investing.com — ventana completa según modo
 print("\n  [Strategy A] investing.com API...")
 try:
     inv_events = fetch_investing(from_date, to_date)
@@ -845,30 +848,62 @@ except Exception as e:
     fetch_errors.append(f'investing.com error: {e}')
     print(f"  ❌ Strategy A failed: {e}")
 
-# Estrategia B: FXStreet (si A insuficiente)
-min_expected = 5 if fetch_mode == 'SMART' else MIN_EVENTS
-if len(fresh_events) < min_expected:
-    print(f"\n  [Strategy B] FXStreet (fresh={len(fresh_events)} < {min_expected})...")
-    try:
-        fxs_events = fetch_fxstreet(from_date, to_date)
-        if fxs_events:
-            if fresh_events:
-                combined = list(fresh_events)
-                combined.extend(fxs_events)
-                fresh_events = combined
-                fetch_method = 'investing.com + FXStreet'
-            else:
-                fresh_events = fxs_events
-                fetch_method = 'FXStreet'
-            print(f"  ✅ Strategy B: total fresh={len(fresh_events)}")
-        else:
-            fetch_errors.append('FXStreet returned 0 events')
-            print("  ⚠️  Strategy B: 0 events")
-    except Exception as e:
-        fetch_errors.append(f'FXStreet error: {e}')
-        print(f"  ❌ Strategy B failed: {e}")
+# Estrategia B: FXStreet
+#
+# Se ejecuta SIEMPRE para hoy (fxs_today_from / fxs_today_to).
+# Razón: investing.com muestra las horas en ET (Eastern Time) y las
+# convierte a UTC internamente. Esto introduce un lag de hasta 60 min
+# respecto a la hora real de publicación del dato (ej: NZD GDP sale a
+# las 21:45 UTC pero investing.com lo lista como 22:45 UTC por la
+# conversión ET→UTC). FXStreet usa UTC nativo y publica el actual en
+# el momento correcto. Al combinar ambas fuentes siempre se captura
+# el dato en el run inmediato posterior a que salga, sin esperar a
+# que investing.com "alcance" la hora ET convertida.
+#
+# Adicionalmente, si Strategy A falló o devolvió menos de lo esperado,
+# FXStreet también cubre la ventana completa como fallback.
+fxs_today_from = today
+fxs_today_to   = today
+min_expected   = 5 if fetch_mode == 'SMART' else MIN_EVENTS
+run_fxs_full   = len(fresh_events) < min_expected
 
-print(f"\n  Fresh events: {len(fresh_events)}")
+print(f"\n  [Strategy B] FXStreet — hoy suplementario + {'ventana completa' if run_fxs_full else 'solo hoy'}...")
+try:
+    # Siempre fetch de hoy para capturar actuals con UTC nativo
+    fxs_today = fetch_fxstreet(fxs_today_from, fxs_today_to)
+    # Si A falló, también fetch de ventana completa
+    fxs_full  = fetch_fxstreet(from_date, to_date) if run_fxs_full else []
+
+    # Combinar: full primero, today encima (today sobreescribe en merge)
+    fxs_events = fxs_full + fxs_today
+    # Dedup rápido por clave exacta para no inflar el conteo
+    fxs_seen = {}
+    for ev in fxs_events:
+        k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+        # Preferir el que tenga actual
+        if k not in fxs_seen or (ev.get('actual') and not fxs_seen[k].get('actual')):
+            fxs_seen[k] = ev
+    fxs_events = list(fxs_seen.values())
+
+    if fxs_events:
+        if fresh_events:
+            combined = list(fresh_events)
+            combined.extend(fxs_events)
+            fresh_events = combined
+            fetch_method = 'investing.com + FXStreet'
+        else:
+            fresh_events = fxs_events
+            fetch_method = 'FXStreet'
+        today_cnt = len([e for e in fxs_events if e.get('dateISO') == today.isoformat()])
+        print(f"  ✅ Strategy B: {len(fxs_events)} events ({today_cnt} de hoy con UTC nativo)")
+    else:
+        fetch_errors.append('FXStreet returned 0 events')
+        print("  ⚠️  Strategy B: 0 events")
+except Exception as e:
+    fetch_errors.append(f'FXStreet error: {e}')
+    print(f"  ❌ Strategy B failed: {e}")
+
+print(f"\n  Fresh total: {len(fresh_events)}")
 if not fresh_events:
     print("  ⚠️  All strategies failed — using base cache only")
     fetch_method = 'cache'
