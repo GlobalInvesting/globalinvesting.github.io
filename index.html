@@ -463,6 +463,57 @@
         .lang-switch:hover {
             border-color: var(--blue);
             color: var(--blue) !important;
+
+        /* ── Guías dropdown ── */
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+        .nav-dropdown > a::after {
+            content: '';
+            display: inline-block;
+            width: 0; height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid currentColor;
+            transition: transform 0.2s;
+        }
+        .nav-dropdown:hover > a::after,
+        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary, #1a1f2e);
+            border: 1px solid var(--border, rgba(255,255,255,0.1));
+            border-radius: 8px;
+            min-width: 200px;
+            padding: 0.35rem 0;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+        .nav-dropdown::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0; right: 0;
+            height: 8px;
+        }
+        .nav-dropdown-menu a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary) !important;
+            text-decoration: none;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+        }
+        .nav-dropdown-menu a:hover {
+            background: var(--bg-tertiary, rgba(255,255,255,0.05));
+            color: var(--text-primary) !important;
+        }
         }
 
         .nav-tabs-wrap {
@@ -4160,7 +4211,19 @@ const DataHealthCheck = ({ economicData }) => {
 <div className="page-nav-links">
     <a href="about.html">Acerca de</a>
     <a href="publicidad.html">Publicidad</a>
-    <a href="about.html#recursos">Guías</a>
+    <div className="nav-dropdown">
+      <a href="guia-score-fortaleza.html">Guías</a>
+      <div className="nav-dropdown-menu">
+          <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+          <a href="guia-carry-trade.html">Carry Trade</a>
+          <a href="guia-cot.html">Reporte COT</a>
+          <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+          <a href="guia-calendario-economico.html">Calendario Económico</a>
+          <a href="guia-pips.html">Pips y Lotaje</a>
+          <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+          <a href="glosario-forex.html">Glosario Forex</a>
+      </div>
+    </div>
     <a href="contact.html">Contacto</a>
     <a href="en.html" className="lang-switch">EN</a>
 
@@ -5475,7 +5538,7 @@ const sentiment = getSentiment(strength);
 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.4rem 1rem', marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
     <a href="about.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Acerca de</a>
     <a href="publicidad.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Publicidad</a>
-    <a href="about.html#recursos" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Guías</a>
+    <a href="guia-score-fortaleza.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Guías</a>
     <a href="terms.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Términos</a>
     <a href="privacy.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Privacidad</a>
     <a href="contact.html" style={{ color: 'var(--text-secondary)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Contacto</a>
