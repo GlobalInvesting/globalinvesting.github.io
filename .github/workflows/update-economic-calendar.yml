@@ -1,34 +1,13 @@
-name: Update Economic Calendar v13 (público — cada hora)
+name: Update Economic Calendar v14 (cada 10 min en horario de mercado)
 
 on:
   schedule:
-    # ── Lunes a viernes, cada hora entre 00:05 y 22:05 UTC ──────────────
-    # Cubre Asia (00–06), Europa (06–12), NY (12–22) sin gaps
-    - cron: '5 0 * * 1-5'
-    - cron: '5 1 * * 1-5'
-    - cron: '5 2 * * 1-5'
-    - cron: '5 3 * * 1-5'
-    - cron: '5 4 * * 1-5'
-    - cron: '5 5 * * 1-5'
-    - cron: '5 6 * * 1-5'
-    - cron: '5 7 * * 1-5'
-    - cron: '5 8 * * 1-5'
-    - cron: '5 9 * * 1-5'
-    - cron: '5 10 * * 1-5'
-    - cron: '5 11 * * 1-5'
-    - cron: '5 12 * * 1-5'
-    - cron: '5 13 * * 1-5'
-    - cron: '5 14 * * 1-5'
-    - cron: '5 15 * * 1-5'
-    - cron: '5 16 * * 1-5'
-    - cron: '5 17 * * 1-5'
-    - cron: '5 18 * * 1-5'
-    - cron: '5 19 * * 1-5'
-    - cron: '5 20 * * 1-5'
-    - cron: '5 21 * * 1-5'
-    - cron: '5 22 * * 1-5'
+    # ── Lunes a viernes, cada 10 minutos entre 00:00 y 22:59 UTC ─────────────
+    # GitHub Actions cron mínimo es 5 min; usamos 10 min para no abusar del límite.
+    # Cubre sesión Asia (00–08), Europa (07–16), NY (13–22) con overlap.
+    - cron: '0,10,20,30,40,50 0-22 * * 1-5'
     # Sábado 06 UTC: actualización de cierre semanal
-    - cron: '5 6 * * 6'
+    - cron: '0 6 * * 6'
   workflow_dispatch:
 
 concurrency:
@@ -38,13 +17,11 @@ concurrency:
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
 
     steps:
       - name: Checkout (este mismo repo público)
         uses: actions/checkout@v4
-        # No necesita PAT_TOKEN ni checkout de repo privado:
-        # el script ya vive aquí.
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -68,7 +45,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "✅ Sin cambios"
           else
-            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v13"
+            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v14"
             git pull --rebase origin main || true
             git push
           fi
