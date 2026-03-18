@@ -1,23 +1,34 @@
-name: Update Economic Calendar v12 (investing.com + FXStreet)
+name: Update Economic Calendar v13 (público — cada hora)
 
 on:
   schedule:
-    # Asia session (JPY, AUD, NZD) — 00:00–05:30 UTC
-    - cron: '5 0 * * *'
-    - cron: '5 2 * * *'
-    - cron: '5 4 * * *'
-    # Europe open (EUR, GBP, CHF) — 06:00–11:00 UTC
-    - cron: '5 6 * * *'
-    - cron: '5 8 * * *'
-    - cron: '5 10 * * *'
-    # US session (USD, CAD) — 12:00–18:30 UTC
-    # Cadencia cada ~2h: captura releases con offset máx. ~115 min (aceptable para datos fundamentales)
-    - cron: '5 12 * * *'
-    - cron: '5 14 * * *'
-    - cron: '5 16 * * *'
-    - cron: '5 18 * * *'
-    # Late / API updates
-    - cron: '5 22 * * *'
+    # ── Lunes a viernes, cada hora entre 00:05 y 22:05 UTC ──────────────
+    # Cubre Asia (00–06), Europa (06–12), NY (12–22) sin gaps
+    - cron: '5 0 * * 1-5'
+    - cron: '5 1 * * 1-5'
+    - cron: '5 2 * * 1-5'
+    - cron: '5 3 * * 1-5'
+    - cron: '5 4 * * 1-5'
+    - cron: '5 5 * * 1-5'
+    - cron: '5 6 * * 1-5'
+    - cron: '5 7 * * 1-5'
+    - cron: '5 8 * * 1-5'
+    - cron: '5 9 * * 1-5'
+    - cron: '5 10 * * 1-5'
+    - cron: '5 11 * * 1-5'
+    - cron: '5 12 * * 1-5'
+    - cron: '5 13 * * 1-5'
+    - cron: '5 14 * * 1-5'
+    - cron: '5 15 * * 1-5'
+    - cron: '5 16 * * 1-5'
+    - cron: '5 17 * * 1-5'
+    - cron: '5 18 * * 1-5'
+    - cron: '5 19 * * 1-5'
+    - cron: '5 20 * * 1-5'
+    - cron: '5 21 * * 1-5'
+    - cron: '5 22 * * 1-5'
+    # Sábado 06 UTC: actualización de cierre semanal
+    - cron: '5 6 * * 6'
   workflow_dispatch:
 
 concurrency:
@@ -27,20 +38,13 @@ concurrency:
 jobs:
   update-calendar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Reducido: sin Playwright, no necesitamos 20min
+    timeout-minutes: 10
 
     steps:
-      - name: Checkout PUBLIC site repo
+      - name: Checkout (este mismo repo público)
         uses: actions/checkout@v4
-        with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.PAT_TOKEN }}
-          path: site
-
-      - name: Checkout THIS private repo (scripts)
-        uses: actions/checkout@v4
-        with:
-          path: engine
+        # No necesita PAT_TOKEN ni checkout de repo privado:
+        # el script ya vive aquí.
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -48,26 +52,23 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4 lxml
+        run: pip install requests beautifulsoup4 lxml
 
       - name: Create output directory
-        run: mkdir -p site/calendar-data
+        run: mkdir -p calendar-data
 
       - name: Run calendar fetcher
-        working-directory: site
-        run: python3 -u ../engine/scripts/update_economic_calendar.py
+        run: python3 -u scripts/update_economic_calendar.py
 
       - name: Commit and push if changed
-        working-directory: site
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add calendar-data/calendar.json
           if git diff --staged --quiet; then
-            echo "✅ No changes to commit"
+            echo "✅ Sin cambios"
           else
-            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v12.4"
+            git commit -m "📅 Calendar $(date -u +'%Y-%m-%d %H:%M') UTC — v13"
             git pull --rebase origin main || true
             git push
           fi
