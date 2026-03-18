@@ -1,28 +1,28 @@
 {
-  "lastUpdate": "2026-03-17",
-  "generatedAt": "2026-03-17T22:40:22.735466Z",
+  "lastUpdate": "2026-03-18",
+  "generatedAt": "2026-03-18T02:54:02.462598Z",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
-  "rangeTo": "2026-04-16",
-  "totalEvents": 918,
+  "rangeTo": "2026-04-17",
+  "totalEvents": 922,
   "currencyCounts": {
-    "AUD": 75,
+    "AUD": 76,
     "CAD": 63,
     "CHF": 35,
-    "EUR": 92,
+    "EUR": 95,
     "GBP": 114,
     "JPY": 96,
-    "NZD": 45,
-    "USD": 398
+    "NZD": 46,
+    "USD": 397
   },
   "impactCounts": {
-    "low": 521,
+    "low": 524,
     "medium": 319,
-    "high": 78
+    "high": 79
   },
   "events": [
     {
@@ -2628,19 +2628,6 @@
     {
       "date": "3 Mar",
       "dateISO": "2026-03-03",
-      "timeUTC": "05:00",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "BOJ Gov Ueda Speaks",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "3 Mar",
-      "dateISO": "2026-03-03",
       "timeUTC": "11:00",
       "country": "GBP",
       "currency": "GBP",
@@ -2750,19 +2737,6 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Spring Statement",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "3 Mar",
-      "dateISO": "2026-03-03",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Member Bowman Speaks",
       "impact": "medium",
       "actual": "",
       "forecast": "",
@@ -7802,13 +7776,26 @@
     {
       "date": "17 Mar",
       "dateISO": "2026-03-17",
+      "timeUTC": "20:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Westpac Consumer Sentiment (Q1)",
+      "impact": "medium",
+      "actual": "94.7",
+      "forecast": "",
+      "previous": "96.5"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
       "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "API Weekly Crude Oil Stock",
       "impact": "medium",
-      "actual": "",
+      "actual": "6.600M",
       "forecast": "-0.600M",
       "previous": "-1.700M"
     },
@@ -7821,9 +7808,9 @@
       "flag": "🇳🇿",
       "event": "Current Account (QoQ) (Q4)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-5.98B",
       "forecast": "-4.78B",
-      "previous": "-8.37B"
+      "previous": "-8.36B"
     },
     {
       "date": "17 Mar",
@@ -7834,7 +7821,7 @@
       "flag": "🇳🇿",
       "event": "Current Account (YoY) (Q4)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-16.35B",
       "forecast": "",
       "previous": "-15.37B"
     },
@@ -7847,9 +7834,35 @@
       "flag": "🇳🇿",
       "event": "Current Account % of GDP (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "-3.70%",
       "forecast": "",
       "previous": "-3.50%"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "23:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Reuters Tankan Index (Mar)",
+      "impact": "low",
+      "actual": "18",
+      "forecast": "",
+      "previous": "13"
+    },
+    {
+      "date": "17 Mar",
+      "dateISO": "2026-03-17",
+      "timeUTC": "23:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "MI Leading Index (MoM) (Feb)",
+      "impact": "low",
+      "actual": "-0.1%",
+      "forecast": "",
+      "previous": "0.0%"
     },
     {
       "date": "17 Mar",
@@ -7860,9 +7873,9 @@
       "flag": "🇯🇵",
       "event": "Adjusted Trade Balance",
       "impact": "medium",
-      "actual": "",
-      "forecast": "-0.63T",
-      "previous": "0.46T"
+      "actual": "-0.37T",
+      "forecast": "-0.62T",
+      "previous": "0.50T"
     },
     {
       "date": "17 Mar",
@@ -7873,7 +7886,7 @@
       "flag": "🇯🇵",
       "event": "Exports (YoY) (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "4.2%",
       "forecast": "1.6%",
       "previous": "16.8%"
     },
@@ -7886,9 +7899,9 @@
       "flag": "🇯🇵",
       "event": "Imports (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "10.2%",
       "forecast": "11.5%",
-      "previous": "-2.5%"
+      "previous": "-2.6%"
     },
     {
       "date": "17 Mar",
@@ -7899,9 +7912,9 @@
       "flag": "🇯🇵",
       "event": "Trade Balance (Feb)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "-485.0B",
-      "previous": "-1,152.7B"
+      "actual": "57.3B",
+      "forecast": "-483.2B",
+      "previous": "-1,163.5B"
     },
     {
       "date": "18 Mar",
@@ -7919,7 +7932,7 @@
     {
       "date": "18 Mar",
       "dateISO": "2026-03-18",
-      "timeUTC": "01:30",
+      "timeUTC": "00:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
@@ -8019,6 +8032,45 @@
       "actual": "",
       "forecast": "0.7%",
       "previous": "-0.8%"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "CPI (YoY) (Feb)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "1.9%",
+      "previous": "1.7%"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "CPI, n.s.a (Feb)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "100.72",
+      "previous": "100.05"
+    },
+    {
+      "date": "18 Mar",
+      "dateISO": "2026-03-18",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "HICP ex Energy & Food (YoY) (Feb)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "2.3%",
+      "previous": "2.1%"
     },
     {
       "date": "18 Mar",
