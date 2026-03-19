@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-19",
-  "generatedAt": "2026-03-19T09:59:14.847317Z",
-  "fetchMode": "SMART",
+  "generatedAt": "2026-03-19T10:54:50.911639Z",
+  "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-18",
-  "totalEvents": 1005,
+  "totalEvents": 1007,
   "currencyCounts": {
     "AUD": 87,
     "CAD": 70,
     "CHF": 37,
-    "EUR": 108,
+    "EUR": 110,
     "GBP": 121,
     "JPY": 111,
     "NZD": 48,
     "USD": 423
   },
   "impactCounts": {
-    "low": 556,
-    "medium": 358,
-    "high": 91
+    "low": 553,
+    "medium": 361,
+    "high": 93
   },
   "events": [
     {
@@ -9161,7 +9161,7 @@
       "flag": "🇪🇺",
       "event": "Construction Output (MoM) (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-0.1",
       "forecast": "",
       "previous": "0.9"
     },
@@ -9174,9 +9174,9 @@
       "flag": "🇪🇺",
       "event": "Wages in euro zone (YoY) (Q4)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.00%",
       "forecast": "",
-      "previous": "3.00%"
+      "previous": "3.20%"
     },
     {
       "date": "19 Mar",
@@ -9187,9 +9187,9 @@
       "flag": "🇪🇺",
       "event": "Labor Cost Index (YoY) (Q4)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.30%",
       "forecast": "",
-      "previous": "3.30%"
+      "previous": "3.40%"
     },
     {
       "date": "19 Mar",
@@ -9200,7 +9200,7 @@
       "flag": "🇪🇺",
       "event": "Labor Cost Index",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.3",
       "forecast": "",
       "previous": "3.3"
     },
@@ -9213,7 +9213,7 @@
       "flag": "🇪🇺",
       "event": "Construction Output w.d.a (YoY)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-1.9",
       "forecast": "",
       "previous": "-0.9"
     },
@@ -9875,23 +9875,23 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Credit Card Spending (YoY) (Feb)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "1.0%"
+      "previous": "1.0"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "07:00",
+      "timeUTC": "06:00",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Public Sector Net Borrowing",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
-      "forecast": "-8.70B",
-      "previous": "-30.40B"
+      "forecast": "-8.5",
+      "previous": "-30.366"
     },
     {
       "date": "20 Mar",
@@ -9940,10 +9940,10 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Current Account (Jan)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
-      "forecast": "17.2B",
-      "previous": "34.6B"
+      "forecast": "17.2",
+      "previous": "14.6"
     },
     {
       "date": "20 Mar",
@@ -9995,7 +9995,20 @@
       "impact": "medium",
       "actual": "",
       "forecast": "12.8",
-      "previous": "12.6B"
+      "previous": "12.6"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Unemployment Rate",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "5.8",
+      "previous": "5.7"
     },
     {
       "date": "20 Mar",
@@ -10007,7 +10020,7 @@
       "event": "CBI Industrial Trends Orders (Mar)",
       "impact": "low",
       "actual": "",
-      "forecast": "-29",
+      "forecast": "-30",
       "previous": "-28"
     },
     {
@@ -10046,7 +10059,7 @@
       "event": "IPPI (MoM) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "0.6%",
+      "forecast": "1.1%",
       "previous": "2.7%"
     },
     {
@@ -10072,8 +10085,8 @@
       "event": "New Housing Price Index (MoM) (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "-0.3%",
-      "previous": "-0.4%"
+      "forecast": "-0.3",
+      "previous": "-0.4"
     },
     {
       "date": "20 Mar",
@@ -10083,10 +10096,10 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Retail Sales (MoM) (Jan)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
-      "forecast": "-0.4%",
-      "previous": "-0.4%"
+      "forecast": "1.5",
+      "previous": "-0.4"
     },
     {
       "date": "20 Mar",
@@ -10098,7 +10111,7 @@
       "event": "RMPI (MoM) (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "0.8%",
+      "forecast": "2.4%",
       "previous": "7.7%"
     },
     {
@@ -10234,7 +10247,7 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
@@ -10242,12 +10255,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-84.2K"
+      "previous": "-84.2"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -10255,12 +10268,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "163.1K"
+      "previous": "163.1"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -10268,12 +10281,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-134.5K"
+      "previous": "-134.5"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
@@ -10281,12 +10294,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "54.2K"
+      "previous": "54.2"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
@@ -10294,12 +10307,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-41.4K"
+      "previous": "-41.4"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
+      "timeUTC": "19:30",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -10307,7 +10320,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "105.1K"
+      "previous": "105.1"
     },
     {
       "date": "20 Mar",
@@ -10464,6 +10477,19 @@
       "actual": "",
       "forecast": "",
       "previous": "-37.1K"
+    },
+    {
+      "date": "21 Mar",
+      "dateISO": "2026-03-21",
+      "timeUTC": "08:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Cipollone speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "23 Mar",
