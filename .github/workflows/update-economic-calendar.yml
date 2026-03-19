@@ -1,18 +1,22 @@
-name: Update Economic Calendar v14 (cada 10 min en horario de mercado)
+name: Update Economic Calendar v15 (cada 10 min en horario de mercado)
 
 on:
   schedule:
-    # ── Lunes a viernes, cada 10 minutos entre 00:00 y 22:59 UTC ─────────────
+    # ── Lunes a viernes, cada 10 minutos entre 00:00 y 23:59 UTC ─────────────
     # GitHub Actions cron mínimo es 5 min; usamos 10 min para no abusar del límite.
     # Cubre sesión Asia (00–08), Europa (07–16), NY (13–22) con overlap.
-    - cron: '0,10,20,30,40,50 0-22 * * 1-5'
+    # Hora 23 añadida para capturar actuals de JPY que salen a las 23:50 UTC.
+    - cron: '0,10,20,30,40,50 0-23 * * 1-5'
     # Sábado 06 UTC: actualización de cierre semanal
     - cron: '0 6 * * 6'
   workflow_dispatch:
 
 concurrency:
   group: update-economic-calendar
-  cancel-in-progress: true
+  # IMPORTANTE: false — no cancelar runs en progreso.
+  # Con true, el run nuevo cancelaba al anterior justo antes del git push,
+  # impidiendo que los actuals recién obtenidos se escribieran en el JSON.
+  cancel-in-progress: false
 
 jobs:
   update-calendar:
