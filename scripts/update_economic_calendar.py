@@ -757,8 +757,11 @@ try:
         prev = json.load(f)
     for ev in prev.get('events', []):
         try:
+            # BUG FIX: usar normalize_for_dedup como clave para que el merge
+            # posterior encuentre los eventos del cache aunque vengan con
+            # nombres ligeramente distintos de diferentes fuentes.
             base_events[(ev['dateISO'], ev['currency'],
-                         ev['event'][:30].lower().strip())] = ev
+                         normalize_for_dedup(ev['event']))] = ev
         except Exception:
             pass
     bd = sorted(set(e['dateISO'] for e in base_events.values()))
@@ -822,9 +825,21 @@ if not FORCE_FULL and base_events:
         print(f"  ✅ Sin eventos próximos → MODO SMART (ventana ±2 días)")
 
 fetch_mode = 'FULL' if FORCE_FULL else 'SMART'
-from_date  = full_from  if FORCE_FULL else smart_from
-to_date    = full_to    if FORCE_FULL else smart_to
-print(f"\nMODE: {fetch_mode}  |  Range: {from_date} → {to_date}  |  UTC now: {now_utc.strftime('%H:%M')}\n")
+
+# BUG FIX: investing.com siempre usa ventana SMART (±2 días), independientemente
+# de FORCE_FULL. El MODO FULL solo amplía la ventana de FXStreet.
+# Razón: investing.com hace 1 request por día con 1.5s de sleep entre cada una.
+# En MODO FULL (65 días hábiles) el fetch tarda ~2.6 min adicionales —
+# suficiente para que el run de la siguiente ronda (cada 10 min) pueda
+# solaparse y causar conflictos de git push. Investing.com en ventana ±2 días
+# (~4 requests) es suficiente para capturar actuals recientes; el cache ya
+# contiene el historial completo.
+inv_from = smart_from
+inv_to   = smart_to
+fxs_from = full_from if FORCE_FULL else smart_from
+fxs_to   = full_to   if FORCE_FULL else smart_to
+
+print(f"\nMODE: {fetch_mode}  |  INV range: {inv_from} → {inv_to}  |  FXS range: {fxs_from} → {fxs_to}  |  UTC now: {now_utc.strftime('%H:%M')}\n")
 
 # ── STEP 2: Fetch ────────────────────────────────────────────────────────────
 print(f"\n{'='*50}\nSTEP 2 — Fetch ({fetch_mode})\n{'='*50}")
@@ -833,10 +848,10 @@ fresh_events  = []
 fetch_method  = ''
 fetch_errors  = []
 
-# Estrategia A: investing.com — ventana completa según modo
+# Estrategia A: investing.com — siempre ventana SMART (±2 días)
 print("\n  [Strategy A] investing.com API...")
 try:
-    inv_events = fetch_investing(from_date, to_date)
+    inv_events = fetch_investing(inv_from, inv_to)
     if inv_events:
         fresh_events = inv_events
         fetch_method = 'investing.com'
@@ -861,25 +876,27 @@ except Exception as e:
 # que investing.com "alcance" la hora ET convertida.
 #
 # Adicionalmente, si Strategy A falló o devolvió menos de lo esperado,
-# FXStreet también cubre la ventana completa como fallback.
+# FXStreet también cubre la ventana fxs_from/fxs_to como fallback
+# (FULL en primer run del día o cuando hay evento próximo).
 fxs_today_from = today
 fxs_today_to   = today
 min_expected   = 5 if fetch_mode == 'SMART' else MIN_EVENTS
 run_fxs_full   = len(fresh_events) < min_expected
 
-print(f"\n  [Strategy B] FXStreet — hoy suplementario + {'ventana completa' if run_fxs_full else 'solo hoy'}...")
+print(f"\n  [Strategy B] FXStreet — hoy suplementario + {'ventana ' + str(fxs_from) + ' → ' + str(fxs_to) if run_fxs_full or FORCE_FULL else 'solo hoy'}...")
 try:
     # Siempre fetch de hoy para capturar actuals con UTC nativo
     fxs_today = fetch_fxstreet(fxs_today_from, fxs_today_to)
-    # Si A falló, también fetch de ventana completa
-    fxs_full  = fetch_fxstreet(from_date, to_date) if run_fxs_full else []
+    # En MODO FULL o si A falló, fetch de la ventana extendida
+    run_fxs_range = run_fxs_full or FORCE_FULL
+    fxs_full  = fetch_fxstreet(fxs_from, fxs_to) if run_fxs_range else []
 
     # Combinar: full primero, today encima (today sobreescribe en merge)
     fxs_events = fxs_full + fxs_today
-    # Dedup rápido por clave exacta para no inflar el conteo
+    # Dedup rápido usando clave normalizada (igual que el merge principal)
     fxs_seen = {}
     for ev in fxs_events:
-        k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+        k = (ev['dateISO'], ev['currency'], normalize_for_dedup(ev['event']))
         # Preferir el que tenga actual
         if k not in fxs_seen or (ev.get('actual') and not fxs_seen[k].get('actual')):
             fxs_seen[k] = ev
@@ -914,7 +931,12 @@ if fresh_events:
     merged = dict(base_events)
     added = updated = actuals_added = 0
     for ev in fresh_events:
-        k = (ev['dateISO'], ev['currency'], ev['event'][:30].lower().strip())
+        # BUG FIX: usar normalize_for_dedup en vez de [:30] para que variantes
+        # cross-fuente (ej: "Non-Farm Payrolls" vs "Nonfarm Payrolls",
+        # "BoC Interest Rate Decision" vs "BOC Rate Decision") hagan match
+        # y el actual del evento fresh actualice el evento existente en cache
+        # en lugar de crear un duplicado sin actual.
+        k = (ev['dateISO'], ev['currency'], normalize_for_dedup(ev['event']))
         if k in merged:
             ex = dict(merged[k])
             for f in ('actual', 'forecast', 'previous', 'timeUTC', 'impact'):
@@ -972,7 +994,7 @@ output = {
     'source':        fetch_method,
     'errorMessage':  None if data_ok else 'No fresh data available.',
     'fetchErrors':   fetch_errors,
-    'rangeFrom':     ad[0] if ad else from_date.isoformat(),
+    'rangeFrom':     ad[0] if ad else inv_from.isoformat(),
     'rangeTo':       full_to.isoformat(),   # siempre mostrar rango completo en metadata
     'totalEvents':   len(final_events),
     'currencyCounts': cc,
