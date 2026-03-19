@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-19",
-  "generatedAt": "2026-03-19T08:07:25.976386Z",
-  "fetchMode": "FULL",
+  "generatedAt": "2026-03-19T09:01:08.740964Z",
+  "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-18",
-  "totalEvents": 1006,
+  "totalEvents": 1005,
   "currencyCounts": {
     "AUD": 87,
     "CAD": 70,
     "CHF": 37,
-    "EUR": 109,
+    "EUR": 108,
     "GBP": 121,
     "JPY": 111,
     "NZD": 48,
     "USD": 423
   },
   "impactCounts": {
-    "low": 552,
-    "medium": 361,
-    "high": 93
+    "low": 556,
+    "medium": 358,
+    "high": 91
   },
   "events": [
     {
@@ -8952,10 +8952,10 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Claimant Count Change (Feb)",
-      "impact": "high",
-      "actual": "4.4",
+      "impact": "medium",
+      "actual": "24.7K",
       "forecast": "25.8K",
-      "previous": "4.4"
+      "previous": "4.7K"
     },
     {
       "date": "19 Mar",
@@ -8991,10 +8991,10 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "Trade Balance (Feb)",
-      "impact": "medium",
-      "actual": "4204.0",
+      "impact": "low",
+      "actual": "4.204B",
       "forecast": "",
-      "previous": "3818.0"
+      "previous": "3.752B"
     },
     {
       "date": "19 Mar",
@@ -9096,7 +9096,7 @@
       "flag": "🇨🇭",
       "event": "SNB Interest Rate Decision (Q1)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.0",
       "forecast": "0.0",
       "previous": "0.0"
     },
@@ -9875,23 +9875,23 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Credit Card Spending (YoY) (Feb)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "1.0"
+      "previous": "1.0%"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "06:00",
+      "timeUTC": "07:00",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Public Sector Net Borrowing",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
-      "forecast": "-8.5",
-      "previous": "-30.366"
+      "forecast": "-8.70B",
+      "previous": "-30.40B"
     },
     {
       "date": "20 Mar",
@@ -9940,10 +9940,10 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Current Account (Jan)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
-      "forecast": "17.2",
-      "previous": "14.6"
+      "forecast": "17.2B",
+      "previous": "34.6B"
     },
     {
       "date": "20 Mar",
@@ -9995,20 +9995,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "12.8",
-      "previous": "12.6"
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Unemployment Rate",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "5.8",
-      "previous": "5.7"
+      "previous": "12.6B"
     },
     {
       "date": "20 Mar",
@@ -10085,8 +10072,8 @@
       "event": "New Housing Price Index (MoM) (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "-0.3",
-      "previous": "-0.4"
+      "forecast": "-0.3%",
+      "previous": "-0.4%"
     },
     {
       "date": "20 Mar",
@@ -10096,10 +10083,10 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Retail Sales (MoM) (Jan)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
-      "forecast": "1.5",
-      "previous": "-0.4"
+      "forecast": "-0.4%",
+      "previous": "-0.4%"
     },
     {
       "date": "20 Mar",
@@ -10247,7 +10234,7 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
@@ -10255,12 +10242,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-84.2"
+      "previous": "-84.2K"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -10268,12 +10255,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "163.1"
+      "previous": "163.1K"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
@@ -10281,12 +10268,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-134.5"
+      "previous": "-134.5K"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
@@ -10294,12 +10281,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "54.2"
+      "previous": "54.2K"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
@@ -10307,12 +10294,12 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-41.4"
+      "previous": "-41.4K"
     },
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "19:30",
+      "timeUTC": "20:30",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -10320,7 +10307,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "105.1"
+      "previous": "105.1K"
     },
     {
       "date": "20 Mar",
