@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-19",
-  "generatedAt": "2026-03-19T06:40:35.309093Z",
+  "generatedAt": "2026-03-19T07:37:18.384859Z",
   "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-18",
-  "totalEvents": 1004,
+  "totalEvents": 1006,
   "currencyCounts": {
     "AUD": 87,
     "CAD": 70,
@@ -18,12 +18,12 @@
     "GBP": 121,
     "JPY": 111,
     "NZD": 48,
-    "USD": 421
+    "USD": 423
   },
   "impactCounts": {
-    "low": 554,
-    "medium": 358,
-    "high": 92
+    "low": 553,
+    "medium": 360,
+    "high": 93
   },
   "events": [
     {
@@ -8817,25 +8817,25 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
-      "timeUTC": "02:46",
+      "timeUTC": "02:30",
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "BoJ Interest Rate Decision",
       "impact": "high",
-      "actual": "0.75",
-      "forecast": "0.75",
-      "previous": "0.75"
+      "actual": "0.75%",
+      "forecast": "0.75%",
+      "previous": "0.75%"
     },
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
-      "timeUTC": "03:00",
+      "timeUTC": "02:30",
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "BoJ Monetary Policy Statement",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8888,9 +8888,9 @@
       "flag": "🇯🇵",
       "event": "Industrial Production (MoM) (Jan)",
       "impact": "medium",
-      "actual": "4.3",
-      "forecast": "2.2",
-      "previous": "2.2"
+      "actual": "4.3%",
+      "forecast": "2.2%",
+      "previous": "0.6%"
     },
     {
       "date": "19 Mar",
@@ -8927,9 +8927,9 @@
       "flag": "🇬🇧",
       "event": "Average Earnings ex Bonus (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.8%",
       "forecast": "4.0%",
-      "previous": "4.2%"
+      "previous": "4.1%"
     },
     {
       "date": "19 Mar",
@@ -8940,7 +8940,7 @@
       "flag": "🇬🇧",
       "event": "Average Earnings Index +Bonus (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.9%",
       "forecast": "3.9%",
       "previous": "4.2%"
     },
@@ -8952,10 +8952,10 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Claimant Count Change (Feb)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "25.8",
-      "previous": "28.6"
+      "impact": "high",
+      "actual": "4.4",
+      "forecast": "25.8K",
+      "previous": "4.4"
     },
     {
       "date": "19 Mar",
@@ -8966,7 +8966,7 @@
       "flag": "🇬🇧",
       "event": "Employment Change 3M/3M (MoM) (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "84K",
       "forecast": "-4K",
       "previous": "52K"
     },
@@ -8979,7 +8979,7 @@
       "flag": "🇬🇧",
       "event": "Unemployment Rate (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "5.2%",
       "forecast": "5.3%",
       "previous": "5.2%"
     },
@@ -8992,7 +8992,7 @@
       "flag": "🇨🇭",
       "event": "Trade Balance (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "4204.0",
       "forecast": "",
       "previous": "3818.0"
     },
@@ -9005,7 +9005,7 @@
       "flag": "🇬🇧",
       "event": "Average Earnings Excluding Bonus (3Mo/Yr)",
       "impact": "high",
-      "actual": "",
+      "actual": "3.8",
       "forecast": "4.0",
       "previous": "4.2"
     },
@@ -9018,7 +9018,7 @@
       "flag": "🇬🇧",
       "event": "Employment Change (3M)",
       "impact": "low",
-      "actual": "",
+      "actual": "84.0",
       "forecast": "",
       "previous": "52.0"
     },
@@ -9031,7 +9031,7 @@
       "flag": "🇬🇧",
       "event": "ILO Unemployment Rate (3M)",
       "impact": "low",
-      "actual": "",
+      "actual": "5.2",
       "forecast": "5.3",
       "previous": "5.2"
     },
@@ -9044,7 +9044,7 @@
       "flag": "🇬🇧",
       "event": "Average Earnings Including Bonus (3Mo/Yr)",
       "impact": "high",
-      "actual": "",
+      "actual": "3.9",
       "forecast": "3.9",
       "previous": "4.2"
     },
@@ -9057,7 +9057,7 @@
       "flag": "🇨🇭",
       "event": "Imports (MoM)",
       "impact": "medium",
-      "actual": "",
+      "actual": "17380.0",
       "forecast": "",
       "previous": "18411.0"
     },
@@ -9070,7 +9070,7 @@
       "flag": "🇨🇭",
       "event": "Exports (MoM)",
       "impact": "medium",
-      "actual": "",
+      "actual": "21584.0",
       "forecast": "",
       "previous": "22229.0"
     },
@@ -9762,6 +9762,32 @@
       "actual": "",
       "forecast": "2.7%",
       "previous": "2.7%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed's Balance Sheet",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "6,646B"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Reserve Balances with Federal Reserve Banks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.073T"
     },
     {
       "date": "19 Mar",
