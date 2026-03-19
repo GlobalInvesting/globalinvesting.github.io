@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/strength-meter.html">
+<link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/strength-meter.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Medidor de Fuerza de Divisas &middot; Forex Strength Meter | Global Investing</title>
+<meta name="description" content="Medidor de fuerza relativa de divisas en tiempo real. Gráfico de líneas estilo MT4 con las 8 divisas principales: USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
+<meta name="keywords" content="medidor fuerza divisas, forex strength meter, currency strength, fortaleza divisas, USD EUR GBP JPY AUD CAD CHF NZD">
+<meta name="author" content="Santiago Plá Casuriaga · Global Investing">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://globalinvesting.github.io/strength-meter.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
+<meta property="og:title" content="Medidor de Fuerza de Divisas · Forex Strength Meter">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:description" content="Fuerza relativa de las 8 divisas principales. Gráfico de líneas estilo terminal con scores fundamentales.">
+<meta property="og:url" content="https://globalinvesting.github.io/strength-meter.html">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { overflow-x: clip; max-width: 100%; }
+
+:root {
+  --bg-primary:   #0b0e14;
+  --bg-secondary: #13171f;
+  --bg-card:      #1a1f2e;
+  --bg-elevated:  #20253a;
+  --text-primary:   #e1e4e8;
+  --text-secondary: #8b949e;
+  --text-tertiary:  #6e7681;
+  --border:       #30363d;
+  --border-hover: #484f58;
+  --blue:         #1e88e5;
+  --blue-dim:     rgba(30,136,229,0.1);
+  --green:        #26a69a;
+  --green-strong: #26a69a;
+  --red:          #ef5350;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; }
+.header-content { max-width: 1800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.brand-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+.brand-subtitle { font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.header-info { display: flex; align-items: center; gap: 2rem; font-size: 0.8125rem; color: var(--text-secondary); }
+.info-item { display: flex; align-items: center; gap: 0.5rem; }
+.status-live { width: 8px; height: 8px; background: var(--green-strong); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.page-nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.page-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+.page-nav-links a:hover { color: var(--text-primary); }
+.lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem !important; color: var(--text-secondary); }
+.lang-switch:hover { border-color: var(--blue); color: var(--blue) !important; }
+
+/* ── Nav tabs ── */
+.nav-tabs-wrap { background: var(--bg-secondary); border-bottom: 1px solid var(--border); }
+.nav-tabs { padding: 0 2rem; display: flex; gap: 0.5rem; max-width: 1800px; margin: 0 auto; overflow-x: auto; scrollbar-width: none; }
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab { padding: 1rem 1.5rem; background: transparent; border: none; color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap; text-decoration: none; display: flex; align-items: center; font-family: inherit; }
+.nav-tab:hover { color: var(--text-primary); }
+.nav-tab.active { color: var(--text-primary); border-bottom-color: var(--blue); }
+
+/* ── Nav dropdown ── */
+.nav-dropdown { position: relative; display: inline-block; }
+.nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; }
+.nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid currentColor; transition: transform 0.2s; }
+.nav-dropdown:hover > a::after, .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
+.nav-dropdown-menu { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 0 0.4rem; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.24); }
+.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+.nav-dropdown::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 0.75rem; }
+.nav-dropdown-menu a { display: block; padding: 0.5rem 1rem; color: var(--text-secondary) !important; font-size: 0.85rem !important; text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+.nav-dropdown-menu a:hover { background: rgba(255,255,255,0.04); color: var(--text-primary) !important; }
+
+/* ── Page ── */
+.page-wrap { max-width: 1800px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+
+/* ── Top bar: title + meta ── */
+.top-bar { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
+.page-meta { font-size: 0.73rem; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
+
+/* ── Controls bar: period left, toggles right ── */
+.controls-bar {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 0.85rem; flex-wrap: wrap;
+}
+.period-group {
+  display: flex; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  flex-shrink: 0;
+}
+.period-btn {
+  padding: 0.32rem 0.8rem; background: transparent; border: none;
+  color: var(--text-secondary); font-size: 0.72rem; font-weight: 700;
+  cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em; transition: all 0.15s;
+  border-right: 1px solid var(--border);
+}
+.period-btn:last-child { border-right: none; }
+.period-btn:hover { color: var(--text-primary); background: var(--bg-elevated); }
+.period-btn.active { background: var(--blue); color: #fff; }
+
+/* ── Currency toggles — HTML buttons with real flag emoji ── */
+.toggle-group { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-left: auto; align-items: center; }
+.ccy-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 4px; border: 1px solid;
+  font-size: 0.68rem; font-weight: 700; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.03em;
+  background: transparent; transition: opacity 0.15s, background 0.15s;
+  line-height: 1;
+}
+.ccy-btn .flag { font-size: 0.85rem; line-height: 1; }
+.ccy-btn.off { opacity: 0.22; }
+
+/* ── Chart container ── */
+.chart-outer {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem 1rem 0.6rem;
+  margin-bottom: 0.85rem; position: relative;
+}
+.chart-inner { position: relative; width: 100%; }
+canvas#sc { display: block; width: 100% !important; cursor: crosshair; }
+
+/* ── Tooltip ── */
+#tt {
+  position: absolute; pointer-events: none;
+  background: #0d1117; border: 1px solid var(--border);
+  border-radius: 6px; padding: 0.55rem 0.8rem;
+  font-size: 0.71rem; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.55);
+  z-index: 10; display: none; min-width: 148px;
+}
+.tt-date { color: var(--text-tertiary); margin-bottom: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.67rem; letter-spacing: 0.03em; }
+.tt-row { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.16rem; line-height: 1.35; }
+.tt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.tt-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; width: 30px; font-size: 0.68rem; }
+.tt-val { font-family: 'JetBrains Mono', monospace; margin-left: auto; padding-left: 0.7rem; font-size: 0.68rem; }
+
+/* ── Legend strip ── */
+.legend-strip { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.leg-item {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 5px; padding: 0.3rem 0.6rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+  transition: opacity 0.15s;
+}
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.leg-flag { font-size: 0.8rem; }
+.leg-code { font-weight: 700; }
+.leg-score { color: var(--text-secondary); }
+.leg-d { }
+.d-pos { color: #26a69a; }
+.d-neg { color: #ef5350; }
+.d-flat { color: var(--text-tertiary); }
+.leg-item.off { opacity: 0.24; }
+
+/* ── Info callout ── */
+.info-callout { background: rgba(30,136,229,0.08); border: 1px solid rgba(30,136,229,0.2); border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.77rem; color: var(--text-secondary); display: flex; gap: 0.6rem; align-items: flex-start; }
+.info-icon { flex-shrink: 0; color: var(--blue); line-height: 1.6; }
+
+/* ── Loading ── */
+.loading-state { text-align: center; padding: 4rem 2rem; color: var(--text-tertiary); }
+.loading-spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 900px) {
+  .header { padding: 1rem; }
+  .page-wrap { padding: 0.75rem 0.75rem 3rem; }
+  .header-info { display: none; }
+  .toggle-group { margin-left: 0; order: 3; width: 100%; }
+  .controls-bar { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" style="position:absolute;left:-9999px;" onfocus="this.style.left='8px';" onblur="this.style.left='-9999px';">Saltar al contenido principal</a>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;align-items:center;">
+      <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;">
+      <div>
+        <div class="brand-title">Global Investing</div>
+        <div class="brand-subtitle">Forex Fundamental Dashboard</div>
+      </div>
+    </div>
+    <div class="page-nav-links">
+      <a href="about.html">Acerca de</a>
+      <a href="publicidad.html">Publicidad</a>
+      <div class="nav-dropdown">
+        <a href="guia-score-fortaleza.html">Guías</a>
+        <div class="nav-dropdown-menu">
+          <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+          <a href="guia-carry-trade.html">Carry Trade</a>
+          <a href="guia-cot.html">Reporte COT</a>
+          <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+          <a href="guia-calendario-economico.html">Calendario Económico</a>
+          <a href="guia-pips.html">Pips y Lotaje</a>
+          <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+          <a href="glosario-forex.html">Glosario Forex</a>
+        </div>
+      </div>
+      <a href="contact.html">Contacto</a>
+      <a href="en.html" class="lang-switch">EN</a>
+    </div>
+    <div class="header-info">
+      <div class="info-item">
+        <div class="status-live"></div>
+        <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Nav tabs ── -->
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <a href="index.html"              class="nav-tab" style="text-decoration:none">Resumen de Divisas</a>
+    <a href="index.html?tab=heatmap"  class="nav-tab" style="text-decoration:none">Mapa de Calor</a>
+    <a href="index.html?tab=trends"   class="nav-tab" style="text-decoration:none">Tendencias Históricas</a>
+    <a href="index.html?tab=calendar" class="nav-tab" style="text-decoration:none">Calendario Económico</a>
+    <a href="index.html?tab=alerts"   class="nav-tab" style="text-decoration:none">Mejores Pares</a>
+    <a href="news.html"               class="nav-tab" style="text-decoration:none">Noticias</a>
+    <a href="carry-trade.html"        class="nav-tab" style="text-decoration:none">Carry Trade</a>
+    <a href="strength-meter.html"     class="nav-tab active" style="text-decoration:none">Fuerza de Divisas</a>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<main class="page-wrap" id="main-content">
+
+  <div id="loading-state" class="loading-state">
+    <div class="loading-spinner"></div>
+    <div>Cargando datos históricos...</div>
+  </div>
+
+  <div id="app-content" style="display:none">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <h1 class="page-title">Fuerza Relativa de Divisas</h1>
+      <span class="page-meta" id="page-meta"></span>
+    </div>
+
+    <!-- Controls: period left, currency toggles right -->
+    <div class="controls-bar">
+      <div class="period-group">
+        <button class="period-btn" data-weeks="12">3M</button>
+        <button class="period-btn" data-weeks="26">6M</button>
+        <button class="period-btn active" data-weeks="52">1A</button>
+        <button class="period-btn" data-weeks="999">Todo</button>
+      </div>
+      <div class="toggle-group" id="toggle-group"></div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-outer">
+      <div class="chart-inner">
+        <canvas id="sc" height="400"></canvas>
+        <div id="tt"></div>
+      </div>
+    </div>
+
+    <!-- Legend strip -->
+    <div class="legend-strip" id="legend-strip"></div>
+
+    <!-- Info -->
+    <div class="info-callout">
+      <span class="info-icon">ℹ</span>
+      <span>
+        Cada línea muestra la <strong>fuerza relativa</strong> de cada divisa: score fundamental centrado en la media del grupo. Valores por encima de cero indican fortaleza superior al promedio; por debajo, debilidad relativa. <a href="guia-score-fortaleza.html" style="color:var(--blue);text-decoration:none;">Ver metodología →</a>
+      </span>
+    </div>
+
+  </div><!-- /app-content -->
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────
+const CCYS = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const FLAGS = { USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵', AUD:'🇦🇺', CAD:'🇨🇦', CHF:'🇨🇭', NZD:'🇳🇿' };
+const COLORS = {
+  USD: '#2196f3',  // blue
+  EUR: '#26a69a',  // teal
+  GBP: '#e91e63',  // magenta
+  JPY: '#ff9800',  // orange
+  AUD: '#ce93d8',  // violet (lighter for dark bg)
+  CAD: '#ff5252',  // red
+  CHF: '#00e5ff',  // cyan
+  NZD: '#aeea00',  // yellow-green
+};
+
+const BASE  = 'https://globalinvesting.github.io';
+const URLS = {
+  latest:  `${BASE}/strength-scores/latest.json`,
+  all:     `${BASE}/scores-history/all.json`,
+  w1:      `${BASE}/scores-history/2026-03-12.json`,
+  w2:      `${BASE}/scores-history/2026-03-16.json`,
+};
+
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+let allSnaps   = [];   // [{date, scores:{USD:n,...}}] sorted asc
+let activeWks  = 52;
+let hidden     = new Set();
+
+// ─────────────────────────────────────────────
+// Data loading
+// ─────────────────────────────────────────────
+async function safeFetch(url) {
+  try { const r = await fetch(url); return r.ok ? await r.json() : null; }
+  catch { return null; }
+}
+
+async function loadData() {
+  const [latest, all, w1, w2] = await Promise.all([
+    safeFetch(URLS.latest), safeFetch(URLS.all),
+    safeFetch(URLS.w1),     safeFetch(URLS.w2),
+  ]);
+
+  if (!latest || !all) {
+    document.getElementById('loading-state').innerHTML =
+      '<div style="color:#ef5350;font-size:0.85rem">Error cargando datos. Recarga la página.</div>';
+    return;
+  }
+
+  document.getElementById('ts-header').textContent = latest.lastUpdate || '';
+  document.getElementById('page-meta').textContent =
+    `Score compuesto v${latest.modelVersion || ''} · ${latest.lastUpdate || ''}`;
+
+  // Build map date → scores
+  const byDate = {};
+
+  // 1. all.json (weekly snapshots through ~03-09)
+  (all.snapshots || []).forEach(s => {
+    if (!byDate[s.date]) {
+      byDate[s.date] = Object.fromEntries(
+        CCYS.map(c => [c, s.scores?.[c]?.score ?? null])
+      );
+    }
+  });
+
+  // 2. Individual weekly files (03-12, 03-16)
+  [w1, w2].forEach(f => {
+    if (!f || !f.date) return;
+    byDate[f.date] = Object.fromEntries(
+      CCYS.map(c => [c, f.scores?.[c]?.score ?? null])
+    );
+  });
+
+  // 3. Latest (today or most recent generation)
+  if (latest.lastUpdate) {
+    byDate[latest.lastUpdate] = Object.fromEntries(
+      CCYS.map(c => [c, latest.scores?.[c]?.score ?? null])
+    );
+  }
+
+  // Sort chronologically
+  allSnaps = Object.keys(byDate).sort().map(date => ({ date, scores: byDate[date] }));
+
+  buildToggles();
+  render();
+  setupInteraction();
+
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('app-content').style.display   = 'block';
+}
+
+// ─────────────────────────────────────────────
+// Filter + relativise
+// ─────────────────────────────────────────────
+function filtered() {
+  if (activeWks >= 999) return allSnaps;
+  const cut = new Date();
+  cut.setDate(cut.getDate() - activeWks * 7);
+  const cutStr = cut.toISOString().slice(0,10);
+  return allSnaps.filter(s => s.date >= cutStr);
+}
+
+function relativise(snaps) {
+  return snaps.map(s => {
+    const vals = CCYS.map(c => s.scores[c]).filter(v => v != null);
+    const mean = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+    return {
+      date: s.date,
+      rel: Object.fromEntries(CCYS.map(c => [
+        c, s.scores[c] != null ? +(s.scores[c]-mean).toFixed(3) : null
+      ]))
+    };
+  });
+}
+
+// ─────────────────────────────────────────────
+// HTML toggles (real emoji flags, no canvas)
+// ─────────────────────────────────────────────
+function buildToggles() {
+  const wrap = document.getElementById('toggle-group');
+  wrap.innerHTML = CCYS.map(c => {
+    const col = COLORS[c];
+    return `<button class="ccy-btn" data-ccy="${c}"
+      style="color:${col};border-color:${col}55;background:${col}18"
+      onclick="toggleCCY('${c}')">
+      <span class="flag">${FLAGS[c]}</span>${c}
+    </button>`;
+  }).join('');
+}
+
+function toggleCCY(c) {
+  hidden.has(c) ? hidden.delete(c) : hidden.add(c);
+  document.querySelectorAll('.ccy-btn[data-ccy="'+c+'"]')
+    .forEach(b => b.classList.toggle('off', hidden.has(c)));
+  document.querySelectorAll('.leg-item[data-ccy="'+c+'"]')
+    .forEach(b => b.classList.toggle('off', hidden.has(c)));
+  render();
+}
+
+// ─────────────────────────────────────────────
+// Canvas render
+// ─────────────────────────────────────────────
+function render(hoverIdx) {
+  const snaps = filtered();
+  const rel   = relativise(snaps);
+  const cv    = document.getElementById('sc');
+  const dpr   = window.devicePixelRatio || 1;
+  const W     = cv.parentElement.clientWidth;
+  const H     = 400;
+
+  cv.width  = W * dpr;
+  cv.height = H * dpr;
+  cv.style.width  = W + 'px';
+  cv.style.height = H + 'px';
+
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Margins
+  const ML = 48, MR = 18, MT = 16, MB = 28;
+  const cW = W - ML - MR;
+  const cH = H - MT - MB;
+
+  // Y range — always use the FULL dataset range so scale stays stable
+  let maxAbs = 8;
+  relativise(allSnaps).forEach(pt =>
+    CCYS.forEach(c => { if (pt.rel[c] != null) maxAbs = Math.max(maxAbs, Math.abs(pt.rel[c])); })
+  );
+  maxAbs = Math.ceil(maxAbs * 1.08); // small breathing room
+
+  const xOf = i => ML + (i / Math.max(rel.length - 1, 1)) * cW;
+  const yOf = v => MT + cH/2 - (v / maxAbs) * (cH/2);
+
+  // ── Background ──
+  ctx.fillStyle = '#1a1f2e';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Horizontal grid ──
+  const gridLevels = [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1];
+  gridLevels.forEach(f => {
+    const v = f * maxAbs;
+    const y = yOf(v);
+    ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(ML+cW, y);
+    ctx.strokeStyle = f === 0 ? '#3d4660' : (Math.abs(f) === 1 ? '#2a3045' : '#222838');
+    ctx.lineWidth = f === 0 ? 1.5 : 1;
+    ctx.stroke();
+  });
+
+  // ── X grid + date labels ──
+  const n = rel.length;
+  const maxLabels = Math.min(12, n);
+  const labelStep = Math.max(1, Math.floor(n / maxLabels));
+  ctx.font = `500 9px 'JetBrains Mono', monospace`;
+  ctx.textAlign = 'center';
+  for (let i = 0; i < n; i++) {
+    if (i % labelStep !== 0 && i !== n-1) continue;
+    const x = xOf(i);
+    ctx.strokeStyle = '#1e2534'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, MT); ctx.lineTo(x, MT+cH); ctx.stroke();
+    ctx.fillStyle = '#4e5a72';
+    ctx.fillText(rel[i].date.slice(5), x, H - 9);
+  }
+
+  // ── Y axis labels ──
+  ctx.textAlign = 'right';
+  ctx.font = `500 9px 'JetBrains Mono', monospace`;
+  gridLevels.filter(f => Math.abs(f) % 0.25 === 0).forEach(f => {
+    const v = f * maxAbs;
+    const y = yOf(v);
+    ctx.fillStyle = f === 0 ? '#6a7890' : '#3e4a5e';
+    ctx.fillText((v>=0?'+':'')+v.toFixed(0), ML-5, y+3.5);
+  });
+
+  // ── Zero line dashed ──
+  const z = yOf(0);
+  ctx.strokeStyle = '#5a6888';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.moveTo(ML, z); ctx.lineTo(ML+cW, z); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Currency lines ──
+  CCYS.forEach(c => {
+    if (hidden.has(c)) return;
+    ctx.strokeStyle = COLORS[c];
+    ctx.lineWidth = 1.8;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath();
+    let pen = false;
+    rel.forEach((pt, i) => {
+      if (pt.rel[c] == null) { pen = false; return; }
+      const x = xOf(i), y = yOf(pt.rel[c]);
+      if (!pen) { ctx.moveTo(x,y); pen=true; } else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  });
+
+  // ── Crosshair + dots ──
+  if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < rel.length) {
+    const x = xOf(hoverIdx);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x,MT); ctx.lineTo(x,MT+cH); ctx.stroke();
+    ctx.setLineDash([]);
+
+    CCYS.forEach(c => {
+      if (hidden.has(c) || rel[hoverIdx]?.rel[c] == null) return;
+      const cy = yOf(rel[hoverIdx].rel[c]);
+      ctx.fillStyle = COLORS[c];
+      ctx.beginPath(); ctx.arc(x, cy, 4, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#0d1117'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(x, cy, 4, 0, Math.PI*2); ctx.stroke();
+    });
+
+    // Tooltip
+    const snap = rel[hoverIdx];
+    const rows = [...CCYS]
+      .filter(c => !hidden.has(c) && snap.rel[c] != null)
+      .sort((a,b) => snap.rel[b] - snap.rel[a]);
+
+    const tip = document.getElementById('tt');
+    tip.innerHTML = `<div class="tt-date">${snap.date}</div>` +
+      rows.map(c => {
+        const v = snap.rel[c];
+        const col = v >= 0.05 ? '#26a69a' : v <= -0.05 ? '#ef5350' : '#8b949e';
+        return `<div class="tt-row">
+          <div class="tt-dot" style="background:${COLORS[c]}"></div>
+          <span class="tt-code" style="color:${COLORS[c]}">${c}</span>
+          <span class="tt-val" style="color:${col}">${v>=0?'+':''}${v.toFixed(2)}</span>
+        </div>`;
+      }).join('');
+
+    const tipW = 152;
+    const rectW = cv.getBoundingClientRect().width;
+    let tx = (x / W * rectW) + 14;
+    if (tx + tipW > rectW - 8) tx = (x / W * rectW) - tipW - 14;
+    tip.style.left    = tx + 'px';
+    tip.style.top     = '14px';
+    tip.style.display = 'block';
+  } else {
+    document.getElementById('tt').style.display = 'none';
+  }
+
+  // Update legend
+  updateLegend(rel.at(-1), rel.at(-2));
+}
+
+// ─────────────────────────────────────────────
+// Legend strip
+// ─────────────────────────────────────────────
+function updateLegend(last, prev) {
+  if (!last) return;
+  const sorted = [...CCYS].sort((a,b) => (last.rel[b]||0) - (last.rel[a]||0));
+  document.getElementById('legend-strip').innerHTML = sorted.map(c => {
+    const v = last.rel[c];
+    const p = prev?.rel[c];
+    const delta = (v!=null && p!=null) ? v-p : null;
+    const dStr = delta==null ? '' : Math.abs(delta)<0.05 ? '' : (delta>0?'+':'')+delta.toFixed(1);
+    const dCls = !dStr ? '' : delta>0 ? 'd-pos' : 'd-neg';
+    const col  = COLORS[c];
+    const offCls = hidden.has(c) ? 'off' : '';
+    return `<div class="leg-item ${offCls}" data-ccy="${c}" style="border-color:${col}30" onclick="toggleCCY('${c}')">
+      <span class="leg-dot" style="background:${col}"></span>
+      <span class="leg-flag">${FLAGS[c]}</span>
+      <span class="leg-code" style="color:${col}">${c}</span>
+      <span class="leg-score">${v!=null?(v>=0?'+':'')+v.toFixed(1):'–'}</span>
+      ${dStr?`<span class="leg-d ${dCls}">${dStr}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+// Interaction
+// ─────────────────────────────────────────────
+function setupInteraction() {
+  const cv = document.getElementById('sc');
+
+  function getIdx(e) {
+    const rect = cv.getBoundingClientRect();
+    const mx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const ML = 48, MR = 18;
+    const cW = rect.width - ML - MR;
+    if (mx < ML || mx > rect.width - MR) return -1;
+    const n = filtered().length;
+    return Math.round(((mx - ML) / cW) * (n-1));
+  }
+
+  cv.addEventListener('mousemove',  e => render(getIdx(e)));
+  cv.addEventListener('mouseleave', () => render());
+  cv.addEventListener('touchmove',  e => { e.preventDefault(); render(getIdx(e)); }, { passive: false });
+  cv.addEventListener('touchend',   () => render());
+}
+
+// ─────────────────────────────────────────────
+// Period buttons
+// ─────────────────────────────────────────────
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeWks = parseInt(btn.dataset.weeks);
+    render();
+  });
+});
+
+// ─────────────────────────────────────────────
+// Resize
+// ─────────────────────────────────────────────
+let rt;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 80); });
+
+// ─────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────
+loadData();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Medidor de Fuerza de Divisas — Forex Strength Meter",
+  "url": "https://globalinvesting.github.io/strength-meter.html",
+  "description": "Gráfico de fuerza relativa de las 8 divisas principales. Score fundamental centrado en media del grupo.",
+  "applicationCategory": "FinanceApplication",
+  "publisher": { "@type": "Organization", "name": "Global Investing", "url": "https://globalinvesting.github.io" }
+}
+</script>
+
+</body>
+</html>
