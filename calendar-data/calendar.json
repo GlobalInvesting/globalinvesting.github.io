@@ -1,29 +1,29 @@
 {
-  "lastUpdate": "2026-03-18",
-  "generatedAt": "2026-03-18T22:42:16.607631Z",
-  "fetchMode": "SMART",
+  "lastUpdate": "2026-03-19",
+  "generatedAt": "2026-03-19T02:13:57.002815Z",
+  "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
-  "rangeTo": "2026-04-17",
-  "totalEvents": 962,
+  "rangeTo": "2026-04-18",
+  "totalEvents": 991,
   "currencyCounts": {
-    "AUD": 84,
-    "CAD": 65,
-    "CHF": 35,
-    "EUR": 93,
-    "GBP": 115,
-    "JPY": 108,
-    "NZD": 46,
-    "USD": 416
+    "AUD": 87,
+    "CAD": 66,
+    "CHF": 37,
+    "EUR": 104,
+    "GBP": 121,
+    "JPY": 111,
+    "NZD": 48,
+    "USD": 417
   },
   "impactCounts": {
-    "low": 548,
-    "medium": 335,
-    "high": 79
+    "low": 550,
+    "medium": 349,
+    "high": 92
   },
   "events": [
     {
@@ -3682,6 +3682,19 @@
     {
       "date": "5 Mar",
       "dateISO": "2026-03-05",
+      "timeUTC": "09:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's De Guindos Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "5 Mar",
+      "dateISO": "2026-03-05",
       "timeUTC": "10:00",
       "country": "GBP",
       "currency": "GBP",
@@ -3942,6 +3955,32 @@
     {
       "date": "5 Mar",
       "dateISO": "2026-03-05",
+      "timeUTC": "18:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "5 Mar",
+      "dateISO": "2026-03-05",
+      "timeUTC": "19:15",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Bowman Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "5 Mar",
+      "dateISO": "2026-03-05",
       "timeUTC": "22:30",
       "country": "USD",
       "currency": "USD",
@@ -4094,6 +4133,19 @@
       "actual": "1.2%",
       "forecast": "1.3%",
       "previous": "1.4%"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "11:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB President Lagarde Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "6 Mar",
@@ -4497,6 +4549,19 @@
       "actual": "2.1%",
       "forecast": "3.0%",
       "previous": "3.0%"
+    },
+    {
+      "date": "6 Mar",
+      "dateISO": "2026-03-06",
+      "timeUTC": "18:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Schnabel Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "6 Mar",
@@ -5528,6 +5593,19 @@
     {
       "date": "11 Mar",
       "dateISO": "2026-03-11",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Bowman Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
       "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
@@ -5732,6 +5810,19 @@
       "actual": "-308.0B",
       "forecast": "-304.4B",
       "previous": "-95.0B"
+    },
+    {
+      "date": "11 Mar",
+      "dateISO": "2026-03-11",
+      "timeUTC": "20:25",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. President Trump Speaks",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "11 Mar",
@@ -8393,7 +8484,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "FOMC Economic Projections",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8589,7 +8680,7 @@
       "flag": "🇯🇵",
       "event": "Core Machinery Orders (MoM) (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "-5.5%",
       "forecast": "-9.6%",
       "previous": "19.1%"
     },
@@ -8602,7 +8693,7 @@
       "flag": "🇯🇵",
       "event": "Core Machinery Orders (YoY) (Jan)",
       "impact": "low",
-      "actual": "",
+      "actual": "13.7%",
       "forecast": "10.5%",
       "previous": "16.8%"
     },
@@ -8615,9 +8706,9 @@
       "flag": "🇯🇵",
       "event": "Foreign Bonds Buying",
       "impact": "low",
-      "actual": "",
+      "actual": "-992.0B",
       "forecast": "",
-      "previous": "399.8B"
+      "previous": "402.5B"
     },
     {
       "date": "18 Mar",
@@ -8628,7 +8719,7 @@
       "flag": "🇯🇵",
       "event": "Foreign Investments in Japanese Stocks",
       "impact": "low",
-      "actual": "",
+      "actual": "-1,772.6B",
       "forecast": "",
       "previous": "385.5B"
     },
@@ -8706,9 +8797,9 @@
       "flag": "🇦🇺",
       "event": "Employment Change (Feb)",
       "impact": "medium",
-      "actual": "",
-      "forecast": "20.3K",
-      "previous": "17.8K"
+      "actual": "48.9K",
+      "forecast": "20.8K",
+      "previous": "26.1K"
     },
     {
       "date": "19 Mar",
@@ -8719,7 +8810,7 @@
       "flag": "🇦🇺",
       "event": "Full Employment Change (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-30.5K",
       "forecast": "",
       "previous": "50.5K"
     },
@@ -8731,8 +8822,8 @@
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "Participation Rate (Feb)",
-      "impact": "low",
-      "actual": "",
+      "impact": "high",
+      "actual": "66.9%",
       "forecast": "66.7%",
       "previous": "66.7%"
     },
@@ -8758,9 +8849,9 @@
       "flag": "🇦🇺",
       "event": "Reserve Assets Total (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "111.7B",
       "forecast": "",
-      "previous": "112,539.0B"
+      "previous": "112.5B"
     },
     {
       "date": "19 Mar",
@@ -8771,9 +8862,48 @@
       "flag": "🇦🇺",
       "event": "Unemployment Rate (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "4.3%",
       "forecast": "4.1%",
       "previous": "4.1%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Full-Time Employment",
+      "impact": "high",
+      "actual": "-30.5",
+      "forecast": "",
+      "previous": "50.5"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Part-Time Employment",
+      "impact": "high",
+      "actual": "79.4",
+      "forecast": "",
+      "previous": "-32.7"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Financial Stability Review",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "19 Mar",
@@ -8791,12 +8921,12 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
-      "timeUTC": "02:30",
+      "timeUTC": "03:00",
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "BoJ Monetary Policy Statement",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8811,8 +8941,8 @@
       "event": "BoJ Interest Rate Decision",
       "impact": "high",
       "actual": "",
-      "forecast": "0.75%",
-      "previous": "0.75%"
+      "forecast": "0.75",
+      "previous": "0.75"
     },
     {
       "date": "19 Mar",
@@ -8834,11 +8964,50 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Industrial Production (MoM) (Jan)",
+      "event": "Industrial Production (YoY)",
       "impact": "medium",
       "actual": "",
-      "forecast": "2.2%",
-      "previous": "-0.1%"
+      "forecast": "",
+      "previous": "2.3"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "04:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Industrial Production (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.2",
+      "previous": "2.2"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "04:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Capacity Utilization",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "1.3"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "05:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Unemployment Rate s.a (3M)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "4.0"
     },
     {
       "date": "19 Mar",
@@ -8848,7 +9017,7 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "BoJ Press Conference",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8887,7 +9056,7 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Claimant Count Change (Feb)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "25.8K",
       "previous": "28.6K"
@@ -8926,10 +9095,101 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "Trade Balance (Feb)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": "3.818B"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Average Earnings Excluding Bonus (3Mo/Yr)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "4.0",
+      "previous": "4.2"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Employment Change (3M)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "52.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "ILO Unemployment Rate (3M)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "5.3",
+      "previous": "5.2"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "Average Earnings Including Bonus (3Mo/Yr)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "3.9",
+      "previous": "4.2"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Imports (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "18411.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "07:00",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Exports (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "22229.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Current Account Balance EUR",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "-777.0"
     },
     {
       "date": "19 Mar",
@@ -8947,12 +9207,12 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
-      "timeUTC": "09:00",
+      "timeUTC": "08:30",
       "country": "CHF",
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "SNB Monetary Policy Assessment",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -8965,10 +9225,36 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "SNB Press Conference",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "09:40",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "10-y Obligaciones Auction",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.167"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "09:40",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "5-y Bond Auction",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "2.577"
     },
     {
       "date": "19 Mar",
@@ -8978,7 +9264,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Construction Output (MoM) (Jan)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": "0.88%"
@@ -9016,11 +9302,24 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Euro Summit",
+      "event": "Labor Cost Index",
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "3.3"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Construction Output w.d.a (YoY)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.9"
     },
     {
       "date": "19 Mar",
@@ -9129,6 +9428,32 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
+      "timeUTC": "12:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Monetary Policy Summary",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "12:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE Minutes",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
@@ -9136,7 +9461,7 @@
       "event": "Philadelphia Fed Manufacturing Index (Mar)",
       "impact": "high",
       "actual": "",
-      "forecast": "8.3",
+      "forecast": "10.0",
       "previous": "16.3"
     },
     {
@@ -9211,24 +9536,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Continuing Jobless Claims",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "1,850K",
-      "previous": "1,850K"
-    },
-    {
-      "date": "19 Mar",
-      "dateISO": "2026-03-19",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "Initial Jobless Claims",
       "impact": "high",
       "actual": "",
-      "forecast": "215K",
-      "previous": "213K"
+      "forecast": "215.0",
+      "previous": "213.0"
     },
     {
       "date": "19 Mar",
@@ -9237,11 +9549,37 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Jobless Claims 4-Week Avg.",
-      "impact": "low",
+      "event": "Initial Jobless Claims 4-week average",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "212.00K"
+      "previous": "212.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Continuing Jobless Claims",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "1.85",
+      "previous": "1.85"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Employment Insurance Beneficiaries Change (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.4"
     },
     {
       "date": "19 Mar",
@@ -9277,7 +9615,7 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "ECB Monetary Policy Statement",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -9294,6 +9632,32 @@
       "actual": "",
       "forecast": "2.15%",
       "previous": "2.15%"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "13:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Rate On Deposit Facility",
+      "impact": "low",
+      "actual": "",
+      "forecast": "2.0",
+      "previous": "2.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "13:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Main Refinancing Operations Rate",
+      "impact": "low",
+      "actual": "",
+      "forecast": "2.15",
+      "previous": "2.15"
     },
     {
       "date": "19 Mar",
@@ -9328,11 +9692,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "New Home Sales (MoM) (Jan)",
-      "impact": "medium",
+      "event": "New Home Sales (MoM)",
+      "impact": "high",
       "actual": "",
-      "forecast": "",
-      "previous": "-1.7%"
+      "forecast": "0.72",
+      "previous": "0.745"
     },
     {
       "date": "19 Mar",
@@ -9367,11 +9731,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Wholesale Inventories (MoM) (Jan)",
-      "impact": "low",
+      "event": "Wholesale Inventories",
+      "impact": "medium",
       "actual": "",
-      "forecast": "0.2%",
-      "previous": "0.2%"
+      "forecast": "0.2",
+      "previous": "0.2"
     },
     {
       "date": "19 Mar",
@@ -9380,11 +9744,24 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Natural Gas Storage",
+      "event": "EIA Natural Gas Storage Change",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "39.0",
+      "previous": "-38.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "15:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Vernal Equinox Day",
       "impact": "low",
       "actual": "",
-      "forecast": "39B",
-      "previous": "-38B"
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "19 Mar",
@@ -9394,10 +9771,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "4-Week Bill Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "3.640%"
+      "previous": "3.64"
     },
     {
       "date": "19 Mar",
@@ -9406,11 +9783,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Atlanta Fed GDPNow (Q1)",
+      "event": "10-year TIPS Auction",
       "impact": "medium",
       "actual": "",
-      "forecast": "2.7%",
-      "previous": "2.7%"
+      "forecast": "",
+      "previous": "1.94"
     },
     {
       "date": "19 Mar",
@@ -9420,7 +9797,7 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Exports (Feb)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "6.21B"
@@ -9433,7 +9810,7 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Imports (Feb)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "6.73B"
@@ -9463,6 +9840,32 @@
       "actual": "",
       "forecast": "",
       "previous": "-2,310M"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "21:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Trade Balance NZD (MoM)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "-470.0",
+      "previous": "-519.0"
+    },
+    {
+      "date": "19 Mar",
+      "dateISO": "2026-03-19",
+      "timeUTC": "21:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "Trade Balance NZD (YoY)",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "-2.3"
     },
     {
       "date": "20 Mar",
@@ -9645,32 +10048,6 @@
       "actual": "",
       "forecast": "",
       "previous": "8.0%"
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. Baker Hughes Oil Rig Count",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "412"
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. Baker Hughes Total Rig Count",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "553"
     },
     {
       "date": "20 Mar",
