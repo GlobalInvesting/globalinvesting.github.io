@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-20",
-  "generatedAt": "2026-03-20T11:48:45.920046Z",
+  "generatedAt": "2026-03-20T12:26:54.437828Z",
   "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-19",
-  "totalEvents": 1098,
+  "totalEvents": 1099,
   "currencyCounts": {
     "AUD": 92,
     "CAD": 70,
@@ -18,12 +18,12 @@
     "GBP": 134,
     "JPY": 121,
     "NZD": 50,
-    "USD": 443
+    "USD": 444
   },
   "impactCounts": {
     "low": 553,
     "medium": 406,
-    "high": 139
+    "high": 140
   },
   "events": [
     {
@@ -10006,9 +10006,9 @@
       "flag": "🇪🇺",
       "event": "Trade Balance (Jan)",
       "impact": "medium",
-      "actual": "12.1",
+      "actual": "-1.9B",
       "forecast": "12.8B",
-      "previous": "11.6"
+      "previous": "11.2B"
     },
     {
       "date": "20 Mar",
@@ -10035,6 +10035,19 @@
       "actual": "0.017",
       "forecast": "",
       "previous": "3.8"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "12:05",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed's Bowman speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "20 Mar",
