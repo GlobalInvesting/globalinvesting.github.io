@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-20",
-  "generatedAt": "2026-03-20T05:41:54.413010Z",
-  "fetchMode": "SMART",
+  "generatedAt": "2026-03-20T06:37:11.046218Z",
+  "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-19",
-  "totalEvents": 1062,
+  "totalEvents": 1077,
   "currencyCounts": {
-    "AUD": 90,
+    "AUD": 92,
     "CAD": 70,
     "CHF": 38,
-    "EUR": 132,
-    "GBP": 130,
+    "EUR": 138,
+    "GBP": 132,
     "JPY": 121,
     "NZD": 50,
-    "USD": 431
+    "USD": 436
   },
   "impactCounts": {
-    "low": 547,
-    "medium": 395,
-    "high": 120
+    "low": 549,
+    "medium": 403,
+    "high": 125
   },
   "events": [
     {
@@ -10520,6 +10520,19 @@
     {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence Index",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "1.0"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
       "timeUTC": "11:00",
       "country": "EUR",
       "currency": "EUR",
@@ -10594,6 +10607,32 @@
       "actual": "",
       "forecast": "",
       "previous": "52.4"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "22:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "S&P Global Manufacturing PMI",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.0"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "22:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "S&P Global Services PMI",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "52.8"
     },
     {
       "date": "23 Mar",
@@ -10780,6 +10819,19 @@
     {
       "date": "24 Mar",
       "dateISO": "2026-03-24",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Unemployment Rate",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "10.4"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
       "timeUTC": "08:15",
       "country": "EUR",
       "currency": "EUR",
@@ -10867,6 +10919,19 @@
       "actual": "",
       "forecast": "",
       "previous": "53.9"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "09:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "S&P Global Manufacturing PMI",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.7"
     },
     {
       "date": "24 Mar",
@@ -11014,6 +11079,45 @@
     {
       "date": "24 Mar",
       "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Manufacturing PMI",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.6"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Services PMI",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.7"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "S&P Global Composite PMI",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.9"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
@@ -11075,6 +11179,19 @@
       "actual": "",
       "forecast": "",
       "previous": "22.44T"
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "2-Year Note Auction",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.455"
     },
     {
       "date": "24 Mar",
@@ -11625,6 +11742,19 @@
     {
       "date": "25 Mar",
       "dateISO": "2026-03-25",
+      "timeUTC": "12:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE's Greene speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "25 Mar",
+      "dateISO": "2026-03-25",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
@@ -11738,6 +11868,19 @@
       "actual": "",
       "forecast": "",
       "previous": "6.156"
+    },
+    {
+      "date": "25 Mar",
+      "dateISO": "2026-03-25",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "5-Year Note Auction",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.615"
     },
     {
       "date": "25 Mar",
@@ -11868,6 +12011,19 @@
       "actual": "",
       "forecast": "",
       "previous": "102.0"
+    },
+    {
+      "date": "26 Mar",
+      "dateISO": "2026-03-26",
+      "timeUTC": "07:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "91.0"
     },
     {
       "date": "26 Mar",
@@ -12176,10 +12332,49 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "GfK Consumer Confidence (Mar)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "-19"
+      "previous": "-19.0"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "00:01",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "65.2"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Industrial Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.0"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Gross Domestic Product (YoY)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.2"
     },
     {
       "date": "27 Mar",
