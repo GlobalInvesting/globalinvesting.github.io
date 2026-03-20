@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-20",
-  "generatedAt": "2026-03-20T07:34:15.840241Z",
+  "generatedAt": "2026-03-20T08:05:53.895030Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-19",
-  "totalEvents": 1063,
+  "totalEvents": 1065,
   "currencyCounts": {
     "AUD": 90,
     "CAD": 70,
     "CHF": 38,
-    "EUR": 133,
+    "EUR": 135,
     "GBP": 130,
     "JPY": 121,
     "NZD": 50,
     "USD": 431
   },
   "impactCounts": {
-    "low": 546,
-    "medium": 396,
-    "high": 121
+    "low": 548,
+    "medium": 394,
+    "high": 123
   },
   "events": [
     {
@@ -9836,10 +9836,10 @@
       "currency": "NZD",
       "flag": "🇳🇿",
       "event": "Credit Card Spending (YoY) (Feb)",
-      "impact": "medium",
-      "actual": "-1.1",
+      "impact": "low",
+      "actual": "-1.1%",
       "forecast": "",
-      "previous": "1.0"
+      "previous": "0.9%"
     },
     {
       "date": "20 Mar",
@@ -9849,10 +9849,10 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "Public Sector Net Borrowing",
-      "impact": "medium",
-      "actual": "14.329",
-      "forecast": "-8.5",
-      "previous": "-30.366"
+      "impact": "low",
+      "actual": "14.30B",
+      "forecast": "8.70B",
+      "previous": "-31.90B"
     },
     {
       "date": "20 Mar",
@@ -9896,13 +9896,52 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
+      "timeUTC": "07:35",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Nagel speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "07:35",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Escrivá speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
+      "timeUTC": "07:35",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Villeroy speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Current Account Balance EUR",
       "impact": "medium",
-      "actual": "",
+      "actual": "-490.0",
       "forecast": "",
       "previous": "-777.0"
     },
@@ -10191,19 +10230,6 @@
       "actual": "",
       "forecast": "",
       "previous": "553"
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
-      "timeUTC": "17:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's Nagel speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "20 Mar",
