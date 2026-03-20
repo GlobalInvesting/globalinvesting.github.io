@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-20",
-  "generatedAt": "2026-03-20T19:55:47.943785Z",
+  "generatedAt": "2026-03-20T20:35:16.352279Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,12 +9,12 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-19",
-  "totalEvents": 1083,
+  "totalEvents": 1082,
   "currencyCounts": {
     "AUD": 90,
     "CAD": 70,
     "CHF": 38,
-    "EUR": 144,
+    "EUR": 143,
     "GBP": 132,
     "JPY": 121,
     "NZD": 50,
@@ -23,7 +23,7 @@
   "impactCounts": {
     "low": 550,
     "medium": 399,
-    "high": 134
+    "high": 133
   },
   "events": [
     {
@@ -10247,19 +10247,6 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "17:30",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's Nagel speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
       "timeUTC": "19:30",
       "country": "USD",
       "currency": "USD",
@@ -10416,13 +10403,26 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
+      "timeUTC": "19:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "CFTC AUD speculative net positions",
+      "impact": "medium",
+      "actual": "69.1K",
+      "forecast": "",
+      "previous": "54.2K"
+    },
+    {
+      "date": "20 Mar",
+      "dateISO": "2026-03-20",
       "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "CFTC Oil NC Net Positions",
       "impact": "medium",
-      "actual": "",
+      "actual": "218.7",
       "forecast": "",
       "previous": "228.0"
     },
@@ -10435,7 +10435,7 @@
       "flag": "🇬🇧",
       "event": "CFTC GBP speculative net positions",
       "impact": "medium",
-      "actual": "-65.5K",
+      "actual": "-65.5",
       "forecast": "",
       "previous": "-84.2"
     },
@@ -10448,7 +10448,7 @@
       "flag": "🇺🇸",
       "event": "CFTC Gold speculative net positions",
       "impact": "medium",
-      "actual": "159.9K",
+      "actual": "159.9",
       "forecast": "",
       "previous": "163.1"
     },
@@ -10461,22 +10461,9 @@
       "flag": "🇺🇸",
       "event": "CFTC S&P 500 speculative net positions",
       "impact": "medium",
-      "actual": "-113.1K",
+      "actual": "-113.1",
       "forecast": "",
       "previous": "-134.5"
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
-      "timeUTC": "20:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "CFTC AUD speculative net positions",
-      "impact": "medium",
-      "actual": "69.1K",
-      "forecast": "",
-      "previous": "54.2"
     },
     {
       "date": "20 Mar",
@@ -10487,7 +10474,7 @@
       "flag": "🇯🇵",
       "event": "CFTC JPY speculative net positions",
       "impact": "medium",
-      "actual": "-67.8K",
+      "actual": "-67.8",
       "forecast": "",
       "previous": "-41.4"
     },
@@ -10500,7 +10487,7 @@
       "flag": "🇪🇺",
       "event": "CFTC EUR speculative net positions",
       "impact": "medium",
-      "actual": "21.1K",
+      "actual": "21.1",
       "forecast": "",
       "previous": "105.1"
     },
