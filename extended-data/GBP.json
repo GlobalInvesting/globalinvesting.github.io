@@ -1,16 +1,19 @@
 {
-  "lastUpdate": "2026-03-20",
-  "source": "FRED (St. Louis Fed) / World Bank / global-rates.com \u2014 v12.1",
+  "lastUpdate": "2026-03-21",
+  "source": "FRED / ECB / BOE / BOC / DBnomics / BIS / World Bank / Calendar \u2014 v13.0",
   "rateMomentumStrategy": "rates-history-12m",
   "data": {
     "bond10y": 4.4324,
     "consumerConfidence": 199.07,
     "businessConfidence": 86.84,
-    "capitalFlows": -3.85,
+    "capitalFlows": -3.87,
     "inflationExpectations": 3.2716,
     "fdi": -0.3515,
     "rateMomentum": -0.75,
-    "rateMomentum24M": -1.5
+    "rateMomentum24M": -1.5,
+    "gdpGrowth": 0.0,
+    "wageGrowth": 3.9,
+    "tradeBalance": -14450.0
   },
   "dates": {
     "bond10y": "2026-02-01",
@@ -19,6 +22,9 @@
     "capitalFlows": "2024-10-01",
     "inflationExpectations": "2024-06-15",
     "fdi": "2024-06-15",
-    "rateMomentum": "2026-03-01"
+    "rateMomentum": "2026-03-01",
+    "gdpGrowth": "2026-03-13",
+    "wageGrowth": "2026-03-19",
+    "tradeBalance": "2026-03-13"
   }
 }
