@@ -217,7 +217,11 @@ def fetch_investing(from_date, to_date):
     # Con chunk = 1 día, dateFrom == dateTo == la fecha real → todos los eventos
     # quedan en su día correcto independientemente del HTML que devuelva investing.
     today      = date.today()
-    eff_from   = max(from_date, today - timedelta(days=14))
+    # 45-day lookback cap: covers monthly indicators published with ~6-week lag
+    # (e.g. AUD Retail Sales, JPY Current Account) that fall outside the 14-day window.
+    # The extra ~22 weekday requests at 1.5s/req = ~33s, only relevant for the nightly
+    # FORCE_FULL run (now_hour == 0). SMART runs pass smart_from = today-5d anyway.
+    eff_from   = max(from_date, today - timedelta(days=45))
     eff_to     = min(to_date,   today + timedelta(days=21))
 
     # Omitir fines de semana (investing no tiene eventos Sáb/Dom y devuelve HTML vacío)
@@ -737,12 +741,14 @@ now_hour  = now_utc.hour
 
 # ── SMART-FETCH: decidir modo según hora y eventos próximos ──────────────────
 # MODO FULL  : primer run del día (hora 0) o forzado → ventana -60/+30 días
-# MODO SMART : resto de horas → ventana hoy ± 2 días (más rápido)
+# MODO SMART : resto de horas → ventana hoy ± 5 días (aumentado de ±2 para capturar
+# eventos que publican tarde en UTC — ej. NZD PSI a las 21:30 UTC, que se perdía
+# si el scraper corría antes de esa hora y el evento quedaba fuera de ±2 días al día siguiente).
 # Tras cargar el cache, se sube a FULL si hay eventos de alto impacto
 # en la próxima hora (sin actual todavía) → captura el dato en seguida.
 
 FORCE_FULL = (now_hour == 0)          # primer run del día siempre full
-smart_from = today - timedelta(days=2)
+smart_from = today - timedelta(days=5)
 smart_to   = today + timedelta(days=2)
 full_from  = today - timedelta(days=60)
 full_to    = today + timedelta(days=30)
