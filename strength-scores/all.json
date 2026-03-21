@@ -7331,7 +7331,7 @@
           }
         },
         "AUD": {
-          "score": 79.1,
+          "score": 80.4,
           "dataQuality": 1.0,
           "bcOutlook": "Neutral",
           "baseScore": 73.0,
@@ -7349,9 +7349,9 @@
             "cot_contrarian": 0.0,
             "low_rate_sh": 0.0,
             "cot_momentum_div": 0.0,
-            "commodity_momentum": -0.11,
+            "commodity_momentum": 1.17,
             "stale_score": -6.0,
-            "totalCapped": 6.14
+            "totalCapped": 7.42
           },
           "contributions": {
             "interestRate": 10.0,
@@ -7391,7 +7391,7 @@
           }
         },
         "CAD": {
-          "score": 49.2,
+          "score": 50.7,
           "dataQuality": 1.0,
           "bcOutlook": "Dovish",
           "baseScore": 52.48,
@@ -7409,9 +7409,9 @@
             "cot_contrarian": -0.79,
             "low_rate_sh": 0.0,
             "cot_momentum_div": 0.0,
-            "commodity_momentum": -3.0,
+            "commodity_momentum": -1.49,
             "stale_score": 0.0,
-            "totalCapped": -3.25
+            "totalCapped": -1.74
           },
           "contributions": {
             "interestRate": 6.1208,
@@ -7578,43 +7578,43 @@
         "CHF",
         "GBP",
         "EUR",
-        "NZD",
-        "CAD"
+        "CAD",
+        "NZD"
       ],
       "signals": [
-        {
-          "pair": "AUD/CAD",
-          "long": "AUD",
-          "short": "CAD",
-          "spread": 29.9,
-          "confidence": "Alta"
-        },
         {
           "pair": "AUD/NZD",
           "long": "AUD",
           "short": "NZD",
-          "spread": 29.3,
+          "spread": 30.6,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "AUD/CAD",
+          "long": "AUD",
+          "short": "CAD",
+          "spread": 29.7,
           "confidence": "Alta"
         },
         {
           "pair": "AUD/EUR",
           "long": "AUD",
           "short": "EUR",
-          "spread": 23.7,
+          "spread": 25.0,
           "confidence": "Alta"
-        },
-        {
-          "pair": "USD/CAD",
-          "long": "USD",
-          "short": "CAD",
-          "spread": 18.3,
-          "confidence": "Media"
         },
         {
           "pair": "USD/NZD",
           "long": "USD",
           "short": "NZD",
           "spread": 17.7,
+          "confidence": "Media"
+        },
+        {
+          "pair": "USD/CAD",
+          "long": "USD",
+          "short": "CAD",
+          "spread": 16.8,
           "confidence": "Media"
         },
         {
