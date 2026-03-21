@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-21",
   "modelVersion": "6.5.3",
-  "checksum": "bdcd4173b080bd42f429afab85e98dc359b30d4cccdddc153380bffad0b67ac8",
+  "checksum": "fe19b0732e8a659d6bd8e071309cd88e7928c93853f60532943baccfadf77c21",
   "scores": {
     "USD": {
       "score": 67.8,
@@ -64,10 +64,10 @@
       }
     },
     "EUR": {
-      "score": 56.3,
+      "score": 55.1,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 55.38,
+      "baseScore": 54.22,
       "contextualAdj": {
         "safe_haven": 0.91,
         "commodity": 0.0,
@@ -103,8 +103,8 @@
         "manufacturingPMI": 2.04,
         "servicesPMI": 3.95,
         "cotPositioning": 2.4438,
-        "consumerConfidence": 1.2856,
-        "businessConfidence": 0.892,
+        "consumerConfidence": 0.0,
+        "businessConfidence": 1.016,
         "economicSurprise": 1.732,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.076,
@@ -124,10 +124,10 @@
       }
     },
     "GBP": {
-      "score": 56.3,
+      "score": 55.8,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 53.58,
+      "baseScore": 53.07,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -164,7 +164,7 @@
         "servicesPMI": 4.2375,
         "cotPositioning": 5.6122,
         "consumerConfidence": 1.08,
-        "businessConfidence": 0.5104,
+        "businessConfidence": 0.0,
         "economicSurprise": 1.804,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.0302,
@@ -184,10 +184,10 @@
       }
     },
     "JPY": {
-      "score": 58.9,
+      "score": 57.5,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 55.01,
+      "baseScore": 53.61,
       "contextualAdj": {
         "safe_haven": 0.52,
         "commodity": 0.0,
@@ -223,7 +223,7 @@
         "manufacturingPMI": 2.475,
         "servicesPMI": 4.225,
         "cotPositioning": 0.5186,
-        "consumerConfidence": 1.4,
+        "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
         "economicSurprise": 2.528,
         "capitalFlows": 0.0,
@@ -244,10 +244,10 @@
       }
     },
     "AUD": {
-      "score": 78.2,
+      "score": 78.3,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 72.02,
+      "baseScore": 72.17,
       "contextualAdj": {
         "safe_haven": 0.8,
         "commodity": 8,
@@ -283,7 +283,7 @@
         "manufacturingPMI": 2.43,
         "servicesPMI": 4.1,
         "cotPositioning": 5.5006,
-        "consumerConfidence": 0.7,
+        "consumerConfidence": 0.844,
         "businessConfidence": 0.0,
         "economicSurprise": 2.528,
         "capitalFlows": 0.0,
@@ -489,8 +489,8 @@
     "USD",
     "JPY",
     "CHF",
-    "EUR",
     "GBP",
+    "EUR",
     "CAD",
     "NZD"
   ],
@@ -499,21 +499,21 @@
       "pair": "AUD/NZD",
       "long": "AUD",
       "short": "NZD",
-      "spread": 29.3,
+      "spread": 29.4,
       "confidence": "Alta"
     },
     {
       "pair": "AUD/CAD",
       "long": "AUD",
       "short": "CAD",
-      "spread": 29.0,
+      "spread": 29.1,
       "confidence": "Alta"
     },
     {
-      "pair": "AUD/GBP",
+      "pair": "AUD/EUR",
       "long": "AUD",
-      "short": "GBP",
-      "spread": 21.9,
+      "short": "EUR",
+      "spread": 23.2,
       "confidence": "Alta"
     },
     {
@@ -528,6 +528,13 @@
       "long": "USD",
       "short": "CAD",
       "spread": 18.6,
+      "confidence": "Media"
+    },
+    {
+      "pair": "USD/EUR",
+      "long": "USD",
+      "short": "EUR",
+      "spread": 12.7,
       "confidence": "Media"
     }
   ],
@@ -573,8 +580,8 @@
       "manufacturingPMI": 2.04,
       "servicesPMI": 3.95,
       "cotPositioning": 2.4438,
-      "consumerConfidence": 1.2856,
-      "businessConfidence": 0.892,
+      "consumerConfidence": 0.0,
+      "businessConfidence": 1.016,
       "economicSurprise": 1.732,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.076,
@@ -598,7 +605,7 @@
       "servicesPMI": 4.2375,
       "cotPositioning": 5.6122,
       "consumerConfidence": 1.08,
-      "businessConfidence": 0.5104,
+      "businessConfidence": 0.0,
       "economicSurprise": 1.804,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.0302,
@@ -621,7 +628,7 @@
       "manufacturingPMI": 2.475,
       "servicesPMI": 4.225,
       "cotPositioning": 0.5186,
-      "consumerConfidence": 1.4,
+      "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
       "economicSurprise": 2.528,
       "capitalFlows": 0.0,
@@ -645,7 +652,7 @@
       "manufacturingPMI": 2.43,
       "servicesPMI": 4.1,
       "cotPositioning": 5.5006,
-      "consumerConfidence": 0.7,
+      "consumerConfidence": 0.844,
       "businessConfidence": 0.0,
       "economicSurprise": 2.528,
       "capitalFlows": 0.0,
