@@ -911,13 +911,20 @@ function renderSpreadChart(pairs, allRatesData) {
   var lcObs = allRatesData[topPair.lc] && allRatesData[topPair.lc].observations ? allRatesData[topPair.lc].observations : [];
   var scObs = allRatesData[topPair.sc] && allRatesData[topPair.sc].observations ? allRatesData[topPair.sc].observations : [];
 
-  var scMap = {};
-  scObs.forEach(function(o) { scMap[o.date] = parseFloat(o.value) || 0; });
+  // Ordenar observaciones del sc por fecha ascendente para forward-fill
+  var scSorted = scObs.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
 
   var points = [];
   lcObs.slice().reverse().forEach(function(o) {
     var lcRate = parseFloat(o.value) || 0;
-    var scRate = scMap[o.date] !== undefined ? scMap[o.date] : null;
+    // Buscar la última observación de sc con fecha <= a la del lc (forward-fill)
+    var scRate = null;
+    for (var k = scSorted.length - 1; k >= 0; k--) {
+      if (scSorted[k].date <= o.date) {
+        scRate = parseFloat(scSorted[k].value) || 0;
+        break;
+      }
+    }
     if (scRate === null) return;
     points.push({ date: o.date, spread: +(lcRate - scRate).toFixed(2) });
   });
