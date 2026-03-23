@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-23",
-  "generatedAt": "2026-03-23T13:48:03.485831Z",
+  "generatedAt": "2026-03-23T14:46:00.806764Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-22",
-  "totalEvents": 1145,
+  "totalEvents": 1146,
   "currencyCounts": {
     "AUD": 96,
     "CAD": 70,
@@ -18,12 +18,12 @@
     "GBP": 136,
     "JPY": 129,
     "NZD": 50,
-    "USD": 468
+    "USD": 469
   },
   "impactCounts": {
     "low": 575,
     "medium": 423,
-    "high": 147
+    "high": 148
   },
   "events": [
     {
@@ -10576,7 +10576,7 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Fed's Miran speech",
+      "event": "Fed's Goolsbee speech",
       "impact": "high",
       "actual": "",
       "forecast": "",
@@ -10589,7 +10589,20 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Fed's Goolsbee speech",
+      "event": "Fed's Miran speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "13:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. President Trump Speaks",
       "impact": "high",
       "actual": "",
       "forecast": "",
@@ -10604,7 +10617,7 @@
       "flag": "🇺🇸",
       "event": "Construction Spending (MoM) (Jan)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-0.3",
       "forecast": "0.1",
       "previous": "0.3"
     },
