@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-23",
-  "generatedAt": "2026-03-23T09:43:16.824660Z",
+  "generatedAt": "2026-03-23T10:39:02.870641Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-22",
-  "totalEvents": 1143,
+  "totalEvents": 1144,
   "currencyCounts": {
     "AUD": 96,
     "CAD": 70,
     "CHF": 39,
     "EUR": 157,
-    "GBP": 136,
+    "GBP": 137,
     "JPY": 129,
     "NZD": 50,
     "USD": 466
   },
   "impactCounts": {
     "low": 575,
-    "medium": 423,
+    "medium": 424,
     "high": 145
   },
   "events": [
@@ -10552,7 +10552,7 @@
       "flag": "🇪🇺",
       "event": "Consumer Confidence (Mar)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-6.0",
       "forecast": "-15.0",
       "previous": "1.0"
     },
@@ -11021,7 +11021,7 @@
       "event": "S&P Global Composite PMI (Mar)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "52.8",
       "previous": "53.7"
     },
     {
@@ -11223,13 +11223,26 @@
       "date": "24 Mar",
       "dateISO": "2026-03-24",
       "timeUTC": "13:45",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE MPC Member Pill Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "13:45",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "S&P Global Manufacturing PMI (Mar)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "51.0",
       "previous": "51.6"
     },
     {
@@ -11255,7 +11268,7 @@
       "event": "S&P Global Services PMI (Mar)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "51.7",
       "previous": "51.7"
     },
     {
