@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-23",
-  "generatedAt": "2026-03-23T12:07:44.354690Z",
+  "generatedAt": "2026-03-23T13:48:03.485831Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-22",
-  "totalEvents": 1143,
+  "totalEvents": 1145,
   "currencyCounts": {
     "AUD": 96,
     "CAD": 70,
@@ -18,12 +18,12 @@
     "GBP": 136,
     "JPY": 129,
     "NZD": 50,
-    "USD": 466
+    "USD": 468
   },
   "impactCounts": {
     "low": 575,
     "medium": 423,
-    "high": 145
+    "high": 147
   },
   "events": [
     {
@@ -10565,9 +10565,35 @@
       "flag": "🇺🇸",
       "event": "Chicago Fed National Activity (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "-0.11",
       "forecast": "",
       "previous": "0.18"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed's Miran speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed's Goolsbee speech",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "23 Mar",
