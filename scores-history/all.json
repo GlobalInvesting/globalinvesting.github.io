@@ -8961,7 +8961,250 @@
         }
       ],
       "note": "interestRate+rateMomentum+outlook historically accurate; other indicators use economic-data-history/ or proxy"
+    },
+    {
+      "date": "2026-03-23",
+      "modelVersion": "6.5.3",
+      "scores": {
+        "USD": {
+          "score": 67.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "EUR": {
+          "score": 56.0,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "GBP": {
+          "score": 56.9,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "JPY": {
+          "score": 58.4,
+          "dataQuality": 1.0,
+          "bcOutlook": "Hawkish"
+        },
+        "AUD": {
+          "score": 80.8,
+          "dataQuality": 1.0,
+          "bcOutlook": "Neutral"
+        },
+        "CAD": {
+          "score": 51.1,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "CHF": {
+          "score": 58.5,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        },
+        "NZD": {
+          "score": 50.6,
+          "dataQuality": 1.0,
+          "bcOutlook": "Dovish"
+        }
+      },
+      "ranking": [
+        "AUD",
+        "USD",
+        "CHF",
+        "JPY",
+        "GBP",
+        "EUR",
+        "CAD",
+        "NZD"
+      ],
+      "signals": [
+        {
+          "pair": "AUD/NZD",
+          "long": "AUD",
+          "short": "NZD",
+          "spread": 30.2,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "AUD/CAD",
+          "long": "AUD",
+          "short": "CAD",
+          "spread": 29.7,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "AUD/EUR",
+          "long": "AUD",
+          "short": "EUR",
+          "spread": 24.8,
+          "confidence": "Alta"
+        },
+        {
+          "pair": "USD/NZD",
+          "long": "USD",
+          "short": "NZD",
+          "spread": 16.5,
+          "confidence": "Baja"
+        },
+        {
+          "pair": "USD/CAD",
+          "long": "USD",
+          "short": "CAD",
+          "spread": 16.0,
+          "confidence": "Baja"
+        }
+      ],
+      "contextualAdj": {
+        "USD": {
+          "safe_haven": 0.8,
+          "commodity": 0.0,
+          "carry_premium": 2.75,
+          "recession": 0.0,
+          "structural_deficit": -1.82,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 2.73,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 0.0,
+          "stale_score": 0.0,
+          "totalCapped": 4.47
+        },
+        "EUR": {
+          "safe_haven": 0.91,
+          "commodity": 0.0,
+          "carry_premium": 0.0,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 0.0,
+          "stale_score": 0.0,
+          "totalCapped": 0.91
+        },
+        "GBP": {
+          "safe_haven": 0.0,
+          "commodity": 0.0,
+          "carry_premium": 2.75,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 0.0,
+          "stale_score": 0.0,
+          "totalCapped": 2.75
+        },
+        "JPY": {
+          "safe_haven": 0.52,
+          "commodity": 0.0,
+          "carry_premium": 0.0,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": -3.18,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 4.85,
+          "low_rate_sh": 1.75,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 0.0,
+          "stale_score": 0.0,
+          "totalCapped": 3.94
+        },
+        "AUD": {
+          "safe_haven": 0.8,
+          "commodity": 8,
+          "carry_premium": 3.45,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 1.17,
+          "stale_score": -6.0,
+          "totalCapped": 7.42
+        },
+        "CAD": {
+          "safe_haven": 0.0,
+          "commodity": 0.53,
+          "carry_premium": 0.0,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": -0.79,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": -1.49,
+          "stale_score": 0.0,
+          "totalCapped": -1.74
+        },
+        "CHF": {
+          "safe_haven": 3.9,
+          "commodity": 0.0,
+          "carry_premium": 0.0,
+          "recession": 0.0,
+          "structural_deficit": 0.0,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": -3.6,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 4.77,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 0.0,
+          "stale_score": 0.0,
+          "totalCapped": 5.07
+        },
+        "NZD": {
+          "safe_haven": 0.13,
+          "commodity": 0.14,
+          "carry_premium": 0.0,
+          "recession": 0.0,
+          "structural_deficit": -1.17,
+          "debt_sustainability": 0.0,
+          "reserve_currency": 0.0,
+          "inflation_stability": 0.0,
+          "yield_curve": 0.0,
+          "stagflation": 0.0,
+          "cot_contrarian": 0.0,
+          "low_rate_sh": 0.0,
+          "cot_momentum_div": 0.0,
+          "commodity_momentum": 3.0,
+          "stale_score": 0.0,
+          "totalCapped": 2.11
+        }
+      },
+      "fx_rates": {}
     }
   ],
-  "note": "interestRate (10%), rateMomentum (7%), outlookScore (5%), fxPerformance1M (8%) are always historically precise. Other indicators use economic-data-history/ if available, otherwise current-data proxy."
+  "note": "interestRate (10%), rateMomentum (7%), outlookScore (5%), fxPerformance1M (8%) are always historically precise. Other indicators use economic-data-history/ if available, otherwise current-data proxy.",
+  "lastUpdate": "2026-03-23",
+  "modelVersion": "6.5.3",
+  "totalSnapshots": 116
 }
