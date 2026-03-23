@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-23",
-  "generatedAt": "2026-03-23T14:46:00.806764Z",
+  "generatedAt": "2026-03-23T15:45:45.131464Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-22",
-  "totalEvents": 1146,
+  "totalEvents": 1145,
   "currencyCounts": {
     "AUD": 96,
     "CAD": 70,
@@ -18,11 +18,11 @@
     "GBP": 136,
     "JPY": 129,
     "NZD": 50,
-    "USD": 469
+    "USD": 468
   },
   "impactCounts": {
     "low": 575,
-    "medium": 423,
+    "medium": 422,
     "high": 148
   },
   "events": [
@@ -7595,19 +7595,6 @@
     {
       "date": "17 Mar",
       "dateISO": "2026-03-17",
-      "timeUTC": "15:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. President Trump Speaks",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "17 Mar",
-      "dateISO": "2026-03-17",
       "timeUTC": "17:00",
       "country": "USD",
       "currency": "USD",
@@ -10533,19 +10520,6 @@
     {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Confidence (Mar)",
-      "impact": "medium",
-      "actual": "-6.0",
-      "forecast": "-15.0",
-      "previous": "1.0"
-    },
-    {
-      "date": "23 Mar",
-      "dateISO": "2026-03-23",
       "timeUTC": "11:00",
       "country": "JPY",
       "currency": "JPY",
@@ -10628,6 +10602,19 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
+      "event": "Consumer Confidence (Mar)",
+      "impact": "high",
+      "actual": "-16.3",
+      "forecast": "-14.4",
+      "previous": "-12.2"
+    },
+    {
+      "date": "23 Mar",
+      "dateISO": "2026-03-23",
+      "timeUTC": "15:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
       "event": "ECB's Cipollone speech",
       "impact": "high",
       "actual": "",
@@ -10643,9 +10630,9 @@
       "flag": "🇺🇸",
       "event": "3-Month Bill Auction",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.63",
       "forecast": "",
-      "previous": "3.61"
+      "previous": "3.57"
     },
     {
       "date": "23 Mar",
