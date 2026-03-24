@@ -2,46 +2,46 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 3.85%, significativamente superior al promedio global. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ha impulsado la divisa. La última decisión de subir tasas en 0.25pp ha confirmado la postura hawkish del banco central, lo que estructuralmente es alcista para la divisa.\n\nLa balanza comercial de Australia muestra un superávit, gracias a sus exportaciones de minerales metalíferos, combustibles y petróleo, y cereales. Aunque la cuenta corriente presenta un déficit, el superávit comercial ayuda a mitigar esta presión. Los términos de intercambio favorables también apoyan el valor de las exportaciones australianas. Las noticias recientes sobre el par AUD/USD indican que el mercado está apostando por una postura más restrictiva del banco central, lo que ha llevado a ganancias en el par.\n\nEl posicionamiento especulativo en el mercado está muy cargado al alza, con un COT de +46.6K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, aunque inferior al promedio de las divisas principales. Las expectativas de otro aumento en la tasa de interés del banco central australiano siguen siendo altas, lo que podría influir en el valor de la divisa en el corto plazo.",
+  "analysis": "El Banco de la Reserva de Australia subió las tasas en 0.50pp en marzo, manteniéndolas en 4.10% desde entonces, lo que ejerce una presión alcista sobre la divisa debido al mayor carry diferencial. Esta decisión se enmarca en un contexto de inflación anual del 3.2%, por encima del objetivo, y un crecimiento del PIB del 2.6% anual, superior al promedio global. Aunque los datos estructurales apuntan a una economía sólida, la cuenta corriente presenta un déficit del 2.9% del PIB, lo que introduce una presión vendedora estructural.\n\nLa balanza comercial, sin embargo, muestra un superávit de 1.8 mil millones de dólares mensuales, gracias principalmente a las exportaciones de minerales metalíferos, que representan el 73% de las exportaciones totales. Los términos de intercambio favorables, con un índice de 172.2, también contribuyen a este superávit. Aunque el PMI manufacturero indica una contracción, la producción industrial muestra un crecimiento del 0.8% mensual, lo que sugiere una economía diversificada.\n\nEl posicionamiento especulativo en el mercado, con 45.4 mil contratos netos a favor del alza, indica una posición alcista extrema y un riesgo de corrección ante cualquier decepción. Con la expectativa de que los datos de inflación de Australia, que se publicarán el 25 de marzo, puedan influir en las decisiones del Banco de la Reserva de Australia, el mercado está atento a cualquier señal de un posible aumento de tasas en mayo, lo que podría reforzar la tendencia alcista de la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-16T08:48:01.589468+00:00",
-  "exportComposition": "Principales exportaciones: minerales metalíferos, combustibles y petróleo, cereales",
+  "generatedAt": "2026-03-24T10:08:56.837378+00:00",
+  "exportComposition": "Comtrade 2023: minerales metalíferos (73%, $193.9B), piedras preciosas y metales (8%, $20.3B), equipos eléctricos y electrónicos (3%, $6.8B)",
   "newsCount": 3,
   "dataSnapshot": {
-    "interestRate": 3.85,
-    "gdpGrowth": 0.9,
+    "interestRate": 4.1,
+    "gdpGrowth": 2.6,
     "inflation": 3.2,
-    "unemployment": 4.1,
+    "unemployment": 4.3,
     "currentAccount": -2.9,
-    "rateMomentum": -0.25,
+    "rateMomentum": 0.0,
     "lastRateDecision": {
       "direction": "SUBIÓ",
-      "delta": 0.25,
-      "current_rate": 3.85,
+      "delta": 0.5,
+      "current_rate": 4.1,
       "prev_rate": 3.6,
       "date": "2026-03-01",
       "source": "rates_history",
-      "cycle_12m": -0.25,
-      "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
+      "cycle_12m": 0.0,
+      "cycle_label": "estable en los últimos 12 meses"
     },
-    "cotPositioning": 46568,
-    "fxPerformance1M": 0.1906,
+    "cotPositioning": 45359,
+    "fxPerformance1M": -0.2475,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-16",
-    "latestNewsTs": 1773643423.0,
+    "lastUpdate": "2026-03-24",
+    "latestNewsTs": 1774322569.0,
     "newsHeadlines": [
-      "AUD/USD Price Forecast: Gains ground below 0.7000 on hawkish RBA bets",
-      "AUD/JPY Price Forecast: Strengthens above 111.50, supported by bullish technical",
-      "Event Guide: RBA Monetary Policy Statement (March 2026)"
+      "Australian inflation data due Wednesday, March 25, 2026. Preview.",
+      "FX Watch: AUD/CHF and AUD/CAD Bounce Setups for a Strong Australian CPI",
+      "FX Watch: AUD/USD and EUR/AUD Retracement Zones If Australia CPI Misses Expectat"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.99,
-    "avg_inflation": 2.3,
-    "avg_unemployment": 4.58,
-    "avg_bond10y": 3.39,
-    "avg_fx_perf_1m": 0.82,
-    "avg_cot": -3255.75
+    "avg_interest_rate": 2.38,
+    "avg_gdp_growth": 1.12,
+    "avg_inflation": 2.08,
+    "avg_unemployment": 5.28,
+    "avg_bond10y": 3.44,
+    "avg_fx_perf_1m": 0.65,
+    "avg_cot": -9265.62
   }
 }

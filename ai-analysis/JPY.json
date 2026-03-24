@@ -2,18 +2,18 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón subió las tasas de interés en su última decisión, lo que sugiere un ciclo restrictivo activo y una presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, el aumento reciente puede atraer inversores en busca de un mayor carry diferencial. La inflación en Japón también está por encima del objetivo, lo que puede llevar al banco central a seguir con una política monetaria más restrictiva.\n\nLa cuenta corriente de Japón muestra un superávit, lo que indica una demanda estructural de la divisa. La composición exportadora del país, con un enfoque en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos, sugiere que el superávit comercial se debe en parte a la demanda de estos productos. La escalada de la guerra en Oriente Medio ha impulsado los precios de la energía al alza, lo que puede afectar las importaciones de Japón y su balanza comercial.\n\nEl posicionamiento especulativo en el mercado muestra una posición corta extrema, con un COT de -49K contratos netos. Esto sugiere un potencial rebote contrario si los datos económicos mejoran. La intervención de Tokyo en el mercado de divisas también es un factor a considerar, especialmente si el par USD/JPY se acerca a los 160. La combinación de estos factores puede llevar a una apreciación de la divisa en el corto plazo.",
+  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio de 2025 y ha mantenido este nivel desde entonces, lo que sugiere un ciclo alcista para la divisa. Aunque la tasa de interés del 0.75% sigue estando por debajo del promedio global, la decisión del banco central de subir las tasas indica una postura más restrictiva. El gobernador del Banco de Japón, Kazuo Ueda, ha expresado que espera que la inflación subyacente acelere moderadamente, lo que podría justificar futuras subidas de tasas.\n\nLa balanza comercial de Japón muestra un superávit, gracias en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Esto sugiere que la demanda estructural de la divisa es fuerte. Sin embargo, la inflación en Japón ha seguido una tendencia a la baja, con el índice de precios al consumidor coreano cayendo a 1.7% en febrero, lo que podría influir en las decisiones del banco central.\n\nEl posicionamiento especulativo en el mercado es muy bajista, con -65K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. A pesar de esto, la divisa se ha apreciado un 3.7% en el último mes, lo que podría indicar un posible squeeze de cortos. En este contexto, el mercado parece estar preparado para una posible subida adicional de tasas por parte del Banco de Japón, lo que podría impulsar la divisa hacia niveles más altos.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-16T08:47:51.984862+00:00",
-  "exportComposition": "Principales exportaciones: vehículos y autopartes, maquinaria industrial, equipos eléctricos y electrónicos",
+  "generatedAt": "2026-03-24T10:08:47.178630+00:00",
+  "exportComposition": "Comtrade 2023: vehículos y autopartes (32%, $370.1B), maquinaria industrial (19%, $215.6B), equipos eléctricos y electrónicos (16%, $184.8B)",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.75,
     "gdpGrowth": 0.7,
-    "inflation": 3.8,
-    "unemployment": 2.5,
+    "inflation": 1.3,
+    "unemployment": 2.7,
     "currentAccount": 4.7,
-    "rateMomentum": 0.65,
+    "rateMomentum": 0.85,
     "lastRateDecision": {
       "direction": "SUBIÓ",
       "delta": 0.25,
@@ -24,24 +24,24 @@
       "cycle_12m": 0.25,
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
-    "cotPositioning": -49219,
-    "fxPerformance1M": 2.0106,
+    "cotPositioning": -65429,
+    "fxPerformance1M": 3.7019,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-16",
-    "latestNewsTs": 1773640526.0,
+    "lastUpdate": "2026-03-24",
+    "latestNewsTs": 1774332224.0,
     "newsHeadlines": [
-      "Tokyo intervention looms large as USD/JPY nears 160 mark",
-      "Pronóstico Semanal de Forex – USD/JPY, Petróleo Crudo WTI, Gasolina, Trigo, Índi",
-      "Week Ahead: Central Bank Bonanza!"
+      "BoJ’s Ueda says to expect underlying inflation to accelerate moderately",
+      "BOJ governor Ueda says underlying inflation is expected to accelerate moderately",
+      "Japan core CPI falls to 1.7% in February, as energy costs drag inflation lower"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.99,
-    "avg_inflation": 2.3,
-    "avg_unemployment": 4.58,
-    "avg_bond10y": 3.39,
-    "avg_fx_perf_1m": 0.82,
-    "avg_cot": -3255.75
+    "avg_interest_rate": 2.38,
+    "avg_gdp_growth": 1.12,
+    "avg_inflation": 2.08,
+    "avg_unemployment": 5.28,
+    "avg_bond10y": 3.44,
+    "avg_fx_perf_1m": 0.65,
+    "avg_cot": -9265.62
   }
 }

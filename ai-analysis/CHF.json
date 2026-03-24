@@ -2,18 +2,18 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "El Banco Nacional Suizo ha mantenido una postura dovish, recortando las tasas de interés en 0.25pp, lo que ha generado una presión bajista sobre la divisa. Aunque la economía suiza muestra un crecimiento del PIB del 2.0% anual, superior al promedio global, la inflación se encuentra por debajo del objetivo, lo que justifica la decisión del banco central. La tasa de interés actual de 0.00% se encuentra muy por debajo del promedio global, lo que podría convertir a la divisa en una financiadora de carry trade en episodios de aversión al riesgo.\n\nLa cuenta corriente suiza muestra un superávit del 5.1% del PIB, lo que genera una demanda estructural de la divisa. La composición exportadora de Suiza, liderada por productos farmacéuticos e instrumentos de precisión, también contribuye a este superávit. La noticia de que el par USD/CHF ha caído por debajo de 0.7900 debido a la debilidad del dólar estadounidense en un contexto de reducción de la aversión al riesgo sugiere que la divisa suiza sigue siendo atractiva en momentos de incertidumbre.\n\nEl posicionamiento especulativo en la divisa suiza muestra un sesgo alcista, con 4.3K contratos netos. El rendimiento FX del último mes también ha sido positivo, con una apreciación del 2.26% frente al dólar estadounidense. Aunque la noticia sobre la decisión de capital de UBS puede generar incertidumbre, el perfil de activo refugio de la divisa suiza, combinado con su superávit de cuenta corriente y deuda contenida, sugiere que puede seguir siendo atractiva en momentos de tensión global.",
+  "analysis": "El Banco Nacional Suizo mantiene una postura dovish, habiendo recortado las tasas en 0.25pp en junio 2025 y manteniéndolas en 0.00% desde entonces. Esto genera una presión bajista sobre la divisa, aunque su perfil de activo refugio y el superávit de cuenta corriente del 5.1% del PIB pueden mitigar esta tendencia en momentos de tensión global. La tasa de interés muy por debajo del promedio global también sugiere que la divisa puede ser utilizada como financiadora de carry trade, lo que podría llevar a una apreciación brusca en episodios de aversión al riesgo.\n\nLa composición exportadora de Suiza, con productos farmacéuticos e instrumentos de precisión como principales exportaciones, contribuye al superávit comercial del país. Aunque la producción industrial y el PMI manufacturero muestran signos de contracción, la cuenta corriente y la balanza comercial siguen siendo positivas. La noticia sobre el uso del inglés como lengua dominante en los consejos de administración de empresas europeas como Airbus y Siemens no parece tener un impacto directo en la economía suiza, pero refleja la globalización y la interconexión de los mercados.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo alcista, con 0.5K contratos netos, y el rendimiento FX del último mes ha sido positivo, con una apreciación del 2.12% versus el dólar estadounidense. Esto sugiere que el mercado está valorando la divisa suiza como un activo refugio, lo que podría continuar en un régimen de risk-off. Sin embargo, la presión bajista generada por la política monetaria dovish del Banco Nacional Suizo podría limitar el alcance de esta apreciación.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-16T08:48:10.569246+00:00",
+  "generatedAt": "2026-03-24T10:09:06.042326+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 3,
+  "newsCount": 1,
   "dataSnapshot": {
     "interestRate": 0.0,
-    "gdpGrowth": 2.0,
+    "gdpGrowth": 0.7,
     "inflation": 0.1,
     "unemployment": 3.0,
     "currentAccount": 5.1,
-    "rateMomentum": -0.25,
+    "rateMomentum": -0.5,
     "lastRateDecision": {
       "direction": "BAJÓ",
       "delta": -0.25,
@@ -21,27 +21,25 @@
       "prev_rate": 0.25,
       "date": "2025-06-01",
       "source": "rates_history",
-      "cycle_12m": -0.25,
-      "cycle_label": "ciclo BAJISTA en 12M (-0.25pp acumulados)"
+      "cycle_12m": -0.5,
+      "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
-    "cotPositioning": 4280,
-    "fxPerformance1M": 2.2596,
+    "cotPositioning": 513,
+    "fxPerformance1M": 2.1208,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-16",
-    "latestNewsTs": 1773638149.0,
+    "lastUpdate": "2026-03-24",
+    "latestNewsTs": 1774268961.0,
     "newsHeadlines": [
-      "USD/CHF slips below 0.7900 as US Dollar weakens on easing risk aversion",
-      "Swiss capital decision looms over UBS",
-      "USDCHF Technicals: There is a key level in the USDCHF I am eyeing. What is it an"
+      "The unspoken rule: is English really the key to success in Europe’s boardrooms?"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.99,
-    "avg_inflation": 2.3,
-    "avg_unemployment": 4.58,
-    "avg_bond10y": 3.39,
-    "avg_fx_perf_1m": 0.82,
-    "avg_cot": -3255.75
+    "avg_interest_rate": 2.38,
+    "avg_gdp_growth": 1.12,
+    "avg_inflation": 2.08,
+    "avg_unemployment": 5.28,
+    "avg_bond10y": 3.44,
+    "avg_fx_perf_1m": 0.65,
+    "avg_cot": -9265.62
   }
 }

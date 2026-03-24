@@ -2,16 +2,16 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra redujo las tasas de interés en 0.25pp, lo que indica un ciclo expansivo y presiona a la baja la divisa debido al menor carry. Aunque la tasa de interés del Reino Unido sigue siendo superior a la del promedio global, la decisión de bajar las tasas sugiere que el banco central está priorizando el crecimiento económico sobre la lucha contra la inflación. Esto podría debilitar la divisa a corto plazo.\n\nLa balanza comercial del Reino Unido muestra un déficit en bienes, lo que ejerce presión vendedora sobre la divisa. La composición exportadora del país, que se centra en maquinaria industrial, productos farmacéuticos y equipos eléctricos y electrónicos, no ha sido capaz de generar un superávit comercial. Los términos de intercambio desfavorables también han encarecido las importaciones, lo que ha agravado el déficit comercial.\n\nEl par GBP/USD ha ganado momentum en los últimos días, lo que sugiere que los traders están posicionándose para las decisiones de tasas de la Fed y el BoE. Aunque el rendimiento FX del último mes ha sido positivo, el posicionamiento especulativo neto alcista podría generar una corrección a la baja si los fundamentos no mejoran. La noticia de que el secretario de energía del Reino Unido ha anunciado que luchará contra los costos energéticos podría tener un impacto positivo en la divisa, aunque es necesario esperar más detalles para evaluar su efecto real.",
+  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que sugiere un enfoque más dovish y presiona a la baja la divisa. Aunque la tasa de interés del Reino Unido es superior al promedio global, el ciclo bajista de las tasas en 12 meses y la decisión de recortar tasas indican una menor presión alcista sobre la divisa. La inflación anual del 2.8% por encima del objetivo y el crecimiento del PIB del 0.8% anual, inferior al promedio global, también influyen en la decisión del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, dominada por piedras preciosas y metales, y bebidas y líquidos alcohólicos, no parece ser lo suficientemente fuerte como para revertir este déficit. Además, los términos de intercambio desfavorables y el déficit en la cuenta corriente también contribuyen a esta presión.\n\nEl posicionamiento especulativo en el mercado, con +11.8K contratos netos, muestra un sesgo alcista, aunque no extremo. La noticia de que Bank of America ha realizado una apuesta bajista importante sobre la libra esterlina introduce incertidumbre en el mercado. Además, la expectativa de que el informe de inflación del Reino Unido pueda influir en la política monetaria del Banco de Inglaterra también puede afectar el valor de la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-16T08:47:47.589694+00:00",
-  "exportComposition": "Principales exportaciones: maquinaria industrial, productos farmacéuticos, equipos eléctricos y electrónicos",
+  "generatedAt": "2026-03-24T10:08:42.618607+00:00",
+  "exportComposition": "Comtrade 2023: piedras preciosas y metales (77%, $0.9B), bebidas y líquidos alcohólicos (19%, $0.2B), productos químicos orgánicos (0%, $0.0B)",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.75,
-    "gdpGrowth": 1.0,
+    "gdpGrowth": 0.8,
     "inflation": 2.8,
-    "unemployment": 4.4,
+    "unemployment": 5.2,
     "currentAccount": -2.2,
     "rateMomentum": -0.75,
     "lastRateDecision": {
@@ -24,24 +24,24 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": 20102,
-    "fxPerformance1M": 2.9692,
+    "cotPositioning": 11768,
+    "fxPerformance1M": 1.2999,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-16",
-    "latestNewsTs": 1773636489.0,
+    "lastUpdate": "2026-03-24",
+    "latestNewsTs": 1774316520.0,
     "newsHeadlines": [
-      "Pound Sterling gains momentum above 1.3250 as traders brace for Fed, BoE rate de",
-      "Chart Art: GBP/USD Ready for Another Channel Pullback?",
-      "Ed Miliband says Labour will 'fight people's corner' on energy costs - but he do"
+      "Event Guide: U.K. CPI Report (February 2026)",
+      "Starmer signals support for household bills next winter amid energy price shock",
+      "British Pound Faces Dire Forecast as Bank of America Places Major Bearish Bet"
     ]
   },
   "globalContext": {
-    "avg_interest_rate": 2.34,
-    "avg_gdp_growth": 0.99,
-    "avg_inflation": 2.3,
-    "avg_unemployment": 4.58,
-    "avg_bond10y": 3.39,
-    "avg_fx_perf_1m": 0.82,
-    "avg_cot": -3255.75
+    "avg_interest_rate": 2.38,
+    "avg_gdp_growth": 1.12,
+    "avg_inflation": 2.08,
+    "avg_unemployment": 5.28,
+    "avg_bond10y": 3.44,
+    "avg_fx_perf_1m": 0.65,
+    "avg_cot": -9265.62
   }
 }
