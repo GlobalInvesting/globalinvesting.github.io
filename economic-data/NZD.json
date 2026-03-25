@@ -1,7 +1,7 @@
 {
   "currency": "NZD",
-  "lastUpdate": "2026-03-24",
-  "source": "IMF:WEO:GGXWDG_NGDP | WorldBank:GDP | WorldBank:ToT:NZ | FRED:CommodityMomentum:NZD(2series)",
+  "lastUpdate": "2026-03-25",
+  "source": "IMF:WEO:GGXWDG_NGDP | WorldBank:GDP | WorldBank:ToT:NZ [fallback] | FRED:CommodityMomentum:NZD(2series)",
   "data": {
     "gdp": 260172385097.616,
     "gdpGrowth": 0.2,
@@ -20,7 +20,7 @@
     "bond10y": 4.6,
     "businessConfidence": 22.0,
     "consumerConfidence": 101.0,
-    "commodityMomentum": 26.53
+    "commodityMomentum": 26.6
   },
   "dates": {
     "gdp": "2024-06-15",
@@ -39,6 +39,6 @@
     "bond10y": "2026-02-15",
     "businessConfidence": "2026-01-15",
     "consumerConfidence": "2026-01-15",
-    "commodityMomentum": "2026-03-24"
+    "commodityMomentum": "2026-03-25"
   }
 }
