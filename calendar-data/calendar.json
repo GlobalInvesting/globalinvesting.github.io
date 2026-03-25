@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-25",
-  "generatedAt": "2026-03-25T03:40:34.986148Z",
+  "generatedAt": "2026-03-25T05:15:48.628055Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-24",
-  "totalEvents": 1164,
+  "totalEvents": 1165,
   "currencyCounts": {
     "AUD": 96,
     "CAD": 72,
@@ -18,12 +18,12 @@
     "GBP": 138,
     "JPY": 130,
     "NZD": 51,
-    "USD": 482
+    "USD": 483
   },
   "impactCounts": {
     "low": 597,
     "medium": 427,
-    "high": 140
+    "high": 141
   },
   "events": [
     {
@@ -11430,6 +11430,19 @@
     {
       "date": "25 Mar",
       "dateISO": "2026-03-25",
+      "timeUTC": "00:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Monthly CPI Indicator (YoY) (Feb)",
+      "impact": "low",
+      "actual": "3.70%",
+      "forecast": "3.80%",
+      "previous": "3.80%"
+    },
+    {
+      "date": "25 Mar",
+      "dateISO": "2026-03-25",
       "timeUTC": "02:40",
       "country": "AUD",
       "currency": "AUD",
@@ -11473,19 +11486,6 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "Monthly CPI Indicator (YoY) (Feb)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "3.80%",
-      "previous": "3.80%"
-    },
-    {
-      "date": "25 Mar",
-      "dateISO": "2026-03-25",
-      "timeUTC": "04:30",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
       "event": "Weighted mean CPI (QoQ) (Jan)",
       "impact": "low",
       "actual": "",
@@ -11501,7 +11501,7 @@
       "flag": "🇯🇵",
       "event": "Leading Economic Index",
       "impact": "medium",
-      "actual": "",
+      "actual": "112.1",
       "forecast": "112.4",
       "previous": "112.4"
     },
@@ -11514,7 +11514,7 @@
       "flag": "🇯🇵",
       "event": "Coincident Index",
       "impact": "medium",
-      "actual": "",
+      "actual": "117.9",
       "forecast": "",
       "previous": "116.8"
     },
@@ -11541,7 +11541,7 @@
       "event": "Core CPI (MoM) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.5%",
       "previous": "-0.6%"
     },
     {
@@ -11645,7 +11645,7 @@
       "event": "PPI Input (YoY) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.4%",
       "previous": "-0.2%"
     },
     {
@@ -11671,7 +11671,7 @@
       "event": "PPI Output (YoY) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.6%",
       "previous": "2.5%"
     },
     {
@@ -11697,7 +11697,7 @@
       "event": "RPI (MoM) (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "0.6%",
+      "forecast": "0.5%",
       "previous": "-0.5%"
     },
     {
@@ -12113,7 +12113,7 @@
       "event": "Crude Oil Inventories",
       "impact": "high",
       "actual": "",
-      "forecast": "-1.400M",
+      "forecast": "-1.300M",
       "previous": "6.156M"
     },
     {
@@ -12178,7 +12178,7 @@
       "event": "EIA Weekly Distillates Stocks",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "-1.300M",
       "previous": "-2.527M"
     },
     {
@@ -12230,7 +12230,7 @@
       "event": "Gasoline Inventories",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "-2.100M",
       "previous": "-5.436M"
     },
     {
@@ -12281,6 +12281,19 @@
       "flag": "🇦🇺",
       "event": "RBA Assist Gov Kent Speaks",
       "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "25 Mar",
+      "dateISO": "2026-03-25",
+      "timeUTC": "23:20",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "U.S. President Trump Speaks",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": ""
