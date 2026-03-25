@@ -511,129 +511,12 @@ var determineCentralBankOutlook = /*#__PURE__*/function () {
   };
 }();
 var fetchForexRates = /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
-    var cacheKey, cached, endpoints, _i, _endpoints, endpoint, response, data, ecbUrl, _response, _data, usdRate, rates, _t6, _t7;
-    return _regenerator().w(function (_context7) {
-      while (1) switch (_context7.p = _context7.n) {
-        case 0:
-          cacheKey = 'forex_rates';
-          cached = CacheManager.get(cacheKey);
-          if (!(cached !== null)) {
-            _context7.n = 1;
-            break;
-          }
-          return _context7.a(2, cached);
-        case 1:
-          endpoints = [{
-            url: "".concat(API_CONFIG.frankfurter.baseUrl, "/latest?from=USD"),
-            name: 'Frankfurter'
-          }, {
-            url: 'https://api.exchangerate-api.com/v4/latest/USD',
-            name: 'ExchangeRate-API'
-          }, {
-            url: 'https://open.er-api.com/v6/latest/USD',
-            name: 'Open Exchange'
-          }, {
-            url: 'https://api.exchangerate.host/latest?base=USD',
-            name: 'Exchangerate.host'
-          }, {
-            url: 'https://api.fixer.io/latest?base=USD',
-            name: 'Fixer.io'
-          }, {
-            url: 'https://api.currencyapi.com/v3/latest?base_currency=USD',
-            name: 'CurrencyAPI'
-          }];
-          _i = 0, _endpoints = endpoints;
-        case 2:
-          if (!(_i < _endpoints.length)) {
-            _context7.n = 9;
-            break;
-          }
-          endpoint = _endpoints[_i];
-          _context7.p = 3;
-          _context7.n = 4;
-          return fetch(endpoint.url);
-        case 4:
-          response = _context7.v;
-          if (!response.ok) {
-            _context7.n = 6;
-            break;
-          }
-          _context7.n = 5;
-          return response.json();
-        case 5:
-          data = _context7.v;
-          if (!data.rates) {
-            _context7.n = 6;
-            break;
-          }
-          console.log("\u2713 Forex rates from ".concat(endpoint.name));
-          CacheManager.set(cacheKey, data.rates, CACHE_CONFIG.FOREX_RATES);
-          return _context7.a(2, data.rates);
-        case 6:
-          _context7.n = 8;
-          break;
-        case 7:
-          _context7.p = 7;
-          _t6 = _context7.v;
-          console.warn("".concat(endpoint.name, " failed"));
-        case 8:
-          _i++;
-          _context7.n = 2;
-          break;
-        case 9:
-          _context7.p = 9;
-          ecbUrl = 'https://api.frankfurter.app/latest?from=EUR';
-          _context7.n = 10;
-          return fetch(ecbUrl);
-        case 10:
-          _response = _context7.v;
-          if (!_response.ok) {
-            _context7.n = 12;
-            break;
-          }
-          _context7.n = 11;
-          return _response.json();
-        case 11:
-          _data = _context7.v;
-          if (!_data.rates) {
-            _context7.n = 12;
-            break;
-          }
-          usdRate = 1 / _data.rates.USD;
-          rates = {};
-          Object.keys(_data.rates).forEach(function (currency) {
-            if (currency !== 'USD') {
-              rates[currency] = _data.rates[currency] * usdRate;
-            }
-          });
-          console.log('✓ Forex rates from ECB (Frankfurter EUR base)');
-          CacheManager.set(cacheKey, rates, CACHE_CONFIG.FOREX_RATES);
-          return _context7.a(2, rates);
-        case 12:
-          _context7.n = 14;
-          break;
-        case 13:
-          _context7.p = 13;
-          _t7 = _context7.v;
-          console.warn('ECB fallback failed');
-        case 14:
-          console.warn('❌ All forex rate sources failed');
-          return _context7.a(2, null);
-      }
-    }, _callee7, null, [[9, 13], [3, 7]]);
-  }));
-  return function fetchForexRates() {
-    return _ref7.apply(this, arguments);
-  };
-}();
-var fetchCentralBankMeetings = /*#__PURE__*/function () {
-  var _ref8 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8(countryCode) {
-    var cacheKey, cached, url, response, data, meetingInfo, _t8;
+  var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+    var cacheKey, cached, fetchWithIndividualTimeout, endpoints, rates, _t7;
     return _regenerator().w(function (_context8) {
       while (1) switch (_context8.p = _context8.n) {
         case 0:
-          cacheKey = "cb_meeting_".concat(countryCode);
+          cacheKey = 'forex_rates';
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
             _context8.n = 1;
@@ -641,46 +524,176 @@ var fetchCentralBankMeetings = /*#__PURE__*/function () {
           }
           return _context8.a(2, cached);
         case 1:
-          _context8.p = 1;
-          url = 'https://globalinvesting.github.io/meetings-data/meetings.json';
-          _context8.n = 2;
-          return fetchWithRetry(url, {
-            cache: 'no-cache',
-            mode: 'cors'
-          }, 3);
-        case 2:
-          response = _context8.v;
-          if (!response.ok) {
-            _context8.n = 4;
+          // FIX: lanzar todos los endpoints en paralelo con timeout individual de 5s
+          // El primero que responda válido gana — sin esperar a los que fallen
+          fetchWithIndividualTimeout = /*#__PURE__*/function () {
+            var _ref8 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(url, name) {
+              var timeoutMs,
+                controller,
+                timer,
+                response,
+                data,
+                usdRate,
+                rates,
+                _args7 = arguments,
+                _t6;
+              return _regenerator().w(function (_context7) {
+                while (1) switch (_context7.p = _context7.n) {
+                  case 0:
+                    timeoutMs = _args7.length > 2 && _args7[2] !== undefined ? _args7[2] : 5000;
+                    controller = new AbortController();
+                    timer = setTimeout(function () {
+                      return controller.abort();
+                    }, timeoutMs);
+                    _context7.p = 1;
+                    _context7.n = 2;
+                    return fetch(url, {
+                      signal: controller.signal
+                    });
+                  case 2:
+                    response = _context7.v;
+                    clearTimeout(timer);
+                    if (response.ok) {
+                      _context7.n = 3;
+                      break;
+                    }
+                    throw new Error("HTTP ".concat(response.status));
+                  case 3:
+                    _context7.n = 4;
+                    return response.json();
+                  case 4:
+                    data = _context7.v;
+                    if (!data.rates) {
+                      _context7.n = 5;
+                      break;
+                    }
+                    console.log("\u2713 Forex rates from ".concat(name));
+                    return _context7.a(2, data.rates);
+                  case 5:
+                    if (!(data.base === 'EUR' && data.rates && data.rates.USD)) {
+                      _context7.n = 6;
+                      break;
+                    }
+                    usdRate = 1 / data.rates.USD;
+                    rates = {};
+                    Object.keys(data.rates).forEach(function (c) {
+                      if (c !== 'USD') rates[c] = data.rates[c] * usdRate;
+                    });
+                    console.log("\u2713 Forex rates from ".concat(name, " (EUR\u2192USD converted)"));
+                    return _context7.a(2, rates);
+                  case 6:
+                    throw new Error('No rates field');
+                  case 7:
+                    _context7.p = 7;
+                    _t6 = _context7.v;
+                    clearTimeout(timer);
+                    throw _t6;
+                  case 8:
+                    return _context7.a(2);
+                }
+              }, _callee7, null, [[1, 7]]);
+            }));
+            return function fetchWithIndividualTimeout(_x9, _x0) {
+              return _ref8.apply(this, arguments);
+            };
+          }();
+          endpoints = [{
+            url: "".concat(API_CONFIG.frankfurter.baseUrl, "/latest?from=USD"),
+            name: 'Frankfurter USD'
+          }, {
+            url: 'https://api.frankfurter.app/latest?from=EUR',
+            name: 'Frankfurter EUR'
+          }, {
+            url: 'https://api.exchangerate-api.com/v4/latest/USD',
+            name: 'ExchangeRate-API'
+          }, {
+            url: 'https://open.er-api.com/v6/latest/USD',
+            name: 'Open Exchange'
+          }];
+          _context8.p = 2;
+          _context8.n = 3;
+          return Promise.any(endpoints.map(function (ep) {
+            return fetchWithIndividualTimeout(ep.url, ep.name, 5000);
+          }));
+        case 3:
+          rates = _context8.v;
+          CacheManager.set(cacheKey, rates, CACHE_CONFIG.FOREX_RATES);
+          return _context8.a(2, rates);
+        case 4:
+          _context8.p = 4;
+          _t7 = _context8.v;
+          console.warn('❌ All forex rate sources failed:', _t7);
+          return _context8.a(2, null);
+      }
+    }, _callee8, null, [[2, 4]]);
+  }));
+  return function fetchForexRates() {
+    return _ref7.apply(this, arguments);
+  };
+}();
+
+// Singleton: el archivo meetings.json es el mismo para las 8 divisas.
+// Se descarga UNA sola vez y se reutiliza en todas las llamadas.
+var _meetingsJsonPromise = null;
+var _getMeetingsJson = function _getMeetingsJson() {
+  if (!_meetingsJsonPromise) {
+    _meetingsJsonPromise = fetchWithRetry('https://globalinvesting.github.io/meetings-data/meetings.json', {
+      cache: 'no-cache',
+      mode: 'cors'
+    }, 3).then(function (r) {
+      return r.ok ? r.json() : null;
+    }).catch(function () {
+      return null;
+    });
+  }
+  return _meetingsJsonPromise;
+};
+var fetchCentralBankMeetings = /*#__PURE__*/function () {
+  var _ref9 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(countryCode) {
+    var cacheKey, cached, data, meetingInfo, _t8;
+    return _regenerator().w(function (_context9) {
+      while (1) switch (_context9.p = _context9.n) {
+        case 0:
+          cacheKey = "cb_meeting_".concat(countryCode);
+          cached = CacheManager.get(cacheKey);
+          if (!(cached !== null)) {
+            _context9.n = 1;
             break;
           }
-          _context8.n = 3;
-          return response.json();
-        case 3:
-          data = _context8.v;
+          return _context9.a(2, cached);
+        case 1:
+          _context9.p = 1;
+          _context9.n = 2;
+          return _getMeetingsJson();
+        case 2:
+          data = _context9.v;
+          if (!data) {
+            _context9.n = 3;
+            break;
+          }
           meetingInfo = data.meetings && data.meetings[countryCode];
           if (!(meetingInfo && meetingInfo.nextMeeting)) {
-            _context8.n = 4;
+            _context9.n = 3;
             break;
           }
           console.log("\u2705 Meeting date for ".concat(countryCode, ": ").concat(meetingInfo.nextMeeting, " (source: cbrates.com)"));
           CacheManager.set(cacheKey, meetingInfo.nextMeeting, CACHE_CONFIG.CENTRAL_BANK_OUTLOOK);
-          return _context8.a(2, meetingInfo.nextMeeting);
-        case 4:
-          _context8.n = 6;
+          return _context9.a(2, meetingInfo.nextMeeting);
+        case 3:
+          _context9.n = 5;
           break;
-        case 5:
-          _context8.p = 5;
-          _t8 = _context8.v;
+        case 4:
+          _context9.p = 4;
+          _t8 = _context9.v;
           console.warn("Meetings fetch failed for ".concat(countryCode, ":"), _t8.message);
-        case 6:
+        case 5:
           console.warn("\u274C No meeting data available for ".concat(countryCode));
-          return _context8.a(2, 'Por confirmar');
+          return _context9.a(2, 'Por confirmar');
       }
-    }, _callee8, null, [[1, 5]]);
+    }, _callee9, null, [[1, 4]]);
   }));
-  return function fetchCentralBankMeetings(_x9) {
-    return _ref8.apply(this, arguments);
+  return function fetchCentralBankMeetings(_x1) {
+    return _ref9.apply(this, arguments);
   };
 }();
 var formatEventTime = function formatEventTime(timeUTC, dateISO) {
@@ -805,20 +818,20 @@ var _precomputedScores = null; // active scores payload
 var _scoresDataDate = null; // ISO date string of the loaded snapshot
 
 var fetchStrengthScores = /*#__PURE__*/function () {
-  var _ref9 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+  var _ref0 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
     var cacheKey, cached, CURRENCIES, validate, url, resp, data, payload, _url, _resp, allData, snapshots, last, _payload, _t9, _t0;
-    return _regenerator().w(function (_context9) {
-      while (1) switch (_context9.p = _context9.n) {
+    return _regenerator().w(function (_context0) {
+      while (1) switch (_context0.p = _context0.n) {
         case 0:
           cacheKey = 'strength_scores_latest';
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context9.n = 1;
+            _context0.n = 1;
             break;
           }
           _precomputedScores = cached.scores;
           _scoresDataDate = cached.date;
-          return _context9.a(2, cached);
+          return _context0.a(2, cached);
         case 1:
           CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
           validate = function validate(data) {
@@ -826,27 +839,27 @@ var fetchStrengthScores = /*#__PURE__*/function () {
               return data.scores[c] !== undefined && data.scores[c] !== null && typeof data.scores[c].score === 'number';
             });
           }; // ── Primary: latest.json ──────────────────────────────────────────────────
-          _context9.p = 2;
+          _context0.p = 2;
           url = 'https://globalinvesting.github.io/strength-scores/latest.json';
-          _context9.n = 3;
+          _context0.n = 3;
           return fetchWithTimeout(url, {
             cache: 'no-cache',
             mode: 'cors'
           }, 5000);
         case 3:
-          resp = _context9.v;
+          resp = _context0.v;
           if (resp.ok) {
-            _context9.n = 4;
+            _context0.n = 4;
             break;
           }
           throw new Error('latest.json not available');
         case 4:
-          _context9.n = 5;
+          _context0.n = 5;
           return resp.json();
         case 5:
-          data = _context9.v;
+          data = _context0.v;
           if (validate(data)) {
-            _context9.n = 6;
+            _context0.n = 6;
             break;
           }
           throw new Error('Incomplete scores payload');
@@ -861,37 +874,37 @@ var fetchStrengthScores = /*#__PURE__*/function () {
           _precomputedScores = payload.scores;
           _scoresDataDate = payload.date;
           console.log("[scores] Loaded v".concat(data.modelVersion, " (").concat(data.lastUpdate, ")"));
-          return _context9.a(2, payload);
+          return _context0.a(2, payload);
         case 7:
-          _context9.p = 7;
-          _t9 = _context9.v;
+          _context0.p = 7;
+          _t9 = _context0.v;
           console.warn('[scores] latest.json failed, trying all.json:', _t9.message);
-          _context9.p = 8;
+          _context0.p = 8;
           _url = 'https://globalinvesting.github.io/strength-scores/all.json';
-          _context9.n = 9;
+          _context0.n = 9;
           return fetchWithTimeout(_url, {
             cache: 'no-cache',
             mode: 'cors'
           }, 5000);
         case 9:
-          _resp = _context9.v;
+          _resp = _context0.v;
           if (_resp.ok) {
-            _context9.n = 10;
+            _context0.n = 10;
             break;
           }
           throw new Error('all.json not available');
         case 10:
-          _context9.n = 11;
+          _context0.n = 11;
           return _resp.json();
         case 11:
-          allData = _context9.v;
+          allData = _context0.v;
           // all.json is an array of snapshots sorted ascending — take the last valid one
           snapshots = Array.isArray(allData) ? allData : allData.snapshots || [];
           last = _toConsumableArray(snapshots).reverse().find(function (s) {
             return validate(s);
           });
           if (last) {
-            _context9.n = 12;
+            _context0.n = 12;
             break;
           }
           throw new Error('No valid snapshot in all.json');
@@ -906,19 +919,19 @@ var fetchStrengthScores = /*#__PURE__*/function () {
           _precomputedScores = _payload.scores;
           _scoresDataDate = _payload.date;
           console.warn("[scores] Using stale snapshot from ".concat(_payload.date));
-          return _context9.a(2, _payload);
+          return _context0.a(2, _payload);
         case 13:
-          _context9.p = 13;
-          _t0 = _context9.v;
+          _context0.p = 13;
+          _t0 = _context0.v;
           console.error('[scores] All sources failed:', _t0.message);
           _precomputedScores = null;
           _scoresDataDate = null;
-          return _context9.a(2, null);
+          return _context0.a(2, null);
       }
-    }, _callee9, null, [[8, 13], [2, 7]]);
+    }, _callee0, null, [[8, 13], [2, 7]]);
   }));
   return function fetchStrengthScores() {
-    return _ref9.apply(this, arguments);
+    return _ref0.apply(this, arguments);
   };
 }();
 
@@ -971,61 +984,61 @@ var getStrength = function getStrength(currency) {
   };
 };
 var fetchAIAnalysis = /*#__PURE__*/function () {
-  var _ref0 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1() {
+  var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
     var cacheKey, cached, indexUrl, indexResponse, index, analyses, promises, _t10;
-    return _regenerator().w(function (_context1) {
-      while (1) switch (_context1.p = _context1.n) {
+    return _regenerator().w(function (_context10) {
+      while (1) switch (_context10.p = _context10.n) {
         case 0:
           cacheKey = 'ai_analysis_Groq';
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context1.n = 1;
+            _context10.n = 1;
             break;
           }
-          return _context1.a(2, cached);
+          return _context10.a(2, cached);
         case 1:
-          _context1.p = 1;
+          _context10.p = 1;
           indexUrl = 'https://globalinvesting.github.io/ai-analysis/index.json';
-          _context1.n = 2;
+          _context10.n = 2;
           return fetchWithRetry(indexUrl, {
             cache: 'no-cache',
             mode: 'cors'
           }, 2);
         case 2:
-          indexResponse = _context1.v;
+          indexResponse = _context10.v;
           if (indexResponse.ok) {
-            _context1.n = 3;
+            _context10.n = 3;
             break;
           }
           throw new Error('Index no disponible');
         case 3:
-          _context1.n = 4;
+          _context10.n = 4;
           return indexResponse.json();
         case 4:
-          index = _context1.v;
+          index = _context10.v;
           analyses = {}; // Cargar todas las divisas en paralelo
           promises = (index.currencies || []).map(/*#__PURE__*/function () {
-            var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(currency) {
+            var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(currency) {
               var url, response, data, _data$dataSnapshot, _t1;
-              return _regenerator().w(function (_context0) {
-                while (1) switch (_context0.p = _context0.n) {
+              return _regenerator().w(function (_context1) {
+                while (1) switch (_context1.p = _context1.n) {
                   case 0:
-                    _context0.p = 0;
+                    _context1.p = 0;
                     url = "https://globalinvesting.github.io/ai-analysis/".concat(currency, ".json");
-                    _context0.n = 1;
+                    _context1.n = 1;
                     return fetchWithTimeout(url, {
                       mode: 'cors'
                     }, 8000);
                   case 1:
-                    response = _context0.v;
+                    response = _context1.v;
                     if (!response.ok) {
-                      _context0.n = 3;
+                      _context1.n = 3;
                       break;
                     }
-                    _context0.n = 2;
+                    _context1.n = 2;
                     return response.json();
                   case 2:
-                    data = _context0.v;
+                    data = _context1.v;
                     if (data.analysis) {
                       analyses[currency] = {
                         text: data.analysis,
@@ -1037,81 +1050,81 @@ var fetchAIAnalysis = /*#__PURE__*/function () {
                       };
                     }
                   case 3:
-                    _context0.n = 5;
+                    _context1.n = 5;
                     break;
                   case 4:
-                    _context0.p = 4;
-                    _t1 = _context0.v;
+                    _context1.p = 4;
+                    _t1 = _context1.v;
                     console.warn("No an\xE1lisis AI para ".concat(currency, ":"), _t1.message);
                   case 5:
-                    return _context0.a(2);
+                    return _context1.a(2);
                 }
-              }, _callee0, null, [[0, 4]]);
+              }, _callee1, null, [[0, 4]]);
             }));
-            return function (_x0) {
-              return _ref1.apply(this, arguments);
+            return function (_x10) {
+              return _ref10.apply(this, arguments);
             };
           }());
-          _context1.n = 5;
+          _context10.n = 5;
           return Promise.all(promises);
         case 5:
           if (!(Object.keys(analyses).length > 0)) {
-            _context1.n = 6;
+            _context10.n = 6;
             break;
           }
           console.log("\u2705 An\xE1lisis Groq cargados: ".concat(Object.keys(analyses).join(', ')));
           // Cache de 6 horas — Groq genera una vez al día
           CacheManager.set(cacheKey, analyses, 6 * 60 * 60 * 1000);
-          return _context1.a(2, analyses);
+          return _context10.a(2, analyses);
         case 6:
-          _context1.n = 8;
+          _context10.n = 8;
           break;
         case 7:
-          _context1.p = 7;
-          _t10 = _context1.v;
+          _context10.p = 7;
+          _t10 = _context10.v;
           console.warn('Análisis AI no disponibles, usando algorítmico:', _t10.message);
         case 8:
-          return _context1.a(2, null);
+          return _context10.a(2, null);
       }
-    }, _callee1, null, [[1, 7]]);
+    }, _callee10, null, [[1, 7]]);
   }));
   return function fetchAIAnalysis() {
-    return _ref0.apply(this, arguments);
+    return _ref1.apply(this, arguments);
   };
 }();
 var fetchEconomicCalendar = /*#__PURE__*/function () {
-  var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
+  var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11() {
     var cacheKey, cached, url, response, data, result, errorResult, _t11;
-    return _regenerator().w(function (_context10) {
-      while (1) switch (_context10.p = _context10.n) {
+    return _regenerator().w(function (_context11) {
+      while (1) switch (_context11.p = _context11.n) {
         case 0:
           cacheKey = 'economic_calendar';
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context10.n = 1;
+            _context11.n = 1;
             break;
           }
-          return _context10.a(2, cached);
+          return _context11.a(2, cached);
         case 1:
-          _context10.p = 1;
+          _context11.p = 1;
           url = 'https://globalinvesting.github.io/calendar-data/calendar.json';
-          _context10.n = 2;
+          _context11.n = 2;
           return fetchWithRetry(url, {
             cache: 'no-cache',
             mode: 'cors'
           }, 3);
         case 2:
-          response = _context10.v;
+          response = _context11.v;
           if (!response.ok) {
-            _context10.n = 4;
+            _context11.n = 4;
             break;
           }
-          _context10.n = 3;
+          _context11.n = 3;
           return response.json();
         case 3:
-          data = _context10.v;
+          data = _context11.v;
           if (!(data.events && data.events.length > 0)) {
-            _context10.n = 4;
+            _context11.n = 4;
             break;
           }
           console.log("\u2705 Real calendar loaded: ".concat(data.events.length, " events (source: ").concat(data.source, ")"));
@@ -1125,13 +1138,13 @@ var fetchEconomicCalendar = /*#__PURE__*/function () {
             currencyCounts: data.currencyCounts || {}
           };
           CacheManager.set(cacheKey, result, CACHE_CONFIG.CALENDAR);
-          return _context10.a(2, result);
+          return _context11.a(2, result);
         case 4:
-          _context10.n = 6;
+          _context11.n = 6;
           break;
         case 5:
-          _context10.p = 5;
-          _t11 = _context10.v;
+          _context11.p = 5;
+          _t11 = _context11.v;
           console.warn('Real calendar fetch failed:', _t11.message);
         case 6:
           // ❌ NO FALLBACK — si el scraping falla, devolver estado de error explícito.
@@ -1146,69 +1159,69 @@ var fetchEconomicCalendar = /*#__PURE__*/function () {
             impactCounts: {},
             currencyCounts: {}
           }; // No cachear el error — reintentar en la próxima llamada
-          return _context10.a(2, errorResult);
+          return _context11.a(2, errorResult);
       }
-    }, _callee10, null, [[1, 5]]);
+    }, _callee11, null, [[1, 5]]);
   }));
   return function fetchEconomicCalendar() {
-    return _ref10.apply(this, arguments);
+    return _ref11.apply(this, arguments);
   };
 }();
 // ← cierre de fetchEconomicCalendar
 
 var fetchHistoricalFXData = /*#__PURE__*/function () {
-  var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee11(currencyCode) {
-    return _regenerator().w(function (_context11) {
-      while (1) switch (_context11.n) {
+  var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(currencyCode) {
+    return _regenerator().w(function (_context12) {
+      while (1) switch (_context12.n) {
         case 0:
-          return _context11.a(2, null);
+          return _context12.a(2, null);
       }
-    }, _callee11);
+    }, _callee12);
   }));
-  return function fetchHistoricalFXData(_x1) {
-    return _ref11.apply(this, arguments);
+  return function fetchHistoricalFXData(_x11) {
+    return _ref12.apply(this, arguments);
   };
 }();
 var fetchRealHistoricalRates = /*#__PURE__*/function () {
-  var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee12(currencyCode) {
+  var _ref13 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(currencyCode) {
     var cacheKey, cached, url, response, data, observations, recent, MONTH_NAMES_ES, labels, rates, result, _t12;
-    return _regenerator().w(function (_context12) {
-      while (1) switch (_context12.p = _context12.n) {
+    return _regenerator().w(function (_context13) {
+      while (1) switch (_context13.p = _context13.n) {
         case 0:
           cacheKey = "real_historical_rates_".concat(currencyCode);
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context12.n = 1;
+            _context13.n = 1;
             break;
           }
-          return _context12.a(2, cached);
+          return _context13.a(2, cached);
         case 1:
-          _context12.p = 1;
+          _context13.p = 1;
           url = "https://globalinvesting.github.io/rates/".concat(currencyCode, ".json");
-          _context12.n = 2;
+          _context13.n = 2;
           return fetchWithRetry(url, {
             cache: 'no-cache',
             mode: 'cors'
           }, 3);
         case 2:
-          response = _context12.v;
+          response = _context13.v;
           if (response.ok) {
-            _context12.n = 3;
+            _context13.n = 3;
             break;
           }
           throw new Error("HTTP ".concat(response.status));
         case 3:
-          _context12.n = 4;
+          _context13.n = 4;
           return response.json();
         case 4:
-          data = _context12.v;
+          data = _context13.v;
           observations = data.observations || [];
           if (!(observations.length < 2)) {
-            _context12.n = 5;
+            _context13.n = 5;
             break;
           }
           console.warn("Insuficientes observaciones hist\xF3ricas para ".concat(currencyCode, ": ").concat(observations.length));
-          return _context12.a(2, null);
+          return _context13.a(2, null);
         case 5:
           // Tomar hasta 8 observaciones (más que 6 para tener margen)
           // observations ya viene ordenado más reciente primero
@@ -1247,32 +1260,32 @@ var fetchRealHistoricalRates = /*#__PURE__*/function () {
           };
           CacheManager.set(cacheKey, result, CACHE_CONFIG.HISTORICAL_DATA);
           console.log("\u2705 Hist\xF3rico real para ".concat(currencyCode, ": ").concat(labels.join(', ')));
-          return _context12.a(2, result);
+          return _context13.a(2, result);
         case 6:
-          _context12.p = 6;
-          _t12 = _context12.v;
+          _context13.p = 6;
+          _t12 = _context13.v;
           console.warn("No se pudo cargar hist\xF3rico real para ".concat(currencyCode, ":"), _t12.message);
-          return _context12.a(2, null);
+          return _context13.a(2, null);
       }
-    }, _callee12, null, [[1, 6]]);
+    }, _callee13, null, [[1, 6]]);
   }));
-  return function fetchRealHistoricalRates(_x10) {
-    return _ref12.apply(this, arguments);
+  return function fetchRealHistoricalRates(_x12) {
+    return _ref13.apply(this, arguments);
   };
 }();
 var generateHistoricalData = /*#__PURE__*/function () {
-  var _ref13 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(currentData, setDataLoadingStatus) {
+  var _ref14 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14(currentData, setDataLoadingStatus) {
     var cacheKey, cached, historical, i, country, data, realHistory;
-    return _regenerator().w(function (_context13) {
-      while (1) switch (_context13.n) {
+    return _regenerator().w(function (_context14) {
+      while (1) switch (_context14.n) {
         case 0:
           cacheKey = 'historical_data';
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context13.n = 1;
+            _context14.n = 1;
             break;
           }
-          return _context13.a(2, cached);
+          return _context14.a(2, cached);
         case 1:
           historical = {};
           setDataLoadingStatus({
@@ -1282,7 +1295,7 @@ var generateHistoricalData = /*#__PURE__*/function () {
           i = 0;
         case 2:
           if (!(i < countries.length)) {
-            _context13.n = 5;
+            _context14.n = 5;
             break;
           }
           country = countries[i];
@@ -1293,10 +1306,10 @@ var generateHistoricalData = /*#__PURE__*/function () {
           });
 
           // Intentar obtener histórico REAL desde rates/XX.json (FRED + scraping)
-          _context13.n = 3;
+          _context14.n = 3;
           return fetchRealHistoricalRates(country.code);
         case 3:
-          realHistory = _context13.v;
+          realHistory = _context14.v;
           if (realHistory && realHistory.rates && realHistory.rates.length >= 2) {
             // ✅ DATOS REALES DISPONIBLES
             // Solo graficamos la tasa de interés real.
@@ -1321,7 +1334,7 @@ var generateHistoricalData = /*#__PURE__*/function () {
           }
         case 4:
           i++;
-          _context13.n = 2;
+          _context14.n = 2;
           break;
         case 5:
           setDataLoadingStatus({
@@ -1329,12 +1342,12 @@ var generateHistoricalData = /*#__PURE__*/function () {
             progress: 98
           });
           CacheManager.set(cacheKey, historical, CACHE_CONFIG.HISTORICAL_DATA);
-          return _context13.a(2, historical);
+          return _context14.a(2, historical);
       }
-    }, _callee13);
+    }, _callee14);
   }));
-  return function generateHistoricalData(_x11, _x12) {
-    return _ref13.apply(this, arguments);
+  return function generateHistoricalData(_x13, _x14) {
+    return _ref14.apply(this, arguments);
   };
 }();
 var generateForexPairRecommendations = function generateForexPairRecommendations(economicData, forexRates) {
@@ -1389,9 +1402,9 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
 
     // Para fortalezas: top 3 contribuidores más altos
     // Para debilidades: bottom 3 contribuidores más bajos (los más rezagados vs sus pares)
-    var nonZeroEntries = Object.entries(contributions).filter(function (_ref14) {
-      var _ref15 = _slicedToArray(_ref14, 2),
-        val = _ref15[1];
+    var nonZeroEntries = Object.entries(contributions).filter(function (_ref15) {
+      var _ref16 = _slicedToArray(_ref15, 2),
+        val = _ref16[1];
       return val > 0;
     });
     var entries;
@@ -1404,10 +1417,10 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         return a[1] - b[1];
       }).slice(0, 3);
     }
-    return entries.map(function (_ref16) {
-      var _ref17 = _slicedToArray(_ref16, 2),
-        key = _ref17[0],
-        val = _ref17[1];
+    return entries.map(function (_ref17) {
+      var _ref18 = _slicedToArray(_ref17, 2),
+        key = _ref18[0],
+        val = _ref18[1];
       return {
         factor: labels[key] || key,
         impact: isPositive ? "+".concat(val.toFixed(1)) : val.toFixed(1)
@@ -1416,9 +1429,9 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
   };
 
   // Ordenar divisas por fortaleza (guard: null scores → 50 como placeholder)
-  var sortedCurrencies = Object.entries(strengthScores).filter(function (_ref18) {
-    var _ref19 = _slicedToArray(_ref18, 2),
-      data = _ref19[1];
+  var sortedCurrencies = Object.entries(strengthScores).filter(function (_ref19) {
+    var _ref20 = _slicedToArray(_ref19, 2),
+      data = _ref20[1];
     return data.score !== null && data.score !== undefined;
   }).sort(function (a, b) {
     return b[1].score - a[1].score;
@@ -1430,15 +1443,15 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
   var weakCurrencies = sortedCurrencies.slice(-3).reverse();
 
   // Generar combinaciones LONG (Comprar fuerte vs débil)
-  strongCurrencies.forEach(function (_ref20) {
-    var _ref21 = _slicedToArray(_ref20, 2),
-      strongCurr = _ref21[0],
-      strongData = _ref21[1];
-    weakCurrencies.forEach(function (_ref22) {
+  strongCurrencies.forEach(function (_ref21) {
+    var _ref22 = _slicedToArray(_ref21, 2),
+      strongCurr = _ref22[0],
+      strongData = _ref22[1];
+    weakCurrencies.forEach(function (_ref23) {
       var _fxPerformance1M, _fxPerformance1M2;
-      var _ref23 = _slicedToArray(_ref22, 2),
-        weakCurr = _ref23[0],
-        weakData = _ref23[1];
+      var _ref24 = _slicedToArray(_ref23, 2),
+        weakCurr = _ref24[0],
+        weakData = _ref24[1];
       if (strongCurr === weakCurr) return;
       var spreadStrength = strongData.score - weakData.score;
       var pairName = "".concat(strongCurr, "/").concat(weakCurr);
@@ -1479,15 +1492,15 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
   });
 
   // Generar combinaciones SHORT (Vender débil vs fuerte)
-  weakCurrencies.forEach(function (_ref24) {
-    var _ref25 = _slicedToArray(_ref24, 2),
-      weakCurr = _ref25[0],
-      weakData = _ref25[1];
-    strongCurrencies.forEach(function (_ref26) {
+  weakCurrencies.forEach(function (_ref25) {
+    var _ref26 = _slicedToArray(_ref25, 2),
+      weakCurr = _ref26[0],
+      weakData = _ref26[1];
+    strongCurrencies.forEach(function (_ref27) {
       var _fxPerformance1M3, _fxPerformance1M4;
-      var _ref27 = _slicedToArray(_ref26, 2),
-        strongCurr = _ref27[0],
-        strongData = _ref27[1];
+      var _ref28 = _slicedToArray(_ref27, 2),
+        strongCurr = _ref28[0],
+        strongData = _ref28[1];
       if (weakCurr === strongCurr) return;
       var spreadStrength = strongData.score - weakData.score;
       var pairName = "".concat(weakCurr, "/").concat(strongCurr);
@@ -1547,11 +1560,11 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
   return finalRecommendations;
 };
 var loadAllEconomicData = /*#__PURE__*/function () {
-  var _ref28 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee17(setEconomicData, setDataLoadingStatus) {
+  var _ref29 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee18(setEconomicData, setDataLoadingStatus) {
     var _economicDataToCache$;
-    var cacheKey, DASHBOARD_VERSION, cachedVersion, cached, sampleCurrencies, hasFxPerf, economicData, loadCountryData, countryResults, completedCount, _iterator, _step, result, _code, data, outlookResults, _iterator2, _step2, _step2$value, country, outlook, nextMeeting, fxRawData, fxResults, _iterator3, _step3, entry, _code2, rest, raw1MValues, totalRaw1M, n, fx1WValues, total1W, n1W, fx3MValues, total3M, n3M, _i2, _Object$entries, _d$fx3M, _d$raw1M, _basket1W, _Object$entries$_i, code, d, basket1M, basket1W, basket3M, composite, economicDataToCache;
-    return _regenerator().w(function (_context17) {
-      while (1) switch (_context17.n) {
+    var cacheKey, DASHBOARD_VERSION, cachedVersion, cached, sampleCurrencies, hasFxPerf, economicData, loadCountryData, countryResults, completedCount, _iterator, _step, result, _code, data, outlookResults, _iterator2, _step2, _step2$value, country, outlook, nextMeeting, fxRawData, fxResults, _iterator3, _step3, entry, _code2, rest, raw1MValues, totalRaw1M, n, fx1WValues, total1W, n1W, fx3MValues, total3M, n3M, _i, _Object$entries, _d$fx3M, _d$raw1M, _basket1W, _Object$entries$_i, code, d, basket1M, basket1W, basket3M, composite, economicDataToCache;
+    return _regenerator().w(function (_context18) {
+      while (1) switch (_context18.n) {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
@@ -1565,7 +1578,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
           }
           cached = CacheManager.get(cacheKey);
           if (!(cached !== null)) {
-            _context17.n = 2;
+            _context18.n = 2;
             break;
           }
           // v5.0 cache validation: reject cache missing fxPerformance1M
@@ -1574,12 +1587,12 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             return cached[c] && cached[c].fxPerformance1M !== null && cached[c].fxPerformance1M !== undefined;
           });
           if (hasFxPerf) {
-            _context17.n = 1;
+            _context18.n = 1;
             break;
           }
           console.log('⚠️ Caché sin fxPerformance1M — invalidando para cargar datos completos...');
           CacheManager.clear(cacheKey);
-          _context17.n = 2;
+          _context18.n = 2;
           break;
         case 1:
           setEconomicData(cached);
@@ -1587,7 +1600,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             status: 'Datos cargados desde caché',
             progress: 100
           });
-          return _context17.a(2, cached);
+          return _context18.a(2, cached);
         case 2:
           economicData = {}; // ── FIX #2: Fetches paralelos ────────────────────────────────────────────
           // Antes: for-loop con await por cada país → 8 países × 3 fetches = ~24 req en serie
@@ -1601,15 +1614,15 @@ var loadAllEconomicData = /*#__PURE__*/function () {
 
           // Helper: carga los 3 archivos de un país en paralelo entre sí
           loadCountryData = /*#__PURE__*/function () {
-            var _ref29 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14(country) {
+            var _ref30 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15(country) {
               var result, _yield$Promise$all, _yield$Promise$all2, econResponse, cotData, extData, interestRateResult, data, dates, lastUpd, _d$bond10y, _d$consumerConfidence, _d$businessConfidence, _d$capitalFlows, _d$fdi, _d$inflationExpectati, _d$rateMomentum, _d$rateMomentum24M, d, dt, _lastUpd;
-              return _regenerator().w(function (_context14) {
-                while (1) switch (_context14.n) {
+              return _regenerator().w(function (_context15) {
+                while (1) switch (_context15.n) {
                   case 0:
                     result = {
                       code: country.code
                     }; // Los 3 fetches del país corren simultáneamente
-                    _context14.n = 1;
+                    _context15.n = 1;
                     return Promise.all([
                     // 1) economic-data
                     fetchWithRetry("https://globalinvesting.github.io/economic-data/".concat(country.code, ".json"), {
@@ -1638,7 +1651,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
                       return null;
                     })]);
                   case 1:
-                    _yield$Promise$all = _context14.v;
+                    _yield$Promise$all = _context15.v;
                     _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 4);
                     econResponse = _yield$Promise$all2[0];
                     cotData = _yield$Promise$all2[1];
@@ -1724,24 +1737,24 @@ var loadAllEconomicData = /*#__PURE__*/function () {
                       result.rateMomentumDate = dt.rateMomentum || _lastUpd;
                       console.log("\u2705 Extended data loaded for ".concat(country.code));
                     }
-                    return _context14.a(2, result);
+                    return _context15.a(2, result);
                 }
-              }, _callee14);
+              }, _callee15);
             }));
-            return function loadCountryData(_x15) {
-              return _ref29.apply(this, arguments);
+            return function loadCountryData(_x17) {
+              return _ref30.apply(this, arguments);
             };
           }(); // Lanzar todos los países en paralelo simultáneamente
           setDataLoadingStatus({
             status: 'Cargando datos de todos los países en paralelo...',
             progress: 10
           });
-          _context17.n = 3;
+          _context18.n = 3;
           return Promise.all(countries.map(function (country) {
             return loadCountryData(country);
           }));
         case 3:
-          countryResults = _context17.v;
+          countryResults = _context18.v;
           // Consolidar resultados en economicData
           completedCount = 0;
           _iterator = _createForOfIteratorHelper(countryResults);
@@ -1767,34 +1780,34 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             status: 'Procesando outlook de bancos centrales...',
             progress: 88
           });
-          _context17.n = 4;
+          _context18.n = 4;
           return Promise.all(countries.map(/*#__PURE__*/function () {
-            var _ref30 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee15(country) {
+            var _ref31 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(country) {
               var _yield$Promise$all3, _yield$Promise$all4, outlook, nextMeeting;
-              return _regenerator().w(function (_context15) {
-                while (1) switch (_context15.n) {
+              return _regenerator().w(function (_context16) {
+                while (1) switch (_context16.n) {
                   case 0:
-                    _context15.n = 1;
+                    _context16.n = 1;
                     return Promise.all([determineCentralBankOutlook(country.code, economicData[country.code]), fetchCentralBankMeetings(country.code)]);
                   case 1:
-                    _yield$Promise$all3 = _context15.v;
+                    _yield$Promise$all3 = _context16.v;
                     _yield$Promise$all4 = _slicedToArray(_yield$Promise$all3, 2);
                     outlook = _yield$Promise$all4[0];
                     nextMeeting = _yield$Promise$all4[1];
-                    return _context15.a(2, {
+                    return _context16.a(2, {
                       country: country,
                       outlook: outlook,
                       nextMeeting: nextMeeting
                     });
                 }
-              }, _callee15);
+              }, _callee16);
             }));
-            return function (_x16) {
-              return _ref30.apply(this, arguments);
+            return function (_x18) {
+              return _ref31.apply(this, arguments);
             };
           }()));
         case 4:
-          outlookResults = _context17.v;
+          outlookResults = _context18.v;
           _iterator2 = _createForOfIteratorHelper(outlookResults);
           try {
             for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
@@ -1818,35 +1831,35 @@ var loadAllEconomicData = /*#__PURE__*/function () {
 
           // Paso 1: cargar todos los datos raw de FX en paralelo
           fxRawData = {};
-          _context17.n = 5;
+          _context18.n = 5;
           return Promise.all(countries.map(/*#__PURE__*/function () {
-            var _ref31 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee16(country) {
+            var _ref32 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee17(country) {
               var fxPerfUrl, fxPerfResponse, d, _d$fxPerformance1M_ra, _d$fxPerformance1W, _d$fxPerformance3M, _t13;
-              return _regenerator().w(function (_context16) {
-                while (1) switch (_context16.p = _context16.n) {
+              return _regenerator().w(function (_context17) {
+                while (1) switch (_context17.p = _context17.n) {
                   case 0:
-                    _context16.p = 0;
+                    _context17.p = 0;
                     fxPerfUrl = "https://globalinvesting.github.io/fx-performance/".concat(country.code, ".json");
-                    _context16.n = 1;
+                    _context17.n = 1;
                     return fetchWithRetry(fxPerfUrl, {
                       cache: 'no-cache',
                       mode: 'cors'
                     }, 2);
                   case 1:
-                    fxPerfResponse = _context16.v;
+                    fxPerfResponse = _context17.v;
                     if (!fxPerfResponse.ok) {
-                      _context16.n = 3;
+                      _context17.n = 3;
                       break;
                     }
-                    _context16.n = 2;
+                    _context17.n = 2;
                     return fxPerfResponse.json();
                   case 2:
-                    d = _context16.v;
+                    d = _context17.v;
                     if (!(d.fxPerformance1M !== null && d.fxPerformance1M !== undefined)) {
-                      _context16.n = 3;
+                      _context17.n = 3;
                       break;
                     }
-                    return _context16.a(2, {
+                    return _context17.a(2, {
                       code: country.code,
                       raw1M: (_d$fxPerformance1M_ra = d.fxPerformance1M_raw) !== null && _d$fxPerformance1M_ra !== void 0 ? _d$fxPerformance1M_ra : d.fxPerformance1M,
                       fx1W: (_d$fxPerformance1W = d.fxPerformance1W) !== null && _d$fxPerformance1W !== void 0 ? _d$fxPerformance1W : null,
@@ -1854,23 +1867,23 @@ var loadAllEconomicData = /*#__PURE__*/function () {
                       date: d.date || new Date().toISOString()
                     });
                   case 3:
-                    _context16.n = 5;
+                    _context17.n = 5;
                     break;
                   case 4:
-                    _context16.p = 4;
-                    _t13 = _context16.v;
+                    _context17.p = 4;
+                    _t13 = _context17.v;
                     console.warn("No FX performance data for ".concat(country.code));
                   case 5:
-                    return _context16.a(2, null);
+                    return _context17.a(2, null);
                 }
-              }, _callee16, null, [[0, 4]]);
+              }, _callee17, null, [[0, 4]]);
             }));
-            return function (_x17) {
-              return _ref31.apply(this, arguments);
+            return function (_x19) {
+              return _ref32.apply(this, arguments);
             };
           }()));
         case 5:
-          fxResults = _context17.v;
+          fxResults = _context18.v;
           _iterator3 = _createForOfIteratorHelper(fxResults);
           try {
             for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
@@ -1919,8 +1932,8 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             return a + b;
           }, 0);
           n3M = fx3MValues.length;
-          for (_i2 = 0, _Object$entries = Object.entries(fxRawData); _i2 < _Object$entries.length; _i2++) {
-            _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2), code = _Object$entries$_i[0], d = _Object$entries$_i[1];
+          for (_i = 0, _Object$entries = Object.entries(fxRawData); _i < _Object$entries.length; _i++) {
+            _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2), code = _Object$entries$_i[0], d = _Object$entries$_i[1];
             // Basket-corrected values (subtract mean of others)
             basket1M = n > 1 ? d.raw1M - (totalRaw1M - d.raw1M) / (n - 1) : d.raw1M;
             basket1W = null;
@@ -1947,12 +1960,12 @@ var loadAllEconomicData = /*#__PURE__*/function () {
           console.log('🔍 Pre-cache check AUD fxPerf1M:', (_economicDataToCache$ = economicDataToCache.AUD) === null || _economicDataToCache$ === void 0 ? void 0 : _economicDataToCache$.fxPerformance1M);
           CacheManager.set(cacheKey, economicDataToCache, CACHE_CONFIG.ECONOMIC_DATA);
           setEconomicData(economicData);
-          return _context17.a(2, economicData);
+          return _context18.a(2, economicData);
       }
-    }, _callee17);
+    }, _callee18);
   }));
-  return function loadAllEconomicData(_x13, _x14) {
-    return _ref28.apply(this, arguments);
+  return function loadAllEconomicData(_x15, _x16) {
+    return _ref29.apply(this, arguments);
   };
 }();
 var clearDashboardCache = function clearDashboardCache() {
@@ -2299,18 +2312,18 @@ var ForexDashboard = function ForexDashboard() {
     };
     var _schedulePoll = function schedulePoll() {
       var delay = getNextPollDelay();
-      pollTimer = setTimeout(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee18() {
+      pollTimer = setTimeout(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19() {
         var fresh, prevEvents, prevActuals, newActuals, _t14;
-        return _regenerator().w(function (_context18) {
-          while (1) switch (_context18.p = _context18.n) {
+        return _regenerator().w(function (_context19) {
+          while (1) switch (_context19.p = _context19.n) {
             case 0:
-              _context18.p = 0;
+              _context19.p = 0;
               setCalendarUpdating(true);
               CacheManager.clear('economic_calendar');
-              _context18.n = 1;
+              _context19.n = 1;
               return fetchEconomicCalendar();
             case 1:
-              fresh = _context18.v;
+              fresh = _context19.v;
               if (fresh && fresh.events && fresh.events.length > 0) {
                 // Detectar filas que recibieron un actual nuevo para flash visual
                 prevEvents = economicCalendar && economicCalendar.events || [];
@@ -2340,21 +2353,21 @@ var ForexDashboard = function ForexDashboard() {
                   }, 120);
                 }
               }
-              _context18.n = 3;
+              _context19.n = 3;
               break;
             case 2:
-              _context18.p = 2;
-              _t14 = _context18.v;
+              _context19.p = 2;
+              _t14 = _context19.v;
             case 3:
-              _context18.p = 3;
+              _context19.p = 3;
               setCalendarUpdating(false);
-              return _context18.f(3);
+              return _context19.f(3);
             case 4:
               _schedulePoll();
             case 5:
-              return _context18.a(2);
+              return _context19.a(2);
           }
-        }, _callee18, null, [[0, 2, 3, 4]]);
+        }, _callee19, null, [[0, 2, 3, 4]]);
       })), delay);
     };
     _schedulePoll();
@@ -2523,12 +2536,12 @@ var ForexDashboard = function ForexDashboard() {
       });
     }, 250);
   };
-  var HeatmapCell = function HeatmapCell(_ref33) {
-    var value = _ref33.value,
-      type = _ref33.type,
-      currency = _ref33.currency,
-      indicator = _ref33.indicator,
-      lastUpdate = _ref33.lastUpdate;
+  var HeatmapCell = function HeatmapCell(_ref34) {
+    var value = _ref34.value,
+      type = _ref34.type,
+      currency = _ref34.currency,
+      indicator = _ref34.indicator,
+      lastUpdate = _ref34.lastUpdate;
     var cellRef = React.useRef(null);
     var _React$useState3 = React.useState(false),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
@@ -2678,10 +2691,10 @@ var ForexDashboard = function ForexDashboard() {
       className: "cell-value"
     }, formatValue(value)));
   };
-  var TooltipCell = function TooltipCell(_ref34) {
-    var children = _ref34.children,
-      tooltip = _ref34.tooltip,
-      title = _ref34.title;
+  var TooltipCell = function TooltipCell(_ref35) {
+    var children = _ref35.children,
+      tooltip = _ref35.tooltip,
+      title = _ref35.title;
     var _React$useState7 = React.useState(false),
       _React$useState8 = _slicedToArray(_React$useState7, 2),
       showTooltip = _React$useState8[0],
@@ -3318,10 +3331,10 @@ var ForexDashboard = function ForexDashboard() {
   };
   useEffect(function () {
     var loadInitialData = /*#__PURE__*/function () {
-      var _ref35 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee19() {
-        var hasEconCache, hasCalCache, hasHistCache, hasPairsCache, hasAICache, hasRatesCache, hasFullCache, globalTimeout, rates, loadedData, calendarResult, historical, aiData, pairRecommendations, _t15;
-        return _regenerator().w(function (_context19) {
-          while (1) switch (_context19.p = _context19.n) {
+      var _ref36 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee20() {
+        var hasEconCache, hasCalCache, hasHistCache, hasPairsCache, hasAICache, hasRatesCache, hasFullCache, globalTimeout, _yield$Promise$all5, _yield$Promise$all6, _, rates, loadedData, calendarResult, historical, aiData, pairRecommendations, _t15;
+        return _regenerator().w(function (_context20) {
+          while (1) switch (_context20.p = _context20.n) {
             case 0:
               // ── Estrategia: caché primero, red en segundo plano ─────────────
               // Si ya tenemos datos en caché (p.ej. al volver desde news.html),
@@ -3335,7 +3348,7 @@ var ForexDashboard = function ForexDashboard() {
               hasRatesCache = !!CacheManager.get('forex_rates');
               hasFullCache = hasEconCache && hasCalCache && hasRatesCache;
               if (!hasFullCache) {
-                _context19.n = 1;
+                _context20.n = 1;
                 break;
               }
               // ✅ Caché completo: ya mostramos los datos (estado inicializado arriba).
@@ -3377,10 +3390,10 @@ var ForexDashboard = function ForexDashboard() {
                     setAiAnalysisReady(true);
                     setEconomicData(function (prev) {
                       var updated = _objectSpread({}, prev);
-                      Object.entries(aiData).forEach(function (_ref36) {
-                        var _ref37 = _slicedToArray(_ref36, 2),
-                          currency = _ref37[0],
-                          analysis = _ref37[1];
+                      Object.entries(aiData).forEach(function (_ref37) {
+                        var _ref38 = _slicedToArray(_ref37, 2),
+                          currency = _ref38[0],
+                          analysis = _ref38[1];
                         if (updated[currency] && analysis.lastRateDecision) {
                           updated[currency] = _objectSpread(_objectSpread({}, updated[currency]), {}, {
                             _aiLastRateDecision: analysis.lastRateDecision
@@ -3394,7 +3407,7 @@ var ForexDashboard = function ForexDashboard() {
                   return console.warn('Background AI refresh failed:', e);
                 });
               }
-              return _context19.a(2);
+              return _context20.a(2);
             case 1:
               // ── Sin caché completo: carga normal con pantalla de progreso ──
               setIsLoading(true);
@@ -3407,55 +3420,52 @@ var ForexDashboard = function ForexDashboard() {
                   progress: 100
                 });
               }, 60000);
-              _context19.p = 2;
+              _context20.p = 2;
+              // FIX: scores y tipos de cambio en paralelo — no bloquean la carga principal
               setDataLoadingStatus({
-                status: 'Cargando scores precalculados...',
+                status: 'Iniciando carga de datos...',
                 progress: 5
               });
-              _context19.n = 3;
-              return fetchStrengthScores();
+              _context20.n = 3;
+              return Promise.all([fetchStrengthScores().then(function (v) {
+                setScoresVersion(function (v2) {
+                  return v2 + 1;
+                });
+                return v;
+              }), fetchForexRates()]);
             case 3:
-              // loads _precomputedScores; null = JS fallback
-              setScoresVersion(function (v) {
-                return v + 1;
-              }); // trigger re-render so getStrength() uses loaded scores
-
-              setDataLoadingStatus({
-                status: 'Cargando tipos de cambio...',
-                progress: 10
-              });
-              _context19.n = 4;
-              return fetchForexRates();
-            case 4:
-              rates = _context19.v;
+              _yield$Promise$all5 = _context20.v;
+              _yield$Promise$all6 = _slicedToArray(_yield$Promise$all5, 2);
+              _ = _yield$Promise$all6[0];
+              rates = _yield$Promise$all6[1];
               setForexRates(rates);
               setLastUpdate(new Date());
-              _context19.n = 5;
+              _context20.n = 4;
               return loadAllEconomicData(setEconomicData, setDataLoadingStatus);
-            case 5:
-              loadedData = _context19.v;
+            case 4:
+              loadedData = _context20.v;
               setDataLoadingStatus({
                 status: 'Cargando calendario económico...',
                 progress: 92
               });
-              _context19.n = 6;
+              _context20.n = 5;
               return fetchEconomicCalendar();
-            case 6:
-              calendarResult = _context19.v;
+            case 5:
+              calendarResult = _context20.v;
               setEconomicCalendar(calendarResult);
-              _context19.n = 7;
+              _context20.n = 6;
               return generateHistoricalData(loadedData, setDataLoadingStatus);
-            case 7:
-              historical = _context19.v;
+            case 6:
+              historical = _context20.v;
               setHistoricalData(historical);
               setDataLoadingStatus({
                 status: 'Cargando análisis AI (Groq)...',
                 progress: 96
               });
-              _context19.n = 8;
+              _context20.n = 7;
               return fetchAIAnalysis();
-            case 8:
-              aiData = _context19.v;
+            case 7:
+              aiData = _context20.v;
               if (aiData && Object.keys(aiData).length > 0) {
                 setAiAnalyses(aiData);
                 setAiAnalysisReady(true);
@@ -3463,10 +3473,10 @@ var ForexDashboard = function ForexDashboard() {
                 // determineCentralBankOutlook pueda usarlo en el cálculo del outlookScore
                 setEconomicData(function (prev) {
                   var updated = _objectSpread({}, prev);
-                  Object.entries(aiData).forEach(function (_ref38) {
-                    var _ref39 = _slicedToArray(_ref38, 2),
-                      currency = _ref39[0],
-                      analysis = _ref39[1];
+                  Object.entries(aiData).forEach(function (_ref39) {
+                    var _ref40 = _slicedToArray(_ref39, 2),
+                      currency = _ref40[0],
+                      analysis = _ref40[1];
                     if (updated[currency] && analysis.lastRateDecision) {
                       updated[currency] = _objectSpread(_objectSpread({}, updated[currency]), {}, {
                         _aiLastRateDecision: analysis.lastRateDecision
@@ -3488,11 +3498,11 @@ var ForexDashboard = function ForexDashboard() {
               });
               clearTimeout(globalTimeout);
               setIsLoading(false);
-              _context19.n = 10;
+              _context20.n = 9;
               break;
-            case 9:
-              _context19.p = 9;
-              _t15 = _context19.v;
+            case 8:
+              _context20.p = 8;
+              _t15 = _context20.v;
               console.error('Error loading initial data:', _t15);
               clearTimeout(globalTimeout);
               setDataLoadingStatus({
@@ -3500,31 +3510,31 @@ var ForexDashboard = function ForexDashboard() {
                 progress: 100
               });
               setIsLoading(false);
-            case 10:
-              return _context19.a(2);
+            case 9:
+              return _context20.a(2);
           }
-        }, _callee19, null, [[2, 9]]);
+        }, _callee20, null, [[2, 8]]);
       }));
       return function loadInitialData() {
-        return _ref35.apply(this, arguments);
+        return _ref36.apply(this, arguments);
       };
     }();
     loadInitialData();
-    var ratesInterval = setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee20() {
+    var ratesInterval = setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21() {
       var rates;
-      return _regenerator().w(function (_context20) {
-        while (1) switch (_context20.n) {
+      return _regenerator().w(function (_context21) {
+        while (1) switch (_context21.n) {
           case 0:
-            _context20.n = 1;
+            _context21.n = 1;
             return fetchForexRates();
           case 1:
-            rates = _context20.v;
+            rates = _context21.v;
             setForexRates(rates);
             setLastUpdate(new Date());
           case 2:
-            return _context20.a(2);
+            return _context21.a(2);
         }
-      }, _callee20);
+      }, _callee21);
     })), 60000);
     return function () {
       return clearInterval(ratesInterval);
@@ -3546,9 +3556,9 @@ var ForexDashboard = function ForexDashboard() {
       chartRefs.current = {};
     };
   }, [activeTab, historicalData]);
-  var DataHealthCheck = function DataHealthCheck(_ref41) {
+  var DataHealthCheck = function DataHealthCheck(_ref42) {
     var _health$issues, _health$warnings;
-    var economicData = _ref41.economicData;
+    var economicData = _ref42.economicData;
     var _useState27 = useState(null),
       _useState28 = _slicedToArray(_useState27, 2),
       health = _useState28[0],
@@ -3568,63 +3578,63 @@ var ForexDashboard = function ForexDashboard() {
     // D-01 FIX: cargar rates/health.json para detectar problemas de scraping
     useEffect(function () {
       var fetchRatesHealth = /*#__PURE__*/function () {
-        var _ref42 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21() {
+        var _ref43 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22() {
           var url, r, data, silentStatuses, problematicCurrencies, _t16;
-          return _regenerator().w(function (_context21) {
-            while (1) switch (_context21.p = _context21.n) {
+          return _regenerator().w(function (_context22) {
+            while (1) switch (_context22.p = _context22.n) {
               case 0:
-                _context21.p = 0;
+                _context22.p = 0;
                 url = 'https://globalinvesting.github.io/rates/health.json';
-                _context21.n = 1;
+                _context22.n = 1;
                 return fetch(url, {
                   cache: 'no-cache',
                   mode: 'cors'
                 });
               case 1:
-                r = _context21.v;
+                r = _context22.v;
                 if (r.ok) {
-                  _context21.n = 2;
+                  _context22.n = 2;
                   break;
                 }
-                return _context21.a(2);
+                return _context22.a(2);
               case 2:
-                _context21.n = 3;
+                _context22.n = 3;
                 return r.json();
               case 3:
-                data = _context21.v;
+                data = _context22.v;
                 // 'ok' y 'degraded_cached' no requieren alerta — datos disponibles y válidos
                 silentStatuses = ['ok', 'degraded_cached'];
                 if (!(silentStatuses.includes(data.overallStatus) && !(data.issues && data.issues.length > 0))) {
-                  _context21.n = 4;
+                  _context22.n = 4;
                   break;
                 }
-                return _context21.a(2);
+                return _context22.a(2);
               case 4:
                 // Alertar solo si hay divisas verdaderamente sin datos (missing) o con issues
-                problematicCurrencies = Object.entries(data.currencies || {}).filter(function (_ref43) {
-                  var _ref44 = _slicedToArray(_ref43, 2),
-                    info = _ref44[1];
+                problematicCurrencies = Object.entries(data.currencies || {}).filter(function (_ref44) {
+                  var _ref45 = _slicedToArray(_ref44, 2),
+                    info = _ref45[1];
                   return info.status === 'fallback' || info.status === 'missing';
-                }).map(function (_ref45) {
-                  var _ref46 = _slicedToArray(_ref45, 1),
-                    ccy = _ref46[0];
+                }).map(function (_ref46) {
+                  var _ref47 = _slicedToArray(_ref46, 1),
+                    ccy = _ref47[0];
                   return ccy;
                 });
                 if (problematicCurrencies.length > 0 || data.issues && data.issues.length > 0) {
                   setRatesHealth(data);
                 }
-                _context21.n = 6;
+                _context22.n = 6;
                 break;
               case 5:
-                _context21.p = 5;
-                _t16 = _context21.v;
+                _context22.p = 5;
+                _t16 = _context22.v;
               case 6:
-                return _context21.a(2);
+                return _context22.a(2);
             }
-          }, _callee21, null, [[0, 5]]);
+          }, _callee22, null, [[0, 5]]);
         }));
         return function fetchRatesHealth() {
-          return _ref42.apply(this, arguments);
+          return _ref43.apply(this, arguments);
         };
       }();
       fetchRatesHealth();
@@ -3634,23 +3644,23 @@ var ForexDashboard = function ForexDashboard() {
 
     // Preparar alertas de tasas de interés
     var ratesIssues = (ratesHealth === null || ratesHealth === void 0 ? void 0 : ratesHealth.issues) || [];
-    var fallbackCcys = Object.entries((ratesHealth === null || ratesHealth === void 0 ? void 0 : ratesHealth.currencies) || {}).filter(function (_ref47) {
-      var _ref48 = _slicedToArray(_ref47, 2),
-        info = _ref48[1];
+    var fallbackCcys = Object.entries((ratesHealth === null || ratesHealth === void 0 ? void 0 : ratesHealth.currencies) || {}).filter(function (_ref48) {
+      var _ref49 = _slicedToArray(_ref48, 2),
+        info = _ref49[1];
       return info.status === 'fallback';
-    }).map(function (_ref49) {
-      var _ref50 = _slicedToArray(_ref49, 2),
-        ccy = _ref50[0],
-        info = _ref50[1];
+    }).map(function (_ref50) {
+      var _ref51 = _slicedToArray(_ref50, 2),
+        ccy = _ref51[0],
+        info = _ref51[1];
       return "".concat(ccy, " (fuente alternativa: ").concat(info.source, ")");
     });
-    var missingCcys = Object.entries((ratesHealth === null || ratesHealth === void 0 ? void 0 : ratesHealth.currencies) || {}).filter(function (_ref51) {
-      var _ref52 = _slicedToArray(_ref51, 2),
-        info = _ref52[1];
+    var missingCcys = Object.entries((ratesHealth === null || ratesHealth === void 0 ? void 0 : ratesHealth.currencies) || {}).filter(function (_ref52) {
+      var _ref53 = _slicedToArray(_ref52, 2),
+        info = _ref53[1];
       return info.status === 'missing';
-    }).map(function (_ref53) {
-      var _ref54 = _slicedToArray(_ref53, 1),
-        ccy = _ref54[0];
+    }).map(function (_ref54) {
+      var _ref55 = _slicedToArray(_ref54, 1),
+        ccy = _ref55[0];
       return ccy;
     });
     return /*#__PURE__*/React.createElement("div", {
