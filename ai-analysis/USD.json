@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal ha mantenido una postura dovish, recortando las tasas en 0.25pp en diciembre 2025 y manteniéndolas en 3.75% desde entonces, lo que ejerce presión bajista sobre la divisa. Aunque los mercados de futuros ya descuentan un recorte adicional, las declaraciones del gobernador sugieren que el camino de las tasas está nubrado por la incertidumbre, como señala un estratega de BNY. Esto se refleja en la decisión de la Fed de no cambiar las tasas en la reunión del FOMC de marzo, lo que indica una cautela en su política monetaria.\n\nLa cuenta corriente y la balanza comercial presentan un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora muestra que los combustibles y el petróleo son una parte significativa de las exportaciones, lo que sugiere que los precios de las commodities pueden influir en la balanza comercial. Aunque el PMI manufacturero indica expansión, la producción industrial solo creció 0.2% mensual, lo que podría ser un indicio de una desaceleración en el sector.\n\nEl posicionamiento especulativo neto es bajista, con -5.6K contratos netos, y el rendimiento FX del último mes ha sido de -3.51% vs USD, lo que sugiere una depreciación de la divisa. La noticia de que los mercados comienzan a apostar por un posible aumento de tasas por parte de la Fed ha fortalecido al dólar, como se refleja en la caída del oro, lo que indica que la incertidumbre sobre el camino de las tasas sigue siendo un factor clave en el mercado.",
+  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo bajista y presión bajista sobre la divisa. Aunque la tasa de interés sigue estando por encima del promedio global, la decisión de bajar tasas sugiere un enfoque más dovish, lo que podría debilitar la divisa. La inflación anual de 2.4% y el crecimiento del PIB del 2.0% anual son factores que podrían influir en la política monetaria futura.\n\nLa balanza comercial muestra un déficit pronunciado de -54.5B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, liderada por combustibles y petróleo, maquinaria industrial y equipos eléctricos y electrónicos, sugiere que la economía está expuesta a factores externos como los precios de las commodities y la demanda global. Las noticias sobre la posible reapertura del estrecho de Ormuz y la coordinación de la liberación de reservas petroleras adicionales podrían influir en los precios de las commodities y, por ende, en la balanza comercial.\n\nEl posicionamiento especulativo neto bajista, con -5.6K contratos netos, y el rendimiento FX del último mes de -3.28% vs USD, sugieren que el mercado está apostando por una debilidad continua de la divisa. Aunque las noticias sobre un posible alto al fuego y la reapertura del estrecho de Ormuz han generado cierta cautela en el mercado, la tendencia general sigue siendo bajista. La divisa sigue cotizando en niveles bajos, lo que podría atraer a inversores a corto plazo en busca de oportunidades de compra.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-24T10:08:33.284990+00:00",
+  "generatedAt": "2026-03-25T10:08:39.275222+00:00",
   "exportComposition": "Comtrade 2023: combustibles y petróleo (20%, $572.8B), maquinaria industrial (13%, $381.9B), equipos eléctricos y electrónicos (13%, $373.2B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": -5615,
-    "fxPerformance1M": -3.508,
+    "fxPerformance1M": -3.2807,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-24",
-    "latestNewsTs": 1774333463.0,
+    "lastUpdate": "2026-03-25",
+    "latestNewsTs": 1774419931.0,
     "newsHeadlines": [
-      "Fed: War fog clouds rate path – BNY",
-      "Gold adds to intraday losses as emerging Fed rate hike bets underpin USD",
-      "Market jitters start to creep in again after the cautious optimism yesterday"
+      "Japan reportedly calls on IEA to coordinate release of additional oil stockpile",
+      "Ceasefire Hopes Lift Markets, FX Signals Skepticism Over Strait of Hormuz Reopen",
+      "Canadian Dollar declines below 1.3800 on safe-haven demand, Fed rate hike bets"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.38,
     "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.08,
+    "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 0.65,
+    "avg_fx_perf_1m": 1.07,
     "avg_cot": -9265.62
   }
 }

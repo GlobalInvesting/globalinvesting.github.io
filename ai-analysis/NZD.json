@@ -2,9 +2,9 @@
   "currency": "NZD",
   "country": "Nueva Zelanda",
   "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con un recorte de tasas de 0.25pp en noviembre 2025, lo que ha mantenido la tasa de interés en 2.25%, por debajo del promedio global. Esto sugiere un enfoque dovish que ejerce presión bajista sobre la divisa. Aunque los mercados de futuros ya descuentan un entorno de bajadas, la inflación anual del 3.1% sigue por encima del objetivo, lo que podría influir en las decisiones futuras del banco central.\n\nLa balanza comercial de Nueva Zelanda muestra un déficit, influenciado por la composición exportadora que se centra en madera y manufacturas, maquinaria industrial, y equipos eléctricos y electrónicos. La volatilidad en los mercados de commodities, como el petróleo, puede afectar estos sectores, aunque el régimen global risk-off podría dirigir flujos hacia activos refugio como el oro, lo que central banks están dispuestas a comprar según se informa.\n\nEl posicionamiento especulativo neto bajista, con -15.9K contratos netos, y el rendimiento FX del último mes que muestra una apreciación del 2.87% vs USD, sugieren un panorama complejo. Aunque el gobernador del RBNZ, Anna Breman, ha advertido sobre un posible aumento de la inflación debido al conflicto en Medio Oriente, lo que podría influir en las decisiones de política monetaria, el mercado parece haber reaccionado a estos factores de manera mixta, introduciendo incertidumbre de corto plazo en el valor de la divisa.",
+  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con un recorte de tasas de 0.25pp en noviembre 2025, lo que ha mantenido la tasa de interés en 2.25%, por debajo del promedio global. Esto ha generado una presión bajista sobre la divisa, ya que el menor carry la hace menos atractiva para los inversores. Además, el ciclo bajista en 12 meses y la inflación por encima del objetivo sugieren que el banco central puede seguir con esta tendencia. Las declaraciones del jefe de economistas del RBNZ, Paul Conway, sobre la existencia de holgura en la economía, también apuntan a una respuesta más cautelosa ante los choques externos.\n\nLa balanza comercial de Nueva Zelanda muestra un déficit, lo que ejerce presión vendedora sobre la divisa. La composición exportadora del país, liderada por la madera y manufacturas, maquinaria industrial y equipos eléctricos y electrónicos, sugiere que la economía es sensible a los cambios en la demanda global y los precios de las commodities. Aunque el término de intercambio es favorable, la cuenta corriente en déficit y la salida neta de capital ponen presión sobre la divisa.\n\nEl posicionamiento especulativo neto bajista, con -15.9K contratos netos, y el rendimiento FX del último mes, que muestra una apreciación del 3.22% vs USD, sugieren que el mercado puede estar sobrevalorando la divisa. Las preocupaciones sobre el poder adquisitivo y la inflación estructuralmente alta, mencionadas por Conway, también pueden influir en la percepción de los inversores. La tendencia a corto plazo puede ser volátil, con riesgo de corrección si los fundamentos no mejoran.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-24T10:09:10.561325+00:00",
+  "generatedAt": "2026-03-25T10:09:18.334049+00:00",
   "exportComposition": "Comtrade 2023: madera y manufacturas (21%, $2.9B), maquinaria industrial (16%, $2.2B), equipos eléctricos y electrónicos (14%, $2.0B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
     },
     "cotPositioning": -15917,
-    "fxPerformance1M": 2.8669,
+    "fxPerformance1M": 3.2152,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-24",
-    "latestNewsTs": 1774332957.0,
+    "lastUpdate": "2026-03-25",
+    "latestNewsTs": 1774405547.0,
     "newsHeadlines": [
-      "This oil analysis today at shows sellers may come out well",
-      "Central banks seen sustaining gold demand amid geopolitics and dedollarisation",
-      "RBNZ’s Breman warns of inflation spike but cautions against overreaction"
+      "RBNZ’s Conway sees economic slack shaping response to oil shock",
+      "RBNZ’s Conway warns on purchasing power as Iran shock clouds NZ outlook, GDP 4ca",
+      "EV interest surges as rising fuel costs bite, Westpac NZ research shows"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.38,
     "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.08,
+    "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 0.65,
+    "avg_fx_perf_1m": 1.07,
     "avg_cot": -9265.62
   }
 }

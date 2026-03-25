@@ -2,15 +2,15 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que sugiere un enfoque más dovish y presiona a la baja la divisa. Aunque la tasa de interés del Reino Unido es superior al promedio global, el ciclo bajista de las tasas en 12 meses y la decisión de recortar tasas indican una menor presión alcista sobre la divisa. La inflación anual del 2.8% por encima del objetivo y el crecimiento del PIB del 0.8% anual, inferior al promedio global, también influyen en la decisión del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, dominada por piedras preciosas y metales, y bebidas y líquidos alcohólicos, no parece ser lo suficientemente fuerte como para revertir este déficit. Además, los términos de intercambio desfavorables y el déficit en la cuenta corriente también contribuyen a esta presión.\n\nEl posicionamiento especulativo en el mercado, con +11.8K contratos netos, muestra un sesgo alcista, aunque no extremo. La noticia de que Bank of America ha realizado una apuesta bajista importante sobre la libra esterlina introduce incertidumbre en el mercado. Además, la expectativa de que el informe de inflación del Reino Unido pueda influir en la política monetaria del Banco de Inglaterra también puede afectar el valor de la divisa en el corto plazo.",
+  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo bajista en 12 meses con -0.75pp acumulados. Esta decisión dovish ejerce presión bajista sobre la divisa, aunque la tasa de interés del Reino Unido sigue siendo 1.37pp por encima del promedio global. La inflación anual del 3.0% supera el objetivo del banco central, lo que podría influir en futuras decisiones monetarias.\n\nLa cuenta corriente y la balanza comercial muestran un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora del Reino Unido se basa principalmente en piedras preciosas y metales, así como en bebidas y líquidos alcohólicos, lo que explica en parte el déficit comercial. Aunque el PMI manufacturero indica expansión, la producción industrial muestra una caída mensual, lo que introduce incertidumbre en el sector.\n\nEl posicionamiento especulativo muestra un sesgo alcista con +11.8K contratos netos, y el rendimiento FX del último mes ha sido positivo con +1.54% vs USD. La expectativa de que el CPI del Reino Unido refleje una inflación persistente en febrero, por encima del objetivo del Banco de Inglaterra, ha llevado al Pound Sterling a cotizar con cautela ante sus pares mayores, lo que introduce cierta incertidumbre de corto plazo en el par GBP/USD.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-24T10:08:42.618607+00:00",
+  "generatedAt": "2026-03-25T10:08:48.951472+00:00",
   "exportComposition": "Comtrade 2023: piedras preciosas y metales (77%, $0.9B), bebidas y líquidos alcohólicos (19%, $0.2B), productos químicos orgánicos (0%, $0.0B)",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 3.75,
     "gdpGrowth": 0.8,
-    "inflation": 2.8,
+    "inflation": 3.0,
     "unemployment": 5.2,
     "currentAccount": -2.2,
     "rateMomentum": -0.75,
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 11768,
-    "fxPerformance1M": 1.2999,
+    "fxPerformance1M": 1.539,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-24",
-    "latestNewsTs": 1774316520.0,
+    "lastUpdate": "2026-03-25",
+    "latestNewsTs": 1774419300.0,
     "newsHeadlines": [
-      "Event Guide: U.K. CPI Report (February 2026)",
-      "Starmer signals support for household bills next winter amid energy price shock",
-      "British Pound Faces Dire Forecast as Bank of America Places Major Bearish Bet"
+      "UK CPI expected to reflect persistent inflation in February, well above BoE’s ta",
+      "Pound Sterling Price News and Forecast: GBP/USD is slightly under pressure ahead",
+      "Pound Sterling trades cautiously ahead of UK CPI data release"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.38,
     "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.08,
+    "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 0.65,
+    "avg_fx_perf_1m": 1.07,
     "avg_cot": -9265.62
   }
 }

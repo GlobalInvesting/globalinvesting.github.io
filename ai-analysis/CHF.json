@@ -2,11 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "El Banco Nacional Suizo mantiene una postura dovish, habiendo recortado las tasas en 0.25pp en junio 2025 y manteniéndolas en 0.00% desde entonces. Esto genera una presión bajista sobre la divisa, aunque su perfil de activo refugio y el superávit de cuenta corriente del 5.1% del PIB pueden mitigar esta tendencia en momentos de tensión global. La tasa de interés muy por debajo del promedio global también sugiere que la divisa puede ser utilizada como financiadora de carry trade, lo que podría llevar a una apreciación brusca en episodios de aversión al riesgo.\n\nLa composición exportadora de Suiza, con productos farmacéuticos e instrumentos de precisión como principales exportaciones, contribuye al superávit comercial del país. Aunque la producción industrial y el PMI manufacturero muestran signos de contracción, la cuenta corriente y la balanza comercial siguen siendo positivas. La noticia sobre el uso del inglés como lengua dominante en los consejos de administración de empresas europeas como Airbus y Siemens no parece tener un impacto directo en la economía suiza, pero refleja la globalización y la interconexión de los mercados.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo alcista, con 0.5K contratos netos, y el rendimiento FX del último mes ha sido positivo, con una apreciación del 2.12% versus el dólar estadounidense. Esto sugiere que el mercado está valorando la divisa suiza como un activo refugio, lo que podría continuar en un régimen de risk-off. Sin embargo, la presión bajista generada por la política monetaria dovish del Banco Nacional Suizo podría limitar el alcance de esta apreciación.",
+  "analysis": "El Banco Nacional Suizo ha mantenido su tasa de interés en 0.00% desde que la recortó 0.25pp en junio 2025, lo que sugiere un enfoque dovish y presión bajista sobre la divisa. Aunque los mercados de futuros no descuentan movimientos significativos en las tasas a corto plazo, el presidente del SNB ha mencionado que están preparados para introducir tasas negativas si es necesario, lo que introduce una nota de precaución en el mercado. Esta postura expansiva y la tasa muy por debajo del promedio global la convierten en una divisa probable financiadora de carry trade.\n\nLa cuenta corriente suiza muestra un superávit del 5.1% del PIB, lo que genera una demanda estructural de la divisa. La composición exportadora, liderada por productos farmacéuticos y instrumentos de precisión, explica en parte este superávit. Aunque el PMI manufacturero indica contracción, la producción industrial ha mostrado un leve crecimiento. La economía suiza parece navegar en un entorno desafiante, pero su perfil de activo refugio podría atraer flujos defensivos en momentos de tensión global.\n\nEl rendimiento FX del franco suizo ha sido positivo en el último mes, con una apreciación del 2.59% versus el dólar estadounidense. El posicionamiento especulativo, aunque ligeramente alcista con +0.5K contratos netos, no sugiere un riesgo inminente de corrección. La sesión europea ha comenzado con expectativas de PMIs peores que los esperados, lo que podría influir en el comportamiento del par en el corto plazo. Sin embargo, el franco suizo parece mantener su terreno, apoyado por su perfil de refugio y la cautela del SNB respecto a futuras decisiones monetarias.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-24T10:09:06.042326+00:00",
+  "generatedAt": "2026-03-25T10:09:13.320900+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 1,
+  "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.7,
@@ -25,21 +25,23 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 513,
-    "fxPerformance1M": 2.1208,
+    "fxPerformance1M": 2.5947,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-24",
-    "latestNewsTs": 1774268961.0,
+    "lastUpdate": "2026-03-25",
+    "latestNewsTs": 1774376530.0,
     "newsHeadlines": [
-      "The unspoken rule: is English really the key to success in Europe’s boardrooms?"
+      "Swiss Market Ends On Firm Note",
+      "SNB Chairman: We are prepared to introduce negative rates but the hurdle is high",
+      "What are the main events for today?"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.38,
     "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.08,
+    "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 0.65,
+    "avg_fx_perf_1m": 1.07,
     "avg_cot": -9265.62
   }
 }

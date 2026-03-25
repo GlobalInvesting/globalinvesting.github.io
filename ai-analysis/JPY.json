@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio de 2025 y ha mantenido este nivel desde entonces, lo que sugiere un ciclo alcista para la divisa. Aunque la tasa de interés del 0.75% sigue estando por debajo del promedio global, la decisión del banco central de subir las tasas indica una postura más restrictiva. El gobernador del Banco de Japón, Kazuo Ueda, ha expresado que espera que la inflación subyacente acelere moderadamente, lo que podría justificar futuras subidas de tasas.\n\nLa balanza comercial de Japón muestra un superávit, gracias en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Esto sugiere que la demanda estructural de la divisa es fuerte. Sin embargo, la inflación en Japón ha seguido una tendencia a la baja, con el índice de precios al consumidor coreano cayendo a 1.7% en febrero, lo que podría influir en las decisiones del banco central.\n\nEl posicionamiento especulativo en el mercado es muy bajista, con -65K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. A pesar de esto, la divisa se ha apreciado un 3.7% en el último mes, lo que podría indicar un posible squeeze de cortos. En este contexto, el mercado parece estar preparado para una posible subida adicional de tasas por parte del Banco de Japón, lo que podría impulsar la divisa hacia niveles más altos.",
+  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio de 2025 y ha mantenido este nivel desde entonces, lo que indica un ciclo alcista y presión alcista sobre la divisa. Aunque la tasa de interés del 0.75% está por debajo del promedio global, la decisión del banco central de subir las tasas sugiere un enfoque hawkish. La inflación anual del 1.3% está por debajo del objetivo, pero el crecimiento del PIB del 0.7% es inferior al promedio global.\n\nLa cuenta corriente muestra un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. La balanza comercial también muestra un superávit en bienes, lo que se debe en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Las noticias recientes sobre la reunión del Banco de Japón sugieren que el banco central mantiene un enfoque de ajuste gradual de las tasas, lo que podría influir en la percepción del mercado sobre la divisa.\n\nEl posicionamiento especulativo muestra una posición corta extrema, con -65K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. A pesar de esto, la divisa se apreció un 3.4% en el último mes, lo que podría indicar un posible squeeze de cortos. Las noticias recientes sobre el yen japonés sugieren que la divisa ha recibido apoyo después de la publicación de las actas de la reunión del Banco de Japón, lo que podría influir en la dirección del par en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-24T10:08:47.178630+00:00",
+  "generatedAt": "2026-03-25T10:08:53.552489+00:00",
   "exportComposition": "Comtrade 2023: vehículos y autopartes (32%, $370.1B), maquinaria industrial (19%, $215.6B), equipos eléctricos y electrónicos (16%, $184.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,23 +25,23 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -65429,
-    "fxPerformance1M": 3.7019,
+    "fxPerformance1M": 3.439,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-24",
-    "latestNewsTs": 1774332224.0,
+    "lastUpdate": "2026-03-25",
+    "latestNewsTs": 1774420706.0,
     "newsHeadlines": [
-      "BoJ’s Ueda says to expect underlying inflation to accelerate moderately",
-      "BOJ governor Ueda says underlying inflation is expected to accelerate moderately",
-      "Japan core CPI falls to 1.7% in February, as energy costs drag inflation lower"
+      "Japanese Yen softens despite BoJ hawkish tone",
+      "Japanese Yen receives support following BoJ Meeting Minutes",
+      "BoJ minutes signal gradual rate hikes as inflation nears target and oil risks ri"
     ]
   },
   "globalContext": {
     "avg_interest_rate": 2.38,
     "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.08,
+    "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 0.65,
+    "avg_fx_perf_1m": 1.07,
     "avg_cot": -9265.62
   }
 }
