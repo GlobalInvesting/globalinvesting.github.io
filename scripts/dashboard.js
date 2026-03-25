@@ -983,6 +983,80 @@ var getStrength = function getStrength(currency) {
     _unavailable: true
   };
 };
+
+// ── DAILY MOMENTUM — derived from strength-scores history ────────────────────
+// Loads all.json snapshots, takes the last 5 trading days, computes per-currency:
+//   delta5d   : score change over 5 days (today − oldest)
+//   dailyChange: last single-day change
+//   trend     : 'rising' | 'falling' | 'flat'  (threshold ±2 pts)
+var _dailyMomentumCache = null;
+var fetchDailyMomentum = /*#__PURE__*/function () {
+  var _ref_dm = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee_dm() {
+    var cacheKey, cached, url, resp, allData, snapshots, recent, CURRENCIES, result, curr, scores, oldest, newest;
+    return _regenerator().w(function (_ctx) {
+      while (1) switch (_ctx.p = _ctx.n) {
+        case 0:
+          cacheKey = 'daily_momentum_v1';
+          cached = CacheManager.get(cacheKey);
+          if (!(cached !== null)) { _ctx.n = 1; break; }
+          _dailyMomentumCache = cached;
+          return _ctx.a(2, cached);
+        case 1:
+          _ctx.p = 1;
+          url = 'https://globalinvesting.github.io/strength-scores/all.json';
+          _ctx.n = 2;
+          return fetchWithTimeout(url, { cache: 'no-cache', mode: 'cors' }, 5000);
+        case 2:
+          resp = _ctx.v;
+          if (resp.ok) { _ctx.n = 3; break; }
+          throw new Error('all.json not available for momentum');
+        case 3:
+          _ctx.n = 4;
+          return resp.json();
+        case 4:
+          allData = _ctx.v;
+          snapshots = Array.isArray(allData) ? allData : (allData.snapshots || []);
+          // Sort ascending by date and take last 6 (to compute 5 deltas)
+          recent = _toConsumableArray(snapshots)
+            .filter(function(s) { return s && s.scores && s.lastUpdate; })
+            .sort(function(a, b) { return a.lastUpdate < b.lastUpdate ? -1 : 1; })
+            .slice(-6);
+          if (recent.length < 2) {
+            _dailyMomentumCache = {};
+            CacheManager.set(cacheKey, {}, 3600);
+            return _ctx.a(2, {});
+          }
+          CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'];
+          result = {};
+          for (var i = 0; i < CURRENCIES.length; i++) {
+            curr = CURRENCIES[i];
+            scores = recent.map(function(s) {
+              var entry = s.scores[curr];
+              return entry ? entry.score : null;
+            }).filter(function(v) { return v !== null; });
+            if (scores.length < 2) { result[curr] = { delta5d: 0, dailyChange: 0, trend: 'flat', scores: scores }; continue; }
+            oldest = scores[0];
+            newest = scores[scores.length - 1];
+            var delta5d = parseFloat((newest - oldest).toFixed(2));
+            var dailyChange = scores.length >= 2 ? parseFloat((scores[scores.length - 1] - scores[scores.length - 2]).toFixed(2)) : 0;
+            var trend = delta5d >= 2 ? 'rising' : delta5d <= -2 ? 'falling' : 'flat';
+            result[curr] = { delta5d: delta5d, dailyChange: dailyChange, trend: trend, scores: scores };
+          }
+          _dailyMomentumCache = result;
+          CacheManager.set(cacheKey, result, 3600);
+          console.log('[momentum] Daily momentum loaded:', Object.entries(result).map(function(e) { return e[0] + ':' + e[1].delta5d; }).join(', '));
+          return _ctx.a(2, result);
+        case 5:
+          _ctx.p = 5;
+          console.warn('[momentum] Failed to load daily momentum:', _ctx.v && _ctx.v.message);
+          _dailyMomentumCache = {};
+          return _ctx.a(2, {});
+      }
+    }, _callee_dm, null, [[1, 5]]);
+  }));
+  return function fetchDailyMomentum() { return _ref_dm.apply(this, arguments); };
+}();
+
 var fetchAIAnalysis = /*#__PURE__*/function () {
   var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
     var cacheKey, cached, indexUrl, indexResponse, index, analyses, promises, _t10;
@@ -1352,6 +1426,7 @@ var generateHistoricalData = /*#__PURE__*/function () {
 }();
 var generateForexPairRecommendations = function generateForexPairRecommendations(economicData, forexRates) {
   var calendarEvents = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var dailyMomentum = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
   var cacheKey = 'forex_pair_recommendations';
   var cached = CacheManager.get(cacheKey);
   if (cached !== null) return cached;
@@ -1469,6 +1544,11 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposing = pairMom1M !== null && pairMom1M < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShort = weakCurr === 'JPY';
+      // Daily momentum (5-day score delta from strength-scores history)
+      var strongDailyMom = dailyMomentum[strongCurr] || null;
+      var weakDailyMom = dailyMomentum[weakCurr] || null;
+      // Penalizar si el strong está cayendo en los últimos 5 días
+      var strongCorrection = strongDailyMom && strongDailyMom.delta5d <= -3;
       recommendations.push({
         type: 'long',
         pair: pairName,
@@ -1486,7 +1566,10 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         pairMom1M: pairMom1M,
         momentumOpposing: momentumOpposing,
         jpyAsShort: jpyAsShort,
-        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0)
+        strongDailyMom: strongDailyMom,
+        weakDailyMom: weakDailyMom,
+        strongCorrection: strongCorrection,
+        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0) * (strongCorrection ? 0.7 : 1.0)
       });
     });
   });
@@ -1520,6 +1603,11 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposingS = pairMom1MS !== null && pairMom1MS < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShortS = weakCurr === 'JPY';
+      // Daily momentum for SHORT: confirma si el weak sigue cayendo (tendencia negativa)
+      var strongDailyMomS = dailyMomentum[strongCurr] || null;
+      var weakDailyMomS = dailyMomentum[weakCurr] || null;
+      // Confirma short si el weak está en corrección (subiendo últimos 5 días = adverso para short)
+      var weakRebounding = weakDailyMomS && weakDailyMomS.delta5d >= 3;
       recommendations.push({
         type: 'short',
         pair: pairName,
@@ -1537,7 +1625,10 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         pairMom1M: pairMom1MS,
         momentumOpposing: momentumOpposingS,
         jpyAsShort: jpyAsShortS,
-        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0)
+        strongDailyMom: strongDailyMomS,
+        weakDailyMom: weakDailyMomS,
+        weakRebounding: weakRebounding,
+        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0) * (weakRebounding ? 0.7 : 1.0)
       });
     });
   });
@@ -3432,12 +3523,13 @@ var ForexDashboard = function ForexDashboard() {
                   return v2 + 1;
                 });
                 return v;
-              }), fetchForexRates()]);
+              }), fetchForexRates(), fetchDailyMomentum()]);
             case 3:
               _yield$Promise$all5 = _context20.v;
-              _yield$Promise$all6 = _slicedToArray(_yield$Promise$all5, 2);
+              _yield$Promise$all6 = _slicedToArray(_yield$Promise$all5, 3);
               _ = _yield$Promise$all6[0];
               rates = _yield$Promise$all6[1];
+              // _yield$Promise$all6[2] is dailyMomentum — stored in _dailyMomentumCache by fetchDailyMomentum
               setForexRates(rates);
               setLastUpdate(new Date());
               _context20.n = 4;
@@ -3490,7 +3582,7 @@ var ForexDashboard = function ForexDashboard() {
                 status: 'Generando recomendaciones de pares...',
                 progress: 98
               });
-              pairRecommendations = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null);
+              pairRecommendations = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null, _dailyMomentumCache || {});
               setDynamicAlerts(pairRecommendations);
               setDataLoadingStatus({
                 status: 'Completado',
@@ -5192,9 +5284,9 @@ var ForexDashboard = function ForexDashboard() {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-title"
-  }, "Mejores Pares de Divisas - An\xE1lisis Fundamental"), /*#__PURE__*/React.createElement("div", {
+  }, "Mejores Pares de Divisas - An\xE1lisis Fundamental y Momentum"), /*#__PURE__*/React.createElement("div", {
     className: "section-meta"
-  }, "Basado en diferenciales de fortaleza fundamental \xB7 Horizonte estimado: 2\u20136 semanas \xB7 Solo se\xF1ales con diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
+  }, "Basado en diferenciales de fortaleza fundamental + momentum diario (5 d\xEDas) \xB7 Horizonte estimado: 2\u20136 semanas \xB7 Solo se\xF1ales con diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))',
@@ -5254,7 +5346,22 @@ var ForexDashboard = function ForexDashboard() {
         padding: '2px 7px',
         cursor: 'help'
       }
-    }, "JPY risk-off"))), /*#__PURE__*/React.createElement("div", {
+    }, "JPY risk-off")),
+    (rec.strongCorrection || rec.weakRebounding) && /*#__PURE__*/React.createElement("span", {
+      title: rec.strongCorrection
+        ? rec.strongCurrency + " est\xE1 corrigiendo en el momentum de corto plazo (score cay\xF3 " + (rec.strongDailyMom ? Math.abs(rec.strongDailyMom.delta5d).toFixed(1) : '?') + " pts en 5 d\xEDas). Los fundamentos siguen siendo s\xF3lidos pero el timing puede no ser \xF3ptimo."
+        : rec.weakCurrency + " est\xE1 rebotando en el corto plazo (score subi\xF3 " + (rec.weakDailyMom ? Math.abs(rec.weakDailyMom.delta5d).toFixed(1) : '?') + " pts en 5 d\xEDas). Puede haber una recuperaci\xF3n temporal antes de continuar bajando.",
+      style: {
+        fontSize: '0.75rem',
+        background: 'rgba(245, 158, 11, 0.15)',
+        color: '#f59e0b',
+        border: '1px solid rgba(245, 158, 11, 0.3)',
+        borderRadius: '4px',
+        padding: '2px 7px',
+        cursor: 'help'
+      }
+    }, rec.strongCorrection ? "\u2198 Correcc. 5d" : "\u2197 Rebote 5d")
+    )), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: 'right'
       }
@@ -5393,14 +5500,62 @@ var ForexDashboard = function ForexDashboard() {
       style: {
         color: 'var(--text-primary)'
       }
-    }, "An\xE1lisis:"), rec.type === 'long' ? /*#__PURE__*/React.createElement("span", null, " ", rec.strongCurrency, " muestra fundamentos superiores con un \xEDndice de fortaleza de ", rec.strength != null ? rec.strength.toFixed(1) : '—', " puntos, superando a ", rec.weakCurrency, " (", rec.weakness != null ? rec.weakness.toFixed(1) : '—', ") por un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos. Este diferencial sugiere una oportunidad de compra (LONG) en ", rec.pair, ".") : /*#__PURE__*/React.createElement("span", null, " ", rec.weakCurrency, " registra debilidad fundamental con ", rec.weakness != null ? rec.weakness.toFixed(1) : '—', " puntos frente a la fortaleza de ", rec.strongCurrency, " (", rec.strength != null ? rec.strength.toFixed(1) : '—', "), generando un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos. Esto indica una oportunidad de venta (SHORT) en ", rec.pair, ".")), /*#__PURE__*/React.createElement("div", {
+    }, "An\xE1lisis:"), rec.type === 'long' ? /*#__PURE__*/React.createElement("span", null, " ", rec.strongCurrency, " muestra fundamentos superiores con un \xEDndice de fortaleza de ", rec.strength != null ? rec.strength.toFixed(1) : '—', " puntos, superando a ", rec.weakCurrency, " (", rec.weakness != null ? rec.weakness.toFixed(1) : '—', ") por un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos.", rec.strongDailyMom && rec.strongDailyMom.trend !== 'flat' ? " Momentum diario de " + rec.strongCurrency + " (" + (rec.strongDailyMom.delta5d > 0 ? "+" : "") + rec.strongDailyMom.delta5d.toFixed(1) + " pts en 5 d\xEDas): " + (rec.strongDailyMom.trend === 'rising' ? "tendencia al alza confirma la se\xF1al." : "en correcci\xF3n reciente \u2014 monitorear entrada.") : "", " Este diferencial sugiere una oportunidad de compra (LONG) en ", rec.pair, ".") : /*#__PURE__*/React.createElement("span", null, " ", rec.weakCurrency, " registra debilidad fundamental con ", rec.weakness != null ? rec.weakness.toFixed(1) : '—', " puntos frente a la fortaleza de ", rec.strongCurrency, " (", rec.strength != null ? rec.strength.toFixed(1) : '—', "), generando un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos.", rec.weakDailyMom && rec.weakDailyMom.trend !== 'flat' ? " Momentum diario de " + rec.weakCurrency + " (" + (rec.weakDailyMom.delta5d > 0 ? "+" : "") + rec.weakDailyMom.delta5d.toFixed(1) + " pts en 5 d\xEDas): " + (rec.weakDailyMom.trend === 'falling' ? "sigue cayendo, confirma el SHORT." : "rebotando \u2014 posible recuperaci\xF3n temporal.") : "", " Esto indica una oportunidad de venta (SHORT) en ", rec.pair, ".")),
+    /*#__PURE__*/React.createElement("div", {
       style: {
         marginTop: '1rem',
+        background: 'var(--bg-elevated)',
+        border: '1px solid var(--border)',
+        borderRadius: '4px',
+        padding: '0.625rem 0.75rem'
+      }
+    },
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }
+    }, "Momentum diario (5 d\xEDas)"),
+    /*#__PURE__*/React.createElement("div", {
+      style: { display: 'flex', gap: '1rem', flexWrap: 'wrap' }
+    },
+    [
+      { code: rec.strongCurrency, mom: rec.strongDailyMom, label: rec.type === 'long' ? 'Compra' : 'Fuerte' },
+      { code: rec.weakCurrency,   mom: rec.weakDailyMom,   label: rec.type === 'long' ? 'Venta'  : 'D\xE9bil'  }
+    ].map(function(item) {
+      var mom = item.mom;
+      var d5 = mom ? mom.delta5d : null;
+      var trend = mom ? mom.trend : 'flat';
+      var arrow = trend === 'rising' ? '\u2197' : trend === 'falling' ? '\u2198' : '\u2192';
+      var clr = trend === 'rising' ? 'var(--green-strong)' : trend === 'falling' ? 'var(--red-strong)' : 'var(--text-tertiary)';
+      var warn = (rec.type === 'long' && item.code === rec.strongCurrency && trend === 'falling') ||
+                 (rec.type === 'short' && item.code === rec.weakCurrency && trend === 'rising');
+      return /*#__PURE__*/React.createElement("div", {
+        key: item.code,
+        style: { display: 'flex', alignItems: 'center', gap: '0.35rem',
+          background: warn ? 'rgba(245,158,11,0.08)' : 'transparent',
+          border: warn ? '1px solid rgba(245,158,11,0.3)' : '1px solid transparent',
+          borderRadius: '4px', padding: '2px 6px' }
+      },
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' } }, item.code),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '1rem', color: clr, lineHeight: 1 } }, arrow),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', color: clr, fontWeight: 600 } },
+        d5 !== null ? (d5 > 0 ? '+' : '') + d5.toFixed(1) + ' pts' : '—'
+      ),
+      warn ? /*#__PURE__*/React.createElement("span", {
+        title: rec.type === 'long'
+          ? rec.strongCurrency + " est\xE1 corrigiendo en los \xFAltimos 5 d\xEDas. El score fundamental sigue siendo alto pero el momentum de corto plazo es bajista."
+          : rec.weakCurrency + " est\xE1 rebotando en los \xFAltimos 5 d\xEDas. Puede haber una recuperaci\xF3n temporal antes de continuar la tendencia bajista.",
+        style: { fontSize: '0.7rem', color: '#f59e0b', cursor: 'help', marginLeft: '2px' }
+      }, "\u26A0\uFE0F") : null
+      );
+    })
+    )),
+    /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: '0.75rem',
         fontSize: '0.75rem',
         color: 'var(--text-tertiary)',
         textAlign: 'center'
       }
-    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "%")));
+    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "%"))
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: '2rem',
