@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-03-24",
-  "generatedAt": "2026-03-24T23:44:54.487665Z",
+  "lastUpdate": "2026-03-25",
+  "generatedAt": "2026-03-25T00:57:34.523633Z",
   "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -8,22 +8,22 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
-  "rangeTo": "2026-04-23",
-  "totalEvents": 1160,
+  "rangeTo": "2026-04-24",
+  "totalEvents": 1172,
   "currencyCounts": {
     "AUD": 96,
-    "CAD": 71,
-    "CHF": 39,
+    "CAD": 72,
+    "CHF": 40,
     "EUR": 161,
     "GBP": 138,
     "JPY": 130,
-    "NZD": 50,
-    "USD": 475
+    "NZD": 51,
+    "USD": 484
   },
   "impactCounts": {
-    "low": 584,
-    "medium": 429,
-    "high": 147
+    "low": 595,
+    "medium": 432,
+    "high": 145
   },
   "events": [
     {
@@ -9142,19 +9142,6 @@
     {
       "date": "19 Mar",
       "dateISO": "2026-03-19",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Summit",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "19 Mar",
-      "dateISO": "2026-03-19",
       "timeUTC": "12:00",
       "country": "GBP",
       "currency": "GBP",
@@ -9616,19 +9603,6 @@
       "flag": "🇯🇵",
       "event": "Vernal Equinox Day",
       "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "19 Mar",
-      "dateISO": "2026-03-19",
-      "timeUTC": "15:15",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB President Lagarde Speaks",
-      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -10520,19 +10494,6 @@
     {
       "date": "23 Mar",
       "dateISO": "2026-03-23",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed's Goolsbee speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "23 Mar",
-      "dateISO": "2026-03-23",
       "timeUTC": "13:30",
       "country": "USD",
       "currency": "USD",
@@ -11313,19 +11274,6 @@
     {
       "date": "24 Mar",
       "dateISO": "2026-03-24",
-      "timeUTC": "15:45",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "ECB's Lane speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "24 Mar",
-      "dateISO": "2026-03-24",
       "timeUTC": "17:00",
       "country": "USD",
       "currency": "USD",
@@ -11358,9 +11306,9 @@
       "flag": "🇺🇸",
       "event": "2-Year Note Auction",
       "impact": "medium",
-      "actual": "3.936",
+      "actual": "3.936%",
       "forecast": "",
-      "previous": "3.455"
+      "previous": "3.455%"
     },
     {
       "date": "24 Mar",
@@ -11371,9 +11319,9 @@
       "flag": "🇺🇸",
       "event": "API Weekly Crude Oil Stock",
       "impact": "medium",
-      "actual": "2.3",
-      "forecast": "-1.3",
-      "previous": "6.6"
+      "actual": "2.300M",
+      "forecast": "-1.300M",
+      "previous": "6.600M"
     },
     {
       "date": "24 Mar",
@@ -11475,7 +11423,7 @@
       "flag": "🇦🇺",
       "event": "CPI (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.7",
       "forecast": "3.8",
       "previous": "3.8"
     },
@@ -11488,7 +11436,7 @@
       "flag": "🇦🇺",
       "event": "CPI Index Number (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "101.31",
       "forecast": "",
       "previous": "101.33"
     },
@@ -11514,7 +11462,7 @@
       "flag": "🇦🇺",
       "event": "Trimmed Mean CPI (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.3",
       "forecast": "3.4",
       "previous": "3.4"
     },
@@ -11553,7 +11501,7 @@
       "flag": "🇦🇺",
       "event": "Weighted mean CPI (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.5%",
       "forecast": "",
       "previous": "3.6%"
     },
@@ -11566,7 +11514,7 @@
       "flag": "🇦🇺",
       "event": "Consumer Price Index (MoM)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.0",
       "forecast": "0.0",
       "previous": "0.4"
     },
@@ -11579,7 +11527,7 @@
       "flag": "🇦🇺",
       "event": "Trimmed Mean CPI (MoM)",
       "impact": "high",
-      "actual": "",
+      "actual": "0.2",
       "forecast": "",
       "previous": "0.3"
     },
@@ -13211,6 +13159,19 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "07:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Supervisory Board Member Tuominen Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -13272,6 +13233,19 @@
       "actual": "",
       "forecast": "",
       "previous": "49.4"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECOFIN Meetings",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "27 Mar",
@@ -13348,8 +13322,8 @@
       "event": "Michigan 1-Year Inflation Expectations (Mar)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
-      "previous": "3.4%"
+      "forecast": "3.2%",
+      "previous": "3.2%"
     },
     {
       "date": "27 Mar",
@@ -13387,7 +13361,7 @@
       "event": "Michigan Current Conditions (Mar)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "57.8",
       "previous": "57.8"
     },
     {
@@ -13471,6 +13445,19 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Daly Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "15:40",
       "country": "USD",
       "currency": "USD",
@@ -13497,11 +13484,11 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
-      "timeUTC": "17:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "U.S. Baker Hughes Oil Rig Count",
+      "timeUTC": "16:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Schnabel Speaks",
       "impact": "medium",
       "actual": "",
       "forecast": "",
@@ -13514,11 +13501,24 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
+      "event": "U.S. Baker Hughes Oil Rig Count",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "414"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
       "event": "U.S. Baker Hughes Total Rig Count",
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": ""
+      "previous": "552"
     },
     {
       "date": "27 Mar",
@@ -13623,6 +13623,162 @@
       "actual": "",
       "forecast": "",
       "previous": "69.1"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Aluminium speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.7K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Copper speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "48.0K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Corn speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "312.3K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Crude Oil speculative net positions",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "218.7K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Nasdaq 100 speculative net positions",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "24.1K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Natural Gas speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-178.0K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Silver speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "21.9K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Soybeans speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "221.1K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "CFTC Wheat speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-25.7K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "CFTC CAD speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.9K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "CFTC CHF speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-25.2K"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "20:30",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "CFTC NZD speculative net positions",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-23.1K"
     },
     {
       "date": "28 Mar",
