@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.1-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.6.2-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -5560,12 +5560,23 @@ var ForexDashboard = function ForexDashboard() {
       { label: 'Par neto',         val: rec.pairMom7d,   role: 'pair'   }
     ].map(function(item) {
       var v = item.val;
-      var isGoodForSignal = rec.type === 'long'
-        ? (item.role === 'strong' ? (v !== null && v > 0) : item.role === 'weak' ? (v !== null && v < 0) : (v !== null && v > 0))
-        : (item.role === 'strong' ? (v !== null && v > 0) : item.role === 'weak' ? (v !== null && v < 0) : (v !== null && v > 0));
-      var isBadForSignal = rec.type === 'long'
-        ? (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40))
-        : (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40));
+      // Color por rol en la señal, no por signo del número:
+      // LONG: strong subir = bueno (verde), weak subir = malo (rojo)
+      // SHORT: strong bajar = bueno (verde), weak bajar = malo (rojo)
+      // Par neto: sigue momAlignment
+      var isGoodForSignal, isBadForSignal;
+      if (item.role === 'pair') {
+        isGoodForSignal = rec.momAlignment === 1;
+        isBadForSignal  = rec.momAlignment === -1;
+      } else if (rec.type === 'long') {
+        // LONG: queremos strong↑ y weak↓
+        isGoodForSignal = item.role === 'strong' ? (v !== null && v > 0.10) : (v !== null && v < -0.10);
+        isBadForSignal  = item.role === 'strong' ? (v !== null && v < -0.20) : (v !== null && v > 0.20);
+      } else {
+        // SHORT: queremos strong↓ y weak↑ (par bajando)
+        isGoodForSignal = item.role === 'strong' ? (v !== null && v < -0.10) : (v !== null && v > 0.10);
+        isBadForSignal  = item.role === 'strong' ? (v !== null && v > 0.20)  : (v !== null && v < -0.20);
+      }
       var clr = isBadForSignal ? 'var(--red-strong)' : isGoodForSignal ? 'var(--green-strong)' : 'var(--text-tertiary)';
       return /*#__PURE__*/React.createElement("div", {
         key: item.role,
@@ -5605,7 +5616,7 @@ var ForexDashboard = function ForexDashboard() {
     style: {
       color: 'var(--text-primary)'
     }
-  }, "Aviso Importante:"), " Estas recomendaciones est\xE1n basadas exclusivamente en an\xE1lisis fundamental y no constituyen asesoramiento financiero. El trading de divisas conlleva riesgos significativos. Considere an\xE1lisis t\xE9cnico, gesti\xF3n de riesgo y consulte con un asesor financiero antes de operar.")), /*#__PURE__*/React.createElement("div", {
+  }, "Aviso Importante:"), " Estos an\xE1lisis combinan metodolog\xEDa fundamental macroecon\xF3mica con momentum de precio (7d basket-adjusted) con fines informativos. La secci\xF3n de an\xE1lisis describe el contexto del par seg\xFAn los datos disponibles \u2014 no constituye una recomendaci\xF3n de operar ni asesoramiento financiero. El trading de divisas conlleva riesgos significativos de p\xE9rdida de capital. Confirme siempre con an\xE1lisis t\xE9cnico propio, aplique gesti\xF3n de riesgo y consulte con un asesor financiero certificado antes de tomar decisiones de inversi\xF3n.")), /*#__PURE__*/React.createElement("div", {
     className: "footer"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
