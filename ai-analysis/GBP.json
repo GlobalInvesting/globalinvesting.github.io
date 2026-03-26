@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo bajista en 12 meses con -0.75pp acumulados. Esta decisión dovish ejerce presión bajista sobre la divisa, aunque la tasa de interés del Reino Unido sigue siendo 1.37pp por encima del promedio global. La inflación anual del 3.0% supera el objetivo del banco central, lo que podría influir en futuras decisiones monetarias.\n\nLa cuenta corriente y la balanza comercial muestran un déficit, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora del Reino Unido se basa principalmente en piedras preciosas y metales, así como en bebidas y líquidos alcohólicos, lo que explica en parte el déficit comercial. Aunque el PMI manufacturero indica expansión, la producción industrial muestra una caída mensual, lo que introduce incertidumbre en el sector.\n\nEl posicionamiento especulativo muestra un sesgo alcista con +11.8K contratos netos, y el rendimiento FX del último mes ha sido positivo con +1.54% vs USD. La expectativa de que el CPI del Reino Unido refleje una inflación persistente en febrero, por encima del objetivo del Banco de Inglaterra, ha llevado al Pound Sterling a cotizar con cautela ante sus pares mayores, lo que introduce cierta incertidumbre de corto plazo en el par GBP/USD.",
+  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que sugiere un enfoque más dovish y presión bajista sobre la divisa. Aunque la tasa de interés del Reino Unido es superior a la del promedio global, el ciclo bajista en 12 meses y la inflación por encima del objetivo podrían limitar el potencial alcista de la divisa. La noticia de que la inflación en el Reino Unido se mantiene en 3.0% anual, la más alta entre sus pares, podría influir en las decisiones del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, dominada por piedras preciosas y metales, podría ser sensible a los cambios en la demanda global y los precios de las commodities. Aunque el PMI manufacturero indica expansión, la producción industrial y las ventas minoristas muestran un comportamiento más débil, lo que podría afectar la cuenta corriente y, por ende, la divisa.\n\nEl posicionamiento especulativo muestra un sesgo alcista, con 11.8K contratos netos, aunque el rendimiento FX del último mes ha sido más moderado. La noticia sobre el giro hawkish del Banco de Inglaterra y las declaraciones de la policymaker Megan Greene sobre la inflación podrían influir en el mercado y sostener el precio de la divisa. Sin embargo, la presión vendedora estructural y el ciclo bajista en tasas podrían limitar el potencial alcista a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:08:48.951472+00:00",
+  "generatedAt": "2026-03-26T10:11:30.464083+00:00",
   "exportComposition": "Comtrade 2023: piedras preciosas y metales (77%, $0.9B), bebidas y líquidos alcohólicos (19%, $0.2B), productos químicos orgánicos (0%, $0.0B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 11768,
-    "fxPerformance1M": 1.539,
+    "fxPerformance1M": 0.4351,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774419300.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774464180.0,
     "newsHeadlines": [
-      "UK CPI expected to reflect persistent inflation in February, well above BoE’s ta",
-      "Pound Sterling Price News and Forecast: GBP/USD is slightly under pressure ahead",
-      "Pound Sterling trades cautiously ahead of UK CPI data release"
+      "UK Inflation Holds at 3.0% as Britain Remains Highest Among Peers",
+      "GBP Surges: BoE’s Hawkish Pivot Bolsters Pound as UOB Analysis Signals Sustained",
+      "BoE’s Greene Signals Inflation Concerns Without Immediate Hike Bias"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }

@@ -2,11 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "El Banco Nacional Suizo ha mantenido su tasa de interés en 0.00% desde que la recortó 0.25pp en junio 2025, lo que sugiere un enfoque dovish y presión bajista sobre la divisa. Aunque los mercados de futuros no descuentan movimientos significativos en las tasas a corto plazo, el presidente del SNB ha mencionado que están preparados para introducir tasas negativas si es necesario, lo que introduce una nota de precaución en el mercado. Esta postura expansiva y la tasa muy por debajo del promedio global la convierten en una divisa probable financiadora de carry trade.\n\nLa cuenta corriente suiza muestra un superávit del 5.1% del PIB, lo que genera una demanda estructural de la divisa. La composición exportadora, liderada por productos farmacéuticos y instrumentos de precisión, explica en parte este superávit. Aunque el PMI manufacturero indica contracción, la producción industrial ha mostrado un leve crecimiento. La economía suiza parece navegar en un entorno desafiante, pero su perfil de activo refugio podría atraer flujos defensivos en momentos de tensión global.\n\nEl rendimiento FX del franco suizo ha sido positivo en el último mes, con una apreciación del 2.59% versus el dólar estadounidense. El posicionamiento especulativo, aunque ligeramente alcista con +0.5K contratos netos, no sugiere un riesgo inminente de corrección. La sesión europea ha comenzado con expectativas de PMIs peores que los esperados, lo que podría influir en el comportamiento del par en el corto plazo. Sin embargo, el franco suizo parece mantener su terreno, apoyado por su perfil de refugio y la cautela del SNB respecto a futuras decisiones monetarias.",
+  "analysis": "El Banco Nacional Suizo ha mantenido una postura dovish desde que recortó las tasas en 0.25pp en junio 2025, lo que ha generado presión bajista sobre la divisa. Aunque los mercados ya descuentan este escenario, el presidente del SNB ha mencionado que están preparados para introducir tasas negativas si es necesario, lo que podría ejercer aún más presión sobre la divisa. Esta postura expansiva se refleja en el ciclo bajista de las tasas en 12 meses, con una acumulación de -0.50pp.\n\nLa cuenta corriente y la balanza comercial de Suiza presentan un superávit, lo que genera una demanda estructural de la divisa. La composición exportadora del país, liderada por productos farmacéuticos e instrumentos de precisión, explica en parte este superávit. Sin embargo, la inflación y el crecimiento del PIB se encuentran por debajo del promedio global, lo que podría afectar la economía en el largo plazo.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo neto alcista, con +0.5K contratos netos, y el rendimiento FX del último mes ha sido positivo, con una apreciación del 1.77% vs USD. Aunque el presidente del SNB ha mencionado que la tasa de política es la herramienta principal, también ha destacado que la intervención en el mercado de divisas puede ser más adecuada en ciertas situaciones, lo que introduce incertidumbre en el mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:09:13.320900+00:00",
+  "generatedAt": "2026-03-26T10:11:54.999456+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 3,
+  "newsCount": 1,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.7,
@@ -25,14 +25,12 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 513,
-    "fxPerformance1M": 2.5947,
+    "fxPerformance1M": 1.7669,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774376530.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774374329.0,
     "newsHeadlines": [
-      "Swiss Market Ends On Firm Note",
-      "SNB Chairman: We are prepared to introduce negative rates but the hurdle is high",
-      "What are the main events for today?"
+      "SNB Chairman: We are prepared to introduce negative rates but the hurdle is high"
     ]
   },
   "globalContext": {
@@ -40,8 +38,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }

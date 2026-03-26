@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "El Banco de la Reserva de Australia subió las tasas en 0.50pp en marzo, lo que ha mantenido una presión alcista sobre la divisa. Esta decisión se debe a la inflación anual del 3.7%, que supera el objetivo del banco central. Aunque los mercados ya descuentan un ciclo restrictivo activo, la tasa de interés del 4.10% sigue siendo atractiva para los inversores de renta fija internacional, lo que podría seguir apoyando al dólar australiano.\n\nLa balanza comercial de Australia muestra un superávit, gracias principalmente a las exportaciones de minerales metalíferos, que representan el 73% de las exportaciones totales. Sin embargo, la cuenta corriente presenta un déficit, lo que podría ejercer presión vendedora estructural sobre la divisa. Aunque los términos de intercambio son favorables, la producción manufacturera se encuentra en contracción, lo que podría afectar las exportaciones en el futuro.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con 45.4K contratos netos, lo que introduce un riesgo de corrección ante cualquier decepción. La noticia de una posible guerra entre Estados Unidos e Irán ha generado volatilidad en los mercados, y el dólar australiano ha debilitado frente al dólar estadounidense. Aunque la inflación en Australia sigue siendo una preocupación, el banco central sigue bajo presión para mantener su política monetaria restrictiva, lo que podría seguir apoyando al dólar australiano en el corto plazo.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 4.10%, significativamente superior al promedio global. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ejerce presión alcista sobre la divisa. Aunque los mercados ya han descuento un ciclo restrictivo activo, las declaraciones del banco central sobre el riesgo de stagflación y la posible necesidad de más subidas de tasas mantienen la incertidumbre.\n\nLa balanza comercial de Australia muestra un superávit en bienes, gracias principalmente a la exportación de minerales metalíferos. Sin embargo, la cuenta corriente presenta un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Los términos de intercambio favorables y el crecimiento del PIB superior al promedio global también influyen en la dinámica de la divisa.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con un COT de +45.4K contratos netos, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos. La reciente advertencia del banco central sobre el impacto del conflicto en Medio Oriente en la inflación y el crecimiento económico introduce incertidumbre de corto plazo, aunque el rendimiento FX del último mes sigue siendo positivo, con una apreciación del 1.08% vs USD.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:09:03.114443+00:00",
+  "generatedAt": "2026-03-26T10:11:44.909404+00:00",
   "exportComposition": "Comtrade 2023: minerales metalíferos (73%, $193.9B), piedras preciosas y metales (8%, $20.3B), equipos eléctricos y electrónicos (3%, $6.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "estable en los últimos 12 meses"
     },
     "cotPositioning": 45359,
-    "fxPerformance1M": 1.7724,
+    "fxPerformance1M": 1.0792,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774420260.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774505637.0,
     "newsHeadlines": [
-      "Global markets swing on US–Iran war headlines as risk-on rally falters – a cross",
-      "AUD: Inflation shock keeps RBA under pressure – Commerzbank",
-      "Australia’s February CPI Came in Soft, but AUD Dropped as Iran War Clouded Infla"
+      "AUD/USD: RBA weighs stagflation risks – Commerzbank",
+      "RBA Warns of ‘Restrictive’ Shift: Why Rising Neutral Rates and Petrol Shocks Cou",
+      "RBA warns Middle East conflict may lift inflation and hit growth outlook"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }

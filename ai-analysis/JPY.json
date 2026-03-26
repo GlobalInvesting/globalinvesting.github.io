@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio de 2025 y ha mantenido este nivel desde entonces, lo que indica un ciclo alcista y presión alcista sobre la divisa. Aunque la tasa de interés del 0.75% está por debajo del promedio global, la decisión del banco central de subir las tasas sugiere un enfoque hawkish. La inflación anual del 1.3% está por debajo del objetivo, pero el crecimiento del PIB del 0.7% es inferior al promedio global.\n\nLa cuenta corriente muestra un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. La balanza comercial también muestra un superávit en bienes, lo que se debe en parte a la composición exportadora del país, que se centra en vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos. Las noticias recientes sobre la reunión del Banco de Japón sugieren que el banco central mantiene un enfoque de ajuste gradual de las tasas, lo que podría influir en la percepción del mercado sobre la divisa.\n\nEl posicionamiento especulativo muestra una posición corta extrema, con -65K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. A pesar de esto, la divisa se apreció un 3.4% en el último mes, lo que podría indicar un posible squeeze de cortos. Las noticias recientes sobre el yen japonés sugieren que la divisa ha recibido apoyo después de la publicación de las actas de la reunión del Banco de Japón, lo que podría influir en la dirección del par en el corto plazo.",
+  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio 2025 y ha mantenido el tipo en 0.75% desde entonces, lo que sugiere un ciclo alcista en los últimos 12 meses. Aunque la tasa de interés sigue estando por debajo del promedio global, la decisión de subir tasas indica una postura hawkish del banco central, lo que ejerce presión alcista sobre la divisa. La inflación anual de 1.3% sigue por debajo del objetivo, lo que podría llevar a una revisión de la política monetaria en el futuro.\n\nLa cuenta corriente presenta un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. La composición exportadora de Japón, liderada por vehículos y autopartes, maquinaria industrial y equipos eléctricos y electrónicos, explica en parte este superávit. Aunque los términos de intercambio son desfavorables, la producción industrial y el PMI manufacturero siguen en expansión, lo que sugiere que el sector exportador sigue siendo resiliente.\n\nEl posicionamiento especulativo está muy cargado a la baja, con -65.4K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. La divisa se apreció un 2.63% el último mes, lo que contradice el posicionamiento bajista, y podría indicar un posible squeeze de cortos. La decisión del Banco de Japón de publicar indicadores para la inflación core estimada cada mes podría influir en la política monetaria y, por tanto, en la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:08:53.552489+00:00",
+  "generatedAt": "2026-03-26T10:11:35.074173+00:00",
   "exportComposition": "Comtrade 2023: vehículos y autopartes (32%, $370.1B), maquinaria industrial (19%, $215.6B), equipos eléctricos y electrónicos (16%, $184.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,13 +25,13 @@
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
     "cotPositioning": -65429,
-    "fxPerformance1M": 3.439,
+    "fxPerformance1M": 2.6253,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774420706.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774502732.0,
     "newsHeadlines": [
-      "Japanese Yen softens despite BoJ hawkish tone",
-      "Japanese Yen receives support following BoJ Meeting Minutes",
+      "BOJ set to release indicators for estimated core CPI every month now",
+      "NZD/USD Plummets for Second Day as Middle East Crisis Fuels US Dollar Surge",
       "BoJ minutes signal gradual rate hikes as inflation nears target and oil risks ri"
     ]
   },
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }

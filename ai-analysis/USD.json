@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo bajista y presión bajista sobre la divisa. Aunque la tasa de interés sigue estando por encima del promedio global, la decisión de bajar tasas sugiere un enfoque más dovish, lo que podría debilitar la divisa. La inflación anual de 2.4% y el crecimiento del PIB del 2.0% anual son factores que podrían influir en la política monetaria futura.\n\nLa balanza comercial muestra un déficit pronunciado de -54.5B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, liderada por combustibles y petróleo, maquinaria industrial y equipos eléctricos y electrónicos, sugiere que la economía está expuesta a factores externos como los precios de las commodities y la demanda global. Las noticias sobre la posible reapertura del estrecho de Ormuz y la coordinación de la liberación de reservas petroleras adicionales podrían influir en los precios de las commodities y, por ende, en la balanza comercial.\n\nEl posicionamiento especulativo neto bajista, con -5.6K contratos netos, y el rendimiento FX del último mes de -3.28% vs USD, sugieren que el mercado está apostando por una debilidad continua de la divisa. Aunque las noticias sobre un posible alto al fuego y la reapertura del estrecho de Ormuz han generado cierta cautela en el mercado, la tendencia general sigue siendo bajista. La divisa sigue cotizando en niveles bajos, lo que podría atraer a inversores a corto plazo en busca de oportunidades de compra.",
+  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que ha generado una presión bajista sobre la divisa debido al menor carry. Aunque la tasa de interés se encuentra en 3.75%, 1.37pp por encima del promedio global, el ciclo bajista en 12 meses y la decisión de bajar tasas sugieren un enfoque dovish por parte del banco central. La inflación se mantiene por encima del objetivo, lo que podría influir en las decisiones futuras de la Fed.\n\nLa cuenta corriente presenta un déficit del 4.1% del PIB, lo que ejerce presión vendedora estructural sobre la divisa. La balanza comercial también muestra un déficit en bienes, lo que se explica en parte por la composición exportadora, donde los combustibles y petróleo representan el 20% de las exportaciones. La situación global, con un régimen risk-off, podría dirigir flujos hacia activos refugio, lo que podría influir en la divisa.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -5.6K contratos netos, lo que se refleja en el rendimiento FX del último mes, que ha sido de -2.50% vs USD. Aunque los mercados permanecen inciertos sobre el conflicto entre Estados Unidos e Irán, la situación no parece tener un impacto directo en la divisa en este momento. La expiración de opciones FX podría influir en el mercado, pero por ahora, la tendencia sigue siendo bajista.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:08:39.275222+00:00",
+  "generatedAt": "2026-03-26T10:11:20.624054+00:00",
   "exportComposition": "Comtrade 2023: combustibles y petróleo (20%, $572.8B), maquinaria industrial (13%, $381.9B), equipos eléctricos y electrónicos (13%, $373.2B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": -5615,
-    "fxPerformance1M": -3.2807,
+    "fxPerformance1M": -2.5049,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774419931.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774505926.0,
     "newsHeadlines": [
-      "Japan reportedly calls on IEA to coordinate release of additional oil stockpile",
-      "Ceasefire Hopes Lift Markets, FX Signals Skepticism Over Strait of Hormuz Reopen",
-      "Canadian Dollar declines below 1.3800 on safe-haven demand, Fed rate hike bets"
+      "Aussie’s Fertilizer Trap: Urea Price Explosion Squeezes AUD",
+      "FX option expiries for 26 March 10am New York cut",
+      "Markets remain torn on what will become of the US-Iran conflict next"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }

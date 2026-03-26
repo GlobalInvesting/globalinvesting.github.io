@@ -2,10 +2,10 @@
   "currency": "EUR",
   "country": "Eurozona",
   "bank": "Banco Central Europeo (BCE)",
-  "analysis": "El Banco Central Europeo recortó las tasas en 0.25pp en junio 2025 y ha mantenido el tipo desde entonces en 2.15%, lo que se traduce en una presión bajista sobre la divisa debido al menor carry. Esta decisión se enmarca en un contexto de ciclo bajista en 12 meses, con una acumulación de -2.10pp. Aunque la inflación se encuentra cerca del objetivo del 2%, el crecimiento del PIB es superior al promedio global, lo que podría sugerir una recuperación económica.\n\nLa balanza comercial presenta un déficit en bienes, lo que se explica en parte por la composición exportadora de la Eurozona, que se centra en plásticos, hierro y acero, y equipos eléctricos y electrónicos. La cuenta corriente, sin embargo, muestra un superávit, lo que indica una demanda estructural de la divisa. Los términos de intercambio favorables también apuntan a una mayor competitividad de las exportaciones.\n\nEl posicionamiento especulativo neto es bajista, con -7.0K contratos netos, lo que se refleja en la depreciación del euro en el último mes. Aunque los mercados han repricado el euro al alza en los últimos días, como señala Rabobank, la tendencia general sigue siendo bajista. La cautela del mercado se debe en parte a las declaraciones del presidente del banco central holandés, que advierte sobre posibles efectos secundarios de los precios energéticos en la economía.",
+  "analysis": "El Banco Central Europeo ha mantenido una postura dovish desde su última decisión de bajar las tasas en 0.25pp en junio 2025, lo que ha generado presión bajista sobre la divisa. Aunque los mercados de futuros ya descuentan un posible recorte adicional, las declaraciones del gobernador del BCE, Joachim Nagel, sugieren que una subida de tasas en abril es una opción, lo que introduce cierta incertidumbre en el mercado. La tasa de interés actual de 2.15% se encuentra por debajo del promedio global, lo que reduce el atractivo del carry trade para la divisa.\n\nLa cuenta corriente de la eurozona muestra un superávit del 1.7% del PIB, lo que sugiere una demanda estructural de la divisa. Sin embargo, la balanza comercial presenta un déficit de 2.2B USD/mes, lo que puede ejercer presión a la baja sobre la divisa. La composición exportadora de la eurozona, liderada por maquinaria industrial, productos farmacéuticos y aeronaves, sugiere que la demanda externa es un factor clave para la economía.\n\nEl posicionamiento especulativo neto bajista, con -7.0K contratos netos, y el rendimiento FX del último mes de -1.47% vs USD, sugieren que el mercado está apostando por una depreciación de la divisa. Aunque las noticias recientes sobre una posible subida de tasas en abril pueden introducir cierta volatilidad, el panorama a corto plazo sigue siendo incierto. La decisión del BCE en abril será clave para determinar la dirección de la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-25T10:08:44.453924+00:00",
-  "exportComposition": "Comtrade 2022: plásticos (21%, $74.7B), hierro y acero (13%, $48.1B), equipos eléctricos y electrónicos (12%, $42.4B)",
+  "generatedAt": "2026-03-26T10:11:25.338759+00:00",
+  "exportComposition": "Comtrade 2023: maquinaria industrial (13%, $34.6B), productos farmacéuticos (12%, $31.7B), aeronaves (10%, $27.6B)",
   "newsCount": 3,
   "dataSnapshot": {
     "interestRate": 2.15,
@@ -27,12 +27,12 @@
     "cotPositioning": -6952,
     "fxPerformance1M": -1.47,
     "fxSource": "static",
-    "lastUpdate": "2026-03-25",
-    "latestNewsTs": 1774419999.0,
+    "lastUpdate": "2026-03-26",
+    "latestNewsTs": 1774507618.0,
     "newsHeadlines": [
-      "EUR/USD: Repricing supports cautious upside – Rabobank",
-      "ECB's Sleijpen: Energy prices likely to become more-entrenched in economy than 2",
-      "Eurozone March flash services PMI 50.1 vs 51.1 expected"
+      "ECB's Nagel: April rate hike certainly an option",
+      "ECB policymaker Nagel: April rate hike is certainly an option but it isn't the o",
+      "Barclays: ECB set to hike as energy shock hits Europe, Fed likely to stay on hol"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.44,
-    "avg_fx_perf_1m": 1.07,
+    "avg_bond10y": 3.46,
+    "avg_fx_perf_1m": 0.61,
     "avg_cot": -9265.62
   }
 }
