@@ -4028,6 +4028,10 @@ var ForexDashboard = function ForexDashboard() {
     var strength = strengthObj.score;
     var sentiment = getSentiment(strength);
     var rate = country.code === 'USD' ? 1 : forexRates[country.code] || 1;
+    // calDates: fechas de los overrides del calendario. Cuando el backend actualizó
+    // un dato con valores del calendario, la fecha real del dato es calDates[campo],
+    // no la fecha de economic-data. Se usa en los tooltips del heatmap.
+    var calDates = (strengthObj.scoringData || {}).calendarDates || {};
 
     // FIX-5 v5.11: Score context badge — 100% data-driven, sin hardcoding de divisas.
     // Activa badge "Score estructural" cuando el score es moderado/alto PERO las
@@ -4595,7 +4599,7 @@ var ForexDashboard = function ForexDashboard() {
       type: "gdpGrowth",
       currency: country.code,
       indicator: "gdpGrowth",
-      lastUpdate: data.gdpGrowthDate
+      lastUpdate: calDates.gdpGrowth || data.gdpGrowthDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.interestRate,
       type: "interestRate",
@@ -4607,13 +4611,13 @@ var ForexDashboard = function ForexDashboard() {
       type: "inflation",
       currency: country.code,
       indicator: "inflation",
-      lastUpdate: data.inflationDate
+      lastUpdate: calDates.inflation || data.inflationDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.unemployment,
       type: "unemployment",
       currency: country.code,
       indicator: "unemployment",
-      lastUpdate: data.unemploymentDate
+      lastUpdate: calDates.unemployment || data.unemploymentDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.currentAccount,
       type: "currentAccount",
@@ -4637,37 +4641,37 @@ var ForexDashboard = function ForexDashboard() {
       type: "production",
       currency: country.code,
       indicator: "production",
-      lastUpdate: data.productionDate
+      lastUpdate: calDates.production || data.productionDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.retailSales,
       type: "retailSales",
       currency: country.code,
       indicator: "retailSales",
-      lastUpdate: data.retailSalesDate
+      lastUpdate: calDates.retailSales || data.retailSalesDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.wageGrowth,
       type: "wageGrowth",
       currency: country.code,
       indicator: "wageGrowth",
-      lastUpdate: data.wageGrowthDate
+      lastUpdate: calDates.wageGrowth || data.wageGrowthDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.manufacturingPMI,
       type: "manufacturingPMI",
       currency: country.code,
       indicator: "manufacturingPMI",
-      lastUpdate: data.manufacturingPMIDate
+      lastUpdate: calDates.manufacturingPMI || data.manufacturingPMIDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.servicesPMI,
       type: "servicesPMI",
       currency: country.code,
       indicator: "servicesPMI",
-      lastUpdate: data.servicesPMIDate
+      lastUpdate: calDates.servicesPMI || data.servicesPMIDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.cotPositioning,
       type: "cotPositioning",
       currency: country.code,
       indicator: "cotPositioning",
-      lastUpdate: data.cotPositioningDate
+      lastUpdate: calDates.cotPositioning || data.cotPositioningDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.bond10y,
       type: "bond10y",
@@ -4679,13 +4683,13 @@ var ForexDashboard = function ForexDashboard() {
       type: "consumerConfidence",
       currency: country.code,
       indicator: "consumerConfidence",
-      lastUpdate: data.consumerConfidenceDate
+      lastUpdate: calDates.consumerConfidence || data.consumerConfidenceDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.businessConfidence,
       type: "businessConfidence",
       currency: country.code,
       indicator: "businessConfidence",
-      lastUpdate: data.businessConfidenceDate
+      lastUpdate: calDates.businessConfidence || data.businessConfidenceDate
     }), /*#__PURE__*/React.createElement(HeatmapCell, {
       value: data.inflationExpectations,
       type: "inflationExpectations",
