@@ -4558,6 +4558,7 @@ var ForexDashboard = function ForexDashboard() {
     var strength = strengthObj.score; // ✅
     var sentiment = getSentiment(strength);
     var overallColor = sentiment === 'alcista' ? 'var(--green-strong)' : sentiment === 'bajista' ? 'var(--red-strong)' : 'var(--neutral)';
+    var calDates = (strengthObj.scoringData || {}).calendarDates || {};
     return /*#__PURE__*/React.createElement("tr", {
       key: country.code
     }, /*#__PURE__*/React.createElement("td", {
