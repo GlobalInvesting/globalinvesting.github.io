@@ -1,0 +1,119 @@
+{
+  "generated": "2026-03-26",
+  "parameters": {
+    "min_diff": 12.0,
+    "windows": [
+      1,
+      2,
+      4,
+      6
+    ]
+  },
+  "summary": {
+    "1w": {
+      "trades": 856,
+      "hit_rate": 47.2,
+      "avg_return_pct": 0.0033,
+      "avg_win_pct": 0.8216,
+      "avg_loss_pct": -0.7281,
+      "sharpe_annualized": 0.0212,
+      "max_drawdown_pct": 48.79,
+      "total_return_pct": -2.45,
+      "by_confidence": {
+        "Alta": {
+          "trades": 254,
+          "hit_rate": 48.8,
+          "avg_return": -0.0135,
+          "sharpe": -0.1066
+        },
+        "Media": {
+          "trades": 602,
+          "hit_rate": 46.5,
+          "avg_return": 0.0104,
+          "sharpe": 0.0625
+        }
+      }
+    },
+    "2w": {
+      "trades": 849,
+      "hit_rate": 46.8,
+      "avg_return_pct": 0.0015,
+      "avg_win_pct": 1.1722,
+      "avg_loss_pct": -1.0267,
+      "sharpe_annualized": 0.0068,
+      "max_drawdown_pct": 70.02,
+      "total_return_pct": -8.77,
+      "by_confidence": {
+        "Alta": {
+          "trades": 249,
+          "hit_rate": 46.2,
+          "avg_return": -0.0744,
+          "sharpe": -0.4028
+        },
+        "Media": {
+          "trades": 600,
+          "hit_rate": 47.0,
+          "avg_return": 0.033,
+          "sharpe": 0.1419
+        }
+      }
+    },
+    "4w": {
+      "trades": 835,
+      "hit_rate": 43.4,
+      "avg_return_pct": -0.0416,
+      "avg_win_pct": 1.6591,
+      "avg_loss_pct": -1.3432,
+      "sharpe_annualized": -0.1378,
+      "max_drawdown_pct": 89.47,
+      "total_return_pct": -41.77,
+      "by_confidence": {
+        "Alta": {
+          "trades": 242,
+          "hit_rate": 39.7,
+          "avg_return": -0.1825,
+          "sharpe": -0.6347
+        },
+        "Media": {
+          "trades": 593,
+          "hit_rate": 44.9,
+          "avg_return": 0.0158,
+          "sharpe": 0.0514
+        }
+      }
+    },
+    "6w": {
+      "trades": 821,
+      "hit_rate": 42.5,
+      "avg_return_pct": -0.1143,
+      "avg_win_pct": 1.9543,
+      "avg_loss_pct": -1.6438,
+      "sharpe_annualized": -0.3342,
+      "max_drawdown_pct": 95.52,
+      "total_return_pct": -69.4,
+      "by_confidence": {
+        "Alta": {
+          "trades": 234,
+          "hit_rate": 38.0,
+          "avg_return": -0.2133,
+          "sharpe": -0.6
+        },
+        "Media": {
+          "trades": 587,
+          "hit_rate": 44.3,
+          "avg_return": -0.0749,
+          "sharpe": -0.2223
+        }
+      }
+    },
+    "overall_4w": {
+      "trades": 835,
+      "hit_rate": 43.4,
+      "sharpe": -0.1378,
+      "avg_return": -0.0416
+    }
+  },
+  "note": "Retrospective backtest. Minor look-ahead bias possible for low-frequency macro data.",
+  "total_trades": 3361,
+  "delta_score_summary": null
+}
