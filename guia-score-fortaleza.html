@@ -240,7 +240,7 @@
                 <li><strong>AUD:</strong> Score 68.4 → <span class="badge badge-bull">Fuerte</span></li>
                 <li><strong>CAD:</strong> Score 47.5 → <span class="badge badge-bear">Débil</span></li>
             </ul>
-            <p style="margin:0;color:var(--text-secondary);">Diferencial: 26.3 puntos → <strong>Confianza Alta</strong>. El modelo sugiere una posición LONG en AUD/CAD, porque los fundamentos de Australia son significativamente más fuertes que los de Canadá en este momento.</p>
+            <p style="margin:0;color:var(--text-secondary);">Diferencial: 26.3 puntos → <strong>Confianza Alta</strong>. El diferencial fundamental favorece una lectura LONG en AUD/CAD. Para mayor convicción, el dashboard también muestra el momentum de precio 7d del par: si AUD sube y CAD baja esa semana, la señal es <strong>Confirmada</strong>; si el par cae a pesar del diferencial, aparece como <strong>Divergencia</strong> — señal de esperar estabilización antes de considerar la entrada.</p>
         </div>
 
         <p>El umbral de confianza para los diferenciales es:</p>
@@ -339,7 +339,7 @@
     <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <h3 itemprop="name">¿Por qué el score puede diferir del movimiento reciente del precio?</h3>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">El score mide fundamentos, no momentum de precio. Es normal que una divisa con score alto haya tenido semanas de corrección técnica: el mercado puede tardar semanas o meses en reflejar los fundamentos. Cuando el precio confirma la fortaleza fundamental, la señal tiene mayor convicción.</p>
+            <p itemprop="text">El score mide fundamentos macroeconómicos, pero el dashboard también incorpora el momentum de precio 7d del par (basket-adjusted) como capa complementaria. Es normal que un par con diferencial fundamental alto esté en corrección técnica esa semana: en ese caso el sistema lo marca como <strong>Divergencia</strong> y lo baja en el ranking, sugiriendo esperar estabilización. Cuando el precio confirma la fortaleza fundamental (par neto &gt;+0.40% en 7d), la señal aparece como <strong>Confirmada</strong> — mayor convicción. El score fundamental sigue siendo el ancla de medio plazo (2–6 semanas); el momentum de precio es el validador de corto plazo.</p>
         </div>
     </div>
     </section>
@@ -368,7 +368,7 @@
     {
       "@type": "Question",
       "name": "¿Por qué el score puede diferir del movimiento reciente del precio?",
-      "acceptedAnswer": {"@type": "Answer","text": "El score mide fundamentos, no momentum de precio. Es normal que una divisa con score alto haya tenido semanas de corrección técnica: el mercado puede tardar semanas o meses en reflejar los fundamentos. Cuando el precio confirma la fortaleza fundamental, la señal tiene mayor convicción."}
+      "acceptedAnswer": {"@type": "Answer","text": "El score mide fundamentos macroeconómicos, pero el dashboard también incorpora el momentum de precio 7d del par (basket-adjusted) como capa complementaria. Cuando el par está en corrección a pesar del diferencial fundamental, el sistema lo marca como Divergencia. Cuando el precio confirma la fortaleza fundamental (par neto >+0.40% en 7d), la señal aparece como Confirmada. El score fundamental es el ancla de medio plazo (2–6 semanas); el momentum de precio es el validador de corto plazo."}
     }
     ]}
     </script>

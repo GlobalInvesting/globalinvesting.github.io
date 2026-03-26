@@ -188,11 +188,12 @@
                 <li><strong>Mapa de Calor de Indicadores:</strong> 20 métricas económicas ponderadas con codificación por color e indicación de fecha de publicación por celda, más columna de PIB total como referencia estructural.</li>
                 <li><strong>Score de Fortaleza Cuantitativo:</strong> Índice 0–100 basado en ponderación de 21 indicadores distribuidos en 6 tiers temáticos, con bandas interpretativas fijas (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte), normalizado automáticamente por los indicadores disponibles.</li>
                 <li><strong>FX Performance 1M (<code>fxPerformance1M</code>) — Peso 8%:</strong> Rendimiento real de cada divisa frente a la canasta de las otras 7 (basket-corrected), eliminando el sesgo USD. Composite ponderado: 70% rendimiento mensual + 20% semanal + 10% trimestral. Opera como confirmador del análisis fundamental, no como driver independiente.</li>
+                <li><strong>FX Performance 7d (<code>fxPerformance1W</code>) — Capa de momentum:</strong> Rendimiento semanal basket-adjusted de cada divisa. Se usa exclusivamente para calcular el <strong>momentum neto del par</strong> (strong% − weak%) en la sección de análisis de pares. Un par neto &gt;+0.40% activa estado <em>Confirmado</em> (bonificación ×1.20 en ranking); &lt;−0.40% activa <em>Divergencia</em> (penalización ×0.70–0.45 según magnitud). No forma parte del score de fortaleza individual.</li>
                 <li><strong>Rate Momentum (<code>rateMomentum</code>) — Peso 7%:</strong> Variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo) o recortes (dovish activo).</li>
                 <li><strong>Posicionamiento COT — Peso 6%:</strong> Huella directa del smart money desde el reporte oficial de la CFTC (<em>financial_lf.htm</em> — Futures Only, categoría Leveraged Funds).</li>
                 <li><strong>Calendario Económico Real:</strong> Eventos obtenidos tres veces al día desde múltiples fuentes. Incluye datos reales de publicación (actual, estimado, previo), horarios en UTC convertidos a la zona horaria local del usuario, impacto oficial y filtro por nivel.</li>
                 <li><strong>Análisis Fundamental con IA:</strong> Los textos de análisis por divisa son generados por Groq AI (modelo llama-3.3-70b-versatile) con datos económicos actualizados diariamente.</li>
-                <li><strong>Señales de Pares:</strong> Divergencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, con factores detallados por par y nivel de confianza. Son indicadores analíticos, no asesoramiento de inversión.</li>
+                <li><strong>Señales de Pares:</strong> Divergencias LONG/SHORT basadas en diferenciales de fortaleza fundamental, enriquecidas con momentum de precio 7d basket-adjusted (Confirmado / Neutral / Divergencia). Son indicadores analíticos, no asesoramiento de inversión.</li>
                 <li><strong>Verificación de Calidad de Datos:</strong> Sistema activo que detecta datos desactualizados, indicadores críticos faltantes y completitud por divisa, con alertas diferenciadas por severidad.</li>
             </ul>
         </div>
@@ -341,7 +342,7 @@ Bandas: &lt; 45 = Débil · 45–65 = Neutral · &gt; 65 = Fuerte</pre>
                     <tr><td><strong>Par</strong></td><td>Divisa base / Divisa cotizada</td><td>Estructura del par analizado</td></tr>
                     <tr><td><strong>Dirección</strong></td><td>LONG / SHORT</td><td>Sesgo direccional según el diferencial fundamental</td></tr>
                     <tr><td><strong>Diferencial</strong></td><td>Score fuerte − Score débil</td><td>Mayor diferencial = mayor divergencia fundamental</td></tr>
-                    <tr><td><strong>Confianza</strong></td><td>Alta (diferencial &ge;20 pts)</td><td>Único nivel mostrado — validado con datos históricos</td></tr>
+                    <tr><td><strong>Momentum 7d</strong></td><td>Par neto basket-adj (strong% − weak% en 7d)</td><td>Confirmado (&gt;+0.40%) · Neutral (±0.40%) · Divergencia (&lt;−0.40%) · penaliza/bonifica el ranking</td></tr>
                     <tr><td><strong>Calidad de Datos</strong></td><td>% de los 21 indicadores disponibles</td><td>Fiabilidad del análisis (≥70% es bueno)</td></tr>
                 </tbody>
             </table>
