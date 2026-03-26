@@ -3422,6 +3422,23 @@ var ForexDashboard = function ForexDashboard() {
 
               // Refresco silencioso de scores precalculados
               fetchStrengthScores().then(function () {
+                // Aplicar bcOutlook del backend sobre el outlook calculado localmente.
+                // Necesario en el path de caché: el outlook ya fue asignado desde caché
+                // antes de que los scores se cargaran en background.
+                setEconomicData(function (prev) {
+                  var updated = _objectSpread({}, prev);
+                  ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'].forEach(function(code) {
+                    var bcOut = getStrength(code).bcOutlook;
+                    if (bcOut && updated[code] && updated[code].outlook !== bcOut) {
+                      console.log("\u2705 outlook override (bg) for " + code + ": " + updated[code].outlook + " \u2192 " + bcOut + " (backend v6.6.1)");
+                      updated[code] = _objectSpread(_objectSpread({}, updated[code]), {}, { outlook: bcOut });
+                      // Actualizar también el objeto country para el render de tarjetas
+                      var c = countries.find(function(x) { return x.code === code; });
+                      if (c) c.outlook = bcOut;
+                    }
+                  });
+                  return updated;
+                });
                 return setScoresVersion(function (v) {
                   return v + 1;
                 });
