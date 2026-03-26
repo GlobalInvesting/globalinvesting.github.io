@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.0-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.6.1-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -5258,12 +5258,22 @@ var ForexDashboard = function ForexDashboard() {
       key: index,
       className: "currency-card",
       style: {
-        borderLeft: "4px solid ".concat(rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)')
+        borderLeft: "4px solid ".concat(
+          rec.momAlignment === -1
+            ? 'var(--red-strong)'
+            : rec.momAlignment === 1
+              ? (rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)')
+              : (rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)')
+        )
       }
     }, /*#__PURE__*/React.createElement("div", {
       className: "card-header",
       style: {
-        background: rec.type === 'long' ? 'rgba(38, 166, 154, 0.1)' : 'rgba(239, 83, 80, 0.1)'
+        background: rec.momAlignment === -1
+          ? (rec.pairMom7d !== null && rec.pairMom7d < -1.0 ? 'rgba(239,83,80,0.18)' : 'rgba(239,83,80,0.11)')
+          : rec.momAlignment === 1
+            ? (rec.type === 'long' ? 'rgba(38,166,154,0.13)' : 'rgba(239,83,80,0.13)')
+            : (rec.type === 'long' ? 'rgba(38,166,154,0.08)' : 'rgba(239,83,80,0.08)')
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5284,7 +5294,38 @@ var ForexDashboard = function ForexDashboard() {
       }
     }, /*#__PURE__*/React.createElement("span", {
       className: "sentiment-badge sentiment-".concat(rec.type === 'long' ? 'alcista' : 'bajista')
-    }, rec.direction), rec.momentumOpposing && /*#__PURE__*/React.createElement("span", {
+    }, rec.direction), rec.pairMom7d !== null && /*#__PURE__*/React.createElement("span", {
+      title: rec.momAlignment === 1
+        ? "Precio confirma la señal fundamental: par ".concat(rec.pairMom7d > 0 ? '+' : '', rec.pairMom7d.toFixed(2), "% esta semana (umbral >+0.40%)")
+        : rec.momAlignment === -1
+          ? "Divergencia de precio: par ".concat(rec.pairMom7d.toFixed(2), "% esta semana, en contra de la señal").concat(rec.pairMom7d < -1.0 ? " — corrección significativa" : "")
+          : "Momentum neutro esta semana (".concat(rec.pairMom7d > 0 ? '+' : '', rec.pairMom7d.toFixed(2), "% par 7d, dentro del rango ±0.40%)"),
+      style: {
+        fontSize: '0.72rem',
+        fontWeight: 700,
+        background: rec.momAlignment === 1
+          ? 'rgba(38,166,154,0.18)'
+          : rec.momAlignment === -1
+            ? 'rgba(239,83,80,0.18)'
+            : 'rgba(120,120,120,0.12)',
+        color: rec.momAlignment === 1
+          ? 'var(--green-strong)'
+          : rec.momAlignment === -1
+            ? 'var(--red-strong)'
+            : 'var(--text-tertiary)',
+        border: rec.momAlignment === 1
+          ? '1px solid rgba(38,166,154,0.35)'
+          : rec.momAlignment === -1
+            ? '1px solid rgba(239,83,80,0.35)'
+            : '1px solid rgba(120,120,120,0.20)',
+        borderRadius: '4px',
+        padding: '2px 7px',
+        cursor: 'help',
+        whiteSpace: 'nowrap'
+      }
+    }, rec.momAlignment === 1 ? 'Confirmado ' : rec.momAlignment === -1 ? 'Divergencia ' : 'Neutral ',
+       (rec.pairMom7d > 0 ? '+' : ''), rec.pairMom7d.toFixed(2), '%'
+    ), rec.momentumOpposing && /*#__PURE__*/React.createElement("span", {
       title: rec.type === 'short' ? "El par subi\xF3 +".concat(Math.abs((_rec$pairMom1M = rec.pairMom1M) !== null && _rec$pairMom1M !== void 0 ? _rec$pairMom1M : 0).toFixed(1), "% el \xFAltimo mes, divergiendo de la se\xF1al SHORT \u2014 el strong cay\xF3 frente al d\xE9bil. La se\xF1al FX contradice el diferencial fundamental. El precio se ha movido en contra de la se\xF1al en el \xFAltimo mes.") : "El par cay\xF3 -".concat(Math.abs((_rec$pairMom1M2 = rec.pairMom1M) !== null && _rec$pairMom1M2 !== void 0 ? _rec$pairMom1M2 : 0).toFixed(1), "% el \xFAltimo mes, divergiendo de la se\xF1al LONG \u2014 el strong cay\xF3 frente al d\xE9bil. La se\xF1al FX contradice el diferencial fundamental. El precio se ha movido en contra de la se\xF1al en el \xFAltimo mes."),
       style: {
         fontSize: '0.75rem',
@@ -5314,7 +5355,9 @@ var ForexDashboard = function ForexDashboard() {
       style: {
         fontSize: '2rem',
         fontWeight: 700,
-        color: rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)'
+        color: rec.momAlignment === -1
+          ? 'var(--red-strong)'
+          : (rec.type === 'long' ? 'var(--green-strong)' : 'var(--red-strong)')
       }
     }, rec.spread != null ? rec.spread.toFixed(1) : '\u2014'), /*#__PURE__*/React.createElement("div", {
       style: {
@@ -5524,7 +5567,6 @@ var ForexDashboard = function ForexDashboard() {
         ? (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40))
         : (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40));
       var clr = isBadForSignal ? 'var(--red-strong)' : isGoodForSignal ? 'var(--green-strong)' : 'var(--text-tertiary)';
-      var arrow = v === null ? '\u2192' : v > 0.15 ? '\u2197' : v < -0.15 ? '\u2198' : '\u2192';
       return /*#__PURE__*/React.createElement("div", {
         key: item.role,
         style: {
@@ -5539,7 +5581,7 @@ var ForexDashboard = function ForexDashboard() {
         }
       },
       /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' } }, item.label),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.95rem', color: clr, lineHeight: 1.1 } }, arrow, ' ', v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014')
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.95rem', color: clr, lineHeight: 1.1 } }, v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014')
       );
     })
     )), /*#__PURE__*/React.createElement("div", {
