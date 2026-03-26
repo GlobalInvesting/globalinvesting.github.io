@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-26",
-  "generatedAt": "2026-03-26T02:48:16.029666Z",
+  "generatedAt": "2026-03-26T03:25:29.405359Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-25",
-  "totalEvents": 1215,
+  "totalEvents": 1213,
   "currencyCounts": {
     "AUD": 100,
     "CAD": 72,
@@ -18,11 +18,11 @@
     "GBP": 141,
     "JPY": 138,
     "NZD": 51,
-    "USD": 508
+    "USD": 506
   },
   "impactCounts": {
-    "low": 624,
-    "medium": 446,
+    "low": 623,
+    "medium": 445,
     "high": 145
   },
   "events": [
@@ -2746,19 +2746,6 @@
     {
       "date": "3 Mar",
       "dateISO": "2026-03-03",
-      "timeUTC": "15:55",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "FOMC Member Williams Speaks",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "3 Mar",
-      "dateISO": "2026-03-03",
       "timeUTC": "16:10",
       "country": "USD",
       "currency": "USD",
@@ -4406,19 +4393,6 @@
       "actual": "3.39M",
       "forecast": "",
       "previous": "3.37M"
-    },
-    {
-      "date": "6 Mar",
-      "dateISO": "2026-03-06",
-      "timeUTC": "15:50",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed Goolsbee Speaks",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "6 Mar",
@@ -12666,19 +12640,6 @@
       "date": "26 Mar",
       "dateISO": "2026-03-26",
       "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Initial Jobless Claims",
-      "impact": "high",
-      "actual": "",
-      "forecast": "210.0",
-      "previous": "205.0"
-    },
-    {
-      "date": "26 Mar",
-      "dateISO": "2026-03-26",
-      "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
@@ -12687,32 +12648,6 @@
       "actual": "",
       "forecast": "",
       "previous": "1.94%"
-    },
-    {
-      "date": "26 Mar",
-      "dateISO": "2026-03-26",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Continuing Jobless Claims",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "1.86",
-      "previous": "1.857"
-    },
-    {
-      "date": "26 Mar",
-      "dateISO": "2026-03-26",
-      "timeUTC": "12:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Jobless Claims 4-Week Avg.",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "210.75K"
     },
     {
       "date": "26 Mar",
@@ -12743,15 +12678,41 @@
     {
       "date": "26 Mar",
       "dateISO": "2026-03-26",
-      "timeUTC": "14:30",
+      "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Natural Gas Storage",
+      "event": "Continuing Jobless Claims",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "1.86",
+      "previous": "1.857"
+    },
+    {
+      "date": "26 Mar",
+      "dateISO": "2026-03-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Initial Jobless Claims",
+      "impact": "high",
+      "actual": "",
+      "forecast": "210.0",
+      "previous": "205.0"
+    },
+    {
+      "date": "26 Mar",
+      "dateISO": "2026-03-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Jobless Claims 4-Week Avg.",
       "impact": "low",
       "actual": "",
-      "forecast": "-49B",
-      "previous": "35B"
+      "forecast": "",
+      "previous": "210.75K"
     },
     {
       "date": "26 Mar",
@@ -12765,6 +12726,19 @@
       "actual": "",
       "forecast": "-49.0",
       "previous": "35.0"
+    },
+    {
+      "date": "26 Mar",
+      "dateISO": "2026-03-26",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Natural Gas Storage",
+      "impact": "low",
+      "actual": "",
+      "forecast": "-49B",
+      "previous": "35B"
     },
     {
       "date": "26 Mar",
@@ -13163,11 +13137,11 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Consumer Price Index (MoM)",
-      "impact": "medium",
+      "event": "Harmonized Index of Consumer Prices (YoY)",
+      "impact": "high",
       "actual": "",
-      "forecast": "",
-      "previous": "0.4"
+      "forecast": "2.6",
+      "previous": "2.5"
     },
     {
       "date": "27 Mar",
@@ -13176,11 +13150,11 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Harmonized Index of Consumer Prices (YoY)",
-      "impact": "high",
+      "event": "Consumer Price Index (MoM)",
+      "impact": "medium",
       "actual": "",
-      "forecast": "2.6",
-      "previous": "2.5"
+      "forecast": "",
+      "previous": "0.4"
     },
     {
       "date": "27 Mar",
