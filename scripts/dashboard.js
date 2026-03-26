@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.4-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.6.5-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -5148,7 +5148,17 @@ var ForexDashboard = function ForexDashboard() {
     }, "No hay eventos con ese filtro para este d\xEDa.") : /*#__PURE__*/React.createElement("div", {
       className: "calendar-container",
       ref: calendarContainerRef
-    }, filteredEvents.map(function (event, index) {
+    },
+    /*#__PURE__*/React.createElement("div", { className: "calendar-header-row" },
+      /*#__PURE__*/React.createElement("div", null, "Hora"),
+      /*#__PURE__*/React.createElement("div", null),
+      /*#__PURE__*/React.createElement("div", null, "Par"),
+      /*#__PURE__*/React.createElement("div", null, "Evento"),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } }, "Real"),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } }, "Est"),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } }, "Ant")
+    ),
+    filteredEvents.map(function (event, index) {
       var isToday = event.dateISO === todayISO;
       var hasActual = !!(event.actual && event.actual !== '');
       // Compute event timestamp in UTC for past/next logic
@@ -5198,47 +5208,26 @@ var ForexDashboard = function ForexDashboard() {
         ref: isNext ? nextEventRef : null,
         "data-event-key": "".concat(event.dateISO, "|").concat(event.currency, "|").concat(event.event),
         style: {
-          borderLeft: isNext ? '' : !isPast && isToday ? '3px solid var(--blue)' : 'none'
+          borderLeft: isNext ? '3px solid var(--green)' : !isPast && isToday ? '3px solid var(--blue)' : '3px solid transparent'
         }
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "event-time"
-      }, isNext && /*#__PURE__*/React.createElement("div", {
-        className: "next-marker"
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "next-dot"
-      }), "Pr\xF3ximo"), /*#__PURE__*/React.createElement("div", {
-        style: {
-          fontWeight: 600,
-          fontSize: '0.875rem',
-          color: isNext ? 'var(--green)' : isToday && !isPast ? 'var(--blue)' : 'inherit'
-        }
-      }, event.date), /*#__PURE__*/React.createElement("div", null, formatEventTime(event.timeUTC || event.time, event.dateISO))), /*#__PURE__*/React.createElement("div", {
-        className: "event-details"
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "event-title"
-      }, event.event), /*#__PURE__*/React.createElement("div", {
-        className: "event-country"
-      }, /*#__PURE__*/React.createElement("span", {
-        className: "flag-emoji"
-      }, event.flag), " ", event.country || event.currency), /*#__PURE__*/React.createElement("div", {
-        style: {
-          display: 'flex',
-          gap: '0.75rem',
-          marginTop: '0.35rem',
-          fontSize: '0.75rem',
-          color: 'var(--text-tertiary)'
-        }
-      }, /*#__PURE__*/React.createElement("span", null, "Real: ", /*#__PURE__*/React.createElement("strong", {
-        style: {
-          color: hasActual ? actualColor : 'var(--text-tertiary)'
-        }
-      }, event.actual || '—')), /*#__PURE__*/React.createElement("span", null, "Est: ", /*#__PURE__*/React.createElement("strong", {
-        style: {
-          color: 'var(--text-secondary)'
-        }
-      }, event.forecast || '—')), /*#__PURE__*/React.createElement("span", null, "Ant: ", /*#__PURE__*/React.createElement("strong", null, event.previous || '—')))), /*#__PURE__*/React.createElement("div", {
-        className: "event-impact impact-".concat(event.impact)
-      }, event.impact === 'high' ? 'Alto Impacto' : event.impact === 'medium' ? 'Medio' : 'Bajo'));
+      },
+      /*#__PURE__*/React.createElement("div", { className: "event-time", style: {
+        color: isNext ? 'var(--green)' : isToday && !isPast ? 'var(--blue)' : 'var(--text-tertiary)'
+      }}, formatEventTime(event.timeUTC || event.time, event.dateISO)),
+      /*#__PURE__*/React.createElement("div", { className: "event-impact-dot impact-".concat(event.impact) }),
+      /*#__PURE__*/React.createElement("div", { className: "event-currency-cell" },
+        /*#__PURE__*/React.createElement("span", null, event.flag), " ", event.currency
+      ),
+      /*#__PURE__*/React.createElement("div", { className: "event-title", title: event.event }, event.event),
+      /*#__PURE__*/React.createElement("div", { className: "event-data-cell", style: { color: hasActual ? actualColor : 'var(--text-tertiary)' }},
+        event.actual || '—'
+      ),
+      /*#__PURE__*/React.createElement("div", { className: "event-data-cell", style: { color: 'var(--text-secondary)' }},
+        event.forecast || '—'
+      ),
+      /*#__PURE__*/React.createElement("div", { className: "event-data-cell", style: { color: 'var(--text-tertiary)' }},
+        event.previous || '—'
+      ));
     })));
   }()), activeTab === 'alerts' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "section-header"
