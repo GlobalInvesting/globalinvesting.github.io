@@ -1469,20 +1469,24 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposing = pairMom1M !== null && pairMom1M < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShort = weakCurr === 'JPY';
-      // Momentum 7d basket-adjusted (precio FX corto plazo)
+      // MOMENTUM INSTITUCIONAL: par neto 7d basket-adjusted
+      // Evaluar el momentum del PAR como unidad (Bloomberg/DailyFX standard):
+      // pairMom7d = strongMom7d - weakMom7d
+      //   > 0 = precio a favor del LONG | < 0 = divergencia
+      // Umbrales: 1 sigma semanal G8 = ~0.6%, umbral conservador = 0.40%
       var strongFx1W = (economicData[strongCurr] || {}).fxPerformance1W;
       var weakFx1W = (economicData[weakCurr] || {}).fxPerformance1W;
       var strongMom7d = strongFx1W != null ? strongFx1W : null;
       var weakMom7d = weakFx1W != null ? weakFx1W : null;
-      // Corrección 7d: strong cae en precio (umbral -0.3% basket)
-      var strongCorrection7d = strongMom7d !== null && strongMom7d < -0.3;
-      // Rebote adverso 7d: weak sube (umbral +0.3%)
-      var weakRebounding7d = weakMom7d !== null && weakMom7d > 0.3;
-      // Confirmación 7d: strong sube Y weak cae → señal confirmada
-      var momConfirmed7d = strongMom7d !== null && weakMom7d !== null && strongMom7d > 0.2 && weakMom7d < -0.2;
-      // Señal compuesta: qué tan alineado está el precio con el fundamental
-      // +1 = confirmado, 0 = neutral, -1 = divergencia
-      var momAlignment = momConfirmed7d ? 1 : (strongCorrection7d || weakRebounding7d) ? -1 : 0;
+      var pairMom7d = strongMom7d !== null && weakMom7d !== null ? strongMom7d - weakMom7d : null;
+      var momConfirmed7d = pairMom7d !== null && pairMom7d > 0.40;
+      var momDivergence7d = pairMom7d !== null && pairMom7d < -0.40;
+      var momDivergenceStrong = pairMom7d !== null && pairMom7d < -1.0;
+      var momAlignment = momConfirmed7d ? 1 : momDivergence7d ? -1 : 0;
+      // Para display individual en panel UI
+      var strongCorrection7d = strongMom7d !== null && strongMom7d < -0.40;
+      var weakRebounding7d = weakMom7d !== null && weakMom7d > 0.40;
+      var momPriorityFactor = momDivergenceStrong ? 0.45 : momDivergence7d ? 0.70 : momConfirmed7d ? 1.20 : 1.0;
       recommendations.push({
         type: 'long',
         pair: pairName,
@@ -1505,8 +1509,10 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         strongCorrection7d: strongCorrection7d,
         weakRebounding7d: weakRebounding7d,
         momConfirmed7d: momConfirmed7d,
+        momDivergence7d: momDivergence7d,
+        pairMom7d: pairMom7d,
         momAlignment: momAlignment,
-        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0) * (strongCorrection7d ? 0.75 : momConfirmed7d ? 1.15 : 1.0)
+        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0) * momPriorityFactor
       });
     });
   });
@@ -1540,17 +1546,23 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposingS = pairMom1MS !== null && pairMom1MS < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShortS = weakCurr === 'JPY';
-      // Momentum 7d basket-adjusted para SHORT
+      // MOMENTUM INSTITUCIONAL SHORT: par neto 7d basket-adjusted
+      // Para SHORT (par = WEAK/STRONG), el par CAE cuando strong supera a weak.
+      // pairMom7dS = strongMom7dS - weakMom7dS
+      //   > 0 = precio confirma el SHORT (strong sube vs weak)
+      //   < 0 = divergencia (par subió, se mueve contra el SHORT)
       var strongFx1WS = (economicData[strongCurr] || {}).fxPerformance1W;
       var weakFx1WS = (economicData[weakCurr] || {}).fxPerformance1W;
       var strongMom7dS = strongFx1WS != null ? strongFx1WS : null;
       var weakMom7dS = weakFx1WS != null ? weakFx1WS : null;
-      // Para SHORT: adverso = weak sube (rebota), favorable = weak cae
-      var weakRebounding7dS = weakMom7dS !== null && weakMom7dS > 0.3;
-      var strongCorrection7dS = strongMom7dS !== null && strongMom7dS < -0.3;
-      // Confirmación SHORT: strong sube Y weak cae
-      var momConfirmed7dS = strongMom7dS !== null && weakMom7dS !== null && strongMom7dS > 0.2 && weakMom7dS < -0.2;
-      var momAlignmentS = momConfirmed7dS ? 1 : (weakRebounding7dS || strongCorrection7dS) ? -1 : 0;
+      var pairMom7dS = strongMom7dS !== null && weakMom7dS !== null ? strongMom7dS - weakMom7dS : null;
+      var momConfirmed7dS = pairMom7dS !== null && pairMom7dS > 0.40;
+      var momDivergence7dS = pairMom7dS !== null && pairMom7dS < -0.40;
+      var momDivergenceStrongS = pairMom7dS !== null && pairMom7dS < -1.0;
+      var momAlignmentS = momConfirmed7dS ? 1 : momDivergence7dS ? -1 : 0;
+      var strongCorrection7dS = strongMom7dS !== null && strongMom7dS < -0.40;
+      var weakRebounding7dS = weakMom7dS !== null && weakMom7dS > 0.40;
+      var momPriorityFactorS = momDivergenceStrongS ? 0.45 : momDivergence7dS ? 0.70 : momConfirmed7dS ? 1.20 : 1.0;
       recommendations.push({
         type: 'short',
         pair: pairName,
@@ -1573,8 +1585,10 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         strongCorrection7d: strongCorrection7dS,
         weakRebounding7d: weakRebounding7dS,
         momConfirmed7d: momConfirmed7dS,
+        momDivergence7d: momDivergence7dS,
+        pairMom7d: pairMom7dS,
         momAlignment: momAlignmentS,
-        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0) * (weakRebounding7dS ? 0.75 : momConfirmed7dS ? 1.15 : 1.0)
+        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0) * momPriorityFactorS
       });
     });
   });
@@ -5430,95 +5444,108 @@ var ForexDashboard = function ForexDashboard() {
       style: {
         color: 'var(--text-primary)'
       }
-    }, "An\xE1lisis:"), rec.type === 'long' ? /*#__PURE__*/React.createElement("span", null,
-      " ", rec.strongCurrency, " muestra fundamentos superiores (",
-      rec.strength != null ? rec.strength.toFixed(1) : '\u2014', " pts) frente a ",
-      rec.weakCurrency, " (", rec.weakness != null ? rec.weakness.toFixed(1) : '\u2014', "), diferencial ",
-      rec.spread != null ? rec.spread.toFixed(1) : '\u2014', " pts.",
-      rec.momConfirmed7d
-        ? " Precio confirma: " + rec.strongCurrency + " +" + (rec.strongMom7d > 0 ? rec.strongMom7d.toFixed(2) : '0') + "% y " + rec.weakCurrency + " " + (rec.weakMom7d <= 0 ? rec.weakMom7d.toFixed(2) : '+' + rec.weakMom7d.toFixed(2)) + "% esta semana \u2014 se\xF1al alineada."
-        : rec.strongCorrection7d
-          ? " Atenci\xF3n: " + rec.strongCurrency + " cay\xF3 " + Math.abs(rec.strongMom7d).toFixed(2) + "% esta semana \u2014 monitorear timing de entrada."
-          : rec.weakRebounding7d
-            ? " Atenci\xF3n: " + rec.weakCurrency + " subi\xF3 " + Math.abs(rec.weakMom7d).toFixed(2) + "% esta semana \u2014 posible recuperaci\xF3n temporal."
-            : " Momentum de precio neutral \u2014 entrada basada en fundamentos.",
-      " Oportunidad de compra (LONG) en ", rec.pair, "."
-    ) : /*#__PURE__*/React.createElement("span", null,
-      " ", rec.weakCurrency, " registra debilidad fundamental (",
-      rec.weakness != null ? rec.weakness.toFixed(1) : '\u2014', " pts) vs ",
-      rec.strongCurrency, " (", rec.strength != null ? rec.strength.toFixed(1) : '\u2014', "), diferencial ",
-      rec.spread != null ? rec.spread.toFixed(1) : '\u2014', " pts.",
-      rec.momConfirmed7d
-        ? " Precio confirma: " + rec.weakCurrency + " " + (rec.weakMom7d <= 0 ? rec.weakMom7d.toFixed(2) : '+' + rec.weakMom7d.toFixed(2)) + "% y " + rec.strongCurrency + " +" + (rec.strongMom7d > 0 ? rec.strongMom7d.toFixed(2) : '0') + "% esta semana \u2014 se\xF1al alineada."
-        : rec.weakRebounding7d
-          ? " Atenci\xF3n: " + rec.weakCurrency + " subi\xF3 " + Math.abs(rec.weakMom7d).toFixed(2) + "% esta semana \u2014 posible recuperaci\xF3n temporal."
-          : rec.strongCorrection7d
-            ? " Atenci\xF3n: " + rec.strongCurrency + " cay\xF3 " + Math.abs(rec.strongMom7d).toFixed(2) + "% esta semana \u2014 contexto adverso."
-            : " Momentum de precio neutral \u2014 se\xF1al basada en fundamentos.",
-      " Oportunidad de venta (SHORT) en ", rec.pair, "."
+    }, "An\xE1lisis:"), /*#__PURE__*/React.createElement("span", null,
+      rec.type === 'long'
+        ? (function() {
+            var pDir = rec.pairMom7d !== null ? (rec.pairMom7d > 0 ? '+' : '') + rec.pairMom7d.toFixed(2) + '% par 7d' : null;
+            return [
+              ' ', rec.strongCurrency, ' supera fundamentalmente a ', rec.weakCurrency,
+              ' (', rec.strength != null ? rec.strength.toFixed(1) : '\u2014', ' vs ',
+              rec.weakness != null ? rec.weakness.toFixed(1) : '\u2014', ' pts, diferencial ',
+              rec.spread != null ? rec.spread.toFixed(1) : '\u2014', ' pts).',
+              rec.momAlignment === 1
+                ? [' Precio confirma (par +', rec.pairMom7d.toFixed(2), '% esta semana): momentum alineado con el fundamental. Se\xF1al de alta convicción.']
+                : rec.momAlignment === -1
+                  ? [' Divergencia de precio: par ', rec.pairMom7d.toFixed(2), '% esta semana, en contra del LONG.',
+                     rec.pairMom7d < -1.0 ? ' Corrección significativa — esperar estabilización antes de entrar.' : ' Monitorear; puede ser pullback hacia soporte.']
+                  : [' Precio neutral (par ', pDir ? rec.pairMom7d.toFixed(2) + '% esta semana' : 'sin datos', '). Entrada basada en fundamentos.'],
+              ' Oportunidad LONG en ', rec.pair, '.'
+            ];
+          })()
+        : (function() {
+            var pDir = rec.pairMom7d !== null ? (rec.pairMom7d > 0 ? '+' : '') + rec.pairMom7d.toFixed(2) + '% par 7d' : null;
+            return [
+              ' ', rec.weakCurrency, ' registra debilidad fundamental vs ', rec.strongCurrency,
+              ' (', rec.weakness != null ? rec.weakness.toFixed(1) : '\u2014', ' vs ',
+              rec.strength != null ? rec.strength.toFixed(1) : '\u2014', ' pts, diferencial ',
+              rec.spread != null ? rec.spread.toFixed(1) : '\u2014', ' pts).',
+              rec.momAlignment === 1
+                ? [' Precio confirma (par -', rec.pairMom7d.toFixed(2), '% esta semana, strong supera al weak): momentum alineado. Se\xF1al de alta convicción.']
+                : rec.momAlignment === -1
+                  ? [' Divergencia de precio: par ', rec.pairMom7d.toFixed(2), '% en contra del SHORT.',
+                     rec.pairMom7d < -1.0 ? ' El weak rebota con fuerza — esperar agotamiento del rebote.' : ' Posible rebote temporal; mantener vigilancia.']
+                  : [' Precio neutral (', pDir ? rec.pairMom7d.toFixed(2) + '% esta semana' : 'sin datos', '). Se\xF1al basada en fundamentos.'],
+              ' Oportunidad SHORT en ', rec.pair, '.'
+            ];
+          })()
     )), /*#__PURE__*/React.createElement("div", {
       style: {
         marginTop: '1rem',
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
+        background: rec.momAlignment === 1
+          ? 'rgba(38,166,154,0.07)'
+          : rec.momAlignment === -1
+            ? 'rgba(239,83,80,0.07)'
+            : 'var(--bg-elevated)',
+        border: rec.momAlignment === 1
+          ? '1px solid rgba(38,166,154,0.30)'
+          : rec.momAlignment === -1
+            ? '1px solid rgba(239,83,80,0.30)'
+            : '1px solid var(--border)',
         borderRadius: '4px',
         padding: '0.625rem 0.75rem'
       }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: '0.68rem',
-        fontWeight: 700,
-        color: 'var(--text-tertiary)',
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        marginBottom: '0.5rem'
-      }
-    }, "Momentum precio 7d (basket-adj)"),
+    },
     /*#__PURE__*/React.createElement("div", {
-      style: { display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }
-    }, [
-      { code: rec.strongCurrency, mom: rec.strongMom7d, role: 'strong' },
-      { code: rec.weakCurrency,   mom: rec.weakMom7d,   role: 'weak' }
+      style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }
+    },
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }
+    }, "Momentum precio 7d (par neto basket-adj)"),
+    /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '0.72rem', fontWeight: 700, padding: '1px 7px', borderRadius: '3px',
+        background: rec.momAlignment === 1 ? 'rgba(38,166,154,0.18)' : rec.momAlignment === -1 ? 'rgba(239,83,80,0.18)' : 'rgba(120,120,120,0.12)',
+        color: rec.momAlignment === 1 ? 'var(--green-strong)' : rec.momAlignment === -1 ? 'var(--red-strong)' : 'var(--text-tertiary)'
+      }
+    }, rec.momAlignment === 1 ? '\u2197 Confirmado' : rec.momAlignment === -1 ? '\u2198 Divergencia' : '\u2192 Neutral')
+    ),
+    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' } },
+    [
+      { label: rec.strongCurrency, val: rec.strongMom7d, role: 'strong' },
+      { label: rec.weakCurrency,   val: rec.weakMom7d,   role: 'weak'   },
+      { label: 'Par neto',         val: rec.pairMom7d,   role: 'pair'   }
     ].map(function(item) {
-      var v = item.mom;
-      var warn = (rec.type === 'long' && item.role === 'strong' && v !== null && v < -0.3) ||
-                 (rec.type === 'long' && item.role === 'weak'   && v !== null && v >  0.3) ||
-                 (rec.type === 'short' && item.role === 'weak'  && v !== null && v >  0.3) ||
-                 (rec.type === 'short' && item.role === 'strong'&& v !== null && v < -0.3);
-      var good = (rec.type === 'long' && item.role === 'strong' && v !== null && v > 0.2) ||
-                 (rec.type === 'long' && item.role === 'weak'   && v !== null && v < -0.2) ||
-                 (rec.type === 'short' && item.role === 'weak'  && v !== null && v < -0.2) ||
-                 (rec.type === 'short' && item.role === 'strong'&& v !== null && v >  0.2);
-      var trend = v === null ? 'flat' : v > 0.2 ? 'rising' : v < -0.2 ? 'falling' : 'flat';
-      var arrow = trend === 'rising' ? '\u2197' : trend === 'falling' ? '\u2198' : '\u2192';
-      var valueColor = good ? 'var(--green-strong)' : warn ? 'var(--red-strong)' : 'var(--text-tertiary)';
-      var bg = warn ? 'rgba(239,83,80,0.08)' : good ? 'rgba(38,166,154,0.08)' : 'transparent';
-      var borderClr = warn ? '1px solid rgba(239,83,80,0.25)' : good ? '1px solid rgba(38,166,154,0.25)' : '1px solid transparent';
+      var v = item.val;
+      var isGoodForSignal = rec.type === 'long'
+        ? (item.role === 'strong' ? (v !== null && v > 0) : item.role === 'weak' ? (v !== null && v < 0) : (v !== null && v > 0))
+        : (item.role === 'strong' ? (v !== null && v > 0) : item.role === 'weak' ? (v !== null && v < 0) : (v !== null && v > 0));
+      var isBadForSignal = rec.type === 'long'
+        ? (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40))
+        : (item.role === 'strong' ? (v !== null && v < -0.40) : item.role === 'weak' ? (v !== null && v > 0.40) : (v !== null && v < -0.40));
+      var clr = isBadForSignal ? 'var(--red-strong)' : isGoodForSignal ? 'var(--green-strong)' : 'var(--text-tertiary)';
+      var arrow = v === null ? '\u2192' : v > 0.15 ? '\u2197' : v < -0.15 ? '\u2198' : '\u2192';
       return /*#__PURE__*/React.createElement("div", {
-        key: item.code,
+        key: item.role,
         style: {
-          display: 'flex', alignItems: 'center', gap: '0.3rem',
-          background: bg, border: borderClr, borderRadius: '4px', padding: '3px 7px'
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px',
+          minWidth: item.role === 'pair' ? '64px' : '52px',
+          padding: item.role === 'pair' ? '3px 8px' : '3px 6px',
+          background: item.role === 'pair'
+            ? (rec.momAlignment === 1 ? 'rgba(38,166,154,0.13)' : rec.momAlignment === -1 ? 'rgba(239,83,80,0.13)' : 'rgba(120,120,120,0.08)')
+            : 'transparent',
+          borderRadius: '4px',
+          border: item.role === 'pair' ? '1px solid rgba(120,120,120,0.18)' : 'none'
         }
       },
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' } }, item.code),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '1rem', color: valueColor, lineHeight: 1 } }, arrow),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', color: valueColor, fontWeight: 600 } },
-        v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014'
-      )
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' } }, item.label),
+      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.95rem', color: clr, lineHeight: 1.1 } }, arrow, ' ', v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014')
       );
     })
     )), /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: '0.75rem',
-        fontSize: '0.72rem',
-        color: 'var(--text-tertiary)',
-        textAlign: 'center'
-      }
-    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "% \xB7 Momentum: ",
-    rec.momAlignment === 1 ? /*#__PURE__*/React.createElement("span", { style: { color: 'var(--green-strong)', fontWeight: 600 } }, "Confirmado") :
-    rec.momAlignment === -1 ? /*#__PURE__*/React.createElement("span", { style: { color: '#f59e0b', fontWeight: 600 } }, "Divergencia") :
-    /*#__PURE__*/React.createElement("span", null, "Neutral")
+      style: { marginTop: '0.6rem', fontSize: '0.7rem', color: 'var(--text-tertiary)', textAlign: 'center' }
+    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "% \xB7 Diferencial de precio 7d: ",
+    rec.pairMom7d !== null ? (rec.pairMom7d > 0 ? '+' : '') + rec.pairMom7d.toFixed(2) + '%' : 'sin datos',
+    " \xB7 Umbral confirmaci\xF3n: \xB10.40%"
     )));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
