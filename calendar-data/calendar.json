@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-26",
-  "generatedAt": "2026-03-26T14:11:58.690754Z",
-  "fetchMode": "SMART",
+  "generatedAt": "2026-03-26T15:45:13.372477Z",
+  "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-25",
-  "totalEvents": 1223,
+  "totalEvents": 1233,
   "currencyCounts": {
     "AUD": 101,
     "CAD": 73,
@@ -18,12 +18,12 @@
     "GBP": 143,
     "JPY": 140,
     "NZD": 51,
-    "USD": 510
+    "USD": 520
   },
   "impactCounts": {
-    "low": 632,
-    "medium": 444,
-    "high": 147
+    "low": 640,
+    "medium": 445,
+    "high": 148
   },
   "events": [
     {
@@ -12710,7 +12710,7 @@
       "flag": "🇺🇸",
       "event": "EIA Natural Gas Storage Change",
       "impact": "medium",
-      "actual": "",
+      "actual": "-54.0",
       "forecast": "-49.0",
       "previous": "35.0"
     },
@@ -12723,7 +12723,7 @@
       "flag": "🇺🇸",
       "event": "Natural Gas Storage",
       "impact": "low",
-      "actual": "",
+      "actual": "-54B",
       "forecast": "-49B",
       "previous": "35B"
     },
@@ -12736,7 +12736,7 @@
       "flag": "🇺🇸",
       "event": "KC Fed Composite Index (Mar)",
       "impact": "low",
-      "actual": "",
+      "actual": "11",
       "forecast": "",
       "previous": "5"
     },
@@ -12749,7 +12749,7 @@
       "flag": "🇺🇸",
       "event": "KC Fed Manufacturing Index (Mar)",
       "impact": "low",
-      "actual": "",
+      "actual": "11",
       "forecast": "",
       "previous": "10"
     },
@@ -12762,7 +12762,7 @@
       "flag": "🇺🇸",
       "event": "Kansas Fed Manufacturing Activity",
       "impact": "medium",
-      "actual": "",
+      "actual": "11.0",
       "forecast": "",
       "previous": "10.0"
     },
@@ -12775,7 +12775,7 @@
       "flag": "🇺🇸",
       "event": "4-Week Bill Auction",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.62",
       "forecast": "",
       "previous": "3.615"
     },
@@ -13003,6 +13003,19 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "00:01",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "65.2"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "06:00",
       "country": "EUR",
       "currency": "EUR",
@@ -13025,19 +13038,6 @@
       "actual": "",
       "forecast": "",
       "previous": "0.2"
-    },
-    {
-      "date": "27 Mar",
-      "dateISO": "2026-03-27",
-      "timeUTC": "06:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Confidence",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "-10.5"
     },
     {
       "date": "27 Mar",
@@ -15274,6 +15274,136 @@
       "actual": "",
       "forecast": "",
       "previous": "0.4%"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Crude Oil Inventories",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "6.926M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Refinery Crude Runs (WoW)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.366M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Crude Oil Imports",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.846M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Cushing Crude Oil Inventories",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.421M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Distillate Fuel Production",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.157M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Weekly Distillates Stocks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.032M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Gasoline Production",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.309M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Heating Oil Stockpiles",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.241M"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "EIA Weekly Refinery Utilization Rates (WoW)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "1.5%"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Gasoline Inventories",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-2.593M"
     },
     {
       "date": "1 Abr",
