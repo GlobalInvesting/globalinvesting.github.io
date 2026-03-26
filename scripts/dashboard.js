@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.5.0-2026-03-13'; // bump: data fixes + industry threshold
+          DASHBOARD_VERSION = '6.6.0-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -1632,16 +1632,16 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             _context18.n = 2;
             break;
           }
-          // v5.0 cache validation: reject cache missing fxPerformance1M
+          // v6.6 cache validation: reject cache missing fxPerformance1M or fxPerformance1W
           sampleCurrencies = ['AUD', 'CHF', 'USD', 'EUR'];
           hasFxPerf = sampleCurrencies.some(function (c) {
-            return cached[c] && cached[c].fxPerformance1M !== null && cached[c].fxPerformance1M !== undefined;
+            return cached[c] && cached[c].fxPerformance1M !== null && cached[c].fxPerformance1M !== undefined && cached[c].fxPerformance1W !== undefined;
           });
           if (hasFxPerf) {
             _context18.n = 1;
             break;
           }
-          console.log('⚠️ Caché sin fxPerformance1M — invalidando para cargar datos completos...');
+          console.log('\u26A0\uFE0F Cach\xE9 sin fxPerformance1W \u2014 invalidando para cargar datos completos...');
           CacheManager.clear(cacheKey);
           _context18.n = 2;
           break;
@@ -2000,6 +2000,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             }
             economicData[code].fxPerformance1M = parseFloat(composite.toFixed(4));
             economicData[code].fxPerformance1MDate = d.date;
+            economicData[code].fxPerformance1W = basket1W !== null ? parseFloat(basket1W.toFixed(4)) : null;
             console.log("\u2705 FX perf basket-adj for ".concat(code, ": ").concat(composite.toFixed(4), "% (raw=").concat((_d$raw1M = d.raw1M) === null || _d$raw1M === void 0 ? void 0 : _d$raw1M.toFixed(3), ", basket1M=").concat(basket1M.toFixed(3), ", 1W=").concat((_basket1W = basket1W) === null || _basket1W === void 0 ? void 0 : _basket1W.toFixed(3), ", 3M=").concat(basket3M === null || basket3M === void 0 ? void 0 : basket3M.toFixed(3), ")"));
           }
           setDataLoadingStatus({
