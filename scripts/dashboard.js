@@ -983,7 +983,6 @@ var getStrength = function getStrength(currency) {
     _unavailable: true
   };
 };
-
 var fetchAIAnalysis = /*#__PURE__*/function () {
   var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee10() {
     var cacheKey, cached, indexUrl, indexResponse, index, analyses, promises, _t10;
@@ -1470,13 +1469,6 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposing = pairMom1M !== null && pairMom1M < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShort = weakCurr === 'JPY';
-      // Momentum diario 7d basado en precio FX (basket-ajustado, ya en economicData)
-      var strongFx1W = (economicData[strongCurr] || {}).fxPerformance1W;
-      var weakFx1W = (economicData[weakCurr] || {}).fxPerformance1W;
-      var strongMom7d = strongFx1W !== null && strongFx1W !== undefined ? strongFx1W : null;
-      var weakMom7d = weakFx1W !== null && weakFx1W !== undefined ? weakFx1W : null;
-      // Corrección: el strong cae en precio los últimos 7 días (umbral -0.3% basket)
-      var strongCorrection = strongMom7d !== null && strongMom7d < -0.3;
       recommendations.push({
         type: 'long',
         pair: pairName,
@@ -1494,10 +1486,7 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         pairMom1M: pairMom1M,
         momentumOpposing: momentumOpposing,
         jpyAsShort: jpyAsShort,
-        strongMom7d: strongMom7d,
-        weakMom7d: weakMom7d,
-        strongCorrection: strongCorrection,
-        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0) * (strongCorrection ? 0.7 : 1.0)
+        priority: spreadStrength * avgQuality * (momentumOpposing ? 0.5 : 1.0) * (jpyAsShort ? 0.6 : 1.0)
       });
     });
   });
@@ -1531,13 +1520,6 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
       var momentumOpposingS = pairMom1MS !== null && pairMom1MS < -2.0;
       // v6.4: JPY como corto tiene HR histórico ~20-40% — se mueve por risk sentiment, no por macro
       var jpyAsShortS = weakCurr === 'JPY';
-      // Momentum diario 7d basado en precio FX (basket-ajustado)
-      var strongFx1WS = (economicData[strongCurr] || {}).fxPerformance1W;
-      var weakFx1WS = (economicData[weakCurr] || {}).fxPerformance1W;
-      var strongMom7dS = strongFx1WS !== null && strongFx1WS !== undefined ? strongFx1WS : null;
-      var weakMom7dS = weakFx1WS !== null && weakFx1WS !== undefined ? weakFx1WS : null;
-      // Rebote adverso: el weak sube en precio los últimos 7 días (umbral +0.3% basket)
-      var weakRebounding = weakMom7dS !== null && weakMom7dS > 0.3;
       recommendations.push({
         type: 'short',
         pair: pairName,
@@ -1555,10 +1537,7 @@ var generateForexPairRecommendations = function generateForexPairRecommendations
         pairMom1M: pairMom1MS,
         momentumOpposing: momentumOpposingS,
         jpyAsShort: jpyAsShortS,
-        strongMom7d: strongMom7dS,
-        weakMom7d: weakMom7dS,
-        weakRebounding: weakRebounding,
-        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0) * (weakRebounding ? 0.7 : 1.0)
+        priority: spreadStrength * avgQuality * (momentumOpposingS ? 0.5 : 1.0) * (jpyAsShortS ? 0.6 : 1.0)
       });
     });
   });
@@ -1970,7 +1949,6 @@ var loadAllEconomicData = /*#__PURE__*/function () {
             }
             economicData[code].fxPerformance1M = parseFloat(composite.toFixed(4));
             economicData[code].fxPerformance1MDate = d.date;
-            economicData[code].fxPerformance1W = basket1W !== null ? parseFloat(basket1W.toFixed(4)) : null;
             console.log("\u2705 FX perf basket-adj for ".concat(code, ": ").concat(composite.toFixed(4), "% (raw=").concat((_d$raw1M = d.raw1M) === null || _d$raw1M === void 0 ? void 0 : _d$raw1M.toFixed(3), ", basket1M=").concat(basket1M.toFixed(3), ", 1W=").concat((_basket1W = basket1W) === null || _basket1W === void 0 ? void 0 : _basket1W.toFixed(3), ", 3M=").concat(basket3M === null || basket3M === void 0 ? void 0 : basket3M.toFixed(3), ")"));
           }
           setDataLoadingStatus({
@@ -5214,9 +5192,9 @@ var ForexDashboard = function ForexDashboard() {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-title"
-  }, "Mejores Pares de Divisas - An\xE1lisis Fundamental y Momentum"), /*#__PURE__*/React.createElement("div", {
+  }, "Mejores Pares de Divisas - An\xE1lisis Fundamental"), /*#__PURE__*/React.createElement("div", {
     className: "section-meta"
-  }, "Basado en diferenciales de fortaleza fundamental + momentum diario (5 d\xEDas) \xB7 Horizonte estimado: 2\u20136 semanas \xB7 Solo se\xF1ales con diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
+  }, "Basado en diferenciales de fortaleza fundamental \xB7 Horizonte estimado: 2\u20136 semanas \xB7 Solo se\xF1ales con diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))',
@@ -5276,22 +5254,7 @@ var ForexDashboard = function ForexDashboard() {
         padding: '2px 7px',
         cursor: 'help'
       }
-    }, "JPY risk-off")),
-    (rec.strongCorrection || rec.weakRebounding) && /*#__PURE__*/React.createElement("span", {
-      title: rec.strongCorrection
-        ? rec.strongCurrency + " cay\xF3 " + Math.abs(rec.strongMom7d !== null ? rec.strongMom7d : 0).toFixed(2) + "% en los \xFAltimos 7 d\xEDas (precio). Fundamentos s\xF3lidos pero momentum de corto plazo bajista."
-        : rec.weakCurrency + " subi\xF3 " + Math.abs(rec.weakMom7d !== null ? rec.weakMom7d : 0).toFixed(2) + "% en los \xFAltimos 7 d\xEDas (precio). Posible recuperaci\xF3n temporal.",
-      style: {
-        fontSize: '0.75rem',
-        background: 'rgba(245, 158, 11, 0.15)',
-        color: '#f59e0b',
-        border: '1px solid rgba(245, 158, 11, 0.3)',
-        borderRadius: '4px',
-        padding: '2px 7px',
-        cursor: 'help'
-      }
-    }, rec.strongCorrection ? "Correcc. 7d" : "Rebote 7d"))
-    ), /*#__PURE__*/React.createElement("div", {
+    }, "JPY risk-off"))), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: 'right'
       }
@@ -5430,73 +5393,14 @@ var ForexDashboard = function ForexDashboard() {
       style: {
         color: 'var(--text-primary)'
       }
-    }, "An\xE1lisis:"), rec.type === 'long' ? /*#__PURE__*/React.createElement("span", null,
-      " ", rec.strongCurrency, " muestra fundamentos superiores con un \xEDndice de fortaleza de ", rec.strength != null ? rec.strength.toFixed(1) : '—', " puntos, superando a ", rec.weakCurrency, " (", rec.weakness != null ? rec.weakness.toFixed(1) : '—', ") por un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos.",
-      rec.strongMom7d !== null && rec.strongMom7d < -0.3 ? " Atenci\xF3n: " + rec.strongCurrency + " cay\xF3 " + Math.abs(rec.strongMom7d).toFixed(2) + "% en precio la \xFAltima semana \u2014 monitorear entrada." : rec.strongMom7d !== null && rec.strongMom7d > 0.3 ? " Momentum de precio de " + rec.strongCurrency + " (" + (rec.strongMom7d > 0 ? "+" : "") + rec.strongMom7d.toFixed(2) + "% semanal) confirma la se\xF1al." : "",
-      " Este diferencial sugiere una oportunidad de compra (LONG) en ", rec.pair, "."
-    ) : /*#__PURE__*/React.createElement("span", null,
-      " ", rec.weakCurrency, " registra debilidad fundamental con ", rec.weakness != null ? rec.weakness.toFixed(1) : '—', " puntos frente a la fortaleza de ", rec.strongCurrency, " (", rec.strength != null ? rec.strength.toFixed(1) : '—', "), generando un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos.",
-      rec.weakMom7d !== null && rec.weakMom7d > 0.3 ? " Atenci\xF3n: " + rec.weakCurrency + " subi\xF3 " + Math.abs(rec.weakMom7d).toFixed(2) + "% en precio la \xFAltima semana \u2014 posible recuperaci\xF3n temporal." : rec.weakMom7d !== null && rec.weakMom7d < -0.3 ? " Precio de " + rec.weakCurrency + " (" + rec.weakMom7d.toFixed(2) + "% semanal) confirma la debilidad." : "",
-      " Esto indica una oportunidad de venta (SHORT) en ", rec.pair, "."
-    )),
-    /*#__PURE__*/React.createElement("div", {
+    }, "An\xE1lisis:"), rec.type === 'long' ? /*#__PURE__*/React.createElement("span", null, " ", rec.strongCurrency, " muestra fundamentos superiores con un \xEDndice de fortaleza de ", rec.strength != null ? rec.strength.toFixed(1) : '—', " puntos, superando a ", rec.weakCurrency, " (", rec.weakness != null ? rec.weakness.toFixed(1) : '—', ") por un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos. Este diferencial sugiere una oportunidad de compra (LONG) en ", rec.pair, ".") : /*#__PURE__*/React.createElement("span", null, " ", rec.weakCurrency, " registra debilidad fundamental con ", rec.weakness != null ? rec.weakness.toFixed(1) : '—', " puntos frente a la fortaleza de ", rec.strongCurrency, " (", rec.strength != null ? rec.strength.toFixed(1) : '—', "), generando un diferencial de ", rec.spread != null ? rec.spread.toFixed(1) : '—', " puntos. Esto indica una oportunidad de venta (SHORT) en ", rec.pair, ".")), /*#__PURE__*/React.createElement("div", {
       style: {
         marginTop: '1rem',
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
-        borderRadius: '4px',
-        padding: '0.625rem 0.75rem'
-      }
-    },
-    /*#__PURE__*/React.createElement("div", {
-      style: { fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }
-    }, "Momentum de precio (7 d\xEDas)"),
-    /*#__PURE__*/React.createElement("div", {
-      style: { display: 'flex', gap: '1rem', flexWrap: 'wrap' }
-    },
-    [
-      { code: rec.strongCurrency, mom7d: rec.strongMom7d, isStrong: true },
-      { code: rec.weakCurrency,   mom7d: rec.weakMom7d,   isStrong: false }
-    ].map(function(item) {
-      var v = item.mom7d;
-      var trend = v === null ? 'flat' : v > 0.3 ? 'rising' : v < -0.3 ? 'falling' : 'flat';
-      var arrow = trend === 'rising' ? '\u2197' : trend === 'falling' ? '\u2198' : '\u2192';
-      var clr = trend === 'rising' ? 'var(--green-strong)' : trend === 'falling' ? 'var(--red-strong)' : 'var(--text-tertiary)';
-      var warn = (rec.type === 'long' && item.isStrong && trend === 'falling') ||
-                 (rec.type === 'short' && !item.isStrong && trend === 'rising');
-      return /*#__PURE__*/React.createElement("div", {
-        key: item.code,
-        title: warn
-          ? (rec.type === 'long'
-            ? item.code + " cay\xF3 en precio la \xFAltima semana. Fundamentos s\xF3lidos pero timing de entrada puede no ser \xF3ptimo."
-            : item.code + " subi\xF3 en precio la \xFAltima semana. Puede haber recuperaci\xF3n temporal antes de continuar bajando.")
-          : '',
-        style: {
-          display: 'flex', alignItems: 'center', gap: '0.35rem',
-          background: warn ? 'rgba(245,158,11,0.08)' : 'transparent',
-          border: warn ? '1px solid rgba(245,158,11,0.3)' : '1px solid transparent',
-          borderRadius: '4px', padding: '2px 6px'
-        }
-      },
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' } }, item.code),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '1rem', color: clr, lineHeight: 1 } }, arrow),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.8rem', color: clr, fontWeight: 600 } },
-        v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '—'
-      ),
-      warn ? /*#__PURE__*/React.createElement("span", {
-        style: { fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600, marginLeft: '2px' }
-      }, "(!)")  : null
-      );
-    })
-    )),
-    /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: '0.75rem',
         fontSize: '0.75rem',
         color: 'var(--text-tertiary)',
         textAlign: 'center'
       }
-    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "%"))
+    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "%")));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: '2rem',
