@@ -1,161 +1,161 @@
 {
-  "updated_utc": "2026-03-26T07:03:14.654251+00:00",
-  "updated_label": "07:03 UTC",
+  "updated_utc": "2026-03-26T12:43:44.465455+00:00",
+  "updated_label": "12:43 UTC",
   "model": "llama-3.3-70b-versatile",
   "total_ai": 8,
   "total_fallback": 0,
   "summaries": {
     "USD": {
       "sentiment": "bull",
-      "confidence": 70,
-      "analysis": "El dólar estadounidense se beneficia de la tensión geopolítica en el Medio Oriente, particularmente con la escalada de la situación entre Estados Unidos e Irán. La incertidumbre y el riesgo de conflicto están impulsando a los inversores hacia activos refugio, como el dólar. La postura del banco central, con la Reserva Federal manteniendo una actitud cautelosa, también apoya al dólar. Los niveles de precio, como el nivel de 1.1600 en EUR/USD, pueden actuar como un techo para la acción del precio, pero la tendencia general sigue siendo favorable para el dólar. La situación en el estrecho de Ormuz y las tensiones con Irán están generando un efecto de 'miedo' que beneficia al dólar como divisa de reserva. La decisión de la PBOC de fijar el tipo de cambio USD/CNY en 6.9056 también puede influir en la dinámica del dólar.",
+      "confidence": 80,
+      "analysis": "El dólar estadounidense se beneficia de la tensión geopolítica y el riesgo global, impulsado por la incertidumbre en el conflicto entre EEUU e Irán. La escalada en Medio Oriente eleva los costes energéticos y desencadena un flujo de capital hacia activos refugio, lo que beneficia al USD. El Banco Central de la Reserva Federal mantiene una postura hawkish, lo que apoya al dólar. Los niveles de precio clave para el USD/JPY se encuentran cerca de 160.00. La OECD reduce las expectativas de crecimiento global, lo que puede impulsar la demanda de activos seguros como el dólar. La postura del banco central y la tensión geopolítica son los principales impulsores del sentimiento alcista en el USD. El riesgo de una guerra entre EEUU e Irán mantiene a los inversores en una posición defensiva, lo que beneficia al dólar estadounidense.",
       "drivers": [
-        "Tensión Irán-Estados Unidos",
-        "Postura hawkish de la Fed",
+        "Tensión geopolítica",
+        "Postura hawkish Fed",
         "Risk-off global",
-        "Diferencial de tasas con economías G10"
+        "Diferencial de tasas"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
-        "ActionForex",
         "ForexLive",
-        "InvestingLive"
+        "InvestingLive",
+        "FXStreet"
       ],
       "articles_count": 8,
-      "latest_ts": 1774505926000
+      "latest_ts": 1774527254000
     },
     "EUR": {
       "sentiment": "mixed",
       "confidence": 50,
-      "analysis": "El euro se encuentra en una situación de incertidumbre debido a la combinación de factores globales y regionales. La escalada en Medio Oriente ha generado un aumento en los costes energéticos, lo que presiona la inflación en la eurozona y plantea un dilema para el BCE entre contener la inflación y evitar la recesión. El BCE ha indicado que un aumento de las tasas en abril es una opción, lo que podría apoyar al euro. Sin embargo, la situación geopolítica y la presión del dólar estadounidense también influyen en el valor del euro. El par EUR/USD se mueve dentro de una corrección técnica limitada, con precios que reflejan la interacción entre datos económicos de la eurozona y la presión del dólar estadounidense. El nivel de 1,17 es un punto de resistencia clave. La decisión del BCE en abril será crucial para determinar el rumbo del euro.",
+      "analysis": "El euro se enfrenta a una situación compleja debido a la escalada en el Medio Oriente, lo que eleva los costes energéticos en la eurozona y crea un dilema para el BCE entre contener la inflación y evitar la recesión. El BCE ha señalado una postura más firme ante el choque energético, con el presidente del Bundesbank, Joachim Nagel, indicando que un aumento de tasas en abril es una opción viable. Sin embargo, la reducción en la probabilidad de un aumento de tasas en abril y la firmeza del dólar estadounidense han presionado al par EUR/USD, que se mantiene por debajo de 1.16. El par EUR/GBP se mantiene por encima de 0.8650 gracias a comentarios hawkish del BCE. La situación geopolítica y la postura del BCE son los principales drivers de la divisa en este momento, con el conflicto en el Medio Oriente aumentando los riesgos inflacionarios y presionando a los bancos centrales a tomar medidas. El próximo evento clave será la declaración del miembro del Consejo de Supervisión del BCE, Tuominen, el 27 de marzo.",
       "drivers": [
-        "Aumento de tasas del BCE",
-        "Costes energéticos en la eurozona",
-        "Presión del dólar estadounidense",
-        "Situación geopolítica en Medio Oriente"
+        "Conflicto Medio Oriente",
+        "Postura BCE",
+        "Aumento costes energéticos",
+        "Spreads bonos periféricos"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
-        "FXStreet",
         "ForexLive",
-        "NewsData EUR",
-        "DailyForex ES"
+        "DailyForex ES",
+        "ActionForex",
+        "FXStreet"
       ],
       "articles_count": 8,
-      "latest_ts": 1774507618000
+      "latest_ts": 1774524690000
     },
     "GBP": {
-      "sentiment": "bull",
-      "confidence": 70,
-      "analysis": "La libra esterlina se beneficia de un giro hawkish del Banco de Inglaterra (BoE), lo que sugiere un apoyo sostenido para la divisa. La inflación en el Reino Unido se mantiene en 3.0%, lo que sigue siendo una preocupación para el BoE. Los comentarios de los miembros del BoE, como Megan Greene y Huw Pill, indican una preocupación creciente por los riesgos de inflación, aunque no necesariamente una decisión inmediata de subir las tasas. El par GBP/USD se encuentra en un nivel técnico significativo, cerca de su media móvil de 200 días. La incertidumbre en torno al conflicto en Medio Oriente y su impacto en los precios energéticos también afecta al Reino Unido, pero el BoE parece dispuesto a actuar si es necesario. Con un entorno de 'incertidumbre radical', el BoE mantiene una postura vigilante. El GBP/USD se mantiene en un rango estrecho, pero la tendencia a corto plazo parece favorable para la libra esterlina.",
+      "sentiment": "mixed",
+      "confidence": 50,
+      "analysis": "El contexto macro principal para el GBP se centra en las declaraciones de los miembros del BoE, como Breeden y Greene, quienes han expresado preocupación por la inflación pero no ven un caso inmediato para un aumento de las tasas. La falta de crecimiento y la capacidad de negociación reducida en el mercado laboral británico podrían actuar como un escudo desinflacionista. La inflación en el Reino Unido se mantuvo estable en 3.0% en febrero, lo que sugiere que las presiones subyacentes siguen siendo firmes. El par GBP/USD se debate en torno a la media móvil de 200 días, reflejando la indecisión de los traders ante expectativas de un BoE y un Fed hawkish. Los niveles de precio concretos, como el soporte en 1.27, serán clave para determinar la dirección futura. La postura del BoE, aunque dovish en el corto plazo, podría volverse más hawkish si la inflación sigue aumentando. La próxima intervención de Greene y el dato de confianza del consumidor serán eventos clave para la divisa.",
       "drivers": [
-        "Giro hawkish del BoE",
-        "Inflación en 3.0%",
-        "Comentarios de Greene y Pill",
-        "Impacto del conflicto en Medio Oriente en precios energético"
+        "Inflación UK estable",
+        "BoE dovish a corto plazo",
+        "Expectativas hawkish",
+        "GBP/USD en 1.27"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
         "ActionForex",
+        "FXStreet",
         "NewsData GBP",
-        "ForexLive",
-        "FXStreet"
+        "ForexLive"
       ],
       "articles_count": 8,
-      "latest_ts": 1774464180000
+      "latest_ts": 1774524569000
     },
     "JPY": {
       "sentiment": "bear",
       "confidence": 60,
-      "analysis": "El yen japonés se debilita ante la perspectiva de un diferencial de tasas cada vez más amplio entre Estados Unidos y Japón. Los minutos de la reunión del BoJ indican un sesgo hacia un ajuste gradual de las tasas, con la inflación acercándose al objetivo y los riesgos del petróleo en aumento. El gobernador del BoJ, Kazuo Ueda, espera que la inflación subyacente aumente moderadamente, apoyada por un mercado laboral ajustado y un comportamiento de fijación de precios corporativo en evolución. Sin embargo, el aumento del petróleo, que Japón importa en gran medida, ejerce presión sobre la economía y el yen. La crisis en Medio Oriente también ha impulsado flujos de refugio hacia el dólar estadounidense, lo que debilita al yen. Con el BoJ adoptando una postura dovish y la Fed manteniendo un sesgo hawkish, el yen japonés enfrenta vientos en contra. El par USD/JPY se mantiene cerca de niveles críticos, con el yen debilitándose en el contexto de una economía global incierta.",
+      "analysis": "El yen japonés se debilita debido a la combinación de factores globales y locales. La escalada en Medio Oriente y el rechazo de Irán a la tregua han generado incertidumbre, lo que normalmente beneficiaría al JPY como refugio seguro. Sin embargo, el aumento del petróleo debido a la tensión geopolítica afecta negativamente a Japón, que importa casi todo su crudo, lo que debilita al JPY. Además, las actas del BoJ sugieren un sesgo hacia el endurecimiento gradual de las tasas, lo que podría fortalecer al yen, pero el gobernador Ueda indicó que el impacto de la reducción temporal del impuesto a los alimentos sobre las expectativas de inflación sería limitado. El diferencial de tasas entre EE.UU. y Japón sigue siendo el driver dominante. Con el par USDJPY acercándose a 160.00, la perspectiva a corto plazo para el JPY parece bearish.",
       "drivers": [
         "Diferencial tasas US-JP",
-        "Inflación subyacente JPY",
         "Aumento del petróleo",
-        "Crisis Medio Oriente"
+        "BoJ endurece tasas gradualmente",
+        "Incertidumbre geopolítica"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
-        "ActionForex",
         "ForexLive",
-        "NewsData JPY"
+        "ActionForex",
+        "InvestingLive"
       ],
       "articles_count": 5,
-      "latest_ts": 1774502732000
+      "latest_ts": 1774513416000
     },
     "AUD": {
-      "sentiment": "mixed",
-      "confidence": 50,
-      "analysis": "El dólar australiano se enfrenta a una situación compleja debido a la escalada en Medio Oriente, que eleva los costes energéticos y presiona la inflación en Australia. El Banco de la Reserva de Australia (RBA) ha advertido sobre el riesgo de una subida en la tasa de interés neutral debido a la persistencia del conflicto, lo que podría llevar a un aumento en las tasas de interés. A pesar de que la inflación en febrero se moderó ligeramente, los precios de la energía siguen siendo una preocupación. El par AUD/USD ha experimentado una caída, rompiendo un triángulo simétrico, y se encuentra cerca de 0.6950. La postura del RBA, que se espera que siga siendo agresiva, ofrece cierto soporte al dólar australiano. Sin embargo, la incertidumbre geopolítica y el riesgo de una desaceleración económica global podrían seguir presionando al dólar australiano. La próxima reunión del RBA y los datos sobre la inflación serán clave para determinar la dirección futura del dólar australiano.",
+      "sentiment": "bull",
+      "confidence": 70,
+      "analysis": "El dólar australiano se ve soportado por la postura hawkish del RBA, que sugiere un posible aumento en las tasas de interés para abordar la inflación persistentemente alta. A pesar de la incertidumbre global, el RBA ha mantenido una actitud firme, lo que ofrece un soporte doméstico al AUD. La inflación en Australia, aunque ha disminuido ligeramente, sigue siendo un desafío, y el conflicto en Medio Oriente podría elevar los precios del petróleo, lo que podría desencadenar más aumentos de tasas. El AUD/USD se cotiza en torno a 0.71, y Rabobank prevé un regreso a este nivel en un plazo de 3-6 meses. La postura del RBA y la posible subida de tasas ofrecen un escenario positivo para el AUD, aunque la incertidumbre global y el riesgo de una desaceleración económica podrían generar volatilidad. Los niveles de precio clave, como el soporte en 0.71, serán cruciales para determinar la dirección futura del par.",
       "drivers": [
-        "RBA agresivo",
-        "Inflación energética",
+        "RBA hawkish",
+        "Inflación alta",
         "Conflicto Medio Oriente",
-        "Risk-off global"
+        "Petrol shock"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
-        "FXStreet",
+        "ForexLive",
+        "NewsData AUD",
         "ActionForex",
-        "DailyForex ES",
-        "MarketPulse"
+        "FXStreet"
       ],
       "articles_count": 8,
-      "latest_ts": 1774505637000
+      "latest_ts": 1774517878000
     },
     "CAD": {
       "sentiment": "mixed",
       "confidence": 50,
-      "analysis": "El dólar canadiense se encuentra en una situación mixta, con señales contradictorias que afectan su valor. Por un lado, el precio del petróleo WTI alto ofrece soporte estructural al CAD, ya que Canadá es un exportador neto de crudo. Sin embargo, la postura dovish del Banco de Canadá podría debilitar esta tendencia. En el mercado, el par USDCAD ha encontrado soporte en niveles clave de media móvil, específicamente en su media móvil de 100 horas, lo que sugiere que los compradores mantienen el control. Además, el USD/CAD ha alcanzado un máximo de dos meses, impulsado por expectativas de una Fed más hawkish. Los niveles de precio concretos, como el soporte en 1.37258, son cruciales para entender la dinámica a corto plazo. La intervención del PBoC, aunque no directamente relacionada con el CAD, puede influir en la liquidez global y, por ende, en los mercados de divisas. La próxima intervención del Subgobernador Senior del Banco de Canadá, Rogers, puede ofrecer más claridad sobre la postura del banco central.",
+      "analysis": "El CAD se encuentra en una situación mixta, con señales contradictorias que influyen en su valor. Por un lado, el aumento del petróleo WTI ofrece soporte estructural al CAD, considerando que Canadá es un exportador neto de crudo. Sin embargo, la expectativa de una postura hawkish por parte de la Fed puede debilitar al CAD en relación con el USD. El par USDCAD ha encontrado soporte en niveles clave de media móvil, específicamente en su media móvil de 100 horas, lo que sugiere interés comprador. Además, el USD/CAD ha alcanzado un máximo de dos meses, impulsado por un dólar estadounidense más firme. Es importante tener en cuenta que la postura del Banco de Canadá (BoC) y los eventos relacionados con el comercio con EEUU, como el USMCA, representan riesgos significativos para el CAD. La intervención del PBoC para inyectar liquidez no tiene un impacto directo en el CAD, pero puede influir en la percepción general de riesgo en los mercados.",
       "drivers": [
         "Petróleo WTI alto",
-        "Postura dovish del BoC",
+        "Expectativa hawkish de la Fed",
         "Soporte en media móvil de 100 horas",
-        "Expectativas hawkish de la Fed"
+        "Comercio con EEUU"
       ],
       "upcoming_event": "BoC Senior Deputy Governor Rogers Speaks — Thu 26 Mar 16:00 UTC",
       "ai_generated": true,
       "sources": [
-        "FXStreet",
         "ForexLive",
-        "InvestingLive"
+        "InvestingLive",
+        "FXStreet"
       ],
       "articles_count": 3,
       "latest_ts": 1774405679000
     },
     "CHF": {
-      "sentiment": "mixed",
-      "confidence": 50,
-      "analysis": "El franco suizo se mantiene como un activo refugio en un entorno de incertidumbre global. El presidente del SNB mencionó que están preparados para introducir tasas negativas si es necesario, aunque el umbral para hacerlo es alto. Esto sugiere que el banco central está dispuesto a intervenir para limitar la apreciación excesiva del CHF. En el frente técnico, el par USD/CHF se acerca a una zona crítica en 0.7950, lo que podría ser un punto de inflexión para la tendencia a corto plazo. La relación entre el dólar estadounidense y el petróleo también juega un papel importante, ya que una caída del precio del petróleo podría apoyar una recuperación del mercado de acciones y, por ende, influir en la demanda de refugio del CHF. Sin embargo, la falta de una señal clara en el mercado hace que el sentimiento sea mixto. Los niveles de precio como 0.7950 en USD/CHF serán clave para determinar la dirección futura.",
+      "sentiment": "bear",
+      "confidence": 60,
+      "analysis": "El franco suizo se enfrenta a una presión bajista debido a la fortaleza del dólar estadounidense, impulsada por la tensión geopolítica en el Golfo. La negativa de Irán a un alto el fuego propuesto y sus condiciones para cualquier acuerdo han llevado a un escenario de risk-off, lo que normalmente beneficiaría al CHF como activo refugio. Sin embargo, en este contexto, la fortaleza del dólar estadounidense parece dominar. El presidente del SNB mencionó que están preparados para introducir tasas negativas si es necesario, aunque el umbral para tal acción es alto. Esto sugiere que el banco central está vigilante pero no necesariamente activo en intervenir en el mercado de divisas en este momento. El par USD/CHF ha roto la barrera de 0.7900, acercándose a su media móvil de 200 días, un nivel crítico a observar. La postura del SNB y la situación geopolítica global son clave para el futuro del CHF.",
       "drivers": [
-        "SNB amenaza con tasas negativas",
-        "USD/CHF en 0.7950",
-        "Relación dólar-petróleo",
-        "Demanda de refugio"
+        "Fortaleza del dólar estadounidense",
+        "Tensión geopolítica en el Golfo",
+        "Preparación del SNB para tasas negativas",
+        "Nivel 0.7900 en USD/CHF"
       ],
       "upcoming_event": null,
       "ai_generated": true,
       "sources": [
         "ForexLive",
-        "NewsData CHF",
-        "BabyPips"
+        "InvestingLive",
+        "NewsData CHF"
       ],
       "articles_count": 3,
-      "latest_ts": 1774502160000
+      "latest_ts": 1774524023000
     },
     "NZD": {
       "sentiment": "mixed",
       "confidence": 40,
-      "analysis": "El dólar neozelandés se enfrenta a señales contradictorias debido a la escalada en la retórica geopolítica y la presión sobre la inflación. La advertencia de los Emiratos Árabes Unidos sobre la interrupción del estrecho de Ormuz como 'terrorismo económico' eleva la incertidumbre global, lo que podría llevar a un escenario de risk-off y afectar negativamente al NZD como divisa de riesgo de alta beta. Por otro lado, el Banco Central de Nueva Zelanda (RBNZ) parece dispuesto a ignorar los picos temporales de inflación, lo que podría mantener la presión sobre las tasas de interés y apoyar al NZD. El precio del crudo, aunque volátil, sigue siendo un factor clave en la inflación y, por ende, en la política monetaria. El NZD se mantiene cerca de niveles críticos, pero sin un claro sesgo alcista o bajista. La atención se centra en los próximos datos de confianza del consumidor y la actividad empresarial para guiar la política monetaria del RBNZ.",
+      "analysis": "El dólar neozelandés se enfrenta a señales contradictorias debido a la escalada de tensiones geopolíticas y la evolución de los datos económicos domésticos. La situación en el estrecho de Ormuz y las declaraciones de la UAE sobre 'terrorismo económico' generan un ambiente de risk-off global, lo que normalmente presiona al NZD. Sin embargo, la intención del RBNZ de ignorar los picos temporales de inflación y el enfoque en la capacidad de compra sugieren una postura más dovish, lo que podría ofrecer algo de soporte al NZD. Los precios del crudo, aunque volátiles, siguen siendo un factor a considerar, pero no son el principal driver para el NZD. La atención se centra en los datos económicos locales, como la confianza del consumidor y la confianza empresarial, para entender mejor el panorama del NZD. El par NZD/USD no ha mostrado un movimiento claro en los niveles de precio, pero la volatilidad global sugiere que los inversores deben estar atentos a los cambios en la política monetaria y los datos económicos.",
       "drivers": [
-        "RBNZ ignora inflación temporal",
-        "Escalada geopolítica",
-        "Volatilidad del crudo",
+        "Tensión en Ormuz",
+        "RBNZ dovish",
+        "Crudo volátil",
         "Confianza del consumidor NZ"
       ],
       "upcoming_event": null,
