@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-26",
-  "generatedAt": "2026-03-26T08:37:56.428363Z",
-  "fetchMode": "FULL",
+  "generatedAt": "2026-03-26T09:44:10.968216Z",
+  "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -21,8 +21,8 @@
     "USD": 507
   },
   "impactCounts": {
-    "low": 628,
-    "medium": 446,
+    "low": 629,
+    "medium": 445,
     "high": 145
   },
   "events": [
@@ -12457,19 +12457,6 @@
     {
       "date": "26 Mar",
       "dateISO": "2026-03-26",
-      "timeUTC": "07:45",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Confidence",
-      "impact": "medium",
-      "actual": "89.0",
-      "forecast": "89.0",
-      "previous": "91.0"
-    },
-    {
-      "date": "26 Mar",
-      "dateISO": "2026-03-26",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -12500,9 +12487,22 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "92.6",
+      "forecast": "89.0",
+      "previous": "97.4"
+    },
+    {
+      "date": "26 Mar",
+      "dateISO": "2026-03-26",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
       "event": "M3 Money Supply (YoY) (Feb)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.0",
       "forecast": "3.3",
       "previous": "3.3"
     },
@@ -12514,10 +12514,10 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "M3 Money Supply (Feb)",
-      "impact": "medium",
-      "actual": "",
+      "impact": "low",
+      "actual": "17,369.5B",
       "forecast": "",
-      "previous": "3.0"
+      "previous": "17,344.7B"
     },
     {
       "date": "26 Mar",
@@ -12528,7 +12528,7 @@
       "flag": "🇪🇺",
       "event": "Loans to Non Financial Corporations (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "2.9%",
       "forecast": "",
       "previous": "2.8%"
     },
@@ -12541,7 +12541,7 @@
       "flag": "🇪🇺",
       "event": "Private Sector Loans (YoY) (Feb)",
       "impact": "low",
-      "actual": "",
+      "actual": "3.0%",
       "forecast": "3.1%",
       "previous": "3.0%"
     },
@@ -12554,7 +12554,7 @@
       "flag": "🇪🇺",
       "event": "Business Confidence",
       "impact": "medium",
-      "actual": "",
+      "actual": "88.8",
       "forecast": "",
       "previous": "88.5"
     },
@@ -13003,19 +13003,6 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
-      "timeUTC": "00:01",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Confidence",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "65.2"
-    },
-    {
-      "date": "27 Mar",
-      "dateISO": "2026-03-27",
       "timeUTC": "06:00",
       "country": "EUR",
       "currency": "EUR",
@@ -13038,6 +13025,19 @@
       "actual": "",
       "forecast": "",
       "previous": "0.2"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "-10.5"
     },
     {
       "date": "27 Mar",
