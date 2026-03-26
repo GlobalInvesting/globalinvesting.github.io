@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.2-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.6.3-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -5474,7 +5474,44 @@ var ForexDashboard = function ForexDashboard() {
         color: 'var(--text-tertiary)',
         fontStyle: 'italic'
       }
-    }, "Datos insuficientes"))), /*#__PURE__*/React.createElement("div", {
+    }, "Datos insuficientes"))),
+    /*#__PURE__*/React.createElement("div", { style: { marginBottom: '1.5rem' } },
+      /*#__PURE__*/React.createElement("div", {
+        style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }
+      },
+        /*#__PURE__*/React.createElement("div", {
+          style: { fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }
+        }, "Momentum precio 7d: ", rec.strongCurrency, "/", rec.weakCurrency),
+        /*#__PURE__*/React.createElement("div", {
+          style: {
+            fontSize: '0.75rem', fontWeight: 700,
+            color: rec.momAlignment === 1 ? 'var(--green-strong)' : rec.momAlignment === -1 ? 'var(--red-strong)' : 'var(--text-tertiary)'
+          }
+        }, rec.momAlignment === 1 ? 'Confirmado' : rec.momAlignment === -1 ? 'Divergencia' : 'Neutral')
+      ),
+      /*#__PURE__*/React.createElement("div", {
+        style: { background: 'var(--bg-elevated)', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border)' }
+      },
+        [
+          { label: rec.strongCurrency, val: rec.strongMom7d },
+          { label: rec.weakCurrency,   val: rec.weakMom7d   },
+          { label: 'Par neto',         val: rec.pairMom7d   }
+        ].map(function(item) {
+          var v = item.val;
+          var clr = v === null ? 'var(--text-tertiary)' : v > 0 ? 'var(--green-strong)' : 'var(--red-strong)';
+          return /*#__PURE__*/React.createElement("div", {
+            key: item.label,
+            style: { display: 'flex', justifyContent: 'space-between', fontSize: '0.8125rem', padding: '0.25rem 0', color: 'var(--text-secondary)' }
+          },
+            /*#__PURE__*/React.createElement("span", null, "\u2022 ", item.label),
+            /*#__PURE__*/React.createElement("span", { style: { color: clr, fontWeight: 600 } },
+              v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014'
+            )
+          );
+        })
+      )
+    ),
+    /*#__PURE__*/React.createElement("div", {
       style: {
         background: 'var(--bg-card)',
         padding: '1rem',
@@ -5485,9 +5522,7 @@ var ForexDashboard = function ForexDashboard() {
         color: 'var(--text-secondary)'
       }
     }, /*#__PURE__*/React.createElement("strong", {
-      style: {
-        color: 'var(--text-primary)'
-      }
+      style: { color: 'var(--text-primary)' }
     }, "An\xE1lisis:"), /*#__PURE__*/React.createElement("span", null,
       rec.type === 'long'
         ? (function() {
@@ -5503,7 +5538,7 @@ var ForexDashboard = function ForexDashboard() {
                   ? [' Divergencia de precio: par ', rec.pairMom7d.toFixed(2), '% esta semana, en contra del LONG.',
                      rec.pairMom7d < -1.0 ? ' Corrección significativa — esperar estabilización antes de entrar.' : ' Monitorear; puede ser pullback hacia soporte.']
                   : [' Precio neutral (par ', pDir ? rec.pairMom7d.toFixed(2) + '% esta semana' : 'sin datos', '). Entrada basada en fundamentos.'],
-              ' Oportunidad LONG en ', rec.pair, '.'
+              ' Par: ', rec.pair, '.'
             ];
           })()
         : (function() {
@@ -5519,87 +5554,12 @@ var ForexDashboard = function ForexDashboard() {
                   ? [' Divergencia de precio: par ', rec.pairMom7d.toFixed(2), '% en contra del SHORT.',
                      rec.pairMom7d < -1.0 ? ' El weak rebota con fuerza — esperar agotamiento del rebote.' : ' Posible rebote temporal; mantener vigilancia.']
                   : [' Precio neutral (', pDir ? rec.pairMom7d.toFixed(2) + '% esta semana' : 'sin datos', '). Se\xF1al basada en fundamentos.'],
-              ' Oportunidad SHORT en ', rec.pair, '.'
+              ' Par: ', rec.pair, '.'
             ];
           })()
     )), /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: '1rem',
-        background: rec.momAlignment === 1
-          ? 'rgba(38,166,154,0.07)'
-          : rec.momAlignment === -1
-            ? 'rgba(239,83,80,0.07)'
-            : 'var(--bg-elevated)',
-        border: rec.momAlignment === 1
-          ? '1px solid rgba(38,166,154,0.30)'
-          : rec.momAlignment === -1
-            ? '1px solid rgba(239,83,80,0.30)'
-            : '1px solid var(--border)',
-        borderRadius: '4px',
-        padding: '0.625rem 0.75rem'
-      }
-    },
-    /*#__PURE__*/React.createElement("div", {
-      style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }
-    },
-    /*#__PURE__*/React.createElement("div", {
-      style: { fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }
-    }, "Momentum precio 7d (par neto basket-adj)"),
-    /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: '0.72rem', fontWeight: 700, padding: '1px 7px', borderRadius: '3px',
-        background: rec.momAlignment === 1 ? 'rgba(38,166,154,0.18)' : rec.momAlignment === -1 ? 'rgba(239,83,80,0.18)' : 'rgba(120,120,120,0.12)',
-        color: rec.momAlignment === 1 ? 'var(--green-strong)' : rec.momAlignment === -1 ? 'var(--red-strong)' : 'var(--text-tertiary)'
-      }
-    }, rec.momAlignment === 1 ? '\u2197 Confirmado' : rec.momAlignment === -1 ? '\u2198 Divergencia' : '\u2192 Neutral')
-    ),
-    /*#__PURE__*/React.createElement("div", { style: { display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' } },
-    [
-      { label: rec.strongCurrency, val: rec.strongMom7d, role: 'strong' },
-      { label: rec.weakCurrency,   val: rec.weakMom7d,   role: 'weak'   },
-      { label: 'Par neto',         val: rec.pairMom7d,   role: 'pair'   }
-    ].map(function(item) {
-      var v = item.val;
-      // Color por rol en la señal, no por signo del número:
-      // LONG: strong subir = bueno (verde), weak subir = malo (rojo)
-      // SHORT: strong bajar = bueno (verde), weak bajar = malo (rojo)
-      // Par neto: sigue momAlignment
-      var isGoodForSignal, isBadForSignal;
-      if (item.role === 'pair') {
-        isGoodForSignal = rec.momAlignment === 1;
-        isBadForSignal  = rec.momAlignment === -1;
-      } else if (rec.type === 'long') {
-        // LONG: queremos strong↑ y weak↓
-        isGoodForSignal = item.role === 'strong' ? (v !== null && v > 0.10) : (v !== null && v < -0.10);
-        isBadForSignal  = item.role === 'strong' ? (v !== null && v < -0.20) : (v !== null && v > 0.20);
-      } else {
-        // SHORT: queremos strong↓ y weak↑ (par bajando)
-        isGoodForSignal = item.role === 'strong' ? (v !== null && v < -0.10) : (v !== null && v > 0.10);
-        isBadForSignal  = item.role === 'strong' ? (v !== null && v > 0.20)  : (v !== null && v < -0.20);
-      }
-      var clr = isBadForSignal ? 'var(--red-strong)' : isGoodForSignal ? 'var(--green-strong)' : 'var(--text-tertiary)';
-      return /*#__PURE__*/React.createElement("div", {
-        key: item.role,
-        style: {
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px',
-          minWidth: item.role === 'pair' ? '64px' : '52px',
-          padding: item.role === 'pair' ? '3px 8px' : '3px 6px',
-          background: item.role === 'pair'
-            ? (rec.momAlignment === 1 ? 'rgba(38,166,154,0.13)' : rec.momAlignment === -1 ? 'rgba(239,83,80,0.13)' : 'rgba(120,120,120,0.08)')
-            : 'transparent',
-          borderRadius: '4px',
-          border: item.role === 'pair' ? '1px solid rgba(120,120,120,0.18)' : 'none'
-        }
-      },
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' } }, item.label),
-      /*#__PURE__*/React.createElement("span", { style: { fontSize: '0.95rem', color: clr, lineHeight: 1.1 } }, v !== null ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '\u2014')
-      );
-    })
-    )), /*#__PURE__*/React.createElement("div", {
-      style: { marginTop: '0.6rem', fontSize: '0.7rem', color: 'var(--text-tertiary)', textAlign: 'center' }
-    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "% \xB7 Diferencial de precio 7d: ",
-    rec.pairMom7d !== null ? (rec.pairMom7d > 0 ? '+' : '') + rec.pairMom7d.toFixed(2) + '%' : 'sin datos',
-    " \xB7 Umbral confirmaci\xF3n: \xB10.40%"
+      style: { marginTop: '0.5rem', fontSize: '0.7rem', color: 'var(--text-tertiary)' }
+    }, "Calidad de datos: ", (rec.dataQuality * 100).toFixed(0), "% \xB7 Umbral confirmaci\xF3n: \xB10.40%"
     )));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
