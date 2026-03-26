@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-26",
-  "generatedAt": "2026-03-26T09:44:10.968216Z",
-  "fetchMode": "SMART",
+  "generatedAt": "2026-03-26T10:38:44.953196Z",
+  "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
   "source": "investing.com + FXStreet",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-25",
-  "totalEvents": 1219,
+  "totalEvents": 1221,
   "currencyCounts": {
     "AUD": 101,
     "CAD": 73,
     "CHF": 41,
-    "EUR": 164,
+    "EUR": 165,
     "GBP": 142,
     "JPY": 140,
     "NZD": 51,
-    "USD": 507
+    "USD": 508
   },
   "impactCounts": {
-    "low": 629,
-    "medium": 445,
+    "low": 630,
+    "medium": 446,
     "high": 145
   },
   "events": [
@@ -13003,6 +13003,19 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "00:01",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "65.2"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "06:00",
       "country": "EUR",
       "currency": "EUR",
@@ -13025,19 +13038,6 @@
       "actual": "",
       "forecast": "",
       "previous": "0.2"
-    },
-    {
-      "date": "27 Mar",
-      "dateISO": "2026-03-27",
-      "timeUTC": "06:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Confidence",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "-10.5"
     },
     {
       "date": "27 Mar",
@@ -13211,6 +13211,19 @@
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Eurogroup Meetings",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
       "timeUTC": "10:30",
       "country": "EUR",
       "currency": "EUR",
@@ -13284,7 +13297,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "3.2%",
-      "previous": "3.2%"
+      "previous": "3.3%"
     },
     {
       "date": "27 Mar",
@@ -13323,7 +13336,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "57.8",
-      "previous": "57.8"
+      "previous": "56.6"
     },
     {
       "date": "27 Mar",
@@ -13389,6 +13402,19 @@
       "actual": "",
       "forecast": "",
       "previous": "-26.14B"
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "FOMC Member Barkin Speaks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
     },
     {
       "date": "27 Mar",
