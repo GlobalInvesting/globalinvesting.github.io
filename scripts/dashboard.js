@@ -1863,10 +1863,19 @@ var loadAllEconomicData = /*#__PURE__*/function () {
           try {
             for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
               _step2$value = _step2.value, country = _step2$value.country, outlook = _step2$value.outlook, nextMeeting = _step2$value.nextMeeting;
-              country.outlook = outlook;
+              // Fuente de verdad: bcOutlook del backend (latest.json).
+              // El backend tiene acceso a rm_trough (rebote desde mínimo 6M), a toda
+              // la historia de rates/*.json y a la lógica v6.6.1 completa.
+              // determineCentralBankOutlook() es solo fallback cuando scores no están disponibles.
+              var _scoredOutlook = getStrength(country.code).bcOutlook;
+              var _finalOutlook = _scoredOutlook || outlook;
+              country.outlook = _finalOutlook;
               country.nextMeeting = nextMeeting;
-              economicData[country.code].outlook = outlook;
+              economicData[country.code].outlook = _finalOutlook;
               economicData[country.code].nextMeeting = nextMeeting;
+              if (_scoredOutlook && _scoredOutlook !== outlook) {
+                console.log("\u2705 outlook override for " + country.code + ": " + outlook + " \u2192 " + _scoredOutlook + " (backend v6.6.1)");
+              }
             }
 
             // ✅ FX Performance ANTES de guardar caché para que quede persistido
@@ -3080,13 +3089,16 @@ var ForexDashboard = function ForexDashboard() {
       return c.code === currency;
     });
 
-    // Usar outlook de economicData si está disponible (más fresco que el objeto country)
-    if ((_economicData$currenc = economicData[currency]) !== null && _economicData$currenc !== void 0 && _economicData$currenc.outlook && country) {
+    // Usar bcOutlook del backend como fuente de verdad (v6.6.1: incluye rm_trough).
+    // Fallback: outlook calculado localmente por determineCentralBankOutlook().
+    var strengthObj = getStrength(currency);
+    var _bcOutlook = strengthObj.bcOutlook;
+    if (_bcOutlook && country) {
+      country.outlook = _bcOutlook;
+      if (economicData[currency]) economicData[currency].outlook = _bcOutlook;
+    } else if ((_economicData$currenc = economicData[currency]) !== null && _economicData$currenc !== void 0 && _economicData$currenc.outlook && country) {
       country.outlook = economicData[currency].outlook;
     }
-
-    // ✅ CORRECCIÓN: Obtener objeto y extraer score
-    var strengthObj = getStrength(currency);
     var strength = strengthObj.score;
     var sentiment = getSentiment(strength);
 
