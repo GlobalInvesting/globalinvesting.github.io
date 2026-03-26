@@ -1204,17 +1204,37 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             overflow-y: auto;
-            max-height: 520px;
+            max-height: 560px;
             scroll-behavior: smooth;
         }
 
-        .calendar-event {
-            padding: 1rem 1.5rem;
+        /* Table header row */
+        .calendar-header-row {
+            display: grid;
+            grid-template-columns: 58px 8px 52px 1fr 64px 64px 64px;
+            gap: 0;
+            padding: 0.3rem 0.75rem;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
+            background: var(--bg-elevated);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .calendar-event {
+            display: grid;
+            grid-template-columns: 58px 8px 52px 1fr 64px 64px 64px;
+            gap: 0;
+            padding: 0.3rem 0.75rem;
+            border-bottom: 1px solid var(--border);
             align-items: center;
-            transition: background 0.2s;
+            transition: background 0.15s;
+            min-height: 32px;
         }
 
         .calendar-event:hover {
@@ -1225,32 +1245,57 @@
             border-bottom: none;
         }
 
+        /* Compact cell styles */
         .event-time {
             font-size: 0.75rem;
+            font-weight: 500;
             color: var(--text-tertiary);
-            min-width: 80px;
+            white-space: nowrap;
         }
 
-        .event-details {
-            flex: 1;
-            padding: 0 1rem;
+        .event-impact-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            justify-self: center;
+        }
+        .event-impact-dot.impact-high   { background: var(--red-strong); }
+        .event-impact-dot.impact-medium { background: var(--orange); }
+        .event-impact-dot.impact-low    { background: var(--neutral); }
+
+        .event-currency-cell {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
 
         .event-title {
-            font-weight: 600;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 0.5rem;
         }
 
-        .event-country {
+        .event-data-cell {
             font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: right;
+            white-space: nowrap;
         }
 
+        /* Legacy - kept for impact badge if needed */
+        .event-details { flex: 1; padding: 0 0.5rem; }
+        .event-country { font-size: 0.72rem; color: var(--text-secondary); }
         .event-impact {
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.6875rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.6rem;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -1413,7 +1458,9 @@
             background: rgba(30, 136, 229, 0.06);
             border-left: 3px solid var(--green) !important;
         }
-        /* Flash cuando llega un nuevo actual en vivo */
+        .next-marker {
+            display: none;
+        }
         @keyframes newActualFlash {
             0%   { background: rgba(76, 175, 80, 0.35); }
             60%  { background: rgba(76, 175, 80, 0.15); }
@@ -1431,17 +1478,6 @@
             margin-left: 6px;
             vertical-align: middle;
             animation: pulse 1s ease-in-out infinite;
-        }
-        .next-marker {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-size: 0.68rem;
-            font-weight: 600;
-            color: var(--green);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.2rem;
         }
         .next-dot {
             width: 7px;
