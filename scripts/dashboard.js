@@ -5151,7 +5151,7 @@ var ForexDashboard = function ForexDashboard() {
     },
     /*#__PURE__*/React.createElement("div", { className: "calendar-header-row" },
       /*#__PURE__*/React.createElement("div", null, "Hora"),
-      /*#__PURE__*/React.createElement("div", null),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'center' } }, "Imp"),
       /*#__PURE__*/React.createElement("div", null, "Par"),
       /*#__PURE__*/React.createElement("div", null, "Evento"),
       /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } }, "Real"),
@@ -5214,9 +5214,18 @@ var ForexDashboard = function ForexDashboard() {
       /*#__PURE__*/React.createElement("div", { className: "event-time", style: {
         color: isNext ? 'var(--green)' : isToday && !isPast ? 'var(--blue)' : 'var(--text-tertiary)'
       }}, formatEventTime(event.timeUTC || event.time, event.dateISO)),
-      /*#__PURE__*/React.createElement("div", { className: "event-impact-dot impact-".concat(event.impact) }),
+      /*#__PURE__*/React.createElement("div", { className: "event-impact-badge impact-".concat(event.impact) },
+        event.impact === 'high' ? 'Alto' : event.impact === 'medium' ? 'Med' : 'Bajo'
+      ),
       /*#__PURE__*/React.createElement("div", { className: "event-currency-cell" },
-        /*#__PURE__*/React.createElement("span", null, event.flag), " ", event.currency
+        /*#__PURE__*/React.createElement("img", {
+          className: "event-flag-img",
+          src: "https://flagcdn.com/w20/".concat(({'USD':'us','EUR':'eu','GBP':'gb','JPY':'jp','AUD':'au','CAD':'ca','CHF':'ch','NZD':'nz'}[event.currency] || 'un'), ".png"),
+          srcSet: "https://flagcdn.com/w40/".concat(({'USD':'us','EUR':'eu','GBP':'gb','JPY':'jp','AUD':'au','CAD':'ca','CHF':'ch','NZD':'nz'}[event.currency] || 'un'), ".png 2x"),
+          alt: event.currency,
+          loading: "lazy"
+        }),
+        " ", event.currency
       ),
       /*#__PURE__*/React.createElement("div", { className: "event-title", title: event.event }, event.event),
       /*#__PURE__*/React.createElement("div", { className: "event-data-cell", style: { color: hasActual ? actualColor : 'var(--text-tertiary)' }},
