@@ -5276,9 +5276,9 @@ var ForexDashboard = function ForexDashboard() {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-title"
-  }, "Mejores Pares de Divisas - Fundamental y Momentum"), /*#__PURE__*/React.createElement("div", {
+  }, "Divergencias Macro - Spreads Fundamentales"), /*#__PURE__*/React.createElement("div", {
     className: "section-meta"
-  }, "Diferenciales fundamentales + momentum de precio (7d basket-adj) \xB7 Horizonte: 2\u20136 semanas \xB7 Solo se\xF1ales con diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
+  }, "Spreads fundamentales entre divisas G8 \xB7 Contexto macro, no se\xF1al de trading directo \xB7 Diferencial \u226520 pts")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))',
@@ -5623,7 +5623,7 @@ var ForexDashboard = function ForexDashboard() {
       fontSize: '0.8125rem',
       lineHeight: '1.6'
     }
-  }, /*#__PURE__*/React.createElement("strong", null, "Aviso Legal:"), /*#__PURE__*/React.createElement("br", null), "Este dashboard es una herramienta de an\xE1lisis cuantitativo con fines informativos y educativos. Los scores de fortaleza, rankings y recomendaciones de pares son c\xE1lculos basados en datos macroecon\xF3micos p\xFAblicos y no constituyen asesoramiento financiero ni se\xF1ales de trading. El trading de divisas (forex) conlleva riesgos significativos de p\xE9rdida de capital. Consulte con un asesor financiero certificado antes de tomar decisiones de inversi\xF3n."), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("strong", null, "Aviso Legal:"), /*#__PURE__*/React.createElement("br", null), "Este dashboard es una herramienta de an\xE1lisis cuantitativo con fines informativos y educativos. Los scores de fortaleza, rankings y spreads fundamentales entre pares son c\xE1lculos basados en datos macroecon\xF3micos p\xFAblicos y representan divergencias macro — no constituyen asesoramiento financiero ni se\xF1ales de trading. Los fundamentos macroecon\xF3micos son hist\xF3ricamente descontados por el mercado antes o durante su publicaci\xF3n. El trading de divisas (forex) conlleva riesgos significativos de p\xE9rdida de capital. Consulte con un asesor financiero certificado antes de tomar decisiones de inversi\xF3n."), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center',
       marginTop: '1.5rem',
