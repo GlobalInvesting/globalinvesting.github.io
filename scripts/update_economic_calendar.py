@@ -931,6 +931,72 @@ if not fresh_events:
     print("  ⚠️  All strategies failed — using base cache only")
     fetch_method = 'cache'
 
+
+# ── STEP 2C: Forecast Enrichment ────────────────────────────────────────────
+# Problema: FXStreet no publica el Consensus hasta 1-3 dias antes del evento.
+# Los eventos con previous pero sin forecast quedan visibles con -- en EST.
+#
+# Fix: Para los proximos 7 dias, fetch extra de FXStreet e investing.com
+# para rellenar forecast vacio en el cache. No agrega ni elimina eventos.
+enrich_from = today
+enrich_to   = today + timedelta(days=7)
+
+print("\n" + "="*50 + "\nSTEP 2C -- Forecast Enrichment (proximos 7 dias)\n" + "="*50)
+
+needs_forecast = {
+    (e["dateISO"], e["currency"], normalize_for_dedup(e["event"]))
+    for e in base_events.values()
+    if (not e.get("forecast", "").strip()
+        and not e.get("actual", "").strip()
+        and e.get("dateISO", "") >= today.isoformat()
+        and e.get("dateISO", "") <= enrich_to.isoformat())
+}
+print("  Eventos sin forecast en proximos 7 dias: " + str(len(needs_forecast)))
+
+enrich_pool = []
+if needs_forecast:
+    fxs_covered = (fxs_from <= enrich_from and fxs_to >= enrich_to)
+    if not fxs_covered:
+        print("  [Enrich] FXStreet fetch ventana 0-7 dias...")
+        try:
+            enrich_fxs = fetch_fxstreet(enrich_from, enrich_to)
+            enrich_pool.extend(enrich_fxs)
+            print("  [Enrich] FXStreet: " + str(len(enrich_fxs)) + " eventos")
+        except Exception as ex_e:
+            print("  [Enrich] FXStreet failed: " + str(ex_e))
+    else:
+        print("  [Enrich] FXStreet ya cubrio esta ventana -- saltando")
+
+    inv_enrich_from = max(enrich_from, inv_to + timedelta(days=1))
+    if inv_enrich_from <= enrich_to:
+        print("  [Enrich] investing.com fetch " + str(inv_enrich_from) + " -> " + str(enrich_to) + "...")
+        try:
+            enrich_inv = fetch_investing(inv_enrich_from, enrich_to)
+            enrich_pool.extend(enrich_inv)
+            print("  [Enrich] investing.com: " + str(len(enrich_inv)) + " eventos")
+        except Exception as ex_e:
+            print("  [Enrich] investing.com failed: " + str(ex_e))
+    else:
+        print("  [Enrich] investing.com ya cubrio esta ventana -- saltando")
+
+    enriched = 0
+    for ev in enrich_pool:
+        fc = ev.get("forecast", "").strip()
+        if not fc:
+            continue
+        k = (ev["dateISO"], ev["currency"], normalize_for_dedup(ev["event"]))
+        if k in needs_forecast and k in base_events:
+            existing = dict(base_events[k])
+            if not existing.get("forecast", "").strip():
+                existing["forecast"] = fc
+                base_events[k] = existing
+                enriched += 1
+    fresh_events.extend(enrich_pool)
+    print("  [Enrich] Forecasts rellenados: " + str(enriched) + " / " + str(len(needs_forecast)) + " candidatos")
+else:
+    print("  Sin candidatos -- todos tienen forecast o actual")
+
+
 # ── STEP 3: Merge con cache ──────────────────────────────────────────────────
 print(f"\n{'='*50}\nSTEP 3 — Merge\n{'='*50}")
 if fresh_events:
