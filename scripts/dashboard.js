@@ -1619,7 +1619,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.3-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.6.4-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -5481,13 +5481,7 @@ var ForexDashboard = function ForexDashboard() {
       },
         /*#__PURE__*/React.createElement("div", {
           style: { fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }
-        }, "Momentum precio 7d: ", rec.strongCurrency, "/", rec.weakCurrency),
-        /*#__PURE__*/React.createElement("div", {
-          style: {
-            fontSize: '0.75rem', fontWeight: 700,
-            color: rec.momAlignment === 1 ? 'var(--green-strong)' : rec.momAlignment === -1 ? 'var(--red-strong)' : 'var(--text-tertiary)'
-          }
-        }, rec.momAlignment === 1 ? 'Confirmado' : rec.momAlignment === -1 ? 'Divergencia' : 'Neutral')
+        }, "Momentum precio 7d: ", rec.strongCurrency, "/", rec.weakCurrency)
       ),
       /*#__PURE__*/React.createElement("div", {
         style: { background: 'var(--bg-elevated)', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border)' }
