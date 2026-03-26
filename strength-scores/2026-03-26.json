@@ -1,12 +1,12 @@
 {
   "lastUpdate": "2026-03-26",
-  "modelVersion": "6.6.1",
-  "checksum": "02b012b3fc03acba677974c74561af08c6f6bc2f69ef2e22cb8c66709a365e3a",
+  "modelVersion": "6.7.0",
+  "checksum": "6959e843906de2d361c636ca16032a0f994312f762278aac2a88fe57c5af6071",
   "scores": {
     "USD": {
-      "score": 58.9,
+      "score": 59.4,
       "dataQuality": 1.0,
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "baseScore": 55.7,
       "contextualAdj": {
         "safe_haven": 0.0,
@@ -24,8 +24,8 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
-        "rate_expectation": -0.51,
-        "totalCapped": 3.16
+        "rate_expectation": 0.0,
+        "totalCapped": 3.67
       },
       "contributions": {
         "interestRate": 8.7352,
@@ -55,7 +55,7 @@
         "economicSurprise": 50.3,
         "rateMomentum": -0.69,
         "interestRate": 3.75,
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "calendarDates": {
           "gdpGrowth": "2026-03-13",
           "inflation": "2026-03-13",
@@ -65,7 +65,7 @@
         }
       },
       "meta": {
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "rateMomentum": -0.69,
         "interestRate": 3.75,
         "esi": 50.3,
@@ -152,9 +152,9 @@
       }
     },
     "GBP": {
-      "score": 51.5,
+      "score": 52.1,
       "dataQuality": 1.0,
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "baseScore": 54.45,
       "contextualAdj": {
         "safe_haven": 0.0,
@@ -172,8 +172,8 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
-        "rate_expectation": -0.67,
-        "totalCapped": -2.92
+        "rate_expectation": -0.13,
+        "totalCapped": -2.38
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -203,14 +203,14 @@
         "economicSurprise": 50.1,
         "rateMomentum": -0.75,
         "interestRate": 3.75,
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "calendarDates": {
           "retailSales": "2026-03-10",
           "cotPositioning": "2026-03-20"
         }
       },
       "meta": {
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "rateMomentum": -0.75,
         "interestRate": 3.75,
         "esi": 50.1,
@@ -365,7 +365,7 @@
     "CAD": {
       "score": 52.8,
       "dataQuality": 1.0,
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "baseScore": 53.28,
       "contextualAdj": {
         "safe_haven": 0.0,
@@ -414,11 +414,11 @@
         "economicSurprise": 48.8,
         "rateMomentum": -0.5,
         "interestRate": 2.25,
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "calendarDates": {}
       },
       "meta": {
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "rateMomentum": -0.5,
         "interestRate": 2.25,
         "esi": 48.8,
@@ -428,7 +428,7 @@
     "CHF": {
       "score": 58.8,
       "dataQuality": 1.0,
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "baseScore": 53.7,
       "contextualAdj": {
         "safe_haven": 3.9,
@@ -477,14 +477,14 @@
         "economicSurprise": 47.4,
         "rateMomentum": -0.5,
         "interestRate": 0.0,
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "calendarDates": {
           "consumerConfidence": "2026-03-09",
           "businessConfidence": "2026-03-25"
         }
       },
       "meta": {
-        "bcOutlook": "Dovish",
+        "bcOutlook": "Neutral",
         "rateMomentum": -0.5,
         "interestRate": 0.0,
         "esi": 47.4,
@@ -591,7 +591,7 @@
       "pair": "AUD/GBP",
       "long": "AUD",
       "short": "GBP",
-      "spread": 26.2,
+      "spread": 25.6,
       "confidence": "Alta"
     },
     {
@@ -612,7 +612,7 @@
       "pair": "JPY/GBP",
       "long": "JPY",
       "short": "GBP",
-      "spread": 19.6,
+      "spread": 19.0,
       "confidence": "Media"
     }
   ],
@@ -812,7 +812,7 @@
   },
   "meta": {
     "USD": {
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "rateMomentum": -0.69,
       "interestRate": 3.75,
       "esi": 50.3,
@@ -837,7 +837,7 @@
       }
     },
     "GBP": {
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "rateMomentum": -0.75,
       "interestRate": 3.75,
       "esi": 50.1,
@@ -869,14 +869,14 @@
       }
     },
     "CAD": {
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "rateMomentum": -0.5,
       "interestRate": 2.25,
       "esi": 48.8,
       "calendarDates": {}
     },
     "CHF": {
-      "bcOutlook": "Dovish",
+      "bcOutlook": "Neutral",
       "rateMomentum": -0.5,
       "interestRate": 0.0,
       "esi": 47.4,
