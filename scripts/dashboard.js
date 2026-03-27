@@ -156,7 +156,7 @@ var fetchWithRetry = /*#__PURE__*/function () {
 var CACHE_CONFIG = {
   FOREX_RATES: 60000,
   ECONOMIC_DATA: 86400000,
-  HISTORICAL_DATA: 604800000,
+  HISTORICAL_DATA: 86400000, // 24h — rates se actualizan diariamente, 7 días era excesivo
   CALENDAR: 120000,
   // 2 min — el workflow corre c/10 min, no tiene sentido cachear 1h
   CENTRAL_BANK_OUTLOOK: 604800000,
@@ -1623,7 +1623,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.7.2-2026-03-27'; // fix: EUR rates actualizado, gráfico histórico 36 meses
+          DASHBOARD_VERSION = '6.7.4-2026-03-27'; // fix: chart stepped + eje Y derecha + labels espaciados + gradiente
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -2519,12 +2519,23 @@ var ForexDashboard = function ForexDashboard() {
                 label: 'Tasa de Interés % (bancos centrales oficiales / BIS)',
                 data: data.rates,
                 borderColor: '#1e88e5',
-                backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                backgroundColor: function() {
+                  var canvas = document.getElementById('chart-' + country.code);
+                  if (!canvas) return 'rgba(30, 136, 229, 0.08)';
+                  var ctx2 = canvas.getContext('2d');
+                  var gradient = ctx2.createLinearGradient(0, 0, 0, canvas.offsetHeight || 200);
+                  gradient.addColorStop(0, 'rgba(30, 136, 229, 0.18)');
+                  gradient.addColorStop(1, 'rgba(30, 136, 229, 0.01)');
+                  return gradient;
+                }(),
+                fill: true,
                 yAxisID: 'y',
                 tension: 0,
+                stepped: 'before',
                 borderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
+                pointRadius: 2.5,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#1e88e5'
               }
               // Índice de Fortaleza eliminado — no hay datos históricos reales del índice compuesto
               ]
@@ -2558,37 +2569,45 @@ var ForexDashboard = function ForexDashboard() {
                   titleColor: '#e1e4e8',
                   bodyColor: '#8b949e',
                   borderColor: '#30363d',
-                  borderWidth: 1
+                  borderWidth: 1,
+                  callbacks: {
+                    label: function(ctx) {
+                      return '  ' + ctx.dataset.label.split('(')[0].trim() + ': ' + ctx.parsed.y.toFixed(2) + '%';
+                    }
+                  }
                 }
               },
               scales: {
                 y: {
                   type: 'linear',
-                  position: 'left',
+                  position: 'right',
                   grid: {
                     color: '#30363d'
                   },
                   ticks: {
-                    color: '#8b949e'
+                    color: '#8b949e',
+                    callback: function(v) { return v.toFixed(1) + '%'; }
                   },
                   title: {
-                    display: true,
-                    text: 'Tasa %',
-                    color: '#8b949e'
+                    display: false
                   },
                   min: function () {
                     var minVal = Math.min.apply(Math, _toConsumableArray(data.rates || [0]));
-                    // Floor to nearest 0.25 step, with 0.25 padding below
                     var floored = Math.floor(minVal * 4) / 4;
                     return Math.max(0, floored - 0.25);
                   }()
                 },
                 x: {
                   grid: {
-                    color: '#30363d'
+                    color: 'rgba(48, 54, 61, 0.5)',
+                    drawBorder: false
                   },
                   ticks: {
-                    color: '#8b949e'
+                    color: '#8b949e',
+                    maxTicksLimit: 7,
+                    autoSkip: true,
+                    maxRotation: 0,
+                    minRotation: 0
                   }
                 }
               }
@@ -4825,12 +4844,12 @@ var ForexDashboard = function ForexDashboard() {
           flexShrink: 0
         },
         loading: "lazy"
-      }), country.code, " - Tendencias 12 Meses"), /*#__PURE__*/React.createElement("div", {
+      }), country.code, " - Tendencias 36 Meses"), /*#__PURE__*/React.createElement("div", {
         className: "chart-wrapper"
       }, /*#__PURE__*/React.createElement("canvas", {
         id: "chart-".concat(country.code),
         role: "img",
-        "aria-label": "Gr\xE1fico de tasas de inter\xE9s hist\xF3ricas para ".concat(country.name, " (").concat(country.code, "). Datos de los \xFAltimos 12 meses.")
+        "aria-label": "Gr\xE1fico de tasas de inter\xE9s hist\xF3ricas para ".concat(country.name, " (").concat(country.code, "). Datos de los \xFAltimos 36 meses.")
       })), function () {
         var hd = historicalData[country.code];
         if (!hd || !hd.labels || !hd.rates) return null;
