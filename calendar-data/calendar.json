@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-27",
-  "generatedAt": "2026-03-27T11:23:39.897238Z",
+  "generatedAt": "2026-03-27T12:03:17.942214Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-26",
-  "totalEvents": 1355,
+  "totalEvents": 1356,
   "currencyCounts": {
     "AUD": 110,
     "CAD": 75,
@@ -18,12 +18,12 @@
     "GBP": 155,
     "JPY": 158,
     "NZD": 54,
-    "USD": 545
+    "USD": 546
   },
   "impactCounts": {
-    "low": 657,
-    "medium": 526,
-    "high": 172
+    "low": 658,
+    "medium": 527,
+    "high": 171
   },
   "events": [
     {
@@ -14138,19 +14138,6 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Consumer Confidence (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "-16.3",
-      "previous": "-12.2"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "09:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
       "event": "Industrial Confidence",
       "impact": "medium",
       "actual": "",
@@ -14169,84 +14156,6 @@
       "actual": "",
       "forecast": "",
       "previous": "98.3"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Business and Consumer Survey (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "98.3"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Business Climate (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "-0.36"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Consumer Inflation Expectation (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "25.8"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Selling Price Expectations (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "11.5"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Services Sentiment (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "5.0"
-    },
-    {
-      "date": "30 Mar",
-      "dateISO": "2026-03-30",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Industrial Sentiment (Mar)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "-7.1"
     },
     {
       "date": "30 Mar",
@@ -14377,6 +14286,97 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Confidence (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "-16.3",
+      "previous": "-16.3"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Business and Consumer Survey (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "98.3"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Business Climate (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.36"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Consumer Inflation Expectation (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "25.8"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Selling Price Expectations (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "11.5"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Services Sentiment (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "5.0"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "21:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Industrial Sentiment (Mar)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-7.1"
     },
     {
       "date": "30 Mar",
@@ -14583,7 +14583,7 @@
       "event": "Retail Trade (YoY)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "0.8",
       "previous": "1.8"
     },
     {
@@ -15714,7 +15714,7 @@
       "event": "Tankan Non - Manufacturing Index",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "33.0",
       "previous": "34.0"
     },
     {
@@ -15740,7 +15740,7 @@
       "event": "Tankan Large Manufacturing Outlook",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "13.0",
       "previous": "15.0"
     },
     {
@@ -15753,7 +15753,7 @@
       "event": "Tankan Non - Manufacturing Outlook",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "28.0",
       "previous": "28.0"
     },
     {
@@ -15766,7 +15766,7 @@
       "event": "Tankan Large Manufacturing Index",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "16.0",
       "previous": "15.0"
     },
     {
@@ -16014,7 +16014,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "51.4",
-      "previous": "51.4"
+      "previous": "51.7"
     },
     {
       "date": "1 Abr",
@@ -16037,10 +16037,10 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "Unemployment Rate (Feb)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "6.1"
+      "previous": "6.1%"
     },
     {
       "date": "1 Abr",
@@ -16115,10 +16115,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "MBA Mortgage Applications (WoW)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-10.5"
+      "previous": "-10.5%"
     },
     {
       "date": "1 Abr",
@@ -16219,10 +16219,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Retail Sales (MoM) (Feb)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "-0.2"
+      "previous": "-0.2%"
     },
     {
       "date": "1 Abr",
@@ -16232,10 +16232,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Retail Sales (YoY) (Feb)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "3.2"
+      "previous": "3.16%"
     },
     {
       "date": "1 Abr",
@@ -16323,7 +16323,7 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "S&P Global Manufacturing PMI (Mar)",
-      "impact": "high",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": "51.0"
@@ -16336,10 +16336,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "S&P Global Manufacturing PMI (Mar)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "52.4",
-      "previous": "52.4"
+      "previous": "51.6"
     },
     {
       "date": "1 Abr",
@@ -16349,7 +16349,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "ISM Manufacturing Employment (Mar)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": "48.8"
@@ -16362,7 +16362,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "ISM Manufacturing New Orders Index (Mar)",
-      "impact": "high",
+      "impact": "low",
       "actual": "",
       "forecast": "",
       "previous": "55.8"
@@ -16375,7 +16375,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "ISM Manufacturing PMI (Mar)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": "52.4"
@@ -16591,6 +16591,19 @@
     {
       "date": "1 Abr",
       "dateISO": "2026-04-01",
+      "timeUTC": "15:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Atlanta Fed GDPNow (Q1)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "2.0%",
+      "previous": "2.0%"
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
       "timeUTC": "17:30",
       "country": "CAD",
       "currency": "CAD",
@@ -16622,10 +16635,10 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Monetary Base (YoY) (Mar)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-10.6"
+      "previous": "-10.6%"
     },
     {
       "date": "1 Abr",
@@ -16695,28 +16708,28 @@
     {
       "date": "2 Abr",
       "dateISO": "2026-04-02",
-      "timeUTC": "00:30",
+      "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "Exports (MoM) (Feb)",
-      "impact": "high",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-0.9"
+      "previous": "-0.9%"
     },
     {
       "date": "2 Abr",
       "dateISO": "2026-04-02",
-      "timeUTC": "00:30",
+      "timeUTC": "01:30",
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "Imports (MoM) (Feb)",
-      "impact": "high",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "0.8"
+      "previous": "0.8%"
     },
     {
       "date": "2 Abr",
@@ -16765,10 +16778,10 @@
       "currency": "CHF",
       "flag": "🇨🇭",
       "event": "CPI (MoM) (Mar)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "0.6%"
+      "previous": "0.6"
     },
     {
       "date": "2 Abr",
@@ -16781,7 +16794,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "0.1%"
+      "previous": "0.1"
     },
     {
       "date": "2 Abr",
@@ -16869,10 +16882,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Challenger Job Cuts (Mar)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "48.307K"
+      "previous": "48.307"
     },
     {
       "date": "2 Abr",
@@ -16908,10 +16921,10 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Exports (Feb)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "62.48B"
+      "previous": "62.48"
     },
     {
       "date": "2 Abr",
@@ -16921,10 +16934,10 @@
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "Imports (Feb)",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "66.13B"
+      "previous": "66.13"
     },
     {
       "date": "2 Abr",
@@ -16950,7 +16963,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "1,819K"
+      "previous": "1.819"
     },
     {
       "date": "2 Abr",
@@ -16976,7 +16989,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-80.80B"
+      "previous": "-81.8"
     },
     {
       "date": "2 Abr",
@@ -17002,7 +17015,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "210K"
+      "previous": "210.0"
     },
     {
       "date": "2 Abr",
@@ -17103,10 +17116,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "4-Week Bill Auction",
-      "impact": "low",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "3.630%"
+      "previous": "3.62"
     },
     {
       "date": "2 Abr",
