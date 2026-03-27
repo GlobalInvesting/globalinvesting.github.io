@@ -23,7 +23,7 @@
   # Content-Security-Policy
   # NOTA: Se usa 'unsafe-inline' porque React y Chart.js inyectan estilos inline.
   # En una refactorización futura, separar JS en módulos y eliminar unsafe-inline.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com pagead2.googlesyndication.com partner.googleadservices.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org https://api.exchangerate-api.com https://open.er-api.com https://sdmx.oecd.org; frame-ancestors 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com pagead2.googlesyndication.com partner.googleadservices.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data: https: flagcdn.com; connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org https://api.exchangerate-api.com https://open.er-api.com https://sdmx.oecd.org; frame-ancestors 'self'; upgrade-insecure-requests
 
 # Datos JSON estáticos — cache de 1 hora
 /strength-scores/*
