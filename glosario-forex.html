@@ -2,56 +2,22 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/glosario-forex.html">
+    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
+    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/glosario-forex.html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos Públicos — Feeds RSS | Global Investing</title>
-    <meta name="description" content="Feeds RSS del Dashboard de Análisis Fundamental Forex. Suscríbete a las noticias forex, análisis fundamental AI y ranking de fortaleza G8 actualizados diariamente.">
+    <title>Glosario de análisis fundamental forex | Global Investing</title>
+    <meta name="description" content="Glosario completo de términos de análisis fundamental forex. Definiciones claras de indicadores económicos, política monetaria, carry trade, COT, PMI y más de 50 términos esenciales para traders.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://globalinvesting.github.io/data.html">
-    <meta property="og:title" content="Datos Públicos y Feeds RSS — Global Investing">
-    <meta property="og:description" content="Feeds RSS del dashboard forex fundamental más completo en español. Noticias, análisis AI y scores G8 en tiempo real.">
-    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta property="og:url" content="https://globalinvesting.github.io/data.html">
-    <link rel="alternate" type="application/rss+xml" title="Noticias Forex — Global Investing" href="https://globalinvesting.github.io/feed.xml">
-    <link rel="alternate" type="application/rss+xml" title="Análisis Fundamental AI — Global Investing" href="https://globalinvesting.github.io/feed-analysis.xml">
-    <link rel="alternate" type="application/rss+xml" title="Scores de Fortaleza G8 — Global Investing" href="https://globalinvesting.github.io/feed-scores.xml">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "DataCatalog",
-      "@id": "https://globalinvesting.github.io/data.html",
-      "name": "Global Investing — Feeds RSS y Datos Públicos Forex",
-      "url": "https://globalinvesting.github.io/data.html",
-      "description": "Feeds RSS de análisis fundamental forex para las 8 divisas G8: noticias, análisis AI y ranking de fortaleza.",
-      "publisher": {
-        "@type": "Organization",
-        "name": "Global Investing",
-        "url": "https://globalinvesting.github.io"
-      },
-      "dataset": [
-        {
-          "@type": "Dataset",
-          "name": "Noticias Forex en Tiempo Real",
-          "description": "Feed RSS con las últimas noticias forex de alto impacto para las 8 divisas G8.",
-          "url": "https://globalinvesting.github.io/feed.xml",
-          "encodingFormat": "application/rss+xml"
-        },
-        {
-          "@type": "Dataset",
-          "name": "Análisis Fundamental AI — G8",
-          "description": "Análisis diario por divisa generado con inteligencia artificial sobre datos macroeconómicos oficiales.",
-          "url": "https://globalinvesting.github.io/feed-analysis.xml",
-          "encodingFormat": "application/rss+xml"
-        },
-        {
-          "@type": "Dataset",
-          "name": "Ranking de Fortaleza G8",
-          "description": "Score de fortaleza fundamental diario para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD con 22 indicadores.",
-          "url": "https://globalinvesting.github.io/feed-scores.xml",
-          "encodingFormat": "application/rss+xml"
-        }
-      ]
-    }
-    </script>
+    <link rel="canonical" href="https://globalinvesting.github.io/glosario-forex.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { overflow-x: hidden; }
@@ -61,53 +27,447 @@
             --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
         }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+        .nav-links a:hover { color: var(--text-primary); }
         .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
         .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
         .breadcrumb a { color: var(--blue); text-decoration: none; }
         h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
-        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
-        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .alpha-nav { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2.5rem; padding: 1rem 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; }
+        .alpha-nav a { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-decoration: none; padding: 0.1rem 0.4rem; border-radius: 3px; transition: all 0.15s; }
+        .alpha-nav a:hover { color: var(--blue); background: var(--blue-dim); }
+        h2 { font-size: 1.6rem; margin-top: 2.5rem; margin-bottom: 1.25rem; color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .term { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(48,54,61,0.5); }
+        .term:last-child { border-bottom: none; }
+        .term-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem; }
+        .term-abbr { font-size: 0.78rem; color: var(--text-secondary); font-style: italic; margin-bottom: 0.5rem; }
+        .term-def { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.75; }
+        .term-def strong { color: var(--text-primary); }
+        .term-related { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.4rem; }
+        .term-related a { color: var(--blue); }
         p { margin-bottom: 1.25rem; color: var(--text-secondary); }
-        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
-        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
-        strong { color: var(--text-primary); }
         a { color: var(--blue); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
-        .highlight-box p { margin: 0; }
-        .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        .data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
-        .data-table td { color: var(--text-secondary); font-size: 0.9rem; }
-        .data-table td:first-child { color: var(--text-primary); font-family: monospace; font-size: 0.85rem; }
-        .example-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
-        .example-box .example-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; }
-        .example-box code { font-family: monospace; font-size: 0.9rem; color: var(--blue); word-break: break-all; }
-        .feed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0 2.5rem; }
-        .feed-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
-        .feed-card-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; }
-        .feed-card h3 { font-size: 1rem; margin-top: 0; margin-bottom: 0.5rem; }
-        .feed-card p { font-size: 0.875rem; margin-bottom: 1rem; }
-        .feed-card-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-        .tag { font-size: 0.72rem; padding: 0.18rem 0.55rem; border-radius: 4px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary); }
-        .tag.green { border-color: var(--border); color: var(--text-secondary); background: var(--bg-secondary); }
-        .tag.blue  { border-color: var(--border); color: var(--text-secondary); background: var(--bg-secondary); }
-        .btn-feed { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: var(--blue); border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: border-color 0.2s; }
-        .btn-feed:hover { border-color: var(--blue); text-decoration: none; }
+        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card:hover { border-color: var(--blue); }
+        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
         .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
         .footer a { color: var(--text-secondary); text-decoration: none; }
         .footer a:hover { color: var(--text-primary); }
         @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
             .container { padding: 2rem 1rem 4rem; }
             h1 { font-size: 1.7rem; }
-            .feed-grid { grid-template-columns: 1fr; }
-            .section { padding: 1.25rem; }
         }
     </style>
-    <style>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  "@id": "https://globalinvesting.github.io/glosario-forex.html",
+  "url": "https://globalinvesting.github.io/glosario-forex.html",
+  "name": "Glosario de Análisis Fundamental Forex",
+  "description": "Glosario completo de términos de análisis fundamental forex. Definiciones claras de indicadores económicos, bancos centrales y divisas.",
+  "inLanguage": "es",
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://globalinvesting.github.io/#organization",
+    "name": "Global Investing",
+    "url": "https://globalinvesting.github.io"
+  }
+}
+</script>
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+    <meta property="og:image:alt" content="Global Investing — Dashboard de Análisis Fundamental Forex">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://globalinvesting.github.io/glosario-forex.html#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://globalinvesting.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guías",
+      "item": "https://globalinvesting.github.io/guia-score-fortaleza.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Glosario de análisis fundamental",
+      "item": "https://globalinvesting.github.io/glosario-forex.html"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
+<header class="header">
+    <div class="header-inner">
+        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
+            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
+            </div>
+        </div>
+        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="about.html">Acerca de</a></li>
+            <li><a href="publicidad.html">Publicidad</a></li>
+<li class="nav-dropdown">
+            <a href="guia-score-fortaleza.html">Guías</a>
+            <div class="nav-dropdown-menu">
+            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+            <a href="guia-carry-trade.html">Carry Trade</a>
+            <a href="guia-cot.html">Reporte COT</a>
+            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+            <a href="guia-calendario-economico.html">Calendario Económico</a>
+            <a href="guia-pips.html">Pips y Lotaje</a>
+            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+            <a href="glosario-forex.html" class="active-guide">Glosario Forex</a>
+            </div>
+        </li>
+            <li><a href="contact.html">Contacto</a></li>
+            <li><a href="en.html" class="lang-switch">EN</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+
+<div class="container" id="main-content" role="main">
+    <div class="breadcrumb">
+        <a href="index.html">Inicio</a> › <a href="guia-score-fortaleza.html">Guías</a> › Glosario de términos fundamentales
+    </div>
+
+    <h1>Glosario de Análisis Fundamental Forex</h1>
+    <div class="meta">
+        <span>Referencia completa</span>
+        <span>Actualizado: marzo 2026</span>
+    </div>
+    <p>Definiciones claras y contextualizadas de los términos más importantes en el análisis fundamental del mercado de divisas, desde indicadores económicos hasta herramientas de política monetaria.</p>
+
+    <div class="alpha-nav">
+        <a href="#A">A</a><a href="#B">B</a><a href="#C">C</a><a href="#D">D</a>
+        <a href="#E">E</a><a href="#F">F</a><a href="#G">G</a><a href="#H">H</a>
+        <a href="#I">I</a><a href="#J">J</a><a href="#L">L</a><a href="#M">M</a>
+        <a href="#N">N</a><a href="#P">P</a><a href="#Q">Q</a><a href="#R">R</a>
+        <a href="#S">S</a><a href="#T">T</a><a href="#V">V</a><a href="#Y">Y</a>
+    </div>
+
+    <h2 id="A">A</h2>
+    <div class="term">
+        <div class="term-title">Acomodaticio (Dovish)</div>
+        <div class="term-def">Descripción de una postura de política monetaria orientada a estimular la economía mediante tasas de interés bajas y, en casos extremos, programas de compra de activos (QE). Un banco central acomodaticio es menos propenso a subir tasas y más propenso a mantenerlas o recortarlas. Generalmente es <strong>negativo para la divisa</strong> porque reduce el diferencial de carry frente a economías con tasas más altas. Sinónimo: dovish.</div>
+        <div class="term-related">Ver también: <a href="#H">Hawkish</a>, <a href="#C">Carry Trade</a></div>
+    </div>
+    <div class="term">
+        <div class="term-title">Apreciación / Depreciación</div>
+        <div class="term-def">La apreciación de una divisa significa que se necesitan menos unidades de esa divisa para comprar otra (o que se necesitan más unidades de la otra divisa para comprar la primera). La depreciación es el proceso inverso. En un par como EUR/USD, si el precio sube de 1.05 a 1.10, el EUR se apreció frente al USD (un euro ahora compra más dólares).</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Aversión al Riesgo (Risk-Off)</div>
+        <div class="term-def">Entorno de mercado caracterizado por la huida de los inversores hacia activos considerados seguros (bonos gubernamentales de alta calidad, JPY, CHF, oro) y la venta de activos de mayor riesgo (acciones, divisas de mercados emergentes, divisas de alto rendimiento). Durante episodios risk-off, las correlaciones entre activos tienden a converger hacia 1 y los fundamentos macroeconómicos individuales pierden relevancia predictiva de corto plazo.</div>
+        <div class="term-related">Ver también: <a href="#R">Risk-On</a>, <a href="#S">Safe Haven</a></div>
+    </div>
+
+    <h2 id="B">B</h2>
+    <div class="term">
+        <div class="term-title">Balanza Comercial</div>
+        <div class="term-def">Diferencia entre el valor de las exportaciones y las importaciones de bienes de un país en un período determinado. Un superávit comercial (exportaciones &gt; importaciones) genera demanda de la divisa local porque los compradores extranjeros deben adquirirla para pagar las exportaciones. Un déficit comercial crónico puede ser un factor de presión bajista estructural sobre la divisa.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Banco Central</div>
+        <div class="term-def">Institución gubernamental responsable de la política monetaria de un país o zona económica. Sus principales herramientas son la tasa de interés de referencia, las operaciones de mercado abierto y (en casos extremos) la intervención cambiaria. Los ocho bancos centrales más importantes para el forex son: <strong>Fed</strong> (USD), <strong>BCE</strong> (EUR), <strong>BoE</strong> (GBP), <strong>BoJ</strong> (JPY), <strong>RBA</strong> (AUD), <strong>BoC</strong> (CAD), <strong>SNB</strong> (CHF), <strong>RBNZ</strong> (NZD).</div>
+        <div class="term-related">Ver guía: <a href="guia-bancos-centrales.html">Los 8 bancos centrales del G8</a></div>
+    </div>
+
+    <h2 id="C">C</h2>
+    <div class="term">
+        <div class="term-title">Carry Trade</div>
+        <div class="term-def">Estrategia que consiste en pedir prestado en una divisa de bajo interés e invertir en una divisa de alto interés, capturando la diferencia — el "carry" — como ganancia. Es uno de los flujos de capital más importantes en el mercado forex. El carry trade funciona mejor en entornos de baja volatilidad y risk-on; se deshace violentamente en episodios de crisis (carry unwind).</div>
+        <div class="term-related">Ver guía: <a href="guia-carry-trade.html">Cómo funciona el carry trade</a></div>
+    </div>
+    <div class="term">
+        <div class="term-title">Carry Unwind</div>
+        <div class="term-def">Cierre masivo y simultáneo de posiciones de carry trade, generalmente desencadenado por un episodio de risk-off o un aumento súbito de la volatilidad. El carry unwind puede generar movimientos muy rápidos y violentos en las divisas de financiación (especialmente JPY y CHF), que se aprecian bruscamente cuando los traders cierran sus posiciones.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">CFTC (Commodity Futures Trading Commission)</div>
+        <div class="term-def">Agencia reguladora de EE.UU. responsable de los mercados de futuros y opciones, incluyendo los futuros de divisas del CME Group. La CFTC publica semanalmente el reporte COT (Commitment of Traders), que detalla el posicionamiento de los grandes participantes en estos mercados.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">COT (Commitment of Traders)</div>
+        <div class="term-def">Reporte semanal publicado por la CFTC que muestra el posicionamiento agregado de las distintas categorías de traders en los mercados de futuros. Para el análisis forex, la categoría más relevante es Leveraged Funds (hedge funds y CTAs). El COT se usa como indicador de posicionamiento institucional y, en posiciones extremas, como señal contrarian.</div>
+        <div class="term-related">Ver guía: <a href="guia-cot.html">Qué es el COT y cómo interpretarlo</a></div>
+    </div>
+    <div class="term">
+        <div class="term-title">CPI (Consumer Price Index / IPC)</div>
+        <div class="term-def">Índice de Precios al Consumidor. Mide la variación promedio de los precios de una cesta representativa de bienes y servicios a lo largo del tiempo. Es el indicador de inflación más seguido por los bancos centrales y tiene alto impacto en el mercado forex, especialmente cuando el dato sorprende al consenso del mercado.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Cuenta Corriente</div>
+        <div class="term-def">Componente de la balanza de pagos que incluye la balanza comercial de bienes y servicios, los ingresos de inversión y las transferencias corrientes. Un superávit de cuenta corriente estructural es un indicador de demanda sostenida de la divisa local. Países como Japón y Suiza tienen superávits crónicos que constituyen un soporte estructural para el JPY y el CHF.</div>
+    </div>
+
+    <h2 id="D">D</h2>
+    <div class="term">
+        <div class="term-title">Diferencial de Tasas</div>
+        <div class="term-def">Diferencia entre las tasas de interés oficiales de dos países o zonas económicas. Es el principal motor del carry trade y uno de los indicadores más vigilados en el análisis fundamental forex. Un diferencial amplio y estable en favor de una divisa tiende a atraer capital hacia ella, generando demanda y apreciación.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Dovish</div>
+        <div class="term-def">Ver <a href="#A">Acomodaticio</a>. Un banco central o funcionario dovish favorece tasas más bajas y política monetaria expansiva. Las declaraciones dovish de funcionarios de bancos centrales suelen generar debilidad en la divisa correspondiente.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">DXY (Dollar Index)</div>
+        <div class="term-def">Índice que mide el valor del dólar estadounidense frente a una cesta de seis divisas principales (EUR con peso 57.6%, JPY 13.6%, GBP 11.9%, CAD 9.1%, SEK 4.2%, CHF 3.6%). Es ampliamente usado como referencia del "estado" general del dólar y tiene correlación inversa con los mercados de materias primas y muchos activos emergentes.</div>
+    </div>
+
+    <h2 id="E">E</h2>
+    <div class="term">
+        <div class="term-title">Empleo (Tasa de Desempleo)</div>
+        <div class="term-def">Porcentaje de la población activa que está en búsqueda activa de trabajo sin encontrarlo. Es uno de los indicadores más importantes para los bancos centrales con mandato dual (como la Fed). Una tasa de desempleo baja es generalmente positiva para la divisa porque indica una economía sana y puede dar espacio al banco central para mantener tasas altas.</div>
+    </div>
+
+    <h2 id="F">F</h2>
+    <div class="term">
+        <div class="term-title">FOMC (Federal Open Market Committee)</div>
+        <div class="term-def">Comité de la Reserva Federal de EE.UU. responsable de las decisiones de política monetaria. Se reúne ocho veces al año. Sus decisiones sobre la tasa de fondos federales son los eventos de mayor impacto en el mercado forex global. El "dot plot" que publica trimestralmente muestra las proyecciones de tasas de cada miembro del comité.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Forward Guidance</div>
+        <div class="term-def">Comunicación prospectiva de un banco central sobre la probable dirección futura de su política monetaria. Es una herramienta de política en sí misma: al comprometerse verbalmente con un camino de tasas, el banco central busca influir en las expectativas del mercado y reducir la volatilidad. Los mercados forex analizan cada comunicado buscando señales de cambio en el forward guidance.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">FX Performance 1M</div>
+        <div class="term-def">En el contexto del dashboard de Global Investing, es el rendimiento de cada divisa calculado como composite basket-corrected: cada moneda se mide contra la canasta de las otras 7, eliminando el sesgo que genera medir todo contra USD. Composición: 70% rendimiento 1M + 20% rendimiento 1S + 10% rendimiento 3M. Tiene un peso del 8% en el modelo y actúa como confirmador (no como driver) — los fundamentales causan el precio, no al revés. Es parte del grupo FX Confirmador (11% total) y es el único indicador completamente libre de lag de publicación: refleja en tiempo casi real el posicionamiento institucional, los flujos de carry y las expectativas de política monetaria.</div>
+    </div>
+
+    <h2 id="G">G</h2>
+    <div class="term">
+        <div class="term-title">G8 (Grupo de las 8 divisas principales)</div>
+        <div class="term-def">En el contexto del análisis forex, las ocho divisas más negociadas y líquidas del mundo: USD (dólar estadounidense), EUR (euro), GBP (libra esterlina), JPY (yen japonés), AUD (dólar australiano), CAD (dólar canadiense), CHF (franco suizo) y NZD (dólar neozelandés). Estas divisas representan la gran mayoría del volumen diario del mercado forex global.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">GDP / PIB (Producto Interior Bruto)</div>
+        <div class="term-def">Medida del valor total de bienes y servicios producidos en un país en un período determinado. Es el indicador más amplio de la salud económica. Para el análisis forex, lo relevante no es el nivel del PIB sino su tasa de crecimiento y su relación con las expectativas del mercado. Una economía acelerando su crecimiento atrae inversión y demanda de la divisa local.</div>
+    </div>
+
+    <h2 id="H">H</h2>
+    <div class="term">
+        <div class="term-title">Hawkish</div>
+        <div class="term-def">Descripción de una postura de política monetaria orientada a controlar la inflación mediante tasas de interés más altas o condiciones financieras más restrictivas. Un banco central o funcionario hawkish es más propenso a subir tasas o a mantenerlas altas por más tiempo. Generalmente es <strong>positivo para la divisa</strong> porque aumenta el diferencial de carry. Antónimo: dovish/acomodaticio.</div>
+    </div>
+
+    <h2 id="I">I</h2>
+    <div class="term">
+        <div class="term-title">Inflación</div>
+        <div class="term-def">Aumento generalizado y sostenido del nivel de precios en una economía. Es la principal variable que los bancos centrales buscan controlar. Una inflación moderada (cerca del objetivo del banco central, generalmente 2%) es neutral para la divisa. Una inflación demasiado alta puede ser positiva si eleva las expectativas de subida de tasas, pero negativa si erosiona el poder adquisitivo. Una inflación demasiado baja puede llevar al banco central a recortar tasas.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Intervención Cambiaria</div>
+        <div class="term-def">Acción directa de un banco central en el mercado de divisas, comprando o vendiendo su propia divisa para influir en su valor. Es una herramienta de último recurso que se usa cuando la volatilidad cambiaria amenaza la estabilidad económica. El Banco Nacional Suizo (SNB) y el Banco de Japón (BoJ) son los más conocidos por utilizar intervenciones cambiarias.</div>
+    </div>
+
+    <h2 id="L">L</h2>
+    <div class="term">
+        <div class="term-title">Leveraged Funds</div>
+        <div class="term-def">Categoría en el reporte COT de la CFTC que incluye hedge funds, fondos de futuros administrados (CTAs) y otros gestores que utilizan apalancamiento para obtener exposición especulativa. Son la categoría de traders más seguida en el análisis COT porque representan el "smart money" especulativo con mayor influencia sobre los precios de corto a medio plazo.</div>
+    </div>
+
+    <h2 id="M">M</h2>
+    <div class="term">
+        <div class="term-title">Mandato Dual</div>
+        <div class="term-def">Sistema de objetivos de política monetaria que incluye tanto la estabilidad de precios (inflación cerca del 2%) como el máximo empleo sostenible. La Reserva Federal de EE.UU. es el principal banco central con mandato dual. La mayoría de otros bancos centrales tienen mandato único de estabilidad de precios, con el empleo como objetivo secundario.</div>
+    </div>
+
+    <h2 id="N">N</h2>
+    <div class="term">
+        <div class="term-title">NFP (Non-Farm Payrolls)</div>
+        <div class="term-def">Reporte mensual de empleo no agrícola de EE.UU. publicado el primer viernes de cada mes por el Bureau of Labor Statistics. Es probablemente el dato económico de mayor impacto individual en el mercado forex. Incluye el número de empleos creados fuera del sector agrícola, la tasa de desempleo y el crecimiento salarial promedio. Sorpresas en cualquiera de estos tres componentes pueden mover el USD significativamente.</div>
+    </div>
+
+    <h2 id="P">P</h2>
+    <div class="term">
+        <div class="term-title">Par de Divisas</div>
+        <div class="term-def">La forma en que se cotizan las divisas en el mercado forex. Siempre se expresan en pares: la primera divisa es la base, la segunda es la cotizada. El precio del par indica cuántas unidades de la divisa cotizada se necesitan para comprar una unidad de la divisa base. En EUR/USD = 1.08, un euro compra 1.08 dólares.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">PIB</div>
+        <div class="term-def">Ver <a href="#G">GDP</a>.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">PMI (Purchasing Managers' Index)</div>
+        <div class="term-def">Índice de gestores de compras. Es un indicador adelantado de la actividad económica basado en encuestas mensuales a los responsables de compras de empresas manufactureras o de servicios. Un PMI por encima de 50 indica expansión de la actividad; por debajo de 50, contracción. Los PMI flash (estimación preliminar) se publican antes del cierre del mes y tienen alto impacto en el mercado.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Política Monetaria</div>
+        <div class="term-def">Conjunto de decisiones de un banco central para influir en la cantidad de dinero en circulación y en el costo del crédito, con el objetivo de mantener la estabilidad de precios y (en algunos casos) el pleno empleo. Las herramientas principales son: la tasa de interés de referencia, las operaciones de mercado abierto, los requisitos de reservas y los programas de compra de activos (QE).</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Pip</div>
+        <div class="term-def">Unidad mínima de movimiento del precio en el mercado forex. Para la mayoría de los pares, un pip equivale a 0.0001 (el cuarto decimal). Para los pares que incluyen JPY, un pip equivale a 0.01 (el segundo decimal). Los movimientos de precio en forex se expresan habitualmente en pips o en "figuras" (100 pips = 1 figura).</div>
+    </div>
+
+    <h2 id="Q">Q</h2>
+    <div class="term">
+        <div class="term-title">QE (Quantitative Easing)</div>
+        <div class="term-def">Flexibilización cuantitativa. Política monetaria no convencional en la que un banco central compra activos financieros (generalmente bonos gubernamentales) en el mercado abierto para inyectar liquidez en la economía y bajar los rendimientos de largo plazo. El QE expansivo es generalmente bajista para la divisa porque aumenta la oferta monetaria. El QT (Quantitative Tightening) es el proceso inverso.</div>
+    </div>
+
+    <h2 id="R">R</h2>
+    <div class="term">
+        <div class="term-title">Rate Momentum</div>
+        <div class="term-def">En el contexto del modelo de scoring del dashboard, es la variación de la tasa de interés oficial respecto a hace 12 meses. Captura si el banco central está en un ciclo de subidas (hawkish activo, positivo para el score) o de recortes (dovish activo, negativo para el score). Una tasa alta pero estacionaria tiene menos momentum que una que acaba de subir.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Risk-On</div>
+        <div class="term-def">Entorno de mercado caracterizado por el apetito por el riesgo elevado: los inversores buscan rendimiento y asumen más exposición a activos de riesgo (acciones, divisas de mercados emergentes, divisas de alto rendimiento como AUD y NZD). El carry trade prospera en entornos risk-on. Generalmente se asocia con mercados de renta variable al alza y volatilidad baja.</div>
+        <div class="term-related">Ver también: <a href="#A">Aversión al Riesgo (Risk-Off)</a></div>
+    </div>
+
+    <h2 id="S">S</h2>
+    <div class="term">
+        <div class="term-title">Safe Haven (Refugio Seguro)</div>
+        <div class="term-def">Divisa o activo que tiende a apreciarse o mantener su valor durante períodos de incertidumbre, crisis o alta volatilidad de mercado. En el forex, el JPY y el CHF son los principales safe havens del G8. El USD también actúa como refugio en crisis sistémicas globales. Las divisas safe haven se aprecian durante episodios risk-off independientemente de sus fundamentos económicos individuales.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Score de Fortaleza Fundamental</div>
+        <div class="term-def">Índice cuantitativo que agrega múltiples indicadores económicos ponderados en un único valor numérico (0–100) representando la fortaleza relativa de una divisa. En el dashboard de Global Investing, el score se calcula a partir de 22 indicadores en 6 tiers temáticos. Los scores por encima de 65 son alcistas, entre 45 y 65 son neutrales, y por debajo de 45 son bajistas.</div>
+        <div class="term-related">Ver guía: <a href="guia-score-fortaleza.html">Cómo leer un score de fortaleza fundamental</a></div>
+    </div>
+    <div class="term">
+        <div class="term-title">Spread (diferencial bid/ask)</div>
+        <div class="term-def">Diferencia entre el precio de compra (ask) y el precio de venta (bid) de un par de divisas. Es el costo implícito de transacción en el mercado forex. Los pares principales (EUR/USD, USD/JPY) tienen spreads muy estrechos en condiciones normales. Los spreads se amplían significativamente durante eventos de alta volatilidad, como publicaciones de datos importantes.</div>
+    </div>
+
+    <h2 id="T">T</h2>
+    <div class="term">
+        <div class="term-title">Tasa de Interés</div>
+        <div class="term-def">Costo del dinero fijado por el banco central de un país. Es el componente de mayor peso del bloque monetario en el modelo de scoring de Global Investing (7%). Forma parte del grupo Tasas y Ciclo Monetario (21% total) y es el principal motor del carry trade. Un aumento de tasas suele apreciar la divisa; un recorte suele depreciarla, asumiendo que el movimiento no haya sido ya descontado por el mercado.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Términos de Intercambio</div>
+        <div class="term-def">Ratio entre el índice de precios de las exportaciones y el índice de precios de las importaciones de un país. Una mejora en los términos de intercambio (exportaciones se encarecen más que las importaciones) es positiva para la divisa porque aumenta los ingresos reales del país por sus exportaciones. Especialmente relevante para divisas de países exportadores de materias primas como AUD, CAD y NZD.</div>
+    </div>
+
+    <h2 id="V">V</h2>
+    <div class="term">
+        <div class="term-title">VIX (Índice de Volatilidad)</div>
+        <div class="term-def">Índice de la Bolsa de Chicago (CBOE) que mide la volatilidad implícita esperada del S&P 500 en los próximos 30 días, calculada a partir de los precios de las opciones. Es el barómetro de "miedo" más seguido en los mercados financieros. Un VIX alto (por encima de 20-25) señala risk-off, favoreciendo a JPY y CHF; un VIX bajo favorece el carry trade y los activos de riesgo.</div>
+    </div>
+
+    <h2 id="Y">Y</h2>
+    <div class="term">
+        <div class="term-title">Yield (Rendimiento de Bono Soberano)</div>
+        <div class="term-def">Tasa de retorno de un bono gubernamental. El rendimiento del bono a 10 años es el más seguido y tiene un peso del 5% en el modelo de scoring del dashboard. Refleja tanto las expectativas de tasas futuras como la prima de riesgo crediticio del país emisor. Diferenciales de rendimiento entre bonos de distintos países son un motor importante de los flujos de capital en el mercado forex.</div>
+    </div>
+    <div class="term">
+        <div class="term-title">Yield Curve (Curva de Rendimientos)</div>
+        <div class="term-def">Representación gráfica de los rendimientos de bonos soberanos a distintos plazos (3 meses, 2 años, 5 años, 10 años, 30 años). Una curva normal es ascendente (los plazos largos rinden más). Una curva invertida (los plazos cortos rinden más que los largos) históricamente ha precedido recesiones y puede ser una señal bajista para la divisa a medio plazo.</div>
+    </div>
+
+    <h2>Guías relacionadas</h2>
+    <div class="related-links">
+        <a href="guia-score-fortaleza.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo leer un score de fortaleza</div>
+        </a>
+        <a href="guia-cot.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Qué es el COT y cómo interpretarlo</div>
+        </a>
+        <a href="guia-bancos-centrales.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Los 8 bancos centrales del G8</div>
+        </a>
+        <a href="guia-carry-trade.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo funciona el carry trade</div>
+        </a>
+    </div>
+</div>
+
+
+<section style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);" itemscope itemtype="https://schema.org/FAQPage">
+    <h2 style="font-size:1.4rem;margin-bottom:1.5rem;color:var(--blue);">Preguntas frecuentes</h2>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(48,54,61,0.5);">
+        <h3 itemprop="name" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">¿Qué es el análisis fundamental en forex?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin:0;">El análisis fundamental en forex consiste en evaluar la fortaleza económica de un país para estimar si su divisa está subvaluada o sobrevaluada. Se basa en indicadores macroeconómicos como el PIB, la inflación (CPI), las tasas de interés, el empleo, la balanza comercial y el PMI, así como en la política monetaria del banco central correspondiente.</p>
+        </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(48,54,61,0.5);">
+        <h3 itemprop="name" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">¿Cuál es la diferencia entre hawkish y dovish en política monetaria?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin:0;">Un banco central hawkish favorece subir las tasas de interés para controlar la inflación, lo que suele fortalecer la divisa al atraer capital externo. Un banco central dovish prefiere tasas bajas para estimular la economía, lo que tiende a debilitar la divisa. El tono del discurso de los funcionarios centrales puede mover el mercado tan significativamente como los datos económicos.</p>
+        </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(48,54,61,0.5);">
+        <h3 itemprop="name" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">¿Qué es el carry trade en forex y cómo funciona?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin:0;">El carry trade consiste en pedir prestado en una divisa con tasa de interés baja (como el JPY o CHF) e invertir en una divisa con tasa alta (como el AUD o NZD), capturando la diferencia como ganancia diaria. Funciona bien en mercados tranquilos y risk-on, pero se deshace violentamente durante crisis de volatilidad, causando apreciaciones bruscas de las divisas de financiación.</p>
+        </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(48,54,61,0.5);">
+        <h3 itemprop="name" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">¿Qué divisas se consideran safe haven y por qué?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin:0;">Las divisas consideradas safe haven son el JPY (yen japonés), el CHF (franco suizo) y, en menor medida, el USD. El JPY y CHF se aprecian en momentos de crisis porque los inversores cierran posiciones de carry trade y repatrían capital. El USD actúa como refugio por ser la divisa de reserva global y el activo de liquidez por excelencia.</p>
+        </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name" style="font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">¿Qué indica el PMI y cómo afecta al forex?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text" style="color:var(--text-secondary);font-size:0.9rem;line-height:1.75;margin:0;">El PMI (Purchasing Managers Index) es un indicador adelantado de la actividad económica basado en encuestas a directores de compras. Un PMI por encima de 50 indica expansión económica; por debajo de 50, contracción. Un PMI sorpresivamente alto tiende a fortalecer la divisa porque anticipa crecimiento y mayor probabilidad de que el banco central suba tasas.</p>
+        </div>
+    </div>
+</section>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/glosario-forex.html#faq","mainEntity":[
+{"@type":"Question","name":"¿Qué es el análisis fundamental en forex?","acceptedAnswer":{"@type":"Answer","text":"El análisis fundamental en forex consiste en evaluar la fortaleza económica de un país para estimar si su divisa está subvaluada o sobrevaluada. Se basa en indicadores macroeconómicos como el PIB, la inflación (CPI), las tasas de interés, el empleo, la balanza comercial y el PMI."}},
+{"@type":"Question","name":"¿Cuál es la diferencia entre hawkish y dovish en política monetaria?","acceptedAnswer":{"@type":"Answer","text":"Un banco central hawkish favorece subir las tasas de interés para controlar la inflación, fortaleciendo la divisa. Un banco central dovish prefiere tasas bajas para estimular la economía, debilitando la divisa. El tono de los funcionarios puede mover el mercado tanto como los datos económicos."}},
+{"@type":"Question","name":"¿Qué es el carry trade en forex y cómo funciona?","acceptedAnswer":{"@type":"Answer","text":"El carry trade consiste en pedir prestado en una divisa con tasa baja (JPY, CHF) e invertir en una con tasa alta (AUD, NZD), capturando la diferencia como ganancia. Funciona en mercados tranquilos pero se deshace violentamente en crisis de volatilidad."}},
+{"@type":"Question","name":"¿Qué divisas se consideran safe haven y por qué?","acceptedAnswer":{"@type":"Answer","text":"El JPY, CHF y USD son divisas safe haven. El JPY y CHF se aprecian en crisis porque los inversores cierran posiciones de carry trade. El USD actúa como refugio por ser la divisa de reserva global."}},
+{"@type":"Question","name":"¿Qué indica el PMI y cómo afecta al forex?","acceptedAnswer":{"@type":"Answer","text":"El PMI (Purchasing Managers Index) mide actividad económica. Por encima de 50 indica expansión; por debajo, contracción. Un PMI alto tiende a fortalecer la divisa al anticipar crecimiento y posibles subidas de tasas."}}
+]}
+</script>
+<footer class="footer">
+    <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:0.5rem;font-size:0.8rem;">
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">Acerca de</a>
+        <a href="publicidad.html">Publicidad</a>
+        <a href="guia-score-fortaleza.html">Guías</a>
+        <a href="terms.html">Términos</a>
+        <a href="privacy.html">Privacidad</a>
+        <a href="data.html">Datos</a>
+        <a href="contact.html">Contacto</a>
+        <a href="en.html" style="padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;">EN</a>
+    </div>
+    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<!-- GDPR Banner (shared) -->
+<style>
 #gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
 #gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
 #gdpr-banner a{color:#5b9bd5;}
@@ -152,172 +512,7 @@
         .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
             color: var(--text-primary) !important; }
         .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        
-        /* ── FAQ Section ── */
-        .faq-section { margin: 3rem 0 2rem; }
-        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
-            color: var(--text-primary); }
-        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
-        .faq-item:last-child { border-bottom: 1px solid var(--border); }
-        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
-            margin: 0 0 0.6rem; line-height: 1.4; }
-        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
-            margin: 0; line-height: 1.7; }
-        
-    </style>
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/data.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/data.html">
-</head>
-<body>
-<a href="#main-content" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Saltar al contenido principal</a>
-
-<header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="about.html">Acerca de</a></li>
-            <li><a href="publicidad.html">Publicidad</a></li>
-            <li class="nav-dropdown">
-                <a href="guia-score-fortaleza.html">Guías</a>
-                <div class="nav-dropdown-menu">
-                    <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-                    <a href="guia-carry-trade.html">Carry Trade</a>
-                    <a href="guia-cot.html">Reporte COT</a>
-                    <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-                    <a href="guia-calendario-economico.html">Calendario Económico</a>
-                    <a href="guia-pips.html">Pips y Lotaje</a>
-                    <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-                    <a href="glosario-forex.html">Glosario Forex</a>
-                </div>
-            </li>
-            <li><a href="contact.html">Contacto</a></li>
-            <li><a href="en.html" class="lang-switch">EN</a></li>
-        </ul></nav>
-    </div>
-</header>
-
-
-<div class="container" id="main-content" role="main">
-    <div class="breadcrumb">
-        <a href="index.html">Inicio</a> › Datos y Feeds RSS
-    </div>
-
-    <h1>Datos y Feeds RSS</h1>
-    <div class="meta">
-        <span>3 feeds disponibles</span>
-        <span>Actualización diaria</span>
-        <span>Español · Inglés</span>
-    </div>
-
-    <p>El dashboard publica sus datos en tiempo real a través de feeds RSS estándar. Es posible suscribirse para recibir noticias forex, análisis AI y el ranking de fortaleza G8 directamente en cualquier lector compatible.</p>
-
-    <h2>Feeds disponibles</h2>
-
-    <div class="feed-grid">
-        <div class="feed-card">
-            <div class="feed-card-label">Noticias</div>
-            <h3>Noticias Forex</h3>
-            <p>Las últimas noticias de alto impacto para las 8 divisas G8, con clasificación por divisa y nivel de relevancia fundamental.</p>
-            <div class="feed-card-meta">
-                <span class="tag green">3× al día</span>
-                <span class="tag">ES · EN</span>
-                <span class="tag">30 artículos</span>
-            </div>
-            <a href="feed.xml" class="btn-feed">Suscribirse al feed</a>
-        </div>
-
-        <div class="feed-card">
-            <div class="feed-card-label">Análisis</div>
-            <h3>Análisis AI por Divisa</h3>
-            <p>Análisis fundamental generado con inteligencia artificial para cada divisa G8, con datos macro, perspectiva del banco central y composición de exportaciones.</p>
-            <div class="feed-card-meta">
-                <span class="tag green">Diario</span>
-                <span class="tag">8 divisas</span>
-                <span class="tag blue">Modelo v5.0</span>
-            </div>
-            <a href="feed-analysis.xml" class="btn-feed">Suscribirse al feed</a>
-        </div>
-
-        <div class="feed-card">
-            <div class="feed-card-label">Scores</div>
-            <h3>Ranking de Fortaleza G8</h3>
-            <p>Score de fortaleza fundamental diario para las 8 divisas principales con señales de trading activas y perspectiva de bancos centrales.</p>
-            <div class="feed-card-meta">
-                <span class="tag green">Diario</span>
-                <span class="tag">22 indicadores</span>
-                <span class="tag blue">Modelo v6.5</span>
-            </div>
-            <a href="feed-scores.xml" class="btn-feed">Suscribirse al feed</a>
-        </div>
-    </div>
-
-    <h2>Cómo usar los feeds</h2>
-    <p>Los feeds RSS son un estándar abierto compatible con cualquier lector. Basta con copiar la URL del feed y pegarla en el lector de preferencia.</p>
-
-    <h3>URLs de los feeds</h3>
-    <div class="example-box">
-        <div class="example-title">Feed de noticias</div>
-        <code>https://globalinvesting.github.io/feed.xml</code>
-    </div>
-    <div class="example-box">
-        <div class="example-title">Feed de análisis AI</div>
-        <code>https://globalinvesting.github.io/feed-analysis.xml</code>
-    </div>
-    <div class="example-box">
-        <div class="example-title">Feed de scores G8</div>
-        <code>https://globalinvesting.github.io/feed-scores.xml</code>
-    </div>
-
-    <h3>Lectores compatibles</h3>
-    <table class="data-table">
-        <thead>
-            <tr><th>Lector</th><th>Plataforma</th><th>Notas</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Feedly</td><td>Web, iOS, Android</td><td>El más utilizado. Plan gratuito disponible.</td></tr>
-            <tr><td>Inoreader</td><td>Web, iOS, Android</td><td>Recomendado para gestionar múltiples fuentes.</td></tr>
-            <tr><td>NetNewsWire</td><td>macOS, iOS</td><td>Gratuito y de código abierto.</td></tr>
-            <tr><td>RSS.app</td><td>Web</td><td>Permite convertir el feed a JSON o Webhook.</td></tr>
-            <tr><td>Zapier / Make</td><td>Automatización</td><td>Conecta el feed a cualquier otra herramienta.</td></tr>
-        </tbody>
-    </table>
-
-    <h2>Recursos del sitio</h2>
-    <p>El dashboard publica los siguientes archivos de forma pública, actualizados automáticamente con la frecuencia indicada.</p>
-
-    <table class="data-table">
-        <thead>
-            <tr><th>Recurso</th><th>Frecuencia</th><th>Contenido</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>feed.xml</td><td>3× al día</td><td>Noticias forex recientes con clasificación por divisa e impacto</td></tr>
-            <tr><td>feed-analysis.xml</td><td>Diario</td><td>Análisis AI por divisa con datos macro y perspectiva de banco central</td></tr>
-            <tr><td>feed-scores.xml</td><td>Diario</td><td>Ranking G8 completo con scores individuales y señales activas</td></tr>
-            <tr><td>sitemap.xml</td><td>Diario</td><td>Mapa del sitio actualizado tras cada recálculo de scores</td></tr>
-        </tbody>
-    </table>
-
-    <div class="highlight-box">
-        <p><strong>Condiciones de uso:</strong> Los feeds son públicos y de libre uso para consumo personal, investigación y proyectos no comerciales. La redistribución o publicación de contenido proveniente de estos feeds requiere atribución visible con enlace a <a href="https://globalinvesting.github.io">globalinvesting.github.io</a>. Para uso comercial o integraciones a escala, <a href="contact.html">puede contactarse aquí</a>.</p>
-    </div>
-
-    <h2>Integración con herramientas externas</h2>
-    <p>Los feeds RSS son compatibles con las principales herramientas de automatización. Algunos casos de uso habituales:</p>
-    <ul>
-        <li>Recibir una notificación cuando aparece una noticia de alto impacto para una divisa específica</li>
-        <li>Enviar el ranking semanal G8 por correo electrónico de forma automática</li>
-        <li>Integrar el análisis AI en un dashboard propio mediante un parser RSS estándar</li>
-        <li>Monitorear señales de trading activas con Zapier o Make</li>
-    </ul>
-</div>
-
+        </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
 <div class="gdpr-btns">
@@ -344,22 +539,9 @@ function init(){
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
 })();
 </script>
-
-<footer class="footer" role="contentinfo">
-    <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:0.5rem;font-size:0.8rem;">
-        <a href="index.html">Dashboard</a>
-        <a href="about.html">Acerca de</a>
-        <a href="publicidad.html">Publicidad</a>
-        <a href="guia-score-fortaleza.html">Guías</a>
-        <a href="data.html" style="color:#58a6ff;">Datos</a>
-        <a href="terms.html">Términos</a>
-        <a href="privacy.html">Privacidad</a>
-        <a href="contact.html">Contacto</a>
-        <a href="en.html" style="padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;">EN</a>
-    </div>
-    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
+<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
 </footer>
-<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

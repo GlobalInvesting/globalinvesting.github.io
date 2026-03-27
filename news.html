@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -9,406 +9,705 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/guia-score-fortaleza.html">
+    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/news.html">
     <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/guia-score-fortaleza.html">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score de fortaleza forex: cómo leerlo | Global Investing</title>
-    <meta name="description" content="Cómo leer el score de fortaleza forex: qué significan los valores, cómo comparar divisas y aplicar el ranking fundamental en tus decisiones de trading.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://globalinvesting.github.io/guia-score-fortaleza.html">
-    <meta property="og:title" content="Guía: Cómo Leer un Score de Fortaleza Fundamental | Global Investing">
-    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta property="og:image:alt" content="Global Investing — Dashboard de Análisis Fundamental Forex">
-    <meta property="og:description" content="Guía completa para interpretar el índice de fortaleza fundamental de divisas. Ejemplos numéricos, umbrales y casos prácticos.">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://globalinvesting.github.io/guia-score-fortaleza.html">
-    <meta property="og:site_name" content="Global Investing">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Guía: Cómo Leer un Score de Fortaleza Fundamental | Global Investing">
-    <meta name="twitter:description" content="Guía completa para interpretar el índice de fortaleza fundamental de divisas. Ejemplos numéricos, umbrales y casos prácticos.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; }
-        :root {
-            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
-            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
-            --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
-        }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
-        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
-        .brand-title:hover { color: var(--blue); }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--text-primary); }
-        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
-        .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
-        .breadcrumb a { color: var(--blue); text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
-        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
-        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
-        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
-        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
-        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
-        strong { color: var(--text-primary); }
-        a { color: var(--blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
-        .highlight-box p { margin: 0; }
-        .score-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        .score-table th, .score-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        .score-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
-        .score-table td { color: var(--text-secondary); font-size: 0.9rem; }
-        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.78rem; font-weight: 600; }
-        .badge-bull { background: rgba(38,166,154,0.15); color: var(--green); border: 1px solid rgba(38,166,154,0.3); }
-        .badge-bear { background: rgba(239,83,80,0.12); color: var(--red); border: 1px solid rgba(239,83,80,0.25); }
-        .badge-neut { background: rgba(139,148,158,0.12); color: var(--text-secondary); border: 1px solid var(--border); }
-        .example-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
-        .example-box .example-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.75rem; }
-        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
-        .related-card:hover { border-color: var(--blue); text-decoration: none; }
-        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
-        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
-        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
-        .footer a { color: var(--text-secondary); text-decoration: none; }
-        .footer a:hover { color: var(--text-primary); }
-        @media (max-width: 768px) {
-            .header { padding: 1rem; }
-            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
-            .container { padding: 2rem 1rem 4rem; }
-            h1 { font-size: 1.7rem; }
-            .section { padding: 1.25rem; }
-        }
-    </style>
-
+    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/news.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Noticias Forex en Tiempo Real | Global Investing</title>
+<meta name="description" content="Noticias forex en tiempo real con análisis AI para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD. Titulares fundamentales actualizados 3 veces al día.">
+<meta name="keywords" content="noticias forex, análisis fundamental forex, USD EUR GBP JPY, noticias divisas, banco central, fed, bce, boe, boj, trading forex, tipo de cambio, mercado de divisas">
+<meta name="author" content="Santiago Plá Casuriaga · Global Investing">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://globalinvesting.github.io/news.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
+<meta property="og:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
+<meta property="og:description" content="Feed de noticias forex con análisis AI. Cobertura de USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. Actualizado 3 veces al día.">
+<meta property="og:url" content="https://globalinvesting.github.io/news.html">
+<meta property="og:image" content="https://globalinvesting.github.io/assets/og-news.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@GlobalInvesting">
+<meta name="twitter:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
+<meta name="twitter:description" content="Feed de noticias forex con análisis AI. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
+<meta name="twitter:image" content="https://globalinvesting.github.io/assets/og-news.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": "https://globalinvesting.github.io/guia-score-fortaleza.html",
-  "url": "https://globalinvesting.github.io/guia-score-fortaleza.html",
-  "headline": "Cómo Leer un Score de Fortaleza Fundamental Forex",
-  "description": "Cómo interpretar el score de fortaleza fundamental en el trading de divisas y qué factores lo componen.",
-  "inLanguage": "es",
-  "articleSection": "Educación Forex",
-  "publisher": {
-    "@type": "Organization",
-    "@id": "https://globalinvesting.github.io/#organization",
-    "name": "Global Investing",
-    "url": "https://globalinvesting.github.io"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "@id": "https://globalinvesting.github.io/guia-score-fortaleza.html#breadcrumb",
-  "itemListElement": [
+  "@graph": [
     {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Inicio",
-      "item": "https://globalinvesting.github.io/"
+      "@type": "WebPage",
+      "@id": "https://globalinvesting.github.io/news.html",
+      "url": "https://globalinvesting.github.io/news.html",
+      "name": "Noticias Forex en Tiempo Real · Análisis Fundamental",
+      "description": "Feed de noticias forex en tiempo real con análisis fundamental AI para las 8 divisas principales.",
+      "inLanguage": "es",
+      "isPartOf": { "@id": "https://globalinvesting.github.io/" },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Dashboard", "item": "https://globalinvesting.github.io/" },
+          { "@type": "ListItem", "position": 2, "name": "Noticias", "item": "https://globalinvesting.github.io/news.html" }
+        ]
+      }
     },
     {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Guías",
-      "item": "https://globalinvesting.github.io/guia-score-fortaleza.html"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "Score de fortaleza",
-      "item": "https://globalinvesting.github.io/guia-score-fortaleza.html"
+      "@type": "Dataset",
+      "@id": "https://globalinvesting.github.io/news.html#dataset",
+      "name": "Análisis de Sentimiento Forex — Noticias en Tiempo Real",
+      "description": "Resúmenes generados por IA con análisis de sentimiento para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD, actualizados diariamente desde FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex y MyFXBook.",
+      "url": "https://globalinvesting.github.io/news.html",
+      "inLanguage": "es",
+      "license": "https://github.com/GlobalInvesting/globalinvesting.github.io/blob/main/LICENSE",
+      "isAccessibleForFree": true,
+      "creator": {
+        "@type": "Organization",
+        "@id": "https://globalinvesting.github.io/#organization",
+        "name": "Global Investing"
+      },
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "application/json",
+        "contentUrl": "https://globalinvesting.github.io/news-data/summaries.json"
+      },
+      "temporalCoverage": "P1D",
+      "variableMeasured": ["Sentimiento de mercado", "Confianza analítica", "Drivers fundamentales por divisa"]
     }
   ]
 }
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; }
+
+  :root {
+    --bg-primary:   #0b0e14;
+    --bg-secondary: #13171f;
+    --bg-card:      #1a1f2e;
+    --bg-elevated:  #20253a;
+    --text-primary:   #e1e4e8;
+    --text-secondary: #8b949e;
+    --text-tertiary:  #6e7681;
+    --text-dim:       #6b7585;
+    --border:       #30363d;
+    --border-hover: #484f58;
+    --blue:         #1e88e5;
+    --blue-dim:     rgba(30,136,229,0.1);
+    --green:        #26a69a;
+    --green-strong: #26a69a;
+    --green-dim:    rgba(38,166,154,0.12);
+    --red:          #ef5350;
+    --red-dim:      rgba(239,83,80,0.12);
+    --orange:       #e0a020;
+    --orange-dim:   rgba(224,160,32,0.08);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-live {
+            width: 8px;
+            height: 8px;
+            background: var(--green-strong);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-loading {
+            width: 8px;
+            height: 8px;
+            background: var(--orange);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .page-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .page-nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .page-nav-links a:hover {
+            color: var(--text-primary);
+        }
+        .lang-switch {
+            padding: 0.22rem 0.55rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.75rem !important;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .lang-switch:hover {
+            border-color: var(--blue);
+            color: var(--blue) !important;
+        }
+
+        .nav-tabs-wrap {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-tabs {
+            padding: 0 2rem;
+            display: flex;
+            gap: 0.5rem;
+            max-width: 1800px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--blue);
+        }
+
+        @media (max-width: 768px) {
+    .header-content {
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+    }
+
+    .page-nav-links {
+        flex-wrap: nowrap;
+        gap: 0.75rem;
+    }
+
+    .page-nav-links a {
+        white-space: nowrap;
+        font-size: 0.8rem;
+    }
+
+    .header-info {
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+}
+
+  .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
+  .page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 0.75rem;
+  }
+  .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
+
+  .analysis-section-label {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .analysis-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 0.75rem; }
+
+  .cur-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; transition: border-color 0.2s, transform 0.15s;
+  }
+  .cur-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .cur-card.bull  { border-left: 3px solid var(--green); }
+  .cur-card.bear  { border-left: 3px solid var(--red); }
+  .cur-card.neut  { border-left: 3px solid var(--text-dim); }
+  .cur-card.mixed { border-left: 3px solid var(--orange); }
+
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.65rem 0.9rem 0.55rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  }
+  .cur-id { display: flex; align-items: center; gap: 0.45rem; }
+  .cur-code { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.04em; }
+  .cur-full-name { font-size: 0.63rem; color: var(--text-dim); font-weight: 400; margin-left: 0.1rem; }
+  .head-right { display: flex; align-items: center; gap: 0.6rem; }
+
+  .sent-badge {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 3px;
+  }
+  .sent-badge.bull  { background: var(--green-dim); border: 1px solid rgba(38,166,154,.3); color: var(--green); }
+  .sent-badge.bear  { background: var(--red-dim);   border: 1px solid rgba(239,83,80,.3);  color: var(--red); }
+  .sent-badge.neut  { background: rgba(107,117,133,.1); border: 1px solid rgba(107,117,133,.25); color: var(--text-dim); }
+  .sent-badge.mixed { background: var(--orange-dim); border: 1px solid rgba(224,160,32,.25); color: var(--orange); }
+
+  .src-count { font-size: 0.6rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  .conf-bar-wrap { padding: 0.5rem 0.9rem 0; display: flex; align-items: center; gap: 0.6rem; }
+  .conf-track { flex: 1; height: 3px; background: rgba(48,54,61,.9); border-radius: 2px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .conf-fill.bull  { background: var(--green); }
+  .conf-fill.bear  { background: var(--red); }
+  .conf-fill.neut  { background: var(--text-dim); }
+  .conf-fill.mixed { background: linear-gradient(90deg, var(--green) 50%, var(--red) 50%); }
+  .conf-label { font-size: 0.6rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); width: 30px; text-align: right; flex-shrink: 0; }
+
+  .card-body { padding: 0.65rem 0.9rem 0.7rem; }
+  .analysis-text { font-size: 0.775rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 0.7rem; }
+
+  .drivers { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.65rem; }
+  .driver-chip {
+    font-size: 0.58rem; font-weight: 600; padding: 0.18rem 0.45rem; border-radius: 3px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    color: var(--text-secondary); letter-spacing: 0.03em; text-transform: uppercase;
+  }
+
+  .card-event {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem;
+    background: var(--blue-dim); border: 1px solid rgba(30,136,229,.15);
+    border-radius: 4px; font-size: 0.68rem; color: var(--text-secondary);
+  }
+  .card-event .ev-icon  { font-size: 0.75rem; flex-shrink: 0; }
+  .card-event .ev-label { color: var(--blue); font-weight: 600; margin-right: 0.2rem; }
+
+  .card-foot {
+    padding: 0.4rem 0.9rem; background: rgba(0,0,0,.15);
+    border-top: 1px solid rgba(48,54,61,.5);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .foot-sources { font-size: 0.58rem; color: var(--text-dim); }
+  .foot-ts { font-size: 0.58rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .foot-ai { font-size: 0.52rem; font-weight: 700; color: var(--blue); border: 1px solid rgba(30,136,229,.3); border-radius: 2px; padding: 0.05rem 0.22rem; }
+
+  .card-skeleton { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; border-left: 3px solid var(--border); }
+  .sk-head { padding: 0.65rem 0.9rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+  .sk-body { padding: 0.65rem 0.9rem 0.7rem; }
+  .sk-line {
+    height: 10px; border-radius: 3px; margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,.04) 50%, var(--bg-elevated) 75%);
+    background-size: 200% 100%; animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .sk-line.w40 { width: 40%; }
+  .sk-line.w70 { width: 70%; }
+  .sk-line.w55 { width: 55%; }
+  .sk-line.w85 { width: 85%; }
+  .sk-line.w100 { width: 100%; }
+
+  .cur-card.no-data { opacity: 0.5; }
+  .no-data-msg { font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 1.2rem 0.9rem; }
+
+  .ai-tag {
+    font-size: 0.52rem; font-weight: 700; color: var(--blue);
+    border: 1px solid rgba(30,136,229,.35); border-radius: 2px;
+    padding: 0.05rem 0.22rem; vertical-align: middle;
+  }
+
+  .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
+
+  @media (max-width: 768px) {
+    .page-wrap { padding: 0.75rem 0.75rem 3rem; }
+    .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
+    .page-title { font-size: 0.9rem; }
+    .currency-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .analysis-text { font-size: 0.73rem; }
+  }
+</style>
+    <link rel="alternate" type="application/rss+xml" title="Noticias Forex — Global Investing" href="https://globalinvesting.github.io/feed.xml">
+    <link rel="alternate" type="application/rss+xml" title="Análisis Fundamental AI — Global Investing" href="https://globalinvesting.github.io/feed-analysis.xml">
+    <link rel="alternate" type="application/rss+xml" title="Scores de Fortaleza G8 — Global Investing" href="https://globalinvesting.github.io/feed-scores.xml">
 </head>
 <body>
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-<header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="about.html">Acerca de</a></li>
-            <li><a href="publicidad.html">Publicidad</a></li>
-<li class="nav-dropdown">
-            <a href="guia-score-fortaleza.html">Guías</a>
-            <div class="nav-dropdown-menu">
-            <a href="guia-score-fortaleza.html" class="active-guide">Score de Fortaleza</a>
-            <a href="guia-carry-trade.html">Carry Trade</a>
-            <a href="guia-cot.html">Reporte COT</a>
-            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-            <a href="guia-calendario-economico.html">Calendario Económico</a>
-            <a href="guia-pips.html">Pips y Lotaje</a>
-            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-            <a href="glosario-forex.html">Glosario Forex</a>
-            </div>
-        </li>
-            <li><a href="contact.html">Contacto</a></li>
-            <li><a href="en.html" class="lang-switch">EN</a></li>
-        </ul></nav>
+
+<div class="header">
+  <div class="header-content">
+    <div style="display:flex;flex-direction:row;align-items:center;">
+      <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+      <div style="display:flex;flex-direction:column;justify-content:center;">
+        <div class="brand-title">Global Investing</div>
+        <div class="brand-subtitle">Forex Fundamental Dashboard</div>
+      </div>
     </div>
-</header>
-
-
-<div class="container" id="main-content" role="main">
-    <div class="breadcrumb">
-        <a href="index.html">Inicio</a> › <a href="guia-score-fortaleza.html">Guías</a> › Cómo leer un score de fortaleza fundamental
+    <div class="page-nav-links">
+      <a href="about.html">Acerca de</a>
+      <a href="publicidad.html">Publicidad</a>
+      <div class="nav-dropdown">
+      <a href="guia-score-fortaleza.html">Guías</a>
+      <div class="nav-dropdown-menu">
+          <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+          <a href="guia-carry-trade.html">Carry Trade</a>
+          <a href="guia-cot.html">Reporte COT</a>
+          <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+          <a href="guia-calendario-economico.html">Calendario Económico</a>
+          <a href="guia-pips.html">Pips y Lotaje</a>
+          <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
+          <a href="glosario-forex.html">Glosario Forex</a>
+      </div>
     </div>
-
-    <h1>Cómo Leer un Score de Fortaleza Fundamental en Forex</h1>
-    <div class="meta">
-        <span>Guía para principiantes e intermedios</span>
-        <span>⏱ Lectura: 8 minutos</span>
-        <span>Actualizado: marzo 2026</span>
+      <a href="contact.html">Contacto</a>
+      <a href="en.html" class="lang-switch">EN</a>
     </div>
-
-    <p>Uno de los conceptos más útiles en el análisis fundamental del mercado de divisas es el <strong>score de fortaleza</strong>: un número que resume, en una sola cifra, cuán fuerte o débil es una divisa desde el punto de vista macroeconómico. Pero ¿qué significa exactamente ese número? ¿Cómo se interpreta? ¿Y cómo se usa en la práctica para tomar decisiones de trading?</p>
-
-    <p>Esta guía explica todo lo necesario para leer e interpretar correctamente un índice de fortaleza fundamental, con ejemplos concretos y casos prácticos.</p>
-
-    <div class="section">
-        <h2>¿Qué es un score de fortaleza fundamental?</h2>
-        <p>Un score de fortaleza fundamental es un <strong>índice cuantitativo</strong> que agrega múltiples indicadores económicos en un único valor numérico. En lugar de revisar manualmente el PIB, la inflación, las tasas de interés y otros 22 indicadores para cada una de las 8 divisas principales, el modelo hace ese trabajo y entrega un resumen.</p>
-        <p>En el dashboard de Global Investing, el score va de <strong>0 a 100 puntos</strong> y se calcula a partir de 22 indicadores económicos ponderados según su relevancia para el trading de divisas. No todos los indicadores pesan igual: la tasa de interés tiene más peso que la producción industrial, porque en forex el carry trade y los diferenciales de tasas son los principales motores de movimiento de precio.</p>
-
-        <div class="highlight-box">
-            <p><strong>Principio clave:</strong> El score no mide si una economía es "buena" en términos absolutos. Mide cuán favorable es el entorno macroeconómico actual para que esa divisa se aprecie frente a sus pares. Una economía puede ser sólida estructuralmente pero tener un score bajo si su banco central está en ciclo de recortes agresivos.</p>
-        </div>
+    <div class="header-info">
+      <div class="info-item">
+        <div class="status-live"></div>
+        <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
+      </div>
     </div>
-
-    <div class="section">
-        <h2>Las tres bandas interpretativas</h2>
-        <p>El score se divide en tres zonas con significado operativo distinto:</p>
-
-        <table class="score-table">
-            <thead>
-                <tr><th>Rango</th><th>Clasificación</th><th>Interpretación</th><th>Sesgo operativo</th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>&gt; 65</strong></td>
-                    <td><span class="badge badge-bull">Fuerte / Alcista</span></td>
-                    <td>Fundamentos macroeconómicos favorables: tasas altas o en alza, inflación controlada, crecimiento sólido, banco central con sesgo hawkish.</td>
-                    <td>Buscar oportunidades LONG en esta divisa frente a divisas débiles.</td>
-                </tr>
-                <tr>
-                    <td><strong>45 – 65</strong></td>
-                    <td><span class="badge badge-neut">Neutral</span></td>
-                    <td>Fundamentos mixtos o en transición. La divisa no tiene una ventaja clara ni desventaja marcada frente al grupo.</td>
-                    <td>Evitar como divisa principal de una posición. Puede usarse como "lado opuesto" de un par si el otro extremo es claro.</td>
-                </tr>
-                <tr>
-                    <td><strong>&lt; 45</strong></td>
-                    <td><span class="badge badge-bear">Débil / Bajista</span></td>
-                    <td>Fundamentos desfavorables: tasas bajas o en recorte, crecimiento débil, banco central dovish, posicionamiento institucional negativo.</td>
-                    <td>Buscar oportunidades SHORT en esta divisa frente a divisas fuertes.</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p>Es importante entender que estas bandas están calibradas a la distribución real de los scores del modelo. En el mercado forex, las 8 economías del G8 son estructuralmente similares (todas desarrolladas, todas con acceso a mercados de capitales globales), por lo que los scores naturalmente se agrupan en un rango más estrecho que en otros activos. Un score de 65 representa una ventaja fundamental genuina, aunque en términos absolutos no parezca "alto".</p>
-    </div>
-
-    <div class="section">
-        <h2>Cómo usar el score en la práctica: el diferencial entre divisas</h2>
-        <p>La forma correcta de usar el score no es mirarlo de forma aislada, sino <strong>comparar dos divisas entre sí</strong>. El diferencial de scores es la base de las recomendaciones de pares.</p>
-
-        <div class="example-box">
-            <div class="example-title">Ejemplo práctico — AUD/CAD</div>
-            <p style="margin-bottom:0.5rem;color:var(--text-secondary);">Supongamos que el dashboard muestra:</p>
-            <ul style="margin-bottom:0.5rem;">
-                <li><strong>AUD:</strong> Score 68.4 → <span class="badge badge-bull">Fuerte</span></li>
-                <li><strong>CAD:</strong> Score 47.5 → <span class="badge badge-bear">Débil</span></li>
-            </ul>
-            <p style="margin:0;color:var(--text-secondary);">Diferencial: 26.3 puntos → <strong>Confianza Alta</strong>. El diferencial fundamental favorece una lectura LONG en AUD/CAD. Para mayor convicción, el dashboard también muestra el momentum de precio 7d del par: si AUD sube y CAD baja esa semana, la señal es <strong>Confirmada</strong>; si el par cae a pesar del diferencial, aparece como <strong>Divergencia</strong> — señal de esperar estabilización antes de considerar la entrada.</p>
-        </div>
-
-        <p>El umbral de confianza para los diferenciales es:</p>
-        <ul>
-            <li><strong>Mayor o igual a 20 puntos:</strong> Confianza Alta — divergencia fundamental significativa. El dashboard muestra únicamente señales que alcanzan este umbral, validado con datos históricos.</li>
-            <li><strong>Menor a 20 puntos:</strong> El diferencial entre ambas divisas es demasiado estrecho para constituir una señal con sustento estadístico. Los fundamentos no dan una lectura clara de fortaleza relativa; en ese contexto, el análisis técnico y los eventos del calendario cobran mayor relevancia.</li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h2>Los componentes del score: qué pesa más y por qué</h2>
-        <p>El score no es un promedio simple. Cada indicador tiene un peso asignado según su capacidad histórica para explicar los movimientos de precio en el mercado forex. Los componentes más importantes son:</p>
-
-        <h3>1. Tasa de interés (10%)</h3>
-        <p>El diferencial de tasas entre dos países es el motor principal del carry trade, que mueve billones de dólares diariamente. Una divisa con tasa del 4.5% atrae capital frente a una con tasa del 0.1%, lo que genera demanda sostenida. El modelo aplica un <em>haircut de ciclo</em>: si el banco central está en un ciclo de recortes activos, el score de tasa se atenúa proporcionalmente, ya que el mercado descuenta esos recortes futuros antes de que se produzcan.</p>
-
-        <h3>2. FX Performance 1M (8%) — Confirmador</h3>
-        <p>El rendimiento real de la divisa en los últimos 30 días, calculado como un <strong>composite ponderado</strong>: 70% rendimiento mensual puro + 20% rendimiento semanal + 10% rendimiento trimestral. Actúa como <strong>confirmador</strong> (peso 8%), no como driver: cuando los fundamentales son sólidos y el precio confirma la dirección, añade convicción al score.</p>
-        <p><em>Nota:</em> El ajuste de safe haven para CHF y JPY se atenúa automáticamente si su rendimiento FX 1M es negativo. Si el mercado no está comprando esa divisa como refugio en este momento, el modelo no le otorga el premio de safe haven aunque sus fundamentales estructurales sean sólidos.</p>
-
-        <h3>3. Perspectiva del banco central (5%)</h3>
-        <p>Una escala de 0 a 100 que refleja el sesgo del banco central: hawkish (restrictivo, propenso a subir tasas), neutral, o dovish (acomodaticio, propenso a recortar tasas). Este componente captura la <em>dirección</em> de la política monetaria, no solo el nivel actual.</p>
-
-        <h3>4. Posicionamiento COT (6%)</h3>
-        <p>Los datos del Commitment of Traders de la CFTC muestran el posicionamiento neto de los Leveraged Funds (hedge funds y CTAs) en los futuros de divisas de Chicago. Es la huella directa del smart money. Posiciones extremas netas en una dirección son una señal contrarian importante.</p>
-        <p><em>Nota:</em> El modelo aplica automáticamente un <strong>filtro de confirmación de precio</strong>: si el posicionamiento institucional extremo (>30K contratos netos) no está siendo confirmado por el movimiento real del precio en el último mes, el score COT se atenúa proporcionalmente. Esto corrige el retraso inherente del reporte COT (hasta 3 días hábiles) y el hecho de que refleja posiciones acumuladas, no flujos recientes.</p>
-
-        <h3>5. Crecimiento del PIB (6%)</h3>
-        <p>No el nivel del PIB, sino su tasa de crecimiento. Una economía que acelera su crecimiento atrae inversión extranjera directa y de cartera, generando demanda de la divisa local.</p>
-
-        <div class="highlight-box">
-            <p><strong>Nota metodológica:</strong> El modelo normaliza automáticamente el score cuando algún indicador no tiene datos disponibles. Si una divisa no tiene datos de producción industrial publicados, ese peso se redistribuye entre los indicadores disponibles. Por eso el porcentaje de calidad de datos (visible en el dashboard) es un indicador de fiabilidad del score: un 85% o más indica que el análisis es robusto.</p>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>Limitaciones y consideraciones al interpretar el score</h2>
-
-        <h3>Limitación 1: El score no es una señal de entrada intraday</h3>
-        <p>El score fundamental es un <strong>indicador de medio plazo (2-6 semanas)</strong>, no un indicador de corto plazo. Una divisa puede tener un score de 68 (fuerte) y aun así caer durante una sesión por un dato puntual, una declaración de un funcionario de banco central, o un episodio de aversión al riesgo global. El análisis técnico y el contexto de mercado inmediato tienen más peso en horizontes intraday.</p>
-
-        <h3>Limitación 2: La calidad de datos afecta la fiabilidad del score</h3>
-        <p>Si el dashboard indica que una divisa tiene solo el 60% de los indicadores disponibles, el score es menos confiable. Los datos faltantes suelen ser indicadores de publicación trimestral o semestral. En esos casos, el intervalo de confianza (visible en el detalle de cada divisa) es más amplio.</p>
-
-        <h3>Limitación 3: Los scores de momentos distintos no son directamente comparables</h3>
-        <p>El score se recalcula diariamente con los datos más recientes. Un score de 65 de la semana pasada no es directamente comparable con el de hoy si hay datos económicos nuevos publicados. La fecha de actualización de los indicadores críticos es visible en el detalle de cada divisa.</p>
-
-        <h3>Limitación 4: Diferenciales bajos reducen la señal fundamental</h3>
-        <p>Cuando dos divisas tienen scores parecidos (diferencial menor a 12 puntos), los fundamentos no dan una lectura clara de fortaleza relativa. En ese contexto, otros factores como el análisis técnico, los flujos de mercado y los eventos del calendario económico cobran mayor relevancia para los participantes del mercado.</p>
-    </div>
-
-    <div class="section">
-        <h2>El score en contexto de mercado: momentos de risk-on y risk-off</h2>
-        <p>El comportamiento del score fundamental cambia según el contexto macro global. En <strong>entornos risk-on</strong> (apetito por el riesgo elevado), las divisas de alto rendimiento como AUD y NZD tienden a tener scores más altos y la correlación precio-score es más fuerte. En <strong>entornos risk-off</strong> (huida a la seguridad), divisas como CHF y JPY se aprecian por su estatus de refugio seguro incluso si su score fundamental no es el más alto.</p>
-        <p>El modelo incorpora ajustes contextuales para esto (safe haven premium, commodity exposure), pero el entorno macro general siempre forma parte del contexto en que se interpretan los scores. En períodos de crisis o alta volatilidad, el análisis fundamental pierde predictibilidad de corto plazo aunque sigue siendo válido para el medio plazo.</p>
-    </div>
-
-    <div class="section">
-        <h2>Resumen: guía de lectura rápida</h2>
-        <ol>
-            <li><strong>Identifica las divisas en los extremos</strong> — Las que están claramente por encima de 65 y por debajo de 45.</li>
-            <li><strong>Calcula el diferencial</strong> — Score fuerte menos score débil. Mayor o igual a 20 = confianza alta y señal visible en el dashboard.</li>
-            <li><strong>Verifica la calidad de datos</strong> — Preferiblemente 70% o más para ambas divisas del par.</li>
-            <li><strong>Considera el contexto macro</strong> — ¿Estamos en risk-on o risk-off? ¿Hay eventos de calendario próximos que puedan alterar el balance?</li>
-            <li><strong>Usa el análisis técnico para el timing</strong> — El score indica la dirección, el técnico define el momento y el nivel de entrada.</li>
-        </ol>
-    </div>
-
-    
-    <section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
-    <h2>Preguntas frecuentes</h2>
-    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">¿Qué score se considera alcista para una divisa?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">Un score por encima de 65 puntos indica fortaleza fundamental con convicción. Entre 45 y 65 es zona neutral. Por debajo de 45 el sesgo es bajista. Estos umbrales están calibrados al estándar de la industria: el top 25% del universo G8 suele quedar por encima de 65.</p>
-        </div>
-    </div>
-    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">¿Con qué frecuencia se actualiza el score?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">El score se recalcula todos los días a las 09:00 UTC, después de que los datos económicos del día anterior ya están disponibles. Los lunes también se guarda un snapshot semanal que alimenta el backtest prospectivo.</p>
-        </div>
-    </div>
-    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">¿Qué diferencial mínimo de score utiliza el modelo como umbral de señal?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">El modelo usa 12 puntos de diferencial como umbral mínimo para considerar una señal válida. Con menos de 12 puntos la ventaja fundamental no es suficientemente clara para justificar el riesgo.</p>
-        </div>
-    </div>
-    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">¿El score reemplaza al análisis técnico?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">No. El score define el sesgo direccional — a qué divisa favorecer estructuralmente — pero no el timing de entrada ni los niveles exactos. La combinación óptima es usar el score para decidir la dirección y el análisis técnico para el momento de entrada.</p>
-        </div>
-    </div>
-    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <h3 itemprop="name">¿Por qué el score puede diferir del movimiento reciente del precio?</h3>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-            <p itemprop="text">El score mide fundamentos macroeconómicos, pero el dashboard también incorpora el momentum de precio 7d del par (basket-adjusted) como capa complementaria. Es normal que un par con diferencial fundamental alto esté en corrección técnica esa semana: en ese caso el sistema lo marca como <strong>Divergencia</strong> y lo baja en el ranking, sugiriendo esperar estabilización. Cuando el precio confirma la fortaleza fundamental (par neto &gt;+0.40% en 7d), la señal aparece como <strong>Confirmada</strong> — mayor convicción. El score fundamental sigue siendo el ancla de medio plazo (2–6 semanas); el momentum de precio es el validador de corto plazo.</p>
-        </div>
-    </div>
-    </section>
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/guia-score-fortaleza.html#faq","mainEntity":[
-    {
-      "@type": "Question",
-      "name": "¿Qué score se considera alcista para una divisa?",
-      "acceptedAnswer": {"@type": "Answer","text": "Un score por encima de 65 puntos indica fortaleza fundamental con convicción. Entre 45 y 65 es zona neutral. Por debajo de 45 el sesgo es bajista. Estos umbrales están calibrados al estándar de la industria: el top 25% del universo G8 suele quedar por encima de 65."}
-    },
-    {
-      "@type": "Question",
-      "name": "¿Con qué frecuencia se actualiza el score?",
-      "acceptedAnswer": {"@type": "Answer","text": "El score se recalcula todos los días a las 09:00 UTC, después de que los datos económicos del día anterior ya están disponibles. Los lunes también se guarda un snapshot semanal que alimenta el backtest prospectivo."}
-    },
-    {
-      "@type": "Question",
-      "name": "¿Qué diferencial mínimo de score utiliza el modelo como umbral de señal?",
-      "acceptedAnswer": {"@type": "Answer","text": "El modelo usa 12 puntos de diferencial como umbral mínimo para considerar una señal válida. Con menos de 12 puntos la ventaja fundamental no es suficientemente clara para justificar el riesgo."}
-    },
-    {
-      "@type": "Question",
-      "name": "¿El score reemplaza al análisis técnico?",
-      "acceptedAnswer": {"@type": "Answer","text": "No. El score define el sesgo direccional — a qué divisa favorecer estructuralmente — pero no el timing de entrada ni los niveles exactos. La combinación óptima es usar el score para decidir la dirección y el análisis técnico para el momento de entrada."}
-    },
-    {
-      "@type": "Question",
-      "name": "¿Por qué el score puede diferir del movimiento reciente del precio?",
-      "acceptedAnswer": {"@type": "Answer","text": "El score mide fundamentos macroeconómicos, pero el dashboard también incorpora el momentum de precio 7d del par (basket-adjusted) como capa complementaria. Cuando el par está en corrección a pesar del diferencial fundamental, el sistema lo marca como Divergencia. Cuando el precio confirma la fortaleza fundamental (par neto >+0.40% en 7d), la señal aparece como Confirmada. El score fundamental es el ancla de medio plazo (2–6 semanas); el momentum de precio es el validador de corto plazo."}
-    }
-    ]}
-    </script>
-    <h2>Guías relacionadas</h2>
-    <div class="related-links">
-        <a href="guia-cot.html" class="related-card">
-            <div class="rc-label">Guía</div>
-            <div class="rc-title">Qué es el COT y cómo interpretarlo</div>
-        </a>
-        <a href="guia-carry-trade.html" class="related-card">
-            <div class="rc-label">Guía</div>
-            <div class="rc-title">Cómo funciona el carry trade</div>
-        </a>
-        <a href="guia-calendario-economico.html" class="related-card">
-            <div class="rc-label">Guía</div>
-            <div class="rc-title">Cómo usar el calendario económico</div>
-        </a>
-        <a href="glosario-forex.html" class="related-card">
-            <div class="rc-label">Referencia</div>
-            <div class="rc-title">Glosario de términos fundamentales</div>
-        </a>
-    </div>
+  </div>
 </div>
-<footer class="footer">
-    <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:0.5rem;font-size:0.8rem;">
-        <a href="index.html">Dashboard</a>
-        <a href="about.html">Acerca de</a>
-        <a href="publicidad.html">Publicidad</a>
-        <a href="guia-score-fortaleza.html">Guías</a>
-        <a href="terms.html">Términos</a>
-        <a href="privacy.html">Privacidad</a>
-        <a href="data.html">Datos</a>
-        <a href="contact.html">Contacto</a>
-        <a href="en.html" style="padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;">EN</a>
-    </div>
-    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
-</footer>
-<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <a href="index.html"              class="nav-tab" style="text-decoration:none">Resumen de Divisas</a>
+    <a href="index.html?tab=heatmap"  class="nav-tab" style="text-decoration:none">Mapa de Calor</a>
+    <a href="index.html?tab=trends"   class="nav-tab" style="text-decoration:none">Tendencias Históricas</a>
+    <a href="index.html?tab=calendar" class="nav-tab" style="text-decoration:none">Calendario Económico</a>
+    <a href="index.html?tab=alerts"   class="nav-tab" style="text-decoration:none">Mejores Pares</a>
+    <a href="news.html"               class="nav-tab active" style="text-decoration:none">Noticias</a>
+    <a href="carry-trade.html"        class="nav-tab" style="text-decoration:none">Carry Trade</a>
+  </div>
+</div>
+
+<main class="page-wrap" id="main-content" role="main">
+  <div class="page-title-row">
+    <h1 class="page-title">Noticias de Mercado</h1>
+  </div>
+
+  <div class="analysis-section-label">
+    Análisis consolidado AI &middot; 8 divisas principales
+    <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+  </div>
+  <div class="currency-grid" id="currency-grid">
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w55"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w85"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w55"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w70"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w55"></div><div class="sk-line w85"></div></div></div>
+    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w70"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
+  </div>
+</main>
+
+<div class="footer">
+  <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE AN&Aacute;LISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
+  <div style="margin-bottom:1rem;">
+    Metodología: Modelo cuantitativo basado en datos económicos reales &bull; 22 indicadores ponderados en 6 tiers<br>
+    Pol&iacute;tica Monetaria (29%) &bull; Balance Externo (19%) &bull; Crecimiento &amp; Empleo (16%) &bull; Sentimiento de Mercado (21%) &bull; FX Confirmador (11%) &bull; Consumo &amp; Salarios (4%)<br>
+    Datos actualizados diariamente desde FRED (St. Louis Fed), Frankfurter/ECB y CFTC
+  </div>
+  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;text-align:center;">
+    <strong>Aviso Legal:</strong><br>
+    Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
+    Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
+    macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
+    El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
+    Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
+    Fuentes de noticias: FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
+  </div>
+  <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+    <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
+      &copy; <span id="year"></span> Santiago Plá Casuriaga &middot; Global Investing. Todos los derechos reservados.
+    </div>
+    Dashboard v6.5.3
+  </div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:.75rem;font-size:.75rem;color:var(--text-secondary);">
+    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
+    <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
+    <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
+    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
+    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
+    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
+    <a href="en.html" class="lang-switch" style="color:var(--text-secondary);text-decoration:none;padding:.15rem .45rem;border:1px solid var(--border);border-radius:4px;white-space:nowrap;">EN</a>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── TIMESTAMP UTILITIES ───────────────────────────────────────────────────────
+/**
+ * Convert a Unix timestamp (ms) to the user's local time string "HH:MM".
+ * Falls back to "--:--" if ts is falsy or invalid.
+ */
+function tsToLocalTime(ts) {
+  if (!ts || ts <= 0) return '--:--';
+  const ms = ts < 1e10 ? ts * 1000 : ts; // normalise seconds vs ms
+  try {
+    return new Date(ms).toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch (e) { return '--:--'; }
+}
+
+/**
+ * Convert a Unix timestamp (ms) to the user's local short date "DD MMM".
+ * e.g. "06 Mar"
+ */
+function tsToLocalDate(ts) {
+  if (!ts || ts <= 0) return '';
+  const ms = ts < 1e10 ? ts * 1000 : ts;
+  try {
+    return new Date(ms).toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'short'
+    });
+  } catch (e) { return ''; }
+}
+
+/**
+ * Convert a UTC ISO string (from summaries.json updated_utc) to local "HH:MM".
+ */
+function utcIsoToLocalTime(isoStr) {
+  if (!isoStr) return '';
+  try {
+    return new Date(isoStr).toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch (e) { return ''; }
+}
+
+// ── HEADER TIMESTAMP ─────────────────────────────────────────────────────────
+const _now = new Date();
+const _tsH = document.getElementById('ts-header');
+if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+document.getElementById('year').textContent = _now.getFullYear();
+
+const FLAG_CODES = { USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz' };
+function flagImg(cur, px=16) {
+  const code = FLAG_CODES[cur];
+  if (!code) return '';
+  const px2=px*2, h=Math.round(px*0.75), h2=Math.round(px2*0.75);
+  return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;" loading="lazy">`;
+}
+
+const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+const CURRENCY_NAMES = {
+  USD:'Dólar Estadounidense', EUR:'Euro', GBP:'Libra Esterlina',
+  JPY:'Yen Japonés', AUD:'Dólar Australiano', CAD:'Dólar Canadiense',
+  CHF:'Franco Suizo', NZD:'Dólar Neozelandés',
+};
+const SENT_LABELS = { bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto' };
+
+// ── CURRENCY ANALYSIS CARDS ───────────────────────────────────────────────────
+async function loadSummaries() {
+  const grid  = document.getElementById('currency-grid');
+  const updEl = document.getElementById('summaries-updated');
+
+  // Show skeletons
+  grid.innerHTML = CURRENCIES.map(() => `
+    <div class="card-skeleton">
+      <div class="sk-head"><div class="sk-line w40"></div></div>
+      <div class="sk-body">
+        <div class="sk-line w100"></div>
+        <div class="sk-line w85"></div>
+        <div class="sk-line w70"></div>
+      </div>
+    </div>`).join('');
+
+  let summariesOK = false;
+  try {
+    const url = `news-data/summaries.json?v=${Date.now()}`;
+    console.log('[loadSummaries] Fetching:', url);
+    const res = await fetch(url);
+    console.log('[loadSummaries] HTTP status:', res.status);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const data = await res.json();
+    const sums = data.summaries || {};
+    console.log('[loadSummaries] Divisas recibidas:', Object.keys(sums));
+
+    const hasData = CURRENCIES.some(c => sums[c] && sums[c].articles_count > 0);
+    if (!hasData) throw new Error('summaries.json sin datos de articulos');
+
+    // Show the update time converted to user's local timezone
+    if (updEl) {
+      const localTime = data.updated_utc
+        ? utcIsoToLocalTime(data.updated_utc)
+        : (data.updated_label || '');
+      updEl.textContent = localTime ? `· ${localTime} (hora local)` : '';
+    }
+
+    grid.innerHTML = '';
+    CURRENCIES.forEach(cur => {
+      const s = sums[cur];
+      grid.innerHTML += s ? renderCurrencyCard(cur, s) : renderSkeletonCard();
+    });
+
+    summariesOK = true;
+    console.info('[loadSummaries] OK — datos AI cargados desde summaries.json');
+
+  } catch (err) {
+    console.warn('[loadSummaries] summaries.json no disponible:', err.message);
+  }
+
+  if (!summariesOK) {
+    if (updEl) updEl.textContent = '· sin datos disponibles';
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">
+      &#9888;&#65039; Análisis no disponible. El archivo <code>summaries.json</code> no existe en el repositorio.<br><br>
+      Ejecuta el workflow de GitHub Actions para generarlo, o espera al próximo ciclo automático.
+    </div>`;
+  }
+}
+
+function renderCurrencyCard(cur, s) {
+  const sent      = (s.sentiment || 'neut').toLowerCase();
+  const conf      = Math.min(100, Math.max(0, parseInt(s.confidence) || 0));
+  const analysis  = s.analysis  || 'Sin análisis disponible.';
+  const drivers   = Array.isArray(s.drivers) ? s.drivers : [];
+  const upcoming  = s.upcoming_event || null;
+  const sources   = Array.isArray(s.sources) ? s.sources.join(' · ') : '—';
+  const count     = s.articles_count || 0;
+  const isAI      = s.ai_generated !== false;
+  const fullName  = CURRENCY_NAMES[cur] || cur;
+
+  // ── LOCAL TIME from latest_ts (Unix ms) ──────────────────────────────────
+  const localTime = tsToLocalTime(s.latest_ts);
+  const localDate = tsToLocalDate(s.latest_ts);
+
+  const driversHtml = drivers.length
+    ? `<div class="drivers">${drivers.map(d=>`<span class="driver-chip">${esc(d)}</span>`).join('')}</div>`
+    : '';
+
+  const upcomingHtml = upcoming
+    ? `<div class="card-event"><span class="ev-icon">&#128197;</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
+    : '';
+
+  // Build a tooltip showing both local time and the original UTC reference
+  const timeTitle = s.latest_ts
+    ? `UTC: ${new Date(s.latest_ts < 1e10 ? s.latest_ts * 1000 : s.latest_ts).toISOString().substr(11,5)}`
+    : '';
+
+  return `<div class="cur-card ${sent}${count===0?' no-data':''}">
+    <div class="card-head">
+      <div class="cur-id">
+        ${flagImg(cur,20)}
+        <span class="cur-code">${esc(cur)}</span>
+        <span class="cur-full-name">${esc(fullName)}</span>
+      </div>
+      <div class="head-right">
+        <span class="src-count">${count} art.</span>
+        <span class="sent-badge ${sent}">${esc(SENT_LABELS[sent]||'Neutral')}</span>
+      </div>
+    </div>
+    <div class="conf-bar-wrap">
+      <div class="conf-track"><div class="conf-fill ${sent}" style="width:${conf}%"></div></div>
+      <span class="conf-label">${conf}%</span>
+    </div>
+    <div class="card-body">
+      ${count===0
+        ? `<div class="no-data-msg">Sin cobertura en las últimas 72h.</div>`
+        : `<p class="analysis-text">${esc(analysis)}</p>${driversHtml}${upcomingHtml}`}
+    </div>
+    <div class="card-foot">
+      <span class="foot-sources">${esc(sources)}</span>
+      <span style="display:flex;align-items:center;gap:.35rem;">
+        ${isAI?'<span class="foot-ai">AI</span>':''}
+        <span class="foot-ts" title="${esc(timeTitle)}">${localDate ? localDate + ' ' : ''}${localTime}</span>
+      </span>
+    </div>
+  </div>`;
+}
+
+function renderSkeletonCard() {
+  return `<div class="card-skeleton">
+    <div class="sk-head"><div class="sk-line w40"></div></div>
+    <div class="sk-body">
+      <div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div>
+    </div>
+  </div>`;
+}
+
+// ── ARRANQUE ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadSummaries();
+});
+</script>
 <!-- GDPR Banner (shared) -->
 <style>
 #gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
@@ -419,20 +718,8 @@
 #gdpr-accept{background:#2e75b6;color:#fff;}
 #gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
 
-        /* ── Header unified ── */
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
-        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; }
-        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
-        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
-        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
-        
         /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; }
+        .nav-dropdown { position: relative; list-style: none; display: inline-block; }
         .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
         .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
             border-left: 4px solid transparent; border-right: 4px solid transparent;
@@ -451,21 +738,11 @@
             left: -8px; right: -8px; height: 0.75rem; }
         .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
             color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+            text-decoration: none; white-space: nowrap;
+            transition: background 0.15s, color 0.15s; }
         .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
             color: var(--text-primary) !important; }
         .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        
-        /* ── FAQ Section ── */
-        .faq-section { margin: 3rem 0 2rem; }
-        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
-            color: var(--text-primary); }
-        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
-        .faq-item:last-child { border-bottom: 1px solid var(--border); }
-        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
-            margin: 0 0 0.6rem; line-height: 1.4; }
-        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
-            margin: 0; line-height: 1.7; }
         </style>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
 <p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
@@ -497,5 +774,13 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 <strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
 · <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var activeTab = document.querySelector('.nav-tab.active');
+    if (activeTab) {
+        activeTab.scrollIntoView({ inline: 'center', block: 'nearest' });
+    }
+});
+</script>
 </body>
 </html>

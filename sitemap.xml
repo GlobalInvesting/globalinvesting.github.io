@@ -1,786 +1,124 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/news.html">
-    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/news.html">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Noticias Forex en Tiempo Real | Global Investing</title>
-<meta name="description" content="Noticias forex en tiempo real con análisis AI para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD. Titulares fundamentales actualizados 3 veces al día.">
-<meta name="keywords" content="noticias forex, análisis fundamental forex, USD EUR GBP JPY, noticias divisas, banco central, fed, bce, boe, boj, trading forex, tipo de cambio, mercado de divisas">
-<meta name="author" content="Santiago Plá Casuriaga · Global Investing">
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<link rel="canonical" href="https://globalinvesting.github.io/news.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Global Investing · Análisis Fundamental Forex">
-<meta property="og:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
-<meta property="og:description" content="Feed de noticias forex con análisis AI. Cobertura de USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD. Actualizado 3 veces al día.">
-<meta property="og:url" content="https://globalinvesting.github.io/news.html">
-<meta property="og:image" content="https://globalinvesting.github.io/assets/og-news.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:locale" content="es_ES">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@GlobalInvesting">
-<meta name="twitter:title" content="Noticias Forex en Tiempo Real · Análisis Fundamental">
-<meta name="twitter:description" content="Feed de noticias forex con análisis AI. USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD.">
-<meta name="twitter:image" content="https://globalinvesting.github.io/assets/og-news.png">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebPage",
-      "@id": "https://globalinvesting.github.io/news.html",
-      "url": "https://globalinvesting.github.io/news.html",
-      "name": "Noticias Forex en Tiempo Real · Análisis Fundamental",
-      "description": "Feed de noticias forex en tiempo real con análisis fundamental AI para las 8 divisas principales.",
-      "inLanguage": "es",
-      "isPartOf": { "@id": "https://globalinvesting.github.io/" },
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Dashboard", "item": "https://globalinvesting.github.io/" },
-          { "@type": "ListItem", "position": 2, "name": "Noticias", "item": "https://globalinvesting.github.io/news.html" }
-        ]
-      }
-    },
-    {
-      "@type": "Dataset",
-      "@id": "https://globalinvesting.github.io/news.html#dataset",
-      "name": "Análisis de Sentimiento Forex — Noticias en Tiempo Real",
-      "description": "Resúmenes generados por IA con análisis de sentimiento para USD, EUR, GBP, JPY, AUD, CAD, CHF y NZD, actualizados diariamente desde FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex y MyFXBook.",
-      "url": "https://globalinvesting.github.io/news.html",
-      "inLanguage": "es",
-      "license": "https://github.com/GlobalInvesting/globalinvesting.github.io/blob/main/LICENSE",
-      "isAccessibleForFree": true,
-      "creator": {
-        "@type": "Organization",
-        "@id": "https://globalinvesting.github.io/#organization",
-        "name": "Global Investing"
-      },
-      "distribution": {
-        "@type": "DataDownload",
-        "encodingFormat": "application/json",
-        "contentUrl": "https://globalinvesting.github.io/news-data/summaries.json"
-      },
-      "temporalCoverage": "P1D",
-      "variableMeasured": ["Sentimiento de mercado", "Confianza analítica", "Drivers fundamentales por divisa"]
-    }
-  ]
-}
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; }
-
-  :root {
-    --bg-primary:   #0b0e14;
-    --bg-secondary: #13171f;
-    --bg-card:      #1a1f2e;
-    --bg-elevated:  #20253a;
-    --text-primary:   #e1e4e8;
-    --text-secondary: #8b949e;
-    --text-tertiary:  #6e7681;
-    --text-dim:       #6b7585;
-    --border:       #30363d;
-    --border-hover: #484f58;
-    --blue:         #1e88e5;
-    --blue-dim:     rgba(30,136,229,0.1);
-    --green:        #26a69a;
-    --green-strong: #26a69a;
-    --green-dim:    rgba(38,166,154,0.12);
-    --red:          #ef5350;
-    --red-dim:      rgba(239,83,80,0.12);
-    --orange:       #e0a020;
-    --orange-dim:   rgba(224,160,32,0.08);
-  }
-
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1.25rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-content {
-            max-width: 1800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--text-primary);
-        }
-
-        .brand-subtitle {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .header-info {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .status-live {
-            width: 8px;
-            height: 8px;
-            background: var(--green-strong);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .status-loading {
-            width: 8px;
-            height: 8px;
-            background: var(--orange);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .page-nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .page-nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .page-nav-links a:hover {
-            color: var(--text-primary);
-        }
-        .lang-switch {
-            padding: 0.22rem 0.55rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.75rem !important;
-            margin-left: 0.5rem;
-            color: var(--text-secondary);
-        }
-        .lang-switch:hover {
-            border-color: var(--blue);
-            color: var(--blue) !important;
-        }
-
-        .nav-tabs-wrap {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-        .nav-tabs {
-            padding: 0 2rem;
-            display: flex;
-            gap: 0.5rem;
-            max-width: 1800px;
-            margin: 0 auto;
-            overflow-x: auto;
-        }
-
-        .nav-tab {
-            padding: 1rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-tab:hover {
-            color: var(--text-primary);
-        }
-
-        .nav-tab.active {
-            color: var(--text-primary);
-            border-bottom-color: var(--blue);
-        }
-
-        @media (max-width: 768px) {
-    .header-content {
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
-    }
-
-    .page-nav-links {
-        flex-wrap: nowrap;
-        gap: 0.75rem;
-    }
-
-    .page-nav-links a {
-        white-space: nowrap;
-        font-size: 0.8rem;
-    }
-
-    .header-info {
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
-        font-size: 0.75rem;
-    }
-}
-
-  .page-wrap { max-width: 1800px; margin: 0 auto; padding: 2rem; }
-  .page-title-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
-    flex-wrap: wrap; gap: 0.75rem;
-  }
-  .page-title { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text-primary); }
-
-  .analysis-section-label {
-    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-dim); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;
-  }
-  .analysis-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 0.75rem; }
-
-  .cur-card {
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
-    overflow: hidden; transition: border-color 0.2s, transform 0.15s;
-  }
-  .cur-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
-  .cur-card.bull  { border-left: 3px solid var(--green); }
-  .cur-card.bear  { border-left: 3px solid var(--red); }
-  .cur-card.neut  { border-left: 3px solid var(--text-dim); }
-  .cur-card.mixed { border-left: 3px solid var(--orange); }
-
-  .card-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.65rem 0.9rem 0.55rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
-  }
-  .cur-id { display: flex; align-items: center; gap: 0.45rem; }
-  .cur-code { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.04em; }
-  .cur-full-name { font-size: 0.63rem; color: var(--text-dim); font-weight: 400; margin-left: 0.1rem; }
-  .head-right { display: flex; align-items: center; gap: 0.6rem; }
-
-  .sent-badge {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
-    text-transform: uppercase; padding: 0.18rem 0.5rem; border-radius: 3px;
-  }
-  .sent-badge.bull  { background: var(--green-dim); border: 1px solid rgba(38,166,154,.3); color: var(--green); }
-  .sent-badge.bear  { background: var(--red-dim);   border: 1px solid rgba(239,83,80,.3);  color: var(--red); }
-  .sent-badge.neut  { background: rgba(107,117,133,.1); border: 1px solid rgba(107,117,133,.25); color: var(--text-dim); }
-  .sent-badge.mixed { background: var(--orange-dim); border: 1px solid rgba(224,160,32,.25); color: var(--orange); }
-
-  .src-count { font-size: 0.6rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
-
-  .conf-bar-wrap { padding: 0.5rem 0.9rem 0; display: flex; align-items: center; gap: 0.6rem; }
-  .conf-track { flex: 1; height: 3px; background: rgba(48,54,61,.9); border-radius: 2px; overflow: hidden; }
-  .conf-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
-  .conf-fill.bull  { background: var(--green); }
-  .conf-fill.bear  { background: var(--red); }
-  .conf-fill.neut  { background: var(--text-dim); }
-  .conf-fill.mixed { background: linear-gradient(90deg, var(--green) 50%, var(--red) 50%); }
-  .conf-label { font-size: 0.6rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); width: 30px; text-align: right; flex-shrink: 0; }
-
-  .card-body { padding: 0.65rem 0.9rem 0.7rem; }
-  .analysis-text { font-size: 0.775rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 0.7rem; }
-
-  .drivers { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.65rem; }
-  .driver-chip {
-    font-size: 0.58rem; font-weight: 600; padding: 0.18rem 0.45rem; border-radius: 3px;
-    background: var(--bg-elevated); border: 1px solid var(--border);
-    color: var(--text-secondary); letter-spacing: 0.03em; text-transform: uppercase;
-  }
-
-  .card-event {
-    display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem;
-    background: var(--blue-dim); border: 1px solid rgba(30,136,229,.15);
-    border-radius: 4px; font-size: 0.68rem; color: var(--text-secondary);
-  }
-  .card-event .ev-icon  { font-size: 0.75rem; flex-shrink: 0; }
-  .card-event .ev-label { color: var(--blue); font-weight: 600; margin-right: 0.2rem; }
-
-  .card-foot {
-    padding: 0.4rem 0.9rem; background: rgba(0,0,0,.15);
-    border-top: 1px solid rgba(48,54,61,.5);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .foot-sources { font-size: 0.58rem; color: var(--text-dim); }
-  .foot-ts { font-size: 0.58rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
-  .foot-ai { font-size: 0.52rem; font-weight: 700; color: var(--blue); border: 1px solid rgba(30,136,229,.3); border-radius: 2px; padding: 0.05rem 0.22rem; }
-
-  .card-skeleton { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; border-left: 3px solid var(--border); }
-  .sk-head { padding: 0.65rem 0.9rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
-  .sk-body { padding: 0.65rem 0.9rem 0.7rem; }
-  .sk-line {
-    height: 10px; border-radius: 3px; margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,.04) 50%, var(--bg-elevated) 75%);
-    background-size: 200% 100%; animation: shimmer 1.6s infinite;
-  }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .sk-line.w40 { width: 40%; }
-  .sk-line.w70 { width: 70%; }
-  .sk-line.w55 { width: 55%; }
-  .sk-line.w85 { width: 85%; }
-  .sk-line.w100 { width: 100%; }
-
-  .cur-card.no-data { opacity: 0.5; }
-  .no-data-msg { font-size: 0.72rem; color: var(--text-dim); text-align: center; padding: 1.2rem 0.9rem; }
-
-  .ai-tag {
-    font-size: 0.52rem; font-weight: 700; color: var(--blue);
-    border: 1px solid rgba(30,136,229,.35); border-radius: 2px;
-    padding: 0.05rem 0.22rem; vertical-align: middle;
-  }
-
-  .footer { margin-top: 4rem; padding: 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; }
-
-  @media (max-width: 768px) {
-    .page-wrap { padding: 0.75rem 0.75rem 3rem; }
-    .page-title-row { margin-bottom: 1rem; padding-bottom: 0.6rem; }
-    .page-title { font-size: 0.9rem; }
-    .currency-grid { grid-template-columns: 1fr; gap: 0.6rem; }
-    .analysis-text { font-size: 0.73rem; }
-  }
-</style>
-    <link rel="alternate" type="application/rss+xml" title="Noticias Forex — Global Investing" href="https://globalinvesting.github.io/feed.xml">
-    <link rel="alternate" type="application/rss+xml" title="Análisis Fundamental AI — Global Investing" href="https://globalinvesting.github.io/feed-analysis.xml">
-    <link rel="alternate" type="application/rss+xml" title="Scores de Fortaleza G8 — Global Investing" href="https://globalinvesting.github.io/feed-scores.xml">
-</head>
-<body>
-    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-
-<div class="header">
-  <div class="header-content">
-    <div style="display:flex;flex-direction:row;align-items:center;">
-      <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-      <div style="display:flex;flex-direction:column;justify-content:center;">
-        <div class="brand-title">Global Investing</div>
-        <div class="brand-subtitle">Forex Fundamental Dashboard</div>
-      </div>
-    </div>
-    <div class="page-nav-links">
-      <a href="about.html">Acerca de</a>
-      <a href="publicidad.html">Publicidad</a>
-      <div class="nav-dropdown">
-      <a href="guia-score-fortaleza.html">Guías</a>
-      <div class="nav-dropdown-menu">
-          <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-          <a href="guia-carry-trade.html">Carry Trade</a>
-          <a href="guia-cot.html">Reporte COT</a>
-          <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-          <a href="guia-calendario-economico.html">Calendario Económico</a>
-          <a href="guia-pips.html">Pips y Lotaje</a>
-          <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-          <a href="glosario-forex.html">Glosario Forex</a>
-      </div>
-    </div>
-      <a href="contact.html">Contacto</a>
-      <a href="en.html" class="lang-switch">EN</a>
-    </div>
-    <div class="header-info">
-      <div class="info-item">
-        <div class="status-live"></div>
-        <span>Actualizado <span id="ts-header" style="color:var(--text-primary);font-weight:500;"></span> <span style="color:var(--text-tertiary);">(hora local)</span></span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="nav-tabs-wrap">
-  <div class="nav-tabs">
-    <a href="index.html"              class="nav-tab" style="text-decoration:none">Resumen de Divisas</a>
-    <a href="index.html?tab=heatmap"  class="nav-tab" style="text-decoration:none">Mapa de Calor</a>
-    <a href="index.html?tab=trends"   class="nav-tab" style="text-decoration:none">Tendencias Históricas</a>
-    <a href="index.html?tab=calendar" class="nav-tab" style="text-decoration:none">Calendario Económico</a>
-    <a href="index.html?tab=alerts"   class="nav-tab" style="text-decoration:none">Mejores Pares</a>
-    <a href="news.html"               class="nav-tab active" style="text-decoration:none">Noticias</a>
-    <a href="carry-trade.html"        class="nav-tab" style="text-decoration:none">Carry Trade</a>
-  </div>
-</div>
-
-<main class="page-wrap" id="main-content" role="main">
-  <div class="page-title-row">
-    <h1 class="page-title">Noticias de Mercado</h1>
-  </div>
-
-  <div class="analysis-section-label">
-    Análisis consolidado AI &middot; 8 divisas principales
-    <span id="summaries-updated" style="font-size:.6rem;color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;"></span>
-  </div>
-  <div class="currency-grid" id="currency-grid">
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w55"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w85"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w70"></div><div class="sk-line w55"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w85"></div><div class="sk-line w100"></div><div class="sk-line w70"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w100"></div><div class="sk-line w55"></div><div class="sk-line w85"></div></div></div>
-    <div class="card-skeleton"><div class="sk-head"><div class="sk-line w40"></div></div><div class="sk-body"><div class="sk-line w70"></div><div class="sk-line w100"></div><div class="sk-line w55"></div></div></div>
-  </div>
-</main>
-
-<div class="footer">
-  <div style="font-weight:600;margin-bottom:.5rem;">DASHBOARD DE AN&Aacute;LISIS FUNDAMENTAL FOREX &mdash; DATA-DRIVEN</div>
-  <div style="margin-bottom:1rem;">
-    Metodología: Modelo cuantitativo basado en datos económicos reales &bull; 22 indicadores ponderados en 6 tiers<br>
-    Pol&iacute;tica Monetaria (29%) &bull; Balance Externo (19%) &bull; Crecimiento &amp; Empleo (16%) &bull; Sentimiento de Mercado (21%) &bull; FX Confirmador (11%) &bull; Consumo &amp; Salarios (4%)<br>
-    Datos actualizados diariamente desde FRED (St. Louis Fed), Frankfurter/ECB y CFTC
-  </div>
-  <div style="background:var(--bg-card);padding:1rem;border-radius:6px;border:1px solid var(--border);margin-top:1rem;font-size:.8125rem;line-height:1.6;text-align:center;">
-    <strong>Aviso Legal:</strong><br>
-    Este dashboard es una herramienta de análisis cuantitativo con fines informativos y educativos.
-    Los scores de fortaleza, rankings y recomendaciones de pares son cálculos basados en datos
-    macroeconómicos públicos y no constituyen asesoramiento financiero ni señales de trading.
-    El trading de divisas (forex) conlleva riesgos significativos de pérdida de capital.
-    Consulte con un asesor financiero certificado antes de tomar decisiones de inversión.
-    Fuentes de noticias: FXStreet, ForexLive, Reuters Business, Investing.com, DailyForex, InstaForex, ActionForex, MyFXBook.
-  </div>
-  <div style="text-align:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-    <div style="margin-top:1rem;font-size:.75rem;color:var(--text-tertiary);">
-      &copy; <span id="year"></span> Santiago Plá Casuriaga &middot; Global Investing. Todos los derechos reservados.
-    </div>
-    Dashboard v6.5.3
-  </div>
-  <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:.75rem;font-size:.75rem;color:var(--text-secondary);">
-    <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
-    <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
-    <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
-    <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
-    <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
-    <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
-    <a href="en.html" class="lang-switch" style="color:var(--text-secondary);text-decoration:none;padding:.15rem .45rem;border:1px solid var(--border);border-radius:4px;white-space:nowrap;">EN</a>
-  </div>
-</div>
-
-<script>
-'use strict';
-
-const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-// ── TIMESTAMP UTILITIES ───────────────────────────────────────────────────────
-/**
- * Convert a Unix timestamp (ms) to the user's local time string "HH:MM".
- * Falls back to "--:--" if ts is falsy or invalid.
- */
-function tsToLocalTime(ts) {
-  if (!ts || ts <= 0) return '--:--';
-  const ms = ts < 1e10 ? ts * 1000 : ts; // normalise seconds vs ms
-  try {
-    return new Date(ms).toLocaleTimeString('es-ES', {
-      hour: '2-digit', minute: '2-digit', hour12: false
-    });
-  } catch (e) { return '--:--'; }
-}
-
-/**
- * Convert a Unix timestamp (ms) to the user's local short date "DD MMM".
- * e.g. "06 Mar"
- */
-function tsToLocalDate(ts) {
-  if (!ts || ts <= 0) return '';
-  const ms = ts < 1e10 ? ts * 1000 : ts;
-  try {
-    return new Date(ms).toLocaleDateString('es-ES', {
-      day: '2-digit', month: 'short'
-    });
-  } catch (e) { return ''; }
-}
-
-/**
- * Convert a UTC ISO string (from summaries.json updated_utc) to local "HH:MM".
- */
-function utcIsoToLocalTime(isoStr) {
-  if (!isoStr) return '';
-  try {
-    return new Date(isoStr).toLocaleTimeString('es-ES', {
-      hour: '2-digit', minute: '2-digit', hour12: false
-    });
-  } catch (e) { return ''; }
-}
-
-// ── HEADER TIMESTAMP ─────────────────────────────────────────────────────────
-const _now = new Date();
-const _tsH = document.getElementById('ts-header');
-if (_tsH) _tsH.textContent = _now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
-document.getElementById('year').textContent = _now.getFullYear();
-
-const FLAG_CODES = { USD:'us',EUR:'eu',GBP:'gb',JPY:'jp',AUD:'au',CAD:'ca',CHF:'ch',NZD:'nz' };
-function flagImg(cur, px=16) {
-  const code = FLAG_CODES[cur];
-  if (!code) return '';
-  const px2=px*2, h=Math.round(px*0.75), h2=Math.round(px2*0.75);
-  return `<img src="https://flagcdn.com/${px}x${h}/${code}.png" srcset="https://flagcdn.com/${px2}x${h2}/${code}.png 2x" width="${px}" height="${h}" alt="${cur}" style="vertical-align:middle;border-radius:1px;flex-shrink:0;" loading="lazy">`;
-}
-
-const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-const CURRENCY_NAMES = {
-  USD:'Dólar Estadounidense', EUR:'Euro', GBP:'Libra Esterlina',
-  JPY:'Yen Japonés', AUD:'Dólar Australiano', CAD:'Dólar Canadiense',
-  CHF:'Franco Suizo', NZD:'Dólar Neozelandés',
-};
-const SENT_LABELS = { bull:'Alcista', bear:'Bajista', neut:'Neutral', mixed:'Mixto' };
-
-// ── CURRENCY ANALYSIS CARDS ───────────────────────────────────────────────────
-async function loadSummaries() {
-  const grid  = document.getElementById('currency-grid');
-  const updEl = document.getElementById('summaries-updated');
-
-  // Show skeletons
-  grid.innerHTML = CURRENCIES.map(() => `
-    <div class="card-skeleton">
-      <div class="sk-head"><div class="sk-line w40"></div></div>
-      <div class="sk-body">
-        <div class="sk-line w100"></div>
-        <div class="sk-line w85"></div>
-        <div class="sk-line w70"></div>
-      </div>
-    </div>`).join('');
-
-  let summariesOK = false;
-  try {
-    const url = `news-data/summaries.json?v=${Date.now()}`;
-    console.log('[loadSummaries] Fetching:', url);
-    const res = await fetch(url);
-    console.log('[loadSummaries] HTTP status:', res.status);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    const data = await res.json();
-    const sums = data.summaries || {};
-    console.log('[loadSummaries] Divisas recibidas:', Object.keys(sums));
-
-    const hasData = CURRENCIES.some(c => sums[c] && sums[c].articles_count > 0);
-    if (!hasData) throw new Error('summaries.json sin datos de articulos');
-
-    // Show the update time converted to user's local timezone
-    if (updEl) {
-      const localTime = data.updated_utc
-        ? utcIsoToLocalTime(data.updated_utc)
-        : (data.updated_label || '');
-      updEl.textContent = localTime ? `· ${localTime} (hora local)` : '';
-    }
-
-    grid.innerHTML = '';
-    CURRENCIES.forEach(cur => {
-      const s = sums[cur];
-      grid.innerHTML += s ? renderCurrencyCard(cur, s) : renderSkeletonCard();
-    });
-
-    summariesOK = true;
-    console.info('[loadSummaries] OK — datos AI cargados desde summaries.json');
-
-  } catch (err) {
-    console.warn('[loadSummaries] summaries.json no disponible:', err.message);
-  }
-
-  if (!summariesOK) {
-    if (updEl) updEl.textContent = '· sin datos disponibles';
-    grid.innerHTML = `<div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-dim);font-size:.82rem;">
-      &#9888;&#65039; Análisis no disponible. El archivo <code>summaries.json</code> no existe en el repositorio.<br><br>
-      Ejecuta el workflow de GitHub Actions para generarlo, o espera al próximo ciclo automático.
-    </div>`;
-  }
-}
-
-function renderCurrencyCard(cur, s) {
-  const sent      = (s.sentiment || 'neut').toLowerCase();
-  const conf      = Math.min(100, Math.max(0, parseInt(s.confidence) || 0));
-  const analysis  = s.analysis  || 'Sin análisis disponible.';
-  const drivers   = Array.isArray(s.drivers) ? s.drivers : [];
-  const upcoming  = s.upcoming_event || null;
-  const sources   = Array.isArray(s.sources) ? s.sources.join(' · ') : '—';
-  const count     = s.articles_count || 0;
-  const isAI      = s.ai_generated !== false;
-  const fullName  = CURRENCY_NAMES[cur] || cur;
-
-  // ── LOCAL TIME from latest_ts (Unix ms) ──────────────────────────────────
-  const localTime = tsToLocalTime(s.latest_ts);
-  const localDate = tsToLocalDate(s.latest_ts);
-
-  const driversHtml = drivers.length
-    ? `<div class="drivers">${drivers.map(d=>`<span class="driver-chip">${esc(d)}</span>`).join('')}</div>`
-    : '';
-
-  const upcomingHtml = upcoming
-    ? `<div class="card-event"><span class="ev-icon">&#128197;</span><span><span class="ev-label">Próximo:</span>${esc(upcoming)}</span></div>`
-    : '';
-
-  // Build a tooltip showing both local time and the original UTC reference
-  const timeTitle = s.latest_ts
-    ? `UTC: ${new Date(s.latest_ts < 1e10 ? s.latest_ts * 1000 : s.latest_ts).toISOString().substr(11,5)}`
-    : '';
-
-  return `<div class="cur-card ${sent}${count===0?' no-data':''}">
-    <div class="card-head">
-      <div class="cur-id">
-        ${flagImg(cur,20)}
-        <span class="cur-code">${esc(cur)}</span>
-        <span class="cur-full-name">${esc(fullName)}</span>
-      </div>
-      <div class="head-right">
-        <span class="src-count">${count} art.</span>
-        <span class="sent-badge ${sent}">${esc(SENT_LABELS[sent]||'Neutral')}</span>
-      </div>
-    </div>
-    <div class="conf-bar-wrap">
-      <div class="conf-track"><div class="conf-fill ${sent}" style="width:${conf}%"></div></div>
-      <span class="conf-label">${conf}%</span>
-    </div>
-    <div class="card-body">
-      ${count===0
-        ? `<div class="no-data-msg">Sin cobertura en las últimas 72h.</div>`
-        : `<p class="analysis-text">${esc(analysis)}</p>${driversHtml}${upcomingHtml}`}
-    </div>
-    <div class="card-foot">
-      <span class="foot-sources">${esc(sources)}</span>
-      <span style="display:flex;align-items:center;gap:.35rem;">
-        ${isAI?'<span class="foot-ai">AI</span>':''}
-        <span class="foot-ts" title="${esc(timeTitle)}">${localDate ? localDate + ' ' : ''}${localTime}</span>
-      </span>
-    </div>
-  </div>`;
-}
-
-function renderSkeletonCard() {
-  return `<div class="card-skeleton">
-    <div class="sk-head"><div class="sk-line w40"></div></div>
-    <div class="sk-body">
-      <div class="sk-line w100"></div><div class="sk-line w85"></div><div class="sk-line w70"></div>
-    </div>
-  </div>`;
-}
-
-// ── ARRANQUE ──────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  loadSummaries();
-});
-</script>
-<!-- GDPR Banner (shared) -->
-<style>
-#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
-#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
-#gdpr-banner a{color:#5b9bd5;}
-#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
-#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
-#gdpr-accept{background:#2e75b6;color:#fff;}
-#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-
-        /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; list-style: none; display: inline-block; }
-        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
-            border-left: 4px solid transparent; border-right: 4px solid transparent;
-            border-top: 4px solid currentColor; transition: transform 0.2s; }
-        .nav-dropdown:hover > a::after,
-        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
-        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
-            right: 0; min-width: 220px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.75rem 0 0.4rem; z-index: 200;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-        .nav-dropdown:hover .nav-dropdown-menu,
-        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-        /* Puente invisible que cubre el gap entre trigger y menú */
-        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
-            left: -8px; right: -8px; height: 0.75rem; }
-        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
-            color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap;
-            transition: background 0.15s, color 0.15s; }
-        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
-            color: var(--text-primary) !important; }
-        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        </style>
-<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
-<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
-<div class="gdpr-btns">
-<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
-<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
-</div></div>
-<script>
-(function(){
-var K='gdpr_consent_v1';
-function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
-function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
-function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
-// Event delegation — funciona aunque scripts externos re-renderizen el DOM
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
-  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
-},true);
-document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
-function init(){
-  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
-  var b=document.getElementById('gdpr-banner');
-  if(b){b.hidden=false;b.style.display='flex';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
-}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
-})();
-</script>
-<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
-· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
-</footer>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var activeTab = document.querySelector('.nav-tab.active');
-    if (activeTab) {
-        activeTab.scrollIntoView({ inline: 'center', block: 'nearest' });
-    }
-});
-</script>
-</body>
-</html>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://globalinvesting.github.io/</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/index.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/news.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/carry-trade.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/about.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-score-fortaleza.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-cot.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-calendario-economico.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-bancos-centrales.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-carry-trade.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/tecnico-vs-fundamental.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/glosario-forex.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/en.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-pips.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/advertise.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/publicidad.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/contact.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/terms.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/privacy.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/data.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>
