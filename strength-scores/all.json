@@ -11888,10 +11888,10 @@
       "date": "2026-03-27",
       "scores": {
         "USD": {
-          "score": 60.8,
+          "score": 60.7,
           "dataQuality": 1.0,
           "bcOutlook": "Neutral",
-          "baseScore": 57.09,
+          "baseScore": 56.99,
           "contextualAdj": {
             "safe_haven": 0.0,
             "commodity": 0.0,
@@ -11928,7 +11928,7 @@
             "wageGrowth": 2.0,
             "manufacturingPMI": 2.43,
             "servicesPMI": 3.7,
-            "cotPositioning": 2.5508,
+            "cotPositioning": 2.4463,
             "consumerConfidence": 0.0,
             "businessConfidence": 0.0,
             "economicSurprise": 2.02,
@@ -11966,7 +11966,7 @@
         "EUR": {
           "score": 47.0,
           "dataQuality": 1.0,
-          "bcOutlook": "Dovish",
+          "bcOutlook": "Neutral",
           "baseScore": 48.89,
           "contextualAdj": {
             "safe_haven": 0.13,
@@ -12016,7 +12016,7 @@
             "economicSurprise": 46.8,
             "rateMomentum": -0.5,
             "interestRate": 2.15,
-            "bcOutlook": "Dovish",
+            "bcOutlook": "Neutral",
             "calendarDates": {
               "inflation": "2026-03-27",
               "manufacturingPMI": "2026-03-27",
@@ -12028,7 +12028,7 @@
             }
           },
           "meta": {
-            "bcOutlook": "Dovish",
+            "bcOutlook": "Neutral",
             "rateMomentum": -0.5,
             "interestRate": 2.15,
             "esi": 46.8,
@@ -12256,10 +12256,10 @@
           }
         },
         "CAD": {
-          "score": 51.9,
+          "score": 52.7,
           "dataQuality": 1.0,
           "bcOutlook": "Neutral",
-          "baseScore": 52.38,
+          "baseScore": 52.6,
           "contextualAdj": {
             "safe_haven": 0.0,
             "commodity": 0.53,
@@ -12271,14 +12271,14 @@
             "inflation_stability": 0.0,
             "yield_curve": 0.0,
             "stagflation": 0.0,
-            "cot_contrarian": -0.79,
+            "cot_contrarian": -0.17,
             "low_rate_sh": 0.0,
             "cot_momentum_div": 0.0,
             "commodity_momentum": -0.27,
             "stale_score": 0.0,
             "delta_score": 0.0,
             "rate_expectation": 0.0,
-            "totalCapped": -0.52
+            "totalCapped": 0.09
           },
           "contributions": {
             "interestRate": 6.1208,
@@ -12296,7 +12296,7 @@
             "wageGrowth": 2.0,
             "manufacturingPMI": 2.1,
             "servicesPMI": 1.7,
-            "cotPositioning": 0.9764,
+            "cotPositioning": 1.1986,
             "consumerConfidence": 1.3496,
             "businessConfidence": 0.0,
             "economicSurprise": 1.956,
@@ -12323,7 +12323,7 @@
           "score": 58.4,
           "dataQuality": 1.0,
           "bcOutlook": "Neutral",
-          "baseScore": 53.34,
+          "baseScore": 53.31,
           "contextualAdj": {
             "safe_haven": 3.9,
             "commodity": 0.0,
@@ -12360,7 +12360,7 @@
             "wageGrowth": 1.4,
             "manufacturingPMI": 1.128,
             "servicesPMI": 4.275,
-            "cotPositioning": 4.2616,
+            "cotPositioning": 4.2282,
             "consumerConfidence": 0.0,
             "businessConfidence": 0.0,
             "economicSurprise": 1.916,
@@ -12390,10 +12390,10 @@
           }
         },
         "NZD": {
-          "score": 46.6,
+          "score": 46.5,
           "dataQuality": 1.0,
           "bcOutlook": "Dovish",
-          "baseScore": 46.66,
+          "baseScore": 46.63,
           "contextualAdj": {
             "safe_haven": 0.13,
             "commodity": 0.14,
@@ -12430,7 +12430,7 @@
             "wageGrowth": 1.4,
             "manufacturingPMI": 2.625,
             "servicesPMI": 3.45,
-            "cotPositioning": 1.767,
+            "cotPositioning": 1.7377,
             "consumerConfidence": 0.982,
             "businessConfidence": 0.0,
             "economicSurprise": 2.104,
@@ -12473,7 +12473,7 @@
           "pair": "JPY/NZD",
           "long": "JPY",
           "short": "NZD",
-          "spread": 25.0,
+          "spread": 25.1,
           "confidence": "Alta",
           "priceAligned": true,
           "fxGateNote": ""
@@ -12482,7 +12482,7 @@
           "pair": "AUD/NZD",
           "long": "AUD",
           "short": "NZD",
-          "spread": 24.8,
+          "spread": 24.9,
           "confidence": "Alta",
           "priceAligned": true,
           "fxGateNote": ""
@@ -12509,7 +12509,7 @@
           "pair": "USD/GBP",
           "long": "USD",
           "short": "GBP",
-          "spread": 13.5,
+          "spread": 13.4,
           "confidence": "Media",
           "priceAligned": true,
           "fxGateNote": ""
@@ -12532,7 +12532,7 @@
           "wageGrowth": 2.0,
           "manufacturingPMI": 2.43,
           "servicesPMI": 3.7,
-          "cotPositioning": 2.5508,
+          "cotPositioning": 2.4463,
           "consumerConfidence": 0.0,
           "businessConfidence": 0.0,
           "economicSurprise": 2.02,
@@ -12652,7 +12652,7 @@
           "wageGrowth": 2.0,
           "manufacturingPMI": 2.1,
           "servicesPMI": 1.7,
-          "cotPositioning": 0.9764,
+          "cotPositioning": 1.1986,
           "consumerConfidence": 1.3496,
           "businessConfidence": 0.0,
           "economicSurprise": 1.956,
@@ -12676,7 +12676,7 @@
           "wageGrowth": 1.4,
           "manufacturingPMI": 1.128,
           "servicesPMI": 4.275,
-          "cotPositioning": 4.2616,
+          "cotPositioning": 4.2282,
           "consumerConfidence": 0.0,
           "businessConfidence": 0.0,
           "economicSurprise": 1.916,
@@ -12700,7 +12700,7 @@
           "wageGrowth": 1.4,
           "manufacturingPMI": 2.625,
           "servicesPMI": 3.45,
-          "cotPositioning": 1.767,
+          "cotPositioning": 1.7377,
           "consumerConfidence": 0.982,
           "businessConfidence": 0.0,
           "economicSurprise": 2.104,
@@ -12724,7 +12724,7 @@
           }
         },
         "EUR": {
-          "bcOutlook": "Dovish",
+          "bcOutlook": "Neutral",
           "rateMomentum": -0.5,
           "interestRate": 2.15,
           "esi": 46.8,
