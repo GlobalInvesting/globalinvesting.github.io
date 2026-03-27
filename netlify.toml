@@ -41,7 +41,7 @@
       style-src 'self' 'unsafe-inline' fonts.googleapis.com;
       font-src fonts.gstatic.com;
       img-src 'self' data: https: flagcdn.com;
-      connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org sdmx.oecd.org;
+      connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org https://api.exchangerate-api.com https://open.er-api.com https://sdmx.oecd.org;
       frame-src googleads.g.doubleclick.net tpc.googlesyndication.com;
       frame-ancestors 'self';
       upgrade-insecure-requests
@@ -72,6 +72,11 @@
   for = "/ai-analysis/*"
   [headers.values]
     Cache-Control = "public, max-age=3600, stale-while-revalidate=300"
+
+[[headers]]
+  for = "/extended-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
 
 [[headers]]
   for = "/fx-history/*"
