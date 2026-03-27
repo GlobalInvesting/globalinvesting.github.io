@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-27",
-  "generatedAt": "2026-03-27T13:41:01.411166Z",
+  "generatedAt": "2026-03-27T14:41:01.565554Z",
   "fetchMode": "FULL",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,21 +9,21 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-26",
-  "totalEvents": 1361,
+  "totalEvents": 1366,
   "currencyCounts": {
     "AUD": 110,
     "CAD": 75,
     "CHF": 46,
-    "EUR": 213,
+    "EUR": 214,
     "GBP": 155,
     "JPY": 158,
     "NZD": 54,
-    "USD": 550
+    "USD": 554
   },
   "impactCounts": {
-    "low": 662,
+    "low": 663,
     "medium": 527,
-    "high": 172
+    "high": 176
   },
   "events": [
     {
@@ -13217,7 +13217,7 @@
       "flag": "🇺🇸",
       "event": "Michigan 1-Year Inflation Expectations (Mar)",
       "impact": "medium",
-      "actual": "",
+      "actual": "3.2%",
       "forecast": "3.2%",
       "previous": "3.3%"
     },
@@ -13230,7 +13230,7 @@
       "flag": "🇺🇸",
       "event": "Michigan Consumer Expectations (Mar)",
       "impact": "high",
-      "actual": "",
+      "actual": "51.7",
       "forecast": "54.1",
       "previous": "54.1"
     },
@@ -13243,7 +13243,7 @@
       "flag": "🇺🇸",
       "event": "Michigan Consumer Sentiment (Mar)",
       "impact": "high",
-      "actual": "",
+      "actual": "53.3",
       "forecast": "54.0",
       "previous": "55.5"
     },
@@ -13256,7 +13256,7 @@
       "flag": "🇺🇸",
       "event": "Michigan Current Conditions (Mar)",
       "impact": "low",
-      "actual": "",
+      "actual": "55.8",
       "forecast": "57.8",
       "previous": "56.6"
     },
@@ -13267,22 +13267,9 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Wholesale Inventories (MoM) (Feb)",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": "0.2%"
-    },
-    {
-      "date": "27 Mar",
-      "dateISO": "2026-03-27",
-      "timeUTC": "14:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "UoM 5-year Consumer Inflation Expectation",
       "impact": "high",
-      "actual": "",
+      "actual": "3.2",
       "forecast": "3.2",
       "previous": "3.2"
     },
@@ -13295,22 +13282,22 @@
       "flag": "🇺🇸",
       "event": "UoM 1-year Consumer Inflation Expectations",
       "impact": "high",
-      "actual": "",
+      "actual": "3.8",
       "forecast": "3.4",
       "previous": "3.4"
     },
     {
       "date": "27 Mar",
       "dateISO": "2026-03-27",
-      "timeUTC": "14:00",
+      "timeUTC": "15:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Retail Inventories Ex Auto (Feb)",
-      "impact": "medium",
+      "event": "Wholesale Inventories (MoM) (Feb)",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "0.4%"
+      "previous": "0.2%"
     },
     {
       "date": "27 Mar",
@@ -13363,6 +13350,19 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "27 Mar",
+      "dateISO": "2026-03-27",
+      "timeUTC": "15:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Inventories Ex Auto (Feb)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.4%"
     },
     {
       "date": "27 Mar",
@@ -14167,7 +14167,7 @@
       "event": "Industrial Confidence",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "-9.0",
       "previous": "-7.1"
     },
     {
@@ -14180,7 +14180,7 @@
       "event": "Economic Sentiment Indicator",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "96.5",
       "previous": "98.3"
     },
     {
@@ -14258,7 +14258,7 @@
       "event": "Services Sentiment (Mar)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "4.0",
       "previous": "5.0"
     },
     {
@@ -15126,11 +15126,11 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Harmonized Index of Consumer Prices (MoM)",
+      "event": "Harmonized Index of Consumer Prices (YoY)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
-      "previous": "0.6"
+      "forecast": "2.8",
+      "previous": "1.9"
     },
     {
       "date": "31 Mar",
@@ -16116,6 +16116,19 @@
       "flag": "🇬🇧",
       "event": "FPC Meeting Minutes",
       "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "1 Abr",
+      "dateISO": "2026-04-01",
+      "timeUTC": "10:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Cipollone speech",
+      "impact": "high",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -17614,6 +17627,58 @@
       "actual": "",
       "forecast": "",
       "previous": "63.0"
+    },
+    {
+      "date": "3 Abr",
+      "dateISO": "2026-04-03",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Services Employment Index",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "51.8"
+    },
+    {
+      "date": "3 Abr",
+      "dateISO": "2026-04-03",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Services Prices Paid",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "63.0"
+    },
+    {
+      "date": "3 Abr",
+      "dateISO": "2026-04-03",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Services PMI",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "56.1"
+    },
+    {
+      "date": "3 Abr",
+      "dateISO": "2026-04-03",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "ISM Services New Orders Index",
+      "impact": "high",
+      "actual": "",
+      "forecast": "",
+      "previous": "58.6"
     },
     {
       "date": "3 Abr",
