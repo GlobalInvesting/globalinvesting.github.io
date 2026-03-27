@@ -1,47 +1,124 @@
-{
-  "currency": "NZD",
-  "country": "Nueva Zelanda",
-  "bank": "Banco de la Reserva de Nueva Zelanda (RBNZ)",
-  "analysis": "La política monetaria del Banco de la Reserva de Nueva Zelanda ha sido recientemente expansiva, con un recorte de tasas de 0.25pp en noviembre 2025, lo que ha mantenido la tasa de interés en 2.25%. Esto ha generado una presión bajista sobre la divisa neozelandesa, aunque los mercados parecen ignorar temporalmente los incrementos de inflación, como se menciona en las declaraciones del RBNZ sobre ignorar los picos temporales de inflación. La inflación anual se encuentra en 3.1%, por encima del objetivo, lo que podría generar expectativas de futuras ajustes en la política monetaria.\n\nLa cuenta corriente de Nueva Zelanda muestra un déficit del 3.7% del PIB, lo que ejerce presión vendedora estructural sobre la divisa. La balanza comercial también presenta un déficit, aunque los términos de intercambio favorables sugieren que las exportaciones neozelandesas ganan valor relativo. La composición exportadora, liderada por madera y manufacturas, maquinaria industrial y equipos eléctricos y electrónicos, explica en parte el origen del déficit comercial. Las tensiones geopolíticas, como las recientes declaraciones de UAE sobre la disruptión del estrecho de Hormuz, podrían afectar los flujos comerciales y, por ende, la divisa.\n\nEl posicionamiento especulativo neto bajista, con -15.9K contratos netos, y el rendimiento FX del último mes, que muestra una apreciación del 2.38% vs USD, sugieren un panorama complejo para la divisa neozelandesa. Aunque el RBNZ parece ignorar los picos de inflación, las declaraciones de Conway sobre la purchasing power y el impacto de la inflación en la economía neozelandesa introducen incertidumbre. La economía global y las decisiones del RBNZ seguirán siendo clave para determinar el rumbo de la divisa en el corto plazo.",
-  "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-26T10:12:00.123423+00:00",
-  "exportComposition": "Comtrade 2023: madera y manufacturas (21%, $2.9B), maquinaria industrial (16%, $2.2B), equipos eléctricos y electrónicos (14%, $2.0B)",
-  "newsCount": 3,
-  "dataSnapshot": {
-    "interestRate": 2.25,
-    "gdpGrowth": 0.2,
-    "inflation": 3.1,
-    "unemployment": 5.4,
-    "currentAccount": -3.7,
-    "rateMomentum": -1.5,
-    "lastRateDecision": {
-      "direction": "BAJÓ",
-      "delta": -0.25,
-      "current_rate": 2.25,
-      "prev_rate": 2.5,
-      "date": "2025-11-01",
-      "source": "rates_history",
-      "cycle_12m": -1.5,
-      "cycle_label": "ciclo BAJISTA en 12M (-1.50pp acumulados)"
-    },
-    "cotPositioning": -15917,
-    "fxPerformance1M": 2.3808,
-    "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-26",
-    "latestNewsTs": 1774494793.0,
-    "newsHeadlines": [
-      "UAE warns Hormuz disruption is “economic terrorism” as tensions rise and rise",
-      "CPI pressure is slowing in Australia. The RBNZ intends to ignore temporary infla",
-      "RBNZ’s Conway warns on purchasing power as Iran shock clouds NZ outlook, GDP 4ca"
-    ]
-  },
-  "globalContext": {
-    "avg_interest_rate": 2.38,
-    "avg_gdp_growth": 1.12,
-    "avg_inflation": 2.17,
-    "avg_unemployment": 5.28,
-    "avg_bond10y": 3.46,
-    "avg_fx_perf_1m": 0.61,
-    "avg_cot": -9265.62
-  }
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://globalinvesting.github.io/</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/index.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/news.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/carry-trade.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/about.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-score-fortaleza.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-cot.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-calendario-economico.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-bancos-centrales.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-carry-trade.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/tecnico-vs-fundamental.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/glosario-forex.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/en.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/guia-pips.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/advertise.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/publicidad.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/contact.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/terms.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/privacy.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://globalinvesting.github.io/data.html</loc>
+    <lastmod>2026-03-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

@@ -1,66 +1,111 @@
 {
-  "runTimestamp": "2026-03-27T19:06:43.754083Z",
-  "runDate": "2026-03-27",
-  "frankfurterOk": true,
-  "currencies": {
-    "USD": {
-      "status": "ok",
-      "rate": "3.75",
-      "source": "NYFed-EFFR",
-      "date": "2026-03-26",
-      "issues": []
-    },
-    "EUR": {
-      "status": "ok",
-      "rate": "2.15",
-      "source": "ECB-SDMX",
-      "date": "2025-06-11",
-      "issues": []
-    },
-    "GBP": {
-      "status": "ok",
-      "rate": "3.75",
-      "source": "BoE-CSV",
-      "date": "2026-03-26",
-      "issues": []
-    },
-    "JPY": {
-      "status": "ok",
-      "rate": "0.75",
-      "source": "BIS-CBPOL",
+  "observations": [
+    {
       "date": "2026-02-01",
-      "issues": []
+      "value": "0.00"
     },
-    "CAD": {
-      "status": "ok",
-      "rate": "2.25",
-      "source": "BoC-Valet",
-      "date": "2026-03-20",
-      "issues": []
+    {
+      "date": "2026-01-01",
+      "value": "0.00"
     },
-    "AUD": {
-      "status": "ok",
-      "rate": "4.10",
-      "source": "RBA-HTML",
-      "date": "2026-03-18",
-      "issues": []
+    {
+      "date": "2025-12-01",
+      "value": "0.00"
     },
-    "CHF": {
-      "status": "ok",
-      "rate": "0",
-      "source": "BIS-CBPOL",
-      "date": "2026-02-01",
-      "issues": []
+    {
+      "date": "2025-11-01",
+      "value": "0.00"
     },
-    "NZD": {
-      "status": "ok",
-      "rate": "2.25",
-      "source": "BIS-CBPOL",
-      "date": "2026-02-01",
-      "issues": []
+    {
+      "date": "2025-10-01",
+      "value": "0.00"
+    },
+    {
+      "date": "2025-09-01",
+      "value": "0.00"
+    },
+    {
+      "date": "2025-08-01",
+      "value": "0.00"
+    },
+    {
+      "date": "2025-07-01",
+      "value": "0.00"
+    },
+    {
+      "date": "2025-06-01",
+      "value": "0.00"
+    },
+    {
+      "date": "2025-05-01",
+      "value": "0.25"
+    },
+    {
+      "date": "2025-04-01",
+      "value": "0.25"
+    },
+    {
+      "date": "2025-03-01",
+      "value": "0.25"
+    },
+    {
+      "date": "2025-02-01",
+      "value": "0.5"
+    },
+    {
+      "date": "2025-01-01",
+      "value": "0.5"
+    },
+    {
+      "date": "2024-12-01",
+      "value": "0.5"
+    },
+    {
+      "date": "2024-11-01",
+      "value": "1.0"
+    },
+    {
+      "date": "2024-10-01",
+      "value": "1.0"
+    },
+    {
+      "date": "2024-09-01",
+      "value": "1.0"
+    },
+    {
+      "date": "2024-08-01",
+      "value": "1.25"
+    },
+    {
+      "date": "2024-07-01",
+      "value": "1.25"
+    },
+    {
+      "date": "2024-06-01",
+      "value": "1.25"
+    },
+    {
+      "date": "2024-05-01",
+      "value": "1.5"
+    },
+    {
+      "date": "2024-04-01",
+      "value": "1.5"
+    },
+    {
+      "date": "2024-03-01",
+      "value": "1.5"
+    },
+    {
+      "date": "2024-02-01",
+      "value": "1.75"
+    },
+    {
+      "date": "2024-01-01",
+      "value": "1.75"
     }
-  },
-  "issues": [],
-  "warnings": [],
-  "overallStatus": "ok"
+  ],
+  "lastUpdate": "2026-02-01",
+  "totalObservations": 26,
+  "zeroRateNote": "Tasa de política SNB en 0.00%. Valor correcto — no indica dato faltante."
 }
