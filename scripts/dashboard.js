@@ -1227,9 +1227,9 @@ var fetchRealHistoricalRates = /*#__PURE__*/function () {
           console.warn("Insuficientes observaciones hist\xF3ricas para ".concat(currencyCode, ": ").concat(observations.length));
           return _context13.a(2, null);
         case 5:
-          // Tomar hasta 8 observaciones (más que 6 para tener margen)
+          // Tomar hasta 36 observaciones (3 años de historial)
           // observations ya viene ordenado más reciente primero
-          recent = observations.slice(0, 14).reverse(); // más antigua primero para el gráfico
+          recent = observations.slice(0, 36).reverse(); // más antigua primero para el gráfico
           MONTH_NAMES_ES = {
             '01': 'Ene',
             '02': 'Feb',
@@ -1623,7 +1623,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.7.1-2026-03-27'; // fix: regenerar pares en path de caché completo
+          DASHBOARD_VERSION = '6.7.2-2026-03-27'; // fix: EUR rates actualizado, gráfico histórico 36 meses
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
