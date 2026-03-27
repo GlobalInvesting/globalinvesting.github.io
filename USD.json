@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/tecnico-vs-fundamental.html">
+    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
+    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/tecnico-vs-fundamental.html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Técnico vs fundamental en forex | Global Investing</title>
+    <meta name="description" content="Comparación detallada entre análisis técnico y análisis fundamental en el trading de divisas. Cuándo usar cada uno, sus limitaciones y cómo combinarlos para tomar mejores decisiones.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://globalinvesting.github.io/tecnico-vs-fundamental.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; }
+        :root {
+            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
+            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
+            --blue: #1e88e5; --green: #26a69a; --red: #ef5350; --orange: #e0a020;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+        .brand-title:hover { color: var(--blue); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+        .nav-links a:hover { color: var(--text-primary); }
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+        .breadcrumb { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .breadcrumb a { color: var(--blue); text-decoration: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); line-height: 1.3; }
+        .meta { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 2.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
+        h3 { font-size: 1.1rem; margin-top: 1.75rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
+        ul, ol { margin-left: 1.75rem; margin-bottom: 1.25rem; }
+        li { margin-bottom: 0.6rem; color: var(--text-secondary); }
+        strong { color: var(--text-primary); }
+        a { color: var(--blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .highlight-box { background: rgba(30,136,229,0.08); border-left: 4px solid var(--blue); padding: 1.25rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+        .highlight-box p { margin: 0; }
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+        .compare-card { border-radius: 6px; padding: 1.5rem; border: 1px solid; }
+        .compare-tech { background: rgba(30,136,229,0.06); border-color: rgba(30,136,229,0.2); }
+        .compare-fund { background: rgba(38,166,154,0.06); border-color: rgba(38,166,154,0.2); }
+        .compare-card h3 { margin-top: 0; font-size: 1rem; }
+        .compare-tech h3 { color: var(--blue); }
+        .compare-fund h3 { color: var(--green); }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .data-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-primary); font-size: 0.85rem; }
+        .data-table td { color: var(--text-secondary); font-size: 0.9rem; }
+        .related-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .related-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-decoration: none; transition: border-color 0.2s; }
+        .related-card:hover { border-color: var(--blue); }
+        .related-card .rc-label { font-size: 0.68rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+        .related-card .rc-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+        .footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
+        .footer a:hover { color: var(--text-primary); }
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .nav-links { flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+            .container { padding: 2rem 1rem 4rem; }
+            h1 { font-size: 1.7rem; }
+            .section { padding: 1.25rem; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .data-table { display: block; overflow-x: auto; font-size: 0.82rem; }
+        }
+    </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "@id": "https://globalinvesting.github.io/tecnico-vs-fundamental.html",
+  "url": "https://globalinvesting.github.io/tecnico-vs-fundamental.html",
+  "headline": "Análisis Técnico vs Fundamental en Forex",
+  "description": "Comparación entre análisis técnico y fundamental en forex: diferencias, ventajas y cómo combinarlos.",
+  "inLanguage": "es",
+  "articleSection": "Educación Forex",
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://globalinvesting.github.io/#organization",
+    "name": "Global Investing",
+    "url": "https://globalinvesting.github.io"
+  }
+}
+</script>
+    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+    <meta property="og:image:alt" content="Global Investing — Dashboard de Análisis Fundamental Forex">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": "https://globalinvesting.github.io/tecnico-vs-fundamental.html#breadcrumb",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://globalinvesting.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guías",
+      "item": "https://globalinvesting.github.io/guia-score-fortaleza.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Análisis técnico vs fundamental",
+      "item": "https://globalinvesting.github.io/tecnico-vs-fundamental.html"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
+<header class="header">
+    <div class="header-inner">
+        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
+            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+                <span class="logo-name">Global Investing</span>
+                <span class="logo-sub">Forex Fundamental Dashboard</span>
+            </div>
+        </div>
+        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="about.html">Acerca de</a></li>
+            <li><a href="publicidad.html">Publicidad</a></li>
+<li class="nav-dropdown">
+            <a href="guia-score-fortaleza.html">Guías</a>
+            <div class="nav-dropdown-menu">
+            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
+            <a href="guia-carry-trade.html">Carry Trade</a>
+            <a href="guia-cot.html">Reporte COT</a>
+            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
+            <a href="guia-calendario-economico.html">Calendario Económico</a>
+            <a href="guia-pips.html">Pips y Lotaje</a>
+            <a href="tecnico-vs-fundamental.html" class="active-guide">Técnico vs Fundamental</a>
+            <a href="glosario-forex.html">Glosario Forex</a>
+            </div>
+        </li>
+            <li><a href="contact.html">Contacto</a></li>
+            <li><a href="en.html" class="lang-switch">EN</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+
+<div class="container" id="main-content" role="main">
+    <div class="breadcrumb">
+        <a href="index.html">Inicio</a> › <a href="about.html">Guías</a> › Análisis técnico vs fundamental
+    </div>
+
+    <h1>Análisis Técnico vs Fundamental en Forex: Diferencias y Cómo Combinarlos</h1>
+    <div class="meta">
+        <span>Nivel principiante a intermedio</span>
+        <span>⏱ Lectura: 8 minutos</span>
+        <span>Actualizado: marzo 2026</span>
+    </div>
+
+    <p>Una de las primeras preguntas que surge al iniciarse en el trading de divisas es: ¿análisis técnico o análisis fundamental? En realidad, plantear la pregunta como una elección excluyente es un error. Los traders más consistentes y profesionales utilizan ambos enfoques de forma complementaria, cada uno para responder un tipo distinto de pregunta.</p>
+
+    <div class="section">
+        <h2>¿Qué estudia cada tipo de análisis?</h2>
+        <div class="compare-grid">
+            <div class="compare-card compare-tech">
+                <h3>Análisis Técnico</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.75rem;">Estudia el <strong style="color:var(--text-primary);">comportamiento histórico del precio</strong>: gráficos, patrones de velas, soportes y resistencias, indicadores matemáticos derivados del precio y el volumen (medias móviles, RSI, MACD, Bollinger Bands).</p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.75rem;"><strong style="color:var(--text-primary);">Premisa central:</strong> El precio descuenta toda la información disponible. Los patrones del pasado tienden a repetirse porque reflejan psicología humana constante: codicia, miedo, sobrereacción.</p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0;"><strong style="color:var(--text-primary);">Responde a:</strong> ¿Dónde está el precio ahora? ¿En qué nivel tiene soporte o resistencia? ¿Cuándo es buen momento para entrar o salir?</p>
+            </div>
+            <div class="compare-card compare-fund">
+                <h3>Análisis Fundamental</h3>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.75rem;">Estudia los <strong style="color:var(--text-primary);">factores económicos subyacentes</strong> que determinan el valor intrínseco de una divisa: tasas de interés, inflación, crecimiento del PIB, empleo, política monetaria, flujos comerciales y de capital.</p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0.75rem;"><strong style="color:var(--text-primary);">Premisa central:</strong> El precio de una divisa, a largo plazo, converge hacia el valor justificado por sus fundamentos económicos. Las desviaciones son temporales y representan oportunidades.</p>
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:0;"><strong style="color:var(--text-primary);">Responde a:</strong> ¿En qué dirección deberían ir los fundamentos? ¿Qué divisas tienen ventajas estructurales? ¿Cuál es el sesgo de trading de medio plazo?</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Las fortalezas y limitaciones de cada enfoque</h2>
+        <table class="data-table">
+            <thead>
+                <tr><th>Aspecto</th><th>Análisis Técnico</th><th>Análisis Fundamental</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Horizonte temporal</strong></td><td>Cualquiera: intradía, swing, posicional</td><td>Medio a largo plazo (semanas, meses)</td></tr>
+                <tr><td><strong>Datos necesarios</strong></td><td>Solo precios históricos</td><td>Datos económicos, comunicados de BC, COT</td></tr>
+                <tr><td><strong>Velocidad de señal</strong></td><td>Rápida (puede darse en minutos)</td><td>Lenta (los ciclos económicos duran meses)</td></tr>
+                <tr><td><strong>Funciona en crisis</strong></td><td>Parcialmente (patrones se distorsionan)</td><td>Parcialmente (risk-off anula fundamentales)</td></tr>
+                <tr><td><strong>Predictibilidad corto plazo</strong></td><td>Moderada</td><td>Baja</td></tr>
+                <tr><td><strong>Predictibilidad largo plazo</strong></td><td>Baja</td><td>Alta (0.7–0.9 correlación a 3–6 meses)</td></tr>
+                <tr><td><strong>Subjetividad</strong></td><td>Alta (dos analistas pueden ver señales opuestas)</td><td>Media (los datos son objetivos, la interpretación varía)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>¿Por qué el análisis fundamental no basta solo para el timing?</h2>
+        <p>El análisis fundamental tiene una limitación crítica en el trading de corto plazo: puede decirte correctamente la dirección, pero no cuándo exactamente se producirá el movimiento. Una divisa puede estar "fundamentalmente sobrevaluada" durante meses o incluso años antes de que el mercado la corrija.</p>
+        <p>El economista John Maynard Keynes lo resumió brillantemente: <em>"El mercado puede permanecer irracional más tiempo del que tú puedes permanecer solvente."</em> Es decir, aunque tengas razón en el análisis fundamental, si entras demasiado pronto y el mercado se mueve en tu contra, puedes sufrir pérdidas significativas antes de que la tesis se valide.</p>
+        <p>Esto es especialmente cierto en el mercado forex, donde los flujos de corto plazo (posicionamiento especulativo, risk-on/off, carry trade) pueden dominar sobre los fundamentales durante períodos prolongados. El análisis técnico te ayuda a identificar el momento en que el mercado empieza a reconocer lo que los fundamentales ya mostraban.</p>
+    </div>
+
+    <div class="section">
+        <h2>¿Por qué el análisis técnico no basta solo para el sesgo direccional?</h2>
+        <p>El análisis técnico tiene su propia limitación estructural: es inherentemente retrospectivo. Todos los patrones e indicadores técnicos se derivan de precios pasados. No tienen mecanismo para anticipar cambios de régimen macroeconómico: un giro en la política monetaria de la Fed, un dato de empleo que sorprende masivamente, una crisis geopolítica.</p>
+        <p>Operar solo con análisis técnico sin consciencia del contexto fundamental es como navegar solo con una brújula sin saber dónde están las corrientes marinas. Puedes leer perfectamente los patrones en el gráfico y aun así estar posicionado contra la marea fundamental, lo que genera operaciones con baja probabilidad de éxito incluso cuando la ejecución técnica es correcta.</p>
+        <p>Además, el análisis técnico tiene el problema de la <strong>profecía autocumplida inversa</strong>: cuando demasiados traders utilizan los mismos patrones e indicadores, el mercado aprende a "cazar" esos niveles antes de moverse en la dirección esperada, generando falsas roturas (fakeouts) que destruyen las posiciones de quienes siguen el libro de texto.</p>
+    </div>
+
+    <div class="section">
+        <h2>La combinación óptima: fundamental para la dirección, técnico para el timing</h2>
+        <p>La forma más efectiva de integrar ambos enfoques en el trading de divisas es asignarles roles distintos y complementarios:</p>
+
+        <h3>El análisis fundamental define el sesgo</h3>
+        <p>Usando herramientas como el score de fortaleza del dashboard, identificas qué divisas tienen los mejores fundamentos (alcistas) y cuáles los peores (bajistas). Esto te da el sesgo de trading: buscas operaciones LONG en las divisas fuertes y SHORT en las débiles, en los pares donde el diferencial es más claro.</p>
+
+        <h3>El análisis técnico define la entrada</h3>
+        <p>Una vez que tienes el sesgo fundamental, usas el análisis técnico para esperar el momento óptimo de entrada: una corrección a un nivel de soporte en una divisa fundamentalmente fuerte, una rotura de resistencia que confirma la continuación de la tendencia, o un patrón de reversa en un nivel técnico clave.</p>
+
+        <h3>El calendario económico conecta ambos</h3>
+        <p>El calendario económico es el puente entre el análisis fundamental y el técnico. Las publicaciones de datos importantes pueden confirmar el análisis fundamental (dato bueno para una divisa que ya tenía score alto → doble confirmación) o contradecirlo (dato malo para una divisa con score alto → revisar la tesis). También define los momentos donde aumentar la precaución técnica.</p>
+
+        <div class="highlight-box">
+            <p><strong>Regla práctica:</strong> Si el análisis técnico y el fundamental apuntan en la misma dirección, la probabilidad de éxito de la operación es significativamente mayor que si solo uno de ellos da la señal. Las mejores operaciones son aquellas donde ambos enfoques convergen: un nivel técnico relevante en una divisa con sesgo fundamental claro.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Horizonte temporal y la elección del enfoque dominante</h2>
+        <p>La importancia relativa de cada tipo de análisis varía según el horizonte temporal de la operación:</p>
+        <ul>
+            <li><strong>Intradía (minutos a horas):</strong> El análisis técnico domina completamente. Los fundamentales de fondo siguen siendo el contexto, pero el movimiento de precio de una sesión está determinado principalmente por flujos de corto plazo, noticias puntuales y la mecánica del mercado.</li>
+            <li><strong>Swing trading (días a semanas):</strong> Equilibrio entre técnico y fundamental. El sesgo fundamental define la dirección preferida; el técnico define la entrada y el nivel de stop.</li>
+            <li><strong>Posicional (semanas a meses):</strong> El análisis fundamental domina. Los fundamentales macroeconómicos tienen correlaciones de 0.7–0.9 con los movimientos de precio en horizontes de 1–3 meses. El dashboard de fortaleza opera en horizonte 2-6 semanas, combinando momentum de precio reciente con ciclo macro. El técnico define el nivel de entrada óptimo y los objetivos.</li>
+        </ul>
+    </div>
+
+    
+    
+    <section class="examples-section">
+    <h2>El análisis fundamental en la práctica: casos reales</h2>
+
+    <h3>EUR/USD 2022: fundamentales bajistas, técnico confirma</h3>
+    <p>A principios de 2022, los fundamentales para el EUR eran claramente bajistas: la Fed subía tasas agresivamente mientras el BCE dudaba en hacerlo, generando una divergencia de política monetaria sin precedentes recientes. El diferencial de tasas favorecía masivamente al USD. El análisis fundamental daba el sesgo: corto EUR/USD. El análisis técnico ayudó a identificar los niveles exactos de entrada — las rupturas de soportes históricos y el impulso bajista confirmaron el movimiento. El par cayó desde 1.14 a la paridad en menos de un año.</p>
+
+    <h3>GBP/JPY 2023-2024: divergencia extrema</h3>
+    <p>En este período el Banco de Inglaterra subía tasas hasta el 5.25% mientras el BOJ mantenía tasas negativas. La divergencia fundamental era máxima. El sesgo del análisis fundamental era inequívocamente alcista en GBP/JPY. El técnico permitió optimizar entradas en correcciones dentro de la tendencia principal. El par subió más de 3.000 pips desde mínimos de 2023 hasta máximos de 2024.</p>
+
+    <h3>Cuándo el técnico contradice al fundamental: el carry unwind</h3>
+    <p>Agosto 2024 es el ejemplo perfecto. Los fundamentales de AUD/JPY seguían favoreciendo al AUD — las tasas australianas eran superiores a las japonesas. Pero el par cayó 10 figuras en días. ¿Por qué? Porque el mercado estaba anticipando un cambio de política del BOJ y el desapalancamiento masivo de posiciones de carry. En casos de stress extremo, el técnico (momentum, ruptura de soportes, volatilidad) gana al fundamental de corto plazo. El fundamental sigue siendo correcto en el horizonte de semanas — el par eventualmente recuperó.
+
+    <h3>La pregunta correcta antes de operar</h3>
+    <p>Antes de entrar en cualquier operación, hay dos preguntas distintas. La primera es: ¿cuál es el sesgo fundamental de este par? ¿Cuál divisa tiene mejores fundamentos macroeconómicos? Eso lo responde el dashboard con el score de fortaleza. La segunda es: ¿es este un buen momento técnico para entrar en esa dirección? ¿El precio está en soporte, el momentum acompaña, la volatilidad es manejable? Eso lo responde el análisis de precio. Cuando ambas respuestas coinciden, la operación tiene el máximo respaldo.</p>
+    </section>
+    
+    <section class="examples-section">
+    <h2>El marco práctico para combinar ambos enfoques</h2>
+    <p>Después de entender las fortalezas y limitaciones de cada tipo de análisis, la pregunta práctica es cómo integrarlos en un proceso concreto. Este marco en tres pasos funciona para la mayoría de estilos de trading con horizonte de días a semanas.</p>
+
+    <h3>Paso 1: sesgo semanal con fundamentales</h3>
+    <p>Al inicio de cada semana, revisá el score de fortaleza de las 8 divisas. Un diferencial de 12+ puntos entre dos divisas representa una ventaja fundamental estadísticamente significativa. Ese sesgo — por ejemplo largo USD contra JPY — es tu marco para la semana. No operarás en contra de él salvo que aparezca información nueva que cambie los fundamentos.</p>
+
+    <h3>Paso 2: contexto macro del calendario</h3>
+    <p>Verificá el calendario económico para la semana. ¿Hay datos de alto impacto para alguna de las divisas en tu radar? Una reunión del banco central puede confirmar el sesgo o crear volatilidad que conviene esperar que se disipe. Este paso tarda 5 minutos pero puede evitar entrar justo antes de un evento que cambia temporalmente las condiciones.</p>
+
+    <h3>Paso 3: entrada con análisis técnico</h3>
+    <p>Con el sesgo y el contexto definidos, usá el técnico para optimizar la entrada. Buscá una corrección dentro de la tendencia fundamental — un retroceso a soporte, una zona de valor — que permita entrar con un stop ajustado. La ventaja fundamental define la dirección; el técnico da el timing y el punto de invalidación.</p>
+
+    <h3>¿Qué hacer cuando ambos se contradicen?</h3>
+    <p>En horizontes cortos (intradía, días) el técnico suele ganar porque refleja el posicionamiento actual del mercado. En horizontes más largos (semanas, meses) el fundamental se impone porque la economía real termina reflejándose en el precio. Cuando el técnico contradice el sesgo fundamental en el corto plazo, reducir el tamaño o esperar confirmación es más prudente que operar contra la corriente de precio.</p>
+    </section>
+    <section class="faq-section" itemscope itemtype="https://schema.org/FAQPage">
+    <h2>Preguntas frecuentes</h2>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Puede un trader usar solo análisis técnico sin entender los fundamentos?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Muchos lo hacen con resultados mixtos. El problema es que los fundamentos son los que crean los grandes movimientos tendenciales: un cambio de ciclo de tasas o una recesión no aparece en el gráfico hasta que ya ocurrió. El análisis técnico solo dice dónde está el precio, no por qué ni hacia dónde va estructuralmente.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Y al revés, puede un trader usar solo análisis fundamental?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Es el enfoque de los macro funds de largo plazo, pero para el trading de mediano plazo tiene una limitación crítica: el timing. Un fundamental puede ser correcto pero el mercado puede tardar meses en reflejarlo — y mientras tanto el precio puede ir en contra lo suficiente para sacarte de la posición.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cuál tiene mejor tasa de acierto en la práctica?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Es una pregunta mal formulada porque operan en horizontes distintos. En horizontes de semanas a meses, el fundamental tiende a ser más predictivo de la dirección. En horizontes de horas a días, el técnico es más relevante para el timing. Los modelos que combinan ambos superan consistentemente a los que usan solo uno.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿Cómo afectan los datos económicos al análisis técnico?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">Los datos de alto impacto pueden invalidar temporalmente niveles técnicos — un soporte puede romperse con fuerza en la publicación del NFP y recuperarse en minutos. Muchos traders técnicos evitan mantener posiciones durante eventos de alto impacto y esperan a que el mercado se estabilice.</p>
+        </div>
+    </div>
+    <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <h3 itemprop="name">¿El dashboard de Global Investing usa análisis técnico o fundamental?</h3>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <p itemprop="text">El score es 100% fundamental: mide 22 indicadores macroeconómicos como tasas de interés, inflación, PIB y posicionamiento institucional. No usa indicadores técnicos. La excepción parcial es el FX Performance, que mide el rendimiento del precio en el último mes como confirmador.</p>
+        </div>
+    </div>
+    </section>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","@id":"https://globalinvesting.github.io/tecnico-vs-fundamental.html#faq","mainEntity":[
+    {
+      "@type": "Question",
+      "name": "¿Puede un trader usar solo análisis técnico sin entender los fundamentos?",
+      "acceptedAnswer": {"@type": "Answer","text": "Muchos lo hacen con resultados mixtos. El problema es que los fundamentos son los que crean los grandes movimientos tendenciales: un cambio de ciclo de tasas o una recesión no aparece en el gráfico hasta que ya ocurrió. El análisis técnico solo dice dónde está el precio, no por qué ni hacia dónde va estructuralmente."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Y al revés, puede un trader usar solo análisis fundamental?",
+      "acceptedAnswer": {"@type": "Answer","text": "Es el enfoque de los macro funds de largo plazo, pero para el trading de mediano plazo tiene una limitación crítica: el timing. Un fundamental puede ser correcto pero el mercado puede tardar meses en reflejarlo — y mientras tanto el precio puede ir en contra lo suficiente para sacarte de la posición."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuál tiene mejor tasa de acierto en la práctica?",
+      "acceptedAnswer": {"@type": "Answer","text": "Es una pregunta mal formulada porque operan en horizontes distintos. En horizontes de semanas a meses, el fundamental tiende a ser más predictivo de la dirección. En horizontes de horas a días, el técnico es más relevante para el timing. Los modelos que combinan ambos superan consistentemente a los que usan solo uno."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo afectan los datos económicos al análisis técnico?",
+      "acceptedAnswer": {"@type": "Answer","text": "Los datos de alto impacto pueden invalidar temporalmente niveles técnicos — un soporte puede romperse con fuerza en la publicación del NFP y recuperarse en minutos. Muchos traders técnicos evitan mantener posiciones durante eventos de alto impacto y esperan a que el mercado se estabilice."}
+    },
+    {
+      "@type": "Question",
+      "name": "¿El dashboard de Global Investing usa análisis técnico o fundamental?",
+      "acceptedAnswer": {"@type": "Answer","text": "El score es 100% fundamental: mide 22 indicadores macroeconómicos como tasas de interés, inflación, PIB y posicionamiento institucional. No usa indicadores técnicos. La excepción parcial es el FX Performance, que mide el rendimiento del precio en el último mes como confirmador."}
+    }
+    ]}
+    </script>
+    <h2>Guías relacionadas</h2>
+    <div class="related-links">
+        <a href="guia-score-fortaleza.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo leer un score de fortaleza fundamental</div>
+        </a>
+        <a href="guia-calendario-economico.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo usar el calendario económico</div>
+        </a>
+        <a href="guia-carry-trade.html" class="related-card">
+            <div class="rc-label">Guía</div>
+            <div class="rc-title">Cómo funciona el carry trade</div>
+        </a>
+        <a href="glosario-forex.html" class="related-card">
+            <div class="rc-label">Referencia</div>
+            <div class="rc-title">Glosario de términos fundamentales</div>
+        </a>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem 1rem;margin-top:0.5rem;font-size:0.8rem;">
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">Acerca de</a>
+        <a href="publicidad.html">Publicidad</a>
+        <a href="guia-score-fortaleza.html">Guías</a>
+        <a href="terms.html">Términos</a>
+        <a href="privacy.html">Privacidad</a>
+        <a href="data.html">Datos</a>
+        <a href="contact.html">Contacto</a>
+        <a href="en.html" style="padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;">EN</a>
+    </div>
+    <p style="margin-top:0.75rem;font-size:0.75rem;color:#6e7681;">El contenido de esta página es informativo y educativo. No constituye asesoramiento financiero ni recomendación de inversión.</p>
+</footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<!-- GDPR Banner (shared) -->
+<style>
+#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
+#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
+#gdpr-banner a{color:#5b9bd5;}
+#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
+#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
+#gdpr-accept{background:#2e75b6;color:#fff;}
+#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
+
+        /* ── Header unified ── */
+        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; }
+        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
+        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
+        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
+        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
+        
+        /* ── Guías dropdown ── */
+        .nav-dropdown { position: relative; }
+        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
+            border-left: 4px solid transparent; border-right: 4px solid transparent;
+            border-top: 4px solid currentColor; transition: transform 0.2s; }
+        .nav-dropdown:hover > a::after,
+        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
+        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
+            right: 0; min-width: 220px; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 0.75rem 0 0.4rem; z-index: 200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+        /* Puente invisible que cubre el gap entre trigger y menú */
+        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
+            left: -8px; right: -8px; height: 0.75rem; }
+        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
+            color: var(--text-secondary) !important; font-size: 0.85rem !important;
+            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
+            color: var(--text-primary) !important; }
+        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
+        
+        /* ── FAQ Section ── */
+        .faq-section { margin: 3rem 0 2rem; }
+        .faq-section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;
+            color: var(--text-primary); }
+        .faq-item { border-top: 1px solid var(--border); padding: 1.25rem 0; }
+        .faq-item:last-child { border-bottom: 1px solid var(--border); }
+        .faq-item h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary);
+            margin: 0 0 0.6rem; line-height: 1.4; }
+        .faq-item p { font-size: 0.925rem; color: var(--text-secondary);
+            margin: 0; line-height: 1.7; }
+        </style>
+<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
+<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
+<div class="gdpr-btns">
+<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
+<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
+</div></div>
+<script>
+(function(){
+var K='gdpr_consent_v1';
+function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
+function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
+function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
+// Event delegation — funciona aunque scripts externos re-renderizen el DOM
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
+  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
+},true);
+document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
+function init(){
+  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
+  var b=document.getElementById('gdpr-banner');
+  if(b){b.hidden=false;b.style.display='flex';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
+})();
+</script>
+<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
+<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
+· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
+</footer>
+</body>
+</html>
