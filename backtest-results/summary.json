@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-26",
+  "generated": "2026-03-27",
   "parameters": {
     "min_diff": 12.0,
     "windows": [
@@ -11,109 +11,287 @@
   },
   "summary": {
     "1w": {
-      "trades": 856,
-      "hit_rate": 47.2,
-      "avg_return_pct": 0.0033,
-      "avg_win_pct": 0.8216,
-      "avg_loss_pct": -0.7281,
-      "sharpe_annualized": 0.0212,
-      "max_drawdown_pct": 48.79,
-      "total_return_pct": -2.45,
+      "trades": 753,
+      "hit_rate": 47.5,
+      "avg_return_pct": 0.0164,
+      "avg_win_pct": 0.8062,
+      "avg_loss_pct": -0.6995,
+      "sharpe_annualized": 0.113,
+      "sortino_annualized": 0.1281,
+      "calmar_ratio": 0.2033,
+      "max_drawdown_pct": 42.25,
+      "total_return_pct": 8.59,
       "by_confidence": {
         "Alta": {
-          "trades": 254,
-          "hit_rate": 48.8,
-          "avg_return": -0.0135,
-          "sharpe": -0.1066
+          "trades": 88,
+          "hit_rate": 59.1,
+          "avg_return": 0.2228,
+          "sharpe": 1.5118
         },
         "Media": {
-          "trades": 602,
-          "hit_rate": 46.5,
-          "avg_return": 0.0104,
-          "sharpe": 0.0625
+          "trades": 665,
+          "hit_rate": 46.0,
+          "avg_return": -0.011,
+          "sharpe": -0.076
+        }
+      },
+      "by_currency": {
+        "USD": {
+          "trades": 77,
+          "hit_rate": 49.4,
+          "avg_return": 0.0636
+        },
+        "EUR": {
+          "trades": 89,
+          "hit_rate": 49.4,
+          "avg_return": -0.0287
+        },
+        "GBP": {
+          "trades": 179,
+          "hit_rate": 50.3,
+          "avg_return": 0.0244
+        },
+        "JPY": {
+          "trades": 143,
+          "hit_rate": 58.7,
+          "avg_return": 0.026
+        },
+        "AUD": {
+          "trades": 545,
+          "hit_rate": 45.9,
+          "avg_return": -0.0294
+        },
+        "CAD": {
+          "trades": 211,
+          "hit_rate": 54.0,
+          "avg_return": 0.0228
+        },
+        "CHF": {
+          "trades": 155,
+          "hit_rate": 51.0,
+          "avg_return": -0.0239
+        },
+        "NZD": {
+          "trades": 107,
+          "hit_rate": 50.5,
+          "avg_return": 0.0418
         }
       }
     },
     "2w": {
-      "trades": 849,
-      "hit_rate": 46.8,
-      "avg_return_pct": 0.0015,
-      "avg_win_pct": 1.1722,
-      "avg_loss_pct": -1.0267,
-      "sharpe_annualized": 0.0068,
-      "max_drawdown_pct": 70.02,
-      "total_return_pct": -8.77,
+      "trades": 746,
+      "hit_rate": 47.9,
+      "avg_return_pct": 0.0367,
+      "avg_win_pct": 1.1587,
+      "avg_loss_pct": -0.993,
+      "sharpe_annualized": 0.1701,
+      "sortino_annualized": 0.2056,
+      "calmar_ratio": 0.3261,
+      "max_drawdown_pct": 62.41,
+      "total_return_pct": 20.35,
       "by_confidence": {
         "Alta": {
-          "trades": 249,
-          "hit_rate": 46.2,
-          "avg_return": -0.0744,
-          "sharpe": -0.4028
+          "trades": 83,
+          "hit_rate": 59.0,
+          "avg_return": 0.3282,
+          "sharpe": 1.4301
         },
         "Media": {
-          "trades": 600,
-          "hit_rate": 47.0,
-          "avg_return": 0.033,
-          "sharpe": 0.1419
+          "trades": 663,
+          "hit_rate": 46.5,
+          "avg_return": 0.0002,
+          "sharpe": 0.0011
+        }
+      },
+      "by_currency": {
+        "USD": {
+          "trades": 76,
+          "hit_rate": 47.4,
+          "avg_return": 0.0706
+        },
+        "EUR": {
+          "trades": 88,
+          "hit_rate": 46.6,
+          "avg_return": -0.0666
+        },
+        "GBP": {
+          "trades": 178,
+          "hit_rate": 53.4,
+          "avg_return": 0.1098
+        },
+        "JPY": {
+          "trades": 142,
+          "hit_rate": 60.6,
+          "avg_return": -0.0591
+        },
+        "AUD": {
+          "trades": 538,
+          "hit_rate": 45.0,
+          "avg_return": -0.0621
+        },
+        "CAD": {
+          "trades": 210,
+          "hit_rate": 52.4,
+          "avg_return": 0.044
+        },
+        "CHF": {
+          "trades": 154,
+          "hit_rate": 51.9,
+          "avg_return": -0.0081
+        },
+        "NZD": {
+          "trades": 106,
+          "hit_rate": 52.8,
+          "avg_return": 0.1388
         }
       }
     },
     "4w": {
-      "trades": 835,
-      "hit_rate": 43.4,
-      "avg_return_pct": -0.0416,
-      "avg_win_pct": 1.6591,
-      "avg_loss_pct": -1.3432,
-      "sharpe_annualized": -0.1378,
-      "max_drawdown_pct": 89.47,
-      "total_return_pct": -41.77,
+      "trades": 733,
+      "hit_rate": 44.5,
+      "avg_return_pct": 0.0163,
+      "avg_win_pct": 1.6715,
+      "avg_loss_pct": -1.3095,
+      "sharpe_annualized": 0.0535,
+      "sortino_annualized": 0.0696,
+      "calmar_ratio": -0.0608,
+      "max_drawdown_pct": 83.78,
+      "total_return_pct": -5.09,
       "by_confidence": {
         "Alta": {
-          "trades": 242,
-          "hit_rate": 39.7,
-          "avg_return": -0.1825,
-          "sharpe": -0.6347
+          "trades": 78,
+          "hit_rate": 52.6,
+          "avg_return": 0.6279,
+          "sharpe": 1.3701
         },
         "Media": {
-          "trades": 593,
-          "hit_rate": 44.9,
-          "avg_return": 0.0158,
-          "sharpe": 0.0514
+          "trades": 655,
+          "hit_rate": 43.5,
+          "avg_return": -0.0565,
+          "sharpe": -0.2017
+        }
+      },
+      "by_currency": {
+        "USD": {
+          "trades": 74,
+          "hit_rate": 56.8,
+          "avg_return": 0.1312
+        },
+        "EUR": {
+          "trades": 86,
+          "hit_rate": 50.0,
+          "avg_return": -0.1182
+        },
+        "GBP": {
+          "trades": 177,
+          "hit_rate": 46.3,
+          "avg_return": 0.1103
+        },
+        "JPY": {
+          "trades": 140,
+          "hit_rate": 60.0,
+          "avg_return": -0.1306
+        },
+        "AUD": {
+          "trades": 526,
+          "hit_rate": 41.3,
+          "avg_return": -0.1554
+        },
+        "CAD": {
+          "trades": 207,
+          "hit_rate": 57.0,
+          "avg_return": 0.2036
+        },
+        "CHF": {
+          "trades": 152,
+          "hit_rate": 55.3,
+          "avg_return": 0.0044
+        },
+        "NZD": {
+          "trades": 104,
+          "hit_rate": 60.6,
+          "avg_return": 0.3672
         }
       }
     },
     "6w": {
-      "trades": 821,
-      "hit_rate": 42.5,
-      "avg_return_pct": -0.1143,
-      "avg_win_pct": 1.9543,
-      "avg_loss_pct": -1.6438,
-      "sharpe_annualized": -0.3342,
-      "max_drawdown_pct": 95.52,
-      "total_return_pct": -69.4,
+      "trades": 719,
+      "hit_rate": 43.3,
+      "avg_return_pct": -0.0611,
+      "avg_win_pct": 2.0048,
+      "avg_loss_pct": -1.6359,
+      "sharpe_annualized": -0.1752,
+      "sortino_annualized": -0.214,
+      "calmar_ratio": -0.5278,
+      "max_drawdown_pct": 91.7,
+      "total_return_pct": -48.4,
       "by_confidence": {
         "Alta": {
-          "trades": 234,
-          "hit_rate": 38.0,
-          "avg_return": -0.2133,
-          "sharpe": -0.6
+          "trades": 76,
+          "hit_rate": 51.3,
+          "avg_return": 0.545,
+          "sharpe": 1.3017
         },
         "Media": {
-          "trades": 587,
-          "hit_rate": 44.3,
-          "avg_return": -0.0749,
-          "sharpe": -0.2223
+          "trades": 643,
+          "hit_rate": 42.3,
+          "avg_return": -0.1327,
+          "sharpe": -0.3922
+        }
+      },
+      "by_currency": {
+        "USD": {
+          "trades": 72,
+          "hit_rate": 55.6,
+          "avg_return": 0.1938
+        },
+        "EUR": {
+          "trades": 84,
+          "hit_rate": 47.6,
+          "avg_return": -0.2153
+        },
+        "GBP": {
+          "trades": 175,
+          "hit_rate": 45.7,
+          "avg_return": 0.1656
+        },
+        "JPY": {
+          "trades": 138,
+          "hit_rate": 63.0,
+          "avg_return": 0.0228
+        },
+        "AUD": {
+          "trades": 514,
+          "hit_rate": 40.7,
+          "avg_return": -0.2505
+        },
+        "CAD": {
+          "trades": 203,
+          "hit_rate": 59.1,
+          "avg_return": 0.3194
+        },
+        "CHF": {
+          "trades": 150,
+          "hit_rate": 49.3,
+          "avg_return": -0.1832
+        },
+        "NZD": {
+          "trades": 102,
+          "hit_rate": 67.6,
+          "avg_return": 0.6214
         }
       }
     },
     "overall_4w": {
-      "trades": 835,
-      "hit_rate": 43.4,
-      "sharpe": -0.1378,
-      "avg_return": -0.0416
+      "trades": 733,
+      "hit_rate": 44.5,
+      "sharpe": 0.0535,
+      "sortino": 0.0696,
+      "calmar": -0.0608,
+      "avg_return": 0.0163
     }
   },
-  "note": "Retrospective backtest. Minor look-ahead bias possible for low-frequency macro data.",
-  "total_trades": 3361,
+  "note": "Retrospective backtest. Minor look-ahead bias for low-frequency macro data.",
+  "total_trades": 2951,
   "delta_score_summary": null
 }
