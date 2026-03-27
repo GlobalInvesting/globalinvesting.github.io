@@ -1,10 +1,11 @@
 {
   "lastUpdate": "2026-03-27",
-  "modelVersion": "6.9.0",
-  "checksum": "4f8ea6f1fea1603ff7ec38fd6b3e24acfe94111cad3f11b2c140b83b285fac7d",
+  "modelVersion": "7.0.0",
+  "checksum": "181e1802e6ea12e499003a570483310a3de17fa5f7139dc1b69d1de7c783aaa5",
+  "macroRegime": "USD_DOMINANCE",
   "scores": {
     "USD": {
-      "score": 60.7,
+      "score": 62.8,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 56.99,
@@ -28,7 +29,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": 3.67
+        "regime_discount": 2.17,
+        "totalCapped": 5.84
       },
       "contributions": {
         "interestRate": 8.7352,
@@ -59,6 +61,7 @@
         "rateMomentum": -0.69,
         "interestRate": 3.75,
         "bcOutlook": "Neutral",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "gdpGrowth": "2026-03-13",
           "inflation": "2026-03-13",
@@ -72,6 +75,7 @@
         "rateMomentum": -0.69,
         "interestRate": 3.75,
         "esi": 50.5,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "gdpGrowth": "2026-03-13",
           "inflation": "2026-03-13",
@@ -82,7 +86,7 @@
       }
     },
     "EUR": {
-      "score": 47.0,
+      "score": 45.4,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 48.89,
@@ -106,7 +110,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": -1.87
+        "regime_discount": -1.58,
+        "totalCapped": -3.45
       },
       "contributions": {
         "interestRate": 5.9325,
@@ -137,6 +142,7 @@
         "rateMomentum": -0.5,
         "interestRate": 2.15,
         "bcOutlook": "Neutral",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
@@ -152,6 +158,7 @@
         "rateMomentum": -0.5,
         "interestRate": 2.15,
         "esi": 46.8,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
@@ -164,7 +171,7 @@
       }
     },
     "GBP": {
-      "score": 43.3,
+      "score": 41.7,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 53.13,
@@ -188,7 +195,8 @@
         "rate_expectation": -0.13,
         "gbp_easing_risk": -4.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": -9.88
+        "regime_discount": -1.58,
+        "totalCapped": -11.46
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -219,6 +227,7 @@
         "rateMomentum": -0.75,
         "interestRate": 3.75,
         "bcOutlook": "Neutral",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "cotPositioning": "2026-03-20"
         }
@@ -228,13 +237,14 @@
         "rateMomentum": -0.75,
         "interestRate": 3.75,
         "esi": 51.0,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "cotPositioning": "2026-03-20"
         }
       }
     },
     "JPY": {
-      "score": 71.6,
+      "score": 68.4,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
       "baseScore": 63.02,
@@ -258,7 +268,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": 8.57
+        "regime_discount": -3.17,
+        "totalCapped": 5.4
       },
       "contributions": {
         "interestRate": 5.21,
@@ -289,6 +300,7 @@
         "rateMomentum": 0.85,
         "interestRate": 0.75,
         "bcOutlook": "Hawkish",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "gdpGrowth": "2026-03-09",
           "inflation": "2026-03-26",
@@ -301,6 +313,7 @@
         "rateMomentum": 0.85,
         "interestRate": 0.75,
         "esi": 52.1,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "gdpGrowth": "2026-03-09",
           "inflation": "2026-03-26",
@@ -310,7 +323,7 @@
       }
     },
     "AUD": {
-      "score": 71.4,
+      "score": 69.3,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
       "baseScore": 62.02,
@@ -334,7 +347,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": 9.43
+        "regime_discount": -2.18,
+        "totalCapped": 7.25
       },
       "contributions": {
         "interestRate": 10.0,
@@ -365,6 +379,7 @@
         "rateMomentum": 0.3,
         "interestRate": 4.1,
         "bcOutlook": "Hawkish",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "businessConfidence": "2026-03-10",
           "cotPositioning": "2026-03-20"
@@ -375,6 +390,7 @@
         "rateMomentum": 0.3,
         "interestRate": 4.1,
         "esi": 51.3,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "businessConfidence": "2026-03-10",
           "cotPositioning": "2026-03-20"
@@ -406,6 +422,7 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
+        "regime_discount": 0.0,
         "totalCapped": 0.09
       },
       "contributions": {
@@ -437,6 +454,7 @@
         "rateMomentum": -0.5,
         "interestRate": 2.25,
         "bcOutlook": "Neutral",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {}
       },
       "meta": {
@@ -444,11 +462,12 @@
         "rateMomentum": -0.5,
         "interestRate": 2.25,
         "esi": 48.9,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {}
       }
     },
     "CHF": {
-      "score": 58.4,
+      "score": 59.8,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 53.31,
@@ -472,7 +491,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": 5.07
+        "regime_discount": 1.38,
+        "totalCapped": 6.45
       },
       "contributions": {
         "interestRate": 7.2,
@@ -503,6 +523,7 @@
         "rateMomentum": -0.5,
         "interestRate": 0.0,
         "bcOutlook": "Neutral",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-09",
           "businessConfidence": "2026-03-25"
@@ -513,6 +534,7 @@
         "rateMomentum": -0.5,
         "interestRate": 0.0,
         "esi": 47.9,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-09",
           "businessConfidence": "2026-03-25"
@@ -520,7 +542,7 @@
       }
     },
     "NZD": {
-      "score": 46.5,
+      "score": 42.3,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
       "baseScore": 46.63,
@@ -544,7 +566,8 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "totalCapped": -0.09
+        "regime_discount": -4.25,
+        "totalCapped": -4.34
       },
       "contributions": {
         "interestRate": 5.3625,
@@ -575,6 +598,7 @@
         "rateMomentum": -1.5,
         "interestRate": 2.25,
         "bcOutlook": "Dovish",
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-18"
         }
@@ -584,6 +608,7 @@
         "rateMomentum": -1.5,
         "interestRate": 2.25,
         "esi": 52.6,
+        "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-18"
         }
@@ -591,8 +616,8 @@
     }
   },
   "ranking": [
-    "JPY",
     "AUD",
+    "JPY",
     "USD",
     "CHF",
     "CAD",
@@ -602,28 +627,10 @@
   ],
   "signals": [
     {
-      "pair": "JPY/GBP",
-      "long": "JPY",
-      "short": "GBP",
-      "spread": 28.3,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
       "pair": "AUD/GBP",
       "long": "AUD",
       "short": "GBP",
-      "spread": 28.1,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
-      "pair": "JPY/NZD",
-      "long": "JPY",
-      "short": "NZD",
-      "spread": 25.1,
+      "spread": 27.6,
       "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
@@ -632,7 +639,25 @@
       "pair": "AUD/NZD",
       "long": "AUD",
       "short": "NZD",
-      "spread": 24.9,
+      "spread": 27.0,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "JPY/GBP",
+      "long": "JPY",
+      "short": "GBP",
+      "spread": 26.7,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "JPY/NZD",
+      "long": "JPY",
+      "short": "NZD",
+      "spread": 26.1,
       "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
@@ -641,7 +666,7 @@
       "pair": "USD/EUR",
       "long": "USD",
       "short": "EUR",
-      "spread": 13.7,
+      "spread": 17.4,
       "confidence": "Media",
       "priceAligned": true,
       "fxGateNote": ""
@@ -847,6 +872,7 @@
       "rateMomentum": -0.69,
       "interestRate": 3.75,
       "esi": 50.5,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "gdpGrowth": "2026-03-13",
         "inflation": "2026-03-13",
@@ -860,6 +886,7 @@
       "rateMomentum": -0.5,
       "interestRate": 2.15,
       "esi": 46.8,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "inflation": "2026-03-27",
         "manufacturingPMI": "2026-03-27",
@@ -875,6 +902,7 @@
       "rateMomentum": -0.75,
       "interestRate": 3.75,
       "esi": 51.0,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "cotPositioning": "2026-03-20"
       }
@@ -884,6 +912,7 @@
       "rateMomentum": 0.85,
       "interestRate": 0.75,
       "esi": 52.1,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "gdpGrowth": "2026-03-09",
         "inflation": "2026-03-26",
@@ -896,6 +925,7 @@
       "rateMomentum": 0.3,
       "interestRate": 4.1,
       "esi": 51.3,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "businessConfidence": "2026-03-10",
         "cotPositioning": "2026-03-20"
@@ -906,6 +936,7 @@
       "rateMomentum": -0.5,
       "interestRate": 2.25,
       "esi": 48.9,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {}
     },
     "CHF": {
@@ -913,6 +944,7 @@
       "rateMomentum": -0.5,
       "interestRate": 0.0,
       "esi": 47.9,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "consumerConfidence": "2026-03-09",
         "businessConfidence": "2026-03-25"
@@ -923,6 +955,7 @@
       "rateMomentum": -1.5,
       "interestRate": 2.25,
       "esi": 52.6,
+      "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "consumerConfidence": "2026-03-18"
       }
