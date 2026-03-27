@@ -1,13 +1,13 @@
 {
   "lastUpdate": "2026-03-27",
-  "modelVersion": "6.7.0",
-  "checksum": "8b14dc72f48bc4acb9e0898620c787d167dc9de9e57501ae216604bb2d634201",
+  "modelVersion": "6.8.0",
+  "checksum": "8017258f71577b9919c69fc02dbdbee6f13955944db45c96b29cac08da4cf536",
   "scores": {
     "USD": {
-      "score": 60.7,
+      "score": 60.8,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 57.08,
+      "baseScore": 57.09,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -24,6 +24,7 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
+        "delta_score": 0.0,
         "rate_expectation": 0.0,
         "totalCapped": 3.67
       },
@@ -46,13 +47,13 @@
         "cotPositioning": 2.5508,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.012,
+        "economicSurprise": 2.02,
         "capitalFlows": 0.0,
         "fxPerformance1M": 6.4113,
         "bond10y": 2.632
       },
       "scoringData": {
-        "economicSurprise": 50.3,
+        "economicSurprise": 50.5,
         "rateMomentum": -0.69,
         "interestRate": 3.75,
         "bcOutlook": "Neutral",
@@ -61,28 +62,28 @@
           "inflation": "2026-03-13",
           "manufacturingPMI": "2026-03-24",
           "servicesPMI": "2026-03-24",
-          "consumerConfidence": "2026-03-13"
+          "consumerConfidence": "2026-03-27"
         }
       },
       "meta": {
         "bcOutlook": "Neutral",
         "rateMomentum": -0.69,
         "interestRate": 3.75,
-        "esi": 50.3,
+        "esi": 50.5,
         "calendarDates": {
           "gdpGrowth": "2026-03-13",
           "inflation": "2026-03-13",
           "manufacturingPMI": "2026-03-24",
           "servicesPMI": "2026-03-24",
-          "consumerConfidence": "2026-03-13"
+          "consumerConfidence": "2026-03-27"
         }
       }
     },
     "EUR": {
-      "score": 49.5,
+      "score": 47.0,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 49.34,
+      "baseScore": 48.86,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.0,
@@ -99,8 +100,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
+        "delta_score": -2.0,
         "rate_expectation": 0.0,
-        "totalCapped": 0.13
+        "totalCapped": -1.87
       },
       "contributions": {
         "interestRate": 5.9325,
@@ -114,26 +116,27 @@
         "gdpGrowth": 4.27,
         "unemployment": 0.0,
         "production": 1.44,
-        "retailSales": 1.0,
+        "retailSales": 0.56,
         "wageGrowth": 2.0,
         "manufacturingPMI": 2.43,
         "servicesPMI": 3.05,
         "cotPositioning": 0.84,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.484,
-        "economicSurprise": 1.916,
+        "economicSurprise": 1.872,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.5793,
         "bond10y": 2.1047
       },
       "scoringData": {
-        "economicSurprise": 47.9,
+        "economicSurprise": 46.8,
         "rateMomentum": -0.5,
         "interestRate": 2.15,
         "bcOutlook": "Dovish",
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
+          "retailSales": "2026-03-27",
           "wageGrowth": "2026-03-19",
           "consumerConfidence": "2026-03-26",
           "businessConfidence": "2026-03-25",
@@ -144,10 +147,11 @@
         "bcOutlook": "Dovish",
         "rateMomentum": -0.5,
         "interestRate": 2.15,
-        "esi": 47.9,
+        "esi": 46.8,
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
+          "retailSales": "2026-03-27",
           "wageGrowth": "2026-03-19",
           "consumerConfidence": "2026-03-26",
           "businessConfidence": "2026-03-25",
@@ -156,7 +160,7 @@
       }
     },
     "GBP": {
-      "score": 50.8,
+      "score": 47.3,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 53.15,
@@ -176,8 +180,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
+        "delta_score": -3.5,
         "rate_expectation": -0.13,
-        "totalCapped": -2.38
+        "totalCapped": -5.88
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -198,13 +203,13 @@
         "cotPositioning": 4.8,
         "consumerConfidence": 0.24,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.036,
+        "economicSurprise": 2.04,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.7122,
         "bond10y": 2.768
       },
       "scoringData": {
-        "economicSurprise": 50.9,
+        "economicSurprise": 51.0,
         "rateMomentum": -0.75,
         "interestRate": 3.75,
         "bcOutlook": "Neutral",
@@ -216,17 +221,17 @@
         "bcOutlook": "Neutral",
         "rateMomentum": -0.75,
         "interestRate": 3.75,
-        "esi": 50.9,
+        "esi": 51.0,
         "calendarDates": {
           "cotPositioning": "2026-03-20"
         }
       }
     },
     "JPY": {
-      "score": 70.9,
+      "score": 71.6,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 63.01,
+      "baseScore": 63.02,
       "contextualAdj": {
         "safe_haven": 1.3,
         "commodity": 0.0,
@@ -243,8 +248,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
+        "delta_score": 0.7,
         "rate_expectation": 0.0,
-        "totalCapped": 7.87
+        "totalCapped": 8.57
       },
       "contributions": {
         "interestRate": 5.21,
@@ -265,13 +271,13 @@
         "cotPositioning": 4.8,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.08,
+        "economicSurprise": 2.084,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.35,
         "bond10y": 1.23
       },
       "scoringData": {
-        "economicSurprise": 52.0,
+        "economicSurprise": 52.1,
         "rateMomentum": 0.85,
         "interestRate": 0.75,
         "bcOutlook": "Hawkish",
@@ -286,7 +292,7 @@
         "bcOutlook": "Hawkish",
         "rateMomentum": 0.85,
         "interestRate": 0.75,
-        "esi": 52.0,
+        "esi": 52.1,
         "calendarDates": {
           "gdpGrowth": "2026-03-09",
           "inflation": "2026-03-26",
@@ -296,10 +302,10 @@
       }
     },
     "AUD": {
-      "score": 74.9,
+      "score": 70.9,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 62.01,
+      "baseScore": 62.02,
       "contextualAdj": {
         "safe_haven": 0.52,
         "commodity": 8,
@@ -316,8 +322,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.96,
         "stale_score": 0.0,
+        "delta_score": -4.0,
         "rate_expectation": 0.0,
-        "totalCapped": 12.93
+        "totalCapped": 8.93
       },
       "contributions": {
         "interestRate": 10.0,
@@ -338,13 +345,13 @@
         "cotPositioning": 0.9146,
         "consumerConfidence": 0.844,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.044,
+        "economicSurprise": 2.052,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.3958,
         "bond10y": 2.7045
       },
       "scoringData": {
-        "economicSurprise": 51.1,
+        "economicSurprise": 51.3,
         "rateMomentum": 0.3,
         "interestRate": 4.1,
         "bcOutlook": "Hawkish",
@@ -357,7 +364,7 @@
         "bcOutlook": "Hawkish",
         "rateMomentum": 0.3,
         "interestRate": 4.1,
-        "esi": 51.1,
+        "esi": 51.3,
         "calendarDates": {
           "businessConfidence": "2026-03-10",
           "cotPositioning": "2026-03-20"
@@ -368,7 +375,7 @@
       "score": 51.8,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 52.33,
+      "baseScore": 52.34,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.53,
@@ -385,6 +392,7 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": -0.27,
         "stale_score": 0.0,
+        "delta_score": 0.0,
         "rate_expectation": 0.0,
         "totalCapped": -0.52
       },
@@ -407,13 +415,13 @@
         "cotPositioning": 0.9764,
         "consumerConfidence": 1.3496,
         "businessConfidence": 0.0,
-        "economicSurprise": 1.948,
+        "economicSurprise": 1.956,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.9735,
         "bond10y": 2.288
       },
       "scoringData": {
-        "economicSurprise": 48.7,
+        "economicSurprise": 48.9,
         "rateMomentum": -0.5,
         "interestRate": 2.25,
         "bcOutlook": "Neutral",
@@ -423,7 +431,7 @@
         "bcOutlook": "Neutral",
         "rateMomentum": -0.5,
         "interestRate": 2.25,
-        "esi": 48.7,
+        "esi": 48.9,
         "calendarDates": {}
       }
     },
@@ -431,7 +439,7 @@
       "score": 58.4,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 53.33,
+      "baseScore": 53.34,
       "contextualAdj": {
         "safe_haven": 3.9,
         "commodity": 0.0,
@@ -448,6 +456,7 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
+        "delta_score": 0.0,
         "rate_expectation": 0.0,
         "totalCapped": 5.07
       },
@@ -470,13 +479,13 @@
         "cotPositioning": 4.2616,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
-        "economicSurprise": 1.904,
+        "economicSurprise": 1.916,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.4712,
         "bond10y": 0.48
       },
       "scoringData": {
-        "economicSurprise": 47.6,
+        "economicSurprise": 47.9,
         "rateMomentum": -0.5,
         "interestRate": 0.0,
         "bcOutlook": "Neutral",
@@ -489,7 +498,7 @@
         "bcOutlook": "Neutral",
         "rateMomentum": -0.5,
         "interestRate": 0.0,
-        "esi": 47.6,
+        "esi": 47.9,
         "calendarDates": {
           "consumerConfidence": "2026-03-09",
           "businessConfidence": "2026-03-25"
@@ -497,10 +506,10 @@
       }
     },
     "NZD": {
-      "score": 48.7,
+      "score": 46.6,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 46.64,
+      "baseScore": 46.66,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.14,
@@ -517,8 +526,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 3.0,
         "stale_score": 0.0,
+        "delta_score": -2.2,
         "rate_expectation": 0.0,
-        "totalCapped": 2.11
+        "totalCapped": -0.09
       },
       "contributions": {
         "interestRate": 5.3625,
@@ -539,13 +549,13 @@
         "cotPositioning": 1.767,
         "consumerConfidence": 0.982,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.088,
+        "economicSurprise": 2.104,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.1254,
         "bond10y": 2.715
       },
       "scoringData": {
-        "economicSurprise": 52.2,
+        "economicSurprise": 52.6,
         "rateMomentum": -1.5,
         "interestRate": 2.25,
         "bcOutlook": "Dovish",
@@ -557,7 +567,7 @@
         "bcOutlook": "Dovish",
         "rateMomentum": -1.5,
         "interestRate": 2.25,
-        "esi": 52.2,
+        "esi": 52.6,
         "calendarDates": {
           "consumerConfidence": "2026-03-18"
         }
@@ -565,8 +575,8 @@
     }
   },
   "ranking": [
-    "AUD",
     "JPY",
+    "AUD",
     "USD",
     "CHF",
     "CAD",
@@ -576,32 +586,49 @@
   ],
   "signals": [
     {
-      "pair": "AUD/NZD",
-      "long": "AUD",
-      "short": "NZD",
-      "spread": 26.2,
-      "confidence": "Alta"
-    },
-    {
-      "pair": "AUD/EUR",
-      "long": "AUD",
-      "short": "EUR",
-      "spread": 25.4,
-      "confidence": "Alta"
-    },
-    {
       "pair": "JPY/NZD",
       "long": "JPY",
       "short": "NZD",
-      "spread": 22.2,
-      "confidence": "Alta"
+      "spread": 25.0,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
     },
     {
       "pair": "JPY/EUR",
       "long": "JPY",
       "short": "EUR",
-      "spread": 21.4,
-      "confidence": "Alta"
+      "spread": 24.6,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "AUD/NZD",
+      "long": "AUD",
+      "short": "NZD",
+      "spread": 24.3,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "AUD/EUR",
+      "long": "AUD",
+      "short": "EUR",
+      "spread": 23.9,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "USD/GBP",
+      "long": "USD",
+      "short": "GBP",
+      "spread": 13.5,
+      "confidence": "Media",
+      "priceAligned": true,
+      "fxGateNote": ""
     }
   ],
   "contributions": {
@@ -624,7 +651,7 @@
       "cotPositioning": 2.5508,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.012,
+      "economicSurprise": 2.02,
       "capitalFlows": 0.0,
       "fxPerformance1M": 6.4113,
       "bond10y": 2.632
@@ -641,14 +668,14 @@
       "gdpGrowth": 4.27,
       "unemployment": 0.0,
       "production": 1.44,
-      "retailSales": 1.0,
+      "retailSales": 0.56,
       "wageGrowth": 2.0,
       "manufacturingPMI": 2.43,
       "servicesPMI": 3.05,
       "cotPositioning": 0.84,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.484,
-      "economicSurprise": 1.916,
+      "economicSurprise": 1.872,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.5793,
       "bond10y": 2.1047
@@ -672,7 +699,7 @@
       "cotPositioning": 4.8,
       "consumerConfidence": 0.24,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.036,
+      "economicSurprise": 2.04,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.7122,
       "bond10y": 2.768
@@ -696,7 +723,7 @@
       "cotPositioning": 4.8,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.08,
+      "economicSurprise": 2.084,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.35,
       "bond10y": 1.23
@@ -720,7 +747,7 @@
       "cotPositioning": 0.9146,
       "consumerConfidence": 0.844,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.044,
+      "economicSurprise": 2.052,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.3958,
       "bond10y": 2.7045
@@ -744,7 +771,7 @@
       "cotPositioning": 0.9764,
       "consumerConfidence": 1.3496,
       "businessConfidence": 0.0,
-      "economicSurprise": 1.948,
+      "economicSurprise": 1.956,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.9735,
       "bond10y": 2.288
@@ -768,7 +795,7 @@
       "cotPositioning": 4.2616,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
-      "economicSurprise": 1.904,
+      "economicSurprise": 1.916,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.4712,
       "bond10y": 0.48
@@ -792,7 +819,7 @@
       "cotPositioning": 1.767,
       "consumerConfidence": 0.982,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.088,
+      "economicSurprise": 2.104,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.1254,
       "bond10y": 2.715
@@ -803,23 +830,24 @@
       "bcOutlook": "Neutral",
       "rateMomentum": -0.69,
       "interestRate": 3.75,
-      "esi": 50.3,
+      "esi": 50.5,
       "calendarDates": {
         "gdpGrowth": "2026-03-13",
         "inflation": "2026-03-13",
         "manufacturingPMI": "2026-03-24",
         "servicesPMI": "2026-03-24",
-        "consumerConfidence": "2026-03-13"
+        "consumerConfidence": "2026-03-27"
       }
     },
     "EUR": {
       "bcOutlook": "Dovish",
       "rateMomentum": -0.5,
       "interestRate": 2.15,
-      "esi": 47.9,
+      "esi": 46.8,
       "calendarDates": {
         "inflation": "2026-03-27",
         "manufacturingPMI": "2026-03-27",
+        "retailSales": "2026-03-27",
         "wageGrowth": "2026-03-19",
         "consumerConfidence": "2026-03-26",
         "businessConfidence": "2026-03-25",
@@ -830,7 +858,7 @@
       "bcOutlook": "Neutral",
       "rateMomentum": -0.75,
       "interestRate": 3.75,
-      "esi": 50.9,
+      "esi": 51.0,
       "calendarDates": {
         "cotPositioning": "2026-03-20"
       }
@@ -839,7 +867,7 @@
       "bcOutlook": "Hawkish",
       "rateMomentum": 0.85,
       "interestRate": 0.75,
-      "esi": 52.0,
+      "esi": 52.1,
       "calendarDates": {
         "gdpGrowth": "2026-03-09",
         "inflation": "2026-03-26",
@@ -851,7 +879,7 @@
       "bcOutlook": "Hawkish",
       "rateMomentum": 0.3,
       "interestRate": 4.1,
-      "esi": 51.1,
+      "esi": 51.3,
       "calendarDates": {
         "businessConfidence": "2026-03-10",
         "cotPositioning": "2026-03-20"
@@ -861,14 +889,14 @@
       "bcOutlook": "Neutral",
       "rateMomentum": -0.5,
       "interestRate": 2.25,
-      "esi": 48.7,
+      "esi": 48.9,
       "calendarDates": {}
     },
     "CHF": {
       "bcOutlook": "Neutral",
       "rateMomentum": -0.5,
       "interestRate": 0.0,
-      "esi": 47.6,
+      "esi": 47.9,
       "calendarDates": {
         "consumerConfidence": "2026-03-09",
         "businessConfidence": "2026-03-25"
@@ -878,7 +906,7 @@
       "bcOutlook": "Dovish",
       "rateMomentum": -1.5,
       "interestRate": 2.25,
-      "esi": 52.2,
+      "esi": 52.6,
       "calendarDates": {
         "consumerConfidence": "2026-03-18"
       }
