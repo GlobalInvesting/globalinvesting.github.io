@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-27",
-  "modelVersion": "6.8.0",
-  "checksum": "71ff0b496c10b3d9a46fbcc4e73892a7b72443ed8a8a55629aad120b26960c65",
+  "modelVersion": "6.9.0",
+  "checksum": "4f8ea6f1fea1603ff7ec38fd6b3e24acfe94111cad3f11b2c140b83b285fac7d",
   "scores": {
     "USD": {
       "score": 60.7,
@@ -26,6 +26,8 @@
         "stale_score": 0.0,
         "delta_score": 0.0,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": 3.67
       },
       "contributions": {
@@ -102,6 +104,8 @@
         "stale_score": 0.0,
         "delta_score": -2.0,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": -1.87
       },
       "contributions": {
@@ -160,7 +164,7 @@
       }
     },
     "GBP": {
-      "score": 47.3,
+      "score": 43.3,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 53.13,
@@ -182,7 +186,9 @@
         "stale_score": 0.0,
         "delta_score": -3.5,
         "rate_expectation": -0.13,
-        "totalCapped": -5.88
+        "gbp_easing_risk": -4.0,
+        "jpy_timing_haircut": 0.0,
+        "totalCapped": -9.88
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -250,6 +256,8 @@
         "stale_score": 0.0,
         "delta_score": 0.7,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": 8.57
       },
       "contributions": {
@@ -324,6 +332,8 @@
         "stale_score": 0.0,
         "delta_score": -3.5,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": 9.43
       },
       "contributions": {
@@ -394,6 +404,8 @@
         "stale_score": 0.0,
         "delta_score": 0.0,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": 0.09
       },
       "contributions": {
@@ -458,6 +470,8 @@
         "stale_score": 0.0,
         "delta_score": 0.0,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": 5.07
       },
       "contributions": {
@@ -528,6 +542,8 @@
         "stale_score": 0.0,
         "delta_score": -2.2,
         "rate_expectation": 0.0,
+        "gbp_easing_risk": 0.0,
+        "jpy_timing_haircut": 0.0,
         "totalCapped": -0.09
       },
       "contributions": {
@@ -580,11 +596,29 @@
     "USD",
     "CHF",
     "CAD",
-    "GBP",
     "EUR",
-    "NZD"
+    "NZD",
+    "GBP"
   ],
   "signals": [
+    {
+      "pair": "JPY/GBP",
+      "long": "JPY",
+      "short": "GBP",
+      "spread": 28.3,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "AUD/GBP",
+      "long": "AUD",
+      "short": "GBP",
+      "spread": 28.1,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
     {
       "pair": "JPY/NZD",
       "long": "JPY",
@@ -604,28 +638,10 @@
       "fxGateNote": ""
     },
     {
-      "pair": "JPY/EUR",
-      "long": "JPY",
-      "short": "EUR",
-      "spread": 24.6,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
-      "pair": "AUD/EUR",
-      "long": "AUD",
-      "short": "EUR",
-      "spread": 24.4,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
-      "pair": "USD/GBP",
+      "pair": "USD/EUR",
       "long": "USD",
-      "short": "GBP",
-      "spread": 13.4,
+      "short": "EUR",
+      "spread": 13.7,
       "confidence": "Media",
       "priceAligned": true,
       "fxGateNote": ""
