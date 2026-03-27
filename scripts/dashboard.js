@@ -1623,7 +1623,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.6.5-2026-03-25'; // bump: fxPerformance1W + institutional pair momentum
+          DASHBOARD_VERSION = '6.7.0-2026-03-27'; // bump: ALERTS TTL 1h→5min, fetchExtendedData 5 reintentos/13s, invalidación caché scores, CSP fix
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
