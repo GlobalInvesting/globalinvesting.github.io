@@ -2,11 +2,11 @@
   "currency": "CHF",
   "country": "Suiza",
   "bank": "Banco Nacional Suizo (SNB)",
-  "analysis": "El Banco Nacional Suizo ha mantenido una postura dovish desde que recortó las tasas en 0.25pp en junio 2025, lo que ha generado presión bajista sobre la divisa. Aunque los mercados ya descuentan este escenario, el presidente del SNB ha mencionado que están preparados para introducir tasas negativas si es necesario, lo que podría ejercer aún más presión sobre la divisa. Esta postura expansiva se refleja en el ciclo bajista de las tasas en 12 meses, con una acumulación de -0.50pp.\n\nLa cuenta corriente y la balanza comercial de Suiza presentan un superávit, lo que genera una demanda estructural de la divisa. La composición exportadora del país, liderada por productos farmacéuticos e instrumentos de precisión, explica en parte este superávit. Sin embargo, la inflación y el crecimiento del PIB se encuentran por debajo del promedio global, lo que podría afectar la economía en el largo plazo.\n\nEl posicionamiento especulativo en el mercado muestra un sesgo neto alcista, con +0.5K contratos netos, y el rendimiento FX del último mes ha sido positivo, con una apreciación del 1.77% vs USD. Aunque el presidente del SNB ha mencionado que la tasa de política es la herramienta principal, también ha destacado que la intervención en el mercado de divisas puede ser más adecuada en ciertas situaciones, lo que introduce incertidumbre en el mercado.",
+  "analysis": "El Banco Nacional Suizo ha mantenido las tasas en 0.00% desde que las recortó 0.25pp en junio 2025, lo que sugiere un ciclo expansivo con menor carry y, por lo tanto, presión bajista sobre la divisa. Aunque la tasa de interés está muy por debajo del promedio global, la economía suiza presenta un perfil de activo refugio debido a su superávit de cuenta corriente y deuda contenida, lo que puede atraer flujos defensivos en momentos de tensión global.\n\nLa balanza comercial suiza muestra un superávit, impulsado principalmente por exportaciones de productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales. Esta composición exportadora sugiere que la economía suiza puede beneficiarse de la demanda global de estos productos, aunque los términos de intercambio desfavorables pueden afectar negativamente las importaciones. La cuenta corriente también presenta un superávit, lo que indica una demanda estructural de la divisa.\n\nEl par USD/CHF ha mostrado un momentum alcista, desafiando su media móvil de 200 días, lo que sugiere una posible continuación de la tendencia. Aunque el posicionamiento especulativo es ligeramente alcista, el rendimiento FX del último mes ha sido positivo, lo que puede indicar una apreciación de la divisa. Sin embargo, la tasa de interés baja y el ciclo expansivo del banco central pueden ejercer presión a la baja sobre la divisa a largo plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-26T10:11:54.999456+00:00",
+  "generatedAt": "2026-03-27T10:06:29.240618+00:00",
   "exportComposition": "Principales exportaciones: productos farmacéuticos, instrumentos de precisión, piedras preciosas y metales",
-  "newsCount": 1,
+  "newsCount": 2,
   "dataSnapshot": {
     "interestRate": 0.0,
     "gdpGrowth": 0.7,
@@ -25,12 +25,13 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.50pp acumulados)"
     },
     "cotPositioning": 513,
-    "fxPerformance1M": 1.7669,
+    "fxPerformance1M": 2.1881,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-26",
-    "latestNewsTs": 1774374329.0,
+    "lastUpdate": "2026-03-27",
+    "latestNewsTs": 1774544712.0,
     "newsHeadlines": [
-      "SNB Chairman: We are prepared to introduce negative rates but the hurdle is high"
+      "USD/CHF Forecast: Critical Bullish Momentum Builds as Pair Challenges 200-Day SM",
+      "USDCHF moved higher yesterday and is continuing today. The high for the week tar"
     ]
   },
   "globalContext": {
@@ -38,8 +39,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.46,
-    "avg_fx_perf_1m": 0.61,
+    "avg_bond10y": 3.43,
+    "avg_fx_perf_1m": 0.92,
     "avg_cot": -9265.62
   }
 }

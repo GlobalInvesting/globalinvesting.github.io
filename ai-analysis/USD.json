@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que ha generado una presión bajista sobre la divisa debido al menor carry. Aunque la tasa de interés se encuentra en 3.75%, 1.37pp por encima del promedio global, el ciclo bajista en 12 meses y la decisión de bajar tasas sugieren un enfoque dovish por parte del banco central. La inflación se mantiene por encima del objetivo, lo que podría influir en las decisiones futuras de la Fed.\n\nLa cuenta corriente presenta un déficit del 4.1% del PIB, lo que ejerce presión vendedora estructural sobre la divisa. La balanza comercial también muestra un déficit en bienes, lo que se explica en parte por la composición exportadora, donde los combustibles y petróleo representan el 20% de las exportaciones. La situación global, con un régimen risk-off, podría dirigir flujos hacia activos refugio, lo que podría influir en la divisa.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -5.6K contratos netos, lo que se refleja en el rendimiento FX del último mes, que ha sido de -2.50% vs USD. Aunque los mercados permanecen inciertos sobre el conflicto entre Estados Unidos e Irán, la situación no parece tener un impacto directo en la divisa en este momento. La expiración de opciones FX podría influir en el mercado, pero por ahora, la tendencia sigue siendo bajista.",
+  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, generando presión bajista sobre la divisa. Aunque la tasa de interés actual de 3.75% está por encima del promedio global, la decisión de bajar tasas sugiere un enfoque más dovish. La inflación anual de 2.4% y el crecimiento del PIB de 2.0% indican que la economía sigue siendo resiliente.\n\nLa composición exportadora de los Estados Unidos, con un fuerte componente de combustibles y petróleo, explica en parte el déficit comercial. La situación global de risk-off también contribuye a la presión sobre la divisa. Aunque el dólar ha mantenido su valor, la noticia de que el oro mantiene su tendencia alcista sugiere que la divisa podría seguir bajo presión.\n\nEl posicionamiento especulativo neto bajista y el rendimiento FX del último mes de -2.73% vs USD indican que el mercado está apostando por una depreciación adicional de la divisa. La noticia de que la pausa en el conflicto con Irán podría actuar como un \"válvula de alivio\" sugiere que la divisa seguirá siendo sensible a los eventos geopolíticos y las decisiones monetarias.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-26T10:11:20.624054+00:00",
+  "generatedAt": "2026-03-27T10:05:44.589968+00:00",
   "exportComposition": "Comtrade 2023: combustibles y petróleo (20%, $572.8B), maquinaria industrial (13%, $381.9B), equipos eléctricos y electrónicos (13%, $373.2B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": -5615,
-    "fxPerformance1M": -2.5049,
+    "fxPerformance1M": -2.7264,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-26",
-    "latestNewsTs": 1774505926.0,
+    "lastUpdate": "2026-03-27",
+    "latestNewsTs": 1774594370.0,
     "newsHeadlines": [
-      "Aussie’s Fertilizer Trap: Urea Price Explosion Squeezes AUD",
-      "FX option expiries for 26 March 10am New York cut",
-      "Markets remain torn on what will become of the US-Iran conflict next"
+      "Gold clings to bullish bias amid weaker USD; upside seems limited amid hawkish F",
+      "Iran Strike Pause: Slow-Boil Inflation Nightmare Scenario Keeps Dollar on Top",
+      "FX option expiries for 27 March 10am New York cut"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.46,
-    "avg_fx_perf_1m": 0.61,
+    "avg_bond10y": 3.43,
+    "avg_fx_perf_1m": 0.92,
     "avg_cot": -9265.62
   }
 }

@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que sugiere un enfoque más dovish y presión bajista sobre la divisa. Aunque la tasa de interés del Reino Unido es superior a la del promedio global, el ciclo bajista en 12 meses y la inflación por encima del objetivo podrían limitar el potencial alcista de la divisa. La noticia de que la inflación en el Reino Unido se mantiene en 3.0% anual, la más alta entre sus pares, podría influir en las decisiones del banco central.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora, dominada por piedras preciosas y metales, podría ser sensible a los cambios en la demanda global y los precios de las commodities. Aunque el PMI manufacturero indica expansión, la producción industrial y las ventas minoristas muestran un comportamiento más débil, lo que podría afectar la cuenta corriente y, por ende, la divisa.\n\nEl posicionamiento especulativo muestra un sesgo alcista, con 11.8K contratos netos, aunque el rendimiento FX del último mes ha sido más moderado. La noticia sobre el giro hawkish del Banco de Inglaterra y las declaraciones de la policymaker Megan Greene sobre la inflación podrían influir en el mercado y sostener el precio de la divisa. Sin embargo, la presión vendedora estructural y el ciclo bajista en tasas podrían limitar el potencial alcista a corto plazo.",
+  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo expansivo con menor carry, presionando a la baja la divisa. La tasa de interés del Reino Unido es de 3.75%, aunque la decisión de bajar tasas sugiere una postura dovish, lo que podría debilitar la divisa.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado de -19.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora no parece ser lo suficientemente fuerte como para revertir este déficit. El régimen global risk-off podría dirigir flujos hacia activos refugio, lo que podría afectar negativamente la divisa.\n\nEl posicionamiento especulativo muestra un sesgo neto alcista con +11.8K contratos netos, y el rendimiento FX del último mes fue de +1.08% vs USD. Sin embargo, la noticia sobre el EUR/GBP y la perspectiva de la Bank of England podría cambiar esta tendencia, introduciendo incertidumbre en el mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-26T10:11:30.464083+00:00",
+  "generatedAt": "2026-03-27T10:06:01.360667+00:00",
   "exportComposition": "Comtrade 2023: piedras preciosas y metales (77%, $0.9B), bebidas y líquidos alcohólicos (19%, $0.2B), productos químicos orgánicos (0%, $0.0B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
     "cotPositioning": 11768,
-    "fxPerformance1M": 0.4351,
+    "fxPerformance1M": 1.0821,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-26",
-    "latestNewsTs": 1774464180.0,
+    "lastUpdate": "2026-03-27",
+    "latestNewsTs": 1774570470.0,
     "newsHeadlines": [
-      "UK Inflation Holds at 3.0% as Britain Remains Highest Among Peers",
-      "GBP Surges: BoE’s Hawkish Pivot Bolsters Pound as UOB Analysis Signals Sustained",
-      "BoE’s Greene Signals Inflation Concerns Without Immediate Hike Bias"
+      "GBP/USD drifts lower as Iran oil shock clouds the BoE rate outlook",
+      "EUR/GBP Forecast: Critical Upside Risks Emerge as Bank of England Shifts Dovishl",
+      "BoE’s Breeden: ‘Lackluster’ Growth is the UK’s Disinflationary Shield"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.46,
-    "avg_fx_perf_1m": 0.61,
+    "avg_bond10y": 3.43,
+    "avg_fx_perf_1m": 0.92,
     "avg_cot": -9265.62
   }
 }

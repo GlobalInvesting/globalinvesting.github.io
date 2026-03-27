@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo restrictiva, con una tasa de interés del 4.10%, significativamente superior al promedio global. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ejerce presión alcista sobre la divisa. Aunque los mercados ya han descuento un ciclo restrictivo activo, las declaraciones del banco central sobre el riesgo de stagflación y la posible necesidad de más subidas de tasas mantienen la incertidumbre.\n\nLa balanza comercial de Australia muestra un superávit en bienes, gracias principalmente a la exportación de minerales metalíferos. Sin embargo, la cuenta corriente presenta un déficit, lo que ejerce presión vendedora estructural sobre la divisa. Los términos de intercambio favorables y el crecimiento del PIB superior al promedio global también influyen en la dinámica de la divisa.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con un COT de +45.4K contratos netos, lo que aumenta el riesgo de corrección ante cualquier decepción en los datos. La reciente advertencia del banco central sobre el impacto del conflicto en Medio Oriente en la inflación y el crecimiento económico introduce incertidumbre de corto plazo, aunque el rendimiento FX del último mes sigue siendo positivo, con una apreciación del 1.08% vs USD.",
+  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo hawkish, con una tasa de interés en 4.10%, significativamente superior al promedio global. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ha ejercido presión alcista sobre la divisa. Aunque los mercados de futuros ya descuentan un ciclo restrictivo activo, las declaraciones del banco central sugieren que podrían subir las tasas nuevamente si la inflación no se contiene.\n\nLa balanza comercial de Australia sigue siendo superavitaria, gracias a la composición exportadora dominada por minerales metalíferos y piedras preciosas. Sin embargo, la cuenta corriente sigue en déficit, lo que ejerce presión vendedora estructural sobre la divisa. La situación se complica con la creciente aversión al riesgo y la posible \"trampa de estagflación\" que podría limitar la capacidad del banco central para subir las tasas.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con un COT de +45.4K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción en los datos. La noticia de que el asistente del gobernador del RBA advirtió sobre un posible aumento en las tasas neutrales y choques de precios de los combustibles podría desencadenar más subidas, lo que ha llevado al par AUD/JPY a acelerar su caída.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-26T10:11:44.909404+00:00",
+  "generatedAt": "2026-03-27T10:06:18.082330+00:00",
   "exportComposition": "Comtrade 2023: minerales metalíferos (73%, $193.9B), piedras preciosas y metales (8%, $20.3B), equipos eléctricos y electrónicos (3%, $6.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -25,14 +25,14 @@
       "cycle_label": "estable en los últimos 12 meses"
     },
     "cotPositioning": 45359,
-    "fxPerformance1M": 1.0792,
+    "fxPerformance1M": 1.9515,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-26",
-    "latestNewsTs": 1774505637.0,
+    "lastUpdate": "2026-03-27",
+    "latestNewsTs": 1774581762.0,
     "newsHeadlines": [
-      "AUD/USD: RBA weighs stagflation risks – Commerzbank",
-      "RBA Warns of ‘Restrictive’ Shift: Why Rising Neutral Rates and Petrol Shocks Cou",
-      "RBA warns Middle East conflict may lift inflation and hit growth outlook"
+      "Stagflation Trap Could Tie RBA’s Hawkish Hand, and Send AUD/JPY to 103",
+      "AUDUSD trades to the downside and tests a key target floor area between 0.6896 a",
+      "RBA Warns of ‘Restrictive’ Shift: Why Rising Neutral Rates and Petrol Shocks Cou"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.46,
-    "avg_fx_perf_1m": 0.61,
+    "avg_bond10y": 3.43,
+    "avg_fx_perf_1m": 0.92,
     "avg_cot": -9265.62
   }
 }
