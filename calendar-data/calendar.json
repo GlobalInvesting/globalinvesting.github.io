@@ -1,6 +1,6 @@
 {
   "lastUpdate": "2026-03-27",
-  "generatedAt": "2026-03-27T09:30:01.205973Z",
+  "generatedAt": "2026-03-27T10:26:25.591743Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -9,20 +9,20 @@
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
   "rangeTo": "2026-04-26",
-  "totalEvents": 1356,
+  "totalEvents": 1358,
   "currencyCounts": {
     "AUD": 110,
     "CAD": 75,
     "CHF": 46,
-    "EUR": 212,
+    "EUR": 213,
     "GBP": 155,
     "JPY": 158,
     "NZD": 54,
-    "USD": 546
+    "USD": 547
   },
   "impactCounts": {
-    "low": 661,
-    "medium": 526,
+    "low": 662,
+    "medium": 527,
     "high": 169
   },
   "events": [
@@ -9857,19 +9857,6 @@
     {
       "date": "20 Mar",
       "dateISO": "2026-03-20",
-      "timeUTC": "12:05",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed's Bowman speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "20 Mar",
-      "dateISO": "2026-03-20",
       "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
@@ -10308,19 +10295,6 @@
       "actual": "218.7",
       "forecast": "",
       "previous": "228.0"
-    },
-    {
-      "date": "21 Mar",
-      "dateISO": "2026-03-21",
-      "timeUTC": "14:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "Fed's Chair Powell speech",
-      "impact": "low",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
     },
     {
       "date": "23 Mar",
@@ -11144,6 +11118,19 @@
     {
       "date": "24 Mar",
       "dateISO": "2026-03-24",
+      "timeUTC": "15:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB's Lane Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
       "timeUTC": "17:00",
       "country": "USD",
       "currency": "USD",
@@ -11202,6 +11189,19 @@
       "flag": "🇪🇺",
       "event": "Independence Day",
       "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "24 Mar",
+      "dateISO": "2026-03-24",
+      "timeUTC": "22:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Vice Chair for Supervision Barr Speaks",
+      "impact": "medium",
       "actual": "",
       "forecast": "",
       "previous": ""
@@ -12903,19 +12903,6 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Fed's Barr speech",
-      "impact": "high",
-      "actual": "",
-      "forecast": "",
-      "previous": ""
-    },
-    {
-      "date": "26 Mar",
-      "dateISO": "2026-03-26",
-      "timeUTC": "23:10",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
       "event": "Fed Vice Chair for Supervision Barr Speaks",
       "impact": "medium",
       "actual": "",
@@ -14505,7 +14492,7 @@
       "event": "Unemployment Rate (Feb)",
       "impact": "low",
       "actual": "",
-      "forecast": "",
+      "forecast": "2.7",
       "previous": "2.7%"
     },
     {
@@ -14518,7 +14505,7 @@
       "event": "Tokyo CPI ex Fresh Food (YoY)",
       "impact": "high",
       "actual": "",
-      "forecast": "",
+      "forecast": "1.8",
       "previous": "1.8"
     },
     {
@@ -14531,7 +14518,7 @@
       "event": "Jobs / Applicants Ratio",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "1.18",
       "previous": "1.18"
     },
     {
@@ -14544,7 +14531,7 @@
       "event": "Industrial Production (MoM) (Feb)",
       "impact": "medium",
       "actual": "",
-      "forecast": "",
+      "forecast": "-2.1",
       "previous": "4.3%"
     },
     {
@@ -14789,10 +14776,10 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Housing Starts (YoY) (Feb)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-0.4"
+      "previous": "-0.4%"
     },
     {
       "date": "31 Mar",
@@ -14844,7 +14831,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-12.067"
+      "previous": "-12.1B"
     },
     {
       "date": "31 Mar",
@@ -14854,10 +14841,10 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "GDP (QoQ) (Q4)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "0.1",
-      "previous": "0.1"
+      "previous": "0.1%"
     },
     {
       "date": "31 Mar",
@@ -14867,10 +14854,10 @@
       "currency": "GBP",
       "flag": "🇬🇧",
       "event": "GDP (YoY) (Q4)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
-      "forecast": "1.0",
-      "previous": "1.0"
+      "forecast": "1.0%",
+      "previous": "1.3%"
     },
     {
       "date": "31 Mar",
@@ -15152,29 +15139,16 @@
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
-      "event": "Retail Sales (YoY)",
-      "impact": "medium",
-      "actual": "",
-      "forecast": "",
-      "previous": "5.1"
-    },
-    {
-      "date": "31 Mar",
-      "dateISO": "2026-03-31",
-      "timeUTC": "10:00",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
       "event": "CPI (YoY) (Mar)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "2.1"
+      "previous": "1.9%"
     },
     {
       "date": "31 Mar",
       "dateISO": "2026-03-31",
-      "timeUTC": "10:00",
+      "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
@@ -15182,7 +15156,20 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "0.1"
+      "previous": "0.6%"
+    },
+    {
+      "date": "31 Mar",
+      "dateISO": "2026-03-31",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Retail Sales (YoY)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "5.1"
     },
     {
       "date": "31 Mar",
@@ -15213,15 +15200,15 @@
     {
       "date": "31 Mar",
       "dateISO": "2026-03-31",
-      "timeUTC": "12:30",
+      "timeUTC": "12:31",
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
       "event": "GDP (MoM) (Jan)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
-      "forecast": "0.0",
-      "previous": "0.2"
+      "forecast": "0.0%",
+      "previous": "0.2%"
     },
     {
       "date": "31 Mar",
@@ -15231,10 +15218,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Redbook (YoY)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "6.7"
+      "previous": "6.7%"
     },
     {
       "date": "31 Mar",
@@ -15377,7 +15364,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "",
-      "previous": "6.946"
+      "previous": "6.946M"
     },
     {
       "date": "31 Mar",
@@ -15473,6 +15460,19 @@
     {
       "date": "31 Mar",
       "dateISO": "2026-03-31",
+      "timeUTC": "19:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed Vice Chair for Supervision Barr Speaks",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": ""
+    },
+    {
+      "date": "31 Mar",
+      "dateISO": "2026-03-31",
       "timeUTC": "20:30",
       "country": "USD",
       "currency": "USD",
@@ -15481,7 +15481,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "2.3"
+      "previous": "2.300M"
     },
     {
       "date": "31 Mar",
@@ -15569,10 +15569,10 @@
       "currency": "AUD",
       "flag": "🇦🇺",
       "event": "S&P Global Manufacturing PMI (Mar)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "50.1",
-      "previous": "50.1"
+      "previous": "51.0"
     },
     {
       "date": "31 Mar",
@@ -17172,6 +17172,32 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "2 Abr",
+      "dateISO": "2026-04-02",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Fed's Balance Sheet",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "6,657B"
+    },
+    {
+      "date": "2 Abr",
+      "dateISO": "2026-04-02",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Reserve Balances with Federal Reserve Banks",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "3.036T"
     },
     {
       "date": "2 Abr",
