@@ -98,6 +98,7 @@ var fetchWithRetry = /*#__PURE__*/function () {
   var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(url) {
     var options,
       maxRetries,
+      timeoutMs,
       attempt,
       isLastAttempt,
       delayMs,
@@ -108,6 +109,7 @@ var fetchWithRetry = /*#__PURE__*/function () {
         case 0:
           options = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : {};
           maxRetries = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : 3;
+          timeoutMs = _args2.length > 3 && _args2[3] !== undefined ? _args2[3] : 8000; // FIX AUDIT: timeout configurable por caller
           attempt = 1;
         case 1:
           if (!(attempt <= maxRetries)) {
@@ -116,7 +118,7 @@ var fetchWithRetry = /*#__PURE__*/function () {
           }
           _context2.p = 2;
           _context2.n = 3;
-          return fetchWithTimeout(url, options, 8000);
+          return fetchWithTimeout(url, options, timeoutMs);
         case 3:
           return _context2.a(2, _context2.v);
         case 4:
@@ -158,7 +160,7 @@ var CACHE_CONFIG = {
   CALENDAR: 120000,
   // 2 min — el workflow corre c/10 min, no tiene sentido cachear 1h
   CENTRAL_BANK_OUTLOOK: 604800000,
-  ALERTS: 3600000
+  ALERTS: 300000 // 5 min — alineado con TTL de strength-scores/latest.json para evitar recomendaciones stale
 };
 var delay = function delay(ms) {
   return new Promise(function (resolve) {
@@ -394,7 +396,7 @@ var fetchExtendedData = /*#__PURE__*/function () {
           return fetchWithRetry(url, {
             cache: 'no-cache',
             mode: 'cors'
-          }, 3);
+          }, 5, 13000); // FIX AUDIT: extended-data crítico para scores — 5 reintentos, 13s timeout
         case 2:
           response = _context5.v;
           if (!response.ok) {
@@ -873,6 +875,7 @@ var fetchStrengthScores = /*#__PURE__*/function () {
           CacheManager.set(cacheKey, payload, 3600);
           _precomputedScores = payload.scores;
           _scoresDataDate = payload.date;
+          CacheManager.clear('forex_pair_recommendations'); // FIX AUDIT: invalidar recomendaciones al cargar scores frescos
           console.log("[scores] Loaded v".concat(data.modelVersion, " (").concat(data.lastUpdate, ")"));
           return _context0.a(2, payload);
         case 7:
@@ -918,6 +921,7 @@ var fetchStrengthScores = /*#__PURE__*/function () {
           CacheManager.set(cacheKey, _payload, 1800); // shorter cache when stale
           _precomputedScores = _payload.scores;
           _scoresDataDate = _payload.date;
+          CacheManager.clear('forex_pair_recommendations'); // FIX AUDIT: invalidar recomendaciones al cargar scores (aunque sean stale)
           console.warn("[scores] Using stale snapshot from ".concat(_payload.date));
           return _context0.a(2, _payload);
         case 13:
