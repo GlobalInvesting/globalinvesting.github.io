@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-27",
   "modelVersion": "6.8.0",
-  "checksum": "8017258f71577b9919c69fc02dbdbee6f13955944db45c96b29cac08da4cf536",
+  "checksum": "1f7cd193989615eb26b586ddeb190a8f0929efec1d6d29295ce9f3213039b4c1",
   "scores": {
     "USD": {
       "score": 60.8,
@@ -83,7 +83,7 @@
       "score": 47.0,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 48.86,
+      "baseScore": 48.89,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.0,
@@ -126,7 +126,7 @@
         "economicSurprise": 1.872,
         "capitalFlows": 0.0,
         "fxPerformance1M": 1.5793,
-        "bond10y": 2.1047
+        "bond10y": 2.1378
       },
       "scoringData": {
         "economicSurprise": 46.8,
@@ -163,7 +163,7 @@
       "score": 47.3,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 53.15,
+      "baseScore": 53.13,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -206,7 +206,7 @@
         "economicSurprise": 2.04,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.7122,
-        "bond10y": 2.768
+        "bond10y": 2.7521
       },
       "scoringData": {
         "economicSurprise": 51.0,
@@ -302,7 +302,7 @@
       }
     },
     "AUD": {
-      "score": 70.9,
+      "score": 71.4,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
       "baseScore": 62.02,
@@ -322,9 +322,9 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.96,
         "stale_score": 0.0,
-        "delta_score": -4.0,
+        "delta_score": -3.5,
         "rate_expectation": 0.0,
-        "totalCapped": 8.93
+        "totalCapped": 9.43
       },
       "contributions": {
         "interestRate": 10.0,
@@ -372,10 +372,10 @@
       }
     },
     "CAD": {
-      "score": 51.8,
+      "score": 51.9,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 52.34,
+      "baseScore": 52.38,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.53,
@@ -418,7 +418,7 @@
         "economicSurprise": 1.956,
         "capitalFlows": 0.0,
         "fxPerformance1M": 2.9735,
-        "bond10y": 2.288
+        "bond10y": 2.328
       },
       "scoringData": {
         "economicSurprise": 48.9,
@@ -595,6 +595,15 @@
       "fxGateNote": ""
     },
     {
+      "pair": "AUD/NZD",
+      "long": "AUD",
+      "short": "NZD",
+      "spread": 24.8,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
       "pair": "JPY/EUR",
       "long": "JPY",
       "short": "EUR",
@@ -604,19 +613,10 @@
       "fxGateNote": ""
     },
     {
-      "pair": "AUD/NZD",
-      "long": "AUD",
-      "short": "NZD",
-      "spread": 24.3,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
       "pair": "AUD/EUR",
       "long": "AUD",
       "short": "EUR",
-      "spread": 23.9,
+      "spread": 24.4,
       "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
@@ -678,7 +678,7 @@
       "economicSurprise": 1.872,
       "capitalFlows": 0.0,
       "fxPerformance1M": 1.5793,
-      "bond10y": 2.1047
+      "bond10y": 2.1378
     },
     "GBP": {
       "interestRate": 8.6688,
@@ -702,7 +702,7 @@
       "economicSurprise": 2.04,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.7122,
-      "bond10y": 2.768
+      "bond10y": 2.7521
     },
     "JPY": {
       "interestRate": 5.21,
@@ -774,7 +774,7 @@
       "economicSurprise": 1.956,
       "capitalFlows": 0.0,
       "fxPerformance1M": 2.9735,
-      "bond10y": 2.288
+      "bond10y": 2.328
     },
     "CHF": {
       "interestRate": 7.2,
