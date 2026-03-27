@@ -1623,7 +1623,7 @@ var loadAllEconomicData = /*#__PURE__*/function () {
         case 0:
           cacheKey = 'all_economic_data'; // ⚠️ IMPORTANTE: Actualizar DASHBOARD_VERSION cada vez que modifiques el código
           // El formato es 'vX.Y.Z-YYYY-MM-DD' — la fecha garantiza invalidación automática del caché
-          DASHBOARD_VERSION = '6.7.0-2026-03-27'; // bump: ALERTS TTL 1h→5min, fetchExtendedData 5 reintentos/13s, invalidación caché scores, CSP fix
+          DASHBOARD_VERSION = '6.7.1-2026-03-27'; // fix: regenerar pares en path de caché completo
           // ✅ Verificar versión del caché
           cachedVersion = localStorage.getItem('forex_dashboard_version');
           if (cachedVersion !== DASHBOARD_VERSION) {
@@ -3443,6 +3443,18 @@ var ForexDashboard = function ForexDashboard() {
                   });
                   return updated;
                 });
+                // FIX: regenerar recomendaciones de pares con los scores frescos.
+                // En el path de caché completo los scores llegan en background — sin este
+                // bloque, dynamicAlerts queda vacío aunque _precomputedScores esté listo.
+                var econCache = CacheManager.get('all_economic_data');
+                var ratesCache = CacheManager.get('forex_rates');
+                if (_precomputedScores && Object.keys(_precomputedScores).length >= 8 && econCache && ratesCache) {
+                  var freshRec = generateForexPairRecommendations(econCache, ratesCache);
+                  if (freshRec && freshRec.length > 0) {
+                    setDynamicAlerts(freshRec);
+                    console.log('[pairRec] Tarjetas regeneradas tras scores background: ' + freshRec.length + ' pares');
+                  }
+                }
                 return setScoresVersion(function (v) {
                   return v + 1;
                 });
