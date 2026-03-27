@@ -3571,8 +3571,28 @@ var ForexDashboard = function ForexDashboard() {
                 status: 'Generando recomendaciones de pares...',
                 progress: 98
               });
-              pairRecommendations = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null);
-              setDynamicAlerts(pairRecommendations);
+              // FIX Bug 2: Guard de condición de carrera — solo generar recomendaciones
+              // si _precomputedScores tiene datos de las 8 divisas. Si fetchStrengthScores()
+              // aún no terminó o devolvió payload incompleto, sortedCurrencies queda vacío
+              // y las tarjetas de Divergencias/Spreads no se renderizan.
+              if (_precomputedScores && Object.keys(_precomputedScores).length >= 8) {
+                pairRecommendations = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null);
+                setDynamicAlerts(pairRecommendations);
+              } else {
+                // Scores aún incompletos: esperar a que fetchStrengthScores termine
+                // y volver a intentar con un pequeño delay para no bloquear el render.
+                console.warn('[pairRec] _precomputedScores incompleto (' + (_precomputedScores ? Object.keys(_precomputedScores).length : 0) + '/8) — reintentando en 2s');
+                setTimeout(function () {
+                  if (_precomputedScores && Object.keys(_precomputedScores).length >= 8) {
+                    var retryRec = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null);
+                    setDynamicAlerts(retryRec);
+                  } else {
+                    // Último intento con los scores disponibles (aunque sean parciales)
+                    var fallbackRec = generateForexPairRecommendations(loadedData, rates, (calendarResult === null || calendarResult === void 0 ? void 0 : calendarResult.events) || null);
+                    if (fallbackRec && fallbackRec.length > 0) setDynamicAlerts(fallbackRec);
+                  }
+                }, 2000);
+              }
               setDataLoadingStatus({
                 status: 'Completado',
                 progress: 100
