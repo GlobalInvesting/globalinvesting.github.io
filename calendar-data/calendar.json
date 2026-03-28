@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-03-27",
-  "generatedAt": "2026-03-27T23:57:52.164430Z",
+  "lastUpdate": "2026-03-28",
+  "generatedAt": "2026-03-28T06:49:37.870328Z",
   "fetchMode": "SMART",
   "timezoneNote": "All timeUTC are UTC.",
   "status": "ok",
@@ -8,22 +8,22 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2026-02-27",
-  "rangeTo": "2026-04-26",
-  "totalEvents": 1382,
+  "rangeTo": "2026-04-27",
+  "totalEvents": 1384,
   "currencyCounts": {
     "AUD": 111,
     "CAD": 76,
     "CHF": 47,
     "EUR": 215,
     "GBP": 156,
-    "JPY": 157,
+    "JPY": 158,
     "NZD": 55,
-    "USD": 565
+    "USD": 566
   },
   "impactCounts": {
-    "low": 662,
-    "medium": 545,
-    "high": 175
+    "low": 664,
+    "medium": 544,
+    "high": 176
   },
   "events": [
     {
@@ -13451,9 +13451,9 @@
       "flag": "🇺🇸",
       "event": "CFTC S&P 500 NC Net Positions",
       "impact": "medium",
-      "actual": "-80.9",
+      "actual": "-80.9K",
       "forecast": "",
-      "previous": "-113.1"
+      "previous": "-113.1K"
     },
     {
       "date": "27 Mar",
@@ -13464,9 +13464,9 @@
       "flag": "🇺🇸",
       "event": "CFTC Gold NC Net Positions",
       "impact": "medium",
-      "actual": "168.3",
+      "actual": "168.3K",
       "forecast": "",
-      "previous": "159.9"
+      "previous": "159.9K"
     },
     {
       "date": "27 Mar",
@@ -13477,9 +13477,9 @@
       "flag": "🇬🇧",
       "event": "CFTC GBP NC Net Positions",
       "impact": "medium",
-      "actual": "-58.4",
+      "actual": "-58.4K",
       "forecast": "",
-      "previous": "-65.5"
+      "previous": "-65.5K"
     },
     {
       "date": "27 Mar",
@@ -13490,9 +13490,9 @@
       "flag": "🇯🇵",
       "event": "CFTC JPY NC Net Positions",
       "impact": "medium",
-      "actual": "-62.8",
+      "actual": "-62.8K",
       "forecast": "",
-      "previous": "-67.8"
+      "previous": "-67.8K"
     },
     {
       "date": "27 Mar",
@@ -13503,9 +13503,9 @@
       "flag": "🇪🇺",
       "event": "CFTC EUR NC Net Positions",
       "impact": "medium",
-      "actual": "9.3",
+      "actual": "9.3K",
       "forecast": "",
-      "previous": "21.1"
+      "previous": "21.1K"
     },
     {
       "date": "27 Mar",
@@ -13516,9 +13516,9 @@
       "flag": "🇦🇺",
       "event": "CFTC AUD NC Net Positions",
       "impact": "medium",
-      "actual": "70.9",
+      "actual": "70.9K",
       "forecast": "",
-      "previous": "69.1"
+      "previous": "69.1K"
     },
     {
       "date": "27 Mar",
@@ -13740,6 +13740,19 @@
       "actual": "",
       "forecast": "",
       "previous": ""
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Housing Starts (YoY) (Feb)",
+      "impact": "low",
+      "actual": "",
+      "forecast": "",
+      "previous": "-0.4%"
     },
     {
       "date": "30 Mar",
@@ -14264,6 +14277,19 @@
     {
       "date": "30 Mar",
       "dateISO": "2026-03-30",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "Retail Inventories Ex Auto (Feb)",
+      "impact": "medium",
+      "actual": "",
+      "forecast": "",
+      "previous": "0.4%"
+    },
+    {
+      "date": "30 Mar",
+      "dateISO": "2026-03-30",
       "timeUTC": "14:30",
       "country": "USD",
       "currency": "USD",
@@ -14688,7 +14714,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "441.7B"
+      "previous": "441,739.0B"
     },
     {
       "date": "31 Mar",
@@ -14711,10 +14737,10 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "Construction Orders (YoY) (Feb)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "5.7"
+      "previous": "5.7%"
     },
     {
       "date": "31 Mar",
@@ -14753,7 +14779,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "2.0%",
-      "previous": "2.7%"
+      "previous": "2.0%"
     },
     {
       "date": "31 Mar",
@@ -14766,7 +14792,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "-2.7%",
-      "previous": "1.5%"
+      "previous": "-2.7%"
     },
     {
       "date": "31 Mar",
@@ -14805,7 +14831,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "1.0%",
-      "previous": "1.3%"
+      "previous": "1.0%"
     },
     {
       "date": "31 Mar",
@@ -15148,7 +15174,7 @@
     {
       "date": "31 Mar",
       "dateISO": "2026-03-31",
-      "timeUTC": "12:31",
+      "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
       "flag": "🇨🇦",
@@ -15520,7 +15546,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "50.1",
-      "previous": "51.0"
+      "previous": "50.1"
     },
     {
       "date": "31 Mar",
@@ -15767,7 +15793,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "",
-      "previous": "-15.70%"
+      "previous": "8.10%"
     },
     {
       "date": "1 Abr",
@@ -15806,7 +15832,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "51.4",
-      "previous": "53.0"
+      "previous": "51.4"
     },
     {
       "date": "1 Abr",
@@ -15962,7 +15988,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "51.4",
-      "previous": "50.8"
+      "previous": "51.4"
     },
     {
       "date": "1 Abr",
@@ -15988,7 +16014,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "51.4",
-      "previous": "51.7"
+      "previous": "51.4"
     },
     {
       "date": "1 Abr",
@@ -17223,7 +17249,7 @@
       "impact": "low",
       "actual": "",
       "forecast": "52.50",
-      "previous": "53.90"
+      "previous": "52.50"
     },
     {
       "date": "3 Abr",
@@ -17236,7 +17262,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "52.8",
-      "previous": "53.8"
+      "previous": "52.8"
     },
     {
       "date": "3 Abr",
@@ -17337,10 +17363,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Average Hourly Earnings (MoM) (Mar)",
-      "impact": "low",
+      "impact": "high",
       "actual": "",
       "forecast": "0.4",
-      "previous": "0.4"
+      "previous": "0.4%"
     },
     {
       "date": "3 Abr",
@@ -17350,7 +17376,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "Average Weekly Hours (Mar)",
-      "impact": "medium",
+      "impact": "low",
       "actual": "",
       "forecast": "34.3",
       "previous": "34.3"
@@ -17392,7 +17418,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "48.0",
-      "previous": "-92.0"
+      "previous": "-92K"
     },
     {
       "date": "3 Abr",
@@ -17444,7 +17470,7 @@
       "impact": "high",
       "actual": "",
       "forecast": "4.5",
-      "previous": "4.4"
+      "previous": "4.4%"
     },
     {
       "date": "3 Abr",
@@ -17493,10 +17519,10 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "S&P Global Composite PMI (Mar)",
-      "impact": "high",
+      "impact": "medium",
       "actual": "",
       "forecast": "51.4",
-      "previous": "51.4"
+      "previous": "51.9"
     },
     {
       "date": "3 Abr",
@@ -17506,7 +17532,7 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "S&P Global Services PMI (Mar)",
-      "impact": "medium",
+      "impact": "high",
       "actual": "",
       "forecast": "51.1",
       "previous": "51.1"
@@ -17678,7 +17704,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "168.3"
+      "previous": "168.3K"
     },
     {
       "date": "3 Abr",
@@ -17704,7 +17730,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-80.9"
+      "previous": "-80.9K"
     },
     {
       "date": "3 Abr",
@@ -17717,7 +17743,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-58.4"
+      "previous": "-58.4K"
     },
     {
       "date": "3 Abr",
@@ -17730,7 +17756,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "-62.8"
+      "previous": "-62.8K"
     },
     {
       "date": "3 Abr",
@@ -17743,7 +17769,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "9.3"
+      "previous": "9.3K"
     },
     {
       "date": "3 Abr",
@@ -17756,7 +17782,7 @@
       "impact": "medium",
       "actual": "",
       "forecast": "",
-      "previous": "70.9"
+      "previous": "70.9K"
     },
     {
       "date": "3 Abr",
