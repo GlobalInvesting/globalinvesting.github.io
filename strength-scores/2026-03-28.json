@@ -1,7 +1,7 @@
 {
   "lastUpdate": "2026-03-28",
-  "modelVersion": "7.1.0",
-  "checksum": "c3ee3faf317094186704da35665753193ad23fa99765ab51ffdbe63d9dec1eab",
+  "modelVersion": "7.2.0",
+  "checksum": "cfd42bdc4335a4a61e50cd365d5fa10a5f7b7493c3f59c3adecc344c7aa7a6e1",
   "macroRegime": "USD_DOMINANCE",
   "scores": {
     "USD": {
@@ -179,7 +179,7 @@
       }
     },
     "GBP": {
-      "score": 41.7,
+      "score": 43.7,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
       "baseScore": 53.13,
@@ -201,14 +201,14 @@
         "stale_score": 0.0,
         "delta_score": -3.5,
         "rate_expectation": -0.13,
-        "gbp_easing_risk": -4.0,
+        "gbp_easing_risk": -2.0,
         "jpy_timing_haircut": 0.0,
         "regime_discount": -1.58,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": -11.46
+        "totalCapped": -9.46
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -654,19 +654,10 @@
     "CHF",
     "CAD",
     "EUR",
-    "NZD",
-    "GBP"
+    "GBP",
+    "NZD"
   ],
   "signals": [
-    {
-      "pair": "AUD/GBP",
-      "long": "AUD",
-      "short": "GBP",
-      "spread": 22.8,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
     {
       "pair": "AUD/NZD",
       "long": "AUD",
@@ -677,10 +668,10 @@
       "fxGateNote": ""
     },
     {
-      "pair": "USD/GBP",
-      "long": "USD",
+      "pair": "AUD/GBP",
+      "long": "AUD",
       "short": "GBP",
-      "spread": 21.1,
+      "spread": 20.8,
       "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
@@ -691,6 +682,15 @@
       "short": "NZD",
       "spread": 20.6,
       "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "USD/GBP",
+      "long": "USD",
+      "short": "GBP",
+      "spread": 19.1,
+      "confidence": "Media",
       "priceAligned": true,
       "fxGateNote": ""
     },
