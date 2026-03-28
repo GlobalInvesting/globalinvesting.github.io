@@ -1,14 +1,14 @@
 {
   "lastUpdate": "2026-03-28",
   "modelVersion": "7.2.0",
-  "checksum": "cfd42bdc4335a4a61e50cd365d5fa10a5f7b7493c3f59c3adecc344c7aa7a6e1",
+  "checksum": "e8ae3c03c7745fbc1b6d685ac486fb882bf0a4244fc6fba334301bce17aac772",
   "macroRegime": "USD_DOMINANCE",
   "scores": {
     "USD": {
-      "score": 62.8,
+      "score": 63.6,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 56.99,
+      "baseScore": 57.21,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -29,12 +29,12 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": 2.17,
+        "regime_discount": 2.77,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": 5.84
+        "totalCapped": 6.44
       },
       "contributions": {
         "interestRate": 8.7352,
@@ -55,13 +55,13 @@
         "cotPositioning": 2.4463,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.02,
+        "economicSurprise": 2.012,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 6.4113,
-        "bond10y": 2.632
+        "fxPerformance1M": 6.6021,
+        "bond10y": 2.668
       },
       "scoringData": {
-        "economicSurprise": 50.5,
+        "economicSurprise": 50.3,
         "rateMomentum": -0.69,
         "interestRate": 3.75,
         "bcOutlook": "Neutral",
@@ -78,7 +78,7 @@
         "bcOutlook": "Neutral",
         "rateMomentum": -0.69,
         "interestRate": 3.75,
-        "esi": 50.5,
+        "esi": 50.3,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "gdpGrowth": "2026-03-13",
@@ -90,10 +90,10 @@
       }
     },
     "EUR": {
-      "score": 47.1,
+      "score": 47.3,
       "dataQuality": 1.0,
-      "bcOutlook": "Neutral",
-      "baseScore": 48.89,
+      "bcOutlook": "Dovish",
+      "baseScore": 49.19,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.0,
@@ -110,16 +110,16 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
-        "delta_score": -2.0,
+        "delta_score": -1.8,
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": -1.58,
+        "regime_discount": -1.88,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 1.62,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": -1.83
+        "totalCapped": -1.93
       },
       "contributions": {
         "interestRate": 5.9325,
@@ -133,28 +133,27 @@
         "gdpGrowth": 4.27,
         "unemployment": 0.0,
         "production": 1.44,
-        "retailSales": 0.56,
+        "retailSales": 1.0,
         "wageGrowth": 2.0,
         "manufacturingPMI": 2.43,
         "servicesPMI": 3.05,
         "cotPositioning": 0.84,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.484,
-        "economicSurprise": 1.872,
+        "economicSurprise": 1.896,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.5793,
+        "fxPerformance1M": 1.4143,
         "bond10y": 2.1378
       },
       "scoringData": {
-        "economicSurprise": 46.8,
+        "economicSurprise": 47.4,
         "rateMomentum": -0.5,
         "interestRate": 2.15,
-        "bcOutlook": "Neutral",
+        "bcOutlook": "Dovish",
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
-          "retailSales": "2026-03-27",
           "wageGrowth": "2026-03-19",
           "consumerConfidence": "2026-03-26",
           "businessConfidence": "2026-03-25",
@@ -162,15 +161,14 @@
         }
       },
       "meta": {
-        "bcOutlook": "Neutral",
+        "bcOutlook": "Dovish",
         "rateMomentum": -0.5,
         "interestRate": 2.15,
-        "esi": 46.8,
+        "esi": 47.4,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "inflation": "2026-03-27",
           "manufacturingPMI": "2026-03-27",
-          "retailSales": "2026-03-27",
           "wageGrowth": "2026-03-19",
           "consumerConfidence": "2026-03-26",
           "businessConfidence": "2026-03-25",
@@ -179,10 +177,10 @@
       }
     },
     "GBP": {
-      "score": 43.7,
+      "score": 42.2,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 53.13,
+      "baseScore": 52.31,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.0,
@@ -199,16 +197,16 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
-        "delta_score": -3.5,
+        "delta_score": -3.8,
         "rate_expectation": -0.13,
         "gbp_easing_risk": -2.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": -1.58,
+        "regime_discount": -1.88,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": -9.46
+        "totalCapped": -10.06
       },
       "contributions": {
         "interestRate": 8.6688,
@@ -231,7 +229,7 @@
         "businessConfidence": 0.0,
         "economicSurprise": 2.04,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 2.7122,
+        "fxPerformance1M": 1.8852,
         "bond10y": 2.7521
       },
       "scoringData": {
@@ -256,10 +254,10 @@
       }
     },
     "JPY": {
-      "score": 62.7,
+      "score": 61.2,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 63.02,
+      "baseScore": 62.65,
       "contextualAdj": {
         "safe_haven": 1.3,
         "commodity": 0.0,
@@ -276,22 +274,22 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
-        "delta_score": 0.7,
+        "delta_score": 0.5,
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": -3.17,
-        "jpy_oil_importer": -5.75,
+        "regime_discount": -3.77,
+        "jpy_oil_importer": -6.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": -0.35
+        "totalCapped": -1.4
       },
       "contributions": {
-        "interestRate": 5.21,
+        "interestRate": 5.5188,
         "inflation": 7.0,
         "outlookScore": 2.5,
-        "rateMomentum": 5.95,
+        "rateMomentum": 5.04,
         "currentAccount": 6.2767,
         "tradeBalance": 2.2239,
         "debt": 2.002,
@@ -308,12 +306,12 @@
         "businessConfidence": 0.0,
         "economicSurprise": 2.084,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.35,
+        "fxPerformance1M": 1.5827,
         "bond10y": 1.23
       },
       "scoringData": {
         "economicSurprise": 52.1,
-        "rateMomentum": 0.85,
+        "rateMomentum": 0.65,
         "interestRate": 0.75,
         "bcOutlook": "Hawkish",
         "macroRegime": "USD_DOMINANCE",
@@ -326,7 +324,7 @@
       },
       "meta": {
         "bcOutlook": "Hawkish",
-        "rateMomentum": 0.85,
+        "rateMomentum": 0.65,
         "interestRate": 0.75,
         "esi": 52.1,
         "macroRegime": "USD_DOMINANCE",
@@ -339,10 +337,10 @@
       }
     },
     "AUD": {
-      "score": 64.5,
+      "score": 60.7,
       "dataQuality": 1.0,
       "bcOutlook": "Hawkish",
-      "baseScore": 62.02,
+      "baseScore": 60.89,
       "contextualAdj": {
         "safe_haven": 0.52,
         "commodity": 3.2,
@@ -359,16 +357,16 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.96,
         "stale_score": 0.0,
-        "delta_score": -3.5,
+        "delta_score": -3.9,
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": -2.18,
+        "regime_discount": -4.46,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": 2.45
+        "totalCapped": -0.23
       },
       "contributions": {
         "interestRate": 10.0,
@@ -386,16 +384,16 @@
         "wageGrowth": 2.0,
         "manufacturingPMI": 1.08,
         "servicesPMI": 1.72,
-        "cotPositioning": 0.9146,
+        "cotPositioning": 0.84,
         "consumerConfidence": 0.844,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.052,
+        "economicSurprise": 2.048,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 2.3958,
+        "fxPerformance1M": 1.3449,
         "bond10y": 2.7045
       },
       "scoringData": {
-        "economicSurprise": 51.3,
+        "economicSurprise": 51.2,
         "rateMomentum": 0.3,
         "interestRate": 4.1,
         "bcOutlook": "Hawkish",
@@ -409,7 +407,7 @@
         "bcOutlook": "Hawkish",
         "rateMomentum": 0.3,
         "interestRate": 4.1,
-        "esi": 51.3,
+        "esi": 51.2,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "businessConfidence": "2026-03-10",
@@ -418,10 +416,10 @@
       }
     },
     "CAD": {
-      "score": 54.0,
+      "score": 53.7,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 52.6,
+      "baseScore": 52.12,
       "contextualAdj": {
         "safe_haven": 0.0,
         "commodity": 0.53,
@@ -445,9 +443,9 @@
         "regime_discount": 0.0,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
-        "cad_oil_exporter": 1.35,
+        "cad_oil_exporter": 1.5,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": 1.44
+        "totalCapped": 1.59
       },
       "contributions": {
         "interestRate": 6.1208,
@@ -465,16 +463,16 @@
         "wageGrowth": 2.0,
         "manufacturingPMI": 2.1,
         "servicesPMI": 1.7,
-        "cotPositioning": 1.1986,
+        "cotPositioning": 1.1988,
         "consumerConfidence": 1.3496,
         "businessConfidence": 0.0,
-        "economicSurprise": 1.956,
+        "economicSurprise": 1.952,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 2.9735,
+        "fxPerformance1M": 2.5006,
         "bond10y": 2.328
       },
       "scoringData": {
-        "economicSurprise": 48.9,
+        "economicSurprise": 48.8,
         "rateMomentum": -0.5,
         "interestRate": 2.25,
         "bcOutlook": "Neutral",
@@ -485,16 +483,16 @@
         "bcOutlook": "Neutral",
         "rateMomentum": -0.5,
         "interestRate": 2.25,
-        "esi": 48.9,
+        "esi": 48.8,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {}
       }
     },
     "CHF": {
-      "score": 61.6,
+      "score": 62.6,
       "dataQuality": 1.0,
       "bcOutlook": "Neutral",
-      "baseScore": 53.31,
+      "baseScore": 53.0,
       "contextualAdj": {
         "safe_haven": 3.9,
         "commodity": 0.0,
@@ -507,7 +505,7 @@
         "yield_curve": 0.0,
         "stagflation": 0.0,
         "cot_contrarian": 0.0,
-        "low_rate_sh": 4.77,
+        "low_rate_sh": 5.13,
         "cot_momentum_div": 0.0,
         "commodity_momentum": 0.0,
         "stale_score": 0.0,
@@ -515,12 +513,12 @@
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": 1.38,
+        "regime_discount": 1.83,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
-        "chf_geopolitical_sh": 1.88,
-        "totalCapped": 8.33
+        "chf_geopolitical_sh": 2.33,
+        "totalCapped": 9.59
       },
       "contributions": {
         "interestRate": 7.2,
@@ -541,14 +539,14 @@
         "cotPositioning": 4.2282,
         "consumerConfidence": 0.0,
         "businessConfidence": 0.0,
-        "economicSurprise": 1.916,
+        "economicSurprise": 1.904,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.4712,
+        "fxPerformance1M": 1.1733,
         "bond10y": 0.48
       },
       "scoringData": {
-        "economicSurprise": 47.9,
-        "rateMomentum": -0.5,
+        "economicSurprise": 47.6,
+        "rateMomentum": -0.25,
         "interestRate": 0.0,
         "bcOutlook": "Neutral",
         "macroRegime": "USD_DOMINANCE",
@@ -559,9 +557,9 @@
       },
       "meta": {
         "bcOutlook": "Neutral",
-        "rateMomentum": -0.5,
+        "rateMomentum": -0.25,
         "interestRate": 0.0,
-        "esi": 47.9,
+        "esi": 47.6,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-09",
@@ -570,10 +568,10 @@
       }
     },
     "NZD": {
-      "score": 42.2,
+      "score": 40.0,
       "dataQuality": 1.0,
       "bcOutlook": "Dovish",
-      "baseScore": 46.63,
+      "baseScore": 46.07,
       "contextualAdj": {
         "safe_haven": 0.13,
         "commodity": 0.06,
@@ -590,16 +588,16 @@
         "cot_momentum_div": 0.0,
         "commodity_momentum": 3.0,
         "stale_score": 0.0,
-        "delta_score": -2.2,
+        "delta_score": -2.4,
         "rate_expectation": 0.0,
         "gbp_easing_risk": 0.0,
         "jpy_timing_haircut": 0.0,
-        "regime_discount": -4.25,
+        "regime_discount": -5.65,
         "jpy_oil_importer": 0.0,
         "eur_ecb_forward": 0.0,
         "cad_oil_exporter": 0.0,
         "chf_geopolitical_sh": 0.0,
-        "totalCapped": -4.43
+        "totalCapped": -6.03
       },
       "contributions": {
         "interestRate": 5.3625,
@@ -620,13 +618,13 @@
         "cotPositioning": 1.7377,
         "consumerConfidence": 0.982,
         "businessConfidence": 0.0,
-        "economicSurprise": 2.104,
+        "economicSurprise": 2.092,
         "capitalFlows": 0.0,
-        "fxPerformance1M": 1.1254,
+        "fxPerformance1M": 0.5834,
         "bond10y": 2.715
       },
       "scoringData": {
-        "economicSurprise": 52.6,
+        "economicSurprise": 52.3,
         "rateMomentum": -1.5,
         "interestRate": 2.25,
         "bcOutlook": "Dovish",
@@ -639,7 +637,7 @@
         "bcOutlook": "Dovish",
         "rateMomentum": -1.5,
         "interestRate": 2.25,
-        "esi": 52.6,
+        "esi": 52.3,
         "macroRegime": "USD_DOMINANCE",
         "calendarDates": {
           "consumerConfidence": "2026-03-18"
@@ -648,10 +646,10 @@
     }
   },
   "ranking": [
-    "AUD",
     "USD",
-    "JPY",
     "CHF",
+    "JPY",
+    "AUD",
     "CAD",
     "EUR",
     "GBP",
@@ -659,28 +657,19 @@
   ],
   "signals": [
     {
-      "pair": "AUD/NZD",
-      "long": "AUD",
-      "short": "NZD",
-      "spread": 22.3,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
-      "pair": "AUD/GBP",
-      "long": "AUD",
-      "short": "GBP",
-      "spread": 20.8,
-      "confidence": "Alta",
-      "priceAligned": true,
-      "fxGateNote": ""
-    },
-    {
       "pair": "USD/NZD",
       "long": "USD",
       "short": "NZD",
-      "spread": 20.6,
+      "spread": 23.6,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "CHF/NZD",
+      "long": "CHF",
+      "short": "NZD",
+      "spread": 22.6,
       "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
@@ -689,8 +678,17 @@
       "pair": "USD/GBP",
       "long": "USD",
       "short": "GBP",
-      "spread": 19.1,
-      "confidence": "Media",
+      "spread": 21.4,
+      "confidence": "Alta",
+      "priceAligned": true,
+      "fxGateNote": ""
+    },
+    {
+      "pair": "CHF/GBP",
+      "long": "CHF",
+      "short": "GBP",
+      "spread": 20.4,
+      "confidence": "Alta",
       "priceAligned": true,
       "fxGateNote": ""
     },
@@ -698,7 +696,7 @@
       "pair": "JPY/EUR",
       "long": "JPY",
       "short": "EUR",
-      "spread": 15.6,
+      "spread": 13.9,
       "confidence": "Media",
       "priceAligned": true,
       "fxGateNote": ""
@@ -724,10 +722,10 @@
       "cotPositioning": 2.4463,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.02,
+      "economicSurprise": 2.012,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 6.4113,
-      "bond10y": 2.632
+      "fxPerformance1M": 6.6021,
+      "bond10y": 2.668
     },
     "EUR": {
       "interestRate": 5.9325,
@@ -741,16 +739,16 @@
       "gdpGrowth": 4.27,
       "unemployment": 0.0,
       "production": 1.44,
-      "retailSales": 0.56,
+      "retailSales": 1.0,
       "wageGrowth": 2.0,
       "manufacturingPMI": 2.43,
       "servicesPMI": 3.05,
       "cotPositioning": 0.84,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.484,
-      "economicSurprise": 1.872,
+      "economicSurprise": 1.896,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.5793,
+      "fxPerformance1M": 1.4143,
       "bond10y": 2.1378
     },
     "GBP": {
@@ -774,14 +772,14 @@
       "businessConfidence": 0.0,
       "economicSurprise": 2.04,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 2.7122,
+      "fxPerformance1M": 1.8852,
       "bond10y": 2.7521
     },
     "JPY": {
-      "interestRate": 5.21,
+      "interestRate": 5.5188,
       "inflation": 7.0,
       "outlookScore": 2.5,
-      "rateMomentum": 5.95,
+      "rateMomentum": 5.04,
       "currentAccount": 6.2767,
       "tradeBalance": 2.2239,
       "debt": 2.002,
@@ -798,7 +796,7 @@
       "businessConfidence": 0.0,
       "economicSurprise": 2.084,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.35,
+      "fxPerformance1M": 1.5827,
       "bond10y": 1.23
     },
     "AUD": {
@@ -817,12 +815,12 @@
       "wageGrowth": 2.0,
       "manufacturingPMI": 1.08,
       "servicesPMI": 1.72,
-      "cotPositioning": 0.9146,
+      "cotPositioning": 0.84,
       "consumerConfidence": 0.844,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.052,
+      "economicSurprise": 2.048,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 2.3958,
+      "fxPerformance1M": 1.3449,
       "bond10y": 2.7045
     },
     "CAD": {
@@ -841,12 +839,12 @@
       "wageGrowth": 2.0,
       "manufacturingPMI": 2.1,
       "servicesPMI": 1.7,
-      "cotPositioning": 1.1986,
+      "cotPositioning": 1.1988,
       "consumerConfidence": 1.3496,
       "businessConfidence": 0.0,
-      "economicSurprise": 1.956,
+      "economicSurprise": 1.952,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 2.9735,
+      "fxPerformance1M": 2.5006,
       "bond10y": 2.328
     },
     "CHF": {
@@ -868,9 +866,9 @@
       "cotPositioning": 4.2282,
       "consumerConfidence": 0.0,
       "businessConfidence": 0.0,
-      "economicSurprise": 1.916,
+      "economicSurprise": 1.904,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.4712,
+      "fxPerformance1M": 1.1733,
       "bond10y": 0.48
     },
     "NZD": {
@@ -892,9 +890,9 @@
       "cotPositioning": 1.7377,
       "consumerConfidence": 0.982,
       "businessConfidence": 0.0,
-      "economicSurprise": 2.104,
+      "economicSurprise": 2.092,
       "capitalFlows": 0.0,
-      "fxPerformance1M": 1.1254,
+      "fxPerformance1M": 0.5834,
       "bond10y": 2.715
     }
   },
@@ -903,7 +901,7 @@
       "bcOutlook": "Neutral",
       "rateMomentum": -0.69,
       "interestRate": 3.75,
-      "esi": 50.5,
+      "esi": 50.3,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "gdpGrowth": "2026-03-13",
@@ -914,15 +912,14 @@
       }
     },
     "EUR": {
-      "bcOutlook": "Neutral",
+      "bcOutlook": "Dovish",
       "rateMomentum": -0.5,
       "interestRate": 2.15,
-      "esi": 46.8,
+      "esi": 47.4,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "inflation": "2026-03-27",
         "manufacturingPMI": "2026-03-27",
-        "retailSales": "2026-03-27",
         "wageGrowth": "2026-03-19",
         "consumerConfidence": "2026-03-26",
         "businessConfidence": "2026-03-25",
@@ -941,7 +938,7 @@
     },
     "JPY": {
       "bcOutlook": "Hawkish",
-      "rateMomentum": 0.85,
+      "rateMomentum": 0.65,
       "interestRate": 0.75,
       "esi": 52.1,
       "macroRegime": "USD_DOMINANCE",
@@ -956,7 +953,7 @@
       "bcOutlook": "Hawkish",
       "rateMomentum": 0.3,
       "interestRate": 4.1,
-      "esi": 51.3,
+      "esi": 51.2,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "businessConfidence": "2026-03-10",
@@ -967,15 +964,15 @@
       "bcOutlook": "Neutral",
       "rateMomentum": -0.5,
       "interestRate": 2.25,
-      "esi": 48.9,
+      "esi": 48.8,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {}
     },
     "CHF": {
       "bcOutlook": "Neutral",
-      "rateMomentum": -0.5,
+      "rateMomentum": -0.25,
       "interestRate": 0.0,
-      "esi": 47.9,
+      "esi": 47.6,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "consumerConfidence": "2026-03-09",
@@ -986,7 +983,7 @@
       "bcOutlook": "Dovish",
       "rateMomentum": -1.5,
       "interestRate": 2.25,
-      "esi": 52.6,
+      "esi": 52.3,
       "macroRegime": "USD_DOMINANCE",
       "calendarDates": {
         "consumerConfidence": "2026-03-18"
