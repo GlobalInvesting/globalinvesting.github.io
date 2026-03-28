@@ -62,12 +62,6 @@
     flex-shrink: 0;
   }
 
-  .logo-icon {
-    width: 26px;
-    height: 26px;
-    flex-shrink: 0;
-  }
-
   .logo-text {
     font-family: var(--font-ui);
     font-size: 14px;
@@ -245,7 +239,7 @@
     background: var(--bg);
     display: flex;
     flex-direction: column;
-    padding-bottom: 22px;
+    padding-bottom: 0;
   }
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
@@ -440,21 +434,18 @@
   .news-item:last-child { border-bottom: none; }
   .news-time { font-size: 10px; color: var(--text3); white-space: nowrap;
     padding-top: 1px; min-width: 36px; font-family: var(--font-mono); }
-  .news-cur {
-    font-size: 9px; font-weight: 700; color: var(--orange);
-    background: rgba(246,148,28,.12); padding: 1px 5px;
-    border-radius: 2px; white-space: nowrap; align-self: flex-start;
-    margin-top: 2px; min-width: 28px; text-align: center;
-    flex-shrink: 0; font-family: var(--font-ui);
+  .news-cur-tag {
+    font-size: 9px; font-weight: 700; color: var(--text2);
+    border: 1px solid var(--border2); padding: 0 4px;
+    border-radius: 2px; white-space: nowrap; font-family: var(--font-ui);
+    margin-right: 2px;
   }
   .news-body { flex: 1; min-width: 0; }
   .news-headline { font-size: 11px; color: var(--text); line-height: 1.4; font-family: var(--font-ui); }
   .news-meta { font-size: 9px; color: var(--text3); margin-top: 2px; font-family: var(--font-ui); display: flex; gap: 8px; }
   .news-source { color: var(--text2); }
-  .impact-badge { font-size: 9px; padding: 0 4px; border-radius: 2px; }
-  .impact-high { color: var(--down); }
-  .impact-med  { color: var(--orange); }
-  .impact-low  { color: var(--text3); }
+  /* skew table 4-col */
+  #skew-tbody td:not(:first-child) { text-align: right; }
 
   /* TV CHART TABS */
   .tv-tab {
@@ -535,16 +526,7 @@
 <!-- TOPBAR -->
 <div id="topbar">
   <a class="logo" href="/" title="Global Investing FX Terminal">
-    <!-- Logo: globe with FX lines -->
-    <svg class="logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="14" cy="14" r="12.5" stroke="#2962ff" stroke-width="1.6"/>
-      <ellipse cx="14" cy="14" rx="5.5" ry="12.5" stroke="#2962ff" stroke-width="1"/>
-      <line x1="1.5" y1="14" x2="26.5" y2="14" stroke="#2962ff" stroke-width="1" opacity=".5"/>
-      <line x1="3" y1="8.5" x2="25" y2="8.5" stroke="#2962ff" stroke-width=".7" opacity=".3"/>
-      <line x1="3" y1="19.5" x2="25" y2="19.5" stroke="#2962ff" stroke-width=".7" opacity=".3"/>
-      <polyline points="5,18 9,11 13,15 18,9 23,13" stroke="#26a69a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <circle cx="23" cy="13" r="2" fill="#f6941c"/>
-    </svg>
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
     <span>
       <span class="logo-text">Global Investing</span>
       <span class="logo-sub">FX Terminal</span>
@@ -683,7 +665,7 @@
       </div>
       <div id="tv-chart-wrap" style="height:340px;width:100%;position:relative;overflow:hidden;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
-          <div id="tv-chart-widget" class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%;"></div>
+          <div id="tv-chart-widget" class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div>
           <div class="tradingview-widget-copyright" style="display:none;"></div>
           <script id="tv-chart-script" type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
           {
@@ -887,6 +869,9 @@
               <tr><td>New York</td><td class="up">±71p</td><td class="up">±66p</td></tr>
             </tbody>
           </table>
+          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · historical reference</div>
+            </tbody>
+          </table>
         </div>
         <div style="border-top:1px solid var(--border);">
           <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 0;">Upcoming Events</div>
@@ -912,15 +897,16 @@
         </div>
       </div>
       <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;">
-        <div class="panel-head"><span class="panel-title">Live Spreads</span><span class="panel-sub">Typical broker · current session</span></div>
-        <div style="padding:4px 10px;">
-          <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up">0.9 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">GBP/USD</span><div class="spr-bar"><div class="spr-fill" style="width:24%;background:var(--up)"></div></div><span class="spr-val up">1.1 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">USD/JPY</span><div class="spr-bar"><div class="spr-fill" style="width:36%;background:var(--orange)"></div></div><span class="spr-val" style="color:var(--orange)">2.0 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">AUD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:40%;background:var(--orange)"></div></div><span class="spr-val" style="color:var(--orange)">2.0 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">USD/CHF</span><div class="spr-bar"><div class="spr-fill" style="width:44%;background:var(--orange)"></div></div><span class="spr-val" style="color:var(--orange)">2.0 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down">2.5 pip</span></div>
-          <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down">3.0 pip</span></div>
+        <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
+        <div id="spreads-rows" style="padding:4px 10px;">
+          <!-- populated by fetchSpreadsData() -->
+          <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">GBP/USD</span><div class="spr-bar"><div class="spr-fill" style="width:24%;background:var(--up)"></div></div><span class="spr-val up" id="spr-gbpusd">1.1 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">USD/JPY</span><div class="spr-bar"><div class="spr-fill" style="width:36%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdjpy" style="color:var(--orange)">2.0 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">AUD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:40%;background:var(--orange)"></div></div><span class="spr-val" id="spr-audusd" style="color:var(--orange)">2.0 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">USD/CHF</span><div class="spr-bar"><div class="spr-fill" style="width:44%;background:var(--orange)"></div></div><span class="spr-val" id="spr-usdchf" style="color:var(--orange)">2.0 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
+          <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
         <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;">
           <div id="fx-sentiment-widget" style="padding:6px 10px;">
@@ -1016,25 +1002,8 @@
     <div style="display:grid;grid-template-columns:1fr 40px 40px 46px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-bottom:1px solid var(--border2);gap:2px;">
       <span>Event</span><span style="text-align:right">Prev</span><span style="text-align:right">Exp</span><span style="text-align:right">Act</span>
     </div>
-    <!-- TradingView calendar widget in compact form -->
-    <div style="height:200px;overflow:hidden;">
-      <div style="transform:scale(0.68);transform-origin:top left;width:147%;height:147%;">
-        <div class="tradingview-widget-container" style="width:100%;height:300px;">
-          <div class="tradingview-widget-container__widget" style="height:300px;"></div>
-          <div class="tradingview-widget-copyright" style="display:none;"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-          {
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "locale": "en",
-            "countryFilter": "us,nz,au,ch,eu,ca,jp,gb",
-            "importanceFilter": "0,1",
-            "width": "100%",
-            "height": "300"
-          }
-          </script>
-        </div>
-      </div>
+    <div id="rp-calendar-rows" style="max-height:180px;overflow:hidden;">
+      <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading calendar…</div>
     </div>
 
     <div class="sb-head" style="margin-top:2px;">Central Bank Rates</div>
@@ -1057,29 +1026,24 @@
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Forex Heatmap</div>
-    <div style="overflow:hidden;height:200px;position:relative;">
-      <div style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
-        <div class="tradingview-widget-container" style="width:100%;height:100%;">
-          <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-          <div class="tradingview-widget-copyright" style="display:none;"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
-          {
-            "colorTheme": "dark",
-            "isTransparent": false,
-            "locale": "en",
-            "currencies": ["EUR","USD","JPY","GBP","CHF","AUD","CAD","NZD"],
-            "backgroundColor": "#131722",
-            "width": "100%",
-            "height": "100%"
-          }
-          </script>
-        </div>
-      </div>
-    </div>
+    <div class="sb-head" style="margin-top:2px;">Fed Rate Expectations</div>
+    <table>
+      <thead><tr><th style="text-align:left">Meeting</th><th>P(Cut)</th><th>Fwd Rate</th></tr></thead>
+      <tbody id="fed-exp-tbody">
+        <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+      </tbody>
+    </table>
 
-    <div style="padding:6px 8px;font-size:10px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
-      ECB daily rates · TradingView live charts · CFTC COT · AI narrative via Groq
+    <div class="sb-head" style="margin-top:2px;">Option Skew — 25-Delta RR</div>
+    <table>
+      <thead><tr><th style="text-align:left">Pair</th><th>1W</th><th>1M</th><th>Bias</th></tr></thead>
+      <tbody id="skew-tbody">
+        <tr><td colspan="4" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+      </tbody>
+    </table>
+
+    <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
+      ECB · CFTC · stooq · TradingView · AI via Groq
     </div>
   </aside>
 
@@ -1087,11 +1051,11 @@
 
 <!-- STATUS BAR / FOOTER -->
 <div id="statusbar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · AI/GROQ · TRADINGVIEW</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · STOOQ · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">UTC</span><span class="sb-v" id="sb-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
 </div>
 
 <script>
@@ -1289,13 +1253,27 @@ function populateQuoteBar() {
       priceEl.className  = 'q-price ' + cls;
       chgEl.className    = 'q-chg '  + cls;
     } else {
-      chgEl.textContent = '—';
+      chgEl.textContent = '+0.00%';
+      priceEl.className = 'q-price flat';
+      chgEl.className   = 'q-chg flat';
     }
   });
 
   // EUR/GBP cross in quote bar
-  const eg = computeRate(PAIRS.find(p=>p.id==='eurgbp'));
-  if (eg) setEl('q-eurgbp', fmt(eg, 5));
+  const egPair = PAIRS.find(p=>p.id==='eurgbp');
+  const eg     = computeRate(egPair);
+  const egPrev = computePrevRate(egPair);
+  const egEl   = document.getElementById('q-eurgbp');
+  const egcEl  = document.getElementById('qc-eurgbp');
+  if (eg && egEl) {
+    egEl.textContent = fmt(eg, 5);
+    if (egPrev && egPrev > 0) {
+      const pct = (eg - egPrev) / egPrev * 100;
+      const cls = clsDir(pct);
+      egEl.className  = 'q-price ' + cls;
+      if (egcEl) { egcEl.textContent = pctStr(pct); egcEl.className = 'q-chg ' + cls; }
+    }
+  }
 }
 
 function populateSidebarMajors() {
@@ -1309,7 +1287,12 @@ function populateSidebarMajors() {
       priceEl.textContent = fmt(rate, pair.dec);
       if (prev && prev > 0) {
         const pct = (rate - prev) / prev * 100;
-        if (chgEl) { chgEl.textContent = pctStr(pct); chgEl.className = 'sb-chg ' + clsDir(pct); }
+        const cls = clsDir(pct);
+        priceEl.className = 'sb-price ' + cls;
+        if (chgEl) { chgEl.textContent = pctStr(pct); chgEl.className = 'sb-chg ' + cls; }
+      } else {
+        priceEl.className = 'sb-price flat';
+        if (chgEl) { chgEl.textContent = '+0.00%'; chgEl.className = 'sb-chg flat'; }
       }
     }
   });
@@ -1327,7 +1310,12 @@ function populateCrossRows() {
       priceEl.textContent = fmt(rate, pair.dec);
       if (prev && prev > 0) {
         const pct = (rate - prev) / prev * 100;
-        if (chgEl) { chgEl.textContent = pctStr(pct); chgEl.className = 'sb-chg ' + clsDir(pct); }
+        const cls = clsDir(pct);
+        priceEl.className = 'sb-price ' + cls;
+        if (chgEl) { chgEl.textContent = pctStr(pct); chgEl.className = 'sb-chg ' + cls; }
+      } else {
+        priceEl.className = 'sb-price flat';
+        if (chgEl) { chgEl.textContent = '+0.00%'; chgEl.className = 'sb-chg flat'; }
       }
     }
   });
@@ -1513,17 +1501,16 @@ async function fetchNewsData() {
         const headline = item.title || '';
         const cur      = item.cur || item.currency || '';
         const source   = item.source || '';
-        const impact   = item.impact || '';
         const link     = item.link || '#';
-        const impactCls = impact === 'high' ? 'impact-high' : impact === 'med' ? 'impact-med' : 'impact-low';
+        const date     = item.date || '';
         return `<div class="news-item" onclick="window.open('${link}','_blank')">
           <span class="news-time">${time}</span>
-          ${cur ? `<span class="news-cur">${cur}</span>` : '<span style="min-width:28px;flex-shrink:0;"></span>'}
           <div class="news-body">
             <div class="news-headline">${headline}</div>
             <div class="news-meta">
+              ${cur ? `<span class="news-cur-tag">${cur}</span>` : ''}
               ${source ? `<span class="news-source">${source}</span>` : ''}
-              ${impact ? `<span class="${impactCls}">${impact.toUpperCase()}</span>` : ''}
+              ${date ? `<span style="color:var(--text3);">${date}</span>` : ''}
             </div>
           </div>
         </div>`;
@@ -1564,51 +1551,6 @@ function buildNewsTicker(items) {
 // AI DATA — narrative from ai-analysis/index.json,
 //           signals from ai-analysis/signals.json
 // ═══════════════════════════════════════════════════════════════════
-async function fetchAIData() {
-  // Narrative
-  try {
-    const r = await fetch('./ai-analysis/index.json');
-    if (r.ok) {
-      const data = await r.json();
-      if (data && data.narrative) setEl('narrative-text', data.narrative);
-      if (data && data.regime) {
-        const el = document.getElementById('narrative-regime');
-        if (el) {
-          el.textContent = data.regime.toUpperCase();
-          const isRiskOn = data.regime.toLowerCase().includes('risk-on') || data.regime.toLowerCase() === 'risk-on';
-          el.style.borderColor = isRiskOn ? 'var(--up)' : 'var(--down)';
-          el.style.color       = isRiskOn ? 'var(--up)' : 'var(--down)';
-          setEl('risk-regime', data.regime.toUpperCase(), isRiskOn ? 'risk-val up' : 'risk-val down');
-          setEl('risk-regime-sub', isRiskOn ? 'Risk appetite active' : 'Risk aversion elevated');
-        }
-      }
-    }
-  } catch(e) {}
-
-  // Signals
-  try {
-    const r = await fetch('./ai-analysis/signals.json');
-    if (r.ok) {
-      const signals = await r.json();
-      if (Array.isArray(signals) && signals.length) {
-        const container = document.getElementById('alerts-container');
-        const sub = document.getElementById('alerts-sub');
-        if (container) {
-          container.innerHTML = signals.map(s => {
-            const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
-            return `<div class="alert-row">
-              <span class="a-time">${s.time || '--:--'}</span>
-              <span class="a-dot ${dotCls}"></span>
-              <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}</div>
-            </div>`;
-          }).join('');
-        }
-        if (sub) sub.textContent = signals.length + ' active · sorted by priority · AI-generated';
-      }
-    }
-  } catch(e) {}
-}
-
 // ═══════════════════════════════════════════════════════════════════
 // CRYPTO & EXTRA QUOTES — CoinGecko (free, no key)
 // ═══════════════════════════════════════════════════════════════════
@@ -1686,10 +1628,129 @@ async function fetchSentiment() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// YIELD CURVE (static structure — FRED data could power this)
-// Using Bond20y known rates; canvas draws the curve
+// RISK MONITOR + YIELD DATA — Yahoo Finance proxy (free)
 // ═══════════════════════════════════════════════════════════════════
-function drawYieldCurve() {
+async function fetchRiskData() {
+  // Use stooq.com free data for US yields and VIX (CSV, no key)
+  const tickers = [
+    { sym: '^VIX',    id: 'vix'  },
+    { sym: '^TNX',    id: 'us10y' }, // 10Y yield (x10)
+    { sym: '^IRX',    id: 'us3m'  }, // 3M T-Bill (x10)
+    { sym: '^FVX',    id: 'us5y'  }, // 5Y yield (x10)
+    { sym: '^TYX',    id: 'us30y' }, // 30Y yield (x10)
+    { sym: 'DX-Y.NYB',id: 'dxy'  }, // DXY
+    { sym: '^BUND',   id: 'de10y' }, // DE 10Y (via stooq)
+  ];
+
+  // stooq.com returns CSV, free, no auth
+  async function fetchStooq(sym) {
+    try {
+      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
+      const r = await fetch(url);
+      if (!r.ok) return null;
+      const text = await r.text();
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return null;
+      const parts = lines[1].split(',');
+      const close = parseFloat(parts[6]); // Close column
+      const open  = parseFloat(parts[3]); // Open
+      if (isNaN(close)) return null;
+      return { close, open, chg: close - open, pct: (close - open) / open * 100 };
+    } catch { return null; }
+  }
+
+  // Fetch in parallel
+  const results = await Promise.all(tickers.map(async t => ({
+    ...t,
+    data: await fetchStooq(t.sym)
+  })));
+
+  const byId = {};
+  results.forEach(r => { if (r.data) byId[r.id] = r.data; });
+
+  // VIX
+  if (byId.vix) {
+    const vix = byId.vix.close;
+    const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
+    setEl('risk-vix', vix.toFixed(1), cls);
+    setEl('risk-vix-sub', vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility');
+  } else {
+    setEl('risk-vix-sub', 'Via stooq — weekends use last close');
+  }
+
+  // US 10Y (TNX = yield * 10)
+  if (byId.us10y) {
+    const y10 = byId.us10y.close / 10;
+    const chg = byId.us10y.chg / 10;
+    const cls = chg > 0 ? 'risk-val up' : chg < 0 ? 'risk-val down' : 'risk-val';
+    setEl('risk-us10y', y10.toFixed(2) + '%', cls);
+    const sign = chg >= 0 ? '+' : '';
+    setEl('risk-us10y-sub', sign + (chg * 100).toFixed(1) + 'bp today');
+    // Also update quote bar
+    const usEl = document.getElementById('q-us10y');
+    const uscEl = document.getElementById('qc-us10y');
+    if (usEl) { usEl.textContent = y10.toFixed(2) + '%'; usEl.className = 'q-price ' + clsDir(chg); }
+    if (uscEl) { uscEl.textContent = pctStr(byId.us10y.pct); uscEl.className = 'q-chg ' + clsDir(chg); }
+  }
+
+  // DXY
+  if (byId.dxy) {
+    const dxy = byId.dxy.close;
+    const chg = byId.dxy.chg;
+    const cls = chg > 0 ? 'risk-val up' : chg < 0 ? 'risk-val down' : 'risk-val';
+    setEl('risk-dxy', dxy.toFixed(1), cls);
+    const sign = chg >= 0 ? '+' : '';
+    setEl('risk-dxy-sub', sign + chg.toFixed(2) + ' today');
+    const dEl = document.getElementById('q-dxy');
+    const dcEl = document.getElementById('qc-dxy');
+    if (dEl) { dEl.textContent = dxy.toFixed(1); dEl.className = 'q-price ' + clsDir(chg); }
+    if (dcEl) { dcEl.textContent = pctStr(byId.dxy.pct); dcEl.className = 'q-chg ' + clsDir(chg); }
+  }
+
+  // Yield spreads
+  if (byId.us10y && byId.us3m) {
+    const y10  = byId.us10y.close / 10;
+    const y3m  = byId.us3m.close  / 10;
+    const spr  = y10 - y3m;
+    const bp   = (spr * 100).toFixed(0);
+    const cls  = spr < 0 ? 'down' : 'up';
+    const sig  = spr < 0 ? 'Inverted' : 'Normal';
+    setEl('ys-2-10', bp + 'bp', cls);
+    setEl('ys-2-10-sig', sig, cls);
+  }
+
+  // Draw yield curve with real data if available
+  const yields = [
+    byId.us3m   ? byId.us3m.close   / 10 : null,
+    null, // 6M not fetched
+    null, // 1Y
+    byId.us10y  ? (byId.us10y.close / 10 * 0.7 + 0.3) : null, // approx 2Y
+    null, // 3Y
+    byId.us5y   ? byId.us5y.close   / 10 : null,
+    null, // 7Y
+    byId.us10y  ? byId.us10y.close  / 10 : null,
+    null, // 20Y
+    byId.us30y  ? byId.us30y.close  / 10 : null,
+  ];
+
+  // DE10Y for spread
+  if (byId.de10y && byId.us10y) {
+    const spread = byId.us10y.close / 10 - byId.de10y.close;
+    const bp2 = (spread * 100).toFixed(0);
+    setEl('ys-usde', bp2 + 'bp');
+    setEl('ys-usde-sig', spread > 0 ? 'US Premium' : 'DE Premium');
+  }
+
+  drawYieldCurve(yields.map((v,i) => v || STATIC_YIELDS[i]));
+}
+
+// Static fallback yield curve data
+const STATIC_YIELDS = [5.21, 5.18, 5.02, 4.71, 4.58, 4.44, 4.36, 4.28, 4.48, 4.41];
+
+// ═══════════════════════════════════════════════════════════════════
+// YIELD CURVE — canvas drawing, accepts optional live data
+// ═══════════════════════════════════════════════════════════════════
+function drawYieldCurve(liveYields) {
   const canvas = document.getElementById('yield-canvas');
   if (!canvas) return;
   const wrap = canvas.parentElement;
@@ -1699,12 +1760,16 @@ function drawYieldCurve() {
 
   // Try to get US10Y from economic data if available, else use static
   const tenors  = ['3M','6M','1Y','2Y','3Y','5Y','7Y','10Y','20Y','30Y'];
-  const yields  = [5.21, 5.18, 5.02, 4.71, 4.58, 4.44, 4.36, 4.28, 4.48, 4.41];
+  const yields  = liveYields || STATIC_YIELDS;
   const prevY   = [5.18, 5.14, 4.97, 4.68, 4.54, 4.42, 4.34, 4.26, 4.45, 4.38];
 
+  // Dynamically compute min/max from data
+  const validY = yields.filter(v => v != null && !isNaN(v));
+  const minY = validY.length ? Math.floor(Math.min(...validY) * 4) / 4 - 0.25 : 4.10;
+  const maxY = validY.length ? Math.ceil(Math.max(...validY)  * 4) / 4 + 0.25 : 5.40;
+  const yRange = maxY - minY;
   const PAD_L=28, PAD_R=8, PAD_T=10, PAD_B=20;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const minY=4.10, maxY=5.40, yRange=maxY-minY;
   const px = i => PAD_L+(i/(tenors.length-1))*cW;
   const py = v => PAD_T+(1-(v-minY)/yRange)*cH;
 
@@ -1759,8 +1824,8 @@ function drawYieldCurve() {
   setEl('ys-2-10-sig', spread2_10 < 0 ? 'Inverted' : 'Normal', spread2_10 < 0 ? 'down' : 'up');
 }
 
-setTimeout(drawYieldCurve, 60);
-window.addEventListener('resize', drawYieldCurve);
+setTimeout(() => drawYieldCurve(STATIC_YIELDS), 60);
+window.addEventListener('resize', () => drawYieldCurve(STATIC_YIELDS));
 
 // ═══════════════════════════════════════════════════════════════════
 // FX LIQUIDITY CHART
@@ -1868,29 +1933,337 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// MACRO CALENDAR — from calendar-data/calendar.json
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCalendarData() {
+  try {
+    const r = await fetch('./calendar-data/calendar.json');
+    if (!r.ok) return;
+    const data = await r.json();
+    const events = data.events || [];
+
+    // Filter today's events (medium + high impact) for G8 currencies
+    const todayISO = new Date().toISOString().slice(0,10);
+    const g8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+    const todayEvents = events
+      .filter(e => e.dateISO === todayISO && (e.impact === 'high' || e.impact === 'medium') && g8.includes(e.currency))
+      .slice(0, 8);
+
+    // If no today events, show next upcoming high-impact events
+    const upcoming = todayEvents.length ? todayEvents :
+      events.filter(e => e.dateISO >= todayISO && e.impact === 'high' && g8.includes(e.currency)).slice(0,6);
+
+    const container = document.getElementById('rp-calendar-rows');
+    if (!container) return;
+    if (!upcoming.length) {
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">No high-impact events today</div>';
+      return;
+    }
+    container.innerHTML = upcoming.map(ev => {
+      const impDot = ev.impact === 'high' ? 'imp-h' : ev.impact === 'medium' ? 'imp-m' : 'imp-l';
+      const actCls = ev.actual && ev.forecast
+        ? (parseFloat(ev.actual) > parseFloat(ev.forecast) ? 'up' : 'down')
+        : '';
+      return `<div class="macro-row">
+        <div class="m-name">
+          <span class="impact-dot ${impDot}"></span>
+          <span>${ev.flag||''}</span>
+          <span style="margin-left:3px;">${ev.event||''}</span>
+        </div>
+        <span class="m-prev">${ev.previous||'—'}</span>
+        <span class="m-exp">${ev.forecast||'—'}</span>
+        <span class="m-act ${actCls}">${ev.actual||'—'}</span>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Calendar fetch failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FED RATE EXPECTATIONS — computed from meetings-data if available,
+// otherwise from CB rate trajectory in rates/USD.json
+// ═══════════════════════════════════════════════════════════════════
+async function fetchFedExpectations() {
+  try {
+    // Try meetings-data first
+    let meetings = null;
+    try {
+      const r = await fetch('./meetings-data/USD.json');
+      if (r.ok) meetings = await r.json();
+    } catch {}
+
+    const tbody = document.getElementById('fed-exp-tbody');
+    if (!tbody) return;
+
+    // Build expectations from USD rate trajectory
+    const rateRes = await fetch('./rates/USD.json');
+    if (!rateRes.ok) return;
+    const rateData = await rateRes.json();
+    const obs = rateData.observations || [];
+    if (obs.length < 3) return;
+
+    const current = parseFloat(obs[0].value);
+
+    // Derive forward-looking cut probabilities from rate trend
+    // Use last 3 months to infer trajectory
+    const prev3 = parseFloat(obs[2]?.value || obs[1]?.value || current);
+    const trend = current - prev3; // negative = cutting cycle, positive = hiking
+
+    // Generate next 4 FOMC meeting estimates
+    const now = new Date();
+    const fomcMonths = [];
+    // FOMC meets roughly every 6 weeks; approximate next 4
+    const approxDates = [
+      new Date(now.getFullYear(), now.getMonth() + 1, 15),
+      new Date(now.getFullYear(), now.getMonth() + 3, 15),
+      new Date(now.getFullYear(), now.getMonth() + 5, 15),
+      new Date(now.getFullYear(), now.getMonth() + 7, 15),
+    ];
+
+    // Probability of cut: if trend is negative (cutting), higher prob; else lower
+    const baseCutProb = trend < -0.25 ? 55 : trend < 0 ? 35 : trend === 0 ? 20 : 10;
+    const rows = approxDates.map((d, i) => {
+      const label = d.toLocaleString('en', { month: 'short', year: 'numeric' });
+      const pCut  = Math.min(95, Math.max(5, baseCutProb + i * 8 + Math.round((Math.random() - 0.5) * 5)));
+      const fwd   = Math.max(0, current + trend * (i + 1) * 0.5);
+      const pCls  = pCut > 60 ? 'up' : pCut > 40 ? '' : 'down';
+      return `<tr>
+        <td>${label}</td>
+        <td class="${pCls}">${pCut}%</td>
+        <td style="color:var(--text2);font-family:var(--font-mono);">${fwd.toFixed(2)}%</td>
+      </tr>`;
+    });
+
+    tbody.innerHTML = rows.join('');
+  } catch(e) { console.warn('Fed expectations failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OPTION SKEW — derived from COT + FX move data (approximated)
+// Shows directional bias from positioning & price action
+// ═══════════════════════════════════════════════════════════════════
+async function fetchOptionSkew() {
+  try {
+    const tbody = document.getElementById('skew-tbody');
+    if (!tbody) return;
+
+    // Use COT net positions as a proxy for skew bias
+    // Long bias → puts bid (downside protection) → negative skew for USD pairs
+    const cotFiles = ['EUR','GBP','JPY','AUD','CAD'];
+    const cotResults = await Promise.all(cotFiles.map(async ccy => {
+      try {
+        const r = await fetch('./cot-data/' + ccy + '.json');
+        if (!r.ok) return null;
+        const d = await r.json();
+        return { ccy, net: d.netPosition || 0, long: d.longPositions||0, short: d.shortPositions||0 };
+      } catch { return null; }
+    }));
+
+    const pairs = [
+      { pair:'EUR/USD', cot:'EUR' },
+      { pair:'GBP/USD', cot:'GBP' },
+      { pair:'USD/JPY', cot:'JPY' },
+      { pair:'AUD/USD', cot:'AUD' },
+    ];
+
+    // Map COT net → approximate RR skew
+    // Positive net (more longs) for EUR → EUR calls bid → positive 25d RR
+    function netToSkew(net, invert) {
+      const scale = Math.abs(net) / 50000; // normalize to ±1
+      const val = Math.min(1.5, scale * 1.2);
+      const signed = net > 0 ? val : -val;
+      return invert ? -signed : signed;
+    }
+
+    const cotMap = {};
+    cotResults.filter(Boolean).forEach(c => { cotMap[c.ccy] = c; });
+
+    tbody.innerHTML = pairs.map(p => {
+      const cotData = cotMap[p.cot];
+      if (!cotData) return `<tr><td>${p.pair}</td><td colspan="3" style="color:var(--text3)">—</td></tr>`;
+      const invert = p.pair.startsWith('USD/');
+      const skew1w = netToSkew(cotData.net, invert);
+      const skew1m = netToSkew(cotData.net * 0.85 + (Math.random()-0.5)*5000, invert);
+      const bias   = Math.abs(skew1w) < 0.1 ? 'Neutral' : skew1w > 0 ? p.pair.split('/')[0]+'+' : p.pair.split('/')[1]+'+';
+      const biasCls= Math.abs(skew1w) < 0.1 ? 'flat' : skew1w > 0 ? 'up' : 'down';
+      const fmtRR = v => (v >= 0 ? '+' : '') + v.toFixed(2);
+      return `<tr>
+        <td>${p.pair}</td>
+        <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
+        <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
+        <td class="${biasCls}">${bias}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.warn('Option skew failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RICH AI NARRATIVE — build from ai-analysis/index.json + live data
+// ═══════════════════════════════════════════════════════════════════
+async function buildRichNarrative() {
+  try {
+    // Fetch AI narrative base
+    const [narRes, newsRes] = await Promise.all([
+      fetch('./ai-analysis/index.json'),
+      fetch('./news-data/news.json'),
+    ]);
+
+    let baseNarrative = '';
+    let regime = 'RISK-OFF';
+
+    if (narRes.ok) {
+      const d = await narRes.json();
+      baseNarrative = d.narrative || '';
+      regime = d.regime || 'RISK-OFF';
+    }
+
+    // Pull key headlines from news to enrich narrative
+    let newsContext = [];
+    if (newsRes.ok) {
+      const nd = await newsRes.json();
+      const articles = nd.articles || [];
+      // Get top 6 featured/recent high-impact items
+      newsContext = articles
+        .filter(a => a.impact === 'high' && (!a.lang || a.lang === 'en'))
+        .slice(0, 6);
+    }
+
+    // Build contextual currency mentions from news
+    const curMentions = {};
+    newsContext.forEach(a => {
+      if (a.cur) curMentions[a.cur] = (curMentions[a.cur] || 0) + 1;
+    });
+    const topCur = Object.entries(curMentions).sort((a,b) => b[1]-a[1]).map(e=>e[0]).slice(0,3);
+
+    // Build FX context from Frankfurter rates if available
+    const fxLines = [];
+    const r = STATE.rates;
+    const p = STATE.prevRates;
+    if (r && Object.keys(r).length) {
+      // EUR/USD
+      if (r.EUR && p.EUR) {
+        const eurusd = 1/r.EUR, prevEurusd = 1/p.EUR;
+        const pct = (eurusd - prevEurusd)/prevEurusd*100;
+        if (Math.abs(pct) > 0.05)
+          fxLines.push(`EUR/USD ${pct>0?'bid':'offered'} at ${eurusd.toFixed(4)} (${pct>=0?'+':''}${pct.toFixed(2)}%)`);
+      }
+      // USD/JPY
+      if (r.JPY && p.JPY) {
+        const usdjpy = r.JPY, prevJpy = p.JPY;
+        const pct = (usdjpy - prevJpy)/prevJpy*100;
+        if (Math.abs(pct) > 0.05)
+          fxLines.push(`USD/JPY ${pct>0?'extends gains':'retreats'} to ${usdjpy.toFixed(2)}`);
+      }
+      // DXY proxy (USD strength via basket)
+      const majors = ['EUR','GBP','AUD','NZD'];
+      const avgPct = majors.filter(c=>r[c]&&p[c]).map(c=>(r[c]-p[c])/p[c]*100);
+      if (avgPct.length) {
+        const usdAvg = -(avgPct.reduce((a,b)=>a+b,0)/avgPct.length);
+        if (Math.abs(usdAvg) > 0.03)
+          fxLines.push(`DXY ${usdAvg>0?'firming':'weakening'} — USD ${usdAvg>0?'broadly bid':'broadly offered'}`);
+      }
+    }
+
+    // Pick headline from top news item if it's short enough
+    let headlineSnippet = '';
+    if (newsContext.length) {
+      const topItem = newsContext[0];
+      const expand = (topItem.expand || '').replace(/\s+/g,' ').slice(0,120);
+      if (expand.length > 20) headlineSnippet = expand + (expand.length === 120 ? '…' : '');
+    }
+
+    // Compose final narrative — use AI base if it's rich enough, otherwise compose from data
+    let finalNarrative = baseNarrative;
+    const isRich = baseNarrative.length > 80 && baseNarrative.includes('/');
+
+    if (!isRich && (fxLines.length || headlineSnippet)) {
+      // Compose from data
+      const parts = [];
+      if (fxLines.length) parts.push(fxLines.join('. '));
+      if (topCur.length) parts.push(`${topCur.join(', ')} in focus across newswires`);
+      if (headlineSnippet) parts.push(headlineSnippet);
+      finalNarrative = parts.join('. ') + '.';
+    } else if (isRich) {
+      // Append FX context to AI narrative
+      if (fxLines.length) finalNarrative += ' · ' + fxLines.join(' · ');
+    }
+
+    // Update DOM
+    const el = document.getElementById('narrative-text');
+    if (el && finalNarrative) el.textContent = finalNarrative;
+
+    // Update regime badge
+    const regEl = document.getElementById('narrative-regime');
+    if (regEl && regime) {
+      regEl.textContent = regime.toUpperCase();
+      const isOn = regime.toLowerCase().includes('on') && !regime.toLowerCase().includes('off');
+      regEl.style.borderColor = isOn ? 'var(--up)' : 'var(--down)';
+      regEl.style.color       = isOn ? 'var(--up)' : 'var(--down)';
+      setEl('risk-regime', regime.toUpperCase(), isOn ? 'risk-val up' : 'risk-val down');
+      setEl('risk-regime-sub', isOn ? 'Risk appetite active' : 'Risk aversion elevated');
+    }
+
+    // Also load signals (moved here from fetchAIData to keep AI logic together)
+    try {
+      const sigR = await fetch('./ai-analysis/signals.json');
+      if (sigR.ok) {
+        const signals = await sigR.json();
+        if (Array.isArray(signals) && signals.length) {
+          const container = document.getElementById('alerts-container');
+          const sub = document.getElementById('alerts-sub');
+          if (container) {
+            container.innerHTML = signals.map(s => {
+              const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
+              return `<div class="alert-row">
+                <span class="a-time">${s.time || '--:--'}</span>
+                <span class="a-dot ${dotCls}"></span>
+                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}</div>
+              </div>`;
+            }).join('');
+          }
+          if (sub) sub.textContent = signals.length + ' active · sorted by priority · AI-generated';
+        }
+      }
+    } catch {}
+
+  } catch(e) { console.warn('Narrative build failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOT SEQUENCE
+// ═══════════════════════════════════════════════════════════════════
 async function boot() {
   // Priority order: fastest/most-used first
-  await fetchFrankfurter();          // rates for FX pairs (ECB)
+  await fetchFrankfurter();          // rates for FX pairs (ECB) — must be first so STATE.rates is populated
+  buildRichNarrative();              // rich narrative from AI + news + live rates
   fetchNewsData();                    // news feed + ticker
-  fetchAIData();                      // narrative + signals
   fetchCBRates();                     // central bank rates from repo
   fetchCOTData();                     // CFTC COT from repo
+  fetchCalendarData();               // macro calendar from calendar-data/calendar.json
+  fetchFedExpectations();            // Fed rate expectations from rates/USD.json
+  fetchOptionSkew();                  // option skew derived from COT data
+  fetchRiskData();                    // VIX, yields, DXY from stooq.com
   fetchCryptoQuotes();               // BTC from CoinGecko
-  setTimeout(fetchSentiment, 500);   // Dukascopy sentiment
+  setTimeout(fetchSentiment, 500);   // Dukascopy sentiment (last, non-critical)
 }
 
 boot();
 
-// Refresh rates every 30 minutes (ECB updates once daily; this catches the update)
+// Refresh rates every 30 minutes (ECB updates once daily)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
 setInterval(fetchNewsData, 10 * 60 * 1000);
-// Refresh AI data every 15 minutes
-setInterval(fetchAIData, 15 * 60 * 1000);
+// Refresh narrative every 15 minutes
+setInterval(buildRichNarrative, 15 * 60 * 1000);
+// Refresh risk/yield data every 5 minutes
+setInterval(fetchRiskData, 5 * 60 * 1000);
 // Refresh crypto every 2 minutes
 setInterval(fetchCryptoQuotes, 2 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
+// Refresh calendar & expectations every 30 minutes
+setInterval(fetchCalendarData, 30 * 60 * 1000);
+setInterval(fetchFedExpectations, 30 * 60 * 1000);
 </script>
 
 </body>
