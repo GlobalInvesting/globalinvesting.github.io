@@ -2,9 +2,9 @@
   "currency": "JPY",
   "country": "Japón",
   "bank": "Banco de Japón (BoJ)",
-  "analysis": "El Banco de Japón subió las tasas en julio 2025 y las ha mantenido en 0.75% desde entonces, ejerciendo presión alcista sobre la divisa. Aunque la tasa de interés sigue estando por debajo del promedio global, el ciclo alcista y la decisión de subir tasas sugieren un enfoque restrictivo. La inflación anual de 1.3% sigue por debajo del objetivo, lo que podría influir en las decisiones futuras.\n\nLa cuenta corriente presenta un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. La composición exportadora de Japón explica en parte este superávit. Aunque los términos de intercambio son desfavorables, la balanza comercial sigue en superávit, lo que apoya la divisa.\n\nEl posicionamiento especulativo muestra una posición corta extrema, con -65.4K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. La divisa se apreció un 2.85% el último mes, lo que contradice el posicionamiento bajista y podría indicar un posible squeeze de cortos.",
+  "analysis": "El Banco de Japón subió las tasas en 0.25pp en julio de 2025 y las ha mantenido desde entonces, lo que sugiere un ciclo alcista. Aunque la tasa de interés del 0.75% está por debajo del promedio global, esta decisión ha ejercido presión alcista sobre la divisa. La inflación anual del 1.3% se encuentra por debajo del objetivo, lo que podría llevar a una revisión de la política monetaria.\n\nLa cuenta corriente presenta un superávit del 4.7% del PIB, lo que indica una demanda estructural de la divisa. La composición exportadora, liderada por vehículos y autopartes, explica en parte este superávit. La noticia de que el cobre está camino de su mejor semana desde el comienzo de la guerra podría influir en los términos de intercambio.\n\nEl posicionamiento especulativo muestra una posición corta extrema, con -54.9K contratos netos, lo que sugiere un potencial rebote contrario si los datos mejoran. La apreciación del 3.03% del yen en el último mes contra el dólar, a pesar de esta posición bajista, podría indicar un posible squeeze de cortos. Una declaración sobre una posible subida de tasas en abril introduce incertidumbre en el mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-27T10:06:07.160226+00:00",
+  "generatedAt": "2026-03-28T09:53:27.079838+00:00",
   "exportComposition": "Comtrade 2023: vehículos y autopartes (32%, $370.1B), maquinaria industrial (19%, $215.6B), equipos eléctricos y electrónicos (16%, $184.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -13,7 +13,7 @@
     "inflation": 1.3,
     "unemployment": 2.7,
     "currentAccount": 4.7,
-    "rateMomentum": 0.85,
+    "rateMomentum": 0.65,
     "lastRateDecision": {
       "direction": "SUBIÓ",
       "delta": 0.25,
@@ -24,15 +24,15 @@
       "cycle_12m": 0.25,
       "cycle_label": "ciclo ALCISTA en 12M (+0.25pp acumulados)"
     },
-    "cotPositioning": -65429,
-    "fxPerformance1M": 2.847,
+    "cotPositioning": -54852,
+    "fxPerformance1M": 3.0266,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-27",
-    "latestNewsTs": 1774594331.0,
+    "lastUpdate": "2026-03-28",
+    "latestNewsTs": 1774636138.0,
     "newsHeadlines": [
-      "BOJ re-estimates Japan's estimated natural rate of interest after review",
-      "USD/JPY presses toward 160.00 as Crude Oil shock deepens Yen slide",
-      "BOJ set to release indicators for estimated core CPI every month now"
+      "Copper set for best week since war began amid demand from China",
+      "USDJPY cracks above 160.00 for the first time since July 2024",
+      "BOJ would hike rates in April \"if you think about it normally\", says former gove"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.43,
-    "avg_fx_perf_1m": 0.92,
-    "avg_cot": -9265.62
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.15,
+    "avg_cot": -7330.62
   }
 }

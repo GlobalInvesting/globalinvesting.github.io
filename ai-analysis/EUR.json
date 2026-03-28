@@ -2,9 +2,9 @@
   "currency": "EUR",
   "country": "Eurozona",
   "bank": "Banco Central Europeo (BCE)",
-  "analysis": "El Banco Central Europeo recortó las tasas en 0.25pp en junio 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo bajista y presión bajista sobre la divisa. Aunque la inflación se encuentra cerca del objetivo del 2%, el crecimiento del PIB es superior al promedio global.\n\nLa balanza comercial presenta un déficit en bienes, explicado en parte por la composición exportadora. La cuenta corriente muestra un superávit, lo que sugiere una demanda estructural de la divisa. La noticia del conflicto en Irán podría retrasar la recuperación del par EUR/USD.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -7.0K contratos netos, lo que se refleja en la depreciación del par en el último mes. Aunque el par ha encontrado soporte por encima de 1.1495, la estabilización puede ser temporal debido a la incertidumbre global.",
+  "analysis": "El Banco Central Europeo recortó las tasas en 0.25pp en junio 2025 y ha mantenido el tipo en 2.15% desde entonces, ejerciendo presión bajista sobre la divisa. Aunque los mercados de futuros no descuentan movimientos significativos en las tasas a corto plazo, las declaraciones de algunos miembros del BCE sugieren una postura cautelosa. La inflación se mantiene cerca del objetivo del 2%, lo que da margen de maniobra al banco central.\n\nLa cuenta corriente presenta un superávit del 1.7% del PIB, lo que sugiere demanda estructural de la divisa, aunque la balanza comercial muestra un déficit en bienes. La composición exportadora de la zona euro no parece estar sufriendo un impacto significativo. La confianza del consumidor y la confianza empresarial se mantienen en niveles razonables.\n\nEl posicionamiento especulativo neto es bajista, con -13.5K contratos netos, y el rendimiento FX del último mes ha sido negativo, lo que sugiere una depreciación de la divisa. El mercado parece estar preparándose para un escenario de menor crecimiento, con atención en los datos de empleo en Estados Unidos y los titulares sobre la guerra que podrían influir en el comportamiento del par EUR/USD.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-27T10:05:50.271376+00:00",
+  "generatedAt": "2026-03-28T09:53:10.638385+00:00",
   "exportComposition": "Comtrade 2023: maquinaria industrial (13%, $34.6B), productos farmacéuticos (12%, $31.7B), aeronaves (10%, $27.6B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -24,15 +24,15 @@
       "cycle_12m": -2.1,
       "cycle_label": "ciclo BAJISTA en 12M (-2.10pp acumulados)"
     },
-    "cotPositioning": -6952,
-    "fxPerformance1M": -2.0299,
+    "cotPositioning": -13538,
+    "fxPerformance1M": -2.2679,
     "fxSource": "static",
-    "lastUpdate": "2026-03-27",
-    "latestNewsTs": 1774593360.0,
+    "lastUpdate": "2026-03-28",
+    "latestNewsTs": 1774637302.0,
     "newsHeadlines": [
-      "Chart alert: EUR/USD found support above 1.1495, potential push up towards “Expa",
-      "EUR/USD: Recovery delayed by Iran conflict – Commerzbank",
-      "Oil supply shock deepens as Gulf refining capacity hit hard - Europe scrambling"
+      "Raoul Pal Says Recessions Are 'Not Possible Anymore' As Prediction Markets Price",
+      "ECB Schnabel: There is no need to rush into action",
+      "EUR/USD Weekly Forecast: War headlines and US employment to set the tone"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.43,
-    "avg_fx_perf_1m": 0.92,
-    "avg_cot": -9265.62
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.15,
+    "avg_cot": -7330.62
   }
 }

@@ -2,9 +2,9 @@
   "currency": "GBP",
   "country": "Reino Unido",
   "bank": "Banco de Inglaterra (BoE)",
-  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, lo que indica un ciclo expansivo con menor carry, presionando a la baja la divisa. La tasa de interés del Reino Unido es de 3.75%, aunque la decisión de bajar tasas sugiere una postura dovish, lo que podría debilitar la divisa.\n\nLa balanza comercial del Reino Unido muestra un déficit pronunciado de -19.3B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora no parece ser lo suficientemente fuerte como para revertir este déficit. El régimen global risk-off podría dirigir flujos hacia activos refugio, lo que podría afectar negativamente la divisa.\n\nEl posicionamiento especulativo muestra un sesgo neto alcista con +11.8K contratos netos, y el rendimiento FX del último mes fue de +1.08% vs USD. Sin embargo, la noticia sobre el EUR/GBP y la perspectiva de la Bank of England podría cambiar esta tendencia, introduciendo incertidumbre en el mercado.",
+  "analysis": "El Banco de Inglaterra recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, presionando a la baja la divisa debido a un menor carry. La tasa de interés del Reino Unido es de 3.75%, 1.37pp por encima del promedio global. La inflación anual es de 3.0%, por encima del objetivo, y el crecimiento del PIB es de 0.8%, inferior al promedio global.\n\nLa balanza comercial del Reino Unido muestra un déficit de -19.3B USD/mes, ejerciendo presión vendedora estructural sobre la divisa. La composición exportadora se centra en piedras preciosas y metales, sensible a los cambios en la demanda global. El PMI manufacturero indica expansión, aunque la producción industrial muestra una caída mensual.\n\nEl posicionamiento especulativo muestra un sesgo alcista con +15.7K contratos netos, y el rendimiento FX del último mes ha sido positivo con una apreciación vs USD. La libra esterlina sigue siendo vulnerable debido a la crisis en Medio Oriente y la falta de un crecimiento sólido y la presión inflacionaria pueden influenciar la divisa en el corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-27T10:06:01.360667+00:00",
+  "generatedAt": "2026-03-28T09:53:21.300664+00:00",
   "exportComposition": "Comtrade 2023: piedras preciosas y metales (77%, $0.9B), bebidas y líquidos alcohólicos (19%, $0.2B), productos químicos orgánicos (0%, $0.0B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -24,14 +24,14 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": 11768,
-    "fxPerformance1M": 1.0821,
+    "cotPositioning": 15716,
+    "fxPerformance1M": 1.5152,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-27",
-    "latestNewsTs": 1774570470.0,
+    "lastUpdate": "2026-03-28",
+    "latestNewsTs": 1774623562.0,
     "newsHeadlines": [
-      "GBP/USD drifts lower as Iran oil shock clouds the BoE rate outlook",
-      "EUR/GBP Forecast: Critical Upside Risks Emerge as Bank of England Shifts Dovishl",
+      "Pound Sterling Price News and Forecast: GBP remains vulnerable amid Mideast cris",
+      "GBP/USD Weekly Forecast: Pound Sterling remains vulnerable amid Mideast crisis",
       "BoE’s Breeden: ‘Lackluster’ Growth is the UK’s Disinflationary Shield"
     ]
   },
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.43,
-    "avg_fx_perf_1m": 0.92,
-    "avg_cot": -9265.62
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.15,
+    "avg_cot": -7330.62
   }
 }

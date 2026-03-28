@@ -2,9 +2,9 @@
   "currency": "AUD",
   "country": "Australia",
   "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "La política monetaria del Banco de la Reserva de Australia sigue siendo hawkish, con una tasa de interés en 4.10%, significativamente superior al promedio global. Esto ha generado un carry atractivo para inversores de renta fija internacional, lo que ha ejercido presión alcista sobre la divisa. Aunque los mercados de futuros ya descuentan un ciclo restrictivo activo, las declaraciones del banco central sugieren que podrían subir las tasas nuevamente si la inflación no se contiene.\n\nLa balanza comercial de Australia sigue siendo superavitaria, gracias a la composición exportadora dominada por minerales metalíferos y piedras preciosas. Sin embargo, la cuenta corriente sigue en déficit, lo que ejerce presión vendedora estructural sobre la divisa. La situación se complica con la creciente aversión al riesgo y la posible \"trampa de estagflación\" que podría limitar la capacidad del banco central para subir las tasas.\n\nEl posicionamiento especulativo en el mercado es extremadamente alcista, con un COT de +45.4K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción en los datos. La noticia de que el asistente del gobernador del RBA advirtió sobre un posible aumento en las tasas neutrales y choques de precios de los combustibles podría desencadenar más subidas, lo que ha llevado al par AUD/JPY a acelerar su caída.",
+  "analysis": "El Banco de la Reserva de Australia mantiene una postura hawkish con una tasa de interés del 4.10%, generando un carry atractivo para inversores. La inflación está por encima del objetivo y el crecimiento del PIB es superior al promedio global, lo que sugiere que el banco central intenta controlar la inflación y mantener el crecimiento económico. Aunque los mercados de futuros descuentan un ciclo restrictivo, la advertencia del RBA sobre una posible \"trampa de estagflación\" podría limitar su capacidad para subir tasas.\n\nLa balanza comercial de Australia muestra un superávit en bienes gracias a su composición exportadora, pero la cuenta corriente presenta un déficit, lo que podría ejercer presión vendedora sobre la divisa. La situación geopolítica actual ha generado un entorno de aversión al riesgo, afectando el precio del AUD.\n\nEl posicionamiento especulativo es muy alcista, con un COT de +49.1K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación vs USD, confirmando la tendencia alcista, aunque el mercado muestra signos de debilidad, lo que podría ser un catalizador para una corrección a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-27T10:06:18.082330+00:00",
+  "generatedAt": "2026-03-28T09:53:37.793958+00:00",
   "exportComposition": "Comtrade 2023: minerales metalíferos (73%, $193.9B), piedras preciosas y metales (8%, $20.3B), equipos eléctricos y electrónicos (3%, $6.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -16,18 +16,18 @@
     "rateMomentum": 0.0,
     "lastRateDecision": {
       "direction": "SUBIÓ",
-      "delta": 0.5,
+      "delta": 0.25,
       "current_rate": 4.1,
-      "prev_rate": 3.6,
+      "prev_rate": 3.85,
       "date": "2026-03-01",
       "source": "rates_history",
       "cycle_12m": 0.0,
       "cycle_label": "estable en los últimos 12 meses"
     },
-    "cotPositioning": 45359,
-    "fxPerformance1M": 1.9515,
+    "cotPositioning": 49145,
+    "fxPerformance1M": 2.3788,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-27",
+    "lastUpdate": "2026-03-28",
     "latestNewsTs": 1774581762.0,
     "newsHeadlines": [
       "Stagflation Trap Could Tie RBA’s Hawkish Hand, and Send AUD/JPY to 103",
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.43,
-    "avg_fx_perf_1m": 0.92,
-    "avg_cot": -9265.62
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.15,
+    "avg_cot": -7330.62
   }
 }

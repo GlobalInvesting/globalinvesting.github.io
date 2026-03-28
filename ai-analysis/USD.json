@@ -2,9 +2,9 @@
   "currency": "USD",
   "country": "Estados Unidos",
   "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, generando presión bajista sobre la divisa. Aunque la tasa de interés actual de 3.75% está por encima del promedio global, la decisión de bajar tasas sugiere un enfoque más dovish. La inflación anual de 2.4% y el crecimiento del PIB de 2.0% indican que la economía sigue siendo resiliente.\n\nLa composición exportadora de los Estados Unidos, con un fuerte componente de combustibles y petróleo, explica en parte el déficit comercial. La situación global de risk-off también contribuye a la presión sobre la divisa. Aunque el dólar ha mantenido su valor, la noticia de que el oro mantiene su tendencia alcista sugiere que la divisa podría seguir bajo presión.\n\nEl posicionamiento especulativo neto bajista y el rendimiento FX del último mes de -2.73% vs USD indican que el mercado está apostando por una depreciación adicional de la divisa. La noticia de que la pausa en el conflicto con Irán podría actuar como un \"válvula de alivio\" sugiere que la divisa seguirá siendo sensible a los eventos geopolíticos y las decisiones monetarias.",
+  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, presionando a la baja la divisa. Aunque la tasa de interés se mantiene en 3.75%, la decisión de bajar tasas indica una postura más dovish, lo que puede afectar negativamente la divisa.\n\nLa cuenta corriente y la balanza comercial presentan un déficit, ejerciendo presión vendedora estructural sobre la divisa. La composición exportadora muestra que los combustibles y el petróleo son una parte importante de las exportaciones, lo que puede ser afectado por los precios de las commodities y la demanda global.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -6.9K contratos netos, sugiriendo que los inversores apostaron por una depreciación de la divisa. El rendimiento FX del último mes muestra una depreciación de -2.90% vs USD, lo que puede ser un indicador de la tendencia a corto plazo.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-27T10:05:44.589968+00:00",
+  "generatedAt": "2026-03-28T09:53:04.925959+00:00",
   "exportComposition": "Comtrade 2023: combustibles y petróleo (20%, $572.8B), maquinaria industrial (13%, $381.9B), equipos eléctricos y electrónicos (13%, $373.2B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -24,15 +24,15 @@
       "cycle_12m": -0.75,
       "cycle_label": "ciclo BAJISTA en 12M (-0.75pp acumulados)"
     },
-    "cotPositioning": -5615,
-    "fxPerformance1M": -2.7264,
+    "cotPositioning": -6921,
+    "fxPerformance1M": -2.8997,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-27",
-    "latestNewsTs": 1774594370.0,
+    "lastUpdate": "2026-03-28",
+    "latestNewsTs": 1774669224.0,
     "newsHeadlines": [
-      "Gold clings to bullish bias amid weaker USD; upside seems limited amid hawkish F",
-      "Iran Strike Pause: Slow-Boil Inflation Nightmare Scenario Keeps Dollar on Top",
-      "FX option expiries for 27 March 10am New York cut"
+      "Dollar Advances as Iran War Rages",
+      "Trump jokes about Hormuz as war drags on, markets slide and NATO doubts resurfac",
+      "investingLive Americas market news wrap: Oil prices surge as war worries mount"
     ]
   },
   "globalContext": {
@@ -40,8 +40,8 @@
     "avg_gdp_growth": 1.12,
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
-    "avg_bond10y": 3.43,
-    "avg_fx_perf_1m": 0.92,
-    "avg_cot": -9265.62
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.15,
+    "avg_cot": -7330.62
   }
 }
