@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Investing · FX Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg-primary:   #0b0e14;
+  --bg-secondary: #13171f;
+  --bg-card:      #1a1f2e;
+  --bg-elevated:  #20253a;
+  --bg-row-hover: #1d2235;
+
+  --green-strong: #26a69a;
+  --green-medium: #00897b;
+  --red-strong:   #ef5350;
+  --red-medium:   #e53935;
+  --neutral:      #607d8b;
+  --orange:       #ff6f00;
+  --blue:         #1e88e5;
+
+  --text-primary:   #e1e4e8;
+  --text-secondary: #8b949e;
+  --text-tertiary:  #6e7681;
+
+  --border:       #30363d;
+  --border-hover: #484f58;
+}
+
+html,body{
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:13px;
+  line-height:1.4;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ══════════════════════════════════════════
+   TOP BAR  (Bloomberg-style ticker strip)
+══════════════════════════════════════════ */
+.ticker-bar{
+  background:var(--bg-secondary);
+  border-bottom:1px solid var(--border);
+  height:30px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  position:relative;
+}
+.ticker-bar::before,.ticker-bar::after{
+  content:'';
+  position:absolute;
+  top:0;bottom:0;width:40px;z-index:2;
+}
+.ticker-bar::before{left:0;background:linear-gradient(90deg,var(--bg-secondary),transparent)}
+.ticker-bar::after{right:0;background:linear-gradient(-90deg,var(--bg-secondary),transparent)}
+
+.ticker-scroll{
+  display:flex;
+  gap:0;
+  animation:scrollticker 40s linear infinite;
+  white-space:nowrap;
+}
+@keyframes scrollticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-scroll:hover{animation-play-state:paused}
+
+.tk-item{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:0 18px;
+  border-right:1px solid var(--border);
+  height:30px;
+}
+.tk-pair{font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:.03em}
+.tk-price{font-size:12px;font-weight:700;color:var(--text-primary);letter-spacing:.02em}
+.tk-chg{font-size:10px;font-weight:600}
+.tk-up{color:var(--green-strong)}
+.tk-dn{color:var(--red-strong)}
+
+/* ── HEADER ── */
+.header{
+  background:var(--bg-secondary);
+  border-bottom:2px solid var(--border);
+  padding:0 20px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.brand{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.04em;
+  color:var(--text-primary);
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+  text-transform:uppercase;
+}
+.brand-dot{
+  width:6px;height:6px;
+  background:var(--green-strong);
+  border-radius:50%;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.hdr-sep{width:1px;height:18px;background:var(--border)}
+
+.hdr-nav{display:flex;align-items:center;gap:0}
+.hdr-nav a{
+  font-size:12px;
+  font-weight:500;
+  color:var(--text-tertiary);
+  text-decoration:none;
+  padding:0 12px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+  transition:color .15s,border-color .15s;
+  white-space:nowrap;
+}
+.hdr-nav a:hover{color:var(--text-primary)}
+.hdr-nav a.active{color:var(--text-primary);border-bottom-color:var(--blue)}
+
+.hdr-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  font-size:11px;
+  color:var(--text-tertiary);
+}
+
+.live-badge{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--green-strong);
+}
+.live-dot{width:6px;height:6px;background:var(--green-strong);border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+
+/* ══════════════════════════════════════════
+   REGIME BAR
+══════════════════════════════════════════ */
+.regime-bar{
+  background:var(--bg-card);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  gap:0;
+}
+
+.rb-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 16px;
+  border-right:1px solid var(--border);
+  height:100%;
+}
+.rb-item:first-child{padding-left:0}
+
+.rb-label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-tertiary);
+}
+.rb-val{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-primary);
+}
+.rb-val.up{color:var(--green-strong)}
+.rb-val.dn{color:var(--red-strong)}
+.rb-val.blue{color:var(--blue)}
+
+.regime-pill{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  padding:2px 8px;
+  border-radius:2px;
+  background:rgba(30,136,229,.15);
+  color:var(--blue);
+  border:1px solid rgba(30,136,229,.3);
+}
+
+.rb-model{
+  margin-left:auto;
+  font-size:10px;
+  color:var(--text-tertiary);
+}
+
+/* ══════════════════════════════════════════
+   MAIN LAYOUT
+══════════════════════════════════════════ */
+.layout{
+  display:grid;
+  grid-template-columns:180px 1fr;
+  min-height:calc(100vh - 108px);
+}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  background:var(--bg-secondary);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  position:sticky;
+  top:108px;
+  height:calc(100vh - 108px);
+}
+
+.lp-section{
+  border-bottom:1px solid var(--border);
+}
+
+.lp-section-title{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-tertiary);
+  padding:8px 12px 4px;
+}
+
+.lp-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 12px;
+  cursor:pointer;
+  border-left:2px solid transparent;
+  transition:background .1s;
+}
+.lp-row:hover{background:var(--bg-row-hover)}
+.lp-row.active{border-left-color:var(--blue);background:rgba(30,136,229,.06)}
+
+.lp-flag{font-size:14px;line-height:1;width:18px}
+.lp-code{font-size:11px;font-weight:700;color:var(--text-primary);width:26px}
+.lp-bar-wrap{flex:1;height:3px;background:var(--bg-elevated);border-radius:1px;overflow:hidden}
+.lp-bar{height:100%;border-radius:1px;transition:width .4s}
+.lp-score{font-size:10px;font-weight:700;width:24px;text-align:right}
+
+.lp-rank-1 .lp-code{color:var(--green-strong)}
+.lp-rank-last .lp-code{color:var(--red-strong)}
+
+/* Nav items */
+.lp-nav-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 12px;
+  font-size:11.5px;
+  font-weight:500;
+  color:var(--text-tertiary);
+  text-decoration:none;
+  transition:color .12s,background .12s;
+  border-left:2px solid transparent;
+}
+.lp-nav-item:hover{color:var(--text-primary);background:var(--bg-row-hover)}
+.lp-nav-item.active{color:var(--text-primary);border-left-color:var(--blue);background:rgba(30,136,229,.06)}
+.lp-nav-icon{width:13px;height:13px;flex-shrink:0;opacity:.6}
+
+/* ── CONTENT ── */
+.content{
+  padding:0;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ══════════════════════════════════════════
+   SECTION HEADERS  (Finviz-style)
+══════════════════════════════════════════ */
+.sec-hd{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px 8px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-secondary);
+}
+
+.sec-title{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+}
+
+.sec-meta{
+  font-size:10px;
+  color:var(--text-tertiary);
+}
+
+.sec-badge{
+  margin-left:auto;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:2px 7px;
+  border-radius:2px;
+  background:rgba(38,166,154,.1);
+  color:var(--green-strong);
+  border:1px solid rgba(38,166,154,.25);
+}
+
+.sec-link{
+  margin-left:auto;
+  font-size:11px;
+  color:var(--blue);
+  text-decoration:none;
+  font-weight:500;
+}
+.sec-link:hover{text-decoration:underline}
+
+/* ══════════════════════════════════════════
+   STRENGTH GRID  (compact Finviz rows)
+══════════════════════════════════════════ */
+.strength-section{border-bottom:1px solid var(--border)}
+
+.strength-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.st-thead th{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-tertiary);
+  padding:6px 10px;
+  text-align:right;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-secondary);
+  white-space:nowrap;
+  cursor:default;
+}
+.st-thead th:first-child{text-align:left;padding-left:16px}
+.st-thead th:nth-child(2){text-align:left}
+
+.strength-table tbody tr{
+  border-bottom:1px solid var(--border);
+  transition:background .1s;
+  cursor:default;
+}
+.strength-table tbody tr:last-child{border-bottom:none}
+.strength-table tbody tr:hover{background:var(--bg-row-hover)}
+
+.strength-table td{
+  padding:8px 10px;
+  text-align:right;
+  white-space:nowrap;
+  font-size:12px;
+}
+.strength-table td:first-child{text-align:left;padding-left:16px}
+.strength-table td:nth-child(2){text-align:left}
+
+/* Currency identity cell */
+.cur-cell{display:flex;align-items:center;gap:8px}
+.cur-flag{font-size:16px;line-height:1}
+.cur-info{}
+.cur-code{font-size:13px;font-weight:700;color:var(--text-primary)}
+.cur-bank{font-size:10px;color:var(--text-tertiary)}
+
+/* Score bar */
+.score-bar-cell{display:flex;align-items:center;gap:8px;min-width:140px}
+.score-num{font-size:14px;font-weight:700;width:38px;flex-shrink:0}
+.score-track{flex:1;height:5px;background:var(--bg-elevated);border-radius:2px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px;transition:width .4s}
+.score-green{color:var(--green-strong)}
+.score-red{color:var(--red-strong)}
+.score-neutral{color:var(--text-secondary)}
+
+/* Base/adj breakdown */
+.breakdown-cell{font-size:11px;color:var(--text-secondary)}
+.adj-pos{color:var(--green-strong);font-weight:600}
+.adj-neg{color:var(--red-strong);font-weight:600}
+
+/* Metric values */
+.mv{font-size:12px;font-weight:600}
+.mv.pos{color:var(--green-strong)}
+.mv.neg{color:var(--red-strong)}
+.mv.dim{color:var(--text-secondary)}
+
+/* Outlook badge */
+.outlook-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  padding:2px 8px;
+  border-radius:2px;
+}
+.ob-hawk{background:rgba(38,166,154,.12);color:var(--green-strong);border:1px solid rgba(38,166,154,.3)}
+.ob-dove{background:rgba(239,83,80,.12);color:var(--red-strong);border:1px solid rgba(239,83,80,.3)}
+.ob-neut{background:rgba(96,125,139,.12);color:var(--neutral);border:1px solid rgba(96,125,139,.3)}
+
+/* AI snippet in row */
+.ai-snippet{
+  font-size:11px;
+  color:var(--text-tertiary);
+  max-width:280px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* ══════════════════════════════════════════
+   TWO / THREE COL
+══════════════════════════════════════════ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)}
+
+.panel{border-right:1px solid var(--border)}
+.panel:last-child{border-right:none}
+
+/* ══════════════════════════════════════════
+   SIGNALS TABLE
+══════════════════════════════════════════ */
+.signals-table{width:100%;border-collapse:collapse}
+.signals-table th{
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-tertiary);padding:6px 10px;text-align:left;
+  border-bottom:1px solid var(--border);background:var(--bg-secondary);
+}
+.signals-table td{
+  padding:8px 10px;border-bottom:1px solid var(--border);
+  font-size:12px;vertical-align:middle;
+}
+.signals-table tr:last-child td{border-bottom:none}
+.signals-table tr:hover td{background:var(--bg-row-hover)}
+
+.sig-pair{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px}
+.sig-long{color:var(--green-strong)}
+.sig-short{color:var(--red-strong)}
+.sig-slash{color:var(--border-hover)}
+
+.conf-high{background:rgba(38,166,154,.1);color:var(--green-strong);border:1px solid rgba(38,166,154,.25)}
+.conf-med{background:rgba(255,111,0,.1);color:var(--orange);border:1px solid rgba(255,111,0,.25)}
+.conf-low{background:rgba(96,125,139,.1);color:var(--neutral);border:1px solid rgba(96,125,139,.2)}
+.conf-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+
+.spread-val{font-size:14px;font-weight:700;color:var(--text-primary)}
+
+/* ══════════════════════════════════════════
+   HEATMAP
+══════════════════════════════════════════ */
+.hm-table{width:100%;border-collapse:collapse;font-size:11px}
+.hm-table th{
+  font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--text-tertiary);padding:5px 8px;text-align:center;
+  border-bottom:1px solid var(--border);background:var(--bg-secondary);
+  white-space:nowrap;
+}
+.hm-table th:first-child{text-align:left;padding-left:10px}
+.hm-table td{
+  padding:6px 8px;border-bottom:1px solid var(--border);
+  text-align:center;font-weight:600;font-size:11px;white-space:nowrap;
+}
+.hm-table tr:last-child td{border-bottom:none}
+.hm-table tr:hover td{filter:brightness(1.15)}
+.hm-table td:first-child{text-align:left;font-size:12px;font-weight:700;color:var(--text-primary);background:var(--bg-secondary);padding-left:10px}
+
+.hm-bull-hi{background:rgba(38,166,154,.28);color:#26a69a}
+.hm-bull-md{background:rgba(38,166,154,.14);color:#1d8a80}
+.hm-bull-lo{background:rgba(38,166,154,.06);color:#146b63}
+.hm-neut{background:rgba(96,125,139,.1);color:var(--neutral)}
+.hm-bear-lo{background:rgba(239,83,80,.06);color:#b93c3a}
+.hm-bear-md{background:rgba(239,83,80,.16);color:#ef5350}
+.hm-bear-hi{background:rgba(239,83,80,.28);color:#f44336}
+
+/* ══════════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════════ */
+.cal-table{width:100%;border-collapse:collapse}
+.cal-table th{
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-tertiary);padding:6px 10px;text-align:left;
+  border-bottom:1px solid var(--border);background:var(--bg-secondary);
+  position:sticky;top:0;
+}
+.cal-table td{
+  padding:7px 10px;border-bottom:1px solid var(--border);
+  font-size:12px;vertical-align:middle;
+}
+.cal-table tr:last-child td{border-bottom:none}
+.cal-table tr:hover td{background:var(--bg-row-hover)}
+.cal-table tr.is-past td{opacity:.42}
+.cal-table tr.is-next td{background:rgba(30,136,229,.05);border-left:2px solid var(--blue)}
+
+.cal-time{color:var(--text-tertiary);font-size:11px;white-space:nowrap}
+.cal-cur{font-weight:700;color:var(--text-secondary);font-size:11px}
+.cal-event-name{color:var(--text-primary);font-size:12px}
+.cal-data{text-align:right;font-weight:600;font-size:11px;white-space:nowrap}
+.cal-data.pos{color:var(--green-strong)}
+.cal-data.neg{color:var(--red-strong)}
+
+.imp-dot{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:middle}
+.imp-hi{background:var(--red-strong)}
+.imp-md{background:var(--orange)}
+.imp-lo{background:var(--neutral)}
+
+.cal-scroll{max-height:380px;overflow-y:auto}
+
+/* ══════════════════════════════════════════
+   AI ANALYSIS
+══════════════════════════════════════════ */
+.ai-table{width:100%;border-collapse:collapse}
+.ai-table th{
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-tertiary);padding:6px 10px;text-align:left;
+  border-bottom:1px solid var(--border);background:var(--bg-secondary);
+}
+.ai-table td{
+  padding:10px;border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+.ai-table tr:last-child td{border-bottom:none}
+.ai-table tr:hover td{background:var(--bg-row-hover)}
+
+.ai-cur{display:flex;align-items:center;gap:8px;width:80px}
+.ai-flag{font-size:18px}
+.ai-code{font-size:13px;font-weight:700;color:var(--text-primary)}
+.ai-bank{font-size:10px;color:var(--text-tertiary)}
+
+.ai-text-cell{font-size:11.5px;line-height:1.55;color:var(--text-secondary);padding-right:16px!important}
+.ai-decision{
+  font-size:11px;color:var(--text-tertiary);
+  border-left:2px solid var(--border);
+  padding-left:8px;
+  white-space:nowrap;
+}
+.ai-next{
+  font-size:10px;
+  color:var(--blue);
+  margin-top:4px;
+  font-weight:500;
+}
+
+/* ══════════════════════════════════════════
+   CARRY TABLE
+══════════════════════════════════════════ */
+.carry-table{width:100%;border-collapse:collapse}
+.carry-table th{
+  font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-tertiary);padding:6px 10px;text-align:right;
+  border-bottom:1px solid var(--border);background:var(--bg-secondary);
+}
+.carry-table th:first-child{text-align:left}
+.carry-table td{
+  padding:7px 10px;border-bottom:1px solid var(--border);
+  font-size:12px;text-align:right;font-weight:500;
+}
+.carry-table td:first-child{text-align:left;font-weight:700;color:var(--text-primary)}
+.carry-table tr:last-child td{border-bottom:none}
+.carry-table tr:hover td{background:var(--bg-row-hover)}
+.diff-pos{color:var(--green-strong);font-weight:700}
+.risk-lo{color:var(--green-strong)}
+.risk-md{color:var(--orange)}
+.risk-hi{color:var(--red-strong)}
+
+/* ══════════════════════════════════════════
+   NEWS
+══════════════════════════════════════════ */
+.news-item{
+  display:flex;
+  gap:10px;
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+  transition:background .1s;
+}
+.news-item:last-child{border-bottom:none}
+.news-item:hover{background:var(--bg-row-hover)}
+
+.news-time{font-size:10px;color:var(--text-tertiary);white-space:nowrap;padding-top:2px;min-width:48px}
+.news-body{flex:1}
+.news-hl{font-size:12px;font-weight:500;color:var(--text-primary);line-height:1.4;margin-bottom:2px}
+.news-src{font-size:10px;color:var(--text-tertiary)}
+.news-tag{
+  font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:1px 5px;border-radius:2px;margin-left:6px;vertical-align:middle;
+}
+.nt-bull{background:rgba(38,166,154,.12);color:var(--green-strong)}
+.nt-bear{background:rgba(239,83,80,.12);color:var(--red-strong)}
+
+/* ══════════════════════════════════════════
+   CHART
+══════════════════════════════════════════ */
+.chart-wrap{
+  padding:12px 16px 16px;
+  background:var(--bg-secondary);
+}
+.chart-canvas-wrap{
+  position:relative;
+  height:180px;
+}
+.chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:10px;
+  font-size:10px;
+  color:var(--text-tertiary);
+}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:12px;height:2px;border-radius:1px;flex-shrink:0}
+
+/* ══════════════════════════════════════════
+   METHODOLOGY PANEL
+══════════════════════════════════════════ */
+.method-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  border-top:1px solid var(--border);
+}
+.method-col{
+  padding:14px 16px;
+  border-right:1px solid var(--border);
+}
+.method-col:last-child{border-right:none}
+.method-col-title{
+  font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-tertiary);margin-bottom:10px;
+}
+.method-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 0;
+  border-bottom:1px solid var(--border);
+  font-size:11.5px;
+  color:var(--text-secondary);
+}
+.method-row:last-child{border-bottom:none}
+.method-pct{font-weight:700;color:var(--text-primary);font-size:12px}
+.method-item{font-size:11.5px;color:var(--text-secondary);padding:3px 0;line-height:1.5}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.dash-footer{
+  padding:12px 20px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:10px;
+  color:var(--text-tertiary);
+  flex-wrap:wrap;
+  gap:8px;
+  background:var(--bg-secondary);
+}
+.footer-links{display:flex;gap:14px}
+.footer-links a{color:var(--text-tertiary);text-decoration:none}
+.footer-links a:hover{color:var(--blue)}
+
+/* ══════════════════════════════════════════
+   DISCLAIMER BOX
+══════════════════════════════════════════ */
+.disclaimer{
+  margin:0 16px 16px;
+  padding:8px 12px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-left:3px solid var(--neutral);
+  border-radius:3px;
+  font-size:10.5px;
+  color:var(--text-tertiary);
+  line-height:1.5;
+}
+
+/* ══════════════════════════════════════════
+   SECTION DIVIDERS & PADDING
+══════════════════════════════════════════ */
+.section-body{padding:0}
+
+.p12{padding:12px 16px}
+.p0{padding:0}
+
+@media(max-width:1200px){
+  .layout{grid-template-columns:1fr}
+  .left-panel{display:none}
+  .three-col{grid-template-columns:1fr 1fr}
+}
+@media(max-width:800px){
+  .two-col,.three-col{grid-template-columns:1fr}
+  .st-thead th:nth-child(n+6){display:none}
+  .strength-table td:nth-child(n+6){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-bar">
+  <div class="ticker-scroll" id="ticker">
+    <!-- duplicated below for seamless loop -->
+  </div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <a class="brand" href="#">
+    <div class="brand-dot"></div>
+    Global Investing
+  </a>
+  <div class="hdr-sep"></div>
+  <nav class="hdr-nav">
+    <a href="#" class="active">Dashboard</a>
+    <a href="news.html">Noticias</a>
+    <a href="carry-trade.html">Carry Trade</a>
+    <a href="data.html">Datos</a>
+    <a href="guia-score-fortaleza.html">Metodología</a>
+    <a href="guia-cot.html">COT</a>
+  </nav>
+  <div class="hdr-right">
+    <div class="live-badge"><div class="live-dot"></div>EN VIVO</div>
+    <span id="ts-display">—</span>
+  </div>
+</header>
+
+<!-- ═══ REGIME BAR ═══ -->
+<div class="regime-bar">
+  <div class="rb-item">
+    <span class="rb-label">Régimen</span>
+    <span class="regime-pill">USD_DOMINANCE</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">DXY 1M</span>
+    <span class="rb-val up">+3.2%</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">Risk-Off</span>
+    <span class="rb-val dn">88%</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">Comm 1M</span>
+    <span class="rb-val dn">−1.7%</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">ESI</span>
+    <span class="rb-val">8/8</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">DQ</span>
+    <span class="rb-val up">100%</span>
+  </div>
+  <div class="rb-item">
+    <span class="rb-label">Modelo</span>
+    <span class="rb-val blue">v7.2.0</span>
+  </div>
+  <div class="rb-model">Actualizado: 2026-03-28 · 22 indicadores · horizonte 2–6 semanas</div>
+</div>
+
+<!-- ═══ LAYOUT ═══ -->
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+    <div class="lp-section">
+      <div class="lp-section-title">Ranking v7.2</div>
+      <div id="lp-scores"></div>
+    </div>
+    <div class="lp-section">
+      <div class="lp-section-title">Secciones</div>
+      <a class="lp-nav-item active" href="#">
+        <svg class="lp-nav-icon" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx=".5" fill="currentColor" opacity=".7"/><rect x="8" y="1" width="5" height="5" rx=".5" fill="currentColor" opacity=".7"/><rect x="1" y="8" width="5" height="5" rx=".5" fill="currentColor" opacity=".7"/><rect x="8" y="8" width="5" height="5" rx=".5" fill="currentColor" opacity=".7"/></svg>
+        Resumen
+      </a>
+      <a class="lp-nav-item" href="carry-trade.html">
+        <svg class="lp-nav-icon" viewBox="0 0 14 14" fill="none"><path d="M1 10 L4 7 L7 8 L10 4 L13 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Carry Trade
+      </a>
+      <a class="lp-nav-item" href="news.html">
+        <svg class="lp-nav-icon" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="4" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><line x1="4" y1="7.5" x2="8" y2="7.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Noticias FX
+      </a>
+      <a class="lp-nav-item" href="data.html">
+        <svg class="lp-nav-icon" viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="4" rx="5" ry="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 4v3c0 1.1 2.24 2 5 2s5-.9 5-2V4" stroke="currentColor" stroke-width="1.2"/><path d="M2 7v3c0 1.1 2.24 2 5 2s5-.9 5-2V7" stroke="currentColor" stroke-width="1.2"/></svg>
+        Datos
+      </a>
+      <a class="lp-nav-item" href="guia-cot.html">
+        <svg class="lp-nav-icon" viewBox="0 0 14 14" fill="none"><path d="M1 11 L3 7 L6 9 L8 4 L11 6 L13 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        COT CFTC
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ 1. STRENGTH TABLE ══ -->
+    <div class="strength-section">
+      <div class="sec-hd">
+        <span class="sec-title">Fortaleza Fundamental · G8</span>
+        <span class="sec-meta">· Ordenadas por score ·</span>
+        <span class="sec-badge">Tiempo Real</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="strength-table">
+          <thead class="st-thead">
+            <tr>
+              <th>Divisa</th>
+              <th>Score</th>
+              <th>Base</th>
+              <th>Ajuste</th>
+              <th>Tasa</th>
+              <th>IPC</th>
+              <th>GDP</th>
+              <th>PMI</th>
+              <th>Desemp.</th>
+              <th>COT</th>
+              <th>Yield 10Y</th>
+              <th>Outlook</th>
+              <th>Análisis IA</th>
+            </tr>
+          </thead>
+          <tbody id="strength-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ 2. SIGNALS + HEATMAP ══ -->
+    <div class="two-col">
+
+      <!-- Signals -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Señales Activas · Mejores Pares</span>
+          <span class="sec-badge" style="margin-left:auto">5 señales</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="signals-table" id="signals-tbl">
+            <thead>
+              <tr>
+                <th>Par</th>
+                <th>Spread</th>
+                <th>Conf.</th>
+                <th>Contexto Macro</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="disclaimer">⚠ Los spreads reflejan divergencias macroeconómicas, no señales de trading directo. Los fundamentos se descuentan antes o durante su publicación.</div>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Mapa de Calor Económico</span>
+          <a class="sec-link" href="data.html" style="margin-left:auto">Ver datos completos →</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="hm-table" id="hm-tbl"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 3. CALENDAR + CARRY ══ -->
+    <div class="two-col">
+
+      <!-- Calendar -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Calendario Económico</span>
+          <span class="sec-meta">· Próximos 7 días ·</span>
+        </div>
+        <div class="cal-scroll">
+          <table class="cal-table">
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th style="text-align:center">Imp</th>
+                <th>Divisa</th>
+                <th>Evento</th>
+                <th style="text-align:right">Real</th>
+                <th style="text-align:right">Est.</th>
+                <th style="text-align:right">Ant.</th>
+              </tr>
+            </thead>
+            <tbody id="cal-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Carry -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Carry Trade · Diferenciales de Tasas</span>
+          <a class="sec-link" href="carry-trade.html" style="margin-left:auto">Calculadora →</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="carry-table" id="carry-tbl">
+            <thead>
+              <tr>
+                <th>Par Long / Short</th>
+                <th>Tasa L</th>
+                <th>Tasa S</th>
+                <th>Diferencial</th>
+                <th>Rend./año</th>
+                <th>Riesgo</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="disclaimer">Cálculo basado en tasas de política monetaria oficiales. El rend. real depende del apalancamiento y swaps del broker.</div>
+      </div>
+    </div>
+
+    <!-- ══ 4. AI ANALYSIS ══ -->
+    <div>
+      <div class="sec-hd">
+        <span class="sec-title">Análisis IA · Bancos Centrales</span>
+        <span class="sec-meta">· Generado con Groq · Comunicados oficiales ·</span>
+        <span class="sec-badge" style="background:rgba(30,136,229,.1);color:var(--blue);border-color:rgba(30,136,229,.3);margin-left:auto">Groq AI</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="ai-table" id="ai-tbl">
+          <thead>
+            <tr>
+              <th>Divisa</th>
+              <th>Score</th>
+              <th>Outlook</th>
+              <th>Análisis del Banco Central</th>
+              <th>Última Decisión</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ 5. NEWS + CHART ══ -->
+    <div class="two-col">
+
+      <!-- News -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Noticias FX · Alto Impacto</span>
+          <a class="sec-link" href="news.html" style="margin-left:auto">Ver todas →</a>
+        </div>
+        <div id="news-list"></div>
+      </div>
+
+      <!-- Chart -->
+      <div class="panel">
+        <div class="sec-hd">
+          <span class="sec-title">Tendencias Históricas · Score 6M</span>
+          <span class="sec-meta">· Snapshots semanales ·</span>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-canvas-wrap">
+            <canvas id="trend-canvas"></canvas>
+          </div>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 6. METHODOLOGY ══ -->
+    <div>
+      <div class="sec-hd">
+        <span class="sec-title">Metodología del Modelo · v7.2.0</span>
+        <a class="sec-link" href="guia-score-fortaleza.html" style="margin-left:auto">Guía completa →</a>
+      </div>
+      <div class="method-grid">
+        <div class="method-col">
+          <div class="method-col-title">Grupos de Indicadores (suma 100%)</div>
+          <div class="method-row"><span>Política Monetaria</span><span class="method-pct" style="color:var(--green-strong)">29%</span></div>
+          <div class="method-row"><span>Sentimiento de Mercado</span><span class="method-pct" style="color:var(--blue)">22%</span></div>
+          <div class="method-row"><span>Balance Externo</span><span class="method-pct" style="color:var(--orange)">19%</span></div>
+          <div class="method-row"><span>Crecimiento y Empleo</span><span class="method-pct">16%</span></div>
+          <div class="method-row"><span>FX Confirmador</span><span class="method-pct" style="color:var(--neutral)">11%</span></div>
+          <div class="method-row"><span>Consumo</span><span class="method-pct" style="color:var(--neutral)">3%</span></div>
+        </div>
+        <div class="method-col">
+          <div class="method-col-title">Ajustes Contextuales</div>
+          <div class="method-item">Safe Haven Premium (CHF, JPY)</div>
+          <div class="method-item">Carry Premium (diferencial de tasas)</div>
+          <div class="method-item">ToT Momentum (AUD, CAD, NZD)</div>
+          <div class="method-item">Prima de Reserva USD</div>
+          <div class="method-item">Commodity Regime Cap</div>
+          <div class="method-item">GBP Stagflation Hold (v7.2 nuevo)</div>
+        </div>
+        <div class="method-col">
+          <div class="method-col-title">Fuentes de Datos Oficiales</div>
+          <div class="method-item">FRED · OECD · World Bank · IMF</div>
+          <div class="method-item">CFTC COT (categoría Leveraged Funds)</div>
+          <div class="method-item">NY Fed · ECB · BoE · RBA · BoC</div>
+          <div class="method-item">BoJ · SNB · RBNZ · BIS WS_CBPOL</div>
+          <div class="method-item">Frankfurter / ECB FX API</div>
+          <div class="method-item">Groq AI (análisis de comunicados)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="dash-footer">
+      <div>
+        <strong>Global Investing</strong> · Dashboard FX Fundamental v7.2.0
+        &nbsp;·&nbsp; <span>Solo informativo, no constituye asesoramiento financiero · El trading de divisas implica alto riesgo</span>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacidad</a>
+        <a href="terms.html">Términos</a>
+        <a href="data.html">Datos</a>
+        <a href="about.html">Acerca de</a>
+      </div>
+    </footer>
+
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA (v7.2.0 live output)
+// ═══════════════════════════════════════════
+const SCORES = [
+  {code:'AUD',flag:'🇦🇺',bank:'RBA', score:64.5,base:62.02,adj:+2.45,outlook:'Hawkish',rate:4.10,inf:2.4, gdp:+1.6,unemp:4.1,pmi:52.1,cot:'+14.2K',carry:+3.1,yld:4.35},
+  {code:'USD',flag:'🇺🇸',bank:'Fed', score:62.8,base:57.00,adj:+5.84,outlook:'Neutral', rate:3.75,inf:2.8, gdp:+2.3,unemp:4.1,pmi:53.5,cot:'+21.5K',carry:+3.5,yld:4.20},
+  {code:'JPY',flag:'🇯🇵',bank:'BoJ', score:62.7,base:63.02,adj:-0.35,outlook:'Hawkish',rate:0.75,inf:3.7, gdp:+0.8,unemp:2.5,pmi:49.3,cot:'-35.1K',carry:-3.0,yld:1.50},
+  {code:'CHF',flag:'🇨🇭',bank:'SNB', score:61.6,base:53.31,adj:+8.33,outlook:'Neutral', rate:0.00,inf:0.4, gdp:+1.1,unemp:2.8,pmi:48.7,cot:'—',     carry:-1.8,yld:0.85},
+  {code:'CAD',flag:'🇨🇦',bank:'BoC', score:54.0,base:52.60,adj:+1.44,outlook:'Neutral', rate:2.25,inf:2.6, gdp:+1.3,unemp:6.6,pmi:51.2,cot:'-12.3K',carry:+2.0,yld:3.45},
+  {code:'EUR',flag:'🇪🇺',bank:'BCE', score:47.1,base:48.89,adj:-1.83,outlook:'Neutral', rate:2.15,inf:1.9, gdp:+0.9,unemp:6.1,pmi:52.4,cot:'+9.3K', carry:+1.2,yld:2.60},
+  {code:'NZD',flag:'🇳🇿',bank:'RBNZ',score:42.2,base:46.63,adj:-4.43,outlook:'Dovish',  rate:3.50,inf:2.2, gdp:-0.1,unemp:5.1,pmi:48.5,cot:'-8.4K', carry:+2.5,yld:4.25},
+  {code:'GBP',flag:'🇬🇧',bank:'BoE', score:43.7,base:53.13,adj:-9.50,outlook:'Neutral', rate:3.75,inf:3.0, gdp:0.0, unemp:4.4,pmi:51.5,cot:'+5.1K', carry:+2.7,yld:4.50},
+];
+const SORTED = [...SCORES].sort((a,b)=>b.score-a.score);
+
+const AI_TEXTS = {
+  AUD:'RBA subió tasas en feb y mar a 4.10%, máximo desde 2012. Mercados pricean tercera suba en mayo. Exportaciones de minerales beneficiadas por demanda china. Riesgo: shock commodity por Medio Oriente.',
+  USD:'Fed en pausa hawkish. NFP +228K, desempleo 4.1%. Inflación subyacente sticky en 2.8%. USD_DOMINANCE activo por geopolítica. QT continúa a USD 60B/mes.',
+  JPY:'BoJ abandonó NIRP en ene 2025, subió a 0.75% en feb 2026. CPI ex-food 3.7% supera objetivo 2%. Nomura proyecta 1.25% a fin de año. Carry unwind sigue siendo riesgo.',
+  CHF:'SNB recortó a 0.00% en mar 2026. Franco actúa como safe haven con risk-off al 88%. Inflación en 0.4% permite postura expansiva. Riesgo de intervención si EUR/CHF cae de 0.93.',
+  CAD:'BoC recortó a 2.25%, mercado en pausa. Economía atada al ciclo EE.UU. y precio del petróleo. WTI en USD 73 limita el upside. Desempleo sube a 6.6%.',
+  EUR:'BCE completa ciclo de recortes con depo rate en 2.15%. Flash CPI 1.9%, bajo objetivo. PMI manufacturero en contracción. Recuperación gradual liderada por servicios.',
+  NZD:'RBNZ en ciclo dovish activo, recortó a 3.50%. GDP Q4 negativo (−0.1%). Inflación bajo control en 2.2%. Economía sensible a demanda china y precios lácteos.',
+  GBP:'BoE en hold hawkish a 3.75% por inflación sticky (3.0%). Mercados pricean subidas ante shock energético. GDP estancado en 0.0%. Stagflation risk elevado.',
+};
+const AI_DECISION = {
+  AUD:{d:'Subida +25pb (mar 2026)',next:'May 2026'},
+  USD:{d:'Hold 3.75% (mar 2026)',  next:'May 2026'},
+  JPY:{d:'Subida +25pb (feb 2026)',next:'Abr 2026'},
+  CHF:{d:'Recorte −25pb (mar 2026)',next:'Jun 2026'},
+  CAD:{d:'Recorte −25pb (mar 2026)',next:'Abr 2026'},
+  EUR:{d:'Recorte −25pb (mar 2026)',next:'Abr 2026'},
+  NZD:{d:'Recorte −25pb (feb 2026)',next:'Abr 2026'},
+  GBP:{d:'Hold 3.75% (mar 2026)',  next:'May 2026'},
+};
+
+const SIGNALS = [
+  {long:'AUD',short:'NZD',spread:22.3,conf:'Alta',  ctx:'RBA hawkish vs RBNZ dovish'},
+  {long:'AUD',short:'GBP',spread:20.8,conf:'Alta',  ctx:'ToT + commodities vs stagflation'},
+  {long:'USD',short:'NZD',spread:20.6,conf:'Alta',  ctx:'USD_DOMINANCE + RBNZ dovish'},
+  {long:'USD',short:'GBP',spread:19.1,conf:'Media', ctx:'USD_DOMINANCE vs GBP hold'},
+  {long:'JPY',short:'EUR',spread:15.6,conf:'Media', ctx:'BoJ hawkish vs BCE dovish'},
+];
+
+const CAL = [
+  {time:'09:00',imp:'hi',cur:'EUR',ev:'IPC Flash Eurozona (Mar)',   real:'2.2%',est:'2.1%',prev:'2.3%',past:true},
+  {time:'11:00',imp:'hi',cur:'USD',ev:'Confianza Consumidor EE.UU.',real:'92.9', est:'94.0',prev:'93.6',past:true},
+  {time:'13:30',imp:'hi',cur:'USD',ev:'Solicitudes Subsidio Desempleo',real:null,est:'222K',prev:'219K',next:true},
+  {time:'14:00',imp:'md',cur:'GBP',ev:'PMI Servicios Final (Mar)',  real:null,  est:'51.2',prev:'51.0'},
+  {time:'15:00',imp:'hi',cur:'USD',ev:'ISM Servicios (Mar)',         real:null,  est:'52.8',prev:'53.5'},
+  {time:'19:00',imp:'md',cur:'CAD',ev:'Permisos Construcción (Feb)', real:null,  est:'+0.5%',prev:'-1.2%'},
+  {time:'Mar 28',imp:'hi',cur:'JPY',ev:'Actas Reunión BoJ',          real:null,  est:null,  prev:null},
+  {time:'Mar 29',imp:'hi',cur:'USD',ev:'NFP Empleos No Agrícolas',   real:null,  est:'+215K',prev:'+228K'},
+  {time:'Mar 29',imp:'hi',cur:'USD',ev:'Tasa Desempleo EE.UU.',      real:null,  est:'4.1%', prev:'4.1%'},
+];
+
+const CARRY = [
+  {pair:'AUD / JPY',lRate:4.10,sRate:0.75,risk:'Medio'},
+  {pair:'USD / JPY',lRate:3.75,sRate:0.75,risk:'Bajo'},
+  {pair:'AUD / CHF',lRate:4.10,sRate:0.00,risk:'Medio'},
+  {pair:'NZD / JPY',lRate:3.50,sRate:0.75,risk:'Alto'},
+  {pair:'GBP / JPY',lRate:3.75,sRate:0.75,risk:'Alto'},
+  {pair:'CAD / CHF',lRate:2.25,sRate:0.00,risk:'Medio'},
+  {pair:'USD / EUR',lRate:3.75,sRate:2.15,risk:'Bajo'},
+  {pair:'AUD / NZD',lRate:4.10,sRate:3.50,risk:'Bajo'},
+];
+
+const NEWS = [
+  {time:'12:43',hl:'Fed Williams: "Dos recortes en 2026 siguen siendo el baseline pese a la inflación sticky"', src:'Reuters', tag:'USD',bull:false},
+  {time:'11:21',hl:'RBA sorprende con tono más hawkish de lo esperado: "Inflación aún no controlada"',          src:'Bloomberg',tag:'AUD',bull:true},
+  {time:'10:05',hl:'BoJ Ueda: el ciclo de normalización continuará si los datos lo permiten',                   src:'NHK',     tag:'JPY',bull:true},
+  {time:'09:34',hl:'IPC Flash eurozona cae a 2.2% en marzo — BCE descarta nuevas subidas este año',             src:'Eurostat', tag:'EUR',bull:false},
+  {time:'08:17',hl:'GBP under pressure: mercados pricean stagflation con BoE atrapado entre inflación y crecimiento cero', src:'FT',tag:'GBP',bull:false},
+  {time:'Ayer', hl:'RBNZ Orr: "Hay espacio para nuevos recortes si la economía no se recupera en Q2"',          src:'RBNZ',    tag:'NZD',bull:false},
+];
+
+const HIST = [
+  {d:'03-Jan',AUD:60.1,USD:61.4,JPY:58.2,CHF:57.3,CAD:53.1,EUR:50.2,NZD:46.8,GBP:48.5},
+  {d:'10-Jan',AUD:61.0,USD:61.8,JPY:59.1,CHF:58.0,CAD:52.8,EUR:49.5,NZD:46.1,GBP:47.2},
+  {d:'17-Jan',AUD:61.4,USD:62.1,JPY:60.2,CHF:57.9,CAD:53.4,EUR:48.9,NZD:45.3,GBP:46.8},
+  {d:'31-Jan',AUD:62.5,USD:62.4,JPY:61.5,CHF:59.2,CAD:54.1,EUR:47.8,NZD:44.5,GBP:45.9},
+  {d:'14-Feb',AUD:63.5,USD:62.5,JPY:62.3,CHF:60.1,CAD:53.8,EUR:47.2,NZD:43.5,GBP:44.2},
+  {d:'28-Feb',AUD:64.0,USD:62.7,JPY:62.4,CHF:61.0,CAD:53.9,EUR:47.1,NZD:42.8,GBP:43.2},
+  {d:'14-Mar',AUD:64.3,USD:62.8,JPY:62.6,CHF:61.4,CAD:54.0,EUR:47.1,NZD:42.3,GBP:43.5},
+  {d:'28-Mar',AUD:64.5,USD:62.8,JPY:62.7,CHF:61.6,CAD:54.0,EUR:47.1,NZD:42.2,GBP:43.7},
+];
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const scoreColor = s => s>65?'var(--green-strong)':s<45?'var(--red-strong)':'var(--text-secondary)';
+const adjSign    = v => v>0?'+'+v.toFixed(2):v.toFixed(2);
+const fv         = v => (v===null||v===undefined)?'—':v;
+const nc         = (v,thresh=0) => typeof v==='number'?(v>thresh?' pos':v<thresh?' neg':''):'' ;
+const outlookBadge = o => {
+  if(o==='Hawkish') return `<span class="outlook-badge ob-hawk">▲ Hawkish</span>`;
+  if(o==='Dovish')  return `<span class="outlook-badge ob-dove">▼ Dovish</span>`;
+  return `<span class="outlook-badge ob-neut">◆ Neutral</span>`;
+};
+
+// ═══════════════════════════════════════════
+//  TIMESTAMP
+// ═══════════════════════════════════════════
+function updateTS(){
+  const n=new Date();
+  document.getElementById('ts-display').textContent=
+    n.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' '+
+    n.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+}
+updateTS(); setInterval(updateTS,30000);
+
+// ═══════════════════════════════════════════
+//  TICKER
+// ═══════════════════════════════════════════
+const TICK_DATA = [
+  {p:'EUR/USD',v:'1.0842',c:'+0.18%',up:true},{p:'GBP/USD',v:'1.2963',c:'+0.23%',up:true},
+  {p:'USD/JPY',v:'150.42',c:'−0.31%',up:false},{p:'AUD/USD',v:'0.6287',c:'−0.14%',up:false},
+  {p:'USD/CAD',v:'1.3915',c:'+0.09%',up:true},{p:'USD/CHF',v:'0.8842',c:'−0.07%',up:false},
+  {p:'NZD/USD',v:'0.5731',c:'+0.05%',up:true},{p:'DXY',v:'104.72',c:'−0.12%',up:false},
+  {p:'XAU/USD',v:'2941',c:'+0.41%',up:true},{p:'WTI',v:'73.18',c:'−0.57%',up:false},
+  {p:'US10Y',v:'4.20%',c:'−2bp',up:false},{p:'VIX',v:'18.4',c:'+0.8',up:false},
+];
+function mkTickItem(d){
+  return `<div class="tk-item">
+    <span class="tk-pair">${d.p}</span>
+    <span class="tk-price">${d.v}</span>
+    <span class="tk-chg ${d.up?'tk-up':'tk-dn'}">${d.c}</span>
+  </div>`;
+}
+const tickerEl = document.getElementById('ticker');
+// duplicate for seamless loop
+const tickHTML = TICK_DATA.map(mkTickItem).join('');
+tickerEl.innerHTML = tickHTML + tickHTML;
+
+// ═══════════════════════════════════════════
+//  LEFT PANEL — RANKING
+// ═══════════════════════════════════════════
+function renderLP(){
+  const el = document.getElementById('lp-scores');
+  const max = Math.max(...SORTED.map(d=>d.score));
+  const min = Math.min(...SORTED.map(d=>d.score));
+  el.innerHTML = SORTED.map((d,i)=>{
+    const pct = ((d.score-min)/(max-min)*65+15).toFixed(1);
+    const col  = scoreColor(d.score);
+    const cls  = i===0?'lp-rank-1':i===SORTED.length-1?'lp-rank-last':'';
+    return `<div class="lp-row ${cls}">
+      <span class="lp-flag">${d.flag}</span>
+      <span class="lp-code">${d.code}</span>
+      <div class="lp-bar-wrap"><div class="lp-bar" style="width:${pct}%;background:${col}"></div></div>
+      <span class="lp-score" style="color:${col}">${d.score}</span>
+    </div>`;
+  }).join('');
+}
+renderLP();
+
+// ═══════════════════════════════════════════
+//  STRENGTH TABLE
+// ═══════════════════════════════════════════
+function renderStrength(){
+  const tb = document.getElementById('strength-body');
+  tb.innerHTML = SORTED.map((d,i)=>{
+    const sc    = scoreColor(d.score);
+    const pct   = (d.score).toFixed(1)+'%';
+    const adjC  = d.adj>=0?'adj-pos':'adj-neg';
+    const aiSnip= (AI_TEXTS[d.code]||'').substring(0,80)+'…';
+    return `<tr>
+      <td><div class="cur-cell">
+        <span class="cur-flag">${d.flag}</span>
+        <div class="cur-info"><div class="cur-code">${d.code}</div><div class="cur-bank">${d.bank}</div></div>
+      </div></td>
+      <td><div class="score-bar-cell">
+        <span class="score-num" style="color:${sc}">${d.score}</span>
+        <div class="score-track"><div class="score-fill" style="width:${pct};background:${sc}"></div></div>
+      </div></td>
+      <td class="breakdown-cell">${d.base.toFixed(1)}</td>
+      <td class="breakdown-cell"><span class="${adjC}">${adjSign(d.adj)}</span></td>
+      <td class="mv dim">${d.rate.toFixed(2)}%</td>
+      <td class="mv${d.inf>3?' neg':d.inf<1?' neg':''}">${d.inf}%</td>
+      <td class="mv${nc(d.gdp)}">${d.gdp>0?'+':''}${d.gdp}%</td>
+      <td class="mv${d.pmi>50?' pos':' neg'}">${d.pmi}</td>
+      <td class="mv dim">${d.unemp}%</td>
+      <td class="mv dim" style="font-size:11px">${d.cot}</td>
+      <td class="mv dim">${d.yld}%</td>
+      <td>${outlookBadge(d.outlook)}</td>
+      <td><span class="ai-snippet">${aiSnip}</span></td>
+    </tr>`;
+  }).join('');
+}
+renderStrength();
+
+// ═══════════════════════════════════════════
+//  SIGNALS
+// ═══════════════════════════════════════════
+function renderSignals(){
+  const flags = Object.fromEntries(SCORES.map(d=>[d.code,d.flag]));
+  const tb = document.querySelector('#signals-tbl tbody');
+  tb.innerHTML = SIGNALS.map(s=>{
+    const cc = s.conf==='Alta'?'conf-high':s.conf==='Media'?'conf-med':'conf-low';
+    return `<tr>
+      <td><div class="sig-pair">
+        <span class="sig-long">${flags[s.long]||''} ${s.long}</span>
+        <span class="sig-slash">/</span>
+        <span class="sig-short">${flags[s.short]||''} ${s.short}</span>
+      </div></td>
+      <td><span class="spread-val">${s.spread.toFixed(1)}</span></td>
+      <td><span class="conf-badge ${cc}">${s.conf}</span></td>
+      <td style="color:var(--text-tertiary);font-size:11px">${s.ctx}</td>
+    </tr>`;
+  }).join('');
+}
+renderSignals();
+
+// ═══════════════════════════════════════════
+//  HEATMAP
+// ═══════════════════════════════════════════
+function renderHeatmap(){
+  const COLS = [
+    {k:'rate', l:'Tasa', f:v=>v>3.5?'hm-bull-hi':v>1.5?'hm-bull-md':v>0?'hm-neut':'hm-bear-md'},
+    {k:'inf',  l:'IPC',  f:v=>v>3?'hm-bear-md':v>2.5?'hm-bear-lo':v>1?'hm-neut':'hm-bull-md'},
+    {k:'gdp',  l:'GDP',  f:v=>v>1.5?'hm-bull-hi':v>0.5?'hm-bull-md':v>0?'hm-bull-lo':'hm-bear-md'},
+    {k:'unemp',l:'Desem',f:v=>v<3?'hm-bull-hi':v<4.5?'hm-bull-md':v<6?'hm-neut':'hm-bear-md'},
+    {k:'pmi',  l:'PMI',  f:v=>v>53?'hm-bull-hi':v>51?'hm-bull-md':v>50?'hm-bull-lo':v>48?'hm-neut':'hm-bear-md'},
+    {k:'carry',l:'Carry',f:v=>v>2.5?'hm-bull-hi':v>1?'hm-bull-md':v>0?'hm-neut':'hm-bear-md'},
+    {k:'yld',  l:'Yield',f:v=>v>3.5?'hm-bull-hi':v>2?'hm-bull-md':v>1?'hm-neut':'hm-bear-md'},
+    {k:'score',l:'Score',f:v=>v>65?'hm-bull-hi':v>55?'hm-bull-md':v>48?'hm-neut':v>44?'hm-bear-lo':'hm-bear-md'},
+  ];
+  const t = document.getElementById('hm-tbl');
+  let h = `<thead><tr><th>Divisa</th>${COLS.map(c=>`<th>${c.l}</th>`).join('')}</tr></thead><tbody>`;
+  SORTED.forEach(d=>{
+    h += `<tr><td>${d.flag} ${d.code}</td>`+COLS.map(c=>{
+      const v = d[c.k];
+      return `<td class="${c.f(typeof v==='number'?v:0)}">${typeof v==='number'?v:v||'—'}</td>`;
+    }).join('')+'</tr>';
+  });
+  t.innerHTML = h+'</tbody>';
+}
+renderHeatmap();
+
+// ═══════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════
+function renderCalendar(){
+  const CFLAGS = {USD:'🇺🇸',EUR:'🇪🇺',GBP:'🇬🇧',JPY:'🇯🇵',AUD:'🇦🇺',CAD:'🇨🇦',CHF:'🇨🇭',NZD:'🇳🇿'};
+  const tb = document.getElementById('cal-body');
+  tb.innerHTML = CAL.map(ev=>{
+    const ic = ev.imp==='hi'?'imp-hi':ev.imp==='md'?'imp-md':'imp-lo';
+    const rc = ev.past?'is-past':ev.next?'is-next':'';
+    const rl = ev.real ? (parseFloat(ev.real)>parseFloat(ev.est||ev.prev||0)?'pos':'neg') : '';
+    return `<tr class="${rc}">
+      <td class="cal-time">${ev.time}</td>
+      <td style="text-align:center"><span class="imp-dot ${ic}"></span></td>
+      <td class="cal-cur">${CFLAGS[ev.cur]||''} ${ev.cur}</td>
+      <td class="cal-event-name">${ev.ev}${ev.next?'<span style="font-size:9px;color:var(--blue);margin-left:6px;font-weight:700">PRÓXIMO</span>':''}</td>
+      <td class="cal-data ${rl}">${fv(ev.real)}</td>
+      <td class="cal-data" style="color:var(--text-tertiary)">${fv(ev.est)}</td>
+      <td class="cal-data" style="color:var(--text-tertiary)">${fv(ev.prev)}</td>
+    </tr>`;
+  }).join('');
+}
+renderCalendar();
+
+// ═══════════════════════════════════════════
+//  CARRY
+// ═══════════════════════════════════════════
+function renderCarry(){
+  const tb = document.querySelector('#carry-tbl tbody');
+  tb.innerHTML = CARRY.map(p=>{
+    const diff = (p.lRate-p.sRate).toFixed(2);
+    const rc = p.risk==='Bajo'?'risk-lo':p.risk==='Medio'?'risk-md':'risk-hi';
+    return `<tr>
+      <td>${p.pair}</td>
+      <td style="color:var(--green-strong)">${p.lRate.toFixed(2)}%</td>
+      <td style="color:var(--red-strong)">${p.sRate.toFixed(2)}%</td>
+      <td><span class="diff-pos">+${diff}%</span></td>
+      <td style="color:var(--green-strong)">+${diff}%</td>
+      <td><span class="${rc}">${p.risk}</span></td>
+    </tr>`;
+  }).join('');
+}
+renderCarry();
+
+// ═══════════════════════════════════════════
+//  AI TABLE
+// ═══════════════════════════════════════════
+function renderAI(){
+  const tb = document.querySelector('#ai-tbl tbody');
+  tb.innerHTML = SORTED.map(d=>{
+    const ai = AI_DECISION[d.code]||{d:'—',next:'—'};
+    return `<tr>
+      <td><div class="ai-cur">
+        <span class="ai-flag">${d.flag}</span>
+        <div><div class="ai-code">${d.code}</div><div class="ai-bank">${d.bank}</div></div>
+      </div></td>
+      <td style="font-weight:700;font-size:14px;color:${scoreColor(d.score)}">${d.score}</td>
+      <td>${outlookBadge(d.outlook)}</td>
+      <td class="ai-text-cell">${AI_TEXTS[d.code]||'—'}</td>
+      <td><div class="ai-decision">${ai.d}<div class="ai-next">Próx: ${ai.next}</div></div></td>
+    </tr>`;
+  }).join('');
+}
+renderAI();
+
+// ═══════════════════════════════════════════
+//  NEWS
+// ═══════════════════════════════════════════
+function renderNews(){
+  const el = document.getElementById('news-list');
+  el.innerHTML = NEWS.map(n=>`
+    <div class="news-item">
+      <div class="news-time">${n.time}</div>
+      <div class="news-body">
+        <div class="news-hl">${n.hl}<span class="news-tag ${n.bull?'nt-bull':'nt-bear'}">${n.tag}</span></div>
+        <div class="news-src">${n.src}</div>
+      </div>
+    </div>`).join('');
+}
+renderNews();
+
+// ═══════════════════════════════════════════
+//  CHART
+// ═══════════════════════════════════════════
+function renderChart(){
+  const canvas = document.getElementById('trend-canvas');
+  if(!window.Chart||!canvas){setTimeout(renderChart,400);return;}
+  const labels = HIST.map(h=>h.d);
+  const curs   = ['AUD','USD','JPY','CHF','CAD','EUR','NZD','GBP'];
+  const colors = ['#26a69a','#1e88e5','#ff6f00','#607d8b','#00acc1','#78909c','#ff7043','#ef5350'];
+  const datasets = curs.map((c,i)=>({
+    label:c, data:HIST.map(h=>h[c]),
+    borderColor:colors[i], backgroundColor:'transparent',
+    borderWidth:1.5, pointRadius:0, pointHoverRadius:3, tension:.35,
+  }));
+  new Chart(canvas,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#13171f',borderColor:'#30363d',borderWidth:1,
+          titleColor:'#8b949e',bodyColor:'#e1e4e8',
+          titleFont:{family:'Inter',size:10},bodyFont:{family:'Inter',size:11},
+        }
+      },
+      scales:{
+        x:{grid:{color:'#1a1f2e'},ticks:{color:'#6e7681',font:{family:'Inter',size:9},maxTicksLimit:8}},
+        y:{min:30,max:75,grid:{color:'#1a1f2e'},ticks:{color:'#6e7681',font:{family:'Inter',size:9}}},
+      }
+    }
+  });
+  document.getElementById('chart-legend').innerHTML = curs.map((c,i)=>
+    `<span class="legend-item"><span class="legend-dot" style="background:${colors[i]}"></span>${c}</span>`
+  ).join('');
+}
+if(!window.Chart){
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+  s.onload=renderChart; document.head.appendChild(s);
+} else renderChart();
+</script>
+</body>
+</html>
