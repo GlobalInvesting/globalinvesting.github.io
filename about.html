@@ -15,6 +15,8 @@
 <meta property="og:description" content="Professional-grade FX monitoring platform built on real-time data, institutional positioning, and AI narrative.">
 <meta property="og:url" content="https://globalinvesting.github.io/about.html">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:locale" content="en_US">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -29,13 +31,9 @@
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
-body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 a { color: inherit; text-decoration: none; }
-#topbar {
-  background: var(--head-bg); border-bottom: 1px solid var(--border);
-  height: 36px; display: flex; align-items: center; padding: 0 10px;
-  position: sticky; top: 0; z-index: 200;
-}
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
 #topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
 .logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
 .logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
@@ -46,11 +44,12 @@ a { color: inherit; text-decoration: none; }
 .site-menu { position: relative; display: flex; align-items: center; }
 .site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
 .site-menu-btn:hover { border-color: var(--border); color: var(--text); }
-.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
 .site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
 .site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
 .site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
 .site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-panel a.current { color: #fff; }
 .site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
 .site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
@@ -58,42 +57,38 @@ a { color: inherit; text-decoration: none; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
 .footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
 
-/* PAGE CONTENT */
 .page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 60px; }
-.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 32px; }
-.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
-.page-hero h1 { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 12px; }
-.page-hero p { font-size: 14px; color: var(--text2); max-width: 620px; line-height: 1.7; }
 
-.section { margin-bottom: 36px; }
-.section h2 { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: .04em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 16px; }
-.section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+/* Hero — paragraph spans full width of .page-wrap, no max-width cap */
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 36px; }
+.page-hero-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.page-hero h1 { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 14px; }
+.page-hero p { font-size: 15px; color: var(--text2); line-height: 1.75; }
+
+.section { margin-bottom: 40px; }
+.section h2 { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 18px; }
+.section p { color: var(--text2); margin-bottom: 14px; font-size: 14px; line-height: 1.75; }
 .section p:last-child { margin-bottom: 0; }
 
-.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.data-table th { text-align: left; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px; border-bottom: 1px solid var(--border2); background: var(--bg2); }
-.data-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
-.data-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; font-family: var(--font-ui); }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; padding: 7px 10px; border-bottom: 1px solid var(--border2); background: var(--bg2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; font-size: 13px; }
+.data-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table .badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; font-family: var(--font-ui); letter-spacing: .04em; }
-.badge-free { background: rgba(38,166,154,.15); color: var(--up); border: 1px solid rgba(38,166,154,.2); }
-.badge-rt { background: rgba(41,98,255,.15); color: var(--blue); border: 1px solid rgba(41,98,255,.2); }
+.badge-rt { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(41,98,255,.15); color: var(--blue); border: 1px solid rgba(41,98,255,.2); letter-spacing: .04em; white-space: nowrap; }
+.badge-daily { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(246,148,28,.10); color: var(--orange); border: 1px solid rgba(246,148,28,.2); letter-spacing: .04em; white-space: nowrap; }
+.badge-weekly { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); letter-spacing: .04em; white-space: nowrap; }
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; }
-.card-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
-.card-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+.card-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
 
-.arch-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.arch-row:last-child { border-bottom: none; }
-.arch-label { min-width: 130px; font-size: 11px; font-weight: 700; color: var(--text); font-family: var(--font-mono); }
-.arch-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
-
-.disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 12px 16px; font-size: 12px; color: var(--text2); line-height: 1.6; margin-top: 32px; }
+.disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; font-size: 13px; color: var(--text2); line-height: 1.65; margin-top: 36px; }
 
 @media (max-width: 600px) {
   .grid-2 { grid-template-columns: 1fr; }
-  .page-hero h1 { font-size: 20px; }
+  .page-hero h1 { font-size: 22px; }
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
   .footer-copy { position: static; transform: none; }
 }
@@ -124,19 +119,18 @@ a { color: inherit; text-decoration: none; }
       </button>
       <div class="site-menu-panel">
         <span class="site-menu-section">Company</span>
-        <a href="about.html" style="color:var(--text)">About</a>
+        <a href="about.html" class="current">About</a>
         <a href="contact.html">Contact</a>
-        <a href="advertise.html">Advertise</a>
-        <a href="terms.html">Terms &amp; Privacy</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
         <div class="site-menu-divider"></div>
         <span class="site-menu-section">Guides</span>
-        <a href="guide-dashboard.html">Using the Terminal</a>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
         <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
         <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
         <a href="guide-market-sentiment.html">Market Sentiment</a>
         <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
-        <a href="guide-cot.html">COT Positioning</a>
-        <a href="guide-cb-rates.html">Central Bank Rates</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
       </div>
     </div>
   </div>
@@ -147,81 +141,64 @@ a { color: inherit; text-decoration: none; }
   <div class="page-hero">
     <div class="page-hero-label">About</div>
     <h1>Global Investing FX Terminal</h1>
-    <p>A professional-grade foreign exchange monitoring platform built entirely on publicly available data feeds, institutional positioning reports, and AI-assisted narrative synthesis. Free to use. No login required. No data sold.</p>
+    <p>A professional-grade foreign exchange monitoring platform that consolidates real-time price feeds, institutional positioning reports, central bank policy data, US Treasury yield curve metrics, cross-asset flows, and AI-assisted market narrative — all in a single, continuously updated interface. No login required.</p>
   </div>
 
   <div class="section">
     <h2>What it is</h2>
-    <p>The FX Terminal is a single-page dashboard designed for serious FX monitoring. It consolidates real-time price feeds, central bank policy data, CFTC institutional positioning, US Treasury yield curve metrics, cross-asset correlation data, and AI-generated market regime narrative — all in one view, updating continuously during market hours.</p>
-    <p>It was built to answer a specific problem: professional-quality FX context is fragmented across Bloomberg terminals, Reuters Eikon, broker platforms, and government data portals. This terminal aggregates the most signal-rich public data into a coherent, fast, and always-available interface.</p>
+    <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
+    <p>Coverage spans real-time price feeds across all G8 major pairs, CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, cross-asset correlation data, live central bank policy rates and meeting calendars, and an AI-generated market regime narrative updated three times daily.</p>
   </div>
 
   <div class="section">
     <h2>Data sources</h2>
     <table class="data-table">
-      <thead><tr><th>Widget / Section</th><th>Source</th><th>Update frequency</th><th>Cost</th></tr></thead>
+      <thead>
+        <tr><th>Section</th><th>Source</th><th>Cadence</th></tr>
+      </thead>
       <tbody>
-        <tr><td>Price Chart</td><td>TradingView embed</td><td>Real-time</td><td><span class="badge badge-rt">LIVE</span></td></tr>
-        <tr><td>Ticker tape</td><td>TradingView embed</td><td>Real-time</td><td><span class="badge badge-rt">LIVE</span></td></tr>
-        <tr><td>Quote bar (FX + XAU + WTI + BTC)</td><td>Frankfurter API (ECB) + open proxies</td><td>Daily ~16:00 CET</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>FX Heatmap</td><td>TradingView embed</td><td>Real-time</td><td><span class="badge badge-rt">LIVE</span></td></tr>
-        <tr><td>Economic Calendar</td><td>TradingView embed</td><td>Real-time</td><td><span class="badge badge-rt">LIVE</span></td></tr>
-        <tr><td>Central Bank Rates</td><td>RBA, BoC, ECB, BoE, BoJ, RBNZ, SNB, Fed direct APIs</td><td>Daily GitHub Action</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>CFTC COT Positioning</td><td>CFTC.gov direct download</td><td>Weekly (Friday)</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>FX Sentiment</td><td>Dukascopy public JSON</td><td>30-min refresh</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>Cross-Asset (SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx)</td><td>Stooq + open proxies</td><td>Daily delayed</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>US Treasury Yield Curve</td><td>Stooq (3M, 2Y, 5Y, 10Y)</td><td>Daily delayed</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>News Headlines</td><td>RSS — Reuters, FT, ForexLive, FXStreet</td><td>3× daily GitHub Action</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>AI Narrative + Market Signals</td><td>Groq (llama-3.3-70b-versatile)</td><td>3× daily GitHub Action</td><td><span class="badge badge-free">FREE</span></td></tr>
-        <tr><td>Economic Map</td><td>TradingView World Economics widget</td><td>Real-time</td><td><span class="badge badge-rt">LIVE</span></td></tr>
+        <tr><td>Price Chart</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Ticker tape</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Quote bar — FX majors</td><td>Frankfurter / ECB</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Quote bar — XAU, WTI, BTC, DXY, US10Y</td><td>Open market feeds</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>Currency Strength Heatmap</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Economic Calendar</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>About</td><td>Official central bank sources</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
+        <tr><td>FX Market Sentiment</td><td>Dukascopy</td><td><span class="badge-daily">30-MIN</span></td></tr>
+        <tr><td>Cross-Asset Monitor</td><td>Stooq and open feeds</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>US Treasury Yield Curve</td><td>Stooq</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>News Headlines</td><td>Reuters, FT, ForexLive, FXStreet</td><td><span class="badge-daily">3× DAILY</span></td></tr>
+        <tr><td>AI Narrative &amp; Market Signals</td><td>Groq LLM</td><td><span class="badge-daily">3× DAILY</span></td></tr>
+        <tr><td>Economic Map</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="section">
-    <h2>Architecture</h2>
-    <p>The terminal is a static site deployed on GitHub Pages. There is no backend server, no database, and no runtime cost. Two GitHub repositories work together:</p>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px 18px;margin-bottom:16px;">
-      <div class="arch-row">
-        <span class="arch-label">engine (private)</span>
-        <span class="arch-desc">Python scripts and GitHub Actions workflows that fetch, process, and write JSON data files to the public repo on schedule. Contains AI prompts and scoring logic.</span>
-      </div>
-      <div class="arch-row">
-        <span class="arch-label">site (public)</span>
-        <span class="arch-desc">Static HTML/CSS/JS terminal UI + JSON data files. GitHub Pages serves it globally. The frontend reads data files with <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fetch()</code> calls — no API keys exposed.</span>
-      </div>
-      <div class="arch-row">
-        <span class="arch-label">TradingView</span>
-        <span class="arch-desc">Embedded widgets for live charting, forex heatmap, economic calendar, ticker tape, and economic map. No API key required for public embeds.</span>
-      </div>
-    </div>
-    <p>This architecture means the terminal is available 24/7, loads fast (no server round trips for most data), and can sustain indefinitely at zero marginal cost.</p>
-  </div>
-
-  <div class="section">
-    <h2>AI usage — intentionally limited</h2>
-    <p>AI (Groq / llama-3.3-70b-versatile) is used for exactly two outputs:</p>
+    <h2>AI in the terminal</h2>
+    <p>AI is used for two specific outputs in the terminal, both clearly labeled:</p>
     <div class="grid-2">
       <div class="card">
-        <div class="card-title">Narrative bar</div>
-        <div class="card-body">A 2–3 sentence market summary updated 3× daily (06:30, 12:30, 21:30 UTC), plus a regime label: RISK-ON / RISK-OFF / MIXED / NEUTRAL. Synthesizes rates, sentiment, cross-asset flows, and macro events into a single readable context.</div>
+        <div class="card-title">Market Narrative</div>
+        <div class="card-body">A concise market summary updated three times daily, synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, MIXED, or NEUTRAL.</div>
       </div>
       <div class="card">
-        <div class="card-title">Alerts &amp; Market Signals</div>
-        <div class="card-body">4–6 prioritized, actionable market signals published alongside the narrative. Each signal includes an asset, a direction, a rationale, and a confidence level based on cross-referencing rate differentials, COT positioning, and recent price action.</div>
+        <div class="card-title">Market Signals</div>
+        <div class="card-body">Four to six prioritized market signals published alongside the narrative, each including an instrument, directional bias, rationale, and confidence level based on multi-factor alignment across rate differentials, positioning, and price context.</div>
       </div>
     </div>
-    <p style="margin-top:14px;">All other sections — News Feed, Quote Bar, COT, Rates, Heatmap, Charts — consume real data directly without AI filtering or summarization. AI does not generate or alter price data.</p>
+    <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
   </div>
 
   <div class="section">
     <h2>Currencies covered</h2>
-    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, covering over 85% of global daily FX turnover by BIS estimates.</p>
+    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, accounting for the substantial majority of global daily FX turnover.</p>
   </div>
 
   <div class="section">
     <h2>Author</h2>
-    <p>Built and maintained by <strong>Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for individual traders and researchers.</p>
+    <p>Built and maintained by <strong style="color:var(--text);">Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for traders and researchers.</p>
     <p>Contact: <a href="mailto:globalinvestingmarkets@gmail.com" style="color:var(--blue);">globalinvestingmarkets@gmail.com</a></p>
   </div>
 

@@ -14,9 +14,6 @@
 <meta property="og:description" content="Get in touch with Global Investing for questions, feedback, or partnership inquiries.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Contact — Global Investing FX Terminal">
-<meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -35,44 +32,19 @@
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
 body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.6; min-height: 100vh; }
-
-/* ── TOPBAR ── */
-#topbar {
-  background: var(--head-bg); border-bottom: 1px solid var(--border);
-  height: 36px; display: flex; align-items: center; padding: 0 10px;
-  position: sticky; top: 0; z-index: 200;
-}
-#topbar .logo {
-  display: flex; align-items: center; gap: 8px;
-  padding-right: 10px; border-right: 1px solid var(--border2);
-  margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0;
-}
-.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; white-space: nowrap; }
-.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 1px; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
 .top-nav { display: flex; height: 100%; }
-.top-nav a {
-  display: flex; align-items: center; padding: 0 10px; font-size: 12px;
-  font-weight: 600; color: var(--text2); border-right: 1px solid var(--border);
-  white-space: nowrap; text-decoration: none; transition: color .15s, background .15s;
-}
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
 .top-nav a:hover { color: var(--text); background: var(--bg3); }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
-.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--up); border-radius: 50%; margin-right: 4px; animation: blink 1.6s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 .site-menu { position: relative; display: flex; align-items: center; }
-.site-menu-btn {
-  display: flex; align-items: center; gap: 5px; background: none;
-  border: 1px solid var(--border2); color: var(--text2); font-size: 10px;
-  font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px;
-  cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s;
-}
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
 .site-menu-btn:hover { border-color: var(--border); color: var(--text); }
-.site-menu-panel {
-  display: none; position: absolute; top: calc(100% + 6px); left: 0;
-  min-width: 210px; background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 6px 0; z-index: 400;
-  box-shadow: 0 8px 24px rgba(0,0,0,.28);
-}
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
 .site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
 .site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
 .site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
@@ -80,51 +52,45 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-ui); f
 .site-menu-panel a.current { color: #fff; }
 .site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
 .site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
 
-/* ── PAGE CONTENT ── */
-.page-wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
-.page-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
-.page-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
-.page-sub { font-size: 14px; color: var(--text2); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+/* PAGE */
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 60px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 36px; }
+.page-hero-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.page-hero h1 { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 10px; }
+.page-hero p { font-size: 14px; color: var(--text2); line-height: 1.7; }
 
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
-@media (max-width: 600px) { .contact-grid { grid-template-columns: 1fr; } }
+/* Contact rows — clean list, no cards, no emojis */
+.contact-list { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 32px; }
+.contact-row { display: grid; grid-template-columns: 160px 1fr; align-items: start; padding: 16px 20px; border-bottom: 1px solid var(--border); gap: 16px; }
+.contact-row:last-child { border-bottom: none; }
+.cr-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding-top: 2px; }
+.cr-content {}
+.cr-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.cr-val { font-size: 13px; color: var(--blue); font-family: var(--font-mono); }
+.cr-val:hover { text-decoration: underline; }
+.cr-desc { font-size: 13px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
 
-.contact-card {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
-  padding: 20px; transition: border-color .2s;
-}
-.contact-card:hover { border-color: var(--border2); }
-.cc-icon { font-size: 20px; margin-bottom: 10px; }
-.cc-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
-.cc-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.cc-val { font-size: 13px; color: var(--blue); text-decoration: none; font-family: var(--font-mono); }
-.cc-val:hover { text-decoration: underline; }
-.cc-desc { font-size: 12px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
-
-.info-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
-.info-block h3 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
-.info-block p { font-size: 13px; color: var(--text2); line-height: 1.6; }
-.info-block a { color: var(--blue); text-decoration: none; }
+.info-block { border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 14px; background: var(--bg2); }
+.info-block h3 { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+.info-block p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+.info-block a { color: var(--blue); }
 .info-block a:hover { text-decoration: underline; }
 
-.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); text-decoration: none; font-size: 12px; margin-bottom: 32px; transition: color .15s; }
-.back-link:hover { color: var(--text); }
-.back-link svg { flex-shrink: 0; }
-
-/* Footer */
-#statusbar {
-  position: fixed; bottom: 0; left: 0; right: 0; height: 22px;
-  background: var(--head-bg); border-top: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 10px; gap: 16px;
-  font-size: 10px; color: var(--text2); z-index: 200; font-family: var(--font-ui);
+@media (max-width: 600px) {
+  .contact-row { grid-template-columns: 1fr; gap: 4px; }
+  .cr-label { padding-bottom: 2px; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
 }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div id="topbar">
   <a class="logo" href="/" title="Global Investing FX Terminal">
     <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
@@ -160,72 +126,60 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-ui); f
         <a href="guide-cot.html">COT / CFTC Positioning</a>
       </div>
     </div>
-    <span><span class="live-dot"></span>LIVE</span>
   </div>
 </div>
 
-<!-- PAGE -->
 <div class="page-wrap">
-  <a class="back-link" href="/">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back to Terminal
-  </a>
 
-  <div class="page-label">Contact</div>
-  <h1 class="page-title">Get in Touch</h1>
-  <p class="page-sub">Questions, feedback, data issues, or partnership inquiries — we're happy to hear from you.</p>
+  <div class="page-hero">
+    <div class="page-hero-label">Contact</div>
+    <h1>Get in Touch</h1>
+    <p>Questions, feedback, data issues, or partnership inquiries. We aim to respond within 1–3 business days.</p>
+  </div>
 
-  <div class="contact-grid">
-    <div class="contact-card">
-      <div class="cc-icon">✉️</div>
-      <div class="cc-label">General inquiries</div>
-      <div class="cc-title">Email</div>
-      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
-      <p class="cc-desc">Questions about the terminal, data sources, or features.</p>
+  <div class="contact-list">
+    <div class="contact-row">
+      <div class="cr-label">General inquiries</div>
+      <div class="cr-content">
+        <div class="cr-title">Email</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Questions about the terminal, features, or data sources.</div>
+      </div>
     </div>
-    <div class="contact-card">
-      <div class="cc-icon">📊</div>
-      <div class="cc-label">Data & technical</div>
-      <div class="cc-title">Data Issues</div>
-      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
-      <p class="cc-desc">Report stale data, broken panels, or incorrect values.</p>
+    <div class="contact-row">
+      <div class="cr-label">Data &amp; technical</div>
+      <div class="cr-content">
+        <div class="cr-title">Data Issues</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=DATA ISSUE">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Report stale panels, broken feeds, or incorrect values. Include "DATA ISSUE" in the subject for priority handling.</div>
+      </div>
     </div>
-    <div class="contact-card">
-      <div class="cc-icon">🤝</div>
-      <div class="cc-label">Business</div>
-      <div class="cc-title">Partnerships</div>
-      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
-      <p class="cc-desc">Advertising, data integrations, or collaboration proposals.</p>
-    </div>
-    <div class="contact-card">
-      <div class="cc-icon">🐦</div>
-      <div class="cc-label">Social</div>
-      <div class="cc-title">Twitter / X</div>
-      <a class="cc-val" href="https://twitter.com/GlobalInvesting" target="_blank" rel="noopener">@GlobalInvesting</a>
-      <p class="cc-desc">Market updates, terminal announcements and commentary.</p>
+    <div class="contact-row">
+      <div class="cr-label">Business</div>
+      <div class="cr-content">
+        <div class="cr-title">Partnerships</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=Partnership">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Data integrations, advertising, or collaboration proposals.</div>
+      </div>
     </div>
   </div>
 
   <div class="info-block">
-    <h3>Response Time</h3>
-    <p>We aim to respond within 1–3 business days. For urgent data issues affecting the terminal, please include "DATA ISSUE" in the subject line.</p>
-  </div>
-
-  <div class="info-block">
-    <h3>Before You Write</h3>
-    <p>Many common questions are answered in our <a href="guide-dashboard.html">terminal guide</a>. For data source details, check the <a href="about.html">About page</a>. If a panel shows stale data, it may be a temporary API issue that resolves automatically within a few minutes.</p>
+    <h3>Before writing</h3>
+    <p>Many questions are answered in the <a href="guide-dashboard.html">terminal guide</a>. For data source details, see the <a href="about.html">About page</a>. If a panel shows stale data, it may be a temporary API issue that resolves automatically.</p>
   </div>
 
   <div class="info-block">
     <h3>Legal</h3>
-    <p>For privacy inquiries or data removal requests, see our <a href="privacy.html">Privacy Policy</a>. For terms of use, see <a href="terms.html">Terms of Use</a>.</p>
+    <p>For privacy inquiries or data removal requests, see our <a href="privacy.html">Privacy Policy</a>. For terms governing use of the terminal, see <a href="terms.html">Terms of Use</a>.</p>
   </div>
+
 </div>
 
 <div id="statusbar">
-  <div><span class="sb-k">GLOBAL INVESTING</span></div>
-  <div class="footer-copy">© 2026 Global Investing — FX Terminal. Educational use only. Not financial advice.</div>
-  <div style="margin-left:auto"><a href="privacy.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Privacy</a> · <a href="terms.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Terms</a></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">CONTACT</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
 </div>
 
 </body>
