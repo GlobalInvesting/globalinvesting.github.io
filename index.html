@@ -18,7 +18,7 @@
     --border2: #363c4e;
     --text: #d1d4dc;
     --text2: #787b86;
-    --text3: #4c525e;
+    --text3: #6b7280;
     --up: #26a69a;
     --down: #ef5350;
     --blue: #2962ff;
@@ -701,7 +701,7 @@
             "watchlist": [],
             "withdateranges": false,
             "compareSymbols": [],
-            "studies": ["MASimple@tv-basicstudies"],
+            "studies": [{"id":"MASimple@tv-basicstudies","inputs":{"length":20}}],
             "autosize": true
           }
           </script>
@@ -873,7 +873,7 @@
           </div>
         </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;">
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;max-height:520px;overflow:hidden;">
         <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
         <div id="spreads-rows" style="padding:4px 10px;">
           <!-- populated by fetchSpreadsData() -->
@@ -885,19 +885,19 @@
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
-        <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;">
-          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+        <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
+          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;">
             <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);">Market Sentiment</span>
             <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;">
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;min-height:0;">
             <!-- myfxbook compact outlook widget (type=0) -->
             <div id="mfxb-container"></div>
             <div style="font-size:9px;color:var(--text3);padding:2px 4px;">
               <a href="https://www.myfxbook.com" class="myfxbookLink" target="_blank" rel="noopener" style="color:var(--text3);text-decoration:none;">Powered by Myfxbook.com</a>
             </div>
             <script class="powered" type="text/javascript"
-              src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
+              src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=0&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
           </div>
         </div>
       </div>
@@ -937,8 +937,8 @@
     </div>
 
     <!-- NEWS FEED + ECONOMIC MAP -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;">
+      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:320px;">
         <div class="panel-head">
           <span class="panel-title">News Feed</span>
           <span class="panel-sub" id="news-sub">FX-relevant · sorted by impact</span>
@@ -947,7 +947,7 @@
           <div class="news-item" style="color:var(--text3);">Loading news…</div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;background:var(--bg);">
+      <div style="display:flex;flex-direction:column;background:var(--bg);height:320px;overflow:hidden;">
         <div class="panel-head">
           <span class="panel-title">Economic Map</span>
           <span class="panel-sub">TradingView · World Economics</span>
@@ -1920,7 +1920,7 @@ async function fetchRiskData() {
   const short2 = byId.us2y || byId.us3m;
   if (byId.us10y && short2) {
     const y10  = byId.us10y.close;
-    const y2   = short2.close / 10;
+    const y2   = short2.close;
     const spr  = y10 - y2;
     const bp   = (spr * 100).toFixed(0);
     const cls  = spr < 0 ? 'down' : 'up';
@@ -1972,14 +1972,9 @@ async function fetchRiskData() {
     setEl('rate-10y', v.toFixed(2) + '%');
     setEl('rate-10y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
-  if (byId.us5y) {
-    const v = byId.us5y.close;
-    const chg = byId.us5y.chg;
-    setEl('rate-5y', v.toFixed(2) + '%');
-    setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
-  }
-  // 2Y approximated from 3M + 10Y blend
-  if (byId.us3m && byId.us10y) {
+  // (rate-5y already set above)
+  // 2Y: only approximate if we don't have real us2y data
+  if (!byId.us2y && byId.us3m && byId.us10y) {
     const approx2y = byId.us3m.close * 0.3 + byId.us10y.close * 0.7;
     setEl('rate-2y', approx2y.toFixed(2) + '%');
     setEl('rate-2y-chg', '—', 'rate-chg flat');
@@ -1987,12 +1982,12 @@ async function fetchRiskData() {
 
   // Draw yield curve
   const yields = [
-    byId.us3m   ? byId.us3m.close  / 10 : STATIC_YIELDS[0],
+    byId.us3m   ? byId.us3m.close : STATIC_YIELDS[0],
     byId.us3m && byId.us10y ? (byId.us3m.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[1], // 6M approx
     byId.us10y  ? (byId.us3m ? byId.us3m.close*0.3 + byId.us10y.close*0.7 : STATIC_YIELDS[2]) : STATIC_YIELDS[2], // 1Y
-    byId.us10y  ? (byId.us10y.close * 0.82 + (byId.us3m ? byId.us3m.close*0.18 : 0)) : STATIC_YIELDS[3], // 2Y
-    byId.us5y   ? (byId.us5y.close /10 * 0.7 + byId.us10y.close*0.3) : STATIC_YIELDS[4], // 3Y
-    byId.us5y   ? byId.us5y.close  / 10 : STATIC_YIELDS[5],
+    byId.us2y   ? byId.us2y.close : (byId.us10y ? (byId.us10y.close * 0.82 + (byId.us3m ? byId.us3m.close*0.18 : 0)) : STATIC_YIELDS[3]), // 2Y
+    byId.us5y   ? (byId.us5y.close * 0.7 + byId.us10y.close*0.3) : STATIC_YIELDS[4], // 3Y
+    byId.us5y   ? byId.us5y.close : STATIC_YIELDS[5],
     byId.us5y && byId.us10y ? (byId.us5y.close*0.4 + byId.us10y.close*0.6) : STATIC_YIELDS[6], // 7Y
     byId.us10y  ? byId.us10y.close : STATIC_YIELDS[7],
     byId.us30y  ? (byId.us30y.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[8], // 20Y
