@@ -489,24 +489,35 @@
     position: fixed; bottom: 0; left: 0; right: 0;
     height: 22px; background: var(--head-bg);
     border-top: 1px solid var(--border);
-    display: flex; align-items: center;
-    padding: 0 10px; gap: 20px;
+    display: flex; align-items: center; flex-wrap: nowrap;
+    padding: 0 10px; gap: 16px;
     font-size: 10px; color: var(--text2); z-index: 200;
     font-family: var(--font-ui);
+    overflow: hidden;
+  }
+  @media (max-width: 900px) {
+    /* Hide TV ticker tape on mobile — it clutters between sections */
+    #tv-ticker-tape { display: none !important; }
+  }
+  @media (max-width: 600px) {
+    #statusbar {
+      position: relative; height: auto; flex-wrap: wrap;
+      gap: 6px; padding: 6px 8px; font-size: 9px;
+    }
+    #statusbar > div:nth-child(n+3) { display: none; }
+    .footer-copy { display: none; }
   }
   .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
   .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
   .footer-copy {
-    position: absolute; left: 50%; transform: translateX(-50%);
     font-size: 10px; color: var(--text3); white-space: nowrap; font-family: var(--font-ui);
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  @media (max-width: 600px) {
+    .footer-copy { position: static; transform: none; order: 10; flex-basis: 100%; text-align: center; }
   }
 
-  /* FX DARK WIDGET — myfxbook */
-  #myfxbook-wrap {
-    width: 100% !important;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+  /* SENTIMENT PANEL */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
 
@@ -514,108 +525,75 @@
      MOBILE RESPONSIVE — max-width: 900px
   ══════════════════════════════════════════════ */
   @media (max-width: 900px) {
-    /* Topbar: stack logo + nav */
-    #topbar {
-      height: auto;
-      flex-wrap: wrap;
-      padding: 6px 8px;
-      gap: 4px;
-    }
-    #topbar .logo { gap: 6px; }
-    .top-nav { display: none; } /* hide nav tabs — use scroll */
+    /* Topbar: minimal */
+    .top-nav { display: none; }
     .topbar-right { margin-left: auto; font-size: 10px; }
     #news-ticker { display: none; }
 
     /* Layout: stack sidebar → main → right panel vertically */
-    #layout {
-      display: flex;
-      flex-direction: column;
-      height: auto;
-      overflow: visible;
-    }
+    #layout { display: flex; flex-direction: column; height: auto; overflow: visible; }
 
     /* Sidebar: horizontal scrollable strip at top */
     #sidebar {
-      width: 100%;
-      max-height: none;
-      overflow-y: visible;
-      overflow-x: auto;
-      border-right: none;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
+      width: 100%; max-height: none; overflow-y: visible; overflow-x: auto;
+      border-right: none; border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: row; flex-wrap: nowrap;
     }
-    #sidebar .sb-section {
-      min-width: 160px;
-      border-bottom: none;
-      border-right: 1px solid var(--border);
-      flex-shrink: 0;
-    }
+    #sidebar .sb-section { min-width: 160px; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
     #sidebar .sb-head { white-space: nowrap; }
 
-    /* Main: full width, auto height */
-    #main {
-      width: 100%;
-      overflow-y: visible;
-      overflow-x: hidden;
-    }
+    /* Main + Right: full width, auto height */
+    #main { width: 100%; overflow-y: visible; overflow-x: hidden; }
+    #rightpanel { width: 100%; border-left: none; border-top: 1px solid var(--border); }
 
-    /* Right panel: full width below main */
-    #rightpanel {
-      width: 100%;
-      border-left: none;
-      border-top: 1px solid var(--border);
-    }
+    /* Narrative: stack label on top, full width text */
+    #narrative { flex-direction: column; gap: 6px; }
+    .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; }
+    .narr-text { font-size: 11px; width: 100%; }
+    .narr-regime { align-self: flex-start; }
 
-    /* 2-column grids → 1 column */
-    div[style*="grid-template-columns:1fr 1fr"] {
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    div[style*="grid-template-columns: 1fr 1fr"] {
-      display: flex !important;
-      flex-direction: column !important;
-    }
+    /* 2-col grids that should become 1-col on mobile */
+    div[style*="grid-template-columns:1fr 1fr"] { display: flex !important; flex-direction: column !important; }
+    div[style*="grid-template-columns: 1fr 1fr"] { display: flex !important; flex-direction: column !important; }
 
-    /* Cross-asset 2-col grid */
+    /* Cross-asset: keep 2 cols (compact enough) */
     .ca-grid { grid-template-columns: 1fr 1fr !important; }
+    .ca-val { font-size: 13px !important; }
+    .ca-name { font-size: 9px !important; }
 
-    /* Risk grid: 2x2 → 2x2 (already good on mobile) */
+    /* Risk grid: 2x2 OK */
     .risk-grid { grid-template-columns: 1fr 1fr !important; }
+    .risk-val { font-size: 13px !important; }
 
-    /* Rates grid: 4-col → 2x2 */
+    /* Rates grid: 2x2 */
     .rates-grid { grid-template-columns: 1fr 1fr !important; }
+    .rate-val { font-size: 15px !important; }
+
+    /* Cross-asset + Risk monitor panels: fixed height → auto */
+    div[style*="height:320px"] { height: auto !important; max-height: none !important; }
+    div[style*="max-height:320px"] { max-height: none !important; }
 
     /* News + Economic map: stack */
-    div[style*="height:440px"] {
-      height: auto !important;
-      flex-direction: column !important;
-    }
-    div[style*="height:440px"] > div {
-      height: auto !important;
-      min-height: 0 !important;
-      border-right: none !important;
-      border-bottom: 1px solid var(--border) !important;
-    }
+    div[style*="height:440px"] { height: auto !important; flex-direction: column !important; }
+    div[style*="height:440px"] > div { height: auto !important; min-height: 0 !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; }
     #news-feed-items { max-height: 300px !important; }
     tv-economic-map { min-height: 260px !important; }
 
     /* Market Sessions + Spreads: stack */
-    div[style*="grid-template-columns:1fr 1fr;border-bottom"] {
-      display: flex !important;
-      flex-direction: column !important;
-    }
+    div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
+
+    /* Sessions table: compact */
+    #sessions-table table { min-width: unset; }
 
     /* Price chart: full width */
     #chart-wrap, .tv-chart-container { width: 100% !important; }
 
-    /* FX table: allow horizontal scroll */
+    /* FX table: horizontal scroll */
     div[style*="overflow-x:auto"] { overflow-x: auto !important; }
     table { min-width: 480px; }
     .fx-pairs-table table, #fx-pairs-tbody { min-width: 480px; }
 
-    /* Heatmap: allow scroll */
+    /* Heatmap */
     #heatmap-wrap { overflow-x: auto !important; }
 
     /* Topbar ticker: scrollable */
@@ -623,31 +601,24 @@
     #quotebar-inner { flex-wrap: nowrap !important; }
     .q-item { display: inline-flex !important; flex-shrink: 0; }
 
-    /* Font size adjustments */
-    .ca-val { font-size: 14px !important; }
-    .risk-val { font-size: 13px !important; }
-    .rate-val { font-size: 16px !important; }
+    /* Font sizes */
     body { font-size: 11px; }
-
-    /* Panel heads: smaller */
     .panel-title { font-size: 10px !important; }
     .panel-sub { font-size: 9px !important; }
 
-    /* Sidebar sections full width in column layout */
+    /* Sidebar full-width columns */
     #sidebar { flex-direction: column; overflow-x: hidden; }
     #sidebar .sb-section { min-width: unset; width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
 
-    /* Sessions/Spreads right column: ensure it's not hidden */
-    div[style*="max-height:520px"] {
-      max-height: none !important;
-      overflow: visible !important;
-    }
+    /* Sessions overflow fix */
+    div[style*="max-height:520px"] { max-height: none !important; overflow: visible !important; }
 
-    /* Myfxbook widget: let it auto-size */
-    #myfxbook-wrap { max-height: 360px !important; overflow-y: auto !important; }
+    /* Market sentiment: auto height */
+    #myfxbook-wrap { max-height: 400px !important; overflow-y: auto !important; }
 
-    /* Footer */
-    #footer { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
+    /* Footer: wrap cleanly */
+    #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
+    #statusbar .footer-copy { position: static; transform: none; width: 100%; order: 10; text-align: center; }
   }
 
   @media (max-width: 480px) {
@@ -959,12 +930,12 @@
           <span class="sess" id="sess-newyork">New York</span>
         </div>
         <table>
-          <thead><tr><th style="text-align:left">Session</th><th>Open (UTC)</th><th>Close (UTC)</th><th>Status</th></tr></thead>
+          <thead><tr><th style="text-align:left">Session</th><th id="sess-col-open">Open</th><th id="sess-col-close">Close</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Sydney</td><td>22:00</td><td>07:00</td><td class="flat" id="status-sydney">—</td></tr>
-            <tr><td>Tokyo</td><td>00:00</td><td>09:00</td><td class="flat" id="status-tokyo">—</td></tr>
-            <tr><td>London</td><td>08:00</td><td>17:00</td><td class="flat" id="status-london">—</td></tr>
-            <tr><td>New York</td><td>13:00</td><td>22:00</td><td class="flat" id="status-newyork">—</td></tr>
+            <tr><td>Sydney</td><td id="sess-open-sydney">22:00</td><td id="sess-close-sydney">07:00</td><td class="flat" id="status-sydney">—</td></tr>
+            <tr><td>Tokyo</td><td id="sess-open-tokyo">00:00</td><td id="sess-close-tokyo">09:00</td><td class="flat" id="status-tokyo">—</td></tr>
+            <tr><td>London</td><td id="sess-open-london">08:00</td><td id="sess-close-london">17:00</td><td class="flat" id="status-london">—</td></tr>
+            <tr><td>New York</td><td id="sess-open-newyork">13:00</td><td id="sess-close-newyork">22:00</td><td class="flat" id="status-newyork">—</td></tr>
           </tbody>
         </table>
         <div style="border-top:1px solid var(--border);padding:4px 8px 0;">
@@ -1021,21 +992,17 @@
         <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Market Sentiment</span>
-            <span class="panel-sub">Myfxbook · retail positioning</span>
+            <span class="panel-sub" id="sent-updated">CFTC · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;">
-            <!-- myfxbook.com outlook widget - Start -->
-<script class="powered" type="text/javascript"
-  src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
-<script type="text/javascript">showOutlookWidget()</script>
-            <!-- myfxbook.com outlook widget - End -->
+          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 10px;min-height:0;width:100%;box-sizing:border-box;">
+            <div id="sent-rows" style="display:flex;flex-direction:column;gap:6px;"></div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- TV TICKER TAPE (TradingView cross-asset bar) -->
-    <div style="height:46px;overflow:hidden;border-bottom:1px solid var(--border);background:var(--bg2);">
+    <div id="tv-ticker-tape" style="height:46px;overflow:hidden;border-bottom:1px solid var(--border);background:var(--bg2);">
       <div class="tradingview-widget-container" style="height:46px;">
         <div class="tradingview-widget-container__widget"></div>
         <div class="tradingview-widget-copyright" style="display:none;"></div>
@@ -1269,15 +1236,33 @@ function updateSessions(h) {
 
   let activeLabel = isWeekend ? 'MARKET CLOSED' : 'INTER-SESSION';
 
+  // Convert UTC hour to local HH:MM string
+  function utcHourToLocal(utcHour) {
+    const d = new Date();
+    d.setUTCHours(utcHour, 0, 0, 0);
+    return d.toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit', hour12:false});
+  }
+
+  // Update session column header to show local timezone
+  const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'Local';
+  const colOpen = document.getElementById('sess-col-open');
+  const colClose = document.getElementById('sess-col-close');
+  if (colOpen) colOpen.textContent = 'Open (' + tzAbbr + ')';
+  if (colClose) colClose.textContent = 'Close (' + tzAbbr + ')';
+
   sessions.forEach(s => {
     const open = !isWeekend && isOpen(s.open, s.close, h);
     const badge = document.getElementById('sess-' + s.id);
     const status = document.getElementById('status-' + s.id);
+    const openEl = document.getElementById('sess-open-' + s.id);
+    const closeEl = document.getElementById('sess-close-' + s.id);
     if (badge) badge.classList.toggle('active', open);
     if (status) {
       status.textContent = isWeekend ? 'Weekend' : (open ? 'Open' : 'Closed');
       status.className = open ? 'up' : 'flat';
     }
+    if (openEl) openEl.textContent = utcHourToLocal(s.open);
+    if (closeEl) closeEl.textContent = utcHourToLocal(s.close);
     if (open) activeLabel = s.id.toUpperCase().replace('NEWYORK','NEW YORK');
   });
 
@@ -1961,7 +1946,12 @@ async function fetchRiskData() {
   // Try stooq.com free CSV data — no auth needed, but may be blocked on weekends
   async function fetchStooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    const urls = [
+      base,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+      `https://corsproxy.io/?${encodeURIComponent(base)}`,
+      `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(base)}`,
+    ];
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
@@ -2012,6 +2002,7 @@ async function fetchRiskData() {
     const urls = [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
       `https://corsproxy.io/?${encodeURIComponent(base)}`,
+      `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(base)}`,
       `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
       `https://corsproxy.io/?${encodeURIComponent(base2)}`,
     ];
@@ -2525,12 +2516,28 @@ function drawLiquidityChart() {
   }
 
   const now = new Date();
-  setEl('liq-time-label', now.getUTCHours().toString().padStart(2,'0')+':'+now.getUTCMinutes().toString().padStart(2,'0')+' UTC');
+  // Show local time in liquidity chart labels
+  const localH = now.getHours().toString().padStart(2,'0');
+  const localM = now.getMinutes().toString().padStart(2,'0');
+  const tzShort = now.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
+  setEl('liq-time-label', localH + ':' + localM + ' ' + tzShort);
   if (isWeekend) {
-    setEl('liq-peak-label', 'Reopens: Sun 21:00');
+    // Convert Sun 21:00 UTC to local time
+    const reopenUTC = new Date(); reopenUTC.setUTCDay ? null : null;
+    const reopenDate = new Date();
+    // Next Sunday 21:00 UTC
+    const daysUntilSun = (7 - reopenDate.getUTCDay()) % 7;
+    reopenDate.setUTCDate(reopenDate.getUTCDate() + (daysUntilSun === 0 ? 0 : daysUntilSun));
+    reopenDate.setUTCHours(21, 0, 0, 0);
+    const rH = reopenDate.getHours().toString().padStart(2,'0');
+    const rM = reopenDate.getMinutes().toString().padStart(2,'0');
+    setEl('liq-peak-label', 'Reopens: Sun ' + rH + ':' + rM + ' ' + tzShort);
   } else {
     const peakH = hours.indexOf(Math.max(...hours));
-    setEl('liq-peak-label', 'Peak: '+Math.floor(peakH/2).toString().padStart(2,'0')+':'+(peakH%2===0?'00':'30')+' UTC');
+    const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakH/2), peakH%2===0?0:30, 0, 0);
+    const pH = peakUTC.getHours().toString().padStart(2,'0');
+    const pM = peakUTC.getMinutes().toString().padStart(2,'0');
+    setEl('liq-peak-label', 'Peak: ' + pH + ':' + pM + ' ' + tzShort);
   }
 }
 
