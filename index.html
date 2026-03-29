@@ -281,7 +281,7 @@
     padding-right: 10px; border-right: 1px solid var(--border2);
     font-family: var(--font-ui);
   }
-  .narr-text  { font-size: 12px; color: var(--text); line-height: 1.5; flex: 1; font-family: var(--font-ui); }
+  .narr-text  { font-size: 12px; color: var(--text); line-height: 1.5; flex: 1; font-family: var(--font-ui); word-wrap: break-word; overflow-wrap: break-word; white-space: normal; min-width: 0; }
   .narr-regime {
     font-size: 10px; font-weight: 700;
     padding: 2px 8px;
@@ -919,17 +919,17 @@
         <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub">Volatility &amp; regime</span></div>
         <div class="risk-grid">
           <div class="risk-cell"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
+          <div class="risk-cell"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
+          <div class="risk-cell"><div class="risk-lbl">EUR/USD IV 1M</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Implied vol</div></div>
           <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
-          <div class="risk-cell"><div class="risk-lbl">US 10Y</div><div class="risk-val" id="risk-us10y">—</div><div class="risk-sub" id="risk-us10y-sub">Nominal yield</div></div>
-          <div class="risk-cell"><div class="risk-lbl">DXY Trend</div><div class="risk-val" id="risk-dxy">—</div><div class="risk-sub" id="risk-dxy-sub">USD index</div></div>
         </div>
         <div style="padding:4px 8px 0;border-top:1px solid var(--border);">
           <table>
             <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th>Signal</th></tr></thead>
             <tbody id="risk-indicators-tbody">
-              <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+              <tr><td>US 10Y Yield</td><td id="ri-us10y">—</td><td id="ri-us10y-sig" class="flat">—</td></tr>
+              <tr><td>DXY Index</td><td id="ri-dxy">—</td><td id="ri-dxy-sig" class="flat">—</td></tr>
               <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
-              <tr><td>USD/JPY vs Nikkei</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1050,12 +1050,17 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow:hidden;padding:0;min-height:0;display:flex;flex-direction:column;">
-            <!-- myfxbook outlook widget type=1 -->
-            <div style="flex:1;overflow-y:auto;overflow-x:hidden;" class="thin-scroll">
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;" class="thin-scroll">
+            <!-- myfxbook.com outlook widget - Start -->
+            <div>
               <script class="powered" type="text/javascript"
                 src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
             </div>
+            <div style="font-size:10px">
+              <a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_self" rel="noopener">Powered by Myfxbook.com</a>
+            </div>
+            <script type="text/javascript">showOutlookWidget()</script>
+            <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
       </div>
@@ -1993,14 +1998,19 @@ async function fetchRiskData() {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
         if (!r.ok) continue;
-        const text = await r.text();
+        let text = await r.text();
+        // allorigins wraps in JSON {contents:"..."} sometimes
+        if (text.trim().startsWith('{')) {
+          try { const j = JSON.parse(text); if (j.contents) text = j.contents; } catch {}
+        }
         const lines = text.trim().split('\n');
         if (lines.length < 2) continue;
         const parts = lines[1].split(',');
         const close = parseFloat(parts[6]);
         const open  = parseFloat(parts[3]);
-        if (isNaN(close) || close === 0) continue;
-        return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+        // stooq returns "N/D" rows when data unavailable — parseFloat gives NaN
+        if (isNaN(close) || close === 0 || close < 0) continue;
+        return { close, open: isNaN(open) ? close : open, chg: isNaN(open) ? 0 : close - open, pct: (!isNaN(open) && open > 0) ? (close - open) / open * 100 : 0 };
       } catch { continue; }
     }
     return null;
@@ -2028,20 +2038,28 @@ async function fetchRiskData() {
 
   // FALLBACK for VIX and DXY via Yahoo Finance when stooq is blocked
   async function fetchYahoo(ySymbol) {
-    const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=2d`;
+    const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
+    const base2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const urls = [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
       `https://corsproxy.io/?${encodeURIComponent(base)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
+      `https://corsproxy.io/?${encodeURIComponent(base2)}`,
     ];
     for (const url of urls) {
       try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
         if (!r.ok) continue;
-        const d = await r.json();
+        const text = await r.text();
+        if (!text || text.length < 50) continue;
+        let d;
+        try { d = JSON.parse(text); } catch { continue; }
+        // Handle allorigins wrapping: {contents: "..."}
+        if (d?.contents) { try { d = JSON.parse(d.contents); } catch { continue; } }
         const meta = d?.chart?.result?.[0]?.meta;
         if (!meta) continue;
-        const close = meta.regularMarketPrice;
-        const open  = meta.chartPreviousClose || meta.previousClose || close;
+        const close = meta.regularMarketPrice ?? meta.regularMarketPreviousClose;
+        const open  = meta.chartPreviousClose ?? meta.previousClose ?? close;
         if (!close || isNaN(close)) continue;
         return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
       } catch { continue; }
@@ -2052,7 +2070,13 @@ async function fetchRiskData() {
   // Fill VIX if stooq missed it
   if (!byId.vix) {
     const v = await fetchYahoo('%5EVIX');
-    if (v) byId.vix = { ...v, fromYahoo: true };
+    if (v && v.close > 5 && v.close < 100) byId.vix = { ...v, fromYahoo: true };
+  }
+  // Validate VIX from stooq — reject absurd values
+  if (byId.vix && (byId.vix.close < 5 || byId.vix.close > 100)) {
+    delete byId.vix;
+    const v = await fetchYahoo('%5EVIX');
+    if (v && v.close > 5 && v.close < 100) byId.vix = { ...v, fromYahoo: true };
   }
   // Fill DXY if stooq missed it — use DX-Y.NYB on Yahoo
   if (!byId.dxy) {
@@ -2062,41 +2086,57 @@ async function fetchRiskData() {
   // Fill 3M T-Bill (^IRX on Yahoo = yield * 10, need to divide by 10)
   if (!byId.us3m) {
     const t = await fetchYahoo('%5EIRX');
-    if (t) byId.us3m = { ...t, close: t.close / 10, chg: t.chg / 10 };
-  }
-  // Fill 2Y Treasury — Yahoo ^TWO = 2Y yield (already in % form, no divide needed)
-  if (!byId.us2y) {
-    // Try ^TWO first, then ^TUX as backup
-    for (const sym of ['%5ETWO', '%5ETUX']) {
-      const t = await fetchYahoo(sym);
-      if (t && t.close > 0.5 && t.close < 20) {
-        // ^TWO reports actual yield in %, not x10
-        byId.us2y = t;
-        break;
-      }
-    }
+    if (t && t.close > 0) byId.us3m = { ...t, close: t.close / 10, chg: t.chg / 10 };
   }
   // Fill 10Y (^TNX = yield * 10)
   if (!byId.us10y) {
     const t = await fetchYahoo('%5ETNX');
-    if (t) byId.us10y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+    if (t && t.close > 0) byId.us10y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
   }
   // Fill 5Y (^FVX = yield * 10)
   if (!byId.us5y) {
     const t = await fetchYahoo('%5EFVX');
-    if (t) byId.us5y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+    if (t && t.close > 0) byId.us5y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
   }
   // Fill 30Y (^TYX = yield * 10)
   if (!byId.us30y) {
     const t = await fetchYahoo('%5ETYX');
-    if (t) byId.us30y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+    if (t && t.close > 0) byId.us30y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+  }
+  // Extended-data repo fallback — fetch USD.json once and extract all needed yields
+  // Engine exports: bond10y (always), bond2y + bond5y (after next engine run with new code)
+  {
+    let usdExt = null;
+    try {
+      const r = await fetch('./extended-data/USD.json');
+      if (r.ok) usdExt = await r.json();
+    } catch { /* skip */ }
+
+    if (usdExt?.data) {
+      // 2Y — from bond2y (new field added by engine) or leave blank
+      if (!byId.us2y) {
+        const v = usdExt.data.bond2y;
+        if (v != null && !isNaN(v) && v > 0.5 && v < 20)
+          byId.us2y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
+      }
+      // 5Y — from bond5y (new field added by engine)
+      if (!byId.us5y) {
+        const v = usdExt.data.bond5y;
+        if (v != null && !isNaN(v) && v > 0.5 && v < 20)
+          byId.us5y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
+      }
+      // 10Y — final fallback
+      if (!byId.us10y) {
+        const v = usdExt.data.bond10y;
+        if (v != null && !isNaN(v))
+          byId.us10y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
+      }
+    }
   }
 
-  // FALLBACK: fetch bond10y values from repo extended-data when all live sources fail
-  // These JSONs are updated daily by the engine and always available
+  // EUR, JPY extended-data bond10y fallbacks
   try {
     const extCurrencies = [
-      { ccy: 'USD', id: 'us10y' },
       { ccy: 'EUR', id: 'de10y' },
       { ccy: 'JPY', id: 'jp10y' },
     ];
@@ -2113,9 +2153,7 @@ async function fetchRiskData() {
       })
     );
     extResults.forEach(item => {
-      if (item && !byId[item.id]) {
-        byId[item.id] = item;
-      }
+      if (item && !byId[item.id]) byId[item.id] = item;
     });
   } catch { /* silently skip */ }
 
@@ -2128,44 +2166,70 @@ async function fetchRiskData() {
     const vix = byId.vix.close;
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
-    const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility';
-    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
+    const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated vol' : 'Low volatility';
+    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : isWeekend ? ' (last close)' : '';
     setEl('risk-vix-sub', regime + srcSuffix);
   } else {
     setEl('risk-vix', '—');
-    setEl('risk-vix-sub', isWeekend ? 'Loading via Yahoo…' : 'loading…');
+    setEl('risk-vix-sub', 'CBOE · proxy unavailable');
   }
 
-  // US 10Y (TNX = yield * 10)
+  // MOVE Index — ^MOVE on Yahoo (ICE BofA bond volatility index)
+  {
+    const move = await fetchYahoo('%5EMOVE');
+    if (move && move.close > 10) {
+      const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val' : 'risk-val up';
+      setEl('risk-move', move.close.toFixed(1), cls);
+      const signal = move.close > 150 ? 'Extreme bond vol' : move.close > 100 ? 'Elevated' : 'Low';
+      const sign = move.chg >= 0 ? '+' : '';
+      setEl('risk-move-sub', signal + ' · ' + sign + move.chg.toFixed(1));
+    } else if (byId.us10y) {
+      // Proxy: MOVE ≈ VIX-like measure from 10Y move
+      const vixLevel = byId.vix ? byId.vix.close : 20;
+      const approx = Math.round(vixLevel * 3.8);
+      const cls = approx > 150 ? 'risk-val down' : approx > 100 ? 'risk-val' : 'risk-val up';
+      setEl('risk-move', approx.toString(), cls);
+      setEl('risk-move-sub', 'Bond vol · est');
+    }
+  }
+
+  // EUR/USD Implied Vol 1M — stooq eurusdv1m.b, fallback VIX proxy
+  {
+    const fxiv = await fetchStooq('eurusdv1m.b');
+    if (fxiv && fxiv.close > 0.5 && fxiv.close < 30) {
+      const cls = fxiv.close > 10 ? 'risk-val down' : fxiv.close > 7 ? 'risk-val' : 'risk-val up';
+      setEl('risk-eurusd-iv', fxiv.close.toFixed(1) + '%', cls);
+      const signal = fxiv.close > 10 ? 'Stress elevated' : fxiv.close > 7 ? 'Moderate' : 'Low vol';
+      setEl('risk-eurusd-iv-sub', signal);
+    } else if (byId.vix) {
+      // Empirical proxy: EUR/USD 1M IV ≈ VIX × 0.22
+      const estIV = (byId.vix.close * 0.22).toFixed(1);
+      const fNum = parseFloat(estIV);
+      const cls = fNum > 10 ? 'risk-val down' : fNum > 7 ? 'risk-val' : 'risk-val up';
+      setEl('risk-eurusd-iv', estIV + '%', cls);
+      setEl('risk-eurusd-iv-sub', 'Implied vol · est');
+    }
+  }
+
+  // Indicator table — US 10Y, DXY, US–EU Spread
   if (byId.us10y) {
-    const y10 = byId.us10y.close;
-    const chg = byId.us10y.chg;
-    const cls = chg > 0.005 ? 'risk-val up' : chg < -0.005 ? 'risk-val down' : 'risk-val';
-    setEl('risk-us10y', y10.toFixed(2) + '%', cls);
+    const y10 = byId.us10y.close, chg = byId.us10y.chg;
     const sign = chg >= 0 ? '+' : '';
-    const srcNote = byId.us10y.fromRepo
-      ? 'Nominal yield · daily data'
-      : (isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
-    setEl('risk-us10y-sub', srcNote);
-    const usEl = document.getElementById('q-us10y');
-    const uscEl = document.getElementById('q-us10y') && document.getElementById('qc-us10y');
+    const cls10 = chg > 0.005 ? 'up' : chg < -0.005 ? 'down' : 'flat';
+    setEl('ri-us10y', y10.toFixed(2) + '%');
+    setEl('ri-us10y-sig', byId.us10y.fromRepo ? 'Daily data' : sign + (chg * 100).toFixed(1) + 'bp', cls10);
+    // Update topbar US10Y
     const _usEl = document.getElementById('q-us10y');
     const _uscEl = document.getElementById('qc-us10y');
     if (_usEl) { _usEl.textContent = y10.toFixed(2) + '%'; _usEl.className = 'q-price ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
     if (_uscEl) { _uscEl.textContent = byId.us10y.fromRepo ? '—' : pctStr(byId.us10y.pct); _uscEl.className = 'q-chg flat'; }
-  } else {
-    setEl('risk-us10y', '—');
-    setEl('risk-us10y-sub', 'Nominal yield');
   }
-
-  // DXY
   if (byId.dxy) {
-    const dxy = byId.dxy.close;
-    const chg = byId.dxy.chg;
-    const cls = chg > 0.05 ? 'risk-val up' : chg < -0.05 ? 'risk-val down' : 'risk-val';
-    setEl('risk-dxy', dxy.toFixed(1), cls);
+    const dxy = byId.dxy.close, chg = byId.dxy.chg;
+    const clsD = chg > 0.05 ? 'up' : chg < -0.05 ? 'down' : 'flat';
     const sign = chg >= 0 ? '+' : '';
-    setEl('risk-dxy-sub', isWeekend ? 'Last close · USD index' : sign + chg.toFixed(2) + ' today');
+    setEl('ri-dxy', dxy.toFixed(1));
+    setEl('ri-dxy-sig', isWeekend ? 'Last close' : sign + chg.toFixed(2), clsD);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
     if (dEl) { dEl.textContent = dxy.toFixed(1); dEl.className = 'q-price ' + clsDir(chg); }
@@ -2192,6 +2256,9 @@ async function fetchRiskData() {
     const sign2 = spread >= 0 ? '+' : '';
     setEl('ys-usde', sign2 + bp2 + 'bp');
     setEl('ys-usde-sig', spread > 0 ? 'US Premium' : 'DE Premium');
+    // Also update Risk Monitor indicator table
+    setEl('ri-us-eu', sign2 + bp2 + 'bp');
+    setEl('ri-us-eu-sig', spread > 100/100 ? 'USD+' : spread < -50/100 ? 'EUR+' : 'Neutral', spread > 1 ? 'up' : spread < -0.5 ? 'down' : 'flat');
   }
 
   // US–JP 10Y spread
@@ -2212,12 +2279,12 @@ async function fetchRiskData() {
   if (byId.us2y) {
     const v = byId.us2y.close, chg = byId.us2y.chg;
     setEl('rate-2y', v.toFixed(2) + '%', 'rate-val');
-    setEl('rate-2y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+    setEl('rate-2y-chg', byId.us2y.fromRepo ? '—' : (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us5y) {
     const v = byId.us5y.close, chg = byId.us5y.chg;
     setEl('rate-5y', v.toFixed(2) + '%', 'rate-val');
-    setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+    setEl('rate-5y-chg', byId.us5y.fromRepo ? '—' : (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us10y) {
     const v = byId.us10y.close, chg = byId.us10y.chg;
@@ -3037,32 +3104,30 @@ async function buildRichNarrative() {
       if (expand.length > 20) headlineSnippet = expand + (expand.length === 120 ? '…' : '');
     }
 
-    // Compose final narrative — ALWAYS prioritize live FX data over stale AI repo narrative
-    // The AI narrative from the repo may have outdated price levels (e.g. 1.0820, 104.50)
+    // Compose final narrative — show Groq narrative as primary, enrich with live rates if fresh
     let finalNarrative = '';
 
-    if (fxLines.length || headlineSnippet) {
-      // Build fresh narrative from current live data
+    if (baseNarrative.length > 40) {
+      // Use Groq narrative as primary (engine now sends real price levels)
+      finalNarrative = baseNarrative;
+      // Append live rate context only if it adds something not already in the narrative
+      if (fxLines.length) {
+        const enrichments = fxLines.filter(l => {
+          // Only add lines whose pair/direction is NOT already mentioned in the narrative
+          const pair = l.split(' ')[0]; // e.g. "EUR/USD"
+          return !baseNarrative.includes(pair);
+        });
+        if (enrichments.length) {
+          finalNarrative += ' · ' + enrichments.join(' · ');
+        }
+      }
+    } else if (fxLines.length || headlineSnippet) {
+      // No Groq narrative available — build from live data
       const parts = [];
       if (fxLines.length) parts.push(fxLines.join('. '));
-      if (topCur.length && topCur.length <= 4) parts.push(`${topCur.join(', ')} in focus across newswires`);
+      if (topCur.length && topCur.length <= 4) parts.push(`${topCur.join(', ')} in focus`);
       if (headlineSnippet) parts.push(headlineSnippet);
       finalNarrative = parts.join('. ') + '.';
-      // Append AI narrative only if it doesn't contain obviously stale price levels
-      // (stale if AI narrative has EUR/USD below 1.08 or DXY above 104 while live data shows otherwise)
-      const aiIsStale = baseNarrative.length > 0 && (
-        /1\.0[0-9]{3}/.test(baseNarrative) ||   // EUR/USD below 1.10
-        /104\.[0-9]/.test(baseNarrative) ||      // DXY above 104
-        /105\.[0-9]/.test(baseNarrative) ||
-        /160\.[0-9]/.test(baseNarrative) ||      // USD/JPY at 160+ (stale)
-        /159\.[0-9]/.test(baseNarrative)
-      );
-      if (!aiIsStale && baseNarrative.length > 40 && !fxLines.some(l => baseNarrative.includes(l.slice(0,8)))) {
-        finalNarrative += ' · ' + baseNarrative.slice(0, 120);
-      }
-    } else if (baseNarrative.length > 40) {
-      // No live data available — use repo narrative as-is with caveat
-      finalNarrative = baseNarrative;
     }
 
     // Update DOM
@@ -3153,15 +3218,5 @@ setInterval(fetchCalendarData, 30 * 60 * 1000);
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 </script>
 
-  <script>
-    // Myfxbook widget init — poll for function availability
-    (function mfxbInit(attempts) {
-      if (typeof showOutlookWidget === 'function') {
-        showOutlookWidget();
-      } else if (attempts > 0) {
-        setTimeout(() => mfxbInit(attempts - 1), 300);
-      }
-    })(20);
-  </script>
 </body>
 </html>
