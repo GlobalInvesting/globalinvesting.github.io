@@ -1,9 +1,11 @@
 {
-  "lastUpdate": "2026-03-28",
+  "lastUpdate": "2026-03-29",
   "source": "FRED / ECB / BOE / BOC / DBnomics / BIS / World Bank / Calendar \u2014 v13.0",
   "rateMomentumStrategy": "fred-csv-12m",
   "data": {
     "bond10y": 4.42,
+    "bond2y": 3.96,
+    "bond5y": 4.08,
     "consumerConfidence": 71.6,
     "businessConfidence": 4.8,
     "capitalFlows": -4.1226,
@@ -17,6 +19,8 @@
   },
   "dates": {
     "bond10y": "2026-03-26",
+    "bond2y": "2026-03-26",
+    "bond5y": "2026-03-26",
     "consumerConfidence": "2026-02-01",
     "businessConfidence": "2026-02-01",
     "capitalFlows": "2024-06-15",
