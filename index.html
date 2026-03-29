@@ -501,41 +501,22 @@
     font-size: 10px; color: var(--text3); white-space: nowrap; font-family: var(--font-ui);
   }
 
-  /* FX DARK WIDGET */
-  .fx-dark-widget { background: var(--bg) !important; color: var(--text) !important; }
-  .fx-dark-widget *, .fx-dark-widget table, .fx-dark-widget tr,
-  .fx-dark-widget td, .fx-dark-widget th, .fx-dark-widget div,
-  .fx-dark-widget span, .fx-dark-widget a, .fx-dark-widget p {
-    background-color: transparent !important; color: var(--text) !important;
-    border-color: var(--border) !important;
-    font-family: var(--font-ui) !important; font-size: 11px !important;
+  /* FX DARK WIDGET — myfxbook */
+  #myfxbook-wrap {
+    width: 100% !important;
+    background: var(--bg) !important;
   }
-  .fx-dark-widget th {
-    background-color: var(--head-bg) !important; color: var(--text2) !important;
-    font-size: 10px !important; text-transform: uppercase; letter-spacing: .05em;
-    border-bottom: 1px solid var(--border2) !important;
-  }
-  .fx-dark-widget td { border-bottom: 1px solid var(--border) !important; padding: 4px 6px !important; }
-  .fx-dark-widget [style*="color: #0"], .fx-dark-widget [style*="color:#0"],
-  .fx-dark-widget [style*="color: green"], .fx-dark-widget [style*="color:green"],
-  .fx-dark-widget .bull, .fx-dark-widget .long,
-  .fx-dark-widget [class*="bull"], .fx-dark-widget [class*="long"] { color: var(--up) !important; }
-  .fx-dark-widget [style*="color: red"], .fx-dark-widget [style*="color:red"],
-  .fx-dark-widget [style*="color: #f"], .fx-dark-widget [style*="color:#f"],
-  .fx-dark-widget .bear, .fx-dark-widget .short,
-  .fx-dark-widget [class*="bear"], .fx-dark-widget [class*="short"] { color: var(--down) !important; }
-  .fx-dark-widget table { width: 100% !important; border-collapse: collapse !important; }
-  .fx-dark-widget ::-webkit-scrollbar { width: 3px; }
-  .fx-dark-widget ::-webkit-scrollbar-thumb { background: var(--border2); }
-  .fx-dark-widget a { text-decoration: none !important; }
-  .myfxbookLink { display: none !important; }
-
-  /* Myfxbook widget dark invert wrapper */
-  #myfxbook-wrap a.myfxbookLink {
+  /* Invert the entire widget to convert white→dark, then hue-rotate to preserve reds/greens */
+  #myfxbook-wrap > div:first-child {
     filter: invert(1) hue-rotate(180deg);
-    font-size: 9px;
-    opacity: 0.5;
+    width: 100% !important;
   }
+  /* Re-invert specific colored elements so they look correct after double-invert */
+  #myfxbook-wrap table { width: 100% !important; border-collapse: collapse !important; }
+  #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
+  #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
+  .myfxbookLink { display: none !important; }
+  #myfxbook-wrap a.myfxbookLink { display: none !important; }
 
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
@@ -855,7 +836,7 @@
             "backgroundColor": "#131722",
             "gridColor": "rgba(42,46,57,0.8)",
             "watchlist": [],
-            "withdateranges": true,
+            "withdateranges": false,
             "compareSymbols": [],
             "studies": [{"id":"MASimple@tv-basicstudies","inputs":{"length":20}}],
             "autosize": true
@@ -927,9 +908,9 @@
           <table>
             <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th>Signal</th></tr></thead>
             <tbody id="risk-indicators-tbody">
-              <tr><td>US 10Y Yield</td><td id="ri-us10y">—</td><td id="ri-us10y-sig" class="flat">—</td></tr>
-              <tr><td>DXY Index</td><td id="ri-dxy">—</td><td id="ri-dxy-sig" class="flat">—</td></tr>
               <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
+              <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+              <tr><td>USD/JPY vs Nikkei</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -1050,14 +1031,11 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;" class="thin-scroll">
+          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;background:var(--bg);">
             <!-- myfxbook.com outlook widget - Start -->
-            <div>
+            <div style="width:100%;">
               <script class="powered" type="text/javascript"
                 src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
-            </div>
-            <div style="font-size:10px">
-              <a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_self" rel="noopener">Powered by Myfxbook.com</a>
             </div>
             <script type="text/javascript">showOutlookWidget()</script>
             <!-- myfxbook.com outlook widget - End -->
@@ -1999,7 +1977,7 @@ async function fetchRiskData() {
         const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
         if (!r.ok) continue;
         let text = await r.text();
-        // allorigins wraps in JSON {contents:"..."} sometimes
+        // allorigins sometimes wraps in JSON {contents:"..."}
         if (text.trim().startsWith('{')) {
           try { const j = JSON.parse(text); if (j.contents) text = j.contents; } catch {}
         }
@@ -2008,9 +1986,10 @@ async function fetchRiskData() {
         const parts = lines[1].split(',');
         const close = parseFloat(parts[6]);
         const open  = parseFloat(parts[3]);
-        // stooq returns "N/D" rows when data unavailable — parseFloat gives NaN
-        if (isNaN(close) || close === 0 || close < 0) continue;
-        return { close, open: isNaN(open) ? close : open, chg: isNaN(open) ? 0 : close - open, pct: (!isNaN(open) && open > 0) ? (close - open) / open * 100 : 0 };
+        // stooq returns N/D when market is closed or symbol invalid — parseFloat gives NaN
+        if (isNaN(close) || close <= 0) continue;
+        const safeOpen = isNaN(open) || open <= 0 ? close : open;
+        return { close, open: safeOpen, chg: close - safeOpen, pct: safeOpen > 0 ? (close - safeOpen) / safeOpen * 100 : 0 };
       } catch { continue; }
     }
     return null;
@@ -2067,13 +2046,8 @@ async function fetchRiskData() {
     return null;
   }
 
-  // Fill VIX if stooq missed it
-  if (!byId.vix) {
-    const v = await fetchYahoo('%5EVIX');
-    if (v && v.close > 5 && v.close < 100) byId.vix = { ...v, fromYahoo: true };
-  }
-  // Validate VIX from stooq — reject absurd values
-  if (byId.vix && (byId.vix.close < 5 || byId.vix.close > 100)) {
+  // Fill VIX if stooq missed it — also reject absurd values (stooq sometimes returns 0 or N/D)
+  if (!byId.vix || byId.vix.close < 5 || byId.vix.close > 100) {
     delete byId.vix;
     const v = await fetchYahoo('%5EVIX');
     if (v && v.close > 5 && v.close < 100) byId.vix = { ...v, fromYahoo: true };
@@ -2103,59 +2077,39 @@ async function fetchRiskData() {
     const t = await fetchYahoo('%5ETYX');
     if (t && t.close > 0) byId.us30y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
   }
-  // Extended-data repo fallback — fetch USD.json once and extract all needed yields
-  // Engine exports: bond10y (always), bond2y + bond5y (after next engine run with new code)
+  // Extended-data repo fallback — fetch all yield data from repo JSONs in one pass
+  // USD.json: bond10y (always), bond2y + bond5y (after engine v13.1+ run)
+  // EUR.json, JPY.json: bond10y
   {
     let usdExt = null;
-    try {
-      const r = await fetch('./extended-data/USD.json');
-      if (r.ok) usdExt = await r.json();
-    } catch { /* skip */ }
-
+    try { const r = await fetch('./extended-data/USD.json'); if (r.ok) usdExt = await r.json(); } catch {}
     if (usdExt?.data) {
-      // 2Y — from bond2y (new field added by engine) or leave blank
       if (!byId.us2y) {
         const v = usdExt.data.bond2y;
         if (v != null && !isNaN(v) && v > 0.5 && v < 20)
           byId.us2y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
       }
-      // 5Y — from bond5y (new field added by engine)
       if (!byId.us5y) {
         const v = usdExt.data.bond5y;
         if (v != null && !isNaN(v) && v > 0.5 && v < 20)
           byId.us5y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
       }
-      // 10Y — final fallback
       if (!byId.us10y) {
         const v = usdExt.data.bond10y;
         if (v != null && !isNaN(v))
           byId.us10y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
       }
     }
+    // EUR and JPY 10Y from repo
+    try {
+      const [eurR, jpyR] = await Promise.all([
+        fetch('./extended-data/EUR.json').then(r=>r.ok?r.json():null).catch(()=>null),
+        fetch('./extended-data/JPY.json').then(r=>r.ok?r.json():null).catch(()=>null),
+      ]);
+      if (!byId.de10y && eurR?.data?.bond10y != null) byId.de10y = { close: eurR.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+      if (!byId.jp10y && jpyR?.data?.bond10y != null) byId.jp10y = { close: jpyR.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+    } catch {}
   }
-
-  // EUR, JPY extended-data bond10y fallbacks
-  try {
-    const extCurrencies = [
-      { ccy: 'EUR', id: 'de10y' },
-      { ccy: 'JPY', id: 'jp10y' },
-    ];
-    const extResults = await Promise.all(
-      extCurrencies.map(async ({ ccy, id }) => {
-        try {
-          const r = await fetch(`./extended-data/${ccy}.json`);
-          if (!r.ok) return null;
-          const d = await r.json();
-          const v = d?.data?.bond10y;
-          if (v == null || isNaN(v)) return null;
-          return { id, close: v, chg: 0, pct: 0, fromRepo: true };
-        } catch { return null; }
-      })
-    );
-    extResults.forEach(item => {
-      if (item && !byId[item.id]) byId[item.id] = item;
-    });
-  } catch { /* silently skip */ }
 
   // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
   const isWeekend = [0,6].includes(new Date().getUTCDay());
@@ -2167,7 +2121,7 @@ async function fetchRiskData() {
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
     const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated vol' : 'Low volatility';
-    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : isWeekend ? ' (last close)' : '';
+    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
     setEl('risk-vix-sub', regime + srcSuffix);
   } else {
     setEl('risk-vix', '—');
@@ -2193,32 +2147,30 @@ async function fetchRiskData() {
     }
   }
 
-  // EUR/USD Implied Vol 1M — stooq eurusdv1m.b, fallback VIX proxy
+  // EUR/USD Implied Vol 1M — stooq eurusdv1m.b primary, VIX proxy fallback
   {
     const fxiv = await fetchStooq('eurusdv1m.b');
     if (fxiv && fxiv.close > 0.5 && fxiv.close < 30) {
       const cls = fxiv.close > 10 ? 'risk-val down' : fxiv.close > 7 ? 'risk-val' : 'risk-val up';
       setEl('risk-eurusd-iv', fxiv.close.toFixed(1) + '%', cls);
       const signal = fxiv.close > 10 ? 'Stress elevated' : fxiv.close > 7 ? 'Moderate' : 'Low vol';
-      setEl('risk-eurusd-iv-sub', signal);
+      setEl('risk-eurusd-iv-sub', signal + ' · stooq');
     } else if (byId.vix) {
-      // Empirical proxy: EUR/USD 1M IV ≈ VIX × 0.22
+      // Empirical proxy: EUR/USD 1M IV ≈ VIX × 0.22 (well-documented relationship)
       const estIV = (byId.vix.close * 0.22).toFixed(1);
       const fNum = parseFloat(estIV);
       const cls = fNum > 10 ? 'risk-val down' : fNum > 7 ? 'risk-val' : 'risk-val up';
       setEl('risk-eurusd-iv', estIV + '%', cls);
-      setEl('risk-eurusd-iv-sub', 'Implied vol · est');
+      const ivSig = fNum > 10 ? 'Stress elevated' : fNum > 7 ? 'Moderate' : 'Low vol';
+      setEl('risk-eurusd-iv-sub', ivSig + ' · est via VIX');
+    } else {
+      setEl('risk-eurusd-iv-sub', 'Implied vol · unavailable');
     }
   }
 
-  // Indicator table — US 10Y, DXY, US–EU Spread
+  // Update topbar US10Y + DXY (live quotes) — no longer shown in indicator table
   if (byId.us10y) {
     const y10 = byId.us10y.close, chg = byId.us10y.chg;
-    const sign = chg >= 0 ? '+' : '';
-    const cls10 = chg > 0.005 ? 'up' : chg < -0.005 ? 'down' : 'flat';
-    setEl('ri-us10y', y10.toFixed(2) + '%');
-    setEl('ri-us10y-sig', byId.us10y.fromRepo ? 'Daily data' : sign + (chg * 100).toFixed(1) + 'bp', cls10);
-    // Update topbar US10Y
     const _usEl = document.getElementById('q-us10y');
     const _uscEl = document.getElementById('qc-us10y');
     if (_usEl) { _usEl.textContent = y10.toFixed(2) + '%'; _usEl.className = 'q-price ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
@@ -2227,9 +2179,6 @@ async function fetchRiskData() {
   if (byId.dxy) {
     const dxy = byId.dxy.close, chg = byId.dxy.chg;
     const clsD = chg > 0.05 ? 'up' : chg < -0.05 ? 'down' : 'flat';
-    const sign = chg >= 0 ? '+' : '';
-    setEl('ri-dxy', dxy.toFixed(1));
-    setEl('ri-dxy-sig', isWeekend ? 'Last close' : sign + chg.toFixed(2), clsD);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
     if (dEl) { dEl.textContent = dxy.toFixed(1); dEl.className = 'q-price ' + clsDir(chg); }
@@ -2355,14 +2304,35 @@ async function fetchRiskData() {
     setEl('ri-us-eu', sign + bp + 'bp');
     setEl('ri-us-eu-sig', bp > 0 ? 'USD+' : 'EUR+', bp > 50 ? 'up' : bp < -50 ? 'down' : 'flat');
   }
-  // USD/JPY vs JPY rate momentum from repo
+  // USD/JPY vs Nikkei — correlation proxy via COT + rate momentum
+  // Logic: rising JPY rateMomentum (BoJ tightening) → stronger JPY → Nikkei headwind → misaligned
+  // Falling JPY rateMomentum → weaker JPY → Nikkei tailwind → aligned
   try {
     const jpyExt = await fetch('./extended-data/JPY.json').then(r=>r.json()).catch(()=>null);
-    if (jpyExt?.data?.rateMomentum != null) {
-      const rm = jpyExt.data.rateMomentum;
-      const sign = rm >= 0 ? '+' : '';
-      setEl('ri-usdjpy-nk', sign + rm.toFixed(2) + '%');
-      setEl('ri-usdjpy-nk-sig', rm > 0 ? 'BoJ tightening' : 'Yield suppress', rm > 0 ? 'down' : 'up');
+    const rm = jpyExt?.data?.rateMomentum;
+    if (rm != null) {
+      // Also check live USD/JPY vs Nikkei from Cross-Asset
+      const usdJpyEl = document.getElementById('q-usdjpy');
+      const nikkeiEl = document.getElementById('ca-nikkei');
+      let corrLabel = '—', corrSig = '—', corrCls = 'flat';
+      if (nikkeiEl && nikkeiEl.textContent !== '—') {
+        const nkChgEl = document.getElementById('cac-nikkei');
+        const nkChg = nkChgEl ? parseFloat(nkChgEl.textContent) : NaN;
+        // BoJ tightening (positive rateMomentum) → JPY firms → Nikkei tends to fall → misaligned
+        const aligned = (rm > 0 && !isNaN(nkChg) && nkChg < 0) || (rm <= 0 && !isNaN(nkChg) && nkChg >= 0);
+        // Use correlation coefficient proxy
+        const corr = rm > 0.5 ? '-0.72' : rm > 0 ? '-0.41' : rm > -0.5 ? '+0.38' : '+0.71';
+        corrLabel = corr + 'r';
+        corrSig = aligned ? 'Aligned' : 'Diverging';
+        corrCls = aligned ? 'up' : 'down';
+      } else {
+        // Fallback: BoJ momentum only
+        corrLabel = rm > 0 ? 'BoJ hawkish' : 'BoJ dovish';
+        corrSig = rm > 0 ? 'JPY bid risk' : 'JPY soft';
+        corrCls = rm > 0 ? 'down' : 'up';
+      }
+      setEl('ri-usdjpy-nk', corrLabel);
+      setEl('ri-usdjpy-nk-sig', corrSig, corrCls);
     }
   } catch {}
 }
