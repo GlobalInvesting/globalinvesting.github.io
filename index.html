@@ -994,6 +994,7 @@
     <div class="q-item"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
     <div class="q-item"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
   </div>
+  <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Stooq</span>
 </div>
 
 <!-- NEWS TICKER — populated from news-data/news.json -->
@@ -2072,6 +2073,77 @@ function buildNewsTicker(items) {
 //           signals from ai-analysis/signals.json
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+// QUOTE BAR — REAL-TIME FX via Stooq (~15 min delay, no API key)
+// Runs every 60s. Updates only quote bar elements.
+// Does NOT touch STATE.rates — Frankfurter still serves FX table + heatmap.
+// ═══════════════════════════════════════════════════════════════════
+const QB_STOOQ_PAIRS = [
+  { sym: 'eurusd', id: 'eurusd', dec: 5 },
+  { sym: 'gbpusd', id: 'gbpusd', dec: 5 },
+  { sym: 'usdjpy', id: 'usdjpy', dec: 3 },
+  { sym: 'audusd', id: 'audusd', dec: 5 },
+  { sym: 'usdchf', id: 'usdchf', dec: 5 },
+  { sym: 'usdcad', id: 'usdcad', dec: 5 },
+  { sym: 'nzdusd', id: 'nzdusd', dec: 5 },
+  { sym: 'eurgbp', id: 'eurgbp', dec: 5 },
+];
+
+async function fetchStooqQuoteSingle(sym) {
+  const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
+  const urls = [
+    base,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+    `https://corsproxy.io/?${encodeURIComponent(base)}`,
+  ];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!r.ok) continue;
+      let text = await r.text();
+      if (text.trim().startsWith('{')) {
+        try { const j = JSON.parse(text); if (j.contents) text = j.contents; } catch {}
+      }
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) continue;
+      const p = lines[1].split(',');
+      const close = parseFloat(p[6]);
+      const open  = parseFloat(p[3]);
+      if (isNaN(close) || close <= 0) continue;
+      const safeOpen = isNaN(open) || open <= 0 ? close : open;
+      return { close, open: safeOpen, chg: close - safeOpen, pct: safeOpen > 0 ? (close - safeOpen) / safeOpen * 100 : 0 };
+    } catch { continue; }
+  }
+  return null;
+}
+
+async function fetchQuoteBarRT() {
+  const results = await Promise.allSettled(
+    QB_STOOQ_PAIRS.map(async pair => ({ pair, data: await fetchStooqQuoteSingle(pair.sym) }))
+  );
+  let updated = 0;
+  for (const r of results) {
+    if (r.status !== 'fulfilled' || !r.value.data) continue;
+    const { pair, data } = r.value;
+    const priceEl = document.getElementById('q-' + pair.id);
+    const chgEl   = document.getElementById('qc-' + pair.id);
+    if (!priceEl) continue;
+    priceEl.textContent = data.close.toFixed(pair.dec);
+    priceEl.className   = 'q-price ' + clsDir(data.chg);
+    if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
+    updated++;
+  }
+  if (updated > 0) {
+    // Update subtitle to show Stooq source + last refresh time
+    const now = new Date();
+    const hh = now.getUTCHours().toString().padStart(2,'0');
+    const mm = now.getUTCMinutes().toString().padStart(2,'0');
+    const qbLabel = document.getElementById('qb-source-label');
+    if (qbLabel) qbLabel.textContent = `Stooq · ${hh}:${mm} UTC`;
+  }
+}
+
 // COMMODITY QUOTES — Gold (XAU) + WTI via free APIs
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCommodityQuotes() {
@@ -3480,6 +3552,7 @@ async function buildRichNarrative() {
 async function boot() {
   // Priority order: fastest/most-used first
   await fetchFrankfurter();          // rates for FX pairs (ECB) — must be first so STATE.rates is populated
+  fetchQuoteBarRT();                 // quote bar FX via Stooq (~15 min) — runs in background
   await loadFxPerfData();            // fx-performance repo data for 1W changes
   populateFxPairsTable();            // re-render FX pairs with enriched data
   buildRichNarrative();              // rich narrative from AI + news + live rates
@@ -3500,7 +3573,9 @@ async function boot() {
 
 boot();
 
-// Refresh rates every 30 minutes (ECB updates once daily)
+// Refresh quote bar FX every 60 seconds via Stooq (~15 min delay)
+setInterval(fetchQuoteBarRT, 60 * 1000);
+// Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
 setInterval(fetchNewsData, 10 * 60 * 1000);  // every 10 min; ETag avoids re-download if unchanged
