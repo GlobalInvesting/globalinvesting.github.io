@@ -671,9 +671,47 @@
     .topbar-right { font-size: 9px; }
   }
 
-</style>
+  /* ── Site menu dropdown ── */
+  .site-menu { position: relative; display: flex; align-items: center; }
+  .site-menu-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: none; border: 1px solid var(--border2);
+    color: var(--text2); font-size: 10px; font-family: var(--font-ui);
+    padding: 3px 8px; border-radius: 4px; cursor: pointer;
+    white-space: nowrap; transition: border-color .15s, color .15s;
+  }
+  .site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+  .site-menu-btn svg { flex-shrink: 0; }
+  .site-menu-panel {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0;
+    min-width: 200px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 0; z-index: 400;
+    box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  }
+  .site-menu:hover .site-menu-panel,
+  .site-menu:focus-within .site-menu-panel { display: block; }
+  /* invisible bridge so menu doesn't close when moving from button to panel */
+  .site-menu::after {
+    content: ''; position: absolute; top: 100%;
+    left: -8px; right: -8px; height: 8px;
+  }
+  .site-menu-panel a {
+    display: block; padding: 5px 14px;
+    color: var(--text2); font-size: 11px; font-family: var(--font-ui);
+    text-decoration: none; white-space: nowrap;
+    transition: background .12s, color .12s;
+  }
+  .site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+  .site-menu-divider {
+    height: 1px; background: var(--border); margin: 5px 0;
+  }
+  .site-menu-section {
+    padding: 3px 14px 2px; font-size: 9px; color: var(--text3);
+    font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .06em;
+  }
 
-<!-- Flag icons (SVG-based, cross-browser) -->
+ (SVG-based, cross-browser) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 
 </head>
@@ -699,6 +737,33 @@
     <a data-target="section-macro">Calendar</a>
   </nav>
   <div class="topbar-right">
+    <!-- Site menu dropdown -->
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/>
+        </svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guia-carry-trade.html">Carry Trade</a>
+        <a href="guia-cot.html">COT Report</a>
+        <a href="guia-bancos-centrales.html">Central Banks</a>
+        <a href="guia-calendario-economico.html">Economic Calendar</a>
+        <a href="guia-score-fortaleza.html">Strength Score</a>
+        <a href="guia-pips.html">Pips &amp; Lot Size</a>
+        <a href="glosario-forex.html">Forex Glossary</a>
+      </div>
+    </div>
     <span id="session-label">DETECTING...</span>
     <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
   </div>
@@ -804,8 +869,8 @@
           <button class="tv-tab" data-sym="OANDA:XAUUSD">XAU/USD</button>
           <button class="tv-tab" data-sym="BLACKBULL:WTI">WTI</button>
           <button class="tv-tab" data-sym="FX:USDOLLAR">DXY</button>
-          <button class="tv-tab" data-sym="SP:SPX">S&P 500</button>
-          <button class="tv-tab" data-sym="NASDAQ:NDX">Nasdaq</button>
+          <button class="tv-tab" data-sym="TVC:SPX">S&P 500</button>
+          <button class="tv-tab" data-sym="TVC:NDX">Nasdaq</button>
           <button class="tv-tab" data-sym="INDEX:NKY">Nikkei</button>
           <button class="tv-tab" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
           <button class="tv-tab" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
@@ -957,7 +1022,7 @@
     </div>
 
     <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);align-items:start;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);align-items:stretch;">
       <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
@@ -1014,7 +1079,7 @@
           </div>
         </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;">
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
         <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
         <div id="spreads-rows" style="padding:4px 10px;">
           <!-- populated by fetchSpreadsData() -->
@@ -1031,7 +1096,7 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="overflow:auto;padding:0;width:100%;background:var(--bg2);position:relative;">
+          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;flex:1;background:var(--bg2);position:relative;">
             <!-- myfxbook.com outlook widget - Start -->
 <div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
@@ -2624,7 +2689,7 @@ document.querySelectorAll('.tv-tab').forEach(tab => {
     script.text = JSON.stringify({
       allow_symbol_change:false, calendar:false, details:false,
       hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
-      hide_volume:false, interval:'60', locale:'en', save_image:false,
+      hide_volume:false, interval:'D', locale:'en', save_image:false,
       style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
       backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
       withdateranges:false, studies:['MASimple@tv-basicstudies'], autosize:true
