@@ -1,371 +1,187 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/terms.html">
-    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/terms.html">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos de Servicio - Dashboard de Análisis Fundamental Forex</title>
-    <meta name="description" content="Términos de Servicio del Dashboard de Análisis Fundamental Forex.">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_ES">
-    <meta property="og:site_name" content="Global Investing Forex Dashboard">
-    <meta property="og:url" content="https://globalinvesting.github.io/terms">
-    <meta property="og:title" content="Términos de Servicio | Global Investing — Dashboard Forex">
-    <meta property="og:description" content="Términos de Servicio del Dashboard de Análisis Fundamental Forex de Global Investing.">
-    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://globalinvesting.github.io/terms">
-    <meta name="twitter:title" content="Términos de Servicio | Global Investing — Dashboard Forex">
-    <meta name="twitter:description" content="Términos de Servicio del Dashboard de Análisis Fundamental Forex de Global Investing.">
-    <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta name="robots" content="index, follow">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; }
-        :root {
-            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
-            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
-            --blue: #1e88e5;
-        }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
-        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 3rem; }
-        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
-        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
-        .brand-title:hover { color: var(--blue); }
-        .brand-wrap { display: flex; flex-direction: column; gap: 0.1rem; }
-        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
-        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; color: var(--text-secondary); text-decoration: none; }
-        .lang-switch:hover { border-color: var(--blue); color: var(--blue) !important; }
-        .nav-links { display: flex; gap: 1.25rem; flex-wrap: nowrap; align-items: center; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; white-space: nowrap; }
-        .nav-links a:hover { color: var(--text-primary); }
-        .nav-links a.active { color: var(--text-primary); }
-        h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        .last-updated { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; }
-        h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
-        ul, ol { margin-left: 2rem; margin-bottom: 1.25rem; }
-        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
-        strong { color: var(--text-primary); }
-        a { color: var(--blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .warning-box { background: rgba(239, 83, 80, 0.1); border-left: 4px solid #ef5350; padding: 1.5rem; margin: 2rem 0; border-radius: 4px; }
-
-        @media (max-width: 768px) {
-            .header { padding: 1rem; }
-            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .brand-title { font-size: 1rem; }
-            .nav-links { flex-wrap: wrap; gap: 0.75rem 1.25rem; }
-            .nav-links a { font-size: 0.85rem; }
-            .container { padding: 2rem 1rem; }
-            h1 { font-size: 1.75rem; }
-            h2 { font-size: 1.25rem; }
-            .section { padding: 1.25rem; }
-            .warning-box { padding: 1rem; }
-        }
-        @media (max-width: 400px) {
-            h1 { font-size: 1.5rem; }
-            .nav-links { gap: 0.5rem 1rem; }
-        }
-    </style>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "@id": "https://globalinvesting.github.io/terms.html",
-  "url": "https://globalinvesting.github.io/terms.html",
-  "name": "Términos de Servicio — Global Investing",
-  "description": "Términos de Servicio del Dashboard de Análisis Fundamental Forex.",
-  "inLanguage": "es",
-  "publisher": {
-    "@type": "Organization",
-    "@id": "https://globalinvesting.github.io/#organization",
-    "name": "Global Investing",
-    "url": "https://globalinvesting.github.io"
-  }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Use — Global Investing FX Terminal</title>
+<meta name="description" content="Terms of Use for the Global Investing FX Terminal. Educational market data tool — not financial advice.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/terms.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://globalinvesting.github.io/terms.html">
+<meta property="og:site_name" content="Global Investing FX Terminal">
+<meta property="og:title" content="Terms of Use — Global Investing FX Terminal">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:locale" content="en_US">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
-</script>
-    <link rel="canonical" href="https://globalinvesting.github.io/terms.html">
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.7; min-height: 100vh; }
+
+#topbar {
+  background: var(--head-bg); border-bottom: 1px solid var(--border);
+  height: 36px; display: flex; align-items: center; padding: 0 10px;
+  position: sticky; top: 0; z-index: 200;
+}
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; white-space: nowrap; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; text-decoration: none; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--up); border-radius: 50%; margin-right: 4px; animation: blink 1.6s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-panel a.current { color: #fff; }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+
+/* Page */
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+.page-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
+.page-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.page-meta { font-size: 12px; color: var(--text3); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); text-decoration: none; font-size: 12px; margin-bottom: 32px; transition: color .15s; }
+.back-link:hover { color: var(--text); }
+
+.disclaimer-box {
+  background: rgba(41, 98, 255, 0.08); border: 1px solid rgba(41, 98, 255, 0.3);
+  border-radius: 8px; padding: 16px 20px; margin-bottom: 36px;
+}
+.disclaimer-box p { font-size: 13px; color: var(--text); line-height: 1.6; margin: 0; }
+.disclaimer-box strong { color: #fff; }
+
+h2 { font-size: 15px; font-weight: 700; color: #fff; margin-top: 36px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+p { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 4px; }
+
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; font-family: var(--font-ui); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+</style>
 </head>
 <body>
-    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-    <header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="about.html">Acerca de</a></li>
-            <li><a href="publicidad.html">Publicidad</a></li>
-<li class="nav-dropdown">
-            <a href="guia-score-fortaleza.html">Guías</a>
-            <div class="nav-dropdown-menu">
-            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-            <a href="guia-carry-trade.html">Carry Trade</a>
-            <a href="guia-cot.html">Reporte COT</a>
-            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-            <a href="guia-calendario-economico.html">Calendario Económico</a>
-            <a href="guia-pips.html">Pips y Lotaje</a>
-            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-            <a href="glosario-forex.html">Glosario Forex</a>
-            </div>
-        </li>
-            <li><a href="contact.html">Contacto</a></li>
-            <li><a href="en.html" class="lang-switch">EN</a></li>
-        </ul></nav>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span><span class="logo-text">Global Investing</span><span class="logo-sub">FX Terminal</span></span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Terminal</a>
+    <a href="guide-dashboard.html">Guides</a>
+    <a href="about.html">About</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html" class="current">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
+      </div>
     </div>
-</header>
+    <span><span class="live-dot"></span>LIVE</span>
+  </div>
+</div>
 
+<div class="page-wrap">
+  <a class="back-link" href="/">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Terminal
+  </a>
 
-<main id="main-content" role="main">
+  <div class="page-label">Legal</div>
+  <h1 class="page-title">Terms of Use</h1>
+  <p class="page-meta">Last updated: March 2026 · Applies to globalinvesting.github.io</p>
 
-    <div class="container">
-        <h1>Términos de Servicio</h1>
-        <p class="last-updated">Última Actualización: 8 de Marzo de 2026</p>
+  <div class="disclaimer-box">
+    <p><strong>Important:</strong> The Global Investing FX Terminal is an educational and informational tool. Nothing on this site constitutes financial advice, investment recommendations, or a solicitation to buy or sell any financial instrument. Forex and CFD trading involves significant risk of loss.</p>
+  </div>
 
-        <div class="warning-box">
-            <p style="margin: 0; font-weight: 600;"><strong>IMPORTANTE:</strong> Por favor lea estos Términos de Servicio cuidadosamente antes de usar nuestro sitio web. Al acceder o usar el Dashboard de Análisis Fundamental Forex, usted acepta estar sujeto a estos Términos.</p>
-        </div>
+  <h2>1. Acceptance of Terms</h2>
+  <p>By accessing or using the Global Investing FX Terminal ("the Terminal"), you agree to be bound by these Terms of Use. If you do not agree, please do not use the Terminal.</p>
 
-        <div class="section">
-            <h2>1. Aceptación de los Términos</h2>
-            <p>Al acceder y usar el Dashboard de Análisis Fundamental Forex (el "Servicio"), usted acepta y acuerda estar sujeto a los términos y disposiciones de este acuerdo.</p>
-        </div>
+  <h2>2. Educational Purpose Only</h2>
+  <p>The Terminal is designed exclusively for educational and informational purposes. All content, data, signals, indicators, charts, and analysis displayed are provided solely to help users understand market dynamics and are not intended to guide trading decisions.</p>
+  <ul>
+    <li>We are not a licensed financial advisor, broker, or investment firm.</li>
+    <li>No content on this site should be construed as financial, investment, tax, or legal advice.</li>
+    <li>Past performance of any indicator or signal does not guarantee future results.</li>
+  </ul>
 
-        <div class="section">
-            <h2>2. Descripción del Servicio</h2>
-            <p>El Dashboard de Análisis Fundamental Forex proporciona:</p>
-            <ul>
-                <li>Información de tipos de cambio en tiempo real.</li>
-                <li>Datos y análisis de indicadores económicos.</li>
-                <li>Evaluaciones de fortaleza de divisas con score cuantitativo.</li>
-                <li>Un calendario económico con datos reales de publicación.</li>
-                <li>Recomendaciones de pares basadas en diferenciales fundamentales.</li>
-                <li>Análisis narrativos generados mediante inteligencia artificial (Groq AI).</li>
-                <li>Un <strong>feed de noticias de mercado</strong> actualizado cada hora con titulares de FXStreet, ForexLive, Reuters, Investing.com y bancos centrales oficiales, clasificados automáticamente por divisa y nivel de impacto.</li>
-            </ul>
-            <p>El Servicio se proporciona "tal cual" y "según disponibilidad" sin garantías de ningún tipo.</p>
-        </div>
+  <h2>3. Data Accuracy & Availability</h2>
+  <p>Market data displayed on the Terminal is sourced from third-party providers including Frankfurter/ECB, CFTC, Stooq, Dukascopy, TradingView, and others. We make reasonable efforts to display accurate and timely data, but we do not guarantee:</p>
+  <ul>
+    <li>The accuracy, completeness, or timeliness of any data shown.</li>
+    <li>Uninterrupted availability of the Terminal or any data feed.</li>
+    <li>That data from third-party sources is free from errors or delays.</li>
+  </ul>
+  <p>Data may be delayed, estimated, or temporarily unavailable due to API limitations, network conditions, or third-party outages.</p>
 
-        <div class="section">
-            <h2>3. Descargo de Responsabilidad — No es Asesoramiento Financiero</h2>
-            <div class="warning-box">
-                <p><strong>AVISO CRÍTICO:</strong> Este Servicio NO proporciona asesoramiento financiero, de inversión, de trading o profesional de ningún tipo.</p>
-            </div>
-            <ul>
-                <li><strong>Solo Informativo:</strong> Todo el contenido, datos, scores, análisis, noticias y recomendaciones de pares proporcionados son únicamente con fines informativos y educativos.</li>
-                <li><strong>No es Asesoramiento de Inversión:</strong> Nada en este Servicio constituye una recomendación para comprar, vender o mantener ningún instrumento financiero.</li>
-                <li><strong>Análisis de IA:</strong> Los textos de análisis generados por inteligencia artificial son descriptivos e informativos. No representan señales de trading ni recomendaciones de ningún tipo.</li>
-                <li><strong>Noticias:</strong> Los titulares del feed de noticias son obtenidos de fuentes externas y se presentan con fines informativos. No constituyen asesoramiento financiero.</li>
-                <li><strong>Responsabilidad Total:</strong> Usted es el único responsable de sus decisiones de trading e inversión.</li>
-            </ul>
-        </div>
+  <h2>4. No Liability</h2>
+  <p>To the fullest extent permitted by law, Global Investing and its operators shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the Terminal or reliance on any information displayed, including but not limited to trading losses.</p>
 
-        <div class="section">
-            <h2>4. Reconocimiento de Riesgo</h2>
-            <ul>
-                <li>El trading de divisas conlleva un riesgo sustancial de pérdida y no es adecuado para todos los inversores.</li>
-                <li>El apalancamiento en el trading de forex puede resultar en pérdidas que excedan su inversión inicial.</li>
-                <li>Los scores de fortaleza y recomendaciones de pares son estimaciones cuantitativas basadas en datos macroeconómicos públicos y no predicen movimientos de precio futuros.</li>
-                <li>Solo debe operar con dinero que pueda permitirse perder.</li>
-            </ul>
-        </div>
+  <h2>5. Third-Party Integrations</h2>
+  <p>The Terminal embeds widgets and data from TradingView, Myfxbook, and other third-party services. Use of these embedded services is subject to their respective terms of service. We are not responsible for the content or availability of third-party services.</p>
 
-        <div class="section">
-            <h2>5. Precisión y Disponibilidad de Datos</h2>
-            <ul>
-                <li><strong>Sin Garantía:</strong> No garantizamos la precisión, integridad o puntualidad de ningún dato económico, tipo de cambio, noticia o análisis.</li>
-                <li><strong>Datos de Terceros:</strong> Los datos provienen de proveedores externos (FRED/St. Louis Fed, OECD, World Bank, IMF, CFTC, Frankfurter/ECB, global-rates.com, Investing.com, FXStreet, ForexLive, Reuters, Groq AI, entre otros) y pueden contener errores o retrasos inherentes a cada fuente.</li>
-                <li><strong>Feed de Noticias:</strong> Las noticias se obtienen automáticamente vía GitHub Actions cada hora. Pueden existir retrasos, titulares incompletos o errores de clasificación de divisa e impacto inherentes al proceso automatizado. El nivel de impacto es estimado por palabras clave y no representa una evaluación editorial.</li>
-                <li><strong>Retrasos COT:</strong> Los datos de Commitment of Traders (COT) tienen un retraso natural de aproximadamente 3 días hábiles según el calendario oficial de publicación de la CFTC.</li>
-                <li><strong>Caché Local:</strong> El Servicio almacena datos económicos en el localStorage de su navegador. Este caché se invalida automáticamente con cada nueva versión del dashboard.</li>
-                <li><strong>Verificación Requerida:</strong> Debe verificar toda la información de fuentes primarias antes de tomar decisiones.</li>
-            </ul>
-        </div>
+  <h2>6. Advertising</h2>
+  <p>The Terminal may display advertisements served by Google AdSense. Ad targeting is subject to your cookie consent preferences as set via the consent banner. See our <a href="privacy.html">Privacy Policy</a> for details.</p>
 
-        <div class="section">
-            <h2>6. Contenido Generado por Inteligencia Artificial</h2>
-            <p>Los análisis narrativos de divisas son generados mediante la API de Groq AI utilizando el modelo llama-3.3-70b-versatile. El uso de este contenido está sujeto a las siguientes condiciones:</p>
-            <ul>
-                <li>Los análisis de IA son generados automáticamente a partir de datos económicos y no han sido revisados manualmente.</li>
-                <li>El contenido generado por IA puede contener imprecisiones o interpretaciones que no reflejen la situación económica actual con total exactitud.</li>
-                <li>No garantizamos la disponibilidad continua del servicio de análisis de IA. Cuando no esté disponible, el dashboard utiliza un sistema de generación algorítmica propio como alternativa.</li>
-            </ul>
-        </div>
+  <h2>7. Intellectual Property</h2>
+  <p>All original code, design, layout, and written content of the Terminal is the property of Global Investing. You may not reproduce, redistribute, or commercialize any part of this Terminal without prior written permission. Market data displayed is owned by its respective providers.</p>
 
-        <div class="section">
-            <h2>7. Obligaciones del Usuario</h2>
-            <ul>
-                <li>Usar el Servicio solo para propósitos legales.</li>
-                <li>No usar sistemas automatizados (bots, scrapers) sin permiso expreso.</li>
-                <li>No copiar, reproducir o distribuir contenido del Servicio sin autorización.</li>
-                <li>Cumplir con todas las leyes y regulaciones aplicables.</li>
-            </ul>
-        </div>
+  <h2>8. Modifications</h2>
+  <p>We reserve the right to modify these Terms at any time. Continued use of the Terminal after any changes constitutes acceptance of the updated Terms. The "Last updated" date at the top of this page will reflect the most recent revision.</p>
 
-        <div class="section">
-            <h2>8. Derechos de Propiedad Intelectual</h2>
-            <p>Todo el contenido, código, metodología de scoring, características y funcionalidad del Servicio son propiedad nuestra o de nuestros licenciantes y están protegidos por derechos de autor y otras leyes de propiedad intelectual. Los datos económicos y las noticias provienen de fuentes públicas y son propiedad de sus respectivos emisores.</p>
-        </div>
+  <h2>9. Governing Law</h2>
+  <p>These Terms are governed by applicable international law. Any disputes arising from use of the Terminal shall be resolved in good faith through direct communication at <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>.</p>
 
-        <div class="section">
-            <h2>9. Limitación de Responsabilidad</h2>
-            <ul>
-                <li>No seremos responsables de ningún daño indirecto, incidental, especial, consecuencial o punitivo.</li>
-                <li>No seremos responsables de pérdidas de trading, ganancias perdidas o daños financieros derivados del uso del Servicio o de decisiones tomadas con base en su contenido.</li>
-                <li>No somos responsables de errores, omisiones, retrasos o interrupciones en los datos proporcionados por terceros.</li>
-                <li>No somos responsables de la calidad, precisión ni disponibilidad del contenido generado por IA ni de los titulares del feed de noticias.</li>
-            </ul>
-        </div>
+  <h2>10. Contact</h2>
+  <p>Questions about these Terms? <a href="contact.html">Contact us</a> or email <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>.</p>
+</div>
 
-        <div class="section">
-            <h2>10. Modificaciones al Servicio</h2>
-            <p>Nos reservamos el derecho de modificar, suspender o descontinuar el Servicio en cualquier momento sin previo aviso, incluyendo cambios en la metodología de scoring, fuentes de datos, indicadores disponibles, fuentes RSS del feed de noticias o cualquier funcionalidad del dashboard. También podemos actualizar estos Términos cuando sea necesario. El uso continuado del Servicio después de los cambios constituye la aceptación de los nuevos Términos.</p>
-        </div>
-
-        <div class="section">
-            <h2>11. Protección de Datos y GDPR</h2>
-            <p>Si usted se encuentra en el Espacio Económico Europeo (EEE), el Reino Unido o cualquier jurisdicción con legislación de protección de datos equivalente, le informamos lo siguiente en cumplimiento del Reglamento General de Protección de Datos (GDPR — Reglamento UE 2016/679) y normativas locales aplicables:</p>
-            <ul>
-                <li><strong>Base legal del tratamiento:</strong> El tratamiento de sus datos se basa en el interés legítimo de operar el Servicio y, cuando aplique, en su consentimiento explícito.</li>
-                <li><strong>Responsable del tratamiento:</strong> Santiago Plá Casuriaga — globalinvestingmarkets@gmail.com.</li>
-                <li><strong>Derechos GDPR:</strong> Tiene derecho de acceso, rectificación, supresión («derecho al olvido»), portabilidad, limitación del tratamiento y oposición. Contacte a globalinvestingmarkets@gmail.com. Responderemos en un plazo máximo de 30 días.</li>
-                <li><strong>Transferencias internacionales:</strong> Algunos proveedores (Google AdSense, Groq AI) pueden estar ubicados fuera del EEE. Las transferencias se realizan bajo las garantías del GDPR (cláusulas contractuales tipo o decisiones de adecuación de la Comisión Europea).</li>
-                <li><strong>Conservación de datos:</strong> Los datos en localStorage se conservan exclusivamente en su dispositivo y puede eliminarlos en cualquier momento. No almacenamos datos personales en servidores propios.</li>
-                <li><strong>Autoridad de control:</strong> Si reside en la UE, puede presentar una reclamación ante la autoridad de protección de datos de su país miembro.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>12. Ley Aplicable y Jurisdicción</h2>
-            <p>Estos Términos de Servicio se rigen por las leyes de la República Oriental del Uruguay, sin perjuicio de las normas de protección al consumidor o protección de datos de mayor rango que pudieran ser aplicables en la jurisdicción de residencia del usuario.</p>
-            <p>Cualquier disputa derivada o relacionada con el uso del Servicio se someterá en primer lugar a una resolución amistosa. En caso de no alcanzarse un acuerdo, las partes se someten a la jurisdicción de los tribunales competentes de Montevideo, Uruguay, salvo que la normativa del país del usuario establezca un foro más favorable para éste.</p>
-            <p>Lo anterior no afecta los derechos que como consumidor le correspondan en virtud de la legislación imperativa de su país de residencia, incluyendo los derechos reconocidos por el GDPR para usuarios en el Espacio Económico Europeo.</p>
-        </div>
-
-        <div class="section">
-            <h2>13. Información de Contacto</h2>
-            <ul>
-                <li><strong>Email:</strong> globalinvestingmarkets@gmail.com</li>
-                <li><strong>Sitio Web:</strong> <a href="contact.html">Página de Contacto</a></li>
-            </ul>
-        </div>
-
-        <div class="warning-box">
-            <p style="margin: 0;"><strong>AL USAR ESTE SERVICIO, USTED RECONOCE QUE HA LEÍDO, ENTENDIDO Y ACEPTA ESTAR SUJETO A ESTOS TÉRMINOS DE SERVICIO.</strong></p>
-        </div>
-
-                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
-            <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.4rem 1rem; margin-top:0.75rem; font-size:0.8rem;">
-                <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
-                <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
-                <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
-                <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
-                <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
-                <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
-                <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
-            </div>
-            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.3</p>
-        </div></div>
-    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-<!-- GDPR Banner (shared) -->
-<style>
-#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
-#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
-#gdpr-banner a{color:#5b9bd5;}
-#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
-#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
-#gdpr-accept{background:#2e75b6;color:#fff;}
-#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-
-        /* ── Header unified ── */
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
-        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; }
-        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
-        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
-        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
-        
-        /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; }
-        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
-            border-left: 4px solid transparent; border-right: 4px solid transparent;
-            border-top: 4px solid currentColor; transition: transform 0.2s; }
-        .nav-dropdown:hover > a::after,
-        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
-        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
-            right: 0; min-width: 220px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.75rem 0 0.4rem; z-index: 200;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-        .nav-dropdown:hover .nav-dropdown-menu,
-        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-        /* Puente invisible que cubre el gap entre trigger y menú */
-        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
-            left: -8px; right: -8px; height: 0.75rem; }
-        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
-            color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
-            color: var(--text-primary) !important; }
-        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        </style>
-<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
-<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
-<div class="gdpr-btns">
-<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
-<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
-</div></div>
-<script>
-(function(){
-var K='gdpr_consent_v1';
-function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
-function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
-function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
-// Event delegation — funciona aunque scripts externos re-renderizen el DOM
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
-  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
-},true);
-document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
-function init(){
-  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
-  var b=document.getElementById('gdpr-banner');
-  if(b){b.hidden=false;b.style.display='flex';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
-}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
-})();
-</script>
-</main>
-<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
-· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
-</footer>
+<div id="statusbar">
+  <div><span style="color:var(--text3);font-weight:700;letter-spacing:.04em;">GLOBAL INVESTING</span></div>
+  <div class="footer-copy">© 2026 Global Investing — FX Terminal. Educational use only. Not financial advice.</div>
+  <div style="margin-left:auto"><a href="privacy.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Privacy</a> · <a href="terms.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Terms</a></div>
+</div>
 </body>
 </html>

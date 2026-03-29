@@ -1,370 +1,232 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/contact.html">
-    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/contact.html">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto - Dashboard de Análisis Fundamental Forex</title>
-    <meta name="description" content="Contáctenos para consultas sobre el Dashboard de Análisis Fundamental Forex.">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_ES">
-    <meta property="og:site_name" content="Global Investing Forex Dashboard">
-    <meta property="og:url" content="https://globalinvesting.github.io/contact">
-    <meta property="og:title" content="Contacto | Global Investing — Dashboard Análisis Forex">
-    <meta property="og:description" content="Contáctenos para consultas sobre el Dashboard de Análisis Fundamental Forex.">
-    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://globalinvesting.github.io/contact">
-    <meta name="twitter:title" content="Contacto | Global Investing — Dashboard Análisis Forex">
-    <meta name="twitter:description" content="Contáctenos para consultas sobre el Dashboard de Análisis Fundamental Forex.">
-    <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta name="robots" content="index, follow">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; }
-        :root {
-            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
-            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
-            --blue: #1e88e5; --green: #26a69a;
-        }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
-        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 3rem; }
-        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
-        .brand-title:hover { color: var(--blue); }
-        .brand-wrap { display: flex; flex-direction: column; }
-        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary, #8b949e); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.1rem; }
-        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
-        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
-        .nav-links { display: flex; gap: 2rem; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--text-primary); }
-        .nav-links a.active { color: var(--text-primary); }
-        .lang-switch { padding: 0.25rem 0.6rem; border: 1px solid var(--border, #30363d); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; }
-        .lang-switch:hover { border-color: var(--blue, #1e88e5); color: var(--blue, #1e88e5) !important; }
-        h1 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--text-primary); }
-        h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
-        ul { margin-left: 2rem; margin-bottom: 1.25rem; }
-        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
-        strong { color: var(--text-primary); }
-        a { color: var(--blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .contact-card { background: var(--bg-secondary); padding: 1.75rem; border-radius: 8px; border: 1px solid var(--border); }
-        .contact-card-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.6rem; }
-        .contact-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
-        .contact-card p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
-        .contact-card a { font-size: 0.9rem; color: var(--blue); word-break: break-all; overflow-wrap: break-word; }
-        .contact-card a .__cf_email__ { word-break: break-all; overflow-wrap: break-word; }
-        .contact-card span { word-break: break-all; overflow-wrap: break-word; }
-        .response-tag { display: inline-block; background: rgba(38,166,154,0.1); color: var(--green); font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.6rem; border-radius: 3px; margin-top: 0.5rem; border: 1px solid rgba(38,166,154,0.2); }
-        .highlight-box { background: rgba(30, 136, 229, 0.06); border-left: 3px solid var(--blue); padding: 1.5rem; margin: 2rem 0; border-radius: 0 4px 4px 0; }
-        .faq-item { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 1.25rem; }
-        .faq-item:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-        .faq-item h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-primary); }
-        .faq-item p { margin-bottom: 0; font-size: 0.9rem; }
-
-        @media (max-width: 768px) {
-            .header { padding: 1rem; }
-            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .brand-title { font-size: 1rem; }
-            .nav-links { flex-wrap: wrap; gap: 0.75rem 1.25rem; }
-            .nav-links a { font-size: 0.85rem; }
-            .container { padding: 2rem 1rem; }
-            h1 { font-size: 1.75rem; }
-            h2 { font-size: 1.25rem; }
-            .section { padding: 1.25rem; }
-            .contact-grid { grid-template-columns: 1fr; gap: 1rem; }
-        }
-        @media (max-width: 400px) {
-            h1 { font-size: 1.5rem; }
-            .nav-links { gap: 0.5rem 1rem; }
-        }
-    </style>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ContactPage",
-  "@id": "https://globalinvesting.github.io/contact.html",
-  "url": "https://globalinvesting.github.io/contact.html",
-  "name": "Contacto — Dashboard de Análisis Fundamental Forex",
-  "description": "Contacto para consultas sobre el Dashboard de Análisis Fundamental Forex.",
-  "inLanguage": "es",
-  "publisher": {
-    "@type": "Organization",
-    "@id": "https://globalinvesting.github.io/#organization",
-    "name": "Global Investing",
-    "url": "https://globalinvesting.github.io"
-  }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Global Investing FX Terminal</title>
+<meta name="description" content="Contact Global Investing — questions, feedback, or partnership inquiries about the FX Terminal.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/contact.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://globalinvesting.github.io/contact.html">
+<meta property="og:site_name" content="Global Investing FX Terminal">
+<meta property="og:title" content="Contact — Global Investing FX Terminal">
+<meta property="og:description" content="Get in touch with Global Investing for questions, feedback, or partnership inquiries.">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contact — Global Investing FX Terminal">
+<meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
-</script>
-    <link rel="canonical" href="https://globalinvesting.github.io/contact.html">
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* ── TOPBAR ── */
+#topbar {
+  background: var(--head-bg); border-bottom: 1px solid var(--border);
+  height: 36px; display: flex; align-items: center; padding: 0 10px;
+  position: sticky; top: 0; z-index: 200;
+}
+#topbar .logo {
+  display: flex; align-items: center; gap: 8px;
+  padding-right: 10px; border-right: 1px solid var(--border2);
+  margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0;
+}
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; white-space: nowrap; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a {
+  display: flex; align-items: center; padding: 0 10px; font-size: 12px;
+  font-weight: 600; color: var(--text2); border-right: 1px solid var(--border);
+  white-space: nowrap; text-decoration: none; transition: color .15s, background .15s;
+}
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--up); border-radius: 50%; margin-right: 4px; animation: blink 1.6s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn {
+  display: flex; align-items: center; gap: 5px; background: none;
+  border: 1px solid var(--border2); color: var(--text2); font-size: 10px;
+  font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px;
+  cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s;
+}
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0;
+  min-width: 210px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 0; z-index: 400;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+}
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-panel a.current { color: #fff; }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+
+/* ── PAGE CONTENT ── */
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+.page-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
+.page-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.page-sub { font-size: 14px; color: var(--text2); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+@media (max-width: 600px) { .contact-grid { grid-template-columns: 1fr; } }
+
+.contact-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; transition: border-color .2s;
+}
+.contact-card:hover { border-color: var(--border2); }
+.cc-icon { font-size: 20px; margin-bottom: 10px; }
+.cc-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+.cc-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.cc-val { font-size: 13px; color: var(--blue); text-decoration: none; font-family: var(--font-mono); }
+.cc-val:hover { text-decoration: underline; }
+.cc-desc { font-size: 12px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+
+.info-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+.info-block h3 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+.info-block p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.info-block a { color: var(--blue); text-decoration: none; }
+.info-block a:hover { text-decoration: underline; }
+
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); text-decoration: none; font-size: 12px; margin-bottom: 32px; transition: color .15s; }
+.back-link:hover { color: var(--text); }
+.back-link svg { flex-shrink: 0; }
+
+/* Footer */
+#statusbar {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 22px;
+  background: var(--head-bg); border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 10px; gap: 16px;
+  font-size: 10px; color: var(--text2); z-index: 200; font-family: var(--font-ui);
+}
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+</style>
 </head>
 <body>
-    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-    <header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="about.html">Acerca de</a></li>
-            <li><a href="publicidad.html">Publicidad</a></li>
-<li class="nav-dropdown">
-            <a href="guia-score-fortaleza.html">Guías</a>
-            <div class="nav-dropdown-menu">
-            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-            <a href="guia-carry-trade.html">Carry Trade</a>
-            <a href="guia-cot.html">Reporte COT</a>
-            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-            <a href="guia-calendario-economico.html">Calendario Económico</a>
-            <a href="guia-pips.html">Pips y Lotaje</a>
-            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-            <a href="glosario-forex.html">Glosario Forex</a>
-            </div>
-        </li>
-            <li><a href="contact.html" class="active">Contacto</a></li>
-            <li><a href="en.html" class="lang-switch">EN</a></li>
-        </ul></nav>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Terminal</a>
+    <a href="guide-dashboard.html">Guides</a>
+    <a href="about.html">About</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="current">Contact</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
+      </div>
     </div>
-</header>
+    <span><span class="live-dot"></span>LIVE</span>
+  </div>
+</div>
 
+<!-- PAGE -->
+<div class="page-wrap">
+  <a class="back-link" href="/">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Terminal
+  </a>
 
-<main id="main-content" role="main">
+  <div class="page-label">Contact</div>
+  <h1 class="page-title">Get in Touch</h1>
+  <p class="page-sub">Questions, feedback, data issues, or partnership inquiries — we're happy to hear from you.</p>
 
-    <div class="container">
-        <h1>Contacto</h1>
-        <p style="font-size: 1.05rem; color: var(--text-secondary);">Para consultas sobre la metodología, reporte de errores en los datos o sugerencias de mejora, utilice los canales indicados a continuación.</p>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <div class="cc-icon">✉️</div>
+      <div class="cc-label">General inquiries</div>
+      <div class="cc-title">Email</div>
+      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+      <p class="cc-desc">Questions about the terminal, data sources, or features.</p>
+    </div>
+    <div class="contact-card">
+      <div class="cc-icon">📊</div>
+      <div class="cc-label">Data & technical</div>
+      <div class="cc-title">Data Issues</div>
+      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+      <p class="cc-desc">Report stale data, broken panels, or incorrect values.</p>
+    </div>
+    <div class="contact-card">
+      <div class="cc-icon">🤝</div>
+      <div class="cc-label">Business</div>
+      <div class="cc-title">Partnerships</div>
+      <a class="cc-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+      <p class="cc-desc">Advertising, data integrations, or collaboration proposals.</p>
+    </div>
+    <div class="contact-card">
+      <div class="cc-icon">🐦</div>
+      <div class="cc-label">Social</div>
+      <div class="cc-title">Twitter / X</div>
+      <a class="cc-val" href="https://twitter.com/GlobalInvesting" target="_blank" rel="noopener">@GlobalInvesting</a>
+      <p class="cc-desc">Market updates, terminal announcements and commentary.</p>
+    </div>
+  </div>
 
-        <div class="contact-grid">
-            <div class="contact-card">
-                <div class="contact-card-label">General</div>
-                <h3>Consultas Generales</h3>
-                <p>Para preguntas sobre la plataforma, sus características o las fuentes de datos utilizadas.</p>
-                <span id="email-display" style="color:var(--blue);font-size:0.9rem;"></span>
-                <div><span class="response-tag">Respuesta en 24–48 h</span></div>
-            </div>
-            <div class="contact-card">
-                <div class="contact-card-label">Datos</div>
-                <h3>Errores de Datos</h3>
-                <p>Si detecta un indicador incorrecto, desactualizado o un error de cálculo en el score fundamental.</p>
-                <a id="email-datos" href="#" style="font-size:0.9rem;">Reportar error de datos →</a>
-            </div>
-            <div class="contact-card">
-                <div class="contact-card-label">Noticias</div>
-                <h3>Feed de Noticias</h3>
-                <p>Para reportar errores en el feed, noticias mal clasificadas o proponer nuevas fuentes RSS.</p>
-                <a id="email-noticias" href="#" style="font-size:0.9rem;">Escribir sobre noticias →</a>
-            </div>
-            <div class="contact-card">
-                <div class="contact-card-label">Mejoras</div>
-                <h3>Sugerencias</h3>
-                <p>Propuestas de nuevos indicadores, funcionalidades o mejoras en el diseño de la plataforma.</p>
-                <a id="email-mejoras" href="#" style="font-size:0.9rem;">Enviar sugerencia →</a>
-            </div>
-        </div>
+  <div class="info-block">
+    <h3>Response Time</h3>
+    <p>We aim to respond within 1–3 business days. For urgent data issues affecting the terminal, please include "DATA ISSUE" in the subject line.</p>
+  </div>
 
-        <div class="highlight-box">
-            <p style="margin: 0;"><strong>Nota:</strong> La metodología y las fuentes de datos están documentadas en detalle en la sección <a href="about.html">Acerca de</a>. El feedback técnico y financiero es especialmente bienvenido.</p>
-        </div>
+  <div class="info-block">
+    <h3>Before You Write</h3>
+    <p>Many common questions are answered in our <a href="guide-dashboard.html">terminal guide</a>. For data source details, check the <a href="about.html">About page</a>. If a panel shows stale data, it may be a temporary API issue that resolves automatically within a few minutes.</p>
+  </div>
 
-        <div class="section">
-            <h2>Preguntas Frecuentes</h2>
+  <div class="info-block">
+    <h3>Legal</h3>
+    <p>For privacy inquiries or data removal requests, see our <a href="privacy.html">Privacy Policy</a>. For terms of use, see <a href="terms.html">Terms of Use</a>.</p>
+  </div>
+</div>
 
-            <div class="faq-item">
-                <h3>¿Los scores son señales de trading?</h3>
-                <p>No. Los scores son un índice cuantitativo de fortaleza fundamental relativa entre las divisas del G8. Constituyen un insumo informativo para el análisis y no representan recomendaciones de compra o venta.</p>
-            </div>
+<div id="statusbar">
+  <div><span class="sb-k">GLOBAL INVESTING</span></div>
+  <div class="footer-copy">© 2026 Global Investing — FX Terminal. Educational use only. Not financial advice.</div>
+  <div style="margin-left:auto"><a href="privacy.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Privacy</a> · <a href="terms.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Terms</a></div>
+</div>
 
-            <div class="faq-item">
-                <h3>¿Con qué frecuencia se actualizan los datos del dashboard?</h3>
-                <p>Los tipos de cambio se actualizan cada 60 segundos. Los indicadores económicos se actualizan diariamente entre las 06:00 y las 09:00 UTC. El COT se actualiza cada viernes a las ~20:00 UTC, siguiendo el calendario de publicación de la CFTC.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Con qué frecuencia se actualiza el feed de noticias?</h3>
-                <p>El feed se actualiza automáticamente 3 veces al día (00:00, 08:00 y 16:00 UTC). La sección <a href="news.html">Noticias</a> muestra la hora local de la última actualización en cada tarjeta de divisa.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Cómo se calcula el nivel de impacto de las noticias?</h3>
-                <p>El nivel de impacto (Alto / Medio / Bajo) se estima automáticamente mediante palabras clave en el titular. Las noticias relacionadas con decisiones de tasas, IPC, NFP, PIB o reuniones de bancos centrales se clasifican como Alto Impacto. No constituye una evaluación editorial manual.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Por qué un indicador aparece en gris sin datos?</h3>
-                <p>Algunos indicadores tienen menor frecuencia de publicación (trimestral o semestral) o no están disponibles para todas las economías. El modelo normaliza automáticamente el score en función de los datos disponibles.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Cómo se calcula el score de fortaleza fundamental?</h3>
-                <p>El score se calcula mediante un modelo cuantitativo con 22 indicadores ponderados distribuidos en 6 grupos temáticos, en una escala fija de 0 a 100 puntos (&lt;45 Débil · 45–65 Neutral · &gt;65 Fuerte). Los grupos son: Política Monetaria (29%), Balance Externo (19%), Crecimiento y Empleo (16%), Sentimiento de Mercado (22%), FX Confirmador (11%) y Consumo (3%). Consulte la sección <a href="about.html">Acerca de</a> para la descripción metodológica completa.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Qué es el FX Performance 1M?</h3>
-                <p>Es el rendimiento real de cada divisa frente a la canasta de las otras 7 divisas del G8 (basket-corrected), eliminando el sesgo USD. Se calcula como un composite ponderado: 70% rendimiento mensual + 20% semanal + 10% trimestral, con tasas de referencia del Banco Central Europeo (Frankfurter API). Actúa como confirmador en el modelo (peso 8%): cuando los fundamentales son sólidos y el precio confirma la dirección, añade convicción al score. Si divergen, es una señal de alerta.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Qué son los datos COT y de dónde provienen?</h3>
-                <p>Los reportes COT (Commitment of Traders) son publicados semanalmente por la CFTC. Muestran el posicionamiento neto de la categoría Leveraged Funds en los mercados de futuros de divisas de Chicago. Los datos provienen directamente del sitio oficial de la CFTC (reporte <em>financial_lf.htm</em> — Futures Only). El modelo aplica lógica contrarian automática para posiciones extremas y una penalización sobre la prima safe haven cuando el COT contradice el perfil estructural de la divisa.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿El calendario económico muestra horarios en mi zona horaria?</h3>
-                <p>Sí. Los horarios se almacenan internamente en UTC y se convierten automáticamente a la zona horaria local del navegador al mostrarse, sin necesidad de configuración adicional.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Los análisis de texto son redactados por personas?</h3>
-                <p>No. Los análisis narrativos de cada divisa son generados automáticamente por Groq AI (modelo llama-3.3-70b-versatile) a partir de los datos económicos actualizados. Son de carácter descriptivo e informativo, y no constituyen asesoramiento financiero.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Qué significan los niveles de confianza en las señales de pares?</h3>
-                <p>Las señales de la pestaña "Mejores Pares" se basan en el diferencial de scores entre dos divisas. Solo se muestran señales de confianza Alta, con un diferencial igual o superior a 20 puntos — umbral validado con datos históricos. También se muestra la calidad de datos: un valor igual o superior al 70% indica que el análisis cuenta con suficientes indicadores para ser fiable. Son indicadores analíticos, no recomendaciones de inversión.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>¿Cómo puedo reportar un error o proponer una funcionalidad?</h3>
-                <p>Envíe un correo a <span id="email-faq" style="color:var(--blue);"></span> con una descripción detallada. Para errores de datos, incluya el indicador afectado, la divisa y la fecha de referencia si es posible.</p>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Tiempos de Respuesta</h2>
-            <ul>
-                <li><strong>Consultas generales:</strong> 24–48 horas</li>
-                <li><strong>Reporte de errores de datos:</strong> 24–48 horas</li>
-                <li><strong>Sugerencias de funcionalidad:</strong> 2–3 días hábiles</li>
-                <li><strong>Problemas de seguridad:</strong> 24 horas (prioridad alta)</li>
-            </ul>
-        </div>
-
-                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
-            <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.4rem 1rem; margin-top:0.75rem; font-size:0.8rem;">
-                <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
-                <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
-                <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
-                <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
-                <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
-                <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
-                <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
-            </div>
-            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.3</p>
-        </div></div>
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-        // Email construido en runtime para evitar obfuscación de Cloudflare
-        const u = 'globalinvestingmarkets';
-        const d = 'gmail.com';
-        const e = u + '@' + d;
-        document.getElementById('email-display').textContent = e;
-        document.getElementById('email-faq').textContent = e;
-        document.getElementById('email-datos').href    = 'mailto:' + e + '?subject=Error%20de%20datos%20-%20Dashboard%20Forex';
-        document.getElementById('email-noticias').href = 'mailto:' + e + '?subject=Feed%20de%20Noticias%20-%20Sugerencia';
-        document.getElementById('email-mejoras').href  = 'mailto:' + e + '?subject=Sugerencia%20-%20Dashboard%20Forex';
-    </script>
-<!-- GDPR Banner (shared) -->
-<style>
-#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
-#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
-#gdpr-banner a{color:#5b9bd5;}
-#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
-#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
-#gdpr-accept{background:#2e75b6;color:#fff;}
-#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-
-        /* ── Header unified ── */
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
-        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; }
-        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
-        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
-        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
-        
-        /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; }
-        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
-            border-left: 4px solid transparent; border-right: 4px solid transparent;
-            border-top: 4px solid currentColor; transition: transform 0.2s; }
-        .nav-dropdown:hover > a::after,
-        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
-        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
-            right: 0; min-width: 220px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.75rem 0 0.4rem; z-index: 200;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-        .nav-dropdown:hover .nav-dropdown-menu,
-        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-        /* Puente invisible que cubre el gap entre trigger y menú */
-        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
-            left: -8px; right: -8px; height: 0.75rem; }
-        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
-            color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
-            color: var(--text-primary) !important; }
-        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        </style>
-<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
-<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
-<div class="gdpr-btns">
-<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
-<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
-</div></div>
-<script>
-(function(){
-var K='gdpr_consent_v1';
-function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
-function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
-function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
-// Event delegation — funciona aunque scripts externos re-renderizen el DOM
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
-  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
-},true);
-document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
-function init(){
-  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
-  var b=document.getElementById('gdpr-banner');
-  if(b){b.hidden=false;b.style.display='flex';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
-}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
-})();
-</script>
-</main>
-<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
-· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
-</footer>
 </body>
 </html>

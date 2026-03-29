@@ -1,373 +1,178 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="favicon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <link rel="alternate" hreflang="es" href="https://globalinvesting.github.io/privacy.html">
-    <link rel="alternate" hreflang="en" href="https://globalinvesting.github.io/en.html">
-    <link rel="alternate" hreflang="x-default" href="https://globalinvesting.github.io/privacy.html">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Privacidad - Dashboard de Análisis Fundamental Forex</title>
-    <meta name="description" content="Política de Privacidad del Dashboard de Análisis Fundamental Forex.">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="es_ES">
-    <meta property="og:site_name" content="Global Investing Forex Dashboard">
-    <meta property="og:url" content="https://globalinvesting.github.io/privacy">
-    <meta property="og:title" content="Política de Privacidad | Global Investing — Dashboard Forex">
-    <meta property="og:description" content="Política de Privacidad del Dashboard de Análisis Fundamental Forex de Global Investing.">
-    <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://globalinvesting.github.io/privacy">
-    <meta name="twitter:title" content="Política de Privacidad | Global Investing — Dashboard Forex">
-    <meta name="twitter:description" content="Política de Privacidad del Dashboard de Análisis Fundamental Forex de Global Investing.">
-    <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
-    <meta name="robots" content="index, follow">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; }
-        :root {
-            --bg-primary: #0b0e14; --bg-secondary: #13171f; --bg-card: #1a1f2e;
-            --text-primary: #e1e4e8; --text-secondary: #8b949e; --border: #30363d;
-            --blue: #1e88e5;
-        }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.8; font-size: 15px; }
-        .container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; margin-bottom: 3rem; }
-        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
-        .brand-title { font-size: 1.125rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
-        .brand-title:hover { color: var(--blue); }
-        .brand-wrap { display: flex; flex-direction: column; gap: 0.1rem; }
-        .brand-subtitle { font-size: 0.68rem; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
-        .lang-switch { padding: 0.22rem 0.55rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem !important; margin-left: 0.5rem; color: var(--text-secondary); text-decoration: none; }
-        .lang-switch:hover { border-color: var(--blue); color: var(--blue) !important; }
-        .nav-links { display: flex; gap: 1.25rem; flex-wrap: nowrap; align-items: center; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; white-space: nowrap; }
-        .nav-links a:hover { color: var(--text-primary); }
-        .nav-links a.active { color: var(--text-primary); }
-        h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        .last-updated { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 2rem; }
-        h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-primary); }
-        h3 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-primary); }
-        p { margin-bottom: 1.25rem; color: var(--text-secondary); }
-        ul, ol { margin-left: 2rem; margin-bottom: 1.25rem; }
-        li { margin-bottom: 0.5rem; color: var(--text-secondary); }
-        strong { color: var(--text-primary); }
-        a { color: var(--blue); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .section { background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-
-        @media (max-width: 768px) {
-            .header { padding: 1rem; }
-            .header-content { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .brand-title { font-size: 1rem; }
-            .nav-links { flex-wrap: wrap; gap: 0.75rem 1.25rem; }
-            .nav-links a { font-size: 0.85rem; }
-            .container { padding: 2rem 1rem; }
-            h1 { font-size: 1.75rem; }
-            h2 { font-size: 1.25rem; }
-            .section { padding: 1.25rem; }
-        }
-        @media (max-width: 400px) {
-            h1 { font-size: 1.5rem; }
-            .nav-links { gap: 0.5rem 1rem; }
-        }
-    </style>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "@id": "https://globalinvesting.github.io/privacy.html",
-  "url": "https://globalinvesting.github.io/privacy.html",
-  "name": "Política de Privacidad — Global Investing",
-  "description": "Política de Privacidad del Dashboard de Análisis Fundamental Forex.",
-  "inLanguage": "es",
-  "publisher": {
-    "@type": "Organization",
-    "@id": "https://globalinvesting.github.io/#organization",
-    "name": "Global Investing",
-    "url": "https://globalinvesting.github.io"
-  }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Global Investing FX Terminal</title>
+<meta name="description" content="Privacy Policy for the Global Investing FX Terminal. How we handle cookies, advertising data, and third-party integrations.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/privacy.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://globalinvesting.github.io/privacy.html">
+<meta property="og:site_name" content="Global Investing FX Terminal">
+<meta property="og:title" content="Privacy Policy — Global Investing FX Terminal">
+<meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
+<meta property="og:locale" content="en_US">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
-</script>
-    <link rel="canonical" href="https://globalinvesting.github.io/privacy.html">
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.7; min-height: 100vh; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; white-space: nowrap; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; text-decoration: none; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--up); border-radius: 50%; margin-right: 4px; animation: blink 1.6s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-panel a.current { color: #fff; }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+.page-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
+.page-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.page-meta { font-size: 12px; color: var(--text3); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); text-decoration: none; font-size: 12px; margin-bottom: 32px; transition: color .15s; }
+.back-link:hover { color: var(--text); }
+h2 { font-size: 15px; font-weight: 700; color: #fff; margin-top: 36px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+p { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 4px; }
+
+.cookie-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.cookie-table th { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; padding: 6px 10px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--head-bg); }
+.cookie-table td { font-size: 12px; color: var(--text2); padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.cookie-table tr:last-child td { border-bottom: none; }
+.cookie-table td:first-child { color: var(--text); font-family: var(--font-mono); font-size: 11px; }
+
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; font-family: var(--font-ui); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+</style>
 </head>
 <body>
-    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:100000;background:#2e75b6;color:#fff;padding:8px 16px;border-radius:4px;font-family:Arial,sans-serif;font-size:14px;text-decoration:none;" onfocus="this.style.left='8px';this.style.width='auto';this.style.height='auto';" onblur="this.style.left='-9999px';this.style.width='1px';this.style.height='1px';">Saltar al contenido principal</a>
-    <header class="header">
-    <div class="header-inner">
-        <div class="logo" style="display:flex;flex-direction:row;align-items:center;">
-            <img src="apple-touch-icon.png" alt="Global Investing" style="width:40px;height:40px;border-radius:8px;margin-right:0.75rem;flex-shrink:0;display:block;">
-            <div style="display:flex;flex-direction:column;justify-content:center;">
-                <span class="logo-name">Global Investing</span>
-                <span class="logo-sub">Forex Fundamental Dashboard</span>
-            </div>
-        </div>
-        <nav class="header-nav"><ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:1.5rem;">
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="about.html">Acerca de</a></li>
-            <li><a href="publicidad.html">Publicidad</a></li>
-<li class="nav-dropdown">
-            <a href="guia-score-fortaleza.html">Guías</a>
-            <div class="nav-dropdown-menu">
-            <a href="guia-score-fortaleza.html">Score de Fortaleza</a>
-            <a href="guia-carry-trade.html">Carry Trade</a>
-            <a href="guia-cot.html">Reporte COT</a>
-            <a href="guia-bancos-centrales.html">Bancos Centrales</a>
-            <a href="guia-calendario-economico.html">Calendario Económico</a>
-            <a href="guia-pips.html">Pips y Lotaje</a>
-            <a href="tecnico-vs-fundamental.html">Técnico vs Fundamental</a>
-            <a href="glosario-forex.html">Glosario Forex</a>
-            </div>
-        </li>
-            <li><a href="contact.html">Contacto</a></li>
-            <li><a href="en.html" class="lang-switch">EN</a></li>
-        </ul></nav>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span><span class="logo-text">Global Investing</span><span class="logo-sub">FX Terminal</span></span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Terminal</a>
+    <a href="guide-dashboard.html">Guides</a>
+    <a href="about.html">About</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html" class="current">Privacy Policy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">How to Use the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT / CFTC Positioning</a>
+      </div>
     </div>
-</header>
+    <span><span class="live-dot"></span>LIVE</span>
+  </div>
+</div>
 
+<div class="page-wrap">
+  <a class="back-link" href="/">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Terminal
+  </a>
 
-<main id="main-content" role="main">
+  <div class="page-label">Legal</div>
+  <h1 class="page-title">Privacy Policy</h1>
+  <p class="page-meta">Last updated: March 2026 · Applies to globalinvesting.github.io</p>
 
-    <div class="container">
-        <h1>Política de Privacidad</h1>
-        <p class="last-updated">Última Actualización: 8 de Marzo de 2026</p>
+  <h2>1. Overview</h2>
+  <p>Global Investing ("we", "us") operates the FX Terminal at globalinvesting.github.io. This Privacy Policy explains what data is collected when you use the Terminal, how it is used, and your choices regarding that data.</p>
+  <p>We do not collect, store, or process personal data on our own servers. The Terminal is a static site hosted on GitHub Pages. No accounts, logins, or user registrations are required.</p>
 
-        <div class="section">
-            <h2>1. Introducción</h2>
-            <p>Bienvenido al Dashboard de Análisis Fundamental Forex. Estamos comprometidos a proteger su privacidad y asegurar la seguridad de su información personal. Esta Política de Privacidad explica cómo recopilamos, usamos, divulgamos y protegemos su información cuando visita nuestro sitio web.</p>
-            <p>Al acceder o usar nuestro sitio web, usted acepta esta Política de Privacidad.</p>
-        </div>
+  <h2>2. Data We Collect</h2>
+  <p>We do not directly collect personal information. However, the following third-party services integrated into the Terminal may collect data:</p>
 
-        <div class="section">
-            <h2>2. Información que Recopilamos</h2>
+  <h2>3. Cookies & Local Storage</h2>
+  <p>The Terminal uses browser <strong>localStorage</strong> for the following essential purposes:</p>
+  <table class="cookie-table">
+    <thead><tr><th>Key</th><th>Purpose</th><th>Expiry</th></tr></thead>
+    <tbody>
+      <tr><td>gdpr_consent_v2</td><td>Stores your cookie consent preference (accepted / rejected)</td><td>13 months</td></tr>
+      <tr><td>tv_chart_symbol</td><td>Remembers your last selected chart symbol (TradingView)</td><td>Session</td></tr>
+    </tbody>
+  </table>
+  <p>No tracking cookies are set by us directly. Third-party cookies (Google AdSense, TradingView) are only loaded after your explicit consent via the cookie banner.</p>
 
-            <h3>2.1 Información Recopilada Automáticamente</h3>
-            <p>Cuando visita nuestro sitio web, podemos recopilar automáticamente cierta información sobre su dispositivo, incluyendo:</p>
-            <ul>
-                <li><strong>Datos de Registro:</strong> Dirección IP, tipo de navegador, sistema operativo, URLs de referencia, páginas vistas y tiempos de acceso.</li>
-                <li><strong>Cookies y Tecnologías de Seguimiento:</strong> Usamos cookies propias y de terceros para mejorar su experiencia y mostrar publicidad relevante.</li>
-                <li><strong>Datos de Uso:</strong> Información sobre cómo interactúa con nuestro dashboard (pestañas visitadas, tiempo de sesión, etc.).</li>
-            </ul>
+  <h2>4. Google AdSense</h2>
+  <p>If you accept cookies, we serve advertisements via Google AdSense (publisher ID: ca-pub-7977942731354565). Google may use cookies to show you personalized ads based on your browsing history. If you reject cookies, ads are served in non-personalized mode with no behavioral tracking.</p>
+  <p>You can manage Google's ad personalization settings at <a href="https://adssettings.google.com" target="_blank" rel="noopener">adssettings.google.com</a>.</p>
 
-            <h3>2.2 Almacenamiento Local (localStorage)</h3>
-            <p>El dashboard utiliza el <strong>localStorage</strong> de su navegador para almacenar en caché datos económicos y de tipos de cambio entre sesiones. Esto mejora el rendimiento al evitar solicitudes repetidas a las APIs externas. Esta información se almacena únicamente en su dispositivo y no es transmitida a nuestros servidores. Puede eliminarla en cualquier momento usando el botón "Limpiar Caché" en el pie del dashboard, o borrando los datos del sitio desde la configuración de su navegador.</p>
+  <h2>5. TradingView Widgets</h2>
+  <p>The Terminal embeds TradingView charts and widgets. TradingView may set its own cookies and collect usage data per their <a href="https://www.tradingview.com/policies/" target="_blank" rel="noopener">Privacy Policy</a>. These widgets load regardless of your AdSense consent, as they are essential to core Terminal functionality.</p>
 
-            <h3>2.3 Información que Usted Proporciona</h3>
-            <ul>
-                <li>Cuando nos contacta por correo electrónico.</li>
-                <li>Cuando se suscribe a boletines o actualizaciones.</li>
-                <li>Cuando participa en encuestas o formularios de comentarios.</li>
-            </ul>
-        </div>
+  <h2>6. GitHub Pages (Hosting)</h2>
+  <p>The Terminal is hosted on GitHub Pages. GitHub may collect server logs including IP addresses, browser type, and pages visited per GitHub's <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">Privacy Statement</a>. We do not have access to these logs.</p>
 
-        <div class="section">
-            <h2>3. Cómo Usamos su Información</h2>
-            <ul>
-                <li><strong>Provisión del Servicio:</strong> Para proporcionar, mantener y mejorar nuestro dashboard.</li>
-                <li><strong>Análisis:</strong> Para entender el comportamiento del usuario y optimizar el rendimiento del sitio.</li>
-                <li><strong>Comunicación:</strong> Para responder a sus consultas enviadas por correo electrónico.</li>
-                <li><strong>Publicidad:</strong> Para mostrar anuncios relevantes a través de servicios de terceros como Google AdSense.</li>
-            </ul>
-        </div>
+  <h2>7. Third-Party Data Sources</h2>
+  <p>The Terminal fetches market data from external APIs (Frankfurter/ECB, CFTC, Stooq, Dukascopy, Groq). These requests are made client-side from your browser and are subject to each provider's privacy policy. We do not intermediary or log these requests.</p>
 
-        <div class="section">
-            <h2>4. Cookies y Tecnologías de Seguimiento</h2>
-            <ul>
-                <li><strong>Cookies Esenciales:</strong> Necesarias para que el sitio web funcione correctamente.</li>
-                <li><strong>Cookies de Análisis:</strong> Nos ayudan a entender cómo los visitantes interactúan con nuestro sitio.</li>
-                <li><strong>Cookies de Publicidad:</strong> Usadas para entregar anuncios relevantes mediante Google AdSense.</li>
-            </ul>
-            <p>Puede controlar el uso de cookies desde la configuración de su navegador. Tenga en cuenta que deshabilitar ciertas cookies puede afectar la funcionalidad del sitio.</p>
-        </div>
+  <h2>8. Your Rights (GDPR)</h2>
+  <p>If you are located in the European Economic Area, you have the right to access, correct, or request deletion of any personal data held about you. Since we do not store personal data ourselves, most requests should be directed to the relevant third-party service (Google, TradingView, GitHub).</p>
+  <p>To withdraw your AdSense cookie consent, clear your browser's localStorage or revisit the Terminal in a private/incognito window.</p>
 
-        <div class="section">
-            <h2>5. Servicios de Terceros</h2>
+  <h2>9. Children's Privacy</h2>
+  <p>The Terminal is not directed at children under 13. We do not knowingly collect data from children.</p>
 
-            <h3>5.1 Google AdSense</h3>
-            <p>Usamos Google AdSense para mostrar anuncios. Google puede usar cookies para personalizar los anuncios que ve en función de sus visitas a este y otros sitios web. Puede optar por no recibir publicidad personalizada visitando <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Configuración de Anuncios de Google</a>.</p>
+  <h2>10. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy periodically. The "Last updated" date at the top reflects the most recent revision. Continued use of the Terminal constitutes acceptance of the updated policy.</p>
 
-            <h3>5.2 APIs de Datos Financieros y Económicos</h3>
-            <p>El dashboard realiza solicitudes a APIs externas para obtener datos en tiempo real. Estas solicitudes se realizan desde su navegador y pueden registrar su dirección IP según las políticas de cada proveedor. Los proveedores incluyen:</p>
-            <ul>
-                <li>Frankfurter API (Banco Central Europeo) — tipos de cambio y FX Performance 1M</li>
-                <li>FRED (Federal Reserve Bank of St. Louis) — indicadores económicos</li>
-                <li>OECD — indicadores económicos y de confianza</li>
-                <li>World Bank — indicadores macroeconómicos</li>
-                <li>global-rates.com — tasas de interés</li>
-                <li>Investing.com — datos de mercado</li>
-                <li>CFTC (cftc.gov) — datos COT</li>
-                <li>cbrates.com — fechas de reuniones de bancos centrales</li>
-                <li>GitHub Pages (globalinvesting.github.io) — datos procesados, análisis de IA y feed de noticias (<code>news.json</code>)</li>
-                <li>FXStreet, ForexLive, Reuters — feeds RSS de noticias procesados vía GitHub Actions</li>
-                <li>Otros proveedores de tipos de cambio como respaldo en cascada</li>
-            </ul>
+  <h2>11. Contact</h2>
+  <p>Privacy questions or data requests: <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a> or visit our <a href="contact.html">Contact page</a>.</p>
+</div>
 
-            <h3>5.3 Feed de Noticias</h3>
-            <p>La sección de Noticias obtiene titulares desde feeds RSS públicos (FXStreet, ForexLive, Reuters, Investing.com y bancos centrales oficiales) mediante un workflow automatizado de GitHub Actions que se ejecuta cada hora en los servidores de GitHub. Las solicitudes a estos feeds se realizan desde los servidores de GitHub, no desde el navegador del usuario. El resultado es un archivo estático <code>news.json</code> publicado en GitHub Pages, que su navegador descarga directamente sin exponer su IP a las fuentes RSS originales.</p>
-
-            <h3>5.4 Groq AI</h3>
-            <p>Los análisis narrativos de divisas son generados mediante la API de Groq AI. Los datos económicos utilizados son enviados a los servidores de Groq para su procesamiento. No se envía información personal del usuario. Consulte la <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener">Política de Privacidad de Groq</a> para más información.</p>
-        </div>
-
-        <div class="section">
-            <h2>6. Compartir y Divulgación de Datos</h2>
-            <p>No vendemos, comercializamos ni alquilamos su información personal a terceros. Podemos compartir su información solo en los siguientes casos:</p>
-            <ul>
-                <li>Cuando lo requiera la ley o una autoridad competente.</li>
-                <li>Con proveedores de servicios de confianza que nos ayudan a operar el sitio, bajo acuerdos de confidencialidad.</li>
-                <li>Para proteger los derechos, propiedad o seguridad de nuestra plataforma y sus usuarios.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>7. Seguridad de Datos</h2>
-            <p>Implementamos medidas de seguridad técnicas y organizativas apropiadas para proteger su información personal. Sin embargo, ningún método de transmisión por Internet es 100% seguro, y no podemos garantizar la seguridad absoluta de la información transmitida a través de nuestro sitio.</p>
-        </div>
-
-        <div class="section">
-            <h2>8. Sus Derechos</h2>
-            <ul>
-                <li><strong>Acceso:</strong> Solicitar acceso a la información personal que podamos tener sobre usted.</li>
-                <li><strong>Corrección:</strong> Solicitar corrección de información inexacta.</li>
-                <li><strong>Eliminación:</strong> Solicitar la eliminación de su información personal.</li>
-                <li><strong>Objeción:</strong> Objetar a nuestro procesamiento de su información personal en ciertos casos.</li>
-                <li><strong>Caché local:</strong> Puede eliminar los datos almacenados localmente por el dashboard en cualquier momento desde la configuración de su navegador o usando el botón "Limpiar Caché" del dashboard.</li>
-            </ul>
-            <p>Para ejercer cualquiera de estos derechos, contáctenos en <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>.</p>
-        </div>
-
-        <div class="section">
-            <h2>9. Privacidad de Menores</h2>
-            <p>Nuestro sitio web no está destinado a personas menores de 18 años. No recopilamos intencionadamente información personal de menores. Si cree que un menor ha proporcionado información personal, contáctenos para eliminarla.</p>
-        </div>
-
-        <div class="section">
-            <h2>10. Cambios a esta Política</h2>
-            <p>Podemos actualizar nuestra Política de Privacidad cuando añadamos nuevas funcionalidades, cambiemos proveedores de servicios o lo requieran cambios legales. Le notificaremos cualquier cambio publicando la nueva Política en esta página y actualizando la fecha de "Última Actualización".</p>
-        </div>
-
-        <div class="section">
-            <h2>10a. Cumplimiento GDPR y Protección de Datos (EEE / Reino Unido)</h2>
-            <p>Si usted accede al Servicio desde el Espacio Económico Europeo (EEE), el Reino Unido o una jurisdicción con normativa de protección de datos equivalente, le informamos lo siguiente en cumplimiento del Reglamento General de Protección de Datos (GDPR — Reglamento UE 2016/679):</p>
-            <ul>
-                <li><strong>Responsable del tratamiento:</strong> Santiago Plá Casuriaga — globalinvestingmarkets@gmail.com.</li>
-                <li><strong>Base jurídica:</strong> El tratamiento de datos técnicos (IP, cookies analíticas) se basa en el interés legítimo de operar y mejorar el Servicio. El tratamiento de datos de comunicación (email) se basa en la ejecución de las acciones solicitadas por el usuario.</li>
-                <li><strong>Plazo de conservación:</strong> Los datos de contacto se conservan mientras sean necesarios para atender la consulta. Los datos analíticos se rigen por las políticas de Google Analytics. Los datos en localStorage se eliminan cuando el usuario los borra o usa el botón "Limpiar Caché".</li>
-                <li><strong>Transferencias fuera del EEE:</strong> Los proveedores como Google (AdSense, Analytics) y Groq AI operan en Estados Unidos. Las transferencias se realizan con las garantías establecidas por la Comisión Europea (cláusulas contractuales tipo). Consulte las políticas de privacidad de Google y Groq para más detalles.</li>
-                <li><strong>Sus derechos:</strong> Acceso · Rectificación · Supresión («derecho al olvido») · Portabilidad · Limitación · Oposición. Para ejercerlos, escriba a globalinvestingmarkets@gmail.com. Responderemos en un plazo máximo de 30 días.</li>
-                <li><strong>Derecho de reclamación:</strong> Tiene derecho a presentar una reclamación ante la autoridad de protección de datos de su país miembro de la UE o ante el ICO si se encuentra en el Reino Unido.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>11. Contáctenos</h2>
-            <ul>
-                <li><strong>Email:</strong> <a href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a></li>
-                <li><strong>Sitio Web:</strong> <a href="contact.html">Página de Contacto</a></li>
-            </ul>
-        </div>
-
-                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
-            <p>© <span id="year"></span> Santiago Plá Casuriaga · Global Investing. Todos los derechos reservados.</p>
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.4rem 1rem; margin-top:0.75rem; font-size:0.8rem;">
-                <a href="about.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Acerca de</a>
-                <a href="publicidad.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Publicidad</a>
-                <a href="guia-score-fortaleza.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Guías</a>
-                <a href="terms.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Términos</a>
-                <a href="privacy.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Privacidad</a>
-                <a href="contact.html" style="color:var(--text-secondary);text-decoration:none;white-space:nowrap;">Contacto</a>
-                <a href="en.html" style="color:var(--text-secondary);text-decoration:none;padding:0.15rem 0.45rem;border:1px solid var(--border);border-radius:4px;font-size:0.75rem;white-space:nowrap;">EN</a>
-            </div>
-            <p style="margin-top:0.5rem;font-size:0.75rem;color:var(--text-tertiary,#6e7681);">Dashboard v6.5.3</p>
-        </div></div>
-    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-<!-- GDPR Banner (shared) -->
-<style>
-#gdpr-banner{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1a1f2e;border-top:2px solid #2e75b6;padding:14px 20px;display:none;flex-wrap:wrap;align-items:center;gap:12px;font-family:Arial,sans-serif;font-size:13px;color:#d0d6e8;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
-#gdpr-banner p{margin:0;flex:1 1 300px;line-height:1.5;}
-#gdpr-banner a{color:#5b9bd5;}
-#gdpr-banner .gdpr-btns{display:flex;gap:8px;flex-shrink:0;}
-#gdpr-banner button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
-#gdpr-accept{background:#2e75b6;color:#fff;}
-#gdpr-reject{background:transparent;color:#d0d6e8;border:1px solid #4a5568!important;}
-
-        /* ── Header unified ── */
-        .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; position: sticky; top: 0; z-index: 100; }
-        .header-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; }
-        .logo-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
-        .logo-sub  { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-        .header-nav { display: flex; align-items: center; gap: 1.5rem; }
-        .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; white-space: nowrap; }
-        .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-        .lang-switch { border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.55rem; font-size: 0.78rem; }
-        @media (max-width: 700px) { .header-inner { flex-wrap: wrap; gap: 0.5rem; } .header-nav { gap: 0.75rem; flex-wrap: nowrap; } .header-nav a { font-size: 0.8rem; } .logo-sub { display: none; } }
-        
-        /* ── Guías dropdown ── */
-        .nav-dropdown { position: relative; }
-        .nav-dropdown > a { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-        .nav-dropdown > a::after { content: ''; display: inline-block; width: 0; height: 0;
-            border-left: 4px solid transparent; border-right: 4px solid transparent;
-            border-top: 4px solid currentColor; transition: transform 0.2s; }
-        .nav-dropdown:hover > a::after,
-        .nav-dropdown:focus-within > a::after { transform: rotate(180deg); }
-        .nav-dropdown-menu { display: none; position: absolute; top: 100%;
-            right: 0; min-width: 220px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.75rem 0 0.4rem; z-index: 200;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
-        .nav-dropdown:hover .nav-dropdown-menu,
-        .nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
-        /* Puente invisible que cubre el gap entre trigger y menú */
-        .nav-dropdown::after { content: ''; position: absolute; top: 100%;
-            left: -8px; right: -8px; height: 0.75rem; }
-        .nav-dropdown-menu a { display: block; padding: 0.5rem 1rem;
-            color: var(--text-secondary) !important; font-size: 0.85rem !important;
-            text-decoration: none; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-        .nav-dropdown-menu a:hover { background: var(--bg-tertiary, rgba(255,255,255,0.05));
-            color: var(--text-primary) !important; }
-        .nav-dropdown-menu a.active-guide { color: var(--text-primary) !important; font-weight: 600; }
-        </style>
-<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" hidden>
-<p><strong id="gdpr-title">Cookies y Privacidad</strong><br>Usamos cookies de terceros (Google AdSense) para publicidad. <a href="/privacy.html">Política de Privacidad</a>.</p>
-<div class="gdpr-btns">
-<button id="gdpr-reject" aria-label="Rechazar cookies no esenciales">Solo esenciales</button>
-<button id="gdpr-accept" aria-label="Aceptar todas las cookies">Aceptar todo</button>
-</div></div>
-<script>
-(function(){
-var K='gdpr_consent_v1';
-function loadAds(p){if(document.getElementById('ads-s'))return;var s=document.createElement('script');s.id='ads-s';s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7977942731354565';if(!p)(window.adsbygoogle=window.adsbygoogle||[]).push({params:{google_npa:'1'}});document.head.appendChild(s);}
-function hide(){var b=document.getElementById('gdpr-banner');if(b){b.hidden=true;b.style.display='none';}}
-function save(v){localStorage.setItem(K,JSON.stringify({v:v,ts:Date.now()}));hide();loadAds(v==='accepted');}
-// Event delegation — funciona aunque scripts externos re-renderizen el DOM
-document.addEventListener('click',function(e){
-  if(e.target&&e.target.id==='gdpr-accept'){e.preventDefault();e.stopPropagation();save('accepted');}
-  else if(e.target&&e.target.id==='gdpr-reject'){e.preventDefault();e.stopPropagation();save('rejected');}
-},true);
-document.addEventListener('keydown',function(e){var b=document.getElementById('gdpr-banner');if(e.key==='Escape'&&b&&!b.hidden)save('rejected');});
-function init(){
-  try{var st=localStorage.getItem(K);if(st){var p=JSON.parse(st);if(p&&p.ts&&(Date.now()-p.ts)<13*30*24*3600*1000){loadAds(p.v==='accepted');return;}}}catch(e){}
-  var b=document.getElementById('gdpr-banner');
-  if(b){b.hidden=false;b.style.display='flex';setTimeout(function(){var btn=document.getElementById('gdpr-accept');if(btn)btn.focus();},300);}
-}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{setTimeout(init,0);}
-})();
-</script>
-</main>
-<footer role="contentinfo" aria-label="Aviso legal" style="background:#0d1117;border-top:1px solid #21262d;padding:10px 20px;font-family:Arial,sans-serif;font-size:11px;color:#8b949e;text-align:center;line-height:1.6;">
-<strong style="color:#c9d1d9;">Aviso de Riesgo:</strong> Contenido exclusivamente informativo. No constituye asesoramiento financiero. El trading de divisas implica alto riesgo.
-· <a href="/privacy.html" style="color:#58a6ff;">Privacidad</a> · <a href="/terms.html" style="color:#58a6ff;">Términos</a> · <a href="data.html" style="color:#58a6ff;">Datos</a>
-</footer>
+<div id="statusbar">
+  <div><span style="color:var(--text3);font-weight:700;letter-spacing:.04em;">GLOBAL INVESTING</span></div>
+  <div class="footer-copy">© 2026 Global Investing — FX Terminal. Educational use only. Not financial advice.</div>
+  <div style="margin-left:auto"><a href="privacy.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Privacy</a> · <a href="terms.html" style="color:var(--text3);text-decoration:none;font-size:10px;">Terms</a></div>
+</div>
 </body>
 </html>
