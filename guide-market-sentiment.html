@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>Spread &amp; Market Sentiment — Global Investing FX Terminal</title>
+<meta name="description" content="How to read the Reference Spreads and Market Sentiment sections of the FX Terminal. Understanding retail positioning data from Myfxbook and typical ECN spreads.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-market-sentiment.html">
+<meta property="og:title" content="Spread & Market Sentiment Guide — Global Investing FX Terminal">
+<meta property="og:description" content="Understanding retail FX positioning data and reference spreads in the Global Investing FX Terminal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.guide-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+.guide-toc { background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0 60px; position: sticky; top: 36px; height: calc(100vh - 36px); overflow-y: auto; }
+.toc-head { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 0 16px 8px; }
+.toc-item { display: block; padding: 5px 16px; font-size: 12px; color: var(--text2); text-decoration: none; transition: color .12s, background .12s; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--text); background: var(--bg3); }
+.toc-item.active { color: var(--text); border-left-color: var(--blue); background: rgba(41,98,255,.06); }
+.toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.guide-content { padding: 32px 40px 80px; max-width: 760px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.page-hero h1 { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.page-hero p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.guide-section { margin-bottom: 40px; scroll-margin-top: 50px; }
+.guide-section h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-section h3 { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; margin-top: 18px; }
+.guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+.callout { border-left: 3px solid var(--blue); background: rgba(41,98,255,.06); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 14px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+.callout strong { color: var(--text); }
+.callout-orange { border-left-color: var(--orange); background: rgba(246,148,28,.06); }
+.callout-green { border-left-color: var(--up); background: rgba(38,166,154,.06); }
+.callout-red { border-left-color: var(--down); background: rgba(239,83,80,.06); }
+
+.spread-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-bottom: 14px; }
+.spread-row-demo { display: grid; grid-template-columns: 70px 1fr 70px; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.spread-row-demo:last-child { border-bottom: none; }
+.spr-sym-d { font-weight: 700; color: var(--text); font-family: var(--font-ui); }
+.spr-bar-d { height: 5px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.spr-fill-d { height: 100%; border-radius: 2px; }
+.spr-val-d { text-align: right; font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+
+.sent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.sent-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 5px; padding: 12px 14px; }
+.sent-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.sent-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+.contra-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.contra-table th { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--bg2); }
+.contra-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 12px; }
+.contra-table td:first-child { color: var(--text); font-weight: 600; }
+.contra-table tr:last-child td { border-bottom: none; }
+
+@media (max-width: 800px) {
+  .guide-wrap { grid-template-columns: 1fr; }
+  .guide-toc { display: none; }
+  .guide-content { padding: 24px 16px 80px; }
+  .sent-grid { grid-template-columns: 1fr; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Overview</a>
+    <a href="/#section-fxpairs">FX Pairs</a>
+    <a href="/#section-rates">Rates</a>
+    <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-positioning">Positioning</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">Using the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html" style="color:var(--text)">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT Positioning</a>
+        <a href="guide-cb-rates.html">Central Bank Rates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#spreads">Reference Spreads</a>
+    <a class="toc-item" href="#spread-color">Color Coding</a>
+    <a class="toc-item" href="#spread-session">Spreads by Session</a>
+    <a class="toc-item" href="#sentiment">Market Sentiment</a>
+    <a class="toc-item" href="#myfxbook">Myfxbook Data</a>
+    <a class="toc-item" href="#contrarian">Contrarian Logic</a>
+    <a class="toc-item" href="#limits">Limitations</a>
+    <a class="toc-item" href="#combining">Combining Both</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-rates-yield-curve.html">← Rates &amp; Yield Curve</a>
+    <a class="toc-item" href="guide-fx-liquidity.html">→ FX Liquidity</a>
+  </nav>
+
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>Spread &amp; Market Sentiment</h1>
+      <p>Two adjacent sub-sections that sit in the same row of the terminal: <strong>Reference Spreads</strong> shows typical ECN trading costs per pair, and <strong>Market Sentiment</strong> shows retail trader positioning via the Myfxbook community. Used together, they give a complementary view of execution cost and crowd positioning.</p>
+    </div>
+
+    <div class="guide-section" id="spreads">
+      <h2>Reference Spreads</h2>
+      <p>The Reference Spreads panel shows typical ECN (Electronic Communication Network) spreads for the seven major FX pairs, expressed in pips. These are representative spreads — not live quotes from a specific broker — and represent average conditions during normal market hours.</p>
+      <div class="spread-demo">
+        <div class="spread-row-demo">
+          <span class="spr-sym-d">EUR/USD</span>
+          <div class="spr-bar-d"><div class="spr-fill-d" style="width:20%;background:var(--up)"></div></div>
+          <span class="spr-val-d" style="color:var(--up)">0.9 pip</span>
+        </div>
+        <div class="spread-row-demo">
+          <span class="spr-sym-d">GBP/USD</span>
+          <div class="spr-bar-d"><div class="spr-fill-d" style="width:24%;background:var(--up)"></div></div>
+          <span class="spr-val-d" style="color:var(--up)">1.1 pip</span>
+        </div>
+        <div class="spread-row-demo">
+          <span class="spr-sym-d">USD/JPY</span>
+          <div class="spr-bar-d"><div class="spr-fill-d" style="width:36%;background:var(--orange)"></div></div>
+          <span class="spr-val-d" style="color:var(--orange)">2.0 pip</span>
+        </div>
+        <div class="spread-row-demo">
+          <span class="spr-sym-d">USD/CAD</span>
+          <div class="spr-bar-d"><div class="spr-fill-d" style="width:52%;background:var(--down)"></div></div>
+          <span class="spr-val-d" style="color:var(--down)">2.5 pip</span>
+        </div>
+        <div class="spread-row-demo">
+          <span class="spr-sym-d">NZD/USD</span>
+          <div class="spr-bar-d"><div class="spr-fill-d" style="width:60%;background:var(--down)"></div></div>
+          <span class="spr-val-d" style="color:var(--down)">3.0 pip</span>
+        </div>
+      </div>
+      <p>The horizontal bar represents the spread relative to the widest reference pair shown. A shorter bar means lower cost (tighter spread). The value is color-coded by cost tier:</p>
+    </div>
+
+    <div class="guide-section" id="spread-color">
+      <h2>Color Coding</h2>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
+          <div style="width:12px;height:12px;background:var(--up);border-radius:2px;flex-shrink:0;"></div>
+          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Green — Tight (&lt; 1.5 pip)</span> <span style="color:var(--text2);">Low execution cost. Standard for EUR/USD and GBP/USD on major ECN brokers during London-NY overlap.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
+          <div style="width:12px;height:12px;background:var(--orange);border-radius:2px;flex-shrink:0;"></div>
+          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Orange — Moderate (1.5–2.5 pip)</span> <span style="color:var(--text2);">Typical for USD/JPY, AUD/USD, USD/CHF. Acceptable for most strategies but relevant for scalping.</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
+          <div style="width:12px;height:12px;background:var(--down);border-radius:2px;flex-shrink:0;"></div>
+          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Red — Wide (&gt; 2.5 pip)</span> <span style="color:var(--text2);">Typical for USD/CAD, NZD/USD. Higher relative cost. Spreads on these pairs can spike 2–5× during thin liquidity windows (Asian session, news events).</span></div>
+        </div>
+      </div>
+      <div class="callout callout-orange">
+        <strong>These are reference spreads, not live quotes.</strong> Actual spreads at your broker depend on account type (ECN vs. market maker), session, news events, and market conditions. Spreads on all pairs widen significantly during non-overlap hours and around high-impact data releases. Always check your broker's live spread before sizing a trade.
+      </div>
+    </div>
+
+    <div class="guide-section" id="spread-session">
+      <h2>Spreads by Session</h2>
+      <p>Spreads are not static. They compress during high-liquidity sessions and widen during thin periods. Understanding when spreads are their tightest is essential for execution-sensitive strategies:</p>
+      <table class="contra-table">
+        <thead><tr><th>Session</th><th>UTC Hours</th><th>EUR/USD Typical</th><th>USD/JPY Typical</th></tr></thead>
+        <tbody>
+          <tr><td>Sydney</td><td>22:00–07:00</td><td>1.2–2.0 pip</td><td>1.5–2.5 pip</td></tr>
+          <tr><td>Tokyo</td><td>00:00–09:00</td><td>0.9–1.5 pip</td><td>0.8–1.2 pip</td></tr>
+          <tr><td>London</td><td>08:00–17:00</td><td>0.4–0.9 pip</td><td>0.8–1.5 pip</td></tr>
+          <tr><td>New York</td><td>13:00–22:00</td><td>0.3–0.7 pip</td><td>0.9–1.5 pip</td></tr>
+          <tr><td>London–NY Overlap</td><td>13:00–17:00</td><td>0.2–0.5 pip</td><td>0.7–1.2 pip</td></tr>
+          <tr><td>News event (any)</td><td>±2 min</td><td>5–20 pip</td><td>5–20 pip</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="sentiment">
+      <h2>Market Sentiment</h2>
+      <p>Below the Reference Spreads, the <strong>Market Sentiment</strong> widget shows the percentage of retail traders who are currently <span style="color:var(--up);">long</span> vs. <span style="color:var(--down);">short</span> each major pair, sourced from the Myfxbook community platform.</p>
+      <p>Each pair is shown with two numbers: the long percentage and the short percentage. These sum to 100% and represent the directional positioning of Myfxbook's tracked account community in real time.</p>
+    </div>
+
+    <div class="guide-section" id="myfxbook">
+      <h2>Myfxbook Data</h2>
+      <p>Myfxbook is a third-party platform where retail forex traders connect their live broker accounts for automated trade tracking, performance analysis, and social sharing. The "Forex Outlook" widget aggregates the open positions of all connected accounts by pair and direction.</p>
+      <div class="sent-grid">
+        <div class="sent-card">
+          <div class="sent-title">What it measures</div>
+          <div class="sent-desc">The directional bias of currently-open retail trades on each pair. If 65% of accounts are long EUR/USD, it means more retail money is positioned for EUR/USD to rise than to fall.</div>
+        </div>
+        <div class="sent-card">
+          <div class="sent-title">Update frequency</div>
+          <div class="sent-desc">Near real-time — the widget pulls live data from Myfxbook's API and updates every 30 minutes in the terminal. The data reflects the current open position balance, not recent trade flow.</div>
+        </div>
+        <div class="sent-card">
+          <div class="sent-title">Coverage</div>
+          <div class="sent-desc">Major pairs (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD, NZD/USD) plus several crosses and exotic pairs. The terminal shows only the majors.</div>
+        </div>
+        <div class="sent-card">
+          <div class="sent-title">Who is included</div>
+          <div class="sent-desc">Retail traders who have voluntarily connected their live (or demo) accounts to Myfxbook. This is a biased sample — active, platform-engaged retail traders — not the full retail market.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="contrarian">
+      <h2>Contrarian Logic — How to Use Sentiment</h2>
+      <p>Retail sentiment data is most useful as a <strong>contrarian indicator</strong>. The underlying logic: retail traders, as a group, tend to be wrong at extremes. When the overwhelming majority of retail positions are on one side, the market has already extracted most of the available profit from that move — meaning the next significant move is likely in the opposite direction.</p>
+      <table class="contra-table">
+        <thead><tr><th>Sentiment Reading</th><th>Contrarian Interpretation</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td>70–80% Long</td><td>Moderate contrarian short signal. Crowd is bullish but not at extreme. Monitor for trend exhaustion.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt;80% Long</td><td>Strong contrarian short signal. Extreme crowd positioning historically precedes meaningful reversals.</td><td style="color:var(--down);">High (contrarian)</td></tr>
+          <tr><td>45–55% either side</td><td>Neutral. No useful signal from sentiment alone. Defer to rate differentials, COT, and price action.</td><td style="color:var(--text2);">None</td></tr>
+          <tr><td>70–80% Short</td><td>Moderate contrarian long signal. Most retail short positions suggest limited further downside.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt;80% Short</td><td>Strong contrarian long signal. Extreme short crowd often precedes sharp short squeezes.</td><td style="color:var(--up);">High (contrarian)</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-red">
+        <strong>Extreme readings can persist.</strong> A pair can be 80%+ long for weeks while it continues to fall. Retail traders are slow to close losing positions. Sentiment extremes identify <em>elevated risk of reversal</em>, not guaranteed entry points. Always combine with price action confirmation and COT data before acting.
+      </div>
+    </div>
+
+    <div class="guide-section" id="limits">
+      <h2>Limitations of Retail Sentiment</h2>
+      <p>Retail positioning data from Myfxbook has meaningful limitations that professional traders account for:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
+        <li><strong style="color:var(--text);">Sample bias:</strong> Only Myfxbook-connected accounts are included. Active, platform-engaged retail traders may behave differently from the full retail population.</li>
+        <li><strong style="color:var(--text);">Not institutional:</strong> This data says nothing about hedge fund, bank, or institutional positioning. For institutional positioning, use the COT panel.</li>
+        <li><strong style="color:var(--text);">Position vs. flow:</strong> Sentiment shows the stock of open positions, not the flow of new trades. A high long reading might reflect losing long-term positions that haven't been closed, not fresh bullish conviction.</li>
+        <li><strong style="color:var(--text);">Delayed signal:</strong> Retail traders are trend-followers who enter late and exit late. The contrarian signal works best at extremes because retail is most heavily positioned after a trend has already run most of its course.</li>
+      </ul>
+    </div>
+
+    <div class="guide-section" id="combining">
+      <h2>Combining Spreads and Sentiment</h2>
+      <p>These two sections work together to inform <em>when</em> and <em>how</em> to execute — not only what direction to trade. Consider:</p>
+      <div class="callout callout-green">
+        <strong>Execution timing:</strong> If your analysis points to a trade, Reference Spreads tells you which session gives you the best execution cost. Entering a GBP/USD position during the London–NY overlap (13:00–17:00 UTC) costs roughly 1/3 of what the same trade costs at 22:00 UTC.
+      </div>
+      <div class="callout">
+        <strong>Sentiment confirmation:</strong> If you're looking for a long trade on AUD/USD and sentiment shows 78% of retail accounts are already long, reconsider position sizing — the crowd is with you, which is typically a late-cycle signal. If sentiment shows 72% short and you're looking to go long, that's a confluence: contrarian sentiment alignment with your directional bias.
+      </div>
+      <p>The highest-quality setups from the Market Sentiment section arise when retail sentiment extremes align with COT institutional positioning in the opposite direction — meaning retail is crowded one way while smart money is positioned the other way. This is the core confluence signal.</p>
+    </div>
+
+  </div>
+</div>
+
+<div id="statusbar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">GUIDE</span><span class="sb-v">SPREAD &amp; MARKET SENTIMENT</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

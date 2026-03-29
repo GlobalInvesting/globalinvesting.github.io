@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>Rates &amp; Yield Curve — Global Investing FX Terminal</title>
+<meta name="description" content="How to read the US Treasury yield curve section of the FX Terminal. Understanding nominal yields, the 2Y–10Y spread, international yield differentials and their impact on currency pairs.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-rates-yield-curve.html">
+<meta property="og:title" content="Rates & Yield Curve Guide — Global Investing FX Terminal">
+<meta property="og:description" content="US Treasury yields, curve shape, and international spread differentials — their meaning and FX implications.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.guide-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+.guide-toc { background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0 60px; position: sticky; top: 36px; height: calc(100vh - 36px); overflow-y: auto; }
+.toc-head { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 0 16px 8px; }
+.toc-item { display: block; padding: 5px 16px; font-size: 12px; color: var(--text2); text-decoration: none; transition: color .12s, background .12s; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--text); background: var(--bg3); }
+.toc-item.active { color: var(--text); border-left-color: var(--blue); background: rgba(41,98,255,.06); }
+.toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.guide-content { padding: 32px 40px 80px; max-width: 760px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.page-hero h1 { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.page-hero p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.guide-section { margin-bottom: 40px; scroll-margin-top: 50px; }
+.guide-section h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-section h3 { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; margin-top: 18px; }
+.guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+.callout { border-left: 3px solid var(--blue); background: rgba(41,98,255,.06); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 14px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+.callout strong { color: var(--text); }
+.callout-orange { border-left-color: var(--orange); background: rgba(246,148,28,.06); }
+.callout-green { border-left-color: var(--up); background: rgba(38,166,154,.06); }
+.callout-red { border-left-color: var(--down); background: rgba(239,83,80,.06); }
+
+/* Yield curve visual */
+.curve-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; }
+.curve-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+.curve-svg-wrap { position: relative; height: 80px; }
+.curve-label { font-size: 10px; color: var(--text3); font-family: var(--font-mono); }
+.curve-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.curve-node { text-align: center; }
+.curve-node .tenor { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+.curve-node .yield-val { font-size: 14px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+
+.spread-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.spread-table th { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--bg2); }
+.spread-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 12px; }
+.spread-table td:first-child { font-family: var(--font-mono); font-weight: 700; color: var(--text); }
+.spread-table tr:last-child td { border-bottom: none; }
+
+.shape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.shape-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 5px; padding: 12px 14px; }
+.shape-name { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+.shape-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+@media (max-width: 800px) {
+  .guide-wrap { grid-template-columns: 1fr; }
+  .guide-toc { display: none; }
+  .guide-content { padding: 24px 16px 80px; }
+  .shape-grid { grid-template-columns: 1fr; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Overview</a>
+    <a href="/#section-fxpairs">FX Pairs</a>
+    <a href="/#section-rates">Rates</a>
+    <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-positioning">Positioning</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">Using the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html" style="color:var(--text)">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT Positioning</a>
+        <a href="guide-cb-rates.html">Central Bank Rates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#what-it-shows">What It Shows</a>
+    <a class="toc-item" href="#tenors">The Four Tenors</a>
+    <a class="toc-item" href="#curve-shape">Curve Shape</a>
+    <a class="toc-item" href="#2y-10y">2Y–10Y Spread</a>
+    <a class="toc-item" href="#intl-spreads">International Spreads</a>
+    <a class="toc-item" href="#us-de">US–DE 10Y Spread</a>
+    <a class="toc-item" href="#us-jp">US–JP 10Y Spread</a>
+    <a class="toc-item" href="#fx-implication">FX Implications</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-cross-asset-risk.html">← Cross-Asset Risk</a>
+    <a class="toc-item" href="guide-market-sentiment.html">→ Market Sentiment</a>
+  </nav>
+
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>Rates &amp; Yield Curve — US Treasuries</h1>
+      <p>The US Treasury yield curve is the single most important macro indicator for FX markets globally. It encodes market expectations for growth, inflation, and Federal Reserve policy — and it drives capital flows between currencies through the interest rate differential mechanism.</p>
+    </div>
+
+    <div class="guide-section" id="what-it-shows">
+      <h2>What It Shows</h2>
+      <p>The Rates &amp; Yield Curve section of the terminal displays four US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
+      <p>Data comes from Stooq and is updated daily. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
+    </div>
+
+    <div class="guide-section" id="tenors">
+      <h2>The Four Tenors — What Each Measures</h2>
+      <div class="curve-grid" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;gap:0;">
+        <div style="padding:12px;border-right:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">3M T-Bill</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Tracks the Fed's overnight policy rate most closely. The "risk-free" short-term rate. When 3M is high relative to 10Y, the curve is inverted.</div>
+        </div>
+        <div style="padding:12px;">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">2Y Note</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Most sensitive to Fed rate expectations over the next 1–2 years. Moves sharply on FOMC decisions and CPI/PCE data. The primary measure of near-term policy pricing.</div>
+        </div>
+        <div style="padding:12px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">5Y Note</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Reflects the medium-term equilibrium policy rate expectation. Often used by fixed income traders to gauge the "neutral rate" implied by markets.</div>
+        </div>
+        <div style="padding:12px;border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">10Y Bond</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">The global benchmark rate. Drives mortgage rates, corporate borrowing costs, and global capital allocation. The single most-watched yield in international markets. USD/JPY has a structural 0.85 correlation to the US 10Y.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="curve-shape">
+      <h2>Curve Shape — What It Signals</h2>
+      <p>The relationship between short and long yields — the <em>slope</em> of the curve — has historically been one of the most reliable leading indicators in macroeconomics:</p>
+      <div class="shape-grid">
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--up);">Normal (Upward Sloping)</div>
+          <div class="shape-desc">Long yields &gt; short yields. Healthy growth expectations. Banks profit by borrowing short, lending long. Supports risk assets and carry trades. Positive for AUD, CAD, NZD.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--text2);">Flat</div>
+          <div class="shape-desc">2Y ≈ 10Y. Transition state — either normalizing from inversion or flattening from normal. Uncertainty about growth trajectory. Mixed FX signal, watch for direction of change.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--down);">Inverted (Downward Sloping)</div>
+          <div class="shape-desc">Short yields &gt; long yields. Market is pricing Fed rate cuts ahead, implying an economic slowdown. Historically preceded every US recession since WWII with a 6–18 month lead. Bearish for risk assets, supportive of JPY and CHF.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--orange);">Bear Steepening</div>
+          <div class="shape-desc">Long yields rising faster than short yields. Often driven by fiscal concerns (large Treasury supply) or inflation expectations rising at the long end. Can be USD-positive on rate differential but negative for growth assets.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="2y-10y">
+      <h2>2Y–10Y Spread</h2>
+      <p>The most widely-watched domestic yield curve spread: the difference between the 10-year Treasury yield and the 2-year Treasury yield, expressed in basis points (bps). Calculated as <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">10Y yield − 2Y yield</code>.</p>
+      <table class="spread-table">
+        <thead><tr><th>Value</th><th>Signal</th><th>FX Context</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--up);">+100 bps or more</td><td>Strongly normal curve</td><td>Robust growth expectations. Strong carry trades. Risk-on currencies supported.</td></tr>
+          <tr><td style="color:var(--up);">+50 to +100 bps</td><td>Moderately normal</td><td>Healthy environment. Gradual USD normalization cycle typically ongoing.</td></tr>
+          <tr><td style="color:var(--text2);">0 to +50 bps</td><td>Flat / Flattening</td><td>Late-cycle signals. Watch for growth deceleration. Begin monitoring JPY.</td></tr>
+          <tr><td style="color:var(--down);">0 to -50 bps</td><td>Mild inversion</td><td>Recession risk on the horizon. Carry trade vulnerability rising. Defensive posture.</td></tr>
+          <tr><td style="color:var(--down);">-50 bps or deeper</td><td>Deep inversion</td><td>Historically high recession probability within 12–18 months. Risk-off bias.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-orange">
+        <strong>The 2Y–10Y re-steepening trap:</strong> When an inverted curve re-steepens (the spread moves from negative back toward zero), it does not mean conditions are improving. A re-steepening from deep inversion typically happens as the Fed begins cutting rates in response to an already-deteriorating economy — which is historically when equities and risk FX begin their most significant declines. This is a common misread.
+      </div>
+    </div>
+
+    <div class="guide-section" id="intl-spreads">
+      <h2>International Yield Spreads</h2>
+      <p>The terminal tracks two critical cross-country 10Y yield differentials. These spreads directly drive currency pair valuations through the interest rate parity mechanism — capital flows toward higher-yielding sovereign debt, bidding up that country's currency.</p>
+    </div>
+
+    <div class="guide-section" id="us-de">
+      <h2>US–DE 10Y Spread (EUR/USD Proxy)</h2>
+      <p>The difference between the US 10-year Treasury yield and the German 10-year Bund yield. This spread is the primary structural driver of EUR/USD over medium-to-long timeframes.</p>
+      <p>When the US–DE spread widens (US yields rise faster or fall slower than German yields), the USD becomes more attractive relative to the EUR, and EUR/USD tends to fall. When the spread narrows, EUR/USD tends to rise.</p>
+      <div class="callout callout-green">
+        <strong>How to read it in the terminal:</strong> The spread value shows in basis points alongside a signal label. A widening spread (US outperforming) carries a bearish EUR/USD implication. A narrowing spread (Germany outperforming, or ECB falling behind the Fed in rate normalisation) carries a bullish EUR/USD implication. The signal label reflects the direction and magnitude of recent change.
+      </div>
+      <p>The correlation between US–DE 10Y spread and EUR/USD typically runs at -0.80 or better over rolling 6-month windows. Divergences between the spread and EUR/USD price action are often mean-reversion setups.</p>
+    </div>
+
+    <div class="guide-section" id="us-jp">
+      <h2>US–JP 10Y Spread (USD/JPY Driver)</h2>
+      <p>The difference between the US 10-year Treasury yield and the Japanese 10-year JGB yield. This is arguably the single most important structural driver of USD/JPY — the pair with the world's highest daily volume.</p>
+      <p>Japan's yield curve control (YCC) policy (now largely unwound as of 2024) historically capped JGB yields near 0%, meaning the US–JP spread widened and narrowed almost entirely based on US yield movements. This made USD/JPY one of the purest expressions of US rate expectations in FX markets.</p>
+      <div class="callout callout-red">
+        <strong>Post-YCC Japan:</strong> As the BoJ has normalized policy and allowed JGB yields to rise, the US–JP spread relationship has become more symmetric. Japanese rate hikes now compress the spread from the JP side as well. This means carry trade unwinds in USD/JPY can be triggered by either US yield declines or JP yield increases — monitor both.</div>
+      <p>The terminal displays the signal as Steepening (spread widening, bullish USD/JPY), Narrowing (spread compressing, bearish USD/JPY), or Stable (within recent range).</p>
+    </div>
+
+    <div class="guide-section" id="fx-implication">
+      <h2>Practical FX Implications</h2>
+      <p>Use the Rates section alongside the Cross-Asset and CB Rates panels for the highest-conviction signals:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.8;">
+        <li>US 10Y rising + DXY strengthening + US–JP spread widening → consensus signal for USD/JPY upside</li>
+        <li>US 2Y falling sharply after CPI miss → Fed cut expectations repriced → short USD, long EUR and commodity pairs</li>
+        <li>Curve inverting deeper while VIX rising → risk-off regime, defensive currencies (JPY, CHF) favored</li>
+        <li>US–DE spread narrowing while ECB holds rates → EUR/USD upside, especially if EUR also has inflation convergence</li>
+        <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
+      </ul>
+      <div class="callout">
+        <strong>Data source:</strong> US Treasury yields in the terminal come from Stooq daily closing data. The values update once per trading day. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="statusbar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">GUIDE</span><span class="sb-v">RATES &amp; YIELD CURVE</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

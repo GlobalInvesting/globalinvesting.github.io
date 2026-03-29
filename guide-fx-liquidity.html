@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>FX Liquidity &amp; Sessions — Global Investing FX Terminal</title>
+<meta name="description" content="Understanding the FX Liquidity chart and Market Sessions section of the Global Investing FX Terminal. Sydney, Tokyo, London, and New York sessions — hours, volume profiles, and pair behavior.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-fx-liquidity.html">
+<meta property="og:title" content="FX Liquidity & Sessions Guide — Global Investing FX Terminal">
+<meta property="og:description" content="Learn how to read the FX liquidity canvas and market sessions, and how session timing affects your trades.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.guide-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+.guide-toc { background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0 60px; position: sticky; top: 36px; height: calc(100vh - 36px); overflow-y: auto; }
+.toc-head { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 0 16px 8px; }
+.toc-item { display: block; padding: 5px 16px; font-size: 12px; color: var(--text2); text-decoration: none; transition: color .12s, background .12s; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--text); background: var(--bg3); }
+.toc-item.active { color: var(--text); border-left-color: var(--blue); background: rgba(41,98,255,.06); }
+.toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.guide-content { padding: 32px 40px 80px; max-width: 760px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.page-hero h1 { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.page-hero p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.guide-section { margin-bottom: 40px; scroll-margin-top: 50px; }
+.guide-section h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-section h3 { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; margin-top: 18px; }
+.guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+.callout { border-left: 3px solid var(--blue); background: rgba(41,98,255,.06); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 14px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+.callout strong { color: var(--text); }
+.callout-orange { border-left-color: var(--orange); background: rgba(246,148,28,.06); }
+.callout-green { border-left-color: var(--up); background: rgba(38,166,154,.06); }
+
+/* Liquidity canvas visualization */
+.liq-canvas-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; margin-bottom: 14px; }
+.liq-bar-row { display: flex; gap: 2px; align-items: flex-end; height: 60px; margin-bottom: 6px; }
+.liq-bar { flex: 1; border-radius: 1px 1px 0 0; min-width: 1px; transition: background .2s; }
+.liq-time-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--text3); font-family: var(--font-mono); }
+
+.session-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.session-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; padding: 14px 16px; }
+.sess-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.sess-hours { font-family: var(--font-mono); font-size: 11px; color: var(--blue); margin-bottom: 6px; }
+.sess-detail { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.sess-pairs { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-top: 6px; }
+
+.vol-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.vol-table th { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--bg2); }
+.vol-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 12px; }
+.vol-table td:first-child { color: var(--text); font-weight: 600; }
+.vol-table tr:last-child td { border-bottom: none; }
+
+@media (max-width: 800px) {
+  .guide-wrap { grid-template-columns: 1fr; }
+  .guide-toc { display: none; }
+  .guide-content { padding: 24px 16px 80px; }
+  .session-cards { grid-template-columns: 1fr; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Overview</a>
+    <a href="/#section-fxpairs">FX Pairs</a>
+    <a href="/#section-rates">Rates</a>
+    <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-positioning">Positioning</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">Using the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html" style="color:var(--text)">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT Positioning</a>
+        <a href="guide-cb-rates.html">Central Bank Rates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#liquidity-chart">Liquidity Canvas</a>
+    <a class="toc-item" href="#reading">How to Read It</a>
+    <a class="toc-item" href="#sessions">The Four Sessions</a>
+    <a class="toc-item" href="#sydney">Sydney</a>
+    <a class="toc-item" href="#tokyo">Tokyo</a>
+    <a class="toc-item" href="#london">London</a>
+    <a class="toc-item" href="#newyork">New York</a>
+    <a class="toc-item" href="#overlap">Overlap Windows</a>
+    <a class="toc-item" href="#vol-profile">Volatility Profile</a>
+    <a class="toc-item" href="#strategy">Session Strategy</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-market-sentiment.html">← Market Sentiment</a>
+    <a class="toc-item" href="guide-cot.html">→ COT Positioning</a>
+  </nav>
+
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>FX Liquidity &amp; Sessions</h1>
+      <p>The FX market operates 24 hours a day, five days a week — but liquidity, volatility, and the pairs most actively traded vary significantly by hour. Understanding the session structure is fundamental to timing entries, managing spreads, and anticipating where volume is concentrated.</p>
+    </div>
+
+    <div class="guide-section" id="liquidity-chart">
+      <h2>The FX Liquidity Canvas</h2>
+      <p>At the top of the left sidebar, the <strong>FX Liquidity</strong> panel shows a canvas-drawn chart depicting the estimated relative liquidity level across each hour of the 24-hour UTC trading day.</p>
+      <div class="liq-canvas-demo">
+        <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Estimated FX Liquidity — 24h UTC</div>
+        <div class="liq-bar-row" id="demo-bars"></div>
+        <div class="liq-time-row">
+          <span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>24:00</span>
+        </div>
+      </div>
+      <p>A vertical line marks the current UTC time, showing you exactly where in the liquidity cycle the market is right now. A peak label highlights the highest-liquidity hour of the day.</p>
+    </div>
+
+    <div class="guide-section" id="reading">
+      <h2>How to Read It</h2>
+      <p>The curve shape reflects aggregate FX volume across all currency pairs, normalized so the highest-liquidity period reaches 100%. Key features to identify at a glance:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
+        <li><strong style="color:var(--text);">The primary peak</strong> — London–New York overlap (13:00–17:00 UTC) consistently shows the highest liquidity globally, accounting for roughly 50% of daily FX volume.</li>
+        <li><strong style="color:var(--text);">The London open spike</strong> — 08:00–09:00 UTC. The moment European banks come online typically produces a sharp volume increase, especially for EUR pairs.</li>
+        <li><strong style="color:var(--text);">The Tokyo–London gap</strong> — 06:00–08:00 UTC. Typically the lowest liquidity window of the day for majors. Spreads widen, price action is thin.</li>
+        <li><strong style="color:var(--text);">The current time marker</strong> — the vertical line tells you whether you are in a high-liquidity window (wide bars on either side) or a thin period (approaching the Asian trough).</li>
+      </ul>
+      <div class="callout callout-green">
+        <strong>Practical use:</strong> Before placing a trade, glance at the liquidity canvas. If the current time marker is in a thin period (low bars), expect wider spreads and potentially erratic, low-conviction price moves. If you're at or near the London–NY peak, spreads are tight and moves are more likely to have follow-through.
+      </div>
+    </div>
+
+    <div class="guide-section" id="sessions">
+      <h2>The Four Trading Sessions</h2>
+      <p>The <strong>Market Sessions</strong> panel in the main content area shows the open/close times (UTC) and current status of all four sessions. Session times include both standard UTC hours and adjust for DST in the topbar session indicator. The terminal calculates which sessions are currently active and highlights them accordingly.</p>
+    </div>
+
+    <div class="guide-section" id="sydney">
+      <h2>Sydney Session</h2>
+      <div class="session-cards" style="grid-template-columns:1fr;">
+        <div class="session-card">
+          <div class="sess-name">🇦🇺 Sydney</div>
+          <div class="sess-hours">22:00 – 07:00 UTC (standard) | 21:00 – 06:00 UTC (AEDT)</div>
+          <div class="sess-detail">The quietest of the four major sessions. Opens the weekly FX market on Sunday (22:00 UTC). Volume is limited — the major Australian and New Zealand banks are active, but international participation is light. AUD and NZD pairs see their most native liquidity here.</div>
+          <div class="sess-pairs">Most active pairs: AUD/USD · NZD/USD · AUD/NZD · AUD/JPY</div>
+        </div>
+      </div>
+      <p>Typical daily ranges in the Sydney session are the smallest of all sessions. EUR/USD and GBP/USD often drift sideways or consolidate moves from the prior New York session close. Avoid news-driven strategies in this window for European pairs — participation is too thin for reliable follow-through.</p>
+    </div>
+
+    <div class="guide-section" id="tokyo">
+      <h2>Tokyo / Asia Session</h2>
+      <div class="session-cards" style="grid-template-columns:1fr;">
+        <div class="session-card">
+          <div class="sess-name">🇯🇵 Tokyo</div>
+          <div class="sess-hours">00:00 – 09:00 UTC (standard) | 23:00 – 08:00 UTC (JST +9)</div>
+          <div class="sess-detail">More active than Sydney, as Japanese, Chinese, and Southeast Asian institutional participants come online. USD/JPY sees its primary native liquidity window here. Important JPY economic data (CPI, employment, BoJ decisions) releases during this session, causing sharp moves in JPY pairs.</div>
+          <div class="sess-pairs">Most active pairs: USD/JPY · EUR/JPY · GBP/JPY · AUD/JPY</div>
+        </div>
+      </div>
+      <p>The Asia session often sets the initial directional bias for USD/JPY that London traders respond to. Crosses involving JPY (EUR/JPY, GBP/JPY) can see larger moves in Tokyo than their component pairs (EUR/USD, GBP/USD) would suggest, as Japanese institutional accounts rebalance cross positions.</p>
+    </div>
+
+    <div class="guide-section" id="london">
+      <h2>London Session</h2>
+      <div class="session-cards" style="grid-template-columns:1fr;">
+        <div class="session-card">
+          <div class="sess-name">🇬🇧 London</div>
+          <div class="sess-hours">08:00 – 17:00 UTC (standard) | 07:00 – 16:00 UTC (BST)</div>
+          <div class="sess-detail">The largest FX trading center globally. The London open (08:00–09:00 UTC) is historically the highest single-hour spike in global FX volume. European institutional flows, ECB and BoE participants, and global macro funds all active simultaneously. EUR, GBP, and CHF pairs see maximum native liquidity.</div>
+          <div class="sess-pairs">Most active pairs: EUR/USD · GBP/USD · EUR/GBP · EUR/CHF · USD/CHF · EUR/JPY</div>
+        </div>
+      </div>
+      <p>The 08:00–09:00 UTC window is one of the highest-conviction entry periods of the day. European PMI data, ECB speeches, UK economic releases, and institutional order flow all concentrate here. Trends that start in the first hour of London frequently define the direction for the rest of the European session.</p>
+      <div class="callout callout-orange">
+        <strong>London fix (16:00 UTC):</strong> The 4pm London WM/Reuters fix is when corporate, fund, and custody accounts execute large foreign exchange benchmarking orders. The 30-minute window before (15:30–16:00) and after (16:00–16:30) can see sharp directional moves as market makers position around anticipated fix flows, followed by a reversal. This is a well-documented intraday pattern.
+      </div>
+    </div>
+
+    <div class="guide-section" id="newyork">
+      <h2>New York Session</h2>
+      <div class="session-cards" style="grid-template-columns:1fr;">
+        <div class="session-card">
+          <div class="sess-name">🇺🇸 New York</div>
+          <div class="sess-hours">13:00 – 22:00 UTC (standard) | 08:00 – 17:00 EST</div>
+          <div class="sess-detail">US economic data (CPI, NFP, ISM, GDP, FOMC decisions) drives the most significant single-session moves in global FX. The NYSE and equity market open at 14:30 UTC creates additional cross-asset flows that impact FX. USD pairs dominate; DXY is most volatile here.</div>
+          <div class="sess-pairs">Most active pairs: EUR/USD · GBP/USD · USD/JPY · USD/CAD · AUD/USD</div>
+        </div>
+      </div>
+      <p>US macro data typically releases at 13:30 UTC (8:30 AM ET) — the first hour of the NY session. This window is the highest-volatility single point of the trading day when major data is scheduled. FOMC decisions (Wednesday 19:00 UTC) and press conferences can produce multi-hundred pip moves in EUR/USD and USD/JPY within minutes.</p>
+    </div>
+
+    <div class="guide-section" id="overlap">
+      <h2>Overlap Windows</h2>
+      <p>Where two sessions are simultaneously active, volume and volatility reach their highest levels. There are two key overlaps:</p>
+      <div class="session-cards">
+        <div class="session-card">
+          <div class="sess-name">Tokyo–London Overlap</div>
+          <div class="sess-hours">08:00 – 09:00 UTC</div>
+          <div class="sess-detail">Brief 1-hour window. Often produces a directional spike in EUR/JPY and GBP/JPY as Tokyo closes positions and London opens new ones. Watch for reversals of Asian session drift.</div>
+        </div>
+        <div class="session-card" style="border-color:var(--blue);">
+          <div class="sess-name" style="color:var(--blue);">London–New York Overlap</div>
+          <div class="sess-hours" style="color:var(--up);">13:00 – 17:00 UTC ← PEAK</div>
+          <div class="sess-detail">The highest liquidity window of the week. All major institutional participants active. Tightest spreads, highest volume, most reliable trend continuation. The 4 hours that matter most for most FX strategies.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="vol-profile">
+      <h2>Session Volatility Profile</h2>
+      <p>The <strong>Session Vol</strong> table within the Market Sessions panel shows historical average daily pip ranges for EUR/USD and USD/JPY across each session. These are long-run averages — individual sessions vary significantly based on news flow and market regime.</p>
+      <table class="vol-table">
+        <thead><tr><th>Session</th><th>EUR/USD Avg Range</th><th>USD/JPY Avg Range</th><th>Character</th></tr></thead>
+        <tbody>
+          <tr><td>Sydney</td><td>±18 pip</td><td>±22 pip</td><td>Thin, drift, consolidation</td></tr>
+          <tr><td>Tokyo</td><td>±28 pip</td><td>±44 pip</td><td>JPY-driven, rangy, data-reactive</td></tr>
+          <tr><td>London</td><td>±62 pip</td><td>±58 pip</td><td>Trend-setting, breakout-prone</td></tr>
+          <tr><td>New York</td><td>±71 pip</td><td>±66 pip</td><td>Data-driven, high volatility, USD-dominant</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Note:</strong> These are historical reference averages, not current ATR values. During high-impact events (FOMC, NFP, CPI), individual sessions can easily produce 3–5× these ranges. During holiday periods or low-conviction markets, sessions may produce less than half these averages.
+      </div>
+    </div>
+
+    <div class="guide-section" id="strategy">
+      <h2>Session Strategy Implications</h2>
+      <p>The session structure directly informs which strategies work best and when:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;margin-bottom:14px;">
+        <li><strong style="color:var(--text);">Breakout strategies</strong> — highest probability at London open (08:00 UTC) and NY data releases (13:30 UTC). Price is most likely to initiate and sustain directional moves in these windows.</li>
+        <li><strong style="color:var(--text);">Range / mean-reversion strategies</strong> — most suited to Sydney session and the Tokyo–London gap (06:00–08:00 UTC) for EUR/USD and GBP/USD. These pairs tend to oscillate without conviction in low-liquidity windows.</li>
+        <li><strong style="color:var(--text);">Execution quality</strong> — best during London–NY overlap (13:00–17:00 UTC). Tightest spreads, deepest order book, less slippage risk.</li>
+        <li><strong style="color:var(--text);">Avoiding thin liquidity</strong> — the 06:00–08:00 UTC window (between Tokyo close and London open) is the highest spread, lowest volume, most erratic period for EUR/USD. A common mistake is entering positions in this window and being "stopped out by the spread."</li>
+      </ul>
+      <div class="callout callout-green">
+        <strong>Using the terminal:</strong> Check the FX Liquidity canvas and the current time marker before entering a trade. If you're at or beyond the New York close (22:00 UTC), the market is entering its thinnest window. If you're approaching or within the London open (08:00 UTC), you're entering the highest-conviction period.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="statusbar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">GUIDE</span><span class="sb-v">FX LIQUIDITY &amp; SESSIONS</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</div>
+
+<script>
+// Draw demo liquidity bars
+const demoBars = document.getElementById('demo-bars');
+if (demoBars) {
+  const profile = [8,6,5,5,6,7,10,18,28,38,44,48,52,62,72,80,78,65,55,48,38,28,18,12];
+  const now = new Date();
+  const currentHour = now.getUTCHours();
+  profile.forEach((val, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'liq-bar';
+    const pct = (val / 80) * 100;
+    bar.style.height = pct + '%';
+    bar.style.background = i === currentHour ? '#2962ff' : (val > 60 ? '#26a69a' : val > 35 ? '#363c4e' : '#2a2e39');
+    demoBars.appendChild(bar);
+  });
+}
+// TOC scroll spy
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

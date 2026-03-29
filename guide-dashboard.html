@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>How to Use the FX Terminal — Global Investing</title>
+<meta name="description" content="A complete guide to the Global Investing FX Terminal. Learn how to read the quote bar, navigate sections, interpret the AI narrative, and monitor live market conditions.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-dashboard.html">
+<meta property="og:title" content="How to Use the FX Terminal — Global Investing">
+<meta property="og:description" content="Complete walkthrough of every section in the Global Investing FX Terminal dashboard.">
+<meta property="og:url" content="https://globalinvesting.github.io/guide-dashboard.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+
+/* GUIDE LAYOUT */
+.guide-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+.guide-toc { background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0 60px; position: sticky; top: 36px; height: calc(100vh - 36px); overflow-y: auto; }
+.toc-head { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 0 16px 8px; }
+.toc-item { display: block; padding: 5px 16px; font-size: 12px; color: var(--text2); text-decoration: none; transition: color .12s, background .12s; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--text); background: var(--bg3); }
+.toc-item.active { color: var(--text); border-left-color: var(--blue); background: rgba(41,98,255,.06); }
+.toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+.guide-content { padding: 32px 40px 80px; max-width: 760px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.page-hero h1 { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.page-hero p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+.guide-section { margin-bottom: 40px; scroll-margin-top: 50px; }
+.guide-section h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-section h3 { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; margin-top: 18px; }
+.guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+
+.callout { border-left: 3px solid var(--blue); background: rgba(41,98,255,.06); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 14px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+.callout strong { color: var(--text); }
+.callout-orange { border-left-color: var(--orange); background: rgba(246,148,28,.06); }
+.callout-green { border-left-color: var(--up); background: rgba(38,166,154,.06); }
+
+.step-list { list-style: none; counter-reset: steps; }
+.step-list li { counter-increment: steps; display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); line-height: 1.6; }
+.step-list li:last-child { border-bottom: none; }
+.step-list li::before { content: counter(steps); display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; min-width: 22px; background: var(--blue); color: #fff; border-radius: 50%; font-size: 10px; font-weight: 700; margin-top: 1px; }
+
+.layout-diagram { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 16px; font-family: var(--font-mono); font-size: 11px; color: var(--text3); line-height: 1.8; }
+.layout-diagram .hl { color: var(--blue); }
+.layout-diagram .hl-g { color: var(--up); }
+.layout-diagram .hl-o { color: var(--orange); }
+
+.regime-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.regime-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 5px; padding: 10px 12px; }
+.regime-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; margin-bottom: 4px; }
+.regime-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.risk-on { color: var(--up); }
+.risk-off { color: var(--down); }
+.mixed { color: var(--orange); }
+.neutral { color: var(--text2); }
+
+@media (max-width: 800px) {
+  .guide-wrap { grid-template-columns: 1fr; }
+  .guide-toc { display: none; }
+  .guide-content { padding: 24px 16px 80px; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+  .regime-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Overview</a>
+    <a href="/#section-fxpairs">FX Pairs</a>
+    <a href="/#section-rates">Rates</a>
+    <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-positioning">Positioning</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html" style="color:var(--text)">Using the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html">COT Positioning</a>
+        <a href="guide-cb-rates.html">Central Bank Rates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#layout">Terminal Layout</a>
+    <a class="toc-item" href="#topbar-guide">Topbar &amp; Quote Bar</a>
+    <a class="toc-item" href="#narrative">AI Narrative &amp; Regime</a>
+    <a class="toc-item" href="#price-chart">Price Chart</a>
+    <a class="toc-item" href="#fx-pairs">FX Pairs Table</a>
+    <a class="toc-item" href="#heatmap">Currency Strength Heatmap</a>
+    <a class="toc-item" href="#sidebar">Left Sidebar</a>
+    <a class="toc-item" href="#right-panel">Right Panel</a>
+    <a class="toc-item" href="#news-feed">News Feed</a>
+    <a class="toc-item" href="#alerts">Alerts &amp; Signals</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-cross-asset-risk.html">→ Cross-Asset Risk</a>
+    <a class="toc-item" href="guide-rates-yield-curve.html">→ Rates &amp; Yield Curve</a>
+    <a class="toc-item" href="guide-market-sentiment.html">→ Market Sentiment</a>
+    <a class="toc-item" href="guide-fx-liquidity.html">→ FX Liquidity</a>
+    <a class="toc-item" href="guide-cot.html">→ COT Positioning</a>
+    <a class="toc-item" href="guide-cb-rates.html">→ Central Bank Rates</a>
+  </nav>
+
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>How to Use the FX Terminal</h1>
+      <p>A complete walkthrough of every section in the dashboard — what each widget shows, where the data comes from, and how to use it to monitor FX market conditions.</p>
+    </div>
+
+    <div class="guide-section" id="layout">
+      <h2>Terminal Layout</h2>
+      <p>The terminal uses a three-column layout at full width. Understanding the structure helps you navigate quickly:</p>
+      <div class="layout-diagram">
+        <span class="hl">[ TOPBAR — Global Investing FX Terminal · Nav · Session · Clock ]</span><br>
+        <span class="hl-g">[ QUOTE BAR — EUR/USD · GBP/USD · USD/JPY · AUD/USD · XAU · WTI · BTC · DXY · US10Y ]</span><br>
+        [ NEWS TICKER — scrolling FX headlines ]<br><br>
+        <span class="hl-o">[ LEFT SIDEBAR ]</span>  │  <span class="hl">[ MAIN CONTENT AREA ]</span>  │  <span class="hl-o">[ RIGHT PANEL ]</span><br>
+        <span class="hl-o">  FX Liquidity     </span>  │  <span class="hl">  Narrative · Chart · FX Table </span>  │  <span class="hl-o">  Macro Calendar  </span><br>
+        <span class="hl-o">  Crosses          </span>  │  <span class="hl">  Heatmap · Cross-Asset · Risk </span>  │  <span class="hl-o">  CB Rates        </span><br>
+        <span class="hl-o">  Carry Top Pairs  </span>  │  <span class="hl">  Rates · COT · Sessions       </span>  │  <span class="hl-o">  Correlations    </span><br>
+                              │  <span class="hl">  Spreads · Sentiment          </span>  │  <span class="hl-o">  Rate Expectations</span><br>
+                              │  <span class="hl">  News · Map · Signals         </span>  │  <span class="hl-o">  Option Skew     </span>
+      </div>
+      <p>On screens narrower than 1100px the layout collapses into a single scrollable column. On mobile, the sidebar and right panel fold into the main flow.</p>
+      <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, and <strong>Calendar</strong>.</p>
+    </div>
+
+    <div class="guide-section" id="topbar-guide">
+      <h2>Topbar &amp; Quote Bar</h2>
+      <h3>Session indicator</h3>
+      <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
+      <h3>Quote bar</h3>
+      <p>The horizontal strip below the topbar shows live prices for EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD, NZD/USD, EUR/GBP, XAU/USD, WTI Crude, BTC/USD, US 10Y Yield, and DXY. Prices come from the Frankfurter/ECB API for FX, and open market proxies for commodities and crypto.</p>
+      <div class="callout">
+        <strong>Update cadence:</strong> FX rates in the quote bar refresh from ECB data, which publishes once daily around 16:00 CET. For real-time tick data, use the TradingView price chart in the main panel, which updates continuously.
+      </div>
+      <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
+      <h3>News ticker</h3>
+      <p>The scrolling headline strip below the quote bar shows the most recent FX-relevant headlines from RSS feeds (Reuters, FT, ForexLive, FXStreet), updated 3× daily by the engine. Headlines are color-tagged by currency when a specific pair is mentioned.</p>
+    </div>
+
+    <div class="guide-section" id="narrative">
+      <h2>AI Narrative &amp; Regime</h2>
+      <p>Immediately below the quote bar in the main panel, the <strong>Narrative bar</strong> provides a 2–3 sentence summary of current market conditions, synthesized by the AI engine from rate differentials, cross-asset flows, COT positioning, and upcoming macro events.</p>
+      <p>Next to the narrative text, the <strong>Regime label</strong> provides a one-word characterization of the overall market environment:</p>
+      <div class="regime-grid">
+        <div class="regime-card">
+          <div class="regime-label risk-on">RISK-ON</div>
+          <div class="regime-desc">Risk appetite is elevated. Equities rising, credit spreads tight, commodity currencies (AUD, NZD, CAD) outperforming, JPY and CHF underperforming as safe-haven demand falls.</div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-label risk-off">RISK-OFF</div>
+          <div class="regime-desc">Risk aversion dominates. Capital flows into safe havens (JPY, CHF, USD), equity volatility rising (VIX elevated), gold bid, commodity currencies under pressure.</div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-label mixed">MIXED</div>
+          <div class="regime-desc">Conflicting signals across asset classes. Typical of transition periods, ahead of major macro events, or when individual currency stories diverge from the broader risk mood.</div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-label neutral">NEUTRAL</div>
+          <div class="regime-desc">No clear directional bias. Low volatility, range-bound markets, or reduced participation (e.g., holiday periods). Wait for clearer conviction signals.</div>
+        </div>
+      </div>
+      <div class="callout callout-orange">
+        <strong>Frequency:</strong> The narrative and regime update at 06:30, 12:30, and 21:30 UTC. The timestamp is shown next to the label. Do not rely on the narrative for intraday tick-by-tick changes — use the live price feeds and VIX/MOVE data in the Risk Monitor for real-time regime shifts.
+      </div>
+    </div>
+
+    <div class="guide-section" id="price-chart">
+      <h2>Price Chart</h2>
+      <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, XAU/USD, WTI, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD.</p>
+      <p>The chart runs all of TradingView's standard features — candlestick, Heikin-Ashi, Renko, and bar charts; all built-in indicators (RSI, MACD, Bollinger Bands, Ichimoku, Volume Profile, etc.); drawing tools; multi-timeframe switching from 1-minute to monthly.</p>
+      <div class="callout callout-green">
+        <strong>Tip:</strong> Right-click the chart to access the full TradingView symbol search. You can chart any instrument available on TradingView, not only the pre-built tabs.
+      </div>
+    </div>
+
+    <div class="guide-section" id="fx-pairs">
+      <h2>FX Pairs Table</h2>
+      <p>Below the price chart, the <strong>FX Pairs — Majors</strong> table shows a snapshot of all major pairs with the following columns:</p>
+      <ul style="list-style:none;padding:0;">
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Pair</strong> <span style="color:var(--text2);">Currency pair identifier (e.g., EUR/USD)</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices from the ECB/Frankfurter feed</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Spread</strong> <span style="color:var(--text2);">Estimated current spread in pips, color-coded (green &lt;1.5 pip, orange 1.5–3, red &gt;3)</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1D</strong> <span style="color:var(--text2);">Percentage change vs. yesterday's closing price</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1W</strong> <span style="color:var(--text2);">Percentage change vs. last week's close</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">IV 1M</strong> <span style="color:var(--text2);">Estimated 1-month implied volatility for the pair</span></li>
+        <li style="padding:6px 0;display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Session Range</strong> <span style="color:var(--text2);">Intraday high/low range as a percentage of average daily range (ADR)</span></li>
+      </ul>
+    </div>
+
+    <div class="guide-section" id="heatmap">
+      <h2>Currency Strength Heatmap</h2>
+      <p>An 8×8 grid showing the relative performance of each G8 currency against every other, computed from Frankfurter/ECB daily rates. Each cell shows the percentage change of the row currency vs. the column currency over the selected timeframe.</p>
+      <p>The diagonal is blank (a currency vs. itself). Green cells indicate the row currency strengthened against the column currency; red indicates it weakened. The intensity of the color scales with the magnitude of the move.</p>
+      <div class="callout">
+        <strong>How to read it:</strong> Scan the rows. A row that is mostly green indicates a broadly strong currency. A row that is mostly red indicates broad weakness. This is more informative than looking at any single pair in isolation, as it shows whether a move is idiosyncratic (one pair reacting) or systematic (one currency moving against the entire basket).
+      </div>
+    </div>
+
+    <div class="guide-section" id="sidebar">
+      <h2>Left Sidebar</h2>
+      <h3>FX Liquidity</h3>
+      <p>A canvas-drawn chart showing estimated FX market liquidity across the 24-hour trading day. The curve peaks at London-New York overlap (~13:00–17:00 UTC), which historically accounts for the highest volume and tightest spreads. A vertical line marks the current UTC time. See the dedicated <a href="guide-fx-liquidity.html" style="color:var(--blue);">FX Liquidity &amp; Sessions guide</a> for a full explanation.</p>
+      <h3>Crosses</h3>
+      <p>Live prices and daily percentage changes for 14 cross pairs (EUR/JPY, GBP/JPY, AUD/JPY, CAD/JPY, CHF/JPY, EUR/CHF, EUR/CAD, EUR/AUD, GBP/CHF, GBP/CAD, AUD/NZD, AUD/CHF, NZD/JPY). Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <h3>Carry Trade — Top Pairs</h3>
+      <p>A ranked list of the highest-yielding carry trade pair candidates, computed from current central bank rate differentials. A carry trade borrows a low-rate currency (historically JPY or CHF) and buys a high-rate currency (historically AUD or NZD). This section shows the net rate differential for the top pairs at current CB policy rates. See <a href="guide-cb-rates.html" style="color:var(--blue);">Central Bank Rates guide</a> for context.</p>
+    </div>
+
+    <div class="guide-section" id="right-panel">
+      <h2>Right Panel</h2>
+      <h3>Macro Calendar — Today</h3>
+      <p>A compact view of today's high-impact economic events with Previous, Expected, and Actual values populated as data releases in real time. Impact is color-coded: red = high impact, orange = medium, gray = low. This panel refreshes from the calendar data throughout the day.</p>
+      <h3>Central Bank Rates</h3>
+      <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the current rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">→ Hold</span>.</p>
+      <h3>Key Correlations</h3>
+      <p>Rolling 60-day structural correlations between selected pairs and reference assets (EUR/USD vs. DXY, AUD/USD vs. Gold, USD/JPY vs. US 10Y Yield, etc.). Correlation values near +1 or -1 indicate strong relationships; values near 0 indicate the correlation has broken down, which can itself be a signal.</p>
+      <h3>CB Rate Expectations</h3>
+      <p>Forward-looking rate expectations for each major central bank at their next scheduled meeting. Values are derived from futures market pricing and analyst consensus. This is distinct from the current rate — it reflects what the market expects to happen next.</p>
+      <h3>Option Skew — 25-Delta Risk Reversal</h3>
+      <p>1-week and 1-month 25-delta risk reversal values for major pairs. A positive risk reversal means calls (upside) are more expensive than puts (downside), indicating the market is paying a premium for upside exposure. A negative value indicates put premium, or downside hedging demand. This is a direct measure of options market sentiment.</p>
+    </div>
+
+    <div class="guide-section" id="news-feed">
+      <h2>News Feed</h2>
+      <p>FX-relevant headlines from Reuters, FT, ForexLive, and FXStreet, filtered and sorted by estimated market impact. Each item shows the source, timestamp, and currency tags for the pairs most likely affected. The feed is updated 3× daily (06:00, 12:00, 21:00 UTC).</p>
+      <p>The <strong>Economic Map</strong> to the right of the news feed is a TradingView world economics widget showing GDP, inflation, and other macro metrics by country in an interactive geographic view.</p>
+    </div>
+
+    <div class="guide-section" id="alerts">
+      <h2>Alerts &amp; Market Signals</h2>
+      <p>The final section of the main panel shows 4–6 AI-generated market signals, updated 3× daily alongside the narrative. Each signal includes:</p>
+      <ul style="list-style:none;padding:0;margin-bottom:14px;">
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Asset</strong> — the currency pair or instrument the signal refers to</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Direction</strong> — Bullish, Bearish, or Watch (monitoring without directional bias)</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Rationale</strong> — the cross-referencing logic (e.g., rate differential + COT positioning alignment + price confirmation)</li>
+        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Confidence</strong> — High / Medium / Low, based on degree of multi-factor alignment</li>
+      </ul>
+      <div class="callout callout-orange">
+        <strong>Important:</strong> These signals are informational context, not trade recommendations. Confidence labels reflect internal cross-factor alignment, not a probability of directional outcome. Always apply your own analysis and risk management before acting on any market signal.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="statusbar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">GUIDE</span><span class="sb-v">USING THE TERMINAL</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</div>
+
+<script>
+// Highlight active TOC item on scroll
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

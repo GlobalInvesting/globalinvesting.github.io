@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<title>COT Positioning Guide — Global Investing FX Terminal</title>
+<meta name="description" content="How to read the CFTC Commitments of Traders positioning section of the FX Terminal. Understanding net contracts, long%, speculative positioning, and how to use COT data for FX analysis.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://globalinvesting.github.io/guide-cot.html">
+<meta property="og:title" content="COT Positioning Guide — Global Investing FX Terminal">
+<meta property="og:description" content="Learn to read CFTC COT data for FX market positioning analysis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
+  --border: #2a2e39; --border2: #363c4e;
+  --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
+  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
+  --head-bg: #1a1d29;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 13px; line-height: 1.6; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+#topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
+#topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
+.logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
+.logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.top-nav { display: flex; height: 100%; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a:hover { color: var(--text); background: var(--bg3); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
+.site-menu { position: relative; display: flex; align-items: center; }
+.site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
+.site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
+.site-menu-panel a { display: block; padding: 5px 14px; color: var(--text2); font-size: 11px; text-decoration: none; white-space: nowrap; transition: background .12s, color .12s; }
+.site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
+.site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
+.sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.guide-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+.guide-toc { background: var(--bg2); border-right: 1px solid var(--border); padding: 20px 0 60px; position: sticky; top: 36px; height: calc(100vh - 36px); overflow-y: auto; }
+.toc-head { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); padding: 0 16px 8px; }
+.toc-item { display: block; padding: 5px 16px; font-size: 12px; color: var(--text2); text-decoration: none; transition: color .12s, background .12s; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--text); background: var(--bg3); }
+.toc-item.active { color: var(--text); border-left-color: var(--blue); background: rgba(41,98,255,.06); }
+.toc-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.guide-content { padding: 32px 40px 80px; max-width: 760px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+.page-hero-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 8px; }
+.page-hero h1 { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.page-hero p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.guide-section { margin-bottom: 40px; scroll-margin-top: 50px; }
+.guide-section h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-section h3 { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; margin-top: 18px; }
+.guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 13px; line-height: 1.7; }
+.callout { border-left: 3px solid var(--blue); background: rgba(41,98,255,.06); padding: 10px 14px; border-radius: 0 4px 4px 0; margin-bottom: 14px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+.callout strong { color: var(--text); }
+.callout-orange { border-left-color: var(--orange); background: rgba(246,148,28,.06); }
+.callout-green { border-left-color: var(--up); background: rgba(38,166,154,.06); }
+.callout-red { border-left-color: var(--down); background: rgba(239,83,80,.06); }
+
+/* COT row demo */
+.cot-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin-bottom: 14px; }
+.cot-header { display: grid; grid-template-columns: 36px 1fr 42px 64px; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding-bottom: 6px; border-bottom: 1px solid var(--border2); gap: 8px; margin-bottom: 6px; }
+.cot-row-d { display: grid; grid-template-columns: 36px 1fr 42px 64px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 11px; gap: 8px; }
+.cot-row-d:last-child { border-bottom: none; }
+.cot-ccy { font-weight: 700; color: var(--text); font-size: 11px; }
+.cot-bar-wrap { height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; position: relative; }
+.cot-bar-long { height: 100%; border-radius: 3px; }
+.cot-pct { text-align: right; font-family: var(--font-mono); font-size: 10px; color: var(--text2); }
+.cot-net { text-align: right; font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
+
+.cot-signal-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+.cot-signal-table th { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; border-bottom: 1px solid var(--border2); text-align: left; background: var(--bg2); }
+.cot-signal-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 12px; }
+.cot-signal-table td:first-child { color: var(--text); font-weight: 600; }
+.cot-signal-table tr:last-child td { border-bottom: none; }
+
+@media (max-width: 800px) {
+  .guide-wrap { grid-template-columns: 1fr; }
+  .guide-toc { display: none; }
+  .guide-content { padding: 24px 16px 80px; }
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a class="logo" href="/" title="Global Investing FX Terminal">
+    <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
+    <span>
+      <span class="logo-text">Global Investing</span>
+      <span class="logo-sub">FX Terminal</span>
+    </span>
+  </a>
+  <nav class="top-nav">
+    <a href="/">Overview</a>
+    <a href="/#section-fxpairs">FX Pairs</a>
+    <a href="/#section-rates">Rates</a>
+    <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-positioning">Positioning</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="site-menu">
+      <button class="site-menu-btn" aria-label="Site menu">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+        Menu
+      </button>
+      <div class="site-menu-panel">
+        <span class="site-menu-section">Company</span>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="advertise.html">Advertise</a>
+        <a href="terms.html">Terms &amp; Privacy</a>
+        <div class="site-menu-divider"></div>
+        <span class="site-menu-section">Guides</span>
+        <a href="guide-dashboard.html">Using the Terminal</a>
+        <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
+        <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
+        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
+        <a href="guide-cot.html" style="color:var(--text)">COT Positioning</a>
+        <a href="guide-cb-rates.html">Central Bank Rates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#what-is-cot">What Is the COT Report</a>
+    <a class="toc-item" href="#the-panel">Reading the Panel</a>
+    <a class="toc-item" href="#net-contracts">Net Contracts</a>
+    <a class="toc-item" href="#long-pct">Long %</a>
+    <a class="toc-item" href="#categories">Trader Categories</a>
+    <a class="toc-item" href="#signal-logic">Signal Logic</a>
+    <a class="toc-item" href="#extremes">Positioning Extremes</a>
+    <a class="toc-item" href="#lag">The Lag Problem</a>
+    <a class="toc-item" href="#combining">Combining with Other Data</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-fx-liquidity.html">← FX Liquidity</a>
+    <a class="toc-item" href="guide-cb-rates.html">→ Central Bank Rates</a>
+  </nav>
+
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>CFTC COT Positioning</h1>
+      <p>The CFTC Commitments of Traders report is one of the most valuable free data sets available to FX traders. It reveals what large institutional speculators are actually positioned for — not what they say, but what they have real money on.</p>
+    </div>
+
+    <div class="guide-section" id="what-is-cot">
+      <h2>What Is the COT Report?</h2>
+      <p>The Commitments of Traders (COT) report is a weekly publication from the US Commodity Futures Trading Commission (CFTC). It shows the aggregate open positions of different categories of traders in futures and options markets regulated by the CFTC — including currency futures traded on the Chicago Mercantile Exchange (CME).</p>
+      <p>For FX traders, the report provides a window into the positioning of the most sophisticated market participants: hedge funds, commodity trading advisors (CTAs), proprietary trading firms, and other large speculative accounts. This is institutional-level data, made public for free, every Friday afternoon.</p>
+      <div class="callout">
+        <strong>Data source in the terminal:</strong> The COT panel pulls directly from <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">CFTC.gov</code>. Data is updated weekly (Friday release covers positions as of the prior Tuesday). The panel header shows the "week ending" date so you always know how current the data is.
+      </div>
+    </div>
+
+    <div class="guide-section" id="the-panel">
+      <h2>Reading the COT Panel</h2>
+      <p>The terminal displays COT data for EUR, GBP, JPY, AUD, CAD, and CHF futures (all quoted vs. USD). Each row shows:</p>
+      <div class="cot-demo">
+        <div class="cot-header">
+          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net Contracts</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">EUR</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:62%;background:var(--up);"></div></div>
+          <span class="cot-pct">62%</span>
+          <span class="cot-net" style="color:var(--up)">+84,200</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">JPY</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:28%;background:var(--down);"></div></div>
+          <span class="cot-pct">28%</span>
+          <span class="cot-net" style="color:var(--down)">-54,300</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">GBP</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:55%;background:var(--up);"></div></div>
+          <span class="cot-pct">55%</span>
+          <span class="cot-net" style="color:var(--up)">+12,800</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">AUD</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:35%;background:var(--down);"></div></div>
+          <span class="cot-pct">35%</span>
+          <span class="cot-net" style="color:var(--down)">-31,500</span>
+        </div>
+      </div>
+      <p>The horizontal bar visualizes the long/short split visually. A bar extending beyond 50% (blue/green zone) means more speculative longs than shorts. A bar below 50% (red zone) means net short positioning.</p>
+    </div>
+
+    <div class="guide-section" id="net-contracts">
+      <h2>Net Contracts</h2>
+      <p>The rightmost column — Net Contracts — is the primary signal metric. It is calculated as:</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;font-family:var(--font-mono);font-size:13px;color:var(--text);margin-bottom:14px;text-align:center;">
+        Net = Total Long Contracts − Total Short Contracts
+      </div>
+      <p>A positive net (shown in green) means speculative accounts hold more long positions than short positions in that currency's futures — they are net bullish on the currency against USD. A negative net (shown in red) means they are net bearish.</p>
+      <p>The <em>absolute magnitude</em> matters: a net position of +10,000 contracts is a modest bullish lean; a net of +120,000 contracts is a historically large extreme position. Extremes are where the most valuable signals arise.</p>
+    </div>
+
+    <div class="guide-section" id="long-pct">
+      <h2>Long % — Directional Bias</h2>
+      <p>The Long% column shows what percentage of total open interest (longs + shorts) is held as long positions. This normalizes the positioning data across currencies that have different total open interest sizes, making EUR, JPY, and CHF comparable on a single scale.</p>
+      <table class="cot-signal-table">
+        <thead><tr><th>Long %</th><th>Directional Bias</th><th>Signal Quality</th></tr></thead>
+        <tbody>
+          <tr><td>&gt; 70%</td><td>Extreme net long — very bullish on currency</td><td style="color:var(--orange);">High (contrarian risk)</td></tr>
+          <tr><td>55–70%</td><td>Moderately net long</td><td style="color:var(--text2);">Directional confirmation</td></tr>
+          <tr><td>45–55%</td><td>Neutral / balanced positioning</td><td style="color:var(--text2);">No strong signal</td></tr>
+          <tr><td>30–45%</td><td>Moderately net short</td><td style="color:var(--text2);">Directional confirmation</td></tr>
+          <tr><td>&lt; 30%</td><td>Extreme net short — very bearish on currency</td><td style="color:var(--orange);">High (contrarian risk)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="categories">
+      <h2>Trader Categories</h2>
+      <p>The COT report breaks participants into categories. The terminal uses <strong>Non-Commercial</strong> (also called "Leveraged Funds" in the Disaggregated COT) positioning — this is the speculative community: hedge funds, CTAs, and other large speculative accounts. This is the most FX-relevant category because these are trend-following, momentum-driven participants with significant market impact.</p>
+      <p>The "Commercial" category (banks hedging real currency exposure) is excluded from the terminal's display because their positions reflect hedging needs rather than directional speculation — they are often "wrong" in the short term by design.</p>
+    </div>
+
+    <div class="guide-section" id="signal-logic">
+      <h2>Signal Logic</h2>
+      <p>COT positioning generates two types of FX signal:</p>
+      <h3>Trend Confirmation</h3>
+      <p>When net positioning aligns with the direction of price action, it confirms that institutional money is behind the move. Example: EUR/USD rising while net EUR longs are also increasing — strong institutional conviction behind the EUR rally. This is a high-confidence environment for trend-following entries.</p>
+      <h3>Contrarian Reversal Signal</h3>
+      <p>When net positioning reaches historical extremes — either extremely long or extremely short — it signals that the trend is crowded and vulnerable to reversal. At extremes, most of the willing buyers (or sellers) are already in the market. A small catalyst can cause a rapid unwind.</p>
+      <div class="callout callout-red">
+        <strong>Extreme JPY short example:</strong> When net JPY short positioning reaches multi-year extremes (large negative net contracts), it historically precedes sharp JPY strengthening as the carry trade unwinds. The 2024 BoJ policy normalization triggered exactly this: JPY shorts had accumulated to extreme levels, and the subsequent squeeze was one of the most violent FX moves in years.
+      </div>
+    </div>
+
+    <div class="guide-section" id="extremes">
+      <h2>Positioning Extremes — Historical Reference</h2>
+      <p>Extremes are relative to each currency's historical range. What constitutes an "extreme" for EUR (which has deep liquidity and high OI) differs from an extreme for CHF (smaller market). As a rule of thumb:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;margin-bottom:14px;">
+        <li>EUR: net longs above +150,000 or below -150,000 contracts = historically extreme</li>
+        <li>JPY: net shorts below -100,000 contracts = historically extreme (2024 peak was ~-185,000)</li>
+        <li>GBP: net longs above +80,000 or shorts below -80,000 = elevated</li>
+        <li>AUD: net shorts below -60,000 = elevated; below -90,000 = extreme</li>
+      </ul>
+      <div class="callout callout-orange">
+        <strong>Relative, not absolute:</strong> These reference levels shift over time as market structure changes. Always compare current positioning to the 52-week or 2-year range for context. An absolute number that would be extreme in 2018 may be moderate in a higher-volatility 2025 environment.
+      </div>
+    </div>
+
+    <div class="guide-section" id="lag">
+      <h2>The Lag Problem</h2>
+      <p>The COT report has a significant structural limitation: it is published on Friday, covering positions as of the prior Tuesday. This means the data is 3–7 days old by the time you read it. In a fast-moving market, significant positioning changes can occur between Tuesday and Friday that are not visible in the report.</p>
+      <p>Additionally, the CFTC data only covers CME futures — not the broader OTC spot FX market, which is far larger. The futures market is a proxy for institutional positioning trends, not a complete picture of global FX flows.</p>
+      <div class="callout">
+        <strong>How to handle the lag:</strong> Use COT positioning as a medium-term backdrop, not a short-term timing tool. Extremely bullish COT positioning today suggests the underlying trend has institutional backing, but it does not tell you what happens in the next 24–48 hours. Combine COT with real-time price action and the Risk Monitor for timing.
+      </div>
+    </div>
+
+    <div class="guide-section" id="combining">
+      <h2>Combining COT with Other Terminal Data</h2>
+      <p>The highest-conviction signals come from multi-factor alignment. The most useful combinations in the terminal:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;margin-bottom:14px;">
+        <li><strong style="color:var(--text);">COT + Central Bank Rates:</strong> Net long a currency with a rising rate trajectory = institutional momentum aligned with rate differential momentum. This is the core of institutional FX trend confirmation.</li>
+        <li><strong style="color:var(--text);">COT + Retail Sentiment (Myfxbook):</strong> Institutions net long while retail is net short = classic smart money vs. crowd divergence. High-confidence contrarian setup for the institutional direction.</li>
+        <li><strong style="color:var(--text);">COT extremes + VIX spike:</strong> Extreme speculative longs in a risk-on currency (e.g., AUD) + sudden VIX spike = high-probability carry unwind. Watch for AUD/JPY breakdown.</li>
+        <li><strong style="color:var(--text);">COT + Yield Spreads:</strong> Institutions net long USD while US–DE or US–JP spread is widening = double confirmation of USD strength thesis. Strongest signal when all three align: COT, yields, and price.</li>
+      </ul>
+      <div class="callout callout-green">
+        <strong>Best practice workflow:</strong> Check the COT panel at the start of each week (Friday or Monday, when fresh data is available). Identify which currencies have extreme or strongly directional positioning. Then use the rest of the terminal during the week to look for setups that align with — or intelligently fade — that institutional positioning.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="statusbar">
+  <div style="display:flex;gap:4px;"><span class="sb-k">GUIDE</span><span class="sb-v">COT POSITIONING</span></div>
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</div>
+
+<script>
+const sections = document.querySelectorAll('.guide-section');
+const tocItems = document.querySelectorAll('.toc-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocItems.forEach(t => t.classList.remove('active'));
+      const link = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
