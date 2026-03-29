@@ -621,7 +621,14 @@
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
 
   /* Force myfxbook widget colors to match dark terminal theme */
-  #myfxbook-widget-inner { filter: invert(1) hue-rotate(180deg); }
+  /* Hide internal "Community Outlook" header + download links (~38px tall) */
+  #myfxbook-widget-inner {
+    filter: invert(1) hue-rotate(180deg);
+    display: block;
+    overflow: hidden;
+    margin-top: -38px;
+    clip-path: inset(38px 0 0 0);
+  }
 
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
@@ -791,11 +798,14 @@
     /* Topbar: minimal on very small screens */
     #topbar { padding: 0 4px; }
     .logo-text { font-size: 10px !important; }
-    .logo-sub { display: none; }
+    .logo-sub { display: block; font-size: 7px !important; } /* keep "FX Terminal" visible */
     .topbar-right { font-size: 9px; gap: 6px !important; }
     /* Session label shortened */
     #session-label { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .top-nav a { padding: 5px 10px; font-size: 10px; }
+    /* Ensure main layout doesn't clip content below header */
+    #layout { overflow: visible !important; }
+    #main { overflow-x: hidden; overflow-y: visible !important; }
   }
 
   /* ── Site menu dropdown ── */
@@ -1591,8 +1601,12 @@ function updateSessions(h) {
   ];
 
   const now = new Date();
-  const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
-  const isWeekend = utcDay === 0 || utcDay === 6;
+  const utcDay = now.getUTCDay();   // 0=Sun, 6=Sat
+  const utcHour = now.getUTCHours();
+  // FX market: opens Sun 21:00 UTC, closes Fri 21:00 UTC
+  const isWeekend = utcDay === 6
+    || (utcDay === 0 && utcHour < 21)
+    || (utcDay === 5 && utcHour >= 21);
 
   let activeLabel = isWeekend ? 'MARKET CLOSED' : 'INTER-SESSION';
 
@@ -1812,7 +1826,8 @@ async function loadFxPerfData() {
 function populateFxPairsTable() {
   const tbody = document.getElementById('fx-pairs-tbody');
   if (!tbody) return;
-  const isWeekend = [0,6].includes(new Date().getUTCDay());
+  const _d = new Date().getUTCDay(), _h = new Date().getUTCHours();
+  const isWeekend = _d === 6 || (_d === 0 && _h < 21) || (_d === 5 && _h >= 21);
 
   const rows = PAIRS.filter(p=>!p.cross).map(pair => {
     const rate = computeRate(pair);
@@ -2113,20 +2128,36 @@ function buildNewsTicker(items) {
 // ═══════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
-// QUOTE BAR — REAL-TIME FX via Stooq (~15 min delay, no API key)
-// Runs every 60s. Updates only quote bar elements.
-// Does NOT touch STATE.rates — Frankfurter still serves FX table + heatmap.
+// QUOTE BAR + FX TABLE — REAL-TIME FX via Stooq (~15 min delay, no API key)
+// Runs every 60s. Updates quote bar, FX pairs table and heatmap.
+// Falls back to Frankfurter data if stooq unavailable.
 // ═══════════════════════════════════════════════════════════════════
 const QB_STOOQ_PAIRS = [
-  { sym: 'eurusd', id: 'eurusd', dec: 5 },
-  { sym: 'gbpusd', id: 'gbpusd', dec: 5 },
-  { sym: 'usdjpy', id: 'usdjpy', dec: 3 },
-  { sym: 'audusd', id: 'audusd', dec: 5 },
-  { sym: 'usdchf', id: 'usdchf', dec: 5 },
-  { sym: 'usdcad', id: 'usdcad', dec: 5 },
-  { sym: 'nzdusd', id: 'nzdusd', dec: 5 },
-  { sym: 'eurgbp', id: 'eurgbp', dec: 5 },
+  { sym: 'eurusd',  id: 'eurusd',  dec: 5 },
+  { sym: 'gbpusd',  id: 'gbpusd',  dec: 5 },
+  { sym: 'usdjpy',  id: 'usdjpy',  dec: 3 },
+  { sym: 'audusd',  id: 'audusd',  dec: 5 },
+  { sym: 'usdchf',  id: 'usdchf',  dec: 5 },
+  { sym: 'usdcad',  id: 'usdcad',  dec: 5 },
+  { sym: 'nzdusd',  id: 'nzdusd',  dec: 5 },
+  { sym: 'eurgbp',  id: 'eurgbp',  dec: 5 },
+  { sym: 'eurjpy',  id: 'eurjpy',  dec: 3 },
+  { sym: 'eurchf',  id: 'eurchf',  dec: 5 },
+  { sym: 'eurcad',  id: 'eurcad',  dec: 5 },
+  { sym: 'euraud',  id: 'euraud',  dec: 5 },
+  { sym: 'gbpjpy',  id: 'gbpjpy',  dec: 3 },
+  { sym: 'gbpchf',  id: 'gbpchf',  dec: 5 },
+  { sym: 'gbpcad',  id: 'gbpcad',  dec: 5 },
+  { sym: 'audjpy',  id: 'audjpy',  dec: 3 },
+  { sym: 'audnzd',  id: 'audnzd',  dec: 5 },
+  { sym: 'audchf',  id: 'audchf',  dec: 5 },
+  { sym: 'cadjpy',  id: 'cadjpy',  dec: 3 },
+  { sym: 'chfjpy',  id: 'chfjpy',  dec: 3 },
+  { sym: 'nzdjpy',  id: 'nzdjpy',  dec: 3 },
 ];
+
+// Cache for stooq RT rates — used to update FX pairs table
+const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 
 async function fetchStooqQuoteSingle(sym) {
   const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
@@ -2164,21 +2195,68 @@ async function fetchQuoteBarRT() {
   for (const r of results) {
     if (r.status !== 'fulfilled' || !r.value.data) continue;
     const { pair, data } = r.value;
+
+    // Store in RT cache for FX pairs table
+    STOOQ_RT_CACHE[pair.id] = data;
+
+    // Update quote bar elements (only majors are in the bar)
     const priceEl = document.getElementById('q-' + pair.id);
     const chgEl   = document.getElementById('qc-' + pair.id);
-    if (!priceEl) continue;
-    priceEl.textContent = data.close.toFixed(pair.dec);
-    priceEl.className   = 'q-price ' + clsDir(data.chg);
+    if (priceEl) {
+      priceEl.textContent = data.close.toFixed(pair.dec);
+      priceEl.className   = 'q-price ' + clsDir(data.chg);
+    }
     if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
     updated++;
   }
   if (updated > 0) {
+    // Update FX pairs table rows with RT data
+    updateFxPairsTableRT();
+
     // Update subtitle to show Stooq source + last refresh time
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
     const qbLabel = document.getElementById('qb-source-label');
     if (qbLabel) qbLabel.textContent = `Stooq · ${hh}:${mm} UTC`;
+  }
+}
+
+// Update FX pairs table with real-time Stooq prices
+function updateFxPairsTableRT() {
+  const tbody = document.getElementById('fx-pairs-tbody');
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const symCell = row.querySelector('td.sym');
+    if (!symCell) return;
+    const symText = symCell.textContent.trim(); // e.g. "EUR/USD"
+    const pairId = symText.replace('/', '').toLowerCase(); // "eurusd"
+    const data = STOOQ_RT_CACHE[pairId];
+    if (!data) return;
+    const pairCfg = PAIRS.find(p => p.id === pairId);
+    if (!pairCfg) return;
+
+    // Columns: sym(0), bid(1), ask(2), spread(3), 1D%(4), 1W%(5), iv(6), H(7), L(8)
+    const tds = row.querySelectorAll('td');
+    if (tds.length < 6) return;
+
+    const pipVal = pairCfg.dec === 3 ? 0.01 : 0.0001;
+    const spreadPips = TYPICAL_SPREADS[pairId] || 0.5;
+    const halfSpread = spreadPips * pipVal / 2;
+
+    tds[1].textContent = fmt(data.close - halfSpread, pairCfg.dec);
+    tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
+    tds[4].textContent = pctStr(data.pct);
+    tds[4].className   = clsDir(data.pct);
+  });
+
+  const upd = document.getElementById('fx-table-updated');
+  if (upd) {
+    const now = new Date();
+    const hh = now.getUTCHours().toString().padStart(2,'0');
+    const mm = now.getUTCMinutes().toString().padStart(2,'0');
+    upd.textContent = `Stooq · ${hh}:${mm} UTC · ~15min delay`;
   }
 }
 
@@ -2523,7 +2601,8 @@ async function fetchRiskData() {
   }
 
   // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
-  const isWeekend = [0,6].includes(new Date().getUTCDay());
+  const _rd = new Date().getUTCDay(), _rh = new Date().getUTCHours();
+  const isWeekend = _rd === 6 || (_rd === 0 && _rh < 21) || (_rd === 5 && _rh >= 21);
   const weekendNote = isWeekend ? ' (last close)' : '';
 
   // VIX
@@ -2899,8 +2978,13 @@ function drawLiquidityChart() {
   const base = [15,12,10,10,18,28,36,44,52,58,62,56,50,44,52,68,85,95,100,92,84,68,50,32,20,15,12];
 
   // Check if weekend (forex closed)
-  const utcDay = new Date().getUTCDay(); // 0=Sun, 6=Sat
-  const isWeekend = utcDay === 0 || utcDay === 6;
+  // FX market: opens Sun 21:00 UTC, closes Fri 21:00 UTC
+  const _now = new Date();
+  const utcDay = _now.getUTCDay();
+  const utcHour = _now.getUTCHours();
+  const isWeekend = utcDay === 6
+    || (utcDay === 0 && utcHour < 21)
+    || (utcDay === 5 && utcHour >= 21);
 
   const hours = Array.from({length:48}, (_,i) => {
     if (isWeekend) return 2; // flat line on weekend
