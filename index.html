@@ -247,7 +247,10 @@
 
   .panel { border-bottom: 1px solid var(--border); }
   /* Suppress TradingView copyright bar that causes gap */
-  .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; }
+  .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }
+  /* Kill any bottom spacing inside TV chart container */
+  #tv-chart-wrap .tradingview-widget-container { margin-bottom:0 !important; padding-bottom:0 !important; }
+  #tv-chart-wrap iframe { display:block; }
 
   .panel-head {
     background: var(--head-bg);
@@ -652,14 +655,14 @@
     </span>
   </a>
   <nav class="top-nav">
-    <a class="active">Overview</a>
-    <a>FX Pairs</a>
-    <a>Macro</a>
-    <a>Rates</a>
-    <a>Cross-Asset</a>
-    <a>Risk</a>
-    <a>Positioning</a>
-    <a>Screener</a>
+    <a class="active" data-target="top">Overview</a>
+    <a data-target="section-fxpairs">FX Pairs</a>
+    <a data-target="section-macro">Macro</a>
+    <a data-target="section-rates">Rates</a>
+    <a data-target="section-crossasset">Cross-Asset</a>
+    <a data-target="section-risk">Risk</a>
+    <a data-target="section-positioning">Positioning</a>
+    <a data-target="section-rates">Screener</a>
   </nav>
   <div class="topbar-right">
     <span id="session-label">DETECTING...</span>
@@ -705,9 +708,9 @@
       <div class="sb-head">FX Liquidity</div>
       <div style="padding:6px 8px 4px;">
         <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;"></canvas>
-        <div style="display:flex;justify-content:space-between;margin-top:3px;">
-          <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">-- UTC</span>
-          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);">Peak: --</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+          <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
+          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
         </div>
       </div>
     </div>
@@ -755,7 +758,7 @@
     </div>
 
     <!-- TRADINGVIEW CHART -->
-    <div class="panel" id="tv-chart-panel">
+    <div class="panel" id="section-fxpairs" data-section="fxpairs">
       <div class="panel-head" style="gap:10px;flex-wrap:wrap;row-gap:0;">
         <span class="panel-title">Price Chart</span>
         <div style="display:flex;gap:0;flex-wrap:wrap;" id="tv-pair-tabs">
@@ -810,7 +813,7 @@
     </div>
 
     <!-- FX PAIRS TABLE — Frankfurter + fx-performance repo data -->
-    <div class="panel">
+    <div class="panel" id="section-fxtable">
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
         <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · IV 1M · Session Range</span>
@@ -845,7 +848,7 @@
 
     <!-- CROSS ASSET + RISK -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;max-height:320px;">
-      <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);">
+      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Extended data · repo</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
           <!-- Populated by fetchCrossAssetData() -->
@@ -859,7 +862,7 @@
           <div class="ca-cell"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
         </div>
       </div>
-      <div class="panel" style="border-bottom:none;">
+      <div class="panel" id="section-risk" style="border-bottom:none;">
         <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub">Volatility &amp; regime</span></div>
         <div class="risk-grid">
           <div class="risk-cell"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
@@ -881,7 +884,7 @@
     </div>
 
     <!-- RATES & YIELD CURVE -->
-    <div class="panel">
+    <div class="panel" id="section-rates">
       <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · TradingView live</span></div>
       <div id="rates-grid-wrap" class="rates-grid">
         <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
@@ -905,7 +908,7 @@
     </div>
 
     <!-- COT POSITIONING — from cot-data/*.json -->
-    <div class="panel">
+    <div class="panel" id="section-positioning">
       <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span></div>
       <div style="padding:6px 10px;">
         <div style="display:grid;grid-template-columns:36px 1fr 42px 64px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
@@ -921,7 +924,7 @@
 
     <!-- SESSIONS + SPREADS -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-      <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);">
+      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
           <span class="sess" id="sess-sydney">Sydney</span>
@@ -995,9 +998,11 @@
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
           <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;">
-            <iframe src="./myfxbook-widget.html"
-              style="width:100%;height:100%;min-height:340px;border:none;background:transparent;"
-              scrolling="auto" title="Market Sentiment"></iframe>
+            <!-- myfxbook.com outlook widget - Start -->
+<div><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
+<div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
+<script type="text/javascript">showOutlookWidget()</script>
+            <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
       </div>
@@ -1060,7 +1065,7 @@
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
-    <div class="panel">
+    <div class="panel" id="section-macro">
       <div class="panel-head">
         <span class="panel-title">Alerts &amp; Market Signals</span>
         <span class="panel-sub" id="alerts-sub">Loading AI signals…</span>
@@ -2528,22 +2533,20 @@ function drawLiquidityChart() {
   const tzShort = now.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
   setEl('liq-time-label', localH + ':' + localM + ' ' + tzShort);
   if (isWeekend) {
-    // Convert Sun 21:00 UTC to local time
-    const reopenUTC = new Date(); reopenUTC.setUTCDay ? null : null;
+    // Convert Sun 21:00 UTC to local time for reopen label
     const reopenDate = new Date();
-    // Next Sunday 21:00 UTC
     const daysUntilSun = (7 - reopenDate.getUTCDay()) % 7;
     reopenDate.setUTCDate(reopenDate.getUTCDate() + (daysUntilSun === 0 ? 0 : daysUntilSun));
     reopenDate.setUTCHours(21, 0, 0, 0);
     const rH = reopenDate.getHours().toString().padStart(2,'0');
     const rM = reopenDate.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Reopens: Sun ' + rH + ':' + rM + ' ' + tzShort);
+    setEl('liq-peak-label', 'Sun ' + rH + ':' + rM);
   } else {
     const peakH = hours.indexOf(Math.max(...hours));
     const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakH/2), peakH%2===0?0:30, 0, 0);
     const pH = peakUTC.getHours().toString().padStart(2,'0');
     const pM = peakUTC.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Peak: ' + pH + ':' + pM + ' ' + tzShort);
+    setEl('liq-peak-label', 'Peak ' + pH + ':' + pM);
   }
 }
 
@@ -3179,6 +3182,35 @@ setInterval(fetchNewsData, 10 * 60 * 1000);
 // Refresh narrative every 15 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
 // Refresh risk/yield data every 5 minutes
+
+// ═══════════════════════════════════════════════════════════════════
+// TOP NAV — smooth scroll to sections + active state
+// ═══════════════════════════════════════════════════════════════════
+(function() {
+  const main = document.getElementById('main');
+  document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = this.dataset.target;
+      document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
+      this.classList.add('active');
+      if (target === 'top') {
+        (main || window).scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      const el = document.getElementById(target);
+      if (!el) return;
+      if (main) {
+        // Scroll inside the main panel (overflow-y: auto)
+        const offset = el.offsetTop - (main.offsetTop || 0);
+        main.scrollTo({ top: offset - 4, behavior: 'smooth' });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+})();
+
 setInterval(fetchRiskData, 5 * 60 * 1000);
 // Refresh crypto every 2 minutes
 setInterval(fetchCryptoQuotes, 2 * 60 * 1000);
