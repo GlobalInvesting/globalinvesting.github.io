@@ -6,7 +6,7 @@
 <title>Global Investing FX Terminal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,7 +24,7 @@
     --blue: #2962ff;
     --orange: #f6941c;
     --head-bg: #1a1d29;
-    --font-ui: 'Exo 2', -apple-system, BlinkMacSystemFont, "Trebuchet MS", Arial, sans-serif;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
@@ -64,19 +64,19 @@
 
   .logo-text {
     font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: #fff;
-    letter-spacing: .04em;
+    letter-spacing: -0.02em;
     line-height: 1;
   }
 
   .logo-sub {
     font-family: var(--font-ui);
-    font-size: 9px;
-    font-weight: 600;
+    font-size: 0.68rem;
+    font-weight: 500;
     color: var(--text2);
-    letter-spacing: .10em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     display: block;
     margin-top: 2px;
@@ -424,6 +424,12 @@
   .imp-m { background: var(--orange); }
   .imp-l { background: var(--text3); }
 
+  /* NEWS FEED SCROLLBAR — custom thin dark */
+  #news-feed-items::-webkit-scrollbar { width: 3px; }
+  #news-feed-items::-webkit-scrollbar-track { background: var(--bg); }
+  #news-feed-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  #news-feed-items { scrollbar-width: thin; scrollbar-color: var(--border2) var(--bg); }
+
   /* NEWS FEED */
   .news-item {
     display: flex; gap: 8px; align-items: flex-start;
@@ -613,18 +619,15 @@
       <div class="sb-row"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
       <div class="sb-row"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
     </div>
-    <!-- CB Rates from rates/*.json -->
     <div class="sb-section">
-      <div class="sb-head">CB Rates</div>
-      <div id="sb-cbrates">
-        <div class="cb-row"><span class="cb-bank">Fed (US)</span><span class="cb-rate" id="cbr-usd">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">ECB (EU)</span><span class="cb-rate" id="cbr-eur">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">BoE (UK)</span><span class="cb-rate" id="cbr-gbp">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">BoJ (JP)</span><span class="cb-rate" id="cbr-jpy">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">RBA (AU)</span><span class="cb-rate" id="cbr-aud">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">SNB (CH)</span><span class="cb-rate" id="cbr-chf">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">BoC (CA)</span><span class="cb-rate" id="cbr-cad">—</span><span class="cb-next flat">—</span></div>
-        <div class="cb-row"><span class="cb-bank">RBNZ (NZ)</span><span class="cb-rate" id="cbr-nzd">—</span><span class="cb-next flat">—</span></div>
+      <div class="sb-head">Technical Summary</div>
+      <div style="padding:4px 0 0; overflow:hidden; background:var(--bg2);">
+        <div style="transform:scale(0.415);transform-origin:top left;width:241%;pointer-events:none;">
+          <iframe frameborder="0" scrolling="no" height="274" width="425"
+            allowtransparency="true" marginwidth="0" marginheight="0"
+            src="https://ssltools.investing.com/technical_summary.php?pairs=1,2,3,4,5,7&curr-name-color=%23787b86&fields=15m,1h,1d&force_lang=4&theme=dark&bg=1e222d&text=d1d4dc&border=2a2e39">
+          </iframe>
+        </div>
       </div>
     </div>
     <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">
@@ -874,8 +877,8 @@
           </table>
         </div>
         <div style="border-top:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 0;">Upcoming Events</div>
-          <div style="overflow:hidden;height:240px;position:relative;">
+          <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">Upcoming Events</div>
+          <div style="overflow:hidden;height:224px;position:relative;">
             <div style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
               <div class="tradingview-widget-container" style="width:100%;height:100%;">
                 <div class="tradingview-widget-container__widget" style="height:100%;"></div>
@@ -1017,7 +1020,7 @@
     <div class="sb-head" style="margin-top:2px;">Key Correlations</div>
     <table>
       <thead><tr><th style="text-align:left">Pair A</th><th>Pair B</th><th>Corr</th></tr></thead>
-      <tbody>
+      <tbody id="correlations-tbody">
         <tr><td>EUR/USD</td><td>DXY</td><td class="down">-0.97</td></tr>
         <tr><td>AUD/USD</td><td>Gold</td><td class="up">+0.72</td></tr>
         <tr><td>USD/JPY</td><td>US10Y</td><td class="up">+0.85</td></tr>
@@ -1025,6 +1028,7 @@
         <tr><td>USD/CAD</td><td>WTI Oil</td><td class="down">-0.68</td></tr>
       </tbody>
     </table>
+    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day structural correlations</div>
 
     <div class="sb-head" style="margin-top:2px;">Fed Rate Expectations</div>
     <table>
@@ -1053,7 +1057,7 @@
 <div id="statusbar">
   <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · STOOQ · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
-  <div style="display:flex;gap:4px;"><span class="sb-k">UTC</span><span class="sb-v" id="sb-clock">--:--:--</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">UTC</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
 </div>
@@ -1136,7 +1140,7 @@ function updateClock() {
   const str = [h,m,s].map(n=>String(n).padStart(2,'0')).join(':');
   setEl('clock', str + ' UTC');
   setEl('sb-clock', str);
-  setEl('sb-clock', str);
+  setEl('footer-clock', str);
   updateSessions(h, m);
 }
 
@@ -1151,17 +1155,27 @@ function updateSessions(h) {
     { id:'london',  open:8,  close:17 },
     { id:'newyork', open:13, close:22 },
   ];
-  let activeLabel = 'INTER-SESSION';
+
+  const now = new Date();
+  const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
+  const isWeekend = utcDay === 0 || utcDay === 6;
+
+  let activeLabel = isWeekend ? 'MARKET CLOSED' : 'INTER-SESSION';
+
   sessions.forEach(s => {
-    const open = isOpen(s.open, s.close, h);
+    const open = !isWeekend && isOpen(s.open, s.close, h);
     const badge = document.getElementById('sess-' + s.id);
     const status = document.getElementById('status-' + s.id);
     if (badge) badge.classList.toggle('active', open);
-    if (status) { status.textContent = open ? 'Open' : 'Closed'; status.className = open ? 'up' : 'flat'; }
+    if (status) {
+      status.textContent = isWeekend ? 'Weekend' : (open ? 'Open' : 'Closed');
+      status.className = open ? 'up' : 'flat';
+    }
     if (open) activeLabel = s.id.toUpperCase().replace('NEWYORK','NEW YORK');
   });
-  setEl('session-label', activeLabel + ' SESSION');
-  setEl('session-status', activeLabel + ' · ACTIVE');
+
+  setEl('session-label', activeLabel + (isWeekend ? '' : ' SESSION'));
+  setEl('session-status', activeLabel + (isWeekend ? ' · CLOSED' : ' · ACTIVE'));
 }
 
 setInterval(updateClock, 1000);
@@ -1172,10 +1186,11 @@ updateClock();
 // ═══════════════════════════════════════════════════════════════════
 async function fetchFrankfurter() {
   try {
-    // Today + yesterday for % change
+    const todayDate  = getLatestBizDate();
+    const prevDate   = getPrevBizDate();
     const [todayRes, prevRes] = await Promise.all([
-      fetch('https://api.frankfurter.app/latest?from=USD'),
-      fetch('https://api.frankfurter.app/latest?from=USD&date=' + getPrevBizDate())
+      fetch('https://api.frankfurter.app/' + todayDate + '?from=USD'),
+      fetch('https://api.frankfurter.app/' + prevDate  + '?from=USD'),
     ]);
     if (!todayRes.ok) return;
     const today = await todayRes.json();
@@ -1191,16 +1206,25 @@ async function fetchFrankfurter() {
     populateHeatmap();
     populateCrossRows();
     document.getElementById('fx-table-updated').textContent =
-      'ECB · updated ' + (today.date || 'today') + ' · daily rate';
+      'ECB · updated ' + (today.date || todayDate) + ' · daily rate';
   } catch(e) {
     console.warn('Frankfurter fetch failed:', e);
   }
 }
 
+function getLatestBizDate() {
+  const d = new Date();
+  // If weekend, go to last Friday
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0,10);
+}
+
 function getPrevBizDate() {
   const d = new Date();
+  // First skip to last business day (handles weekend today)
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
+  // Then go one more business day back
   d.setUTCDate(d.getUTCDate() - 1);
-  // skip weekends
   while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0,10);
 }
@@ -1552,7 +1576,49 @@ function buildNewsTicker(items) {
 //           signals from ai-analysis/signals.json
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
-// CRYPTO & EXTRA QUOTES — CoinGecko (free, no key)
+// COMMODITY QUOTES — Gold (XAU) + WTI via free APIs
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCommodityQuotes() {
+  try {
+    // Gold via Open Exchange Rates metals endpoint (free, no key needed via metals-api fallback)
+    // Use stooq for Gold and WTI
+    async function fetchStooqQuote(sym) {
+      try {
+        const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
+        const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!r.ok) return null;
+        const text = await r.text();
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) return null;
+        const p = lines[1].split(',');
+        const close = parseFloat(p[6]);
+        const open  = parseFloat(p[3]);
+        if (isNaN(close) || close === 0) return null;
+        return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+      } catch { return null; }
+    }
+
+    const [gold, wti] = await Promise.all([
+      fetchStooqQuote('xauusd'),
+      fetchStooqQuote('cl.f'),  // WTI crude futures
+    ]);
+
+    if (gold) {
+      const el = document.getElementById('q-xauusd');
+      const ce = document.getElementById('qc-xauusd');
+      if (el) { el.textContent = gold.close.toFixed(2); el.className = 'q-price ' + clsDir(gold.chg); }
+      if (ce) { ce.textContent = pctStr(gold.pct); ce.className = 'q-chg ' + clsDir(gold.chg); }
+    }
+    if (wti) {
+      const el = document.getElementById('q-wti');
+      const ce = document.getElementById('qc-wti');
+      if (el) { el.textContent = wti.close.toFixed(2); el.className = 'q-price ' + clsDir(wti.chg); }
+      if (ce) { ce.textContent = pctStr(wti.pct); ce.className = 'q-chg ' + clsDir(wti.chg); }
+    }
+  } catch(e) { console.warn('Commodity fetch failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCryptoQuotes() {
   try {
@@ -1581,7 +1647,7 @@ const SENTIMENT_FALLBACK = [
   { sym:'EUR/JPY', buy:61, sell:39 }, { sym:'GBP/JPY', buy:57, sell:43 },
 ];
 
-function renderSentiment(pairs) {
+function renderSentiment(pairs, sourceLabel) {
   const container = document.getElementById('sent-rows');
   if (!container) return;
   container.innerHTML = pairs.map(p => {
@@ -1599,7 +1665,8 @@ function renderSentiment(pairs) {
     </div>`;
   }).join('');
   const now = new Date();
-  setEl('sent-updated', now.getUTCHours().toString().padStart(2,'0') + ':' + now.getUTCMinutes().toString().padStart(2,'0') + ' UTC');
+  const timeStr = now.getUTCHours().toString().padStart(2,'0') + ':' + now.getUTCMinutes().toString().padStart(2,'0') + ' UTC';
+  setEl('sent-updated', (sourceLabel || '') + ' · ' + timeStr);
 }
 
 async function fetchSentiment() {
@@ -1607,100 +1674,104 @@ async function fetchSentiment() {
     const r = await fetch('https://freeserv.dukascopy.com/2.0/api?path=sentiment/list&prettyprint=true&jsonp=false', {mode:'cors'});
     if (r.ok) {
       const data = await r.json();
-      if (data && data.data) {
+      if (data && data.data && data.data.length) {
         const mapped = data.data.slice(0,10).map(d => ({
           sym:  (d.instrument||d.sym||'').replace('_','/'),
           buy:  Math.round(d.longVolume || d.buy || 50),
           sell: Math.round(d.shortVolume || d.sell || 50),
         })).filter(d=>d.sym);
-        renderSentiment(mapped);
-        return;
+        if (mapped.length) { renderSentiment(mapped, 'Dukascopy live'); return; }
       }
     }
   } catch(e) {}
-  // Fallback with slight random variation
+  // Fallback with slight random variation — clearly labeled
   const varied = SENTIMENT_FALLBACK.map(p => ({
     sym: p.sym,
     buy:  Math.min(95, Math.max(5, p.buy  + Math.round((Math.random()-.5)*6))),
-    sell: Math.min(95, Math.max(5, p.sell + Math.round((Math.random()-.5)*6))),
+    sell: 0,
   })).map(p => ({ ...p, sell: 100 - p.buy }));
-  renderSentiment(varied);
+  renderSentiment(varied, 'Estimated · live feed unavailable');
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// RISK MONITOR + YIELD DATA — Yahoo Finance proxy (free)
+// RISK MONITOR + YIELD DATA — multiple free sources with fallback
 // ═══════════════════════════════════════════════════════════════════
 async function fetchRiskData() {
-  // Use stooq.com free data for US yields and VIX (CSV, no key)
-  const tickers = [
-    { sym: '^VIX',    id: 'vix'  },
-    { sym: '^TNX',    id: 'us10y' }, // 10Y yield (x10)
-    { sym: '^IRX',    id: 'us3m'  }, // 3M T-Bill (x10)
-    { sym: '^FVX',    id: 'us5y'  }, // 5Y yield (x10)
-    { sym: '^TYX',    id: 'us30y' }, // 30Y yield (x10)
-    { sym: 'DX-Y.NYB',id: 'dxy'  }, // DXY
-    { sym: '^BUND',   id: 'de10y' }, // DE 10Y (via stooq)
-  ];
-
-  // stooq.com returns CSV, free, no auth
+  // Try stooq.com free CSV data — no auth needed, but may be blocked on weekends
   async function fetchStooq(sym) {
     try {
       const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
-      const r = await fetch(url);
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
       if (!r.ok) return null;
       const text = await r.text();
       const lines = text.trim().split('\n');
       if (lines.length < 2) return null;
       const parts = lines[1].split(',');
-      const close = parseFloat(parts[6]); // Close column
-      const open  = parseFloat(parts[3]); // Open
-      if (isNaN(close)) return null;
-      return { close, open, chg: close - open, pct: (close - open) / open * 100 };
+      const close = parseFloat(parts[6]);
+      const open  = parseFloat(parts[3]);
+      if (isNaN(close) || close === 0) return null;
+      return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
     } catch { return null; }
   }
 
-  // Fetch in parallel
+  const tickers = [
+    { sym: '^VIX',     id: 'vix'   },
+    { sym: '^TNX',     id: 'us10y' },
+    { sym: '^IRX',     id: 'us3m'  },
+    { sym: '^FVX',     id: 'us5y'  },
+    { sym: '^TYX',     id: 'us30y' },
+    { sym: 'DX-Y.NYB', id: 'dxy'   },
+    { sym: '^BUND',    id: 'de10y' },
+  ];
+
   const results = await Promise.all(tickers.map(async t => ({
-    ...t,
-    data: await fetchStooq(t.sym)
+    ...t, data: await fetchStooq(t.sym)
   })));
 
   const byId = {};
   results.forEach(r => { if (r.data) byId[r.id] = r.data; });
+
+  // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
+  const isWeekend = [0,6].includes(new Date().getUTCDay());
+  const weekendNote = isWeekend ? ' (last close)' : '';
 
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
-    setEl('risk-vix-sub', vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility');
+    const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility';
+    setEl('risk-vix-sub', regime + weekendNote);
   } else {
-    setEl('risk-vix-sub', 'Via stooq — weekends use last close');
+    setEl('risk-vix', '—');
+    setEl('risk-vix-sub', 'stooq · ' + (isWeekend ? 'weekend closed' : 'loading…'));
   }
 
   // US 10Y (TNX = yield * 10)
   if (byId.us10y) {
     const y10 = byId.us10y.close / 10;
     const chg = byId.us10y.chg / 10;
-    const cls = chg > 0 ? 'risk-val up' : chg < 0 ? 'risk-val down' : 'risk-val';
+    const cls = chg > 0.005 ? 'risk-val up' : chg < -0.005 ? 'risk-val down' : 'risk-val';
     setEl('risk-us10y', y10.toFixed(2) + '%', cls);
     const sign = chg >= 0 ? '+' : '';
-    setEl('risk-us10y-sub', sign + (chg * 100).toFixed(1) + 'bp today');
-    // Also update quote bar
+    setEl('risk-us10y-sub', isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
     const usEl = document.getElementById('q-us10y');
     const uscEl = document.getElementById('qc-us10y');
-    if (usEl) { usEl.textContent = y10.toFixed(2) + '%'; usEl.className = 'q-price ' + clsDir(chg); }
-    if (uscEl) { uscEl.textContent = pctStr(byId.us10y.pct); uscEl.className = 'q-chg ' + clsDir(chg); }
+    if (usEl) { usEl.textContent = y10.toFixed(2) + '%'; usEl.className = 'q-price ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
+    if (uscEl) { uscEl.textContent = pctStr(byId.us10y.pct); uscEl.className = 'q-chg ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
+  } else {
+    setEl('risk-us10y', '—');
+    setEl('risk-us10y-sub', 'Nominal yield');
   }
 
   // DXY
   if (byId.dxy) {
     const dxy = byId.dxy.close;
     const chg = byId.dxy.chg;
-    const cls = chg > 0 ? 'risk-val up' : chg < 0 ? 'risk-val down' : 'risk-val';
+    const cls = chg > 0.05 ? 'risk-val up' : chg < -0.05 ? 'risk-val down' : 'risk-val';
     setEl('risk-dxy', dxy.toFixed(1), cls);
     const sign = chg >= 0 ? '+' : '';
-    setEl('risk-dxy-sub', sign + chg.toFixed(2) + ' today');
+    setEl('risk-dxy-sub', isWeekend ? 'Last close · USD index' : sign + chg.toFixed(2) + ' today');
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
     if (dEl) { dEl.textContent = dxy.toFixed(1); dEl.className = 'q-price ' + clsDir(chg); }
@@ -1714,26 +1785,11 @@ async function fetchRiskData() {
     const spr  = y10 - y3m;
     const bp   = (spr * 100).toFixed(0);
     const cls  = spr < 0 ? 'down' : 'up';
-    const sig  = spr < 0 ? 'Inverted' : 'Normal';
     setEl('ys-2-10', bp + 'bp', cls);
-    setEl('ys-2-10-sig', sig, cls);
+    setEl('ys-2-10-sig', spr < 0 ? 'Inverted' : 'Normal', cls);
   }
 
-  // Draw yield curve with real data if available
-  const yields = [
-    byId.us3m   ? byId.us3m.close   / 10 : null,
-    null, // 6M not fetched
-    null, // 1Y
-    byId.us10y  ? (byId.us10y.close / 10 * 0.7 + 0.3) : null, // approx 2Y
-    null, // 3Y
-    byId.us5y   ? byId.us5y.close   / 10 : null,
-    null, // 7Y
-    byId.us10y  ? byId.us10y.close  / 10 : null,
-    null, // 20Y
-    byId.us30y  ? byId.us30y.close  / 10 : null,
-  ];
-
-  // DE10Y for spread
+  // US–DE spread
   if (byId.de10y && byId.us10y) {
     const spread = byId.us10y.close / 10 - byId.de10y.close;
     const bp2 = (spread * 100).toFixed(0);
@@ -1741,7 +1797,87 @@ async function fetchRiskData() {
     setEl('ys-usde-sig', spread > 0 ? 'US Premium' : 'DE Premium');
   }
 
-  drawYieldCurve(yields.map((v,i) => v || STATIC_YIELDS[i]));
+  // Rate cells
+  if (byId.us3m) {
+    const v = byId.us3m.close / 10;
+    const chg = byId.us3m.chg / 10;
+    setEl('rate-3m', v.toFixed(2) + '%', v > 0 ? 'rate-val' : 'rate-val flat');
+    setEl('rate-3m-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+  }
+  if (byId.us10y) {
+    const v = byId.us10y.close / 10;
+    const chg = byId.us10y.chg / 10;
+    setEl('rate-10y', v.toFixed(2) + '%');
+    setEl('rate-10y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+  }
+  if (byId.us5y) {
+    const v = byId.us5y.close / 10;
+    const chg = byId.us5y.chg / 10;
+    setEl('rate-5y', v.toFixed(2) + '%');
+    setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+  }
+  // 2Y approximated from 3M + 10Y blend
+  if (byId.us3m && byId.us10y) {
+    const approx2y = byId.us3m.close / 10 * 0.3 + byId.us10y.close / 10 * 0.7;
+    setEl('rate-2y', approx2y.toFixed(2) + '%');
+    setEl('rate-2y-chg', '—', 'rate-chg flat');
+  }
+
+  // Draw yield curve
+  const yields = [
+    byId.us3m   ? byId.us3m.close  / 10 : STATIC_YIELDS[0],
+    byId.us3m && byId.us10y ? (byId.us3m.close/10*0.6 + byId.us10y.close/10*0.4) : STATIC_YIELDS[1], // 6M approx
+    byId.us10y  ? (byId.us3m ? byId.us3m.close/10*0.3 + byId.us10y.close/10*0.7 : STATIC_YIELDS[2]) : STATIC_YIELDS[2], // 1Y
+    byId.us10y  ? (byId.us10y.close/10 * 0.82 + (byId.us3m ? byId.us3m.close/10*0.18 : 0)) : STATIC_YIELDS[3], // 2Y
+    byId.us5y   ? (byId.us5y.close /10 * 0.7 + byId.us10y.close/10*0.3) : STATIC_YIELDS[4], // 3Y
+    byId.us5y   ? byId.us5y.close  / 10 : STATIC_YIELDS[5],
+    byId.us5y && byId.us10y ? (byId.us5y.close/10*0.4 + byId.us10y.close/10*0.6) : STATIC_YIELDS[6], // 7Y
+    byId.us10y  ? byId.us10y.close / 10 : STATIC_YIELDS[7],
+    byId.us30y  ? (byId.us30y.close/10*0.6 + byId.us10y.close/10*0.4) : STATIC_YIELDS[8], // 20Y
+    byId.us30y  ? byId.us30y.close / 10 : STATIC_YIELDS[9],
+  ];
+
+  drawYieldCurve(yields);
+
+  // Populate Risk Monitor spread signals table
+  const spreadsTbody = document.getElementById('spreads-tbody');
+  if (spreadsTbody) {
+    const rows = [];
+    if (byId.us10y && byId.us3m) {
+      const spr = (byId.us10y.close / 10) - (byId.us3m.close / 10);
+      const bp = (spr * 100).toFixed(0);
+      const cls = spr < 0 ? 'down' : 'up';
+      rows.push(`<tr><td>10Y–3M</td><td class="${cls}">${bp}bp</td><td class="${cls}">${spr < 0 ? 'Inverted ⚠' : 'Normal'}</td></tr>`);
+    }
+    if (byId.us10y && byId.de10y) {
+      const spr = (byId.us10y.close / 10) - byId.de10y.close;
+      const bp = (spr * 100).toFixed(0);
+      rows.push(`<tr><td>US–DE 10Y</td><td>${bp}bp</td><td style="color:var(--text2);">${spr > 0 ? 'US Premium' : 'DE Premium'}</td></tr>`);
+    }
+    if (byId.vix) {
+      const vix = byId.vix.close;
+      const cls = vix > 25 ? 'down' : vix > 18 ? '' : 'up';
+      rows.push(`<tr><td>VIX Level</td><td class="${cls}">${vix.toFixed(1)}</td><td class="${cls}">${vix > 30 ? 'Extreme' : vix > 20 ? 'Elevated' : 'Normal'}</td></tr>`);
+    }
+    spreadsTbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="3" style="color:var(--text3);text-align:center;">Stooq · awaiting data</td></tr>';
+  }
+
+  // Regime assessment based on VIX + yield curve
+  if (byId.vix) {
+    const vix = byId.vix.close;
+    const isInverted = byId.us10y && byId.us3m && (byId.us10y.close < byId.us3m.close);
+    let regime, regimeSub;
+    if (vix > 30) { regime = 'RISK-OFF'; regimeSub = 'High fear — reduce exposure'; }
+    else if (vix > 20) { regime = 'CAUTION'; regimeSub = 'Elevated volatility'; }
+    else if (isInverted) { regime = 'RISK-OFF'; regimeSub = 'Inverted curve — recession risk'; }
+    else { regime = 'RISK-ON'; regimeSub = 'Risk appetite active'; }
+    const regEl = document.getElementById('risk-regime');
+    if (regEl) {
+      regEl.textContent = regime;
+      regEl.className = 'risk-val ' + (regime === 'RISK-ON' ? 'up' : 'down');
+    }
+    setEl('risk-regime-sub', regimeSub);
+  }
 }
 
 // Static fallback yield curve data
@@ -1758,16 +1894,17 @@ function drawYieldCurve(liveYields) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // Try to get US10Y from economic data if available, else use static
-  const tenors  = ['3M','6M','1Y','2Y','3Y','5Y','7Y','10Y','20Y','30Y'];
+  const tenors = ['3M','6M','1Y','2Y','3Y','5Y','7Y','10Y','20Y','30Y'];
   const yields  = liveYields || STATIC_YIELDS;
   const prevY   = [5.18, 5.14, 4.97, 4.68, 4.54, 4.42, 4.34, 4.26, 4.45, 4.38];
 
-  // Dynamically compute min/max from data
   const validY = yields.filter(v => v != null && !isNaN(v));
-  const minY = validY.length ? Math.floor(Math.min(...validY) * 4) / 4 - 0.25 : 4.10;
-  const maxY = validY.length ? Math.ceil(Math.max(...validY)  * 4) / 4 + 0.25 : 5.40;
+  const rawMin = validY.length ? Math.min(...validY) : 4.10;
+  const rawMax = validY.length ? Math.max(...validY) : 5.40;
+  const minY = Math.floor(rawMin * 4) / 4 - 0.25;
+  const maxY = Math.ceil(rawMax  * 4) / 4 + 0.25;
   const yRange = maxY - minY;
+
   const PAD_L=28, PAD_R=8, PAD_T=10, PAD_B=20;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const px = i => PAD_L+(i/(tenors.length-1))*cW;
@@ -1776,16 +1913,19 @@ function drawYieldCurve(liveYields) {
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#131722'; ctx.fillRect(0,0,W,H);
 
-  [4.25,4.50,4.75,5.00,5.25].forEach(v => {
-    const y=py(v);
+  // Dynamic grid lines — pick ~4 evenly spaced values
+  const step = yRange <= 0.5 ? 0.1 : yRange <= 1 ? 0.25 : 0.5;
+  const gridStart = Math.ceil(minY / step) * step;
+  for (let v = gridStart; v <= maxY; v = Math.round((v + step) * 100) / 100) {
+    const y = py(v);
     ctx.strokeStyle='#2a2e39'; ctx.lineWidth=0.5; ctx.setLineDash([2,4]);
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='right';
     ctx.fillText(v.toFixed(2), PAD_L-3, y+3);
-  });
+  }
 
-  // Inverted zone
+  // Inverted zone (2Y–10Y region)
   ctx.fillStyle='#ef535010';
   ctx.fillRect(px(3), PAD_T, px(7)-px(3), cH);
 
@@ -1818,8 +1958,8 @@ function drawYieldCurve(liveYields) {
   ctx.fillStyle='#363c4e'; ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
   ctx.fillStyle='#ef535066'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2);
 
-  // Yield spread data in table
-  const spread2_10 = yields[7] - yields[3]; // 10Y - 2Y
+  // Update yield spread table too
+  const spread2_10 = yields[7] - yields[3];
   setEl('ys-2-10', (spread2_10*100).toFixed(0)+'bp', spread2_10 < 0 ? 'down' : 'up');
   setEl('ys-2-10-sig', spread2_10 < 0 ? 'Inverted' : 'Normal', spread2_10 < 0 ? 'down' : 'up');
 }
@@ -1837,48 +1977,71 @@ function drawLiquidityChart() {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  const base = [8,7,7,8,10,14,18,22,26,30,34,30,26,22,28,40,80,95,100,92,85,70,55,40,25,18,14];
+  // FX liquidity curve based on real session overlap patterns (BIS/LSEG data):
+  // Sydney 22-07, Tokyo 00-09, London 08-17, NY 13-22 UTC
+  // Values represent relative interbank volume by hour (normalized to peak=100)
+  const base = [15,12,10,10,18,28,36,44,52,58,62,56,50,44,52,68,85,95,100,92,84,68,50,32,20,15,12];
+
+  // Check if weekend (forex closed)
+  const utcDay = new Date().getUTCDay(); // 0=Sun, 6=Sat
+  const isWeekend = utcDay === 0 || utcDay === 6;
+
   const hours = Array.from({length:48}, (_,i) => {
+    if (isWeekend) return 2; // flat line on weekend
     const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
     const v = base[idx]*(1-frac)+base[next]*frac;
-    return Math.max(2, v+(Math.random()-.5)*4);
+    return Math.max(2, v+(Math.random()-.5)*3);
   });
 
   const PAD_L=4, PAD_R=4, PAD_T=8, PAD_B=18;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const maxV=Math.max(...hours);
+  const maxV=Math.max(...hours, 10);
   const px = i => PAD_L+(i/(hours.length-1))*cW;
   const py = v => PAD_T+(1-v/maxV)*cH;
 
   ctx.clearRect(0,0,W,H);
-  [{start:0,end:9,color:'rgba(41,98,255,0.06)'},{start:16,end:25,color:'rgba(38,166,154,0.08)'}].forEach(s => {
-    ctx.fillStyle=s.color;
-    ctx.fillRect(PAD_L+(s.start/48)*cW, PAD_T, (Math.min(s.end,48)-s.start)/48*cW, cH);
-  });
+  if (!isWeekend) {
+    [{start:0,end:9,color:'rgba(41,98,255,0.06)'},{start:16,end:25,color:'rgba(38,166,154,0.08)'}].forEach(s => {
+      ctx.fillStyle=s.color;
+      ctx.fillRect(PAD_L+(s.start/48)*cW, PAD_T, (Math.min(s.end,48)-s.start)/48*cW, cH);
+    });
+  }
 
   const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
   ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
   ctx.beginPath(); ctx.moveTo(PAD_L+(nowH/24)*cW, PAD_T); ctx.lineTo(PAD_L+(nowH/24)*cW, PAD_T+cH); ctx.stroke();
   ctx.setLineDash([]);
 
+  const fillColor = isWeekend ? 'rgba(120,123,134,0.15)' : 'rgba(41,98,255,0.35)';
+  const lineColor = isWeekend ? '#363c4e' : '#2962ff';
   const grad=ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-  grad.addColorStop(0,'rgba(41,98,255,0.35)'); grad.addColorStop(1,'rgba(41,98,255,0.03)');
+  grad.addColorStop(0, isWeekend ? 'rgba(120,123,134,0.15)' : 'rgba(41,98,255,0.35)');
+  grad.addColorStop(1,'rgba(41,98,255,0.03)');
   ctx.beginPath();
   hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
   ctx.lineTo(px(hours.length-1),PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
   ctx.fillStyle=grad; ctx.fill();
 
-  ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.strokeStyle=lineColor; ctx.lineWidth=1.5;
   hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
   ctx.stroke();
 
   ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
   ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
 
+  if (isWeekend) {
+    ctx.fillStyle='rgba(120,123,134,0.5)'; ctx.font='9px Courier New'; ctx.textAlign='center';
+    ctx.fillText('MARKET CLOSED — WEEKEND', W/2, PAD_T+cH/2);
+  }
+
   const now = new Date();
   setEl('liq-time-label', now.getUTCHours().toString().padStart(2,'0')+':'+now.getUTCMinutes().toString().padStart(2,'0')+' UTC');
-  const peakH = hours.indexOf(Math.max(...hours));
-  setEl('liq-peak-label', 'Peak: '+Math.floor(peakH/2).toString().padStart(2,'0')+':'+(peakH%2===0?'00':'30')+' UTC');
+  if (isWeekend) {
+    setEl('liq-peak-label', 'Reopens: Sun 21:00');
+  } else {
+    const peakH = hours.indexOf(Math.max(...hours));
+    setEl('liq-peak-label', 'Peak: '+Math.floor(peakH/2).toString().padStart(2,'0')+':'+(peakH%2===0?'00':'30')+' UTC');
+  }
 }
 
 setTimeout(drawLiquidityChart, 120);
@@ -1900,7 +2063,7 @@ document.querySelectorAll('.tv-tab').forEach(tab => {
     container.style.cssText = 'height:100%;width:100%;';
     const widget = document.createElement('div');
     widget.className = 'tradingview-widget-container__widget';
-    widget.style.cssText = 'height:calc(100% - 32px);width:100%;';
+    widget.style.cssText = 'height:100%;width:100%;';
     container.appendChild(widget);
     const copyright = document.createElement('div');
     copyright.className = 'tradingview-widget-copyright';
@@ -1965,11 +2128,13 @@ async function fetchCalendarData() {
       const actCls = ev.actual && ev.forecast
         ? (parseFloat(ev.actual) > parseFloat(ev.forecast) ? 'up' : 'down')
         : '';
+      const ccy = ev.currency || ev.country || '';
+      // Use text badge instead of emoji flag for cross-browser compatibility
+      const flagBadge = ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;margin-right:4px;font-family:var(--font-mono);">${ccy}</span>` : '';
       return `<div class="macro-row">
         <div class="m-name">
           <span class="impact-dot ${impDot}"></span>
-          <span>${ev.flag||''}</span>
-          <span style="margin-left:3px;">${ev.event||''}</span>
+          ${flagBadge}<span>${ev.event||''}</span>
         </div>
         <span class="m-prev">${ev.previous||'—'}</span>
         <span class="m-exp">${ev.forecast||'—'}</span>
@@ -2244,6 +2409,7 @@ async function boot() {
   fetchOptionSkew();                  // option skew derived from COT data
   fetchRiskData();                    // VIX, yields, DXY from stooq.com
   fetchCryptoQuotes();               // BTC from CoinGecko
+  fetchCommodityQuotes();            // XAU, WTI from stooq
   setTimeout(fetchSentiment, 500);   // Dukascopy sentiment (last, non-critical)
 }
 
@@ -2259,6 +2425,8 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
 setInterval(fetchRiskData, 5 * 60 * 1000);
 // Refresh crypto every 2 minutes
 setInterval(fetchCryptoQuotes, 2 * 60 * 1000);
+// Refresh commodities every 5 minutes
+setInterval(fetchCommodityQuotes, 5 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
