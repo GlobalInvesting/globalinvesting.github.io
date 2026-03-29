@@ -230,9 +230,10 @@
   .sb-price { font-family: var(--font-mono); font-size: 11px; }
   .sb-chg   { font-family: var(--font-mono); font-size: 10px; }
 
-  .up   { color: var(--up);   }
-  .down { color: var(--down); }
-  .flat { color: var(--text2); }
+  .up      { color: var(--up);     }
+  .down    { color: var(--down);   }
+  .flat    { color: var(--text2);  }
+  .warning { color: var(--orange); }
 
   /* ── MAIN ── */
   #main {
@@ -523,6 +524,10 @@
   /* Flag icons in sidebar tables */
   .fi { width: 16px; height: 12px; display: inline-block; }
 
+  /* Force myfxbook widget table to fill container width */
+  #myfxbook-wrap table { width: 100% !important; }
+  #myfxbook-wrap td, #myfxbook-wrap th { font-size: 11px !important; }
+
   /* SENTIMENT PANEL */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
@@ -745,10 +750,7 @@
       <div id="sb-carry-rows" style="padding:2px 0;">
         <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
-      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Rate differential · repo data</div>
-    </div>
-    <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">
-      <span class="sb-k">Local</span> · <span id="sb-clock" style="font-family:var(--font-mono);">--:--:--</span>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Rate differential · central bank policy rates</div>
     </div>
   </aside>
 
@@ -854,7 +856,7 @@
     <!-- CROSS ASSET + RISK -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;max-height:320px;">
       <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
-        <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Extended data · repo</span></div>
+        <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
           <!-- Populated by fetchCrossAssetData() -->
           <div class="ca-cell"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
@@ -928,7 +930,7 @@
     </div>
 
     <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);align-items:stretch;">
       <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
@@ -985,7 +987,7 @@
           </div>
         </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;max-height:520px;overflow:hidden;height:100%;">
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
         <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
         <div id="spreads-rows" style="padding:4px 10px;">
           <!-- populated by fetchSpreadsData() -->
@@ -1002,9 +1004,9 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="overflow-y:hidden;overflow-x:hidden;padding:0;width:100%;flex:1;background:var(--bg);">
+          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;flex:1;background:var(--bg);position:relative;">
             <!-- myfxbook.com outlook widget - Start -->
-<div><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
+<div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
 <script type="text/javascript">showOutlookWidget()</script>
             <!-- myfxbook.com outlook widget - End -->
@@ -1115,7 +1117,7 @@
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table>
-      <thead><tr><th style="text-align:left">Banco · Reunión</th><th>Sesgo</th><th>Tasa fwd</th></tr></thead>
+      <thead><tr><th style="text-align:left">Bank · Meeting</th><th>Bias</th><th>Fwd Rate</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
@@ -1224,7 +1226,7 @@ function updateClock() {
   const localStr = [lh,lm,ls].map(n=>String(n).padStart(2,'0')).join(':');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   setEl('clock', localStr + ' ' + tzAbbr);
-  setEl('sb-clock', localStr);
+  // sb-clock removed (redundant with header clock)
   setEl('footer-clock', localStr);
   // Sessions use UTC internally
   updateSessions(now.getUTCHours(), now.getUTCMinutes());
@@ -1625,7 +1627,7 @@ async function fetchCBRates() {
   if (tbody) {
     const bankInfo = {
       usd: { flag: 'us', name: 'Federal Reserve',         short: 'Fed'  },
-      eur: { flag: 'eu', name: 'Banco Central Europeo',   short: 'BCE'  },
+      eur: { flag: 'eu', name: 'European Central Bank',  short: 'ECB'  },
       gbp: { flag: 'gb', name: 'Bank of England',         short: 'BoE'  },
       jpy: { flag: 'jp', name: 'Bank of Japan',           short: 'BoJ'  },
       aud: { flag: 'au', name: 'Reserve Bank of Australia',short: 'RBA' },
@@ -2134,39 +2136,39 @@ async function fetchRiskData() {
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
-    const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
+    const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val warning' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
     const signal = vix > 30 ? 'High' : vix > 20 ? 'Elevated' : 'Low';
     const chg = byId.vix.chg || 0;
     const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '→';
     const chgStr = (chg >= 0 ? ' +' : ' ') + chg.toFixed(1);
-    const srcNote = byId.vix.fromRepo ? ' · repo' : byId.vix.fromYahoo ? ' · Yahoo' : ' · stooq';
+    const srcNote = byId.vix.fromRepo ? ' · FRED' : ' · CBOE';
     setEl('risk-vix-sub', arrow + chgStr + ' · ' + signal + srcNote);
   } else {
     setEl('risk-vix', '—', 'risk-val');
-    setEl('risk-vix-sub', 'CBOE · no data');
+    setEl('risk-vix-sub', 'CBOE · unavailable');
   }
 
   // MOVE Index — ^MOVE on Yahoo (ICE BofA bond volatility index)
   {
     const move = await fetchYahoo('%5EMOVE');
     if (move && move.close > 10) {
-      const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val' : 'risk-val up';
+      const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val warning' : 'risk-val up';
       setEl('risk-move', move.close.toFixed(1), cls);
       const signal = move.close > 150 ? 'High' : move.close > 100 ? 'Elevated' : 'Low';
       const arrow = move.chg > 0 ? '▲' : move.chg < 0 ? '▼' : '→';
       const chgStr = (move.chg >= 0 ? ' +' : ' ') + move.chg.toFixed(1);
-      setEl('risk-move-sub', arrow + chgStr + ' · ' + signal + ' · Yahoo');
+      setEl('risk-move-sub', arrow + chgStr + ' · ' + signal + ' · ICE BofA');
     } else if (byId.us10y) {
       // Proxy: MOVE ≈ VIX-like measure from 10Y move
       const vixLevel = byId.vix ? byId.vix.close : 20;
       const approx = Math.round(vixLevel * 3.8);
-      const cls = approx > 150 ? 'risk-val down' : approx > 100 ? 'risk-val' : 'risk-val up';
+      const cls = approx > 150 ? 'risk-val down' : approx > 100 ? 'risk-val warning' : 'risk-val up';
       setEl('risk-move', approx.toString(), cls);
-      setEl('risk-move-sub', 'Bond vol · est · proxy');
+      setEl('risk-move-sub', 'Bond vol · estimated');
     } else {
       setEl('risk-move', '—', 'risk-val');
-      setEl('risk-move-sub', 'ICE BofA · no data');
+      setEl('risk-move-sub', 'ICE BofA · unavailable');
     }
   }
 
@@ -2938,7 +2940,7 @@ async function fetchFedExpectations() {
     const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const bankMeta = {
       USD: { flag:'us', short:'Fed',  trendKey:'usd' },
-      EUR: { flag:'eu', short:'BCE',  trendKey:'eur' },
+      EUR: { flag:'eu', short:'ECB',  trendKey:'eur' },
       GBP: { flag:'gb', short:'BoE',  trendKey:'gbp' },
       JPY: { flag:'jp', short:'BoJ',  trendKey:'jpy' },
       AUD: { flag:'au', short:'RBA',  trendKey:'aud' },
@@ -2963,9 +2965,9 @@ async function fetchFedExpectations() {
 
       // Bias from trend
       const trendDir = CB_TREND[bankMeta[ccy].trendKey] || 'flat';
-      const biasLabel = trendDir === 'down' ? '<span class="up">↓ Recorte</span>'
-                      : trendDir === 'up'   ? '<span class="down">↑ Alza</span>'
-                      :                       '<span class="flat">→ Pausa</span>';
+      const biasLabel = trendDir === 'down' ? '<span class="up">↓ Cut</span>'
+                      : trendDir === 'up'   ? '<span class="down">↑ Hike</span>'
+                      :                       '<span class="flat">→ Hold</span>';
 
       // Forward rate estimate: next step based on trend
       const step = Math.abs(trend) > 0.1 ? (trend < 0 ? -0.25 : 0.25) : 0;
@@ -2974,7 +2976,7 @@ async function fetchFedExpectations() {
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
-      rows.push(`<tr title="Próxima reunión: ${nextMtg}">
+      rows.push(`<tr title="Next meeting: ${nextMtg}">
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
         <td>${biasLabel}</td>
         <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">${fwd.toFixed(2)}%</td>
@@ -3215,7 +3217,7 @@ boot();
 // Refresh rates every 30 minutes (ECB updates once daily)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
-setInterval(fetchNewsData, 60 * 60 * 1000);  // check every hour (ETag avoids unnecessary downloads)
+setInterval(fetchNewsData, 10 * 60 * 1000);  // every 10 min; ETag avoids re-download if unchanged
 // Refresh narrative every 15 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
 // Refresh risk/yield data every 5 minutes
