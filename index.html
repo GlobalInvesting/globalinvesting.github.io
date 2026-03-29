@@ -992,10 +992,16 @@
         <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Market Sentiment</span>
-            <span class="panel-sub" id="sent-updated">CFTC · retail positioning</span>
+            <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 10px;min-height:0;width:100%;box-sizing:border-box;">
-            <div id="sent-rows" style="display:flex;flex-direction:column;gap:6px;"></div>
+          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;">
+            <!-- myfxbook.com outlook widget - Start -->
+<div>
+  <script class="powered" type="text/javascript"
+    src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
+</div>
+<script type="text/javascript">showOutlookWidget()</script>
+            <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
       </div>
@@ -2107,9 +2113,12 @@ async function fetchRiskData() {
     const vix = byId.vix.close;
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
-    const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated vol' : 'Low volatility';
-    const srcSuffix = byId.vix.fromRepo ? ' · Daily · FRED' : byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
-    setEl('risk-vix-sub', regime + srcSuffix);
+    const signal = vix > 30 ? 'High' : vix > 20 ? 'Elevated' : 'Low';
+    // Show change arrow + bp change + signal label  (e.g. "▼ -0.8 · Low")
+    const chg = byId.vix.chg || 0;
+    const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '→';
+    const chgStr = (chg >= 0 ? ' +' : ' ') + chg.toFixed(1);
+    setEl('risk-vix-sub', arrow + chgStr + ' · ' + signal);
   } else {
     setEl('risk-vix', '—');
     setEl('risk-vix-sub', 'CBOE · proxy unavailable');
@@ -2121,9 +2130,10 @@ async function fetchRiskData() {
     if (move && move.close > 10) {
       const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val' : 'risk-val up';
       setEl('risk-move', move.close.toFixed(1), cls);
-      const signal = move.close > 150 ? 'Extreme bond vol' : move.close > 100 ? 'Elevated' : 'Low';
-      const sign = move.chg >= 0 ? '+' : '';
-      setEl('risk-move-sub', signal + ' · ' + sign + move.chg.toFixed(1));
+      const signal = move.close > 150 ? 'High' : move.close > 100 ? 'Elevated' : 'Low';
+      const arrow = move.chg > 0 ? '▲' : move.chg < 0 ? '▼' : '→';
+      const chgStr = (move.chg >= 0 ? ' +' : ' ') + move.chg.toFixed(1);
+      setEl('risk-move-sub', arrow + chgStr + ' · ' + signal);
     } else if (byId.us10y) {
       // Proxy: MOVE ≈ VIX-like measure from 10Y move
       const vixLevel = byId.vix ? byId.vix.close : 20;
