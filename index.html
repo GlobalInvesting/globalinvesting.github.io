@@ -722,7 +722,7 @@
             <th style="text-align:left">Pair</th>
             <th>Bid</th><th>Ask</th><th>Spread</th>
             <th>1D Chg</th><th>1W Chg</th>
-            <th>IV 1M</th><th>Sess H</th><th>Sess L</th>
+            <th title="Implied Volatility · 30-day options market estimate">IV 1M</th><th>Sess H</th><th>Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
@@ -744,7 +744,7 @@
     </div>
 
     <!-- CROSS ASSET + RISK -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:360px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;max-height:320px;">
       <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Extended data · repo</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
@@ -890,15 +890,14 @@
             <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);">Market Sentiment</span>
             <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;position:relative;">
-            <!-- dark overlay that removes the white background via mix-blend-mode -->
-            <div style="position:absolute;inset:0;background:#1a1d23;mix-blend-mode:multiply;pointer-events:none;z-index:1;"></div>
-            <div style="filter:invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.95);transform-origin:top left;">
-              <!-- myfxbook outlook widget -->
-              <script class="powered" type="text/javascript"
-                src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
-              <script type="text/javascript">if(typeof showOutlookWidget==='function')showOutlookWidget();</script>
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;">
+            <!-- myfxbook compact outlook widget (type=0) -->
+            <div id="mfxb-container"></div>
+            <div style="font-size:9px;color:var(--text3);padding:2px 4px;">
+              <a href="https://www.myfxbook.com" class="myfxbookLink" target="_blank" rel="noopener" style="color:var(--text3);text-decoration:none;">Powered by Myfxbook.com</a>
             </div>
+            <script class="powered" type="text/javascript"
+              src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=0&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
           </div>
         </div>
       </div>
@@ -1888,8 +1887,8 @@ async function fetchRiskData() {
 
   // US 10Y (TNX = yield * 10)
   if (byId.us10y) {
-    const y10 = byId.us10y.close / 10;
-    const chg = byId.us10y.chg / 10;
+    const y10 = byId.us10y.close;
+    const chg = byId.us10y.chg;
     const cls = chg > 0.005 ? 'risk-val up' : chg < -0.005 ? 'risk-val down' : 'risk-val';
     setEl('risk-us10y', y10.toFixed(2) + '%', cls);
     const sign = chg >= 0 ? '+' : '';
@@ -1920,7 +1919,7 @@ async function fetchRiskData() {
   // Yield spreads — 2Y-10Y (prefer us2y, fallback us3m)
   const short2 = byId.us2y || byId.us3m;
   if (byId.us10y && short2) {
-    const y10  = byId.us10y.close / 10;
+    const y10  = byId.us10y.close;
     const y2   = short2.close / 10;
     const spr  = y10 - y2;
     const bp   = (spr * 100).toFixed(0);
@@ -1932,7 +1931,7 @@ async function fetchRiskData() {
 
   // US–DE 10Y spread
   if (byId.de10y && byId.us10y) {
-    const spread = byId.us10y.close / 10 - byId.de10y.close;
+    const spread = byId.us10y.close - byId.de10y.close;
     const bp2 = (spread * 100).toFixed(0);
     const sign2 = spread >= 0 ? '+' : '';
     setEl('ys-usde', sign2 + bp2 + 'bp');
@@ -1941,7 +1940,7 @@ async function fetchRiskData() {
 
   // US–JP 10Y spread
   if (byId.jp10y && byId.us10y) {
-    const spreadJP = byId.us10y.close / 10 - byId.jp10y.close / 10;
+    const spreadJP = byId.us10y.close - byId.jp10y.close;
     const bpJP = (spreadJP * 100).toFixed(0);
     const signJP = spreadJP >= 0 ? '+' : '';
     setEl('ys-usjp', signJP + bpJP + 'bp');
@@ -1950,38 +1949,38 @@ async function fetchRiskData() {
 
   // Rate cells
   if (byId.us3m) {
-    const v = byId.us3m.close / 10;
-    const chg = byId.us3m.chg / 10;
+    const v = byId.us3m.close;
+    const chg = byId.us3m.chg;
     setEl('rate-3m', v.toFixed(2) + '%', v > 0 ? 'rate-val' : 'rate-val flat');
     setEl('rate-3m-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us2y) {
-    const v = byId.us2y.close / 10;
-    const chg = byId.us2y.chg / 10;
+    const v = byId.us2y.close;
+    const chg = byId.us2y.chg;
     setEl('rate-2y', v.toFixed(2) + '%', 'rate-val');
     setEl('rate-2y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us5y) {
-    const v = byId.us5y.close / 10;
-    const chg = byId.us5y.chg / 10;
+    const v = byId.us5y.close;
+    const chg = byId.us5y.chg;
     setEl('rate-5y', v.toFixed(2) + '%', 'rate-val');
     setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us10y) {
-    const v = byId.us10y.close / 10;
-    const chg = byId.us10y.chg / 10;
+    const v = byId.us10y.close;
+    const chg = byId.us10y.chg;
     setEl('rate-10y', v.toFixed(2) + '%');
     setEl('rate-10y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us5y) {
-    const v = byId.us5y.close / 10;
-    const chg = byId.us5y.chg / 10;
+    const v = byId.us5y.close;
+    const chg = byId.us5y.chg;
     setEl('rate-5y', v.toFixed(2) + '%');
     setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   // 2Y approximated from 3M + 10Y blend
   if (byId.us3m && byId.us10y) {
-    const approx2y = byId.us3m.close / 10 * 0.3 + byId.us10y.close / 10 * 0.7;
+    const approx2y = byId.us3m.close * 0.3 + byId.us10y.close * 0.7;
     setEl('rate-2y', approx2y.toFixed(2) + '%');
     setEl('rate-2y-chg', '—', 'rate-chg flat');
   }
@@ -1989,15 +1988,15 @@ async function fetchRiskData() {
   // Draw yield curve
   const yields = [
     byId.us3m   ? byId.us3m.close  / 10 : STATIC_YIELDS[0],
-    byId.us3m && byId.us10y ? (byId.us3m.close/10*0.6 + byId.us10y.close/10*0.4) : STATIC_YIELDS[1], // 6M approx
-    byId.us10y  ? (byId.us3m ? byId.us3m.close/10*0.3 + byId.us10y.close/10*0.7 : STATIC_YIELDS[2]) : STATIC_YIELDS[2], // 1Y
-    byId.us10y  ? (byId.us10y.close/10 * 0.82 + (byId.us3m ? byId.us3m.close/10*0.18 : 0)) : STATIC_YIELDS[3], // 2Y
-    byId.us5y   ? (byId.us5y.close /10 * 0.7 + byId.us10y.close/10*0.3) : STATIC_YIELDS[4], // 3Y
+    byId.us3m && byId.us10y ? (byId.us3m.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[1], // 6M approx
+    byId.us10y  ? (byId.us3m ? byId.us3m.close*0.3 + byId.us10y.close*0.7 : STATIC_YIELDS[2]) : STATIC_YIELDS[2], // 1Y
+    byId.us10y  ? (byId.us10y.close * 0.82 + (byId.us3m ? byId.us3m.close*0.18 : 0)) : STATIC_YIELDS[3], // 2Y
+    byId.us5y   ? (byId.us5y.close /10 * 0.7 + byId.us10y.close*0.3) : STATIC_YIELDS[4], // 3Y
     byId.us5y   ? byId.us5y.close  / 10 : STATIC_YIELDS[5],
-    byId.us5y && byId.us10y ? (byId.us5y.close/10*0.4 + byId.us10y.close/10*0.6) : STATIC_YIELDS[6], // 7Y
-    byId.us10y  ? byId.us10y.close / 10 : STATIC_YIELDS[7],
-    byId.us30y  ? (byId.us30y.close/10*0.6 + byId.us10y.close/10*0.4) : STATIC_YIELDS[8], // 20Y
-    byId.us30y  ? byId.us30y.close / 10 : STATIC_YIELDS[9],
+    byId.us5y && byId.us10y ? (byId.us5y.close*0.4 + byId.us10y.close*0.6) : STATIC_YIELDS[6], // 7Y
+    byId.us10y  ? byId.us10y.close : STATIC_YIELDS[7],
+    byId.us30y  ? (byId.us30y.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[8], // 20Y
+    byId.us30y  ? byId.us30y.close : STATIC_YIELDS[9],
   ];
 
   drawYieldCurve(yields);
@@ -2007,13 +2006,13 @@ async function fetchRiskData() {
   if (spreadsTbody) {
     const rows = [];
     if (byId.us10y && byId.us3m) {
-      const spr = (byId.us10y.close / 10) - (byId.us3m.close / 10);
+      const spr = (byId.us10y.close) - (byId.us3m.close);
       const bp = (spr * 100).toFixed(0);
       const cls = spr < 0 ? 'down' : 'up';
       rows.push(`<tr><td>10Y–3M</td><td class="${cls}">${bp}bp</td><td class="${cls}">${spr < 0 ? 'Inverted ⚠' : 'Normal'}</td></tr>`);
     }
     if (byId.us10y && byId.de10y) {
-      const spr = (byId.us10y.close / 10) - byId.de10y.close;
+      const spr = (byId.us10y.close) - byId.de10y.close;
       const bp = (spr * 100).toFixed(0);
       rows.push(`<tr><td>US–DE 10Y</td><td>${bp}bp</td><td style="color:var(--text2);">${spr > 0 ? 'US Premium' : 'DE Premium'}</td></tr>`);
     }
@@ -2301,7 +2300,7 @@ async function fetchCarryData() {
       const shortRate = (rateData[p.short]??0).toFixed(2);
       return `<div class="sb-row">
         <span class="sb-sym">${p.long}/${p.short}</span>
-        <span class="sb-price" style="font-size:10px;color:var(--text3);">${longRate}% · ${shortRate}%</span>
+        <span class="sb-price" style="font-size:8.5px;color:var(--text3);letter-spacing:-0.01em;">${longRate}% · ${shortRate}%</span>
         <span class="sb-chg ${cls}">${sign}${p.diff.toFixed(2)}%</span>
       </div>`;
     }).join('');
@@ -2770,5 +2769,15 @@ setInterval(fetchCalendarData, 30 * 60 * 1000);
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 </script>
 
+  <script>
+    // Myfxbook widget init — poll for function availability
+    (function mfxbInit(attempts) {
+      if (typeof showOutlookWidget === 'function') {
+        showOutlookWidget();
+      } else if (attempts > 0) {
+        setTimeout(() => mfxbInit(attempts - 1), 300);
+      }
+    })(20);
+  </script>
 </body>
 </html>
