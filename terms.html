@@ -82,6 +82,21 @@ li { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 4px;
 
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; font-family: var(--font-ui); }
 .footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+@media (max-width: 900px) {
+  #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
+  #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
+  .topbar-right { margin-left: auto; font-size: 10px; padding: 4px 0; order: 2; flex-shrink: 0; gap: 8px !important; }
+  .top-nav { display: flex; overflow-x: auto; overflow-y: hidden; width: 100%; order: 10; border-top: 1px solid var(--border2); height: auto; min-height: 30px; -webkit-overflow-scrolling: touch; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%); mask-image: linear-gradient(to right, black 88%, transparent 100%); }
+  .top-nav::-webkit-scrollbar { display: none; }
+  .top-nav a { flex-shrink: 0; white-space: nowrap; padding: 6px 12px; font-size: 11px; height: auto; }
+}
+@media (max-width: 480px) {
+  #topbar { padding: 0 4px; }
+  .logo-text { font-size: 10px !important; }
+  .logo-sub { display: none; }
+  .topbar-right { font-size: 9px; gap: 6px !important; }
+  .top-nav a { padding: 5px 10px; font-size: 10px; }
+}
 </style>
 </head>
 <body>

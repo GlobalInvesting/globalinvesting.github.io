@@ -627,22 +627,54 @@
      MOBILE RESPONSIVE — max-width: 900px
   ══════════════════════════════════════════════ */
   @media (max-width: 900px) {
-    /* Topbar: wrap nav below logo on mobile */
-    #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; }
-    #topbar .logo { padding: 6px 8px 6px 0; }
+    /* Topbar: two-row layout — row1: logo + right controls, row2: nav tabs */
+    #topbar {
+      padding: 0 6px;
+      height: auto;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    #topbar .logo {
+      padding: 6px 8px 6px 0;
+      flex-shrink: 0;
+      order: 1;
+    }
+    /* Push topbar-right to far right of row 1 */
+    .topbar-right {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 4px 0;
+      order: 2;
+      flex-shrink: 0;
+      gap: 8px !important;
+    }
+    /* Hide clock on mobile to save header space */
+    #clock { display: none; }
+    .live-dot { display: none; }
+    /* Nav tabs: full-width second row, horizontally scrollable */
     .top-nav {
-      display: flex; overflow-x: auto; overflow-y: hidden;
-      width: 100%; order: 10; border-top: 1px solid var(--border2);
-      height: auto; min-height: 28px;
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      order: 10;
+      border-top: 1px solid var(--border2);
+      height: auto;
+      min-height: 30px;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      /* Right-edge fade hint so user knows it scrolls */
+      -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
+      mask-image: linear-gradient(to right, black 88%, transparent 100%);
     }
     .top-nav::-webkit-scrollbar { display: none; }
     .top-nav a {
-      flex-shrink: 0; white-space: nowrap;
-      padding: 5px 10px; font-size: 10px; height: auto;
+      flex-shrink: 0;
+      white-space: nowrap;
+      padding: 6px 12px;
+      font-size: 11px;
+      height: auto;
     }
-    .topbar-right { margin-left: auto; font-size: 10px; padding: 6px 0; }
     #news-ticker { display: none; }
 
     /* Layout: stack sidebar → main → right panel vertically */
@@ -756,11 +788,14 @@
     .ca-val { font-size: 13px !important; }
     .rate-val { font-size: 14px !important; }
 
-    /* Topbar: minimal */
-    #topbar { padding: 4px 6px; }
+    /* Topbar: minimal on very small screens */
+    #topbar { padding: 0 4px; }
     .logo-text { font-size: 10px !important; }
     .logo-sub { display: none; }
-    .topbar-right { font-size: 9px; }
+    .topbar-right { font-size: 9px; gap: 6px !important; }
+    /* Session label shortened */
+    #session-label { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-nav a { padding: 5px 10px; font-size: 10px; }
   }
 
   /* ── Site menu dropdown ── */
