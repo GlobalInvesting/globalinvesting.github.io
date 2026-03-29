@@ -1,10 +1,10 @@
 {
   "currency": "USD",
-  "country": "Estados Unidos",
-  "bank": "Reserva Federal (Fed)",
-  "analysis": "La Reserva Federal recortó las tasas en 0.25pp en diciembre 2025 y ha mantenido el tipo desde entonces, presionando a la baja la divisa. Aunque la tasa de interés se mantiene en 3.75%, la decisión de bajar tasas indica una postura más dovish, lo que puede afectar negativamente la divisa.\n\nLa cuenta corriente y la balanza comercial presentan un déficit, ejerciendo presión vendedora estructural sobre la divisa. La composición exportadora muestra que los combustibles y el petróleo son una parte importante de las exportaciones, lo que puede ser afectado por los precios de las commodities y la demanda global.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -6.9K contratos netos, sugiriendo que los inversores apostaron por una depreciación de la divisa. El rendimiento FX del último mes muestra una depreciación de -2.90% vs USD, lo que puede ser un indicador de la tendencia a corto plazo.",
+  "country": "United States",
+  "bank": "Federal Reserve (Fed)",
+  "analysis": "La política monetaria de la Fed ha sido expansiva, con un recorte de tasas de 0.25pp en diciembre 2025, manteniendo la tasa en 3.75%, aunque sigue siendo 1.37pp por encima del promedio global. Esto ha generado presión bajista sobre la divisa, ya que el menor carry reduce su atractivo. La inflación se mantiene por encima del objetivo, pero el crecimiento del PIB es superior al promedio global.\n\nLa balanza comercial de Estados Unidos muestra un déficit pronunciado, con un déficit de -54.5B USD/mes, lo que ejerce presión vendedora estructural sobre la divisa. La composición exportadora del país sugiere que la economía está expuesta a factores externos, como los precios de las commodities y la demanda global.\n\nEl posicionamiento especulativo muestra un sesgo neto bajista, con -6.9K contratos netos, lo que sugiere que los inversores apostaban por una depreciación del dólar. El rendimiento FX del último mes ha sido negativo, con una depreciación de -2.90% vs USD, reflejando la pérdida de atractivo de la divisa.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-28T09:53:04.925959+00:00",
+  "generatedAt": "2026-03-29T09:52:42.859919+00:00",
   "exportComposition": "Comtrade 2023: combustibles y petróleo (20%, $572.8B), maquinaria industrial (13%, $381.9B), equipos eléctricos y electrónicos (13%, $373.2B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -27,12 +27,12 @@
     "cotPositioning": -6921,
     "fxPerformance1M": -2.8997,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-28",
-    "latestNewsTs": 1774669224.0,
+    "lastUpdate": "2026-03-29",
+    "latestNewsTs": 1774655894.0,
     "newsHeadlines": [
-      "Dollar Advances as Iran War Rages",
       "Trump jokes about Hormuz as war drags on, markets slide and NATO doubts resurfac",
-      "investingLive Americas market news wrap: Oil prices surge as war worries mount"
+      "investingLive Americas market news wrap: Oil prices surge as war worries mount",
+      "Houthis in Yemen announce entry into the conflict if any alliance joins the US a"
     ]
   },
   "globalContext": {
@@ -41,7 +41,7 @@
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 1.15,
+    "avg_fx_perf_1m": 1.13,
     "avg_cot": -7330.62
   }
 }

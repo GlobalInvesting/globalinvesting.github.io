@@ -1,5 +1,96 @@
 {
-  "narrative": "USD firms as risk-off tone dominates — EUR/USD at 1.1517; GBP/USD under pressure near 1.3281. JPY outperforms on safe-haven flows; USD/JPY trading at 159.9. AUD/USD firming to 0.6884 — equities slide, oil surges on supply concerns.",
-  "regime": "RISK-OFF",
-  "generated_at": "2026-03-29T07:31:40Z"
+  "generatedAt": "2026-03-29T09:53:23.570486+00:00",
+  "model": "llama-3.3-70b-versatile",
+  "version": "5.0",
+  "currencies": [
+    "USD",
+    "EUR",
+    "GBP",
+    "JPY",
+    "AUD",
+    "CAD",
+    "CHF",
+    "NZD"
+  ],
+  "totalGenerated": 6,
+  "totalReused": 2,
+  "comtradeHits": 6,
+  "newsIntegrated": 18,
+  "keysUsed": 4,
+  "errors": [],
+  "results": {
+    "USD": {
+      "success": true,
+      "reused": false,
+      "wordCount": 164,
+      "generatedAt": "2026-03-29T09:52:42.859919+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 1
+    },
+    "EUR": {
+      "success": true,
+      "reused": false,
+      "wordCount": 127,
+      "generatedAt": "2026-03-29T09:52:48.128589+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 1
+    },
+    "GBP": {
+      "success": true,
+      "reused": false,
+      "wordCount": 179,
+      "generatedAt": "2026-03-29T09:52:58.683614+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 2
+    },
+    "JPY": {
+      "success": true,
+      "reused": false,
+      "wordCount": 191,
+      "generatedAt": "2026-03-29T09:53:04.484507+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 2
+    },
+    "AUD": {
+      "success": true,
+      "reused": false,
+      "wordCount": 178,
+      "generatedAt": "2026-03-29T09:53:14.989960+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 3
+    },
+    "CAD": {
+      "success": true,
+      "reused": false,
+      "wordCount": 168,
+      "generatedAt": "2026-03-29T09:53:20.508598+00:00",
+      "newsIntegrated": 3,
+      "exportDataSource": "comtrade",
+      "keyUsed": 3
+    },
+    "CHF": {
+      "success": true,
+      "reused": true,
+      "fallback": true
+    },
+    "NZD": {
+      "success": true,
+      "reused": true,
+      "fallback": true
+    }
+  },
+  "globalContext": {
+    "avg_interest_rate": 2.38,
+    "avg_gdp_growth": 1.12,
+    "avg_inflation": 2.17,
+    "avg_unemployment": 5.28,
+    "avg_bond10y": 3.45,
+    "avg_fx_perf_1m": 1.13,
+    "avg_cot": -7330.62
+  }
 }

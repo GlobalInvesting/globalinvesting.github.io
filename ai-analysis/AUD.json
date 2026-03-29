@@ -1,10 +1,10 @@
 {
   "currency": "AUD",
   "country": "Australia",
-  "bank": "Banco de la Reserva de Australia (RBA)",
-  "analysis": "El Banco de la Reserva de Australia mantiene una postura hawkish con una tasa de interés del 4.10%, generando un carry atractivo para inversores. La inflación está por encima del objetivo y el crecimiento del PIB es superior al promedio global, lo que sugiere que el banco central intenta controlar la inflación y mantener el crecimiento económico. Aunque los mercados de futuros descuentan un ciclo restrictivo, la advertencia del RBA sobre una posible \"trampa de estagflación\" podría limitar su capacidad para subir tasas.\n\nLa balanza comercial de Australia muestra un superávit en bienes gracias a su composición exportadora, pero la cuenta corriente presenta un déficit, lo que podría ejercer presión vendedora sobre la divisa. La situación geopolítica actual ha generado un entorno de aversión al riesgo, afectando el precio del AUD.\n\nEl posicionamiento especulativo es muy alcista, con un COT de +49.1K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. El rendimiento FX del último mes ha sido positivo, con una apreciación vs USD, confirmando la tendencia alcista, aunque el mercado muestra signos de debilidad, lo que podría ser un catalizador para una corrección a corto plazo.",
+  "bank": "Reserve Bank of Australia (RBA)",
+  "analysis": "La política monetaria del Reserve Bank of Australia es hawkish, con una tasa de interés en 4.10%, lo que genera un carry atractivo para inversores. Esta postura restrictiva es estructuralmente alcista para la divisa, ya que el diferencial de tasas es mayor. Aunque los mercados de futuros descuentan un posible ajuste en las expectativas de inflación, la tendencia general sigue siendo de presión alcista.\n\nLa balanza comercial de Australia muestra un superávit en bienes, gracias a las exportaciones de minerales metalíferos. Sin embargo, la cuenta corriente presenta un déficit, lo que introduce una presión vendedora estructural sobre la divisa. Los términos de intercambio son favorables, pero la producción industrial y el PMI manufacturero muestran signos de contracción.\n\nEl posicionamiento especulativo es extremadamente alcista, con 49.1K contratos netos, lo que sugiere un riesgo de corrección ante cualquier decepción. La noticia de que la inflación podría aumentar a 6.4 por ciento para junio ha generado preocupación, y el par AUDUSD ha comenzado a cotizar a la baja, lo que podría ser un indicio de una posible corrección en el mercado.",
   "model": "llama-3.3-70b-versatile",
-  "generatedAt": "2026-03-28T09:53:37.793958+00:00",
+  "generatedAt": "2026-03-29T09:53:14.989960+00:00",
   "exportComposition": "Comtrade 2023: minerales metalíferos (73%, $193.9B), piedras preciosas y metales (8%, $20.3B), equipos eléctricos y electrónicos (3%, $6.8B)",
   "newsCount": 3,
   "dataSnapshot": {
@@ -27,12 +27,12 @@
     "cotPositioning": 49145,
     "fxPerformance1M": 2.3788,
     "fxSource": "frankfurter",
-    "lastUpdate": "2026-03-28",
-    "latestNewsTs": 1774581762.0,
+    "lastUpdate": "2026-03-29",
+    "latestNewsTs": 1774675711.0,
     "newsHeadlines": [
+      "Inflation could soar to 6.4 per cent by June, economists predict",
       "Stagflation Trap Could Tie RBA’s Hawkish Hand, and Send AUD/JPY to 103",
-      "AUDUSD trades to the downside and tests a key target floor area between 0.6896 a",
-      "RBA Warns of ‘Restrictive’ Shift: Why Rising Neutral Rates and Petrol Shocks Cou"
+      "AUDUSD trades to the downside and tests a key target floor area between 0.6896 a"
     ]
   },
   "globalContext": {
@@ -41,7 +41,7 @@
     "avg_inflation": 2.17,
     "avg_unemployment": 5.28,
     "avg_bond10y": 3.45,
-    "avg_fx_perf_1m": 1.15,
+    "avg_fx_perf_1m": 1.13,
     "avg_cot": -7330.62
   }
 }
