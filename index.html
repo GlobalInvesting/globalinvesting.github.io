@@ -616,8 +616,7 @@
     /* Sessions overflow fix */
     div[style*="max-height:520px"] { max-height: none !important; overflow: visible !important; }
 
-    /* Market sentiment: auto height */
-    #myfxbook-wrap { max-height: 400px !important; overflow-y: auto !important; }
+    /* Market sentiment: no forced height */
 
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
@@ -662,7 +661,7 @@
     <a data-target="section-crossasset">Cross-Asset</a>
     <a data-target="section-risk">Risk</a>
     <a data-target="section-positioning">Positioning</a>
-    <a data-target="section-rates">Screener</a>
+    <a data-target="section-macro">Calendar</a>
   </nav>
   <div class="topbar-right">
     <span id="session-label">DETECTING...</span>
@@ -778,7 +777,7 @@
         </div>
         <span class="panel-sub" style="margin-left:auto;">TradingView · live data</span>
       </div>
-      <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-1px;">
+      <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
           <div id="tv-chart-widget" class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div>
           <div class="tradingview-widget-copyright" style="display:none;"></div>
@@ -992,12 +991,12 @@
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
-        <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
+        <div style="border-top:1px solid var(--border);overflow:hidden;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;">
+          <div id="myfxbook-wrap" style="overflow-y:hidden;overflow-x:hidden;padding:0;width:100%;">
             <!-- myfxbook.com outlook widget - Start -->
 <div><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
