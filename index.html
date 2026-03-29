@@ -536,9 +536,22 @@
      MOBILE RESPONSIVE — max-width: 900px
   ══════════════════════════════════════════════ */
   @media (max-width: 900px) {
-    /* Topbar: minimal */
-    .top-nav { display: none; }
-    .topbar-right { margin-left: auto; font-size: 10px; }
+    /* Topbar: wrap nav below logo on mobile */
+    #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; }
+    #topbar .logo { padding: 6px 8px 6px 0; }
+    .top-nav {
+      display: flex; overflow-x: auto; overflow-y: hidden;
+      width: 100%; order: 10; border-top: 1px solid var(--border2);
+      height: auto; min-height: 28px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .top-nav a {
+      flex-shrink: 0; white-space: nowrap;
+      padding: 5px 10px; font-size: 10px; height: auto;
+    }
+    .topbar-right { margin-left: auto; font-size: 10px; padding: 6px 0; }
     #news-ticker { display: none; }
 
     /* Layout: stack sidebar → main → right panel vertically */
@@ -603,6 +616,9 @@
     div[style*="overflow-x:auto"] { overflow-x: auto !important; }
     table { min-width: 480px; }
     .fx-pairs-table table, #fx-pairs-tbody { min-width: 480px; }
+    /* Right panel tables must NOT get that min-width — they're in a narrow column */
+    #rightpanel table { min-width: unset !important; width: 100% !important; }
+    #rightpanel td, #rightpanel th { font-size: 10px !important; padding: 2px 4px !important; }
 
     /* Heatmap */
     #heatmap-wrap { overflow-x: auto !important; }
@@ -724,26 +740,22 @@
         </div>
       </div>
     </div>
-    <!-- FX Majors — rates from Frankfurter -->
-    <div class="sb-section">
-      <div class="sb-head">FX Majors</div>
-      <div id="sb-majors">
-        <div class="sb-row"><span class="sb-sym">EUR/USD</span><span class="sb-price" id="sb-eurusd">—</span><span class="sb-chg" id="sbc-eurusd">—</span></div>
-        <div class="sb-row"><span class="sb-sym">GBP/USD</span><span class="sb-price" id="sb-gbpusd">—</span><span class="sb-chg" id="sbc-gbpusd">—</span></div>
-        <div class="sb-row"><span class="sb-sym">USD/JPY</span><span class="sb-price" id="sb-usdjpy">—</span><span class="sb-chg" id="sbc-usdjpy">—</span></div>
-        <div class="sb-row"><span class="sb-sym">AUD/USD</span><span class="sb-price" id="sb-audusd">—</span><span class="sb-chg" id="sbc-audusd">—</span></div>
-        <div class="sb-row"><span class="sb-sym">USD/CHF</span><span class="sb-price" id="sb-usdchf">—</span><span class="sb-chg" id="sbc-usdchf">—</span></div>
-        <div class="sb-row"><span class="sb-sym">USD/CAD</span><span class="sb-price" id="sb-usdcad">—</span><span class="sb-chg" id="sbc-usdcad">—</span></div>
-        <div class="sb-row"><span class="sb-sym">NZD/USD</span><span class="sb-price" id="sb-nzdusd">—</span><span class="sb-chg" id="sbc-nzdusd">—</span></div>
-      </div>
-    </div>
     <div class="sb-section">
       <div class="sb-head">Crosses</div>
       <div class="sb-row"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
       <div class="sb-row"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
-      <div class="sb-row"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
-      <div class="sb-row"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
       <div class="sb-row"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
+      <div class="sb-row"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span></div>
+      <div class="sb-row"><span class="sb-sym">EUR/AUD</span><span class="sb-price" id="sb-euraud">—</span><span class="sb-chg" id="sbc-euraud">—</span></div>
+      <div class="sb-row"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
+      <div class="sb-row"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span></div>
+      <div class="sb-row"><span class="sb-sym">GBP/CAD</span><span class="sb-price" id="sb-gbpcad">—</span><span class="sb-chg" id="sbc-gbpcad">—</span></div>
+      <div class="sb-row"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
+      <div class="sb-row"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span></div>
+      <div class="sb-row"><span class="sb-sym">AUD/CHF</span><span class="sb-price" id="sb-audchf">—</span><span class="sb-chg" id="sbc-audchf">—</span></div>
+      <div class="sb-row"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
+      <div class="sb-row"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
+      <div class="sb-row"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span></div>
     </div>
     <div class="sb-section">
       <div class="sb-head">Carry Trade — Top Pairs</div>
@@ -930,7 +942,7 @@
     </div>
 
     <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);align-items:stretch;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);align-items:start;">
       <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
@@ -987,7 +999,7 @@
           </div>
         </div>
       </div>
-      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
+      <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
         <div id="spreads-rows" style="padding:4px 10px;">
           <!-- populated by fetchSpreadsData() -->
@@ -1004,7 +1016,7 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;flex:1;background:var(--bg);position:relative;">
+          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;max-height:220px;background:var(--bg);position:relative;">
             <!-- myfxbook.com outlook widget - Start -->
 <div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
@@ -1169,9 +1181,18 @@ const PAIRS = [
   { id:'nzdusd', base:'NZD', quote:'USD', invert:true,  dec:5 },
   { id:'eurgbp', base:'EUR', quote:'GBP', cross:['EUR','GBP'], dec:5 },
   { id:'eurjpy', base:'EUR', quote:'JPY', cross:['EUR','JPY'], dec:3 },
-  { id:'gbpjpy', base:'GBP', quote:'JPY', cross:['GBP','JPY'], dec:3 },
-  { id:'audjpy', base:'AUD', quote:'JPY', cross:['AUD','JPY'], dec:3 },
   { id:'eurchf', base:'EUR', quote:'CHF', cross:['EUR','CHF'], dec:5 },
+  { id:'eurcad', base:'EUR', quote:'CAD', cross:['EUR','CAD'], dec:5 },
+  { id:'euraud', base:'EUR', quote:'AUD', cross:['EUR','AUD'], dec:5 },
+  { id:'gbpjpy', base:'GBP', quote:'JPY', cross:['GBP','JPY'], dec:3 },
+  { id:'gbpchf', base:'GBP', quote:'CHF', cross:['GBP','CHF'], dec:5 },
+  { id:'gbpcad', base:'GBP', quote:'CAD', cross:['GBP','CAD'], dec:5 },
+  { id:'audjpy', base:'AUD', quote:'JPY', cross:['AUD','JPY'], dec:3 },
+  { id:'audnzd', base:'AUD', quote:'NZD', cross:['AUD','NZD'], dec:5 },
+  { id:'audchf', base:'AUD', quote:'CHF', cross:['AUD','CHF'], dec:5 },
+  { id:'cadjpy', base:'CAD', quote:'JPY', cross:['CAD','JPY'], dec:3 },
+  { id:'chfjpy', base:'CHF', quote:'JPY', cross:['CHF','JPY'], dec:3 },
+  { id:'nzdjpy', base:'NZD', quote:'JPY', cross:['NZD','JPY'], dec:3 },
 ];
 
 // CB rate config
@@ -1307,7 +1328,6 @@ async function fetchFrankfurter() {
     STATE.prevRates = (prev && prev.rates) ? prev.rates : {};
 
     populateQuoteBar();
-    populateSidebarMajors();
     populateFxPairsTable();
     populateHeatmap();
     populateCrossRows();
@@ -1406,30 +1426,10 @@ function populateQuoteBar() {
   }
 }
 
-function populateSidebarMajors() {
-  PAIRS.filter(p => !p.cross).forEach(pair => {
-    const rate = computeRate(pair);
-    const prev = computePrevRate(pair);
-    const priceEl = document.getElementById('sb-' + pair.id);
-    const chgEl   = document.getElementById('sbc-' + pair.id);
-    if (!priceEl) return;
-    if (rate != null) {
-      priceEl.textContent = fmt(rate, pair.dec);
-      if (prev && prev > 0) {
-        const pct = (rate - prev) / prev * 100;
-        const cls = clsDir(pct);
-        priceEl.className = 'sb-price ' + cls;
-        if (chgEl) { chgEl.textContent = pctStr(pct); chgEl.className = 'sb-chg ' + cls; }
-      } else {
-        priceEl.className = 'sb-price flat';
-        if (chgEl) { chgEl.textContent = '+0.00%'; chgEl.className = 'sb-chg flat'; }
-      }
-    }
-  });
-}
 
 function populateCrossRows() {
-  ['eurgbp','eurjpy','gbpjpy','audjpy','eurchf'].forEach(id => {
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy'];
+  crossIds.forEach(id => {
     const pair = PAIRS.find(p=>p.id===id);
     if (!pair) return;
     const rate = computeRate(pair);
@@ -1455,13 +1455,19 @@ function populateCrossRows() {
 const TYPICAL_SPREADS = {
   eurusd:0.2, gbpusd:0.4, usdjpy:0.2, audusd:0.4,
   usdchf:0.5, usdcad:0.5, nzdusd:0.6, eurgbp:0.5,
-  eurjpy:0.5, gbpjpy:1.2, audjpy:0.8, eurchf:1.0,
+  eurjpy:0.5, eurchf:1.0, eurcad:0.8, euraud:1.0,
+  gbpjpy:1.2, gbpchf:1.2, gbpcad:1.5,
+  audjpy:0.8, audnzd:1.5, audchf:1.5,
+  cadjpy:1.0, chfjpy:1.5, nzdjpy:1.8,
 };
 // Estimated 1M implied vol from historical avg (used as proxy when live IV unavailable)
 const EST_IV = {
   eurusd:6.2, gbpusd:7.0, usdjpy:7.8, audusd:9.1,
   usdchf:7.4, usdcad:6.8, nzdusd:10.2, eurgbp:5.8,
-  eurjpy:9.4, gbpjpy:11.2, audjpy:12.0, eurchf:8.5,
+  eurjpy:9.4, eurchf:8.5, eurcad:7.5, euraud:9.0,
+  gbpjpy:11.2, gbpchf:9.0, gbpcad:9.5,
+  audjpy:12.0, audnzd:8.5, audchf:10.0,
+  cadjpy:9.5, chfjpy:10.5, nzdjpy:12.5,
 };
 
 // Repo performance data cache
@@ -1789,7 +1795,7 @@ async function fetchCommodityQuotes() {
     const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
     for (const url of urls) {
       try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
         if (!r.ok) continue;
         const text = await r.text();
         const lines = text.trim().split('\n');
@@ -1804,7 +1810,7 @@ async function fetchCommodityQuotes() {
     // All stooq failed — try Yahoo Finance via allorigins
     try {
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + fallbackClose + '?interval=1d&range=2d')}`;
-      const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(9000) });
+      const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
       if (!r2.ok) return null;
       const d = await r2.json();
       const meta = d?.chart?.result?.[0]?.meta;
@@ -1985,7 +1991,7 @@ async function fetchRiskData() {
     ];
     for (const url of urls) {
       try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
         if (!r.ok) continue;
         let text = await r.text();
         // allorigins sometimes wraps in JSON {contents:"..."}
@@ -2039,7 +2045,7 @@ async function fetchRiskData() {
     ];
     for (const url of urls) {
       try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
+        const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
         if (!r.ok) continue;
         const text = await r.text();
         if (!text || text.length < 50) continue;
@@ -2058,37 +2064,29 @@ async function fetchRiskData() {
     return null;
   }
 
-  // Fill VIX if stooq missed it — also reject absurd values (stooq sometimes returns 0 or N/D)
-  if (!byId.vix || byId.vix.close < 5 || byId.vix.close > 100) {
-    delete byId.vix;
-    const v = await fetchYahoo('%5EVIX');
-    if (v && v.close > 5 && v.close < 100) byId.vix = { ...v, fromYahoo: true };
-  }
-  // Fill DXY if stooq missed it — use DX-Y.NYB on Yahoo
-  if (!byId.dxy) {
-    const d = await fetchYahoo('DX-Y.NYB');
-    if (d) byId.dxy = d;
-  }
-  // Fill 3M T-Bill (^IRX on Yahoo = yield * 10, need to divide by 10)
-  if (!byId.us3m) {
-    const t = await fetchYahoo('%5EIRX');
-    if (t && t.close > 0) byId.us3m = { ...t, close: t.close / 10, chg: t.chg / 10 };
-  }
-  // Fill 10Y (^TNX = yield * 10)
-  if (!byId.us10y) {
-    const t = await fetchYahoo('%5ETNX');
-    if (t && t.close > 0) byId.us10y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
-  }
-  // Fill 5Y (^FVX = yield * 10)
-  if (!byId.us5y) {
-    const t = await fetchYahoo('%5EFVX');
-    if (t && t.close > 0) byId.us5y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
-  }
-  // Fill 30Y (^TYX = yield * 10)
-  if (!byId.us30y) {
-    const t = await fetchYahoo('%5ETYX');
-    if (t && t.close > 0) byId.us30y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
-  }
+  // Run all Yahoo fallbacks in parallel — avoids sequential await stacking (up to 60s worst-case)
+  const needVix  = !byId.vix || byId.vix.close < 5 || byId.vix.close > 100;
+  const needDxy  = !byId.dxy;
+  const needUs3m = !byId.us3m;
+  const needUs10y= !byId.us10y;
+  const needUs5y = !byId.us5y;
+  const needUs30y= !byId.us30y;
+
+  const [yVix, yDxy, yUs3m, yUs10y, yUs5y, yUs30y] = await Promise.all([
+    needVix   ? fetchYahoo('%5EVIX')    : Promise.resolve(null),
+    needDxy   ? fetchYahoo('DX-Y.NYB') : Promise.resolve(null),
+    needUs3m  ? fetchYahoo('%5EIRX')   : Promise.resolve(null),
+    needUs10y ? fetchYahoo('%5ETNX')   : Promise.resolve(null),
+    needUs5y  ? fetchYahoo('%5EFVX')   : Promise.resolve(null),
+    needUs30y ? fetchYahoo('%5ETYX')   : Promise.resolve(null),
+  ]);
+
+  if (needVix)  { delete byId.vix; if (yVix && yVix.close > 5 && yVix.close < 100) byId.vix = { ...yVix, fromYahoo: true }; }
+  if (needDxy  && yDxy)  byId.dxy   = yDxy;
+  if (needUs3m && yUs3m && yUs3m.close > 0) byId.us3m  = { ...yUs3m,  close: yUs3m.close / 10,  chg: yUs3m.chg / 10 };
+  if (needUs10y&& yUs10y&& yUs10y.close > 0) byId.us10y = { ...yUs10y, close: yUs10y.close / 10, chg: yUs10y.chg / 10, pct: yUs10y.pct };
+  if (needUs5y && yUs5y && yUs5y.close > 0)  byId.us5y  = { ...yUs5y,  close: yUs5y.close / 10,  chg: yUs5y.chg / 10,  pct: yUs5y.pct };
+  if (needUs30y&& yUs30y&& yUs30y.close > 0) byId.us30y = { ...yUs30y, close: yUs30y.close / 10, chg: yUs30y.chg / 10, pct: yUs30y.pct };
   // Extended-data repo fallback — fetch all yield data from repo JSONs in one pass
   // USD.json: bond10y (always), bond2y + bond5y (after engine v13.1+ run)
   // EUR.json, JPY.json: bond10y
@@ -2149,9 +2147,14 @@ async function fetchRiskData() {
     setEl('risk-vix-sub', 'CBOE · unavailable');
   }
 
+  // MOVE + EUR/USD IV — fetch in parallel
+  const [move, fxiv] = await Promise.all([
+    fetchYahoo('%5EMOVE'),
+    fetchStooq('eurusdv1m.b'),
+  ]);
+
   // MOVE Index — ^MOVE on Yahoo (ICE BofA bond volatility index)
   {
-    const move = await fetchYahoo('%5EMOVE');
     if (move && move.close > 10) {
       const cls = move.close > 150 ? 'risk-val down' : move.close > 100 ? 'risk-val warning' : 'risk-val up';
       setEl('risk-move', move.close.toFixed(1), cls);
@@ -2174,7 +2177,6 @@ async function fetchRiskData() {
 
   // EUR/USD Implied Vol 1M — stooq eurusdv1m.b primary, VIX proxy fallback
   {
-    const fxiv = await fetchStooq('eurusdv1m.b');
     if (fxiv && fxiv.close > 0.5 && fxiv.close < 30) {
       const cls = fxiv.close > 10 ? 'risk-val down' : fxiv.close > 7 ? 'risk-val' : 'risk-val up';
       setEl('risk-eurusd-iv', fxiv.close.toFixed(1) + '%', cls);
@@ -2688,7 +2690,7 @@ async function fetchCrossAssetData() {
     const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
     for (const url of urls) {
       try {
-        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
         if (!r.ok) continue;
         const t = await r.text();
         const lines = t.trim().split('\n');
@@ -2742,7 +2744,7 @@ async function fetchCrossAssetData() {
       `https://corsproxy.io/?${encodeURIComponent(yBase)}`
     ]) {
       try {
-        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
         const yd = await yr.json();
         const meta = yd?.chart?.result?.[0]?.meta;
@@ -2764,7 +2766,7 @@ async function fetchCrossAssetData() {
       `https://corsproxy.io/?${encodeURIComponent(yBase)}`
     ]) {
       try {
-        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
         const yd = await yr.json();
         const meta = yd?.chart?.result?.[0]?.meta;
@@ -2808,7 +2810,7 @@ async function fetchCrossAssetData() {
       `https://corsproxy.io/?${encodeURIComponent(yBase)}`
     ]) {
       try {
-        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
         const yd = await yr.json();
         const meta = yd?.chart?.result?.[0]?.meta;
