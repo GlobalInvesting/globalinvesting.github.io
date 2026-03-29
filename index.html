@@ -620,6 +620,9 @@
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
 
+  /* Invert myfxbook widget colors to match dark terminal theme */
+  #myfxbook-widget-inner { filter: invert(1) hue-rotate(180deg); }
+
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
   ══════════════════════════════════════════════ */
@@ -967,7 +970,7 @@
         <a href="guide-dashboard.html">How to Use the Terminal</a>
         <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
         <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
-        <a href="guide-market-sentiment.html">Market Sentiment</a>
+        <a href="guide-market-sentiment.html">Retail Market Sentiment</a>
         <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
         <a href="guide-cot.html">COT / CFTC Positioning</a>
       </div>
@@ -1300,7 +1303,7 @@
         </div>
         <div style="border-top:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <span class="panel-title">Market Sentiment</span>
+            <span class="panel-title">Retail Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
           <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;flex:1;background:var(--bg2);position:relative;min-height:0;">
