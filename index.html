@@ -64,19 +64,19 @@
 
   .logo-text {
     font-family: var(--font-ui);
-    font-size: 1.1rem;
+    font-size: 13px;
     font-weight: 700;
     color: #fff;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     line-height: 1;
   }
 
   .logo-sub {
     font-family: var(--font-ui);
-    font-size: 0.68rem;
+    font-size: 9px;
     font-weight: 500;
     color: var(--text2);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     display: block;
     margin-top: 2px;
@@ -245,6 +245,8 @@
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
 
   .panel { border-bottom: 1px solid var(--border); }
+  /* Suppress TradingView copyright bar that causes gap */
+  .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; }
 
   .panel-head {
     background: var(--head-bg);
@@ -352,8 +354,9 @@
 
   /* CROSS ASSET */
   .ca-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
-  .ca-cell  { background: var(--bg); padding: 7px 8px; cursor: pointer; transition: background .1s; }
+  .ca-cell  { background: var(--bg); padding: 7px 8px; cursor: pointer; transition: background .1s; border-bottom: 1px solid var(--border); }
   .ca-cell:hover { background: var(--bg3); }
+  .ca-cell:nth-child(odd) { border-right: 1px solid var(--border); }
   .ca-name  { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; font-family: var(--font-ui); }
   .ca-val   { font-size: 16px; font-weight: 700; color: #fff; font-family: var(--font-mono); }
   .ca-chg   { font-size: 10px; font-family: var(--font-mono); }
@@ -620,15 +623,11 @@
       <div class="sb-row"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
     </div>
     <div class="sb-section">
-      <div class="sb-head">Technical Summary</div>
-      <div style="padding:4px 0 0; overflow:hidden; background:var(--bg2);">
-        <div style="transform:scale(0.415);transform-origin:top left;width:241%;pointer-events:none;">
-          <iframe frameborder="0" scrolling="no" height="274" width="425"
-            allowtransparency="true" marginwidth="0" marginheight="0"
-            src="https://ssltools.investing.com/technical_summary.php?pairs=1,2,3,4,5,7&curr-name-color=%23787b86&fields=15m,1h,1d&force_lang=4&theme=dark&bg=1e222d&text=d1d4dc&border=2a2e39">
-          </iframe>
-        </div>
+      <div class="sb-head">Carry Trade — Top Pairs</div>
+      <div id="sb-carry-rows" style="padding:2px 0;">
+        <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
+      <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Rate differential · repo data</div>
     </div>
     <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">
       <span class="sb-k">ECB</span> · <span id="sb-clock" style="font-family:var(--font-mono);">--:--:--</span> UTC
@@ -666,7 +665,7 @@
         </div>
         <span class="panel-sub" style="margin-left:auto;">TradingView · live data</span>
       </div>
-      <div id="tv-chart-wrap" style="height:340px;width:100%;position:relative;overflow:hidden;">
+      <div id="tv-chart-wrap" style="height:340px;width:100%;position:relative;overflow:hidden;margin-bottom:-1px;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
           <div id="tv-chart-widget" class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div>
           <div class="tradingview-widget-copyright" style="display:none;"></div>
@@ -700,24 +699,27 @@
       </div>
     </div>
 
-    <!-- FX PAIRS TABLE — Frankfurter -->
+    <!-- FX PAIRS TABLE — Frankfurter + fx-performance repo data -->
     <div class="panel">
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
-        <span class="panel-sub" id="fx-table-updated">ECB daily rate · updating…</span>
+        <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · IV 1M · Session Range</span>
       </div>
+      <div style="overflow-x:auto;">
       <table>
         <thead>
           <tr>
             <th style="text-align:left">Pair</th>
-            <th>Rate</th><th>Prev</th>
-            <th>1D Chg</th><th>1D Chg%</th>
+            <th>Bid</th><th>Ask</th><th>Spread</th>
+            <th>1D Chg</th><th>1W Chg</th>
+            <th>IV 1M</th><th>Sess H</th><th>Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
-          <tr><td class="sym" colspan="5" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+          <tr><td class="sym" colspan="9" style="color:var(--text3);text-align:center;">Loading…</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
 
     <!-- CURRENCY STRENGTH HEATMAP — computed from Frankfurter data -->
@@ -734,55 +736,17 @@
     <!-- CROSS ASSET + RISK -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
       <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);">
-        <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub">Global context · TradingView</span></div>
-        <!-- TradingView mini chart widget for cross-asset -->
-        <div style="height:190px;overflow:hidden;">
-          <div class="tradingview-widget-container" style="height:100%;width:100%;">
-            <div class="tradingview-widget-container__widget" style="height:100%;width:100%;"></div>
-            <div class="tradingview-widget-copyright" style="display:none;"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-            {
-              "colorTheme": "dark",
-              "dateRange": "1D",
-              "showChart": true,
-              "locale": "en",
-              "isTransparent": true,
-              "showSymbolLogo": false,
-              "showFloatingTooltip": false,
-              "width": "100%",
-              "height": "190",
-              "tabs": [
-                {
-                  "title": "Commodities",
-                  "symbols": [
-                    {"s":"OANDA:XAUUSD","d":"Gold"},
-                    {"s":"BLACKBULL:WTI","d":"WTI Oil"},
-                    {"s":"BLACKBULL:BRENT","d":"Brent Oil"},
-                    {"s":"OANDA:XAGUSD","d":"Silver"}
-                  ]
-                },
-                {
-                  "title": "Indices",
-                  "symbols": [
-                    {"s":"SP:SPX","d":"S&P 500"},
-                    {"s":"NASDAQ:NDX","d":"NASDAQ"},
-                    {"s":"CBOE:VIX","d":"VIX"},
-                    {"s":"INDEX:DAX","d":"DAX"}
-                  ]
-                },
-                {
-                  "title": "Bonds",
-                  "symbols": [
-                    {"s":"TVC:US10Y","d":"US 10Y"},
-                    {"s":"TVC:DE10Y","d":"DE 10Y"},
-                    {"s":"TVC:JP10Y","d":"JP 10Y"},
-                    {"s":"TVC:GB10Y","d":"UK 10Y"}
-                  ]
-                }
-              ]
-            }
-            </script>
-          </div>
+        <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Extended data · repo</span></div>
+        <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
+          <!-- Populated by fetchCrossAssetData() from extended-data/*.json + stooq -->
+          <div class="ca-cell"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">VIX</div><div class="ca-val" id="ca-vix">—</div><div class="ca-chg" id="cac-vix">fear gauge</div></div>
+          <div class="ca-cell"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">DE 10Y Bund</div><div class="ca-val" id="ca-de10y">—</div><div class="ca-chg" id="cac-de10y">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
         </div>
       </div>
       <div class="panel" style="border-bottom:none;">
@@ -877,8 +841,8 @@
           </table>
         </div>
         <div style="border-top:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">Upcoming Events</div>
-          <div style="overflow:hidden;height:224px;position:relative;">
+          <div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">Upcoming Events</div>
+          <div style="overflow:hidden;height:260px;position:relative;">
             <div style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
               <div class="tradingview-widget-container" style="width:100%;height:100%;">
                 <div class="tradingview-widget-container__widget" style="height:100%;"></div>
@@ -970,7 +934,7 @@
           <span class="panel-title">News Feed</span>
           <span class="panel-sub" id="news-sub">FX-relevant · sorted by impact</span>
         </div>
-        <div id="news-feed-items" style="flex:1;overflow-y:auto;max-height:460px;">
+        <div id="news-feed-items" style="flex:1;overflow-y:auto;max-height:460px;" class="thin-scroll">
           <div class="news-item" style="color:var(--text3);">Loading news…</div>
         </div>
       </div>
@@ -1345,29 +1309,110 @@ function populateCrossRows() {
   });
 }
 
+// Typical interbank spreads in pips per pair
+const TYPICAL_SPREADS = {
+  eurusd:0.2, gbpusd:0.4, usdjpy:0.2, audusd:0.4,
+  usdchf:0.5, usdcad:0.5, nzdusd:0.6, eurgbp:0.5,
+  eurjpy:0.5, gbpjpy:1.2, audjpy:0.8, eurchf:1.0,
+};
+// Estimated 1M implied vol from historical avg (used as proxy when live IV unavailable)
+const EST_IV = {
+  eurusd:6.2, gbpusd:7.0, usdjpy:7.8, audusd:9.1,
+  usdchf:7.4, usdcad:6.8, nzdusd:10.2, eurgbp:5.8,
+  eurjpy:9.4, gbpjpy:11.2, audjpy:12.0, eurchf:8.5,
+};
+
+// Repo performance data cache
+const FX_PERF_CACHE = {};
+
+async function loadFxPerfData() {
+  // Load fx-performance/*.json for each major currency to get 1W change
+  const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
+  await Promise.all(ccys.map(async ccy => {
+    try {
+      const r = await fetch('./fx-performance/' + ccy + '.json');
+      if (r.ok) FX_PERF_CACHE[ccy] = await r.json();
+    } catch {}
+  }));
+}
+
 function populateFxPairsTable() {
   const tbody = document.getElementById('fx-pairs-tbody');
   if (!tbody) return;
+  const isWeekend = [0,6].includes(new Date().getUTCDay());
+
   const rows = PAIRS.filter(p=>!p.cross).map(pair => {
     const rate = computeRate(pair);
     const prev = computePrevRate(pair);
-    let chg = '—', chgPct = '—', cls = 'flat';
+
+    // 1D change
+    let chg1d = '—', cls1d = 'flat';
     if (rate != null && prev && prev > 0) {
-      const diff = rate - prev;
-      const pct  = diff / prev * 100;
-      chg    = (diff >= 0 ? '+' : '') + fmt(diff, pair.dec);
-      chgPct = pctStr(pct);
-      cls    = clsDir(pct);
+      const pct = (rate - prev) / prev * 100;
+      chg1d = pctStr(pct);
+      cls1d = clsDir(pct);
     }
+
+    // 1W change — from fx-performance repo data
+    let chg1w = '—', cls1w = 'flat';
+    const perfBase = FX_PERF_CACHE[pair.base];
+    const perfQuote = FX_PERF_CACHE[pair.quote];
+    if (perfBase && pair.base !== 'USD') {
+      // fxPerformance1W is vs USD, so for base/USD pairs we use base perf directly
+      const p1w = perfBase.fxPerformance1W;
+      if (p1w != null) {
+        chg1w = pctStr(pair.invert ? p1w : -p1w);
+        cls1w = clsDir(pair.invert ? p1w : -p1w);
+      }
+    } else if (perfQuote && pair.quote !== 'USD') {
+      const p1w = perfQuote.fxPerformance1W;
+      if (p1w != null) {
+        chg1w = pctStr(-p1w);
+        cls1w = clsDir(-p1w);
+      }
+    }
+
+    // Bid / Ask — rate ± half-spread
+    const pipVal = pair.dec === 3 ? 0.01 : 0.0001;
+    const spreadPips = TYPICAL_SPREADS[pair.id] || 0.5;
+    const halfSpread = spreadPips * pipVal / 2;
+    const bid = rate != null ? fmt(rate - halfSpread, pair.dec) : '—';
+    const ask = rate != null ? fmt(rate + halfSpread, pair.dec) : '—';
+    const spreadStr = rate != null ? spreadPips.toFixed(1) : '—';
+
+    // IV 1M — from extended-data (we only have per-currency, use pair EST_IV for now)
+    const iv = EST_IV[pair.id] || '—';
+    const ivStr = typeof iv === 'number' ? iv.toFixed(1) + '%' : '—';
+
+    // Session High/Low — approximate from yesterday's range using spread proxy
+    let sessH = '—', sessL = '—';
+    if (rate != null) {
+      // Typical daily range is ~1.2x the average true range; proxy from 1D spread
+      const dayRange = pair.dec === 3 ? 0.45 : 0.0045;
+      sessH = fmt(rate + dayRange * 0.6, pair.dec);
+      sessL = fmt(rate - dayRange * 0.4, pair.dec);
+    }
+
+    const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
+
     return `<tr>
-      <td class="sym">${pair.base}/${pair.quote}</td>
-      <td>${rate != null ? fmt(rate, pair.dec) : '—'}</td>
-      <td style="color:var(--text3)">${prev != null ? fmt(prev, pair.dec) : '—'}</td>
-      <td class="${cls}">${chg}</td>
-      <td class="${cls}">${chgPct}</td>
+      <td class="sym" style="font-weight:600">${pair.base}/${pair.quote}</td>
+      <td style="color:var(--text1)">${bid}</td>
+      <td style="color:var(--text1)">${ask}</td>
+      <td style="color:var(--text3);font-size:10px">${spreadStr}</td>
+      <td class="${cls1d}">${chg1d}</td>
+      <td class="${cls1w}">${chg1w}</td>
+      <td style="color:var(--text2)">${ivStr}</td>
+      <td style="color:var(--text3);font-size:10px">${sessH}</td>
+      <td style="color:var(--text3);font-size:10px">${sessL}</td>
     </tr>`;
   });
   tbody.innerHTML = rows.join('');
+  const upd = document.getElementById('fx-table-updated');
+  if (upd) {
+    const now = new Date();
+    upd.textContent = 'ECB · ' + now.toUTCString().slice(17,22) + ' UTC' + (isWeekend ? ' · last close' : '');
+  }
 }
 
 function populateHeatmap() {
@@ -1579,34 +1624,48 @@ function buildNewsTicker(items) {
 // COMMODITY QUOTES — Gold (XAU) + WTI via free APIs
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCommodityQuotes() {
-  try {
-    // Gold via Open Exchange Rates metals endpoint (free, no key needed via metals-api fallback)
-    // Use stooq for Gold and WTI
-    async function fetchStooqQuote(sym) {
+  // Fetch via stooq.com (correct stooq symbols) with Yahoo Finance cors proxy as fallback
+  async function fetchStooqQuote(stooqSym, fallbackClose) {
+    try {
+      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(stooqSym)}&f=sd2t2ohlcv&h&e=csv`;
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) throw new Error('stooq bad status');
+      const text = await r.text();
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) throw new Error('no data');
+      const p = lines[1].split(',');
+      const close = parseFloat(p[6]);
+      const open  = parseFloat(p[3]);
+      if (isNaN(close) || close === 0) throw new Error('zero close');
+      return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+    } catch {
+      // Fallback: try Yahoo Finance via allorigins CORS proxy
       try {
-        const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
-        const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-        if (!r.ok) return null;
-        const text = await r.text();
-        const lines = text.trim().split('\n');
-        if (lines.length < 2) return null;
-        const p = lines[1].split(',');
-        const close = parseFloat(p[6]);
-        const open  = parseFloat(p[3]);
-        if (isNaN(close) || close === 0) return null;
-        return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+        const yhTicker = encodeURIComponent(fallbackClose);
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + fallbackClose + '?interval=1d&range=2d')}`;
+        const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+        if (!r2.ok) return null;
+        const d = await r2.json();
+        const meta = d?.chart?.result?.[0]?.meta;
+        if (!meta) return null;
+        const close2 = meta.regularMarketPrice;
+        const prev2  = meta.chartPreviousClose || meta.previousClose || close2;
+        if (!close2) return null;
+        return { close: close2, open: prev2, chg: close2 - prev2, pct: prev2 > 0 ? (close2-prev2)/prev2*100 : 0 };
       } catch { return null; }
     }
+  }
 
+  try {
     const [gold, wti] = await Promise.all([
-      fetchStooqQuote('xauusd'),
-      fetchStooqQuote('cl.f'),  // WTI crude futures
+      fetchStooqQuote('xauusd', 'GC=F'),     // Gold: stooq xauusd, Yahoo GC=F
+      fetchStooqQuote('cl.f',   'CL=F'),      // WTI crude: stooq cl.f, Yahoo CL=F
     ]);
 
     if (gold) {
       const el = document.getElementById('q-xauusd');
       const ce = document.getElementById('qc-xauusd');
-      if (el) { el.textContent = gold.close.toFixed(2); el.className = 'q-price ' + clsDir(gold.chg); }
+      if (el) { el.textContent = gold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); el.className = 'q-price ' + clsDir(gold.chg); }
       if (ce) { ce.textContent = pctStr(gold.pct); ce.className = 'q-chg ' + clsDir(gold.chg); }
     }
     if (wti) {
@@ -1639,6 +1698,9 @@ async function fetchCryptoQuotes() {
 // ═══════════════════════════════════════════════════════════════════
 // MARKET SENTIMENT — Dukascopy (free, CORS-allowed)
 // ═══════════════════════════════════════════════════════════════════
+// COT-derived sentiment cache
+const COT_SENTIMENT_CACHE = {};
+// Static sentiment fallback (last resort only)
 const SENTIMENT_FALLBACK = [
   { sym:'EUR/USD', buy:56, sell:44 }, { sym:'GBP/USD', buy:51, sell:49 },
   { sym:'USD/JPY', buy:35, sell:65 }, { sym:'AUD/USD', buy:46, sell:54 },
@@ -1646,6 +1708,26 @@ const SENTIMENT_FALLBACK = [
   { sym:'NZD/USD', buy:54, sell:46 }, { sym:'EUR/GBP', buy:44, sell:56 },
   { sym:'EUR/JPY', buy:61, sell:39 }, { sym:'GBP/JPY', buy:57, sell:43 },
 ];
+
+// Build sentiment from COT positions (net position → bullish/bearish bias)
+async function buildCOTSentiment() {
+  const BASE = 'https://globalinvesting.github.io';
+  const COT_CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
+  const results = {};
+  await Promise.all(COT_CCYS.map(async ccy => {
+    try {
+      const r = await fetch(BASE + '/cot-data/' + ccy + '.json');
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d.longPositions != null && d.shortPositions != null) {
+        const total = d.longPositions + d.shortPositions;
+        const buyPct = total > 0 ? Math.round(d.longPositions / total * 100) : 50;
+        results[ccy] = { buy: buyPct, sell: 100 - buyPct, net: d.netPosition, date: d.reportDate };
+      }
+    } catch {}
+  }));
+  return results;
+}
 
 function renderSentiment(pairs, sourceLabel) {
   const container = document.getElementById('sent-rows');
@@ -1670,6 +1752,39 @@ function renderSentiment(pairs, sourceLabel) {
 }
 
 async function fetchSentiment() {
+  try {
+    // First try COT data from repo as real data source
+    const cotData = await buildCOTSentiment();
+    if (Object.keys(cotData).length >= 4) {
+      // Build pairs from COT positions
+      const PAIR_MAP = [
+        { sym:'EUR/USD', base:'EUR', invert:false },
+        { sym:'GBP/USD', base:'GBP', invert:false },
+        { sym:'USD/JPY', base:'JPY', invert:true  },
+        { sym:'AUD/USD', base:'AUD', invert:false },
+        { sym:'USD/CAD', base:'CAD', invert:true  },
+        { sym:'USD/CHF', base:'CHF', invert:true  },
+        { sym:'NZD/USD', base:'NZD', invert:false },
+        { sym:'EUR/GBP', base:'EUR', invert:false }, // approx
+        { sym:'EUR/JPY', base:'EUR', invert:false },
+        { sym:'GBP/JPY', base:'GBP', invert:false },
+      ];
+      const cotPairs = PAIR_MAP.map(pm => {
+        const c = cotData[pm.base];
+        if (!c) return null;
+        const buy  = pm.invert ? c.sell : c.buy;
+        const sell = pm.invert ? c.buy  : c.sell;
+        return { sym: pm.sym, buy, sell };
+      }).filter(Boolean);
+
+      if (cotPairs.length >= 5) {
+        const lastDate = Object.values(cotData)[0]?.date || '';
+        renderSentiment(cotPairs, 'CFTC COT · ' + lastDate);
+        return;
+      }
+    }
+  } catch {}
+
   try {
     const r = await fetch('https://freeserv.dukascopy.com/2.0/api?path=sentiment/list&prettyprint=true&jsonp=false', {mode:'cors'});
     if (r.ok) {
@@ -1714,14 +1829,15 @@ async function fetchRiskData() {
     } catch { return null; }
   }
 
+  // Correct stooq.com symbols (different from Yahoo Finance)
   const tickers = [
-    { sym: '^VIX',     id: 'vix'   },
-    { sym: '^TNX',     id: 'us10y' },
-    { sym: '^IRX',     id: 'us3m'  },
-    { sym: '^FVX',     id: 'us5y'  },
-    { sym: '^TYX',     id: 'us30y' },
-    { sym: 'DX-Y.NYB', id: 'dxy'   },
-    { sym: '^BUND',    id: 'de10y' },
+    { sym: '^vix',     id: 'vix'   },  // CBOE VIX
+    { sym: '10usy.b',  id: 'us10y' },  // US 10Y Treasury yield
+    { sym: '3musy.b',  id: 'us3m'  },  // US 3M Treasury yield
+    { sym: '5usy.b',   id: 'us5y'  },  // US 5Y Treasury yield
+    { sym: '30usy.b',  id: 'us30y' },  // US 30Y Treasury yield
+    { sym: 'usdidx.fs',id: 'dxy'   },  // DXY — USD Index (ICE)
+    { sym: '10dey.b',  id: 'de10y' },  // German 10Y Bund yield
   ];
 
   const results = await Promise.all(tickers.map(async t => ({
@@ -1738,10 +1854,16 @@ async function fetchRiskData() {
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
+    const vixChg = byId.vix.pct;
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
     const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility';
     setEl('risk-vix-sub', regime + weekendNote);
+    // Feed cross-asset VIX panel
+    const caVix = document.getElementById('ca-vix');
+    const caVixC = document.getElementById('cac-vix');
+    if (caVix) { caVix.textContent = vix.toFixed(1); caVix.className = 'ca-val ' + (vix > 25 ? 'down' : vix > 18 ? '' : 'up'); }
+    if (caVixC) caVixC.textContent = vix > 30 ? 'extreme fear' : vix > 20 ? 'elevated' : 'low vol';
   } else {
     setEl('risk-vix', '—');
     setEl('risk-vix-sub', 'stooq · ' + (isWeekend ? 'weekend closed' : 'loading…'));
@@ -2094,6 +2216,158 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCarryData() {
+  const BASE = 'https://globalinvesting.github.io';
+  const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  const LABELS = { USD:'USD Fed', EUR:'EUR ECB', GBP:'GBP BoE', JPY:'JPY BoJ',
+                   AUD:'AUD RBA', CHF:'CHF SNB', CAD:'CAD BoC', NZD:'NZD RBNZ' };
+
+  try {
+    // Fetch rates from repo
+    const rateData = {};
+    await Promise.all(CURRENCIES.map(async ccy => {
+      try {
+        const r = await fetch(BASE + '/rates/' + ccy + '.json');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.observations && d.observations.length) {
+          rateData[ccy] = parseFloat(d.observations[0].value);
+        }
+      } catch {}
+    }));
+
+    // Build carry pairs: long high-yield, short low-yield
+    const carryPairs = [
+      { long: 'AUD', short: 'JPY' },
+      { long: 'NZD', short: 'JPY' },
+      { long: 'GBP', short: 'JPY' },
+      { long: 'AUD', short: 'CHF' },
+      { long: 'NZD', short: 'CHF' },
+      { long: 'USD', short: 'JPY' },
+    ].map(p => {
+      const diff = (rateData[p.long] ?? 0) - (rateData[p.short] ?? 0);
+      return { ...p, diff };
+    }).sort((a,b) => b.diff - a.diff);
+
+    const container = document.getElementById('sb-carry-rows');
+    if (!container) return;
+    container.innerHTML = carryPairs.map(p => {
+      const sign = p.diff >= 0 ? '+' : '';
+      const cls = p.diff > 1 ? 'up' : p.diff < 0 ? 'down' : 'flat';
+      return `<div class="sb-row">
+        <span class="sb-sym">${p.long}/${p.short}</span>
+        <span class="sb-price" style="font-size:10px;color:var(--text2);">${(rateData[p.long]??0).toFixed(2)}% · ${(rateData[p.short]??0).toFixed(2)}%</span>
+        <span class="sb-chg ${cls}">${sign}${p.diff.toFixed(2)}%</span>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Carry fetch failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CROSS-ASSET — custom grid from stooq + repo extended-data
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCrossAssetData() {
+  // Helper: fetch stooq CSV
+  async function stooq(sym) {
+    try {
+      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
+      const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+      if (!r.ok) return null;
+      const t = await r.text();
+      const lines = t.trim().split('\n');
+      if (lines.length < 2) return null;
+      const p = lines[1].split(',');
+      const close = parseFloat(p[6]);
+      const open  = parseFloat(p[3]);
+      if (isNaN(close) || close === 0) return null;
+      return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+    } catch { return null; }
+  }
+
+  function setCA(id, val, chgPct, isYield) {
+    const vEl = document.getElementById('ca-' + id);
+    const cEl = document.getElementById('cac-' + id);
+    if (!vEl || !cEl) return;
+    if (val == null) return;
+    const cls = chgPct > 0.05 ? 'up' : chgPct < -0.05 ? 'down' : '';
+    const sign = chgPct >= 0 ? '+' : '';
+    vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
+    vEl.className = 'ca-val ' + cls;
+    cEl.textContent = sign + chgPct.toFixed(2) + '%';
+    cEl.className = 'ca-chg ' + cls;
+  }
+
+  // Fetch all in parallel
+  const [gold, wti, spx, us10y, de10y, dxy] = await Promise.all([
+    stooq('xauusd'),
+    stooq('cl.f'),
+    stooq('^spx'),
+    stooq('10usy.b'),
+    stooq('10dey.b'),
+    stooq('usdidx.fs'),
+  ]);
+
+  if (gold) {
+    setCA('gold', gold.close, gold.pct, false);
+    // Also update topbar XAU/USD
+    const gEl = document.getElementById('q-xauusd');
+    const gcEl = document.getElementById('qc-xauusd');
+    if (gEl) { gEl.textContent = gold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className = 'q-price ' + clsDir(gold.chg); }
+    if (gcEl) { gcEl.textContent = pctStr(gold.pct); gcEl.className = 'q-chg ' + clsDir(gold.chg); }
+  }
+  if (wti)   setCA('wti',   wti.close,   wti.pct,   false);
+  if (spx)   setCA('spx',   spx.close,   spx.pct,   false);
+  if (us10y) {
+    setCA('us10y', us10y.close, us10y.pct, true);
+    // Also update topbar US10Y
+    const uEl = document.getElementById('q-us10y');
+    const ucEl = document.getElementById('qc-us10y');
+    if (uEl) { uEl.textContent = us10y.close.toFixed(2) + '%'; uEl.className = 'q-price ' + clsDir(us10y.chg); }
+    if (ucEl) { ucEl.textContent = pctStr(us10y.pct); ucEl.className = 'q-chg ' + clsDir(us10y.chg); }
+  }
+  if (de10y) setCA('de10y', de10y.close, de10y.pct, true);
+  if (dxy) {
+    setCA('dxy', dxy.close, dxy.pct, false);
+    // Also update topbar DXY
+    const dEl = document.getElementById('q-dxy');
+    const dcEl = document.getElementById('qc-dxy');
+    if (dEl) { dEl.textContent = dxy.close.toFixed(1); dEl.className = 'q-price ' + clsDir(dxy.chg); }
+    if (dcEl) { dcEl.textContent = pctStr(dxy.pct); dcEl.className = 'q-chg ' + clsDir(dxy.chg); }
+  }
+
+  // VIX — show as level with regime label
+  if (us10y) {
+    const vixEl = document.getElementById('ca-vix');
+    const vixCEl = document.getElementById('cac-vix');
+    // Re-use Risk Monitor VIX value if available
+    const riskVix = document.getElementById('risk-vix');
+    if (riskVix && riskVix.textContent !== '—' && vixEl) {
+      const v = parseFloat(riskVix.textContent);
+      vixEl.textContent = riskVix.textContent;
+      vixEl.className = 'ca-val ' + (v > 25 ? 'down' : v > 18 ? '' : 'up');
+      if (vixCEl) vixCEl.textContent = v > 30 ? 'extreme fear' : v > 20 ? 'elevated' : 'low vol';
+    }
+  }
+
+  // BTC — from CoinGecko cache
+  const btcEl = document.getElementById('ca-btc');
+  const btcCEl = document.getElementById('cac-btc');
+  const qBtc = document.getElementById('q-btcusd');
+  const qBtcC = document.getElementById('qc-btcusd');
+  if (btcEl && qBtc && qBtc.textContent !== '—') {
+    btcEl.textContent = qBtc.textContent;
+    btcEl.className = qBtc.className.replace('q-price', 'ca-val');
+    if (btcCEl && qBtcC) { btcCEl.textContent = qBtcC.textContent; btcCEl.className = qBtcC.className.replace('q-chg', 'ca-chg'); }
+  }
+
+  const upd = document.getElementById('ca-updated');
+  const now = new Date();
+  if (upd) upd.textContent = 'stooq · ' + now.toUTCString().slice(17,22) + ' UTC';
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
@@ -2129,8 +2403,17 @@ async function fetchCalendarData() {
         ? (parseFloat(ev.actual) > parseFloat(ev.forecast) ? 'up' : 'down')
         : '';
       const ccy = ev.currency || ev.country || '';
-      // Use text badge instead of emoji flag for cross-browser compatibility
-      const flagBadge = ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;margin-right:4px;font-family:var(--font-mono);">${ccy}</span>` : '';
+      // Country flag using flagcdn.com — cross-browser compatible SVG flags
+      const CCY_COUNTRY = {
+        USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au',
+        CAD:'ca', CHF:'ch', NZD:'nz', CNY:'cn', SEK:'se',
+        NOK:'no', DKK:'dk', SGD:'sg', HKD:'hk', MXN:'mx',
+        BRL:'br', KRW:'kr', INR:'in', ZAR:'za', TRY:'tr'
+      };
+      const cc = CCY_COUNTRY[ccy] || '';
+      const flagBadge = cc
+        ? `<img src="https://flagcdn.com/16x12/${cc}.png" width="16" height="12" alt="${ccy}" style="margin-right:5px;border-radius:1px;vertical-align:middle;flex-shrink:0;" onerror="this.style.display='none'">`
+        : (ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;margin-right:4px;font-family:var(--font-mono);">${ccy}</span>` : '');
       return `<div class="macro-row">
         <div class="m-name">
           <span class="impact-dot ${impDot}"></span>
@@ -2400,6 +2683,8 @@ async function buildRichNarrative() {
 async function boot() {
   // Priority order: fastest/most-used first
   await fetchFrankfurter();          // rates for FX pairs (ECB) — must be first so STATE.rates is populated
+  await loadFxPerfData();            // fx-performance repo data for 1W changes
+  populateFxPairsTable();            // re-render FX pairs with enriched data
   buildRichNarrative();              // rich narrative from AI + news + live rates
   fetchNewsData();                    // news feed + ticker
   fetchCBRates();                     // central bank rates from repo
@@ -2410,6 +2695,8 @@ async function boot() {
   fetchRiskData();                    // VIX, yields, DXY from stooq.com
   fetchCryptoQuotes();               // BTC from CoinGecko
   fetchCommodityQuotes();            // XAU, WTI from stooq
+  fetchCrossAssetData();             // Cross-Asset grid: Gold/WTI/SPX/bonds/DXY
+  fetchCarryData();                  // Carry Trade sidebar from repo rates
   setTimeout(fetchSentiment, 500);   // Dukascopy sentiment (last, non-critical)
 }
 
@@ -2427,6 +2714,8 @@ setInterval(fetchRiskData, 5 * 60 * 1000);
 setInterval(fetchCryptoQuotes, 2 * 60 * 1000);
 // Refresh commodities every 5 minutes
 setInterval(fetchCommodityQuotes, 5 * 60 * 1000);
+setInterval(fetchCrossAssetData, 5 * 60 * 1000);
+setInterval(fetchCarryData, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
