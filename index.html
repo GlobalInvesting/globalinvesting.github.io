@@ -620,8 +620,19 @@
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  /* Invert myfxbook widget colors to match dark terminal theme */
-  #myfxbook-widget-inner { filter: invert(1) hue-rotate(180deg); }
+  /* Force myfxbook widget to use site background instead of white */
+  #myfxbook-widget-inner,
+  #myfxbook-widget-inner > *,
+  #myfxbook-widget-inner table,
+  #myfxbook-widget-inner tr,
+  #myfxbook-widget-inner td,
+  #myfxbook-widget-inner th,
+  #myfxbook-widget-inner div {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: var(--text) !important;
+    border-color: var(--border2) !important;
+  }
 
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
