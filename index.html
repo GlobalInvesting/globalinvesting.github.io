@@ -537,6 +537,162 @@
     opacity: 0.5;
   }
 
+  /* ══════════════════════════════════════════════
+     MOBILE RESPONSIVE — max-width: 900px
+  ══════════════════════════════════════════════ */
+  @media (max-width: 900px) {
+    /* Topbar: stack logo + nav */
+    #topbar {
+      height: auto;
+      flex-wrap: wrap;
+      padding: 6px 8px;
+      gap: 4px;
+    }
+    #topbar .logo { gap: 6px; }
+    .top-nav { display: none; } /* hide nav tabs — use scroll */
+    .topbar-right { margin-left: auto; font-size: 10px; }
+    #news-ticker { display: none; }
+
+    /* Layout: stack sidebar → main → right panel vertically */
+    #layout {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      overflow: visible;
+    }
+
+    /* Sidebar: horizontal scrollable strip at top */
+    #sidebar {
+      width: 100%;
+      max-height: none;
+      overflow-y: visible;
+      overflow-x: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+    }
+    #sidebar .sb-section {
+      min-width: 160px;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #sidebar .sb-head { white-space: nowrap; }
+
+    /* Main: full width, auto height */
+    #main {
+      width: 100%;
+      overflow-y: visible;
+      overflow-x: hidden;
+    }
+
+    /* Right panel: full width below main */
+    #rightpanel {
+      width: 100%;
+      border-left: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* 2-column grids → 1 column */
+    div[style*="grid-template-columns:1fr 1fr"] {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    div[style*="grid-template-columns: 1fr 1fr"] {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Cross-asset 2-col grid */
+    .ca-grid { grid-template-columns: 1fr 1fr !important; }
+
+    /* Risk grid: 2x2 → 2x2 (already good on mobile) */
+    .risk-grid { grid-template-columns: 1fr 1fr !important; }
+
+    /* Rates grid: 4-col → 2x2 */
+    .rates-grid { grid-template-columns: 1fr 1fr !important; }
+
+    /* News + Economic map: stack */
+    div[style*="height:440px"] {
+      height: auto !important;
+      flex-direction: column !important;
+    }
+    div[style*="height:440px"] > div {
+      height: auto !important;
+      min-height: 0 !important;
+      border-right: none !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+    #news-feed-items { max-height: 300px !important; }
+    tv-economic-map { min-height: 260px !important; }
+
+    /* Market Sessions + Spreads: stack */
+    div[style*="grid-template-columns:1fr 1fr;border-bottom"] {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Price chart: full width */
+    #chart-wrap, .tv-chart-container { width: 100% !important; }
+
+    /* FX table: allow horizontal scroll */
+    div[style*="overflow-x:auto"] { overflow-x: auto !important; }
+    table { min-width: 480px; }
+    .fx-pairs-table table, #fx-pairs-tbody { min-width: 480px; }
+
+    /* Heatmap: allow scroll */
+    #heatmap-wrap { overflow-x: auto !important; }
+
+    /* Topbar ticker: scrollable */
+    #tv-ticker { overflow-x: auto; white-space: nowrap; }
+    #quotebar-inner { flex-wrap: nowrap !important; }
+    .q-item { display: inline-flex !important; flex-shrink: 0; }
+
+    /* Font size adjustments */
+    .ca-val { font-size: 14px !important; }
+    .risk-val { font-size: 13px !important; }
+    .rate-val { font-size: 16px !important; }
+    body { font-size: 11px; }
+
+    /* Panel heads: smaller */
+    .panel-title { font-size: 10px !important; }
+    .panel-sub { font-size: 9px !important; }
+
+    /* Sidebar sections full width in column layout */
+    #sidebar { flex-direction: column; overflow-x: hidden; }
+    #sidebar .sb-section { min-width: unset; width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+
+    /* Sessions/Spreads right column: ensure it's not hidden */
+    div[style*="max-height:520px"] {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    /* Myfxbook widget: let it auto-size */
+    #myfxbook-wrap { max-height: 360px !important; overflow-y: auto !important; }
+
+    /* Footer */
+    #footer { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
+  }
+
+  @media (max-width: 480px) {
+    /* Extra-small: single column everything */
+    .ca-grid { grid-template-columns: 1fr 1fr !important; }
+    .rates-grid { grid-template-columns: 1fr 1fr !important; }
+    .risk-grid { grid-template-columns: 1fr 1fr !important; }
+    table { font-size: 10px; }
+    .ca-val { font-size: 13px !important; }
+    .rate-val { font-size: 14px !important; }
+
+    /* Topbar: minimal */
+    #topbar { padding: 4px 6px; }
+    .logo-text { font-size: 10px !important; }
+    .logo-sub { display: none; }
+    .topbar-right { font-size: 9px; }
+  }
+
 </style>
 
 </head>
@@ -640,7 +796,7 @@
       <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Rate differential · repo data</div>
     </div>
     <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">
-      <span class="sb-k">ECB</span> · <span id="sb-clock" style="font-family:var(--font-mono);">--:--:--</span> UTC
+      <span class="sb-k">Local</span> · <span id="sb-clock" style="font-family:var(--font-mono);">--:--:--</span>
     </div>
   </aside>
 
@@ -769,9 +925,11 @@
         </div>
         <div style="padding:4px 8px 0;border-top:1px solid var(--border);">
           <table>
-            <thead><tr><th style="text-align:left">Spread</th><th>Value</th><th>Signal</th></tr></thead>
-            <tbody id="spreads-tbody">
-              <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+            <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th>Signal</th></tr></thead>
+            <tbody id="risk-indicators-tbody">
+              <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+              <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
+              <tr><td>USD/JPY vs Nikkei</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -892,7 +1050,7 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow:hidden;padding:0;">
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;">
             <!-- myfxbook outlook widget type=1 -->
             <div>
               <script class="powered" type="text/javascript"
@@ -1033,7 +1191,7 @@
 <div id="statusbar">
   <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · STOOQ · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
-  <div style="display:flex;gap:4px;"><span class="sb-k">UTC</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
 </div>
@@ -1112,12 +1270,15 @@ function setEl(id, text, cls) {
 // ═══════════════════════════════════════════════════════════════════
 function updateClock() {
   const now = new Date();
-  const h = now.getUTCHours(), m = now.getUTCMinutes(), s = now.getUTCSeconds();
-  const str = [h,m,s].map(n=>String(n).padStart(2,'0')).join(':');
-  setEl('clock', str + ' UTC');
-  setEl('sb-clock', str);
-  setEl('footer-clock', str);
-  updateSessions(h, m);
+  // Local time for display
+  const lh = now.getHours(), lm = now.getMinutes(), ls = now.getSeconds();
+  const localStr = [lh,lm,ls].map(n=>String(n).padStart(2,'0')).join(':');
+  const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+  setEl('clock', localStr + ' ' + tzAbbr);
+  setEl('sb-clock', localStr);
+  setEl('footer-clock', localStr);
+  // Sessions use UTC internally
+  updateSessions(now.getUTCHours(), now.getUTCMinutes());
 }
 
 function isOpen(openH, closeH, h) {
@@ -1760,8 +1921,10 @@ function renderSentiment(pairs, sourceLabel) {
     </div>`;
   }).join('');
   const now = new Date();
-  const timeStr = now.getUTCHours().toString().padStart(2,'0') + ':' + now.getUTCMinutes().toString().padStart(2,'0') + ' UTC';
-  setEl('sent-updated', (sourceLabel || '') + ' · ' + timeStr);
+  const lh = now.getHours().toString().padStart(2,'0');
+  const lm = now.getMinutes().toString().padStart(2,'0');
+  const tzAbbr2 = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+  setEl('sent-updated', (sourceLabel || '') + ' · ' + lh + ':' + lm + ' ' + tzAbbr2);
 }
 
 async function fetchSentiment() {
@@ -1866,7 +2029,66 @@ async function fetchRiskData() {
   const byId = {};
   results.forEach(r => { if (r.data) byId[r.id] = r.data; });
 
-  // FALLBACK: fetch bond10y values from repo extended-data when stooq fails
+  // FALLBACK for VIX and DXY via Yahoo Finance when stooq is blocked
+  async function fetchYahoo(ySymbol) {
+    const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=2d`;
+    const urls = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+      `https://corsproxy.io/?${encodeURIComponent(base)}`,
+    ];
+    for (const url of urls) {
+      try {
+        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        if (!r.ok) continue;
+        const d = await r.json();
+        const meta = d?.chart?.result?.[0]?.meta;
+        if (!meta) continue;
+        const close = meta.regularMarketPrice;
+        const open  = meta.chartPreviousClose || meta.previousClose || close;
+        if (!close || isNaN(close)) continue;
+        return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+      } catch { continue; }
+    }
+    return null;
+  }
+
+  // Fill VIX if stooq missed it
+  if (!byId.vix) {
+    const v = await fetchYahoo('%5EVIX');
+    if (v) byId.vix = v;
+  }
+  // Fill DXY if stooq missed it — use DX-Y.NYB on Yahoo
+  if (!byId.dxy) {
+    const d = await fetchYahoo('DX-Y.NYB');
+    if (d) byId.dxy = d;
+  }
+  // Fill 3M T-Bill (^IRX on Yahoo = yield * 10, need to divide by 10)
+  if (!byId.us3m) {
+    const t = await fetchYahoo('%5EIRX');
+    if (t) byId.us3m = { ...t, close: t.close / 10, chg: t.chg / 10 };
+  }
+  // Fill 2Y Treasury (^TUX on Yahoo = yield * 10)
+  if (!byId.us2y) {
+    const t = await fetchYahoo('%5ETUX');
+    if (t) byId.us2y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+  }
+  // Fill 10Y (^TNX = yield * 10)
+  if (!byId.us10y) {
+    const t = await fetchYahoo('%5ETNX');
+    if (t) byId.us10y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+  }
+  // Fill 5Y (^FVX = yield * 10)
+  if (!byId.us5y) {
+    const t = await fetchYahoo('%5EFVX');
+    if (t) byId.us5y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+  }
+  // Fill 30Y (^TYX = yield * 10)
+  if (!byId.us30y) {
+    const t = await fetchYahoo('%5ETYX');
+    if (t) byId.us30y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+  }
+
+  // FALLBACK: fetch bond10y values from repo extended-data when all live sources fail
   // These JSONs are updated daily by the engine and always available
   try {
     const extCurrencies = [
@@ -1922,7 +2144,9 @@ async function fetchRiskData() {
     const cls = chg > 0.005 ? 'risk-val up' : chg < -0.005 ? 'risk-val down' : 'risk-val';
     setEl('risk-us10y', y10.toFixed(2) + '%', cls);
     const sign = chg >= 0 ? '+' : '';
-    const srcNote = byId.us10y.fromRepo ? 'Repo data · last close' : (isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
+    const srcNote = byId.us10y.fromRepo
+      ? 'Nominal yield · daily data'
+      : (isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
     setEl('risk-us10y-sub', srcNote);
     const usEl = document.getElementById('q-us10y');
     const uscEl = document.getElementById('q-us10y') && document.getElementById('qc-us10y');
@@ -1980,85 +2204,48 @@ async function fetchRiskData() {
     setEl('ys-usjp-sig', spreadJP > 0 ? 'US Premium' : 'JP Premium');
   }
 
-  // Rate cells
+  // Rate cells — only show data from real (non-approximated) sources
   if (byId.us3m) {
-    const v = byId.us3m.close;
-    const chg = byId.us3m.chg;
-    setEl('rate-3m', v.toFixed(2) + '%', v > 0 ? 'rate-val' : 'rate-val flat');
+    const v = byId.us3m.close, chg = byId.us3m.chg;
+    setEl('rate-3m', v.toFixed(2) + '%', 'rate-val');
     setEl('rate-3m-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us2y) {
-    const v = byId.us2y.close;
-    const chg = byId.us2y.chg;
+    const v = byId.us2y.close, chg = byId.us2y.chg;
     setEl('rate-2y', v.toFixed(2) + '%', 'rate-val');
     setEl('rate-2y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us5y) {
-    const v = byId.us5y.close;
-    const chg = byId.us5y.chg;
+    const v = byId.us5y.close, chg = byId.us5y.chg;
     setEl('rate-5y', v.toFixed(2) + '%', 'rate-val');
     setEl('rate-5y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   if (byId.us10y) {
-    const v = byId.us10y.close;
-    const chg = byId.us10y.chg;
-    setEl('rate-10y', v.toFixed(2) + '%');
-    setEl('rate-10y-chg', byId.us10y.fromRepo ? 'repo' : (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
-  }
-  // (rate-5y already set above)
-  // 2Y: only approximate if we don't have real us2y data
-  if (!byId.us2y && byId.us10y) {
-    // Use 3M if available, else approximate 2Y ≈ 10Y - 14bp (typical curve shape)
-    const approx2y = byId.us3m
-      ? byId.us3m.close * 0.3 + byId.us10y.close * 0.7
-      : byId.us10y.close - 0.14;
-    setEl('rate-2y', approx2y.toFixed(2) + '%');
-    setEl('rate-2y-chg', '~est', 'rate-chg flat');
-  }
-  // 5Y: approximate from 10Y if not available
-  if (!byId.us5y && byId.us10y) {
-    const approx5y = byId.us10y.close - 0.08;
-    setEl('rate-5y', approx5y.toFixed(2) + '%');
-    setEl('rate-5y-chg', '~est', 'rate-chg flat');
+    const v = byId.us10y.close, chg = byId.us10y.chg;
+    setEl('rate-10y', v.toFixed(2) + '%', 'rate-val');
+    // fromRepo means we have the value but no intraday change
+    setEl('rate-10y-chg', byId.us10y.fromRepo ? '—' : (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
 
-  // Draw yield curve
-  const yields = [
-    byId.us3m   ? byId.us3m.close : STATIC_YIELDS[0],
-    byId.us3m && byId.us10y ? (byId.us3m.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[1], // 6M approx
-    byId.us10y  ? (byId.us3m ? byId.us3m.close*0.3 + byId.us10y.close*0.7 : STATIC_YIELDS[2]) : STATIC_YIELDS[2], // 1Y
-    byId.us2y   ? byId.us2y.close : (byId.us10y ? (byId.us10y.close * 0.82 + (byId.us3m ? byId.us3m.close*0.18 : 0)) : STATIC_YIELDS[3]), // 2Y
-    byId.us5y   ? (byId.us5y.close * 0.7 + byId.us10y.close*0.3) : STATIC_YIELDS[4], // 3Y
-    byId.us5y   ? byId.us5y.close : STATIC_YIELDS[5],
-    byId.us5y && byId.us10y ? (byId.us5y.close*0.4 + byId.us10y.close*0.6) : STATIC_YIELDS[6], // 7Y
-    byId.us10y  ? byId.us10y.close : STATIC_YIELDS[7],
-    byId.us30y  ? (byId.us30y.close*0.6 + byId.us10y.close*0.4) : STATIC_YIELDS[8], // 20Y
-    byId.us30y  ? byId.us30y.close : STATIC_YIELDS[9],
+  // Draw yield curve — only real data points, no interpolation
+  // Tenors with real data: 3M (us3m), 2Y (us2y), 5Y (us5y), 10Y (us10y), 30Y (us30y)
+  const REAL_TENORS = [
+    { label:'3M',  key:'us3m'  },
+    { label:'2Y',  key:'us2y'  },
+    { label:'5Y',  key:'us5y'  },
+    { label:'10Y', key:'us10y' },
+    { label:'30Y', key:'us30y' },
   ];
+  const realPoints = REAL_TENORS
+    .map(t => ({ label: t.label, val: byId[t.key]?.close ?? null }))
+    .filter(p => p.val !== null);
 
-  drawYieldCurveAndCache(yields);
-
-  // Populate Risk Monitor spread signals table
-  const spreadsTbody = document.getElementById('spreads-tbody');
-  if (spreadsTbody) {
-    const rows = [];
-    if (byId.us10y && byId.us3m) {
-      const spr = (byId.us10y.close) - (byId.us3m.close);
-      const bp = (spr * 100).toFixed(0);
-      const cls = spr < 0 ? 'down' : 'up';
-      rows.push(`<tr><td>10Y–3M</td><td class="${cls}">${bp}bp</td><td class="${cls}">${spr < 0 ? 'Inverted ⚠' : 'Normal'}</td></tr>`);
-    }
-    if (byId.us10y && byId.de10y) {
-      const spr = (byId.us10y.close) - byId.de10y.close;
-      const bp = (spr * 100).toFixed(0);
-      rows.push(`<tr><td>US–DE 10Y</td><td>${bp}bp</td><td style="color:var(--text2);">${spr > 0 ? 'US Premium' : 'DE Premium'}</td></tr>`);
-    }
-    if (byId.vix) {
-      const vix = byId.vix.close;
-      const cls = vix > 25 ? 'down' : vix > 18 ? '' : 'up';
-      rows.push(`<tr><td>VIX Level</td><td class="${cls}">${vix.toFixed(1)}</td><td class="${cls}">${vix > 30 ? 'Extreme' : vix > 20 ? 'Elevated' : 'Normal'}</td></tr>`);
-    }
-    spreadsTbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="3" style="color:var(--text3);text-align:center;">Stooq · awaiting data</td></tr>';
+  // Need at least 2 points to draw the curve
+  if (realPoints.length >= 2) {
+    drawYieldCurveAndCache(realPoints);
+  } else {
+    // Not enough live data — draw with static fallback and note it
+    drawYieldCurveAndCache(null);
   }
 
   // Regime assessment based on VIX + yield curve
@@ -2077,21 +2264,58 @@ async function fetchRiskData() {
     }
     setEl('risk-regime-sub', regimeSub);
   }
+
+  // Risk Monitor Indicator table — computed from live data
+  // Gold/SPX ratio
+  const goldEl = document.getElementById('ca-gold');
+  const spxEl  = document.getElementById('ca-spx');
+  if (goldEl && spxEl && goldEl.textContent !== '—' && spxEl.textContent !== '—') {
+    const gVal = parseFloat(goldEl.textContent.replace(/,/g,''));
+    const sVal = parseFloat(spxEl.textContent.replace(/,/g,''));
+    if (!isNaN(gVal) && !isNaN(sVal) && sVal > 0) {
+      const ratio = (gVal / sVal).toFixed(3);
+      const rNum = parseFloat(ratio);
+      const sig = rNum > 0.75 ? 'Risk-Off signal' : rNum > 0.55 ? 'Neutral' : 'Risk-On signal';
+      const cls = rNum > 0.75 ? 'down' : rNum < 0.55 ? 'up' : 'flat';
+      setEl('ri-gold-spx', ratio);
+      setEl('ri-gold-spx-sig', sig, cls);
+    }
+  }
+  // US–EU Spread 10Y (uses byId from this scope)
+  if (byId.us10y && byId.de10y) {
+    const spr = byId.us10y.close - byId.de10y.close;
+    const bp = Math.round(spr * 100);
+    const sign = bp >= 0 ? '+' : '';
+    setEl('ri-us-eu', sign + bp + 'bp');
+    setEl('ri-us-eu-sig', bp > 0 ? 'USD+' : 'EUR+', bp > 50 ? 'up' : bp < -50 ? 'down' : 'flat');
+  }
+  // USD/JPY vs JPY rate momentum from repo
+  try {
+    const jpyExt = await fetch('./extended-data/JPY.json').then(r=>r.json()).catch(()=>null);
+    if (jpyExt?.data?.rateMomentum != null) {
+      const rm = jpyExt.data.rateMomentum;
+      const sign = rm >= 0 ? '+' : '';
+      setEl('ri-usdjpy-nk', sign + rm.toFixed(2) + '%');
+      setEl('ri-usdjpy-nk-sig', rm > 0 ? 'BoJ tightening' : 'Yield suppress', rm > 0 ? 'down' : 'up');
+    }
+  } catch {}
 }
 
-// Static fallback yield curve data — updated to current market levels (Mar 2026)
-const STATIC_YIELDS = [4.35, 4.30, 4.25, 4.28, 4.30, 4.32, 4.36, 4.42, 4.52, 4.58];
-let _lastDrawnYields = STATIC_YIELDS;
+// Static fallback yield curve data — used only when no live data available
+const STATIC_YIELDS = [4.35, 4.28, 4.32, 4.42, 4.58]; // 3M,2Y,5Y,10Y,30Y
+const STATIC_LABELS = ['3M','2Y','5Y','10Y','30Y'];
+let _lastDrawnYields = null; // {label, val}[] or null
 
-function drawYieldCurveAndCache(yields) {
-  _lastDrawnYields = yields || STATIC_YIELDS;
-  drawYieldCurve(_lastDrawnYields);
+function drawYieldCurveAndCache(points) {
+  // points can be: {label,val}[] (real data) or null (use static)
+  _lastDrawnYields = points;
+  drawYieldCurve(points);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// YIELD CURVE — canvas drawing, accepts optional live data
+// YIELD CURVE — canvas drawing, accepts real sparse data points
 // ═══════════════════════════════════════════════════════════════════
-function drawYieldCurve(liveYields) {
+function drawYieldCurve(points) {
   const canvas = document.getElementById('yield-canvas');
   if (!canvas) return;
   const wrap = canvas.parentElement;
@@ -2099,77 +2323,120 @@ function drawYieldCurve(liveYields) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  const tenors = ['3M','6M','1Y','2Y','3Y','5Y','7Y','10Y','20Y','30Y'];
-  const yields  = liveYields || STATIC_YIELDS;
-  const prevY   = [5.18, 5.14, 4.97, 4.68, 4.54, 4.42, 4.34, 4.26, 4.45, 4.38];
+  // Build display data — real points or static fallback
+  let labels, vals, isLive;
+  if (points && points.length >= 2) {
+    labels = points.map(p => p.label);
+    vals   = points.map(p => p.val);
+    isLive = true;
+  } else {
+    labels = STATIC_LABELS;
+    vals   = STATIC_YIELDS;
+    isLive = false;
+  }
 
-  const validY = yields.filter(v => v != null && !isNaN(v));
-  const rawMin = validY.length ? Math.min(...validY) : 4.10;
-  const rawMax = validY.length ? Math.max(...validY) : 5.40;
-  const minY = Math.floor(rawMin * 4) / 4 - 0.25;
-  const maxY = Math.ceil(rawMax  * 4) / 4 + 0.25;
-  const yRange = maxY - minY;
+  // Prior curve reference (last week approximate — static reference)
+  const PRIOR_MAP = { '3M':4.32,'2Y':4.35,'5Y':4.38,'7Y':4.36,'10Y':4.26,'20Y':4.45,'30Y':4.38,'6M':4.28,'1Y':4.25 };
+  const prevVals = labels.map(l => PRIOR_MAP[l] ?? null);
 
-  const PAD_L=28, PAD_R=8, PAD_T=10, PAD_B=20;
+  const n = labels.length;
+  const validV = vals.filter(v => v != null && !isNaN(v));
+  const rawMin = validV.length ? Math.min(...validV, ...prevVals.filter(Boolean)) : 4.10;
+  const rawMax = validV.length ? Math.max(...validV, ...prevVals.filter(Boolean)) : 5.40;
+  const minY = Math.floor(rawMin * 4) / 4 - 0.15;
+  const maxY = Math.ceil(rawMax  * 4) / 4 + 0.15;
+  const yRange = maxY - minY || 1;
+
+  const PAD_L=32, PAD_R=8, PAD_T=12, PAD_B=20;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const px = i => PAD_L+(i/(tenors.length-1))*cW;
+  const px = i => PAD_L+(i/(n-1))*cW;
   const py = v => PAD_T+(1-(v-minY)/yRange)*cH;
 
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#131722'; ctx.fillRect(0,0,W,H);
 
-  // Dynamic grid lines — pick ~4 evenly spaced values
+  // Grid lines
   const step = yRange <= 0.5 ? 0.1 : yRange <= 1 ? 0.25 : 0.5;
   const gridStart = Math.ceil(minY / step) * step;
-  for (let v = gridStart; v <= maxY; v = Math.round((v + step) * 100) / 100) {
+  for (let v = gridStart; v <= maxY + 0.001; v = Math.round((v + step) * 1000) / 1000) {
     const y = py(v);
     ctx.strokeStyle='#2a2e39'; ctx.lineWidth=0.5; ctx.setLineDash([2,4]);
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#9ba1ae'; ctx.font='bold 8.5px Courier New'; ctx.textAlign='right';
-    ctx.fillText(v.toFixed(2), PAD_L-3, y+3);
+    ctx.fillStyle='#9ba1ae'; ctx.font='bold 8px Courier New'; ctx.textAlign='right';
+    ctx.fillText(v.toFixed(2)+'%', PAD_L-3, y+3);
   }
 
-  // Inverted zone (2Y–10Y region)
-  ctx.fillStyle='#ef535010';
-  ctx.fillRect(px(3), PAD_T, px(7)-px(3), cH);
+  // Inverted zone — shade between shortest and longest tenor if inverted
+  const firstV = vals[0], lastV = vals[n-1];
+  if (firstV != null && lastV != null && firstV > lastV) {
+    ctx.fillStyle='#ef535012';
+    ctx.fillRect(PAD_L, PAD_T, cW, cH);
+  }
 
   // Prior curve
-  ctx.beginPath(); ctx.strokeStyle='#363c4e'; ctx.lineWidth=1;
-  prevY.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.stroke();
+  const priorPts = prevVals.map((v,i) => v != null ? [px(i), py(v)] : null).filter(Boolean);
+  if (priorPts.length >= 2) {
+    ctx.beginPath(); ctx.strokeStyle='#363c4e'; ctx.lineWidth=1;
+    priorPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    ctx.stroke();
+  }
 
   // Fill under current curve
-  ctx.beginPath();
-  yields.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.lineTo(px(tenors.length-1), PAD_T+cH); ctx.lineTo(PAD_L, PAD_T+cH); ctx.closePath();
-  ctx.fillStyle='#2962ff12'; ctx.fill();
+  const curPts = vals.map((v,i) => v != null ? [px(i), py(v)] : null).filter(Boolean);
+  if (curPts.length >= 2) {
+    ctx.beginPath();
+    curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    ctx.lineTo(curPts[curPts.length-1][0], PAD_T+cH);
+    ctx.lineTo(PAD_L, PAD_T+cH);
+    ctx.closePath();
+    ctx.fillStyle='#2962ff12'; ctx.fill();
 
-  // Current curve
-  ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.8;
-  yields.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.stroke();
+    // Current curve line
+    ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.8;
+    curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    ctx.stroke();
 
-  yields.forEach((v,i) => {
-    ctx.beginPath(); ctx.arc(px(i),py(v),2.5,0,Math.PI*2);
-    ctx.fillStyle='#2962ff'; ctx.fill();
-  });
+    // Dots + value labels at each real point
+    vals.forEach((v, i) => {
+      if (v == null) return;
+      const x = px(i), y = py(v);
+      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
+      ctx.fillStyle='#2962ff'; ctx.fill();
+    });
+  }
 
+  // X-axis labels
   ctx.fillStyle='#9ba1ae'; ctx.font='bold 8.5px Courier New'; ctx.textAlign='center';
-  tenors.forEach((t,i) => ctx.fillText(t, px(i), H-5));
+  labels.forEach((t,i) => ctx.fillText(t, px(i), H-5));
 
+  // Legend
   ctx.textAlign='left';
   ctx.fillStyle='#4d8ffa'; ctx.fillText('● Current', PAD_L, PAD_T-2);
   ctx.fillStyle='#6b7280'; ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
-  ctx.fillStyle='#ef535099'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2);
+  if (!isLive) {
+    ctx.fillStyle='#6b7280'; ctx.fillText('(static)', PAD_L+92, PAD_T-2);
+  } else {
+    // Check inversion
+    const spr = (vals[n-1] ?? 0) - (vals[0] ?? 0); // long - short
+    if (spr < 0) { ctx.fillStyle='#ef535099'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2); }
+  }
 
-  // Update yield spread table too
-  const spread2_10 = yields[7] - yields[3];
-  setEl('ys-2-10', (spread2_10*100).toFixed(0)+'bp', spread2_10 < 0 ? 'down' : 'up');
-  setEl('ys-2-10-sig', spread2_10 < 0 ? 'Inverted' : 'Normal', spread2_10 < 0 ? 'down' : 'up');
+  // Update yield spread table using real 2Y and 10Y
+  const real2y  = vals[labels.indexOf('2Y')];
+  const real3m  = vals[labels.indexOf('3M')];
+  const real10y = vals[labels.indexOf('10Y')];
+  const shortKey = real2y ?? real3m;
+  if (shortKey != null && real10y != null) {
+    const spread = real10y - shortKey;
+    const bp = Math.round(spread * 100);
+    const sign = bp >= 0 ? '+' : '';
+    setEl('ys-2-10', sign + bp + 'bp', spread < 0 ? 'down' : 'up');
+    setEl('ys-2-10-sig', spread < 0 ? 'Inverted' : 'Normal', spread < 0 ? 'down' : 'up');
+  }
 }
 
-setTimeout(() => drawYieldCurveAndCache(STATIC_YIELDS), 60);
+setTimeout(() => drawYieldCurveAndCache(null), 60);
 window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields));
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2383,7 +2650,7 @@ async function fetchCrossAssetData() {
     if (chgPct == null) {
       vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
       vEl.className = 'ca-val flat';
-      cEl.textContent = 'repo'; cEl.className = 'ca-chg flat';
+      cEl.textContent = '—'; cEl.className = 'ca-chg flat';
       return;
     }
     const cls = chgPct > 0.05 ? 'up' : chgPct < -0.05 ? 'down' : '';
@@ -2433,29 +2700,68 @@ async function fetchCrossAssetData() {
     const uEl = document.getElementById('q-us10y');
     const ucEl = document.getElementById('qc-us10y');
     if (uEl) { uEl.textContent = us10y.close.toFixed(2) + '%'; uEl.className = 'q-price ' + (us10y.fromRepo ? 'flat' : clsDir(us10y.chg)); }
-    if (ucEl) { ucEl.textContent = us10y.fromRepo ? 'repo' : pctStr(us10y.pct); ucEl.className = 'q-chg flat'; }
+    if (ucEl) { ucEl.textContent = us10y.fromRepo ? '—' : pctStr(us10y.pct); ucEl.className = 'q-chg flat'; }
   }
   if (de10y) setCA('de10y', de10y.close, de10y.fromRepo ? null : de10y.pct, true);
-  if (dxy) {
-    setCA('dxy', dxy.close, dxy.pct, false);
-    // Also update topbar DXY
+  // DXY — stooq first, then Yahoo fallback
+  let dxyData = dxy;
+  if (!dxyData) {
+    // Yahoo: DX-Y.NYB
+    const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?interval=1d&range=2d`;
+    for (const yurl of [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
+      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
+    ]) {
+      try {
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        if (!yr.ok) continue;
+        const yd = await yr.json();
+        const meta = yd?.chart?.result?.[0]?.meta;
+        if (!meta?.regularMarketPrice) continue;
+        const close = meta.regularMarketPrice;
+        const open  = meta.chartPreviousClose || meta.previousClose || close;
+        dxyData = { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+        break;
+      } catch { continue; }
+    }
+  }
+  if (dxyData) {
+    setCA('dxy', dxyData.close, dxyData.pct, false);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
-    if (dEl) { dEl.textContent = dxy.close.toFixed(1); dEl.className = 'q-price ' + clsDir(dxy.chg); }
-    if (dcEl) { dcEl.textContent = pctStr(dxy.pct); dcEl.className = 'q-chg ' + clsDir(dxy.chg); }
+    if (dEl) { dEl.textContent = dxyData.close.toFixed(1); dEl.className = 'q-price ' + clsDir(dxyData.chg); }
+    if (dcEl) { dcEl.textContent = pctStr(dxyData.pct); dcEl.className = 'q-chg ' + clsDir(dxyData.chg); }
   }
 
-  // VIX — show as level with regime label
-  if (us10y) {
-    const vixEl = document.getElementById('ca-vix');
+  // VIX — stooq via fetchRiskData should run in parallel; also fetch directly here as fallback
+  {
+    const vixEl  = document.getElementById('ca-vix');
     const vixCEl = document.getElementById('cac-vix');
-    // Re-use Risk Monitor VIX value if available
-    const riskVix = document.getElementById('risk-vix');
-    if (riskVix && riskVix.textContent !== '—' && vixEl) {
-      const v = parseFloat(riskVix.textContent);
-      vixEl.textContent = riskVix.textContent;
-      vixEl.className = 'ca-val ' + (v > 25 ? 'down' : v > 18 ? '' : 'up');
-      if (vixCEl) vixCEl.textContent = v > 30 ? 'extreme fear' : v > 20 ? 'elevated' : 'low vol';
+    if (vixEl) {
+      // Try DOM value first (if fetchRiskData already finished)
+      const riskVix = document.getElementById('risk-vix');
+      let v = riskVix && riskVix.textContent !== '—' ? parseFloat(riskVix.textContent) : NaN;
+      if (isNaN(v)) {
+        // Fetch VIX directly from Yahoo
+        const vBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=2d`;
+        for (const vurl of [
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(vBase)}`,
+          `https://corsproxy.io/?${encodeURIComponent(vBase)}`
+        ]) {
+          try {
+            const vr = await fetch(vurl, { signal: AbortSignal.timeout(8000) });
+            if (!vr.ok) continue;
+            const vd = await vr.json();
+            const vm = vd?.chart?.result?.[0]?.meta;
+            if (vm?.regularMarketPrice) { v = vm.regularMarketPrice; break; }
+          } catch { continue; }
+        }
+      }
+      if (!isNaN(v)) {
+        vixEl.textContent = v.toFixed(1);
+        vixEl.className = 'ca-val ' + (v > 25 ? 'down' : v > 18 ? '' : 'up');
+        if (vixCEl) vixCEl.textContent = v > 30 ? 'extreme fear' : v > 20 ? 'elevated' : 'low vol';
+      }
     }
   }
 
@@ -2472,7 +2778,9 @@ async function fetchCrossAssetData() {
 
   const upd = document.getElementById('ca-updated');
   const now = new Date();
-  if (upd) upd.textContent = 'stooq · ' + now.toUTCString().slice(17,22) + ' UTC';
+  const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+  if (upd) upd.textContent = 'stooq + Yahoo · ' + localHHMM + ' ' + tzAbbr;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2794,16 +3102,17 @@ async function boot() {
   await loadFxPerfData();            // fx-performance repo data for 1W changes
   populateFxPairsTable();            // re-render FX pairs with enriched data
   buildRichNarrative();              // rich narrative from AI + news + live rates
-  fetchNewsData();                    // news feed + ticker
-  fetchCBRates();                     // central bank rates from repo
-  fetchCOTData();                     // CFTC COT from repo
+  fetchNewsData();                   // news feed + ticker
+  fetchCBRates();                    // central bank rates from repo
+  fetchCOTData();                    // CFTC COT from repo
   fetchCalendarData();               // macro calendar from calendar-data/calendar.json
   fetchFedExpectations();            // Fed rate expectations from rates/USD.json
-  fetchOptionSkew();                  // option skew derived from COT data
-  fetchRiskData();                    // VIX, yields, DXY from stooq.com
+  fetchOptionSkew();                 // option skew derived from COT data
+  // Fetch risk data first (VIX, yields) so cross-asset can reuse DOM values
+  await fetchRiskData();             // VIX, yields, DXY from stooq+Yahoo
   fetchCryptoQuotes();               // BTC from CoinGecko
   fetchCommodityQuotes();            // XAU, WTI from stooq
-  fetchCrossAssetData();             // Cross-Asset grid: Gold/WTI/SPX/bonds/DXY
+  fetchCrossAssetData();             // Cross-Asset grid: Gold/WTI/SPX/bonds/DXY/VIX
   fetchCarryData();                  // Carry Trade sidebar from repo rates
   setTimeout(fetchSentiment, 500);   // Dukascopy sentiment (last, non-critical)
 }
