@@ -504,19 +504,11 @@
   /* FX DARK WIDGET — myfxbook */
   #myfxbook-wrap {
     width: 100% !important;
-    background: var(--bg) !important;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
-  /* Invert the entire widget to convert white→dark, then hue-rotate to preserve reds/greens */
-  #myfxbook-wrap > div:first-child {
-    filter: invert(1) hue-rotate(180deg);
-    width: 100% !important;
-  }
-  /* Re-invert specific colored elements so they look correct after double-invert */
-  #myfxbook-wrap table { width: 100% !important; border-collapse: collapse !important; }
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
-  .myfxbookLink { display: none !important; }
-  #myfxbook-wrap a.myfxbookLink { display: none !important; }
 
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
@@ -1031,13 +1023,11 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;background:var(--bg);">
+          <div id="myfxbook-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;width:100%;">
             <!-- myfxbook.com outlook widget - Start -->
-            <div style="width:100%;">
-              <script class="powered" type="text/javascript"
-                src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
-            </div>
-            <script type="text/javascript">showOutlookWidget()</script>
+<script class="powered" type="text/javascript"
+  src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
+<script type="text/javascript">showOutlookWidget()</script>
             <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
@@ -2099,6 +2089,12 @@ async function fetchRiskData() {
         if (v != null && !isNaN(v))
           byId.us10y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
       }
+      // VIX from repo (FRED VIXCLS, updated daily by engine)
+      if (!byId.vix && usdExt.data.vix != null) {
+        const v = usdExt.data.vix;
+        if (v > 5 && v < 100)
+          byId.vix = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
+      }
     }
     // EUR and JPY 10Y from repo
     try {
@@ -2121,7 +2117,7 @@ async function fetchRiskData() {
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
     const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated vol' : 'Low volatility';
-    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
+    const srcSuffix = byId.vix.fromRepo ? ' · Daily · FRED' : byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
     setEl('risk-vix-sub', regime + srcSuffix);
   } else {
     setEl('risk-vix', '—');
@@ -2162,7 +2158,8 @@ async function fetchRiskData() {
       const cls = fNum > 10 ? 'risk-val down' : fNum > 7 ? 'risk-val' : 'risk-val up';
       setEl('risk-eurusd-iv', estIV + '%', cls);
       const ivSig = fNum > 10 ? 'Stress elevated' : fNum > 7 ? 'Moderate' : 'Low vol';
-      setEl('risk-eurusd-iv-sub', ivSig + ' · est via VIX');
+      const vixSrc = byId.vix.fromRepo ? ' · est via FRED VIX' : ' · est via VIX';
+      setEl('risk-eurusd-iv-sub', ivSig + vixSrc);
     } else {
       setEl('risk-eurusd-iv-sub', 'Implied vol · unavailable');
     }
@@ -2280,22 +2277,7 @@ async function fetchRiskData() {
     setEl('risk-regime-sub', regimeSub);
   }
 
-  // Risk Monitor Indicator table — computed from live data
-  // Gold/SPX ratio
-  const goldEl = document.getElementById('ca-gold');
-  const spxEl  = document.getElementById('ca-spx');
-  if (goldEl && spxEl && goldEl.textContent !== '—' && spxEl.textContent !== '—') {
-    const gVal = parseFloat(goldEl.textContent.replace(/,/g,''));
-    const sVal = parseFloat(spxEl.textContent.replace(/,/g,''));
-    if (!isNaN(gVal) && !isNaN(sVal) && sVal > 0) {
-      const ratio = (gVal / sVal).toFixed(3);
-      const rNum = parseFloat(ratio);
-      const sig = rNum > 0.75 ? 'Risk-Off signal' : rNum > 0.55 ? 'Neutral' : 'Risk-On signal';
-      const cls = rNum > 0.75 ? 'down' : rNum < 0.55 ? 'up' : 'flat';
-      setEl('ri-gold-spx', ratio);
-      setEl('ri-gold-spx-sig', sig, cls);
-    }
-  }
+  // Gold/SPX ratio — computed in fetchCrossAssetData() after gold & SPX are fetched
   // US–EU Spread 10Y (uses byId from this scope)
   if (byId.us10y && byId.de10y) {
     const spr = byId.us10y.close - byId.de10y.close;
@@ -2819,6 +2801,16 @@ async function fetchCrossAssetData() {
   const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   if (upd) upd.textContent = 'stooq + Yahoo · ' + localHHMM + ' ' + tzAbbr;
+
+  // Gold / SPX ratio — computed here where gold & spx are in scope
+  if (gold && spx && spx.close > 0) {
+    const ratio = (gold.close / spx.close).toFixed(3);
+    const rNum  = parseFloat(ratio);
+    const sig   = rNum > 0.75 ? 'Risk-Off signal' : rNum > 0.55 ? 'Neutral' : 'Risk-On signal';
+    const cls   = rNum > 0.75 ? 'down' : rNum < 0.55 ? 'up' : 'flat';
+    setEl('ri-gold-spx', ratio);
+    setEl('ri-gold-spx-sig', sig, cls);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
