@@ -621,13 +621,13 @@
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
 
   /* Force myfxbook widget colors to match dark terminal theme */
-  /* Hide internal "Community Outlook" header + download links (~38px tall) */
+  /* Hide only the internal "Community Outlook" title row (~28px), keep column headers visible */
   #myfxbook-widget-inner {
     filter: invert(1) hue-rotate(180deg);
     display: block;
     overflow: hidden;
-    margin-top: -38px;
-    clip-path: inset(38px 0 0 0);
+    margin-top: -28px;
+    clip-path: inset(28px 0 0 0);
   }
 
   /* ══════════════════════════════════════════════
@@ -1355,7 +1355,16 @@
             <!-- myfxbook.com outlook widget - Start -->
 <div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
-<script type="text/javascript">showOutlookWidget()</script>
+<script type="text/javascript">
+(function(){
+  var sx=window.scrollX,sy=window.scrollY;
+  var m=document.getElementById('main');
+  var mx=m?m.scrollLeft:0,my=m?m.scrollTop:0;
+  showOutlookWidget();
+  function restore(){ window.scrollTo(sx,sy); if(m){m.scrollLeft=mx;m.scrollTop=my;} }
+  setTimeout(restore,0); setTimeout(restore,300); setTimeout(restore,800);
+})();
+</script>
             <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
@@ -2162,9 +2171,9 @@ const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 async function fetchStooqQuoteSingle(sym) {
   const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
   const urls = [
-    base,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
     `https://corsproxy.io/?${encodeURIComponent(base)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+    base,
   ];
   for (const url of urls) {
     try {
@@ -2266,7 +2275,7 @@ async function fetchCommodityQuotes() {
   // Fetch via stooq.com (correct stooq symbols) with Yahoo Finance cors proxy as fallback
   async function fetchStooqQuote(stooqSym, fallbackClose) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(stooqSym)}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    const urls = [`https://corsproxy.io/?${encodeURIComponent(base)}`, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, base];
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -2457,10 +2466,9 @@ async function fetchRiskData() {
   async function fetchStooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
     const urls = [
-      base,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
       `https://corsproxy.io/?${encodeURIComponent(base)}`,
-      `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(base)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
+      base,
     ];
     for (const url of urls) {
       try {
@@ -2510,11 +2518,10 @@ async function fetchRiskData() {
     const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const base2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const urls = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
       `https://corsproxy.io/?${encodeURIComponent(base)}`,
-      `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(base)}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
       `https://corsproxy.io/?${encodeURIComponent(base2)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
     ];
     for (const url of urls) {
       try {
@@ -3165,7 +3172,7 @@ async function fetchCrossAssetData() {
   // Helper: fetch stooq CSV
   async function stooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    const urls = [`https://corsproxy.io/?${encodeURIComponent(base)}`, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, base];
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -3672,25 +3679,31 @@ async function buildRichNarrative() {
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
 async function boot() {
-  // Priority order: fastest/most-used first
-  await fetchFrankfurter();          // rates for FX pairs (ECB) — must be first so STATE.rates is populated
-  fetchQuoteBarRT();                 // quote bar FX via Stooq (~15 min) — runs in background
-  await loadFxPerfData();            // fx-performance repo data for 1W changes
-  populateFxPairsTable();            // re-render FX pairs with enriched data
-  buildRichNarrative();              // rich narrative from AI + news + live rates
-  fetchNewsData();                   // news feed + ticker
-  fetchCBRates();                    // central bank rates from repo
-  fetchCOTData();                    // CFTC COT from repo
-  fetchCalendarData();               // macro calendar from calendar-data/calendar.json
-  fetchFedExpectations();            // Fed rate expectations from rates/USD.json
-  fetchOptionSkew();                 // option skew derived from COT data
-  // Fetch risk data first (VIX, yields) so cross-asset can reuse DOM values
-  await fetchRiskData();             // VIX, yields, DXY from stooq+Yahoo
+  // PHASE 1: Critical path — FX pairs table needs Frankfurter first
+  await fetchFrankfurter();          // ECB rates → populates STATE.rates for FX table
+
+  // PHASE 2: Parallel — all remaining data loads simultaneously
+  fetchQuoteBarRT();                 // Stooq RT quotes (quote bar + FX table RT update)
+  loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
+
+  // Static repo data — all parallel, fast (same GitHub Pages origin)
+  fetchCBRates();
+  fetchCOTData();
+  fetchCalendarData();
+  fetchFedExpectations();
+  fetchOptionSkew();
+  fetchCarryData();
+  fetchNewsData();
+
+  // External API data — parallel, may be slower
+  fetchRiskData().then(() => {
+    // Cross-asset and commodities after risk data so Gold/SPX ratio uses fresh prices
+    fetchCrossAssetData();
+    fetchCommodityQuotes();
+  });
   fetchCryptoQuotes();               // BTC from CoinGecko
-  fetchCommodityQuotes();            // XAU, WTI from stooq
-  fetchCrossAssetData();             // Cross-Asset grid: Gold/WTI/SPX/bonds/DXY/VIX
-  fetchCarryData();                  // Carry Trade sidebar from repo rates
-  setTimeout(fetchSentiment, 500);   // Dukascopy sentiment (last, non-critical)
+  buildRichNarrative();              // AI narrative (non-blocking)
+  setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
 }
 
 boot();
@@ -3733,12 +3746,10 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
   });
 })();
 
-setInterval(fetchRiskData, 5 * 60 * 1000);
-// Refresh crypto every 2 minutes
-setInterval(fetchCryptoQuotes, 2 * 60 * 1000);
-// Refresh commodities every 5 minutes
-setInterval(fetchCommodityQuotes, 5 * 60 * 1000);
-setInterval(fetchCrossAssetData, 5 * 60 * 1000);
+// Risk + Cross-Asset: every 2 minutes, chained so Gold/SPX ratio uses fresh prices
+setInterval(() => { fetchRiskData().then(() => { fetchCrossAssetData(); fetchCommodityQuotes(); }); }, 2 * 60 * 1000);
+// Crypto: every 90 seconds
+setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
