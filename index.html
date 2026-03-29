@@ -641,6 +641,14 @@
     div[style*="max-height:520px"] { max-height: none !important; overflow: visible !important; }
 
     /* Market sentiment: no forced height */
+    /* Myfxbook widget overflows its fixed internal table — clip + scroll horizontally */
+    #myfxbook-wrap { overflow-x: auto !important; overflow-y: hidden !important; -webkit-overflow-scrolling: touch; }
+    #myfxbook-wrap table { min-width: unset !important; width: 100% !important; font-size: 9px !important; }
+    #myfxbook-wrap td, #myfxbook-wrap th { padding: 2px 4px !important; font-size: 9px !important; }
+
+    /* Reference Spreads: ensure it fills full width when stacked */
+    #spreads-rows { width: 100%; box-sizing: border-box; }
+    .spread-row { grid-template-columns: 48px 1fr 42px; gap: 4px; }
 
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
@@ -791,9 +799,16 @@
           <button class="tv-tab" data-sym="FX:EURGBP">EUR/GBP</button>
           <button class="tv-tab" data-sym="FX:EURJPY">EUR/JPY</button>
           <button class="tv-tab" data-sym="FX:GBPJPY">GBP/JPY</button>
+          <button class="tv-tab" data-sym="FX:EURCHF">EUR/CHF</button>
+          <button class="tv-tab" data-sym="FX:AUDJPY">AUD/JPY</button>
           <button class="tv-tab" data-sym="OANDA:XAUUSD">XAU/USD</button>
           <button class="tv-tab" data-sym="BLACKBULL:WTI">WTI</button>
           <button class="tv-tab" data-sym="FX:USDOLLAR">DXY</button>
+          <button class="tv-tab" data-sym="SP:SPX">S&P 500</button>
+          <button class="tv-tab" data-sym="NASDAQ:NDX">Nasdaq</button>
+          <button class="tv-tab" data-sym="INDEX:NKY">Nikkei</button>
+          <button class="tv-tab" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
+          <button class="tv-tab" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
         </div>
         <span class="panel-sub" style="margin-left:auto;">TradingView · live data</span>
       </div>
@@ -1016,7 +1031,7 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;max-height:220px;background:var(--bg);position:relative;">
+          <div id="myfxbook-wrap" style="overflow:auto;padding:0;width:100%;background:var(--bg2);position:relative;">
             <!-- myfxbook.com outlook widget - Start -->
 <div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
 <div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
@@ -1877,12 +1892,11 @@ const SENTIMENT_FALLBACK = [
 
 // Build sentiment from COT positions (net position → bullish/bearish bias)
 async function buildCOTSentiment() {
-  const BASE = 'https://globalinvesting.github.io';
   const COT_CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
   const results = {};
   await Promise.all(COT_CCYS.map(async ccy => {
     try {
-      const r = await fetch(BASE + '/cot-data/' + ccy + '.json');
+      const r = await fetch('./cot-data/' + ccy + '.json');
       if (!r.ok) return;
       const d = await r.json();
       if (d.longPositions != null && d.shortPositions != null) {
@@ -2632,7 +2646,6 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCarryData() {
-  const BASE = 'https://globalinvesting.github.io';
   const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
   const LABELS = { USD:'USD Fed', EUR:'EUR ECB', GBP:'GBP BoE', JPY:'JPY BoJ',
                    AUD:'AUD RBA', CHF:'CHF SNB', CAD:'CAD BoC', NZD:'NZD RBNZ' };
@@ -2642,7 +2655,7 @@ async function fetchCarryData() {
     const rateData = {};
     await Promise.all(CURRENCIES.map(async ccy => {
       try {
-        const r = await fetch(BASE + '/rates/' + ccy + '.json');
+        const r = await fetch('./rates/' + ccy + '.json');
         if (!r.ok) return;
         const d = await r.json();
         if (d.observations && d.observations.length) {
