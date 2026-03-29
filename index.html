@@ -54,9 +54,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 14px;
+    padding-right: 10px;
     border-right: 1px solid var(--border2);
-    margin-right: 10px;
+    margin-right: 8px;
     white-space: nowrap;
     text-decoration: none;
     flex-shrink: 0;
@@ -64,22 +64,23 @@
 
   .logo-text {
     font-family: var(--font-ui);
-    font-size: 13px;
+    font-size: 11.5px;
     font-weight: 700;
     color: #fff;
-    letter-spacing: -0.01em;
-    line-height: 1;
+    letter-spacing: 0em;
+    line-height: 1.1;
+    white-space: nowrap;
   }
 
   .logo-sub {
     font-family: var(--font-ui);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 500;
-    color: var(--text2);
-    letter-spacing: 0.06em;
+    color: var(--text3);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     display: block;
-    margin-top: 2px;
+    margin-top: 1px;
   }
 
   .top-nav { display: flex; height: 100%; }
@@ -244,7 +245,11 @@
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  .panel { border-bottom: 1px solid var(--border); }
+    /* FXStreet widget dark override */
+  [fxs_widget] { background: transparent !important; }
+  [fxs_widget] * { font-family: var(--font-ui) !important; }
+
+.panel { border-bottom: 1px solid var(--border); }
   /* Suppress TradingView copyright bar that causes gap */
   .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; }
 
@@ -529,6 +534,9 @@
   .fx-dark-widget a { text-decoration: none !important; }
   .myfxbookLink { display: none !important; }
 </style>
+  <script type="text/javascript">
+    var fxs_widget_config = { Culture: 'en-US' };
+  </script>
 </head>
 <body>
 
@@ -875,19 +883,17 @@
           <div class="spread-row"><span class="spr-sym">USD/CAD</span><div class="spr-bar"><div class="spr-fill" style="width:52%;background:var(--down)"></div></div><span class="spr-val down" id="spr-usdcad">2.5 pip</span></div>
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
-        <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;">
-          <div id="fx-sentiment-widget" style="padding:6px 10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);">Market Sentiment</span>
-              <span id="sent-updated" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">loading…</span>
-            </div>
-            <div id="sent-rows" style="display:flex;flex-direction:column;gap:3px;"></div>
-            <div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
-              <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Based on open positions · retail traders</span>
-              <span style="font-size:9px;color:var(--text3);display:flex;gap:10px;font-family:var(--font-ui);">
-                <span><span style="color:var(--up)">■</span> Long</span>
-                <span><span style="color:var(--down)">■</span> Short</span>
-              </span>
+        <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;">
+          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);">Market Sentiment</span>
+            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">FXStreet · live themes</span>
+          </div>
+          <div style="flex:1;overflow:hidden;position:relative;background:var(--bg2);">
+            <div fxs_widget fxs_name="marketthemessentiment"
+              fxs_onlyHighlighted="false"
+              fxs_rows="8"
+              fxs_groups="30888515-8828-44bf-83f8-27dada519e2f,bullish;30888515-8828-44bf-83f8-27dada519e2f,bearish;34c316e5-3d2f-45b0-83cd-29379ba11516,bearish;34c316e5-3d2f-45b0-83cd-29379ba11516,bullish"
+              style="width:100%;height:100%;display:block;">
             </div>
           </div>
         </div>
@@ -929,12 +935,12 @@
 
     <!-- NEWS FEED + ECONOMIC MAP -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;">
+      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
         <div class="panel-head">
           <span class="panel-title">News Feed</span>
           <span class="panel-sub" id="news-sub">FX-relevant · sorted by impact</span>
         </div>
-        <div id="news-feed-items" style="flex:1;overflow-y:auto;max-height:460px;" class="thin-scroll">
+        <div id="news-feed-items" style="flex:1;overflow-y:auto;min-height:0;" class="thin-scroll">
           <div class="news-item" style="color:var(--text3);">Loading news…</div>
         </div>
       </div>
@@ -1626,34 +1632,35 @@ function buildNewsTicker(items) {
 async function fetchCommodityQuotes() {
   // Fetch via stooq.com (correct stooq symbols) with Yahoo Finance cors proxy as fallback
   async function fetchStooqQuote(stooqSym, fallbackClose) {
-    try {
-      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(stooqSym)}&f=sd2t2ohlcv&h&e=csv`;
-      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (!r.ok) throw new Error('stooq bad status');
-      const text = await r.text();
-      const lines = text.trim().split('\n');
-      if (lines.length < 2) throw new Error('no data');
-      const p = lines[1].split(',');
-      const close = parseFloat(p[6]);
-      const open  = parseFloat(p[3]);
-      if (isNaN(close) || close === 0) throw new Error('zero close');
-      return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
-    } catch {
-      // Fallback: try Yahoo Finance via allorigins CORS proxy
+    const base = `https://stooq.com/q/l/?s=${encodeURIComponent(stooqSym)}&f=sd2t2ohlcv&h&e=csv`;
+    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    for (const url of urls) {
       try {
-        const yhTicker = encodeURIComponent(fallbackClose);
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + fallbackClose + '?interval=1d&range=2d')}`;
-        const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
-        if (!r2.ok) return null;
-        const d = await r2.json();
-        const meta = d?.chart?.result?.[0]?.meta;
-        if (!meta) return null;
-        const close2 = meta.regularMarketPrice;
-        const prev2  = meta.chartPreviousClose || meta.previousClose || close2;
-        if (!close2) return null;
-        return { close: close2, open: prev2, chg: close2 - prev2, pct: prev2 > 0 ? (close2-prev2)/prev2*100 : 0 };
-      } catch { return null; }
+        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        if (!r.ok) continue;
+        const text = await r.text();
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) continue;
+        const p = lines[1].split(',');
+        const close = parseFloat(p[6]);
+        const open  = parseFloat(p[3]);
+        if (isNaN(close) || close === 0) continue;
+        return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+      } catch { continue; }
     }
+    // All stooq failed — try Yahoo Finance via allorigins
+    try {
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + fallbackClose + '?interval=1d&range=2d')}`;
+      const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(9000) });
+      if (!r2.ok) return null;
+      const d = await r2.json();
+      const meta = d?.chart?.result?.[0]?.meta;
+      if (!meta) return null;
+      const close2 = meta.regularMarketPrice;
+      const prev2  = meta.chartPreviousClose || meta.previousClose || close2;
+      if (!close2) return null;
+      return { close: close2, open: prev2, chg: close2 - prev2, pct: prev2 > 0 ? (close2-prev2)/prev2*100 : 0 };
+    } catch { return null; }
   }
 
   try {
@@ -1814,19 +1821,23 @@ async function fetchSentiment() {
 async function fetchRiskData() {
   // Try stooq.com free CSV data — no auth needed, but may be blocked on weekends
   async function fetchStooq(sym) {
-    try {
-      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
-      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (!r.ok) return null;
-      const text = await r.text();
-      const lines = text.trim().split('\n');
-      if (lines.length < 2) return null;
-      const parts = lines[1].split(',');
-      const close = parseFloat(parts[6]);
-      const open  = parseFloat(parts[3]);
-      if (isNaN(close) || close === 0) return null;
-      return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
-    } catch { return null; }
+    const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
+    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    for (const url of urls) {
+      try {
+        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        if (!r.ok) continue;
+        const text = await r.text();
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) continue;
+        const parts = lines[1].split(',');
+        const close = parseFloat(parts[6]);
+        const open  = parseFloat(parts[3]);
+        if (isNaN(close) || close === 0) continue;
+        return { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+      } catch { continue; }
+    }
+    return null;
   }
 
   // Correct stooq.com symbols (different from Yahoo Finance)
@@ -2256,10 +2267,16 @@ async function fetchCarryData() {
     container.innerHTML = carryPairs.map(p => {
       const sign = p.diff >= 0 ? '+' : '';
       const cls = p.diff > 1 ? 'up' : p.diff < 0 ? 'down' : 'flat';
-      return `<div class="sb-row">
-        <span class="sb-sym">${p.long}/${p.short}</span>
-        <span class="sb-price" style="font-size:10px;color:var(--text2);">${(rateData[p.long]??0).toFixed(2)}% · ${(rateData[p.short]??0).toFixed(2)}%</span>
-        <span class="sb-chg ${cls}">${sign}${p.diff.toFixed(2)}%</span>
+      const longRate = (rateData[p.long]??0).toFixed(2);
+      const shortRate = (rateData[p.short]??0).toFixed(2);
+      return `<div class="sb-row" style="flex-direction:column;align-items:stretch;gap:2px;padding:5px 8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="sb-sym">${p.long}/${p.short}</span>
+          <span class="sb-chg ${cls}" style="font-size:11px;font-weight:700;">${sign}${p.diff.toFixed(2)}%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">${longRate}% long · ${shortRate}% short</span>
+        </div>
       </div>`;
     }).join('');
   } catch(e) { console.warn('Carry fetch failed:', e); }
@@ -2271,19 +2288,23 @@ async function fetchCarryData() {
 async function fetchCrossAssetData() {
   // Helper: fetch stooq CSV
   async function stooq(sym) {
-    try {
-      const url = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
-      const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
-      if (!r.ok) return null;
-      const t = await r.text();
-      const lines = t.trim().split('\n');
-      if (lines.length < 2) return null;
-      const p = lines[1].split(',');
-      const close = parseFloat(p[6]);
-      const open  = parseFloat(p[3]);
-      if (isNaN(close) || close === 0) return null;
-      return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
-    } catch { return null; }
+    const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
+    const urls = [base, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, `https://corsproxy.io/?${encodeURIComponent(base)}`];
+    for (const url of urls) {
+      try {
+        const r = await fetch(url, { signal: AbortSignal.timeout(9000) });
+        if (!r.ok) continue;
+        const t = await r.text();
+        const lines = t.trim().split('\n');
+        if (lines.length < 2) continue;
+        const p = lines[1].split(',');
+        const close = parseFloat(p[6]);
+        const open  = parseFloat(p[3]);
+        if (isNaN(close) || close === 0) continue;
+        return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
+      } catch { continue; }
+    }
+    return null;
   }
 
   function setCA(id, val, chgPct, isYield) {
@@ -2723,5 +2744,6 @@ setInterval(fetchCalendarData, 30 * 60 * 1000);
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 </script>
 
+  <script type="text/javascript" src="https://markettools.fxstreet.com/v1/WidgetBaseJs/GetWidgetBaseJs" async></script>
 </body>
 </html>
