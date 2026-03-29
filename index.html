@@ -904,15 +904,15 @@
       <div class="panel" style="border-bottom:none;border-right:1px solid var(--border);">
         <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Extended data · repo</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
-          <!-- Populated by fetchCrossAssetData() from extended-data/*.json + stooq -->
+          <!-- Populated by fetchCrossAssetData() -->
+          <div class="ca-cell"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
           <div class="ca-cell"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
           <div class="ca-cell"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">VIX</div><div class="ca-val" id="ca-vix">—</div><div class="ca-chg" id="cac-vix">fear gauge</div></div>
-          <div class="ca-cell"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">DE 10Y Bund</div><div class="ca-val" id="ca-de10y">—</div><div class="ca-chg" id="cac-de10y">loading</div></div>
           <div class="ca-cell"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
           <div class="ca-cell"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
+          <div class="ca-cell"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
         </div>
       </div>
       <div class="panel" style="border-bottom:none;">
@@ -1050,14 +1050,11 @@
             <span class="panel-title">Market Sentiment</span>
             <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0;">
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow:hidden;padding:0;min-height:0;display:flex;flex-direction:column;">
             <!-- myfxbook outlook widget type=1 -->
-            <div>
+            <div style="flex:1;overflow-y:auto;overflow-x:hidden;" class="thin-scroll">
               <script class="powered" type="text/javascript"
                 src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
-            </div>
-            <div style="font-size:9px;color:var(--text3);padding:2px 6px;">
-              <a href="https://www.myfxbook.com" class="myfxbookLink" target="_blank" rel="noopener" style="color:var(--text3);text-decoration:none;">Powered by Myfxbook.com</a>
             </div>
           </div>
         </div>
@@ -2055,7 +2052,7 @@ async function fetchRiskData() {
   // Fill VIX if stooq missed it
   if (!byId.vix) {
     const v = await fetchYahoo('%5EVIX');
-    if (v) byId.vix = v;
+    if (v) byId.vix = { ...v, fromYahoo: true };
   }
   // Fill DXY if stooq missed it — use DX-Y.NYB on Yahoo
   if (!byId.dxy) {
@@ -2067,10 +2064,17 @@ async function fetchRiskData() {
     const t = await fetchYahoo('%5EIRX');
     if (t) byId.us3m = { ...t, close: t.close / 10, chg: t.chg / 10 };
   }
-  // Fill 2Y Treasury (^TUX on Yahoo = yield * 10)
+  // Fill 2Y Treasury — Yahoo ^TWO = 2Y yield (already in % form, no divide needed)
   if (!byId.us2y) {
-    const t = await fetchYahoo('%5ETUX');
-    if (t) byId.us2y = { ...t, close: t.close / 10, chg: t.chg / 10, pct: t.pct };
+    // Try ^TWO first, then ^TUX as backup
+    for (const sym of ['%5ETWO', '%5ETUX']) {
+      const t = await fetchYahoo(sym);
+      if (t && t.close > 0.5 && t.close < 20) {
+        // ^TWO reports actual yield in %, not x10
+        byId.us2y = t;
+        break;
+      }
+    }
   }
   // Fill 10Y (^TNX = yield * 10)
   if (!byId.us10y) {
@@ -2122,19 +2126,14 @@ async function fetchRiskData() {
   // VIX
   if (byId.vix) {
     const vix = byId.vix.close;
-    const vixChg = byId.vix.pct;
     const cls = vix > 30 ? 'risk-val down' : vix > 20 ? 'risk-val' : 'risk-val up';
     setEl('risk-vix', vix.toFixed(1), cls);
     const regime = vix > 30 ? 'Extreme fear' : vix > 20 ? 'Elevated volatility' : 'Low volatility';
-    setEl('risk-vix-sub', regime + weekendNote);
-    // Feed cross-asset VIX panel
-    const caVix = document.getElementById('ca-vix');
-    const caVixC = document.getElementById('cac-vix');
-    if (caVix) { caVix.textContent = vix.toFixed(1); caVix.className = 'ca-val ' + (vix > 25 ? 'down' : vix > 18 ? '' : 'up'); }
-    if (caVixC) caVixC.textContent = vix > 30 ? 'extreme fear' : vix > 20 ? 'elevated' : 'low vol';
+    const srcSuffix = byId.vix.fromYahoo ? ' · Yahoo' : weekendNote;
+    setEl('risk-vix-sub', regime + srcSuffix);
   } else {
     setEl('risk-vix', '—');
-    setEl('risk-vix-sub', 'stooq · ' + (isWeekend ? 'weekend closed' : 'loading…'));
+    setEl('risk-vix-sub', isWeekend ? 'Loading via Yahoo…' : 'loading…');
   }
 
   // US 10Y (TNX = yield * 10)
@@ -2661,52 +2660,86 @@ async function fetchCrossAssetData() {
     cEl.className = 'ca-chg ' + cls;
   }
 
-  // Fetch all in parallel
-  const [gold, wti, spx, _us10y, _de10y, dxy] = await Promise.all([
+  // Fetch all in parallel — stooq symbols
+  const [gold, wti, spx, nikkei, stoxx, _us10y, dxy] = await Promise.all([
     stooq('xauusd'),
     stooq('cl.f'),
     stooq('^spx'),
+    stooq('^nkx'),       // Nikkei 225
+    stooq('^sx5e'),      // EUR Stoxx 50
     stooq('10usy.b'),
-    stooq('10dey.b'),
     stooq('usdidx.fs'),
   ]);
 
-  // Fallback: repo extended-data for yields when stooq fails
-  let us10y = _us10y, de10y = _de10y;
-  if (!us10y || !de10y) {
-    try {
-      const [usdExt, eurExt] = await Promise.all([
-        !us10y ? fetch('./extended-data/USD.json').then(r=>r.json()).catch(()=>null) : Promise.resolve(null),
-        !de10y ? fetch('./extended-data/EUR.json').then(r=>r.json()).catch(()=>null) : Promise.resolve(null),
-      ]);
-      if (!us10y && usdExt?.data?.bond10y) us10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-      if (!de10y && eurExt?.data?.bond10y) de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-    } catch { /* skip */ }
+  // Fallback for Nikkei via Yahoo if stooq misses it
+  let nikkeiData = nikkei;
+  if (!nikkeiData) {
+    const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?interval=1d&range=2d`;
+    for (const yurl of [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
+      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
+    ]) {
+      try {
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        if (!yr.ok) continue;
+        const yd = await yr.json();
+        const meta = yd?.chart?.result?.[0]?.meta;
+        if (!meta?.regularMarketPrice) continue;
+        const close = meta.regularMarketPrice;
+        const open = meta.chartPreviousClose || meta.previousClose || close;
+        nikkeiData = { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+        break;
+      } catch { continue; }
+    }
   }
 
+  // Fallback for Stoxx 50 via Yahoo
+  let stoxxData = stoxx;
+  if (!stoxxData) {
+    const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5ESTOXX50E?interval=1d&range=2d`;
+    for (const yurl of [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
+      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
+    ]) {
+      try {
+        const yr = await fetch(yurl, { signal: AbortSignal.timeout(8000) });
+        if (!yr.ok) continue;
+        const yd = await yr.json();
+        const meta = yd?.chart?.result?.[0]?.meta;
+        if (!meta?.regularMarketPrice) continue;
+        const close = meta.regularMarketPrice;
+        const open = meta.chartPreviousClose || meta.previousClose || close;
+        stoxxData = { close, open, chg: close - open, pct: open > 0 ? (close - open) / open * 100 : 0 };
+        break;
+      } catch { continue; }
+    }
+  }
+
+  // Fallback: repo extended-data for US10Y when stooq fails
+  let us10y = _us10y;
+  if (!us10y) {
+    try {
+      const usdExt = await fetch('./extended-data/USD.json').then(r=>r.json()).catch(()=>null);
+      if (usdExt?.data?.bond10y) us10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+    } catch {}
+  }
+
+  if (spx)  setCA('spx',  spx.close,  spx.pct,  false);
   if (gold) {
     setCA('gold', gold.close, gold.pct, false);
-    // Also update topbar XAU/USD
     const gEl = document.getElementById('q-xauusd');
     const gcEl = document.getElementById('qc-xauusd');
     if (gEl) { gEl.textContent = gold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className = 'q-price ' + clsDir(gold.chg); }
     if (gcEl) { gcEl.textContent = pctStr(gold.pct); gcEl.className = 'q-chg ' + clsDir(gold.chg); }
   }
-  if (wti)   setCA('wti',   wti.close,   wti.pct,   false);
-  if (spx)   setCA('spx',   spx.close,   spx.pct,   false);
-  if (us10y) {
-    setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true);
-    // Also update topbar US10Y
-    const uEl = document.getElementById('q-us10y');
-    const ucEl = document.getElementById('qc-us10y');
-    if (uEl) { uEl.textContent = us10y.close.toFixed(2) + '%'; uEl.className = 'q-price ' + (us10y.fromRepo ? 'flat' : clsDir(us10y.chg)); }
-    if (ucEl) { ucEl.textContent = us10y.fromRepo ? '—' : pctStr(us10y.pct); ucEl.className = 'q-chg flat'; }
-  }
-  if (de10y) setCA('de10y', de10y.close, de10y.fromRepo ? null : de10y.pct, true);
+  if (wti)       setCA('wti',    wti.close,    wti.pct,    false);
+  if (nikkeiData) setCA('nikkei', nikkeiData.close, nikkeiData.pct, false);
+  if (stoxxData)  setCA('stoxx',  stoxxData.close,  stoxxData.pct,  false);
+  if (us10y)     setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true);
+
   // DXY — stooq first, then Yahoo fallback
   let dxyData = dxy;
   if (!dxyData) {
-    // Yahoo: DX-Y.NYB
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?interval=1d&range=2d`;
     for (const yurl of [
       `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
@@ -2733,39 +2766,7 @@ async function fetchCrossAssetData() {
     if (dcEl) { dcEl.textContent = pctStr(dxyData.pct); dcEl.className = 'q-chg ' + clsDir(dxyData.chg); }
   }
 
-  // VIX — stooq via fetchRiskData should run in parallel; also fetch directly here as fallback
-  {
-    const vixEl  = document.getElementById('ca-vix');
-    const vixCEl = document.getElementById('cac-vix');
-    if (vixEl) {
-      // Try DOM value first (if fetchRiskData already finished)
-      const riskVix = document.getElementById('risk-vix');
-      let v = riskVix && riskVix.textContent !== '—' ? parseFloat(riskVix.textContent) : NaN;
-      if (isNaN(v)) {
-        // Fetch VIX directly from Yahoo
-        const vBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=2d`;
-        for (const vurl of [
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(vBase)}`,
-          `https://corsproxy.io/?${encodeURIComponent(vBase)}`
-        ]) {
-          try {
-            const vr = await fetch(vurl, { signal: AbortSignal.timeout(8000) });
-            if (!vr.ok) continue;
-            const vd = await vr.json();
-            const vm = vd?.chart?.result?.[0]?.meta;
-            if (vm?.regularMarketPrice) { v = vm.regularMarketPrice; break; }
-          } catch { continue; }
-        }
-      }
-      if (!isNaN(v)) {
-        vixEl.textContent = v.toFixed(1);
-        vixEl.className = 'ca-val ' + (v > 25 ? 'down' : v > 18 ? '' : 'up');
-        if (vixCEl) vixCEl.textContent = v > 30 ? 'extreme fear' : v > 20 ? 'elevated' : 'low vol';
-      }
-    }
-  }
-
-  // BTC — from CoinGecko cache
+  // BTC — from CoinGecko cache (topbar q-btcusd)
   const btcEl = document.getElementById('ca-btc');
   const btcCEl = document.getElementById('cac-btc');
   const qBtc = document.getElementById('q-btcusd');
@@ -3036,20 +3037,32 @@ async function buildRichNarrative() {
       if (expand.length > 20) headlineSnippet = expand + (expand.length === 120 ? '…' : '');
     }
 
-    // Compose final narrative — use AI base if it's rich enough, otherwise compose from data
-    let finalNarrative = baseNarrative;
-    const isRich = baseNarrative.length > 80 && baseNarrative.includes('/');
+    // Compose final narrative — ALWAYS prioritize live FX data over stale AI repo narrative
+    // The AI narrative from the repo may have outdated price levels (e.g. 1.0820, 104.50)
+    let finalNarrative = '';
 
-    if (!isRich && (fxLines.length || headlineSnippet)) {
-      // Compose from data
+    if (fxLines.length || headlineSnippet) {
+      // Build fresh narrative from current live data
       const parts = [];
       if (fxLines.length) parts.push(fxLines.join('. '));
-      if (topCur.length) parts.push(`${topCur.join(', ')} in focus across newswires`);
+      if (topCur.length && topCur.length <= 4) parts.push(`${topCur.join(', ')} in focus across newswires`);
       if (headlineSnippet) parts.push(headlineSnippet);
       finalNarrative = parts.join('. ') + '.';
-    } else if (isRich) {
-      // Append FX context to AI narrative
-      if (fxLines.length) finalNarrative += ' · ' + fxLines.join(' · ');
+      // Append AI narrative only if it doesn't contain obviously stale price levels
+      // (stale if AI narrative has EUR/USD below 1.08 or DXY above 104 while live data shows otherwise)
+      const aiIsStale = baseNarrative.length > 0 && (
+        /1\.0[0-9]{3}/.test(baseNarrative) ||   // EUR/USD below 1.10
+        /104\.[0-9]/.test(baseNarrative) ||      // DXY above 104
+        /105\.[0-9]/.test(baseNarrative) ||
+        /160\.[0-9]/.test(baseNarrative) ||      // USD/JPY at 160+ (stale)
+        /159\.[0-9]/.test(baseNarrative)
+      );
+      if (!aiIsStale && baseNarrative.length > 40 && !fxLines.some(l => baseNarrative.includes(l.slice(0,8)))) {
+        finalNarrative += ' · ' + baseNarrative.slice(0, 120);
+      }
+    } else if (baseNarrative.length > 40) {
+      // No live data available — use repo narrative as-is with caveat
+      finalNarrative = baseNarrative;
     }
 
     // Update DOM
