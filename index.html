@@ -851,7 +851,9 @@
           </table>
         </div>
         <div style="border-top:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;padding:5px 8px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">Upcoming Events</div>
+          <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;">
+            <span class="panel-title">Upcoming Events</span>
+          </div>
           <div style="overflow:hidden;height:260px;position:relative;">
             <div style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
               <div class="tradingview-widget-container" style="width:100%;height:100%;">
@@ -886,18 +888,19 @@
           <div class="spread-row"><span class="spr-sym">NZD/USD</span><div class="spr-bar"><div class="spr-fill" style="width:60%;background:var(--down)"></div></div><span class="spr-val down" id="spr-nzdusd">3.0 pip</span></div>
         </div>
         <div style="border-top:1px solid var(--border);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;">
-          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <span style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-ui);">Market Sentiment</span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Myfxbook · retail positioning</span>
+          <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <span class="panel-title">Market Sentiment</span>
+            <span class="panel-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;min-height:0;">
-            <!-- myfxbook compact outlook widget (type=0) -->
-            <div id="mfxb-container"></div>
-            <div style="font-size:9px;color:var(--text3);padding:2px 4px;">
+          <div id="myfxbook-wrap" class="fx-dark-widget" style="flex:1;overflow:hidden;padding:0;">
+            <!-- myfxbook outlook widget type=1 -->
+            <div>
+              <script class="powered" type="text/javascript"
+                src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
+            </div>
+            <div style="font-size:9px;color:var(--text3);padding:2px 6px;">
               <a href="https://www.myfxbook.com" class="myfxbookLink" target="_blank" rel="noopener" style="color:var(--text3);text-decoration:none;">Powered by Myfxbook.com</a>
             </div>
-            <script class="powered" type="text/javascript"
-              src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=0&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script>
           </div>
         </div>
       </div>
@@ -937,8 +940,8 @@
     </div>
 
     <!-- NEWS FEED + ECONOMIC MAP -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;">
-      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:320px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:440px;">
+      <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:440px;">
         <div class="panel-head">
           <span class="panel-title">News Feed</span>
           <span class="panel-sub" id="news-sub">FX-relevant · sorted by impact</span>
@@ -947,14 +950,14 @@
           <div class="news-item" style="color:var(--text3);">Loading news…</div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;background:var(--bg);height:320px;overflow:hidden;">
+      <div style="display:flex;flex-direction:column;background:var(--bg);height:440px;overflow:hidden;">
         <div class="panel-head">
           <span class="panel-title">Economic Map</span>
           <span class="panel-sub">TradingView · World Economics</span>
         </div>
         <div style="flex:1;overflow:hidden;background:#131722;display:flex;align-items:stretch;">
           <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-economic-map.js"></script>
-          <tv-economic-map theme="dark" transparent style="width:100%;height:100%;min-height:280px;display:block;background:#131722;"></tv-economic-map>
+          <tv-economic-map theme="dark" transparent style="width:100%;height:100%;min-height:380px;display:block;background:#131722;"></tv-economic-map>
         </div>
       </div>
     </div>
@@ -1863,6 +1866,33 @@ async function fetchRiskData() {
   const byId = {};
   results.forEach(r => { if (r.data) byId[r.id] = r.data; });
 
+  // FALLBACK: fetch bond10y values from repo extended-data when stooq fails
+  // These JSONs are updated daily by the engine and always available
+  try {
+    const extCurrencies = [
+      { ccy: 'USD', id: 'us10y' },
+      { ccy: 'EUR', id: 'de10y' },
+      { ccy: 'JPY', id: 'jp10y' },
+    ];
+    const extResults = await Promise.all(
+      extCurrencies.map(async ({ ccy, id }) => {
+        try {
+          const r = await fetch(`./extended-data/${ccy}.json`);
+          if (!r.ok) return null;
+          const d = await r.json();
+          const v = d?.data?.bond10y;
+          if (v == null || isNaN(v)) return null;
+          return { id, close: v, chg: 0, pct: 0, fromRepo: true };
+        } catch { return null; }
+      })
+    );
+    extResults.forEach(item => {
+      if (item && !byId[item.id]) {
+        byId[item.id] = item;
+      }
+    });
+  } catch { /* silently skip */ }
+
   // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
   const isWeekend = [0,6].includes(new Date().getUTCDay());
   const weekendNote = isWeekend ? ' (last close)' : '';
@@ -1892,11 +1922,14 @@ async function fetchRiskData() {
     const cls = chg > 0.005 ? 'risk-val up' : chg < -0.005 ? 'risk-val down' : 'risk-val';
     setEl('risk-us10y', y10.toFixed(2) + '%', cls);
     const sign = chg >= 0 ? '+' : '';
-    setEl('risk-us10y-sub', isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
+    const srcNote = byId.us10y.fromRepo ? 'Repo data · last close' : (isWeekend ? 'Last close · nominal yield' : sign + (chg * 100).toFixed(1) + 'bp today');
+    setEl('risk-us10y-sub', srcNote);
     const usEl = document.getElementById('q-us10y');
-    const uscEl = document.getElementById('qc-us10y');
-    if (usEl) { usEl.textContent = y10.toFixed(2) + '%'; usEl.className = 'q-price ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
-    if (uscEl) { uscEl.textContent = pctStr(byId.us10y.pct); uscEl.className = 'q-chg ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
+    const uscEl = document.getElementById('q-us10y') && document.getElementById('qc-us10y');
+    const _usEl = document.getElementById('q-us10y');
+    const _uscEl = document.getElementById('qc-us10y');
+    if (_usEl) { _usEl.textContent = y10.toFixed(2) + '%'; _usEl.className = 'q-price ' + (chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat'); }
+    if (_uscEl) { _uscEl.textContent = byId.us10y.fromRepo ? '—' : pctStr(byId.us10y.pct); _uscEl.className = 'q-chg flat'; }
   } else {
     setEl('risk-us10y', '—');
     setEl('risk-us10y-sub', 'Nominal yield');
@@ -1970,14 +2003,23 @@ async function fetchRiskData() {
     const v = byId.us10y.close;
     const chg = byId.us10y.chg;
     setEl('rate-10y', v.toFixed(2) + '%');
-    setEl('rate-10y-chg', (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
+    setEl('rate-10y-chg', byId.us10y.fromRepo ? 'repo' : (chg >= 0 ? '+' : '') + (chg*100).toFixed(1) + 'bp', chg > 0 ? 'rate-chg up' : chg < 0 ? 'rate-chg down' : 'rate-chg flat');
   }
   // (rate-5y already set above)
   // 2Y: only approximate if we don't have real us2y data
-  if (!byId.us2y && byId.us3m && byId.us10y) {
-    const approx2y = byId.us3m.close * 0.3 + byId.us10y.close * 0.7;
+  if (!byId.us2y && byId.us10y) {
+    // Use 3M if available, else approximate 2Y ≈ 10Y - 14bp (typical curve shape)
+    const approx2y = byId.us3m
+      ? byId.us3m.close * 0.3 + byId.us10y.close * 0.7
+      : byId.us10y.close - 0.14;
     setEl('rate-2y', approx2y.toFixed(2) + '%');
-    setEl('rate-2y-chg', '—', 'rate-chg flat');
+    setEl('rate-2y-chg', '~est', 'rate-chg flat');
+  }
+  // 5Y: approximate from 10Y if not available
+  if (!byId.us5y && byId.us10y) {
+    const approx5y = byId.us10y.close - 0.08;
+    setEl('rate-5y', approx5y.toFixed(2) + '%');
+    setEl('rate-5y-chg', '~est', 'rate-chg flat');
   }
 
   // Draw yield curve
@@ -1994,7 +2036,7 @@ async function fetchRiskData() {
     byId.us30y  ? byId.us30y.close : STATIC_YIELDS[9],
   ];
 
-  drawYieldCurve(yields);
+  drawYieldCurveAndCache(yields);
 
   // Populate Risk Monitor spread signals table
   const spreadsTbody = document.getElementById('spreads-tbody');
@@ -2037,8 +2079,14 @@ async function fetchRiskData() {
   }
 }
 
-// Static fallback yield curve data
-const STATIC_YIELDS = [5.21, 5.18, 5.02, 4.71, 4.58, 4.44, 4.36, 4.28, 4.48, 4.41];
+// Static fallback yield curve data — updated to current market levels (Mar 2026)
+const STATIC_YIELDS = [4.35, 4.30, 4.25, 4.28, 4.30, 4.32, 4.36, 4.42, 4.52, 4.58];
+let _lastDrawnYields = STATIC_YIELDS;
+
+function drawYieldCurveAndCache(yields) {
+  _lastDrawnYields = yields || STATIC_YIELDS;
+  drawYieldCurve(_lastDrawnYields);
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // YIELD CURVE — canvas drawing, accepts optional live data
@@ -2078,7 +2126,7 @@ function drawYieldCurve(liveYields) {
     ctx.strokeStyle='#2a2e39'; ctx.lineWidth=0.5; ctx.setLineDash([2,4]);
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='right';
+    ctx.fillStyle='#9ba1ae'; ctx.font='bold 8.5px Courier New'; ctx.textAlign='right';
     ctx.fillText(v.toFixed(2), PAD_L-3, y+3);
   }
 
@@ -2107,13 +2155,13 @@ function drawYieldCurve(liveYields) {
     ctx.fillStyle='#2962ff'; ctx.fill();
   });
 
-  ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
+  ctx.fillStyle='#9ba1ae'; ctx.font='bold 8.5px Courier New'; ctx.textAlign='center';
   tenors.forEach((t,i) => ctx.fillText(t, px(i), H-5));
 
   ctx.textAlign='left';
-  ctx.fillStyle='#2962ff'; ctx.fillText('● Current', PAD_L, PAD_T-2);
-  ctx.fillStyle='#363c4e'; ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
-  ctx.fillStyle='#ef535066'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2);
+  ctx.fillStyle='#4d8ffa'; ctx.fillText('● Current', PAD_L, PAD_T-2);
+  ctx.fillStyle='#6b7280'; ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
+  ctx.fillStyle='#ef535099'; ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2);
 
   // Update yield spread table too
   const spread2_10 = yields[7] - yields[3];
@@ -2121,8 +2169,8 @@ function drawYieldCurve(liveYields) {
   setEl('ys-2-10-sig', spread2_10 < 0 ? 'Inverted' : 'Normal', spread2_10 < 0 ? 'down' : 'up');
 }
 
-setTimeout(() => drawYieldCurve(STATIC_YIELDS), 60);
-window.addEventListener('resize', () => drawYieldCurve(STATIC_YIELDS));
+setTimeout(() => drawYieldCurveAndCache(STATIC_YIELDS), 60);
+window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields));
 
 // ═══════════════════════════════════════════════════════════════════
 // FX LIQUIDITY CHART
@@ -2332,6 +2380,12 @@ async function fetchCrossAssetData() {
     const cEl = document.getElementById('cac-' + id);
     if (!vEl || !cEl) return;
     if (val == null) return;
+    if (chgPct == null) {
+      vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
+      vEl.className = 'ca-val flat';
+      cEl.textContent = 'repo'; cEl.className = 'ca-chg flat';
+      return;
+    }
     const cls = chgPct > 0.05 ? 'up' : chgPct < -0.05 ? 'down' : '';
     const sign = chgPct >= 0 ? '+' : '';
     vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
@@ -2341,7 +2395,7 @@ async function fetchCrossAssetData() {
   }
 
   // Fetch all in parallel
-  const [gold, wti, spx, us10y, de10y, dxy] = await Promise.all([
+  const [gold, wti, spx, _us10y, _de10y, dxy] = await Promise.all([
     stooq('xauusd'),
     stooq('cl.f'),
     stooq('^spx'),
@@ -2349,6 +2403,19 @@ async function fetchCrossAssetData() {
     stooq('10dey.b'),
     stooq('usdidx.fs'),
   ]);
+
+  // Fallback: repo extended-data for yields when stooq fails
+  let us10y = _us10y, de10y = _de10y;
+  if (!us10y || !de10y) {
+    try {
+      const [usdExt, eurExt] = await Promise.all([
+        !us10y ? fetch('./extended-data/USD.json').then(r=>r.json()).catch(()=>null) : Promise.resolve(null),
+        !de10y ? fetch('./extended-data/EUR.json').then(r=>r.json()).catch(()=>null) : Promise.resolve(null),
+      ]);
+      if (!us10y && usdExt?.data?.bond10y) us10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+      if (!de10y && eurExt?.data?.bond10y) de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+    } catch { /* skip */ }
+  }
 
   if (gold) {
     setCA('gold', gold.close, gold.pct, false);
@@ -2361,14 +2428,14 @@ async function fetchCrossAssetData() {
   if (wti)   setCA('wti',   wti.close,   wti.pct,   false);
   if (spx)   setCA('spx',   spx.close,   spx.pct,   false);
   if (us10y) {
-    setCA('us10y', us10y.close, us10y.pct, true);
+    setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true);
     // Also update topbar US10Y
     const uEl = document.getElementById('q-us10y');
     const ucEl = document.getElementById('qc-us10y');
-    if (uEl) { uEl.textContent = us10y.close.toFixed(2) + '%'; uEl.className = 'q-price ' + clsDir(us10y.chg); }
-    if (ucEl) { ucEl.textContent = pctStr(us10y.pct); ucEl.className = 'q-chg ' + clsDir(us10y.chg); }
+    if (uEl) { uEl.textContent = us10y.close.toFixed(2) + '%'; uEl.className = 'q-price ' + (us10y.fromRepo ? 'flat' : clsDir(us10y.chg)); }
+    if (ucEl) { ucEl.textContent = us10y.fromRepo ? 'repo' : pctStr(us10y.pct); ucEl.className = 'q-chg flat'; }
   }
-  if (de10y) setCA('de10y', de10y.close, de10y.pct, true);
+  if (de10y) setCA('de10y', de10y.close, de10y.fromRepo ? null : de10y.pct, true);
   if (dxy) {
     setCA('dxy', dxy.close, dxy.pct, false);
     // Also update topbar DXY
