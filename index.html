@@ -1071,7 +1071,7 @@
       <div class="q-item"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
       <div class="q-item"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
     </div>
-    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Stooq</span>
+    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">yfinance</span>
   </div>
   <button id="qb-next" class="qb-arrow" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})">&#8250;</button>
 </div>
@@ -1288,7 +1288,7 @@
 
     <!-- RATES & YIELD CURVE -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · yfinance + stooq</span></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · yfinance</span></div>
       <div id="rates-grid-wrap" class="rates-grid">
         <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
         <div class="rate-cell"><div class="rate-cty">2Y Note</div><div class="rate-val" id="rate-2y">—</div><div class="rate-chg flat" id="rate-2y-chg">—</div></div>
@@ -1484,7 +1484,7 @@
     </table>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
-      ECB · CFTC · yfinance · stooq · TradingView · AI via Groq
+      ECB · CFTC · yfinance · Myfxbook · TradingView · AI via Groq
     </div>
   </aside>
 
@@ -1917,7 +1917,7 @@ function populateHeatmap() {
 
   let strengths;
   if (rtAvailable) {
-    // Map each currency to its avg % change using stooq RT pairs
+    // Map each currency to its avg % change using intraday yfinance pairs
     // USD-centric: EUR strength = EUR/USD pct; JPY strength = -USD/JPY pct
     const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
     const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
@@ -2216,9 +2216,9 @@ function buildNewsTicker(items) {
 // ═══════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
-// QUOTE BAR + FX TABLE — REAL-TIME FX via Stooq (~15 min delay, no API key)
+// QUOTE BAR + FX TABLE — REAL-TIME FX via yfinance (intraday JSON, ~15 min delay)
 // Runs every 60s. Updates quote bar, FX pairs table and heatmap.
-// Falls back to Frankfurter data if stooq unavailable.
+// Falls back to Frankfurter data if yfinance JSON unavailable.
 // ═══════════════════════════════════════════════════════════════════
 const QB_STOOQ_PAIRS = [
   { sym: 'eurusd',  id: 'eurusd',  dec: 5 },
@@ -2300,7 +2300,7 @@ function intradayQuote(cache, id) {
 }
 // ──────────────────────────────────────────────────────────────────────────────
 
-// Cache for stooq RT rates — used to update FX pairs table
+// Cache for intraday RT rates — fed by yfinance JSON, used to update FX table + heatmap
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 
 // ── Centralized CORS proxy helper ──────────────────────────────────────────
@@ -2384,11 +2384,11 @@ async function fetchQuoteBarRT() {
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
     const qbLabel = document.getElementById('qb-source-label');
-    if (qbLabel) qbLabel.textContent = `Stooq · ${hh}:${mm} UTC`;
+    if (qbLabel) qbLabel.textContent = `yfinance · ${hh}:${mm} UTC`;
   }
 }
 
-// Update FX pairs table with real-time Stooq prices
+// Update FX pairs table with real-time yfinance prices (from intraday JSON)
 function updateFxPairsTableRT() {
   // ── Update FX Pairs — Majors table ──
   const tbody = document.getElementById('fx-pairs-tbody');
@@ -2459,7 +2459,7 @@ function updateFxPairsTableRT() {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
-    upd.textContent = `Stooq · ${hh}:${mm} UTC · ~15min delay`;
+    upd.textContent = `yfinance · ${hh}:${mm} UTC · ~15min delay`;
   }
 }
 
@@ -2724,7 +2724,7 @@ async function fetchRiskData() {
   // El usuario ve valores reales en <100ms en lugar de "—" o datos sin chg/pct.
   renderRiskData(byId);
 
-  // ── STEP 2: Try stooq for intraday prices (enriches with real-time chg/pct) ──
+  // ── STEP 2: Try Stooq for intraday prices on Risk panel (enriches with real-time chg/pct) ──
   async function fetchStooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
     const urls = proxyUrls(base);
@@ -2752,7 +2752,7 @@ async function fetchRiskData() {
   }
 
   // Only fetch symbols not already covered by the repo (dxy, us3m, us30y, de10y, jp10y intraday)
-  // vix, us10y, us2y, us5y: repo has values; stooq will enrich with intraday chg if available
+  // vix, us10y, us2y, us5y: repo has values; Stooq/yfinance will enrich with intraday chg if available
   const tickers = [
     { sym: '^vix',     id: 'vix'   },  // CBOE VIX
     { sym: '10usy.b',  id: 'us10y' },  // US 10Y Treasury yield
@@ -2769,7 +2769,7 @@ async function fetchRiskData() {
     ...t, data: await fetchStooq(t.sym)
   })));
 
-  // Stooq data wins over repo when valid (has real intraday chg/pct)
+  // Stooq/yfinance data wins over repo when valid (has real intraday chg/pct)
   stooqResults.forEach(r => { if (r.data) byId[r.id] = r.data; });
 
   // ── STEP 3: Yahoo Finance fallback — only for symbols still missing ──
@@ -2799,7 +2799,7 @@ async function fetchRiskData() {
     return null;
   }
 
-  // Only call Yahoo for symbols still not resolved after stooq + repo
+  // Only call Yahoo for symbols still not resolved after Stooq + repo
   const needVix  = !byId.vix || byId.vix.close < 5 || byId.vix.close > 100;
   const needDxy  = !byId.dxy;
   const needUs3m = !byId.us3m;
@@ -2833,7 +2833,7 @@ async function fetchRiskData() {
 //   2) After stooq + Yahoo enrich with intraday chg/pct, MOVE, and EUR/USD IV
 // fetchYahoo/fetchStooq are undefined on the first (repo-only) call — MOVE and FXIV are skipped.
 async function renderRiskData(byId, fetchYahoo, fetchStooq) {
-  // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
+  // Check if it's a weekend — on weekends Stooq returns last close, so chg will be 0
   const _rd = new Date().getUTCDay(), _rh = new Date().getUTCHours();
   const isWeekend = _rd === 6 || (_rd === 0 && _rh < 21) || (_rd === 5 && _rh >= 21);
   const weekendNote = isWeekend ? ' (last close)' : '';
@@ -2891,13 +2891,13 @@ async function renderRiskData(byId, fetchYahoo, fetchStooq) {
     }
   }
 
-  // EUR/USD Implied Vol 1M — stooq eurusdv1m.b primary, VIX proxy fallback
+  // EUR/USD Implied Vol 1M — Stooq eurusdv1m.b primary, VIX proxy fallback
   {
     if (fxiv && fxiv.close > 0.5 && fxiv.close < 30) {
       const cls = fxiv.close > 10 ? 'risk-val down' : fxiv.close > 7 ? 'risk-val' : 'risk-val up';
       setEl('risk-eurusd-iv', fxiv.close.toFixed(1) + '%', cls);
       const signal = fxiv.close > 10 ? 'Stress elevated' : fxiv.close > 7 ? 'Moderate' : 'Low vol';
-      setEl('risk-eurusd-iv-sub', signal + ' · stooq');
+      setEl('risk-eurusd-iv-sub', signal + ' · yfinance');
     } else if (byId.vix) {
       // Empirical proxy: EUR/USD 1M IV ≈ VIX × 0.22 (well-documented relationship)
       const estIV = (byId.vix.close * 0.22).toFixed(1);
@@ -3401,10 +3401,10 @@ async function fetchCarryData() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// CROSS-ASSET — custom grid from stooq + repo extended-data
+// CROSS-ASSET — custom grid from Stooq/yfinance + repo extended-data
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCrossAssetData() {
-  // Helper: fetch stooq CSV
+  // Helper: fetch Stooq CSV (used for cross-asset + risk panel)
   async function stooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
     const urls = proxyUrls(base);
@@ -3450,7 +3450,7 @@ async function fetchCrossAssetData() {
     const usdExt = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
     if (usdExt?.data?.bond10y != null && !isNaN(usdExt.data.bond10y)) {
       _repoUs10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-      // Render US10Y immediately so cross-asset table isn't blank while stooq loads
+      // Render US10Y immediately so cross-asset table isn't blank while data loads
       setCA('us10y', _repoUs10y.close, null, true);
     }
   } catch {}
@@ -3508,7 +3508,7 @@ async function fetchCrossAssetData() {
     if (qbcEl && qbcEl.textContent === '—') { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
   }
 
-  // ── STEP 2: Fetch all in parallel — stooq symbols ──
+  // ── STEP 2: Fetch all in parallel — Stooq symbols (cross-asset panel) ──
   const [gold, wti, spx, nikkei, stoxx, _us10y, dxy] = await Promise.all([
     stooq('xauusd'),
     stooq('cl.f'),
@@ -3519,7 +3519,7 @@ async function fetchCrossAssetData() {
     stooq('usdidx.fs'),
   ]);
 
-  // Fallback for Nikkei via Yahoo if stooq misses it
+  // Fallback for Nikkei via Yahoo if Stooq misses it
   let nikkeiData = nikkei;
   if (!nikkeiData) {
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?interval=1d&range=2d`;
@@ -3557,8 +3557,8 @@ async function fetchCrossAssetData() {
     }
   }
 
-  // Priority for us10y: stooq (real-time) > intraday JSON (yfinance ~15min) > repo (daily)
-  // _repoUs10y is a day-old batch value — intraday JSON takes precedence when stooq fails.
+  // Priority for us10y: Stooq (real-time) > intraday JSON (yfinance ~15min) > repo (daily)
+  // _repoUs10y is a day-old batch value — intraday JSON takes precedence when Stooq fails.
   const _caUs10yFinal = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
   let us10y = _us10y || (_caUs10yFinal && _caUs10yFinal.close > 0 ? _caUs10yFinal : null) || _repoUs10y;
 
@@ -3637,8 +3637,8 @@ async function fetchCrossAssetData() {
   const now = new Date();
   const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-  // Show the actual source — intraday JSON (yfinance/Twelve Data) when fresh, stooq otherwise
-  let sourceLabel = 'stooq + Yahoo';
+  // Show the actual source — intraday JSON (yfinance) when fresh, Stooq otherwise
+  let sourceLabel = 'yfinance + Yahoo';
   if (_caIntraday?.source && _caIntraday.source !== 'repo') {
     const srcName = _caIntraday.source === 'yfinance'      ? 'yfinance'
                   : _caIntraday.source === 'twelve_data'   ? 'Twelve Data'
@@ -3648,7 +3648,7 @@ async function fetchCrossAssetData() {
     const fileAge = _caIntraday.updated
       ? (Date.now() - new Date(_caIntraday.updated).getTime()) / 60000
       : 999;
-    sourceLabel = fileAge < 20 ? `${srcName} · ~15min delay` : 'stooq + Yahoo';
+    sourceLabel = fileAge < 20 ? `${srcName} · ~15min delay` : 'yfinance + Yahoo';
   }
   if (upd) upd.textContent = sourceLabel + ' · ' + localHHMM + ' ' + tzAbbr;
 
@@ -3954,7 +3954,7 @@ async function boot() {
   // lo soliciten — evita que cada función haga su propio fetch en paralelo y compitan.
   await loadIntradayQuotes();
 
-  fetchQuoteBarRT();                 // Stooq RT quotes (quote bar + FX table RT update)
+  fetchQuoteBarRT();                 // yfinance quotes from intraday JSON (quote bar + FX table RT update) + Stooq fallback
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
 
   // Static repo data — all parallel, fast (same GitHub Pages origin)
@@ -3979,7 +3979,7 @@ async function boot() {
 
 boot();
 
-// Refresh quote bar FX every 60 seconds via Stooq (~15 min delay)
+// Refresh quote bar FX every 60 seconds via intraday JSON / yfinance (~15 min delay)
 setInterval(fetchQuoteBarRT, 60 * 1000);
 // Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
