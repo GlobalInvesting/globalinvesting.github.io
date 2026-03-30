@@ -280,7 +280,7 @@
   }
   .ticker-track {
     display: flex; align-items: center;
-    animation: ticker-scroll 120s linear infinite; white-space: nowrap;
+    white-space: nowrap; /* animation injected dynamically by buildNewsTicker() */
   }
   .ticker-track:hover { animation-play-state: paused; }
   .ticker-item {
@@ -292,7 +292,7 @@
   .ticker-item .t-cur { color: var(--orange); font-weight: 700; font-size: 9px; }
   .t-up   { color: var(--up); }
   .t-down { color: var(--down); }
-  @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  /* @keyframes ticker-scroll removed — replaced by JS-injected ticker-exact keyframe */
 
   /* ── LAYOUT ── */
   #layout {
@@ -1118,6 +1118,11 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
           <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
           <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;padding:0 1px;">
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(41,98,255,0.35);border-radius:1px;"></span>Tokyo</span>
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>London</span>
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>New York</span>
         </div>
       </div>
     </div>
@@ -2200,22 +2205,57 @@ function buildNewsTicker(items) {
   const track = document.getElementById('ticker-track');
   if (!track || !items.length) return;
 
-  const tickerItems = [...items.slice(0,12), ...items.slice(0,12)].map(item => {
+  // Use up to 15 items; duplicate for seamless infinite loop
+  const src = items.slice(0, 15);
+  const makeItem = item => {
     const cur   = item.cur || item.currency || '';
     const title = item.title || '';
-    // truncate long headlines
-    const short = title.length > 90 ? title.slice(0,87) + '…' : title;
-    return `<span class="ticker-item">${cur ? `<span class="t-tag">${cur}</span> · ` : ''}${short}</span>`;
-  });
+    const short = title.length > 90 ? title.slice(0, 87) + '\u2026' : title;
+    return '<span class="ticker-item">' + (cur ? '<span class="t-tag">' + cur + '</span> \u00b7 ' : '') + short + '</span>';
+  };
 
-  track.innerHTML = tickerItems.join('');
+  // Render set A + identical set B side by side.
+  // Animation scrolls exactly one full set-A width, then resets invisibly.
+  track.innerHTML = src.map(makeItem).join('') + src.map(makeItem).join('');
 
-  // Recalculate animation duration based on content width
+  // Reset any running animation first
+  track.style.animation = 'none';
+  track.style.transform = 'translateX(0)';
+
+  // Double rAF ensures the browser has laid out the new innerHTML before we measure
   requestAnimationFrame(() => {
-    const contentW = track.scrollWidth / 2; // half because we duplicated
-    const speed = 80; // px per second
-    const duration = Math.max(40, contentW / speed);
-    track.style.animationDuration = duration + 's';
+    requestAnimationFrame(() => {
+      const halfW = track.scrollWidth / 2;
+      if (!halfW) return;
+
+      const speed    = 80;  // px/s — increase to go faster
+      const duration = Math.max(30, halfW / speed);
+
+      // Inject a pixel-exact keyframe so the loop jump is invisible
+      const styleId = 'ticker-kf-style';
+      let styleEl = document.getElementById(styleId);
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent =
+        '@keyframes ticker-exact {' +
+        '  0%   { transform: translateX(0); }' +
+        '  100% { transform: translateX(-' + halfW + 'px); }' +
+        '}';
+
+      track.style.animation = 'ticker-exact ' + duration + 's linear infinite';
+
+      // Re-measure on container resize (e.g. sidebar toggle)
+      if (window._tickerRO) window._tickerRO.disconnect();
+      window._tickerRO = new ResizeObserver(() => {
+        const newHalf = track.scrollWidth / 2;
+        if (!newHalf || Math.abs(newHalf - halfW) < 2) return;
+        buildNewsTicker(items);
+      });
+      window._tickerRO.observe(track.parentElement);
+    });
   });
 }
 
@@ -2260,23 +2300,24 @@ const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 // ── Centralized CORS proxy helper ──────────────────────────────────────────
 // Returns an ordered list of proxy URLs for a given target URL.
 // Proxies are tried in order; first success wins.
-// NOTE: thingproxy.freeboard.io removed — DNS no longer resolves (ERR_NAME_NOT_RESOLVED).
+// REMOVED: thingproxy.freeboard.io — DNS no longer resolves (ERR_NAME_NOT_RESOLVED).
+// REMOVED: allorigins from stooq list — returns 400/429 for stooq CSV URLs.
 function proxyUrls(targetUrl) {
   const enc = encodeURIComponent(targetUrl);
   return [
     `https://corsproxy.io/?${enc}`,
-    `https://api.allorigins.win/raw?url=${enc}`,
     `https://api.codetabs.com/v1/proxy?quest=${enc}`,
     targetUrl, // direct fallback
   ];
 }
 
-// Same but for Yahoo Finance — allorigins handles JSON wrapping better
+// Yahoo Finance proxy list.
+// REMOVED: corsproxy.io — returns 404 for ^-prefixed Yahoo symbols (^VIX, ^TNX, ^MOVE, etc.)
+// allorigins handles Yahoo JSON wrapping correctly; kept as primary.
 function proxyUrlsYahoo(targetUrl) {
   const enc = encodeURIComponent(targetUrl);
   return [
     `https://api.allorigins.win/raw?url=${enc}`,
-    `https://corsproxy.io/?${enc}`,
     `https://api.codetabs.com/v1/proxy?quest=${enc}`,
   ];
 }
@@ -3949,7 +3990,15 @@ function drawLiquidityChart() {
 
   // Session bands
   if (!isWeekend) {
-    [{start:0,end:9,color:'rgba(41,98,255,0.06)'},{start:16,end:25,color:'rgba(38,166,154,0.08)'}].forEach(s => {
+    // Session bands: start/end in half-hour slots (0=00:00 UTC, 18=09:00 UTC, etc.)
+    // Tokyo 00:00-09:00 UTC = slots 0-18 (blue)
+    // London 08:00-17:00 UTC = slots 16-34 (teal)
+    // NY 13:00-22:00 UTC = slots 26-44 (amber)
+    [
+      {start:0,  end:18, color:'rgba(41,98,255,0.07)'},
+      {start:16, end:34, color:'rgba(38,166,154,0.08)'},
+      {start:26, end:44, color:'rgba(246,148,28,0.06)'}
+    ].forEach(s => {
       ctx.fillStyle=s.color;
       ctx.fillRect(PAD_L+(s.start/48)*cW, PAD_T, (Math.min(s.end,48)-s.start)/48*cW, cH);
     });
@@ -4009,6 +4058,21 @@ function drawLiquidityChart() {
   // Hour labels
   ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
   ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
+
+  // Session name labels inside bands (only on weekday)
+  if (!isWeekend) {
+    const sessionLabels = [
+      { label:'TYO', slotMid:9,  color:'rgba(41,98,255,0.55)'   },  // Tokyo  00:00-09:00 midpoint=04:30 → slot 9
+      { label:'LON', slotMid:25, color:'rgba(38,166,154,0.55)'  },  // London 08:00-17:00 midpoint=12:30 → slot 25
+      { label:'NY',  slotMid:35, color:'rgba(246,148,28,0.55)'  },  // NY     13:00-22:00 midpoint=17:30 → slot 35
+    ];
+    ctx.font = '7px Courier New'; ctx.textAlign = 'center';
+    sessionLabels.forEach(sl => {
+      const x = PAD_L + (sl.slotMid / 48) * cW;
+      ctx.fillStyle = sl.color;
+      ctx.fillText(sl.label, x, PAD_T + 9);
+    });
+  }
 
   // Bottom labels
   const now = new Date();
