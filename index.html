@@ -4059,20 +4059,6 @@ function drawLiquidityChart() {
   ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
   ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
 
-  // Session name labels inside bands (only on weekday)
-  if (!isWeekend) {
-    const sessionLabels = [
-      { label:'TYO', slotMid:9,  color:'rgba(41,98,255,0.55)'   },  // Tokyo  00:00-09:00 midpoint=04:30 → slot 9
-      { label:'LON', slotMid:25, color:'rgba(38,166,154,0.55)'  },  // London 08:00-17:00 midpoint=12:30 → slot 25
-      { label:'NY',  slotMid:35, color:'rgba(246,148,28,0.55)'  },  // NY     13:00-22:00 midpoint=17:30 → slot 35
-    ];
-    ctx.font = '7px Courier New'; ctx.textAlign = 'center';
-    sessionLabels.forEach(sl => {
-      const x = PAD_L + (sl.slotMid / 48) * cW;
-      ctx.fillStyle = sl.color;
-      ctx.fillText(sl.label, x, PAD_T + 9);
-    });
-  }
 
   // Bottom labels
   const now = new Date();
