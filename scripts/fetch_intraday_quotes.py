@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.1 — Intraday quotes via yfinance
+fetch_intraday_quotes.py  v2.2 — Intraday quotes via yfinance (+ FX pairs)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -20,6 +20,7 @@ FUENTES POR SÍMBOLO:
   US30Y   → yfinance  ^TYX          (US 30Y Treasury yield)
   MOVE    → yfinance  ^MOVE         (ICE BofA Bond Volatility Index)
   BTC     → yfinance  BTC-USD       (Bitcoin)
+  FX pairs→ yfinance  EURUSD=X etc  (21 pares — reemplaza Stooq bloqueado por CORS)
 
 Por qué yfinance y no Twelve Data/Alpha Vantage:
   • yfinance funciona server-side en GitHub Actions sin CORS ni proxies
@@ -69,6 +70,29 @@ YFINANCE_SYMBOLS = {
     # Risk panel — bond vol + crypto
     "move":   "^MOVE",    # ICE BofA MOVE Index (bond market volatility)
     "btc":    "BTC-USD",  # Bitcoin — topbar + cross-asset panel
+    # FX Majors — reemplazan Stooq (bloqueado por CORS) como fuente para heatmap + quote bar
+    "eurusd": "EURUSD=X",
+    "gbpusd": "GBPUSD=X",
+    "usdjpy": "JPY=X",
+    "audusd": "AUDUSD=X",
+    "usdchf": "CHF=X",
+    "usdcad": "CAD=X",
+    "nzdusd": "NZDUSD=X",
+    # FX Crosses
+    "eurgbp": "EURGBP=X",
+    "eurjpy": "EURJPY=X",
+    "eurchf": "EURCHF=X",
+    "eurcad": "EURCAD=X",
+    "euraud": "EURAUD=X",
+    "gbpjpy": "GBPJPY=X",
+    "gbpchf": "GBPCHF=X",
+    "gbpcad": "GBPCAD=X",
+    "audjpy": "AUDJPY=X",
+    "audnzd": "AUDNZD=X",
+    "audchf": "AUDCHF=X",
+    "cadjpy": "CADJPY=X",
+    "chfjpy": "CHFJPY=X",
+    "nzdjpy": "NZDJPY=X",
 }
 
 # Yields que Yahoo devuelve ×10 (^TNX=43.42 significa 4.342%) — dividir por 10
@@ -91,6 +115,28 @@ VALIDATORS = {
     "us30y":  lambda v: 0 < v < 20,
     "move":   lambda v: 10 < v < 400,
     "btc":    lambda v: v > 1000,
+    # FX pairs
+    "eurusd": lambda v: 0.8 < v < 1.6,
+    "gbpusd": lambda v: 0.9 < v < 2.0,
+    "usdjpy": lambda v: 80 < v < 200,
+    "audusd": lambda v: 0.4 < v < 1.2,
+    "usdchf": lambda v: 0.5 < v < 1.5,
+    "usdcad": lambda v: 0.9 < v < 1.8,
+    "nzdusd": lambda v: 0.3 < v < 1.0,
+    "eurgbp": lambda v: 0.6 < v < 1.0,
+    "eurjpy": lambda v: 100 < v < 200,
+    "eurchf": lambda v: 0.8 < v < 1.5,
+    "eurcad": lambda v: 1.0 < v < 2.0,
+    "euraud": lambda v: 1.0 < v < 2.5,
+    "gbpjpy": lambda v: 100 < v < 250,
+    "gbpchf": lambda v: 0.8 < v < 1.8,
+    "gbpcad": lambda v: 1.0 < v < 2.5,
+    "audjpy": lambda v: 50 < v < 120,
+    "audnzd": lambda v: 0.8 < v < 1.5,
+    "audchf": lambda v: 0.4 < v < 1.0,
+    "cadjpy": lambda v: 60 < v < 130,
+    "chfjpy": lambda v: 100 < v < 220,
+    "nzdjpy": lambda v: 40 < v < 110,
 }
 
 
@@ -203,7 +249,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.1  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.2  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
