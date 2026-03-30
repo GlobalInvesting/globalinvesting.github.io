@@ -1163,9 +1163,9 @@
           {
             "allow_symbol_change": false,
             "calendar": false,
-            "details": false,
+            "details": true,
             "hide_side_toolbar": true,
-            "hide_top_toolbar": true,
+            "hide_top_toolbar": false,
             "hide_legend": false,
             "hide_volume": true,
             "hotlist": false,
@@ -3116,8 +3116,8 @@ document.querySelectorAll('.tv-tab').forEach(tab => {
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     script.async = true;
     script.text = JSON.stringify({
-      allow_symbol_change:false, calendar:false, details:false,
-      hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:true,
+      allow_symbol_change:false, calendar:false, details:true,
+      hide_side_toolbar:true, hide_top_toolbar:false, hide_legend:false,
       hide_volume:true, interval:'D', locale:'en', save_image:false,
       style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
       backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
