@@ -2735,19 +2735,26 @@ async function fetchRiskData() {
     if (jpyExt?.data?.bond10y != null) byId.jp10y = { close: jpyExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
   } catch {}
 
-  // Render immediately with repo data so the page shows values without waiting for external APIs
-  renderRiskData(byId);
-
-  // ── STEP 1.5: Load intraday quotes JSON (GitHub Action — Twelve Data + AV) ──
-  // This is the new primary source for intraday data. Overwrites repo values for
-  // vix, us10y, dxy. Stooq/Yahoo below will still run but only fill remaining gaps.
+  // ── STEP 1.5: Load intraday quotes JSON (GitHub Action — yfinance) ──
+  // Same-origin fetch — instantáneo si boot() ya lo pre-cargó (caché 90s).
+  // Enriquece byId con datos intraday frescos ANTES del primer render.
   const _intradayData = await loadIntradayQuotes();
   if (_intradayData) {
     const _iq = (id) => intradayQuote(_intradayData, id);
-    if (_iq('vix'))   { const q = _iq('vix');   if (q.close > 5 && q.close < 100) byId.vix   = q; }
-    if (_iq('us10y')) { const q = _iq('us10y'); if (q.close > 0)                  byId.us10y = q; }
-    if (_iq('dxy'))   { const q = _iq('dxy');   if (q.close > 50 && q.close < 130) byId.dxy  = q; }
+    const _set = (id, guard) => { const q = _iq(id); if (q && guard(q.close)) byId[id] = q; };
+    _set('vix',   v => v > 5 && v < 100);
+    _set('us10y', v => v > 0 && v < 20);
+    _set('us2y',  v => v > 0 && v < 20);
+    _set('us5y',  v => v > 0 && v < 20);
+    _set('us30y', v => v > 0 && v < 20);
+    _set('dxy',   v => v > 50 && v < 130);
+    // MOVE — guardado en byId para usarlo en renderRiskData si Yahoo falla
+    _set('move',  v => v > 10 && v < 400);
   }
+
+  // Render con repo + intraday JSON antes de esperar stooq/Yahoo.
+  // El usuario ve valores reales en <100ms en lugar de "—" o datos sin chg/pct.
+  renderRiskData(byId);
 
   // ── STEP 2: Try stooq for intraday prices (enriches with real-time chg/pct) ──
   async function fetchStooq(sym) {
@@ -2881,11 +2888,17 @@ async function renderRiskData(byId, fetchYahoo, fetchStooq) {
 
   // MOVE + EUR/USD IV — only available via external APIs; skip on repo-only (first) render pass
   let move = null, fxiv = null;
+  // MOVE: try intraday JSON first (yfinance ^MOVE via GitHub Action), then Yahoo fallback
+  if (byId.move && byId.move.close > 10) {
+    move = byId.move;
+  }
   if (typeof fetchYahoo === 'function' && typeof fetchStooq === 'function') {
-    [move, fxiv] = await Promise.all([
-      fetchYahoo('%5EMOVE'),
+    const [yMove, yFxiv] = await Promise.all([
+      move ? Promise.resolve(null) : fetchYahoo('%5EMOVE'),
       fetchStooq('eurusdv1m.b'),
     ]);
+    if (!move && yMove) move = yMove;
+    fxiv = yFxiv;
   }
 
   // MOVE Index — ^MOVE on Yahoo (ICE BofA bond volatility index)
@@ -3466,6 +3479,36 @@ async function fetchCrossAssetData() {
   let _caStoxx  = _caIntraday ? intradayQuote(_caIntraday, 'stoxx')  : null;
   let _caDxy    = _caIntraday ? intradayQuote(_caIntraday, 'dxy')    : null;
 
+  // Render inmediato con JSON intraday — el usuario ve valores en <100ms.
+  // Stooq en Step 2 sobreescribirá si tiene datos más frescos.
+  if (_caSpx)    setCA('spx',    _caSpx.close,    _caSpx.pct,    false);
+  if (_caGold) {
+    setCA('gold', _caGold.close, _caGold.pct, false);
+    const gEl = document.getElementById('q-xauusd'), gcEl = document.getElementById('qc-xauusd');
+    if (gEl)  { gEl.textContent  = _caGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className  = 'q-price ' + clsDir(_caGold.chg); }
+    if (gcEl) { gcEl.textContent = pctStr(_caGold.pct); gcEl.className = 'q-chg '   + clsDir(_caGold.chg); }
+  }
+  if (_caWti)    setCA('wti',    _caWti.close,    _caWti.pct,    false);
+  if (_caNikkei) setCA('nikkei', _caNikkei.close, _caNikkei.pct, false);
+  if (_caStoxx)  setCA('stoxx',  _caStoxx.close,  _caStoxx.pct,  false);
+  if (_caDxy) {
+    setCA('dxy', _caDxy.close, _caDxy.pct, false);
+    const dEl = document.getElementById('q-dxy'), dcEl = document.getElementById('qc-dxy');
+    if (dEl)  { dEl.textContent  = _caDxy.close.toFixed(1); dEl.className  = 'q-price ' + clsDir(_caDxy.chg); }
+    if (dcEl) { dcEl.textContent = pctStr(_caDxy.pct);      dcEl.className = 'q-chg '   + clsDir(_caDxy.chg); }
+  }
+  // BTC inmediato desde JSON
+  const _caBtcEarly = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
+  if (_caBtcEarly) {
+    const btcFmtE = _caBtcEarly.close.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+    const bEl = document.getElementById('ca-btc'), bcEl = document.getElementById('cac-btc');
+    const qbEl = document.getElementById('q-btcusd'), qbcEl = document.getElementById('qc-btcusd');
+    if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val '  + clsDir(_caBtcEarly.chg); }
+    if (bcEl) { bcEl.textContent = pctStr(_caBtcEarly.pct); bcEl.className = 'ca-chg ' + clsDir(_caBtcEarly.chg); }
+    if (qbEl && qbEl.textContent === '—')  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
+    if (qbcEl && qbcEl.textContent === '—') { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
+  }
+
   // ── STEP 2: Fetch all in parallel — stooq symbols ──
   const [gold, wti, spx, nikkei, stoxx, _us10y, dxy] = await Promise.all([
     stooq('xauusd'),
@@ -3570,12 +3613,24 @@ async function fetchCrossAssetData() {
     if (dcEl) { dcEl.textContent = pctStr(dxyData.pct); dcEl.className = 'q-chg ' + clsDir(dxyData.chg); }
   }
 
-  // BTC — from CoinGecko cache (topbar q-btcusd)
+  // BTC — intraday JSON (yfinance BTC-USD) primary, CoinGecko topbar cache fallback
   const btcEl = document.getElementById('ca-btc');
   const btcCEl = document.getElementById('cac-btc');
   const qBtc = document.getElementById('q-btcusd');
   const qBtcC = document.getElementById('qc-btcusd');
-  if (btcEl && qBtc && qBtc.textContent !== '—') {
+  const _btcIntraday = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
+  if (_btcIntraday && btcEl) {
+    const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    btcEl.textContent  = btcFmt;
+    btcEl.className    = 'ca-val ' + clsDir(_btcIntraday.chg);
+    if (btcCEl) { btcCEl.textContent = pctStr(_btcIntraday.pct); btcCEl.className = 'ca-chg ' + clsDir(_btcIntraday.chg); }
+    // Also update topbar q-btcusd if still showing —
+    if (qBtc && qBtc.textContent === '—') {
+      qBtc.textContent  = btcFmt;
+      qBtc.className    = 'q-price ' + clsDir(_btcIntraday.chg);
+      if (qBtcC) { qBtcC.textContent = pctStr(_btcIntraday.pct); qBtcC.className = 'q-chg ' + clsDir(_btcIntraday.chg); }
+    }
+  } else if (btcEl && qBtc && qBtc.textContent !== '—') {
     btcEl.textContent = qBtc.textContent;
     btcEl.className = qBtc.className.replace('q-price', 'ca-val');
     if (btcCEl && qBtcC) { btcCEl.textContent = qBtcC.textContent; btcCEl.className = qBtcC.className.replace('q-chg', 'ca-chg'); }
@@ -3894,6 +3949,12 @@ async function boot() {
   await fetchFrankfurter();          // ECB rates → populates STATE.rates for FX table
 
   // PHASE 2: Parallel — all remaining data loads simultaneously
+
+  // Pre-cargar intraday JSON ahora (same-origin, ~0ms) para que fetchRiskData
+  // y fetchCrossAssetData lo encuentren en caché cuando lo necesiten.
+  // Sin await — se resuelve en paralelo; el caché de 90s garantiza que no se vuelve a pedir.
+  loadIntradayQuotes();
+
   fetchQuoteBarRT();                 // Stooq RT quotes (quote bar + FX table RT update)
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
 
