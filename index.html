@@ -3640,10 +3640,11 @@ async function fetchCrossAssetData() {
   const now = new Date();
   const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-  // Show the actual source — intraday JSON (Twelve Data) when fresh, stooq otherwise
+  // Show the actual source — intraday JSON (yfinance/Twelve Data) when fresh, stooq otherwise
   let sourceLabel = 'stooq + Yahoo';
   if (_caIntraday?.source && _caIntraday.source !== 'repo') {
-    const srcName = _caIntraday.source === 'twelve_data' ? 'Twelve Data'
+    const srcName = _caIntraday.source === 'yfinance'      ? 'yfinance'
+                  : _caIntraday.source === 'twelve_data'   ? 'Twelve Data'
                   : _caIntraday.source === 'alpha_vantage' ? 'Alpha Vantage'
                   : 'mixed APIs';
     // Check if the file is fresh (under 20 min old)
@@ -3952,8 +3953,9 @@ async function boot() {
 
   // Pre-cargar intraday JSON ahora (same-origin, ~0ms) para que fetchRiskData
   // y fetchCrossAssetData lo encuentren en caché cuando lo necesiten.
-  // Sin await — se resuelve en paralelo; el caché de 90s garantiza que no se vuelve a pedir.
-  loadIntradayQuotes();
+  // await garantiza que el JSON esté listo ANTES de que fetchRiskData/fetchCrossAssetData
+  // lo soliciten — evita que cada función haga su propio fetch en paralelo y compitan.
+  await loadIntradayQuotes();
 
   fetchQuoteBarRT();                 // Stooq RT quotes (quote bar + FX table RT update)
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
