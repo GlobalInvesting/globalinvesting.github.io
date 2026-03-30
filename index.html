@@ -2233,33 +2233,67 @@ async function fetchQuoteBarRT() {
 
 // Update FX pairs table with real-time Stooq prices
 function updateFxPairsTableRT() {
+  // ── Update FX Pairs — Majors table ──
   const tbody = document.getElementById('fx-pairs-tbody');
-  if (!tbody) return;
-  const rows = tbody.querySelectorAll('tr');
-  rows.forEach(row => {
-    const symCell = row.querySelector('td.sym');
-    if (!symCell) return;
-    const symText = symCell.textContent.trim(); // e.g. "EUR/USD"
-    const pairId = symText.replace('/', '').toLowerCase(); // "eurusd"
-    const data = STOOQ_RT_CACHE[pairId];
+  if (tbody) {
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const symCell = row.querySelector('td.sym');
+      if (!symCell) return;
+      const symText = symCell.textContent.trim();
+      const pairId = symText.replace('/', '').toLowerCase();
+      const data = STOOQ_RT_CACHE[pairId];
+      if (!data) return;
+      const pairCfg = PAIRS.find(p => p.id === pairId);
+      if (!pairCfg) return;
+      const tds = row.querySelectorAll('td');
+      if (tds.length < 6) return;
+      const pipVal = pairCfg.dec === 3 ? 0.01 : 0.0001;
+      const spreadPips = TYPICAL_SPREADS[pairId] || 0.5;
+      const halfSpread = spreadPips * pipVal / 2;
+      tds[1].textContent = fmt(data.close - halfSpread, pairCfg.dec);
+      tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
+      tds[4].textContent = pctStr(data.pct);
+      tds[4].className   = clsDir(data.pct);
+    });
+  }
+
+  // ── Update Crosses sidebar from the same RT cache ──
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy'];
+  crossIds.forEach(id => {
+    const data = STOOQ_RT_CACHE[id];
     if (!data) return;
-    const pairCfg = PAIRS.find(p => p.id === pairId);
+    const pairCfg = PAIRS.find(p => p.id === id);
     if (!pairCfg) return;
-
-    // Columns: sym(0), bid(1), ask(2), spread(3), 1D%(4), 1W%(5), iv(6), H(7), L(8)
-    const tds = row.querySelectorAll('td');
-    if (tds.length < 6) return;
-
-    const pipVal = pairCfg.dec === 3 ? 0.01 : 0.0001;
-    const spreadPips = TYPICAL_SPREADS[pairId] || 0.5;
-    const halfSpread = spreadPips * pipVal / 2;
-
-    tds[1].textContent = fmt(data.close - halfSpread, pairCfg.dec);
-    tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
-    tds[4].textContent = pctStr(data.pct);
-    tds[4].className   = clsDir(data.pct);
+    const priceEl = document.getElementById('sb-' + id);
+    const chgEl   = document.getElementById('sbc-' + id);
+    if (priceEl) {
+      priceEl.textContent = fmt(data.close, pairCfg.dec);
+      priceEl.className = 'sb-price ' + clsDir(data.pct);
+    }
+    if (chgEl) {
+      chgEl.textContent = pctStr(data.pct);
+      chgEl.className = 'sb-chg ' + clsDir(data.pct);
+    }
   });
 
+  // ── Update Cross-Asset gold/wti cells if commodity cache is available ──
+  function setCA_rt(caId, data) {
+    if (!data) return;
+    const vEl = document.getElementById('ca-' + caId);
+    const cEl = document.getElementById('cac-' + caId);
+    if (!vEl || !cEl) return;
+    const cls = data.pct > 0.05 ? 'up' : data.pct < -0.05 ? 'down' : '';
+    const sign = data.pct >= 0 ? '+' : '';
+    vEl.textContent = data.close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    vEl.className = 'ca-val ' + cls;
+    cEl.textContent = sign + data.pct.toFixed(2) + '%';
+    cEl.className = 'ca-chg ' + cls;
+  }
+  setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
+  setCA_rt('wti',  STOOQ_RT_CACHE['wti']);
+
+  // ── Timestamp ──
   const upd = document.getElementById('fx-table-updated');
   if (upd) {
     const now = new Date();
@@ -2312,17 +2346,21 @@ async function fetchCommodityQuotes() {
     ]);
 
     if (gold) {
+      STOOQ_RT_CACHE['xauusd'] = gold; // share with updateFxPairsTableRT → Cross-Asset
       const el = document.getElementById('q-xauusd');
       const ce = document.getElementById('qc-xauusd');
       if (el) { el.textContent = gold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); el.className = 'q-price ' + clsDir(gold.chg); }
       if (ce) { ce.textContent = pctStr(gold.pct); ce.className = 'q-chg ' + clsDir(gold.chg); }
     }
     if (wti) {
+      STOOQ_RT_CACHE['wti'] = wti; // share with updateFxPairsTableRT → Cross-Asset
       const el = document.getElementById('q-wti');
       const ce = document.getElementById('qc-wti');
       if (el) { el.textContent = wti.close.toFixed(2); el.className = 'q-price ' + clsDir(wti.chg); }
       if (ce) { ce.textContent = pctStr(wti.pct); ce.className = 'q-chg ' + clsDir(wti.chg); }
     }
+    // Sync Cross-Asset cells immediately after commodity data is fresh
+    updateFxPairsTableRT();
   } catch(e) { console.warn('Commodity fetch failed:', e); }
 }
 
@@ -2517,11 +2555,12 @@ async function fetchRiskData() {
   async function fetchYahoo(ySymbol) {
     const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const base2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
+    // allorigins first — correctly handles Yahoo JSON wrapping; corsproxy often 404s for ^-prefixed symbols
     const urls = [
-      `https://corsproxy.io/?${encodeURIComponent(base)}`,
       `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
-      `https://corsproxy.io/?${encodeURIComponent(base2)}`,
       `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
+      `https://corsproxy.io/?${encodeURIComponent(base)}`,
+      `https://corsproxy.io/?${encodeURIComponent(base2)}`,
     ];
     for (const url of urls) {
       try {
@@ -2562,6 +2601,15 @@ async function fetchRiskData() {
   ]);
 
   if (needVix)  { delete byId.vix; if (yVix && yVix.close > 5 && yVix.close < 100) byId.vix = { ...yVix, fromYahoo: true }; }
+  // VIX tertiary fallback: extended-data repo file (updated by engine)
+  if (!byId.vix) {
+    try {
+      const usdRepo = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
+      if (usdRepo?.data?.vix && usdRepo.data.vix > 5 && usdRepo.data.vix < 100) {
+        byId.vix = { close: usdRepo.data.vix, open: usdRepo.data.vix, chg: 0, pct: 0, fromRepo: true };
+      }
+    } catch {}
+  }
   if (needDxy  && yDxy)  byId.dxy   = yDxy;
   if (needUs3m && yUs3m && yUs3m.close > 0) byId.us3m  = { ...yUs3m,  close: yUs3m.close / 10,  chg: yUs3m.chg / 10 };
   if (needUs10y&& yUs10y&& yUs10y.close > 0) byId.us10y = { ...yUs10y, close: yUs10y.close / 10, chg: yUs10y.chg / 10, pct: yUs10y.pct };
