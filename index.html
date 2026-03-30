@@ -613,10 +613,6 @@
     font-family: var(--font-ui);
     overflow: hidden;
   }
-  @media (max-width: 900px) {
-    /* Hide TV ticker tape on mobile — it clutters between sections */
-    #tv-ticker-tape { display: none !important; }
-  }
   @media (max-width: 600px) {
     #statusbar {
       position: relative; height: auto; flex-wrap: wrap;
@@ -1430,39 +1426,6 @@
             <!-- myfxbook.com outlook widget - End -->
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- TV TICKER TAPE (TradingView cross-asset bar) -->
-    <div id="tv-ticker-tape" style="height:46px;overflow:hidden;border-bottom:1px solid var(--border);background:var(--bg2);">
-      <div class="tradingview-widget-container" style="height:46px;">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright" style="display:none;"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-          "symbols": [
-            {"proName":"FOREXCOM:EURUSD","title":"EUR/USD"},
-            {"proName":"FOREXCOM:GBPUSD","title":"GBP/USD"},
-            {"proName":"FX_IDC:USDJPY","title":"USD/JPY"},
-            {"proName":"FOREXCOM:AUDUSD","title":"AUD/USD"},
-            {"proName":"FOREXCOM:USDCHF","title":"USD/CHF"},
-            {"proName":"FOREXCOM:USDCAD","title":"USD/CAD"},
-            {"proName":"FOREXCOM:NZDUSD","title":"NZD/USD"},
-            {"proName":"OANDA:XAUUSD","title":"XAU/USD"},
-            {"proName":"BLACKBULL:WTI","title":"WTI Oil"},
-            {"proName":"BITSTAMP:BTCUSD","title":"BTC/USD"},
-            {"proName":"VANTAGE:SP500","title":"S&P 500"},
-            {"proName":"CFI:US100","title":"NASDAQ"},
-            {"proName":"CBOE:VIX","title":"VIX"},
-            {"proName":"TVC:US10Y","title":"US 10Y"}
-          ],
-          "showSymbolLogo": false,
-          "isTransparent": true,
-          "displayMode": "compact",
-          "colorTheme": "dark",
-          "locale": "en"
-        }
-        </script>
       </div>
     </div>
 
@@ -2709,13 +2672,8 @@ async function fetchSentiment() {
       }
     }
   } catch(e) {}
-  // Fallback with slight random variation — clearly labeled
-  const varied = SENTIMENT_FALLBACK.map(p => ({
-    sym: p.sym,
-    buy:  Math.min(95, Math.max(5, p.buy  + Math.round((Math.random()-.5)*6))),
-    sell: 0,
-  })).map(p => ({ ...p, sell: 100 - p.buy }));
-  renderSentiment(varied, 'Estimated · live feed unavailable');
+  // Static reference fallback — no artificial noise
+  renderSentiment(SENTIMENT_FALLBACK, 'Historical avg · live feed unavailable');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3827,7 +3785,7 @@ async function fetchOptionSkew() {
       if (!cotData) return `<tr><td>${p.pair}</td><td colspan="3" style="color:var(--text3)">—</td></tr>`;
       const invert = p.pair.startsWith('USD/');
       const skew1w = netToSkew(cotData.net, invert);
-      const skew1m = netToSkew(cotData.net * 0.85 + (Math.random()-0.5)*5000, invert);
+      const skew1m = netToSkew(cotData.net * 0.85, invert);
       const bias   = Math.abs(skew1w) < 0.1 ? 'Neutral' : skew1w > 0 ? p.pair.split('/')[0]+'+' : p.pair.split('/')[1]+'+';
       const biasCls= Math.abs(skew1w) < 0.1 ? 'flat' : skew1w > 0 ? 'up' : 'down';
       const fmtRR = v => (v >= 0 ? '+' : '') + v.toFixed(2);
@@ -4151,7 +4109,7 @@ async function fetchLiquidityData() {
       // Fade future hours slightly (past = real vol driven, future = baseline)
       const isFuture = h > nowUTC;
       const scale = isFuture ? 0.75 : volScalar;
-      return Math.max(2, v * scale + (Math.random()-0.5)*2);
+      return Math.max(2, v * scale);
     });
 
     _liqData = data;
@@ -4161,7 +4119,7 @@ async function fetchLiquidityData() {
     _liqData = Array.from({length:48}, (_,i) => {
       if (isWeekend) return 2;
       const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
-      return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac+(Math.random()-.5)*2);
+      return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac);
     });
   }
 }
@@ -4179,7 +4137,7 @@ function drawLiquidityChart() {
   const hours = _liqData || Array.from({length:48}, (_,i) => {
     if (isWeekend) return 2;
     const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
-    return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac+(Math.random()-.5)*3);
+    return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac);
   });
 
   const PAD_L=4, PAD_R=4, PAD_T=8, PAD_B=18;
@@ -4382,7 +4340,8 @@ window.addEventListener('resize', drawLiquidityChart);
   });
 })();
 
-setInterval(() => { fetchRiskData().then(() => { fetchCrossAssetData(); fetchCommodityQuotes(); }); }, 2 * 60 * 1000);
+// Risk + Cross-Asset run in parallel every 2 min — same as boot() — no chaining
+setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); }, 2 * 60 * 1000);
 // Crypto: every 90 seconds
 setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData, 30 * 60 * 1000);
