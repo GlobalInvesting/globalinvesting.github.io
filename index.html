@@ -1042,7 +1042,7 @@
         <a href="guide-dashboard.html">How to Use the Terminal</a>
         <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
         <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
-        <a href="guide-market-sentiment.html">Retail Market Sentiment</a>
+        <a href="guide-market-sentiment.html">Retail FX Positioning</a>
         <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
         <a href="guide-cot.html">COT / CFTC Positioning</a>
       </div>
@@ -1395,7 +1395,7 @@
         </div>
         <div style="border-top:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <span class="panel-title">Retail Market Sentiment</span>
+            <span class="panel-title">Retail FX Positioning</span>
             <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
           </div>
           <div id="myfxbook-wrap" style="overflow:hidden;padding:4px 8px 2px;width:100%;flex:1;background:var(--bg2);position:relative;min-height:0;display:flex;flex-direction:column;">
@@ -2263,10 +2263,10 @@ async function loadIntradayQuotes() {
     const data = await r.json();
     if (!data?.quotes) return null;
 
-    // Validate freshness — reject if file is older than 20 minutes (workflows run every 15min)
-      if (data.updated) {
+    // Validate freshness — reject if file is older than 35 minutes
+    if (data.updated) {
       const age = (now - new Date(data.updated).getTime()) / 60000;
-      if (age > 20) {
+      if (age > 35) {
         console.warn(`[Intraday] File is ${age.toFixed(0)}min old — treating as stale`);
         // Still return it but mark all quotes as stale so UI shows note
         Object.values(data.quotes).forEach(q => q.stale = true);
@@ -2353,53 +2353,38 @@ async function fetchStooqQuoteSingle(sym) {
   return null;
 }
 
-// ── fetchQuoteBarRT ────────────────────────────────────────────────────────
-// Fuente primaria: intraday-data/quotes.json (yfinance via GitHub Action, ~15min delay)
-// Los proxies de Stooq (corsproxy.io, codetabs) están bloqueados por CORS desde el browser.
-// yfinance corre server-side en GitHub Actions y ahora incluye los 21 pares FX.
-// Fallback: fetchStooqQuoteSingle si quotes.json no tiene pares FX (workflow viejo).
 async function fetchQuoteBarRT() {
-  const cache = await loadIntradayQuotes();
+  const results = await Promise.allSettled(
+    QB_STOOQ_PAIRS.map(async pair => ({ pair, data: await fetchStooqQuoteSingle(pair.sym) }))
+  );
   let updated = 0;
+  for (const r of results) {
+    if (r.status !== 'fulfilled' || !r.value.data) continue;
+    const { pair, data } = r.value;
 
-  // PASO 1: Leer pares FX del quotes.json (same-origin, sin CORS)
-  if (cache?.quotes) {
-    for (const pair of QB_STOOQ_PAIRS) {
-      const q = intradayQuote(cache, pair.id);
-      if (!q) continue;
-      STOOQ_RT_CACHE[pair.id] = q;
-      const priceEl = document.getElementById('q-' + pair.id);
-      const chgEl   = document.getElementById('qc-' + pair.id);
-      if (priceEl) { priceEl.textContent = q.close.toFixed(pair.dec); priceEl.className = 'q-price ' + clsDir(q.chg); }
-      if (chgEl)   { chgEl.textContent = pctStr(q.pct); chgEl.className = 'q-chg ' + clsDir(q.pct); }
-      updated++;
+    // Store in RT cache for FX pairs table
+    STOOQ_RT_CACHE[pair.id] = data;
+
+    // Update quote bar elements (only majors are in the bar)
+    const priceEl = document.getElementById('q-' + pair.id);
+    const chgEl   = document.getElementById('qc-' + pair.id);
+    if (priceEl) {
+      priceEl.textContent = data.close.toFixed(pair.dec);
+      priceEl.className   = 'q-price ' + clsDir(data.chg);
     }
+    if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
+    updated++;
   }
-
-  // PASO 2: Fallback a Stooq si intraday JSON no tiene pares FX
-  if (updated < 4) {
-    const results = await Promise.allSettled(
-      QB_STOOQ_PAIRS.map(async pair => ({ pair, data: await fetchStooqQuoteSingle(pair.sym) }))
-    );
-    for (const r of results) {
-      if (r.status !== 'fulfilled' || !r.value.data) continue;
-      const { pair, data } = r.value;
-      STOOQ_RT_CACHE[pair.id] = data;
-      const priceEl = document.getElementById('q-' + pair.id);
-      const chgEl   = document.getElementById('qc-' + pair.id);
-      if (priceEl) { priceEl.textContent = data.close.toFixed(pair.dec); priceEl.className = 'q-price ' + clsDir(data.chg); }
-      if (chgEl)   { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.pct); }
-      updated++;
-    }
-  }
-
   if (updated > 0) {
+    // Update FX pairs table rows with RT data
     updateFxPairsTableRT();
+
+    // Update subtitle to show Stooq source + last refresh time
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
     const qbLabel = document.getElementById('qb-source-label');
-    if (qbLabel) qbLabel.textContent = `yfinance · ${hh}:${mm} UTC`;
+    if (qbLabel) qbLabel.textContent = `Stooq · ${hh}:${mm} UTC`;
   }
 }
 
@@ -2474,7 +2459,7 @@ function updateFxPairsTableRT() {
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
-    upd.textContent = `yfinance · ${hh}:${mm} UTC · ~15min delay`;
+    upd.textContent = `Stooq · ${hh}:${mm} UTC · ~15min delay`;
   }
 }
 
