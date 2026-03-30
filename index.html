@@ -4045,7 +4045,7 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
 // and map observed price-change magnitude → proxy for interbank volume.
 // Falls back to BIS/LSEG session-overlap baseline if fetch fails.
 
-const LIQ_BASE = [15,12,10,10,18,28,36,44,52,58,62,56,50,44,52,68,85,95,100,92,84,68,50,32];
+const LIQ_BASE = [18,14,11,10,12,20,30,42,58,68,72,70,72,82,95,100,95,80,68,55,42,30,22,20];
 // Session definitions (UTC hours)
 const LIQ_SESSIONS = [
   { name:'Sydney',   start:22, end:7,  color:'rgba(120,100,255,0.10)' },
@@ -4058,25 +4058,7 @@ let _liqData = null; // cache: array of 48 values (half-hours, UTC 00:00→23:30
 
 async function fetchLiquidityData() {
   try {
-    // ── SOURCE 1: Myfxbook sentiment volumes → real retail participation by pair
-    // longVol + shortVol = total USD volume notional per pair, usable as session proxy
-    let mfxVolScalar = 1.0;
-    try {
-      const mfxR = await fetch('./sentiment-data/myfxbook.json');
-      if (mfxR.ok) {
-        const mfxD = await mfxR.json();
-        const ageMin = mfxD.updated ? (Date.now() - new Date(mfxD.updated).getTime()) / 60000 : 999;
-        if (mfxD.pairs && mfxD.pairs.length >= 5 && ageMin < 120) {
-          // Sum total volume across all pairs as a measure of overall market participation
-          const totalVol = mfxD.pairs.reduce((s, p) => s + (p.longVol || 0) + (p.shortVol || 0), 0);
-          // Baseline: ~4000 units total across 24 pairs is typical
-          // Scale: more vol → more liquidity activity
-          mfxVolScalar = Math.min(1.8, Math.max(0.6, totalVol / 4000));
-        }
-      }
-    } catch {}
-
-    // ── SOURCE 2: Frankfurter daily volatility as secondary scalar
+    // Frankfurter: timeseries last 5 days to compute daily range/volatility
     const today = new Date();
     const yyyy = today.getUTCFullYear();
     const mm = String(today.getUTCMonth()+1).padStart(2,'0');
@@ -4089,7 +4071,7 @@ async function fetchLiquidityData() {
     const json = await r.json();
     const rates = Object.values(json.rates);
 
-    let volScalar = mfxVolScalar; // start from Myfxbook scalar
+    let volScalar = 1.0;
     if (rates.length >= 2) {
       const changes = [];
       for (let i = 1; i < rates.length; i++) {
@@ -4099,12 +4081,11 @@ async function fetchLiquidityData() {
         if (prev.JPY && cur.JPY) changes.push(Math.abs(cur.JPY - prev.JPY) / prev.JPY);
       }
       const avgChange = changes.reduce((a,b)=>a+b,0)/changes.length;
-      // Blend: 60% price vol + 40% Myfxbook participation
-      const priceScalar = Math.min(2.0, Math.max(0.5, avgChange / 0.005));
-      volScalar = priceScalar * 0.6 + mfxVolScalar * 0.4;
+      // Typical daily range ≈ 0.5% → volScalar=1.0; higher vol → boosted activity
+      volScalar = Math.min(2.0, Math.max(0.5, avgChange / 0.005));
     }
 
-    // Build 48 half-hour buckets from session-overlap baseline, scaled by blended vol
+    // Build 48 half-hour buckets from session-overlap baseline, scaled by vol
     const nowUTC = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
     const isWeekend = [0,6].includes(new Date().getUTCDay());
 
@@ -4115,6 +4096,7 @@ async function fetchLiquidityData() {
       const next = (idx+1) % 24;
       const frac = h - Math.floor(h);
       const v = LIQ_BASE[idx]*(1-frac) + LIQ_BASE[next]*frac;
+      // Fade future hours slightly (past = real vol driven, future = baseline)
       const isFuture = h > nowUTC;
       const scale = isFuture ? 0.75 : volScalar;
       return Math.max(2, v * scale);
