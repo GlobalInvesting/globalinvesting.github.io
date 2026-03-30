@@ -1,0 +1,36 @@
+{
+  "updated": "2026-03-30T19:58:12Z",
+  "source": "mixed",
+  "quotes": {
+    "gold": {
+      "close": 4509.966,
+      "prev_close": 4507.6783,
+      "chg": 2.2877,
+      "pct": 0.0508,
+      "source": "twelve_data"
+    },
+    "wti": {
+      "close": 124.2,
+      "prev_close": 117.26,
+      "chg": 6.94,
+      "pct": 5.9185,
+      "source": "alpha_vantage"
+    },
+    "vix": {
+      "close": 27.44,
+      "prev_close": 27.44,
+      "chg": 0,
+      "pct": 0,
+      "source": "repo",
+      "stale": true
+    },
+    "us10y": {
+      "close": 4.42,
+      "prev_close": 4.42,
+      "chg": 0,
+      "pct": 0,
+      "source": "repo",
+      "stale": true
+    }
+  }
+}
