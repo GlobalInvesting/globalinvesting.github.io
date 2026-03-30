@@ -90,25 +90,27 @@ SYMBOL_MAP = {
 PRIORITY_IDS = [1, 2, 3, 11, 7, 4, 20, 6, 9, 13]
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; GlobalInvestingBot/1.0)",
-    "Accept": "application/json",
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/123.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.myfxbook.com/",
 }
 
 TIMEOUT = 15  # seconds
 
+# ── Session (persiste cookies entre requests — requerido por Myfxbook) ────────
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+_session = requests.Session()
+_session.headers.update(HEADERS)
+
 
 def api_get(path, params=None):
     url = f"{BASE_URL}/{path}"
-    r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
-    r.raise_for_status()
-    return r.json()
-
-
-def api_post(path, params=None):
-    url = f"{BASE_URL}/{path}"
-    r = requests.post(url, params=params, headers=HEADERS, timeout=TIMEOUT)
+    r = _session.get(url, params=params, timeout=TIMEOUT)
     r.raise_for_status()
     return r.json()
 
@@ -152,6 +154,7 @@ def main():
             sys.exit(1)
 
         print(f"[Auth] Login OK. Session: {session_token[:8]}...")
+        time.sleep(1)  # Myfxbook necesita un momento para registrar la sesión
 
         # STEP 2 — Fetch community outlook
         print("[API]  Fetching community outlook...")
