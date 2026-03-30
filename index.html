@@ -1078,8 +1078,13 @@
   <aside id="sidebar">
     <div class="sb-section">
       <div class="sb-head">FX Liquidity</div>
-      <div style="padding:6px 8px 4px;">
-        <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;"></canvas>
+      <div style="padding:6px 8px 4px;position:relative;">
+        <div id="liq-tooltip" style="display:none;position:absolute;z-index:99;background:#1e222d;border:1px solid #363c4e;border-radius:3px;padding:4px 7px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+          <span id="liq-tt-time" style="color:#787b86;"></span><br>
+          <span id="liq-tt-session" style="color:#f6941c;font-size:8px;"></span><br>
+          <span id="liq-tt-vol" style="color:#2962ff;font-weight:600;"></span>
+        </div>
+        <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:crosshair;"></canvas>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
           <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
           <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
@@ -3925,6 +3930,87 @@ fetchLiquidityData().then(() => drawLiquidityChart());
 setInterval(() => fetchLiquidityData().then(() => drawLiquidityChart()), 30 * 60 * 1000);
 setInterval(drawLiquidityChart, 60 * 1000);
 window.addEventListener('resize', drawLiquidityChart);
+
+// ── FX Liquidity tooltip ──────────────────────────────────────────────────────
+(function() {
+  const SESSION_NAMES = [
+    { name:'Sydney',   start:22, end:7  },
+    { name:'Tokyo',    start:0,  end:9  },
+    { name:'London',   start:8,  end:17 },
+    { name:'New York', start:13, end:22 },
+  ];
+
+  function getActiveSessions(utcH) {
+    const active = SESSION_NAMES.filter(s => {
+      if (s.end < s.start) return utcH >= s.start || utcH < s.end; // wraps midnight
+      return utcH >= s.start && utcH < s.end;
+    }).map(s => s.name);
+    return active.length ? active.join(' + ') : 'Inter-session';
+  }
+
+  function volLabel(v, maxV) {
+    const pct = Math.round((v / maxV) * 100);
+    if (pct >= 85) return 'Very High (' + pct + '%)';
+    if (pct >= 60) return 'High (' + pct + '%)';
+    if (pct >= 35) return 'Moderate (' + pct + '%)';
+    if (pct >= 15) return 'Low (' + pct + '%)';
+    return 'Very Low (' + pct + '%)';
+  }
+
+  const canvas = document.getElementById('liquidity-canvas');
+  const tooltip = document.getElementById('liq-tooltip');
+  if (!canvas || !tooltip) return;
+
+  canvas.addEventListener('mousemove', function(e) {
+    const hours = _liqData;
+    if (!hours) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const PAD_L = 4, PAD_R = 4, PAD_T = 8, PAD_B = 18;
+    const W = canvas.width, H = canvas.height;
+    const cW = W - PAD_L - PAD_R;
+
+    // Scale mouse X from CSS pixels to canvas pixels
+    const scaleX = W / rect.width;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    if (mouseX < PAD_L || mouseX > W - PAD_R) { tooltip.style.display = 'none'; return; }
+
+    // Map x → slot index (0–47, each = 30 min)
+    const frac = (mouseX - PAD_L) / cW;
+    const slot = Math.max(0, Math.min(47, Math.round(frac * 47)));
+    const utcH = slot / 2; // e.g. slot 17 → 08:30 UTC
+
+    const hh = Math.floor(utcH).toString().padStart(2,'0');
+    const mm = utcH % 1 === 0 ? '00' : '30';
+
+    // Convert UTC slot to local time for display
+    const d = new Date(); d.setUTCHours(Math.floor(utcH), utcH%1===0?0:30, 0, 0);
+    const localHH = d.getHours().toString().padStart(2,'0');
+    const localMM = d.getMinutes().toString().padStart(2,'0');
+    const tzShort = d.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
+
+    const maxV = Math.max(...hours, 10);
+    const v = hours[slot];
+
+    document.getElementById('liq-tt-time').textContent = hh + ':' + mm + ' UTC  (' + localHH + ':' + localMM + ' ' + tzShort + ')';
+    document.getElementById('liq-tt-session').textContent = '▸ ' + getActiveSessions(Math.floor(utcH));
+    document.getElementById('liq-tt-vol').textContent = '⬤ Activity: ' + volLabel(v, maxV);
+
+    // Position tooltip above cursor, inside the canvas wrapper
+    const ttW = tooltip.offsetWidth || 160;
+    const canvasLeft = rect.left;
+    const relX = e.clientX - rect.left; // in CSS px
+    let left = relX + 8;
+    if (left + ttW > rect.width - 4) left = relX - ttW - 8;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = '2px';
+    tooltip.style.display = 'block';
+  });
+
+  canvas.addEventListener('mouseleave', function() {
+    tooltip.style.display = 'none';
+  });
+})();
 
 setInterval(() => { fetchRiskData().then(() => { fetchCrossAssetData(); fetchCommodityQuotes(); }); }, 2 * 60 * 1000);
 // Crypto: every 90 seconds
