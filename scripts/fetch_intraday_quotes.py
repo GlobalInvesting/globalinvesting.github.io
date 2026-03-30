@@ -1,0 +1,70 @@
+name: Update Intraday Quotes — v1.1 (Twelve Data + Alpha Vantage)
+
+# Runs every 15 minutes during weekday market hours (UTC):
+#   EU session:  07:00–16:00 UTC  (covers London open + Europe)
+#   US session:  13:00–22:00 UTC  (covers NYSE/NASDAQ 9:30am–4pm ET)
+#   Combined window: 07:00–22:00 UTC Monday–Friday
+#
+# ✅ Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
+#    No PAT_TOKEN needed: GITHUB_TOKEN con permissions: contents: write alcanza
+#    porque el workflow y el repo destino son el mismo.
+#
+# API usage estimate (Twelve Data free tier: 800 calls/day):
+#   15h window × 4 runs/hour × 1 batch call = 60 calls/day  ✅
+#   Alpha Vantage solo se llama como fallback (25 calls/day free, rara vez se activa)
+
+on:
+  schedule:
+    - cron: '0,15,30,45 7-21 * * 1-5'   # cada 15 min, 07:00–21:45 UTC, lun–vie
+    - cron: '0 22 * * 1-5'              # tick final 22:00 UTC (cierre NYSE)
+  workflow_dispatch:                     # trigger manual desde GitHub UI
+
+concurrency:
+  group: update-intraday-quotes
+  cancel-in-progress: false             # no cancelar un fetch en curso — esperar
+
+permissions:
+  contents: write                       # necesario para hacer git push al mismo repo
+
+jobs:
+  fetch-intraday-quotes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        # Sin "with: repository" ni "token: PAT" — usa GITHUB_TOKEN del repo actual
+        # Esto es suficiente porque script, workflow y datos viven en el mismo repo público
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p intraday-data
+
+      - name: Fetch intraday quotes
+        env:
+          TWELVE_DATA_API_KEY:   ${{ secrets.TWELVE_DATA_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          SITE_PATH: .           # repo raíz = sitio público
+        run: python3 fetch_intraday_quotes.py
+
+      - name: Commit and push quotes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+          git add intraday-data/quotes.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit (data unchanged)"
+          else
+            TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
+            git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
+            git pull --rebase origin main || true
+            git push
+          fi
