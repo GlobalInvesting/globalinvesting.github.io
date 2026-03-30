@@ -3557,10 +3557,12 @@ async function fetchCrossAssetData() {
     }
   }
 
-  // Fallback: use pre-loaded repo value when stooq fails (avoids second fetch of USD.json)
-  let us10y = _us10y || _repoUs10y;
+  // Priority for us10y: stooq (real-time) > intraday JSON (yfinance ~15min) > repo (daily)
+  // _repoUs10y is a day-old batch value — intraday JSON takes precedence when stooq fails.
+  const _caUs10yFinal = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
+  let us10y = _us10y || (_caUs10yFinal && _caUs10yFinal.close > 0 ? _caUs10yFinal : null) || _repoUs10y;
 
-  // ── STEP 2.5: Fill gaps with intraday JSON (Twelve Data / Alpha Vantage) ──
+  // ── STEP 2.5: Fill gaps with intraday JSON (yfinance via GitHub Action) ──
   // _caXxx variables were loaded in Step 1.5. Use them when stooq/Yahoo both failed.
   const finalSpx    = spx     || _caSpx;
   const finalGold   = gold    || _caGold;
@@ -3568,10 +3570,6 @@ async function fetchCrossAssetData() {
   const finalNikkei = nikkeiData || _caNikkei;
   const finalStoxx  = stoxxData  || _caStoxx;
   const finalDxy    = dxy     || _caDxy;
-  if (!us10y) {
-    const caUs10y = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
-    if (caUs10y && caUs10y.close > 0) us10y = caUs10y;
-  }
 
   if (finalSpx)  setCA('spx',  finalSpx.close,  finalSpx.pct,  false);
   if (finalGold) {
