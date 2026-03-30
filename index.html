@@ -1061,9 +1061,9 @@
   <!-- SIDEBAR LEFT -->
   <aside id="sidebar">
     <div class="sb-section">
-      <div class="sb-head">FX Liquidity</div>
+      <div class="sb-head">FX Liquidity <span style="font-size:8px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">· Session model</span></div>
       <div style="padding:6px 8px 4px;">
-        <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;"></canvas>
+        <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:default;" title="Typical interbank volume model (BIS/LSEG session data). Orange line = current time. No free real-time FX volume API exists."></canvas>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
           <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
           <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
@@ -1913,24 +1913,64 @@ function populateFxPairsTable() {
 }
 
 function populateHeatmap() {
-  const r = STATE.rates;
-  const p = STATE.prevRates;
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
-  // Compute % change vs USD for each
-  const strengths = ccys.map(ccy => {
-    if (ccy === 'USD') return { ccy, pct: 0 };
-    const cur  = r[ccy];
-    const prev = p[ccy];
-    if (!cur) return { ccy, pct: 0 };
-    // ccy/USD today vs yesterday (higher = USD weaker vs this ccy)
-    const rateCur  = 1 / cur;
-    const ratePrev = prev ? 1 / prev : null;
-    const pct = ratePrev ? (rateCur - ratePrev) / ratePrev * 100 : 0;
-    // "USD" strength is inverse: if EUR/USD up, USD weaker
-    return { ccy, pct };
-  });
-  // USD's "strength" = -average of others
-  strengths.find(s=>s.ccy==='USD').pct = -strengths.filter(s=>s.ccy!=='USD').reduce((a,b)=>a+b.pct,0)/7;
+
+  // Prefer STOOQ_RT_CACHE (intraday ~15min delay) over ECB daily rates
+  // because ECB daily rates have zero intraday movement (same open/close on weekends)
+  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 4;
+
+  let strengths;
+  if (rtAvailable) {
+    // Map each currency to its avg % change using stooq RT pairs
+    // USD-centric: EUR strength = EUR/USD pct; JPY strength = -USD/JPY pct
+    const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
+    const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
+
+    // Pairs where base is vs USD (invert = true means USD is base)
+    const pairDefs = [
+      { id: 'eurusd', base: 'EUR', quote: 'USD', sign: 1 },
+      { id: 'gbpusd', base: 'GBP', quote: 'USD', sign: 1 },
+      { id: 'audusd', base: 'AUD', quote: 'USD', sign: 1 },
+      { id: 'nzdusd', base: 'NZD', quote: 'USD', sign: 1 },
+      { id: 'usdjpy', base: 'USD', quote: 'JPY', sign: -1 }, // USD/JPY up = JPY weak
+      { id: 'usdchf', base: 'USD', quote: 'CHF', sign: -1 },
+      { id: 'usdcad', base: 'USD', quote: 'CAD', sign: -1 },
+      { id: 'eurgbp', base: 'EUR', quote: 'GBP', sign: 1 },
+      { id: 'eurjpy', base: 'EUR', quote: 'JPY', sign: 1 },
+      { id: 'gbpjpy', base: 'GBP', quote: 'JPY', sign: 1 },
+      { id: 'audjpy', base: 'AUD', quote: 'JPY', sign: 1 },
+      { id: 'cadjpy', base: 'CAD', quote: 'JPY', sign: 1 },
+    ];
+
+    pairDefs.forEach(({ id, base, quote, sign }) => {
+      const d = STOOQ_RT_CACHE[id];
+      if (!d || !d.pct) return;
+      const p = d.pct * sign;
+      if (base in pctMap)  { pctMap[base]  += p;  countMap[base]++;  }
+      if (quote in pctMap) { pctMap[quote] -= p;  countMap[quote]++; }
+    });
+
+    // Average out each currency
+    strengths = ccys.map(ccy => ({
+      ccy,
+      pct: countMap[ccy] > 0 ? pctMap[ccy] / countMap[ccy] : 0
+    }));
+  } else {
+    // Fallback: ECB daily rates
+    const r = STATE.rates;
+    const p = STATE.prevRates;
+    strengths = ccys.map(ccy => {
+      if (ccy === 'USD') return { ccy, pct: 0 };
+      const cur  = r[ccy];
+      const prev = p[ccy];
+      if (!cur) return { ccy, pct: 0 };
+      const rateCur  = 1 / cur;
+      const ratePrev = prev ? 1 / prev : null;
+      const pct = ratePrev ? (rateCur - ratePrev) / ratePrev * 100 : 0;
+      return { ccy, pct };
+    });
+    strengths.find(s=>s.ccy==='USD').pct = -strengths.filter(s=>s.ccy!=='USD').reduce((a,b)=>a+b.pct,0)/7;
+  }
 
   strengths.sort((a,b)=>b.pct-a.pct);
 
@@ -2292,6 +2332,9 @@ function updateFxPairsTableRT() {
   }
   setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
   setCA_rt('wti',  STOOQ_RT_CACHE['wti']);
+
+  // ── Refresh heatmap with latest RT data ──
+  populateHeatmap();
 
   // ── Timestamp ──
   const upd = document.getElementById('fx-table-updated');
@@ -3404,21 +3447,29 @@ async function fetchCalendarData() {
     const data = await r.json();
     const events = data.events || [];
 
-    // Filter today's events (medium + high impact) for G8 currencies
+    // Filter today's events for G8 currencies — include all impacts
     const todayISO = new Date().toISOString().slice(0,10);
     const g8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-    const todayEvents = events
-      .filter(e => e.dateISO === todayISO && (e.impact === 'high' || e.impact === 'medium') && g8.includes(e.currency))
-      .slice(0, 8);
+    const g8events = events.filter(e => g8.includes(e.currency));
 
-    // If no today events, show next upcoming high-impact events
-    const upcoming = todayEvents.length ? todayEvents :
-      events.filter(e => e.dateISO >= todayISO && e.impact === 'high' && g8.includes(e.currency)).slice(0,6);
+    // Today: high+medium first; if <3, fill with low-impact too
+    let todayHM = g8events.filter(e => e.dateISO === todayISO && (e.impact === 'high' || e.impact === 'medium'));
+    let todayAll = g8events.filter(e => e.dateISO === todayISO);
+    let todayEvents = todayHM.length >= 2 ? todayHM : todayAll;
+    todayEvents = todayEvents.slice(0, 8);
+
+    // If still nothing today, look ahead up to 3 business days (high+medium only)
+    let upcoming = todayEvents;
+    if (!upcoming.length) {
+      upcoming = g8events
+        .filter(e => e.dateISO > todayISO && (e.impact === 'high' || e.impact === 'medium'))
+        .slice(0, 6);
+    }
 
     const container = document.getElementById('rp-calendar-rows');
     if (!container) return;
     if (!upcoming.length) {
-      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">No high-impact events today</div>';
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">No scheduled events — check back Monday</div>';
       return;
     }
     container.innerHTML = upcoming.map(ev => {
