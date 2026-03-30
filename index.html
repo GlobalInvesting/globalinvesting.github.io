@@ -1061,12 +1061,19 @@
   <!-- SIDEBAR LEFT -->
   <aside id="sidebar">
     <div class="sb-section">
-      <div class="sb-head">FX Liquidity <span style="font-size:8px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">· Session model</span></div>
-      <div style="padding:6px 8px 4px;">
-        <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:default;" title="Typical interbank volume model (BIS/LSEG session data). Orange line = current time. No free real-time FX volume API exists."></canvas>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-          <span id="liq-time-label" style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">--:--</span>
-          <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
+      <div class="sb-head">FX Liquidity <span style="font-size:8px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">· Live · Myfxbook</span></div>
+      <div style="padding:4px 6px 2px;overflow:hidden;">
+        <iframe
+          src="https://widgets.myfxbook.com/widgets/liquidity.html?"
+          width="100%"
+          height="130"
+          frameborder="0"
+          scrolling="no"
+          style="display:block;filter:invert(1) hue-rotate(180deg);border-radius:2px;margin-bottom:2px;"
+          title="FX Liquidity — Myfxbook"
+        ></iframe>
+        <div style="text-align:right;">
+          <a href="https://www.myfxbook.com" target="_blank" rel="noopener" style="font-size:8px;color:var(--text3);text-decoration:none;">Powered by Myfxbook.com</a>
         </div>
       </div>
     </div>
@@ -3061,104 +3068,6 @@ setTimeout(() => drawYieldCurveAndCache(null), 60);
 window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields));
 
 // ═══════════════════════════════════════════════════════════════════
-// FX LIQUIDITY CHART
-// ═══════════════════════════════════════════════════════════════════
-function drawLiquidityChart() {
-  const canvas = document.getElementById('liquidity-canvas');
-  if (!canvas) return;
-  const W = canvas.parentElement.clientWidth - 16, H = 110;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  // FX liquidity curve based on real session overlap patterns (BIS/LSEG data):
-  // Sydney 22-07, Tokyo 00-09, London 08-17, NY 13-22 UTC
-  // Values represent relative interbank volume by hour (normalized to peak=100)
-  const base = [15,12,10,10,18,28,36,44,52,58,62,56,50,44,52,68,85,95,100,92,84,68,50,32,20,15,12];
-
-  // Check if weekend (forex closed)
-  // FX market: opens Sun 21:00 UTC, closes Fri 21:00 UTC
-  const _now = new Date();
-  const utcDay = _now.getUTCDay();
-  const utcHour = _now.getUTCHours();
-  const isWeekend = utcDay === 6
-    || (utcDay === 0 && utcHour < 21)
-    || (utcDay === 5 && utcHour >= 21);
-
-  const hours = Array.from({length:48}, (_,i) => {
-    if (isWeekend) return 2; // flat line on weekend
-    const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
-    const v = base[idx]*(1-frac)+base[next]*frac;
-    return Math.max(2, v+(Math.random()-.5)*3);
-  });
-
-  const PAD_L=4, PAD_R=4, PAD_T=8, PAD_B=18;
-  const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const maxV=Math.max(...hours, 10);
-  const px = i => PAD_L+(i/(hours.length-1))*cW;
-  const py = v => PAD_T+(1-v/maxV)*cH;
-
-  ctx.clearRect(0,0,W,H);
-  if (!isWeekend) {
-    [{start:0,end:9,color:'rgba(41,98,255,0.06)'},{start:16,end:25,color:'rgba(38,166,154,0.08)'}].forEach(s => {
-      ctx.fillStyle=s.color;
-      ctx.fillRect(PAD_L+(s.start/48)*cW, PAD_T, (Math.min(s.end,48)-s.start)/48*cW, cH);
-    });
-  }
-
-  const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
-  ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
-  ctx.beginPath(); ctx.moveTo(PAD_L+(nowH/24)*cW, PAD_T); ctx.lineTo(PAD_L+(nowH/24)*cW, PAD_T+cH); ctx.stroke();
-  ctx.setLineDash([]);
-
-  const fillColor = isWeekend ? 'rgba(120,123,134,0.15)' : 'rgba(41,98,255,0.35)';
-  const lineColor = isWeekend ? '#363c4e' : '#2962ff';
-  const grad=ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-  grad.addColorStop(0, isWeekend ? 'rgba(120,123,134,0.15)' : 'rgba(41,98,255,0.35)');
-  grad.addColorStop(1,'rgba(41,98,255,0.03)');
-  ctx.beginPath();
-  hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.lineTo(px(hours.length-1),PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-
-  ctx.beginPath(); ctx.strokeStyle=lineColor; ctx.lineWidth=1.5;
-  hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.stroke();
-
-  ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
-  ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
-
-  if (isWeekend) {
-    ctx.fillStyle='rgba(120,123,134,0.5)'; ctx.font='9px Courier New'; ctx.textAlign='center';
-    ctx.fillText('MARKET CLOSED — WEEKEND', W/2, PAD_T+cH/2);
-  }
-
-  const now = new Date();
-  // Show local time in liquidity chart labels
-  const localH = now.getHours().toString().padStart(2,'0');
-  const localM = now.getMinutes().toString().padStart(2,'0');
-  const tzShort = now.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
-  setEl('liq-time-label', localH + ':' + localM + ' ' + tzShort);
-  if (isWeekend) {
-    // Convert Sun 21:00 UTC to local time for reopen label
-    const reopenDate = new Date();
-    const daysUntilSun = (7 - reopenDate.getUTCDay()) % 7;
-    reopenDate.setUTCDate(reopenDate.getUTCDate() + (daysUntilSun === 0 ? 0 : daysUntilSun));
-    reopenDate.setUTCHours(21, 0, 0, 0);
-    const rH = reopenDate.getHours().toString().padStart(2,'0');
-    const rM = reopenDate.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Sun ' + rH + ':' + rM);
-  } else {
-    const peakH = hours.indexOf(Math.max(...hours));
-    const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakH/2), peakH%2===0?0:30, 0, 0);
-    const pH = peakUTC.getHours().toString().padStart(2,'0');
-    const pM = peakUTC.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Peak ' + pH + ':' + pM);
-  }
-}
-
-setTimeout(drawLiquidityChart, 120);
-setInterval(drawLiquidityChart, 60000);
-window.addEventListener('resize', drawLiquidityChart);
 
 // ═══════════════════════════════════════════════════════════════════
 // TV CHART TAB SWITCHING
