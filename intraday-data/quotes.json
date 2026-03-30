@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-30T22:35:59Z",
+  "updated": "2026-03-30T22:55:07Z",
   "source": "yfinance",
   "quotes": {
     "vix": {
@@ -17,17 +17,17 @@
       "source": "yfinance"
     },
     "gold": {
-      "close": 4535.3999,
+      "close": 4537.2998,
       "prev_close": 4492.0,
-      "chg": 43.3999,
-      "pct": 0.9662,
+      "chg": 45.2998,
+      "pct": 1.0085,
       "source": "yfinance"
     },
     "wti": {
-      "close": 104.68,
+      "close": 104.89,
       "prev_close": 99.64,
-      "chg": 5.04,
-      "pct": 5.0582,
+      "chg": 5.25,
+      "pct": 5.269,
       "source": "yfinance"
     },
     "us10y": {
@@ -94,10 +94,157 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 66741.3203,
+      "close": 66712.8828,
       "prev_close": 65954.9219,
-      "chg": 786.3984,
-      "pct": 1.1923,
+      "chg": 757.9609,
+      "pct": 1.1492,
+      "source": "yfinance"
+    },
+    "eurusd": {
+      "close": 1.1464,
+      "prev_close": 1.1535,
+      "chg": -0.0071,
+      "pct": -0.6168,
+      "source": "yfinance"
+    },
+    "gbpusd": {
+      "close": 1.3181,
+      "prev_close": 1.3336,
+      "chg": -0.0155,
+      "pct": -1.1594,
+      "source": "yfinance"
+    },
+    "usdjpy": {
+      "close": 159.776,
+      "prev_close": 159.704,
+      "chg": 0.072,
+      "pct": 0.0451,
+      "source": "yfinance"
+    },
+    "audusd": {
+      "close": 0.6852,
+      "prev_close": 0.6887,
+      "chg": -0.0035,
+      "pct": -0.5107,
+      "source": "yfinance"
+    },
+    "usdchf": {
+      "close": 0.7997,
+      "prev_close": 0.7947,
+      "chg": 0.005,
+      "pct": 0.6254,
+      "source": "yfinance"
+    },
+    "usdcad": {
+      "close": 1.3928,
+      "prev_close": 1.3852,
+      "chg": 0.0076,
+      "pct": 0.5487,
+      "source": "yfinance"
+    },
+    "nzdusd": {
+      "close": 0.5721,
+      "prev_close": 0.5762,
+      "chg": -0.0041,
+      "pct": -0.7054,
+      "source": "yfinance"
+    },
+    "eurgbp": {
+      "close": 0.8695,
+      "prev_close": 0.8649,
+      "chg": 0.0045,
+      "pct": 0.5237,
+      "source": "yfinance"
+    },
+    "eurjpy": {
+      "close": 183.128,
+      "prev_close": 184.224,
+      "chg": -1.096,
+      "pct": -0.5949,
+      "source": "yfinance"
+    },
+    "eurchf": {
+      "close": 0.9165,
+      "prev_close": 0.9166,
+      "chg": -0.0001,
+      "pct": -0.0153,
+      "source": "yfinance"
+    },
+    "eurcad": {
+      "close": 1.5962,
+      "prev_close": 1.5976,
+      "chg": -0.0014,
+      "pct": -0.0889,
+      "source": "yfinance"
+    },
+    "euraud": {
+      "close": 1.6724,
+      "prev_close": 1.6747,
+      "chg": -0.0023,
+      "pct": -0.1403,
+      "source": "yfinance"
+    },
+    "gbpjpy": {
+      "close": 210.611,
+      "prev_close": 212.962,
+      "chg": -2.351,
+      "pct": -1.104,
+      "source": "yfinance"
+    },
+    "gbpchf": {
+      "close": 1.054,
+      "prev_close": 1.0596,
+      "chg": -0.0055,
+      "pct": -0.5228,
+      "source": "yfinance"
+    },
+    "gbpcad": {
+      "close": 1.8356,
+      "prev_close": 1.8467,
+      "chg": -0.0111,
+      "pct": -0.5994,
+      "source": "yfinance"
+    },
+    "audjpy": {
+      "close": 109.496,
+      "prev_close": 109.983,
+      "chg": -0.487,
+      "pct": -0.4428,
+      "source": "yfinance"
+    },
+    "audnzd": {
+      "close": 1.1976,
+      "prev_close": 1.1953,
+      "chg": 0.0023,
+      "pct": 0.1899,
+      "source": "yfinance"
+    },
+    "audchf": {
+      "close": 0.5473,
+      "prev_close": 0.5472,
+      "chg": 0.0001,
+      "pct": 0.0128,
+      "source": "yfinance"
+    },
+    "cadjpy": {
+      "close": 114.695,
+      "prev_close": 115.282,
+      "chg": -0.587,
+      "pct": -0.5092,
+      "source": "yfinance"
+    },
+    "chfjpy": {
+      "close": 199.789,
+      "prev_close": 200.9451,
+      "chg": -1.1561,
+      "pct": -0.5753,
+      "source": "yfinance"
+    },
+    "nzdjpy": {
+      "close": 91.388,
+      "prev_close": 91.995,
+      "chg": -0.607,
+      "pct": -0.6598,
       "source": "yfinance"
     }
   }
