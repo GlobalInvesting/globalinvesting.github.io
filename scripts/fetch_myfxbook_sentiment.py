@@ -1,128 +1,61 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v1.0 — Myfxbook Community Outlook via REST API
+fetch_myfxbook_sentiment.py  v2.0 — Myfxbook Community Outlook via REST API
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Produce:  sentiment-data/myfxbook.json
-Schedule: Cada 30 min en días hábiles (via GitHub Action en repo público)
+API docs: https://www.myfxbook.com/api
+  - Login:   GET /api/login.json?email=X&password=Y  -> { session: "TOKEN" }
+  - Outlook: GET /api/get-community-outlook.json?session=TOKEN
+             -> { symbols: [ {name, shortPercentage, longPercentage, ...} ] }
+  - Logout:  GET /api/logout.json?session=TOKEN
 
-FLUJO:
-  1. POST /api/login.json            → obtiene session token
-  2. GET  /api/get-community-outlook.json  → descarga posicionamiento retail
-  3. Normaliza a formato {sym, longPercent, shortPercent} para el terminal
-  4. GET  /api/logout.json           → cierra la sesión (buenas prácticas)
-
-CREDENCIALES:
-  Leer de variables de entorno (GitHub Secrets en el Action):
-    MYFXBOOK_EMAIL    — email de la cuenta Myfxbook
-    MYFXBOOK_PASSWORD — contraseña de la cuenta Myfxbook
-
-  ⚠️  No hardcodear credenciales. El script falla de forma limpia si no están.
-
-NOTAS:
-  • La API de Myfxbook no tiene límite de calls documentado para el plan free.
-    Con 30 runs/día estamos muy por debajo de cualquier límite razonable.
-  • El session token expira. Hacemos login en cada run para evitar tokens stale.
-  • Este script NO requiere API keys de pago — solo una cuenta Myfxbook gratuita.
-  • Vive en el repo PÚBLICO porque no contiene ventaja competitiva y aprovecha
-    los minutos ilimitados de GitHub Actions del repo público.
-
-FORMATO DE SALIDA (sentiment-data/myfxbook.json):
-  {
-    "updated": "2026-03-30T20:00:00Z",
-    "source": "myfxbook",
-    "pairs": [
-      { "sym": "EUR/USD", "long": 56, "short": 44, "longVol": 1234567, "shortVol": 987654 },
-      ...
-    ]
-  }
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NOTAS (API v1.38, oct 2025):
+  - Sesiones IP-bound, TTL 1 mes.
+  - get-community-outlook solo acepta "session", NO "email".
+  - symbols es un ARRAY con campo "name" (ej: "EURUSD"), no un dict.
+  - Limite free: 100 requests/24h.
 """
 
-import os
-import sys
-import json
-import time
+import os, sys, json, time
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 try:
     import requests
 except ImportError:
-    print("[ERROR] requests no instalado. Correr: pip install requests")
+    print("[ERROR] requests no instalado.")
     sys.exit(1)
 
-# ── Config ──────────────────────────────────────────────────────────────────
-
-BASE_URL = "https://www.myfxbook.com/api"
-
+BASE_URL          = "https://www.myfxbook.com/api"
 MYFXBOOK_EMAIL    = os.environ.get("MYFXBOOK_EMAIL", "")
 MYFXBOOK_PASSWORD = os.environ.get("MYFXBOOK_PASSWORD", "")
 
-# Symbol IDs to fetch — matches the current widget embed
-# Format: myfxbook internal ID → display symbol
-SYMBOL_MAP = {
-    1:   "EUR/USD",
-    2:   "GBP/USD",
-    3:   "USD/JPY",
-    4:   "USD/CHF",
-    5:   "EUR/CHF",
-    6:   "EUR/GBP",
-    7:   "USD/CAD",
-    9:   "EUR/JPY",
-    10:  "EUR/CAD",
-    11:  "AUD/USD",
-    12:  "AUD/JPY",
-    13:  "GBP/JPY",
-    14:  "CHF/JPY",
-    17:  "EUR/AUD",
-    20:  "NZD/USD",
-    24:  "GBP/CHF",
-    25:  "EUR/NZD",
-    26:  "AUD/CAD",
-    27:  "GBP/CAD",
-    28:  "AUD/CHF",
-    29:  "GBP/AUD",
-    46:  "AUD/NZD",
-    47:  "CAD/JPY",
-    49:  "GBP/NZD",
+SYMBOL_DISPLAY = {
+    "EURUSD":"EUR/USD","GBPUSD":"GBP/USD","USDJPY":"USD/JPY","USDCHF":"USD/CHF",
+    "EURCHF":"EUR/CHF","EURGBP":"EUR/GBP","USDCAD":"USD/CAD","EURJPY":"EUR/JPY",
+    "EURCAD":"EUR/CAD","AUDUSD":"AUD/USD","AUDJPY":"AUD/JPY","GBPJPY":"GBP/JPY",
+    "CHFJPY":"CHF/JPY","EURAUD":"EUR/AUD","NZDUSD":"NZD/USD","GBPCHF":"GBP/CHF",
+    "EURNZD":"EUR/NZD","AUDCAD":"AUD/CAD","GBPCAD":"GBP/CAD","AUDCHF":"AUD/CHF",
+    "GBPAUD":"GBP/AUD","AUDNZD":"AUD/NZD","CADJPY":"CAD/JPY","GBPNZD":"GBP/NZD",
 }
 
-# Priority order for the terminal panel (top 10 shown by default)
-PRIORITY_IDS = [1, 2, 3, 11, 7, 4, 20, 6, 9, 13]
+PRIORITY_ORDER = [
+    "EURUSD","GBPUSD","USDJPY","AUDUSD","USDCAD","USDCHF","NZDUSD","EURGBP",
+    "EURJPY","GBPJPY","EURAUD","EURCAD","EURCHF","EURNZD","AUDJPY","AUDCAD",
+    "AUDCHF","AUDNZD","GBPCHF","GBPAUD","GBPCAD","GBPNZD","CHFJPY","CADJPY",
+]
 
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/123.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.myfxbook.com/",
-}
+_http = requests.Session()
+_http.headers.update({
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+})
 
-TIMEOUT = 15  # seconds
-
-# ── Session (persiste cookies entre requests — requerido por Myfxbook) ────────
-
-_session = requests.Session()
-_session.headers.update(HEADERS)
-
-
-def api_get(path, params=None, raw_params=None):
-    url = f"{BASE_URL}/{path}"
-    if raw_params:
-        # Construir query string manualmente para evitar double-encoding
-        from urllib.parse import urlencode
-        qs = urlencode(raw_params, quote_via=lambda s, *a, **k: s)
-        url = f"{url}?{qs}"
-        r = _session.get(url, timeout=TIMEOUT)
-    else:
-        r = _session.get(url, params=params, timeout=TIMEOUT)
+def api_get(path, params):
+    qs  = urlencode(params)
+    url = f"{BASE_URL}/{path}?{qs}"
+    r   = _http.get(url, timeout=20)
     r.raise_for_status()
     return r.json()
-
-
-# ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
     site_path = os.environ.get("SITE_PATH", ".")
@@ -132,146 +65,93 @@ def main():
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"\n{'='*60}")
-    print(f"fetch_myfxbook_sentiment.py  v1.0  —  {ts}")
+    print(f"fetch_myfxbook_sentiment.py  v2.0  --  {ts}")
     print(f"{'='*60}\n")
 
-    # Validate credentials
     if not MYFXBOOK_EMAIL or not MYFXBOOK_PASSWORD:
         print("[ERROR] MYFXBOOK_EMAIL and MYFXBOOK_PASSWORD environment variables required.")
-        print("        Set them as GitHub Secrets: MYFXBOOK_EMAIL, MYFXBOOK_PASSWORD")
         sys.exit(1)
 
-    session_token = None
+    # STEP 1: Login
+    print(f"[Auth] Logging in as {MYFXBOOK_EMAIL}...")
+    login_data = api_get("login.json", {"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD})
+    print(f"[Auth] Response: error={login_data.get('error')} message='{login_data.get('message','')}'")
 
+    if login_data.get("error"):
+        print(f"[Auth] Login failed: {login_data.get('message','unknown')}")
+        sys.exit(1)
+
+    session_token = login_data.get("session", "")
+    if not session_token:
+        print(f"[Auth] No session token. Full response: {login_data}")
+        sys.exit(1)
+
+    print(f"[Auth] Login OK. Session: {session_token[:8]}... (len={len(session_token)})")
+    time.sleep(2)
+
+    # STEP 2: Community Outlook — solo session, sin email
+    print("[API]  Fetching community outlook...")
     try:
-        # STEP 1 — Login
-        print(f"[Auth] Logging in as {MYFXBOOK_EMAIL}...")
-        login_resp = api_get("login.json", params={
-            "email":    MYFXBOOK_EMAIL,
-            "password": MYFXBOOK_PASSWORD,
-        })
-
-        if login_resp.get("error"):
-            print(f"[Auth] Login failed: {login_resp.get('message', 'unknown error')}")
-            sys.exit(1)
-
-        session_token = login_resp.get("session")
-        if not session_token:
-            print("[Auth] No session token returned")
-            sys.exit(1)
-
-        # Decodificar el token si viene URL-encoded (ej: %2F → /)
-        from urllib.parse import unquote
-        session_token = unquote(session_token)
-
-        print(f"[Auth] Login OK. Session: {session_token[:8]}...")
-        time.sleep(1)  # Myfxbook necesita un momento para registrar la sesión
-
-        # STEP 2 — Fetch community outlook
-        print("[API]  Fetching community outlook...")
-        outlook_resp = api_get("get-community-outlook.json", raw_params={
-            "session": session_token,
-            "email":   MYFXBOOK_EMAIL,
-        })
-
-        if outlook_resp.get("error"):
-            print(f"[API]  Error: {outlook_resp.get('message', 'unknown')}")
-            sys.exit(1)
-
-        symbols_data = outlook_resp.get("symbols", {})
-        if not symbols_data:
-            print("[API]  No symbols data in response")
-            sys.exit(1)
-
-        # STEP 3 — Normalize
-        # The API returns data keyed by symbol name, e.g.:
-        # { "EURUSD": { "name": "EUR/USD", "shortPercentage": 44.2, "longPercentage": 55.8,
-        #               "shortVolume": 987654, "longVolume": 1234567, ... } }
-        pairs = []
-
-        # Build lookup from symbol name → data
-        sym_lookup = {}
-        for key, val in symbols_data.items():
-            name = val.get("name", key)
-            # Normalize: "EURUSD" → "EUR/USD"
-            display = name if "/" in name else key
-            sym_lookup[display.replace("_", "/")] = val
-
-        # Also try numeric ID lookup from our SYMBOL_MAP
-        for sym_id in PRIORITY_IDS + [k for k in SYMBOL_MAP if k not in PRIORITY_IDS]:
-            display = SYMBOL_MAP.get(sym_id)
-            if not display:
-                continue
-
-            # Try to find by display name
-            raw = sym_lookup.get(display)
-            if raw is None:
-                # Try without slash
-                raw = sym_lookup.get(display.replace("/", ""))
-            if raw is None:
-                continue
-
-            long_pct  = raw.get("longPercentage")  or raw.get("longPercent")  or 0
-            short_pct = raw.get("shortPercentage") or raw.get("shortPercent") or 0
-            long_vol  = raw.get("longVolume",  0)
-            short_vol = raw.get("shortVolume", 0)
-
-            # Normalize to integers
-            long_pct  = round(float(long_pct))
-            short_pct = round(float(short_pct))
-
-            # Ensure they sum to 100
-            if long_pct + short_pct != 100:
-                total = long_pct + short_pct
-                if total > 0:
-                    long_pct  = round(long_pct  / total * 100)
-                    short_pct = 100 - long_pct
-
-            pairs.append({
-                "sym":      display,
-                "long":     long_pct,
-                "short":    short_pct,
-                "longVol":  int(long_vol),
-                "shortVol": int(short_vol),
-            })
-
-            bias = "LONG" if long_pct >= short_pct else "SHORT"
-            print(f"  {display:10s}  long={long_pct:3d}%  short={short_pct:3d}%  [{bias}]")
-
-        if not pairs:
-            print("[ERROR] Could not normalize any pairs from API response")
-            sys.exit(1)
-
-        # STEP 4 — Logout (best practice)
-        try:
-            api_get("logout.json", raw_params={"session": session_token})
-            print("\n[Auth] Logged out OK")
-        except Exception as e:
-            print(f"\n[Auth] Logout warning (non-fatal): {e}")
-
-        # STEP 5 — Write output
-        output = {
-            "updated": ts,
-            "source":  "myfxbook",
-            "pairs":   pairs,
-        }
-
-        with open(out_file, "w") as f:
-            json.dump(output, f, indent=2)
-
-        print(f"\n{'='*60}")
-        print(f"✅ {len(pairs)} pairs → {out_file}")
-        print(f"{'='*60}\n")
-
-    except requests.RequestException as e:
-        print(f"\n[ERROR] Network error: {e}")
-        sys.exit(1)
+        outlook_data = api_get("get-community-outlook.json", {"session": session_token})
     except Exception as e:
-        print(f"\n[ERROR] Unexpected error: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"[API]  Request failed: {e}")
         sys.exit(1)
 
+    print(f"[API]  Response: error={outlook_data.get('error')} message='{outlook_data.get('message','')}'")
+
+    if outlook_data.get("error"):
+        print(f"[API]  Error from server: {outlook_data.get('message','unknown')}")
+        print(f"[API]  Full response: {json.dumps(outlook_data)[:500]}")
+        sys.exit(1)
+
+    # symbols es un ARRAY: [{name, shortPercentage, longPercentage, ...}]
+    symbols_list = outlook_data.get("symbols", [])
+    if not symbols_list:
+        print(f"[API]  No symbols. Response keys: {list(outlook_data.keys())}")
+        sys.exit(1)
+
+    print(f"[API]  Got {len(symbols_list)} symbols")
+
+    # STEP 3: Normalizar
+    sym_map = {item.get("name","").upper().replace("/",""): item for item in symbols_list}
+
+    pairs = []
+    for api_name in PRIORITY_ORDER:
+        raw = sym_map.get(api_name)
+        if not raw:
+            continue
+        display   = SYMBOL_DISPLAY.get(api_name, api_name)
+        long_pct  = round(float(raw.get("longPercentage",  0) or 0))
+        short_pct = round(float(raw.get("shortPercentage", 0) or 0))
+        long_vol  = round(float(raw.get("longVolume",  0) or 0), 2)
+        short_vol = round(float(raw.get("shortVolume", 0) or 0), 2)
+        total = long_pct + short_pct
+        if total > 0 and total != 100:
+            long_pct  = round(long_pct / total * 100)
+            short_pct = 100 - long_pct
+        pairs.append({"sym": display, "long": long_pct, "short": short_pct, "longVol": long_vol, "shortVol": short_vol})
+        bias = "LONG " if long_pct >= short_pct else "SHORT"
+        print(f"  {display:10s}  long={long_pct:3d}%  short={short_pct:3d}%  [{bias}]")
+
+    if not pairs:
+        print(f"[ERROR] No pairs normalized. sym_map keys: {list(sym_map.keys())[:5]}")
+        sys.exit(1)
+
+    # STEP 4: Logout
+    try:
+        api_get("logout.json", {"session": session_token})
+        print("\n[Auth] Logged out OK")
+    except Exception as e:
+        print(f"\n[Auth] Logout warning (non-fatal): {e}")
+
+    # STEP 5: Escribir JSON
+    output = {"updated": ts, "source": "myfxbook", "pairs": pairs}
+    with open(out_file, "w") as f:
+        json.dump(output, f, indent=2)
+
+    print(f"\n{'='*60}")
+    print(f"OK {len(pairs)} pairs -> {out_file}")
+    print(f"{'='*60}\n")
 
 if __name__ == "__main__":
     main()
