@@ -1,23 +1,10 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v2.0 — Myfxbook Community Outlook via REST API
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-API docs: https://www.myfxbook.com/api
-  - Login:   GET /api/login.json?email=X&password=Y  -> { session: "TOKEN" }
-  - Outlook: GET /api/get-community-outlook.json?session=TOKEN
-             -> { symbols: [ {name, shortPercentage, longPercentage, ...} ] }
-  - Logout:  GET /api/logout.json?session=TOKEN
-
-NOTAS (API v1.38, oct 2025):
-  - Sesiones IP-bound, TTL 1 mes.
-  - get-community-outlook solo acepta "session", NO "email".
-  - symbols es un ARRAY con campo "name" (ej: "EURUSD"), no un dict.
-  - Limite free: 100 requests/24h.
+fetch_myfxbook_sentiment.py  v2.1 — debug IP-bound session issue
 """
 
 import os, sys, json, time
 from datetime import datetime, timezone
-from urllib.parse import urlencode
 
 try:
     import requests
@@ -44,18 +31,13 @@ PRIORITY_ORDER = [
     "AUDCHF","AUDNZD","GBPCHF","GBPAUD","GBPCAD","GBPNZD","CHFJPY","CADJPY",
 ]
 
-_http = requests.Session()
-_http.headers.update({
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Accept": "application/json",
-})
-
-def api_get(path, params):
-    qs  = urlencode(params)
-    url = f"{BASE_URL}/{path}?{qs}"
-    r   = _http.get(url, timeout=20)
-    r.raise_for_status()
-    return r.json()
+def get_public_ip(session):
+    """Obtiene la IP pública que verá Myfxbook."""
+    try:
+        r = session.get("https://api.ipify.org?format=json", timeout=5)
+        return r.json().get("ip", "unknown")
+    except:
+        return "unknown"
 
 def main():
     site_path = os.environ.get("SITE_PATH", ".")
@@ -65,16 +47,31 @@ def main():
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"\n{'='*60}")
-    print(f"fetch_myfxbook_sentiment.py  v2.0  --  {ts}")
+    print(f"fetch_myfxbook_sentiment.py  v2.1  --  {ts}")
     print(f"{'='*60}\n")
 
     if not MYFXBOOK_EMAIL or not MYFXBOOK_PASSWORD:
         print("[ERROR] MYFXBOOK_EMAIL and MYFXBOOK_PASSWORD environment variables required.")
         sys.exit(1)
 
+    # Una sola Session para TODAS las requests — mismas cookies, mismo socket pool
+    http = requests.Session()
+    http.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+    })
+
+    # Verificar IP antes del login
+    ip_before = get_public_ip(http)
+    print(f"[Net]  Public IP before login: {ip_before}")
+
     # STEP 1: Login
     print(f"[Auth] Logging in as {MYFXBOOK_EMAIL}...")
-    login_data = api_get("login.json", {"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD})
+    r = http.get(f"{BASE_URL}/login.json",
+                 params={"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD},
+                 timeout=20)
+    r.raise_for_status()
+    login_data = r.json()
     print(f"[Auth] Response: error={login_data.get('error')} message='{login_data.get('message','')}'")
 
     if login_data.get("error"):
@@ -86,25 +83,52 @@ def main():
         print(f"[Auth] No session token. Full response: {login_data}")
         sys.exit(1)
 
-    print(f"[Auth] Login OK. Session: {session_token[:8]}... (len={len(session_token)})")
-    time.sleep(2)
+    print(f"[Auth] Login OK. Token len={len(session_token)}")
+    print(f"[Auth] Token preview (first 16): {session_token[:16]}")
+    print(f"[Auth] Token has special chars: {any(c in session_token for c in '/+= %')}")
 
-    # STEP 2: Community Outlook — solo session, sin email
-    print("[API]  Fetching community outlook...")
-    try:
-        outlook_data = api_get("get-community-outlook.json", {"session": session_token})
-    except Exception as e:
-        print(f"[API]  Request failed: {e}")
-        sys.exit(1)
+    # Verificar IP después del login (debe ser la misma)
+    ip_after = get_public_ip(http)
+    print(f"[Net]  Public IP after login:  {ip_after}")
+    if ip_before != ip_after:
+        print(f"[Net]  WARNING: IP changed between requests! {ip_before} -> {ip_after}")
+        print(f"[Net]  This is the cause of 'Invalid session' — sessions are IP-bound since Oct 2025")
+    else:
+        print(f"[Net]  IP stable: {ip_after}")
 
+    time.sleep(1)
+
+    # STEP 2: Community Outlook — pasar token con params= (requests maneja el encoding)
+    print("\n[API]  Fetching community outlook...")
+    print(f"[API]  URL: {BASE_URL}/get-community-outlook.json?session=***")
+    
+    r2 = http.get(f"{BASE_URL}/get-community-outlook.json",
+                  params={"session": session_token},
+                  timeout=20)
+    
+    print(f"[API]  HTTP status: {r2.status_code}")
+    print(f"[API]  Final URL (redacted): {r2.url[:80]}...")
+    
+    r2.raise_for_status()
+    outlook_data = r2.json()
     print(f"[API]  Response: error={outlook_data.get('error')} message='{outlook_data.get('message','')}'")
 
     if outlook_data.get("error"):
-        print(f"[API]  Error from server: {outlook_data.get('message','unknown')}")
-        print(f"[API]  Full response: {json.dumps(outlook_data)[:500]}")
-        sys.exit(1)
+        print(f"[API]  Error: {outlook_data.get('message','unknown')}")
+        # Intentar con token URL-encoded manualmente como fallback
+        print("\n[API]  Retrying with manually encoded token...")
+        from urllib.parse import quote
+        encoded_token = quote(session_token, safe='')
+        url_manual = f"{BASE_URL}/get-community-outlook.json?session={encoded_token}"
+        print(f"[API]  Manual URL token preview: {url_manual[len(BASE_URL)+35:len(BASE_URL)+51]}...")
+        r3 = http.get(url_manual, timeout=20)
+        print(f"[API]  Retry HTTP status: {r3.status_code}")
+        outlook_data = r3.json()
+        print(f"[API]  Retry response: error={outlook_data.get('error')} message='{outlook_data.get('message','')}'")
+        if outlook_data.get("error"):
+            print("[API]  Both attempts failed.")
+            sys.exit(1)
 
-    # symbols es un ARRAY: [{name, shortPercentage, longPercentage, ...}]
     symbols_list = outlook_data.get("symbols", [])
     if not symbols_list:
         print(f"[API]  No symbols. Response keys: {list(outlook_data.keys())}")
@@ -114,7 +138,6 @@ def main():
 
     # STEP 3: Normalizar
     sym_map = {item.get("name","").upper().replace("/",""): item for item in symbols_list}
-
     pairs = []
     for api_name in PRIORITY_ORDER:
         raw = sym_map.get(api_name)
@@ -134,12 +157,11 @@ def main():
         print(f"  {display:10s}  long={long_pct:3d}%  short={short_pct:3d}%  [{bias}]")
 
     if not pairs:
-        print(f"[ERROR] No pairs normalized. sym_map keys: {list(sym_map.keys())[:5]}")
         sys.exit(1)
 
     # STEP 4: Logout
     try:
-        api_get("logout.json", {"session": session_token})
+        http.get(f"{BASE_URL}/logout.json", params={"session": session_token}, timeout=10)
         print("\n[Auth] Logged out OK")
     except Exception as e:
         print(f"\n[Auth] Logout warning (non-fatal): {e}")
