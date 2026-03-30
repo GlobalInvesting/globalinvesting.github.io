@@ -2173,8 +2173,16 @@ async function fetchNewsData() {
     // ── NEWS FEED (fill the full panel, up to 24 items)
     const feedEl = document.getElementById('news-feed-items');
     if (feedEl) {
-      feedEl.innerHTML = enItems.slice(0, 24).map(item => {
-        const time     = item.time || '--:--';
+    feedEl.innerHTML = enItems.slice(0, 24).map(item => {
+        // Convert UTC timestamp to user's local time
+        let time = item.time || '--:--';
+        if (item.ts) {
+          const d = new Date(item.ts);
+          time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        } else if (item.datetime) {
+          const d = new Date(item.datetime);
+          if (!isNaN(d)) time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
         const headline = item.title || '';
         const cur      = item.cur || item.currency || '';
         const source   = item.source || '';
@@ -3045,9 +3053,9 @@ async function renderRiskData(byId, fetchYahoo, fetchStooq) {
     const vix = byId.vix.close;
     const isInverted = byId.us10y && byId.us3m && (byId.us10y.close < byId.us3m.close);
     let regime, regimeSub;
-    if (vix > 30) { regime = 'RISK-OFF'; regimeSub = 'High fear — reduce exposure'; }
+    if (vix > 30) { regime = 'RISK-OFF'; regimeSub = 'High fear · VIX elevated'; }
     else if (vix > 20) { regime = 'CAUTION'; regimeSub = 'Elevated volatility'; }
-    else if (isInverted) { regime = 'RISK-OFF'; regimeSub = 'Inverted curve — recession risk'; }
+    else if (isInverted) { regime = 'RISK-OFF'; regimeSub = 'Inverted curve · recession risk'; }
     else { regime = 'RISK-ON'; regimeSub = 'Risk appetite active'; }
     const regEl = document.getElementById('risk-regime');
     if (regEl) {
@@ -3492,6 +3500,18 @@ async function fetchCrossAssetData() {
   if (_caWti)    setCA('wti',    _caWti.close,    _caWti.pct,    false);
   if (_caNikkei) setCA('nikkei', _caNikkei.close, _caNikkei.pct, false);
   if (_caStoxx)  setCA('stoxx',  _caStoxx.close,  _caStoxx.pct,  false);
+  // US10Y desde intraday JSON — sobreescribe el valor de repo (que puede tener 1 día de delay)
+  const _caUs10yEarly = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
+  if (_caUs10yEarly && _caUs10yEarly.close > 0) setCA('us10y', _caUs10yEarly.close, _caUs10yEarly.pct, true);
+  // Gold/SPX ratio — calculado apenas tenemos ambos valores del JSON
+  if (_caGold && _caSpx && _caSpx.close > 0) {
+    const ratio = (_caGold.close / _caSpx.close).toFixed(3);
+    const rNum  = parseFloat(ratio);
+    const sig   = rNum > 0.75 ? 'Risk-Off signal' : rNum > 0.55 ? 'Neutral' : 'Risk-On signal';
+    const cls   = rNum > 0.75 ? 'down' : rNum < 0.55 ? 'up' : 'flat';
+    setEl('ri-gold-spx', ratio);
+    setEl('ri-gold-spx-sig', sig, cls);
+  }
   if (_caDxy) {
     setCA('dxy', _caDxy.close, _caDxy.pct, false);
     const dEl = document.getElementById('q-dxy'), dcEl = document.getElementById('qc-dxy');
