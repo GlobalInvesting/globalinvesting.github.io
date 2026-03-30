@@ -1079,7 +1079,7 @@
     <div class="sb-section">
       <div class="sb-head">FX Liquidity</div>
       <div style="padding:6px 8px 4px;position:relative;">
-        <div id="liq-tooltip" style="display:none;position:absolute;z-index:99;background:#1e222d;border:1px solid #363c4e;border-radius:3px;padding:4px 7px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+        <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:#1e222d;border:1px solid #363c4e;border-radius:3px;padding:4px 7px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
           <span id="liq-tt-time" style="color:#787b86;"></span><br>
           <span id="liq-tt-session" style="color:#f6941c;font-size:8px;"></span><br>
           <span id="liq-tt-vol" style="color:#2962ff;font-weight:600;"></span>
@@ -3996,14 +3996,17 @@ window.addEventListener('resize', drawLiquidityChart);
     document.getElementById('liq-tt-session').textContent = '▸ ' + getActiveSessions(Math.floor(utcH));
     document.getElementById('liq-tt-vol').textContent = '⬤ Activity: ' + volLabel(v, maxV);
 
-    // Position tooltip above cursor, inside the canvas wrapper
-    const ttW = tooltip.offsetWidth || 160;
-    const canvasLeft = rect.left;
-    const relX = e.clientX - rect.left; // in CSS px
-    let left = relX + 8;
-    if (left + ttW > rect.width - 4) left = relX - ttW - 8;
+    // Position tooltip next to cursor using fixed coordinates
+    const ttW = tooltip.offsetWidth || 170;
+    const ttH = tooltip.offsetHeight || 56;
+    let left = e.clientX + 14;
+    let top  = e.clientY - ttH / 2;
+    // Flip left if near right edge of viewport
+    if (left + ttW > window.innerWidth - 8) left = e.clientX - ttW - 14;
+    if (top < 4) top = 4;
+    if (top + ttH > window.innerHeight - 4) top = window.innerHeight - ttH - 4;
     tooltip.style.left = left + 'px';
-    tooltip.style.top = '2px';
+    tooltip.style.top  = top  + 'px';
     tooltip.style.display = 'block';
   });
 
