@@ -1,36 +1,62 @@
 {
-  "updated": "2026-03-30T19:58:12Z",
-  "source": "mixed",
+  "updated": "2026-03-30T20:07:43Z",
+  "source": "yfinance",
   "quotes": {
+    "vix": {
+      "close": 30.41,
+      "prev_close": 31.05,
+      "chg": -0.64,
+      "pct": -2.0612,
+      "source": "yfinance"
+    },
+    "spx": {
+      "close": 6343.7202,
+      "prev_close": 6368.8501,
+      "chg": -25.1299,
+      "pct": -0.3946,
+      "source": "yfinance"
+    },
     "gold": {
-      "close": 4509.966,
-      "prev_close": 4507.6783,
-      "chg": 2.2877,
-      "pct": 0.0508,
-      "source": "twelve_data"
+      "close": 4544.7998,
+      "prev_close": 4492.0,
+      "chg": 52.7998,
+      "pct": 1.1754,
+      "source": "yfinance"
     },
     "wti": {
-      "close": 124.2,
-      "prev_close": 117.26,
-      "chg": 6.94,
-      "pct": 5.9185,
-      "source": "alpha_vantage"
-    },
-    "vix": {
-      "close": 27.44,
-      "prev_close": 27.44,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true
+      "close": 104.06,
+      "prev_close": 99.64,
+      "chg": 4.42,
+      "pct": 4.436,
+      "source": "yfinance"
     },
     "us10y": {
-      "close": 4.42,
-      "prev_close": 4.42,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true
+      "close": 4.342,
+      "prev_close": 4.44,
+      "chg": -0.098,
+      "pct": -2.2072,
+      "source": "yfinance"
+    },
+    "nikkei": {
+      "close": 53373.0703,
+      "prev_close": 53603.6484,
+      "chg": -230.5781,
+      "pct": -0.4302,
+      "source": "yfinance"
+    },
+    "stoxx": {
+      "close": 5541.79,
+      "prev_close": 5505.7998,
+      "chg": 35.9902,
+      "pct": 0.6537,
+      "source": "yfinance"
+    },
+    "dxy": {
+      "close": 100.52,
+      "prev_close": 100.15,
+      "chg": 0.37,
+      "pct": 0.3694,
+      "source": "yfinance"
     }
   }
 }
