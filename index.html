@@ -1303,7 +1303,7 @@
 
     <!-- RATES & YIELD CURVE -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · TradingView live</span></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · yfinance + stooq</span></div>
       <div id="rates-grid-wrap" class="rates-grid">
         <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
         <div class="rate-cell"><div class="rate-cty">2Y Note</div><div class="rate-val" id="rate-2y">—</div><div class="rate-chg flat" id="rate-2y-chg">—</div></div>
@@ -1369,7 +1369,7 @@
               <tr><td>New York</td><td class="up">±71p</td><td class="up">±66p</td></tr>
             </tbody>
           </table>
-          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · historical reference</div>
+          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · 5yr historical avg · fixed reference</div>
         </div>
         <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
@@ -1533,7 +1533,7 @@
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Option Skew — 25-Delta RR</div>
+    <div class="sb-head" style="margin-top:2px;">Option Skew — 25-Delta RR <span style="font-size:9px;color:var(--text3);font-weight:normal;">est. via COT</span></div>
     <table>
       <thead><tr><th style="text-align:left">Pair</th><th>1W</th><th>1M</th><th>Bias</th></tr></thead>
       <tbody id="skew-tbody">
@@ -1542,7 +1542,7 @@
     </table>
 
     <div style="padding:6px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);margin-top:auto;">
-      ECB · CFTC · stooq · TradingView · AI via Groq
+      ECB · CFTC · yfinance · stooq · TradingView · AI via Groq
     </div>
   </aside>
 
@@ -1550,7 +1550,7 @@
 
 <!-- STATUS BAR / FOOTER -->
 <div id="statusbar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · STOOQ · TRADINGVIEW</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · YFINANCE · STOOQ · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
@@ -2348,6 +2348,7 @@ function intradayQuote(cache, id) {
   if (!q.close || isNaN(q.close) || q.close <= 0) return null;
   return {
     close:      q.close,
+    prev_close: q.prev_close ?? null,
     open:       q.prev_close ?? q.close,
     chg:        q.chg  ?? 0,
     pct:        q.pct  ?? 0,
@@ -3041,11 +3042,20 @@ async function renderRiskData(byId, fetchYahoo, fetchStooq) {
     .filter(p => p.val !== null);
 
   // Need at least 2 points to draw the curve
+  // Build prior curve from prev_close in byId (comes from quotes.json via intraday JSON)
+  const priorPoints = REAL_TENORS
+    .map(t => {
+      const q = byId[t.key];
+      const prev = q?.prev_close ?? null;
+      return prev != null ? { label: t.label, val: prev } : null;
+    })
+    .filter(Boolean);
+
   if (realPoints.length >= 2) {
-    drawYieldCurveAndCache(realPoints);
+    drawYieldCurveAndCache(realPoints, priorPoints.length >= 2 ? priorPoints : null);
   } else {
     // Not enough live data — draw with static fallback and note it
-    drawYieldCurveAndCache(null);
+    drawYieldCurveAndCache(null, null);
   }
 
   // Regime assessment based on VIX + yield curve
@@ -3111,17 +3121,20 @@ async function renderRiskData(byId, fetchYahoo, fetchStooq) {
 const STATIC_YIELDS = [4.35, 4.28, 4.32, 4.42, 4.58]; // 3M,2Y,5Y,10Y,30Y
 const STATIC_LABELS = ['3M','2Y','5Y','10Y','30Y'];
 let _lastDrawnYields = null; // {label, val}[] or null
+let _lastDrawnPrior  = null; // {label, val}[] from prev_close, or null
 
-function drawYieldCurveAndCache(points) {
+function drawYieldCurveAndCache(points, priorPoints) {
   // points can be: {label,val}[] (real data) or null (use static)
+  // priorPoints: {label,val}[] from prev_close in quotes.json (optional, overrides PRIOR_MAP)
   _lastDrawnYields = points;
-  drawYieldCurve(points);
+  _lastDrawnPrior  = priorPoints || null;
+  drawYieldCurve(points, priorPoints);
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // YIELD CURVE — canvas drawing, accepts real sparse data points
 // ═══════════════════════════════════════════════════════════════════
-function drawYieldCurve(points) {
+function drawYieldCurve(points, priorPoints) {
   const canvas = document.getElementById('yield-canvas');
   if (!canvas) return;
   const wrap = canvas.parentElement;
@@ -3141,9 +3154,16 @@ function drawYieldCurve(points) {
     isLive = false;
   }
 
-  // Prior curve reference (last week approximate — static reference)
+  // Prior curve reference — use prev_close from quotes.json when available, else PRIOR_MAP
   const PRIOR_MAP = { '3M':4.32,'2Y':4.35,'5Y':4.38,'7Y':4.36,'10Y':4.26,'20Y':4.45,'30Y':4.38,'6M':4.28,'1Y':4.25 };
-  const prevVals = labels.map(l => PRIOR_MAP[l] ?? null);
+  let prevVals;
+  if (priorPoints && priorPoints.length >= 2) {
+    const priorLookup = {};
+    priorPoints.forEach(p => { priorLookup[p.label] = p.val; });
+    prevVals = labels.map(l => priorLookup[l] ?? PRIOR_MAP[l] ?? null);
+  } else {
+    prevVals = labels.map(l => PRIOR_MAP[l] ?? null);
+  }
 
   const n = labels.length;
   const validV = vals.filter(v => v != null && !isNaN(v));
@@ -3243,7 +3263,7 @@ function drawYieldCurve(points) {
 }
 
 setTimeout(() => drawYieldCurveAndCache(null), 60);
-window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields));
+window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDrawnPrior));
 
 // ═══════════════════════════════════════════════════════════════════
 
