@@ -808,8 +808,14 @@
     #main { overflow-x: hidden; overflow-y: visible !important; }
 
     /* Liquidity widget: recalibrate for narrow mobile viewport */
-    #liquidity-clip { height: 220px !important; }
-    #liquidity-clip iframe { margin-top: -52px !important; height: 290px !important; }
+    /* On mobile the iframe is full-width — reset desktop left-crop, retune vertical */
+    #liquidity-clip { height: 200px !important; }
+    #liquidity-clip iframe {
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-top: -48px !important;
+      height: 260px !important;
+    }
   }
 
   /* ── Site menu dropdown ── */
@@ -2218,13 +2224,34 @@ const QB_STOOQ_PAIRS = [
 // Cache for stooq RT rates — used to update FX pairs table
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 
+// ── Centralized CORS proxy helper ──────────────────────────────────────────
+// Returns an ordered list of proxy URLs for a given target URL.
+// Proxies are tried in order; first success wins.
+function proxyUrls(targetUrl) {
+  const enc = encodeURIComponent(targetUrl);
+  return [
+    `https://corsproxy.io/?${enc}`,
+    `https://api.allorigins.win/raw?url=${enc}`,
+    `https://api.codetabs.com/v1/proxy?quest=${enc}`,
+    `https://thingproxy.freeboard.io/fetch/${targetUrl}`,
+    targetUrl, // direct fallback
+  ];
+}
+
+// Same but for Yahoo Finance — allorigins handles JSON wrapping better
+function proxyUrlsYahoo(targetUrl) {
+  const enc = encodeURIComponent(targetUrl);
+  return [
+    `https://api.allorigins.win/raw?url=${enc}`,
+    `https://corsproxy.io/?${enc}`,
+    `https://api.codetabs.com/v1/proxy?quest=${enc}`,
+  ];
+}
+// ──────────────────────────────────────────────────────────────────────────
+
 async function fetchStooqQuoteSingle(sym) {
   const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
-  const urls = [
-    `https://corsproxy.io/?${encodeURIComponent(base)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
-    base,
-  ];
+  const urls = proxyUrls(base);
   for (const url of urls) {
     try {
       const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -2362,7 +2389,7 @@ async function fetchCommodityQuotes() {
   // Fetch via stooq.com (correct stooq symbols) with Yahoo Finance cors proxy as fallback
   async function fetchStooqQuote(stooqSym, fallbackClose) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(stooqSym)}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [`https://corsproxy.io/?${encodeURIComponent(base)}`, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, base];
+    const urls = proxyUrls(base);
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -2377,19 +2404,23 @@ async function fetchCommodityQuotes() {
         return { close, open, chg: close - open, pct: open > 0 ? (close-open)/open*100 : 0 };
       } catch { continue; }
     }
-    // All stooq failed — try Yahoo Finance via allorigins
-    try {
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + fallbackClose + '?interval=1d&range=2d')}`;
-      const r2 = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
-      if (!r2.ok) return null;
-      const d = await r2.json();
-      const meta = d?.chart?.result?.[0]?.meta;
-      if (!meta) return null;
-      const close2 = meta.regularMarketPrice;
-      const prev2  = meta.chartPreviousClose || meta.previousClose || close2;
-      if (!close2) return null;
-      return { close: close2, open: prev2, chg: close2 - prev2, pct: prev2 > 0 ? (close2-prev2)/prev2*100 : 0 };
-    } catch { return null; }
+    // All stooq failed — try Yahoo Finance with multiple proxies
+    const yUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${fallbackClose}?interval=1d&range=2d`;
+    for (const pu of proxyUrlsYahoo(yUrl)) {
+      try {
+        const r2 = await fetch(pu, { signal: AbortSignal.timeout(5000) });
+        if (!r2.ok) continue;
+        let d = await r2.json();
+        if (d?.contents) { try { d = JSON.parse(d.contents); } catch { continue; } }
+        const meta = d?.chart?.result?.[0]?.meta;
+        if (!meta) continue;
+        const close2 = meta.regularMarketPrice;
+        const prev2  = meta.chartPreviousClose || meta.previousClose || close2;
+        if (!close2) continue;
+        return { close: close2, open: prev2, chg: close2 - prev2, pct: prev2 > 0 ? (close2-prev2)/prev2*100 : 0 };
+      } catch { continue; }
+    }
+    return null;
   }
 
   try {
@@ -2556,11 +2587,7 @@ async function fetchRiskData() {
   // Try stooq.com free CSV data — no auth needed, but may be blocked on weekends
   async function fetchStooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [
-      `https://corsproxy.io/?${encodeURIComponent(base)}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
-      base,
-    ];
+    const urls = proxyUrls(base);
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -2609,12 +2636,7 @@ async function fetchRiskData() {
     const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const base2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     // allorigins first — correctly handles Yahoo JSON wrapping; corsproxy often 404s for ^-prefixed symbols
-    const urls = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(base2)}`,
-      `https://corsproxy.io/?${encodeURIComponent(base)}`,
-      `https://corsproxy.io/?${encodeURIComponent(base2)}`,
-    ];
+    const urls = [...proxyUrlsYahoo(base), ...proxyUrlsYahoo(base2)];
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
@@ -3175,7 +3197,7 @@ async function fetchCrossAssetData() {
   // Helper: fetch stooq CSV
   async function stooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym)}&f=sd2t2ohlcv&h&e=csv`;
-    const urls = [`https://corsproxy.io/?${encodeURIComponent(base)}`, `https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, base];
+    const urls = proxyUrls(base);
     for (const url of urls) {
       try {
         const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -3227,10 +3249,7 @@ async function fetchCrossAssetData() {
   let nikkeiData = nikkei;
   if (!nikkeiData) {
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?interval=1d&range=2d`;
-    for (const yurl of [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
-      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
-    ]) {
+    for (const yurl of proxyUrlsYahoo(yBase)) {
       try {
         const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
@@ -3249,10 +3268,7 @@ async function fetchCrossAssetData() {
   let stoxxData = stoxx;
   if (!stoxxData) {
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/%5ESTOXX50E?interval=1d&range=2d`;
-    for (const yurl of [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
-      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
-    ]) {
+    for (const yurl of proxyUrlsYahoo(yBase)) {
       try {
         const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
@@ -3293,10 +3309,7 @@ async function fetchCrossAssetData() {
   let dxyData = dxy;
   if (!dxyData) {
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?interval=1d&range=2d`;
-    for (const yurl of [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(yBase)}`,
-      `https://corsproxy.io/?${encodeURIComponent(yBase)}`
-    ]) {
+    for (const yurl of proxyUrlsYahoo(yBase)) {
       try {
         const yr = await fetch(yurl, { signal: AbortSignal.timeout(5000) });
         if (!yr.ok) continue;
@@ -3360,21 +3373,26 @@ async function fetchCalendarData() {
     const events = data.events || [];
 
     // Filter today's events for G8 currencies — include all impacts
-    const todayISO = new Date().toISOString().slice(0,10);
+    // Use both UTC date and local date to handle timezone differences (e.g. UTC-3 Montevideo)
+    const nowUTC = new Date();
+    const todayISO = nowUTC.toISOString().slice(0, 10); // UTC date
+    const localISO = new Date(nowUTC.getTime() - nowUTC.getTimezoneOffset() * 60000).toISOString().slice(0, 10); // local date
+    const todayDates = [...new Set([todayISO, localISO])]; // deduplicated
     const g8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const g8events = events.filter(e => g8.includes(e.currency));
 
     // Today: high+medium first; if <3, fill with low-impact too
-    let todayHM = g8events.filter(e => e.dateISO === todayISO && (e.impact === 'high' || e.impact === 'medium'));
-    let todayAll = g8events.filter(e => e.dateISO === todayISO);
+    let todayHM = g8events.filter(e => todayDates.includes(e.dateISO) && (e.impact === 'high' || e.impact === 'medium'));
+    let todayAll = g8events.filter(e => todayDates.includes(e.dateISO));
     let todayEvents = todayHM.length >= 2 ? todayHM : todayAll;
     todayEvents = todayEvents.slice(0, 8);
 
     // If still nothing today, look ahead up to 3 business days (high+medium only)
     let upcoming = todayEvents;
     if (!upcoming.length) {
+      const minToday = todayDates.reduce((a, b) => a < b ? a : b);
       upcoming = g8events
-        .filter(e => e.dateISO > todayISO && (e.impact === 'high' || e.impact === 'medium'))
+        .filter(e => e.dateISO > minToday && (e.impact === 'high' || e.impact === 'medium'))
         .slice(0, 6);
     }
 
@@ -3741,16 +3759,19 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
       document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
       this.classList.add('active');
       if (target === 'top') {
-        (main || window).scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       const el = document.getElementById(target);
       if (!el) return;
-      if (main) {
-        // Scroll inside the main panel (overflow-y: auto)
+      // Check if main is actually scrollable (desktop) or not (mobile overflow:visible)
+      const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
+      if (mainScrollable) {
         const offset = el.offsetTop - (main.offsetTop || 0);
         main.scrollTo({ top: offset - 4, behavior: 'smooth' });
       } else {
+        // Mobile: use scrollIntoView on the element itself
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
