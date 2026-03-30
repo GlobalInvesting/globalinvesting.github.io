@@ -504,7 +504,7 @@
 
   /* MACRO */
   .macro-row {
-    display: grid; grid-template-columns: 1fr 40px 40px 46px;
+    display: grid; grid-template-columns: 32px 1fr 36px 36px 42px;
     padding: 4px 8px; border-bottom: 1px solid var(--border);
     font-size: 11px; gap: 2px; align-items: center;
     cursor: pointer; transition: background .1s;
@@ -619,6 +619,10 @@
   /* SENTIMENT PANEL */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
+  /* Hide "Powered by Myfxbook" footer on sentiment widget — always */
+  #myfxbook-wrap .myfxbookLink,
+  #myfxbook-wrap a[href*="myfxbook"],
+  #myfxbook-wrap div:has(.myfxbookLink) { display: none !important; height: 0 !important; overflow: hidden !important; }
 
   /* Force myfxbook widget colors to match dark terminal theme */
   /* Hide only the internal "Community Outlook" title row (~28px), keep column headers visible */
@@ -996,12 +1000,12 @@
   <nav class="top-nav">
     <a class="active" data-target="top">Overview</a>
     <a data-target="section-fxpairs">FX Pairs</a>
-    <a data-target="section-macro">Macro</a>
-    <a data-target="section-rates">Rates</a>
+    <a data-target="section-econmap">Macro</a>
+    <a data-target="section-cbrates">Rates</a>
     <a data-target="section-crossasset">Cross-Asset</a>
     <a data-target="section-risk">Risk</a>
     <a data-target="section-positioning">Positioning</a>
-    <a data-target="section-macro">Calendar</a>
+    <a data-target="section-calendar">Calendar</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1421,7 +1425,7 @@
     </div>
 
     <!-- NEWS FEED + ECONOMIC MAP -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:440px;">
+    <div id="section-econmap" style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:440px;">
       <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:440px;">
         <div class="panel-head">
           <span class="panel-title">News Feed</span>
@@ -1458,15 +1462,15 @@
 
   <!-- RIGHT PANEL -->
   <aside id="rightpanel">
-    <div class="sb-head">Macro Calendar — Today</div>
-    <div style="display:grid;grid-template-columns:1fr 40px 40px 46px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-bottom:1px solid var(--border2);gap:2px;">
-      <span>Event</span><span style="text-align:right">Prev</span><span style="text-align:right">Exp</span><span style="text-align:right">Act</span>
+    <div id="section-calendar" class="sb-head">Macro Calendar — Today</div>
+    <div style="display:grid;grid-template-columns:32px 1fr 36px 36px 42px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-bottom:1px solid var(--border2);gap:2px;">
+      <span>Time</span><span>Event</span><span style="text-align:right">Prev</span><span style="text-align:right">Exp</span><span style="text-align:right">Act</span>
     </div>
-    <div id="rp-calendar-rows" style="max-height:180px;overflow:hidden;">
+    <div id="rp-calendar-rows" style="max-height:240px;overflow-y:auto;overflow-x:hidden;">
       <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading calendar…</div>
     </div>
 
-    <div class="sb-head" style="margin-top:2px;">Central Bank Rates</div>
+    <div id="section-cbrates" class="sb-head" style="margin-top:2px;">Central Bank Rates</div>
     <table id="cbrates-table">
       <thead><tr><th style="text-align:left">Bank</th><th>Rate</th><th>Trend</th></tr></thead>
       <tbody id="cbrates-tbody">
@@ -3128,8 +3132,38 @@ document.querySelectorAll('.tv-tab').forEach(tab => {
     });
     container.appendChild(script);
     wrap.appendChild(container);
+    // Re-trigger legend minimize after symbol change
+    setTimeout(minimizeTVLegend, 3000);
   });
 });
+
+// ── TradingView legend auto-minimize (MA 20, Close, Vol labels) ──────────
+// The widget renders inside an iframe so we poll for the minimize buttons
+// and click them. Runs on initial load and on each symbol change.
+function minimizeTVLegend() {
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+  const iframe = wrap.querySelector('iframe');
+  if (!iframe) return;
+  // Try accessing the iframe document (same-origin if TV embeds it same-domain, else blocked)
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!doc) return;
+    // Click all legend item minimize/collapse buttons (aria-label or title contains "Minimize")
+    const btns = doc.querySelectorAll(
+      '[data-name="legend-source-item"] button[aria-label], ' +
+      '.legendItemControls button, ' +
+      '[class*="minimizeButton"], ' +
+      '[class*="collapseButton"]'
+    );
+    btns.forEach(btn => { try { btn.click(); } catch(_){} });
+  } catch(_) {
+    // Cross-origin — can't access iframe internals, nothing we can do
+  }
+}
+// Run once after initial widget loads (give it ~4s to render)
+setTimeout(minimizeTVLegend, 4000);
+// ─────────────────────────────────────────────────────────────────────────
 
 // TOP NAV
 document.querySelectorAll('.top-nav a').forEach(a => {
@@ -3381,19 +3415,25 @@ async function fetchCalendarData() {
     const g8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const g8events = events.filter(e => g8.includes(e.currency));
 
-    // Today: high+medium first; if <3, fill with low-impact too
-    let todayHM = g8events.filter(e => todayDates.includes(e.dateISO) && (e.impact === 'high' || e.impact === 'medium'));
-    let todayAll = g8events.filter(e => todayDates.includes(e.dateISO));
-    let todayEvents = todayHM.length >= 2 ? todayHM : todayAll;
+    // Skip purely informational DST-change entries (they're not tradeable events)
+    const isDST = e => (e.event || e.name || '').toLowerCase().includes('daylight saving');
+    const meaningful = g8events.filter(e => !isDST(e));
+
+    // Today: high+medium first; if <2, fill with all non-DST too
+    const todayMeaningful = meaningful.filter(e => todayDates.includes(e.dateISO));
+    const todayHM = todayMeaningful.filter(e => e.impact === 'high' || e.impact === 'medium');
+    let todayEvents = todayHM.length >= 2 ? todayHM : todayMeaningful;
     todayEvents = todayEvents.slice(0, 8);
 
-    // If still nothing today, look ahead up to 3 business days (high+medium only)
+    // If still nothing meaningful today, look ahead up to 3 business days (high+medium only)
     let upcoming = todayEvents;
-    if (!upcoming.length) {
+    if (upcoming.length < 2) {
       const minToday = todayDates.reduce((a, b) => a < b ? a : b);
-      upcoming = g8events
+      const ahead = meaningful
         .filter(e => e.dateISO > minToday && (e.impact === 'high' || e.impact === 'medium'))
-        .slice(0, 6);
+        .slice(0, 8);
+      // If today had some events, show them + upcoming combined; otherwise just upcoming
+      upcoming = todayEvents.length ? [...todayEvents, ...ahead].slice(0, 8) : ahead;
     }
 
     const container = document.getElementById('rp-calendar-rows');
@@ -3402,6 +3442,11 @@ async function fetchCalendarData() {
       container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">No scheduled events — check back Monday</div>';
       return;
     }
+    // Update calendar heading: "Today" vs "Upcoming" depending on content
+    const calHead = document.getElementById('section-calendar');
+    const hasToday = upcoming.some(e => todayDates.includes(e.dateISO));
+    if (calHead) calHead.textContent = hasToday ? 'Macro Calendar — Today' : 'Macro Calendar — Upcoming';
+
     container.innerHTML = upcoming.map(ev => {
       const impDot = ev.impact === 'high' ? 'imp-h' : ev.impact === 'medium' ? 'imp-m' : 'imp-l';
       const actCls = ev.actual && ev.forecast
@@ -3417,12 +3462,16 @@ async function fetchCalendarData() {
       };
       const cc = CCY_COUNTRY[ccy] || '';
       const flagBadge = cc
-        ? `<img src="https://flagcdn.com/16x12/${cc}.png" width="16" height="12" alt="${ccy}" style="margin-right:5px;border-radius:1px;vertical-align:middle;flex-shrink:0;" onerror="this.style.display='none'">`
-        : (ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 3px;border-radius:2px;margin-right:4px;font-family:var(--font-mono);">${ccy}</span>` : '');
+        ? `<img src="https://flagcdn.com/16x12/${cc}.png" width="16" height="12" alt="${ccy}" style="margin-right:3px;border-radius:1px;vertical-align:middle;flex-shrink:0;" onerror="this.style.display='none'">`
+        : (ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 2px;border-radius:2px;margin-right:3px;font-family:var(--font-mono);">${ccy}</span>` : '');
+      // Show date prefix for upcoming events not from today
+      const isToday = todayDates.includes(ev.dateISO);
+      const timeLabel = ev.timeUTC ? ev.timeUTC.slice(0,5) : (isToday ? '' : (ev.date || ev.dateISO?.slice(5) || ''));
       return `<div class="macro-row">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap;">${timeLabel}</span>
         <div class="m-name">
           <span class="impact-dot ${impDot}"></span>
-          ${flagBadge}<span>${ev.event||''}</span>
+          ${flagBadge}<span>${ev.event||ev.name||''}</span>
         </div>
         <span class="m-prev">${ev.previous||'—'}</span>
         <span class="m-exp">${ev.forecast||'—'}</span>
@@ -3752,26 +3801,46 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
 // ═══════════════════════════════════════════════════════════════════
 (function() {
   const main = document.getElementById('main');
+  const rightPanel = document.getElementById('rightpanel');
+  // Targets that live in the right panel sidebar, not main
+  const RIGHT_PANEL_TARGETS = new Set(['section-cbrates', 'section-calendar']);
+
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
       const target = this.dataset.target;
       document.querySelectorAll('.top-nav a').forEach(a => a.classList.remove('active'));
       this.classList.add('active');
+
       if (target === 'top') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
+
       const el = document.getElementById(target);
       if (!el) return;
-      // Check if main is actually scrollable (desktop) or not (mobile overflow:visible)
+
+      // Check if this target is in the right panel
+      if (RIGHT_PANEL_TARGETS.has(target) && rightPanel) {
+        const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
+        if (mainScrollable) {
+          // Desktop: rightpanel is fixed aside — scroll rightpanel to the element
+          const offset = el.offsetTop - rightPanel.offsetTop;
+          rightPanel.scrollTo({ top: offset - 4, behavior: 'smooth' });
+        } else {
+          // Mobile: rightpanel is stacked below main — use scrollIntoView
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+      }
+
+      // Normal main-panel targets
       const mainScrollable = main && main.scrollHeight > main.clientHeight && getComputedStyle(main).overflowY !== 'visible';
       if (mainScrollable) {
         const offset = el.offsetTop - (main.offsetTop || 0);
         main.scrollTo({ top: offset - 4, behavior: 'smooth' });
       } else {
-        // Mobile: use scrollIntoView on the element itself
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
