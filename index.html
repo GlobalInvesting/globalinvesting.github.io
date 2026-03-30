@@ -806,6 +806,10 @@
     /* Ensure main layout doesn't clip content below header */
     #layout { overflow: visible !important; }
     #main { overflow-x: hidden; overflow-y: visible !important; }
+
+    /* Liquidity widget: recalibrate for narrow mobile viewport */
+    #liquidity-clip { height: 220px !important; }
+    #liquidity-clip iframe { margin-top: -52px !important; height: 290px !important; }
   }
 
   /* ── Site menu dropdown ── */
@@ -1063,7 +1067,7 @@
     <div class="sb-section">
       <div class="sb-head">FX Liquidity <span style="font-size:8px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;">· Live · Myfxbook</span></div>
       <div style="padding:0px 4px 2px;overflow:hidden;">
-        <div style="overflow:hidden;height:200px;position:relative;">
+        <div id="liquidity-clip" style="overflow:hidden;height:200px;position:relative;">
           <iframe
             src="https://widgets.myfxbook.com/widgets/liquidity.html?"
             width="125%"
