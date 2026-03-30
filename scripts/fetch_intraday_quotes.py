@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.0 — Intraday quotes via yfinance + Twelve Data (forex/gold)
+fetch_intraday_quotes.py  v2.1 — Intraday quotes via yfinance
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -14,12 +14,17 @@ FUENTES POR SÍMBOLO:
   NIKKEI  → yfinance  ^N225
   STOXX   → yfinance  ^STOXX50E
   DXY     → yfinance  DX-Y.NYB
+  US2Y    → yfinance  ^IRX          (13-week T-Bill, mejor proxy disponible)
+  US5Y    → yfinance  ^FVX          (US 5Y Treasury yield)
+  US30Y   → yfinance  ^TYX          (US 30Y Treasury yield)
+  MOVE    → yfinance  ^MOVE         (ICE BofA Bond Volatility Index)
+  BTC     → yfinance  BTC-USD       (Bitcoin)
 
 Por qué yfinance y no Twelve Data/Alpha Vantage:
   • yfinance funciona server-side en GitHub Actions sin CORS ni proxies
-  • Cubre todos los índices, commodities y yields sin costo
+  • Cubre todos los índices, commodities, yields y el MOVE sin costo
   • TD free = solo forex/crypto/US stocks (índices y WTI requieren plan pago)
-  • AV free = no tiene VIX, SPX, Nikkei, Stoxx
+  • AV free = no tiene VIX, SPX, Nikkei, Stoxx, MOVE
 
 Twelve Data (API key opcional):
   • Se usa SOLO como fallback para XAU/USD si yfinance falla en gold
@@ -195,7 +200,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.0  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.1  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
