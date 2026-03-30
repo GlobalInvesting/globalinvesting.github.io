@@ -2260,13 +2260,13 @@ const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 // ── Centralized CORS proxy helper ──────────────────────────────────────────
 // Returns an ordered list of proxy URLs for a given target URL.
 // Proxies are tried in order; first success wins.
+// NOTE: thingproxy.freeboard.io removed — DNS no longer resolves (ERR_NAME_NOT_RESOLVED).
 function proxyUrls(targetUrl) {
   const enc = encodeURIComponent(targetUrl);
   return [
     `https://corsproxy.io/?${enc}`,
     `https://api.allorigins.win/raw?url=${enc}`,
     `https://api.codetabs.com/v1/proxy?quest=${enc}`,
-    `https://thingproxy.freeboard.io/fetch/${targetUrl}`,
     targetUrl, // direct fallback
   ];
 }
@@ -2617,7 +2617,32 @@ async function fetchSentiment() {
 // RISK MONITOR + YIELD DATA — multiple free sources with fallback
 // ═══════════════════════════════════════════════════════════════════
 async function fetchRiskData() {
-  // Try stooq.com free CSV data — no auth needed, but may be blocked on weekends
+  // ── STEP 1: Load repo extended-data first (same-origin, instant, no CORS) ──
+  // These files are updated daily by the engine. Populating byId here avoids
+  // triggering any external API call for data we already have fresh.
+  const byId = {};
+  try {
+    const [usdExt, eurExt, jpyExt] = await Promise.all([
+      fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('./extended-data/EUR.json').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('./extended-data/JPY.json').then(r => r.ok ? r.json() : null).catch(() => null),
+    ]);
+    if (usdExt?.data) {
+      const d = usdExt.data;
+      const repo = (v) => ({ close: v, open: v, chg: 0, pct: 0, fromRepo: true });
+      if (d.vix    != null && d.vix > 5 && d.vix < 100)            byId.vix   = repo(d.vix);
+      if (d.bond10y != null && !isNaN(d.bond10y))                   byId.us10y = repo(d.bond10y);
+      if (d.bond2y  != null && !isNaN(d.bond2y)  && d.bond2y > 0)  byId.us2y  = repo(d.bond2y);
+      if (d.bond5y  != null && !isNaN(d.bond5y)  && d.bond5y > 0)  byId.us5y  = repo(d.bond5y);
+    }
+    if (eurExt?.data?.bond10y != null) byId.de10y = { close: eurExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+    if (jpyExt?.data?.bond10y != null) byId.jp10y = { close: jpyExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+  } catch {}
+
+  // Render immediately with repo data so the page shows values without waiting for external APIs
+  renderRiskData(byId);
+
+  // ── STEP 2: Try stooq for intraday prices (enriches with real-time chg/pct) ──
   async function fetchStooq(sym) {
     const base = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
     const urls = proxyUrls(base);
@@ -2644,7 +2669,8 @@ async function fetchRiskData() {
     return null;
   }
 
-  // Correct stooq.com symbols (different from Yahoo Finance)
+  // Only fetch symbols not already covered by the repo (dxy, us3m, us30y, de10y, jp10y intraday)
+  // vix, us10y, us2y, us5y: repo has values; stooq will enrich with intraday chg if available
   const tickers = [
     { sym: '^vix',     id: 'vix'   },  // CBOE VIX
     { sym: '10usy.b',  id: 'us10y' },  // US 10Y Treasury yield
@@ -2657,14 +2683,14 @@ async function fetchRiskData() {
     { sym: '10jpy.b',  id: 'jp10y' },  // Japan 10Y JGB yield
   ];
 
-  const results = await Promise.all(tickers.map(async t => ({
+  const stooqResults = await Promise.all(tickers.map(async t => ({
     ...t, data: await fetchStooq(t.sym)
   })));
 
-  const byId = {};
-  results.forEach(r => { if (r.data) byId[r.id] = r.data; });
+  // Stooq data wins over repo when valid (has real intraday chg/pct)
+  stooqResults.forEach(r => { if (r.data) byId[r.id] = r.data; });
 
-  // FALLBACK for VIX and DXY via Yahoo Finance when stooq is blocked
+  // ── STEP 3: Yahoo Finance fallback — only for symbols still missing ──
   async function fetchYahoo(ySymbol) {
     const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
     const base2 = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ySymbol)}?interval=1d&range=5d`;
@@ -2691,7 +2717,7 @@ async function fetchRiskData() {
     return null;
   }
 
-  // Run all Yahoo fallbacks in parallel — avoids sequential await stacking (up to 60s worst-case)
+  // Only call Yahoo for symbols still not resolved after stooq + repo
   const needVix  = !byId.vix || byId.vix.close < 5 || byId.vix.close > 100;
   const needDxy  = !byId.dxy;
   const needUs3m = !byId.us3m;
@@ -2709,60 +2735,22 @@ async function fetchRiskData() {
   ]);
 
   if (needVix)  { delete byId.vix; if (yVix && yVix.close > 5 && yVix.close < 100) byId.vix = { ...yVix, fromYahoo: true }; }
-  // VIX tertiary fallback: extended-data repo file (updated by engine)
-  if (!byId.vix) {
-    try {
-      const usdRepo = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
-      if (usdRepo?.data?.vix && usdRepo.data.vix > 5 && usdRepo.data.vix < 100) {
-        byId.vix = { close: usdRepo.data.vix, open: usdRepo.data.vix, chg: 0, pct: 0, fromRepo: true };
-      }
-    } catch {}
-  }
   if (needDxy  && yDxy)  byId.dxy   = yDxy;
   if (needUs3m && yUs3m && yUs3m.close > 0) byId.us3m  = { ...yUs3m,  close: yUs3m.close / 10,  chg: yUs3m.chg / 10 };
   if (needUs10y&& yUs10y&& yUs10y.close > 0) byId.us10y = { ...yUs10y, close: yUs10y.close / 10, chg: yUs10y.chg / 10, pct: yUs10y.pct };
   if (needUs5y && yUs5y && yUs5y.close > 0)  byId.us5y  = { ...yUs5y,  close: yUs5y.close / 10,  chg: yUs5y.chg / 10,  pct: yUs5y.pct };
   if (needUs30y&& yUs30y&& yUs30y.close > 0) byId.us30y = { ...yUs30y, close: yUs30y.close / 10, chg: yUs30y.chg / 10, pct: yUs30y.pct };
-  // Extended-data repo fallback — fetch all yield data from repo JSONs in one pass
-  // USD.json: bond10y (always), bond2y + bond5y (after engine v13.1+ run)
-  // EUR.json, JPY.json: bond10y
-  {
-    let usdExt = null;
-    try { const r = await fetch('./extended-data/USD.json'); if (r.ok) usdExt = await r.json(); } catch {}
-    if (usdExt?.data) {
-      if (!byId.us2y) {
-        const v = usdExt.data.bond2y;
-        if (v != null && !isNaN(v) && v > 0.5 && v < 20)
-          byId.us2y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
-      }
-      if (!byId.us5y) {
-        const v = usdExt.data.bond5y;
-        if (v != null && !isNaN(v) && v > 0.5 && v < 20)
-          byId.us5y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
-      }
-      if (!byId.us10y) {
-        const v = usdExt.data.bond10y;
-        if (v != null && !isNaN(v))
-          byId.us10y = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
-      }
-      // VIX from repo (FRED VIXCLS, updated daily by engine)
-      if (!byId.vix && usdExt.data.vix != null) {
-        const v = usdExt.data.vix;
-        if (v > 5 && v < 100)
-          byId.vix = { close: v, open: v, chg: 0, pct: 0, fromRepo: true };
-      }
-    }
-    // EUR and JPY 10Y from repo
-    try {
-      const [eurR, jpyR] = await Promise.all([
-        fetch('./extended-data/EUR.json').then(r=>r.ok?r.json():null).catch(()=>null),
-        fetch('./extended-data/JPY.json').then(r=>r.ok?r.json():null).catch(()=>null),
-      ]);
-      if (!byId.de10y && eurR?.data?.bond10y != null) byId.de10y = { close: eurR.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-      if (!byId.jp10y && jpyR?.data?.bond10y != null) byId.jp10y = { close: jpyR.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-    } catch {}
-  }
 
+  // ── STEP 4: Final render with the best data (repo + stooq + Yahoo) ──
+  // MOVE and EUR/USD IV require external APIs, only fetch them on this final pass.
+  await renderRiskData(byId, fetchYahoo, fetchStooq);
+}
+
+// renderRiskData — separated so it can be called:
+//   1) Immediately after repo data loads (fast path — populates UI without waiting)
+//   2) After stooq + Yahoo enrich with intraday chg/pct, MOVE, and EUR/USD IV
+// fetchYahoo/fetchStooq are undefined on the first (repo-only) call — MOVE and FXIV are skipped.
+async function renderRiskData(byId, fetchYahoo, fetchStooq) {
   // Check if it's a weekend — on weekends stooq returns last close, so chg will be 0
   const _rd = new Date().getUTCDay(), _rh = new Date().getUTCHours();
   const isWeekend = _rd === 6 || (_rd === 0 && _rh < 21) || (_rd === 5 && _rh >= 21);
@@ -2784,11 +2772,14 @@ async function fetchRiskData() {
     setEl('risk-vix-sub', 'CBOE · unavailable');
   }
 
-  // MOVE + EUR/USD IV — fetch in parallel
-  const [move, fxiv] = await Promise.all([
-    fetchYahoo('%5EMOVE'),
-    fetchStooq('eurusdv1m.b'),
-  ]);
+  // MOVE + EUR/USD IV — only available via external APIs; skip on repo-only (first) render pass
+  let move = null, fxiv = null;
+  if (typeof fetchYahoo === 'function' && typeof fetchStooq === 'function') {
+    [move, fxiv] = await Promise.all([
+      fetchYahoo('%5EMOVE'),
+      fetchStooq('eurusdv1m.b'),
+    ]);
+  }
 
   // MOVE Index — ^MOVE on Yahoo (ICE BofA bond volatility index)
   {
@@ -3346,7 +3337,18 @@ async function fetchCrossAssetData() {
     cEl.className = 'ca-chg ' + cls;
   }
 
-  // Fetch all in parallel — stooq symbols
+  // ── STEP 1: Pre-load repo data (same-origin, instant) so US10Y is available immediately ──
+  let _repoUs10y = null;
+  try {
+    const usdExt = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    if (usdExt?.data?.bond10y != null && !isNaN(usdExt.data.bond10y)) {
+      _repoUs10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
+      // Render US10Y immediately so cross-asset table isn't blank while stooq loads
+      setCA('us10y', _repoUs10y.close, null, true);
+    }
+  } catch {}
+
+  // ── STEP 2: Fetch all in parallel — stooq symbols ──
   const [gold, wti, spx, nikkei, stoxx, _us10y, dxy] = await Promise.all([
     stooq('xauusd'),
     stooq('cl.f'),
@@ -3395,14 +3397,8 @@ async function fetchCrossAssetData() {
     }
   }
 
-  // Fallback: repo extended-data for US10Y when stooq fails
-  let us10y = _us10y;
-  if (!us10y) {
-    try {
-      const usdExt = await fetch('./extended-data/USD.json').then(r=>r.json()).catch(()=>null);
-      if (usdExt?.data?.bond10y) us10y = { close: usdExt.data.bond10y, chg: 0, pct: 0, fromRepo: true };
-    } catch {}
-  }
+  // Fallback: use pre-loaded repo value when stooq fails (avoids second fetch of USD.json)
+  let us10y = _us10y || _repoUs10y;
 
   if (spx)  setCA('spx',  spx.close,  spx.pct,  false);
   if (gold) {
