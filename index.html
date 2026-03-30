@@ -634,27 +634,9 @@
   /* Flag icons in sidebar tables */
   .fi { width: 16px; height: 12px; display: inline-block; }
 
-  /* Force myfxbook widget table to fill container width */
-  #myfxbook-wrap table { width: 100% !important; }
-  #myfxbook-wrap td, #myfxbook-wrap th { font-size: 11px !important; }
-
-  /* SENTIMENT PANEL */
+  /* SENTIMENT PANEL — native render (no iframe) */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
-  /* Hide "Powered by Myfxbook" footer on sentiment widget — always */
-  #myfxbook-wrap .myfxbookLink,
-  #myfxbook-wrap a[href*="myfxbook"],
-  #myfxbook-wrap div:has(.myfxbookLink) { display: none !important; height: 0 !important; overflow: hidden !important; }
-
-  /* Force myfxbook widget colors to match dark terminal theme */
-  /* Hide only the internal "Community Outlook" title row (~28px), keep column headers visible */
-  #myfxbook-widget-inner {
-    filter: invert(1) hue-rotate(180deg);
-    display: block;
-    overflow: hidden;
-    margin-top: -28px;
-    clip-path: inset(28px 0 0 0);
-  }
 
   /* ══════════════════════════════════════════════
      MOBILE RESPONSIVE — max-width: 900px
@@ -808,9 +790,7 @@
 
     /* Market sentiment: no forced height */
     /* Myfxbook widget overflows its fixed internal table — clip + scroll horizontally */
-    #myfxbook-wrap { overflow-x: auto !important; overflow-y: hidden !important; -webkit-overflow-scrolling: touch; }
-    #myfxbook-wrap table { min-width: unset !important; width: 100% !important; font-size: 9px !important; }
-    #myfxbook-wrap td, #myfxbook-wrap th { padding: 2px 4px !important; font-size: 9px !important; }
+
 
     /* Reference Spreads: ensure it fills full width when stacked */
     #spreads-rows { width: 100%; box-sizing: border-box; }
@@ -1368,12 +1348,8 @@
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · 5yr historical avg · fixed reference</div>
         </div>
         <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;gap:0;flex-shrink:0;">
+          <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
-            <span style="flex:1;"></span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);width:68px;text-align:right;padding-right:2px;">Actual</span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);width:68px;text-align:right;padding-right:2px;">Forecast</span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);width:68px;text-align:right;padding-right:4px;">Previous</span>
           </div>
           <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;min-height:0;">
             <div id="tvcal-scale" style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
@@ -1411,23 +1387,13 @@
         <div style="border-top:1px solid var(--border);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="padding:4px 10px 3px;background:var(--head-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Retail Market Sentiment</span>
-            <span class="panel-sub">Myfxbook · retail positioning</span>
+            <span class="panel-sub" id="sent-source-sub">Myfxbook · retail positioning</span>
           </div>
-          <div id="myfxbook-wrap" style="overflow:hidden;padding:0;width:100%;flex:1;background:var(--bg2);position:relative;min-height:0;">
-            <!-- myfxbook.com outlook widget - Start -->
-<div id="myfxbook-widget-inner"><script class="powered" type="text/javascript" src="https://widgets.myfxbook.com/scripts/fxOutlook.js?type=1&symbols=,1,2,3,4,5,6,7,8,9,10,11,12,13,14,17,20,24,25,26,27,28,29,46,47,48,49,103,107"></script></div>
-<div style="font-size:10px"><a href="https://www.myfxbook.com" title="" class="myfxbookLink" target="_blank" rel="noopener">Powered by Myfxbook.com</a></div>
-<script type="text/javascript">
-(function(){
-  var sx=window.scrollX,sy=window.scrollY;
-  var m=document.getElementById('main');
-  var mx=m?m.scrollLeft:0,my=m?m.scrollTop:0;
-  showOutlookWidget();
-  function restore(){ window.scrollTo(sx,sy); if(m){m.scrollLeft=mx;m.scrollTop=my;} }
-  setTimeout(restore,0); setTimeout(restore,300); setTimeout(restore,800);
-})();
-</script>
-            <!-- myfxbook.com outlook widget - End -->
+          <div id="myfxbook-wrap" style="overflow:hidden;padding:4px 8px 2px;width:100%;flex:1;background:var(--bg2);position:relative;min-height:0;display:flex;flex-direction:column;">
+            <div id="sent-rows" style="flex:1;overflow-y:auto;" class="thin-scroll">
+              <div style="color:var(--text3);font-size:11px;padding:8px 0;">Loading sentiment…</div>
+            </div>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;flex-shrink:0;" id="sent-updated"></div>
           </div>
         </div>
       </div>
@@ -2629,11 +2595,29 @@ function renderSentiment(pairs, sourceLabel) {
 }
 
 async function fetchSentiment() {
+  // ── SOURCE 1: Myfxbook community outlook (primary — updated every 30min via GitHub Action) ──
   try {
-    // First try COT data from repo as real data source
+    const r = await fetch('./sentiment-data/myfxbook.json');
+    if (r.ok) {
+      const d = await r.json();
+      // Freshness check: reject if data is older than 2 hours
+      const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
+      const ageMin = (Date.now() - updatedMs) / 60000;
+      if (d.pairs && d.pairs.length >= 5 && ageMin < 120) {
+        const pairs = d.pairs.map(p => ({ sym: p.sym, buy: p.long, sell: p.short }));
+        const ageLabel = ageMin < 60
+          ? Math.round(ageMin) + 'min ago'
+          : Math.round(ageMin / 60 * 10) / 10 + 'h ago';
+        renderSentiment(pairs, 'Myfxbook · ' + ageLabel);
+        return;
+      }
+    }
+  } catch {}
+
+  // ── SOURCE 2: CFTC COT positioning (weekly, same-origin, reliable) ──
+  try {
     const cotData = await buildCOTSentiment();
     if (Object.keys(cotData).length >= 4) {
-      // Build pairs from COT positions
       const PAIR_MAP = [
         { sym:'EUR/USD', base:'EUR', invert:false },
         { sym:'GBP/USD', base:'GBP', invert:false },
@@ -2642,7 +2626,7 @@ async function fetchSentiment() {
         { sym:'USD/CAD', base:'CAD', invert:true  },
         { sym:'USD/CHF', base:'CHF', invert:true  },
         { sym:'NZD/USD', base:'NZD', invert:false },
-        { sym:'EUR/GBP', base:'EUR', invert:false }, // approx
+        { sym:'EUR/GBP', base:'EUR', invert:false },
         { sym:'EUR/JPY', base:'EUR', invert:false },
         { sym:'GBP/JPY', base:'GBP', invert:false },
       ];
@@ -2653,7 +2637,6 @@ async function fetchSentiment() {
         const sell = pm.invert ? c.buy  : c.sell;
         return { sym: pm.sym, buy, sell };
       }).filter(Boolean);
-
       if (cotPairs.length >= 5) {
         const lastDate = Object.values(cotData)[0]?.date || '';
         renderSentiment(cotPairs, 'CFTC COT · ' + lastDate);
@@ -2662,6 +2645,7 @@ async function fetchSentiment() {
     }
   } catch {}
 
+  // ── SOURCE 3: Dukascopy live sentiment (CORS-allowed, real-time) ──
   try {
     const r = await fetch('https://freeserv.dukascopy.com/2.0/api?path=sentiment/list&prettyprint=true&jsonp=false', {mode:'cors'});
     if (r.ok) {
@@ -2675,8 +2659,9 @@ async function fetchSentiment() {
         if (mapped.length) { renderSentiment(mapped, 'Dukascopy live'); return; }
       }
     }
-  } catch(e) {}
-  // Static reference fallback — no artificial noise
+  } catch {}
+
+  // ── SOURCE 4: Static reference fallback ──
   renderSentiment(SENTIMENT_FALLBACK, 'Historical avg · live feed unavailable');
 }
 
