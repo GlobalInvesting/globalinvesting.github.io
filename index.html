@@ -2744,6 +2744,7 @@ async function fetchRiskData() {
     const _set = (id, guard) => { const q = _iq(id); if (q && guard(q.close)) byId[id] = q; };
     _set('vix',   v => v > 5 && v < 100);
     _set('us10y', v => v > 0 && v < 20);
+    _set('us3m',  v => v > 0 && v < 20);
     _set('us2y',  v => v > 0 && v < 20);
     _set('us5y',  v => v > 0 && v < 20);
     _set('us30y', v => v > 0 && v < 20);
