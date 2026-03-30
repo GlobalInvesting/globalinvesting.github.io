@@ -2228,8 +2228,8 @@ function buildNewsTicker(items) {
       const halfW = track.scrollWidth / 2;
       if (!halfW) return;
 
-      const speed    = 80;  // px/s — increase to go faster
-      const duration = Math.max(30, halfW / speed);
+      const speed    = 35;  // px/s — lower = slower/more readable
+      const duration = Math.max(60, halfW / speed);
 
       // Inject a pixel-exact keyframe so the loop jump is invisible
       const styleId = 'ticker-kf-style';
