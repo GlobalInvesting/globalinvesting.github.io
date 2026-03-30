@@ -185,28 +185,42 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="liquidity-chart">
       <h2>The FX Liquidity Canvas</h2>
-      <p>At the top of the left sidebar, the <strong>FX Liquidity</strong> panel shows a canvas-drawn chart depicting the estimated relative liquidity level across each hour of the 24-hour UTC trading day.</p>
+      <p>At the top of the left sidebar, the <strong>FX Liquidity</strong> panel shows a canvas-drawn chart depicting the estimated relative interbank activity level across each 30-minute slot of the 24-hour UTC trading day.</p>
       <div class="liq-canvas-demo">
-        <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Estimated FX Liquidity — 24h UTC</div>
+        <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">FX Liquidity — 24h UTC</div>
         <div class="liq-bar-row" id="demo-bars"></div>
         <div class="liq-time-row">
           <span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>24:00</span>
         </div>
       </div>
-      <p>A vertical line marks the current UTC time, showing you exactly where in the liquidity cycle the market is right now. A peak label highlights the highest-liquidity hour of the day.</p>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">How to read it</h3>
+      <p>The chart is divided into two visual zones separated by a dashed orange vertical line marking the <strong>current UTC time</strong>:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
+        <li><strong style="color:#2962ff;">Solid blue area (left of the line)</strong> — the past. Activity levels already observed today, scaled by real EUR/USD, GBP/EUR, and JPY/EUR daily volatility from the Frankfurter API. Higher volatility days push the curve up; quieter days pull it down.</li>
+        <li><strong style="color:rgba(41,98,255,0.5);">Dashed blue line (right of the line)</strong> — the projected remainder of the day, based on historical BIS/LSEG session-overlap patterns. This is an estimate, not a live feed.</li>
+        <li><strong style="color:#f6941c;">Orange dashed vertical line</strong> — the current UTC moment. Everything to its left has happened; everything to its right is projected.</li>
+      </ul>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">Interactive tooltip</h3>
+      <p>Hover anywhere on the canvas to see a tooltip showing the UTC time for that point, the active trading session(s) at that hour, and the relative activity level as a percentage of the day's peak — labeled Very High, High, Moderate, Low, or Very Low. Points in the projected future are marked <em>(est.)</em>.</p>
+
+      <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">Data source &amp; refresh</h3>
+      <p>On page load, the chart fetches the last 5 trading days of EUR/USD, GBP/EUR, and JPY/EUR rates from the <strong>Frankfurter API</strong> (European Central Bank data) and computes average daily volatility. This scalar is applied to the BIS/LSEG session-overlap baseline to reflect whether the current market environment is active or subdued. Data refreshes every 30 minutes; the chart redraws every 60 seconds. If the fetch fails, the chart falls back silently to the baseline curve.</p>
+      <p>On weekends (Saturday–Sunday UTC), the chart displays a flat line with a "MARKET CLOSED" label, since FX spot trading is inactive.</p>
     </div>
 
     <div class="guide-section" id="reading">
-      <h2>How to Read It</h2>
+      <h2>Key liquidity windows</h2>
       <p>The curve shape reflects aggregate FX volume across all currency pairs, normalized so the highest-liquidity period reaches 100%. Key features to identify at a glance:</p>
       <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
         <li><strong style="color:var(--text);">The primary peak</strong> — London–New York overlap (13:00–17:00 UTC) consistently shows the highest liquidity globally, accounting for roughly 50% of daily FX volume.</li>
         <li><strong style="color:var(--text);">The London open spike</strong> — 08:00–09:00 UTC. The moment European banks come online typically produces a sharp volume increase, especially for EUR pairs.</li>
         <li><strong style="color:var(--text);">The Tokyo–London gap</strong> — 06:00–08:00 UTC. Typically the lowest liquidity window of the day for majors. Spreads widen, price action is thin.</li>
-        <li><strong style="color:var(--text);">The current time marker</strong> — the vertical line tells you whether you are in a high-liquidity window (wide bars on either side) or a thin period (approaching the Asian trough).</li>
+        <li><strong style="color:var(--text);">The current time marker</strong> — the orange dashed line tells you whether you are in a high-liquidity window or a thin period at a glance.</li>
       </ul>
       <div class="callout callout-green">
-        <strong>Practical use:</strong> Before placing a trade, glance at the liquidity canvas. If the current time marker is in a thin period (low bars), expect wider spreads and potentially erratic, low-conviction price moves. If you're at or near the London–NY peak, spreads are tight and moves are more likely to have follow-through.
+        <strong>Practical use:</strong> Before placing a trade, glance at the liquidity canvas. If the orange line is in a trough (low curve), expect wider spreads and potentially erratic, low-conviction price moves. If you're at or near the London–NY peak, spreads are tight and moves are more likely to have follow-through.
       </div>
     </div>
 

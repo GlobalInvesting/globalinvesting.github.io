@@ -3905,14 +3905,10 @@ function drawLiquidityChart() {
     for (let i=nowSlot+1; i<48; i++) ctx.lineTo(px(i),py(hours[i]));
     ctx.stroke(); ctx.setLineDash([]);
 
-    // ── NOW-LINE: línea naranja vertical en el momento actual ─────────────
-    ctx.strokeStyle='rgba(246,148,28,0.85)'; ctx.lineWidth=1.5; ctx.setLineDash([2,3]);
+    // ── NOW-LINE: línea naranja vertical punteada — igual que el original ────
+    ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
     ctx.beginPath(); ctx.moveTo(nowX, PAD_T); ctx.lineTo(nowX, PAD_T+cH); ctx.stroke();
     ctx.setLineDash([]);
-
-    // Pequeño dot naranja sobre la curva en "ahora"
-    ctx.beginPath(); ctx.arc(nowX, py(hours[nowSlot]), 3, 0, Math.PI*2);
-    ctx.fillStyle='#f6941c'; ctx.fill();
 
   } else {
     // Weekend: curva plana, fill gris
