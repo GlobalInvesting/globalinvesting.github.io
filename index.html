@@ -209,17 +209,40 @@
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
   /* ── QUOTE BAR ── */
-  #tv-ticker {
+  #tv-ticker-wrap {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: stretch;
-    overflow-x: auto;
-    scrollbar-width: none;
     height: 34px;
     flex-shrink: 0;
+    position: relative;
+  }
+  #tv-ticker {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+    min-width: 0;
   }
   #tv-ticker::-webkit-scrollbar { display: none; }
+  .qb-arrow {
+    flex-shrink: 0;
+    width: 26px;
+    background: var(--bg2);
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  #qb-prev { border-right: 1px solid var(--border2); display: none; }
+  #qb-next { border-left:  1px solid var(--border2); }
   #quotebar-inner {
     display: flex;
     align-items: stretch;
@@ -1045,25 +1068,27 @@
 </div>
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
-<div id="tv-ticker" style="position:relative;">
-  <button id="qb-prev" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;height:100%;position:absolute;left:0;top:0;z-index:2;background:var(--bg2);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
-  <div id="quotebar-inner">
-    <div class="q-item"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
-    <div class="q-item"><span class="q-sym">GBP/USD</span><span class="q-price" id="q-gbpusd">—</span><span class="q-chg" id="qc-gbpusd">—</span></div>
-    <div class="q-item"><span class="q-sym">USD/JPY</span><span class="q-price" id="q-usdjpy">—</span><span class="q-chg" id="qc-usdjpy">—</span></div>
-    <div class="q-item"><span class="q-sym">AUD/USD</span><span class="q-price" id="q-audusd">—</span><span class="q-chg" id="qc-audusd">—</span></div>
-    <div class="q-item"><span class="q-sym">USD/CHF</span><span class="q-price" id="q-usdchf">—</span><span class="q-chg" id="qc-usdchf">—</span></div>
-    <div class="q-item"><span class="q-sym">USD/CAD</span><span class="q-price" id="q-usdcad">—</span><span class="q-chg" id="qc-usdcad">—</span></div>
-    <div class="q-item"><span class="q-sym">NZD/USD</span><span class="q-price" id="q-nzdusd">—</span><span class="q-chg" id="qc-nzdusd">—</span></div>
-    <div class="q-item"><span class="q-sym">EUR/GBP</span><span class="q-price" id="q-eurgbp">—</span><span class="q-chg" id="qc-eurgbp">—</span></div>
-    <div class="q-item"><span class="q-sym">XAU/USD</span><span class="q-price" id="q-xauusd">—</span><span class="q-chg" id="qc-xauusd">—</span></div>
-    <div class="q-item"><span class="q-sym">WTI</span><span class="q-price" id="q-wti">—</span><span class="q-chg" id="qc-wti">—</span></div>
-    <div class="q-item"><span class="q-sym">BTC/USD</span><span class="q-price" id="q-btcusd">—</span><span class="q-chg" id="qc-btcusd">—</span></div>
-    <div class="q-item"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
-    <div class="q-item"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
+<div id="tv-ticker-wrap">
+  <button id="qb-prev" class="qb-arrow" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})">&#8249;</button>
+  <div id="tv-ticker">
+    <div id="quotebar-inner">
+      <div class="q-item"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
+      <div class="q-item"><span class="q-sym">GBP/USD</span><span class="q-price" id="q-gbpusd">—</span><span class="q-chg" id="qc-gbpusd">—</span></div>
+      <div class="q-item"><span class="q-sym">USD/JPY</span><span class="q-price" id="q-usdjpy">—</span><span class="q-chg" id="qc-usdjpy">—</span></div>
+      <div class="q-item"><span class="q-sym">AUD/USD</span><span class="q-price" id="q-audusd">—</span><span class="q-chg" id="qc-audusd">—</span></div>
+      <div class="q-item"><span class="q-sym">USD/CHF</span><span class="q-price" id="q-usdchf">—</span><span class="q-chg" id="qc-usdchf">—</span></div>
+      <div class="q-item"><span class="q-sym">USD/CAD</span><span class="q-price" id="q-usdcad">—</span><span class="q-chg" id="qc-usdcad">—</span></div>
+      <div class="q-item"><span class="q-sym">NZD/USD</span><span class="q-price" id="q-nzdusd">—</span><span class="q-chg" id="qc-nzdusd">—</span></div>
+      <div class="q-item"><span class="q-sym">EUR/GBP</span><span class="q-price" id="q-eurgbp">—</span><span class="q-chg" id="qc-eurgbp">—</span></div>
+      <div class="q-item"><span class="q-sym">XAU/USD</span><span class="q-price" id="q-xauusd">—</span><span class="q-chg" id="qc-xauusd">—</span></div>
+      <div class="q-item"><span class="q-sym">WTI</span><span class="q-price" id="q-wti">—</span><span class="q-chg" id="qc-wti">—</span></div>
+      <div class="q-item"><span class="q-sym">BTC/USD</span><span class="q-price" id="q-btcusd">—</span><span class="q-chg" id="qc-btcusd">—</span></div>
+      <div class="q-item"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
+      <div class="q-item"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
+    </div>
+    <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Stooq</span>
   </div>
-  <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Stooq</span>
-  <button id="qb-next" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;height:100%;position:absolute;right:0;top:0;z-index:2;background:var(--bg2);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
+  <button id="qb-next" class="qb-arrow" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})">&#8250;</button>
 </div>
 
 <!-- NEWS TICKER — populated from news-data/news.json -->
@@ -3213,7 +3238,7 @@ setTimeout(minimizeTVLegend, 4000);
   }
   if (ticker) {
     ticker.addEventListener('scroll', updateQbArrows, { passive: true });
-    setTimeout(updateQbArrows, 200);
+    setTimeout(updateQbArrows, 400);
   }
 })();
 // ─────────────────────────────────────────────────────────────────────────
