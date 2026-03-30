@@ -3955,60 +3955,6 @@ function drawLiquidityChart() {
     setEl('liq-peak-label', 'Peak ' + pH + ':' + pM);
   }
 }
-  }
-
-  // Now-line — same as original
-  const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
-  ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
-  ctx.beginPath(); ctx.moveTo(PAD_L+(nowH/24)*cW, PAD_T); ctx.lineTo(PAD_L+(nowH/24)*cW, PAD_T+cH); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Single gradient fill — exactly as original
-  const lineColor = isWeekend ? '#363c4e' : '#2962ff';
-  const grad=ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-  grad.addColorStop(0, isWeekend ? 'rgba(120,123,134,0.15)' : 'rgba(41,98,255,0.35)');
-  grad.addColorStop(1,'rgba(41,98,255,0.03)');
-  ctx.beginPath();
-  hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.lineTo(px(hours.length-1),PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-
-  // Line — exactly as original
-  ctx.beginPath(); ctx.strokeStyle=lineColor; ctx.lineWidth=1.5;
-  hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
-  ctx.stroke();
-
-  // Hour labels — exactly as original (Courier New)
-  ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
-  ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
-
-  if (isWeekend) {
-    ctx.fillStyle='rgba(120,123,134,0.5)'; ctx.font='9px Courier New'; ctx.textAlign='center';
-    ctx.fillText('MARKET CLOSED — WEEKEND', W/2, PAD_T+cH/2);
-  }
-
-  // Bottom labels — exactly as original
-  const now = new Date();
-  const localH = now.getHours().toString().padStart(2,'0');
-  const localM = now.getMinutes().toString().padStart(2,'0');
-  const tzShort = now.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
-  setEl('liq-time-label', localH + ':' + localM + ' ' + tzShort);
-  if (isWeekend) {
-    const reopenDate = new Date();
-    const daysUntilSun = (7 - reopenDate.getUTCDay()) % 7;
-    reopenDate.setUTCDate(reopenDate.getUTCDate() + (daysUntilSun === 0 ? 0 : daysUntilSun));
-    reopenDate.setUTCHours(21, 0, 0, 0);
-    const rH = reopenDate.getHours().toString().padStart(2,'0');
-    const rM = reopenDate.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Sun ' + rH + ':' + rM);
-  } else {
-    const peakH = hours.indexOf(Math.max(...hours));
-    const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakH/2), peakH%2===0?0:30, 0, 0);
-    const pH = peakUTC.getHours().toString().padStart(2,'0');
-    const pM = peakUTC.getMinutes().toString().padStart(2,'0');
-    setEl('liq-peak-label', 'Peak ' + pH + ':' + pM);
-  }
-}
 
 // Initial load: fetch real data then draw
 fetchLiquidityData().then(() => drawLiquidityChart());
