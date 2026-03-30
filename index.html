@@ -741,10 +741,10 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
-    /* TV Events calendar: slightly taller on mobile, scale up font to match site */
-    #section-tvcalendar { min-height: 0 !important; flex: 1 !important; }
-    #section-tvcalendar > div:last-child { min-height: 280px !important; height: 280px !important; }
-    #section-tvcalendar [style*="transform:scale(0.72)"] {
+    /* TV Events calendar: fixed height on mobile so iframe fills space properly */
+    #section-tvcalendar { min-height: 0 !important; flex: none !important; }
+    #tvcal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
+    #tvcal-scale {
       transform: scale(0.88) !important;
       width: 113.6% !important;
       height: 113.6% !important;
@@ -1342,8 +1342,8 @@
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
           </div>
-          <div style="overflow:hidden;flex:1;position:relative;min-height:0;">
-            <div style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
+          <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;min-height:0;">
+            <div id="tvcal-scale" style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
               <div class="tradingview-widget-container" style="width:100%;height:100%;">
                 <div class="tradingview-widget-container__widget" style="height:100%;"></div>
                 <div class="tradingview-widget-copyright" style="display:none;"></div>
