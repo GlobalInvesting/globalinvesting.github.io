@@ -3968,12 +3968,13 @@ async function boot() {
   fetchCarryData();
   fetchNewsData();
 
-  // External API data — parallel, may be slower
-  fetchRiskData().then(() => {
-    // Cross-asset and commodities after risk data so Gold/SPX ratio uses fresh prices
-    fetchCrossAssetData();
-    fetchCommodityQuotes();
-  });
+  // External API data — all in parallel.
+  // fetchCrossAssetData runs immediately (no longer waits for fetchRiskData) so the
+  // Cross-Asset panel populates from the intraday JSON cache on first render (~100ms).
+  // Gold/SPX ratio is computed inside fetchCrossAssetData once it has both values.
+  fetchRiskData();
+  fetchCrossAssetData();
+  fetchCommodityQuotes();
   fetchCryptoQuotes();               // BTC from CoinGecko
   buildRichNarrative();              // AI narrative (non-blocking)
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
