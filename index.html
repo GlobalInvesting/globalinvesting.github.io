@@ -2573,7 +2573,9 @@ async function buildCOTSentiment() {
 function renderSentiment(pairs, sourceLabel) {
   const container = document.getElementById('sent-rows');
   if (!container) return;
-  container.innerHTML = pairs.map(p => {
+  // Ordenar por convicción descendente (mayor diferencia entre lado dominante y el otro)
+  const sorted = [...pairs].sort((a, b) => Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell));
+  container.innerHTML = sorted.map(p => {
     const bias    = p.buy >= p.sell ? 'LONG' : 'SHORT';
     const biasCol = p.buy >= p.sell ? 'var(--up)' : 'var(--down)';
     return `<div style="display:grid;grid-template-columns:52px 1fr 36px 36px 40px;align-items:center;gap:4px;padding:2px 0;">
