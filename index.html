@@ -326,10 +326,12 @@
   /* ── MAIN ── */
   #main {
     overflow-y: auto;
+    overflow-x: hidden;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     padding-bottom: 0;
+    min-width: 0;
   }
   #main::-webkit-scrollbar { width: 4px; }
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
@@ -550,12 +552,13 @@
   #skew-tbody td:not(:first-child) { text-align: right; }
 
   /* TV CHART TABS */
+  #tv-pair-tabs::-webkit-scrollbar { display: none; }
   .tv-tab {
     background: none; border: 1px solid var(--border2); border-right: none;
     color: var(--text2); font-size: 10px; font-weight: 700;
-    padding: 2px 9px; cursor: pointer; text-transform: uppercase;
+    padding: 4px 9px; cursor: pointer; text-transform: uppercase;
     letter-spacing: .04em; transition: all .12s; font-family: var(--font-ui);
-    white-space: nowrap;
+    white-space: nowrap; flex-shrink: 0;
   }
   .tv-tab:last-child { border-right: 1px solid var(--border2); }
   .tv-tab:hover { color: var(--text); background: var(--bg3); }
@@ -1042,7 +1045,8 @@
 </div>
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
-<div id="tv-ticker">
+<div id="tv-ticker" style="position:relative;">
+  <button id="qb-prev" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;height:100%;position:absolute;left:0;top:0;z-index:2;background:var(--bg2);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
   <div id="quotebar-inner">
     <div class="q-item"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
     <div class="q-item"><span class="q-sym">GBP/USD</span><span class="q-price" id="q-gbpusd">—</span><span class="q-chg" id="qc-gbpusd">—</span></div>
@@ -1059,6 +1063,7 @@
     <div class="q-item"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
   </div>
   <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">Stooq</span>
+  <button id="qb-next" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;height:100%;position:absolute;right:0;top:0;z-index:2;background:var(--bg2);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
 </div>
 
 <!-- NEWS TICKER — populated from news-data/news.json -->
@@ -1129,31 +1134,37 @@
 
     <!-- TRADINGVIEW CHART -->
     <div class="panel" id="section-fxpairs" data-section="fxpairs">
-      <div class="panel-head" style="gap:10px;flex-wrap:wrap;row-gap:0;">
-        <span class="panel-title">Price Chart</span>
-        <div style="display:flex;gap:0;flex-wrap:wrap;" id="tv-pair-tabs">
-          <button class="tv-tab active" data-sym="FX:EURUSD">EUR/USD</button>
-          <button class="tv-tab" data-sym="FX:GBPUSD">GBP/USD</button>
-          <button class="tv-tab" data-sym="FX:USDJPY">USD/JPY</button>
-          <button class="tv-tab" data-sym="FX:AUDUSD">AUD/USD</button>
-          <button class="tv-tab" data-sym="FX:USDCHF">USD/CHF</button>
-          <button class="tv-tab" data-sym="FX:USDCAD">USD/CAD</button>
-          <button class="tv-tab" data-sym="FX:NZDUSD">NZD/USD</button>
-          <button class="tv-tab" data-sym="FX:EURGBP">EUR/GBP</button>
-          <button class="tv-tab" data-sym="FX:EURJPY">EUR/JPY</button>
-          <button class="tv-tab" data-sym="FX:GBPJPY">GBP/JPY</button>
-          <button class="tv-tab" data-sym="FX:EURCHF">EUR/CHF</button>
-          <button class="tv-tab" data-sym="FX:AUDJPY">AUD/JPY</button>
-          <button class="tv-tab" data-sym="OANDA:XAUUSD">XAU/USD</button>
-          <button class="tv-tab" data-sym="BLACKBULL:WTI">WTI</button>
-          <button class="tv-tab" data-sym="CAPITALCOM:DXY">DXY</button>
-          <button class="tv-tab" data-sym="VANTAGE:SP500">S&P 500</button>
-          <button class="tv-tab" data-sym="CFI:US100">Nasdaq</button>
-          <button class="tv-tab" data-sym="INDEX:NKY">Nikkei</button>
-          <button class="tv-tab" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
-          <button class="tv-tab" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
+      <div style="background:var(--head-bg);border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;">
+          <span class="panel-title">Price Chart</span>
+          <span class="panel-sub">TradingView · live data</span>
         </div>
-        <span class="panel-sub" style="margin-left:auto;">TradingView · live data</span>
+        <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
+          <button id="tv-tabs-prev" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
+          <div id="tv-pair-tabs" style="display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;flex:1;">
+            <button class="tv-tab active" data-sym="FX:EURUSD">EUR/USD</button>
+            <button class="tv-tab" data-sym="FX:GBPUSD">GBP/USD</button>
+            <button class="tv-tab" data-sym="FX:USDJPY">USD/JPY</button>
+            <button class="tv-tab" data-sym="FX:AUDUSD">AUD/USD</button>
+            <button class="tv-tab" data-sym="FX:USDCHF">USD/CHF</button>
+            <button class="tv-tab" data-sym="FX:USDCAD">USD/CAD</button>
+            <button class="tv-tab" data-sym="FX:NZDUSD">NZD/USD</button>
+            <button class="tv-tab" data-sym="FX:EURGBP">EUR/GBP</button>
+            <button class="tv-tab" data-sym="FX:EURJPY">EUR/JPY</button>
+            <button class="tv-tab" data-sym="FX:GBPJPY">GBP/JPY</button>
+            <button class="tv-tab" data-sym="FX:EURCHF">EUR/CHF</button>
+            <button class="tv-tab" data-sym="FX:AUDJPY">AUD/JPY</button>
+            <button class="tv-tab" data-sym="OANDA:XAUUSD">XAU/USD</button>
+            <button class="tv-tab" data-sym="BLACKBULL:WTI">WTI</button>
+            <button class="tv-tab" data-sym="CAPITALCOM:DXY">DXY</button>
+            <button class="tv-tab" data-sym="VANTAGE:SP500">S&P 500</button>
+            <button class="tv-tab" data-sym="CFI:US100">Nasdaq</button>
+            <button class="tv-tab" data-sym="INDEX:NKY">Nikkei</button>
+            <button class="tv-tab" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
+            <button class="tv-tab" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
+          </div>
+          <button id="tv-tabs-next" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
+        </div>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
@@ -3156,6 +3167,55 @@ function minimizeTVLegend() {
 }
 // Run once after initial widget loads (give it ~4s to render)
 setTimeout(minimizeTVLegend, 4000);
+// ─────────────────────────────────────────────────────────────────────────
+
+// ── HORIZONTAL SCROLL WITH MOUSE WHEEL (desktop) ─────────────────────────
+// Converts vertical wheel events into horizontal scroll on designated bars
+(function() {
+  function addWheelScroll(el) {
+    if (!el) return;
+    el.addEventListener('wheel', function(e) {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    }, { passive: false });
+  }
+  addWheelScroll(document.getElementById('tv-pair-tabs'));
+  addWheelScroll(document.getElementById('tv-ticker'));
+  addWheelScroll(document.getElementById('quotebar-inner'));
+
+  // Arrow visibility for tv-pair-tabs
+  const tabs   = document.getElementById('tv-pair-tabs');
+  const btnPrev = document.getElementById('tv-tabs-prev');
+  const btnNext = document.getElementById('tv-tabs-next');
+  function updateTabArrows() {
+    if (!tabs || !btnPrev || !btnNext) return;
+    const atStart = tabs.scrollLeft <= 2;
+    const atEnd   = tabs.scrollLeft + tabs.clientWidth >= tabs.scrollWidth - 2;
+    btnPrev.style.display = atStart ? 'none' : 'flex';
+    btnNext.style.display = atEnd   ? 'none' : 'flex';
+  }
+  if (tabs) {
+    tabs.addEventListener('scroll', updateTabArrows, { passive: true });
+    setTimeout(updateTabArrows, 200);
+  }
+
+  // Arrow visibility for quote bar
+  const ticker   = document.getElementById('tv-ticker');
+  const qbPrev   = document.getElementById('qb-prev');
+  const qbNext   = document.getElementById('qb-next');
+  function updateQbArrows() {
+    if (!ticker || !qbPrev || !qbNext) return;
+    const atStart = ticker.scrollLeft <= 2;
+    const atEnd   = ticker.scrollLeft + ticker.clientWidth >= ticker.scrollWidth - 2;
+    qbPrev.style.display = atStart ? 'none' : 'flex';
+    qbNext.style.display = atEnd   ? 'none' : 'flex';
+  }
+  if (ticker) {
+    ticker.addEventListener('scroll', updateQbArrows, { passive: true });
+    setTimeout(updateQbArrows, 200);
+  }
+})();
 // ─────────────────────────────────────────────────────────────────────────
 
 // TOP NAV
