@@ -741,6 +741,15 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
+    /* TV Events calendar: taller on mobile, scale up font to match site */
+    #section-tvcalendar { min-height: 420px !important; flex: none !important; }
+    #section-tvcalendar > div:last-child { min-height: 380px !important; }
+    #section-tvcalendar [style*="transform:scale(0.72)"] {
+      transform: scale(0.88) !important;
+      width: 113.6% !important;
+      height: 113.6% !important;
+    }
+
     /* Sessions table: compact */
     #sessions-table table { min-width: unset; }
 
@@ -1005,7 +1014,7 @@
     <a data-target="section-crossasset">Cross-Asset</a>
     <a data-target="section-risk">Risk</a>
     <a data-target="section-positioning">Positioning</a>
-    <a data-target="section-calendar">Calendar</a>
+    <a data-target="section-tvcalendar">Calendar</a>
   </nav>
   <div class="topbar-right">
     <!-- Site menu dropdown -->
@@ -1165,8 +1174,8 @@
             "details": false,
             "hide_side_toolbar": true,
             "hide_top_toolbar": true,
-            "hide_legend": false,
-            "hide_volume": false,
+            "hide_legend": true,
+            "hide_volume": true,
             "hotlist": false,
             "interval": "D",
             "locale": "en",
@@ -1329,7 +1338,7 @@
           </table>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · historical reference</div>
         </div>
-        <div style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
+        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
           </div>
@@ -1462,15 +1471,7 @@
 
   <!-- RIGHT PANEL -->
   <aside id="rightpanel">
-    <div id="section-calendar" class="sb-head">Macro Calendar — Today</div>
-    <div style="display:grid;grid-template-columns:32px 1fr 36px 36px 42px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-bottom:1px solid var(--border2);gap:2px;">
-      <span>Time</span><span>Event</span><span style="text-align:right">Prev</span><span style="text-align:right">Exp</span><span style="text-align:right">Act</span>
-    </div>
-    <div id="rp-calendar-rows" style="max-height:240px;overflow-y:auto;overflow-x:hidden;">
-      <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading calendar…</div>
-    </div>
-
-    <div id="section-cbrates" class="sb-head" style="margin-top:2px;">Central Bank Rates</div>
+    <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
     <table id="cbrates-table">
       <thead><tr><th style="text-align:left">Bank</th><th>Rate</th><th>Trend</th></tr></thead>
       <tbody id="cbrates-tbody">
@@ -3124,8 +3125,8 @@ document.querySelectorAll('.tv-tab').forEach(tab => {
     script.async = true;
     script.text = JSON.stringify({
       allow_symbol_change:false, calendar:false, details:false,
-      hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
-      hide_volume:false, interval:'D', locale:'en', save_image:false,
+      hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:true,
+      hide_volume:true, interval:'D', locale:'en', save_image:false,
       style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
       backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
       withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
@@ -3396,90 +3397,6 @@ async function fetchCrossAssetData() {
 // ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-// MACRO CALENDAR — from calendar-data/calendar.json
-// ═══════════════════════════════════════════════════════════════════
-async function fetchCalendarData() {
-  try {
-    const r = await fetch('./calendar-data/calendar.json');
-    if (!r.ok) return;
-    const data = await r.json();
-    const events = data.events || [];
-
-    // Filter today's events for G8 currencies — include all impacts
-    // Use both UTC date and local date to handle timezone differences (e.g. UTC-3 Montevideo)
-    const nowUTC = new Date();
-    const todayISO = nowUTC.toISOString().slice(0, 10); // UTC date
-    const localISO = new Date(nowUTC.getTime() - nowUTC.getTimezoneOffset() * 60000).toISOString().slice(0, 10); // local date
-    const todayDates = [...new Set([todayISO, localISO])]; // deduplicated
-    const g8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
-    const g8events = events.filter(e => g8.includes(e.currency));
-
-    // Skip purely informational DST-change entries (they're not tradeable events)
-    const isDST = e => (e.event || e.name || '').toLowerCase().includes('daylight saving');
-    const meaningful = g8events.filter(e => !isDST(e));
-
-    // Today: high+medium first; if <2, fill with all non-DST too
-    const todayMeaningful = meaningful.filter(e => todayDates.includes(e.dateISO));
-    const todayHM = todayMeaningful.filter(e => e.impact === 'high' || e.impact === 'medium');
-    let todayEvents = todayHM.length >= 2 ? todayHM : todayMeaningful;
-    todayEvents = todayEvents.slice(0, 8);
-
-    // If still nothing meaningful today, look ahead up to 3 business days (high+medium only)
-    let upcoming = todayEvents;
-    if (upcoming.length < 2) {
-      const minToday = todayDates.reduce((a, b) => a < b ? a : b);
-      const ahead = meaningful
-        .filter(e => e.dateISO > minToday && (e.impact === 'high' || e.impact === 'medium'))
-        .slice(0, 8);
-      // If today had some events, show them + upcoming combined; otherwise just upcoming
-      upcoming = todayEvents.length ? [...todayEvents, ...ahead].slice(0, 8) : ahead;
-    }
-
-    const container = document.getElementById('rp-calendar-rows');
-    if (!container) return;
-    if (!upcoming.length) {
-      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">No scheduled events — check back Monday</div>';
-      return;
-    }
-    // Update calendar heading: "Today" vs "Upcoming" depending on content
-    const calHead = document.getElementById('section-calendar');
-    const hasToday = upcoming.some(e => todayDates.includes(e.dateISO));
-    if (calHead) calHead.textContent = hasToday ? 'Macro Calendar — Today' : 'Macro Calendar — Upcoming';
-
-    container.innerHTML = upcoming.map(ev => {
-      const impDot = ev.impact === 'high' ? 'imp-h' : ev.impact === 'medium' ? 'imp-m' : 'imp-l';
-      const actCls = ev.actual && ev.forecast
-        ? (parseFloat(ev.actual) > parseFloat(ev.forecast) ? 'up' : 'down')
-        : '';
-      const ccy = ev.currency || ev.country || '';
-      // Country flag using flagcdn.com — cross-browser compatible SVG flags
-      const CCY_COUNTRY = {
-        USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au',
-        CAD:'ca', CHF:'ch', NZD:'nz', CNY:'cn', SEK:'se',
-        NOK:'no', DKK:'dk', SGD:'sg', HKD:'hk', MXN:'mx',
-        BRL:'br', KRW:'kr', INR:'in', ZAR:'za', TRY:'tr'
-      };
-      const cc = CCY_COUNTRY[ccy] || '';
-      const flagBadge = cc
-        ? `<img src="https://flagcdn.com/16x12/${cc}.png" width="16" height="12" alt="${ccy}" style="margin-right:3px;border-radius:1px;vertical-align:middle;flex-shrink:0;" onerror="this.style.display='none'">`
-        : (ccy ? `<span style="font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 2px;border-radius:2px;margin-right:3px;font-family:var(--font-mono);">${ccy}</span>` : '');
-      // Show date prefix for upcoming events not from today
-      const isToday = todayDates.includes(ev.dateISO);
-      const timeLabel = ev.timeUTC ? ev.timeUTC.slice(0,5) : (isToday ? '' : (ev.date || ev.dateISO?.slice(5) || ''));
-      return `<div class="macro-row">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap;">${timeLabel}</span>
-        <div class="m-name">
-          <span class="impact-dot ${impDot}"></span>
-          ${flagBadge}<span>${ev.event||ev.name||''}</span>
-        </div>
-        <span class="m-prev">${ev.previous||'—'}</span>
-        <span class="m-exp">${ev.forecast||'—'}</span>
-        <span class="m-act ${actCls}">${ev.actual||'—'}</span>
-      </div>`;
-    }).join('');
-  } catch(e) { console.warn('Calendar fetch failed:', e); }
-}
 
 // ═══════════════════════════════════════════════════════════════════
 // FED RATE EXPECTATIONS — computed from meetings-data if available,
@@ -3767,7 +3684,6 @@ async function boot() {
   // Static repo data — all parallel, fast (same GitHub Pages origin)
   fetchCBRates();
   fetchCOTData();
-  fetchCalendarData();
   fetchFedExpectations();
   fetchOptionSkew();
   fetchCarryData();
@@ -3803,7 +3719,7 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
   const main = document.getElementById('main');
   const rightPanel = document.getElementById('rightpanel');
   // Targets that live in the right panel sidebar, not main
-  const RIGHT_PANEL_TARGETS = new Set(['section-cbrates', 'section-calendar']);
+  const RIGHT_PANEL_TARGETS = new Set(['section-cbrates']);
 
   document.querySelectorAll('.top-nav a[data-target]').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -3855,7 +3771,6 @@ setInterval(fetchCarryData, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
-setInterval(fetchCalendarData, 30 * 60 * 1000);
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 </script>
 
