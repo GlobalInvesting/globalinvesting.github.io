@@ -14,7 +14,8 @@ FUENTES POR SÍMBOLO:
   NIKKEI  → yfinance  ^N225
   STOXX   → yfinance  ^STOXX50E
   DXY     → yfinance  DX-Y.NYB
-  US2Y    → yfinance  ^IRX          (13-week T-Bill, mejor proxy disponible)
+  US2Y    → yfinance  ^IRX          (13-week T-Bill, proxy de 2Y; el real us2y viene de FRED en repo)
+  US3M    → yfinance  ^IRX          (13-week T-Bill = 3M, mismo símbolo)
   US5Y    → yfinance  ^FVX          (US 5Y Treasury yield)
   US30Y   → yfinance  ^TYX          (US 30Y Treasury yield)
   MOVE    → yfinance  ^MOVE         (ICE BofA Bond Volatility Index)
@@ -61,7 +62,8 @@ YFINANCE_SYMBOLS = {
     "stoxx":  "^STOXX50E",
     "dxy":    "DX-Y.NYB",
     # Risk panel — yield curve
-    "us2y":   "^IRX",     # Yahoo ^IRX = 13-week T-Bill (best proxy; us2y from FRED en repo)
+    "us3m":   "^IRX",     # Yahoo ^IRX = 13-week T-Bill yield (3M)
+    "us2y":   "^IRX",     # mismo símbolo — proxy de 2Y (el real us2y viene de FRED en repo)
     "us5y":   "^FVX",     # US 5Y Treasury yield (×10 en Yahoo — se divide abajo)
     "us30y":  "^TYX",     # US 30Y Treasury yield (×10 en Yahoo — se divide abajo)
     # Risk panel — bond vol + crypto
@@ -83,6 +85,7 @@ VALIDATORS = {
     "nikkei": lambda v: v > 5000,
     "stoxx":  lambda v: v > 500,
     "dxy":    lambda v: 50 < v < 130,
+    "us3m":   lambda v: 0 < v < 20,
     "us2y":   lambda v: 0 < v < 20,
     "us5y":   lambda v: 0 < v < 20,
     "us30y":  lambda v: 0 < v < 20,
