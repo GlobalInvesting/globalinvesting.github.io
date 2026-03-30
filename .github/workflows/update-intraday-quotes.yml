@@ -43,7 +43,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests --break-system-packages
+        run: pip install yfinance requests --break-system-packages
 
       - name: Create output directory
         run: mkdir -p intraday-data
@@ -53,7 +53,7 @@ jobs:
           TWELVE_DATA_API_KEY:   ${{ secrets.TWELVE_DATA_API_KEY }}
           ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
           SITE_PATH: .           # repo raíz = sitio público
-        run: python3 scripts/fetch_intraday_quotes.py
+        run: python3 fetch_intraday_quotes.py
 
       - name: Commit and push quotes
         run: |
