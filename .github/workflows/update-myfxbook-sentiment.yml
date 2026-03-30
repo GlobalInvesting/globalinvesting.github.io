@@ -1,6 +1,6 @@
-name: Update Myfxbook Sentiment — v1.0
+name: Update Myfxbook Sentiment — v1.1
 
-# Runs every 30 minutes during weekday market hours (UTC).
+# Runs every 15 minutes during weekday market hours (UTC).
 # Covers the main FX sessions: EU open through NY close.
 #
 # ✅ Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
@@ -11,16 +11,16 @@ name: Update Myfxbook Sentiment — v1.0
 #   MYFXBOOK_EMAIL    — email address of your Myfxbook account
 #   MYFXBOOK_PASSWORD — password of your Myfxbook account
 #
-# API usage: 30 runs/day max. Myfxbook free tier has no documented hard limit;
-# this schedule is conservative and well within normal usage.
+# API usage: ~60 runs/day. Myfxbook free tier allows 100 requests/24h;
+# this schedule is within that limit. Each run = 3 API calls (login, outlook, logout).
 #
 # OUTPUT: sentiment-data/myfxbook.json (committed to repo, served via GitHub Pages)
 
 on:
   schedule:
-    - cron: '0,30 7-21 * * 1-5'    # every 30 min, 07:00–21:30 UTC, Mon–Fri
-    - cron: '0 22 * * 1-5'         # final tick at 22:00 UTC (NY close)
-  workflow_dispatch:                 # manual trigger from GitHub UI
+    - cron: '0,15,30,45 7-21 * * 1-5'   # every 15 min, 07:00–21:45 UTC, Mon–Fri
+    - cron: '0 22 * * 1-5'              # final tick at 22:00 UTC (NY close)
+  workflow_dispatch:                     # manual trigger from GitHub UI
 
 concurrency:
   group: update-myfxbook-sentiment
