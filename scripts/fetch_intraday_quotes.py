@@ -46,6 +46,7 @@ except ImportError:
 TWELVE_DATA_API_KEY = os.environ.get("TWELVE_DATA_API_KEY", "")
 
 YFINANCE_SYMBOLS = {
+    # Cross-Asset panel
     "vix":    "^VIX",
     "spx":    "^GSPC",
     "gold":   "GC=F",
@@ -54,7 +55,19 @@ YFINANCE_SYMBOLS = {
     "nikkei": "^N225",
     "stoxx":  "^STOXX50E",
     "dxy":    "DX-Y.NYB",
+    # Risk panel — yield curve
+    "us2y":   "^IRX",     # Yahoo ^IRX = 13-week T-Bill (best proxy; us2y from FRED en repo)
+    "us5y":   "^FVX",     # US 5Y Treasury yield (×10 en Yahoo — se divide abajo)
+    "us30y":  "^TYX",     # US 30Y Treasury yield (×10 en Yahoo — se divide abajo)
+    # Risk panel — bond vol + crypto
+    "move":   "^MOVE",    # ICE BofA MOVE Index (bond market volatility)
+    "btc":    "BTC-USD",  # Bitcoin — topbar + cross-asset panel
 }
+
+# Yields que Yahoo devuelve ×10 (^TNX=43.42 significa 4.342%) — dividir por 10
+# Nota: ^TNX YA está corregido en el map original (yfinance lo devuelve en % directo)
+# ^IRX, ^FVX, ^TYX también vienen en % directamente desde yfinance (a diferencia de Yahoo API)
+YIELD_DIVIDE_10 = set()   # yfinance Ticker.history ya normaliza — no hace falta dividir
 
 VALIDATORS = {
     "vix":    lambda v: 5 < v < 100,
@@ -65,6 +78,11 @@ VALIDATORS = {
     "nikkei": lambda v: v > 5000,
     "stoxx":  lambda v: v > 500,
     "dxy":    lambda v: 50 < v < 130,
+    "us2y":   lambda v: 0 < v < 20,
+    "us5y":   lambda v: 0 < v < 20,
+    "us30y":  lambda v: 0 < v < 20,
+    "move":   lambda v: 10 < v < 400,
+    "btc":    lambda v: v > 1000,
 }
 
 
