@@ -2294,6 +2294,61 @@ const QB_STOOQ_PAIRS = [
   { sym: 'nzdjpy',  id: 'nzdjpy',  dec: 3 },
 ];
 
+// ── Intraday quotes cache (from GitHub Action — Twelve Data + Alpha Vantage) ──
+// Loaded once per refresh cycle and shared between fetchRiskData and fetchCrossAssetData.
+// Avoids double-fetching the same JSON in the same 2-min cycle.
+let _intradayCacheTime = 0;
+let _intradayCache     = null;
+
+async function loadIntradayQuotes() {
+  const now = Date.now();
+  // Re-use cache for up to 90 seconds within the same refresh cycle
+  if (_intradayCache && (now - _intradayCacheTime) < 90_000) return _intradayCache;
+
+  try {
+    const r = await fetch('./intraday-data/quotes.json?_=' + Math.floor(now / 60000), {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data?.quotes) return null;
+
+    // Validate freshness — reject if file is older than 35 minutes
+    if (data.updated) {
+      const age = (now - new Date(data.updated).getTime()) / 60000;
+      if (age > 35) {
+        console.warn(`[Intraday] File is ${age.toFixed(0)}min old — treating as stale`);
+        // Still return it but mark all quotes as stale so UI shows note
+        Object.values(data.quotes).forEach(q => q.stale = true);
+      }
+    }
+
+    _intradayCache     = data;
+    _intradayCacheTime = now;
+    console.log(`[Intraday] ✓ Loaded ${Object.keys(data.quotes).length} quotes — source: ${data.source}`);
+    return data;
+  } catch (e) {
+    console.warn('[Intraday] Could not load quotes.json:', e.message);
+    return null;
+  }
+}
+
+// Helper: extract a standardised quote object from intraday cache
+function intradayQuote(cache, id) {
+  if (!cache?.quotes?.[id]) return null;
+  const q = cache.quotes[id];
+  if (!q.close || isNaN(q.close) || q.close <= 0) return null;
+  return {
+    close:      q.close,
+    open:       q.prev_close ?? q.close,
+    chg:        q.chg  ?? 0,
+    pct:        q.pct  ?? 0,
+    fromIntraday: true,
+    stale:      q.stale ?? false,
+  };
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 // Cache for stooq RT rates — used to update FX pairs table
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 
@@ -2682,6 +2737,17 @@ async function fetchRiskData() {
 
   // Render immediately with repo data so the page shows values without waiting for external APIs
   renderRiskData(byId);
+
+  // ── STEP 1.5: Load intraday quotes JSON (GitHub Action — Twelve Data + AV) ──
+  // This is the new primary source for intraday data. Overwrites repo values for
+  // vix, us10y, dxy. Stooq/Yahoo below will still run but only fill remaining gaps.
+  const _intradayData = await loadIntradayQuotes();
+  if (_intradayData) {
+    const _iq = (id) => intradayQuote(_intradayData, id);
+    if (_iq('vix'))   { const q = _iq('vix');   if (q.close > 5 && q.close < 100) byId.vix   = q; }
+    if (_iq('us10y')) { const q = _iq('us10y'); if (q.close > 0)                  byId.us10y = q; }
+    if (_iq('dxy'))   { const q = _iq('dxy');   if (q.close > 50 && q.close < 130) byId.dxy  = q; }
+  }
 
   // ── STEP 2: Try stooq for intraday prices (enriches with real-time chg/pct) ──
   async function fetchStooq(sym) {
@@ -3389,6 +3455,17 @@ async function fetchCrossAssetData() {
     }
   } catch {}
 
+  // ── STEP 1.5: Intraday quotes from GitHub Action (Twelve Data + Alpha Vantage) ──
+  // Pre-populate with reliable API data so stooq/Yahoo failures don't leave cells blank.
+  // Stooq results below will override these when available (stooq is more real-time when it works).
+  const _caIntraday = await loadIntradayQuotes();  // uses cache — no extra network call if already loaded
+  let _caGold   = _caIntraday ? intradayQuote(_caIntraday, 'gold')   : null;
+  let _caWti    = _caIntraday ? intradayQuote(_caIntraday, 'wti')    : null;
+  let _caSpx    = _caIntraday ? intradayQuote(_caIntraday, 'spx')    : null;
+  let _caNikkei = _caIntraday ? intradayQuote(_caIntraday, 'nikkei') : null;
+  let _caStoxx  = _caIntraday ? intradayQuote(_caIntraday, 'stoxx')  : null;
+  let _caDxy    = _caIntraday ? intradayQuote(_caIntraday, 'dxy')    : null;
+
   // ── STEP 2: Fetch all in parallel — stooq symbols ──
   const [gold, wti, spx, nikkei, stoxx, _us10y, dxy] = await Promise.all([
     stooq('xauusd'),
@@ -3441,21 +3518,34 @@ async function fetchCrossAssetData() {
   // Fallback: use pre-loaded repo value when stooq fails (avoids second fetch of USD.json)
   let us10y = _us10y || _repoUs10y;
 
-  if (spx)  setCA('spx',  spx.close,  spx.pct,  false);
-  if (gold) {
-    setCA('gold', gold.close, gold.pct, false);
+  // ── STEP 2.5: Fill gaps with intraday JSON (Twelve Data / Alpha Vantage) ──
+  // _caXxx variables were loaded in Step 1.5. Use them when stooq/Yahoo both failed.
+  const finalSpx    = spx     || _caSpx;
+  const finalGold   = gold    || _caGold;
+  const finalWti    = wti     || _caWti;
+  const finalNikkei = nikkeiData || _caNikkei;
+  const finalStoxx  = stoxxData  || _caStoxx;
+  const finalDxy    = dxy     || _caDxy;
+  if (!us10y) {
+    const caUs10y = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
+    if (caUs10y && caUs10y.close > 0) us10y = caUs10y;
+  }
+
+  if (finalSpx)  setCA('spx',  finalSpx.close,  finalSpx.pct,  false);
+  if (finalGold) {
+    setCA('gold', finalGold.close, finalGold.pct, false);
     const gEl = document.getElementById('q-xauusd');
     const gcEl = document.getElementById('qc-xauusd');
-    if (gEl) { gEl.textContent = gold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className = 'q-price ' + clsDir(gold.chg); }
-    if (gcEl) { gcEl.textContent = pctStr(gold.pct); gcEl.className = 'q-chg ' + clsDir(gold.chg); }
+    if (gEl) { gEl.textContent = finalGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className = 'q-price ' + clsDir(finalGold.chg); }
+    if (gcEl) { gcEl.textContent = pctStr(finalGold.pct); gcEl.className = 'q-chg ' + clsDir(finalGold.chg); }
   }
-  if (wti)       setCA('wti',    wti.close,    wti.pct,    false);
-  if (nikkeiData) setCA('nikkei', nikkeiData.close, nikkeiData.pct, false);
-  if (stoxxData)  setCA('stoxx',  stoxxData.close,  stoxxData.pct,  false);
-  if (us10y)     setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true);
+  if (finalWti)    setCA('wti',    finalWti.close,    finalWti.pct,    false);
+  if (finalNikkei) setCA('nikkei', finalNikkei.close, finalNikkei.pct, false);
+  if (finalStoxx)  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false);
+  if (us10y)       setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true);
 
-  // DXY — stooq first, then Yahoo fallback
-  let dxyData = dxy;
+  // DXY — stooq first, then intraday JSON fallback, then Yahoo
+  let dxyData = finalDxy;
   if (!dxyData) {
     const yBase = `https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?interval=1d&range=2d`;
     for (const yurl of proxyUrlsYahoo(yBase)) {
@@ -3495,11 +3585,23 @@ async function fetchCrossAssetData() {
   const now = new Date();
   const localHHMM = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-  if (upd) upd.textContent = 'stooq + Yahoo · ' + localHHMM + ' ' + tzAbbr;
+  // Show the actual source — intraday JSON (Twelve Data) when fresh, stooq otherwise
+  let sourceLabel = 'stooq + Yahoo';
+  if (_caIntraday?.source && _caIntraday.source !== 'repo') {
+    const srcName = _caIntraday.source === 'twelve_data' ? 'Twelve Data'
+                  : _caIntraday.source === 'alpha_vantage' ? 'Alpha Vantage'
+                  : 'mixed APIs';
+    // Check if the file is fresh (under 20 min old)
+    const fileAge = _caIntraday.updated
+      ? (Date.now() - new Date(_caIntraday.updated).getTime()) / 60000
+      : 999;
+    sourceLabel = fileAge < 20 ? `${srcName} · ~15min delay` : 'stooq + Yahoo';
+  }
+  if (upd) upd.textContent = sourceLabel + ' · ' + localHHMM + ' ' + tzAbbr;
 
   // Gold / SPX ratio — computed here where gold & spx are in scope
-  if (gold && spx && spx.close > 0) {
-    const ratio = (gold.close / spx.close).toFixed(3);
+  if (finalGold && finalSpx && finalSpx.close > 0) {
+    const ratio = (finalGold.close / finalSpx.close).toFixed(3);
     const rNum  = parseFloat(ratio);
     const sig   = rNum > 0.75 ? 'Risk-Off signal' : rNum > 0.55 ? 'Neutral' : 'Risk-On signal';
     const cls   = rNum > 0.75 ? 'down' : rNum < 0.55 ? 'up' : 'flat';
