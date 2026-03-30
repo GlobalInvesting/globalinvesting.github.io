@@ -108,9 +108,16 @@ _session = requests.Session()
 _session.headers.update(HEADERS)
 
 
-def api_get(path, params=None):
+def api_get(path, params=None, raw_params=None):
     url = f"{BASE_URL}/{path}"
-    r = _session.get(url, params=params, timeout=TIMEOUT)
+    if raw_params:
+        # Construir query string manualmente para evitar double-encoding
+        from urllib.parse import urlencode
+        qs = urlencode(raw_params, quote_via=lambda s, *a, **k: s)
+        url = f"{url}?{qs}"
+        r = _session.get(url, timeout=TIMEOUT)
+    else:
+        r = _session.get(url, params=params, timeout=TIMEOUT)
     r.raise_for_status()
     return r.json()
 
@@ -153,12 +160,16 @@ def main():
             print("[Auth] No session token returned")
             sys.exit(1)
 
+        # Decodificar el token si viene URL-encoded (ej: %2F → /)
+        from urllib.parse import unquote
+        session_token = unquote(session_token)
+
         print(f"[Auth] Login OK. Session: {session_token[:8]}...")
         time.sleep(1)  # Myfxbook necesita un momento para registrar la sesión
 
         # STEP 2 — Fetch community outlook
         print("[API]  Fetching community outlook...")
-        outlook_resp = api_get("get-community-outlook.json", params={
+        outlook_resp = api_get("get-community-outlook.json", raw_params={
             "session": session_token,
             "email":   MYFXBOOK_EMAIL,
         })
@@ -233,7 +244,7 @@ def main():
 
         # STEP 4 — Logout (best practice)
         try:
-            api_get("logout.json", params={"session": session_token})
+            api_get("logout.json", raw_params={"session": session_token})
             print("\n[Auth] Logged out OK")
         except Exception as e:
             print(f"\n[Auth] Logout warning (non-fatal): {e}")
