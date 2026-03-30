@@ -741,9 +741,9 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
-    /* TV Events calendar: taller on mobile, scale up font to match site */
-    #section-tvcalendar { min-height: 420px !important; flex: none !important; }
-    #section-tvcalendar > div:last-child { min-height: 380px !important; }
+    /* TV Events calendar: slightly taller on mobile, scale up font to match site */
+    #section-tvcalendar { min-height: 0 !important; flex: 1 !important; }
+    #section-tvcalendar > div:last-child { min-height: 280px !important; height: 280px !important; }
     #section-tvcalendar [style*="transform:scale(0.72)"] {
       transform: scale(0.88) !important;
       width: 113.6% !important;
