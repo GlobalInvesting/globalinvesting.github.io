@@ -775,6 +775,12 @@
     /* Right panel tables must NOT get that min-width — they're in a narrow column */
     #rightpanel table { min-width: unset !important; width: 100% !important; }
     #rightpanel td, #rightpanel th { font-size: 10px !important; padding: 2px 4px !important; }
+    /* Indicator + Spread tables in main panel: no min-width, fit container width */
+    table:has(#risk-indicators-tbody),
+    table:has(#yield-spreads-tbody) { min-width: unset !important; width: 100% !important; }
+    /* Fallback for browsers without :has() — target by container */
+    #section-risk table,
+    #section-rates table { min-width: unset !important; width: 100% !important; }
 
     /* Heatmap */
     #heatmap-wrap { overflow-x: auto !important; }
@@ -1286,7 +1292,7 @@
           <div class="risk-cell"><div class="risk-lbl">EUR/USD IV 1M</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Implied vol</div></div>
           <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
         </div>
-        <div style="padding:4px 8px 0;border-top:1px solid var(--border);">
+        <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
           <table>
             <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
             <tbody id="risk-indicators-tbody">
@@ -1311,7 +1317,7 @@
       <div class="yield-canvas-wrap">
         <canvas id="yield-canvas" height="100"></canvas>
       </div>
-      <div style="padding:0 10px 6px;">
+      <div style="padding:0 10px 6px;overflow-x:auto;">
         <table>
           <thead><tr><th style="text-align:left">Spread</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
           <tbody id="yield-spreads-tbody">
