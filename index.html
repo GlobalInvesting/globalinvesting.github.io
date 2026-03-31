@@ -3691,6 +3691,54 @@ async function fetchOptionSkew() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// LOAD AI REGIME — fast-path: set narrative badge BEFORE fetchRiskData runs.
+// Called with await in boot() so _aiRegimeFresh is populated and the badge
+// shows the correct regime on first paint, with zero flicker.
+// buildRichNarrative() runs afterwards to fill in the full narrative text.
+// ═══════════════════════════════════════════════════════════════════
+async function loadAIRegime() {
+  try {
+    const res = await fetch('./ai-analysis/index.json');
+    if (!res.ok) return;
+    const d = await res.json();
+    let regime = (d.regime || 'RISK-OFF').toUpperCase();
+    const generatedAt = d.generated_at || null;
+
+    // Staleness check — same 4-hour threshold as buildRichNarrative
+    let isStale = false;
+    if (generatedAt) {
+      const ageMinutes = (Date.now() - new Date(generatedAt).getTime()) / 60000;
+      if (ageMinutes > 240) isStale = true;
+    }
+
+    const regEl = document.getElementById('narrative-regime');
+    if (!regEl) return;
+
+    if (isStale) {
+      _aiRegimeFresh = false;
+      regEl.textContent = regime;
+      regEl.className = 'narr-regime stale';
+      regEl.title = 'AI signal stale — live VIX assessment active';
+    } else {
+      _aiRegimeFresh = true;
+      const isOn  = regime === 'RISK-ON';
+      const isOff = regime === 'RISK-OFF';
+      const badgeColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
+      regEl.textContent = regime;
+      regEl.className = 'narr-regime';
+      regEl.style.borderColor = badgeColor;
+      regEl.style.color       = badgeColor;
+      regEl.title = '';
+
+      // Also prime the Risk Monitor badge so both panels are in sync from first paint
+      const riskCls = isOn ? 'risk-val up' : isOff ? 'risk-val down' : 'risk-val warning';
+      setEl('risk-regime', regime, riskCls);
+      setEl('risk-regime-sub', isOn ? 'Risk appetite active' : isOff ? 'Risk aversion elevated' : 'Elevated caution');
+    }
+  } catch { /* silently skip — renderRiskData will handle the badge via live data */ }
+}
+
 // RICH AI NARRATIVE — build from ai-analysis/index.json + live data
 // ═══════════════════════════════════════════════════════════════════
 async function buildRichNarrative() {
@@ -3917,6 +3965,12 @@ async function boot() {
   fetchCarryData();
   fetchNewsData();
 
+  // ── CRITICAL: Load AI regime badge FIRST, before fetchRiskData touches the narrative badge.
+  // loadAIRegime() is a lightweight fetch of ai-analysis/index.json (~same-origin, <50ms).
+  // By awaiting it here, _aiRegimeFresh is set and the badge shows the correct regime
+  // on first paint — fetchRiskData will see _aiRegimeFresh=true and not overwrite it.
+  await loadAIRegime();
+
   // External API data — all in parallel.
   // fetchCrossAssetData runs immediately (no longer waits for fetchRiskData) so the
   // Cross-Asset panel populates from the intraday JSON cache on first render (~100ms).
@@ -3925,7 +3979,7 @@ async function boot() {
   fetchCrossAssetData();
   fetchCommodityQuotes();
   fetchCryptoQuotes();               // BTC from CoinGecko
-  buildRichNarrative();              // AI narrative (non-blocking)
+  buildRichNarrative();              // AI narrative full build (non-blocking, fills narrative text)
   setTimeout(fetchSentiment, 800);   // Dukascopy sentiment (last, non-critical)
 }
 
