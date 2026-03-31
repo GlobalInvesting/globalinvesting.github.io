@@ -175,6 +175,85 @@ def compute_hv30(closes_series):
         return None
 
 
+# Pairs for which we compute rolling 60-day Pearson correlation
+CORRELATION_PAIRS = [
+    ("eurusd", "dxy"),
+    ("audusd", "gold"),
+    ("usdjpy", "us10y"),
+    ("gbpusd", "eurusd"),
+    ("usdcad", "wti"),
+]
+
+# Human-readable labels for the frontend
+CORRELATION_LABELS = {
+    ("eurusd", "dxy"):    ("EUR/USD", "DXY"),
+    ("audusd", "gold"):   ("AUD/USD", "Gold"),
+    ("usdjpy", "us10y"):  ("USD/JPY", "US 10Y"),
+    ("gbpusd", "eurusd"): ("GBP/USD", "EUR/USD"),
+    ("usdcad", "wti"):    ("USD/CAD", "WTI Oil"),
+}
+
+# All unique symbols needed for correlation (merged with FX pairs)
+CORR_SYMBOLS = {k: v for k, v in YFINANCE_SYMBOLS.items()
+                if any(k in pair for pair in CORRELATION_PAIRS)}
+
+
+def pearson(x, y):
+    """Compute Pearson correlation coefficient between two equal-length lists."""
+    n = len(x)
+    if n < 10:
+        return None
+    mx, my = sum(x) / n, sum(y) / n
+    num = sum((xi - mx) * (yi - my) for xi, yi in zip(x, y))
+    den_x = math.sqrt(sum((xi - mx) ** 2 for xi in x))
+    den_y = math.sqrt(sum((yi - my) ** 2 for yi in y))
+    if den_x == 0 or den_y == 0:
+        return None
+    return round(num / (den_x * den_y), 3)
+
+
+def fetch_correlations():
+    """
+    Downloads 90 days of daily closes for each symbol used in correlation pairs
+    and computes rolling 60-day Pearson correlation.
+    Returns a list of dicts ready for quotes.json:
+      [{ "a": "EUR/USD", "b": "DXY", "corr": -0.97, "n": 60 }, ...]
+    """
+    print("\n[Correlations] Computing rolling 60-day correlations...")
+
+    # Fetch 90d history for all needed symbols
+    series = {}
+    for sym_id, yf_sym in CORR_SYMBOLS.items():
+        try:
+            ticker = yf.Ticker(yf_sym)
+            hist = ticker.history(period="3mo", interval="1d", auto_adjust=True)
+            if hist.empty or len(hist) < 15:
+                print(f"[Correlations] {sym_id}: insufficient data ({len(hist)} days)")
+                continue
+            series[sym_id] = hist["Close"].dropna().tolist()
+            print(f"[Correlations] ✓ {sym_id:8s} ({yf_sym}): {len(series[sym_id])} closes")
+        except Exception as e:
+            print(f"[Correlations] Error fetching {sym_id}: {e}")
+
+    results = []
+    for sym_a, sym_b in CORRELATION_PAIRS:
+        labels = CORRELATION_LABELS[(sym_a, sym_b)]
+        if sym_a not in series or sym_b not in series:
+            print(f"[Correlations] Skipping {sym_a}/{sym_b} — missing data")
+            results.append({"a": labels[0], "b": labels[1], "corr": None, "n": 0})
+            continue
+        # Align to shortest series, use last 60 points
+        sa, sb = series[sym_a], series[sym_b]
+        n = min(len(sa), len(sb), 60)
+        sa60, sb60 = sa[-n:], sb[-n:]
+        corr = pearson(sa60, sb60)
+        status = f"{corr:+.3f}" if corr is not None else "N/A"
+        print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: {status}  (n={n})")
+        results.append({"a": labels[0], "b": labels[1], "corr": corr, "n": n})
+
+    return results
+
+
 def fetch_hv30_fx(fx_pairs):
     """
     Descarga 90 días de historia diaria para cada par FX y calcula HV30.
@@ -381,7 +460,11 @@ def main():
         if pair_id in quotes and hv is not None:
             quotes[pair_id]["hv30"] = hv
 
-    output = {"updated": ts, "source": source_label, "quotes": quotes, "hv30": hv30_output}
+    # PASO 6: Calcular correlaciones rolling 60d
+    correlations = fetch_correlations()
+
+    output = {"updated": ts, "source": source_label, "quotes": quotes,
+              "hv30": hv30_output, "correlations": correlations}
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
