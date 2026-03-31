@@ -1287,7 +1287,7 @@
             <th style="text-align:left">Pair</th>
             <th>Bid</th><th>Ask</th><th>Spread</th>
             <th>1D Chg</th><th>1W Chg</th>
-            <th title="Historical Volatility 30 días — desviación estándar anualizada de retornos diarios, calculada con datos reales de yfinance. No es IV de opciones.">HV 30d</th><th>Sess H</th><th>Sess L</th>
+            <th title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th><th>Sess H</th><th>Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
@@ -1517,14 +1517,10 @@
     <table>
       <thead><tr><th style="text-align:left">Pair A</th><th>Pair B</th><th>Corr</th></tr></thead>
       <tbody id="correlations-tbody">
-        <tr><td>EUR/USD</td><td>DXY</td><td class="down">-0.97</td></tr>
-        <tr><td>AUD/USD</td><td>Gold</td><td class="up">+0.72</td></tr>
-        <tr><td>USD/JPY</td><td>US10Y</td><td class="up">+0.85</td></tr>
-        <tr><td>GBP/USD</td><td>EUR/USD</td><td class="up">+0.91</td></tr>
-        <tr><td>USD/CAD</td><td>WTI Oil</td><td class="down">-0.68</td></tr>
+        <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
     </table>
-    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day structural correlations</div>
+    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance</div>
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table>
@@ -1866,6 +1862,26 @@ const TYPICAL_SPREADS = {
 // Repo performance data cache
 const FX_PERF_CACHE = {};
 
+// ── Key Correlations — populated from intraday-data/quotes.json (computed by Python script) ──
+async function populateCorrelations() {
+  try {
+    const data = await loadIntradayQuotes();
+    const tbody = document.getElementById('correlations-tbody');
+    if (!tbody) return;
+    const corrs = data?.correlations;
+    if (!Array.isArray(corrs) || corrs.length === 0) return;
+    tbody.innerHTML = corrs.map(c => {
+      const v = c.corr;
+      if (v == null) return `<tr><td>${c.a}</td><td>${c.b}</td><td style="color:var(--text3)">—</td></tr>`;
+      const sign = v >= 0 ? '+' : '';
+      const cls = v >= 0.3 ? 'up' : v <= -0.3 ? 'down' : '';
+      return `<tr><td>${c.a}</td><td>${c.b}</td><td class="${cls}">${sign}${v.toFixed(2)}</td></tr>`;
+    }).join('');
+  } catch (e) {
+    console.warn('[Correlations] Failed to load:', e);
+  }
+}
+
 async function loadFxPerfData() {
   // Load fx-performance/*.json for each major currency to get 1W change
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
@@ -1955,7 +1971,8 @@ function populateFxPairsTable() {
   const upd = document.getElementById('fx-table-updated');
   if (upd) {
     const now = new Date();
-    upd.textContent = 'ECB · ' + now.toUTCString().slice(17,22) + ' UTC' + (isWeekend ? ' · last close' : '');
+    const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+    upd.textContent = 'ECB · ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}) + ' ' + tzAbbr + (isWeekend ? ' · last close' : '');
   }
 }
 
@@ -2405,11 +2422,12 @@ async function fetchQuoteBarRT() {
   if (totalUpdated > 0) {
     updateFxPairsTableRT();
     const now = new Date();
-    const hh = now.getUTCHours().toString().padStart(2,'0');
-    const mm = now.getUTCMinutes().toString().padStart(2,'0');
+    const hh = now.getHours().toString().padStart(2,'0');
+    const mm = now.getMinutes().toString().padStart(2,'0');
+    const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     const srcLabel = 'yfinance';  // sole source
     const qbLabel = document.getElementById('qb-source-label');
-    if (qbLabel) qbLabel.textContent = `${srcLabel} · ${hh}:${mm} UTC`;
+    if (qbLabel) qbLabel.textContent = `${srcLabel} · ${hh}:${mm} ${tzAbbr}`;
   }
 }
 
@@ -2495,9 +2513,10 @@ function updateFxPairsTableRT() {
   const upd = document.getElementById('fx-table-updated');
   if (upd) {
     const now = new Date();
-    const hh = now.getUTCHours().toString().padStart(2,'0');
-    const mm = now.getUTCMinutes().toString().padStart(2,'0');
-    upd.textContent = `yfinance · ${hh}:${mm} UTC · ~15min delay`;
+    const hh = now.getHours().toString().padStart(2,'0');
+    const mm = now.getMinutes().toString().padStart(2,'0');
+    const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+    upd.textContent = `yfinance · ${hh}:${mm} ${tzAbbr} · ~15min delay`;
   }
 }
 
@@ -3776,6 +3795,7 @@ async function boot() {
   // Se awaita para que populateFxPairsTable encuentre el cache listo al renderizar.
   await fetchQuoteBarRT();
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
+  populateCorrelations(); // 60-day rolling correlations from quotes.json
 
   // Static repo data — all parallel, fast (same GitHub Pages origin)
   fetchCBRates();
@@ -4159,6 +4179,77 @@ setInterval(fetchCarryData, 30 * 60 * 1000);
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
+
+// ═══════════════════════════════════════════════════════════════════
+// MOBILE VISIBILITY FIX — TradingView widgets + FX Liquidity chart
+// When the browser tab/app returns to foreground on mobile, iframes
+// may go blank and canvas charts may render at wrong dimensions.
+// We force a redraw whenever the page becomes visible again.
+// ═══════════════════════════════════════════════════════════════════
+(function() {
+  // Helper: reload the active TradingView chart by simulating a tab click
+  function reloadActiveTVChart() {
+    const activeTab = document.querySelector('.tv-tab.active');
+    if (activeTab) activeTab.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  }
+
+  // Helper: reload the Economic Calendar widget by re-injecting its script
+  function reloadTVCalendar() {
+    const scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    // Remove existing iframe/content and re-create the widget container
+    const container = scaleWrap.querySelector('.tradingview-widget-container');
+    if (!container) return;
+    const existingScript = container.querySelector('script');
+    if (!existingScript) return;
+    // Clone the widget container content to force re-init
+    const clone = container.cloneNode(true);
+    container.parentNode.replaceChild(clone, container);
+  }
+
+  // FX Liquidity chart: force redraw when visible
+  function redrawLiquidityIfVisible() {
+    const canvas = document.getElementById('liquidity-canvas');
+    if (!canvas) return;
+    // Only redraw if canvas has zero dimensions (collapsed/invisible at paint time)
+    if (canvas.parentElement.clientWidth > 0) drawLiquidityChart();
+  }
+
+  // On page visibility change (tab switch, app background/foreground)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState !== 'visible') return;
+    // Small delay to let the browser re-paint before we measure dimensions
+    setTimeout(function() {
+      redrawLiquidityIfVisible();
+      reloadActiveTVChart();
+    }, 350);
+  });
+
+  // On pageshow (iOS Safari fires this when returning from bfcache)
+  window.addEventListener('pageshow', function(e) {
+    if (!e.persisted) return; // only for bfcache restores
+    setTimeout(function() {
+      redrawLiquidityIfVisible();
+      reloadActiveTVChart();
+      reloadTVCalendar();
+    }, 350);
+  });
+
+  // IntersectionObserver: redraw liquidity chart the first time it enters viewport
+  // (fixes the wrong-position bug when the chart is not visible on initial paint)
+  const liqCanvas = document.getElementById('liquidity-canvas');
+  if (liqCanvas && typeof IntersectionObserver !== 'undefined') {
+    const obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          drawLiquidityChart();
+          obs.unobserve(entry.target); // only needed once per session
+        }
+      });
+    }, { threshold: 0.1 });
+    obs.observe(liqCanvas);
+  }
+})();
 </script>
 
 </body>
