@@ -1551,7 +1551,7 @@
 
 <!-- STATUS BAR / FOOTER -->
 <div id="statusbar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · YFINANCE · STOOQ · TRADINGVIEW</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · YFINANCE · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
@@ -2382,6 +2382,8 @@ async function fetchQuoteBarRT() {
         open:  q.prev_close ?? q.close,
         chg:   q.chg  ?? 0,
         pct:   q.pct  ?? 0,
+        high:  (q.high  != null && q.high  > 0) ? q.high  : null,
+        low:   (q.low   != null && q.low   > 0) ? q.low   : null,
         fromIntraday: true,
         stale: q.stale ?? false,
       };
@@ -3409,7 +3411,7 @@ async function fetchCrossAssetData() {
   if (us10y)       setCA('us10y',  us10y.close, us10y.fromRepo ? null : us10y.pct, true);
 
   const dxyData = finalDxy;
-  if (if (dxyData) {
+  if (dxyData) {
     setCA('dxy', dxyData.close, dxyData.pct, false);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
