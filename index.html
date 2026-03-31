@@ -411,6 +411,11 @@
     white-space: nowrap; align-self: center; letter-spacing: .04em;
     font-family: var(--font-ui);
   }
+  .narr-regime.stale {
+    border-color: var(--text3) !important;
+    color: var(--text3) !important;
+    opacity: 0.6;
+  }
 
   /* TABLE */
   table { width: 100%; border-collapse: collapse; }
@@ -1564,6 +1569,9 @@ const STATE = {
   cbRates: {},    // Central bank rates from rates/*.json
   cotData: {},    // COT data from cot-data/*.json
 };
+// True when buildRichNarrative has set the regime badge from a fresh AI JSON (< 4h old).
+// fetchRiskData will not overwrite the narrative-regime badge in that case.
+let _aiRegimeFresh = false;
 
 // Currency config: which pairs to compute from Frankfurter USD-base
 const PAIRS = [
@@ -2944,21 +2952,63 @@ async function renderRiskData(byId) {
     drawYieldCurveAndCache(null, null);
   }
 
-  // Regime assessment based on VIX + yield curve
+  // Regime assessment based on VIX + yield curve + cross-asset context
   if (byId.vix) {
     const vix = byId.vix.close;
     const isInverted = byId.us10y && byId.us3m && (byId.us10y.close < byId.us3m.close);
+
+    // Multi-factor scoring — each bearish signal adds weight
+    // RISK-ON requires VIX < 18 AND no other stress signals (more conservative threshold)
+    let stressScore = 0;
+    if (vix > 30) stressScore += 3;
+    else if (vix > 25) stressScore += 2;
+    else if (vix > 18) stressScore += 1;
+    if (isInverted) stressScore += 1;
+    // Gold up strongly (>1%) as safe-haven = additional stress signal
+    if (byId.gold && byId.gold.pct > 1.0) stressScore += 1;
+    // SPX down (>0.5%) on the day = risk pressure
+    if (byId.spx && byId.spx.pct < -0.5) stressScore += 1;
+    // MOVE index elevated = bond market stress
+    if (byId.move && byId.move.close > 120) stressScore += 1;
+
     let regime, regimeSub;
-    if (vix > 30) { regime = 'RISK-OFF'; regimeSub = 'High fear · VIX elevated'; }
-    else if (vix > 20) { regime = 'CAUTION'; regimeSub = 'Elevated volatility'; }
-    else if (isInverted) { regime = 'RISK-OFF'; regimeSub = 'Inverted curve · recession risk'; }
-    else { regime = 'RISK-ON'; regimeSub = 'Risk appetite active'; }
+    if (stressScore >= 4)      { regime = 'RISK-OFF'; regimeSub = `High stress · VIX ${vix.toFixed(1)}`; }
+    else if (stressScore >= 2) { regime = 'CAUTION';  regimeSub = `Elevated volatility · VIX ${vix.toFixed(1)}`; }
+    else if (stressScore === 1){ regime = 'MIXED';    regimeSub = `Mixed signals · VIX ${vix.toFixed(1)}`; }
+    else                       { regime = 'RISK-ON';  regimeSub = `Risk appetite active · VIX ${vix.toFixed(1)}`; }
+    if (isInverted && regime !== 'RISK-OFF') regimeSub += ' · inverted curve';
+
+    // ── Risk Monitor badge ──
     const regEl = document.getElementById('risk-regime');
     if (regEl) {
       regEl.textContent = regime;
-      regEl.className = 'risk-val ' + (regime === 'RISK-ON' ? 'up' : 'down');
+      regEl.className = 'risk-val ' + (regime === 'RISK-ON' ? 'up' : regime === 'RISK-OFF' ? 'down' : '');
+      regEl.style.opacity = '';
     }
     setEl('risk-regime-sub', regimeSub);
+
+    // ── Narrative badge (above narrative text) ──
+    // Rule: always show the MORE CONSERVATIVE of AI regime vs live assessment.
+    // If AI regime is fresh, only override it if the live assessment is more bearish.
+    // If AI regime is stale, the live assessment is authoritative.
+    const narrRegEl = document.getElementById('narrative-regime');
+    if (narrRegEl) {
+      const REGIME_RANK = { 'RISK-ON': 0, 'MIXED': 1, 'CAUTION': 2, 'RISK-OFF': 3 };
+      const liveRank = REGIME_RANK[regime] ?? 1;
+      const currentText = narrRegEl.textContent.toUpperCase().replace('__STALE__','');
+      const currentRank = REGIME_RANK[currentText] ?? -1;
+      // Override if: AI was stale (badge has .stale class) OR live regime is more bearish
+      const isCurrentStale = narrRegEl.classList.contains('stale');
+      if (isCurrentStale || liveRank > currentRank || !_aiRegimeFresh) {
+        const isOn  = regime === 'RISK-ON';
+        const isOff = regime === 'RISK-OFF';
+        narrRegEl.textContent = regime;
+        narrRegEl.className = 'narr-regime';
+        narrRegEl.style.borderColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
+        narrRegEl.style.color       = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
+        narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
+      }
+    }
   }
 
   // Gold/SPX ratio — computed in fetchCrossAssetData() after gold & SPX are fetched
@@ -3652,6 +3702,15 @@ async function buildRichNarrative() {
       const d = await narRes.json();
       baseNarrative = d.narrative || '';
       regime = d.regime || 'RISK-OFF';
+
+      // Staleness check — if the AI JSON is older than 4 hours, mark regime badge as stale
+      // so users know it may not reflect current market conditions
+      if (d.generated_at) {
+        const ageMinutes = (Date.now() - new Date(d.generated_at).getTime()) / 60000;
+        if (ageMinutes > 240) {
+          regime = '__STALE__' + regime;
+        }
+      }
     }
 
     // Pull key headlines from news to enrich narrative
@@ -3742,12 +3801,35 @@ async function buildRichNarrative() {
     // Update regime badge
     const regEl = document.getElementById('narrative-regime');
     if (regEl && regime) {
-      regEl.textContent = regime.toUpperCase();
-      const isOn = regime.toLowerCase().includes('on') && !regime.toLowerCase().includes('off');
-      regEl.style.borderColor = isOn ? 'var(--up)' : 'var(--down)';
-      regEl.style.color       = isOn ? 'var(--up)' : 'var(--down)';
-      setEl('risk-regime', regime.toUpperCase(), isOn ? 'risk-val up' : 'risk-val down');
-      setEl('risk-regime-sub', isOn ? 'Risk appetite active' : 'Risk aversion elevated');
+      const isStale = regime.startsWith('__STALE__');
+      const cleanRegime = isStale ? regime.replace('__STALE__', '') : regime;
+      const isOn = cleanRegime.toLowerCase().includes('on') && !cleanRegime.toLowerCase().includes('off');
+
+      if (isStale) {
+        // Stale AI regime — show the badge greyed-out with age indicator.
+        // fetchRiskData() drives the authoritative live assessment.
+        _aiRegimeFresh = false;
+        const ageHours = Math.round((Date.now() - new Date(d.generated_at).getTime()) / 3600000);
+        const ageLabel = ageHours >= 1 ? `${ageHours}h ago` : 'stale';
+        regEl.textContent = cleanRegime.toUpperCase();
+        regEl.className = 'narr-regime stale';
+        regEl.title = `AI signal from ${ageLabel} — live VIX assessment shown in Risk Monitor`;
+        const riskRegEl = document.getElementById('risk-regime');
+        if (riskRegEl) riskRegEl.style.opacity = '0.5';
+        setEl('risk-regime-sub', `AI signal from ${ageLabel} · live assessment active`);
+      } else {
+        // Fresh AI regime — set narrative badge and mark as authoritative
+        _aiRegimeFresh = true;
+        regEl.textContent = cleanRegime.toUpperCase();
+        regEl.className = 'narr-regime';
+        regEl.style.borderColor = isOn ? 'var(--up)' : 'var(--down)';
+        regEl.style.color       = isOn ? 'var(--up)' : 'var(--down)';
+        regEl.title = '';
+        const riskRegEl = document.getElementById('risk-regime');
+        if (riskRegEl) riskRegEl.style.opacity = '';
+        setEl('risk-regime', cleanRegime.toUpperCase(), isOn ? 'risk-val up' : 'risk-val down');
+        setEl('risk-regime-sub', isOn ? 'Risk appetite active' : 'Risk aversion elevated');
+      }
     }
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
