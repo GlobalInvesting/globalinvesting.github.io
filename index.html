@@ -1278,7 +1278,7 @@
     <div class="panel" id="section-fxtable">
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
-        <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · IV 1M · Session Range</span>
+        <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
       </div>
       <div style="overflow-x:auto;">
       <table>
@@ -1287,7 +1287,7 @@
             <th style="text-align:left">Pair</th>
             <th>Bid</th><th>Ask</th><th>Spread</th>
             <th>1D Chg</th><th>1W Chg</th>
-            <th title="Implied Volatility · 30-day options market estimate">IV 1M</th><th>Sess H</th><th>Sess L</th>
+            <th title="Historical Volatility 30 días — desviación estándar anualizada de retornos diarios, calculada con datos reales de yfinance. No es IV de opciones.">HV 30d</th><th>Sess H</th><th>Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
@@ -1329,7 +1329,7 @@
         <div class="risk-grid">
           <div class="risk-cell"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
           <div class="risk-cell"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
-          <div class="risk-cell"><div class="risk-lbl">EUR/USD IV 1M</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Implied vol</div></div>
+          <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
           <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
         </div>
         <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
@@ -1863,16 +1863,6 @@ const TYPICAL_SPREADS = {
   audjpy:0.8, audnzd:1.5, audchf:1.5,
   cadjpy:1.0, chfjpy:1.5, nzdjpy:1.8,
 };
-// Estimated 1M implied vol from historical avg (used as proxy when live IV unavailable)
-const EST_IV = {
-  eurusd:6.2, gbpusd:7.0, usdjpy:7.8, audusd:9.1,
-  usdchf:7.4, usdcad:6.8, nzdusd:10.2, eurgbp:5.8,
-  eurjpy:9.4, eurchf:8.5, eurcad:7.5, euraud:9.0,
-  gbpjpy:11.2, gbpchf:9.0, gbpcad:9.5,
-  audjpy:12.0, audnzd:8.5, audchf:10.0,
-  cadjpy:9.5, chfjpy:10.5, nzdjpy:12.5,
-};
-
 // Repo performance data cache
 const FX_PERF_CACHE = {};
 
@@ -1897,31 +1887,32 @@ function populateFxPairsTable() {
     const rate = computeRate(pair);
     const prev = computePrevRate(pair);
 
-    // 1D change
+    // 1D change — fuente primaria: RT cache (quotes.json yfinance, prev_close real)
+    // Fallback: ECB Frankfurter (solo si RT cache no está disponible aún)
     let chg1d = '—', cls1d = 'flat';
-    if (rate != null && prev && prev > 0) {
+    const rtD1 = STOOQ_RT_CACHE[pair.id];
+    if (rtD1?.pct != null) {
+      chg1d = pctStr(rtD1.pct);
+      cls1d = clsDir(rtD1.pct);
+    } else if (rate != null && prev && prev > 0) {
       const pct = (rate - prev) / prev * 100;
       chg1d = pctStr(pct);
       cls1d = clsDir(pct);
     }
 
     // 1W change — from fx-performance repo data
+    // Regla: BASE/USD → +perf[BASE]; USD/QUOTE → -perf[QUOTE]
     let chg1w = '—', cls1w = 'flat';
-    const perfBase = FX_PERF_CACHE[pair.base];
+    const perfBase  = FX_PERF_CACHE[pair.base];
     const perfQuote = FX_PERF_CACHE[pair.quote];
-    if (perfBase && pair.base !== 'USD') {
-      // fxPerformance1W is vs USD, so for base/USD pairs we use base perf directly
+    if (pair.quote === 'USD' && perfBase && perfBase.fxPerformance1W != null) {
       const p1w = perfBase.fxPerformance1W;
-      if (p1w != null) {
-        chg1w = pctStr(pair.invert ? p1w : -p1w);
-        cls1w = clsDir(pair.invert ? p1w : -p1w);
-      }
-    } else if (perfQuote && pair.quote !== 'USD') {
+      chg1w = pctStr(p1w);
+      cls1w = clsDir(p1w);
+    } else if (pair.base === 'USD' && perfQuote && perfQuote.fxPerformance1W != null) {
       const p1w = perfQuote.fxPerformance1W;
-      if (p1w != null) {
-        chg1w = pctStr(-p1w);
-        cls1w = clsDir(-p1w);
-      }
+      chg1w = pctStr(-p1w);
+      cls1w = clsDir(-p1w);
     }
 
     // Bid / Ask — rate ± half-spread
@@ -1932,9 +1923,12 @@ function populateFxPairsTable() {
     const ask = rate != null ? fmt(rate + halfSpread, pair.dec) : '—';
     const spreadStr = rate != null ? spreadPips.toFixed(1) : '—';
 
-    // IV 1M — from extended-data (we only have per-currency, use pair EST_IV for now)
-    const iv = EST_IV[pair.id] || '—';
-    const ivStr = typeof iv === 'number' ? iv.toFixed(1) + '%' : '—';
+    // HV30 — volatilidad histórica 30 días calculada por fetch_intraday_quotes.py
+    // Fuente: quotes.json campo hv30 por par, inyectado en STOOQ_RT_CACHE
+    // Reemplaza EST_IV (hardcodeado). Muestra '—' si aún no está disponible.
+    const rtDhv = STOOQ_RT_CACHE[pair.id];
+    const hv30val = rtDhv?.hv30 ?? null;
+    const ivStr = hv30val != null ? hv30val.toFixed(1) + '%' : '—';
 
     // Session High/Low — from intraday RT cache (STOOQ_RT_CACHE populated by yfinance JSON).
     // yfinance period="5d" returns daily OHLC — high/low not yet stored in quotes.json,
@@ -2345,12 +2339,14 @@ function intradayQuote(cache, id) {
   if (!cache?.quotes?.[id]) return null;
   const q = cache.quotes[id];
   if (!q.close || isNaN(q.close) || q.close <= 0) return null;
+  // chg/pct solo son válidos si prev_close existe — de lo contrario null (evita +0.00% falso)
+  const hasPrev = q.prev_close != null && q.prev_close > 0;
   return {
     close:      q.close,
     prev_close: q.prev_close ?? null,
     open:       q.prev_close ?? q.close,
-    chg:        q.chg  ?? 0,
-    pct:        q.pct  ?? 0,
+    chg:        hasPrev ? (q.chg  ?? null) : null,
+    pct:        hasPrev ? (q.pct  ?? null) : null,
     fromIntraday: true,
     stale:      q.stale ?? false,
   };
@@ -2377,13 +2373,16 @@ async function fetchQuoteBarRT() {
     for (const pair of QB_STOOQ_PAIRS) {
       const q = intradayData.quotes[pair.id];
       if (!q?.close || isNaN(q.close) || q.close <= 0) continue;
+      // chg/pct solo válidos si prev_close existe — null evita mostrar +0.00% falso
+      const hasPrev = q.prev_close != null && q.prev_close > 0;
       const data = {
         close: q.close,
         open:  q.prev_close ?? q.close,
-        chg:   q.chg  ?? 0,
-        pct:   q.pct  ?? 0,
+        chg:   hasPrev ? (q.chg  ?? null) : null,
+        pct:   hasPrev ? (q.pct  ?? null) : null,
         high:  (q.high  != null && q.high  > 0) ? q.high  : null,
         low:   (q.low   != null && q.low   > 0) ? q.low   : null,
+        hv30:  (q.hv30  != null) ? q.hv30 : (intradayData.hv30?.[pair.id] ?? null),
         fromIntraday: true,
         stale: q.stale ?? false,
       };
@@ -2436,8 +2435,18 @@ function updateFxPairsTableRT() {
       const halfSpread = spreadPips * pipVal / 2;
       tds[1].textContent = fmt(data.close - halfSpread, pairCfg.dec);
       tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
-      tds[4].textContent = pctStr(data.pct);
-      tds[4].className   = clsDir(data.pct);
+      // 1D Chg: respetar null — mostrar '—' en vez de '+0.00%' cuando prev_close no existe
+      if (data.pct != null) {
+        tds[4].textContent = pctStr(data.pct);
+        tds[4].className   = clsDir(data.pct);
+      } else {
+        tds[4].textContent = '—';
+        tds[4].className   = 'flat';
+      }
+      // HV30: actualizar si el dato está disponible en el cache (columna índice 6)
+      if (tds[6] && data.hv30 != null) {
+        tds[6].textContent = data.hv30.toFixed(1) + '%';
+      }
       // SESS H / SESS L — populate from high/low if available in intraday data
       if (tds[7]) tds[7].textContent = (data.high  != null) ? fmt(data.high,  pairCfg.dec) : '—';
       if (tds[8]) tds[8].textContent = (data.low   != null) ? fmt(data.low,   pairCfg.dec) : '—';
@@ -2765,9 +2774,7 @@ async function renderRiskData(byId) {
   }
 
   // MOVE — from intraday quotes.json (yfinance ^MOVE). No external fallback.
-  // EUR/USD IV — estimated from VIX proxy (Stooq eurusdv1m.b removed: CORS blocked).
   const move = (byId.move && byId.move.close > 10) ? byId.move : null;
-  const fxiv = null; // stooq eurusdv1m.b removed — VIX proxy used below
 
   // MOVE Index — ^MOVE via yfinance (ICE BofA bond volatility index)
   {
@@ -2791,15 +2798,17 @@ async function renderRiskData(byId) {
     }
   }
 
-  // EUR/USD Implied Vol 1M — Stooq eurusdv1m.b primary, VIX proxy fallback
+  // EUR/USD HV 30d — fuente primaria: HV30 calculada por fetch_intraday_quotes.py
+  // Fallback: proxy VIX × 0.22 (relación empírica documentada)
   {
-    if (fxiv && fxiv.close > 0.5 && fxiv.close < 30) {
-      const cls = fxiv.close > 10 ? 'risk-val down' : fxiv.close > 7 ? 'risk-val' : 'risk-val up';
-      setEl('risk-eurusd-iv', fxiv.close.toFixed(1) + '%', cls);
-      const signal = fxiv.close > 10 ? 'Stress elevated' : fxiv.close > 7 ? 'Moderate' : 'Low vol';
-      setEl('risk-eurusd-iv-sub', signal + ' · yfinance');
+    const eurusdHV = STOOQ_RT_CACHE['eurusd']?.hv30 ?? null;
+    if (eurusdHV != null && eurusdHV > 1 && eurusdHV < 40) {
+      const cls = eurusdHV > 10 ? 'risk-val down' : eurusdHV > 7 ? 'risk-val' : 'risk-val up';
+      setEl('risk-eurusd-iv', eurusdHV.toFixed(1) + '%', cls);
+      const signal = eurusdHV > 10 ? 'Stress elevated' : eurusdHV > 7 ? 'Moderate' : 'Low vol';
+      setEl('risk-eurusd-iv-sub', signal + ' · HV 30d');
     } else if (byId.vix) {
-      // Empirical proxy: EUR/USD 1M IV ≈ VIX × 0.22 (well-documented relationship)
+      // Proxy empírico: EUR/USD HV ≈ VIX × 0.22
       const estIV = (byId.vix.close * 0.22).toFixed(1);
       const fNum = parseFloat(estIV);
       const cls = fNum > 10 ? 'risk-val down' : fNum > 7 ? 'risk-val' : 'risk-val up';
@@ -2808,7 +2817,7 @@ async function renderRiskData(byId) {
       const vixSrc = byId.vix.fromRepo ? ' · est via FRED VIX' : ' · est via VIX';
       setEl('risk-eurusd-iv-sub', ivSig + vixSrc);
     } else {
-      setEl('risk-eurusd-iv-sub', 'Implied vol · unavailable');
+      setEl('risk-eurusd-iv-sub', 'HV 30d · unavailable');
     }
   }
 
