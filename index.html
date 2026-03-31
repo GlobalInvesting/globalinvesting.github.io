@@ -820,9 +820,49 @@
     #spreads-rows { width: 100%; box-sizing: border-box; }
     .spread-row { grid-template-columns: 48px 1fr 42px; gap: 4px; }
 
-    /* Indicator + Yield Spread tables: hide Signal column on mobile */
-    .signal-col { display: none !important; }
-    [id$="-sig"] { display: none !important; }
+    /* Indicator + Yield Spread tables: show all 3 columns on mobile.
+       Label col truncates with ellipsis if too long; Value and Signal
+       shrink to content and never wrap or get clipped. */
+    .signal-col { display: table-cell !important; }
+    [id$="-sig"] { display: table-cell !important; }
+
+    table:has(#risk-indicators-tbody),
+    table:has(#yield-spreads-tbody),
+    #section-risk table,
+    #section-rates table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    /* Col 1 (label): fills remaining space, truncates with ellipsis */
+    #risk-indicators-tbody td:first-child,
+    #yield-spreads-tbody td:first-child,
+    table:has(#risk-indicators-tbody) th:first-child,
+    table:has(#yield-spreads-tbody) th:first-child {
+      width: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Col 2 (Value) and Col 3 (Signal): fixed narrow width, no wrapping */
+    #risk-indicators-tbody td:nth-child(2),
+    #yield-spreads-tbody td:nth-child(2),
+    #risk-indicators-tbody td:nth-child(3),
+    #yield-spreads-tbody td:nth-child(3),
+    table:has(#risk-indicators-tbody) th:nth-child(2),
+    table:has(#yield-spreads-tbody) th:nth-child(2),
+    table:has(#risk-indicators-tbody) th:nth-child(3),
+    table:has(#yield-spreads-tbody) th:nth-child(3) {
+      width: 58px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Compact font + padding for these tables on mobile */
+    #section-risk table td, #section-risk table th,
+    #section-rates table td, #section-rates table th {
+      font-size: 10px;
+      padding: 3px 4px;
+    }
 
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
