@@ -1936,14 +1936,12 @@ function populateFxPairsTable() {
     const iv = EST_IV[pair.id] || '—';
     const ivStr = typeof iv === 'number' ? iv.toFixed(1) + '%' : '—';
 
-    // Session High/Low — approximate from yesterday's range using spread proxy
-    let sessH = '—', sessL = '—';
-    if (rate != null) {
-      // Typical daily range is ~1.2x the average true range; proxy from 1D spread
-      const dayRange = pair.dec === 3 ? 0.45 : 0.0045;
-      sessH = fmt(rate + dayRange * 0.6, pair.dec);
-      sessL = fmt(rate - dayRange * 0.4, pair.dec);
-    }
+    // Session High/Low — from intraday RT cache (STOOQ_RT_CACHE populated by yfinance JSON).
+    // yfinance period="5d" returns daily OHLC — high/low not yet stored in quotes.json,
+    // so we show '—' rather than invent synthetic ranges. Will populate when script adds high/low.
+    const rtD = STOOQ_RT_CACHE[pair.id];
+    const sessH = (rtD?.high  != null) ? fmt(rtD.high,  pair.dec) : '—';
+    const sessL = (rtD?.low   != null) ? fmt(rtD.low,   pair.dec) : '—';
 
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
 
@@ -2413,37 +2411,66 @@ async function fetchStooqQuoteSingle(sym) {
 }
 
 async function fetchQuoteBarRT() {
-  const results = await Promise.allSettled(
-    QB_STOOQ_PAIRS.map(async pair => ({ pair, data: await fetchStooqQuoteSingle(pair.sym) }))
-  );
-  let updated = 0;
-  for (const r of results) {
-    if (r.status !== 'fulfilled' || !r.value.data) continue;
-    const { pair, data } = r.value;
+  // ── PASO 1: intraday quotes.json (yfinance via GitHub Action — fuente primaria) ──
+  // Cubre los 35 símbolos incluyendo todos los pares FX con prev_close real (chg/pct real).
+  // No depende de CORS proxies, es same-origin y siempre disponible.
+  const intradayData = await loadIntradayQuotes();
+  let updatedFromIntraday = 0;
 
-    // Store in RT cache for FX pairs table
-    STOOQ_RT_CACHE[pair.id] = data;
+  if (intradayData?.quotes) {
+    for (const pair of QB_STOOQ_PAIRS) {
+      const q = intradayData.quotes[pair.id];
+      if (!q?.close || isNaN(q.close) || q.close <= 0) continue;
+      const data = {
+        close: q.close,
+        open:  q.prev_close ?? q.close,
+        chg:   q.chg  ?? 0,
+        pct:   q.pct  ?? 0,
+        fromIntraday: true,
+        stale: q.stale ?? false,
+      };
+      STOOQ_RT_CACHE[pair.id] = data;
 
-    // Update quote bar elements (only majors are in the bar)
-    const priceEl = document.getElementById('q-' + pair.id);
-    const chgEl   = document.getElementById('qc-' + pair.id);
-    if (priceEl) {
-      priceEl.textContent = data.close.toFixed(pair.dec);
-      priceEl.className   = 'q-price ' + clsDir(data.chg);
+      const priceEl = document.getElementById('q-' + pair.id);
+      const chgEl   = document.getElementById('qc-' + pair.id);
+      if (priceEl) {
+        priceEl.textContent = data.close.toFixed(pair.dec);
+        priceEl.className   = 'q-price ' + clsDir(data.chg);
+      }
+      if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
+      updatedFromIntraday++;
     }
-    if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
-    updated++;
   }
-  if (updated > 0) {
-    // Update FX pairs table rows with RT data
-    updateFxPairsTableRT();
 
-    // Update subtitle to show Stooq source + last refresh time
+  // ── PASO 2: Stooq CORS fallback — solo para pares que el JSON no cubrió ──
+  const missingPairs = QB_STOOQ_PAIRS.filter(p => !STOOQ_RT_CACHE[p.id]);
+  if (missingPairs.length > 0) {
+    const results = await Promise.allSettled(
+      missingPairs.map(async pair => ({ pair, data: await fetchStooqQuoteSingle(pair.sym) }))
+    );
+    for (const r of results) {
+      if (r.status !== 'fulfilled' || !r.value.data) continue;
+      const { pair, data } = r.value;
+      STOOQ_RT_CACHE[pair.id] = data;
+      const priceEl = document.getElementById('q-' + pair.id);
+      const chgEl   = document.getElementById('qc-' + pair.id);
+      if (priceEl) {
+        priceEl.textContent = data.close.toFixed(pair.dec);
+        priceEl.className   = 'q-price ' + clsDir(data.chg);
+      }
+      if (chgEl) { chgEl.textContent = pctStr(data.pct); chgEl.className = 'q-chg ' + clsDir(data.chg); }
+    }
+  }
+
+  const totalUpdated = Object.keys(STOOQ_RT_CACHE).length;
+  if (totalUpdated > 0) {
+    updateFxPairsTableRT();
     const now = new Date();
     const hh = now.getUTCHours().toString().padStart(2,'0');
     const mm = now.getUTCMinutes().toString().padStart(2,'0');
+    const srcLabel = updatedFromIntraday > 0 ? 'yfinance' : 'stooq';
     const qbLabel = document.getElementById('qb-source-label');
-    if (qbLabel) qbLabel.textContent = `yfinance · ${hh}:${mm} UTC`;
+    if (qbLabel) qbLabel.textContent = `${srcLabel} · ${hh}:${mm} UTC`;
   }
 }
 
@@ -2471,6 +2498,9 @@ function updateFxPairsTableRT() {
       tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
       tds[4].textContent = pctStr(data.pct);
       tds[4].className   = clsDir(data.pct);
+      // SESS H / SESS L — populate from high/low if available in intraday data
+      if (tds[7]) tds[7].textContent = (data.high  != null) ? fmt(data.high,  pairCfg.dec) : '—';
+      if (tds[8]) tds[8].textContent = (data.low   != null) ? fmt(data.low,   pairCfg.dec) : '—';
     });
   }
 
