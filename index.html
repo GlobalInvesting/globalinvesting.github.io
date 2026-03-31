@@ -720,8 +720,11 @@
     .narr-regime { align-self: flex-start; }
 
     /* 2-col grids that should become 1-col on mobile */
-    div[style*="grid-template-columns:1fr 1fr"] { display: flex !important; flex-direction: column !important; }
-    div[style*="grid-template-columns: 1fr 1fr"] { display: flex !important; flex-direction: column !important; }
+    div[style*="grid-template-columns:1fr 1fr"]:not(#cross-asset-grid):not(.ca-grid) { display: flex !important; flex-direction: column !important; }
+    div[style*="grid-template-columns: 1fr 1fr"]:not(#cross-asset-grid):not(.ca-grid) { display: flex !important; flex-direction: column !important; }
+
+    /* Cross-asset: always keep 2 cols — compact enough for mobile */
+    #cross-asset-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
 
     /* Cross-asset: keep 2 cols (compact enough) */
     .ca-grid { grid-template-columns: 1fr 1fr !important; }
@@ -796,6 +799,9 @@
     /* Sessions table: no min-width — se adapta al ancho del panel */
     #section-crossasset table { min-width: unset !important; width: 100% !important; }
     #section-crossasset td, #section-crossasset th { font-size: 10px !important; padding: 2px 4px !important; white-space: nowrap; }
+    /* Sessions: add left breathing room to first column so it's not cut off */
+    #section-crossasset td:first-child,
+    #section-crossasset th:first-child { padding-left: 8px !important; }
 
     /* Market sentiment: no forced height */
     /* Myfxbook widget overflows its fixed internal table — clip + scroll horizontally */
@@ -804,6 +810,10 @@
     /* Reference Spreads: ensure it fills full width when stacked */
     #spreads-rows { width: 100%; box-sizing: border-box; }
     .spread-row { grid-template-columns: 48px 1fr 42px; gap: 4px; }
+
+    /* Indicator + Yield Spread tables: hide Signal column on mobile */
+    .signal-col { display: none !important; }
+    [id$="-sig"] { display: none !important; }
 
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
@@ -1275,7 +1285,7 @@
         </div>
         <div style="padding:4px 8px 0;border-top:1px solid var(--border);">
           <table>
-            <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th>Signal</th></tr></thead>
+            <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
             <tbody id="risk-indicators-tbody">
               <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
               <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
@@ -1300,7 +1310,7 @@
       </div>
       <div style="padding:0 10px 6px;">
         <table>
-          <thead><tr><th style="text-align:left">Spread</th><th>Value</th><th>Signal</th></tr></thead>
+          <thead><tr><th style="text-align:left">Spread</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
           <tbody id="yield-spreads-tbody">
             <tr><td>2Y–10Y</td><td class="down" id="ys-2-10">—</td><td id="ys-2-10-sig">—</td></tr>
             <tr><td>US–DE 10Y</td><td id="ys-usde">—</td><td id="ys-usde-sig">—</td></tr>
@@ -2603,6 +2613,15 @@ function renderSentiment(pairs, sourceLabel) {
   const lm = now.getMinutes().toString().padStart(2,'0');
   const tzAbbr2 = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   setEl('sent-updated', (sourceLabel || '') + ' · ' + lh + ':' + lm + ' ' + tzAbbr2);
+  // Update subtitle to reflect actual source (Myfxbook vs COT fallback)
+  const isCOT = sourceLabel && sourceLabel.includes('COT');
+  const isHistorical = sourceLabel && sourceLabel.includes('Historical');
+  const subEl = document.getElementById('sent-source-sub');
+  if (subEl) {
+    if (isCOT) subEl.textContent = 'CFTC COT · speculative positioning (Myfxbook unavailable)';
+    else if (isHistorical) subEl.textContent = 'Historical avg · live feed unavailable';
+    else subEl.textContent = 'Myfxbook · retail positioning';
+  }
 }
 
 async function fetchSentiment() {
@@ -2611,14 +2630,14 @@ async function fetchSentiment() {
     const r = await fetch('./sentiment-data/myfxbook.json');
     if (r.ok) {
       const d = await r.json();
-      // Freshness check: reject if data is older than 2 hours
+      // Freshness check: reject if data is older than 15 hours (covers overnight/weekend gaps between workflow runs)
       const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
       const ageMin = (Date.now() - updatedMs) / 60000;
-      if (d.pairs && d.pairs.length >= 5 && ageMin < 120) {
+      if (d.pairs && d.pairs.length >= 5 && ageMin < 900) {
         const pairs = d.pairs.map(p => ({ sym: p.sym, buy: p.long, sell: p.short }));
         const ageLabel = ageMin < 60
           ? Math.round(ageMin) + 'min ago'
-          : Math.round(ageMin / 60 * 10) / 10 + 'h ago';
+          : Math.round(ageMin / 60) + 'h ago';
         renderSentiment(pairs, 'Myfxbook · ' + ageLabel);
         return;
       }
