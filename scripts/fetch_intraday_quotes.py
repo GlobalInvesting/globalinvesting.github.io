@@ -37,6 +37,7 @@ Twelve Data (API key opcional):
 import os
 import json
 import sys
+import math
 from datetime import datetime, timezone
 
 try:
@@ -138,6 +139,69 @@ VALIDATORS = {
     "chfjpy": lambda v: 100 < v < 220,
     "nzdjpy": lambda v: 40 < v < 110,
 }
+
+
+# FX pairs para los que calculamos HV30 (los mismos que aparecen en la tabla de Majors)
+HV30_FX_PAIRS = [
+    "eurusd", "gbpusd", "usdjpy", "audusd", "usdchf", "usdcad", "nzdusd",
+    "eurgbp", "eurjpy", "eurchf", "eurcad", "euraud",
+    "gbpjpy", "gbpchf", "gbpcad",
+    "audjpy", "audnzd", "audchf",
+    "cadjpy", "chfjpy", "nzdjpy",
+]
+
+
+def compute_hv30(closes_series):
+    """
+    Calcula la Historical Volatility anualizada de 30 días a partir de una
+    serie de cierres diarios (lista o pandas Series).
+    Retorna el valor en porcentaje (ej: 6.4 para 6.4%) o None si hay pocos datos.
+    """
+    try:
+        prices = [float(c) for c in closes_series if c is not None and float(c) > 0]
+        # Necesitamos al menos 22 cierres para 21 retornos diarios
+        if len(prices) < 22:
+            return None
+        # Usar los últimos 31 precios → 30 retornos
+        window = prices[-31:]
+        returns = [math.log(window[i] / window[i - 1]) for i in range(1, len(window))]
+        n = len(returns)
+        mean = sum(returns) / n
+        variance = sum((r - mean) ** 2 for r in returns) / (n - 1)
+        hv_daily = math.sqrt(variance)
+        hv_annual = hv_daily * math.sqrt(252) * 100  # en %
+        return round(hv_annual, 2)
+    except Exception:
+        return None
+
+
+def fetch_hv30_fx(fx_pairs):
+    """
+    Descarga 90 días de historia diaria para cada par FX y calcula HV30.
+    Retorna dict { pair_id: hv30_value_or_None }.
+    """
+    print("\n[HV30] Calculando volatilidad histórica 30d para pares FX...")
+    hv30_results = {}
+    yf_map = {k: v for k, v in YFINANCE_SYMBOLS.items() if k in fx_pairs}
+
+    for pair_id, yf_sym in yf_map.items():
+        try:
+            ticker = yf.Ticker(yf_sym)
+            hist = ticker.history(period="3mo", interval="1d", auto_adjust=True)
+            if hist.empty or len(hist) < 22:
+                print(f"[HV30] {pair_id}: insuficientes datos ({len(hist)} días)")
+                hv30_results[pair_id] = None
+                continue
+            closes = hist["Close"].dropna().tolist()
+            hv = compute_hv30(closes)
+            hv30_results[pair_id] = hv
+            status = f"{hv:.2f}%" if hv is not None else "N/A"
+            print(f"[HV30] ✓ {pair_id:8s} ({yf_sym}): {status}  ({len(closes)} cierres)")
+        except Exception as e:
+            print(f"[HV30] Error en {pair_id}: {e}")
+            hv30_results[pair_id] = None
+
+    return hv30_results
 
 
 def fetch_yfinance_all(symbols_map):
@@ -309,7 +373,15 @@ def main():
     sources = set(q.get("source") for q in quotes.values())
     source_label = "yfinance" if sources <= {"yfinance"} else ("repo" if sources == {"repo"} else "mixed")
 
-    output = {"updated": ts, "source": source_label, "quotes": quotes}
+    # PASO 5: Calcular HV30 para pares FX e inyectar en cada quote
+    hv30_data = fetch_hv30_fx(HV30_FX_PAIRS)
+    hv30_output = {}
+    for pair_id, hv in hv30_data.items():
+        hv30_output[pair_id] = hv  # None si no se pudo calcular
+        if pair_id in quotes and hv is not None:
+            quotes[pair_id]["hv30"] = hv
+
+    output = {"updated": ts, "source": source_label, "quotes": quotes, "hv30": hv30_output}
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
@@ -321,7 +393,8 @@ def main():
             stale = " [STALE]" if q.get("stale") else ""
             hi  = f"  H:{q['high']:.4f}"  if q.get("high")  is not None else ""
             lo  = f"  L:{q['low']:.4f}"   if q.get("low")   is not None else ""
-            print(f"   {sym:8s}  {q['close']:>12.4f}  {q['pct']:+.2f}%  [{q['source']}]{hi}{lo}{stale}")
+            hv  = f"  HV30:{q['hv30']:.1f}%" if q.get("hv30") is not None else ""
+            print(f"   {sym:8s}  {q['close']:>12.4f}  {q['pct']:+.2f}%  [{q['source']}]{hi}{lo}{hv}{stale}")
         else:
             print(f"   {sym:8s}  — sin datos")
     print(f"{'='*60}\n")
