@@ -173,11 +173,19 @@ def fetch_yfinance_all(symbols_map):
                     results[internal_id] = None
                     continue
 
+                # high/low del día más reciente disponible
+                highs = hist["High"].dropna()
+                lows  = hist["Low"].dropna()
+                day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
+                day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
+
                 results[internal_id] = {
                     "close":      round(close, 4),
                     "prev_close": round(prev_close, 4),
                     "chg":        round(chg, 4),
                     "pct":        round(pct, 4),
+                    "high":       day_high,
+                    "low":        day_low,
                     "source":     "yfinance",
                 }
                 print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%")
