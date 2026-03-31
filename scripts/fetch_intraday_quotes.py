@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.2 — Intraday quotes via yfinance (+ FX pairs)
+fetch_intraday_quotes.py  v2.3 — Intraday quotes via yfinance (+ FX pairs)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -257,7 +257,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.2  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.3  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
@@ -319,7 +319,9 @@ def main():
         q = quotes.get(sym)
         if q:
             stale = " [STALE]" if q.get("stale") else ""
-            print(f"   {sym:8s}  {q['close']:>12.4f}  {q['pct']:+.2f}%  [{q['source']}]{stale}")
+            hi  = f"  H:{q['high']:.4f}"  if q.get("high")  is not None else ""
+            lo  = f"  L:{q['low']:.4f}"   if q.get("low")   is not None else ""
+            print(f"   {sym:8s}  {q['close']:>12.4f}  {q['pct']:+.2f}%  [{q['source']}]{hi}{lo}{stale}")
         else:
             print(f"   {sym:8s}  — sin datos")
     print(f"{'='*60}\n")
