@@ -180,17 +180,17 @@ CORRELATION_PAIRS = [
     ("eurusd", "dxy"),
     ("audusd", "gold"),
     ("usdjpy", "us10y"),
-    ("gbpusd", "eurusd"),
+    ("usdjpy", "vix"),
     ("usdcad", "wti"),
 ]
 
 # Human-readable labels for the frontend
 CORRELATION_LABELS = {
-    ("eurusd", "dxy"):    ("EUR/USD", "DXY"),
-    ("audusd", "gold"):   ("AUD/USD", "Gold"),
-    ("usdjpy", "us10y"):  ("USD/JPY", "US 10Y"),
-    ("gbpusd", "eurusd"): ("GBP/USD", "EUR/USD"),
-    ("usdcad", "wti"):    ("USD/CAD", "WTI Oil"),
+    ("eurusd", "dxy"):   ("EUR/USD", "DXY"),
+    ("audusd", "gold"):  ("AUD/USD", "Gold"),
+    ("usdjpy", "us10y"): ("USD/JPY", "US 10Y"),
+    ("usdjpy", "vix"):   ("USD/JPY", "VIX"),
+    ("usdcad", "wti"):   ("USD/CAD", "WTI Oil"),
 }
 
 # All unique symbols needed for correlation (merged with FX pairs)
