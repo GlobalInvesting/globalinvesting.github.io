@@ -3772,7 +3772,9 @@ async function boot() {
   // lo soliciten — evita que cada función haga su propio fetch en paralelo y compitan.
   await loadIntradayQuotes();
 
-  fetchQuoteBarRT();                 // yfinance quotes from intraday JSON (quote bar + FX table RT update) + Stooq fallback
+  // fetchQuoteBarRT popula STOOQ_RT_CACHE (precios RT + hv30).
+  // Se awaita para que populateFxPairsTable encuentre el cache listo al renderizar.
+  await fetchQuoteBarRT();
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
 
   // Static repo data — all parallel, fast (same GitHub Pages origin)
