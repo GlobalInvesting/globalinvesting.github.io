@@ -2997,9 +2997,15 @@ async function renderRiskData(byId) {
       const liveRank = REGIME_RANK[regime] ?? 1;
       const currentText = narrRegEl.textContent.toUpperCase().replace('__STALE__','');
       const currentRank = REGIME_RANK[currentText] ?? -1;
-      // Override if: AI was stale (badge has .stale class) OR live regime is more bearish
+      // Override rules for the narrative badge:
+      // - AI stale → live is always authoritative
+      // - AI fresh → ONLY override if live is strictly MORE BEARISH than current AI regime
+      //   (never downgrade: if AI says RISK-ON and live also says RISK-ON, keep it)
+      // This prevents the RISK-ON→CAUTION flip caused by VIX > 25 scoring
+      // while still escalating to RISK-OFF if things genuinely deteriorate mid-session.
       const isCurrentStale = narrRegEl.classList.contains('stale');
-      if (isCurrentStale || liveRank > currentRank || !_aiRegimeFresh) {
+      const shouldOverride = isCurrentStale || !_aiRegimeFresh || (liveRank > currentRank && liveRank >= 2);
+      if (shouldOverride) {
         const isOn  = regime === 'RISK-ON';
         const isOff = regime === 'RISK-OFF';
         narrRegEl.textContent = regime;
@@ -3697,16 +3703,18 @@ async function buildRichNarrative() {
 
     let baseNarrative = '';
     let regime = 'RISK-OFF';
+    let _narrativeGeneratedAt = null; // kept in outer scope for stale age display
 
     if (narRes.ok) {
       const d = await narRes.json();
       baseNarrative = d.narrative || '';
       regime = d.regime || 'RISK-OFF';
+      _narrativeGeneratedAt = d.generated_at || null;
 
       // Staleness check — if the AI JSON is older than 4 hours, mark regime badge as stale
       // so users know it may not reflect current market conditions
-      if (d.generated_at) {
-        const ageMinutes = (Date.now() - new Date(d.generated_at).getTime()) / 60000;
+      if (_narrativeGeneratedAt) {
+        const ageMinutes = (Date.now() - new Date(_narrativeGeneratedAt).getTime()) / 60000;
         if (ageMinutes > 240) {
           regime = '__STALE__' + regime;
         }
@@ -3809,8 +3817,10 @@ async function buildRichNarrative() {
         // Stale AI regime — show the badge greyed-out with age indicator.
         // fetchRiskData() drives the authoritative live assessment.
         _aiRegimeFresh = false;
-        const ageHours = Math.round((Date.now() - new Date(d.generated_at).getTime()) / 3600000);
-        const ageLabel = ageHours >= 1 ? `${ageHours}h ago` : 'stale';
+        const ageHours = _narrativeGeneratedAt
+          ? Math.round((Date.now() - new Date(_narrativeGeneratedAt).getTime()) / 3600000)
+          : null;
+        const ageLabel = ageHours != null ? (ageHours >= 1 ? `${ageHours}h ago` : 'stale') : 'stale';
         regEl.textContent = cleanRegime.toUpperCase();
         regEl.className = 'narr-regime stale';
         regEl.title = `AI signal from ${ageLabel} — live VIX assessment shown in Risk Monitor`;
@@ -3820,15 +3830,19 @@ async function buildRichNarrative() {
       } else {
         // Fresh AI regime — set narrative badge and mark as authoritative
         _aiRegimeFresh = true;
+        const isOff = cleanRegime.toUpperCase().includes('OFF');
+        const isCaution = !isOn && !isOff; // CAUTION or MIXED
+        const badgeColor = isOn ? 'var(--up)' : isCaution ? 'var(--orange)' : 'var(--down)';
         regEl.textContent = cleanRegime.toUpperCase();
         regEl.className = 'narr-regime';
-        regEl.style.borderColor = isOn ? 'var(--up)' : 'var(--down)';
-        regEl.style.color       = isOn ? 'var(--up)' : 'var(--down)';
+        regEl.style.borderColor = badgeColor;
+        regEl.style.color       = badgeColor;
         regEl.title = '';
         const riskRegEl = document.getElementById('risk-regime');
         if (riskRegEl) riskRegEl.style.opacity = '';
-        setEl('risk-regime', cleanRegime.toUpperCase(), isOn ? 'risk-val up' : 'risk-val down');
-        setEl('risk-regime-sub', isOn ? 'Risk appetite active' : 'Risk aversion elevated');
+        const riskCls = isOn ? 'risk-val up' : isCaution ? 'risk-val warning' : 'risk-val down';
+        setEl('risk-regime', cleanRegime.toUpperCase(), riskCls);
+        setEl('risk-regime-sub', isOn ? 'Risk appetite active' : isCaution ? 'Elevated caution' : 'Risk aversion elevated');
       }
     }
 
@@ -3841,10 +3855,26 @@ async function buildRichNarrative() {
           const container = document.getElementById('alerts-container');
           const sub = document.getElementById('alerts-sub');
           if (container) {
+            // Convert engine UTC time string "HH:MM" to user's local timezone
+            function localizeSignalTime(timeStr) {
+              if (!timeStr || timeStr === '--:--') return timeStr || '--:--';
+              try {
+                const [h, m] = timeStr.split(':').map(Number);
+                if (isNaN(h) || isNaN(m)) return timeStr;
+                const now = new Date();
+                const utcDate = new Date(Date.UTC(
+                  now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m
+                ));
+                return utcDate.toLocaleTimeString(navigator.language || 'en', {
+                  hour: '2-digit', minute: '2-digit', hour12: false
+                });
+              } catch { return timeStr; }
+            }
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
+              const localTime = localizeSignalTime(s.time);
               return `<div class="alert-row">
-                <span class="a-time">${s.time || '--:--'}</span>
+                <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
                 <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}</div>
               </div>`;
