@@ -2854,3 +2854,60 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     obs.observe(liqCanvas);
   }
 })();
+
+// ═══════════════════════════════════════════════════════════════════
+// ACCESSIBILITY — WCAG 2.1 AA enhancements
+// ═══════════════════════════════════════════════════════════════════
+(function initA11y() {
+  // ── 1. Site menu: sync aria-expanded with :focus-within state ──
+  const menuBtn = document.querySelector('.site-menu-btn');
+  const siteMenu = document.querySelector('.site-menu');
+  if (menuBtn && siteMenu) {
+    // :focus-within shows the panel via CSS; mirror state in aria-expanded
+    siteMenu.addEventListener('focusin',  () => menuBtn.setAttribute('aria-expanded', 'true'));
+    siteMenu.addEventListener('focusout', (e) => {
+      // Only collapse if focus left the entire .site-menu
+      if (!siteMenu.contains(e.relatedTarget)) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    siteMenu.addEventListener('mouseenter', () => menuBtn.setAttribute('aria-expanded', 'true'));
+    siteMenu.addEventListener('mouseleave', () => menuBtn.setAttribute('aria-expanded', 'false'));
+  }
+
+  // ── 2. Chart tabs: sync aria-selected on click ──
+  const tablist = document.getElementById('tv-pair-tabs');
+  if (tablist) {
+    tablist.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tv-tab');
+      if (!btn) return;
+      tablist.querySelectorAll('.tv-tab').forEach(t => {
+        t.setAttribute('aria-selected', t === btn ? 'true' : 'false');
+      });
+    });
+  }
+
+  // ── 3. Top-nav scroll links: add aria-current="page" to active ──
+  const topNavLinks = document.querySelectorAll('.top-nav a');
+  topNavLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      topNavLinks.forEach(l => l.removeAttribute('aria-current'));
+      link.setAttribute('aria-current', 'location');
+    });
+  });
+  // Set initial aria-current on Overview
+  const firstNavLink = document.querySelector('.top-nav a.active');
+  if (firstNavLink) firstNavLink.setAttribute('aria-current', 'location');
+
+  // ── 4. Live region: announce price updates to screen readers ──
+  // A visually-hidden sr-only announcement div for dynamic price changes
+  if (!document.getElementById('sr-announce')) {
+    const announce = document.createElement('div');
+    announce.id = 'sr-announce';
+    announce.setAttribute('role', 'status');
+    announce.setAttribute('aria-live', 'polite');
+    announce.setAttribute('aria-atomic', 'true');
+    announce.className = 'sr-only';
+    document.body.appendChild(announce);
+  }
+})();
