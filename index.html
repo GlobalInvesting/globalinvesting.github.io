@@ -103,6 +103,7 @@
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to main content</a>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
   <p>
     <strong id="gdpr-title">Cookies &amp; Privacy</strong><br>
@@ -118,7 +119,7 @@
 <script src="assets/gdpr.js"></script>
 
 <!-- TOPBAR -->
-<div id="topbar">
+<header id="topbar" role="banner" aria-label="Global Investing FX Terminal">
   <a class="logo" href="/" title="Global Investing FX Terminal">
     <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
     <span>
@@ -126,7 +127,7 @@
       <span class="logo-sub">FX Terminal</span>
     </span>
   </a>
-  <nav class="top-nav">
+  <nav class="top-nav" aria-label="Dashboard sections">
     <a class="active" data-target="top">Overview</a>
     <a data-target="section-fxpairs">FX Pairs</a>
     <a data-target="section-econmap">Macro</a>
@@ -139,7 +140,7 @@
   <div class="topbar-right">
     <!-- Site menu dropdown -->
     <div class="site-menu">
-      <button class="site-menu-btn" aria-label="Site menu">
+      <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/>
           <rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
@@ -166,11 +167,11 @@
     <span id="session-label">DETECTING...</span>
     <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
   </div>
-</div>
+</header>
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
 <div id="tv-ticker-wrap">
-  <button id="qb-prev" class="qb-arrow" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})">&#8249;</button>
+  <button id="qb-prev" class="qb-arrow" aria-label="Scroll quotes left" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})">&#8249;</button>
   <div id="tv-ticker">
     <div id="quotebar-inner">
       <div class="q-item"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
@@ -189,7 +190,7 @@
     </div>
     <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">yfinance</span>
   </div>
-  <button id="qb-next" class="qb-arrow" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})">&#8250;</button>
+  <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})">&#8250;</button>
 </div>
 
 <!-- NEWS TICKER — populated from news-data/news.json -->
@@ -206,7 +207,7 @@
 <div id="layout">
 
   <!-- SIDEBAR LEFT -->
-  <aside id="sidebar">
+  <aside id="sidebar" aria-label="FX Pairs sidebar">
     <div class="sb-section">
       <div class="sb-head">FX Liquidity</div>
       <div style="padding:6px 8px 4px;position:relative;">
@@ -271,30 +272,30 @@
           <span class="panel-sub">TradingView · live data</span>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
-          <button id="tv-tabs-prev" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
-          <div id="tv-pair-tabs" style="display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;flex:1;">
-            <button class="tv-tab active" data-sym="FX:EURUSD">EUR/USD</button>
-            <button class="tv-tab" data-sym="FX:GBPUSD">GBP/USD</button>
-            <button class="tv-tab" data-sym="FX:USDJPY">USD/JPY</button>
-            <button class="tv-tab" data-sym="FX:AUDUSD">AUD/USD</button>
-            <button class="tv-tab" data-sym="FX:USDCHF">USD/CHF</button>
-            <button class="tv-tab" data-sym="FX:USDCAD">USD/CAD</button>
-            <button class="tv-tab" data-sym="FX:NZDUSD">NZD/USD</button>
-            <button class="tv-tab" data-sym="FX:EURGBP">EUR/GBP</button>
-            <button class="tv-tab" data-sym="FX:EURJPY">EUR/JPY</button>
-            <button class="tv-tab" data-sym="FX:GBPJPY">GBP/JPY</button>
-            <button class="tv-tab" data-sym="FX:EURCHF">EUR/CHF</button>
-            <button class="tv-tab" data-sym="FX:AUDJPY">AUD/JPY</button>
-            <button class="tv-tab" data-sym="OANDA:XAUUSD">XAU/USD</button>
-            <button class="tv-tab" data-sym="BLACKBULL:WTI">WTI</button>
-            <button class="tv-tab" data-sym="CAPITALCOM:DXY">DXY</button>
-            <button class="tv-tab" data-sym="VANTAGE:SP500">S&P 500</button>
-            <button class="tv-tab" data-sym="CFI:US100">Nasdaq</button>
-            <button class="tv-tab" data-sym="INDEX:NKY">Nikkei</button>
-            <button class="tv-tab" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
-            <button class="tv-tab" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
+          <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
+          <div id="tv-pair-tabs" role="tablist" aria-label="Currency pair chart selector" style="display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;flex:1;">
+            <button class="tv-tab active" role="tab" aria-selected="true" data-sym="FX:EURUSD">EUR/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:GBPUSD">GBP/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:USDJPY">USD/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:AUDUSD">AUD/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:USDCHF">USD/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:USDCAD">USD/CAD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:NZDUSD">NZD/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:EURGBP">EUR/GBP</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:EURJPY">EUR/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:GBPJPY">GBP/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:EURCHF">EUR/CHF</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:AUDJPY">AUD/JPY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="OANDA:XAUUSD">XAU/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="BLACKBULL:WTI">WTI</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CAPITALCOM:DXY">DXY</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="VANTAGE:SP500">S&P 500</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CFI:US100">Nasdaq</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="INDEX:NKY">Nikkei</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
           </div>
-          <button id="tv-tabs-next" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
+          <button id="tv-tabs-next" aria-label="Scroll chart tabs right" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
         </div>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;">
@@ -338,13 +339,13 @@
         <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
       </div>
       <div style="overflow-x:auto;">
-      <table>
+      <table aria-label="FX Pairs — Majors">
         <thead>
           <tr>
-            <th style="text-align:left">Pair</th>
-            <th>Bid</th><th>Ask</th><th>Spread</th>
-            <th>1D Chg</th><th>1W Chg</th>
-            <th title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th><th>Sess H</th><th>Sess L</th>
+            <th style="text-align:left" scope="col">Pair</th>
+            <th scope="col">Bid</th><th scope="col">Ask</th><th scope="col">Spread</th>
+            <th scope="col">1D Chg</th><th scope="col">1W Chg</th>
+            <th scope="col" title="Historical Volatility 30d — annualized standard deviation of daily returns, computed from real yfinance data. Not options-implied volatility.">HV 30d</th><th scope="col">Sess H</th><th scope="col">Sess L</th>
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
@@ -390,8 +391,8 @@
           <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
         </div>
         <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
-          <table>
-            <thead><tr><th style="text-align:left">Indicator</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
+          <table aria-label="Risk indicators">
+            <thead><tr><th style="text-align:left" scope="col">Indicator</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
             <tbody id="risk-indicators-tbody">
               <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
               <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
@@ -415,8 +416,8 @@
         <canvas id="yield-canvas" height="100"></canvas>
       </div>
       <div style="padding:0 10px 6px;overflow-x:auto;">
-        <table>
-          <thead><tr><th style="text-align:left">Spread</th><th>Value</th><th class="signal-col">Signal</th></tr></thead>
+        <table aria-label="Yield spreads">
+          <thead><tr><th style="text-align:left" scope="col">Spread</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
           <tbody id="yield-spreads-tbody">
             <tr><td>2Y–10Y</td><td class="down" id="ys-2-10">—</td><td id="ys-2-10-sig">—</td></tr>
             <tr><td>US–DE 10Y</td><td id="ys-usde">—</td><td id="ys-usde-sig">—</td></tr>
@@ -451,8 +452,8 @@
           <span class="sess" id="sess-london">London</span>
           <span class="sess" id="sess-newyork">New York</span>
         </div>
-        <table>
-          <thead><tr><th style="text-align:left">Session</th><th id="sess-col-open">Open</th><th id="sess-col-close">Close</th><th>Status</th></tr></thead>
+        <table aria-label="Trading sessions">
+          <thead><tr><th style="text-align:left" scope="col">Session</th><th id="sess-col-open">Open</th><th id="sess-col-close">Close</th><th>Status</th></tr></thead>
           <tbody>
             <tr><td>Sydney</td><td id="sess-open-sydney">22:00</td><td id="sess-close-sydney">07:00</td><td class="flat" id="status-sydney">—</td></tr>
             <tr><td>Tokyo</td><td id="sess-open-tokyo">00:00</td><td id="sess-close-tokyo">09:00</td><td class="flat" id="status-tokyo">—</td></tr>
@@ -461,8 +462,8 @@
           </tbody>
         </table>
         <div style="border-top:1px solid var(--border);padding:4px 8px 0;flex-shrink:0;">
-          <table>
-            <thead><tr><th style="text-align:left">Session Vol</th><th>EUR/USD</th><th>USD/JPY</th></tr></thead>
+          <table aria-label="Session volatility">
+            <thead><tr><th style="text-align:left" scope="col">Session Vol</th><th>EUR/USD</th><th>USD/JPY</th></tr></thead>
             <tbody>
               <tr><td>Sydney</td><td class="flat">±18p</td><td class="flat">±22p</td></tr>
               <tr><td>Tokyo</td><td class="flat">±28p</td><td class="up">±44p</td></tr>
@@ -561,18 +562,18 @@
   </main>
 
   <!-- RIGHT PANEL -->
-  <aside id="rightpanel">
+  <aside id="rightpanel" aria-label="Market data panels">
     <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
-    <table id="cbrates-table">
-      <thead><tr><th style="text-align:left">Bank</th><th>Rate</th><th>Trend</th></tr></thead>
+    <table id="cbrates-table" aria-label="Central bank interest rates">
+      <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
       <tbody id="cbrates-tbody">
         <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
     </table>
 
     <div class="sb-head" style="margin-top:2px;">Key Correlations</div>
-    <table>
-      <thead><tr><th style="text-align:left">Pair A</th><th>Pair B</th><th>Corr</th></tr></thead>
+    <table aria-label="Key FX correlations">
+      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col">Corr</th></tr></thead>
       <tbody id="correlations-tbody">
         <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
@@ -580,16 +581,16 @@
     <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance</div>
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
-    <table>
-      <thead><tr><th style="text-align:left">Bank · Meeting</th><th>Bias</th><th>Fwd Rate</th></tr></thead>
+    <table aria-label="Central bank rate expectations">
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th>Bias</th><th>Fwd Rate</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
     </table>
 
     <div class="sb-head" style="margin-top:2px;">Option Skew — 25-Delta RR <span style="font-size:9px;color:var(--text3);font-weight:normal;">est. via COT</span></div>
-    <table>
-      <thead><tr><th style="text-align:left">Pair</th><th>1W</th><th>1M</th><th>Bias</th></tr></thead>
+    <table aria-label="Option skew — 25-Delta Risk Reversal">
+      <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
       <tbody id="skew-tbody">
         <tr><td colspan="4" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
@@ -603,14 +604,14 @@
 </div>
 
 <!-- STATUS BAR / FOOTER -->
-<div id="statusbar">
+<footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">DATA</span><span class="sb-v">ECB/FRANKFURTER · CFTC · YFINANCE · TRADINGVIEW</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">DELAY</span><span class="sb-v" style="color:var(--orange);">~15 MIN · NOT FOR EXECUTION</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
-</div>
+</footer>
 
 
 <script src="assets/dashboard.js"></script>
