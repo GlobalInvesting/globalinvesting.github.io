@@ -2854,4 +2854,3 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     obs.observe(liqCanvas);
   }
 })();
-</script>

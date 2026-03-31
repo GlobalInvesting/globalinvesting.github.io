@@ -842,7 +842,6 @@
   }
 
 
-/* ── GDPR Banner ── */
   #gdpr-banner {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999;
     background: #1a1f2e; border-top: 2px solid #2962ff;
@@ -866,4 +865,3 @@
     #gdpr-banner .gdpr-btns { width: 100%; }
     #gdpr-banner button { flex: 1; }
   }
-</style>
