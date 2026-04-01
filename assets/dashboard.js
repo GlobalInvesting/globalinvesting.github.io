@@ -2819,13 +2819,17 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     if (canvas.parentElement.clientWidth > 0) drawLiquidityChart();
   }
 
+  // Detect mobile once (pointer: coarse covers phones + tablets)
+  var isMobile = window.matchMedia('(pointer: coarse)').matches;
+
   // On page visibility change (tab switch, app background/foreground)
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState !== 'visible') return;
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      reloadActiveTVChart();
+      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
+      if (isMobile) reloadActiveTVChart();
     }, 350);
   });
 
@@ -2834,8 +2838,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     if (!e.persisted) return; // only for bfcache restores
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      reloadActiveTVChart();
-      reloadTVCalendar();
+      // Mobile only: widgets may have gone blank after bfcache restore
+      if (isMobile) {
+        reloadActiveTVChart();
+        reloadTVCalendar();
+      }
     }, 350);
   });
 
