@@ -1047,41 +1047,36 @@ function renderGeneralStats(g) {
   const el = document.getElementById('sent-general');
   if (!el) return;
   if (!g || !g.profitablePct) { el.style.display = 'none'; return; }
-  const profPct    = g.profitablePct    || 0;
-  const notProfPct = g.nonProfitablePct || (100 - profPct);
-  const realPct    = g.realAccountsPct  || 0;
-  const totalFunds = g.totalFunds       || '';
-  const avgDep     = g.averageDeposit   || '';
-  const avgProfit  = g.avgAccountProfit || '';
-  const avgLoss    = g.avgAccountLoss   || '';
+
+  const profPct   = g.profitablePct   || 0;
+  const realPct   = g.realAccountsPct || 0;
+  const totalFunds= g.totalFunds      || '';
+  const avgDep    = g.averageDeposit  || '';
+  const avgProfit = g.avgAccountProfit|| '';
+  const avgLoss   = g.avgAccountLoss  || '';
+
+  // Profitable mini-bar
+  const barW = Math.round(profPct);
+  const barCol = profPct >= 50 ? 'var(--up)' : 'var(--down)';
 
   el.style.display = 'block';
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;padding:0;">
-      <div style="display:flex;align-items:center;gap:4px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Profitable</span>
-        <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:28px;">
-          <div style="height:100%;width:${profPct}%;background:var(--up);opacity:.8;border-radius:2px;"></div>
+    <div style="padding:4px 0 2px;">
+      <!-- Profitable bar row -->
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);white-space:nowrap;">Profitable</span>
+        <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${barW}%;background:${barCol};opacity:.8;border-radius:2px;"></div>
         </div>
-        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${profPct}%</span>
+        <span style="font-size:9px;font-weight:700;color:${barCol};font-family:var(--font-mono);white-space:nowrap;">${profPct}%</span>
+        ${realPct ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:4px;">Real accts</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${realPct}%</span>` : ''}
       </div>
-      <div style="display:flex;align-items:center;gap:4px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Real accts</span>
-        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${realPct}%</span>
+      <!-- Stats row -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        ${totalFunds ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${totalFunds}</span>` : ''}
+        ${avgDep ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${avgDep}</span>` : ''}
+        ${avgProfit ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L</span><span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">+$${avgProfit}</span>${avgLoss ? `<span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">$${avgLoss}</span>` : ''}` : ''}
       </div>
-      ${totalFunds ? `<div style="display:flex;align-items:center;gap:4px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds</span>
-        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${totalFunds}</span>
-      </div>` : ''}
-      ${avgDep ? `<div style="display:flex;align-items:center;gap:4px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit</span>
-        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${avgDep}</span>
-      </div>` : ''}
-      ${avgProfit ? `<div style="display:flex;align-items:center;gap:4px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L</span>
-        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">+$${avgProfit}</span>
-        ${avgLoss ? `<span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">$${avgLoss}</span>` : ''}
-      </div>` : ''}
     </div>`;
 }
 
@@ -1135,59 +1130,106 @@ function renderSentiment(pairs, sourceLabel) {
     const totalPos  = p.totalPos || longPos + shortPos;
     const avgLongPx = p.avgLongPx  || p.avgLong  || 0;
     const avgShortPx= p.avgShortPx || p.avgShort || 0;
+    const livePrice = p.livePrice  || 0;
 
-    const posStr    = fmtPos(totalPos);
+    // Distance from live price to avg entry of the dominant (larger) side
+    // Positive = retail is underwater on that side (price moved against them)
+    // Negative = retail is in profit on that side
+    let distHtml = '';
+    if (livePrice > 0 && (avgLongPx > 0 || avgShortPx > 0)) {
+      const domSide   = buyPct >= sellPct ? 'long' : 'short';
+      const avgPx     = domSide === 'long' ? avgLongPx : avgShortPx;
+      if (avgPx > 0) {
+        // For pairs where USD is base (USDJPY, USDCAD, USDCHF), price moves inversely
+        const rawDist  = livePrice - avgPx;            // positive = price above avg
+        const pctDist  = (rawDist / avgPx) * 100;
+        // If retail longs are below live price → they're profitable (green dist)
+        // If retail longs are above live price → they're underwater (red dist)
+        const inProfit = domSide === 'long' ? livePrice > avgPx : livePrice < avgPx;
+        const distCol  = inProfit ? 'var(--up)' : 'var(--down)';
+        const distSign = pctDist >= 0 ? '+' : '';
+        const distPips = Math.abs(rawDist) < 1
+          ? (Math.abs(rawDist) * (livePrice < 10 ? 100 : 10000)).toFixed(0) + ' pip'
+          : Math.abs(rawDist).toFixed(2);
+        const profitLabel = inProfit ? '▲ profit' : '▼ trapped';
+        distHtml = `
+          <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
+            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">${domSide === 'long' ? 'L' : 'S'} avg:</span>
+            <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${avgPx.toFixed(avgPx < 10 ? 3 : 4)}</span>
+            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">→</span>
+            <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${livePrice.toFixed(livePrice < 10 ? 3 : 4)}</span>
+            <span style="font-size:9px;font-weight:700;color:${distCol};font-family:var(--font-mono);">${distSign}${pctDist.toFixed(2)}%</span>
+            <span style="font-size:9px;color:${distCol};font-family:var(--font-ui);opacity:.8;">${distPips} · ${profitLabel}</span>
+          </div>`;
+      }
+    }
+
+    const posStr      = fmtPos(totalPos);
     const longPosStr  = fmtPos(longPos);
     const shortPosStr = fmtPos(shortPos);
-    const longPxStr   = fmtPx(avgLongPx);
-    const shortPxStr  = fmtPx(avgShortPx);
     const volStr      = fmtVol(totalVol);
 
-    // Second detail line: show positions breakdown or volume
+    // ── Line 2: positions + volume (compact) ──
     let detailHtml = '';
     if (longPosStr && shortPosStr) {
-      detailHtml = `
-        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
-          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">pos:</span>
-          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">▲${longPosStr}</span>
-          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">▼${shortPosStr}</span>
-          ${posStr ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-left:2px;">(${posStr})</span>` : ''}
-          ${volStr !== '—' ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:4px;">vol:</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${volStr}</span>` : ''}
-        </div>`;
+      detailHtml = `<div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">pos</span>
+        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">▲${longPosStr}</span>
+        <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">▼${shortPosStr}</span>
+        ${posStr ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">(${posStr})</span>` : ''}
+        ${volStr !== '—' ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:3px;">vol</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${volStr}</span>` : ''}
+      </div>`;
     } else if (totalVol > 0) {
-      detailHtml = `
-        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
-          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">vol:</span>
-          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${fmtVol(longVol)}</span>
-          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${fmtVol(shortVol)}</span>
-        </div>`;
+      detailHtml = `<div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">vol</span>
+        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${fmtVol(longVol)}</span>
+        <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${fmtVol(shortVol)}</span>
+      </div>`;
     }
 
-    // Avg price line
-    let priceHtml = '';
-    if (longPxStr && shortPxStr) {
-      priceHtml = `
-        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
-          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">avg:</span>
-          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${longPxStr}</span>
-          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${shortPxStr}</span>
-        </div>`;
+    // ── Line 3: distance badge — the key actionable signal ──
+    // distHtml built above in the livePrice block
+
+    // ── Bar tick position: where is live price relative to avgLong–avgShort range? ──
+    let tickPct = null;
+    if (livePrice > 0 && avgLongPx > 0 && avgShortPx > 0) {
+      const lo = Math.min(avgLongPx, avgShortPx);
+      const hi = Math.max(avgLongPx, avgShortPx);
+      const span = hi - lo;
+      if (span > 0) {
+        // Clamp tick to 5–95% so it's always visible
+        tickPct = Math.min(95, Math.max(5, ((livePrice - lo) / span) * 100));
+      }
     }
 
-    const hasExtra = detailHtml || priceHtml;
+    // Determine background tint for trapped scenario (subtle red/green wash)
+    let rowBg = 'transparent';
+    if (distHtml) {
+      const domSide  = buyPct >= sellPct ? 'long' : 'short';
+      const avgPx    = domSide === 'long' ? avgLongPx : avgShortPx;
+      if (avgPx > 0 && livePrice > 0) {
+        const inProfit = domSide === 'long' ? livePrice > avgPx : livePrice < avgPx;
+        const absPct   = Math.abs((livePrice - avgPx) / avgPx * 100);
+        if (!inProfit && absPct > 0.5) rowBg = 'rgba(220,60,60,0.04)';
+        else if (inProfit && absPct > 0.5) rowBg = 'rgba(60,200,120,0.04)';
+      }
+    }
 
-    return `<div style="padding:3px 0;border-bottom:1px solid var(--border);${hasExtra ? '' : 'padding-bottom:2px;'}">
+    return `<div style="padding:5px 0 4px;border-bottom:1px solid var(--border);background:${rowBg};">
+      <!-- Row 1: symbol · bar with tick · pcts · bias -->
       <div style="display:grid;grid-template-columns:52px 1fr 30px 30px 18px;align-items:center;gap:4px;">
-        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);letter-spacing:.01em;">${p.sym}</span>
-        <div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-          <div style="position:absolute;left:0;top:0;height:100%;width:${buyPct}%;background:var(--up);opacity:.9;border-radius:2px 0 0 2px;"></div>
-          <div style="position:absolute;right:0;top:0;height:100%;width:${sellPct}%;background:var(--down);opacity:.9;border-radius:0 2px 2px 0;"></div>
+        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);letter-spacing:.02em;">${p.sym}</span>
+        <div style="position:relative;height:7px;background:var(--bg3);border-radius:2px;overflow:visible;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${buyPct}%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;overflow:hidden;"></div>
+          <div style="position:absolute;right:0;top:0;height:100%;width:${sellPct}%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;overflow:hidden;"></div>
+          ${tickPct !== null ? `<div style="position:absolute;top:-2px;height:calc(100% + 4px);width:2px;background:#fff;opacity:.9;border-radius:1px;left:calc(${tickPct.toFixed(1)}% - 1px);z-index:2;box-shadow:0 0 3px rgba(255,255,255,.5);"></div>` : ''}
         </div>
         <span style="font-size:9px;color:var(--up);text-align:right;font-family:var(--font-mono);">${buyPct}%</span>
         <span style="font-size:9px;color:var(--down);text-align:right;font-family:var(--font-mono);">${sellPct}%</span>
         <span style="font-size:9px;font-weight:800;color:${biasCol};text-align:right;font-family:var(--font-ui);">${bias}</span>
       </div>
-      ${detailHtml}${priceHtml}
+      ${detailHtml}
+      ${distHtml}
     </div>`;
   }).join('');
 
@@ -1209,6 +1251,13 @@ function renderSentiment(pairs, sourceLabel) {
 }
 
 async function fetchSentiment() {
+  // Pre-load intraday quotes (cached) so we can compute distance-to-avg-price
+  const intradayData = await loadIntradayQuotes().catch(() => null);
+  const liveQuotes   = intradayData?.quotes || {};
+
+  // Helper: normalize pair sym → quotes.json key (e.g. "EUR/USD" → "eurusd")
+  function symToQuoteKey(sym) { return sym.replace('/', '').toLowerCase(); }
+
   // ── SOURCE 1: Myfxbook community outlook (primary — updated every 30min via GitHub Action) ──
   try {
     const r = await fetch('./sentiment-data/myfxbook.json');
@@ -1218,18 +1267,24 @@ async function fetchSentiment() {
       const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
       const ageMin = (Date.now() - updatedMs) / 60000;
       if (d.pairs && d.pairs.length >= 5 && ageMin < 900) {
-        const pairs = d.pairs.map(p => ({
-          sym:       p.sym,
-          buy:       p.long,
-          sell:      p.short,
-          longVol:   p.longVol  || 0,
-          shortVol:  p.shortVol || 0,
-          longPos:   p.longPos  || 0,
-          shortPos:  p.shortPos || 0,
-          totalPos:  p.totalPos || 0,
-          avgLongPx: p.avgLongPx  || 0,
-          avgShortPx:p.avgShortPx || 0,
-        }));
+        const pairs = d.pairs.map(p => {
+          const qKey   = symToQuoteKey(p.sym);
+          const liveQ  = liveQuotes[qKey];
+          const livePrice = liveQ?.close || 0;
+          return {
+            sym:        p.sym,
+            buy:        p.long,
+            sell:       p.short,
+            longVol:    p.longVol   || 0,
+            shortVol:   p.shortVol  || 0,
+            longPos:    p.longPos   || 0,
+            shortPos:   p.shortPos  || 0,
+            totalPos:   p.totalPos  || 0,
+            avgLongPx:  p.avgLongPx  || 0,
+            avgShortPx: p.avgShortPx || 0,
+            livePrice,
+          };
+        });
         renderGeneralStats(d.general || null);
         const ageLabel = ageMin < 60
           ? Math.round(ageMin) + 'min ago'
