@@ -146,6 +146,37 @@ a { color: inherit; text-decoration: none; }
 .tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
+
+/* ── Callouts ── */
+.callout { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 13px; color: var(--text2); line-height: 1.7; }
+.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
+.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
+.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+
+/* ── Session cards ── */
+.session-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 18px 0; }
+.session-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; transition: border-color .15s; }
+.session-card:hover { border-color: var(--border2); }
+.sess-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.sess-hours { font-size: 11px; color: var(--blue); font-family: var(--font-mono); margin-bottom: 10px; }
+.sess-detail { font-size: 12.5px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+.sess-pairs { font-size: 11px; color: var(--text3); border-top: 1px solid var(--border); padding-top: 8px; }
+@media (max-width: 600px) { .session-cards { grid-template-columns: 1fr; } }
+
+/* ── Liquidity bar demo ── */
+.liq-canvas-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 18px 0; overflow: hidden; }
+.liq-bar-row { display: flex; gap: 2px; height: 36px; align-items: flex-end; margin-bottom: 4px; }
+.liq-time-row { display: flex; justify-content: space-between; font-size: 9px; color: var(--text3); font-family: var(--font-mono); padding-top: 4px; }
+
+/* ── Vol table ── */
+.vol-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
+.vol-table thead { background: var(--head-bg); }
+.vol-table th { text-align: left; font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
+.vol-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 13px; transition: background .12s; }
+.vol-table tbody tr:hover td { background: var(--bg2); }
+.vol-table tr:last-child td { border-bottom: none; }
+.vol-table td:first-child { color: var(--text); font-weight: 600; }
+
 </style>
 </head>
 <body>

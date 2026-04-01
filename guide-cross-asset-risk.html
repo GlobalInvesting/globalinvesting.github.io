@@ -146,6 +146,40 @@ a { color: inherit; text-decoration: none; }
 .tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
+
+/* ── Callouts ── */
+.callout { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 13px; color: var(--text2); line-height: 1.7; }
+.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
+.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
+.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+
+/* ── Metric grid ── */
+.metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+.metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; position: relative; overflow: hidden; transition: border-color .15s; }
+.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--blue), transparent); }
+.metric-card:hover { border-color: var(--border2); }
+.metric-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.metric-sub { font-size: 12px; color: var(--text2); line-height: 1.65; }
+@media (max-width: 600px) { .metric-grid { grid-template-columns: 1fr; } }
+
+/* ── Flow rows ── */
+.flow-row { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.flow-row:last-child { border-bottom: none; }
+.flow-label { font-size: 11px; font-weight: 700; color: var(--text); white-space: nowrap; width: 120px; flex-shrink: 0; padding-top: 2px; }
+.flow-arrow { font-size: 14px; color: var(--blue); flex-shrink: 0; padding-top: 1px; }
+.flow-desc { font-size: 13px; color: var(--text2); line-height: 1.65; }
+
+/* ── Threshold table ── */
+.threshold-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
+.threshold-table thead { background: var(--head-bg); }
+.threshold-table th { text-align: left; font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
+.threshold-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 13px; transition: background .12s; }
+.threshold-table tbody tr:hover td { background: var(--bg2); }
+.threshold-table tr:last-child td { border-bottom: none; }
+.t-low  { color: var(--up)   !important; font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+.t-mid  { color: var(--orange) !important; font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+.t-hi   { color: var(--down) !important; font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+
 </style>
 </head>
 <body>

@@ -146,6 +146,36 @@ a { color: inherit; text-decoration: none; }
 .tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
+
+/* ── Callouts ── */
+.callout { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 13px; color: var(--text2); line-height: 1.7; }
+.callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
+.callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
+.callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
+
+/* ── Curve grid ── */
+.curve-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 18px 0; }
+.curve-grid > div { padding: 14px 16px; border-right: 1px solid var(--border); }
+.curve-grid > div:last-child { border-right: none; }
+@media (max-width: 600px) { .curve-grid { grid-template-columns: 1fr; } .curve-grid > div { border-right: none; border-bottom: 1px solid var(--border); } .curve-grid > div:last-child { border-bottom: none; } }
+
+/* ── Shape grid ── */
+.shape-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
+.shape-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; transition: border-color .15s; }
+.shape-card:hover { border-color: var(--border2); }
+.shape-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.shape-desc { font-size: 12.5px; color: var(--text2); line-height: 1.7; }
+@media (max-width: 600px) { .shape-grid { grid-template-columns: 1fr; } }
+
+/* ── Spread table ── */
+.spread-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
+.spread-table thead { background: var(--head-bg); }
+.spread-table th { text-align: left; font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
+.spread-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); font-size: 13px; transition: background .12s; }
+.spread-table tbody tr:hover td { background: var(--bg2); }
+.spread-table tr:last-child td { border-bottom: none; }
+.spread-table td:first-child { font-weight: 600; font-family: var(--font-mono); font-size: 12px; }
+
 </style>
 </head>
 <body>
