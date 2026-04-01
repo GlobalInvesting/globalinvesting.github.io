@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spread & Retail FX Positioning — Global Investing FX Terminal</title>
-<meta name="description" content="How to read the Reference Spreads and Retail FX Positioning sections of the FX Terminal. Understanding retail positioning data from Myfxbook and typical ECN spreads.">
+<title>Retail FX Positioning — Global Investing FX Terminal</title>
+<meta name="description" content="How to read the Retail FX Positioning panel in the FX Terminal. Open positions, average entry prices, retail traps, and contrarian signals from Myfxbook community data.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-market-sentiment.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -247,14 +247,15 @@ a { color: inherit; text-decoration: none; }
 <div class="guide-wrap">
   <nav class="guide-toc">
     <div class="toc-head">Contents</div>
-    <a class="toc-item" href="#spreads">Reference Spreads</a>
-    <a class="toc-item" href="#spread-color">Color Coding</a>
-    <a class="toc-item" href="#spread-session">Spreads by Session</a>
-    <a class="toc-item" href="#sentiment">Retail FX Positioning</a>
+    <a class="toc-item" href="#overview">Panel Overview</a>
     <a class="toc-item" href="#myfxbook">Myfxbook Data</a>
+    <a class="toc-item" href="#reading-bar">Reading the Bar</a>
+    <a class="toc-item" href="#open-positions">Open Positions</a>
+    <a class="toc-item" href="#avg-price">Avg Entry Price</a>
+    <a class="toc-item" href="#price-distance">Price Distance</a>
+    <a class="toc-item" href="#general-stats">Community Stats</a>
     <a class="toc-item" href="#contrarian">Contrarian Logic</a>
     <a class="toc-item" href="#limits">Limitations</a>
-    <a class="toc-item" href="#combining">Combining Both</a>
     <div class="toc-divider"></div>
     <a class="toc-item" href="guide-rates-yield-curve.html">← Rates &amp; Yield Curve</a>
     <a class="toc-item" href="guide-fx-liquidity.html">→ FX Liquidity</a>
@@ -263,148 +264,180 @@ a { color: inherit; text-decoration: none; }
   <div class="guide-content">
     <div class="page-hero">
       <div class="page-hero-label">Guide</div>
-      <h1>Spread &amp; Retail FX Positioning</h1>
-      <p>Two adjacent sub-sections that sit in the same row of the terminal: <strong>Reference Spreads</strong> shows typical ECN trading costs per pair, and <strong>Retail FX Positioning</strong> shows retail trader positioning via the Myfxbook community. Used together, they give a complementary view of execution cost and crowd positioning.</p>
+      <h1>Retail FX Positioning</h1>
+      <p>The <strong>Retail FX Positioning</strong> panel shows where retail traders are positioned right now — how many are long vs. short each pair, how many positions are open, where they entered, and whether they're currently winning or losing. The data comes from the Myfxbook community platform and updates every 30 minutes via a server-side script.</p>
     </div>
 
-    <div class="guide-section" id="spreads">
-      <h2>Reference Spreads</h2>
-      <p>The Reference Spreads panel shows typical ECN (Electronic Communication Network) spreads for the seven major FX pairs, expressed in pips. These are representative spreads — not live quotes from a specific broker — and represent average conditions during normal market hours.</p>
-      <div class="spread-demo">
-        <div class="spread-row-demo">
-          <span class="spr-sym-d">EUR/USD</span>
-          <div class="spr-bar-d"><div class="spr-fill-d" style="width:20%;background:var(--up)"></div></div>
-          <span class="spr-val-d" style="color:var(--up)">0.9 pip</span>
+    <div class="guide-section" id="overview">
+      <h2>Panel Overview</h2>
+      <p>Each row in the panel represents one currency pair. The pairs are sorted by total open positions — the most actively-traded pairs appear at the top. Every row contains four distinct pieces of information:</p>
+      <div class="sent-grid">
+        <div class="sent-card">
+          <div class="sent-title">Long / Short bar</div>
+          <div class="sent-desc">A split bar showing the percentage of retail traders who are currently long (green, left) vs. short (red, right). The white vertical line on the bar marks the current price relative to the retail average entry range.</div>
         </div>
-        <div class="spread-row-demo">
-          <span class="spr-sym-d">GBP/USD</span>
-          <div class="spr-bar-d"><div class="spr-fill-d" style="width:24%;background:var(--up)"></div></div>
-          <span class="spr-val-d" style="color:var(--up)">1.1 pip</span>
+        <div class="sent-card">
+          <div class="sent-title">Open positions count</div>
+          <div class="sent-desc">The total number of open positions in the Myfxbook community for this pair right now. EUR/USD typically leads with 50,000+ positions. Higher count = more statistically reliable data.</div>
         </div>
-        <div class="spread-row-demo">
-          <span class="spr-sym-d">USD/JPY</span>
-          <div class="spr-bar-d"><div class="spr-fill-d" style="width:36%;background:var(--orange)"></div></div>
-          <span class="spr-val-d" style="color:var(--orange)">2.0 pip</span>
+        <div class="sent-card">
+          <div class="sent-title">Avg entry price</div>
+          <div class="sent-desc">The volume-weighted average price at which the dominant side (longs or shorts) entered their positions. This is the price level the crowd is anchored to.</div>
         </div>
-        <div class="spread-row-demo">
-          <span class="spr-sym-d">USD/CAD</span>
-          <div class="spr-bar-d"><div class="spr-fill-d" style="width:52%;background:var(--down)"></div></div>
-          <span class="spr-val-d" style="color:var(--down)">2.5 pip</span>
-        </div>
-        <div class="spread-row-demo">
-          <span class="spr-sym-d">NZD/USD</span>
-          <div class="spr-bar-d"><div class="spr-fill-d" style="width:60%;background:var(--down)"></div></div>
-          <span class="spr-val-d" style="color:var(--down)">3.0 pip</span>
+        <div class="sent-card">
+          <div class="sent-title">Price distance</div>
+          <div class="sent-desc">How far the current price is from the dominant side's average entry, expressed as a percentage and in pips. Shown in red if the dominant side is losing (trapped), green if they are in profit.</div>
         </div>
       </div>
-      <p>The horizontal bar represents the spread relative to the widest reference pair shown. A shorter bar means lower cost (tighter spread). The value is color-coded by cost tier:</p>
-    </div>
-
-    <div class="guide-section" id="spread-color">
-      <h2>Color Coding</h2>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
-          <div style="width:12px;height:12px;background:var(--up);border-radius:2px;flex-shrink:0;"></div>
-          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Green — Tight (&lt; 1.5 pip)</span> <span style="color:var(--text2);">Low execution cost. Standard for EUR/USD and GBP/USD on major ECN brokers during London-NY overlap.</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
-          <div style="width:12px;height:12px;background:var(--orange);border-radius:2px;flex-shrink:0;"></div>
-          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Orange — Moderate (1.5–2.5 pip)</span> <span style="color:var(--text2);">Typical for USD/JPY, AUD/USD, USD/CHF. Acceptable for most strategies but relevant for scalping.</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;">
-          <div style="width:12px;height:12px;background:var(--down);border-radius:2px;flex-shrink:0;"></div>
-          <div style="font-size:12px;"><span style="color:var(--text);font-weight:700;">Red — Wide (&gt; 2.5 pip)</span> <span style="color:var(--text2);">Typical for USD/CAD, NZD/USD. Higher relative cost. Spreads on these pairs can spike 2–5× during thin liquidity windows (Asian session, news events).</span></div>
-        </div>
+      <div class="callout">
+        <strong>Hover over any element in the panel</strong> to see a tooltip explaining what it means and how to use it. Underlined elements are interactive.
       </div>
-      <div class="callout callout-orange">
-        <strong>These are reference spreads, not live quotes.</strong> Actual spreads at your broker depend on account type (ECN vs. market maker), session, news events, and market conditions. Spreads on all pairs widen significantly during non-overlap hours and around high-impact data releases. Always check your broker's live spread before sizing a trade.
-      </div>
-    </div>
-
-    <div class="guide-section" id="spread-session">
-      <h2>Spreads by Session</h2>
-      <p>Spreads are not static. They compress during high-liquidity sessions and widen during thin periods. Understanding when spreads are their tightest is essential for execution-sensitive strategies:</p>
-      <table class="contra-table">
-        <thead><tr><th>Session</th><th>UTC Hours</th><th>EUR/USD Typical</th><th>USD/JPY Typical</th></tr></thead>
-        <tbody>
-          <tr><td>Sydney</td><td>22:00–07:00</td><td>1.2–2.0 pip</td><td>1.5–2.5 pip</td></tr>
-          <tr><td>Tokyo</td><td>00:00–09:00</td><td>0.9–1.5 pip</td><td>0.8–1.2 pip</td></tr>
-          <tr><td>London</td><td>08:00–17:00</td><td>0.4–0.9 pip</td><td>0.8–1.5 pip</td></tr>
-          <tr><td>New York</td><td>13:00–22:00</td><td>0.3–0.7 pip</td><td>0.9–1.5 pip</td></tr>
-          <tr><td>London–NY Overlap</td><td>13:00–17:00</td><td>0.2–0.5 pip</td><td>0.7–1.2 pip</td></tr>
-          <tr><td>News event (any)</td><td>±2 min</td><td>5–20 pip</td><td>5–20 pip</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="guide-section" id="sentiment">
-      <h2>Retail FX Positioning</h2>
-      <p>Below the Reference Spreads, the <strong>Retail FX Positioning</strong> widget shows the percentage of retail traders who are currently <span style="color:var(--up);">long</span> vs. <span style="color:var(--down);">short</span> each major pair, sourced from the Myfxbook community platform.</p>
-      <p>Each pair is shown with two numbers: the long percentage and the short percentage. These sum to 100% and represent the directional positioning of Myfxbook's tracked account community in real time.</p>
     </div>
 
     <div class="guide-section" id="myfxbook">
       <h2>Myfxbook Data</h2>
-      <p>Myfxbook is a third-party platform where retail forex traders connect their live broker accounts for automated trade tracking, performance analysis, and social sharing. The "Forex Outlook" widget aggregates the open positions of all connected accounts by pair and direction.</p>
-      <div class="sent-grid">
-        <div class="sent-card">
-          <div class="sent-title">What it measures</div>
-          <div class="sent-desc">The directional bias of currently-open retail trades on each pair. If 65% of accounts are long EUR/USD, it means more retail money is positioned for EUR/USD to rise than to fall.</div>
+      <p>Myfxbook is a third-party platform where retail forex traders voluntarily connect their live broker accounts for automated trade tracking and performance analysis. The "Community Outlook" feature aggregates the open positions of all connected accounts by pair and direction.</p>
+      <table class="contra-table">
+        <thead><tr><th>Property</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>What it measures</td><td>The current open position balance of Myfxbook-connected accounts — not recent trade flow, not closed trades.</td></tr>
+          <tr><td>Update frequency</td><td>Every 30 minutes via a GitHub Actions server-side script. The timestamp shown in the panel footer reflects the age of the data.</td></tr>
+          <tr><td>Sample size</td><td>Typically 10,000–60,000 open positions per major pair. EUR/USD is always the largest sample.</td></tr>
+          <tr><td>Who is included</td><td>Retail traders who connected live or demo accounts to Myfxbook. Not representative of the full retail market — see Limitations.</td></tr>
+          <tr><td>Pairs shown</td><td>24 pairs sorted by total open positions. Majors (EUR/USD, GBP/USD, USD/JPY…) plus selected crosses.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="reading-bar">
+      <h2>Reading the Long / Short Bar</h2>
+      <p>The horizontal bar is the first thing to look at. It splits at the point where long % meets short % — green fills from the left, red from the right.</p>
+      <div class="spread-demo">
+        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
+          <span class="spr-sym-d">EUR/USD</span>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:35%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:65%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:42%;transform:translateX(-1px);"></div>
+          </div>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">35% <span style="color:var(--up);">L</span> · 65% <span style="color:var(--down);">S</span></span>
         </div>
-        <div class="sent-card">
-          <div class="sent-title">Update frequency</div>
-          <div class="sent-desc">Near real-time — the widget pulls live data from Myfxbook's API and updates every 15 minutes in the terminal. The data reflects the current open position balance, not recent trade flow.</div>
+        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
+          <span class="spr-sym-d">GBP/USD</span>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:66%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:34%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:55%;transform:translateX(-1px);"></div>
+          </div>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">66% <span style="color:var(--up);">L</span> · 34% <span style="color:var(--down);">S</span></span>
         </div>
-        <div class="sent-card">
-          <div class="sent-title">Coverage</div>
-          <div class="sent-desc">Major pairs (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD, NZD/USD) plus several crosses and exotic pairs. The terminal shows only the majors.</div>
-        </div>
-        <div class="sent-card">
-          <div class="sent-title">Who is included</div>
-          <div class="sent-desc">Retail traders who have voluntarily connected their live (or demo) accounts to Myfxbook. This is a biased sample — active, platform-engaged retail traders — not the full retail market.</div>
+        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
+          <span class="spr-sym-d">AUD/NZD</span>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:11%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:89%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:18%;transform:translateX(-1px);"></div>
+          </div>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">11% <span style="color:var(--up);">L</span> · 89% <span style="color:var(--down);">S</span></span>
         </div>
       </div>
+      <p>The <strong style="color:#fff;">white vertical line</strong> on the bar marks where the current market price sits relative to the range between the average long entry and the average short entry. If the line is shifted toward the short side, price is closer to where shorts entered — useful for gauging who is under more pressure.</p>
+      <div class="callout callout-orange">
+        <strong>Readings near 50/50 carry no signal.</strong> Retail is split and no crowd bias exists. Focus your attention on readings above 65% or below 35% on either side — those are where useful contrarian information starts to appear.
+      </div>
+    </div>
+
+    <div class="guide-section" id="open-positions">
+      <h2>Open Positions Count</h2>
+      <p>Below the pair symbol, the panel shows the total number of open positions tracked by Myfxbook for that pair. This number is the primary sort key — pairs with the most positions appear at the top.</p>
+      <p>Why does this matter? A sentiment reading of 80% short on AUD/NZD with 300 open positions is statistically weak. The same reading on EUR/USD with 54,000 positions carries real weight — it represents a massive, coordinated crowd exposure that market makers and institutional players will react to.</p>
+      <table class="contra-table">
+        <thead><tr><th>Position count</th><th>Statistical weight</th><th>How to treat it</th></tr></thead>
+        <tbody>
+          <tr><td>&gt; 20,000</td><td style="color:var(--up);">High</td><td>Strong signal — enough accounts to be actionable. Major pairs only.</td></tr>
+          <tr><td>5,000–20,000</td><td style="color:var(--orange);">Medium</td><td>Useful directional context. Confirm with price action.</td></tr>
+          <tr><td>&lt; 5,000</td><td style="color:var(--down);">Low</td><td>Treat as background noise. Sample too small for reliable inference.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="avg-price">
+      <h2>Average Entry Price</h2>
+      <p>The panel shows the volume-weighted average entry price for both the long side and the short side of the dominant group. This is the price level around which retail's crowd psychology is anchored.</p>
+      <p>Example: EUR/USD longs entered at an average of <span style="font-family:var(--font-mono);color:var(--text);">1.1691</span>, shorts at <span style="font-family:var(--font-mono);color:var(--text);">1.1368</span>. If the current price is <span style="font-family:var(--font-mono);color:var(--text);">1.1566</span>, longs are underwater by about 125 pips while shorts are roughly breakeven. These levels act as invisible support and resistance — when price approaches the average entry of a large trapped crowd, the risk of a flush (stop-out cascade) increases significantly.</p>
+      <div class="callout callout-green">
+        <strong>Practical use:</strong> Mark the average long and average short price on your chart. Treat them as soft S/R levels. A rally into the average short entry of a heavily short retail crowd often stalls or reverses — because shorts start closing (buying) around their entry level, creating supply pressure that institutional players can sell into.
+      </div>
+    </div>
+
+    <div class="guide-section" id="price-distance">
+      <h2>Price Distance — Trapped vs. In Profit</h2>
+      <p>The small number below the percentage bar shows how far the current price is from the dominant side's average entry, in both percentage terms and pips. The color tells you the situation at a glance:</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin:16px 0;">
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--down);border-radius:4px;">
+          <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;color:var(--down);font-weight:700;">▼ trapped</div>
+          <div style="font-size:13.5px;color:var(--text2);">The dominant side is losing. Their positions are underwater. If the move continues against them, forced stop-outs or panic closes can accelerate the trend — a potential fuel-for-move scenario.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--up);border-radius:4px;">
+          <div style="min-width:80px;font-family:var(--font-mono);font-size:12px;color:var(--up);font-weight:700;">▲ profit</div>
+          <div style="font-size:13.5px;color:var(--text2);">The dominant side is winning. They may take profits soon, creating pressure in the opposite direction. A large crowd in profit often creates a ceiling — they sell (or buy to close) as price moves further in their favor.</div>
+        </div>
+      </div>
+      <h3>Reading the pip distance</h3>
+      <p>The pip distance tells you how much pain (or gain) the crowd is sitting on. A retail crowd trapped 200 pips offside on EUR/USD is in a very different psychological state than one trapped 5 pips offside. Larger pip distances suggest:</p>
+      <ul>
+        <li>More pain — higher probability of eventual forced liquidation</li>
+        <li>A larger potential stop-hunt target for institutional players</li>
+        <li>The crowd has been holding through a significant adverse move, suggesting stubborn conviction that often breaks suddenly</li>
+      </ul>
+      <div class="callout callout-red">
+        <strong>The most powerful setups</strong> occur when a large crowd (20,000+ positions) is heavily trapped (one-sided, 70%+ on the losing side, 100+ pips offside) and price begins to move further against them. That combination can produce fast, sharp moves as stops cascade.
+      </div>
+    </div>
+
+    <div class="guide-section" id="general-stats">
+      <h2>Community Stats Footer</h2>
+      <p>At the bottom of the panel, a compact footer shows aggregate statistics for the entire Myfxbook community sample. These numbers provide context for interpreting the pair-level data.</p>
+      <table class="contra-table">
+        <thead><tr><th>Metric</th><th>What it tells you</th></tr></thead>
+        <tbody>
+          <tr><td>Profitable %</td><td>Percentage of accounts with a positive balance right now. Above 60% is typical in trending markets. A sharp drop signals broad retail drawdown — potential capitulation signal.</td></tr>
+          <tr><td>Real accts %</td><td>Share of accounts that are live (real money) vs. demo. Higher real-account percentage makes the sentiment data more behaviorally meaningful — real money creates different psychological anchors than demo.</td></tr>
+          <tr><td>Total funds</td><td>Sum of capital across all tracked accounts. Combined with average deposit, this lets you infer approximate sample size and trader profile.</td></tr>
+          <tr><td>Avg deposit</td><td>Average account size. A higher average (e.g. $90K+) suggests a more sophisticated, semi-professional sample. Lower averages (e.g. $5K) suggest retail micro accounts where behavior is more erratic.</td></tr>
+          <tr><td>Avg P&amp;L (gain / loss)</td><td>Average profit of winning accounts vs. average loss of losing accounts. If avg loss significantly exceeds avg gain, the community is in a losing cycle — historically a contrarian signal of near-term mean reversion.</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="guide-section" id="contrarian">
-      <h2>Contrarian Logic — How to Use Sentiment</h2>
-      <p>Retail sentiment data is most useful as a <strong>contrarian indicator</strong>. The underlying logic: retail traders, as a group, tend to be wrong at extremes. When the overwhelming majority of retail positions are on one side, the market has already extracted most of the available profit from that move — meaning the next significant move is likely in the opposite direction.</p>
+      <h2>Contrarian Logic</h2>
+      <p>Retail sentiment is most useful as a <strong>contrarian indicator</strong>. The logic: retail traders as a group tend to be wrong at extremes because they enter trends late, hold losers too long, and close winners too early. When the crowd is overwhelmingly positioned one way, the easy money in that direction has typically already been made.</p>
       <table class="contra-table">
-        <thead><tr><th>Sentiment Reading</th><th>Contrarian Interpretation</th><th>Confidence</th></tr></thead>
+        <thead><tr><th>Sentiment reading</th><th>Contrarian interpretation</th><th>Strength</th></tr></thead>
         <tbody>
-          <tr><td>70–80% Long</td><td>Moderate contrarian short signal. Crowd is bullish but not at extreme. Monitor for trend exhaustion.</td><td style="color:var(--orange);">Medium</td></tr>
-          <tr><td>&gt;80% Long</td><td>Strong contrarian short signal. Extreme crowd positioning historically precedes meaningful reversals.</td><td style="color:var(--down);">High (contrarian)</td></tr>
-          <tr><td>45–55% either side</td><td>Neutral. No useful signal from sentiment alone. Defer to rate differentials, COT, and price action.</td><td style="color:var(--text2);">None</td></tr>
-          <tr><td>70–80% Short</td><td>Moderate contrarian long signal. Most retail short positions suggest limited further downside.</td><td style="color:var(--orange);">Medium</td></tr>
-          <tr><td>&gt;80% Short</td><td>Strong contrarian long signal. Extreme short crowd often precedes sharp short squeezes.</td><td style="color:var(--up);">High (contrarian)</td></tr>
+          <tr><td>70–80% Long</td><td>Moderate contrarian short bias. Crowd is bullish but not at extreme. Watch for trend exhaustion signals.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt; 80% Long</td><td>Strong contrarian short signal. Historically precedes meaningful reversals, especially combined with trapped status.</td><td style="color:var(--down);">High</td></tr>
+          <tr><td>45–55% either side</td><td>No useful signal. Defer to COT, rate differentials, and price action.</td><td style="color:var(--text2);">None</td></tr>
+          <tr><td>70–80% Short</td><td>Moderate contrarian long bias. Crowded shorts suggest limited further downside without a catalyst.</td><td style="color:var(--orange);">Medium</td></tr>
+          <tr><td>&gt; 80% Short</td><td>Strong contrarian long signal. Extreme short positioning often precedes sharp short squeezes.</td><td style="color:var(--up);">High</td></tr>
         </tbody>
       </table>
       <div class="callout callout-red">
-        <strong>Extreme readings can persist.</strong> A pair can be 80%+ long for weeks while it continues to fall. Retail traders are slow to close losing positions. Sentiment extremes identify <em>elevated risk of reversal</em>, not guaranteed entry points. Always combine with price action confirmation and COT data before acting.
+        <strong>Extreme readings can persist for weeks.</strong> A pair can sit at 85% short while continuing to fall — retail holds losing longs (or adds to them) far longer than expected. Sentiment extremes flag <em>elevated reversal risk</em>, not immediate entry points. Always wait for price action confirmation before acting on a contrarian signal.
       </div>
+      <p>The highest-quality setups arise when retail sentiment extremes align with institutional COT positioning in the opposite direction — retail crowded one way, smart money positioned the other. That is the core confluence signal the panel is designed to help you identify.</p>
     </div>
 
     <div class="guide-section" id="limits">
-      <h2>Limitations of Retail Sentiment</h2>
-      <p>Retail positioning data from Myfxbook has meaningful limitations that professional traders account for:</p>
-      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
-        <li><strong style="color:var(--text);">Sample bias:</strong> Only Myfxbook-connected accounts are included. Active, platform-engaged retail traders may behave differently from the full retail population.</li>
-        <li><strong style="color:var(--text);">Not institutional:</strong> This data says nothing about hedge fund, bank, or institutional positioning. For institutional positioning, use the COT panel.</li>
-        <li><strong style="color:var(--text);">Position vs. flow:</strong> Sentiment shows the stock of open positions, not the flow of new trades. A high long reading might reflect losing long-term positions that haven't been closed, not fresh bullish conviction.</li>
-        <li><strong style="color:var(--text);">Delayed signal:</strong> Retail traders are trend-followers who enter late and exit late. The contrarian signal works best at extremes because retail is most heavily positioned after a trend has already run most of its course.</li>
+      <h2>Limitations</h2>
+      <ul>
+        <li><strong style="color:var(--text);">Sample bias.</strong> Only Myfxbook-connected accounts are included. Active, platform-engaged traders may behave differently from the broader retail population. The sample skews toward more engaged, technically-oriented traders.</li>
+        <li><strong style="color:var(--text);">Not institutional.</strong> This data says nothing about hedge fund, bank, or proprietary-desk positioning. For institutional positioning, use the COT panel in the terminal.</li>
+        <li><strong style="color:var(--text);">Positions, not flow.</strong> Sentiment shows the stock of currently open positions, not the rate of new orders. A high long reading might reflect stubborn longs who haven't closed yet — not fresh bullish conviction. Always check the avg entry price to distinguish.</li>
+        <li><strong style="color:var(--text);">30-minute data lag.</strong> The data updates every 30 minutes via a scheduled server script. In fast-moving markets, the snapshot can be meaningfully stale. The panel footer shows the age of the current data.</li>
+        <li><strong style="color:var(--text);">No causal mechanism.</strong> High retail short interest does not automatically cause a squeeze. You need a catalyst — a data release, central bank comment, or technical break — to trigger the move. Sentiment tells you the fuel is there, not when it will ignite.</li>
       </ul>
-    </div>
-
-    <div class="guide-section" id="combining">
-      <h2>Combining Spreads and Sentiment</h2>
-      <p>These two sections work together to inform <em>when</em> and <em>how</em> to execute — not only what direction to trade. Consider:</p>
-      <div class="callout callout-green">
-        <strong>Execution timing:</strong> If your analysis points to a trade, Reference Spreads tells you which session gives you the best execution cost. Entering a GBP/USD position during the London–NY overlap (13:00–17:00 UTC) costs roughly 1/3 of what the same trade costs at 22:00 UTC.
-      </div>
-      <div class="callout">
-        <strong>Sentiment confirmation:</strong> If you're looking for a long trade on AUD/USD and sentiment shows 78% of retail accounts are already long, reconsider position sizing — the crowd is with you, which is typically a late-cycle signal. If sentiment shows 72% short and you're looking to go long, that's a confluence: contrarian sentiment alignment with your directional bias.
-      </div>
-      <p>The highest-quality setups from the Retail FX Positioning section arise when retail sentiment extremes align with COT institutional positioning in the opposite direction — meaning retail is crowded one way while smart money is positioned the other way. This is the core confluence signal.</p>
     </div>
 
   </div>
@@ -412,7 +445,7 @@ a { color: inherit; text-decoration: none; }
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · SPREAD &amp; MARKET SENTIMENT</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · RETAIL FX POSITIONING</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
   <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
 </footer>
