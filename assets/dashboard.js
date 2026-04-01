@@ -1043,31 +1043,161 @@ async function buildCOTSentiment() {
   return results;
 }
 
+function renderGeneralStats(g) {
+  const el = document.getElementById('sent-general');
+  if (!el) return;
+  if (!g || !g.profitablePct) { el.style.display = 'none'; return; }
+  const profPct    = g.profitablePct    || 0;
+  const notProfPct = g.nonProfitablePct || (100 - profPct);
+  const realPct    = g.realAccountsPct  || 0;
+  const totalFunds = g.totalFunds       || '';
+  const avgDep     = g.averageDeposit   || '';
+  const avgProfit  = g.avgAccountProfit || '';
+  const avgLoss    = g.avgAccountLoss   || '';
+
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;padding:0;">
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Profitable</span>
+        <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:28px;">
+          <div style="height:100%;width:${profPct}%;background:var(--up);opacity:.8;border-radius:2px;"></div>
+        </div>
+        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${profPct}%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Real accts</span>
+        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${realPct}%</span>
+      </div>
+      ${totalFunds ? `<div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds</span>
+        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${totalFunds}</span>
+      </div>` : ''}
+      ${avgDep ? `<div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit</span>
+        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${avgDep}</span>
+      </div>` : ''}
+      ${avgProfit ? `<div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L</span>
+        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">+$${avgProfit}</span>
+        ${avgLoss ? `<span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">$${avgLoss}</span>` : ''}
+      </div>` : ''}
+    </div>`;
+}
+
 function renderSentiment(pairs, sourceLabel) {
   const container = document.getElementById('sent-rows');
   if (!container) return;
-  // Ordenar por convicción descendente (mayor diferencia entre lado dominante y el otro)
-  const sorted = [...pairs].sort((a, b) => Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell));
+
+  const hasRichData = pairs.some(p => p.totalVol > 0 || p.totalPos > 0 || p.longPos > 0);
+
+  // Sort by total volume (longVol + shortVol) descending — most traded pairs first.
+  // Falls back to conviction sort if no volume data is available.
+  const sorted = [...pairs].sort((a, b) => {
+    const volA = (a.longVol || 0) + (a.shortVol || 0);
+    const volB = (b.longVol || 0) + (b.shortVol || 0);
+    const posA = (a.longPos || 0) + (a.shortPos || 0);
+    const posB = (b.longPos || 0) + (b.shortPos || 0);
+    // Prefer position count if available, then volume, then conviction
+    if (posA + posB > 0) return posB - posA;
+    if (volA + volB > 0) return volB - volA;
+    return Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell);
+  });
+
+  // Format volume: 1234.5 → "1.2K", 12345 → "12.3K"
+  function fmtVol(v) {
+    if (!v || v === 0) return '—';
+    if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+    return v.toFixed(0);
+  }
+  // Format position count: 3888 → "3.9K", 892 → "892"
+  function fmtPos(v) {
+    if (!v || v === 0) return null;
+    if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+    return String(v);
+  }
+  // Format price: 5 decimal places, trim trailing zeros but keep at least 4
+  function fmtPx(v) {
+    if (!v || v === 0) return null;
+    return v.toFixed(v < 10 ? 4 : 2);
+  }
+
   container.innerHTML = sorted.map(p => {
-    const bias    = p.buy >= p.sell ? 'LONG' : 'SHORT';
-    const biasCol = p.buy >= p.sell ? 'var(--up)' : 'var(--down)';
-    return `<div style="display:grid;grid-template-columns:52px 1fr 36px 36px 40px;align-items:center;gap:4px;padding:2px 0;">
-      <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);">${p.sym}</span>
-      <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:hidden;">
-        <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
-        <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+    const buyPct  = p.buy  || p.long  || 0;
+    const sellPct = p.sell || p.short || 0;
+    const bias    = buyPct >= sellPct ? 'L' : 'S';
+    const biasCol = buyPct >= sellPct ? 'var(--up)' : 'var(--down)';
+    const longVol   = p.longVol  || 0;
+    const shortVol  = p.shortVol || 0;
+    const totalVol  = longVol + shortVol;
+    const longPos   = p.longPos  || 0;
+    const shortPos  = p.shortPos || 0;
+    const totalPos  = p.totalPos || longPos + shortPos;
+    const avgLongPx = p.avgLongPx  || p.avgLong  || 0;
+    const avgShortPx= p.avgShortPx || p.avgShort || 0;
+
+    const posStr    = fmtPos(totalPos);
+    const longPosStr  = fmtPos(longPos);
+    const shortPosStr = fmtPos(shortPos);
+    const longPxStr   = fmtPx(avgLongPx);
+    const shortPxStr  = fmtPx(avgShortPx);
+    const volStr      = fmtVol(totalVol);
+
+    // Second detail line: show positions breakdown or volume
+    let detailHtml = '';
+    if (longPosStr && shortPosStr) {
+      detailHtml = `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
+          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">pos:</span>
+          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">▲${longPosStr}</span>
+          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">▼${shortPosStr}</span>
+          ${posStr ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-left:2px;">(${posStr})</span>` : ''}
+          ${volStr !== '—' ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:4px;">vol:</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${volStr}</span>` : ''}
+        </div>`;
+    } else if (totalVol > 0) {
+      detailHtml = `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
+          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">vol:</span>
+          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${fmtVol(longVol)}</span>
+          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${fmtVol(shortVol)}</span>
+        </div>`;
+    }
+
+    // Avg price line
+    let priceHtml = '';
+    if (longPxStr && shortPxStr) {
+      priceHtml = `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:1px;">
+          <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">avg:</span>
+          <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${longPxStr}</span>
+          <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${shortPxStr}</span>
+        </div>`;
+    }
+
+    const hasExtra = detailHtml || priceHtml;
+
+    return `<div style="padding:3px 0;border-bottom:1px solid var(--border);${hasExtra ? '' : 'padding-bottom:2px;'}">
+      <div style="display:grid;grid-template-columns:52px 1fr 30px 30px 18px;align-items:center;gap:4px;">
+        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);letter-spacing:.01em;">${p.sym}</span>
+        <div style="position:relative;height:6px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${buyPct}%;background:var(--up);opacity:.9;border-radius:2px 0 0 2px;"></div>
+          <div style="position:absolute;right:0;top:0;height:100%;width:${sellPct}%;background:var(--down);opacity:.9;border-radius:0 2px 2px 0;"></div>
+        </div>
+        <span style="font-size:9px;color:var(--up);text-align:right;font-family:var(--font-mono);">${buyPct}%</span>
+        <span style="font-size:9px;color:var(--down);text-align:right;font-family:var(--font-mono);">${sellPct}%</span>
+        <span style="font-size:9px;font-weight:800;color:${biasCol};text-align:right;font-family:var(--font-ui);">${bias}</span>
       </div>
-      <span style="font-size:10px;color:var(--up);text-align:right;font-family:var(--font-mono);">${p.buy}%</span>
-      <span style="font-size:10px;color:var(--down);text-align:right;font-family:var(--font-mono);">${p.sell}%</span>
-      <span style="font-size:9px;font-weight:700;color:${biasCol};text-align:right;letter-spacing:.03em;font-family:var(--font-ui);">${bias}</span>
+      ${detailHtml}${priceHtml}
     </div>`;
   }).join('');
+
   const now = new Date();
   const lh = now.getHours().toString().padStart(2,'0');
   const lm = now.getMinutes().toString().padStart(2,'0');
   const tzAbbr2 = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   setEl('sent-updated', (sourceLabel || '') + ' · ' + lh + ':' + lm + ' ' + tzAbbr2);
-  // Update subtitle to reflect actual source (Myfxbook vs COT fallback)
+
+  // Update subtitle to reflect actual source
   const isCOT = sourceLabel && sourceLabel.includes('COT');
   const isHistorical = sourceLabel && sourceLabel.includes('Historical');
   const subEl = document.getElementById('sent-source-sub');
@@ -1088,7 +1218,19 @@ async function fetchSentiment() {
       const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
       const ageMin = (Date.now() - updatedMs) / 60000;
       if (d.pairs && d.pairs.length >= 5 && ageMin < 900) {
-        const pairs = d.pairs.map(p => ({ sym: p.sym, buy: p.long, sell: p.short }));
+        const pairs = d.pairs.map(p => ({
+          sym:       p.sym,
+          buy:       p.long,
+          sell:      p.short,
+          longVol:   p.longVol  || 0,
+          shortVol:  p.shortVol || 0,
+          longPos:   p.longPos  || 0,
+          shortPos:  p.shortPos || 0,
+          totalPos:  p.totalPos || 0,
+          avgLongPx: p.avgLongPx  || 0,
+          avgShortPx:p.avgShortPx || 0,
+        }));
+        renderGeneralStats(d.general || null);
         const ageLabel = ageMin < 60
           ? Math.round(ageMin) + 'min ago'
           : Math.round(ageMin / 60) + 'h ago';
