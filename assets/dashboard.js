@@ -2792,6 +2792,44 @@ async function buildRichNarrative() {
       finalNarrative = parts.join('. ') + '.';
     }
 
+    // ── Live token substitution ───────────────────────────────────────────────
+    // Groq embeds {{gold_pct}}, {{spx_pct}}, {{dxy_pct}}, {{vix}} as placeholders
+    // for metrics that update every 5 min. Replace them with the freshest available
+    // values from intraday quotes — so the narrative never shows stale percentages.
+    if (finalNarrative && finalNarrative.includes('{{')) {
+      try {
+        const iq = await loadIntradayQuotes();
+        const q  = iq?.quotes ?? {};
+
+        const fmtPct = (key) => {
+          const d = q[key];
+          if (!d || d.pct == null) return null;
+          const sign = d.pct >= 0 ? '+' : '';
+          return `${sign}${d.pct.toFixed(2)}%`;
+        };
+
+        const liveTokens = {
+          '{{gold_pct}}': fmtPct('gold'),
+          '{{spx_pct}}':  fmtPct('spx'),
+          '{{dxy_pct}}':  fmtPct('dxy'),
+          '{{vix}}':      q.vix?.close != null ? q.vix.close.toFixed(1) : null,
+        };
+
+        for (const [token, value] of Object.entries(liveTokens)) {
+          if (value !== null && finalNarrative.includes(token)) {
+            finalNarrative = finalNarrative.replaceAll(token, value);
+          }
+        }
+
+        // Fallback: if any token still unreplaced (intraday unavailable),
+        // strip the braces so text reads naturally — e.g. "gold +{{gold_pct}}" → "gold"
+        finalNarrative = finalNarrative.replace(/\{\{[^}]+\}\}/g, '…');
+      } catch (_) {
+        // Token substitution is best-effort — never block the narrative render
+        finalNarrative = finalNarrative.replace(/\{\{[^}]+\}\}/g, '…');
+      }
+    }
+
     // Update DOM
     const el = document.getElementById('narrative-text');
     if (el && finalNarrative) el.textContent = finalNarrative;
