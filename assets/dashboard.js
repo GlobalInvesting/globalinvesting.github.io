@@ -1043,203 +1043,270 @@ async function buildCOTSentiment() {
   return results;
 }
 
-function renderGeneralStats(g) {
-  const el = document.getElementById('sent-general');
-  if (!el) return;
-  if (!g || !g.profitablePct) { el.style.display = 'none'; return; }
-
-  const profPct   = g.profitablePct   || 0;
-  const realPct   = g.realAccountsPct || 0;
-  const totalFunds= g.totalFunds      || '';
-  const avgDep    = g.averageDeposit  || '';
-  const avgProfit = g.avgAccountProfit|| '';
-  const avgLoss   = g.avgAccountLoss  || '';
-
-  // Profitable mini-bar
-  const barW = Math.round(profPct);
-  const barCol = profPct >= 50 ? 'var(--up)' : 'var(--down)';
-
-  el.style.display = 'block';
-  el.innerHTML = `
-    <div style="padding:4px 0 2px;">
-      <!-- Profitable bar row -->
-      <div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);white-space:nowrap;">Profitable</span>
-        <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-          <div style="height:100%;width:${barW}%;background:${barCol};opacity:.8;border-radius:2px;"></div>
-        </div>
-        <span style="font-size:9px;font-weight:700;color:${barCol};font-family:var(--font-mono);white-space:nowrap;">${profPct}%</span>
-        ${realPct ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:4px;">Real accts</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${realPct}%</span>` : ''}
-      </div>
-      <!-- Stats row -->
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        ${totalFunds ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${totalFunds}</span>` : ''}
-        ${avgDep ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">$${avgDep}</span>` : ''}
-        ${avgProfit ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L</span><span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">+$${avgProfit}</span>${avgLoss ? `<span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">$${avgLoss}</span>` : ''}` : ''}
-      </div>
-    </div>`;
-}
-
-function renderSentiment(pairs, sourceLabel) {
+function renderSentiment(pairs, sourceLabel, general) {
   const container = document.getElementById('sent-rows');
   if (!container) return;
 
-  const hasRichData = pairs.some(p => p.totalVol > 0 || p.totalPos > 0 || p.longPos > 0);
+  // ── Inject tooltip engine once ──
+  if (!document.getElementById('fx-tt-style')) {
+    const s = document.createElement('style');
+    s.id = 'fx-tt-style';
+    s.textContent = `
+      #fx-tt {
+        position:fixed;z-index:99999;max-width:230px;
+        background:var(--bg3);border:1px solid var(--border2);
+        border-radius:4px;padding:8px 10px;
+        font-size:11px;color:var(--text);line-height:1.5;
+        pointer-events:none;display:none;font-family:var(--font-ui);
+      }
+      #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
+      #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
+      .fx-tip { border-bottom:1px dashed var(--border2);cursor:help; }
+    `;
+    document.head.appendChild(s);
 
-  // Sort by total volume (longVol + shortVol) descending — most traded pairs first.
-  // Falls back to conviction sort if no volume data is available.
-  const sorted = [...pairs].sort((a, b) => {
-    const volA = (a.longVol || 0) + (a.shortVol || 0);
-    const volB = (b.longVol || 0) + (b.shortVol || 0);
-    const posA = (a.longPos || 0) + (a.shortPos || 0);
-    const posB = (b.longPos || 0) + (b.shortPos || 0);
-    // Prefer position count if available, then volume, then conviction
-    if (posA + posB > 0) return posB - posA;
-    if (volA + volB > 0) return volB - volA;
-    return Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell);
+    const ttEl = document.createElement('div');
+    ttEl.id = 'fx-tt';
+    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
+    document.body.appendChild(ttEl);
+
+    document.addEventListener('mousemove', ev => {
+      const tt = document.getElementById('fx-tt');
+      if (tt && tt.style.display === 'block') {
+        const vw = window.innerWidth, vh = window.innerHeight;
+        let x = ev.clientX + 14, y = ev.clientY + 14;
+        if (x + 240 > vw) x = ev.clientX - 244;
+        if (y + 140 > vh) y = ev.clientY - 144;
+        tt.style.left = x + 'px'; tt.style.top = y + 'px';
+      }
+    });
+  }
+
+  function attachTip(el, title, body, ex) {
+    el.classList.add('fx-tip');
+    el.addEventListener('mouseenter', ev => {
+      const tt = document.getElementById('fx-tt');
+      document.getElementById('fx-tt-title').textContent = title;
+      document.getElementById('fx-tt-body').textContent  = body;
+      const exEl = document.getElementById('fx-tt-ex');
+      exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
+      tt.style.display = 'block';
+      const vw = window.innerWidth, vh = window.innerHeight;
+      let x = ev.clientX + 14, y = ev.clientY + 14;
+      if (x + 240 > vw) x = ev.clientX - 244;
+      if (y + 140 > vh) y = ev.clientY - 144;
+      tt.style.left = x + 'px'; tt.style.top = y + 'px';
+    });
+    el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
+  }
+
+  function fmtK(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'K' : String(n); }
+
+  // Sort: by totalPos if available, else by conviction
+  const sorted = [...pairs].sort((a, b) =>
+    (b.totalPos || 0) !== (a.totalPos || 0)
+      ? (b.totalPos || 0) - (a.totalPos || 0)
+      : Math.max(b.buy, b.sell) - Math.max(a.buy, a.sell)
+  );
+
+  container.innerHTML = '';
+
+  sorted.forEach(p => {
+    const hasRich  = p.totalPos > 0;
+    const domLong  = p.buy >= p.sell;
+    const biasCol  = domLong ? 'var(--up)' : 'var(--down)';
+    const biasLbl  = domLong ? 'L' : 'S';
+
+    // Price distance calculation
+    let distHtml = '';
+    if (hasRich && p.avgL > 0 && p.avgS > 0) {
+      const domAvg = domLong ? p.avgL : p.avgS;
+      // Use quotes cache if available, else skip tick
+      const qCache = (typeof intradayQuote === 'function' && window._lastIntradayData)
+        ? intradayQuote(window._lastIntradayData, p.sym.replace('/', '').toLowerCase())
+        : null;
+      const currentPrice = qCache ? qCache.close : 0;
+      const decimals = domAvg > 20 ? 2 : 4;
+      const trapped  = currentPrice > 0
+        ? (domLong ? currentPrice < domAvg : currentPrice > domAvg)
+        : false;
+      const distPct  = currentPrice > 0
+        ? ((currentPrice - domAvg) / domAvg * 100)
+        : null;
+      const distPips = currentPrice > 0
+        ? Math.abs(Math.round((currentPrice - domAvg) * (domAvg > 20 ? 100 : 10000)))
+        : null;
+      const distCol  = trapped ? 'var(--down)' : 'var(--up)';
+      const distSign = distPct !== null && distPct >= 0 ? '+' : '';
+      const trappedTxt = trapped ? '▼ trapped' : '▲ profit';
+
+      const domSideTxt = domLong ? 'longs' : 'shorts';
+      const distBody = distPct !== null
+        ? `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are currently ${trapped ? 'underwater (losing)' : 'in profit'}.`
+        : `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}.`;
+      const distEx = trapped
+        ? 'If price continues against them, mass stop-outs may trigger a sharp move.'
+        : 'They may take profits soon, creating pressure in the opposite direction.';
+
+      const avgTxt = currentPrice > 0
+        ? `${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="color:${distCol}">${trappedTxt}</span>`
+        : `avg ${domLong ? 'L' : 'S'} ${domAvg.toFixed(decimals)}`;
+
+      distHtml = `<span data-tip-dist style="font-size:9px;color:${distCol};font-family:var(--font-mono);">${avgTxt}</span>`;
+
+      // Tick position on bar
+      var tickHtml = '';
+      if (currentPrice > 0) {
+        const lo = Math.min(p.avgL, p.avgS), hi = Math.max(p.avgL, p.avgS);
+        const range = hi - lo || domAvg * 0.01;
+        const tickPct = Math.min(98, Math.max(2,
+          (currentPrice - (lo - range * 1.5)) / (range * 4) * 100
+        ));
+        tickHtml = `<div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;" data-tip-tick></div>`;
+      }
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:58px 1fr 36px 36px 22px;align-items:center;gap:4px;padding:5px 0 1px;border-bottom:1px solid var(--border);';
+
+      const symSpan   = document.createElement('div');
+      symSpan.style.cssText = 'display:flex;flex-direction:column;gap:1px;';
+      symSpan.innerHTML = `
+        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);">${p.sym}</span>
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">${fmtK(p.totalPos)} pos</span>
+      `;
+
+      const barDiv = document.createElement('div');
+      barDiv.style.cssText = 'position:relative;height:8px;background:var(--bg3);border-radius:1px;overflow:visible;';
+      barDiv.innerHTML = `
+        <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+        <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+        ${tickHtml}
+      `;
+
+      const buySpan  = document.createElement('span');
+      buySpan.style.cssText = 'font-size:10px;color:var(--up);text-align:right;font-family:var(--font-mono);';
+      buySpan.textContent = p.buy + '%';
+
+      const sellSpan = document.createElement('span');
+      sellSpan.style.cssText = 'font-size:10px;color:var(--down);text-align:right;font-family:var(--font-mono);';
+      sellSpan.textContent = p.sell + '%';
+
+      const biasSpan = document.createElement('span');
+      biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};text-align:right;font-family:var(--font-ui);`;
+      biasSpan.textContent = biasLbl;
+
+      row.append(symSpan, barDiv, buySpan, sellSpan, biasSpan);
+
+      // Dist row
+      const distRow = document.createElement('div');
+      distRow.style.cssText = 'display:grid;grid-template-columns:58px 1fr;gap:4px;padding:1px 0 5px;border-bottom:1px solid var(--border);';
+      distRow.innerHTML = `<span></span><span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">${avgTxt}</span>`;
+
+      container.appendChild(row);
+      container.appendChild(distRow);
+
+      // Attach tooltips
+      attachTip(symSpan.querySelector('span:last-child'),
+        'Open positions',
+        `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
+        `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
+      );
+      attachTip(barDiv,
+        'Long / Short bar',
+        `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
+        `A nearly all-red bar means retail is heavily short — historically a bullish contrarian signal.`
+      );
+      if (tickHtml) {
+        attachTip(barDiv.querySelector('[data-tip-tick]') || barDiv,
+          'Current price marker',
+          `The white line shows where price is now relative to the retail average entry prices for longs and shorts.`,
+          `If the line is left of center, price fell below where retail longs entered — they are underwater.`
+        );
+      }
+      attachTip(buySpan,
+        '% Long',
+        `Percentage of retail traders currently holding long (buy) positions in ${p.sym}.`,
+        `Readings above 70% long are unusual and often precede a drop as crowded longs get squeezed.`
+      );
+      attachTip(sellSpan,
+        '% Short',
+        `Percentage of retail traders currently holding short (sell) positions in ${p.sym}.`,
+        `Readings above 70% short are unusual and often precede a rally as crowded shorts get squeezed.`
+      );
+      const distEl = distRow.querySelector('span:last-child');
+      attachTip(distEl,
+        trapped ? 'Retail trapped' : 'Retail in profit',
+        distBody,
+        distEx
+      );
+
+    } else {
+      // Fallback: simple row without rich data
+      const row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:52px 1fr 36px 36px 40px;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);';
+      row.innerHTML = `
+        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);">${p.sym}</span>
+        <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:hidden;">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+          <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+        </div>
+        <span style="font-size:10px;color:var(--up);text-align:right;font-family:var(--font-mono);">${p.buy}%</span>
+        <span style="font-size:10px;color:var(--down);text-align:right;font-family:var(--font-mono);">${p.sell}%</span>
+        <span style="font-size:9px;font-weight:700;color:${biasCol};text-align:right;font-family:var(--font-ui);">${biasLbl}</span>
+      `;
+      container.appendChild(row);
+    }
   });
 
-  // Format volume: 1234.5 → "1.2K", 12345 → "12.3K"
-  function fmtVol(v) {
-    if (!v || v === 0) return '—';
-    if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
-    return v.toFixed(0);
-  }
-  // Format position count: 3888 → "3.9K", 892 → "892"
-  function fmtPos(v) {
-    if (!v || v === 0) return null;
-    if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
-    return String(v);
-  }
-  // Format price: 5 decimal places, trim trailing zeros but keep at least 4
-  function fmtPx(v) {
-    if (!v || v === 0) return null;
-    return v.toFixed(v < 10 ? 4 : 2);
-  }
+  // ── General stats footer ──
+  const genEl = document.getElementById('sent-general');
+  if (genEl && general) {
+    const profPct   = general.profitablePercentage || 0;
+    const realPct   = general.realAccountsPercentage || 0;
+    const funds     = general.totalFunds || '';
+    const avgDep    = general.averageDeposit || '';
+    const avgProfit = general.averageAccountProfit || '';
+    const avgLoss   = general.averageAccountLoss || '';
 
-  container.innerHTML = sorted.map(p => {
-    const buyPct  = p.buy  || p.long  || 0;
-    const sellPct = p.sell || p.short || 0;
-    const bias    = buyPct >= sellPct ? 'L' : 'S';
-    const biasCol = buyPct >= sellPct ? 'var(--up)' : 'var(--down)';
-    const longVol   = p.longVol  || 0;
-    const shortVol  = p.shortVol || 0;
-    const totalVol  = longVol + shortVol;
-    const longPos   = p.longPos  || 0;
-    const shortPos  = p.shortPos || 0;
-    const totalPos  = p.totalPos || longPos + shortPos;
-    const avgLongPx = p.avgLongPx  || p.avgLong  || 0;
-    const avgShortPx= p.avgShortPx || p.avgShort || 0;
-    const livePrice = p.livePrice  || 0;
-
-    // Distance from live price to avg entry of the dominant (larger) side
-    // Positive = retail is underwater on that side (price moved against them)
-    // Negative = retail is in profit on that side
-    let distHtml = '';
-    if (livePrice > 0 && (avgLongPx > 0 || avgShortPx > 0)) {
-      const domSide   = buyPct >= sellPct ? 'long' : 'short';
-      const avgPx     = domSide === 'long' ? avgLongPx : avgShortPx;
-      if (avgPx > 0) {
-        // For pairs where USD is base (USDJPY, USDCAD, USDCHF), price moves inversely
-        const rawDist  = livePrice - avgPx;            // positive = price above avg
-        const pctDist  = (rawDist / avgPx) * 100;
-        // If retail longs are below live price → they're profitable (green dist)
-        // If retail longs are above live price → they're underwater (red dist)
-        const inProfit = domSide === 'long' ? livePrice > avgPx : livePrice < avgPx;
-        const distCol  = inProfit ? 'var(--up)' : 'var(--down)';
-        const distSign = pctDist >= 0 ? '+' : '';
-        const distPips = Math.abs(rawDist) < 1
-          ? (Math.abs(rawDist) * (livePrice < 10 ? 100 : 10000)).toFixed(0) + ' pip'
-          : Math.abs(rawDist).toFixed(2);
-        const profitLabel = inProfit ? '▲ profit' : '▼ trapped';
-        distHtml = `
-          <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">${domSide === 'long' ? 'L' : 'S'} avg:</span>
-            <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${avgPx.toFixed(avgPx < 10 ? 3 : 4)}</span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">→</span>
-            <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${livePrice.toFixed(livePrice < 10 ? 3 : 4)}</span>
-            <span style="font-size:9px;font-weight:700;color:${distCol};font-family:var(--font-mono);">${distSign}${pctDist.toFixed(2)}%</span>
-            <span style="font-size:9px;color:${distCol};font-family:var(--font-ui);opacity:.8;">${distPips} · ${profitLabel}</span>
-          </div>`;
-      }
-    }
-
-    const posStr      = fmtPos(totalPos);
-    const longPosStr  = fmtPos(longPos);
-    const shortPosStr = fmtPos(shortPos);
-    const volStr      = fmtVol(totalVol);
-
-    // ── Line 2: positions + volume (compact) ──
-    let detailHtml = '';
-    if (longPosStr && shortPosStr) {
-      detailHtml = `<div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">pos</span>
-        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">▲${longPosStr}</span>
-        <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">▼${shortPosStr}</span>
-        ${posStr ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">(${posStr})</span>` : ''}
-        ${volStr !== '—' ? `<span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-left:3px;">vol</span><span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">${volStr}</span>` : ''}
-      </div>`;
-    } else if (totalVol > 0) {
-      detailHtml = `<div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">vol</span>
-        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${fmtVol(longVol)}</span>
-        <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">${fmtVol(shortVol)}</span>
-      </div>`;
-    }
-
-    // ── Line 3: distance badge — the key actionable signal ──
-    // distHtml built above in the livePrice block
-
-    // ── Bar tick position: where is live price relative to avgLong–avgShort range? ──
-    let tickPct = null;
-    if (livePrice > 0 && avgLongPx > 0 && avgShortPx > 0) {
-      const lo = Math.min(avgLongPx, avgShortPx);
-      const hi = Math.max(avgLongPx, avgShortPx);
-      const span = hi - lo;
-      if (span > 0) {
-        // Clamp tick to 5–95% so it's always visible
-        tickPct = Math.min(95, Math.max(5, ((livePrice - lo) / span) * 100));
-      }
-    }
-
-    // Determine background tint for trapped scenario (subtle red/green wash)
-    let rowBg = 'transparent';
-    if (distHtml) {
-      const domSide  = buyPct >= sellPct ? 'long' : 'short';
-      const avgPx    = domSide === 'long' ? avgLongPx : avgShortPx;
-      if (avgPx > 0 && livePrice > 0) {
-        const inProfit = domSide === 'long' ? livePrice > avgPx : livePrice < avgPx;
-        const absPct   = Math.abs((livePrice - avgPx) / avgPx * 100);
-        if (!inProfit && absPct > 0.5) rowBg = 'rgba(220,60,60,0.04)';
-        else if (inProfit && absPct > 0.5) rowBg = 'rgba(60,200,120,0.04)';
-      }
-    }
-
-    return `<div style="padding:5px 0 4px;border-bottom:1px solid var(--border);background:${rowBg};">
-      <!-- Row 1: symbol · bar with tick · pcts · bias -->
-      <div style="display:grid;grid-template-columns:52px 1fr 30px 30px 18px;align-items:center;gap:4px;">
-        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);letter-spacing:.02em;">${p.sym}</span>
-        <div style="position:relative;height:7px;background:var(--bg3);border-radius:2px;overflow:visible;">
-          <div style="position:absolute;left:0;top:0;height:100%;width:${buyPct}%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;overflow:hidden;"></div>
-          <div style="position:absolute;right:0;top:0;height:100%;width:${sellPct}%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;overflow:hidden;"></div>
-          ${tickPct !== null ? `<div style="position:absolute;top:-2px;height:calc(100% + 4px);width:2px;background:#fff;opacity:.9;border-radius:1px;left:calc(${tickPct.toFixed(1)}% - 1px);z-index:2;box-shadow:0 0 3px rgba(255,255,255,.5);"></div>` : ''}
+    genEl.style.cssText = 'padding:4px 0 2px;border-top:1px solid var(--border);flex-shrink:0;';
+    genEl.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+        <span style="font-size:9px;color:var(--text2);font-family:var(--font-ui);">Profitable</span>
+        <div style="flex:1;height:3px;background:var(--bg3);border-radius:1px;">
+          <div style="height:3px;width:${profPct}%;background:var(--up);border-radius:1px;"></div>
         </div>
-        <span style="font-size:9px;color:var(--up);text-align:right;font-family:var(--font-mono);">${buyPct}%</span>
-        <span style="font-size:9px;color:var(--down);text-align:right;font-family:var(--font-mono);">${sellPct}%</span>
-        <span style="font-size:9px;font-weight:800;color:${biasCol};text-align:right;font-family:var(--font-ui);">${bias}</span>
+        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${profPct}%</span>
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Real accts ${realPct}%</span>
       </div>
-      ${detailHtml}
-      ${distHtml}
-    </div>`;
-  }).join('');
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds <span style="color:var(--text2);">$${funds}</span></span>
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit <span style="color:var(--text2);">$${avgDep}</span></span>
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L <span style="color:var(--up);">+$${avgProfit}</span> <span style="color:var(--down);">${avgLoss}</span></span>
+      </div>
+    `;
 
+    // Tooltips on general stats
+    const profRow = genEl.querySelector('div:first-child');
+    attachTip(profRow,
+      'Profitable accounts',
+      'Percentage of Myfxbook accounts with a positive balance right now.',
+      'Above 60% is common in trending markets. Falls sharply during high-volatility events.'
+    );
+    const statsRow = genEl.querySelector('div:last-child');
+    attachTip(statsRow,
+      'Community snapshot',
+      'Total funds and average deposit give context on sample size and trader profile. Avg P&L shows winning vs losing account averages.',
+      'If avg loss exceeds avg profit, retail is in capitulation mode — a potential contrarian signal.'
+    );
+  }
+
+  // ── Timestamp & source label ──
   const now = new Date();
   const lh = now.getHours().toString().padStart(2,'0');
   const lm = now.getMinutes().toString().padStart(2,'0');
   const tzAbbr2 = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   setEl('sent-updated', (sourceLabel || '') + ' · ' + lh + ':' + lm + ' ' + tzAbbr2);
 
-  // Update subtitle to reflect actual source
   const isCOT = sourceLabel && sourceLabel.includes('COT');
   const isHistorical = sourceLabel && sourceLabel.includes('Historical');
   const subEl = document.getElementById('sent-source-sub');
@@ -1251,13 +1318,6 @@ function renderSentiment(pairs, sourceLabel) {
 }
 
 async function fetchSentiment() {
-  // Pre-load intraday quotes (cached) so we can compute distance-to-avg-price
-  const intradayData = await loadIntradayQuotes().catch(() => null);
-  const liveQuotes   = intradayData?.quotes || {};
-
-  // Helper: normalize pair sym → quotes.json key (e.g. "EUR/USD" → "eurusd")
-  function symToQuoteKey(sym) { return sym.replace('/', '').toLowerCase(); }
-
   // ── SOURCE 1: Myfxbook community outlook (primary — updated every 30min via GitHub Action) ──
   try {
     const r = await fetch('./sentiment-data/myfxbook.json');
@@ -1267,29 +1327,21 @@ async function fetchSentiment() {
       const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
       const ageMin = (Date.now() - updatedMs) / 60000;
       if (d.pairs && d.pairs.length >= 5 && ageMin < 900) {
-        const pairs = d.pairs.map(p => {
-          const qKey   = symToQuoteKey(p.sym);
-          const liveQ  = liveQuotes[qKey];
-          const livePrice = liveQ?.close || 0;
-          return {
-            sym:        p.sym,
-            buy:        p.long,
-            sell:       p.short,
-            longVol:    p.longVol   || 0,
-            shortVol:   p.shortVol  || 0,
-            longPos:    p.longPos   || 0,
-            shortPos:   p.shortPos  || 0,
-            totalPos:   p.totalPos  || 0,
-            avgLongPx:  p.avgLongPx  || 0,
-            avgShortPx: p.avgShortPx || 0,
-            livePrice,
-          };
-        });
-        renderGeneralStats(d.general || null);
+        const pairs = d.pairs.map(p => ({
+          sym:      p.sym,
+          buy:      p.long,
+          sell:     p.short,
+          totalPos: p.totalPos  || 0,
+          longPos:  p.longPos   || 0,
+          shortPos: p.shortPos  || 0,
+          avgL:     p.avgLongPx || 0,
+          avgS:     p.avgShortPx|| 0,
+        }));
         const ageLabel = ageMin < 60
           ? Math.round(ageMin) + 'min ago'
           : Math.round(ageMin / 60) + 'h ago';
-        renderSentiment(pairs, 'Myfxbook · ' + ageLabel);
+        const general = d.general || null;
+        renderSentiment(pairs, 'Myfxbook · ' + ageLabel, general);
         return;
       }
     }
