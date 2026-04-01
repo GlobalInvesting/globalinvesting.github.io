@@ -1,31 +1,63 @@
-name: Update Intraday Quotes — v1.2 (Twelve Data + Alpha Vantage)
+name: Update Intraday Quotes — v1.4 (Twelve Data + Alpha Vantage)
 
-# Runs every 15 minutes, 24/7, Mon–Sun.
+# ESTRATEGIA DE TRIGGER — v1.4
 #
-# ✅ yfinance (fuente principal) no tiene límite de API duro — es scraping de Yahoo Finance.
-#    Twelve Data (fallback gold) — free tier: 800 calls/día.
-#      96 runs/día × 1 call/run (solo si yfinance falla en gold) = en la práctica < 10 calls/día ✅
-#    Alpha Vantage (fallback secundario) — 25 calls/día free, casi nunca se activa ✅
+# El cron nativo de GitHub Actions (schedule) NO es confiable para intervalos cortos:
+# en la práctica salta ejecuciones bajo carga del sistema de GitHub.
 #
-# ✅ Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
-#    No PAT_TOKEN needed: GITHUB_TOKEN con permissions: contents: write alcanza
-#    porque el workflow y el repo destino son el mismo.
+# Solución: cron-job.org (gratuito) actúa como reloj externo y dispara este workflow
+# exactamente cada 5 minutos vía HTTP POST al endpoint de repository_dispatch.
 #
-# API usage estimate (24/7):
-#   96 runs/día × 1 batch yfinance call = 96 calls yfinance (sin límite formal) ✅
-#   Twelve Data: solo fallback para XAU/USD si yfinance falla → estimado < 5 calls/día ✅
+# FLUJO:
+#   cron-job.org (cada 5 min)
+#     → POST https://api.github.com/repos/<owner>/<repo>/dispatches
+#     → event_type: "trigger-intraday-quotes"
+#     → Este workflow se ejecuta ✅
+#
+# El schedule de GitHub se mantiene como RED DE SEGURIDAD (fallback),
+# pero corriendo solo cada 10 min — así si cron-job.org falla, el gap máximo es 10 min.
+#
+# ✅ Duración promedio del job: ~30 seg → sin riesgo de solapamiento a 5 min de intervalo.
+#
+# SETUP REQUERIDO (una sola vez):
+#   1. Crear un Personal Access Token (PAT) en GitHub:
+#      → GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+#      → Permissions: "Actions" = Read and Write  (o "workflows" + "contents")
+#      → Guardar el token como secret CRONJOB_PAT en este repo
+#
+#   2. Crear un job en https://cron-job.org con:
+#      → URL:    https://api.github.com/repos/<OWNER>/<REPO>/dispatches
+#      → Method: POST
+#      → Headers:
+#            Authorization: Bearer <tu-PAT>
+#            Accept: application/vnd.github+json
+#            Content-Type: application/json
+#            X-GitHub-Api-Version: 2022-11-28
+#      → Body:   {"event_type":"trigger-intraday-quotes"}
+#      → Schedule: cada 5 minutos
+#
+# ✅ cron-job.org free tier: hasta 60 jobs, ejecuciones cada 1 min mínimo — más que suficiente.
+# ✅ yfinance sin límite formal. Twelve Data fallback: < 10 calls/día del free tier (800/día).
+#
+# API usage estimate (24/7 a 5 min):
+#   288 runs/día × 1 batch yfinance call = 288 calls yfinance (sin límite formal) ✅
+#   Twelve Data: solo fallback gold → estimado < 10 calls/día ✅
 
 on:
+  repository_dispatch:
+    types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 15 min exactos
+
   schedule:
-    - cron: '0,15,30,45 * * * *'   # cada 15 min, todas las horas, todos los días
-  workflow_dispatch:                 # trigger manual desde GitHub UI
+    - cron: '*/10 * * * *'             # fallback cada 10 min — red de seguridad si cron-job.org falla
+
+  workflow_dispatch:                   # trigger manual desde GitHub UI
 
 concurrency:
   group: update-intraday-quotes
-  cancel-in-progress: false         # no cancelar un fetch en curso — esperar
+  cancel-in-progress: false            # no cancelar un fetch en curso — esperar
 
 permissions:
-  contents: write                   # necesario para hacer git push al mismo repo
+  contents: write                      # necesario para hacer git push al mismo repo
 
 jobs:
   fetch-intraday-quotes:
@@ -60,7 +92,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git add intraday-data/quotes.json
           if git diff --staged --quiet; then
-            echo "No changes to commit (data unchanged)\""
+            echo "No changes to commit (data unchanged)"
           else
             TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
             git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
