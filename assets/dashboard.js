@@ -1053,15 +1053,15 @@ function renderSentiment(pairs, sourceLabel, general) {
     s.id = 'fx-tt-style';
     s.textContent = `
       #fx-tt {
-        position:fixed;z-index:99999;max-width:230px;
+        position:fixed;z-index:99999;max-width:240px;
         background:var(--bg3);border:1px solid var(--border2);
-        border-radius:4px;padding:8px 10px;
-        font-size:11px;color:var(--text);line-height:1.5;
+        border-radius:4px;padding:9px 11px;
+        font-size:11px;color:var(--text);line-height:1.55;
         pointer-events:none;display:none;font-family:var(--font-ui);
       }
       #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
       #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
-      .fx-tip { border-bottom:1px dashed var(--border2);cursor:help; }
+      .fx-tip { border-bottom:1px dashed rgba(255,255,255,0.2);cursor:help; }
     `;
     document.head.appendChild(s);
 
@@ -1075,14 +1075,15 @@ function renderSentiment(pairs, sourceLabel, general) {
       if (tt && tt.style.display === 'block') {
         const vw = window.innerWidth, vh = window.innerHeight;
         let x = ev.clientX + 14, y = ev.clientY + 14;
-        if (x + 240 > vw) x = ev.clientX - 244;
-        if (y + 140 > vh) y = ev.clientY - 144;
+        if (x + 248 > vw) x = ev.clientX - 252;
+        if (y + 150 > vh) y = ev.clientY - 154;
         tt.style.left = x + 'px'; tt.style.top = y + 'px';
       }
     });
   }
 
   function attachTip(el, title, body, ex) {
+    if (!el) return;
     el.classList.add('fx-tip');
     el.addEventListener('mouseenter', ev => {
       const tt = document.getElementById('fx-tt');
@@ -1093,8 +1094,8 @@ function renderSentiment(pairs, sourceLabel, general) {
       tt.style.display = 'block';
       const vw = window.innerWidth, vh = window.innerHeight;
       let x = ev.clientX + 14, y = ev.clientY + 14;
-      if (x + 240 > vw) x = ev.clientX - 244;
-      if (y + 140 > vh) y = ev.clientY - 144;
+      if (x + 248 > vw) x = ev.clientX - 252;
+      if (y + 150 > vh) y = ev.clientY - 154;
       tt.style.left = x + 'px'; tt.style.top = y + 'px';
     });
     el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
@@ -1102,7 +1103,7 @@ function renderSentiment(pairs, sourceLabel, general) {
 
   function fmtK(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'K' : String(n); }
 
-  // Sort: by totalPos if available, else by conviction
+  // Sort by totalPos descending, fallback to conviction
   const sorted = [...pairs].sort((a, b) =>
     (b.totalPos || 0) !== (a.totalPos || 0)
       ? (b.totalPos || 0) - (a.totalPos || 0)
@@ -1112,191 +1113,221 @@ function renderSentiment(pairs, sourceLabel, general) {
   container.innerHTML = '';
 
   sorted.forEach(p => {
-    const hasRich  = p.totalPos > 0;
-    const domLong  = p.buy >= p.sell;
-    const biasCol  = domLong ? 'var(--up)' : 'var(--down)';
-    const biasLbl  = domLong ? 'L' : 'S';
+    const hasRich = p.totalPos > 0 && p.avgL > 0 && p.avgS > 0;
+    const domLong = p.buy >= p.sell;
+    const biasCol = domLong ? 'var(--up)' : 'var(--down)';
+    const biasLbl = domLong ? 'L' : 'S';
 
-    // Price distance calculation
-    let distHtml = '';
-    if (hasRich && p.avgL > 0 && p.avgS > 0) {
-      const domAvg = domLong ? p.avgL : p.avgS;
-      // Use quotes cache if available, else skip tick
+    // ── Price distance + tick ──
+    let distPct = null, distPips = null, trapped = false, currentPrice = 0, domAvg = 0, decimals = 4;
+    let tickPct = null;
+
+    if (hasRich) {
+      domAvg   = domLong ? p.avgL : p.avgS;
+      decimals = domAvg > 20 ? 2 : 4;
       const qCache = (typeof intradayQuote === 'function' && _intradayCache)
         ? intradayQuote(_intradayCache, p.sym.replace('/', '').toLowerCase())
         : null;
-      const currentPrice = qCache ? qCache.close : 0;
-      const decimals = domAvg > 20 ? 2 : 4;
-      const trapped  = currentPrice > 0
-        ? (domLong ? currentPrice < domAvg : currentPrice > domAvg)
-        : false;
-      const distPct  = currentPrice > 0
-        ? ((currentPrice - domAvg) / domAvg * 100)
-        : null;
-      const distPips = currentPrice > 0
-        ? Math.abs(Math.round((currentPrice - domAvg) * (domAvg > 20 ? 100 : 10000)))
-        : null;
-      const distCol  = trapped ? 'var(--down)' : 'var(--up)';
-      const distSign = distPct !== null && distPct >= 0 ? '+' : '';
-      const trappedTxt = trapped ? '▼ trapped' : '▲ profit';
+      currentPrice = qCache ? qCache.close : 0;
 
-      const domSideTxt = domLong ? 'longs' : 'shorts';
-      const distBody = distPct !== null
-        ? `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are currently ${trapped ? 'underwater (losing)' : 'in profit'}.`
-        : `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}.`;
-      const distEx = trapped
-        ? 'If price continues against them, mass stop-outs may trigger a sharp move.'
-        : 'They may take profits soon, creating pressure in the opposite direction.';
-
-      const avgTxt = currentPrice > 0
-        ? `${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="color:${distCol}">${trappedTxt}</span>`
-        : `avg ${domLong ? 'L' : 'S'} ${domAvg.toFixed(decimals)}`;
-
-      distHtml = `<span data-tip-dist style="font-size:9px;color:${distCol};font-family:var(--font-mono);">${avgTxt}</span>`;
-
-      // Tick position on bar
-      var tickHtml = '';
       if (currentPrice > 0) {
-        const lo = Math.min(p.avgL, p.avgS), hi = Math.max(p.avgL, p.avgS);
-        const range = hi - lo || domAvg * 0.01;
-        const tickPct = Math.min(98, Math.max(2,
+        trapped   = domLong ? currentPrice < domAvg : currentPrice > domAvg;
+        distPct   = (currentPrice - domAvg) / domAvg * 100;
+        distPips  = Math.abs(Math.round((currentPrice - domAvg) * (domAvg > 20 ? 100 : 10000)));
+        // tick: map currentPrice into [min-1.5r … max+1.5r]
+        const lo    = Math.min(p.avgL, p.avgS);
+        const hi    = Math.max(p.avgL, p.avgS);
+        const range = (hi - lo) || domAvg * 0.01;
+        tickPct = Math.min(98, Math.max(2,
           (currentPrice - (lo - range * 1.5)) / (range * 4) * 100
         ));
-        tickHtml = `<div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;" data-tip-tick></div>`;
       }
+    }
 
-      const row = document.createElement('div');
-      row.style.cssText = 'display:grid;grid-template-columns:58px 1fr 36px 36px 22px;align-items:center;gap:4px;padding:5px 0 1px;border-bottom:1px solid var(--border);';
+    const distCol  = trapped ? 'var(--down)' : 'var(--up)';
+    const distSign = distPct !== null && distPct >= 0 ? '+' : '';
 
-      const symSpan   = document.createElement('div');
-      symSpan.style.cssText = 'display:flex;flex-direction:column;gap:1px;';
-      symSpan.innerHTML = `
-        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);">${p.sym}</span>
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">${fmtK(p.totalPos)} pos</span>
-      `;
+    // ── Outer wrapper: two-row layout ──
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'border-bottom:1px solid var(--border);padding:5px 0 4px;';
 
-      const barDiv = document.createElement('div');
-      barDiv.style.cssText = 'position:relative;height:8px;background:var(--bg3);border-radius:1px;overflow:visible;';
-      barDiv.innerHTML = `
-        <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
-        <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
-        ${tickHtml}
-      `;
+    // Row 1: sym | bar | %L %S bias
+    const row1 = document.createElement('div');
+    row1.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:6px;';
 
-      const buySpan  = document.createElement('span');
-      buySpan.style.cssText = 'font-size:10px;color:var(--up);text-align:right;font-family:var(--font-mono);';
-      buySpan.textContent = p.buy + '%';
+    // Sym + positions
+    const symDiv = document.createElement('div');
+    symDiv.style.cssText = 'display:flex;flex-direction:column;gap:1px;min-width:0;';
+    const symSpan = document.createElement('span');
+    symSpan.style.cssText = 'font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);white-space:nowrap;';
+    symSpan.textContent = p.sym;
+    symDiv.appendChild(symSpan);
 
-      const sellSpan = document.createElement('span');
-      sellSpan.style.cssText = 'font-size:10px;color:var(--down);text-align:right;font-family:var(--font-mono);';
-      sellSpan.textContent = p.sell + '%';
+    let posSpan = null;
+    if (hasRich) {
+      posSpan = document.createElement('span');
+      posSpan.style.cssText = 'font-size:9px;color:var(--text3);font-family:var(--font-ui);cursor:help;display:inline-block;';
+      posSpan.textContent = fmtK(p.totalPos) + ' pos';
+      symDiv.appendChild(posSpan);
+    }
 
-      const biasSpan = document.createElement('span');
-      biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};text-align:right;font-family:var(--font-ui);`;
-      biasSpan.textContent = biasLbl;
+    // Bar
+    const barDiv = document.createElement('div');
+    barDiv.style.cssText = 'position:relative;height:8px;background:var(--bg3);border-radius:1px;overflow:visible;cursor:help;';
+    barDiv.innerHTML = `
+      <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
+      <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
+    `;
 
-      row.append(symSpan, barDiv, buySpan, sellSpan, biasSpan);
+    // Tick element (separate so we can attach its own tooltip)
+    let tickEl = null;
+    if (tickPct !== null) {
+      tickEl = document.createElement('div');
+      tickEl.style.cssText = `position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:${tickPct}%;transform:translateX(-1px);z-index:2;cursor:help;`;
+      barDiv.appendChild(tickEl);
+    }
 
-      // Dist row
-      const distRow = document.createElement('div');
-      distRow.style.cssText = 'display:grid;grid-template-columns:58px 1fr;gap:4px;padding:1px 0 5px;border-bottom:1px solid var(--border);';
-      distRow.innerHTML = `<span></span><span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">${avgTxt}</span>`;
+    // Right block: %L %S bias
+    const rightDiv = document.createElement('div');
+    rightDiv.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
 
-      container.appendChild(row);
-      container.appendChild(distRow);
+    const buySpan  = document.createElement('span');
+    buySpan.style.cssText = 'font-size:10px;color:var(--up);font-family:var(--font-mono);cursor:help;';
+    buySpan.textContent = p.buy + '%';
 
-      // Attach tooltips
-      attachTip(symSpan.querySelector('span:last-child'),
+    const sellSpan = document.createElement('span');
+    sellSpan.style.cssText = 'font-size:10px;color:var(--down);font-family:var(--font-mono);cursor:help;';
+    sellSpan.textContent = p.sell + '%';
+
+    const biasSpan = document.createElement('span');
+    biasSpan.style.cssText = `font-size:9px;font-weight:700;color:${biasCol};font-family:var(--font-ui);min-width:10px;text-align:right;`;
+    biasSpan.textContent = biasLbl;
+
+    rightDiv.append(buySpan, sellSpan, biasSpan);
+    row1.append(symDiv, barDiv, rightDiv);
+    wrap.appendChild(row1);
+
+    // Row 2: (empty spacer) | dist info — only when we have price data
+    if (distPct !== null) {
+      const row2 = document.createElement('div');
+      row2.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;gap:6px;margin-top:2px;';
+
+      const distSpan = document.createElement('span');
+      distSpan.style.cssText = `font-size:9px;color:${distCol};font-family:var(--font-mono);cursor:help;grid-column:2/4;`;
+      distSpan.innerHTML = `${trapped ? '▼' : '▲'} ${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="opacity:.7">${trapped ? 'trapped' : 'in profit'}</span>`;
+
+      row2.append(document.createElement('span'), distSpan);
+      wrap.appendChild(row2);
+
+      // Tooltip for dist
+      const domSideTxt = domLong ? 'longs' : 'shorts';
+      const distBody = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
+      const distEx   = trapped
+        ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
+        : 'They may take profits soon, creating pressure in the opposite direction.';
+      attachTip(distSpan, trapped ? 'Retail trapped' : 'Retail in profit', distBody, distEx);
+    }
+
+    container.appendChild(wrap);
+
+    // ── Attach tooltips ──
+    if (posSpan) {
+      attachTip(posSpan,
         'Open positions',
         `Number of Myfxbook traders with ${p.sym} open right now. Higher count = more statistically representative.`,
         `EUR/USD with 54K positions is the most-followed pair — mass stop-outs here move the market.`
       );
-      attachTip(barDiv,
-        'Long / Short bar',
-        `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
-        `A nearly all-red bar means retail is heavily short — historically a bullish contrarian signal.`
-      );
-      if (tickHtml) {
-        attachTip(barDiv.querySelector('[data-tip-tick]') || barDiv,
-          'Current price marker',
-          `The white line shows where price is now relative to the retail average entry prices for longs and shorts.`,
-          `If the line is left of center, price fell below where retail longs entered — they are underwater.`
-        );
-      }
-      attachTip(buySpan,
-        '% Long',
-        `Percentage of retail traders currently holding long (buy) positions in ${p.sym}.`,
-        `Readings above 70% long are unusual and often precede a drop as crowded longs get squeezed.`
-      );
-      attachTip(sellSpan,
-        '% Short',
-        `Percentage of retail traders currently holding short (sell) positions in ${p.sym}.`,
-        `Readings above 70% short are unusual and often precede a rally as crowded shorts get squeezed.`
-      );
-      const distEl = distRow.querySelector('span:last-child');
-      attachTip(distEl,
-        trapped ? 'Retail trapped' : 'Retail in profit',
-        distBody,
-        distEx
-      );
-
-    } else {
-      // Fallback: simple row without rich data
-      const row = document.createElement('div');
-      row.style.cssText = 'display:grid;grid-template-columns:52px 1fr 36px 36px 40px;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);';
-      row.innerHTML = `
-        <span style="font-size:10px;font-weight:700;color:#fff;font-family:var(--font-ui);">${p.sym}</span>
-        <div style="position:relative;height:6px;background:var(--bg3);border-radius:1px;overflow:hidden;">
-          <div style="position:absolute;left:0;top:0;height:100%;width:${p.buy}%;background:var(--up);opacity:.85;border-radius:1px 0 0 1px;"></div>
-          <div style="position:absolute;right:0;top:0;height:100%;width:${p.sell}%;background:var(--down);opacity:.85;border-radius:0 1px 1px 0;"></div>
-        </div>
-        <span style="font-size:10px;color:var(--up);text-align:right;font-family:var(--font-mono);">${p.buy}%</span>
-        <span style="font-size:10px;color:var(--down);text-align:right;font-family:var(--font-mono);">${p.sell}%</span>
-        <span style="font-size:9px;font-weight:700;color:${biasCol};text-align:right;font-family:var(--font-ui);">${biasLbl}</span>
-      `;
-      container.appendChild(row);
     }
+    attachTip(barDiv,
+      'Long / Short bar',
+      `Shows the split between retail buyers (green, left) and sellers (red, right). Extreme readings are often contrarian signals.`,
+      `A nearly all-red bar means retail is heavily short — historically a bullish contrarian signal.`
+    );
+    if (tickEl) {
+      attachTip(tickEl,
+        'Current price (white line)',
+        `The white bar shows where price is now relative to the retail average entry for the dominant side.`,
+        `Line to the left of center = price fell below where retail longs entered — they are underwater.`
+      );
+    }
+    attachTip(buySpan,
+      '% Long',
+      `Percentage of retail traders currently holding long (buy) positions in ${p.sym}.`,
+      `Readings above 70% long are unusual and often precede a drop as crowded longs get squeezed.`
+    );
+    attachTip(sellSpan,
+      '% Short',
+      `Percentage of retail traders currently holding short (sell) positions in ${p.sym}.`,
+      `Readings above 70% short are unusual and often precede a rally as crowded shorts get squeezed.`
+    );
   });
 
   // ── General stats footer ──
   const genEl = document.getElementById('sent-general');
   if (genEl && general) {
-    const profPct   = general.profitablePercentage || 0;
+    const profPct   = general.profitablePercentage   || 0;
     const realPct   = general.realAccountsPercentage || 0;
-    const funds     = general.totalFunds || '';
-    const avgDep    = general.averageDeposit || '';
-    const avgProfit = general.averageAccountProfit || '';
-    const avgLoss   = general.averageAccountLoss || '';
+    const funds     = general.totalFunds             || '';
+    const avgDep    = general.averageDeposit         || '';
+    const avgProfit = general.averageAccountProfit   || '';
+    const avgLoss   = general.averageAccountLoss     || '';
 
-    genEl.style.cssText = 'padding:4px 0 2px;border-top:1px solid var(--border);flex-shrink:0;margin:0 8px;';
-    genEl.innerHTML = `
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-        <span style="font-size:9px;color:var(--text2);font-family:var(--font-ui);">Profitable</span>
-        <div style="flex:1;height:3px;background:var(--bg3);border-radius:1px;">
-          <div style="height:3px;width:${profPct}%;background:var(--up);border-radius:1px;"></div>
-        </div>
-        <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${profPct}%</span>
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Real accts ${realPct}%</span>
+    // No extra background — inherits var(--bg2) from myfxbook-wrap
+    genEl.style.cssText = 'padding:5px 0 2px;border-top:1px solid var(--border);flex-shrink:0;';
+    genEl.innerHTML = '';
+
+    // Profitable row with mini bar
+    const profRow = document.createElement('div');
+    profRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;cursor:help;';
+    profRow.innerHTML = `
+      <span style="font-size:9px;color:var(--text2);font-family:var(--font-ui);white-space:nowrap;">Profitable</span>
+      <div style="flex:1;height:3px;background:var(--bg3);border-radius:1px;">
+        <div style="height:3px;width:${profPct}%;background:var(--up);border-radius:1px;"></div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Total funds <span style="color:var(--text2);">$${funds}</span></span>
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg deposit <span style="color:var(--text2);">$${avgDep}</span></span>
-        <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg P&amp;L <span style="color:var(--up);">+$${avgProfit}</span> <span style="color:var(--down);">${avgLoss}</span></span>
-      </div>
+      <span style="font-size:9px;color:var(--up);font-family:var(--font-mono);">${profPct}%</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);white-space:nowrap;">Real ${realPct}%</span>
     `;
+    genEl.appendChild(profRow);
 
-    // Tooltips on general stats
-    const profRow = genEl.querySelector('div:first-child');
+    // Stats row
+    const statsRow = document.createElement('div');
+    statsRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;cursor:help;';
+    statsRow.innerHTML = `
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Funds <span style="color:var(--text2);">$${funds}</span></span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg dep <span style="color:var(--text2);">$${avgDep}</span></span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);">P&amp;L <span style="color:var(--up);">+$${avgProfit}</span> <span style="color:var(--down);">${avgLoss}</span></span>
+    `;
+    genEl.appendChild(statsRow);
+
+    // Tooltips on footer items
     attachTip(profRow,
       'Profitable accounts',
-      'Percentage of Myfxbook accounts with a positive balance right now.',
-      'Above 60% is common in trending markets. Falls sharply during high-volatility events.'
+      'Percentage of Myfxbook accounts currently showing a positive balance. Above 60% is common in trending markets.',
+      'Falls sharply during high-volatility periods — a rising profitable % can signal market stabilization.'
     );
-    const statsRow = genEl.querySelector('div:last-child');
-    attachTip(statsRow,
-      'Community snapshot',
-      'Total funds and average deposit give context on sample size and trader profile. Avg P&L shows winning vs losing account averages.',
-      'If avg loss exceeds avg profit, retail is in capitulation mode — a potential contrarian signal.'
+    // Individual stat tooltips
+    const statSpans = statsRow.querySelectorAll('span');
+    attachTip(statSpans[0],
+      'Total funds',
+      'Sum of capital in all sampled Myfxbook accounts. Larger sample = more statistical weight.',
+      'More total funds means the sentiment data better reflects real institutional-retail behavior.'
+    );
+    attachTip(statSpans[1],
+      'Average deposit',
+      'Average account size in the sample. Higher values indicate more experienced or semi-professional traders.',
+      '$96K average suggests the sample skews toward serious traders, not micro accounts — data carries more weight.'
+    );
+    attachTip(statSpans[2],
+      'Community P&L',
+      'Average profit of winning accounts vs average loss of losing accounts.',
+      'If avg loss exceeds avg profit, retail is in capitulation mode — often a contrarian signal for reversals.'
+    );
+    // Real accounts tooltip on profRow's last span
+    const realSpan = profRow.querySelector('span:last-child');
+    attachTip(realSpan,
+      'Real accounts %',
+      'Share of accounts using real money (vs demo). Higher % = more meaningful signal.',
+      'Above 50% real accounts means the data reflects actual capital at risk, not practice accounts.'
     );
   }
 
