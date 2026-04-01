@@ -125,6 +125,7 @@ def main():
         sys.exit(1)
 
     print(f"[API]  Got {len(symbols_list)} symbols")
+    print(f"[DEBUG] First symbol raw keys/values: {symbols_list[0] if symbols_list else 'empty'}")
 
     # ── STEP 3: Normalizar ───────────────────────────────────────────────────
     sym_map = {item.get("name", "").upper().replace("/", ""): item for item in symbols_list}
