@@ -145,12 +145,23 @@ def main():
             long_pct  = round(long_pct / total * 100)
             short_pct = 100 - long_pct
 
+        long_pos   = int(raw.get("longPositions",  0) or 0)
+        short_pos  = int(raw.get("shortPositions", 0) or 0)
+        total_pos  = int(raw.get("totalPositions", long_pos + short_pos) or long_pos + short_pos)
+        avg_long   = round(float(raw.get("avgLongPrice",  0) or 0), 5)
+        avg_short  = round(float(raw.get("avgShortPrice", 0) or 0), 5)
+
         pairs.append({
-            "sym":      display,
-            "long":     long_pct,
-            "short":    short_pct,
-            "longVol":  long_vol,
-            "shortVol": short_vol,
+            "sym":        display,
+            "long":       long_pct,
+            "short":      short_pct,
+            "longVol":    long_vol,
+            "shortVol":   short_vol,
+            "longPos":    long_pos,
+            "shortPos":   short_pos,
+            "totalPos":   total_pos,
+            "avgLongPx":  avg_long,
+            "avgShortPx": avg_short,
         })
 
         bias = "LONG " if long_pct >= short_pct else "SHORT"
@@ -168,7 +179,22 @@ def main():
         print(f"\n[Auth] Logout warning (non-fatal): {e}")
 
     # ── STEP 5: Escribir JSON ────────────────────────────────────────────────
-    output = {"updated": ts, "source": "myfxbook", "pairs": pairs}
+    general_raw = outlook_data.get("general", {})
+    general = {}
+    if general_raw:
+        general = {
+            "demoAccountsPct":    general_raw.get("demoAccountsPercentage", 0),
+            "realAccountsPct":    general_raw.get("realAccountsPercentage", 0),
+            "profitablePct":      general_raw.get("profitablePercentage", 0),
+            "nonProfitablePct":   general_raw.get("nonProfitablePercentage", 0),
+            "fundsWon":           general_raw.get("fundsWon", "0"),
+            "fundsLost":          general_raw.get("fundsLost", "0"),
+            "averageDeposit":     general_raw.get("averageDeposit", "0"),
+            "avgAccountProfit":   general_raw.get("averageAccountProfit", "0"),
+            "avgAccountLoss":     general_raw.get("averageAccountLoss", "0"),
+            "totalFunds":         general_raw.get("totalFunds", "0"),
+        }
+    output = {"updated": ts, "source": "myfxbook", "pairs": pairs, "general": general}
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
