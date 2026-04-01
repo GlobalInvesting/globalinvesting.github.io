@@ -1054,11 +1054,13 @@ function renderSentiment(pairs, sourceLabel, general) {
     s.id = 'fx-tt-style';
     s.textContent = `
       #fx-tt {
-        position:fixed;z-index:99999;max-width:240px;
+        position:fixed;z-index:99999;
+        width:min(240px, calc(100vw - 24px));
         background:var(--bg3);border:1px solid var(--border2);
         border-radius:4px;padding:9px 11px;
         font-size:11px;color:var(--text);line-height:1.55;
         pointer-events:none;display:none;font-family:var(--font-ui);
+        box-sizing:border-box;
       }
       #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
       #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
@@ -1071,35 +1073,57 @@ function renderSentiment(pairs, sourceLabel, general) {
     ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
     document.body.appendChild(ttEl);
 
+    window._fxTTPos = function(cx, cy) {
+      const tt = document.getElementById('fx-tt');
+      if (!tt) return;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const ttW = Math.min(240, vw - 24);
+      const ttH = tt.offsetHeight || 130;
+      const PAD = 8;
+      let x = cx + 14, y = cy + 14;
+      if (x + ttW > vw - PAD) x = cx - ttW - 8;
+      if (x < PAD) x = PAD;
+      if (y + ttH > vh - PAD) y = cy - ttH - 8;
+      if (y < PAD) y = PAD;
+      tt.style.left = x + 'px';
+      tt.style.top  = y + 'px';
+    };
+
     document.addEventListener('mousemove', ev => {
       const tt = document.getElementById('fx-tt');
-      if (tt && tt.style.display === 'block') {
-        const vw = window.innerWidth, vh = window.innerHeight;
-        let x = ev.clientX + 14, y = ev.clientY + 14;
-        if (x + 248 > vw) x = ev.clientX - 252;
-        if (y + 150 > vh) y = ev.clientY - 154;
-        tt.style.left = x + 'px'; tt.style.top = y + 'px';
-      }
+      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
     });
+
+    document.addEventListener('touchstart', ev => {
+      if (!ev.target.closest('.fx-tip')) {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      }
+    }, { passive: true });
   }
 
   function attachTip(el, title, body, ex) {
     if (!el) return;
     el.classList.add('fx-tip');
-    el.addEventListener('mouseenter', ev => {
+
+    function _showTip(cx, cy) {
       const tt = document.getElementById('fx-tt');
       document.getElementById('fx-tt-title').textContent = title;
       document.getElementById('fx-tt-body').textContent  = body;
       const exEl = document.getElementById('fx-tt-ex');
       exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
       tt.style.display = 'block';
-      const vw = window.innerWidth, vh = window.innerHeight;
-      let x = ev.clientX + 14, y = ev.clientY + 14;
-      if (x + 248 > vw) x = ev.clientX - 252;
-      if (y + 150 > vh) y = ev.clientY - 154;
-      tt.style.left = x + 'px'; tt.style.top = y + 'px';
-    });
+      requestAnimationFrame(() => window._fxTTPos(cx, cy));
+    }
+
+    el.addEventListener('mouseenter', ev => _showTip(ev.clientX, ev.clientY));
     el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
+
+    el.addEventListener('touchstart', ev => {
+      ev.stopPropagation();
+      const t = ev.touches[0];
+      _showTip(t.clientX, t.clientY);
+    }, { passive: true });
   }
 
   function fmtK(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'K' : String(n); }
@@ -1737,12 +1761,10 @@ async function renderRiskData(byId) {
       const currentRank = REGIME_RANK[currentText] ?? -1;
       // Override rules for the narrative badge:
       // - AI stale → live is always authoritative
-      // - AI fresh → ONLY override if live is strictly MORE BEARISH than current AI regime
-      //   (never downgrade: if AI says RISK-ON and live also says RISK-ON, keep it)
-      // This prevents the RISK-ON→CAUTION flip caused by VIX > 25 scoring
-      // while still escalating to RISK-OFF if things genuinely deteriorate mid-session.
+      // - AI fresh → override if live is more bearish (any step up, including MIXED)
+      //   This keeps the narrative badge consistent with the Risk Monitor badge.
       const isCurrentStale = narrRegEl.classList.contains('stale');
-      const shouldOverride = isCurrentStale || !_aiRegimeFresh || (liveRank > currentRank && liveRank >= 2);
+      const shouldOverride = isCurrentStale || !_aiRegimeFresh || (liveRank > currentRank);
       if (shouldOverride) {
         const isOn  = regime === 'RISK-ON';
         const isOff = regime === 'RISK-OFF';
