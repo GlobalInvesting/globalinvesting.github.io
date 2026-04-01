@@ -426,7 +426,7 @@ function populateFxPairsTable() {
 function populateHeatmap() {
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
 
-  // Prefer STOOQ_RT_CACHE (intraday ~15min delay) over ECB daily rates
+  // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
   // because ECB daily rates have zero intraday movement (same open/close on weekends)
   const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 4;
 
@@ -731,7 +731,7 @@ function buildNewsTicker(items) {
 // ═══════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
-// QUOTE BAR + FX TABLE — REAL-TIME FX via yfinance (intraday JSON, ~15 min delay)
+// QUOTE BAR + FX TABLE — REAL-TIME FX via yfinance (intraday JSON, ~5 min delay)
 // Runs every 60s. Updates quote bar, FX pairs table and heatmap.
 // Falls back to Frankfurter data if yfinance JSON unavailable.
 // ═══════════════════════════════════════════════════════════════════
@@ -963,7 +963,7 @@ function updateFxPairsTableRT() {
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    upd.textContent = `yfinance · ${hh}:${mm} ${tzAbbr} · ~15min delay`;
+    upd.textContent = `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
   }
 }
 
@@ -2415,7 +2415,7 @@ async function fetchCrossAssetData() {
 
   // ── STEP 2: All cross-asset data from intraday quotes.json (yfinance) ──
   // Stooq and Yahoo removed — both blocked by CORS in production.
-  // quotes.json (same-origin, ~15min delay) covers all symbols.
+  // quotes.json (same-origin, ~5min delay) covers all symbols.
   const finalSpx    = _caSpx;
   const finalGold   = _caGold;
   const finalWti    = _caWti;
@@ -2479,11 +2479,11 @@ async function fetchCrossAssetData() {
                   : _caIntraday.source === 'twelve_data'   ? 'Twelve Data'
                   : _caIntraday.source === 'alpha_vantage' ? 'Alpha Vantage'
                   : 'mixed APIs';
-    // Check if the file is fresh (under 20 min old)
+    // Check if the file is fresh (under 8 min old — 5 min interval + 3 min margin)
     const fileAge = _caIntraday.updated
       ? (Date.now() - new Date(_caIntraday.updated).getTime()) / 60000
       : 999;
-    sourceLabel = fileAge < 20 ? `${srcName} · ~15min delay` : 'yfinance';
+    sourceLabel = fileAge < 8 ? `${srcName} · ~5min delay` : 'yfinance';
   }
   if (upd) upd.textContent = sourceLabel + ' · ' + localHHMM + ' ' + tzAbbr;
 
@@ -2927,13 +2927,13 @@ async function boot() {
 
 boot();
 
-// Refresh quote bar FX every 60 seconds via intraday JSON / yfinance (~15 min delay)
+// Refresh quote bar FX every 60 seconds via intraday JSON / yfinance (~5 min delay)
 setInterval(fetchQuoteBarRT, 60 * 1000);
 // Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
 setInterval(fetchNewsData, 10 * 60 * 1000);  // every 10 min; ETag avoids re-download if unchanged
-// Refresh narrative every 15 minutes
+// Refresh narrative every 5 minutes
 setInterval(buildRichNarrative, 15 * 60 * 1000);
 // Refresh risk/yield data every 5 minutes
 
