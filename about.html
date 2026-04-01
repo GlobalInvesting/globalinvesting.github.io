@@ -3,47 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>About — Global Investing FX Terminal</title>
 <meta name="description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform built on real-time data feeds, institutional positioning data, and AI-powered market narrative.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://globalinvesting.github.io/about.html">
-<meta property="og:title" content="About — Global Investing FX Terminal">
-<meta property="og:description" content="Professional-grade FX monitoring platform built on real-time data, institutional positioning, and AI narrative.">
-<meta property="og:url" content="https://globalinvesting.github.io/about.html">
+<meta name="google-adsense-account" content="ca-pub-7977942731354565">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://globalinvesting.github.io/about.html">
+<meta property="og:site_name" content="Global Investing FX Terminal">
+<meta property="og:title" content="About — Global Investing FX Terminal">
+<meta property="og:description" content="Global Investing FX Terminal is a professional-grade foreign exchange monitoring platform built on real-time data feeds, institutional positioning data, and AI-powered market narrative.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About — Global Investing FX Terminal">
+<meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
+<meta name="twitter:site" content="@GlobalInvesting">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #131722; --bg2: #1e222d; --bg3: #2a2e39;
   --border: #2a2e39; --border2: #363c4e;
   --text: #d1d4dc; --text2: #787b86; --text3: #6b7280;
   --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
-  --head-bg: #1a1d29;
+  --head-bg: #1a1d29; --accent: #2962ff;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
 body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 a { color: inherit; text-decoration: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+.skip-link:focus { position: fixed; left: 8px; top: 8px; width: auto; height: auto; padding: 6px 12px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 600; border-radius: 4px; z-index: 9999; outline: 2px solid #fff; }
+#gdpr-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 14px 18px; font-size: 12px; color: var(--text2); z-index: 9000; max-width: 520px; width: calc(100% - 32px); box-shadow: 0 8px 32px rgba(0,0,0,.4); display: flex; flex-direction: column; gap: 10px; }
+#gdpr-banner[hidden] { display: none !important; }
+.gdpr-btns { display: flex; gap: 8px; }
+#gdpr-accept { background: var(--blue); color: #fff; border: none; border-radius: 4px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-ui); }
+#gdpr-reject { background: none; color: var(--text2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 14px; font-size: 11px; cursor: pointer; font-family: var(--font-ui); }
 #topbar { background: var(--head-bg); border-bottom: 1px solid var(--border); height: 36px; display: flex; align-items: center; padding: 0 10px; position: sticky; top: 0; z-index: 200; }
 #topbar .logo { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-right: 1px solid var(--border2); margin-right: 8px; white-space: nowrap; text-decoration: none; flex-shrink: 0; }
 .logo-text { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.1; }
 .logo-sub { font-size: 8px; font-weight: 500; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: block; margin-top: 1px; }
 .top-nav { display: flex; height: 100%; }
-.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; }
+.top-nav a { display: flex; align-items: center; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--text2); border-right: 1px solid var(--border); white-space: nowrap; transition: color .15s, background .15s; text-decoration: none; }
 .top-nav a:hover { color: var(--text); background: var(--bg3); }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text2); }
 .site-menu { position: relative; display: flex; align-items: center; }
 .site-menu-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--border2); color: var(--text2); font-size: 10px; font-family: var(--font-ui); padding: 3px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
 .site-menu-btn:hover { border-color: var(--border); color: var(--text); }
+.site-menu-btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .site-menu-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 210px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; z-index: 400; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
 .site-menu:hover .site-menu-panel, .site-menu:focus-within .site-menu-panel { display: block; }
 .site-menu::after { content: ''; position: absolute; top: 100%; left: -8px; right: -8px; height: 8px; }
@@ -51,47 +66,11 @@ a { color: inherit; text-decoration: none; }
 .site-menu-panel a:hover { background: var(--bg3); color: var(--text); }
 .site-menu-panel a.current { color: #fff; }
 .site-menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
-.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
-#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; }
+.site-menu-section { padding: 3px 14px 2px; font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; display: block; }
+#statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
 .footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
-
-.page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 60px; }
-
-/* Hero — paragraph spans full width of .page-wrap, no max-width cap */
-.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 36px; }
-.page-hero-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
-.page-hero h1 { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 14px; }
-.page-hero p { font-size: 15px; color: var(--text2); line-height: 1.75; }
-
-.section { margin-bottom: 40px; }
-.section h2 { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 18px; }
-.section p { color: var(--text2); margin-bottom: 14px; font-size: 14px; line-height: 1.75; }
-.section p:last-child { margin-bottom: 0; }
-
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th { text-align: left; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; padding: 7px 10px; border-bottom: 1px solid var(--border2); background: var(--bg2); }
-.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; font-size: 13px; }
-.data-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
-.data-table tr:last-child td { border-bottom: none; }
-.badge-rt { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(41,98,255,.15); color: var(--blue); border: 1px solid rgba(41,98,255,.2); letter-spacing: .04em; white-space: nowrap; }
-.badge-daily { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(246,148,28,.10); color: var(--orange); border: 1px solid rgba(246,148,28,.2); letter-spacing: .04em; white-space: nowrap; }
-.badge-weekly { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); letter-spacing: .04em; white-space: nowrap; }
-
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
-.card-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
-.card-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
-
-.disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; font-size: 13px; color: var(--text2); line-height: 1.65; margin-top: 36px; }
-
-@media (max-width: 600px) {
-  .grid-2 { grid-template-columns: 1fr; }
-  .page-hero h1 { font-size: 22px; }
-  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
-}
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -100,6 +79,10 @@ a { color: inherit; text-decoration: none; }
   .top-nav::-webkit-scrollbar { display: none; }
   .top-nav a { flex-shrink: 0; white-space: nowrap; padding: 6px 12px; font-size: 11px; height: auto; }
 }
+@media (max-width: 600px) {
+  #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
+  .footer-copy { position: static; transform: none; }
+}
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
   .logo-text { font-size: 10px !important; }
@@ -107,11 +90,48 @@ a { color: inherit; text-decoration: none; }
   .topbar-right { font-size: 9px; gap: 6px !important; }
   .top-nav a { padding: 5px 10px; font-size: 10px; }
 }
+
+.page-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 60px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 36px; }
+.page-hero-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.page-hero h1 { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 14px; }
+.page-hero p { font-size: 15px; color: var(--text2); line-height: 1.75; }
+.section { margin-bottom: 40px; }
+.section h2 { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 18px; }
+.section p { color: var(--text2); margin-bottom: 14px; font-size: 14px; line-height: 1.75; }
+.section p:last-child { margin-bottom: 0; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; padding: 7px 10px; border-bottom: 1px solid var(--border2); background: var(--bg2); }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; font-size: 13px; }
+.data-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+.data-table tr:last-child td { border-bottom: none; }
+.badge-rt { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(41,98,255,.15); color: var(--blue); border: 1px solid rgba(41,98,255,.2); letter-spacing: .04em; white-space: nowrap; }
+.badge-daily { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: rgba(246,148,28,.10); color: var(--orange); border: 1px solid rgba(246,148,28,.2); letter-spacing: .04em; white-space: nowrap; }
+.badge-weekly { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); letter-spacing: .04em; white-space: nowrap; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+.card-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
+.disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; font-size: 13px; color: var(--text2); line-height: 1.65; margin-top: 36px; }
+@media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .page-hero h1 { font-size: 22px; } }
 </style>
 </head>
 <body>
 
-<div id="topbar">
+
+<a href="#main" class="skip-link">Skip to main content</a>
+<div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
+  <span id="gdpr-desc"><strong id="gdpr-title">Cookies &amp; Privacy</strong><br>
+    We use first- and third-party cookies (Google AdSense) to display relevant advertising.
+    See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Use</a>.</span>
+  <div class="gdpr-btns">
+    <button id="gdpr-reject" aria-label="Reject non-essential cookies">Essential only</button>
+    <button id="gdpr-accept" aria-label="Accept all cookies">Accept all</button>
+  </div>
+</div>
+<script src="assets/gdpr.js"></script>
+
+<header id="topbar" role="banner" aria-label="Global Investing FX Terminal">
   <a class="logo" href="/" title="Global Investing FX Terminal">
     <img src="apple-touch-icon.png" alt="Global Investing" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;display:block;">
     <span>
@@ -119,20 +139,27 @@ a { color: inherit; text-decoration: none; }
       <span class="logo-sub">FX Terminal</span>
     </span>
   </a>
-  <nav class="top-nav">
+  <nav class="top-nav" aria-label="Dashboard sections">
     <a href="/">Overview</a>
     <a href="/#section-fxpairs">FX Pairs</a>
-    <a href="/#section-rates">Rates</a>
+    <a href="/#section-econmap">Macro</a>
+    <a href="/#section-cbrates">Rates</a>
     <a href="/#section-crossasset">Cross-Asset</a>
+    <a href="/#section-risk">Risk</a>
     <a href="/#section-positioning">Positioning</a>
+    <a href="/#section-tvcalendar">Calendar</a>
   </nav>
   <div class="topbar-right">
     <div class="site-menu">
-      <button class="site-menu-btn" aria-label="Site menu">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/><rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/></svg>
+      <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect y="1" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="5.75" width="13" height="1.5" rx=".75" fill="currentColor"/>
+          <rect y="10.5" width="13" height="1.5" rx=".75" fill="currentColor"/>
+        </svg>
         Menu
       </button>
-      <div class="site-menu-panel">
+      <div class="site-menu-panel" id="site-menu-dropdown">
         <span class="site-menu-section">Company</span>
         <a href="about.html" class="current">About</a>
         <a href="contact.html">Contact</a>
@@ -143,91 +170,36 @@ a { color: inherit; text-decoration: none; }
         <a href="guide-dashboard.html">How to Use the Terminal</a>
         <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor</a>
         <a href="guide-rates-yield-curve.html">Rates &amp; Yield Curve</a>
-        <a href="guide-market-sentiment.html">Retail Market Sentiment</a>
+        <a href="guide-market-sentiment.html">Retail FX Positioning</a>
         <a href="guide-fx-liquidity.html">FX Liquidity &amp; Sessions</a>
         <a href="guide-cot.html">COT / CFTC Positioning</a>
       </div>
     </div>
   </div>
-</div>
+</header>
 
-<div class="page-wrap">
+<main id="main">
 
-  <div class="page-hero">
-    <div class="page-hero-label">About</div>
-    <h1>Global Investing FX Terminal</h1>
-    <p>A professional-grade foreign exchange monitoring platform that consolidates real-time price feeds, institutional positioning reports, central bank policy data, US Treasury yield curve metrics, cross-asset flows, and AI-assisted market narrative — all in a single, continuously updated interface. No login required.</p>
-  </div>
+</main>
 
-  <div class="section">
-    <h2>What it is</h2>
-    <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
-    <p>Coverage spans real-time price feeds across all G8 major pairs, CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, cross-asset correlation data, live central bank policy rates and meeting calendars, and an AI-generated market regime narrative updated three times daily, and news headlines refreshed every hour.</p>
-  </div>
-
-  <div class="section">
-    <h2>Data sources</h2>
-    <table class="data-table">
-      <thead>
-        <tr><th>Section</th><th>Source</th><th>Cadence</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Price Chart</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>Quote bar — FX majors</td><td>Stooq</td><td><span class="badge-daily">~15 MIN</span></td></tr>
-        <tr><td>Quote bar — XAU, WTI, BTC, DXY, US10Y</td><td>Stooq / CoinGecko</td><td><span class="badge-daily">~15 MIN</span></td></tr>
-        <tr><td>Currency Strength Heatmap</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>Economic Calendar</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>Central Bank Rates</td><td>Official central bank sources</td><td><span class="badge-daily">DAILY</span></td></tr>
-        <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
-        <tr><td>FX Liquidity Canvas</td><td>Frankfurter API (ECB) · BIS/LSEG session baseline</td><td><span class="badge-daily">30 MIN</span></td></tr>
-        <tr><td>FX Retail Market Sentiment</td><td>Myfxbook</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>Cross-Asset Monitor</td><td>Stooq and open feeds</td><td><span class="badge-daily">DAILY</span></td></tr>
-        <tr><td>US Treasury Yield Curve</td><td>Stooq</td><td><span class="badge-daily">DAILY</span></td></tr>
-        <tr><td>News Headlines</td><td>FXStreet, ForexLive, ECB, BoE, Investing.com and others</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
-        <tr><td>AI Narrative &amp; Market Signals</td><td>Groq LLM</td><td><span class="badge-daily">3× DAILY</span></td></tr>
-        <tr><td>Economic Map</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>AI in the terminal</h2>
-    <p>AI is used for two specific outputs in the terminal, both clearly labeled:</p>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Market Narrative</div>
-        <div class="card-body">A concise market summary updated three times daily (06:30, 12:30, 21:30 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, MIXED, or NEUTRAL.</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Market Signals</div>
-        <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>
-      </div>
-    </div>
-    <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
-  </div>
-
-  <div class="section">
-    <h2>Currencies covered</h2>
-    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, accounting for the substantial majority of global daily FX turnover.</p>
-  </div>
-
-  <div class="section">
-    <h2>Author</h2>
-    <p>Built and maintained by <strong style="color:var(--text);">Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for traders and researchers.</p>
-    <p>Contact: 
-  <a href="mailto:globalinvestingmarkets@gmail.com" style="color:var(--blue);">
-    globalinvestingmarkets@gmail.com
-  </a>
-</p>
-
-  </div>
-
-  <div class="disclaimer">
-    <strong style="color:var(--orange);">Disclaimer.</strong> Content on this terminal is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX trading involves significant risk and is not suitable for all investors. Past data does not guarantee future results.
-  </div>
-
-</div>
-
-<div id="statusbar">
+<footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
-  <div class="footer-copy">© 2026 Santiago Plá Cas
+  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+</footer>
+
+
+<script>
+// aria-expanded on site menu button
+const btn = document.querySelector('.site-menu-btn');
+const menu = document.querySelector('.site-menu');
+if (btn && menu) {
+  const update = () => btn.setAttribute('aria-expanded', String(menu.matches(':hover') || menu.matches(':focus-within')));
+  menu.addEventListener('mouseenter', update);
+  menu.addEventListener('mouseleave', update);
+  menu.addEventListener('focusin', update);
+  menu.addEventListener('focusout', update);
+}
+</script>
+</body>
+</html>
