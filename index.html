@@ -7,7 +7,10 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-CJLGQET9KJ');
+  gtag('config', 'G-CJLGQET9KJ', {
+    'link_attribution': true,
+    'search_console_domain': 'globalinvesting.github.io'
+  });
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,10 +19,11 @@
 <!-- ═══════════════════════════════════════
      SEO — Core
      ═══════════════════════════════════════ -->
-<meta name="description" content="Professional FX Terminal with real-time forex rates, currency strength heatmap, yield curve, Cross-Asset Risk Monitor, COT positioning, central bank rates, FX liquidity sessions and AI market signals. Free, no login required.">
+<meta name="description" content="Free professional FX terminal — live forex rates, currency strength heatmap, US Treasury yield curve, COT positioning, central bank rates, cross-asset risk monitor and AI market signals. No login required.">
 <meta name="keywords" content="fx terminal, forex dashboard 2026, real-time forex rates, currency strength meter, yield curve monitor, cross asset risk, COT positioning CFTC, central bank rates live, FX liquidity sessions, DXY dollar index, forex spread monitor, VIX MOVE index, forex market signals, professional forex tools, global investing fx">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<meta name="author" content="Global Investing">
+<meta name="author" content="Santiago Plá Casuriaga — Global Investing">
+<meta name="theme-color" content="#0d1117">
 <link rel="canonical" href="https://globalinvesting.github.io/">
 <link rel="sitemap" type="application/xml" href="https://globalinvesting.github.io/sitemap.xml">
 
@@ -71,9 +75,10 @@
   "@type": "WebApplication",
   "name": "Global Investing FX Terminal",
   "url": "https://globalinvesting.github.io/",
-  "description": "Professional real-time FX terminal with currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT CFTC positioning, central bank rates, FX session liquidity map and AI-powered market signals.",
+  "description": "Free professional FX terminal with live forex rates, currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT CFTC positioning, central bank rates, FX session liquidity map and AI-powered market signals.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "featureList": [
     "Real-time FX rates (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, XAU/USD, WTI, BTC)",
@@ -88,10 +93,92 @@
     "Macro Economic Calendar"
   ],
   "author": {
+    "@type": "Person",
+    "name": "Santiago Plá Casuriaga",
+    "url": "https://globalinvesting.github.io/about.html"
+  },
+  "publisher": {
     "@type": "Organization",
     "name": "Global Investing",
     "url": "https://globalinvesting.github.io/"
-  }
+  },
+  "inLanguage": "en"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "FX Terminal",
+      "item": "https://globalinvesting.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guides",
+      "item": "https://globalinvesting.github.io/guide-dashboard.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "About",
+      "item": "https://globalinvesting.github.io/about.html"
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is the Global Investing FX Terminal free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the FX Terminal is completely free. No login, registration or subscription is required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How real-time is the forex data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FX rates are delayed approximately 15 minutes, sourced from ECB/Frankfurter, CFTC, Yahoo Finance and TradingView."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does the Currency Strength Heatmap show?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It shows the relative strength of major currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) computed from ECB cross rates, helping traders identify the strongest and weakest currencies at a glance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the COT positioning data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly every Friday."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the AI market signal work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The AI signal is powered by a Groq LLM that synthesises live market data — including rates, risk indicators and positioning — to generate a plain-language directional bias for major FX pairs."
+      }
+    }
+  ]
 }
 </script>
 
