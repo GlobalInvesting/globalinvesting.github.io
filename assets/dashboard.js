@@ -1122,8 +1122,8 @@ function renderSentiment(pairs, sourceLabel, general) {
     if (hasRich && p.avgL > 0 && p.avgS > 0) {
       const domAvg = domLong ? p.avgL : p.avgS;
       // Use quotes cache if available, else skip tick
-      const qCache = (typeof intradayQuote === 'function' && window._lastIntradayData)
-        ? intradayQuote(window._lastIntradayData, p.sym.replace('/', '').toLowerCase())
+      const qCache = (typeof intradayQuote === 'function' && _intradayCache)
+        ? intradayQuote(_intradayCache, p.sym.replace('/', '').toLowerCase())
         : null;
       const currentPrice = qCache ? qCache.close : 0;
       const decimals = domAvg > 20 ? 2 : 4;
@@ -1268,7 +1268,7 @@ function renderSentiment(pairs, sourceLabel, general) {
     const avgProfit = general.averageAccountProfit || '';
     const avgLoss   = general.averageAccountLoss || '';
 
-    genEl.style.cssText = 'padding:4px 0 2px;border-top:1px solid var(--border);flex-shrink:0;';
+    genEl.style.cssText = 'padding:4px 0 2px;border-top:1px solid var(--border);flex-shrink:0;margin:0 8px;';
     genEl.innerHTML = `
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
         <span style="font-size:9px;color:var(--text2);font-family:var(--font-ui);">Profitable</span>
@@ -1318,6 +1318,9 @@ function renderSentiment(pairs, sourceLabel, general) {
 }
 
 async function fetchSentiment() {
+  // Pre-load intraday quotes so renderSentiment can access _intradayCache for price distances
+  await loadIntradayQuotes().catch(() => null);
+
   // ── SOURCE 1: Myfxbook community outlook (primary — updated every 30min via GitHub Action) ──
   try {
     const r = await fetch('./sentiment-data/myfxbook.json');
