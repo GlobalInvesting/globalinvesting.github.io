@@ -1,5 +1,11 @@
 {
-  "narrative": "USD weakens as risk-on tone dominates — DXY retreats. EUR/USD firms at 1.16080; GBP/USD extends gains to 1.33070. AUD/USD surges to 0.69480 on RBA hiking prospects — gold +2.58% on safe-haven demand amid equity strength.",
+  "narrative": "USD weakens — DXY retreats {{dxy_pct}}. EUR/USD firms at 1.15830; GBP/USD also gains at 1.32980. USD/JPY slides to 158.782 — JPY supported by BoJ stance, gold {{gold_pct}} on safe-haven demand amid equities {{spx_pct}} and VIX at {{vix}}.",
   "regime": "RISK-ON",
-  "generated_at": "2026-04-01T14:10:50Z"
+  "generated_at": "2026-04-01T18:40:11Z",
+  "tokens": {
+    "gold_pct": "+2.88%",
+    "spx_pct": "+0.52%",
+    "dxy_pct": "-0.34%",
+    "vix": "24.6"
+  }
 }
