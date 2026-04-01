@@ -728,6 +728,10 @@
     #spreads-rows { width: 100%; box-sizing: border-box; }
     .spread-row { grid-template-columns: 48px 1fr 42px; gap: 4px; }
 
+    /* Retail FX Positioning: fixed height + internal scroll on mobile */
+    #myfxbook-wrap { max-height: 340px !important; flex: none !important; }
+    #sent-rows { overflow-y: auto !important; flex: 1 !important; min-height: 0 !important; }
+
     /* Indicator + Yield Spread tables: show all 3 columns on mobile.
        Label col truncates with ellipsis if too long; Value and Signal
        shrink to content and never wrap or get clipped. */

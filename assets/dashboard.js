@@ -1207,25 +1207,41 @@ function renderSentiment(pairs, sourceLabel, general) {
     row1.append(symDiv, barDiv, rightDiv);
     wrap.appendChild(row1);
 
-    // Row 2: (empty spacer) | dist info — only when we have price data
-    if (distPct !== null) {
+    // Row 2: avg entry / dist info — show whenever we have rich data
+    if (hasRich) {
       const row2 = document.createElement('div');
       row2.style.cssText = 'display:grid;grid-template-columns:58px 1fr auto;gap:6px;margin-top:2px;';
 
       const distSpan = document.createElement('span');
-      distSpan.style.cssText = `font-size:9px;color:${distCol};font-family:var(--font-mono);cursor:help;grid-column:2/4;`;
-      distSpan.innerHTML = `${trapped ? '▼' : '▲'} ${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="opacity:.7">${trapped ? 'trapped' : 'in profit'}</span>`;
+      distSpan.style.cssText = `font-size:9px;font-family:var(--font-mono);cursor:help;grid-column:2/4;`;
 
+      let distTitle, distBody, distEx;
+
+      if (distPct !== null) {
+        // Full dist: live price available
+        const distCol = trapped ? 'var(--down)' : 'var(--up)';
+        distSpan.style.color = distCol;
+        distSpan.innerHTML = `${trapped ? '▼' : '▲'} ${distSign}${distPct.toFixed(2)}% · ${distPips}pip · <span style="opacity:.7">${trapped ? 'trapped' : 'in profit'}</span>`;
+        const domSideTxt = domLong ? 'longs' : 'shorts';
+        distTitle = trapped ? 'Retail trapped' : 'Retail in profit';
+        distBody  = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
+        distEx    = trapped
+          ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
+          : 'They may take profits soon, creating pressure in the opposite direction.';
+      } else {
+        // Partial: show avg entry without live price
+        const longDec = p.avgL > 20 ? 2 : 4;
+        const shortDec = p.avgS > 20 ? 2 : 4;
+        distSpan.style.color = 'var(--text3)';
+        distSpan.innerHTML = `avg L ${p.avgL.toFixed(longDec)} · S ${p.avgS.toFixed(shortDec)}`;
+        distTitle = 'Average entry price';
+        distBody  = `Retail longs entered at avg ${p.avgL.toFixed(longDec)}, shorts at avg ${p.avgS.toFixed(shortDec)}. Live price not available for this pair — trapped/profit status cannot be calculated.`;
+        distEx    = 'Compare these levels to the current chart price to assess whether the dominant side is underwater or in profit.';
+      }
+
+      attachTip(distSpan, distTitle, distBody, distEx);
       row2.append(document.createElement('span'), distSpan);
       wrap.appendChild(row2);
-
-      // Tooltip for dist
-      const domSideTxt = domLong ? 'longs' : 'shorts';
-      const distBody = `The dominant side (${domSideTxt}) entered at avg ${domAvg.toFixed(decimals)}. Current price: ${currentPrice.toFixed(decimals)}. They are ${trapped ? 'underwater (losing)' : 'in profit'}.`;
-      const distEx   = trapped
-        ? 'If price continues against them, mass stop-outs can trigger a sharp move.'
-        : 'They may take profits soon, creating pressure in the opposite direction.';
-      attachTip(distSpan, trapped ? 'Retail trapped' : 'Retail in profit', distBody, distEx);
     }
 
     container.appendChild(wrap);
