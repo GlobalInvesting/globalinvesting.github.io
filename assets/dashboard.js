@@ -13,13 +13,13 @@ let _aiRegimeFresh = false;
 
 // Currency config: which pairs to compute from Frankfurter USD-base
 const PAIRS = [
-  { id:'eurusd', base:'EUR', quote:'USD', invert:true,  dec:5 },
-  { id:'gbpusd', base:'GBP', quote:'USD', invert:true,  dec:5 },
-  { id:'usdjpy', base:'JPY', quote:'USD', invert:false, dec:3 },
-  { id:'audusd', base:'AUD', quote:'USD', invert:true,  dec:5 },
-  { id:'usdchf', base:'CHF', quote:'USD', invert:false, dec:5 },
-  { id:'usdcad', base:'CAD', quote:'USD', invert:false, dec:5 },
-  { id:'nzdusd', base:'NZD', quote:'USD', invert:true,  dec:5 },
+  { id:'eurusd', base:'EUR', quote:'USD', invert:true,  dec:5, label:'EUR/USD' },
+  { id:'gbpusd', base:'GBP', quote:'USD', invert:true,  dec:5, label:'GBP/USD' },
+  { id:'usdjpy', base:'JPY', quote:'USD', invert:false, dec:3, label:'USD/JPY' },
+  { id:'audusd', base:'AUD', quote:'USD', invert:true,  dec:5, label:'AUD/USD' },
+  { id:'usdchf', base:'CHF', quote:'USD', invert:false, dec:5, label:'USD/CHF' },
+  { id:'usdcad', base:'CAD', quote:'USD', invert:false, dec:5, label:'USD/CAD' },
+  { id:'nzdusd', base:'NZD', quote:'USD', invert:true,  dec:5, label:'NZD/USD' },
   { id:'eurgbp', base:'EUR', quote:'GBP', cross:['EUR','GBP'], dec:5 },
   { id:'eurjpy', base:'EUR', quote:'JPY', cross:['EUR','JPY'], dec:3 },
   { id:'eurchf', base:'EUR', quote:'CHF', cross:['EUR','CHF'], dec:5 },
@@ -363,18 +363,19 @@ function populateFxPairsTable() {
     }
 
     // 1W change — from fx-performance repo data
-    // Regla: BASE/USD → +perf[BASE]; USD/QUOTE → -perf[QUOTE]
+    // fxPerformance1W[CCY] = % change of CCY vs USD (positive = CCY strengthened vs USD)
+    // pair.invert = false → pair is CCY/USD (EUR/USD, GBP/USD, AUD/USD, NZD/USD)
+    //               → 1W = +perf[pair.base]  (EUR stronger = EUR/USD up)
+    // pair.invert = true  → pair is USD/CCY (USD/JPY, USD/CHF, USD/CAD)
+    //               → 1W = -perf[pair.base]  (JPY stronger = USD/JPY down → invert)
     let chg1w = '—', cls1w = 'flat';
-    const perfBase  = FX_PERF_CACHE[pair.base];
-    const perfQuote = FX_PERF_CACHE[pair.quote];
-    if (pair.quote === 'USD' && perfBase && perfBase.fxPerformance1W != null) {
-      const p1w = perfBase.fxPerformance1W;
+    const perfNonUSD = FX_PERF_CACHE[pair.base]; // pair.base is always the non-USD currency
+    if (perfNonUSD && perfNonUSD.fxPerformance1W != null) {
+      const p1w = pair.invert
+        ? -perfNonUSD.fxPerformance1W   // USD/JPY: JPY up = pair down
+        :  perfNonUSD.fxPerformance1W;  // EUR/USD: EUR up = pair up
       chg1w = pctStr(p1w);
       cls1w = clsDir(p1w);
-    } else if (pair.base === 'USD' && perfQuote && perfQuote.fxPerformance1W != null) {
-      const p1w = perfQuote.fxPerformance1W;
-      chg1w = pctStr(-p1w);
-      cls1w = clsDir(-p1w);
     }
 
     // Bid / Ask — rate ± half-spread
@@ -402,7 +403,7 @@ function populateFxPairsTable() {
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
 
     return `<tr>
-      <td class="sym" style="font-weight:600">${pair.base}/${pair.quote}</td>
+      <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
       <td style="color:var(--text1)">${bid}</td>
       <td style="color:var(--text1)">${ask}</td>
       <td style="color:var(--text3);font-size:10px">${spreadStr}</td>
