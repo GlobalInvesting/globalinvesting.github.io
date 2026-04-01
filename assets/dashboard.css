@@ -537,10 +537,11 @@
   .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
   .footer-copy {
     font-size: 10px; color: var(--text3); white-space: nowrap; font-family: var(--font-ui);
-    flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+    position: absolute; left: 50%; transform: translateX(-50%);
+    pointer-events: none; /* sits above flex flow but never blocks clicks */
   }
   @media (max-width: 600px) {
-    .footer-copy { position: static; transform: none; order: 10; flex-basis: 100%; text-align: center; }
+    .footer-copy { display: none; }
   }
 
   /* Flag icons in sidebar tables */
