@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -186,7 +186,155 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#what-is-cot">What Is the COT Report</a>
+    <a class="toc-item" href="#the-panel">Reading the Panel</a>
+    <a class="toc-item" href="#net-contracts">Net Contracts</a>
+    <a class="toc-item" href="#long-pct">Long %</a>
+    <a class="toc-item" href="#categories">Trader Categories</a>
+    <a class="toc-item" href="#signal-logic">Signal Logic</a>
+    <a class="toc-item" href="#extremes">Positioning Extremes</a>
+    <a class="toc-item" href="#lag">The Lag Problem</a>
+    <a class="toc-item" href="#combining">Combining with Other Data</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-fx-liquidity.html">← FX Liquidity</a>
+  </nav>
 
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>CFTC COT Positioning</h1>
+      <p>The CFTC Commitments of Traders report is one of the most valuable free data sets available to FX traders. It reveals what large institutional speculators are actually positioned for — not what they say, but what they have real money on.</p>
+    </div>
+
+    <div class="guide-section" id="what-is-cot">
+      <h2>What Is the COT Report?</h2>
+      <p>The Commitments of Traders (COT) report is a weekly publication from the US Commodity Futures Trading Commission (CFTC). It shows the aggregate open positions of different categories of traders in futures and options markets regulated by the CFTC — including currency futures traded on the Chicago Mercantile Exchange (CME).</p>
+      <p>For FX traders, the report provides a window into the positioning of the most sophisticated market participants: hedge funds, commodity trading advisors (CTAs), proprietary trading firms, and other large speculative accounts. This is institutional-level data, made public for free, every Friday afternoon.</p>
+      <div class="callout">
+        <strong>Data source in the terminal:</strong> The COT panel pulls directly from <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">CFTC.gov</code>. Data is updated weekly (Friday release covers positions as of the prior Tuesday). The panel header shows the "week ending" date so you always know how current the data is.
+      </div>
+    </div>
+
+    <div class="guide-section" id="the-panel">
+      <h2>Reading the COT Panel</h2>
+      <p>The terminal displays COT data for EUR, GBP, JPY, AUD, CAD, and CHF futures (all quoted vs. USD). Each row shows:</p>
+      <div class="cot-demo">
+        <div class="cot-header">
+          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net Contracts</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">EUR</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:62%;background:var(--up);"></div></div>
+          <span class="cot-pct">62%</span>
+          <span class="cot-net" style="color:var(--up)">+84,200</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">JPY</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:28%;background:var(--down);"></div></div>
+          <span class="cot-pct">28%</span>
+          <span class="cot-net" style="color:var(--down)">-54,300</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">GBP</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:55%;background:var(--up);"></div></div>
+          <span class="cot-pct">55%</span>
+          <span class="cot-net" style="color:var(--up)">+12,800</span>
+        </div>
+        <div class="cot-row-d">
+          <span class="cot-ccy">AUD</span>
+          <div class="cot-bar-wrap"><div class="cot-bar-long" style="width:35%;background:var(--down);"></div></div>
+          <span class="cot-pct">35%</span>
+          <span class="cot-net" style="color:var(--down)">-31,500</span>
+        </div>
+      </div>
+      <p>The horizontal bar visualizes the long/short split visually. A bar extending beyond 50% (blue/green zone) means more speculative longs than shorts. A bar below 50% (red zone) means net short positioning.</p>
+    </div>
+
+    <div class="guide-section" id="net-contracts">
+      <h2>Net Contracts</h2>
+      <p>The rightmost column — Net Contracts — is the primary signal metric. It is calculated as:</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:5px;padding:12px 16px;font-family:var(--font-mono);font-size:13px;color:var(--text);margin-bottom:14px;text-align:center;">
+        Net = Total Long Contracts − Total Short Contracts
+      </div>
+      <p>A positive net (shown in green) means speculative accounts hold more long positions than short positions in that currency's futures — they are net bullish on the currency against USD. A negative net (shown in red) means they are net bearish.</p>
+      <p>The <em>absolute magnitude</em> matters: a net position of +10,000 contracts is a modest bullish lean; a net of +120,000 contracts is a historically large extreme position. Extremes are where the most valuable signals arise.</p>
+    </div>
+
+    <div class="guide-section" id="long-pct">
+      <h2>Long % — Directional Bias</h2>
+      <p>The Long% column shows what percentage of total open interest (longs + shorts) is held as long positions. This normalizes the positioning data across currencies that have different total open interest sizes, making EUR, JPY, and CHF comparable on a single scale.</p>
+      <table class="cot-signal-table">
+        <thead><tr><th>Long %</th><th>Directional Bias</th><th>Signal Quality</th></tr></thead>
+        <tbody>
+          <tr><td>&gt; 70%</td><td>Extreme net long — very bullish on currency</td><td style="color:var(--orange);">High (contrarian risk)</td></tr>
+          <tr><td>55–70%</td><td>Moderately net long</td><td style="color:var(--text2);">Directional confirmation</td></tr>
+          <tr><td>45–55%</td><td>Neutral / balanced positioning</td><td style="color:var(--text2);">No strong signal</td></tr>
+          <tr><td>30–45%</td><td>Moderately net short</td><td style="color:var(--text2);">Directional confirmation</td></tr>
+          <tr><td>&lt; 30%</td><td>Extreme net short — very bearish on currency</td><td style="color:var(--orange);">High (contrarian risk)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="categories">
+      <h2>Trader Categories</h2>
+      <p>The COT report breaks participants into categories. The terminal uses <strong>Non-Commercial</strong> (also called "Leveraged Funds" in the Disaggregated COT) positioning — this is the speculative community: hedge funds, CTAs, and other large speculative accounts. This is the most FX-relevant category because these are trend-following, momentum-driven participants with significant market impact.</p>
+      <p>The "Commercial" category (banks hedging real currency exposure) is excluded from the terminal's display because their positions reflect hedging needs rather than directional speculation — they are often "wrong" in the short term by design.</p>
+    </div>
+
+    <div class="guide-section" id="signal-logic">
+      <h2>Signal Logic</h2>
+      <p>COT positioning generates two types of FX signal:</p>
+      <h3>Trend Confirmation</h3>
+      <p>When net positioning aligns with the direction of price action, it confirms that institutional money is behind the move. Example: EUR/USD rising while net EUR longs are also increasing — strong institutional conviction behind the EUR rally. This is a high-confidence environment for trend-following entries.</p>
+      <h3>Contrarian Reversal Signal</h3>
+      <p>When net positioning reaches historical extremes — either extremely long or extremely short — it signals that the trend is crowded and vulnerable to reversal. At extremes, most of the willing buyers (or sellers) are already in the market. A small catalyst can cause a rapid unwind.</p>
+      <div class="callout callout-red">
+        <strong>Extreme JPY short example:</strong> When net JPY short positioning reaches multi-year extremes (large negative net contracts), it historically precedes sharp JPY strengthening as the carry trade unwinds. The 2024 BoJ policy normalization triggered exactly this: JPY shorts had accumulated to extreme levels, and the subsequent squeeze was one of the most violent FX moves in years.
+      </div>
+    </div>
+
+    <div class="guide-section" id="extremes">
+      <h2>Positioning Extremes — Historical Reference</h2>
+      <p>Extremes are relative to each currency's historical range. What constitutes an "extreme" for EUR (which has deep liquidity and high OI) differs from an extreme for CHF (smaller market). As a rule of thumb:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;margin-bottom:14px;">
+        <li>EUR: net longs above +150,000 or below -150,000 contracts = historically extreme</li>
+        <li>JPY: net shorts below -100,000 contracts = historically extreme (2024 peak was ~-185,000)</li>
+        <li>GBP: net longs above +80,000 or shorts below -80,000 = elevated</li>
+        <li>AUD: net shorts below -60,000 = elevated; below -90,000 = extreme</li>
+      </ul>
+      <div class="callout callout-orange">
+        <strong>Relative, not absolute:</strong> These reference levels shift over time as market structure changes. Always compare current positioning to the 52-week or 2-year range for context. An absolute number that would be extreme in 2018 may be moderate in a higher-volatility 2025 environment.
+      </div>
+    </div>
+
+    <div class="guide-section" id="lag">
+      <h2>The Lag Problem</h2>
+      <p>The COT report has a significant structural limitation: it is published on Friday, covering positions as of the prior Tuesday. This means the data is 3–7 days old by the time you read it. In a fast-moving market, significant positioning changes can occur between Tuesday and Friday that are not visible in the report.</p>
+      <p>Additionally, the CFTC data only covers CME futures — not the broader OTC spot FX market, which is far larger. The futures market is a proxy for institutional positioning trends, not a complete picture of global FX flows.</p>
+      <div class="callout">
+        <strong>How to handle the lag:</strong> Use COT positioning as a medium-term backdrop, not a short-term timing tool. Extremely bullish COT positioning today suggests the underlying trend has institutional backing, but it does not tell you what happens in the next 24–48 hours. Combine COT with real-time price action and the Risk Monitor for timing.
+      </div>
+    </div>
+
+    <div class="guide-section" id="combining">
+      <h2>Combining COT with Other Terminal Data</h2>
+      <p>The highest-conviction signals come from multi-factor alignment. The most useful combinations in the terminal:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;margin-bottom:14px;">
+        <li><strong style="color:var(--text);">COT + Central Bank Rates:</strong> Net long a currency with a rising rate trajectory = institutional momentum aligned with rate differential momentum. This is the core of institutional FX trend confirmation.</li>
+        <li><strong style="color:var(--text);">COT + Retail Sentiment (Myfxbook):</strong> Institutions net long while retail is net short = classic smart money vs. crowd divergence. High-confidence contrarian setup for the institutional direction.</li>
+        <li><strong style="color:var(--text);">COT extremes + VIX spike:</strong> Extreme speculative longs in a risk-on currency (e.g., AUD) + sudden VIX spike = high-probability carry unwind. Watch for AUD/JPY breakdown.</li>
+        <li><strong style="color:var(--text);">COT + Yield Spreads:</strong> Institutions net long USD while US–DE or US–JP spread is widening = double confirmation of USD strength thesis. Strongest signal when all three align: COT, yields, and price.</li>
+      </ul>
+      <div class="callout callout-green">
+        <strong>Best practice workflow:</strong> Check the COT panel at the start of each week (Friday or Monday, when fresh data is available). Identify which currencies have extreme or strongly directional positioning. Then use the rest of the terminal during the week to look for setups that align with — or intelligently fade — that institutional positioning.
+      </div>
+    </div>
+
+  </div>
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">

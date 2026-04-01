@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -186,7 +186,139 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#what-it-shows">What It Shows</a>
+    <a class="toc-item" href="#tenors">The Four Tenors</a>
+    <a class="toc-item" href="#curve-shape">Curve Shape</a>
+    <a class="toc-item" href="#2y-10y">2Y–10Y Spread</a>
+    <a class="toc-item" href="#intl-spreads">International Spreads</a>
+    <a class="toc-item" href="#us-de">US–DE 10Y Spread</a>
+    <a class="toc-item" href="#us-jp">US–JP 10Y Spread</a>
+    <a class="toc-item" href="#fx-implication">FX Implications</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-cross-asset-risk.html">← Cross-Asset Risk</a>
+    <a class="toc-item" href="guide-market-sentiment.html">→ Market Sentiment</a>
+  </nav>
 
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>Rates &amp; Yield Curve — US Treasuries</h1>
+      <p>The US Treasury yield curve is the single most important macro indicator for FX markets globally. It encodes market expectations for growth, inflation, and Federal Reserve policy — and it drives capital flows between currencies through the interest rate differential mechanism.</p>
+    </div>
+
+    <div class="guide-section" id="what-it-shows">
+      <h2>What It Shows</h2>
+      <p>The Rates &amp; Yield Curve section of the terminal displays four US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
+      <p>Data comes from yfinance (via GitHub Actions) and updates every 15 minutes during market hours. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
+    </div>
+
+    <div class="guide-section" id="tenors">
+      <h2>The Four Tenors — What Each Measures</h2>
+      <div class="curve-grid" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:16px;gap:0;">
+        <div style="padding:12px;border-right:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">3M T-Bill</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Tracks the Fed's overnight policy rate most closely. The "risk-free" short-term rate. When 3M is high relative to 10Y, the curve is inverted.</div>
+        </div>
+        <div style="padding:12px;">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">2Y Note</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Most sensitive to Fed rate expectations over the next 1–2 years. Moves sharply on FOMC decisions and CPI/PCE data. The primary measure of near-term policy pricing.</div>
+        </div>
+        <div style="padding:12px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">5Y Note</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Reflects the medium-term equilibrium policy rate expectation. Often used by fixed income traders to gauge the "neutral rate" implied by markets.</div>
+        </div>
+        <div style="padding:12px;border-top:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">10Y Bond</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">The global benchmark rate. Drives mortgage rates, corporate borrowing costs, and global capital allocation. The single most-watched yield in international markets. USD/JPY has a structural 0.85 correlation to the US 10Y.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="curve-shape">
+      <h2>Curve Shape — What It Signals</h2>
+      <p>The relationship between short and long yields — the <em>slope</em> of the curve — has historically been one of the most reliable leading indicators in macroeconomics:</p>
+      <div class="shape-grid">
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--up);">Normal (Upward Sloping)</div>
+          <div class="shape-desc">Long yields &gt; short yields. Healthy growth expectations. Banks profit by borrowing short, lending long. Supports risk assets and carry trades. Positive for AUD, CAD, NZD.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--text2);">Flat</div>
+          <div class="shape-desc">2Y ≈ 10Y. Transition state — either normalizing from inversion or flattening from normal. Uncertainty about growth trajectory. Mixed FX signal, watch for direction of change.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--down);">Inverted (Downward Sloping)</div>
+          <div class="shape-desc">Short yields &gt; long yields. Market is pricing Fed rate cuts ahead, implying an economic slowdown. Historically preceded every US recession since WWII with a 6–18 month lead. Bearish for risk assets, supportive of JPY and CHF.</div>
+        </div>
+        <div class="shape-card">
+          <div class="shape-name" style="color:var(--orange);">Bear Steepening</div>
+          <div class="shape-desc">Long yields rising faster than short yields. Often driven by fiscal concerns (large Treasury supply) or inflation expectations rising at the long end. Can be USD-positive on rate differential but negative for growth assets.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="2y-10y">
+      <h2>2Y–10Y Spread</h2>
+      <p>The most widely-watched domestic yield curve spread: the difference between the 10-year Treasury yield and the 2-year Treasury yield, expressed in basis points (bps). Calculated as <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">10Y yield − 2Y yield</code>.</p>
+      <table class="spread-table">
+        <thead><tr><th>Value</th><th>Signal</th><th>FX Context</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--up);">+100 bps or more</td><td>Strongly normal curve</td><td>Robust growth expectations. Strong carry trades. Risk-on currencies supported.</td></tr>
+          <tr><td style="color:var(--up);">+50 to +100 bps</td><td>Moderately normal</td><td>Healthy environment. Gradual USD normalization cycle typically ongoing.</td></tr>
+          <tr><td style="color:var(--text2);">0 to +50 bps</td><td>Flat / Flattening</td><td>Late-cycle signals. Watch for growth deceleration. Begin monitoring JPY.</td></tr>
+          <tr><td style="color:var(--down);">0 to -50 bps</td><td>Mild inversion</td><td>Recession risk on the horizon. Carry trade vulnerability rising. Defensive posture.</td></tr>
+          <tr><td style="color:var(--down);">-50 bps or deeper</td><td>Deep inversion</td><td>Historically high recession probability within 12–18 months. Risk-off bias.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-orange">
+        <strong>The 2Y–10Y re-steepening trap:</strong> When an inverted curve re-steepens (the spread moves from negative back toward zero), it does not mean conditions are improving. A re-steepening from deep inversion typically happens as the Fed begins cutting rates in response to an already-deteriorating economy — which is historically when equities and risk FX begin their most significant declines. This is a common misread.
+      </div>
+    </div>
+
+    <div class="guide-section" id="intl-spreads">
+      <h2>International Yield Spreads</h2>
+      <p>The terminal tracks two critical cross-country 10Y yield differentials. These spreads directly drive currency pair valuations through the interest rate parity mechanism — capital flows toward higher-yielding sovereign debt, bidding up that country's currency.</p>
+    </div>
+
+    <div class="guide-section" id="us-de">
+      <h2>US–DE 10Y Spread (EUR/USD Proxy)</h2>
+      <p>The difference between the US 10-year Treasury yield and the German 10-year Bund yield. This spread is the primary structural driver of EUR/USD over medium-to-long timeframes.</p>
+      <p>When the US–DE spread widens (US yields rise faster or fall slower than German yields), the USD becomes more attractive relative to the EUR, and EUR/USD tends to fall. When the spread narrows, EUR/USD tends to rise.</p>
+      <div class="callout callout-green">
+        <strong>How to read it in the terminal:</strong> The spread value shows in basis points alongside a signal label. A widening spread (US outperforming) carries a bearish EUR/USD implication. A narrowing spread (Germany outperforming, or ECB falling behind the Fed in rate normalisation) carries a bullish EUR/USD implication. The signal label reflects the direction and magnitude of recent change.
+      </div>
+      <p>The correlation between US–DE 10Y spread and EUR/USD typically runs at -0.80 or better over rolling 6-month windows. Divergences between the spread and EUR/USD price action are often mean-reversion setups.</p>
+    </div>
+
+    <div class="guide-section" id="us-jp">
+      <h2>US–JP 10Y Spread (USD/JPY Driver)</h2>
+      <p>The difference between the US 10-year Treasury yield and the Japanese 10-year JGB yield. This is arguably the single most important structural driver of USD/JPY — the pair with the world's highest daily volume.</p>
+      <p>Japan's yield curve control (YCC) policy (now largely unwound as of 2024) historically capped JGB yields near 0%, meaning the US–JP spread widened and narrowed almost entirely based on US yield movements. This made USD/JPY one of the purest expressions of US rate expectations in FX markets.</p>
+      <div class="callout callout-red">
+        <strong>Post-YCC Japan:</strong> As the BoJ has normalized policy and allowed JGB yields to rise, the US–JP spread relationship has become more symmetric. Japanese rate hikes now compress the spread from the JP side as well. This means carry trade unwinds in USD/JPY can be triggered by either US yield declines or JP yield increases — monitor both.</div>
+      <p>The terminal displays the signal as Steepening (spread widening, bullish USD/JPY), Narrowing (spread compressing, bearish USD/JPY), or Stable (within recent range).</p>
+    </div>
+
+    <div class="guide-section" id="fx-implication">
+      <h2>Practical FX Implications</h2>
+      <p>Use the Rates section alongside the Cross-Asset and CB Rates panels for the highest-conviction signals:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.8;">
+        <li>US 10Y rising + DXY strengthening + US–JP spread widening → consensus signal for USD/JPY upside</li>
+        <li>US 2Y falling sharply after CPI miss → Fed cut expectations repriced → short USD, long EUR and commodity pairs</li>
+        <li>Curve inverting deeper while VIX rising → risk-off regime, defensive currencies (JPY, CHF) favored</li>
+        <li>US–DE spread narrowing while ECB holds rates → EUR/USD upside, especially if EUR also has inflation convergence</li>
+        <li>Bear steepening (10Y rising, 2Y stable) → watch for gold and AUD pressure as real rates rise</li>
+      </ul>
+      <div class="callout">
+        <strong>Data source:</strong> US Treasury yields in the terminal come from yfinance via a GitHub Actions workflow that runs every 15 minutes during market hours. For real-time tick data on Treasury yields, use the TradingView chart (US10Y, US02Y, etc.) in the price chart panel.
+      </div>
+    </div>
+
+  </div>
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">

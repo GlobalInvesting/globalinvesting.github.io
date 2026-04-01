@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -186,7 +186,187 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="guide-wrap">
+  <nav class="guide-toc">
+    <div class="toc-head">Contents</div>
+    <a class="toc-item" href="#overview">What It Shows</a>
+    <a class="toc-item" href="#cross-asset">Cross-Asset Panel</a>
+    <a class="toc-item" href="#risk-monitor">Risk Monitor</a>
+    <a class="toc-item" href="#vix">VIX — Equity Volatility</a>
+    <a class="toc-item" href="#move">MOVE Index — Bond Vol</a>
+    <a class="toc-item" href="#iv">EUR/USD Implied Vol</a>
+    <a class="toc-item" href="#gold">Gold as Risk Signal</a>
+    <a class="toc-item" href="#flows">Asset Flow Logic</a>
+    <a class="toc-item" href="#divergence">Divergence Signals</a>
+    <div class="toc-divider"></div>
+    <a class="toc-item" href="guide-dashboard.html">← Terminal Overview</a>
+    <a class="toc-item" href="guide-rates-yield-curve.html">→ Rates &amp; Yield Curve</a>
+  </nav>
 
+  <div class="guide-content">
+    <div class="page-hero">
+      <div class="page-hero-label">Guide</div>
+      <h1>Cross-Asset Risk Monitor</h1>
+      <p>FX prices don't move in isolation. Equity volatility, bond market stress, commodity prices, and capital flows across asset classes all drive currency pairs in real time. The Cross-Asset and Risk Monitor sections give you a unified view of these intermarket forces.</p>
+    </div>
+
+    <div class="guide-section" id="overview">
+      <h2>What It Shows</h2>
+      <p>The terminal combines two adjacent panels — <strong>Cross-Asset</strong> and <strong>Risk Monitor</strong> — that together answer the core intermarket question: is risk appetite expanding or contracting right now, and what does that mean for FX?</p>
+      <p>These are not FX prices. They are the broader market context that explains <em>why</em> FX pairs are moving. A professional FX analyst always monitors these in parallel with the price chart — they are the macro backdrop, not an afterthought.</p>
+    </div>
+
+    <div class="guide-section" id="cross-asset">
+      <h2>Cross-Asset Panel</h2>
+      <p>Eight instruments displaying their latest price and daily percentage change:</p>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-name">S&amp;P 500</div>
+          <div class="metric-sub">The primary global risk barometer. Rising SPX = expanding risk appetite = pressure on JPY/CHF, support for AUD/NZD/EM. Falling SPX = risk-off = JPY/CHF bid.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">Gold XAU/USD</div>
+          <div class="metric-sub">Safe-haven and USD proxy. Rising gold often accompanies USD weakness, but can also reflect general de-risking. Watch gold vs. equities: if both fall, it is severe risk-off (deflation fear).</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">WTI Crude Oil</div>
+          <div class="metric-sub">Key driver for CAD (Canada exports oil) and NOK. Also a global growth proxy. WTI rising = growth optimism = risk-on = CAD/USD supported. WTI falling = growth concern = CAD pressure.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">BTC/USD</div>
+          <div class="metric-sub">A high-beta risk asset. BTC tends to lead risk-on/off moves in recent years, particularly in Asia session. Extreme BTC moves often precede similar moves in AUD and NZD.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">Nikkei 225</div>
+          <div class="metric-sub">Critical for USD/JPY. Nikkei and USD/JPY are structurally positively correlated — both benefit from weak JPY and risk-on flows. Nikkei dropping sharply often accompanies JPY strengthening.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">EUR Stoxx 50</div>
+          <div class="metric-sub">European equity benchmark. Stoxx weakness vs. SPX strength indicates relative Europe underperformance, typically bearish for EUR. Stoxx outperforming = EUR support.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">DXY Index</div>
+          <div class="metric-sub">The US Dollar Index (EUR-heavy basket). The single most important macro FX variable. DXY rising = USD strengthening across the board. All major pairs move inversely to DXY by construction.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">US 10Y Yield</div>
+          <div class="metric-sub">The global risk-free rate benchmark. Rising yields = USD support (carry), pressure on EM and gold. Sharp yield spikes = risk-off if driven by credit concerns vs. growth.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-section" id="risk-monitor">
+      <h2>Risk Monitor — Overview</h2>
+      <p>The Risk Monitor panel shows three volatility gauges that, together, characterize the type and severity of market stress (if any). Understanding all three simultaneously is more valuable than reading any one in isolation.</p>
+    </div>
+
+    <div class="guide-section" id="vix">
+      <h2>VIX — CBOE Volatility Index</h2>
+      <p>VIX measures the 30-day implied volatility of S&amp;P 500 options. It is constructed from real option prices and represents the market's consensus expectation of near-term equity volatility. It is often called the "fear gauge."</p>
+      <table class="threshold-table">
+        <thead><tr><th>VIX Level</th><th>Regime</th><th>FX Implication</th></tr></thead>
+        <tbody>
+          <tr><td class="t-low">&lt; 15</td><td>Complacency / Low vol</td><td>Risk-on dominant. Carry trades perform. JPY/CHF weak. AUD/NZD/EM supported.</td></tr>
+          <tr><td class="t-mid">15 – 20</td><td>Normal / Transitional</td><td>No strong directional bias from vol alone. Look at rate differentials for direction.</td></tr>
+          <tr><td class="t-mid">20 – 30</td><td>Elevated stress</td><td>Carry unwind risk. Begin monitoring JPY/CHF crosses for sudden strength. Watch DXY.</td></tr>
+          <tr><td class="t-hi">30 – 40</td><td>Significant stress</td><td>JPY/CHF sharply bid. AUD/NZD/EM selling off. USD typically strong (liquidity premium).</td></tr>
+          <tr><td class="t-hi">&gt; 40</td><td>Crisis / Panic</td><td>All correlations compress. Every safe haven bid simultaneously. Historical reference: COVID spike 85, GFC peak 89.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-orange">
+        <strong>Direction matters more than level.</strong> A VIX at 25 and falling is less concerning than a VIX at 18 and rising rapidly. The <em>rate of change</em> of VIX — particularly a spike from below 20 to above 25 in a single session — is the most actionable signal for FX traders, as it triggers systematic carry trade unwinding.
+      </div>
+    </div>
+
+    <div class="guide-section" id="move">
+      <h2>MOVE Index — Bond Volatility</h2>
+      <p>The ICE BofA MOVE Index measures implied volatility in US Treasury options across the 2Y, 5Y, 10Y, and 30Y tenors. It is the bond market's equivalent of the VIX. MOVE and VIX historically co-move, but divergences are highly significant for FX.</p>
+      <p>Normal MOVE range is 80–100. Levels above 120 indicate bond market stress; the 2023 regional banking crisis pushed MOVE above 180. The 2022 rate shock cycle saw sustained MOVE above 130.</p>
+
+      <h3>MOVE vs VIX Divergence</h3>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--down);">↑</span>
+        <span class="flow-label">MOVE high</span>
+        <span class="flow-desc" style="color:var(--text2);">VIX low or normal → Bond market is pricing policy uncertainty that equities haven't priced yet. This often precedes equity selloffs. USD typically bid on rate uncertainty. Watch EUR/USD and USD/JPY closely.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--down);">↑</span>
+        <span class="flow-label">VIX high</span>
+        <span class="flow-desc" style="color:var(--text2);">MOVE normal → Equity stress without bond stress. Often a growth scare rather than policy/credit crisis. JPY and CHF bid, but USD may not be as dominant.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow" style="color:var(--down);">↑↑</span>
+        <span class="flow-label">Both high</span>
+        <span class="flow-desc" style="color:var(--text2);">Simultaneous stress in equities and bonds. The most severe scenario. USD dominates as the global liquidity currency. All other major currencies under pressure.</span>
+      </div>
+    </div>
+
+    <div class="guide-section" id="iv">
+      <h2>EUR/USD Implied Volatility 1M</h2>
+      <p>The 1-month at-the-money implied volatility for EUR/USD, derived from option market pricing. This tells you how much movement option traders expect in EUR/USD over the next month, expressed as an annualized percentage.</p>
+      <p>Historical average is approximately 6–8%. Readings above 10% indicate elevated uncertainty; above 12% suggests a near-term catalyst is being priced (e.g., Fed meeting, ECB decision, major election).</p>
+      <div class="callout callout-green">
+        <strong>IV and options skew together:</strong> High IV alone tells you the market expects movement but not direction. The Option Skew panel (25-Delta Risk Reversal, in the right panel) tells you which direction the options market is hedging toward. Combining high IV with strong negative skew = market pricing a sharp EUR/USD decline. High IV with positive skew = market bidding for upside.
+      </div>
+    </div>
+
+    <div class="guide-section" id="gold">
+      <h2>Gold as a Risk Signal</h2>
+      <p>Gold's relationship with FX is more complex than "safe haven = gold up." The important relationships to monitor:</p>
+      <div class="flow-row">
+        <span class="flow-arrow"><span style="display:inline-block;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--orange);vertical-align:middle;"></span></span>
+        <span class="flow-label">Gold ↑ DXY ↓</span>
+        <span class="flow-desc" style="color:var(--text2);">Classic risk-off without flight to USD. Typical when USD itself is the concern (Fed policy uncertainty, US fiscal stress). EUR/USD and AUD/USD may hold up despite risk-off.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow"><span style="display:inline-block;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--orange);vertical-align:middle;"></span></span>
+        <span class="flow-label">Gold ↑ DXY ↑</span>
+        <span class="flow-desc" style="color:var(--text2);">Both safe havens bid simultaneously. Extreme stress — all other currencies selling off. Rare but historically coincides with geopolitical crisis events.</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow"><span style="display:inline-block;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--orange);vertical-align:middle;"></span></span>
+        <span class="flow-label">Gold ↓ DXY ↑</span>
+        <span class="flow-desc" style="color:var(--text2);">USD dominance. Rising US rates making gold less attractive. Typical of Fed hiking cycles. AUD/USD historically most negatively affected (gold exporter).</span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-arrow"><span style="display:inline-block;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--orange);vertical-align:middle;"></span></span>
+        <span class="flow-label">Gold ↓ DXY ↓</span>
+        <span class="flow-desc" style="color:var(--text2);">Risk-on with non-USD flows. Capital rotating into equities, EM, or commodity currencies. EUR, GBP, AUD typically outperform.</span>
+      </div>
+    </div>
+
+    <div class="guide-section" id="flows">
+      <h2>Asset Flow Logic — FX Implications</h2>
+      <p>The following flows are structurally reliable across market cycles. Use them as a starting framework:</p>
+      <table class="threshold-table">
+        <thead><tr><th>If you see…</th><th>Expect pressure on…</th><th>Expect bid in…</th></tr></thead>
+        <tbody>
+          <tr><td>VIX spike &gt; 25</td><td>AUD, NZD, CAD, EM</td><td>JPY, CHF, USD</td></tr>
+          <tr><td>Equities rallying broadly</td><td>JPY, CHF</td><td>AUD, NZD, CAD, EUR</td></tr>
+          <tr><td>Oil &gt;+3% intraday</td><td>USD (if growth-driven)</td><td>CAD, NOK</td></tr>
+          <tr><td>US 10Y yield rising fast</td><td>Gold, EM, JPY (sometimes)</td><td>USD, carry longs</td></tr>
+          <tr><td>US 10Y yield falling fast</td><td>USD carry premium</td><td>Gold, JPY, EUR</td></tr>
+          <tr><td>DXY &gt;+0.5% intraday</td><td>All major pairs (mechanical)</td><td>—</td></tr>
+          <tr><td>Nikkei &gt;-2% intraday</td><td>USD/JPY (JPY strengthens)</td><td>JPY</td></tr>
+          <tr><td>MOVE &gt; 130 sustained</td><td>EM, carry trades broadly</td><td>USD, CHF</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-section" id="divergence">
+      <h2>Divergence Signals</h2>
+      <p>The most actionable signals come from <em>divergences</em> between cross-asset panels — when different asset classes are sending conflicting messages about risk appetite. These situations create high-probability setups because one market must eventually reprice toward the other.</p>
+      <div class="callout callout-red">
+        <strong>Key divergence example:</strong> S&amp;P 500 making new highs while VIX refuses to fall below 20, and MOVE remains elevated. This signals that bond and options markets are skeptical of the equity rally — historically a precursor to equity correction and risk-off FX flows. Watch for JPY strength and AUD weakness to lead.
+      </div>
+      <div class="callout callout-green">
+        <strong>Bullish divergence example:</strong> VIX declining, Stoxx and Nikkei both rallying, DXY softening simultaneously. Multiple risk-on signals aligning. Supports long commodity currencies (AUD, CAD, NZD) vs. JPY and CHF.
+      </div>
+      <p>When the Cross-Asset and Risk Monitor panels are all pointing the same direction, confidence in the regime signal is high. When they diverge, lower position sizing and wait for confirmation.</p>
+    </div>
+
+  </div>
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">

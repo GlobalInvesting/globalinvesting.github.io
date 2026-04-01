@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -114,6 +114,22 @@ a { color: inherit; text-decoration: none; }
 .card-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
 .disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; font-size: 13px; color: var(--text2); line-height: 1.65; margin-top: 36px; }
 @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .page-hero h1 { font-size: 22px; } }
+
+/* Terms page styles */
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+.page-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; }
+.page-title { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.page-meta { font-size: 12px; color: var(--text3); margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text2); text-decoration: none; font-size: 12px; margin-bottom: 32px; transition: color .15s; }
+.back-link:hover { color: var(--text); }
+.disclaimer-box { background: rgba(41,98,255,0.08); border: 1px solid rgba(41,98,255,0.3); border-radius: 8px; padding: 16px 20px; margin-bottom: 36px; }
+.disclaimer-box p { font-size: 13px; color: var(--text); line-height: 1.6; margin: 0; }
+.disclaimer-box strong { color: #fff; }
+p { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 4px; }
 </style>
 </head>
 <body>
@@ -179,7 +195,61 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="page-wrap">
+  <a class="back-link" href="/">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Terminal
+  </a>
 
+  <div class="page-label">Legal</div>
+  <h1 class="page-title">Terms of Use</h1>
+  <p class="page-meta">Last updated: March 2026 · Applies to globalinvesting.github.io</p>
+
+  <div class="disclaimer-box">
+    <p><strong>Important:</strong> The Global Investing FX Terminal is an educational and informational tool. Nothing on this site constitutes financial advice, investment recommendations, or a solicitation to buy or sell any financial instrument. Forex and CFD trading involves significant risk of loss.</p>
+  </div>
+
+  <h2>1. Acceptance of Terms</h2>
+  <p>By accessing or using the Global Investing FX Terminal ("the Terminal"), you agree to be bound by these Terms of Use. If you do not agree, please do not use the Terminal.</p>
+
+  <h2>2. Educational Purpose Only</h2>
+  <p>The Terminal is designed exclusively for educational and informational purposes. All content, data, signals, indicators, charts, and analysis displayed are provided solely to help users understand market dynamics and are not intended to guide trading decisions.</p>
+  <ul>
+    <li>We are not a licensed financial advisor, broker, or investment firm.</li>
+    <li>No content on this site should be construed as financial, investment, tax, or legal advice.</li>
+    <li>Past performance of any indicator or signal does not guarantee future results.</li>
+  </ul>
+
+  <h2>3. Data Accuracy & Availability</h2>
+  <p>Market data displayed on the Terminal is sourced from third-party providers including Frankfurter/ECB, CFTC, Stooq, Myfxbook, TradingView, Groq, and others. We make reasonable efforts to display accurate and timely data, but we do not guarantee:</p>
+  <ul>
+    <li>The accuracy, completeness, or timeliness of any data shown.</li>
+    <li>Uninterrupted availability of the Terminal or any data feed.</li>
+    <li>That data from third-party sources is free from errors or delays.</li>
+  </ul>
+  <p>Data may be delayed, estimated, or temporarily unavailable due to API limitations, network conditions, or third-party outages.</p>
+
+  <h2>4. No Liability</h2>
+  <p>To the fullest extent permitted by law, Global Investing and its operators shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the Terminal or reliance on any information displayed, including but not limited to trading losses.</p>
+
+  <h2>5. Third-Party Integrations</h2>
+  <p>The Terminal embeds widgets and data from TradingView, Myfxbook, and other third-party services. Use of these embedded services is subject to their respective terms of service. We are not responsible for the content or availability of third-party services.</p>
+
+  <h2>6. Advertising</h2>
+  <p>The Terminal may display advertisements served by Google AdSense. Ad targeting is subject to your cookie consent preferences as set via the consent banner. See our <a href="privacy.html">Privacy Policy</a> for details.</p>
+
+  <h2>7. Intellectual Property</h2>
+  <p>All original code, design, layout, and written content of the Terminal is the property of Global Investing. You may not reproduce, redistribute, or commercialize any part of this Terminal without prior written permission. Market data displayed is owned by its respective providers.</p>
+
+  <h2>8. Modifications</h2>
+  <p>We reserve the right to modify these Terms at any time. Continued use of the Terminal after any changes constitutes acceptance of the updated Terms. The "Last updated" date at the top of this page will reflect the most recent revision.</p>
+
+  <h2>9. Governing Law</h2>
+  <p>These Terms are governed by applicable international law. Any disputes arising from use of the Terminal shall be resolved in good faith through direct communication at <a href="/cdn-cgi/l/email-protection#d5b2b9bab7b4b9bcbba3b0a6a1bcbbb2b8b4a7beb0a1a695b2b8b4bcb9fbb6bab8"><span class="__cf_email__" data-cfemail="a7c0cbc8c5c6cbcec9d1c2d4d3cec9c0cac6d5ccc2d3d4e7c0cac6cecb89c4c8ca">[email&#160;protected]</span></a>.</p>
+
+  <h2>10. Contact</h2>
+  <p>Questions about these Terms? <a href="contact.html">Contact us</a> or email <a href="/cdn-cgi/l/email-protection#aec9c2c1cccfc2c7c0d8cbdddac7c0c9c3cfdcc5cbdaddeec9c3cfc7c280cdc1c3"><span class="__cf_email__" data-cfemail="adcac1c2cfccc1c4c3dbc8ded9c4c3cac0ccdfc6c8d9deedcac0ccc4c183cec2c0">[email&#160;protected]</span></a>.</p>
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">

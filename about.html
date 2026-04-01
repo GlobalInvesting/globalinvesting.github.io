@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -179,7 +179,82 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="page-wrap">
 
+  <div class="page-hero">
+    <div class="page-hero-label">About</div>
+    <h1>Global Investing FX Terminal</h1>
+    <p>A professional-grade foreign exchange monitoring platform that consolidates real-time price feeds, institutional positioning reports, central bank policy data, US Treasury yield curve metrics, cross-asset flows, and AI-assisted market narrative — all in a single, continuously updated interface. No login required.</p>
+  </div>
+
+  <div class="section">
+    <h2>What it is</h2>
+    <p>The FX Terminal is a single-page dashboard designed for serious FX market monitoring. It was built to address a specific gap: professional-quality FX context is fragmented across institutional terminals, broker platforms, and government data portals. This terminal aggregates the most signal-rich publicly available data into a coherent, fast, and always-accessible interface.</p>
+    <p>Coverage spans real-time price feeds across all G8 major pairs, CFTC institutional positioning updated weekly, US Treasury yield curve with key spread metrics, cross-asset correlation data, live central bank policy rates and meeting calendars, and an AI-generated market regime narrative updated three times daily, and news headlines refreshed every hour.</p>
+  </div>
+
+  <div class="section">
+    <h2>Data sources</h2>
+    <table class="data-table">
+      <thead>
+        <tr><th>Section</th><th>Source</th><th>Cadence</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Price Chart</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Quote bar — FX majors</td><td>Stooq</td><td><span class="badge-daily">~15 MIN</span></td></tr>
+        <tr><td>Quote bar — XAU, WTI, BTC, DXY, US10Y</td><td>Stooq / CoinGecko</td><td><span class="badge-daily">~15 MIN</span></td></tr>
+        <tr><td>Currency Strength Heatmap</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Economic Calendar</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Central Bank Rates</td><td>Official central bank sources</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
+        <tr><td>FX Liquidity Canvas</td><td>Frankfurter API (ECB) · BIS/LSEG session baseline</td><td><span class="badge-daily">30 MIN</span></td></tr>
+        <tr><td>FX Retail Market Sentiment</td><td>Myfxbook</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+        <tr><td>Cross-Asset Monitor</td><td>Stooq and open feeds</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>US Treasury Yield Curve</td><td>Stooq</td><td><span class="badge-daily">DAILY</span></td></tr>
+        <tr><td>News Headlines</td><td>FXStreet, ForexLive, ECB, BoE, Investing.com and others</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
+        <tr><td>AI Narrative &amp; Market Signals</td><td>Groq LLM</td><td><span class="badge-daily">3× DAILY</span></td></tr>
+        <tr><td>Economic Map</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>AI in the terminal</h2>
+    <p>AI is used for two specific outputs in the terminal, both clearly labeled:</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Market Narrative</div>
+        <div class="card-body">A concise market summary updated three times daily (06:30, 12:30, 21:30 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, MIXED, or NEUTRAL.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Market Signals</div>
+        <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>
+      </div>
+    </div>
+    <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
+  </div>
+
+  <div class="section">
+    <h2>Currencies covered</h2>
+    <p>USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, accounting for the substantial majority of global daily FX turnover.</p>
+  </div>
+
+  <div class="section">
+    <h2>Author</h2>
+    <p>Built and maintained by <strong style="color:var(--text);">Santiago Plá Casuriaga</strong>. Independent developer focused on professional-grade financial data tooling for traders and researchers.</p>
+    <p>Contact: 
+  <a href="/cdn-cgi/l/email-protection#0f6863606d6e636661796a7c7b666168626e7d646a7b7c4f68626e6663216c6062" style="color:var(--blue);">
+    <span class="__cf_email__" data-cfemail="37505b5855565b5e59415244435e59505a56455c52434477505a565e5b1954585a">[email&#160;protected]</span>
+  </a>
+</p>
+
+  </div>
+
+  <div class="disclaimer">
+    <strong style="color:var(--orange);">Disclaimer.</strong> Content on this terminal is informational and educational only. It does not constitute financial advice, an investment recommendation, or an offer to buy or sell any financial instrument. FX trading involves significant risk and is not suitable for all investors. Past data does not guarantee future results.
+  </div>
+
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">

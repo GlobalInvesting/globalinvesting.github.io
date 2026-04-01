@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { position: static; transform: none; }
+  .footer-copy { text-align: center; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -114,6 +114,30 @@ a { color: inherit; text-decoration: none; }
 .card-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
 .disclaimer { background: var(--bg2); border: 1px solid var(--border2); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; font-size: 13px; color: var(--text2); line-height: 1.65; margin-top: 36px; }
 @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } .page-hero h1 { font-size: 22px; } }
+
+/* Contact page styles */
+.page-wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 60px; }
+.page-hero { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 36px; }
+.page-hero-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.page-hero h1 { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 10px; }
+.page-hero p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+.contact-list { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 32px; }
+.contact-row { display: grid; grid-template-columns: 160px 1fr; align-items: start; padding: 16px 20px; border-bottom: 1px solid var(--border); gap: 16px; }
+.contact-row:last-child { border-bottom: none; }
+.cr-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding-top: 2px; }
+.cr-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.cr-val { font-size: 13px; color: var(--blue); font-family: var(--font-mono); }
+.cr-val:hover { text-decoration: underline; }
+.cr-desc { font-size: 13px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+.info-block { border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 14px; background: var(--bg2); }
+.info-block h3 { font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+.info-block p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+.info-block a { color: var(--blue); }
+.info-block a:hover { text-decoration: underline; }
+@media (max-width: 600px) {
+  .contact-row { grid-template-columns: 1fr; gap: 4px; }
+  .cr-label { padding-bottom: 2px; }
+}
 </style>
 </head>
 <body>
@@ -179,7 +203,52 @@ a { color: inherit; text-decoration: none; }
 </header>
 
 <main id="main">
+<div class="page-wrap">
 
+  <div class="page-hero">
+    <div class="page-hero-label">Contact</div>
+    <h1>Get in Touch</h1>
+    <p>Questions, feedback, data issues, or partnership inquiries. We aim to respond within 1–3 business days.</p>
+  </div>
+
+  <div class="contact-list">
+    <div class="contact-row">
+      <div class="cr-label">General inquiries</div>
+      <div class="cr-content">
+        <div class="cr-title">Email</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Questions about the terminal, features, or data sources.</div>
+      </div>
+    </div>
+    <div class="contact-row">
+      <div class="cr-label">Data &amp; technical</div>
+      <div class="cr-content">
+        <div class="cr-title">Data Issues</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=DATA ISSUE">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Report stale panels, broken feeds, or incorrect values. Include "DATA ISSUE" in the subject for priority handling.</div>
+      </div>
+    </div>
+    <div class="contact-row">
+      <div class="cr-label">Business</div>
+      <div class="cr-content">
+        <div class="cr-title">Partnerships</div>
+        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=Partnership">globalinvestingmarkets@gmail.com</a>
+        <div class="cr-desc">Data integrations, advertising, or collaboration proposals.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <h3>Before writing</h3>
+    <p>Many questions are answered in the <a href="guide-dashboard.html">terminal guide</a>. For data source details, see the <a href="about.html">About page</a>. If a panel shows stale data, it may be a temporary API issue that resolves automatically.</p>
+  </div>
+
+  <div class="info-block">
+    <h3>Legal</h3>
+    <p>For privacy inquiries or data removal requests, see our <a href="privacy.html">Privacy Policy</a>. For terms governing use of the terminal, see <a href="terms.html">Terms of Use</a>.</p>
+  </div>
+
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
