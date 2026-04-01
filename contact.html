@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 #statusbar { position: fixed; bottom: 0; left: 0; right: 0; height: 22px; background: var(--head-bg); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; gap: 16px; font-size: 10px; color: var(--text2); z-index: 200; overflow: hidden; font-family: var(--font-ui); }
 .sb-k { color: var(--text3); font-weight: 700; letter-spacing: .04em; }
 .sb-v { color: var(--text2); font-family: var(--font-mono); font-size: 10px; }
-.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.footer-copy { font-size: 10px; color: var(--text3); white-space: nowrap; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
 @media (max-width: 900px) {
   #topbar { padding: 0 6px; height: auto; flex-wrap: wrap; align-items: center; }
   #topbar .logo { padding: 6px 8px 6px 0; flex-shrink: 0; order: 1; }
@@ -81,7 +81,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 600px) {
   #statusbar { position: relative; height: auto; flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
-  .footer-copy { text-align: center; }
+  .footer-copy { display: none; }
 }
 @media (max-width: 480px) {
   #topbar { padding: 0 4px; }
@@ -216,7 +216,7 @@ a { color: inherit; text-decoration: none; }
       <div class="cr-label">General inquiries</div>
       <div class="cr-content">
         <div class="cr-title">Email</div>
-        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com">globalinvestingmarkets@gmail.com</a>
+        <a class="cr-val" href="/cdn-cgi/l/email-protection#f592999a9794999c9b839086819c9b929894879e908186b59298949c99db969a98"><span class="__cf_email__" data-cfemail="0e6962616c6f626760786b7d7a676069636f7c656b7a7d4e69636f6762206d6163">[email&#160;protected]</span></a>
         <div class="cr-desc">Questions about the terminal, features, or data sources.</div>
       </div>
     </div>
@@ -224,7 +224,7 @@ a { color: inherit; text-decoration: none; }
       <div class="cr-label">Data &amp; technical</div>
       <div class="cr-content">
         <div class="cr-title">Data Issues</div>
-        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=DATA ISSUE">globalinvestingmarkets@gmail.com</a>
+        <a class="cr-val" href="/cdn-cgi/l/email-protection#6403080b0605080d0a120117100d0a030905160f011017240309050d084a070b095b1711060e0107105920253025442d37373121"><span class="__cf_email__" data-cfemail="5a3d3635383b3633342c3f292e33343d373b28313f2e291a3d373b333674393537">[email&#160;protected]</span></a>
         <div class="cr-desc">Report stale panels, broken feeds, or incorrect values. Include "DATA ISSUE" in the subject for priority handling.</div>
       </div>
     </div>
@@ -232,7 +232,7 @@ a { color: inherit; text-decoration: none; }
       <div class="cr-label">Business</div>
       <div class="cr-content">
         <div class="cr-title">Partnerships</div>
-        <a class="cr-val" href="mailto:globalinvestingmarkets@gmail.com?subject=Partnership">globalinvestingmarkets@gmail.com</a>
+        <a class="cr-val" href="/cdn-cgi/l/email-protection#fe9992919c9f929790889b8d8a979099939f8c959b8a8dbe99939f9792d09d9193c18d8b9c949b9d8ac3ae9f8c8a909b8c8d96978e"><span class="__cf_email__" data-cfemail="4d2a21222f2c2124233b283e3924232a202c3f2628393e0d2a202c2421632e2220">[email&#160;protected]</span></a>
         <div class="cr-desc">Data integrations, advertising, or collaboration proposals.</div>
       </div>
     </div>
@@ -254,21 +254,4 @@ a { color: inherit; text-decoration: none; }
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">CONTACT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
-</footer>
-
-
-<script>
-// aria-expanded on site menu button
-const btn = document.querySelector('.site-menu-btn');
-const menu = document.querySelector('.site-menu');
-if (btn && menu) {
-  const update = () => btn.setAttribute('aria-expanded', String(menu.matches(':hover') || menu.matches(':focus-within')));
-  menu.addEventListener('mouseenter', update);
-  menu.addEventListener('mouseleave', update);
-  menu.addEventListener('focusin', update);
-  menu.addEventListener('focusout', update);
-}
-</script>
-</body>
-</html>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span>
