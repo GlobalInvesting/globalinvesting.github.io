@@ -15,7 +15,7 @@ name: Update Intraday Quotes — v1.4 (Twelve Data + Alpha Vantage)
 #     → Este workflow se ejecuta ✅
 #
 # El schedule de GitHub se mantiene como RED DE SEGURIDAD (fallback),
-# pero corriendo solo cada 10 min — así si cron-job.org falla, el gap máximo es 10 min.
+# pero corriendo solo cada 5 min — así si cron-job.org falla, el gap máximo es 5 min.
 #
 # ✅ Duración promedio del job: ~30 seg → sin riesgo de solapamiento a 5 min de intervalo.
 #
@@ -45,10 +45,10 @@ name: Update Intraday Quotes — v1.4 (Twelve Data + Alpha Vantage)
 
 on:
   repository_dispatch:
-    types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 15 min exactos
+    types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
 
   schedule:
-    - cron: '*/10 * * * *'             # fallback cada 10 min — red de seguridad si cron-job.org falla
+    - cron: '*/5 * * * *'              # fallback cada 5 min — red de seguridad si cron-job.org falla
 
   workflow_dispatch:                   # trigger manual desde GitHub UI
 
