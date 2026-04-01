@@ -1,4 +1,4 @@
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg: #131722;
@@ -520,10 +520,17 @@
     height: 22px; background: var(--head-bg);
     border-top: 1px solid var(--border);
     display: flex; align-items: center; flex-wrap: nowrap;
-    padding: 0 10px; gap: 16px;
+    padding: 0 10px; gap: 10px;
     font-size: 10px; color: var(--text2); z-index: 200;
     font-family: var(--font-ui);
     overflow: hidden;
+  }
+  #statusbar > div:not(.footer-copy) {
+    flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Limit the wide DATA item so it doesn't crowd the centered copyright */
+  #statusbar > div:first-child {
+    max-width: 220px;
   }
   @media (max-width: 600px) {
     #statusbar {
