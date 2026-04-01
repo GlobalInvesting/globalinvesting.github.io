@@ -57,11 +57,6 @@
 
 # ── Cache para datos JSON dinámicos ──────────────────────────────────────────
 [[headers]]
-  for = "/strength-scores/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600, stale-while-revalidate=300"
-
-[[headers]]
   for = "/economic-data/*"
   [headers.values]
     Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
@@ -85,11 +80,6 @@
   for = "/extended-data/*"
   [headers.values]
     Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
-
-[[headers]]
-  for = "/fx-history/*"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
 
 # ── Assets estáticos — cache largo ───────────────────────────────────────────
 [[headers]]
