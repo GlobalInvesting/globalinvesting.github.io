@@ -1,0 +1,55 @@
+name: Fetch Forex News
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every 1 hour (UTC) — 24x daily
+  workflow_dispatch:
+
+# Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
+# Scripts movidos desde el engine privado en auditoría 2026-03-31.
+
+concurrency:
+  group: forex-news
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git pull --rebase origin main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install feedparser==6.0.11 requests==2.32.3 python-dateutil==2.9.0.post0 --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p news-data
+
+      - name: Fetch news from RSS feeds
+        env:
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+        run: python scripts/fetch_news.py
+
+      - name: Commit updated news data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news-data/news.json
+          git diff --cached --quiet && echo "Sin cambios." && exit 0
+          git commit -m "chore: fetch news [$(date -u '+%Y-%m-%d %H:%M') UTC]"
+          for i in 1 2 3; do
+            git push && break
+            echo "Push rechazado (intento $i), haciendo pull --rebase..."
+            git pull --rebase origin main
+          done
