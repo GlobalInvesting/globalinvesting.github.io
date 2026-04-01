@@ -1476,6 +1476,188 @@ async function fetchSentiment() {
 // ═══════════════════════════════════════════════════════════════════
 // RISK MONITOR + YIELD DATA — multiple free sources with fallback
 // ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+// RISK MONITOR TOOLTIPS
+// Uses the same #fx-tt engine as renderSentiment.
+// attachRiskTip() is a standalone wrapper that works even if
+// renderSentiment hasn't run yet (it bootstraps the engine itself).
+// ═══════════════════════════════════════════════════════════════════
+function attachRiskTip(el, title, body, ex) {
+  if (!el) return;
+
+  // Bootstrap tooltip DOM once (shared with fx sentiment engine)
+  if (!document.getElementById('fx-tt-style')) {
+    const s = document.createElement('style');
+    s.id = 'fx-tt-style';
+    s.textContent = `
+      #fx-tt {
+        position:fixed;z-index:99999;
+        width:min(240px, calc(100vw - 24px));
+        background:var(--bg3);border:1px solid var(--border2);
+        border-radius:4px;padding:9px 11px;
+        font-size:11px;color:var(--text);line-height:1.55;
+        pointer-events:none;display:none;font-family:var(--font-ui);
+        box-sizing:border-box;
+      }
+      #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
+      #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
+      .fx-tip { border-bottom:1px dashed rgba(255,255,255,0.2);cursor:help; }
+    `;
+    document.head.appendChild(s);
+    const ttEl = document.createElement('div');
+    ttEl.id = 'fx-tt';
+    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
+    document.body.appendChild(ttEl);
+    window._fxTTPos = function(cx, cy) {
+      const tt = document.getElementById('fx-tt');
+      if (!tt) return;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const ttW = Math.min(240, vw - 24);
+      const ttH = tt.offsetHeight || 130;
+      const PAD = 8;
+      let x = cx + 14, y = cy + 14;
+      if (x + ttW > vw - PAD) x = cx - ttW - 8;
+      if (x < PAD) x = PAD;
+      if (y + ttH > vh - PAD) y = cy - ttH - 8;
+      if (y < PAD) y = PAD;
+      tt.style.left = x + 'px'; tt.style.top = y + 'px';
+    };
+    document.addEventListener('mousemove', ev => {
+      const tt = document.getElementById('fx-tt');
+      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
+    });
+    document.addEventListener('touchstart', ev => {
+      if (!ev.target.closest('.fx-tip')) {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      }
+    }, { passive: true });
+  }
+
+  function _showTip(cx, cy) {
+    const tt = document.getElementById('fx-tt');
+    document.getElementById('fx-tt-title').textContent = title;
+    document.getElementById('fx-tt-body').textContent  = body;
+    const exEl = document.getElementById('fx-tt-ex');
+    exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
+    tt.style.display = 'block';
+    requestAnimationFrame(() => window._fxTTPos(cx, cy));
+  }
+
+  el.classList.add('fx-tip');
+  el.addEventListener('mouseenter', ev => _showTip(ev.clientX, ev.clientY));
+  el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
+  el.addEventListener('touchstart', ev => {
+    ev.stopPropagation();
+    const t = ev.touches[0];
+    _showTip(t.clientX, t.clientY);
+  }, { passive: true });
+}
+
+function attachRiskMonitorTooltips() {
+  // ── VIX ──────────────────────────────────────────────────────────
+  const vixCell = document.querySelector('#section-risk .risk-cell:nth-child(1)');
+  if (vixCell) attachRiskTip(vixCell,
+    'VIX — CBOE Volatility Index',
+    'Measures expected 30-day volatility of the S&P 500 derived from options prices. Known as the "fear gauge." Above 30 = high stress. Below 18 = complacency.',
+    'A VIX spike above 25 mid-session signals institutional hedging activity — often precedes sharp moves in risk assets and FX.'
+  );
+
+  // ── MOVE Index ───────────────────────────────────────────────────
+  const moveCell = document.querySelector('#section-risk .risk-cell:nth-child(2)');
+  if (moveCell) attachRiskTip(moveCell,
+    'MOVE Index — ICE BofA',
+    'Bond market equivalent of VIX. Measures expected 30-day volatility across US Treasuries (1M, 3M, 6M, 1Y options). Elevated MOVE = bond market uncertainty.',
+    'MOVE > 120 signals bond stress that typically spills into FX. USD pairs become erratic when MOVE is elevated because rate expectations are unstable.'
+  );
+
+  // ── EUR/USD HV 30d ───────────────────────────────────────────────
+  const hvCell = document.querySelector('#section-risk .risk-cell:nth-child(3)');
+  if (hvCell) attachRiskTip(hvCell,
+    'EUR/USD Historical Volatility (30d)',
+    'Realized volatility of EUR/USD over the past 30 days, calculated from daily log returns. Not a forecast — it measures what actually happened. Useful for sizing positions.',
+    'If HV 30d is 8% and your stop is 100 pips on EUR/USD (≈0.86%), that stop is ~1σ for the current regime. Below 7% = quiet market, above 12% = trending/stressed.'
+  );
+
+  // ── Regime ───────────────────────────────────────────────────────
+  const regCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
+  if (regCell) attachRiskTip(regCell,
+    'Market Regime',
+    'Composite live assessment based on: VIX level, yield curve shape (inverted = stress), gold safe-haven demand, S&P 500 daily performance, and MOVE index. Updates in real time.',
+    'RISK-ON: all signals green, risk assets bid. MIXED: conflicting signals, trade smaller. CAUTION: elevated vol + 1–2 stress factors. RISK-OFF: high stress, USD/JPY/CHF bid, equities sold.'
+  );
+
+  // ── Risk Indicators table rows ───────────────────────────────────
+  const riRows = document.querySelectorAll('#risk-indicators-tbody tr');
+  const riTips = [
+    {
+      title: 'US–EU Spread 10Y',
+      body:  'Difference between US 10-year Treasury yield and German 10-year Bund yield (in basis points). Measures relative monetary policy divergence between the Fed and ECB.',
+      ex:    'Spread > +100bp historically supports USD. Narrowing spread (ECB hiking or Fed cutting) tends to push EUR/USD higher.'
+    },
+    {
+      title: 'Gold / SPX Ratio',
+      body:  'Price of gold divided by the S&P 500 level. Rising ratio = investors moving from risk assets to safe havens. Falling ratio = risk appetite dominant.',
+      ex:    'Ratio > 0.8 and rising historically aligns with USD strength (safe-haven flows), JPY appreciation, and commodity currency weakness.'
+    },
+    {
+      title: 'USD/JPY vs Nikkei Correlation',
+      body:  'Rolling 60-day Pearson correlation between USD/JPY and Nikkei 225. Normally positive (+0.6 to +0.8) — both move together with risk appetite. Divergence signals a break in the risk-on/risk-off relationship.',
+      ex:    'Correlation below +0.3 or negative = structural shift. Either JPY is moving on BoJ policy or Nikkei is decoupling from USD flows. Worth monitoring for regime change.'
+    },
+  ];
+  riRows.forEach((row, i) => {
+    if (riTips[i]) attachRiskTip(row, riTips[i].title, riTips[i].body, riTips[i].ex);
+  });
+
+  // ── Yield Spreads table rows ─────────────────────────────────────
+  const ysRows = document.querySelectorAll('#yield-spreads-tbody tr');
+  const ysTips = [
+    {
+      title: '2Y–10Y Spread (US)',
+      body:  'Difference between US 10-year and 2-year Treasury yields. Positive = normal curve (growth expected). Negative = inverted curve (recession signal).',
+      ex:    'Inversion sustained > 3 months has preceded every US recession since 1980. When disinversion begins (curve steepening), USD typically weakens as Fed cut bets increase.'
+    },
+    {
+      title: 'US–DE 10Y Spread',
+      body:  'Difference between US and German 10-year yields. Reflects Fed vs ECB policy divergence. Wide positive spread = USD yield advantage, typically bearish for EUR/USD.',
+      ex:    'Spread above +150bp historically coincides with EUR/USD below 1.05. Compression below +100bp tends to support EUR/USD recovery.'
+    },
+    {
+      title: 'US–JP 10Y Spread',
+      body:  'Difference between US and Japanese 10-year yields. Wide spread = USD yield advantage over JPY. Drives carry trade flows into USD/JPY.',
+      ex:    'Spread > +350bp = strong carry incentive to be long USD/JPY. BoJ YCC adjustments that lift JGB yields compress this spread rapidly, causing sharp JPY strength.'
+    },
+  ];
+  ysRows.forEach((row, i) => {
+    if (ysTips[i]) attachRiskTip(row, ysTips[i].title, ysTips[i].body, ysTips[i].ex);
+  });
+
+  // ── Option Skew table ─────────────────────────────────────────────
+  // Header row
+  const skewHead = document.querySelector('table[aria-label="Option skew — 25-Delta Risk Reversal"] thead tr');
+  if (skewHead) attachRiskTip(skewHead,
+    'Option Skew — 25-Delta Risk Reversal',
+    'The 25-delta risk reversal measures the difference in implied volatility between OTM calls and OTM puts at the same delta. Positive = calls more expensive (upside demand). Negative = puts more expensive (downside hedging).',
+    'Estimated here from CFTC COT net positioning as a proxy. A large positive 1M skew on EUR/USD means the market is paying more to hedge/speculate for upside — directional bias signal.'
+  );
+  const skewRows = document.querySelectorAll('#skew-tbody tr');
+  const skewPairTips = {
+    'EUR/USD': { body: 'EUR/USD skew derived from CFTC speculative net EUR positioning. Positive = EUR calls bid (market positioned for EUR upside). Negative = EUR puts bid (downside protection).', ex: 'Combines 1W momentum (sensitive) with 1M trend (structural). Divergence between 1W and 1M signals a potential inflection point.' },
+    'GBP/USD': { body: 'GBP/USD skew from CFTC net GBP futures. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
+    'USD/JPY': { body: 'USD/JPY skew from CFTC net JPY futures (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
+    'AUD/USD': { body: 'AUD/USD skew from CFTC net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
+  };
+  skewRows.forEach(row => {
+    const pairCell = row.querySelector('td:first-child');
+    if (!pairCell) return;
+    const pair = pairCell.textContent.trim();
+    const tip  = skewPairTips[pair];
+    if (tip) attachRiskTip(row, pair + ' — Option Skew', tip.body, tip.ex);
+  });
+}
+
 async function fetchRiskData() {
   // ── STEP 1: Load repo extended-data first (same-origin, instant, no CORS) ──
   // These files are updated daily by the engine. Populating byId here avoids
@@ -2721,7 +2903,7 @@ async function boot() {
   fetchCBRates();
   fetchCOTData();
   fetchFedExpectations();
-  fetchOptionSkew();
+  fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
   fetchNewsData();
 
@@ -3097,7 +3279,7 @@ window.addEventListener('resize', drawLiquidityChart);
 })();
 
 // Risk + Cross-Asset run in parallel every 2 min — same as boot() — no chaining
-setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); }, 2 * 60 * 1000);
+setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); fetchOptionSkew().then(() => attachRiskMonitorTooltips()); }, 2 * 60 * 1000);
 // Crypto: every 90 seconds
 setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData, 30 * 60 * 1000);
