@@ -1405,7 +1405,7 @@ function renderSentiment(pairs, sourceLabel, general) {
   const subEl = document.getElementById('sent-source-sub');
   if (subEl) {
     if (isCOT) subEl.textContent = 'CFTC COT · speculative positioning (Myfxbook unavailable)';
-    else if (isHistorical) subEl.textContent = 'Historical avg · live feed unavailable';
+    else if (isHistorical) subEl.textContent = 'Static fallback · live feeds unavailable';
     else subEl.textContent = 'Myfxbook · retail positioning';
   }
 }
@@ -1491,7 +1491,7 @@ async function fetchSentiment() {
   } catch {}
 
   // ── SOURCE 4: Static reference fallback ──
-  renderSentiment(SENTIMENT_FALLBACK, 'Historical avg · live feed unavailable');
+  renderSentiment(SENTIMENT_FALLBACK, 'Static fallback · live feeds unavailable');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1657,11 +1657,11 @@ function attachRiskMonitorTooltips() {
 
   // ── Option Skew table ─────────────────────────────────────────────
   // Header row
-  const skewHead = document.querySelector('table[aria-label="Option skew — 25-Delta Risk Reversal"] thead tr');
+  const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
-    'Option Skew — 25-Delta Risk Reversal',
-    'The 25-delta risk reversal measures the difference in implied volatility between OTM calls and OTM puts at the same delta. Positive = calls more expensive (upside demand). Negative = puts more expensive (downside hedging).',
-    'Estimated here from CFTC COT net positioning as a proxy. A large positive 1M skew on EUR/USD means the market is paying more to hedge/speculate for upside — directional bias signal.'
+    'COT-Derived Positioning Bias',
+    'Directional bias per pair derived from CFTC Commitments of Traders (COT) net speculative positioning. Positive = speculative longs dominate (base currency bid). Negative = speculative shorts dominate.',
+    'Not implied volatility. This is a positioning proxy — large net COT long/short historically precedes mean-reversion. 1W is more reactive; 1M is the structural trend. Divergence between the two signals potential inflection.'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   const skewPairTips = {
@@ -1910,10 +1910,18 @@ async function renderRiskData(byId) {
     })
     .filter(Boolean);
 
+  // Populate STATIC_YIELDS from prev_close — eliminates stale hardcoded constants.
+  // Used only when realPoints < 2 (rare: live fetch failed). STATIC_LABELS order: 3M,2Y,5Y,10Y,30Y
+  if (priorPoints.length >= 3 && STATIC_YIELDS === null) {
+    const pLookup = {};
+    priorPoints.forEach(p => { pLookup[p.label] = p.val; });
+    STATIC_YIELDS = STATIC_LABELS.map(l => pLookup[l] ?? null);
+  }
+
   if (realPoints.length >= 2) {
     drawYieldCurveAndCache(realPoints, priorPoints.length >= 2 ? priorPoints : null);
   } else {
-    // Not enough live data — draw with static fallback and note it
+    // Not enough live data — draw with runtime-derived static fallback
     drawYieldCurveAndCache(null, null);
   }
 
@@ -2022,9 +2030,12 @@ async function renderRiskData(byId) {
   } catch {}
 }
 
-// Static fallback yield curve data — used only when no live data available
-const STATIC_YIELDS = [4.35, 4.28, 4.32, 4.42, 4.58]; // 3M,2Y,5Y,10Y,30Y
+// Yield curve labels — fixed set of tenors we display
 const STATIC_LABELS = ['3M','2Y','5Y','10Y','30Y'];
+// STATIC_YIELDS: populated at runtime from the first successful quotes.json fetch
+// (prev_close of each tenor). Falls back to null → drawYieldCurve shows dashes.
+// This eliminates the stale hardcoded [4.35, 4.28, 4.32, 4.42, 4.58] constants.
+let STATIC_YIELDS = null;
 let _lastDrawnYields = null; // {label, val}[] or null
 let _lastDrawnPrior  = null; // {label, val}[] from prev_close, or null
 
@@ -2047,27 +2058,33 @@ function drawYieldCurve(points, priorPoints) {
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // Build display data — real points or static fallback
+  // Build display data — real points or runtime-derived fallback
   let labels, vals, isLive;
   if (points && points.length >= 2) {
     labels = points.map(p => p.label);
     vals   = points.map(p => p.val);
     isLive = true;
-  } else {
+  } else if (STATIC_YIELDS) {
+    // STATIC_YIELDS populated at runtime from prev_close — not a hardcoded constant
     labels = STATIC_LABELS;
     vals   = STATIC_YIELDS;
     isLive = false;
+  } else {
+    // No data at all — draw nothing meaningful
+    labels = STATIC_LABELS;
+    vals   = [null, null, null, null, null];
+    isLive = false;
   }
 
-  // Prior curve reference — use prev_close from quotes.json when available, else PRIOR_MAP
-  const PRIOR_MAP = { '3M':4.32,'2Y':4.35,'5Y':4.38,'7Y':4.36,'10Y':4.26,'20Y':4.45,'30Y':4.38,'6M':4.28,'1Y':4.25 };
+  // Prior curve — exclusively from prev_close in quotes.json (priorPoints).
+  // No hardcoded PRIOR_MAP: if prev_close is absent the prior line simply isn't drawn.
   let prevVals;
   if (priorPoints && priorPoints.length >= 2) {
     const priorLookup = {};
     priorPoints.forEach(p => { priorLookup[p.label] = p.val; });
-    prevVals = labels.map(l => priorLookup[l] ?? PRIOR_MAP[l] ?? null);
+    prevVals = labels.map(l => priorLookup[l] ?? null);
   } else {
-    prevVals = labels.map(l => PRIOR_MAP[l] ?? null);
+    prevVals = labels.map(() => null);   // prior line hidden — no stale fallback
   }
 
   const n = labels.length;
@@ -3048,6 +3065,68 @@ async function fetchReferenceSpreads() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// SESSION VOLATILITY — HV30-derived pip ranges per trading session
+//
+// Methodology:
+//   daily_range_pips = close × (HV30/100) / √252 × pip_factor
+//   session_range    = daily_range × SESSION_RATIO[session]
+//
+//   SESSION_RATIO: empirical session/daily range ratios from Myfxbook
+//   5-year session statistics (2019-2024). Each session’s ratio reflects
+//   how much of the total daily range it typically contributes, accounting
+//   for session overlap (sum > 1.0 is expected and correct).
+//
+//   EUR/USD: pip_factor = 10000 (4-decimal pair)
+//   USD/JPY: pip_factor = 100   (2-decimal pair)
+//
+//   Refreshes with every intraday JSON update (~5 min in production).
+//   Falls back silently to static HTML values if data unavailable.
+// ═══════════════════════════════════════════════════════════════════
+async function computeSessionVol() {
+  try {
+    const data = await loadIntradayQuotes();
+    if (!data?.quotes) return;
+
+    const eur = data.quotes.eurusd;
+    const jpy = data.quotes.usdjpy;
+    if (!eur?.hv30 || !jpy?.hv30) return;
+
+    // Session/daily range ratios — Myfxbook 5yr empirical averages
+    const SESSION_RATIO_EUR = { syd: 0.28, tok: 0.50, lon: 0.87, ny: 0.83 };
+    const SESSION_RATIO_JPY = { syd: 0.25, tok: 0.60, lon: 0.75, ny: 0.80 };
+
+    // Daily range estimate from HV30 (annualised % → daily pips)
+    const dailyEur = eur.close * (eur.hv30 / 100) / Math.sqrt(252) * 10000;
+    const dailyJpy = jpy.close * (jpy.hv30 / 100) / Math.sqrt(252) * 100;
+
+    const sessions = [
+      { key: 'syd', eurId: 'svol-syd-eur', jpyId: 'svol-syd-jpy' },
+      { key: 'tok', eurId: 'svol-tok-eur', jpyId: 'svol-tok-jpy' },
+      { key: 'lon', eurId: 'svol-lon-eur', jpyId: 'svol-lon-jpy' },
+      { key: 'ny',  eurId: 'svol-ny-eur',  jpyId: 'svol-ny-jpy'  },
+    ];
+
+    sessions.forEach(({ key, eurId, jpyId }) => {
+      const eurPips = Math.round(dailyEur * SESSION_RATIO_EUR[key]);
+      const jpyPips = Math.round(dailyJpy * SESSION_RATIO_JPY[key]);
+
+      // Colour tiers: low = flat, mid = neutral, high = up (brightest)
+      const eurCls = eurPips < 25 ? 'flat' : eurPips < 55 ? '' : 'up';
+      const jpyCls = jpyPips < 30 ? 'flat' : jpyPips < 60 ? '' : 'up';
+
+      const elEur = document.getElementById(eurId);
+      const elJpy = document.getElementById(jpyId);
+      if (elEur) { elEur.textContent = `±${eurPips}p`; elEur.className = eurCls; }
+      if (elJpy) { elJpy.textContent = `±${jpyPips}p`; elJpy.className = jpyCls; }
+    });
+
+    const sub = document.getElementById('svol-sub');
+    if (sub) sub.textContent = `HV30 ${eur.hv30.toFixed(1)}% · session ratios BIS/Myfxbook`;
+
+  } catch(e) { console.warn('[SessionVol] Failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
 async function boot() {
@@ -3076,6 +3155,7 @@ async function boot() {
   fetchCarryData();
   fetchNewsData();
   fetchReferenceSpreads();          // HV30+VIX+MOVE vol model — no external API, updates with intraday JSON
+  computeSessionVol();              // HV30-derived session pip ranges — replaces static table
 
   // ── CRITICAL: Load AI regime badge FIRST, before fetchRiskData touches the narrative badge.
   // loadAIRegime() is a lightweight fetch of ai-analysis/index.json (~same-origin, <50ms).
