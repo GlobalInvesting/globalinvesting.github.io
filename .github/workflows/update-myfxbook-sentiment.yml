@@ -71,8 +71,10 @@ jobs:
           TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
           git commit -m "Sentiment update — ${TIMESTAMP}"
           for i in 1 2 3; do
-            git push && break
+            git push && echo "✅ Push succeeded" && exit 0
             echo "Push rejected (attempt $i) — rebasing..."
             git fetch origin main
             git rebase origin/main
           done
+          echo "❌ All push attempts failed — data not published."
+          exit 1
