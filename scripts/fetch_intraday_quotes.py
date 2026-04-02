@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.3 — Intraday quotes via yfinance (+ FX pairs)
+fetch_intraday_quotes.py  v2.4 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -20,7 +20,16 @@ FUENTES POR SÍMBOLO:
   US30Y   → yfinance  ^TYX          (US 30Y Treasury yield)
   MOVE    → yfinance  ^MOVE         (ICE BofA Bond Volatility Index)
   BTC     → yfinance  BTC-USD       (Bitcoin)
+  FTSE    → yfinance  ^FTSE         (FTSE 100 — para correlación GBP/USD)
+  ASX     → yfinance  ^AXJO         (ASX 200  — para correlación AUD/USD)
+  NZX     → yfinance  ^NZ50         (NZX 50   — para correlación NZD/USD)
   FX pairs→ yfinance  EURUSD=X etc  (21 pares — reemplaza Stooq bloqueado por CORS)
+
+SALIDAS CLAVE:
+  quotes        — precios intraday de todos los símbolos
+  hv30          — volatilidad histórica 30d por par FX
+  correlations  — Pearson 60d rolling (10 pares, incluye GBP/FTSE, AUD/ASX, NZD/NZX, EUR/STOXX)
+  fx_etf_iv     — IV real de ATM options en ETFs de divisa CBOE (FXE, FXB, FXY, FXA, FXF, FXC)
 
 Por qué yfinance y no Twelve Data/Alpha Vantage:
   • yfinance funciona server-side en GitHub Actions sin CORS ni proxies
@@ -71,6 +80,10 @@ YFINANCE_SYMBOLS = {
     # Risk panel — bond vol + crypto
     "move":   "^MOVE",    # ICE BofA MOVE Index (bond market volatility)
     "btc":    "BTC-USD",  # Bitcoin — topbar + cross-asset panel
+    # Equity indices for extended correlations (GBP, AUD, NZD) — not shown in panel
+    "ftse":   "^FTSE",    # FTSE 100 — GBP/USD correlation
+    "asx":    "^AXJO",    # ASX 200  — AUD/USD correlation
+    "nzx":    "^NZ50",    # NZX 50   — NZD/USD correlation
     # FX Majors — reemplazan Stooq (bloqueado por CORS) como fuente para heatmap + quote bar
     "eurusd": "EURUSD=X",
     "gbpusd": "GBPUSD=X",
@@ -182,15 +195,27 @@ CORRELATION_PAIRS = [
     ("usdjpy", "us10y"),
     ("usdjpy", "vix"),
     ("usdcad", "wti"),
+    # Extended pairs — added v2.4
+    ("gbpusd", "ftse"),    # GBP/USD vs FTSE 100 (BoE/UK equity link)
+    ("audusd", "asx"),     # AUD/USD vs ASX 200  (domestic equity proxy)
+    ("nzdusd", "nzx"),     # NZD/USD vs NZX 50   (domestic equity proxy)
+    ("eurusd", "stoxx"),   # EUR/USD vs EuroStoxx 50 (ECB/EU equity link)
+    ("gbpusd", "gold"),    # GBP/USD vs Gold      (safe-haven vs sterling)
 ]
 
 # Human-readable labels for the frontend
 CORRELATION_LABELS = {
-    ("eurusd", "dxy"):   ("EUR/USD", "DXY"),
-    ("audusd", "gold"):  ("AUD/USD", "Gold"),
-    ("usdjpy", "us10y"): ("USD/JPY", "US 10Y"),
-    ("usdjpy", "vix"):   ("USD/JPY", "VIX"),
-    ("usdcad", "wti"):   ("USD/CAD", "WTI Oil"),
+    ("eurusd", "dxy"):    ("EUR/USD", "DXY"),
+    ("audusd", "gold"):   ("AUD/USD", "Gold"),
+    ("usdjpy", "us10y"):  ("USD/JPY", "US 10Y"),
+    ("usdjpy", "vix"):    ("USD/JPY", "VIX"),
+    ("usdcad", "wti"):    ("USD/CAD", "WTI Oil"),
+    # Extended
+    ("gbpusd", "ftse"):   ("GBP/USD", "FTSE 100"),
+    ("audusd", "asx"):    ("AUD/USD", "ASX 200"),
+    ("nzdusd", "nzx"):    ("NZD/USD", "NZX 50"),
+    ("eurusd", "stoxx"):  ("EUR/USD", "EuroStoxx"),
+    ("gbpusd", "gold"):   ("GBP/USD", "Gold"),
 }
 
 # All unique symbols needed for correlation (merged with FX pairs)
@@ -281,6 +306,121 @@ def fetch_hv30_fx(fx_pairs):
             hv30_results[pair_id] = None
 
     return hv30_results
+
+
+# ── FX ETF Implied Volatility ─────────────────────────────────────────────────
+# Source: CBOE-listed currency ETF options via yfinance (free, no key)
+# ETF → FX pair mapping:
+#   FXE → EUR/USD    FXB → GBP/USD    FXY → USD/JPY (inverted ETF convention)
+#   FXA → AUD/USD    FXF → USD/CHF (inverted)    FXC → USD/CAD (inverted)
+# Method: ATM implied vol from nearest expiry with ≥4 days to expiration.
+# Limitation: ETF option liquidity is lower than OTC FX interbank options.
+#   IV may deviate 1–3 vol points from true OTC 25d RR. Label accordingly.
+# Output in quotes.json under key "fx_etf_iv":
+#   { "eurusd": { "iv": 7.4, "expiry": "2025-04-18", "source": "FXE options" }, ... }
+FX_ETF_MAP = {
+    "eurusd": {"etf": "FXE", "invert": False},
+    "gbpusd": {"etf": "FXB", "invert": False},
+    "usdjpy": {"etf": "FXY", "invert": True },  # FXY = JPY/USD → invert for USD/JPY
+    "audusd": {"etf": "FXA", "invert": False},
+    "usdchf": {"etf": "FXF", "invert": True },  # FXF = CHF/USD
+    "usdcad": {"etf": "FXC", "invert": True },  # FXC = CAD/USD
+}
+
+def fetch_fx_etf_iv():
+    """
+    Fetches ATM implied volatility from CBOE-listed FX ETF option chains via yfinance.
+    Returns dict { pair_id: { "iv": float_pct, "expiry": str, "source": str } | None }.
+    Falls back gracefully to None per pair if options are illiquid or unavailable.
+    """
+    from datetime import date as _date
+    print("\n[ETF-IV] Fetching FX ETF implied volatility...")
+    results = {}
+    today = _date.today()
+
+    for pair_id, cfg in FX_ETF_MAP.items():
+        etf_sym = cfg["etf"]
+        try:
+            ticker = yf.Ticker(etf_sym)
+            exps = ticker.options
+            if not exps:
+                print(f"[ETF-IV] {etf_sym}: no options available")
+                results[pair_id] = None
+                continue
+
+            # Pick nearest expiry with ≥4 days to go (avoid pin-risk distortion near expiry)
+            chosen_exp = None
+            for exp_str in exps:
+                try:
+                    exp_date = _date.fromisoformat(exp_str)
+                    if (exp_date - today).days >= 4:
+                        chosen_exp = exp_str
+                        break
+                except ValueError:
+                    continue
+
+            if not chosen_exp:
+                print(f"[ETF-IV] {etf_sym}: no valid expiry found")
+                results[pair_id] = None
+                continue
+
+            chain = ticker.option_chain(chosen_exp)
+            calls = chain.calls
+
+            # Current spot for ATM strike selection
+            spot_info = ticker.history(period="2d", interval="1d")
+            if spot_info.empty:
+                results[pair_id] = None
+                continue
+            spot = float(spot_info["Close"].iloc[-1])
+
+            # Nearest strike to spot = ATM
+            strikes = calls["strike"].dropna().tolist()
+            if not strikes:
+                results[pair_id] = None
+                continue
+            atm_strike = min(strikes, key=lambda s: abs(s - spot))
+
+            # IV from ATM call; fallback to ATM put if call IV is bad
+            atm_call = calls[calls["strike"] == atm_strike]
+            iv_raw = None
+            if not atm_call.empty:
+                iv_raw = atm_call["impliedVolatility"].iloc[0]
+
+            if iv_raw is None or (iv_raw != iv_raw) or iv_raw <= 0:
+                puts = chain.puts
+                atm_put = puts[puts["strike"] == atm_strike]
+                if not atm_put.empty:
+                    iv_raw = atm_put["impliedVolatility"].iloc[0]
+
+            if iv_raw is None or (iv_raw != iv_raw) or iv_raw <= 0 or iv_raw > 1.5:
+                print(f"[ETF-IV] {etf_sym}: IV out of range ({iv_raw})")
+                results[pair_id] = None
+                continue
+
+            # yfinance returns IV as decimal (0.074 → 7.4%)
+            iv_pct = round(float(iv_raw) * 100, 1)
+            # FX ETF IV plausibility gate: 3–40%
+            if not (3.0 <= iv_pct <= 40.0):
+                print(f"[ETF-IV] {etf_sym}: IV {iv_pct}% outside plausible range")
+                results[pair_id] = None
+                continue
+
+            results[pair_id] = {
+                "iv":     iv_pct,
+                "expiry": chosen_exp,
+                "source": f"{etf_sym} options",
+                "atm":    round(atm_strike, 4),
+            }
+            print(f"[ETF-IV] ✓ {pair_id:8s} ({etf_sym}): ATM IV={iv_pct:.1f}%  exp={chosen_exp}  K={atm_strike}")
+
+        except Exception as e:
+            print(f"[ETF-IV] {etf_sym} ({pair_id}): {e}")
+            results[pair_id] = None
+
+    valid = sum(1 for v in results.values() if v is not None)
+    print(f"[ETF-IV] {valid}/{len(FX_ETF_MAP)} pairs with real IV")
+    return results
 
 
 def fetch_yfinance_all(symbols_map):
@@ -463,8 +603,12 @@ def main():
     # PASO 6: Calcular correlaciones rolling 60d
     correlations = fetch_correlations()
 
+    # PASO 7: Implied volatility real desde FX ETF options (CBOE vía yfinance)
+    fx_etf_iv = fetch_fx_etf_iv()
+
     output = {"updated": ts, "source": source_label, "quotes": quotes,
-              "hv30": hv30_output, "correlations": correlations}
+              "hv30": hv30_output, "correlations": correlations,
+              "fx_etf_iv": fx_etf_iv}
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
