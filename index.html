@@ -225,7 +225,6 @@
     <a href="#section-cbrates" data-target="section-cbrates">Rates</a>
     <a href="#section-crossasset" data-target="section-crossasset">Cross-Asset</a>
     <a href="#section-risk" data-target="section-risk">Risk</a>
-    <a href="#section-screener" data-target="section-screener">Screener</a>
     <a href="#section-positioning" data-target="section-positioning">Positioning</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
   </nav>
@@ -450,29 +449,6 @@
     </div>
 
 
-    <!-- FX SCREENER — ranks all pairs by 1D momentum, HV30 and ECN spread -->
-    <div class="panel" id="section-screener">
-      <div class="panel-head">
-        <span class="panel-title">FX Screener</span>
-        <span class="panel-sub" id="screener-updated">All pairs · sorted by momentum</span>
-      </div>
-      <div style="overflow-x:auto;">
-        <table aria-label="FX Screener — all pairs ranked" style="width:100%;">
-          <thead>
-            <tr>
-              <th style="text-align:left" scope="col">Pair</th>
-              <th scope="col" class="scr-th scr-sort-desc" data-sort="mom" onclick="_screenerSort('mom')" style="cursor:pointer;" title="Sort by 1D momentum">1D Chg ↕</th>
-              <th scope="col" class="scr-th" data-sort="hv" onclick="_screenerSort('hv')" style="cursor:pointer;" title="Sort by HV 30d">HV 30d ↕</th>
-              <th scope="col" class="scr-th" data-sort="spr" onclick="_screenerSort('spr')" style="cursor:pointer;" title="Sort by spread">Spread ↕</th>
-            </tr>
-          </thead>
-          <tbody id="screener-tbody">
-            <tr><td colspan="4" style="color:var(--text3);text-align:center;">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- CURRENCY STRENGTH HEATMAP — computed from Frankfurter data -->
     <div class="panel">
       <div class="panel-head">
@@ -668,7 +644,7 @@
       </div>
     </div>
 
-    <!-- ALERTS & MARKET SIGNALS (AI-powered + user-configurable price alerts) -->
+    <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
     <div class="panel" id="section-macro">
       <div class="panel-head">
         <span class="panel-title">Alerts &amp; Market Signals</span>
@@ -676,35 +652,6 @@
       </div>
       <div id="alerts-container" role="log" aria-live="polite" aria-label="Alerts and Market Signals" aria-relevant="additions">
         <div class="alert-row" style="color:var(--text3);">Fetching AI-generated market signals…</div>
-      </div>
-
-      <!-- USER PRICE ALERTS -->
-      <div style="border-top:1px solid var(--border);padding:8px 10px 6px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:11px;font-weight:600;color:var(--text);">Price Alerts</span>
-          <span style="font-size:9px;color:var(--text3);">saved locally · checks every 60s</span>
-        </div>
-        <form id="alert-add-form" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;" onsubmit="return false;">
-          <select id="alert-pair" style="font-size:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:3px;padding:3px 4px;flex:1;min-width:80px;">
-            <option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option>
-            <option>AUD/USD</option><option>USD/CHF</option><option>USD/CAD</option>
-            <option>NZD/USD</option><option>EUR/GBP</option><option>EUR/JPY</option>
-            <option>GBP/JPY</option><option>AUD/JPY</option><option>USD/JPY</option>
-            <option>XAU/USD</option><option>DXY</option>
-          </select>
-          <select id="alert-dir" style="font-size:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:3px;padding:3px 4px;">
-            <option value="above">↑ Above</option>
-            <option value="below">↓ Below</option>
-          </select>
-          <input id="alert-level" type="number" step="0.0001" min="0" placeholder="Price level"
-            style="font-size:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:3px;padding:3px 5px;width:90px;font-family:var(--font-mono);">
-          <button type="submit"
-            style="font-size:10px;background:var(--blue);color:#fff;border:none;border-radius:3px;padding:3px 8px;cursor:pointer;">+ Add</button>
-        </form>
-        <div id="user-alerts-list">
-          <div style="color:var(--text3);font-size:10px;padding:4px 0;">No alerts set. Use the form above to add one.</div>
-        </div>
-      </div>
     </div>
 
   </main>
