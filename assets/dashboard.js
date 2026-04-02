@@ -1973,21 +1973,30 @@ async function renderRiskData(byId) {
     setEl('risk-regime-sub', regimeSub);
 
     // ── Narrative badge (above narrative text) ──
-    // Rule: always show the MORE CONSERVATIVE of AI regime vs live assessment.
-    // If AI regime is fresh, only override it if the live assessment is more bearish.
-    // If AI regime is stale, the live assessment is authoritative.
+    // Rule: always show the MORE CONSERVATIVE of AI regime vs live assessment —
+    //       BUT override AI if it is 2+ steps MORE BEARISH than the live data.
+    //       This prevents a stale/wrong AI RISK-OFF badge showing on a clearly non-stressed session.
+    // Override triggers:
+    //   1. AI stale (>4h old) → live is always authoritative
+    //   2. AI not fresh → live is authoritative
+    //   3. AI fresh + live is more bearish → show live (conservative rule)
+    //   4. AI fresh + AI is 2+ steps more bearish than live → live overrides (data-contradiction rule)
+    //      Example: AI=RISK-OFF (rank 3) but live=MIXED (rank 1) → gap=2 → live wins
+    //      Example: AI=RISK-OFF (rank 3) but live=RISK-ON (rank 0) → gap=3 → live wins
+    //      Example: AI=CAUTION (rank 2) but live=MIXED (rank 1) → gap=1 → AI kept (within tolerance)
     const narrRegEl = document.getElementById('narrative-regime');
     if (narrRegEl) {
       const REGIME_RANK = { 'RISK-ON': 0, 'MIXED': 1, 'CAUTION': 2, 'RISK-OFF': 3 };
       const liveRank = REGIME_RANK[regime] ?? 1;
       const currentText = narrRegEl.textContent.toUpperCase().replace('__STALE__','');
       const currentRank = REGIME_RANK[currentText] ?? -1;
-      // Override rules for the narrative badge:
-      // - AI stale → live is always authoritative
-      // - AI fresh → override if live is more bearish (any step up, including MIXED)
-      //   This keeps the narrative badge consistent with the Risk Monitor badge.
       const isCurrentStale = narrRegEl.classList.contains('stale');
-      const shouldOverride = isCurrentStale || !_aiRegimeFresh || (liveRank > currentRank);
+      // AI-vs-live divergence: positive = AI more bearish than live
+      const aiLiveDivergence = currentRank - liveRank;
+      const shouldOverride = isCurrentStale
+        || !_aiRegimeFresh
+        || (liveRank > currentRank)          // live is more bearish → conservative rule
+        || (aiLiveDivergence >= 2);          // AI is 2+ steps more bearish than live → data contradiction
       if (shouldOverride) {
         const isOn  = regime === 'RISK-ON';
         const isOff = regime === 'RISK-OFF';
@@ -1995,7 +2004,8 @@ async function renderRiskData(byId) {
         narrRegEl.className = 'narr-regime';
         narrRegEl.style.borderColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
         narrRegEl.style.color       = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-        narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
+        const overrideReason = (aiLiveDivergence >= 2) ? 'AI-live divergence override' : 'Live assessment';
+        narrRegEl.title = `${overrideReason} · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
       }
     }
   }
