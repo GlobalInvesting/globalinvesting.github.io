@@ -1,31 +1,24 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Cabeceras de seguridad HTTP — globalinvesting.github.io
 # Compatible con: Cloudflare Pages, Netlify
-# Última actualización: 2026-03-12
+# Última actualización: 2026-04-02
+#
+# FORMATO _headers (Netlify / Cloudflare Pages):
+#   - Cada bloque empieza con una ruta en su propia línea (sin #)
+#   - Las cabeceras van indentadas debajo, como "  Nombre: valor"
+#   - Los comentarios solo pueden ser líneas que empiezan con #
+#   - /* */ NO es sintaxis de comentario — es un path glob (coincide con todo)
 # ─────────────────────────────────────────────────────────────────────────────
 
 /*
-  # Strict-Transport-Security: HSTS con preload (máx. 1 año)
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-
-  # Previene clickjacking — solo permite iframes desde el mismo origen
   X-Frame-Options: SAMEORIGIN
-
-  # Previene MIME-sniffing attacks
   X-Content-Type-Options: nosniff
-
-  # Limita referrer a origen estricto en cross-origin
   Referrer-Policy: strict-origin-when-cross-origin
-
-  # Permissions Policy — deshabilita APIs no usadas
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-
-  # Content-Security-Policy
-  # NOTA: 'unsafe-inline' eliminado de script-src (2026-03) — todo JS en assets/dashboard.js,
-  # assets/gdpr.js. Mantenido en style-src para widgets de TradingView que inyectan estilos.
   Content-Security-Policy: default-src 'self'; script-src 'self' cdn.jsdelivr.net unpkg.com s3.tradingview.com widgets.tradingview-widget.com pagead2.googlesyndication.com partner.googleadservices.com tpc.googlesyndication.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com s3.tradingview.com widgets.tradingview-widget.com; font-src fonts.gstatic.com; img-src 'self' data: https: flagcdn.com; connect-src 'self' https://globalinvesting.github.io https://api.frankfurter.app https://api.worldbank.org https://api.stlouisfed.org https://api.exchangerate-api.com https://open.er-api.com https://sdmx.oecd.org https://api.coingecko.com https://freeserv.dukascopy.com https://www.myfxbook.com; frame-src googleads.g.doubleclick.net tpc.googlesyndication.com s3.tradingview.com widgets.tradingview-widget.com; frame-ancestors 'self'; upgrade-insecure-requests
 
-# Datos JSON estáticos — cache de 1 hora
+# Datos JSON dinámicos — cache corto
 /economic-data/*
   Cache-Control: public, max-age=7200, stale-while-revalidate=600
 
@@ -47,3 +40,4 @@
 
 /*.ico
   Cache-Control: public, max-age=2592000
+
