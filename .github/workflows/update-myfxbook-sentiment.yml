@@ -62,13 +62,17 @@ jobs:
       - name: Commit and push sentiment data
         run: |
           git config user.name  "github-actions[bot]"
-          git config user.email "github-actions@github.com"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add sentiment-data/myfxbook.json
           if git diff --staged --quiet; then
             echo "No changes to commit (data unchanged)"
-          else
-            TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
-            git commit -m "Sentiment update — ${TIMESTAMP}"
-            git pull --rebase origin main || true
-            git push
+            exit 0
           fi
+          TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
+          git commit -m "Sentiment update — ${TIMESTAMP}"
+          for i in 1 2 3; do
+            git push && break
+            echo "Push rejected (attempt $i) — rebasing..."
+            git fetch origin main
+            git rebase origin/main
+          done
