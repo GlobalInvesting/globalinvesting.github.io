@@ -950,3 +950,18 @@ a:focus-visible,
   opacity: 0;
   pointer-events: none;
 }
+
+/* ── FX Screener ─────────────────────────────────────────────────────── */
+#section-screener table th { cursor:default; user-select:none; }
+#section-screener table th.scr-th { color:var(--text2); }
+#section-screener table th.scr-th:hover { color:var(--text); }
+#section-screener table th.scr-sort-desc::after { content:' ↓'; color:var(--blue); }
+#section-screener table th.scr-sort-asc::after  { content:' ↑'; color:var(--blue); }
+#section-screener table td { position:relative; overflow:hidden; }
+
+/* ── Price Alert form ────────────────────────────────────────────────── */
+#alert-add-form input:focus,
+#alert-add-form select:focus {
+  outline: 1px solid var(--blue);
+}
+#user-alerts-list button:hover { color:var(--down) !important; }

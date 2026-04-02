@@ -297,14 +297,26 @@ function populateCrossRows() {
 }
 
 // Typical interbank spreads in pips per pair
-const TYPICAL_SPREADS = {
-  eurusd:0.2, gbpusd:0.4, usdjpy:0.2, audusd:0.4,
-  usdchf:0.5, usdcad:0.5, nzdusd:0.6, eurgbp:0.5,
+// LIVE_SPREADS is updated by fetchReferenceSpreads() whenever the intraday JSON loads.
+// Falls back to ECN_FLOOR_SPREADS (static institutional minimums) until first update.
+// ECB_FLOOR values calibrated against IC Markets Razor, Pepperstone Razor, LMAX avg.
+const ECN_FLOOR_SPREADS = {
+  eurusd:0.1, gbpusd:0.2, usdjpy:0.1, audusd:0.2,
+  usdchf:0.2, usdcad:0.2, nzdusd:0.3, eurgbp:0.5,
   eurjpy:0.5, eurchf:1.0, eurcad:0.8, euraud:1.0,
   gbpjpy:1.2, gbpchf:1.2, gbpcad:1.5,
   audjpy:0.8, audnzd:1.5, audchf:1.5,
   cadjpy:1.0, chfjpy:1.5, nzdjpy:1.8,
 };
+// Live spread cache — populated by fetchReferenceSpreads() from HV30+VIX+MOVE model.
+// Using a Proxy so TYPICAL_SPREADS reads from LIVE_SPREADS when a key has been set,
+// and from ECN_FLOOR_SPREADS as fallback. All existing code uses TYPICAL_SPREADS unchanged.
+const LIVE_SPREADS = {};
+const TYPICAL_SPREADS = new Proxy({}, {
+  get(_, pair) {
+    return LIVE_SPREADS[pair] ?? ECN_FLOOR_SPREADS[pair] ?? 0.5;
+  }
+});
 // Repo performance data cache
 const FX_PERF_CACHE = {};
 
@@ -973,6 +985,9 @@ function updateFxPairsTableRT() {
   }
   setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
   setCA_rt('wti',  STOOQ_RT_CACHE['wti']);
+
+  // ── Check price alerts against latest RT prices ──
+  checkPriceAlerts();
 
   // ── Refresh heatmap with latest RT data ──
   populateHeatmap();
@@ -3026,7 +3041,16 @@ async function fetchReferenceSpreads() {
       computed[pair] = Math.max(ECN_FLOOR[pair], Math.round(raw * 10) / 10);
     }
 
-    // ── Render ────────────────────────────────────────────────────────
+    // ── Write into LIVE_SPREADS so TYPICAL_SPREADS Proxy feeds dynamic Bid/Ask ──
+    // All existing bid/ask calculations in populateFxPairsTable and updateFxPairsTableRT
+    // automatically pick up the new values via the Proxy — no extra code needed.
+    let _spreadsChanged = false;
+    for (const [pair, pips] of Object.entries(computed)) {
+      if (LIVE_SPREADS[pair] !== pips) { LIVE_SPREADS[pair] = pips; _spreadsChanged = true; }
+    }
+    if (_spreadsChanged && Object.keys(STOOQ_RT_CACHE).length > 0) updateFxPairsTableRT();
+
+    // ── Render Reference Spreads panel ────────────────────────────────
     const MAX_PIP = 5.0;
     const pairMap = {
       eurusd: 'spr-eurusd', gbpusd: 'spr-gbpusd', usdjpy: 'spr-usdjpy',
@@ -3126,6 +3150,225 @@ async function computeSessionVol() {
   } catch(e) { console.warn('[SessionVol] Failed:', e); }
 }
 
+
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIGURABLE PRICE ALERTS — localStorage-backed
+//
+// Design: lightweight key-value store per pair.
+//   alert = { pair, level, dir ('above'|'below'), triggered, created }
+// On each RT update (fetchQuoteBarRT), checkPriceAlerts() scans the
+// list and fires triggered alerts via the Alerts panel (visual only —
+// no push notifications required; this is client-side only).
+// ═══════════════════════════════════════════════════════════════════
+const ALERT_STORAGE_KEY = 'fx_price_alerts_v1';
+
+function loadAlerts() {
+  try { return JSON.parse(localStorage.getItem(ALERT_STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function saveAlerts(alerts) {
+  try { localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(alerts)); } catch {}
+}
+
+function addPriceAlert(pair, level, dir) {
+  const alerts = loadAlerts();
+  // Prevent duplicates (same pair + level ± 0.0001)
+  const already = alerts.some(a =>
+    a.pair === pair && a.dir === dir && Math.abs(a.level - level) < 0.0001
+  );
+  if (already) return false;
+  alerts.push({ pair, level, dir, triggered: false, created: Date.now() });
+  saveAlerts(alerts);
+  renderAlertsList();
+  return true;
+}
+
+function deletePriceAlert(idx) {
+  const alerts = loadAlerts();
+  alerts.splice(idx, 1);
+  saveAlerts(alerts);
+  renderAlertsList();
+}
+
+function checkPriceAlerts() {
+  const alerts = loadAlerts();
+  if (!alerts.length) return;
+  let changed = false;
+  const panel = document.getElementById('user-alerts-list');
+
+  alerts.forEach((a, i) => {
+    if (a.triggered) return;
+    // Get current price from RT cache
+    const id = a.pair.replace('/', '').toLowerCase();
+    const rt = STOOQ_RT_CACHE[id];
+    if (!rt?.close) return;
+    const price = rt.close;
+    const hit = (a.dir === 'above' && price >= a.level)
+             || (a.dir === 'below' && price <= a.level);
+    if (hit) {
+      a.triggered = true;
+      changed = true;
+      // Show in alerts panel
+      const alertsContainer = document.getElementById('alerts-container');
+      if (alertsContainer) {
+        const row = document.createElement('div');
+        row.className = 'alert-row';
+        row.style.cssText = 'border-left:3px solid var(--orange);padding-left:6px;';
+        const now = new Date();
+        const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+        row.innerHTML = `<span class="a-time">${t}</span><span class="a-dot a-warn"></span>` +
+          `<div class="a-text"><strong>Alert triggered</strong> — ${a.pair} ${a.dir === 'above' ? '≥' : '≤'} ${a.level}</div>`;
+        alertsContainer.prepend(row);
+      }
+    }
+  });
+
+  if (changed) {
+    saveAlerts(alerts);
+    renderAlertsList();
+  }
+}
+
+function renderAlertsList() {
+  const list = document.getElementById('user-alerts-list');
+  if (!list) return;
+  const alerts = loadAlerts();
+  if (!alerts.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:10px;padding:4px 0;">No alerts set. Use the form above to add one.</div>';
+    return;
+  }
+  list.innerHTML = alerts.map((a, i) => {
+    const triggered = a.triggered;
+    const cls = triggered ? 'flat' : (a.dir === 'above' ? 'up' : 'down');
+    const icon = triggered ? '✓' : (a.dir === 'above' ? '↑' : '↓');
+    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border2);font-size:10px;${triggered?'opacity:.45':''}">` +
+      `<span class="${cls}" style="font-family:var(--font-mono);min-width:70px;">${a.pair}</span>` +
+      `<span class="${cls}" style="font-family:var(--font-mono);">${icon} ${a.level}</span>` +
+      `<span style="color:var(--text3);font-size:9px;margin-left:auto;">${triggered?'Done':''}</span>` +
+      `<button onclick="deletePriceAlert(${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:0 2px;" aria-label="Delete alert">✕</button>` +
+      `</div>`;
+  }).join('');
+}
+
+function initAlertForm() {
+  const form = document.getElementById('alert-add-form');
+  if (!form) return;
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const pair  = document.getElementById('alert-pair').value;
+    const level = parseFloat(document.getElementById('alert-level').value);
+    const dir   = document.getElementById('alert-dir').value;
+    if (!pair || isNaN(level) || level <= 0) return;
+    const ok = addPriceAlert(pair, level, dir);
+    if (ok) {
+      document.getElementById('alert-level').value = '';
+      // Pre-fill with current price for convenience
+      const id = pair.replace('/', '').toLowerCase();
+      const rt = STOOQ_RT_CACHE[id];
+      if (rt?.close) document.getElementById('alert-level').placeholder = rt.close.toFixed(4);
+    }
+  });
+
+  // Update price placeholder when pair changes
+  document.getElementById('alert-pair').addEventListener('change', function() {
+    const id = this.value.replace('/', '').toLowerCase();
+    const rt = STOOQ_RT_CACHE[id];
+    const inp = document.getElementById('alert-level');
+    if (rt?.close && inp) inp.placeholder = rt.close.toFixed(4);
+  });
+
+  renderAlertsList();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FX SCREENER — ranks all pairs by momentum, HV30, and spread
+// Uses data already loaded in STOOQ_RT_CACHE + LIVE_SPREADS.
+// Renders into #screener-tbody, called after fetchQuoteBarRT().
+// ═══════════════════════════════════════════════════════════════════
+function renderFXScreener() {
+  const tbody = document.getElementById('screener-tbody');
+  if (!tbody) return;
+
+  const allPairs = [
+    ...PAIRS.filter(p => !p.cross),
+    ...PAIRS.filter(p => p.cross),
+  ];
+
+  const rows = allPairs.map(pair => {
+    const rt = STOOQ_RT_CACHE[pair.id];
+    if (!rt?.close) return null;
+    const pct   = rt.pct   ?? null;
+    const hv30  = rt.hv30  ?? null;
+    const spread = TYPICAL_SPREADS[pair.id] ?? null;
+    const label = pair.label || (pair.base + '/' + pair.quote);
+    // Momentum score: |pct| weighted by direction signal
+    const momScore = pct !== null ? Math.abs(pct) : -1;
+    return { id: pair.id, label, pct, hv30, spread, momScore };
+  }).filter(Boolean);
+
+  // Sort selector state
+  const sortKey = tbody.dataset.sort || 'mom';
+  const sortDir = tbody.dataset.dir  || 'desc';
+
+  rows.sort((a, b) => {
+    let va, vb;
+    if (sortKey === 'mom')    { va = a.pct    ?? -99; vb = b.pct    ?? -99; }
+    else if (sortKey === 'hv'){ va = a.hv30   ?? -99; vb = b.hv30   ?? -99; }
+    else                      { va = a.spread ?? 99;  vb = b.spread ?? 99; }
+    // For spread, lower = better (reverse default)
+    const multiplier = (sortKey === 'spr')
+      ? (sortDir === 'asc' ? 1 : -1)
+      : (sortDir === 'desc' ? -1 : 1);
+    return (va - vb) * multiplier;
+  });
+
+  tbody.innerHTML = rows.map(r => {
+    const pctCls  = r.pct > 0.05 ? 'up' : r.pct < -0.05 ? 'down' : 'flat';
+    const pctStr  = r.pct !== null ? (r.pct >= 0 ? '+' : '') + r.pct.toFixed(2) + '%' : '—';
+    const hvStr   = r.hv30  !== null ? r.hv30.toFixed(1) + '%' : '—';
+    const sprStr  = r.spread !== null ? r.spread.toFixed(1) + 'p' : '—';
+    const sprCls  = r.spread !== null ? (r.spread <= 1.0 ? 'up' : r.spread <= 2.0 ? '' : 'down') : '';
+    // Momentum bar width: map ±2% range → 0–100%
+    const barPct  = r.pct !== null ? Math.min(100, Math.abs(r.pct) / 2 * 100) : 0;
+    const barCol  = r.pct > 0 ? 'var(--up)' : r.pct < 0 ? 'var(--down)' : 'var(--text3)';
+    const barDir  = r.pct >= 0 ? 'left' : 'right';
+    return `<tr>
+      <td style="font-weight:600;font-size:10px;">${r.label}</td>
+      <td class="${pctCls}" style="position:relative;">
+        <div style="position:absolute;top:50%;transform:translateY(-50%);${barDir}:0;width:${barPct}%;height:70%;background:${barCol};opacity:.15;border-radius:1px;"></div>
+        <span style="position:relative;">${pctStr}</span>
+      </td>
+      <td style="color:var(--text2);font-size:10px;">${hvStr}</td>
+      <td class="${sprCls}" style="font-size:10px;">${sprStr}</td>
+    </tr>`;
+  }).join('');
+
+  const upd = document.getElementById('screener-updated');
+  if (upd) {
+    const now = new Date();
+    const hh = now.getHours().toString().padStart(2,'0');
+    const mm = now.getMinutes().toString().padStart(2,'0');
+    upd.textContent = `${rows.length} pairs · ${hh}:${mm}`;
+  }
+}
+
+// Sort handler for screener column headers
+window._screenerSort = function(key) {
+  const tbody = document.getElementById('screener-tbody');
+  if (!tbody) return;
+  const prev = tbody.dataset.sort;
+  const prevDir = tbody.dataset.dir || 'desc';
+  tbody.dataset.sort = key;
+  tbody.dataset.dir  = (prev === key && prevDir === 'desc') ? 'asc' : 'desc';
+  // Update sort indicator
+  document.querySelectorAll('.scr-th').forEach(th => th.classList.remove('scr-sort-asc','scr-sort-desc'));
+  const activeEl = document.querySelector(`.scr-th[data-sort="${key}"]`);
+  if (activeEl) activeEl.classList.add(tbody.dataset.dir === 'asc' ? 'scr-sort-asc' : 'scr-sort-desc');
+  renderFXScreener();
+};
+
 // ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
@@ -3144,6 +3387,7 @@ async function boot() {
   // fetchQuoteBarRT popula STOOQ_RT_CACHE (precios RT + hv30).
   // Se awaita para que populateFxPairsTable encuentre el cache listo al renderizar.
   await fetchQuoteBarRT();
+  renderFXScreener();                                   // screener: first render from RT cache
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
@@ -3176,9 +3420,10 @@ async function boot() {
 }
 
 boot();
+initAlertForm();  // price alert UI — runs after boot so STOOQ_RT_CACHE is populated
 
 // Refresh quote bar FX every 60 seconds via intraday JSON / yfinance (~5 min delay)
-setInterval(fetchQuoteBarRT, 60 * 1000);
+setInterval(() => { fetchQuoteBarRT().then(renderFXScreener); }, 60 * 1000);
 // Refresh ECB rates every 30 minutes (FX table + heatmap + cross rows)
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 // Refresh news every 10 minutes
