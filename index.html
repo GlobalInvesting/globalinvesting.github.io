@@ -558,13 +558,13 @@
           <table aria-label="Session volatility">
             <thead><tr><th style="text-align:left" scope="col">Session Vol</th><th>EUR/USD</th><th>USD/JPY</th></tr></thead>
             <tbody>
-              <tr><td>Sydney</td><td class="flat">±18p</td><td class="flat">±22p</td></tr>
-              <tr><td>Tokyo</td><td class="flat">±28p</td><td class="up">±44p</td></tr>
-              <tr><td>London</td><td class="up">±62p</td><td class="up">±58p</td></tr>
-              <tr><td>New York</td><td class="up">±71p</td><td class="up">±66p</td></tr>
+              <tr><td>Sydney</td><td id="svol-syd-eur" class="flat">±18p</td><td id="svol-syd-jpy" class="flat">±22p</td></tr>
+              <tr><td>Tokyo</td><td id="svol-tok-eur" class="flat">±28p</td><td id="svol-tok-jpy" class="up">±44p</td></tr>
+              <tr><td>London</td><td id="svol-lon-eur" class="up">±62p</td><td id="svol-lon-jpy" class="up">±58p</td></tr>
+              <tr><td>New York</td><td id="svol-ny-eur" class="up">±71p</td><td id="svol-ny-jpy" class="up">±66p</td></tr>
             </tbody>
           </table>
-          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Avg daily range · 5yr historical avg · fixed reference</div>
+          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">HV30-derived · session ratios BIS 2022</div>
         </div>
         <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
@@ -683,8 +683,8 @@
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Option Skew — 25-Delta RR <span style="font-size:9px;color:var(--text3);font-weight:normal;">est. via COT</span></div>
-    <table aria-label="Option skew — 25-Delta Risk Reversal">
+    <div class="sb-head" style="margin-top:2px;">Positioning Bias <span style="font-size:9px;color:var(--text3);font-weight:normal;">COT-derived · not IV</span></div>
+    <table aria-label="COT-derived directional positioning bias per pair">
       <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
       <tbody id="skew-tbody">
         <tr><td colspan="4" style="color:var(--text3);text-align:center;">Loading…</td></tr>
