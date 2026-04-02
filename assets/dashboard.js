@@ -1635,9 +1635,9 @@ function attachRiskMonitorTooltips() {
       ex:    'Ratio > 0.8 and rising historically aligns with USD strength (safe-haven flows), JPY appreciation, and commodity currency weakness.'
     },
     {
-      title: 'USD/JPY vs Nikkei Correlation',
-      body:  'Rolling 60-day Pearson correlation between USD/JPY and Nikkei 225. Normally positive (+0.6 to +0.8) — both move together with risk appetite. Divergence signals a break in the risk-on/risk-off relationship.',
-      ex:    'Correlation below +0.3 or negative = structural shift. Either JPY is moving on BoJ policy or Nikkei is decoupling from USD flows. Worth monitoring for regime change.'
+      title: 'USD/JPY vs VIX — 60d Correlation',
+      body:  'Rolling 60-day Pearson correlation between USD/JPY and VIX, computed from real price data. Normally negative (−0.3 to −0.7): when VIX spikes (risk-off), JPY is bid and USD/JPY falls. A positive reading is unusual.',
+      ex:    'Positive correlation means USD and volatility are rising together — typically a USD funding stress episode (2020, 2008). Neutral (near 0) means the relationship has broken down temporarily.'
     },
   ];
   riRows.forEach((row, i) => {
@@ -2009,35 +2009,31 @@ async function renderRiskData(byId) {
     setEl('ri-us-eu', sign + bp + 'bp');
     setEl('ri-us-eu-sig', bp > 0 ? 'USD+' : 'EUR+', bp > 50 ? 'up' : bp < -50 ? 'down' : 'flat');
   }
-  // USD/JPY vs Nikkei — correlation proxy via COT + rate momentum
-  // Logic: rising JPY rateMomentum (BoJ tightening) → stronger JPY → Nikkei headwind → misaligned
-  // Falling JPY rateMomentum → weaker JPY → Nikkei tailwind → aligned
+  // USD/JPY vs VIX — real 60-day rolling Pearson from quotes.json (computed by engine).
+  // Replaces the previous hardcoded proxy coefficients (-0.72, -0.41, etc.) which were
+  // invented values. Now shows the actual computed correlation or '—' if unavailable.
+  // Label updated in index.html from 'USD/JPY vs Nikkei' → 'USD/JPY vs VIX (60d)'.
   try {
-    const jpyExt = await fetch('./extended-data/JPY.json').then(r=>r.json()).catch(()=>null);
-    const rm = jpyExt?.data?.rateMomentum;
-    if (rm != null) {
-      // Also check live USD/JPY vs Nikkei from Cross-Asset
-      const usdJpyEl = document.getElementById('q-usdjpy');
-      const nikkeiEl = document.getElementById('ca-nikkei');
-      let corrLabel = '—', corrSig = '—', corrCls = 'flat';
-      if (nikkeiEl && nikkeiEl.textContent !== '—') {
-        const nkChgEl = document.getElementById('cac-nikkei');
-        const nkChg = nkChgEl ? parseFloat(nkChgEl.textContent) : NaN;
-        // BoJ tightening (positive rateMomentum) → JPY firms → Nikkei tends to fall → misaligned
-        const aligned = (rm > 0 && !isNaN(nkChg) && nkChg < 0) || (rm <= 0 && !isNaN(nkChg) && nkChg >= 0);
-        // Use correlation coefficient proxy
-        const corr = rm > 0.5 ? '-0.72' : rm > 0 ? '-0.41' : rm > -0.5 ? '+0.38' : '+0.71';
-        corrLabel = corr + 'r';
-        corrSig = aligned ? 'Aligned' : 'Diverging';
-        corrCls = aligned ? 'up' : 'down';
+    const _corrIntraday = _intradayData || await loadIntradayQuotes().catch(() => null);
+    const corrs = _corrIntraday?.correlations;
+    if (Array.isArray(corrs)) {
+      const entry = corrs.find(c =>
+        (c.a === 'USD/JPY' && c.b === 'VIX') || (c.a === 'VIX' && c.b === 'USD/JPY')
+      );
+      if (entry?.corr != null) {
+        const v = entry.corr;
+        const sign = v >= 0 ? '+' : '';
+        const corrLabel = sign + v.toFixed(2) + 'r';
+        // Interpretation: positive = USD/JPY and VIX move together (unusual, stress + USD bid)
+        // Negative = normal risk-off (VIX up → JPY bid → USD/JPY falls)
+        const corrSig = v < -0.3 ? 'Normal (risk-off)' : v > 0.3 ? 'Unusual' : 'Neutral';
+        const corrCls = v < -0.3 ? 'up' : v > 0.3 ? 'down' : 'flat';
+        setEl('ri-usdjpy-nk', corrLabel);
+        setEl('ri-usdjpy-nk-sig', corrSig, corrCls);
       } else {
-        // Fallback: BoJ momentum only
-        corrLabel = rm > 0 ? 'BoJ hawkish' : 'BoJ dovish';
-        corrSig = rm > 0 ? 'JPY bid risk' : 'JPY soft';
-        corrCls = rm > 0 ? 'down' : 'up';
+        setEl('ri-usdjpy-nk', '—');
+        setEl('ri-usdjpy-nk-sig', 'No data', 'flat');
       }
-      setEl('ri-usdjpy-nk', corrLabel);
-      setEl('ri-usdjpy-nk-sig', corrSig, corrCls);
     }
   } catch {}
 }
