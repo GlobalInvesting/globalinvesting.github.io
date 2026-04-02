@@ -663,7 +663,8 @@ async function fetchNewsData() {
     // ── NEWS FEED (fill the full panel, up to 24 items)
     const feedEl = document.getElementById('news-feed-items');
     if (feedEl) {
-    feedEl.innerHTML = enItems.slice(0, 24).map(item => {
+    feedEl.innerHTML = '';
+    enItems.slice(0, 24).forEach(item => {
         // Convert UTC timestamp to user's local time
         let time = item.time || '--:--';
         if (item.ts) {
@@ -676,20 +677,36 @@ async function fetchNewsData() {
         const headline = item.title || '';
         const cur      = item.cur || item.currency || '';
         const source   = item.source || '';
-        const link     = item.link || '#';
+        // Only allow https:// links — blocks javascript: and data: URIs
+        const rawLink  = item.link || '';
+        const safeLink = rawLink.startsWith('https://') ? rawLink : '';
         const date     = item.date || '';
-        return `<div class="news-item" onclick="window.open('${link}','_blank')">
-          <span class="news-time">${time}</span>
-          <div class="news-body">
-            <div class="news-headline">${headline}</div>
-            <div class="news-meta">
-              ${cur ? `<span class="news-cur-tag">${cur}</span>` : ''}
-              ${source ? `<span class="news-source">${source}</span>` : ''}
-              ${date ? `<span style="color:var(--text3);">${date}</span>` : ''}
-            </div>
-          </div>
-        </div>`;
-      }).join('');
+        // Build item via DOM (never innerHTML for user-controlled strings)
+        const wrap = document.createElement('div');
+        wrap.className = 'news-item';
+        if (safeLink) {
+          wrap.style.cursor = 'pointer';
+          wrap.addEventListener('click', () => window.open(safeLink, '_blank', 'noopener,noreferrer'));
+        }
+        const timeEl = document.createElement('span');
+        timeEl.className = 'news-time';
+        timeEl.textContent = time;
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'news-body';
+        const headEl = document.createElement('div');
+        headEl.className = 'news-headline';
+        headEl.textContent = headline;
+        const metaEl = document.createElement('div');
+        metaEl.className = 'news-meta';
+        if (cur) { const s = document.createElement('span'); s.className = 'news-cur-tag'; s.textContent = cur; metaEl.appendChild(s); }
+        if (source) { const s = document.createElement('span'); s.className = 'news-source'; s.textContent = source; metaEl.appendChild(s); }
+        if (date) { const s = document.createElement('span'); s.style.color = 'var(--text3)'; s.textContent = date; metaEl.appendChild(s); }
+        bodyEl.appendChild(headEl);
+        bodyEl.appendChild(metaEl);
+        wrap.appendChild(timeEl);
+        wrap.appendChild(bodyEl);
+        feedEl.appendChild(wrap);
+      });
 
       const sub = document.getElementById('news-sub');
       if (sub && data.total) sub.textContent = `FX-relevant · ${data.total} stories · sorted by impact`;
