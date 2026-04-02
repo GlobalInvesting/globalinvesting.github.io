@@ -505,7 +505,28 @@ function populateHeatmap() {
 // ═══════════════════════════════════════════════════════════════════
 // CENTRAL BANK RATES — from rates/*.json
 // ═══════════════════════════════════════════════════════════════════
-const CB_TREND = { usd:'flat', eur:'down', gbp:'down', jpy:'up', aud:'flat', chf:'down', cad:'down', nzd:'down' };
+
+/**
+ * Compute CB trend direction dynamically from rates/*.json observations.
+ * Compares latest rate vs 2 observations back (~2 months).
+ * Returns 'up' | 'down' | 'flat'.
+ * - Any cut  (diff ≤ -0.05pp) → 'down'
+ * - Any hike (diff ≥ +0.05pp) → 'up'
+ * - No change or data gap > 6 months → 'flat'
+ */
+function computeCBTrend(obs) {
+  if (!obs || obs.length < 3) return 'flat';
+  const latest = parseFloat(obs[0].value);
+  const ref    = parseFloat(obs[Math.min(2, obs.length - 1)].value);
+  if (isNaN(latest) || isNaN(ref)) return 'flat';
+  // Guard: if the two observations are more than 180 days apart, data is stale — don't infer
+  const d0 = new Date(obs[0].date), dN = new Date(obs[Math.min(2, obs.length - 1)].date);
+  if ((d0 - dN) / 86400000 > 180) return 'flat';
+  const diff = latest - ref;
+  if (diff <= -0.05) return 'down';
+  if (diff >=  0.05) return 'up';
+  return 'flat';
+}
 
 async function fetchCBRates() {
   const promises = CB_CONFIG.map(async cfg => {
@@ -515,7 +536,7 @@ async function fetchCBRates() {
       const data = await r.json();
       const obs = data.observations;
       if (!obs || !obs.length) return null;
-      return { id: cfg.id, label: cfg.label, rate: parseFloat(obs[0].value), date: obs[0].date };
+      return { id: cfg.id, label: cfg.label, rate: parseFloat(obs[0].value), date: obs[0].date, obs };
     } catch { return null; }
   });
 
@@ -532,19 +553,19 @@ async function fetchCBRates() {
   const tbody = document.getElementById('cbrates-tbody');
   if (tbody) {
     const bankInfo = {
-      usd: { flag: 'us', name: 'Federal Reserve',         short: 'Fed'  },
-      eur: { flag: 'eu', name: 'European Central Bank',  short: 'ECB'  },
-      gbp: { flag: 'gb', name: 'Bank of England',         short: 'BoE'  },
-      jpy: { flag: 'jp', name: 'Bank of Japan',           short: 'BoJ'  },
-      aud: { flag: 'au', name: 'Reserve Bank of Australia',short: 'RBA' },
-      chf: { flag: 'ch', name: 'Swiss National Bank',     short: 'SNB'  },
-      cad: { flag: 'ca', name: 'Bank of Canada',          short: 'BoC'  },
-      nzd: { flag: 'nz', name: 'Reserve Bank of NZ',      short: 'RBNZ' },
+      usd: { flag: 'us', name: 'Federal Reserve',          short: 'Fed'  },
+      eur: { flag: 'eu', name: 'European Central Bank',    short: 'ECB'  },
+      gbp: { flag: 'gb', name: 'Bank of England',          short: 'BoE'  },
+      jpy: { flag: 'jp', name: 'Bank of Japan',            short: 'BoJ'  },
+      aud: { flag: 'au', name: 'Reserve Bank of Australia',short: 'RBA'  },
+      chf: { flag: 'ch', name: 'Swiss National Bank',      short: 'SNB'  },
+      cad: { flag: 'ca', name: 'Bank of Canada',           short: 'BoC'  },
+      nzd: { flag: 'nz', name: 'Reserve Bank of NZ',       short: 'RBNZ' },
     };
     const trendMap = { up:'<span class="up">↑</span>', down:'<span class="down">↓</span>', flat:'<span class="flat">—</span>' };
     tbody.innerHTML = results.filter(Boolean).map(res => {
       const info  = bankInfo[res.id] || { flag: '', name: res.label, short: res.label };
-      const trend = CB_TREND[res.id] || 'flat';
+      const trend = computeCBTrend(res.obs);           // ← dynamic, replaces static CB_TREND
       const flag  = info.flag ? `<span class="fi fi-${info.flag}" style="margin-right:5px;border-radius:2px;"></span>` : '';
       return `<tr title="${info.name}">
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${info.short}</span></td>
@@ -2525,15 +2546,33 @@ async function fetchFedExpectations() {
 
     const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const bankMeta = {
-      USD: { flag:'us', short:'Fed',  trendKey:'usd' },
-      EUR: { flag:'eu', short:'ECB',  trendKey:'eur' },
-      GBP: { flag:'gb', short:'BoE',  trendKey:'gbp' },
-      JPY: { flag:'jp', short:'BoJ',  trendKey:'jpy' },
-      AUD: { flag:'au', short:'RBA',  trendKey:'aud' },
-      CAD: { flag:'ca', short:'BoC',  trendKey:'cad' },
-      CHF: { flag:'ch', short:'SNB',  trendKey:'chf' },
-      NZD: { flag:'nz', short:'RBNZ', trendKey:'nzd' },
+      USD: { flag:'us', short:'Fed'  },
+      EUR: { flag:'eu', short:'ECB'  },
+      GBP: { flag:'gb', short:'BoE'  },
+      JPY: { flag:'jp', short:'BoJ'  },
+      AUD: { flag:'au', short:'RBA'  },
+      CAD: { flag:'ca', short:'BoC'  },
+      CHF: { flag:'ch', short:'SNB'  },
+      NZD: { flag:'nz', short:'RBNZ' },
     };
+
+    // CIP spot sources — quote convention (how many USD per 1 unit of ccy, or inverse)
+    // EUR/GBP/AUD/NZD: spot is direct (EURUSD etc.) → base currency is the foreign one
+    // JPY/CHF/CAD:     spot is inverse (USDJPY etc.) → USD is the base
+    const cipSpot = {
+      EUR: { pair:'eurusd', usdIsBase: false },
+      GBP: { pair:'gbpusd', usdIsBase: false },
+      AUD: { pair:'audusd', usdIsBase: false },
+      NZD: { pair:'nzdusd', usdIsBase: false },
+      JPY: { pair:'usdjpy', usdIsBase: true  },
+      CHF: { pair:'usdchf', usdIsBase: true  },
+      CAD: { pair:'usdcad', usdIsBase: true  },
+    };
+
+    // USD rate (domestic) for CIP denominator — use STATE.cbRates if already loaded
+    const usdObs  = rateResponses[0]?.observations || [];
+    const r_usd   = (usdObs.length ? parseFloat(usdObs[0].value) : (STATE.cbRates?.usd?.rate ?? 4.33)) / 100;
+    const T30     = 30 / 360;   // 30-day forward period
 
     const rows = [];
     currencies.forEach((ccy, i) => {
@@ -2543,29 +2582,67 @@ async function fetchFedExpectations() {
       if (obs.length < 2) return;
 
       const current = parseFloat(obs[0].value);
-      const prev    = parseFloat(obs[Math.min(2, obs.length - 1)].value);
-      const trend   = current - prev; // negative = cutting, positive = hiking
 
       const meetings = meetingsRes?.meetings?.[ccy];
       const nextMtg  = meetings?.allMeetingsFormatted?.[0] || '—';
 
-      // Bias from trend
-      const trendDir = CB_TREND[bankMeta[ccy].trendKey] || 'flat';
-      const biasLabel = trendDir === 'down' ? '<span class="up">↓ Cut</span>'
-                      : trendDir === 'up'   ? '<span class="down">↑ Hike</span>'
+      // ── Bias: computed dynamically from rate trajectory ──────────
+      const trendDir  = computeCBTrend(obs);   // 'up' | 'down' | 'flat'
+      const biasLabel = trendDir === 'down' ? '<span class="down">↓ Cut</span>'
+                      : trendDir === 'up'   ? '<span class="up">↑ Hike</span>'
                       :                       '<span class="flat">→ Hold</span>';
 
-      // Forward rate estimate: next step based on trend
-      const step = Math.abs(trend) > 0.1 ? (trend < 0 ? -0.25 : 0.25) : 0;
-      const fwd  = Math.max(0, current + step);
+      // ── Forward rate via Covered Interest Parity (CIP) ───────────
+      // F = S × (1 + r_f × T) / (1 + r_d × T)
+      // For USD row we show the expected next rate level instead of CIP
+      let fwdDisplay = '—';
+      if (ccy === 'USD') {
+        // For USD show next-step projection (no spot needed)
+        const step = trendDir === 'down' ? -0.25 : trendDir === 'up' ? 0.25 : 0;
+        fwdDisplay = Math.max(0, current + step).toFixed(2) + '%';
+      } else {
+        const cipCfg = cipSpot[ccy];
+        if (cipCfg) {
+          // Try intraday quotes cache first, then STATE.rates (Frankfurter)
+          const midFromState = (() => {
+            try {
+              const fr = STATE.rates;   // Frankfurter USD-base: { EUR: 0.92, JPY: 151.x, … }
+              if (!fr) return null;
+              if (!cipCfg.usdIsBase) {
+                // EURUSD = 1 / fr.EUR  (Frankfurter gives EUR per USD)
+                return fr[ccy] ? 1 / fr[ccy] : null;
+              } else {
+                // USDJPY = fr.JPY
+                return fr[ccy] || null;
+              }
+            } catch { return null; }
+          })();
+
+          const S = midFromState;
+          if (S && S > 0) {
+            const r_f = current / 100;
+            if (!cipCfg.usdIsBase) {
+              // S = units of USD per 1 foreign (e.g. EURUSD = 1.08)
+              // F_foreign_in_USD = S × (1 + r_f×T) / (1 + r_usd×T)
+              const F = S * (1 + r_f * T30) / (1 + r_usd * T30);
+              fwdDisplay = F.toFixed(4);
+            } else {
+              // S = units of foreign per 1 USD (e.g. USDJPY = 150)
+              // F_usd_in_foreign = S × (1 + r_f×T) / (1 + r_usd×T)  [same formula, different read]
+              const F = S * (1 + r_f * T30) / (1 + r_usd * T30);
+              fwdDisplay = F.toFixed(ccy === 'JPY' ? 2 : 4);
+            }
+          }
+        }
+      }
 
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
-      rows.push(`<tr title="Next meeting: ${nextMtg}">
+      rows.push(`<tr title="Next meeting: ${nextMtg} · CIP 30d fwd">
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
         <td>${biasLabel}</td>
-        <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">${fwd.toFixed(2)}%</td>
+        <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">${fwdDisplay}</td>
       </tr>`);
     });
 
@@ -2879,6 +2956,63 @@ async function buildRichNarrative() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// REFERENCE SPREADS — from spreads-data/spreads.json (engine 2×/day)
+// Falls back silently to the static HTML values when file absent.
+// ═══════════════════════════════════════════════════════════════════
+async function fetchReferenceSpreads() {
+  try {
+    const data = await fetch('./spreads-data/spreads.json')
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null);
+
+    if (!data?.spreads) return;   // no file yet — keep static HTML fallback
+
+    const MAX_PIP = 5.0;
+    const pairMap = {
+      eurusd: 'spr-eurusd',
+      gbpusd: 'spr-gbpusd',
+      usdjpy: 'spr-usdjpy',
+      audusd: 'spr-audusd',
+      usdchf: 'spr-usdchf',
+      usdcad: 'spr-usdcad',
+      nzdusd: 'spr-nzdusd',
+    };
+
+    for (const [pair, elId] of Object.entries(pairMap)) {
+      const s = data.spreads[pair];
+      if (!s) continue;
+      const pips = s.spread_pips;
+      const el   = document.getElementById(elId);
+      if (!el) continue;
+      const row    = el.closest('.spread-row');
+      const fillEl = row?.querySelector('.spr-fill');
+
+      // Color tiers: ≤1.2 green, ≤2.0 orange, >2.0 red
+      const color = pips <= 1.2 ? 'var(--up)' : pips <= 2.0 ? 'var(--orange)' : 'var(--down)';
+      const cls   = pips <= 1.2 ? 'up'        : pips <= 2.0 ? ''              : 'down';
+
+      el.textContent  = pips.toFixed(1) + ' pip';
+      el.className    = 'spr-val' + (cls ? ' ' + cls : '');
+      el.style.color  = cls ? '' : 'var(--orange)';
+
+      if (fillEl) {
+        fillEl.style.width      = Math.min(100, (pips / MAX_PIP) * 100) + '%';
+        fillEl.style.background = color;
+      }
+    }
+
+    // Update subtitle with timestamp
+    const sub = document.getElementById('spreads-sub');
+    if (sub && data.updated) {
+      const t = new Date(data.updated);
+      const hhmm = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+      sub.textContent = `ECN live · ${hhmm} UTC`;
+    }
+
+  } catch(e) { console.warn('[Spreads] Failed:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
 async function boot() {
@@ -2906,6 +3040,7 @@ async function boot() {
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
   fetchNewsData();
+  fetchReferenceSpreads();          // spreads-data/spreads.json (engine 2×/day, graceful fallback)
 
   // ── CRITICAL: Load AI regime badge FIRST, before fetchRiskData touches the narrative badge.
   // loadAIRegime() is a lightweight fetch of ai-analysis/index.json (~same-origin, <50ms).
