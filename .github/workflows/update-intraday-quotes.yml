@@ -93,9 +93,32 @@ jobs:
           git add intraday-data/quotes.json
           if git diff --staged --quiet; then
             echo "No changes to commit (data unchanged)"
-          else
-            TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
-            git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
-            git pull --rebase origin main || true
-            git push
+            exit 0
           fi
+
+          TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
+          git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
+
+          # Push with up to 4 retries to handle race conditions with concurrent runs.
+          # Strategy: rebase on top of remote, then re-stage our file if needed.
+          for i in 1 2 3 4; do
+            echo "Push attempt $i..."
+            git push && echo "✅ Push succeeded" && exit 0
+
+            echo "Push rejected — pulling remote changes (attempt $i)..."
+            git fetch origin main
+
+            # Rebase our commit on top of remote. If there's a conflict on
+            # quotes.json (two runs updating the same file), ours wins: we
+            # keep the version we just fetched (most recent data) by taking
+            # "theirs" (remote) as base and re-applying our new payload.
+            if ! git rebase origin/main; then
+              echo "Rebase conflict — resolving by keeping our fetched data..."
+              git checkout --theirs intraday-data/quotes.json
+              git add intraday-data/quotes.json
+              git rebase --continue --no-edit || git rebase --skip
+            fi
+          done
+
+          echo "❌ All push attempts failed — will retry on next scheduled run."
+          exit 1
