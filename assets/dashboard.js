@@ -2013,10 +2013,13 @@ async function renderRiskData(byId) {
   // Replaces the previous hardcoded proxy coefficients (-0.72, -0.41, etc.) which were
   // invented values. Now shows the actual computed correlation or '—' if unavailable.
   // Label updated in index.html from 'USD/JPY vs Nikkei' → 'USD/JPY vs VIX (60d)'.
-  try {
-    const _corrIntraday = _intradayData || await loadIntradayQuotes().catch(() => null);
-    const corrs = _corrIntraday?.correlations;
-    if (Array.isArray(corrs)) {
+  // USD/JPY vs VIX correlation — always force a fresh cache read to avoid boot-order race.
+  // loadIntradayQuotes() returns the 90s cache if already loaded, so this costs nothing
+  // on second render but guarantees the data is available on first paint.
+  loadIntradayQuotes().then(_freshData => {
+    try {
+      const corrs = _freshData?.correlations;
+      if (!Array.isArray(corrs)) return;
       const entry = corrs.find(c =>
         (c.a === 'USD/JPY' && c.b === 'VIX') || (c.a === 'VIX' && c.b === 'USD/JPY')
       );
@@ -2024,8 +2027,6 @@ async function renderRiskData(byId) {
         const v = entry.corr;
         const sign = v >= 0 ? '+' : '';
         const corrLabel = sign + v.toFixed(2) + 'r';
-        // Interpretation: positive = USD/JPY and VIX move together (unusual, stress + USD bid)
-        // Negative = normal risk-off (VIX up → JPY bid → USD/JPY falls)
         const corrSig = v < -0.3 ? 'Normal (risk-off)' : v > 0.3 ? 'Unusual' : 'Neutral';
         const corrCls = v < -0.3 ? 'up' : v > 0.3 ? 'down' : 'flat';
         setEl('ri-usdjpy-nk', corrLabel);
@@ -2034,8 +2035,8 @@ async function renderRiskData(byId) {
         setEl('ri-usdjpy-nk', '—');
         setEl('ri-usdjpy-nk-sig', 'No data', 'flat');
       }
-    }
-  } catch {}
+    } catch {}
+  }).catch(() => {});
 }
 
 // Yield curve labels — fixed set of tenors we display
