@@ -1671,9 +1671,9 @@ function attachRiskMonitorTooltips() {
   // Header row
   const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
-    'COT-Derived Positioning Bias',
-    'Directional bias per pair derived from CFTC Commitments of Traders (COT) net speculative positioning. Positive = speculative longs dominate (base currency bid). Negative = speculative shorts dominate.',
-    'Not implied volatility. This is a positioning proxy — large net COT long/short historically precedes mean-reversion. 1W is more reactive; 1M is the structural trend. Divergence between the two signals potential inflection.'
+    'Positioning Bias — ETF IV + COT',
+    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) when available — real market-implied vol from nearest expiry ≥4 days. COT column shows CFTC net speculative positioning as directional proxy. Falls back to COT-only model if ETF IV unavailable.',
+    'ETF options have lower liquidity than OTC FX interbank options — IV may differ 1–3 vol points from true 25d RR. Direction (Bias column) always comes from COT net positioning.'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   const skewPairTips = {
@@ -2676,16 +2676,37 @@ async function fetchFedExpectations() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// OPTION SKEW — derived from COT + FX move data (approximated)
-// Shows directional bias from positioning & price action
+// POSITIONING BIAS — primary: real ATM IV from FX ETF options (quotes.json fx_etf_iv)
+// Fallback: COT net positioning proxy (original behavior) when ETF IV unavailable.
+//
+// ETF IV source (CBOE, via yfinance — fetch_intraday_quotes.py):
+//   FXE → EUR/USD  FXB → GBP/USD  FXY → USD/JPY  FXA → AUD/USD
+// COT fallback: netToSkew() maps CFTC net spec position to ±1.5 directional bias.
+//   The 1W/1M column distinction is preserved but both now show real IV when available.
+//
+// Column semantics when ETF IV is available:
+//   IV col  = ATM implied vol (annualised %, from nearest CBOE expiry ≥4d out)
+//   Bias    = directional bias from COT net (unchanged — positioning, not vol)
+// Column semantics when COT fallback only (ETF IV unavailable):
+//   1W/1M   = COT-derived positioning proxy (original behavior)
 // ═══════════════════════════════════════════════════════════════════
 async function fetchOptionSkew() {
   try {
     const tbody = document.getElementById('skew-tbody');
     if (!tbody) return;
 
-    // Use COT net positions as a proxy for skew bias
-    // Long bias → puts bid (downside protection) → negative skew for USD pairs
+    const pairs = [
+      { pair:'EUR/USD', cot:'EUR', etfId:'eurusd' },
+      { pair:'GBP/USD', cot:'GBP', etfId:'gbpusd' },
+      { pair:'USD/JPY', cot:'JPY', etfId:'usdjpy' },
+      { pair:'AUD/USD', cot:'AUD', etfId:'audusd' },
+    ];
+
+    // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
+    const intradayData = await loadIntradayQuotes().catch(() => null);
+    const etfIvMap = intradayData?.fx_etf_iv || {};
+
+    // ── SOURCE 2: COT positioning (bias direction + fallback values) ──
     const cotFiles = ['EUR','GBP','JPY','AUD','CAD'];
     const cotResults = await Promise.all(cotFiles.map(async ccy => {
       try {
@@ -2695,42 +2716,80 @@ async function fetchOptionSkew() {
         return { ccy, net: d.netPosition || 0, long: d.longPositions||0, short: d.shortPositions||0 };
       } catch { return null; }
     }));
+    const cotMap = {};
+    cotResults.filter(Boolean).forEach(c => { cotMap[c.ccy] = c; });
 
-    const pairs = [
-      { pair:'EUR/USD', cot:'EUR' },
-      { pair:'GBP/USD', cot:'GBP' },
-      { pair:'USD/JPY', cot:'JPY' },
-      { pair:'AUD/USD', cot:'AUD' },
-    ];
-
-    // Map COT net → approximate RR skew
-    // Positive net (more longs) for EUR → EUR calls bid → positive 25d RR
+    // COT → directional bias proxy (used for Bias column + fallback 1W/1M)
     function netToSkew(net, invert) {
-      const scale = Math.abs(net) / 50000; // normalize to ±1
+      const scale = Math.abs(net) / 50000;
       const val = Math.min(1.5, scale * 1.2);
       const signed = net > 0 ? val : -val;
       return invert ? -signed : signed;
     }
 
-    const cotMap = {};
-    cotResults.filter(Boolean).forEach(c => { cotMap[c.ccy] = c; });
+    // Update thead to reflect what's actually showing
+    const hasAnyEtfIv = pairs.some(p => etfIvMap[p.etfId]?.iv != null);
+    const thead = tbody.closest('table')?.querySelector('thead tr');
+    if (thead) {
+      if (hasAnyEtfIv) {
+        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
+      } else {
+        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th>';
+      }
+    }
 
     tbody.innerHTML = pairs.map(p => {
       const cotData = cotMap[p.cot];
-      if (!cotData) return `<tr><td>${p.pair}</td><td colspan="3" style="color:var(--text3)">—</td></tr>`;
-      const invert = p.pair.startsWith('USD/');
-      const skew1w = netToSkew(cotData.net, invert);
-      const skew1m = netToSkew(cotData.net * 0.85, invert);
-      const bias   = Math.abs(skew1w) < 0.1 ? 'Neutral' : skew1w > 0 ? p.pair.split('/')[0]+'+' : p.pair.split('/')[1]+'+';
-      const biasCls= Math.abs(skew1w) < 0.1 ? 'flat' : skew1w > 0 ? 'up' : 'down';
-      const fmtRR = v => (v >= 0 ? '+' : '') + v.toFixed(2);
-      return `<tr>
-        <td>${p.pair}</td>
-        <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
-        <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
-        <td class="${biasCls}">${bias}</td>
-      </tr>`;
+      const etfIv   = etfIvMap[p.etfId];
+      const invert  = p.pair.startsWith('USD/');
+
+      if (!cotData && !etfIv) {
+        return `<tr><td>${p.pair}</td><td colspan="3" style="color:var(--text3)">—</td></tr>`;
+      }
+
+      // Directional bias from COT (unchanged — positioning signal)
+      const cotSkew = cotData ? netToSkew(cotData.net, invert) : 0;
+      const bias    = Math.abs(cotSkew) < 0.1 ? 'Neutral'
+                    : cotSkew > 0 ? p.pair.split('/')[0]+'+'
+                    : p.pair.split('/')[1]+'+';
+      const biasCls = Math.abs(cotSkew) < 0.1 ? 'flat' : cotSkew > 0 ? 'up' : 'down';
+      const fmtRR   = v => (v >= 0 ? '+' : '') + v.toFixed(2);
+
+      if (etfIv?.iv != null) {
+        // ── ETF IV available: show real implied vol ──
+        const ivStr  = etfIv.iv.toFixed(1) + '%';
+        const ivCls  = etfIv.iv > 12 ? 'down' : etfIv.iv > 7 ? '' : 'up';
+        const cotStr = cotData ? fmtRR(cotSkew) : '—';
+        const cotCls = cotData ? (cotSkew >= 0 ? 'up' : 'down') : 'flat';
+        return `<tr title="ETF: ${etfIv.source} · exp ${etfIv.expiry} · ATM strike ${etfIv.atm}">
+          <td>${p.pair}</td>
+          <td class="${ivCls}" style="font-family:var(--font-mono)">${ivStr}</td>
+          <td class="${cotCls}" style="font-size:10px">${cotStr}</td>
+          <td class="${biasCls}">${bias}</td>
+        </tr>`;
+      } else {
+        // ── COT fallback: original behavior ──
+        const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
+        const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
+        return `<tr title="COT positioning proxy — ETF IV unavailable">
+          <td>${p.pair}</td>
+          <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
+          <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
+          <td class="${biasCls}">${bias}</td>
+        </tr>`;
+      }
     }).join('');
+
+    // Update panel subtitle to reflect actual source
+    const panelHead = tbody.closest('.card, section, div')
+      ?.previousElementSibling?.querySelector('span[style*="text3"]')
+      || document.querySelector('.sb-head span[style*="text3"]');
+    if (hasAnyEtfIv && panelHead) {
+      panelHead.textContent = 'ETF options IV · CBOE';
+    } else if (panelHead) {
+      panelHead.textContent = 'COT-derived · not IV';
+    }
+
   } catch(e) { console.warn('Option skew failed:', e); }
 }
 
