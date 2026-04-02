@@ -34,6 +34,24 @@
 /extended-data/*
   Cache-Control: public, max-age=7200, stale-while-revalidate=600
 
+/intraday-data/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=60
+
+/news-data/*
+  Cache-Control: public, max-age=1800, stale-while-revalidate=300
+
+/sentiment-data/*
+  Cache-Control: public, max-age=900, stale-while-revalidate=180
+
+/meetings-data/*
+  Cache-Control: public, max-age=7200, stale-while-revalidate=600
+
+/fx-performance/*
+  Cache-Control: public, max-age=7200, stale-while-revalidate=600
+
+/calendar-data/*
+  Cache-Control: public, max-age=7200, stale-while-revalidate=600
+
 # Assets estáticos — cache largo
 /*.png
   Cache-Control: public, max-age=2592000

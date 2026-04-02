@@ -81,6 +81,36 @@
   [headers.values]
     Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
 
+[[headers]]
+  for = "/intraday-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=60"
+
+[[headers]]
+  for = "/news-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=1800, stale-while-revalidate=300"
+
+[[headers]]
+  for = "/sentiment-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=900, stale-while-revalidate=180"
+
+[[headers]]
+  for = "/meetings-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
+
+[[headers]]
+  for = "/fx-performance/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
+
+[[headers]]
+  for = "/calendar-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=7200, stale-while-revalidate=600"
+
 # ── Assets estáticos — cache largo ───────────────────────────────────────────
 [[headers]]
   for = "/*.png"
