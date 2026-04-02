@@ -48,7 +48,7 @@ on:
     types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
 
   schedule:
-    - cron: '*/5 * * * *'              # fallback cada 5 min — red de seguridad si cron-job.org falla
+    - cron: '*/15 * * * *'             # fallback cada 15 min — red de seguridad si cron-job.org falla
 
   workflow_dispatch:                   # trigger manual desde GitHub UI
 
