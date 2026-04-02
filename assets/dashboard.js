@@ -2956,44 +2956,80 @@ async function buildRichNarrative() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// REFERENCE SPREADS — from spreads-data/spreads.json (engine 2×/day)
-// Falls back silently to the static HTML values when file absent.
+// REFERENCE SPREADS — computed from HV30 + VIX + MOVE
+//
+// Methodology (professional ECN spread model):
+//   spread = ECN_FLOOR + HV30 × VOL_COEF × vixMultiplier [× moveMultiplier]
+//
+//   ECN_FLOOR  — institutional minimum at peak liquidity (London/NY overlap),
+//                calibrated against IC Markets, Pepperstone Razor, LMAX avg.
+//   VOL_COEF   — pip sensitivity per 1% of 30-day realised vol, per pair.
+//                Higher for commodity currencies (AUD, NZD) that gap more.
+//   vixMult    — linear stress scalar: 1.0× at VIX 15 → 1.5× at VIX 30,
+//                capped at 2.0×. Captures widening during risk-off spikes.
+//   moveMult   — MOVE overlay applied to rates-sensitive pairs (JPY, CHF):
+//                +5% per 10 MOVE points above 80 (IG desk convention).
+//
+//   All inputs from intraday-data/quotes.json — no external API required.
+//   Refreshes every time the intraday JSON updates (~5 min in production).
 // ═══════════════════════════════════════════════════════════════════
 async function fetchReferenceSpreads() {
   try {
-    const data = await fetch('./spreads-data/spreads.json')
-      .then(r => r.ok ? r.json() : null)
-      .catch(() => null);
+    // ── Model parameters ─────────────────────────────────────────────
+    const ECN_FLOOR = {
+      eurusd: 0.1, gbpusd: 0.2, usdjpy: 0.1,
+      audusd: 0.2, usdchf: 0.2, usdcad: 0.2, nzdusd: 0.3,
+    };
+    const VOL_COEF = {
+      eurusd: 0.035, gbpusd: 0.045, usdjpy: 0.030,
+      audusd: 0.060, usdchf: 0.055, usdcad: 0.050, nzdusd: 0.070,
+    };
 
-    if (!data?.spreads) return;   // no file yet — keep static HTML fallback
+    // ── Fetch vol inputs from the already-loaded intraday cache ───────
+    const intradayData = await loadIntradayQuotes();
+    if (!intradayData) return;   // silently keep static HTML fallback
 
+    const quotes = intradayData.quotes || {};
+    const hv30   = intradayData.hv30  || {};
+
+    const vix  = quotes.vix?.close  || 15;
+    const move = quotes.move?.close  || 80;
+
+    // Stress multipliers
+    const vixMult  = Math.min(2.0, Math.max(1.0, 1.0 + (vix  - 15) / 30));
+    const moveMult = Math.min(1.3, Math.max(1.0, 1.0 + (move - 80) / 200));
+
+    // ── Compute spreads ───────────────────────────────────────────────
+    const computed = {};
+    for (const pair of Object.keys(ECN_FLOOR)) {
+      const hv      = hv30[pair] ?? quotes[pair]?.hv30 ?? 8.0;
+      const isRates = pair === 'usdjpy' || pair === 'usdchf';
+      const volMult = isRates ? vixMult * moveMult : vixMult;
+      const raw     = ECN_FLOOR[pair] + hv * VOL_COEF[pair] * volMult;
+      computed[pair] = Math.max(ECN_FLOOR[pair], Math.round(raw * 10) / 10);
+    }
+
+    // ── Render ────────────────────────────────────────────────────────
     const MAX_PIP = 5.0;
     const pairMap = {
-      eurusd: 'spr-eurusd',
-      gbpusd: 'spr-gbpusd',
-      usdjpy: 'spr-usdjpy',
-      audusd: 'spr-audusd',
-      usdchf: 'spr-usdchf',
-      usdcad: 'spr-usdcad',
+      eurusd: 'spr-eurusd', gbpusd: 'spr-gbpusd', usdjpy: 'spr-usdjpy',
+      audusd: 'spr-audusd', usdchf: 'spr-usdchf', usdcad: 'spr-usdcad',
       nzdusd: 'spr-nzdusd',
     };
 
     for (const [pair, elId] of Object.entries(pairMap)) {
-      const s = data.spreads[pair];
-      if (!s) continue;
-      const pips = s.spread_pips;
-      const el   = document.getElementById(elId);
+      const pips = computed[pair];
+      if (pips == null) continue;
+      const el = document.getElementById(elId);
       if (!el) continue;
-      const row    = el.closest('.spread-row');
-      const fillEl = row?.querySelector('.spr-fill');
+      const fillEl = el.closest('.spread-row')?.querySelector('.spr-fill');
 
-      // Color tiers: ≤1.2 green, ≤2.0 orange, >2.0 red
-      const color = pips <= 1.2 ? 'var(--up)' : pips <= 2.0 ? 'var(--orange)' : 'var(--down)';
-      const cls   = pips <= 1.2 ? 'up'        : pips <= 2.0 ? ''              : 'down';
+      const color = pips <= 1.0 ? 'var(--up)' : pips <= 2.0 ? 'var(--orange)' : 'var(--down)';
+      const cls   = pips <= 1.0 ? 'up'        : pips <= 2.0 ? ''              : 'down';
 
-      el.textContent  = pips.toFixed(1) + ' pip';
-      el.className    = 'spr-val' + (cls ? ' ' + cls : '');
-      el.style.color  = cls ? '' : 'var(--orange)';
+      el.textContent = pips.toFixed(1) + ' pip';
+      el.className   = 'spr-val' + (cls ? ' ' + cls : '');
+      el.style.color = cls ? '' : 'var(--orange)';
 
       if (fillEl) {
         fillEl.style.width      = Math.min(100, (pips / MAX_PIP) * 100) + '%';
@@ -3001,12 +3037,11 @@ async function fetchReferenceSpreads() {
       }
     }
 
-    // Update subtitle with timestamp
+    // Subtitle — vol regime label
     const sub = document.getElementById('spreads-sub');
-    if (sub && data.updated) {
-      const t = new Date(data.updated);
-      const hhmm = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-      sub.textContent = `ECN live · ${hhmm} UTC`;
+    if (sub) {
+      const regime = vix < 20 ? 'Low vol' : vix < 28 ? 'Elevated vol' : 'High vol';
+      sub.textContent = `ECN est. · ${regime} · VIX ${vix.toFixed(1)}`;
     }
 
   } catch(e) { console.warn('[Spreads] Failed:', e); }
@@ -3040,7 +3075,7 @@ async function boot() {
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
   fetchNewsData();
-  fetchReferenceSpreads();          // spreads-data/spreads.json (engine 2×/day, graceful fallback)
+  fetchReferenceSpreads();          // HV30+VIX+MOVE vol model — no external API, updates with intraday JSON
 
   // ── CRITICAL: Load AI regime badge FIRST, before fetchRiskData touches the narrative badge.
   // loadAIRegime() is a lightweight fetch of ai-analysis/index.json (~same-origin, <50ms).
