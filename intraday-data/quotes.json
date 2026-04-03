@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-03T08:00:26Z",
+  "updated": "2026-04-03T08:05:20Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -66,10 +66,10 @@
       "source": "yfinance"
     },
     "dxy": {
-      "close": 99.964,
+      "close": 99.962,
       "prev_close": 100.03,
-      "chg": -0.066,
-      "pct": -0.066,
+      "chg": -0.068,
+      "pct": -0.068,
       "high": 100.077,
       "low": 99.953,
       "source": "yfinance"
@@ -84,12 +84,12 @@
       "source": "yfinance"
     },
     "us2y": {
-      "close": 3.79,
+      "close": 3.81,
       "prev_close": 3.605,
       "chg": 0.002,
       "pct": 0.0555,
       "source": "fred_dgs2",
-      "sourceDate": "2026-03-31"
+      "sourceDate": "2026-04-01"
     },
     "us5y": {
       "close": 3.948,
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 67031.5,
+      "close": 67053.1562,
       "prev_close": 66888.5703,
-      "chg": 142.9297,
-      "pct": 0.2137,
+      "chg": 164.5859,
+      "pct": 0.2461,
       "high": 67079.3281,
       "low": 66296.9531,
       "source": "yfinance"
@@ -155,30 +155,30 @@
       "source": "yfinance"
     },
     "eurusd": {
-      "close": 1.1546,
+      "close": 1.1547,
       "prev_close": 1.1591,
-      "chg": -0.0045,
-      "pct": -0.3845,
+      "chg": -0.0043,
+      "pct": -0.373,
       "high": 1.155,
       "low": 1.1533,
       "source": "yfinance",
-      "hv30": 7.97
+      "hv30": 7.96
     },
     "gbpusd": {
       "close": 1.3239,
       "prev_close": 1.3303,
-      "chg": -0.0064,
-      "pct": -0.4821,
+      "chg": -0.0063,
+      "pct": -0.4765,
       "high": 1.3243,
       "low": 1.3222,
       "source": "yfinance",
-      "hv30": 8.39
+      "hv30": 8.38
     },
     "usdjpy": {
-      "close": 159.588,
+      "close": 159.59,
       "prev_close": 158.688,
-      "chg": 0.9,
-      "pct": 0.5671,
+      "chg": 0.902,
+      "pct": 0.5684,
       "high": 159.712,
       "low": 159.418,
       "source": "yfinance",
@@ -188,7 +188,7 @@
       "close": 0.6909,
       "prev_close": 0.6924,
       "chg": -0.0015,
-      "pct": -0.2175,
+      "pct": -0.2147,
       "high": 0.6916,
       "low": 0.6904,
       "source": "yfinance",
@@ -198,11 +198,11 @@
       "close": 0.7978,
       "prev_close": 0.794,
       "chg": 0.0039,
-      "pct": 0.4862,
+      "pct": 0.4874,
       "high": 0.7991,
       "low": 0.7974,
       "source": "yfinance",
-      "hv30": 7.13
+      "hv30": 7.14
     },
     "usdcad": {
       "close": 1.3921,
@@ -218,27 +218,27 @@
       "close": 0.571,
       "prev_close": 0.575,
       "chg": -0.004,
-      "pct": -0.691,
+      "pct": -0.7023,
       "high": 0.5721,
       "low": 0.5707,
       "source": "yfinance",
-      "hv30": 10.84
+      "hv30": 10.85
     },
     "eurgbp": {
-      "close": 0.8718,
+      "close": 0.8719,
       "prev_close": 0.8712,
       "chg": 0.0006,
-      "pct": 0.0631,
+      "pct": 0.0723,
       "high": 0.8729,
       "low": 0.8717,
       "source": "yfinance",
       "hv30": 4.01
     },
     "eurjpy": {
-      "close": 184.192,
+      "close": 184.205,
       "prev_close": 183.898,
-      "chg": 0.294,
-      "pct": 0.1599,
+      "chg": 0.307,
+      "pct": 0.1669,
       "high": 184.244,
       "low": 183.981,
       "source": "yfinance",
@@ -248,117 +248,117 @@
       "close": 0.9209,
       "prev_close": 0.9202,
       "chg": 0.0007,
-      "pct": 0.0728,
+      "pct": 0.0772,
       "high": 0.9219,
       "low": 0.9204,
       "source": "yfinance",
       "hv30": 5.55
     },
     "eurcad": {
-      "close": 1.6066,
+      "close": 1.6067,
       "prev_close": 1.6081,
-      "chg": -0.0015,
-      "pct": -0.092,
+      "chg": -0.0014,
+      "pct": -0.0864,
       "high": 1.6069,
       "low": 1.6049,
       "source": "yfinance",
       "hv30": 7.21
     },
     "euraud": {
-      "close": 1.6706,
+      "close": 1.6708,
       "prev_close": 1.674,
-      "chg": -0.0034,
-      "pct": -0.2013,
-      "high": 1.6708,
+      "chg": -0.0033,
+      "pct": -0.1941,
+      "high": 1.6709,
       "low": 1.6686,
       "source": "yfinance",
       "hv30": 7.57
     },
     "gbpjpy": {
-      "close": 211.258,
+      "close": 211.257,
       "prev_close": 211.041,
-      "chg": 0.217,
-      "pct": 0.1028,
+      "chg": 0.216,
+      "pct": 0.1024,
       "high": 211.31,
       "low": 210.848,
       "source": "yfinance",
       "hv30": 5.9
     },
     "gbpchf": {
-      "close": 1.0561,
+      "close": 1.0562,
       "prev_close": 1.056,
-      "chg": 0.0001,
-      "pct": 0.0133,
+      "chg": 0.0002,
+      "pct": 0.0199,
       "high": 1.0571,
       "low": 1.0546,
       "source": "yfinance",
       "hv30": 6.86
     },
     "gbpcad": {
-      "close": 1.8426,
+      "close": 1.8428,
       "prev_close": 1.8455,
-      "chg": -0.0029,
-      "pct": -0.1593,
+      "chg": -0.0027,
+      "pct": -0.1458,
       "high": 1.843,
       "low": 1.8383,
       "source": "yfinance",
       "hv30": 7.55
     },
     "audjpy": {
-      "close": 110.246,
+      "close": 110.247,
       "prev_close": 109.846,
-      "chg": 0.4,
-      "pct": 0.3641,
+      "chg": 0.401,
+      "pct": 0.3651,
       "high": 110.34,
       "low": 110.04,
       "source": "yfinance",
-      "hv30": 9.28
+      "hv30": 9.27
     },
     "audnzd": {
-      "close": 1.2102,
+      "close": 1.2104,
       "prev_close": 1.2041,
-      "chg": 0.0061,
-      "pct": 0.5041,
+      "chg": 0.0062,
+      "pct": 0.5174,
       "high": 1.2105,
       "low": 1.2054,
       "source": "yfinance",
-      "hv30": 5.42
+      "hv30": 5.41
     },
     "audchf": {
       "close": 0.5512,
       "prev_close": 0.5497,
       "chg": 0.0015,
-      "pct": 0.2729,
+      "pct": 0.2711,
       "high": 0.5522,
       "low": 0.5493,
       "source": "yfinance",
       "hv30": 10.17
     },
     "cadjpy": {
-      "close": 114.638,
+      "close": 114.637,
       "prev_close": 114.342,
-      "chg": 0.296,
-      "pct": 0.2589,
+      "chg": 0.295,
+      "pct": 0.258,
       "high": 114.698,
       "low": 114.517,
       "source": "yfinance",
       "hv30": 7.7
     },
     "chfjpy": {
-      "close": 199.998,
+      "close": 199.996,
       "prev_close": 199.8256,
-      "chg": 0.1724,
-      "pct": 0.0863,
-      "high": 200.027,
+      "chg": 0.1704,
+      "pct": 0.0853,
+      "high": 200.038,
       "low": 199.577,
       "source": "yfinance",
       "hv30": 7.15
     },
     "nzdjpy": {
-      "close": 91.086,
+      "close": 91.059,
       "prev_close": 91.208,
-      "chg": -0.122,
-      "pct": -0.1338,
+      "chg": -0.149,
+      "pct": -0.1634,
       "high": 91.237,
       "low": 91.037,
       "source": "yfinance",
@@ -366,13 +366,13 @@
     }
   },
   "hv30": {
-    "eurusd": 7.97,
-    "gbpusd": 8.39,
+    "eurusd": 7.96,
+    "gbpusd": 8.38,
     "usdjpy": 7.61,
     "audusd": 11.78,
-    "usdchf": 7.13,
+    "usdchf": 7.14,
     "usdcad": 3.82,
-    "nzdusd": 10.84,
+    "nzdusd": 10.85,
     "eurgbp": 4.01,
     "eurjpy": 4.89,
     "eurchf": 5.55,
@@ -381,8 +381,8 @@
     "gbpjpy": 5.9,
     "gbpchf": 6.86,
     "gbpcad": 7.55,
-    "audjpy": 9.28,
-    "audnzd": 5.42,
+    "audjpy": 9.27,
+    "audnzd": 5.41,
     "audchf": 10.17,
     "cadjpy": 7.7,
     "chfjpy": 7.15,
@@ -416,7 +416,7 @@
     {
       "a": "USD/CAD",
       "b": "WTI Oil",
-      "corr": 0.196,
+      "corr": 0.195,
       "n": 60
     },
     {
@@ -434,7 +434,7 @@
     {
       "a": "NZD/USD",
       "b": "NZX 50",
-      "corr": 0.23,
+      "corr": 0.231,
       "n": 60
     },
     {
