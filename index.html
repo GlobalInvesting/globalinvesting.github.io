@@ -3,15 +3,7 @@
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJLGQET9KJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-CJLGQET9KJ', {
-    'link_attribution': true,
-    'search_console_domain': 'globalinvesting.github.io'
-  });
-</script>
+<script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Global Investing FX Terminal | Professional Forex Dashboard 2026</title>
@@ -262,7 +254,7 @@
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
 <div id="tv-ticker-wrap">
-  <button id="qb-prev" class="qb-arrow" aria-label="Scroll quotes left" onclick="document.getElementById('tv-ticker').scrollBy({left:-200,behavior:'smooth'})">&#8249;</button>
+  <button id="qb-prev" class="qb-arrow" aria-label="Scroll quotes left">&#8249;</button>
   <div id="tv-ticker">
     <div id="quotebar-inner">
       <div class="q-item"><span class="q-sym">EUR/USD</span><span class="q-price" id="q-eurusd">—</span><span class="q-chg" id="qc-eurusd">—</span></div>
@@ -281,7 +273,7 @@
     </div>
     <span id="qb-source-label" style="font-size:9px;color:var(--text3);padding:0 8px;white-space:nowrap;align-self:center;flex-shrink:0;">yfinance</span>
   </div>
-  <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right" onclick="document.getElementById('tv-ticker').scrollBy({left:200,behavior:'smooth'})">&#8250;</button>
+  <button id="qb-next" class="qb-arrow" aria-label="Scroll quotes right">&#8250;</button>
 </div>
 
 <!-- NEWS TICKER — populated from news-data/news.json -->
@@ -363,7 +355,7 @@
           <span class="panel-sub">TradingView · live data</span>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
-          <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:-200,behavior:'smooth'})" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
+          <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
           <div id="tv-pair-tabs" role="tablist" aria-label="Currency pair chart selector" style="display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;flex:1;">
             <button class="tv-tab active" role="tab" aria-selected="true" data-sym="FX:EURUSD">EUR/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX:GBPUSD">GBP/USD</button>
@@ -386,7 +378,7 @@
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
           </div>
-          <button id="tv-tabs-next" aria-label="Scroll chart tabs right" onclick="document.getElementById('tv-pair-tabs').scrollBy({left:200,behavior:'smooth'})" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
+          <button id="tv-tabs-next" aria-label="Scroll chart tabs right" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
         </div>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;">
