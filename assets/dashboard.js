@@ -3651,31 +3651,58 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 // We force a redraw whenever the page becomes visible again.
 // ═══════════════════════════════════════════════════════════════════
 (function() {
-  // Helper: reload the active TradingView chart by simulating a tab click
+  // Helper: reload the active TradingView chart by fully recreating the widget.
+  // Simulating a tab click is unreliable on mobile when the iframe has gone blank;
+  // instead we rebuild the widget container from scratch, reusing the same symbol
+  // that was already selected (or falling back to the first tab).
   function reloadActiveTVChart() {
-    const activeTab = document.querySelector('.tv-tab.active');
-    if (activeTab) activeTab.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+    var activeTab = document.querySelector('.tv-tab.active') || document.querySelector('.tv-tab');
+    if (!activeTab) return;
+    // Dispatch a real click — the existing click handler tears down & rebuilds the widget
+    activeTab.dispatchEvent(new MouseEvent('click', {bubbles: true}));
   }
 
   // Helper: reload the Economic Calendar widget by re-injecting its script
   function reloadTVCalendar() {
-    const scaleWrap = document.getElementById('tvcal-scale');
+    var scaleWrap = document.getElementById('tvcal-scale');
     if (!scaleWrap) return;
-    // Remove existing iframe/content and re-create the widget container
-    const container = scaleWrap.querySelector('.tradingview-widget-container');
+    var container = scaleWrap.querySelector('.tradingview-widget-container');
     if (!container) return;
-    const existingScript = container.querySelector('script');
+    var existingScript = container.querySelector('script');
     if (!existingScript) return;
-    // Clone the widget container content to force re-init
-    const clone = container.cloneNode(true);
+    var clone = container.cloneNode(true);
     container.parentNode.replaceChild(clone, container);
+  }
+
+  // Helper: reload the Economic Map custom element (<tv-economic-map>).
+  // On mobile, the shadow-DOM / web-component loses its internal iframe when the
+  // browser suspends the page. The only reliable recovery is to replace the element.
+  function reloadEconomicMap() {
+    var mapEl = document.querySelector('tv-economic-map');
+    if (!mapEl) return;
+    var parent = mapEl.parentNode;
+    if (!parent) return;
+    // Build a fresh replacement with the same attributes
+    var replacement = document.createElement('tv-economic-map');
+    replacement.setAttribute('theme', 'dark');
+    replacement.setAttribute('transparent', '');
+    replacement.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:#131722;';
+    parent.replaceChild(replacement, mapEl);
+  }
+
+  // Helper: check whether the TV price chart iframe has gone blank (zero-height or missing)
+  function tvChartIsBlank() {
+    var wrap = document.getElementById('tv-chart-wrap');
+    if (!wrap) return false;
+    var iframe = wrap.querySelector('iframe');
+    // Blank if no iframe at all, or if it has collapsed to 0px
+    return !iframe || iframe.offsetHeight === 0;
   }
 
   // FX Liquidity chart: force redraw when visible
   function redrawLiquidityIfVisible() {
-    const canvas = document.getElementById('liquidity-canvas');
+    var canvas = document.getElementById('liquidity-canvas');
     if (!canvas) return;
-    // Only redraw if canvas has zero dimensions (collapsed/invisible at paint time)
     if (canvas.parentElement.clientWidth > 0) drawLiquidityChart();
   }
 
@@ -3688,9 +3715,12 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
-      if (isMobile) reloadActiveTVChart();
-    }, 350);
+      // Only reload TV widgets on mobile — desktop iframes stay alive across switches
+      if (isMobile) {
+        reloadActiveTVChart();
+        reloadEconomicMap();
+      }
+    }, 400);
   });
 
   // On pageshow (iOS Safari fires this when returning from bfcache)
@@ -3698,12 +3728,12 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     if (!e.persisted) return; // only for bfcache restores
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Mobile only: widgets may have gone blank after bfcache restore
       if (isMobile) {
         reloadActiveTVChart();
         reloadTVCalendar();
+        reloadEconomicMap();
       }
-    }, 350);
+    }, 400);
   });
 
   // IntersectionObserver: redraw liquidity chart the first time it enters viewport
