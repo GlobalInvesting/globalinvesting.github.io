@@ -3657,10 +3657,44 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 // We force a redraw whenever the page becomes visible again.
 // ═══════════════════════════════════════════════════════════════════
 (function() {
-  // Helper: reload the active TradingView chart by simulating a tab click
+  // Helper: reload the active TradingView chart by fully re-creating its widget
+  // (simulating a click doesn't work when the tab is already active)
   function reloadActiveTVChart() {
     const activeTab = document.querySelector('.tv-tab.active');
-    if (activeTab) activeTab.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+    if (!activeTab) return;
+    const sym = activeTab.dataset.sym;
+    if (!sym) {
+      // Fallback: dispatch click if no sym data attribute
+      activeTab.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+      return;
+    }
+    const wrap = document.getElementById('tv-chart-wrap');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    const container = document.createElement('div');
+    container.className = 'tradingview-widget-container';
+    container.style.cssText = 'height:100%;width:100%;';
+    const widget = document.createElement('div');
+    widget.className = 'tradingview-widget-container__widget';
+    widget.style.cssText = 'height:100%;width:100%;';
+    container.appendChild(widget);
+    const copyright = document.createElement('div');
+    copyright.className = 'tradingview-widget-copyright';
+    copyright.style.display = 'none';
+    container.appendChild(copyright);
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.text = JSON.stringify({
+      allow_symbol_change:false, calendar:false, details:true,
+      hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
+      hide_volume:true, interval:'D', locale:'en', save_image:false,
+      style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
+      backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
+      withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
+    });
+    container.appendChild(script);
+    wrap.appendChild(container);
   }
 
   // Helper: reload the Economic Calendar widget by re-injecting its script
@@ -3695,19 +3729,30 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     setTimeout(function() {
       redrawLiquidityIfVisible();
       // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
-      if (isMobile) reloadActiveTVChart();
+      if (isMobile) {
+        reloadActiveTVChart();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
+      }
     }, 350);
   });
 
   // On pageshow (iOS Safari fires this when returning from bfcache)
   window.addEventListener('pageshow', function(e) {
     if (!e.persisted) return; // only for bfcache restores
+    // Reset scroll to top so page doesn't restore mid-page on mobile
+    if (isMobile) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
     setTimeout(function() {
       redrawLiquidityIfVisible();
       // Mobile only: widgets may have gone blank after bfcache restore
       if (isMobile) {
         reloadActiveTVChart();
-        reloadTVCalendar();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
   });
