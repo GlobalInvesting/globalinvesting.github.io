@@ -14,7 +14,7 @@ FUENTES POR SÍMBOLO:
   NIKKEI  → yfinance  ^N225
   STOXX   → yfinance  ^STOXX50E
   DXY     → yfinance  DX-Y.NYB
-  US2Y    → yfinance  ^IRX          (13-week T-Bill, proxy de 2Y; el real us2y viene de FRED en repo)
+  US2Y    → FRED DGS2               (real Treasury 2Y; ^IRX solo como placeholder inicial, reemplazado en PASO 4)
   US3M    → yfinance  ^IRX          (13-week T-Bill = 3M, mismo símbolo)
   US5Y    → yfinance  ^FVX          (US 5Y Treasury yield)
   US30Y   → yfinance  ^TYX          (US 30Y Treasury yield)
@@ -74,7 +74,7 @@ YFINANCE_SYMBOLS = {
     "dxy":    "DX-Y.NYB",
     # Risk panel — yield curve
     "us3m":   "^IRX",     # Yahoo ^IRX = 13-week T-Bill yield (3M)
-    "us2y":   "^IRX",     # mismo símbolo — proxy de 2Y (el real us2y viene de FRED en repo)
+    "us2y":   "^IRX",     # T-Bill 13 semanas (3M) — placeholder inicial; reemplazado por FRED DGS2 (real 2Y) en PASO 4
     "us5y":   "^FVX",     # US 5Y Treasury yield (×10 en Yahoo — se divide abajo)
     "us30y":  "^TYX",     # US 30Y Treasury yield (×10 en Yahoo — se divide abajo)
     # Risk panel — bond vol + crypto
