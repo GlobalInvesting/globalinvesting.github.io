@@ -950,6 +950,8 @@ function updateFxPairsTableRT() {
       const halfSpread = spreadPips * pipVal / 2;
       tds[1].textContent = fmt(data.close - halfSpread, pairCfg.dec);
       tds[2].textContent = fmt(data.close + halfSpread, pairCfg.dec);
+      // Spread: keep in sync with TYPICAL_SPREADS (may have been updated by fetchReferenceSpreads)
+      if (tds[3]) tds[3].textContent = spreadPips.toFixed(1);
       // 1D Chg: respetar null — mostrar '—' en vez de '+0.00%' cuando prev_close no existe
       if (data.pct != null) {
         tds[4].textContent = pctStr(data.pct);
