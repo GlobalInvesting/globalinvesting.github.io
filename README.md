@@ -50,7 +50,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 |-----------|----------|------------|
 | `ai-analysis/signals.json` | AI narrative and market signals | Engine — 8× daily |
 | `calendar-data/` | Economic calendar events | Engine — daily |
-| `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) | Engine — weekly (Saturday) |
+| `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
 | `fx-performance/` | FX pair performance data | Engine — daily |
