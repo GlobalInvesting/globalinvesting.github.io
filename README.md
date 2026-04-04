@@ -12,16 +12,16 @@ A professional-grade foreign exchange monitoring platform for serious market par
 
 - **Real-time price feeds** — Major FX pairs, commodities (XAU, WTI), crypto (BTC), DXY, and US 10Y yield
 - **Currency strength heatmap** — 8×8 grid showing G8 currency performance across all pairs
-- **AI market narrative** — 2–3 sentence regime summary updated 3× daily (06:30, 12:30, 21:30 UTC)
-- **CFTC COT positioning** — Institutional positioning data from CFTC.gov, updated weekly
-- **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y from Stooq, updated daily
-- **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations
+- **AI market narrative** — 2–3 sentence regime summary updated 8× daily alongside market signals
+- **CFTC COT positioning** — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined) from CFTC.gov, updated weekly
+- **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
+- **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
 - **Central bank policy rates** — All G8 CBs with rate cycle direction
 - **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
+- **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias
 - **Economic calendar** — TradingView embed with real-time event actuals
-- **News feed** — Reuters, FT, ForexLive, FXStreet via RSS, filtered by FX relevance
-- **Option skew** — 25-delta risk reversals for major pairs
-- **Market signals** — 4–6 AI-generated signals updated alongside the narrative
+- **News feed** — FXStreet, ForexLive, Investing.com and others, filtered by FX relevance, updated hourly
+- **Market signals** — 5–7 AI-generated signals updated 8× daily
 
 ---
 
@@ -40,7 +40,7 @@ The frontend reads all data via `fetch()` from JSON files committed to this repo
 
 ## Currencies covered
 
-USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, covering over 85% of global daily FX turnover by BIS estimates.
+USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major currencies, covering the substantial majority of global daily FX turnover.
 
 ---
 
@@ -48,13 +48,15 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 
 | Directory | Contents | Updated by |
 |-----------|----------|------------|
-| `ai-analysis/signals.json` | AI narrative and market signals | Engine — 3× daily |
+| `ai-analysis/signals.json` | AI narrative and market signals | Engine — 8× daily |
 | `calendar-data/` | Economic calendar events | Engine — daily |
-| `cot-data/` | CFTC COT positioning | Engine — weekly |
+| `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
+| `fx-performance/` | FX pair performance data | Engine — daily |
+| `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels | Engine — every 15 min |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
-| `news-data/` | RSS news feed | Engine — 3× daily |
+| `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
 
 ---
