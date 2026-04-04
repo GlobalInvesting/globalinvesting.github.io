@@ -570,7 +570,7 @@
     padding: 0 10px; gap: 10px;
     font-size: 10px; color: var(--text2); z-index: 200;
     font-family: var(--font-ui);
-    overflow: hidden;
+    overflow: visible;
   }
   #statusbar > div:not(.footer-copy) {
     flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1109,9 +1109,9 @@ a:focus-visible,
   font-family: var(--font-ui); letter-spacing: .01em;
   box-shadow: 0 3px 10px rgba(0,0,0,.4);
 }
-/* keep tooltips inside viewport at edges */
-.pd-cell[data-tip]:first-child:hover::after { left: 0; transform: none; }
-.pd-cell[data-tip]:last-child:hover::after  { left: auto; right: 0; transform: none; }
+/* keep tooltips inside viewport — 2-col grid: odd = left col, even = right col */
+.pd-cell[data-tip]:nth-child(odd):hover::after  { left: 0; transform: none; }
+.pd-cell[data-tip]:nth-child(even):hover::after { left: auto; right: 0; transform: none; }
 
 /* ── CONFIGURABLE ALERTS PANEL ──────────────────────────────────── */
 #alerts-panel {
