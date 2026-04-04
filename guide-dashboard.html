@@ -416,102 +416,108 @@ a { color: inherit; text-decoration: none; }
       <h2>Price Chart</h2>
       <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, XAU/USD, WTI, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD. FX pairs use ICE Data Services as the data source for TradingView (e.g. <code>FX_IDC:EURUSD</code>), providing reliable real-time quotes directly on the chart.</p>
       <p>The chart is embedded in a focused read-only view — fixed to candlestick style and Daily timeframe, with a 20-period MA overlay. Toolbars are intentionally hidden to keep the layout compact.</p>
-      <!-- MOCK: Price chart widget -->
+      <!-- MOCK: Price chart widget — mirrors actual TradingView embed (ICE source, EUR/USD 1D) -->
       <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
         <!-- Tab row -->
-        <div style="background:#1a1d29;border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
+        <div style="background:#1a1d29;border-bottom:1px solid #2a2e39;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
           <div style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #2962ff;white-space:nowrap;cursor:pointer;">EUR/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">USD/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">GBP/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">AUD/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">USD/CAD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">USD/CHF</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">NZD/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">EUR/GBP</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">EUR/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">GBP/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">XAU/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">DXY</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">WTI</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">S&amp;P 500</div>
-          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">BTC/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/JPY</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">AUD/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/CAD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/CHF</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">NZD/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/GBP</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/JPY</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/JPY</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">XAU/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">DXY</div>
         </div>
-        <!-- Chart area — bearish EUR/USD pattern matching the live widget -->
-        <div style="position:relative;background:#131722;padding:8px 10px 0;">
-          <!-- Top-left instrument label -->
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Euro / U.S. Dollar · 1D · ICE</span>
-            <span style="font-size:9px;color:var(--down);font-family:var(--font-mono);">1.15165 −0.00214 (−0.19%)</span>
+        <!-- Chart area — realistic TradingView-style with y-axis, peak in Feb, decline to Apr -->
+        <div style="position:relative;background:#131722;">
+          <!-- Symbol/source info bar -->
+          <div style="padding:5px 10px 0;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:11px;font-weight:600;color:#d1d4dc;">Euro / U.S. Dollar · 1D · ICE</span>
+            <span style="font-size:10px;color:#ef5350;">-0.00214 (-0.19%)</span>
           </div>
-          <div style="font-size:8px;color:#2962ff;font-family:var(--font-mono);margin-bottom:2px;">MA 20 close</div>
-        </div>
-        <div style="position:relative;height:148px;padding:0 10px 20px;">
-          <svg viewBox="0 0 560 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
-            <!-- Gradient fill under MA line (bearish: peak in Feb, falling to Apr) -->
-            <defs>
-              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#2962ff" stop-opacity="0.08"/>
-                <stop offset="100%" stop-color="#2962ff" stop-opacity="0.01"/>
-              </linearGradient>
-            </defs>
-            <!-- MA 20 line — rise from Dec, peak mid-Feb ~y=22, then decline to Apr ~y=95 -->
-            <polyline points="0,85 40,78 80,68 120,52 160,38 200,28 240,22 280,30 320,44 360,58 400,72 440,82 480,90 520,95 560,98" fill="none" stroke="#2962ff" stroke-width="1.5" opacity="0.9"/>
-            <!-- Candles — Dec: rising gently; Jan-Feb: strong up; Mar: reversal; Apr: declining -->
-            <!-- Dec candles (x 10–110, y around 80-70) -->
-            <line x1="10" y1="80" x2="10" y2="92" stroke="#26a69a" stroke-width="1"/><rect x="7" y="82" width="6" height="7" fill="#26a69a"/>
-            <line x1="28" y1="77" x2="28" y2="88" stroke="#ef5350" stroke-width="1"/><rect x="25" y="79" width="6" height="7" fill="#ef5350"/>
-            <line x1="46" y1="73" x2="46" y2="84" stroke="#26a69a" stroke-width="1"/><rect x="43" y="75" width="6" height="7" fill="#26a69a"/>
-            <line x1="64" y1="69" x2="64" y2="80" stroke="#26a69a" stroke-width="1"/><rect x="61" y="71" width="6" height="7" fill="#26a69a"/>
-            <line x1="82" y1="65" x2="82" y2="76" stroke="#ef5350" stroke-width="1"/><rect x="79" y="67" width="6" height="7" fill="#ef5350"/>
-            <!-- Jan candles (x 100–200, y 60-40) -->
-            <line x1="100" y1="58" x2="100" y2="69" stroke="#26a69a" stroke-width="1"/><rect x="97" y="60" width="6" height="7" fill="#26a69a"/>
-            <line x1="118" y1="52" x2="118" y2="63" stroke="#26a69a" stroke-width="1"/><rect x="115" y="54" width="6" height="7" fill="#26a69a"/>
-            <line x1="136" y1="47" x2="136" y2="58" stroke="#ef5350" stroke-width="1"/><rect x="133" y="49" width="6" height="7" fill="#ef5350"/>
-            <line x1="154" y1="42" x2="154" y2="53" stroke="#26a69a" stroke-width="1"/><rect x="151" y="44" width="6" height="7" fill="#26a69a"/>
-            <line x1="172" y1="36" x2="172" y2="47" stroke="#26a69a" stroke-width="1"/><rect x="169" y="38" width="6" height="7" fill="#26a69a"/>
-            <!-- Feb peak candles (x 190–260, y 20-35) -->
-            <line x1="190" y1="24" x2="190" y2="35" stroke="#26a69a" stroke-width="1"/><rect x="187" y="26" width="6" height="7" fill="#26a69a"/>
-            <line x1="208" y1="19" x2="208" y2="30" stroke="#26a69a" stroke-width="1"/><rect x="205" y="21" width="6" height="7" fill="#26a69a"/>
-            <line x1="226" y1="22" x2="226" y2="33" stroke="#ef5350" stroke-width="1"/><rect x="223" y="24" width="6" height="7" fill="#ef5350"/>
-            <line x1="244" y1="26" x2="244" y2="37" stroke="#ef5350" stroke-width="1"/><rect x="241" y="28" width="6" height="7" fill="#ef5350"/>
-            <!-- Mar decline candles (x 260–420, y 35-75) -->
-            <line x1="262" y1="30" x2="262" y2="41" stroke="#ef5350" stroke-width="1"/><rect x="259" y="32" width="6" height="7" fill="#ef5350"/>
-            <line x1="280" y1="36" x2="280" y2="47" stroke="#ef5350" stroke-width="1"/><rect x="277" y="38" width="6" height="7" fill="#ef5350"/>
-            <line x1="298" y1="42" x2="298" y2="53" stroke="#26a69a" stroke-width="1"/><rect x="295" y="44" width="6" height="7" fill="#26a69a"/>
-            <line x1="316" y1="48" x2="316" y2="60" stroke="#ef5350" stroke-width="1"/><rect x="313" y="50" width="6" height="8" fill="#ef5350"/>
-            <line x1="334" y1="54" x2="334" y2="65" stroke="#ef5350" stroke-width="1"/><rect x="331" y="56" width="6" height="7" fill="#ef5350"/>
-            <line x1="352" y1="58" x2="352" y2="70" stroke="#26a69a" stroke-width="1"/><rect x="349" y="60" width="6" height="8" fill="#26a69a"/>
-            <line x1="370" y1="63" x2="370" y2="75" stroke="#ef5350" stroke-width="1"/><rect x="367" y="65" width="6" height="8" fill="#ef5350"/>
-            <line x1="388" y1="68" x2="388" y2="79" stroke="#ef5350" stroke-width="1"/><rect x="385" y="70" width="6" height="7" fill="#ef5350"/>
-            <line x1="406" y1="71" x2="406" y2="83" stroke="#26a69a" stroke-width="1"/><rect x="403" y="73" width="6" height="8" fill="#26a69a"/>
-            <!-- Apr candles (x 424–530, y 85-100) -->
-            <line x1="424" y1="78" x2="424" y2="90" stroke="#ef5350" stroke-width="1"/><rect x="421" y="80" width="6" height="8" fill="#ef5350"/>
-            <line x1="442" y1="82" x2="442" y2="94" stroke="#26a69a" stroke-width="1"/><rect x="439" y="84" width="6" height="8" fill="#26a69a"/>
-            <line x1="460" y1="86" x2="460" y2="98" stroke="#ef5350" stroke-width="1"/><rect x="457" y="88" width="6" height="8" fill="#ef5350"/>
-            <line x1="478" y1="88" x2="478" y2="100" stroke="#26a69a" stroke-width="1"/><rect x="475" y="90" width="6" height="8" fill="#26a69a"/>
-            <line x1="496" y1="91" x2="496" y2="103" stroke="#ef5350" stroke-width="1"/><rect x="493" y="93" width="6" height="8" fill="#ef5350"/>
-            <line x1="514" y1="92" x2="514" y2="104" stroke="#26a69a" stroke-width="1"/><rect x="511" y="94" width="6" height="8" fill="#26a69a"/>
-            <line x1="532" y1="94" x2="532" y2="106" stroke="#ef5350" stroke-width="1"/><rect x="529" y="96" width="6" height="8" fill="#ef5350"/>
-            <line x1="550" y1="93" x2="550" y2="105" stroke="#26a69a" stroke-width="1"/><rect x="547" y="95" width="6" height="8" fill="#26a69a"/>
-            <!-- Time axis labels -->
-            <text x="20" y="128" fill="#4c525e" font-size="8" font-family="monospace">Dec</text>
-            <text x="130" y="128" fill="#4c525e" font-size="8" font-family="monospace">2026</text>
-            <text x="220" y="128" fill="#4c525e" font-size="8" font-family="monospace">Feb</text>
-            <text x="330" y="128" fill="#4c525e" font-size="8" font-family="monospace">Mar</text>
-            <text x="460" y="128" fill="#4c525e" font-size="8" font-family="monospace">Apr</text>
-            <!-- Price level lines (right axis hints) -->
-            <line x1="553" y1="20" x2="560" y2="20" stroke="#ef5350" stroke-width="1.5" opacity="0.8"/>
-            <line x1="553" y1="95" x2="560" y2="95" stroke="#26a69a" stroke-width="1.5" opacity="0.8"/>
+          <div style="padding:2px 10px 6px;">
+            <span style="font-size:10px;color:#2962ff;font-family:monospace;">MA 20  close</span>
+          </div>
+          <!-- Main chart SVG -->
+          <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+            <!-- Y-axis price labels -->
+            <text x="638" y="18" fill="#787b86" font-size="8.5" font-family="monospace">1.2000</text>
+            <text x="638" y="60" fill="#787b86" font-size="8.5" font-family="monospace">1.1800</text>
+            <text x="638" y="102" fill="#787b86" font-size="8.5" font-family="monospace">1.1600</text>
+            <text x="638" y="144" fill="#787b86" font-size="8.5" font-family="monospace">1.1400</text>
+            <text x="638" y="186" fill="#787b86" font-size="8.5" font-family="monospace">1.1200</text>
+            <!-- Y-axis grid lines -->
+            <line x1="0" y1="14" x2="632" y2="14" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="56" x2="632" y2="56" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="98" x2="632" y2="98" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="140" x2="632" y2="140" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="182" x2="632" y2="182" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <!-- Dec candles: rising from ~1.142 → ~1.152 (y≈155→125) -->
+            <line x1="15" y1="150" x2="15" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="12" y="155" width="7" height="9" fill="#26a69a"/>
+            <line x1="28" y1="143" x2="28" y2="160" stroke="#ef5350" stroke-width="1"/><rect x="25" y="147" width="7" height="10" fill="#ef5350"/>
+            <line x1="41" y1="138" x2="41" y2="155" stroke="#26a69a" stroke-width="1"/><rect x="38" y="141" width="7" height="9" fill="#26a69a"/>
+            <line x1="54" y1="135" x2="54" y2="151" stroke="#26a69a" stroke-width="1"/><rect x="51" y="138" width="7" height="8" fill="#26a69a"/>
+            <line x1="67" y1="132" x2="67" y2="148" stroke="#ef5350" stroke-width="1"/><rect x="64" y="135" width="7" height="9" fill="#ef5350"/>
+            <line x1="80" y1="128" x2="80" y2="143" stroke="#26a69a" stroke-width="1"/><rect x="77" y="130" width="7" height="8" fill="#26a69a"/>
+            <!-- 2026 label -->
+            <text x="90" y="196" fill="#787b86" font-size="8.5" font-family="monospace">2026</text>
+            <!-- Jan candles: ~1.152→1.165 (y≈125→95) -->
+            <line x1="95" y1="120" x2="95" y2="136" stroke="#26a69a" stroke-width="1"/><rect x="92" y="122" width="7" height="9" fill="#26a69a"/>
+            <line x1="108" y1="117" x2="108" y2="133" stroke="#26a69a" stroke-width="1"/><rect x="105" y="119" width="7" height="9" fill="#26a69a"/>
+            <line x1="121" y1="114" x2="121" y2="130" stroke="#ef5350" stroke-width="1"/><rect x="118" y="117" width="7" height="9" fill="#ef5350"/>
+            <line x1="134" y1="110" x2="134" y2="126" stroke="#26a69a" stroke-width="1"/><rect x="131" y="112" width="7" height="9" fill="#26a69a"/>
+            <line x1="147" y1="105" x2="147" y2="120" stroke="#26a69a" stroke-width="1"/><rect x="144" y="107" width="7" height="8" fill="#26a69a"/>
+            <line x1="160" y1="100" x2="160" y2="116" stroke="#ef5350" stroke-width="1"/><rect x="157" y="103" width="7" height="9" fill="#ef5350"/>
+            <!-- Feb label -->
+            <text x="175" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Feb</text>
+            <!-- Feb candles: peak at ~1.20 (y≈14) then start declining -->
+            <line x1="178" y1="60" x2="178" y2="76" stroke="#26a69a" stroke-width="1"/><rect x="175" y="62" width="7" height="9" fill="#26a69a"/>
+            <line x1="191" y1="32" x2="191" y2="50" stroke="#26a69a" stroke-width="1"/><rect x="188" y="35" width="7" height="10" fill="#26a69a"/>
+            <line x1="204" y1="18" x2="204" y2="38" stroke="#26a69a" stroke-width="1"/><rect x="201" y="20" width="7" height="12" fill="#26a69a"/>
+            <!-- Peak candle -->
+            <line x1="217" y1="16" x2="217" y2="28" stroke="#ef5350" stroke-width="1"/><rect x="214" y="19" width="7" height="8" fill="#ef5350"/>
+            <line x1="230" y1="22" x2="230" y2="42" stroke="#ef5350" stroke-width="1"/><rect x="227" y="25" width="7" height="12" fill="#ef5350"/>
+            <line x1="243" y1="36" x2="243" y2="56" stroke="#ef5350" stroke-width="1"/><rect x="240" y="38" width="7" height="13" fill="#ef5350"/>
+            <!-- Mar label -->
+            <text x="258" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Mar</text>
+            <!-- Mar candles: declining ~1.185→1.150 (y≈56→128) -->
+            <line x1="262" y1="54" x2="262" y2="74" stroke="#ef5350" stroke-width="1"/><rect x="259" y="57" width="7" height="13" fill="#ef5350"/>
+            <line x1="275" y1="70" x2="275" y2="90" stroke="#ef5350" stroke-width="1"/><rect x="272" y="73" width="7" height="12" fill="#ef5350"/>
+            <line x1="288" y1="80" x2="288" y2="100" stroke="#26a69a" stroke-width="1"/><rect x="285" y="83" width="7" height="12" fill="#26a69a"/>
+            <line x1="301" y1="90" x2="301" y2="110" stroke="#ef5350" stroke-width="1"/><rect x="298" y="93" width="7" height="12" fill="#ef5350"/>
+            <line x1="314" y1="100" x2="314" y2="120" stroke="#ef5350" stroke-width="1"/><rect x="311" y="103" width="7" height="12" fill="#ef5350"/>
+            <line x1="327" y1="108" x2="327" y2="128" stroke="#26a69a" stroke-width="1"/><rect x="324" y="111" width="7" height="12" fill="#26a69a"/>
+            <line x1="340" y1="115" x2="340" y2="135" stroke="#ef5350" stroke-width="1"/><rect x="337" y="118" width="7" height="12" fill="#ef5350"/>
+            <!-- Apr label -->
+            <text x="355" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Apr</text>
+            <!-- Apr candles: ~1.148-1.155 recovering slightly (y≈130→110) -->
+            <line x1="358" y1="128" x2="358" y2="148" stroke="#26a69a" stroke-width="1"/><rect x="355" y="131" width="7" height="12" fill="#26a69a"/>
+            <line x1="371" y1="122" x2="371" y2="142" stroke="#26a69a" stroke-width="1"/><rect x="368" y="125" width="7" height="12" fill="#26a69a"/>
+            <line x1="384" y1="126" x2="384" y2="146" stroke="#ef5350" stroke-width="1"/><rect x="381" y="129" width="7" height="12" fill="#ef5350"/>
+            <line x1="397" y1="120" x2="397" y2="140" stroke="#26a69a" stroke-width="1"/><rect x="394" y="123" width="7" height="12" fill="#26a69a"/>
+            <!-- MA 20 line: rises Dec→Feb peak, falls Mar→Apr -->
+            <polyline points="15,160 67,148 95,132 147,112 178,68 204,30 230,36 262,62 288,88 327,114 358,132 397,124" fill="none" stroke="#2962ff" stroke-width="1.5" opacity="0.85"/>
+            <!-- Right side price badges -->
+            <rect x="613" y="116" width="54" height="15" rx="2" fill="#ef5350"/>
+            <text x="616" y="127" fill="#fff" font-size="8.5" font-family="monospace">1.15439</text>
+            <rect x="613" y="133" width="54" height="15" rx="2" fill="#26a69a"/>
+            <text x="616" y="144" fill="#fff" font-size="8.5" font-family="monospace">1.15165</text>
+            <!-- Current price dashed line -->
+            <line x1="0" y1="131" x2="612" y2="131" stroke="#ef5350" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.6"/>
+            <!-- TradingView TV logo bottom left -->
+            <rect x="8" y="174" width="22" height="18" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
+            <text x="11" y="187" fill="#2962ff" font-size="9" font-weight="bold" font-family="sans-serif">TV</text>
+            <!-- ICE badge top right -->
+            <rect x="594" y="4" width="30" height="14" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
+            <text x="597" y="14" fill="#787b86" font-size="8" font-family="monospace">ICE</text>
+            <!-- Time axis bottom line -->
+            <line x1="0" y1="192" x2="632" y2="192" stroke="#2a2e39" stroke-width="0.7"/>
           </svg>
-          <!-- TradingView logo badge -->
-          <div style="position:absolute;bottom:24px;left:18px;width:22px;height:22px;background:#131722;border:1px solid #2a2e39;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:7px;font-weight:900;color:#2962ff;">TV</span>
-          </div>
-          <!-- Price labels right side -->
-          <div style="position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:2px;align-items:flex-end;">
-            <span style="font-size:9px;font-family:monospace;background:#ef5350;color:#fff;padding:1px 4px;border-radius:2px;">1.15439</span>
-            <span style="font-size:9px;font-family:monospace;background:#26a69a;color:#fff;padding:1px 4px;border-radius:2px;">1.15165</span>
-          </div>
         </div>
       </div>
       <div class="callout callout-green">
@@ -676,28 +682,32 @@ a { color: inherit; text-decoration: none; }
       </div>
       <h3>Crosses</h3>
       <p>Live prices and daily percentage changes for 21 cross pairs, ordered by Bloomberg/Reuters ISO hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
-      <!-- MOCK: Crosses panel — 21 pairs, no group headers (matches index sidebar) -->
+      <!-- MOCK: Crosses full list (21 pairs, ISO hierarchy) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:260px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CROSSES</span>
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Crosses</span>
           <span style="font-size:8px;color:var(--text3);">21 pairs · ISO order</span>
         </div>
-        <div style="padding:2px 0;max-height:300px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
+        <div style="padding:2px 0;max-height:342px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
+          <div style="padding:2px 8px;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);">EUR</div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/GBP</span><span style="color:var(--text2);">0.8382</span><span style="color:var(--up);">+0.06%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/JPY</span><span style="color:var(--text2);">162.48</span><span style="color:var(--up);">+0.11%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/CHF</span><span style="color:var(--text2);">0.9612</span><span style="color:var(--down);">−0.08%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/CAD</span><span style="color:var(--text2);">1.4731</span><span style="color:var(--down);">−0.14%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/AUD</span><span style="color:var(--text2);">1.6624</span><span style="color:var(--up);">+0.09%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">EUR/NZD</span><span style="color:var(--text2);">1.8042</span><span style="color:var(--up);">+0.17%</span></div>
+          <div style="padding:2px 8px;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);">GBP</div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">GBP/JPY</span><span style="color:var(--text2);">193.72</span><span style="color:var(--down);">−0.22%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">GBP/CHF</span><span style="color:var(--text2);">1.1468</span><span style="color:var(--down);">−0.11%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">GBP/CAD</span><span style="color:var(--text2);">1.7582</span><span style="color:var(--down);">−0.19%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">GBP/AUD</span><span style="color:var(--text2);">1.9834</span><span style="color:var(--up);">+0.03%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">GBP/NZD</span><span style="color:var(--text2);">2.1523</span><span style="color:var(--up);">+0.12%</span></div>
+          <div style="padding:2px 8px;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);">AUD</div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">AUD/JPY</span><span style="color:var(--text2);">97.74</span><span style="color:var(--up);">+0.08%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">AUD/NZD</span><span style="color:var(--text2);">1.0853</span><span style="color:var(--down);">−0.05%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">AUD/CHF</span><span style="color:var(--text2);">0.5840</span><span style="color:var(--up);">+0.04%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">AUD/CAD</span><span style="color:var(--text2);">0.8871</span><span style="color:var(--down);">−0.09%</span></div>
+          <div style="padding:2px 8px;font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);">NZD · CAD · CHF</div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">NZD/JPY</span><span style="color:var(--text2);">90.04</span><span style="color:var(--up);">+0.13%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">NZD/CAD</span><span style="color:var(--text2);">0.8172</span><span style="color:var(--down);">−0.07%</span></div>
           <div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid var(--border);font-size:10px;font-family:monospace;cursor:pointer;"><span style="color:var(--text);">NZD/CHF</span><span style="color:var(--text2);">0.5382</span><span style="color:var(--up);">+0.02%</span></div>
@@ -708,29 +718,6 @@ a { color: inherit; text-decoration: none; }
       </div>
       <h3>Carry Trade — Top Pairs</h3>
       <p>A ranked list of the highest-yielding carry trade pair candidates, computed from current central bank rate differentials. A carry trade borrows a low-rate currency (historically JPY or CHF) and buys a high-rate currency (historically AUD or NZD). This section shows the net rate differential for the top pairs at current CB policy rates. See <a href="about.html" style="color:var(--blue);">data sources</a> for context.</p>
-      <!-- MOCK: Carry Trade top pairs -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:340px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
-          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Carry Trade — Top Pairs</span>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
-          <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;">#</th>
-            <th style="text-align:left;padding:3px 6px;">Pair</th>
-            <th style="padding:3px 6px;">Long</th>
-            <th style="padding:3px 6px;">Short</th>
-            <th style="padding:3px 6px;color:var(--up);">Differential</th>
-          </tr></thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text3);font-family:monospace;">1</td><td style="padding:4px 6px;color:var(--text);font-family:monospace;font-weight:600;">AUD/JPY</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">AUD 4.10%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">JPY 0.50%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+3.60%</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text3);font-family:monospace;">2</td><td style="padding:4px 6px;color:var(--text);font-family:monospace;font-weight:600;">NZD/JPY</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">NZD 3.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">JPY 0.50%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+3.25%</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text3);font-family:monospace;">3</td><td style="padding:4px 6px;color:var(--text);font-family:monospace;font-weight:600;">GBP/JPY</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">GBP 4.50%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">JPY 0.50%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+4.00%</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text3);font-family:monospace;">4</td><td style="padding:4px 6px;color:var(--text);font-family:monospace;font-weight:600;">AUD/CHF</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">AUD 4.10%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">CHF 0.25%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+3.85%</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text3);font-family:monospace;">5</td><td style="padding:4px 6px;color:var(--text);font-family:monospace;font-weight:600;">NZD/CHF</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">NZD 3.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">CHF 0.25%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+3.50%</td></tr>
-          </tbody>
-        </table>
-        <div style="padding:3px 8px 5px;font-size:9px;color:var(--text3);">Ranked by net CB rate differential · Updated daily</div>
-      </div>
       <h3>Upcoming Events</h3>
       <p>A TradingView economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times in UTC. Use this to anticipate volatility windows before they arrive.</p>
     </div>

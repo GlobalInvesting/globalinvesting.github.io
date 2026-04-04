@@ -312,34 +312,62 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="reading-bar">
       <h2>Reading the Long / Short Bar</h2>
       <p>The horizontal bar is the first thing to look at. It splits at the point where long % meets short % — green fills from the left, red from the right.</p>
-      <div class="spread-demo">
-        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
-          <span class="spr-sym-d">EUR/USD</span>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:35%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:65%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:42%;transform:translateX(-1px);"></div>
-          </div>
-          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">35% <span style="color:var(--up);">L</span> · 65% <span style="color:var(--down);">S</span></span>
+      <!-- MOCK: Full Retail FX Positioning panel matching index layout -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">RETAIL FX POSITIONING</span>
+          <span style="font-size:9.5px;color:var(--text3);">Myfxbook · retail positioning</span>
         </div>
-        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
-          <span class="spr-sym-d">GBP/USD</span>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:66%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:34%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:55%;transform:translateX(-1px);"></div>
+        <!-- EUR/USD row -->
+        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">EUR/USD</span>
+            <span style="font-size:10px;color:var(--text3);">47% <span style="color:var(--up);">L</span> · 53% <span style="color:var(--down);">S</span></span>
           </div>
-          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">66% <span style="color:var(--up);">L</span> · 34% <span style="color:var(--down);">S</span></span>
-        </div>
-        <div class="spread-row-demo" style="grid-template-columns:70px 1fr 120px;">
-          <span class="spr-sym-d">AUD/NZD</span>
-          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;">
-            <div style="position:absolute;left:0;top:0;height:100%;width:11%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
-            <div style="position:absolute;right:0;top:0;height:100%;width:89%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
-            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:18%;transform:translateX(-1px);"></div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">55.2K pos</div>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:47%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:53%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:50%;"></div>
           </div>
-          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);">11% <span style="color:var(--up);">L</span> · 89% <span style="color:var(--down);">S</span></span>
+          <div style="font-size:10px;color:var(--down);">▼ +1.78% · 201pip · trapped</div>
         </div>
+        <!-- GBP/USD row -->
+        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">GBP/USD</span>
+            <span style="font-size:10px;color:var(--text3);">63% <span style="color:var(--up);">L</span> · 37% <span style="color:var(--down);">S</span></span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">33.3K pos</div>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:63%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:37%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:56%;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--down);">▼ -1.89% · 254pip · trapped</div>
+        </div>
+        <!-- AUD/CAD row -->
+        <div style="border-bottom:1px solid var(--border);padding:6px 12px 4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:12px;font-weight:700;color:var(--text);font-family:var(--font-mono);">AUD/CAD</span>
+            <span style="font-size:10px;color:var(--text3);">31% <span style="color:var(--up);">L</span> · 69% <span style="color:var(--down);">S</span></span>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;">32.8K pos</div>
+          <div style="position:relative;height:8px;background:var(--bg3);border-radius:2px;overflow:visible;margin-bottom:5px;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:31%;background:var(--up);opacity:.85;border-radius:2px 0 0 2px;"></div>
+            <div style="position:absolute;right:0;top:0;height:100%;width:69%;background:var(--down);opacity:.85;border-radius:0 2px 2px 0;"></div>
+            <div style="position:absolute;top:-3px;width:2px;height:14px;background:#fff;opacity:.9;border-radius:1px;left:45%;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--up);">▲ +3.17% · 295pip · trapped</div>
+        </div>
+        <!-- Footer stats -->
+        <div style="padding:5px 12px;display:flex;gap:16px;font-size:10px;color:var(--text3);">
+          <span>Profitable <span style="color:var(--text);">67%</span></span>
+          <span>Real <span style="color:var(--text);">59%</span></span>
+          <span>Funds <span style="color:var(--text);">$1.68B</span></span>
+          <span>Avg dep <span style="color:var(--text);">$94,870</span></span>
+        </div>
+        <div style="padding:2px 12px 6px;font-size:9px;color:var(--text3);">Myfxbook · 2h ago · 01:04 GMT-3</div>
       </div>
       <p>The <strong style="color:#fff;">white vertical line</strong> on the bar marks where the current market price sits relative to the range between the average long entry and the average short entry. If the line is shifted toward the short side, price is closer to where shorts entered — useful for gauging who is under more pressure.</p>
       <div class="callout callout-orange">

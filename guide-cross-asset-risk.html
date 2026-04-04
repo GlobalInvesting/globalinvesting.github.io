@@ -278,56 +278,59 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="cross-asset">
       <h2>Cross-Asset Panel</h2>
       <p>Eight instruments displaying their latest price and daily percentage change. Each cell is clickable — clicking any instrument opens it directly in the TradingView price chart (S&amp;P 500, Gold, WTI, BTC/USD, Nikkei, EUR Stoxx 50, DXY). The US 10Y Yield cell is display-only and does not open a chart.</p>
-      <!-- MOCK: Cross-Asset panel (2-col grid, 8 cells) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:340px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Cross-Asset</span>
-          <span style="font-size:8px;color:var(--text3);">Multi-source · daily</span>
+
+      <!-- MOCK: Cross-Asset panel (mirrors index layout exactly) -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">CROSS-ASSET</span>
+          <span style="font-size:9.5px;color:var(--text3);">Multi-source · daily</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--border);">
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">S&amp;P 500</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">5,204</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−0.87%</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">S&amp;P 500</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">5,204</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-0.87%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Gold XAU/USD</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">3,112</div>
-            <div style="font-size:10px;color:var(--up);font-family:monospace;">+1.24%</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">GOLD XAU/USD</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3,112</div>
+            <div style="font-size:10.5px;color:var(--up);margin-top:2px;">+1.24%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">WTI Crude</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">71.40</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−1.53%</div>
+          <div style="padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">WTI CRUDE</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">71.40</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-1.53%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">BTC/USD</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">83,420</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−2.11%</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">BTC/USD</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">83,420</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-2.11%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Nikkei 225</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">34,820</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−0.44%</div>
+          <div style="padding:10px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">NIKKEI 225</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">34,820</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-0.44%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-bottom:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">EUR Stoxx 50</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">5,088</div>
-            <div style="font-size:10px;color:var(--up);font-family:monospace;">+0.31%</div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">EUR STOXX 50</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">5,088</div>
+            <div style="font-size:10.5px;color:var(--up);margin-top:2px;">+0.31%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;border-right:1px solid var(--border);cursor:pointer;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">DXY Index</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">102.84</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−0.38%</div>
+          <div style="padding:10px 14px;border-right:1px solid var(--border);cursor:pointer;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">DXY INDEX</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">102.84</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-0.38%</div>
           </div>
-          <div style="background:var(--bg);padding:7px 8px;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">US 10Y Yield</div>
-            <div style="font-size:15px;font-weight:700;color:#fff;font-family:monospace;">4.18%</div>
-            <div style="font-size:10px;color:var(--down);font-family:monospace;">−0.04 bp</div>
+          <div style="padding:10px 14px;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">US 10Y YIELD</div>
+            <div style="font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.18%</div>
+            <div style="font-size:10.5px;color:var(--down);margin-top:2px;">-0.04 bp</div>
           </div>
         </div>
       </div>
-      <div class="metric-grid">
+
+      <!-- Explanation cards below the mock — one per instrument -->
+      <div class="metric-grid" style="margin-top:4px;">
         <div class="metric-card">
           <div class="metric-name">S&amp;P 500</div>
           <div class="metric-sub">The primary global risk barometer. Rising SPX = expanding risk appetite = pressure on JPY/CHF, support for AUD/NZD/EM. Falling SPX = risk-off = JPY/CHF bid.</div>
@@ -364,38 +367,38 @@ a { color: inherit; text-decoration: none; }
     </div>
 
     <div class="guide-section" id="risk-monitor">
+      <h2>Risk Monitor — Overview</h2>
 
-      <!-- MOCK: Risk Monitor panel (2-col grid) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:340px;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Risk Monitor</span>
-          <span style="font-size:8px;color:var(--text3);">Volatility &amp; regime</span>
+      <!-- MOCK: Risk Monitor panel (mirrors index layout) -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:22px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">RISK MONITOR</span>
+          <span style="font-size:9.5px;color:var(--text3);">Volatility &amp; regime</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
-          <div style="background:var(--bg);padding:6px 8px;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">VIX</div>
-            <div style="font-size:20px;font-weight:700;color:var(--down);font-family:monospace;line-height:1.1;">22.4</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:1px;font-family:monospace;">↑ Elevated fear</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="padding:12px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">VIX</div>
+            <div style="font-size:22px;font-weight:700;color:var(--down);font-family:var(--font-mono);">22.4</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">↑ Elevated fear</div>
           </div>
-          <div style="background:var(--bg);padding:6px 8px;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">MOVE Index</div>
-            <div style="font-size:20px;font-weight:700;color:var(--orange);font-family:monospace;line-height:1.1;">108</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:1px;font-family:monospace;">Bond vol</div>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">MOVE INDEX</div>
+            <div style="font-size:22px;font-weight:700;color:var(--orange);font-family:var(--font-mono);">108</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Bond vol</div>
           </div>
-          <div style="background:var(--bg);padding:6px 8px;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">EUR/USD HV 30d</div>
-            <div style="font-size:20px;font-weight:700;color:#fff;font-family:monospace;line-height:1.1;">6.8%</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:1px;font-family:monospace;">Hist. volatility</div>
+          <div style="padding:12px 14px;border-right:1px solid var(--border);">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">EUR/USD HV 30D</div>
+            <div style="font-size:22px;font-weight:700;color:var(--text);font-family:var(--font-mono);">6.8%</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">Hist. volatility</div>
           </div>
-          <div style="background:var(--bg);padding:6px 8px;">
-            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Regime</div>
-            <div style="font-size:15px;font-weight:700;color:var(--down);font-family:monospace;line-height:1.1;">RISK OFF</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:1px;font-family:monospace;">VIX &gt; 20</div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:9.5px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">REGIME</div>
+            <div style="font-size:16px;font-weight:700;color:var(--down);font-family:var(--font-mono);">RISK OFF</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:3px;">VIX &gt; 20</div>
           </div>
         </div>
       </div>
 
-      <h2>Risk Monitor — Overview</h2>
       <p>The Risk Monitor panel shows three volatility gauges that, together, characterize the type and severity of market stress (if any). Understanding all three simultaneously is more valuable than reading any one in isolation.</p>
     </div>
 
