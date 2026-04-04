@@ -312,7 +312,7 @@
     </div>
     <div class="sb-section">
       <div class="sb-head">Crosses</div>
-      <div style="overflow-y:auto;max-height:286px;scrollbar-width:thin;">
+      <div style="overflow-y:auto;max-height:286px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
       <div class="sb-row" data-sym="FX:EURGBP" style="cursor:pointer;" title="Open EUR/GBP chart"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
       <div class="sb-row" data-sym="FX:EURJPY" style="cursor:pointer;" title="Open EUR/JPY chart"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
       <div class="sb-row" data-sym="FX:EURCHF" style="cursor:pointer;" title="Open EUR/CHF chart"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
@@ -467,13 +467,13 @@
         <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
           <!-- Populated by fetchCrossAssetData() -->
-          <div class="ca-cell"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
-          <div class="ca-cell"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
+          <div class="ca-cell" data-sym="VANTAGE:SP500" style="cursor:pointer;" title="Open S&P 500 chart"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
+          <div class="ca-cell" data-sym="BLACKBULL:GOLD.F" style="cursor:pointer;" title="Open XAU/USD chart"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
+          <div class="ca-cell" data-sym="BLACKBULL:WTI" style="cursor:pointer;" title="Open WTI chart"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
+          <div class="ca-cell" data-sym="BITSTAMP:BTCUSD" style="cursor:pointer;" title="Open BTC/USD chart"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
+          <div class="ca-cell" data-sym="OSE:NK2251!" style="cursor:pointer;" title="Open Nikkei 225 chart"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
+          <div class="ca-cell" data-sym="GOMARKETS:STOXX50" style="cursor:pointer;" title="Open EUR Stoxx 50 chart"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
+          <div class="ca-cell" data-sym="FXOPEN:DXY" style="cursor:pointer;" title="Open DXY chart"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
           <div class="ca-cell"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
         </div>
       </div>
