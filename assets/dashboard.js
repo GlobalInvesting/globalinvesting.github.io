@@ -179,12 +179,16 @@ async function fetchFrankfurter() {
     STATE.rates = today.rates || {};
     STATE.prevRates = (prev && prev.rates) ? prev.rates : {};
 
-    populateQuoteBar();
-    populateFxPairsTable();
-    populateHeatmap();
-    populateCrossRows();
-    document.getElementById('fx-table-updated').textContent =
-      'ECB · updated ' + (today.date || todayDate) + ' · daily rate';
+    // Only use Frankfurter data to populate UI if intraday RT cache is not yet loaded
+    // (avoids overwriting live yfinance prices with stale ECB daily rates)
+    if (Object.keys(STOOQ_RT_CACHE).length === 0) {
+      populateQuoteBar();
+      populateFxPairsTable();
+      populateHeatmap();
+      populateCrossRows();
+      const updEl = document.getElementById('fx-table-updated');
+      if (updEl) updEl.textContent = 'ECB · updated ' + (today.date || todayDate) + ' · daily rate';
+    }
   } catch(e) {
     console.warn('Frankfurter fetch failed:', e);
   }
@@ -3300,8 +3304,9 @@ async function computeSessionVol() {
 // BOOT SEQUENCE
 // ═══════════════════════════════════════════════════════════════════
 async function boot() {
-  // PHASE 1: Critical path — FX pairs table needs Frankfurter first
-  await fetchFrankfurter();          // ECB rates → populates STATE.rates for FX table
+  // PHASE 1: Load intraday quotes.json (same-origin, no CORS) — primary data source
+  // Frankfurter (ECB) is non-blocking background fallback — CORS may block it in some browsers
+  fetchFrankfurter();                // background: populates STATE.rates as fallback only
 
   // PHASE 2: Parallel — all remaining data loads simultaneously
 
