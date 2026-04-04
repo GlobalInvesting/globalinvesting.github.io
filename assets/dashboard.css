@@ -218,6 +218,10 @@
   }
   #sidebar::-webkit-scrollbar { width: 3px; }
   #sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
+  /* Crosses scrollable list — match sidebar scrollbar style */
+  .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar { width: 3px; }
+  .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar-track { background: transparent; }
+  .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
   .sb-section { border-bottom: 1px solid var(--border); padding-bottom: 2px; }
 

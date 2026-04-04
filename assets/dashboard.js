@@ -2313,6 +2313,13 @@ document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
   loadTVChart(row.dataset.sym);
 });
 
+// ── Cross-Asset cells: click to open chart (US 10Y excluded — no TV symbol) ──
+document.querySelectorAll('#cross-asset-grid .ca-cell[data-sym]').forEach(cell => {
+  cell.addEventListener('click', function() {
+    loadTVChart(this.dataset.sym);
+  });
+});
+
 // ── Risk Monitor VIX cell: click to open chart ──
 document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('click', () => {
   loadTVChart('CAPITALCOM:VIX');
