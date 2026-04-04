@@ -454,29 +454,54 @@ function populateHeatmap() {
 
   // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
   // because ECB daily rates have zero intraday movement (same open/close on weekends)
-  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 4;
+  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 14; // need majority of 28 pairs
 
   let strengths;
   if (rtAvailable) {
-    // Map each currency to its avg % change using intraday yfinance pairs
-    // USD-centric: EUR strength = EUR/USD pct; JPY strength = -USD/JPY pct
+    // Map each currency to its avg % change across all 28 G8 pairs.
+    // Each currency appears in exactly 7 pairs — equal statistical weight.
     const pctMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
     const countMap = { USD: 0, EUR: 0, GBP: 0, JPY: 0, AUD: 0, CHF: 0, CAD: 0, NZD: 0 };
 
-    // Pairs where base is vs USD (invert = true means USD is base)
+    // All 28 G8 pairs (8×7÷2) — industry-standard currency strength calculation.
+    // Each of the 8 currencies appears in exactly 7 pairs, giving equal statistical weight.
+    // sign: +1 means base strengthens when price rises; -1 means quote strengthens.
     const pairDefs = [
+      // 7 USD majors
       { id: 'eurusd', base: 'EUR', quote: 'USD', sign: 1 },
       { id: 'gbpusd', base: 'GBP', quote: 'USD', sign: 1 },
       { id: 'audusd', base: 'AUD', quote: 'USD', sign: 1 },
       { id: 'nzdusd', base: 'NZD', quote: 'USD', sign: 1 },
-      { id: 'usdjpy', base: 'USD', quote: 'JPY', sign: -1 }, // USD/JPY up = JPY weak
+      { id: 'usdjpy', base: 'USD', quote: 'JPY', sign: -1 },
       { id: 'usdchf', base: 'USD', quote: 'CHF', sign: -1 },
       { id: 'usdcad', base: 'USD', quote: 'CAD', sign: -1 },
+      // 6 EUR crosses
       { id: 'eurgbp', base: 'EUR', quote: 'GBP', sign: 1 },
       { id: 'eurjpy', base: 'EUR', quote: 'JPY', sign: 1 },
+      { id: 'eurchf', base: 'EUR', quote: 'CHF', sign: 1 },
+      { id: 'eurcad', base: 'EUR', quote: 'CAD', sign: 1 },
+      { id: 'euraud', base: 'EUR', quote: 'AUD', sign: 1 },
+      { id: 'eurnzd', base: 'EUR', quote: 'NZD', sign: 1 },
+      // 5 GBP crosses
       { id: 'gbpjpy', base: 'GBP', quote: 'JPY', sign: 1 },
+      { id: 'gbpchf', base: 'GBP', quote: 'CHF', sign: 1 },
+      { id: 'gbpcad', base: 'GBP', quote: 'CAD', sign: 1 },
+      { id: 'gbpaud', base: 'GBP', quote: 'AUD', sign: 1 },
+      { id: 'gbpnzd', base: 'GBP', quote: 'NZD', sign: 1 },
+      // 4 AUD crosses
       { id: 'audjpy', base: 'AUD', quote: 'JPY', sign: 1 },
+      { id: 'audchf', base: 'AUD', quote: 'CHF', sign: 1 },
+      { id: 'audcad', base: 'AUD', quote: 'CAD', sign: 1 },
+      { id: 'audnzd', base: 'AUD', quote: 'NZD', sign: 1 },
+      // 3 NZD crosses
+      { id: 'nzdjpy', base: 'NZD', quote: 'JPY', sign: 1 },
+      { id: 'nzdchf', base: 'NZD', quote: 'CHF', sign: 1 },
+      { id: 'nzdcad', base: 'NZD', quote: 'CAD', sign: 1 },
+      // 2 CAD crosses
       { id: 'cadjpy', base: 'CAD', quote: 'JPY', sign: 1 },
+      { id: 'cadchf', base: 'CAD', quote: 'CHF', sign: 1 },
+      // 1 CHF cross
+      { id: 'chfjpy', base: 'CHF', quote: 'JPY', sign: 1 },
     ];
 
     pairDefs.forEach(({ id, base, quote, sign }) => {
