@@ -113,8 +113,8 @@ YFINANCE_SYMBOLS = {
     "gbpnzd": "GBPNZD=X",
     "audcad": "AUDCAD=X",
     "cadchf": "CADCHF=X",
-    "cadnzd": "CADNZD=X",
-    "chfnzd": "CHFNZD=X",
+    "nzdcad": "NZDCAD=X",
+    "nzdchf": "NZDCHF=X",
 }
 
 # Yields que Yahoo devuelve ×10 (^TNX=43.42 significa 4.342%) — dividir por 10
@@ -164,8 +164,8 @@ VALIDATORS = {
     "gbpnzd": lambda v: 1.6 < v < 2.8,
     "audcad": lambda v: 0.7 < v < 1.2,
     "cadchf": lambda v: 0.50 < v < 0.85,
-    "cadnzd": lambda v: 0.9 < v < 1.5,
-    "chfnzd": lambda v: 1.4 < v < 2.5,
+    "nzdcad": lambda v: 0.67 < v < 1.11,
+    "nzdchf": lambda v: 0.40 < v < 0.71,
 }
 
 
@@ -176,7 +176,7 @@ HV30_FX_PAIRS = [
     "gbpjpy", "gbpchf", "gbpcad",
     "audjpy", "audnzd", "audchf",
     "cadjpy", "chfjpy", "nzdjpy",
-    "eurnzd", "gbpaud", "gbpnzd", "audcad", "cadchf", "cadnzd", "chfnzd",
+    "eurnzd", "gbpaud", "gbpnzd", "audcad", "cadchf", "nzdcad", "nzdchf",
 ]
 
 
