@@ -1737,15 +1737,15 @@ function attachRiskMonitorTooltips() {
   const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
     'Positioning Bias — ETF IV + COT',
-    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) when available — real market-implied vol from nearest expiry ≥4 days. COT column shows CFTC net speculative positioning as directional proxy. Falls back to COT-only model if ETF IV unavailable.',
-    'ETF options have lower liquidity than OTC FX interbank options — IV may differ 1–3 vol points from true 25d RR. Direction (Bias column) always comes from COT net positioning.'
+    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) when available — real market-implied vol from nearest expiry ≥4 days. COT bias column shows CFTC Disaggregated TFF net positioning of Leveraged Funds (hedge funds, CTAs) — Options+Futures Combined source. Falls back to COT-only model if ETF IV unavailable.',
+    'ETF options have lower liquidity than OTC FX interbank options — IV may differ 1–3 vol points from true 25d RR. Direction always comes from Leveraged Funds net positioning (most reactive speculative category).'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   const skewPairTips = {
-    'EUR/USD': { body: 'EUR/USD skew derived from CFTC speculative net EUR positioning. Positive = EUR calls bid (market positioned for EUR upside). Negative = EUR puts bid (downside protection).', ex: 'Combines 1W momentum (sensitive) with 1M trend (structural). Divergence between 1W and 1M signals a potential inflection point.' },
-    'GBP/USD': { body: 'GBP/USD skew from CFTC net GBP futures. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
-    'USD/JPY': { body: 'USD/JPY skew from CFTC net JPY futures (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
-    'AUD/USD': { body: 'AUD/USD skew from CFTC net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
+    'EUR/USD': { body: 'EUR/USD skew derived from CFTC Leveraged Funds net EUR positioning (Options+Futures Combined). Positive = EUR calls bid (market positioned for EUR upside). Negative = EUR puts bid (downside protection).', ex: 'Most reliable when Leveraged Funds and Asset Manager positioning agree in direction. Divergence between the two signals uncertainty or a potential positioning squeeze.' },
+    'GBP/USD': { body: 'GBP/USD skew from CFTC Leveraged Funds net GBP positioning. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
+    'USD/JPY': { body: 'USD/JPY skew from CFTC Leveraged Funds net JPY positioning (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
+    'AUD/USD': { body: 'AUD/USD skew from CFTC Leveraged Funds net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
   };
   skewRows.forEach(row => {
     const pairCell = row.querySelector('td:first-child');
