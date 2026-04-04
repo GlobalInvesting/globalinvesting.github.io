@@ -548,7 +548,7 @@
           <span class="sess" id="sess-newyork">New York</span>
         </div>
         <table aria-label="Trading sessions">
-          <thead><tr><th style="text-align:left" scope="col">Session</th><th id="sess-col-open">Open</th><th id="sess-col-close">Close</th><th>Status</th></tr></thead>
+          <thead><tr><th style="text-align:left" scope="col">Session</th><th id="sess-col-open" scope="col">Open</th><th id="sess-col-close" scope="col">Close</th><th scope="col">Status</th></tr></thead>
           <tbody>
             <tr><td>Sydney</td><td id="sess-open-sydney">22:00</td><td id="sess-close-sydney">07:00</td><td class="flat" id="status-sydney">—</td></tr>
             <tr><td>Tokyo</td><td id="sess-open-tokyo">00:00</td><td id="sess-close-tokyo">09:00</td><td class="flat" id="status-tokyo">—</td></tr>
@@ -558,7 +558,7 @@
         </table>
         <div style="border-top:1px solid var(--border);padding:4px 8px 0;flex-shrink:0;">
           <table aria-label="Session volatility">
-            <thead><tr><th style="text-align:left" scope="col">Session Vol</th><th>EUR/USD</th><th>USD/JPY</th></tr></thead>
+            <thead><tr><th style="text-align:left" scope="col">Session Vol</th><th scope="col">EUR/USD</th><th scope="col">USD/JPY</th></tr></thead>
             <tbody>
               <tr><td>Sydney</td><td id="svol-syd-eur" class="flat">±18p</td><td id="svol-syd-jpy" class="flat">±22p</td></tr>
               <tr><td>Tokyo</td><td id="svol-tok-eur" class="flat">±28p</td><td id="svol-tok-jpy" class="up">±44p</td></tr>
@@ -678,7 +678,7 @@
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table aria-label="Central bank rate expectations">
-      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th>Bias</th><th>Fwd Rate</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col">Bias</th><th scope="col">Fwd Rate</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
       </tbody>
@@ -711,6 +711,8 @@
 
 
 <script src="assets/dashboard.js"></script>
+
+<div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
 </body>
 </html>
