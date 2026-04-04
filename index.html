@@ -672,15 +672,44 @@
       </div>
     </div>
 
-    <!-- CARRY TRADE RANKING — G8 CB rate differential, top 10 -->
+    <!-- ETF OPTIONS IV — CBOE volatility surface proxies -->
     <div class="sb-head" style="margin-top:0;">
-      Carry Trade Ranking
-      <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">G8 &middot; CB rate differential</span>
+      Options IV <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">ETF · CBOE · 30-day</span>
     </div>
-    <div id="carry-rank-rows">
+    <div id="etf-iv-rows">
       <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading&hellip;</div>
     </div>
-    <div style="padding:3px 8px 5px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);">+ = long base rate advantage &middot; CB policy rates</div>
+    <div style="padding:3px 8px 5px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);">Implied vol · 30-day ATM · CBOE/yfinance</div>
+
+    <!-- CONFIGURABLE ALERTS -->
+    <div class="sb-head" style="margin-top:2px;">
+      Alerts
+      <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">threshold · browser notification</span>
+      <span id="alerts-fired-badge" style="display:none;" class="alert-notif-badge">0</span>
+    </div>
+    <div id="alerts-panel">
+      <div id="alerts-rows"><!-- populated by initAlerts() --></div>
+      <div class="alert-add-row">
+        <select id="alert-sym-sel" class="alert-select" aria-label="Alert instrument">
+          <option value="vix">VIX</option>
+          <option value="eurusd">EUR/USD</option>
+          <option value="usdjpy">USD/JPY</option>
+          <option value="gbpusd">GBP/USD</option>
+          <option value="audusd">AUD/USD</option>
+          <option value="usdchf">USD/CHF</option>
+          <option value="xauusd">Gold</option>
+          <option value="us10y">US 10Y</option>
+          <option value="move">MOVE</option>
+        </select>
+        <select id="alert-dir-sel" class="alert-select" style="width:40px;flex:none;" aria-label="Alert direction">
+          <option value="above">&gt;</option>
+          <option value="below">&lt;</option>
+        </select>
+        <input id="alert-val-inp" class="alert-input" type="number" step="any" placeholder="Value" aria-label="Alert threshold value">
+        <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
+      </div>
+    </div>
+    <div style="padding:2px 8px 5px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);">Alerts check every 5 min · require browser permission</div>
 
     <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
     <table id="cbrates-table" aria-label="Central bank interest rates">
