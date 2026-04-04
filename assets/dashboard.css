@@ -1154,3 +1154,46 @@ a:focus-visible,
   background: var(--down); color: #fff; font-family: var(--font-mono);
   vertical-align: middle;
 }
+
+/* ── ALERTS POPOVER (statusbar bell icon) ───────────────────────── */
+#alerts-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg2, #141820);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.55);
+  z-index: 1000;
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+.alp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 10px 6px;
+  font-size: 11px; font-weight: 700; color: var(--text);
+  text-transform: uppercase; letter-spacing: .06em;
+  border-bottom: 1px solid var(--border);
+  background: var(--head-bg, #1a1f2e);
+}
+.alp-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 11px; padding: 0 2px;
+  line-height: 1;
+}
+.alp-close:hover { color: var(--text); }
+.alp-rows {
+  max-height: 180px; overflow-y: auto;
+}
+.alp-add {
+  display: flex; gap: 4px; padding: 6px 8px;
+  align-items: center; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.alp-dir { width: 40px !important; flex: none !important; }
+.alp-footer {
+  padding: 3px 8px 5px;
+  font-size: 9px; color: var(--text3);
+  border-top: 1px solid var(--border);
+}

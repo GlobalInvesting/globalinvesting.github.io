@@ -190,7 +190,10 @@ async function fetchFrankfurter() {
       if (updEl) updEl.textContent = 'ECB · updated ' + (today.date || todayDate) + ' · daily rate';
     }
   } catch(e) {
-    console.warn('Frankfurter fetch failed:', e);
+    // Frankfurter is a fallback only — CORS blocks are expected when yfinance data is available
+    if (!(e instanceof TypeError && e.message.includes('fetch'))) {
+      console.warn('Frankfurter fetch failed:', e);
+    }
   }
 }
 
@@ -3708,12 +3711,11 @@ async function boot() {
   populateCorrelations(); // 60-day rolling correlations from quotes.json
 
   // Static repo data — all parallel, fast (same GitHub Pages origin)
-  fetchCBRates();
+  fetchCBRates().then(() => fetchCarryRanking());   // ranking needs rates populated first
   fetchCOTData();
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
-  fetchCarryRanking();
   fetchEtfIV();
   initAlerts();
   fetchNewsData();
@@ -4392,6 +4394,9 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
   // Main keydown handler
   document.addEventListener('keydown', e => {
+    // Never intercept browser/OS shortcuts (Ctrl, Meta, Alt combos)
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
     const tag = document.activeElement?.tagName?.toLowerCase();
     if (tag === 'input' || tag === 'textarea' || tag === 'select'
         || document.activeElement?.isContentEditable) return;
@@ -4681,4 +4686,25 @@ function initAlerts() {
   // Check immediately, then every 5 min
   alertsCheck();
   setInterval(alertsCheck, 5 * 60 * 1000);
+
+  // Close popover when clicking outside
+  document.addEventListener('click', e => {
+    const anchor = document.getElementById('alerts-anchor');
+    if (anchor && !anchor.contains(e.target)) {
+      const pop = document.getElementById('alerts-popover');
+      if (pop) pop.style.display = 'none';
+      const btn = document.getElementById('alerts-bell-btn');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+  }, true);
+}
+
+function toggleAlertsPopover() {
+  const pop = document.getElementById('alerts-popover');
+  const btn = document.getElementById('alerts-bell-btn');
+  if (!pop) return;
+  const isOpen = pop.style.display !== 'none';
+  pop.style.display = isOpen ? 'none' : 'block';
+  if (btn) btn.setAttribute('aria-expanded', String(!isOpen));
+  if (!isOpen) alertsRender(); // refresh list when opening
 }
