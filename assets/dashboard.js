@@ -34,6 +34,13 @@ const PAIRS = [
   { id:'cadjpy', base:'CAD', quote:'JPY', cross:['CAD','JPY'], dec:3 },
   { id:'chfjpy', base:'CHF', quote:'JPY', cross:['CHF','JPY'], dec:3 },
   { id:'nzdjpy', base:'NZD', quote:'JPY', cross:['NZD','JPY'], dec:3 },
+  { id:'eurnzd', base:'EUR', quote:'NZD', cross:['EUR','NZD'], dec:5 },
+  { id:'gbpaud', base:'GBP', quote:'AUD', cross:['GBP','AUD'], dec:5 },
+  { id:'gbpnzd', base:'GBP', quote:'NZD', cross:['GBP','NZD'], dec:5 },
+  { id:'audcad', base:'AUD', quote:'CAD', cross:['AUD','CAD'], dec:5 },
+  { id:'cadchf', base:'CAD', quote:'CHF', cross:['CAD','CHF'], dec:5 },
+  { id:'cadnzd', base:'CAD', quote:'NZD', cross:['CAD','NZD'], dec:5 },
+  { id:'chfnzd', base:'CHF', quote:'NZD', cross:['CHF','NZD'], dec:5 },
 ];
 
 // CB rate config
@@ -273,7 +280,7 @@ function populateQuoteBar() {
 
 
 function populateCrossRows() {
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','cadnzd','chfnzd'];
   crossIds.forEach(id => {
     const pair = PAIRS.find(p=>p.id===id);
     if (!pair) return;
@@ -414,7 +421,10 @@ function populateFxPairsTable() {
 
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
 
-    return `<tr>
+    const tvSym = pair.invert
+      ? `FX:${pair.base}${pair.quote}`
+      : `FX:${pair.quote}${pair.base}`;
+    return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Open chart">
       <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
       <td style="color:var(--text1)">${bid}</td>
       <td style="color:var(--text1)">${ask}</td>
@@ -807,6 +817,13 @@ const QB_STOOQ_PAIRS = [
   { sym: 'cadjpy',  id: 'cadjpy',  dec: 3 },
   { sym: 'chfjpy',  id: 'chfjpy',  dec: 3 },
   { sym: 'nzdjpy',  id: 'nzdjpy',  dec: 3 },
+  { sym: 'eurnzd',  id: 'eurnzd',  dec: 5 },
+  { sym: 'gbpaud',  id: 'gbpaud',  dec: 5 },
+  { sym: 'gbpnzd',  id: 'gbpnzd',  dec: 5 },
+  { sym: 'audcad',  id: 'audcad',  dec: 5 },
+  { sym: 'cadchf',  id: 'cadchf',  dec: 5 },
+  { sym: 'cadnzd',  id: 'cadnzd',  dec: 5 },
+  { sym: 'chfnzd',  id: 'chfnzd',  dec: 5 },
 ];
 
 // ── Intraday quotes cache (from GitHub Action — Twelve Data + Alpha Vantage) ──
@@ -971,7 +988,7 @@ function updateFxPairsTableRT() {
   }
 
   // ── Update Crosses sidebar from the same RT cache ──
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','cadnzd','chfnzd'];
   crossIds.forEach(id => {
     const data = STOOQ_RT_CACHE[id];
     if (!data) return;
@@ -2228,41 +2245,80 @@ window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDr
 // ═══════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// SHARED: load any symbol into the TradingView chart + scroll to it
+// ═══════════════════════════════════════════════════════════════════
+function loadTVChart(sym) {
+  // Deactivate all tabs; activate matching tab if exists
+  document.querySelectorAll('.tv-tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.dataset.sym === sym) t.classList.add('active');
+  });
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const container = document.createElement('div');
+  container.className = 'tradingview-widget-container';
+  container.style.cssText = 'height:100%;width:100%;';
+  const widget = document.createElement('div');
+  widget.className = 'tradingview-widget-container__widget';
+  widget.style.cssText = 'height:100%;width:100%;';
+  container.appendChild(widget);
+  const copyright = document.createElement('div');
+  copyright.className = 'tradingview-widget-copyright';
+  copyright.style.display = 'none';
+  container.appendChild(copyright);
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
+  script.text = JSON.stringify({
+    allow_symbol_change:false, calendar:false, details:true,
+    hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
+    hide_volume:true, interval:'D', locale:'en', save_image:false,
+    style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
+    backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
+    withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
+  });
+  container.appendChild(script);
+  wrap.appendChild(container);
+  // Scroll chart into view
+  const chartSection = document.getElementById('section-chart') || wrap.closest('.panel') || wrap;
+  chartSection.scrollIntoView({ behavior:'smooth', block:'start' });
+  setTimeout(minimizeTVLegend, 3000);
+}
+
+// ── Quote bar: click any item to open chart ──
+document.getElementById('quotebar-inner')?.addEventListener('click', e => {
+  const item = e.target.closest('.q-item');
+  if (!item) return;
+  const sym = item.dataset.sym;
+  if (sym) loadTVChart(sym);
+});
+
+// ── Sidebar crosses: click any row to open chart ──
+document.getElementById('sidebar')?.addEventListener('click', e => {
+  const row = e.target.closest('.sb-row[data-sym]');
+  if (!row) return;
+  loadTVChart(row.dataset.sym);
+});
+
+// ── FX Pairs table: click any row to open chart ──
+document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
+  const row = e.target.closest('tr[data-sym]');
+  if (!row) return;
+  loadTVChart(row.dataset.sym);
+});
+
+// ── Risk Monitor VIX cell: click to open chart ──
+document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('click', () => {
+  loadTVChart('CAPITALCOM:VIX');
+});
+
 // TV CHART TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════════
 document.querySelectorAll('.tv-tab').forEach(tab => {
   tab.addEventListener('click', function() {
-    document.querySelectorAll('.tv-tab').forEach(t => t.classList.remove('active'));
-    this.classList.add('active');
-    const sym = this.dataset.sym;
-    const wrap = document.getElementById('tv-chart-wrap');
-    wrap.innerHTML = '';
-    const container = document.createElement('div');
-    container.className = 'tradingview-widget-container';
-    container.style.cssText = 'height:100%;width:100%;';
-    const widget = document.createElement('div');
-    widget.className = 'tradingview-widget-container__widget';
-    widget.style.cssText = 'height:100%;width:100%;';
-    container.appendChild(widget);
-    const copyright = document.createElement('div');
-    copyright.className = 'tradingview-widget-copyright';
-    copyright.style.display = 'none';
-    container.appendChild(copyright);
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.async = true;
-    script.text = JSON.stringify({
-      allow_symbol_change:false, calendar:false, details:true,
-      hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
-      hide_volume:true, interval:'D', locale:'en', save_image:false,
-      style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
-      backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
-      withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
-    });
-    container.appendChild(script);
-    wrap.appendChild(container);
-    // Re-trigger legend minimize after symbol change
-    setTimeout(minimizeTVLegend, 3000);
+    loadTVChart(this.dataset.sym);
   });
 });
 
