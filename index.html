@@ -478,7 +478,7 @@
         </div>
       </div>
       <div class="panel" id="section-risk" style="border-bottom:none;" role="region" aria-label="Risk Monitor">
-        <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub">Volatility &amp; regime</span></div>
+        <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime</span></div>
         <div class="risk-grid" aria-live="polite" aria-atomic="false">
           <div class="risk-cell" style="cursor:pointer;" title="Open VIX chart"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
           <div class="risk-cell"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
@@ -500,7 +500,7 @@
 
     <!-- RATES & YIELD CURVE -->
     <div class="panel" id="section-rates">
-      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub">Nominal yields · yfinance</span></div>
+      <div class="panel-head"><span class="panel-title">Rates &amp; Yield Curve — US Treasuries</span><span class="panel-sub" id="yield-panel-sub">Nominal yields · yfinance</span></div>
       <div id="rates-grid-wrap" class="rates-grid">
         <div class="rate-cell"><div class="rate-cty">3M T-Bill</div><div class="rate-val" id="rate-3m">—</div><div class="rate-chg flat" id="rate-3m-chg">—</div></div>
         <div class="rate-cell"><div class="rate-cty">2Y Note</div><div class="rate-val" id="rate-2y">—</div><div class="rate-chg flat" id="rate-2y-chg">—</div></div>
@@ -526,8 +526,8 @@
     <div class="panel" id="section-positioning">
       <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span></div>
       <div style="padding:6px 10px;">
-        <div style="display:grid;grid-template-columns:36px 1fr 42px 64px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
-          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net Contracts</span>
+        <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 52px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
+          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span>6M</span>
         </div>
         <div id="cot-rows">
           <div class="cot-row" style="color:var(--text3);">
