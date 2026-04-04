@@ -1068,3 +1068,89 @@ a:focus-visible,
   white-space: nowrap;
 }
 .kb-hint-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── ETF OPTIONS IV PANEL ───────────────────────────────────────── */
+.etf-iv-row {
+  display: flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+.etf-iv-row:hover { background: var(--row-hover, rgba(255,255,255,.04)); }
+.etf-iv-lbl {
+  font-size: 10px; font-family: var(--font-mono); font-weight: 600;
+  color: var(--text); width: 46px; flex-shrink: 0; letter-spacing: .01em;
+}
+.etf-iv-bar-wrap {
+  flex: 1; height: 4px; background: var(--border2);
+  border-radius: 2px; overflow: hidden; min-width: 0;
+}
+.etf-iv-bar { height: 100%; border-radius: 2px; transition: width .4s; }
+.etf-iv-bar-high { background: var(--down, #e05252); }
+.etf-iv-bar-mid  { background: var(--orange, #e09f52); }
+.etf-iv-bar-low  { background: var(--up, #52b788); }
+.etf-iv-val {
+  font-size: 10px; font-family: var(--font-mono);
+  color: var(--text); width: 34px; text-align: right; flex-shrink: 0;
+}
+.etf-iv-chg {
+  font-size: 9px; font-family: var(--font-mono);
+  width: 38px; text-align: right; flex-shrink: 0; color: var(--text3);
+}
+
+/* ── PAIR DETAIL — TOOLTIPS ─────────────────────────────────────── */
+.pd-cell { position: relative; }
+.pd-cell[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 4px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2, #1a1f2e); color: var(--text); border: 1px solid var(--border2);
+  font-size: 9px; line-height: 1.4; padding: 4px 7px; border-radius: 4px;
+  white-space: nowrap; z-index: 999; pointer-events: none;
+  font-family: var(--font-ui); letter-spacing: .01em;
+  box-shadow: 0 3px 10px rgba(0,0,0,.4);
+}
+/* keep tooltips inside viewport at edges */
+.pd-cell[data-tip]:first-child:hover::after { left: 0; transform: none; }
+.pd-cell[data-tip]:last-child:hover::after  { left: auto; right: 0; transform: none; }
+
+/* ── CONFIGURABLE ALERTS PANEL ──────────────────────────────────── */
+#alerts-panel {
+  border-bottom: 1px solid var(--border);
+}
+.alert-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 8px; border-bottom: 1px solid var(--border);
+  font-size: 10px; font-family: var(--font-ui);
+}
+.alert-row-active { background: rgba(224,82,82,.08); }
+.alert-lbl { flex: 1; color: var(--text2); }
+.alert-val  { font-family: var(--font-mono); font-size: 9.5px; color: var(--text3); }
+.alert-fired { color: var(--down); font-weight: 600; }
+.alert-add-row {
+  display: flex; gap: 4px; padding: 5px 8px; align-items: center; flex-wrap: wrap;
+}
+.alert-select, .alert-input {
+  font-size: 9.5px; font-family: var(--font-mono);
+  background: var(--bg2, #1a1f2e); border: 1px solid var(--border2);
+  color: var(--text); border-radius: 3px; padding: 2px 5px;
+}
+.alert-select { flex: 1; min-width: 80px; }
+.alert-input  { width: 64px; }
+.alert-add-btn {
+  font-size: 9px; font-family: var(--font-mono); font-weight: 600;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text3); padding: 2px 8px; border-radius: 3px; cursor: pointer;
+  transition: border-color .15s, color .15s; white-space: nowrap;
+}
+.alert-add-btn:hover { border-color: var(--blue); color: var(--blue); }
+.alert-del {
+  font-size: 9px; color: var(--text3); cursor: pointer; padding: 0 2px;
+  line-height: 1; flex-shrink: 0;
+}
+.alert-del:hover { color: var(--down); }
+.alert-notif-badge {
+  display: inline-block; font-size: 8px; padding: 1px 5px;
+  border-radius: 10px; margin-left: 4px;
+  background: var(--down); color: #fff; font-family: var(--font-mono);
+  vertical-align: middle;
+}

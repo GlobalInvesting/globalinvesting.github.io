@@ -2130,7 +2130,7 @@ async function renderRiskData(byId) {
     const now = new Date();
     const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    const yieldSrc = (byId.us2y && !byId.us2y.fromRepo) ? 'yfinance ~15min delay' : 'FRED DGS2 · daily batch';
+    const yieldSrc = (byId.us2y && !byId.us2y.fromRepo) ? 'yfinance ~5min delay' : 'FRED DGS2 · daily batch';
     yieldSub.textContent = 'Nominal yields · ' + yieldSrc + ' · updated ' + hhmm + ' ' + tzAbbr;
   }
 
@@ -2178,7 +2178,7 @@ async function renderRiskData(byId) {
     const now = new Date();
     const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    riskSub.textContent = 'VIX · MOVE · HV30 · yfinance ~15min delay · updated ' + hhmm + ' ' + tzAbbr;
+    riskSub.textContent = 'VIX · MOVE · HV30 · yfinance ~5min delay · updated ' + hhmm + ' ' + tzAbbr;
   }
 }
 
@@ -2522,7 +2522,7 @@ async function updatePairDetail(tvSym) {
   panel.innerHTML = `
     <div class="pd-header">
       <span class="pd-sym">${label}</span>
-      <span class="pd-source">yfinance · ~15min</span>
+      <span class="pd-source">yfinance · ~5min</span>
     </div>
     <div class="pd-price-block">
       <div class="pd-price ${price == null ? 'pd-dim' : ''}">${price != null ? price.toFixed(dec) : '—'}</div>
@@ -2530,14 +2530,14 @@ async function updatePairDetail(tvSym) {
       ${sessH != null && sessL != null ? `<div class="pd-range">H ${sessH.toFixed(dec)} · L ${sessL.toFixed(dec)}</div>` : ''}
     </div>
     <div class="pd-grid">
-      <div class="pd-cell"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">ATM IV</div><div class="pd-val">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
-      <div class="pd-cell"><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="Weekly % change vs prev Friday close"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
+      <div class="pd-cell" data-tip="30-day historical (realised) volatility"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="30-day ATM implied vol from options market"><div class="pd-lbl">ATM IV</div><div class="pd-val">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="IV minus HV: +ve = options expensive vs realised"><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="CFTC Leveraged Funds net contracts (speculative)"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
+      <div class="pd-cell" data-tip="CFTC Asset Managers net contracts (institutional)"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
+      <div class="pd-cell" data-tip="CB rate differential: base minus quote rate"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="${base || 'Base'} central bank policy rate (annualised)"><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
     </div>
     <div class="pd-footer">
       ${alignHtml}
@@ -2649,70 +2649,70 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// CARRY TRADE RANKING — full G8 28-pair differential, rightpanel
+// ETF OPTIONS IV — CBOE / yfinance implied volatility proxies, rightpanel
 // ═══════════════════════════════════════════════════════════════════
-async function fetchCarryRanking() {
-  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
-  function carryTV(long, short) {
-    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
-    if (long  === 'USD') return 'FX_IDC:USD' + short;
-    return 'FX_IDC:' + long + short;
-  }
-  const container = document.getElementById('carry-rank-rows');
+// Tickers sourced from intraday quotes.json (yfinance) where available,
+// with VIX as anchor.  Displays IV alongside 1-day change and a
+// colour-coded percentile bar (high IV = red, low IV = green).
+// ═══════════════════════════════════════════════════════════════════
+const ETF_IV_MANIFEST = [
+  { key:'vix',    label:'VIX',    desc:'S&P 500 30d implied vol (CBOE)',     tvSym:'TVC:VIX'          },
+  { key:'vix9d',  label:'VIX9D',  desc:'S&P 500 9-day implied vol (CBOE)',   tvSym:'CBOE:VIX9D'       },
+  { key:'vvix',   label:'VVIX',   desc:'Vol-of-vol: VIX options IV (CBOE)',  tvSym:'CBOE:VVIX'        },
+  { key:'move',   label:'MOVE',   desc:'US Treasury bond vol index (ICE)',   tvSym:'CBOE:MOVE'        },
+  { key:'gld_iv', label:'GLD IV', desc:'SPDR Gold ETF 30d implied vol',      tvSym:'AMEX:GLD'         },
+  { key:'tlt_iv', label:'TLT IV', desc:'20+ yr Treasury ETF 30d implied vol',tvSym:'NASDAQ:TLT'       },
+  { key:'eem_iv', label:'EEM IV', desc:'Emerging markets ETF 30d impl. vol', tvSym:'AMEX:EEM'         },
+  { key:'efa_iv', label:'EFA IV', desc:'EAFE developed markets ETF IV',      tvSym:'AMEX:EFA'         },
+];
+
+async function fetchEtfIV() {
+  const container = document.getElementById('etf-iv-rows');
   if (!container) return;
 
   try {
-    const rates = {};
-    await Promise.all(G8.map(async ccy => {
-      const cached = STATE.cbRates?.[ccy.toLowerCase()];
-      if (cached?.rate != null) { rates[ccy] = cached.rate; return; }
-      try {
-        const r = await fetch('./rates/' + ccy + '.json');
-        if (!r.ok) return;
-        const d = await r.json();
-        if (d.observations?.[0]?.value) rates[ccy] = parseFloat(d.observations[0].value);
-      } catch {}
-    }));
+    const intra = await loadIntradayQuotes();
+    const ivCache = intra?.etf_iv || {};   // etf_iv block injected by engine
+    const vixVal  = STOOQ_RT_CACHE['vix']?.close ?? intra?.byId?.['vix']?.close ?? null;
 
-    if (Object.keys(rates).length < 4) {
-      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Rate data unavailable</div>';
+    // Build rows from manifest; use etf_iv block first, then STOOQ_RT_CACHE
+    const rows = ETF_IV_MANIFEST.map(m => {
+      const cached = ivCache[m.key];
+      let iv  = cached?.iv  ?? STOOQ_RT_CACHE[m.key]?.close ?? null;
+      let chg = cached?.chg ?? STOOQ_RT_CACHE[m.key]?.pct   ?? null;
+      // VIX and MOVE are direct prices (not % IV), use as-is
+      if (m.key === 'vix' && iv == null) iv = vixVal;
+      if (m.key === 'move') iv = STOOQ_RT_CACHE['move']?.close ?? iv;
+      return { ...m, iv, chg };
+    }).filter(r => r.iv != null);
+
+    if (!rows.length) {
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Awaiting data…</div>';
       return;
     }
 
-    const allPairs = [];
-    for (let i = 0; i < G8.length; i++) {
-      for (let j = i + 1; j < G8.length; j++) {
-        const a = G8[i], b = G8[j];
-        const rA = rates[a] ?? null, rB = rates[b] ?? null;
-        if (rA == null || rB == null) continue;
-        const diff = rA - rB;
-        allPairs.push(diff >= 0
-          ? { long: a, short: b, diff,       rLong: rA, rShort: rB }
-          : { long: b, short: a, diff: -diff, rLong: rB, rShort: rA });
-      }
-    }
-    allPairs.sort((a, b) => b.diff - a.diff);
+    // Percentile bar: scale 0–100 relative to max IV in current set
+    const maxIv = Math.max(...rows.map(r => r.iv));
 
-    const top    = allPairs.slice(0, 10);
-    const maxDiff = top[0]?.diff || 1;
-
-    container.innerHTML = top.map((p, idx) => {
-      const sym = carryTV(p.long, p.short);
-      const bar = Math.round((p.diff / maxDiff) * 60);
-      const cls = p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim';
-      return `<div class="carry-rank-row" data-sym="${sym}" title="Open ${p.long}/${p.short} chart">
-        <span class="cr-rank">${idx + 1}</span>
-        <span class="cr-pair">${p.long}/${p.short}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
-        <span class="cr-diff ${cls}">+${p.diff.toFixed(2)}%</span>
+    container.innerHTML = rows.map(r => {
+      const barW  = Math.round((r.iv / maxIv) * 68);
+      const barCls = r.iv > 30 ? 'etf-iv-bar-high' : r.iv > 18 ? 'etf-iv-bar-mid' : 'etf-iv-bar-low';
+      const chgCls = r.chg == null ? '' : r.chg > 0 ? 'pd-up' : r.chg < 0 ? 'pd-dn' : '';
+      const chgTxt = r.chg != null ? (r.chg >= 0 ? '+' : '') + r.chg.toFixed(1) + '%' : '';
+      return `<div class="etf-iv-row" data-sym="${r.tvSym}" title="${r.desc}">
+        <span class="etf-iv-lbl">${r.label}</span>
+        <div class="etf-iv-bar-wrap"><div class="etf-iv-bar ${barCls}" style="width:${barW}px"></div></div>
+        <span class="etf-iv-val">${r.iv.toFixed(1)}</span>
+        ${chgTxt ? `<span class="etf-iv-chg ${chgCls}">${chgTxt}</span>` : '<span class="etf-iv-chg"></span>'}
       </div>`;
     }).join('');
 
-    container.querySelectorAll('.carry-rank-row[data-sym]').forEach(row => {
+    container.querySelectorAll('.etf-iv-row[data-sym]').forEach(row => {
+      row.style.cursor = 'pointer';
       row.addEventListener('click', () => loadTVChart(row.dataset.sym));
     });
   } catch(e) {
-    console.warn('[CarryRanking]', e);
+    console.warn('[EtfIV]', e);
     if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
   }
 }
@@ -3644,7 +3644,8 @@ async function boot() {
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
-  fetchCarryRanking();
+  fetchEtfIV();
+  initAlerts();
   fetchNewsData();
   fetchReferenceSpreads();          // HV30+VIX+MOVE vol model — no external API, updates with intraday JSON
   computeSessionVol();              // HV30-derived session pip ranges — replaces static table
@@ -4025,7 +4026,7 @@ setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes
 // Crypto: every 90 seconds
 setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData, 30 * 60 * 1000);
-setInterval(fetchCarryRanking, 30 * 60 * 1000);
+setInterval(fetchEtfIV,    10 * 60 * 1000);  // refresh IV every 10 min
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
@@ -4443,7 +4444,18 @@ function exportPanel(type, format = 'csv') {
 
   else { console.warn('[Export] Unknown panel type:', type); return; }
 
-  if (!rows || !rows.length) { console.warn('[Export] No data available for:', type); return; }
+  if (!rows || !rows.length) {
+    // Visual feedback — flash the button that triggered this export
+    document.querySelectorAll('.export-btn').forEach(b => {
+      if (b.textContent.trim() === format.toUpperCase()) {
+        const orig = b.textContent;
+        b.textContent = 'NO DATA'; b.style.color = 'var(--orange)';
+        setTimeout(() => { b.textContent = orig; b.style.color = ''; }, 1800);
+      }
+    });
+    console.warn('[Export] No data available for:', type);
+    return;
+  }
 
   let blob_content, mime, ext;
   if (format === 'json') {
@@ -4469,4 +4481,133 @@ function exportPanel(type, format = 'csv') {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  // Visual feedback — flash ✓ on every matching button in this panel
+  document.querySelectorAll('.export-btn').forEach(b => {
+    if (b.textContent.trim() === ext.slice(1).toUpperCase()) {
+      const orig = b.textContent;
+      b.textContent = '✓'; b.style.color = 'var(--up)';
+      setTimeout(() => { b.textContent = orig; b.style.color = ''; }, 1400);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFIGURABLE ALERTS — threshold monitoring with Notifications API
+// ═══════════════════════════════════════════════════════════════════
+// Storage: localStorage key 'gi_alerts' → JSON array of alert objects
+// Alert object: { id, sym, dir:'above'|'below', threshold, label, fired:bool, firedAt }
+// Check cycle: every 5 minutes (piggybacks on fetchQuoteBarRT interval)
+// ═══════════════════════════════════════════════════════════════════
+
+const ALERTS_KEY = 'gi_alerts';
+const ALERTS_LABELS = {
+  vix:'VIX', eurusd:'EUR/USD', usdjpy:'USD/JPY', gbpusd:'GBP/USD',
+  audusd:'AUD/USD', usdchf:'USD/CHF', xauusd:'Gold', us10y:'US 10Y', move:'MOVE',
+};
+
+function alertsLoad() {
+  try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch { return []; }
+}
+function alertsSave(arr) {
+  try { localStorage.setItem(ALERTS_KEY, JSON.stringify(arr)); } catch {}
+}
+function alertsCurrentValue(sym) {
+  if (sym === 'vix')  return STOOQ_RT_CACHE['vix']?.close  ?? null;
+  if (sym === 'move') return STOOQ_RT_CACHE['move']?.close ?? null;
+  if (sym === 'us10y') {
+    const el = document.getElementById('yc-10y');
+    const v  = parseFloat(el?.textContent);
+    return isNaN(v) ? null : v;
+  }
+  return STOOQ_RT_CACHE[sym]?.close ?? null;
+}
+
+function alertsRender() {
+  const container = document.getElementById('alerts-rows');
+  if (!container) return;
+  const arr = alertsLoad();
+  if (!arr.length) {
+    container.innerHTML = '<div style="padding:5px 8px;font-size:10px;color:var(--text3);">No alerts set. Add one below.</div>';
+    return;
+  }
+  container.innerHTML = arr.map(a => {
+    const dirSym = a.dir === 'above' ? '>' : '<';
+    const cls    = a.fired ? 'alert-row alert-row-active' : 'alert-row';
+    const firedTxt = a.fired ? ` <span class="alert-fired">⚡ FIRED ${a.firedAt || ''}</span>` : '';
+    const cur    = alertsCurrentValue(a.sym);
+    const curTxt = cur != null ? ` · now ${cur.toFixed(cur > 10 ? 2 : 5)}` : '';
+    return `<div class="${cls}" data-id="${a.id}">
+      <span class="alert-lbl">${ALERTS_LABELS[a.sym] || a.sym} ${dirSym} ${a.threshold}${curTxt}${firedTxt}</span>
+      <span class="alert-del" title="Remove alert" onclick="alertsRemove('${a.id}')">✕</span>
+    </div>`;
+  }).join('');
+
+  // Update fired badge count
+  const firedCount = arr.filter(a => a.fired).length;
+  const badge = document.getElementById('alerts-fired-badge');
+  if (badge) {
+    badge.textContent = firedCount;
+    badge.style.display = firedCount > 0 ? 'inline-block' : 'none';
+  }
+}
+
+function alertsRemove(id) {
+  alertsSave(alertsLoad().filter(a => a.id !== id));
+  alertsRender();
+}
+
+function alertsAddFromUI() {
+  const sym  = document.getElementById('alert-sym-sel')?.value;
+  const dir  = document.getElementById('alert-dir-sel')?.value;
+  const val  = parseFloat(document.getElementById('alert-val-inp')?.value);
+  if (!sym || !dir || isNaN(val)) return;
+  const arr = alertsLoad();
+  arr.push({ id: Date.now().toString(36), sym, dir, threshold: val, label: ALERTS_LABELS[sym] || sym, fired: false, firedAt: null });
+  alertsSave(arr);
+  document.getElementById('alert-val-inp').value = '';
+  alertsRender();
+  // Request notification permission on first alert add
+  if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function alertsCheck() {
+  const arr = alertsLoad();
+  if (!arr.length) return;
+  let changed = false;
+
+  arr.forEach(a => {
+    if (a.fired) return;   // already fired — don't re-fire
+    const cur = alertsCurrentValue(a.sym);
+    if (cur == null) return;
+    const triggered = (a.dir === 'above' && cur > a.threshold) ||
+                      (a.dir === 'below' && cur < a.threshold);
+    if (!triggered) return;
+
+    a.fired   = true;
+    a.firedAt = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    changed   = true;
+
+    // Browser notification
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification('GI Terminal Alert', {
+          body: `${ALERTS_LABELS[a.sym] || a.sym} ${a.dir === 'above' ? '>' : '<'} ${a.threshold}  ·  Now: ${cur.toFixed(cur > 10 ? 2 : 5)}`,
+          icon: '/favicon-192x192.png',
+          tag : 'gi-alert-' + a.id,
+        });
+      } catch {}
+    }
+  });
+
+  if (changed) { alertsSave(arr); alertsRender(); }
+}
+
+function initAlerts() {
+  alertsRender();
+  // Check immediately, then every 5 min
+  alertsCheck();
+  setInterval(alertsCheck, 5 * 60 * 1000);
 }
