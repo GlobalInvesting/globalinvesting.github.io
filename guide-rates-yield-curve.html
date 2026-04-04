@@ -267,6 +267,76 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="what-it-shows">
       <h2>What It Shows</h2>
       <p>The Rates &amp; Yield Curve section of the terminal displays four US Treasury nominal yields (3-month T-Bill, 2-year Note, 5-year Note, 10-year Bond), a canvas-drawn yield curve connecting them, and a table of three key spreads: the 2Y–10Y domestic spread, the US–Germany 10Y differential, and the US–Japan 10Y differential.</p>
+      <!-- MOCK: Rates panel matching index structure -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:340px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Rates &amp; Yield Curve — US Treasuries</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
+          <div style="background:var(--bg);padding:6px 8px;">
+            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">3M T-Bill</div>
+            <div style="font-size:17px;font-weight:700;color:#fff;font-family:monospace;line-height:1.1;">5.25%</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:1px;font-family:monospace;">+0.00</div>
+          </div>
+          <div style="background:var(--bg);padding:6px 8px;">
+            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">2Y Note</div>
+            <div style="font-size:17px;font-weight:700;color:#fff;font-family:monospace;line-height:1.1;">4.70%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:1px;font-family:monospace;">−0.03</div>
+          </div>
+          <div style="background:var(--bg);padding:6px 8px;">
+            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">5Y Note</div>
+            <div style="font-size:17px;font-weight:700;color:#fff;font-family:monospace;line-height:1.1;">4.45%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:1px;font-family:monospace;">−0.02</div>
+          </div>
+          <div style="background:var(--bg);padding:6px 8px;">
+            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">10Y Bond</div>
+            <div style="font-size:17px;font-weight:700;color:#fff;font-family:monospace;line-height:1.1;">4.18%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:1px;font-family:monospace;">−0.04</div>
+          </div>
+        </div>
+        <div style="padding:8px 10px 4px;background:var(--bg);">
+          <svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:64px;display:block;">
+            <defs>
+              <linearGradient id="ycGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2962ff" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#2962ff" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <line x1="8" y1="10" x2="292" y2="10" stroke="#2a2e39" stroke-width="0.5"/>
+            <line x1="8" y1="30" x2="292" y2="30" stroke="#2a2e39" stroke-width="0.5"/>
+            <line x1="8" y1="50" x2="292" y2="50" stroke="#2a2e39" stroke-width="0.5"/>
+            <line x1="8" y1="68" x2="292" y2="68" stroke="#2a2e39" stroke-width="0.5"/>
+            <polygon points="30,15 110,29 190,38 270,50 270,68 30,68" fill="url(#ycGrad)"/>
+            <polyline points="30,15 110,29 190,38 270,50" fill="none" stroke="#2962ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="30" cy="15" r="3" fill="#2962ff"/>
+            <circle cx="110" cy="29" r="3" fill="#2962ff"/>
+            <circle cx="190" cy="38" r="3" fill="#2962ff"/>
+            <circle cx="270" cy="50" r="3" fill="#2962ff"/>
+            <text x="30" y="10" fill="#787b86" font-size="7" font-family="monospace" text-anchor="middle">5.25</text>
+            <text x="110" y="24" fill="#787b86" font-size="7" font-family="monospace" text-anchor="middle">4.70</text>
+            <text x="190" y="33" fill="#787b86" font-size="7" font-family="monospace" text-anchor="middle">4.45</text>
+            <text x="270" y="45" fill="#787b86" font-size="7" font-family="monospace" text-anchor="middle">4.18</text>
+            <text x="30" y="77" fill="#4c525e" font-size="7" font-family="monospace" text-anchor="middle">3M</text>
+            <text x="110" y="77" fill="#4c525e" font-size="7" font-family="monospace" text-anchor="middle">2Y</text>
+            <text x="190" y="77" fill="#4c525e" font-size="7" font-family="monospace" text-anchor="middle">5Y</text>
+            <text x="270" y="77" fill="#4c525e" font-size="7" font-family="monospace" text-anchor="middle">10Y</text>
+          </svg>
+        </div>
+        <div style="border-top:1px solid var(--border);padding:4px 8px 6px;">
+          <table style="width:100%;border-collapse:collapse;font-size:10px;">
+            <thead><tr style="color:var(--text3);font-size:9px;border-bottom:1px solid var(--border2);">
+              <th style="text-align:left;padding:3px 4px;">Spread</th>
+              <th style="text-align:center;padding:3px 4px;">Value</th>
+              <th style="text-align:center;padding:3px 4px;">Signal</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px;color:var(--text2);">2Y–10Y</td><td style="padding:4px;text-align:center;font-family:monospace;color:var(--down);">−0.52%</td><td style="padding:4px;text-align:center;color:var(--down);">Inverted</td></tr>
+              <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px;color:var(--text2);">US–DE 10Y</td><td style="padding:4px;text-align:center;font-family:monospace;color:var(--text);">+1.84%</td><td style="padding:4px;text-align:center;color:var(--text2);">USD favored</td></tr>
+              <tr><td style="padding:4px;color:var(--text2);">US–JP 10Y</td><td style="padding:4px;text-align:center;font-family:monospace;color:var(--text);">+3.68%</td><td style="padding:4px;text-align:center;color:var(--text2);">USD/JPY bid</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <p>Data comes from yfinance and updates every 5 minutes during market hours. The yield curve canvas visualizes the slope and shape of the curve in real time, making it immediately obvious whether the curve is normal, flat, or inverted.</p>
     </div>
 
