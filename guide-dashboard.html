@@ -337,6 +337,37 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="topbar-guide">
       <h2>Topbar &amp; Quote Bar</h2>
+      <!-- MOCK: Topbar + Quote bar + Ticker -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+        <!-- Topbar -->
+        <div style="background:#1a1d29;border-bottom:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;gap:10px;">
+          <div style="width:24px;height:24px;background:#2962ff22;border:1px solid #2962ff44;border-radius:4px;flex-shrink:0;"></div>
+          <span style="font-size:11px;font-weight:700;color:#fff;">Global Investing</span>
+          <span style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;">FX Terminal</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px;">
+            <span style="width:6px;height:6px;background:var(--up);border-radius:50%;display:inline-block;"></span>
+            <span style="font-size:10px;color:var(--up);font-weight:600;">LIVE · London</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:8px;">08:42 UTC</span>
+          </div>
+        </div>
+        <!-- Quote bar -->
+        <div style="background:#181b26;border-bottom:1px solid var(--border);padding:4px 12px;display:flex;gap:16px;overflow:hidden;flex-wrap:nowrap;">
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">EUR/USD <span style="color:#26a69a;font-weight:600;">1.0847</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">GBP/USD <span style="color:#26a69a;font-weight:600;">1.2934</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">USD/JPY <span style="color:#ef5350;font-weight:600;">149.82</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">AUD/USD <span style="color:#ef5350;font-weight:600;">0.6521</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">USD/CHF <span style="color:#26a69a;font-weight:600;">0.8971</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">XAU/USD <span style="color:#26a69a;font-weight:600;">2,341</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">WTI <span style="color:#ef5350;font-weight:600;">78.40</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">US10Y <span style="color:#f6941c;font-weight:600;">4.28%</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">DXY <span style="color:#ef5350;font-weight:600;">104.2</span></span>
+        </div>
+        <!-- News ticker -->
+        <div style="background:#131722;padding:4px 12px;font-size:10px;color:var(--text3);display:flex;gap:8px;overflow:hidden;">
+          <span style="color:var(--blue);font-weight:700;flex-shrink:0;">LIVE</span>
+          <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">Fed holds rates steady · <span style="color:#2962ff44;background:#2962ff11;padding:0 3px;border-radius:2px;">EUR</span> ECB minutes signal caution · JPY weakens on BoJ commentary · <span style="color:#26a69a22;background:#26a69a11;padding:0 3px;border-radius:2px;">XAU</span> Gold hits session high ···</span>
+        </div>
+      </div>
       <h3>Session indicator</h3>
       <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
       <h3>Quote bar</h3>
@@ -380,6 +411,69 @@ a { color: inherit; text-decoration: none; }
       <h2>Price Chart</h2>
       <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, XAU/USD, WTI, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD.</p>
       <p>The chart is embedded in a focused read-only view — fixed to candlestick style and Daily timeframe, with a 20-period MA overlay. Toolbars are intentionally hidden to keep the layout compact.</p>
+      <!-- MOCK: Price chart widget -->
+      <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
+        <!-- Tab row -->
+        <div style="background:#1a1d29;border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
+          <div style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #2962ff;white-space:nowrap;cursor:pointer;">EUR/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">GBP/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">USD/JPY</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">XAU/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">DXY</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">WTI</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">SPX</div>
+          <div style="padding:5px 10px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer;">BTC</div>
+        </div>
+        <!-- Chart area (SVG candlestick mock) -->
+        <div style="position:relative;height:180px;padding:10px 12px 24px;">
+          <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <!-- MA line -->
+            <polyline points="0,95 40,90 80,85 120,88 160,82 200,78 240,80 280,75 320,72 360,76 400,70 440,68 480,65 520,63 560,60" fill="none" stroke="#2962ff" stroke-width="1.2" opacity="0.7"/>
+            <!-- Candles -->
+            <line x1="10" y1="88" x2="10" y2="102" stroke="#26a69a" stroke-width="1"/><rect x="7" y="91" width="6" height="8" fill="#26a69a"/>
+            <line x1="30" y1="84" x2="30" y2="98" stroke="#ef5350" stroke-width="1"/><rect x="27" y="86" width="6" height="9" fill="#ef5350"/>
+            <line x1="50" y1="80" x2="50" y2="93" stroke="#26a69a" stroke-width="1"/><rect x="47" y="82" width="6" height="8" fill="#26a69a"/>
+            <line x1="70" y1="83" x2="70" y2="96" stroke="#ef5350" stroke-width="1"/><rect x="67" y="85" width="6" height="8" fill="#ef5350"/>
+            <line x1="90" y1="76" x2="90" y2="89" stroke="#26a69a" stroke-width="1"/><rect x="87" y="78" width="6" height="8" fill="#26a69a"/>
+            <line x1="110" y1="73" x2="110" y2="86" stroke="#26a69a" stroke-width="1"/><rect x="107" y="75" width="6" height="8" fill="#26a69a"/>
+            <line x1="130" y1="76" x2="130" y2="89" stroke="#ef5350" stroke-width="1"/><rect x="127" y="78" width="6" height="8" fill="#ef5350"/>
+            <line x1="150" y1="70" x2="150" y2="83" stroke="#26a69a" stroke-width="1"/><rect x="147" y="72" width="6" height="7" fill="#26a69a"/>
+            <line x1="170" y1="68" x2="170" y2="81" stroke="#26a69a" stroke-width="1"/><rect x="167" y="70" width="6" height="7" fill="#26a69a"/>
+            <line x1="190" y1="72" x2="190" y2="85" stroke="#ef5350" stroke-width="1"/><rect x="187" y="74" width="6" height="8" fill="#ef5350"/>
+            <line x1="210" y1="65" x2="210" y2="79" stroke="#26a69a" stroke-width="1"/><rect x="207" y="67" width="6" height="8" fill="#26a69a"/>
+            <line x1="230" y1="62" x2="230" y2="76" stroke="#26a69a" stroke-width="1"/><rect x="227" y="64" width="6" height="8" fill="#26a69a"/>
+            <line x1="250" y1="65" x2="250" y2="78" stroke="#ef5350" stroke-width="1"/><rect x="247" y="67" width="6" height="8" fill="#ef5350"/>
+            <line x1="270" y1="58" x2="270" y2="72" stroke="#26a69a" stroke-width="1"/><rect x="267" y="60" width="6" height="8" fill="#26a69a"/>
+            <line x1="290" y1="55" x2="290" y2="69" stroke="#26a69a" stroke-width="1"/><rect x="287" y="57" width="6" height="8" fill="#26a69a"/>
+            <line x1="310" y1="59" x2="310" y2="72" stroke="#ef5350" stroke-width="1"/><rect x="307" y="61" width="6" height="8" fill="#ef5350"/>
+            <line x1="330" y1="52" x2="330" y2="66" stroke="#26a69a" stroke-width="1"/><rect x="327" y="54" width="6" height="8" fill="#26a69a"/>
+            <line x1="350" y1="55" x2="350" y2="68" stroke="#ef5350" stroke-width="1"/><rect x="347" y="57" width="6" height="7" fill="#ef5350"/>
+            <line x1="370" y1="48" x2="370" y2="62" stroke="#26a69a" stroke-width="1"/><rect x="367" y="50" width="6" height="8" fill="#26a69a"/>
+            <line x1="390" y1="45" x2="390" y2="59" stroke="#26a69a" stroke-width="1"/><rect x="387" y="47" width="6" height="8" fill="#26a69a"/>
+            <line x1="410" y1="50" x2="410" y2="63" stroke="#ef5350" stroke-width="1"/><rect x="407" y="52" width="6" height="7" fill="#ef5350"/>
+            <line x1="430" y1="44" x2="430" y2="57" stroke="#26a69a" stroke-width="1"/><rect x="427" y="46" width="6" height="7" fill="#26a69a"/>
+            <line x1="450" y1="41" x2="450" y2="55" stroke="#26a69a" stroke-width="1"/><rect x="447" y="43" width="6" height="8" fill="#26a69a"/>
+            <line x1="470" y1="45" x2="470" y2="58" stroke="#ef5350" stroke-width="1"/><rect x="467" y="47" width="6" height="7" fill="#ef5350"/>
+            <line x1="490" y1="38" x2="490" y2="52" stroke="#26a69a" stroke-width="1"/><rect x="487" y="40" width="6" height="8" fill="#26a69a"/>
+            <line x1="510" y1="35" x2="510" y2="49" stroke="#26a69a" stroke-width="1"/><rect x="507" y="37" width="6" height="8" fill="#26a69a"/>
+            <line x1="530" y1="39" x2="530" y2="52" stroke="#ef5350" stroke-width="1"/><rect x="527" y="41" width="6" height="7" fill="#ef5350"/>
+            <line x1="550" y1="32" x2="550" y2="46" stroke="#26a69a" stroke-width="1"/><rect x="547" y="34" width="6" height="8" fill="#26a69a"/>
+            <!-- Time axis labels -->
+            <text x="10" y="148" fill="#787b86" font-size="8" font-family="monospace">Sep</text>
+            <text x="120" y="148" fill="#787b86" font-size="8" font-family="monospace">Oct</text>
+            <text x="230" y="148" fill="#787b86" font-size="8" font-family="monospace">Nov</text>
+            <text x="340" y="148" fill="#787b86" font-size="8" font-family="monospace">Dec</text>
+            <text x="460" y="148" fill="#787b86" font-size="8" font-family="monospace">Jan</text>
+            <!-- MA label -->
+            <text x="4" y="10" fill="#2962ff" font-size="8" font-family="monospace">MA 20</text>
+          </svg>
+          <!-- TradingView logo badge -->
+          <div style="position:absolute;bottom:28px;left:20px;width:24px;height:24px;background:#131722;border:1px solid #2a2e39;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:8px;font-weight:900;color:#2962ff;">TV</span>
+          </div>
+          <div style="position:absolute;bottom:28px;right:16px;font-size:9px;color:#363c4e;">yfinance · Daily · ~5min delay</div>
+        </div>
+      </div>
       <div class="callout callout-green">
         <strong>Tip:</strong> Click the TradingView logo in the bottom-left corner of the chart to open it on TradingView.com with full functionality — all chart types, indicators, drawing tools, and timeframes.
       </div>
@@ -388,23 +482,120 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="fx-pairs">
       <h2>FX Pairs Table</h2>
       <p>Below the price chart, the <strong>FX Pairs — Majors</strong> table shows a snapshot of all major pairs with the following columns:</p>
+      <!-- MOCK: FX Pairs table -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">FX Pairs — Majors</span>
+          <span style="font-size:9px;color:var(--text3);">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono, monospace);">
+          <thead>
+            <tr style="background:var(--bg3);color:var(--text3);text-transform:uppercase;font-size:9px;letter-spacing:.05em;">
+              <th style="text-align:left;padding:4px 8px;">Pair</th>
+              <th style="padding:4px 6px;">Bid</th><th style="padding:4px 6px;">Ask</th>
+              <th style="padding:4px 6px;">Spread</th>
+              <th style="padding:4px 6px;">1D Chg</th><th style="padding:4px 6px;">1W Chg</th>
+              <th style="padding:4px 6px;">HV 30d</th>
+              <th style="padding:4px 6px;">Sess H</th><th style="padding:4px 6px;">Sess L</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:5px 8px;font-weight:700;color:var(--text);">EUR/USD</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.0843</td><td style="padding:5px 6px;color:var(--text2);">1.0845</td>
+              <td style="padding:5px 6px;color:var(--up);">0.9p</td>
+              <td style="padding:5px 6px;color:var(--up);">+0.21%</td><td style="padding:5px 6px;color:var(--down);">−0.44%</td>
+              <td style="padding:5px 6px;color:var(--text2);">6.8%</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.0861</td><td style="padding:5px 6px;color:var(--text2);">1.0821</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:5px 8px;font-weight:700;color:var(--text);">GBP/USD</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.2931</td><td style="padding:5px 6px;color:var(--text2);">1.2934</td>
+              <td style="padding:5px 6px;color:var(--up);">1.1p</td>
+              <td style="padding:5px 6px;color:var(--up);">+0.14%</td><td style="padding:5px 6px;color:var(--up);">+0.32%</td>
+              <td style="padding:5px 6px;color:var(--text2);">7.2%</td>
+              <td style="padding:5px 6px;color:var(--text2);">1.2951</td><td style="padding:5px 6px;color:var(--text2);">1.2908</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:5px 8px;font-weight:700;color:var(--text);">USD/JPY</td>
+              <td style="padding:5px 6px;color:var(--text2);">149.78</td><td style="padding:5px 6px;color:var(--text2);">149.80</td>
+              <td style="padding:5px 6px;color:var(--orange);">2.0p</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.33%</td><td style="padding:5px 6px;color:var(--down);">−0.81%</td>
+              <td style="padding:5px 6px;color:var(--text2);">9.1%</td>
+              <td style="padding:5px 6px;color:var(--text2);">150.24</td><td style="padding:5px 6px;color:var(--text2);">149.42</td>
+            </tr>
+            <tr>
+              <td style="padding:5px 8px;font-weight:700;color:var(--text);color:var(--text3);">AUD/USD</td>
+              <td style="padding:5px 6px;color:var(--text3);">0.6519</td><td style="padding:5px 6px;color:var(--text3);">0.6522</td>
+              <td style="padding:5px 6px;color:var(--orange);">2.0p</td>
+              <td style="padding:5px 6px;color:var(--down);">−0.18%</td><td style="padding:5px 6px;color:var(--down);">−0.55%</td>
+              <td style="padding:5px 6px;color:var(--text3);">8.4%</td>
+              <td style="padding:5px 6px;color:var(--text3);">0.6541</td><td style="padding:5px 6px;color:var(--text3);">0.6505</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Spread color: <span style="color:var(--up);">green &lt;1.5 pip</span> · <span style="color:var(--orange);">orange 1.5–3</span> · <span style="color:var(--down);">red &gt;3</span> · Source: yfinance / ECB · ~5min delay</div>
+      </div>
       <ul style="list-style:none;padding:0;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Pair</strong> <span style="color:var(--text2);">Currency pair identifier (e.g., EUR/USD)</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Bid / Ask</strong> <span style="color:var(--text2);">Current bid and ask prices from the ECB/Frankfurter feed</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Spread</strong> <span style="color:var(--text2);">Estimated current spread in pips, color-coded (green &lt;1.5 pip, orange 1.5–3, red &gt;3)</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1D</strong> <span style="color:var(--text2);">Percentage change vs. yesterday's closing price</span></li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">1W</strong> <span style="color:var(--text2);">Percentage change vs. last week's close</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">IV 1M</strong> <span style="color:var(--text2);">Estimated 1-month implied volatility for the pair</span></li>
-        <li style="padding:6px 0;display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Session Range</strong> <span style="color:var(--text2);">Intraday high/low range as a percentage of average daily range (ADR)</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">HV 30d</strong> <span style="color:var(--text2);">30-day historical (realized) volatility — annualized standard deviation of daily log returns, computed from yfinance data. Not implied volatility.</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Sess H</strong> <span style="color:var(--text2);">Intraday session high price.</span></li>
+        <li style="padding:6px 0;display:flex;gap:12px;font-size:12px;"><strong style="min-width:100px;color:var(--text);">Sess L</strong> <span style="color:var(--text2);">Intraday session low price.</span></li>
       </ul>
     </div>
 
     <div class="guide-section" id="heatmap">
       <h2>Currency Strength Heatmap</h2>
-      <p>An 8×8 grid showing the relative performance of each G8 currency against every other, computed from Frankfurter/ECB daily rates. Each cell shows the percentage change of the row currency vs. the column currency over the selected timeframe.</p>
-      <p>The diagonal is blank (a currency vs. itself). Green cells indicate the row currency strengthened against the column currency; red indicates it weakened. The intensity of the color scales with the magnitude of the move.</p>
+      <p>A ranked row of 8 cells — one per G8 currency (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) — sorted from strongest to weakest. Each cell shows the currency's average percentage change computed across multiple cross pairs, giving a basket-weighted view of intraday strength rather than a single pair reading.</p>
+      <!-- MOCK: Currency Strength Heatmap -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Currency Strength Heatmap</span>
+          <span style="font-size:9px;color:var(--text3);">Relative performance vs USD basket · ECB daily</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:0;">
+          <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">CHF</div>
+            <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.85</div>
+          </div>
+          <div style="background:#0d3d2e;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">CAD</div>
+            <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.30</div>
+          </div>
+          <div style="background:#1a3a2a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">USD</div>
+            <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.15</div>
+          </div>
+          <div style="background:#1a3a2a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">JPY</div>
+            <div style="font-size:10px;color:var(--up);margin-top:3px;">+0.13</div>
+          </div>
+          <div style="background:#3d1a1a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">EUR</div>
+            <div style="font-size:10px;color:var(--down);margin-top:3px;">−0.17</div>
+          </div>
+          <div style="background:#3d1a1a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">AUD</div>
+            <div style="font-size:10px;color:var(--down);margin-top:3px;">−0.19</div>
+          </div>
+          <div style="background:#3d1a1a;border-right:1px solid var(--border);padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">GBP</div>
+            <div style="font-size:10px;color:var(--down);margin-top:3px;">−0.41</div>
+          </div>
+          <div style="background:#5a1a1a;padding:10px 4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--text);">NZD</div>
+            <div style="font-size:10px;color:var(--down);margin-top:3px;">−1.05</div>
+          </div>
+        </div>
+        <div style="padding:4px 8px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">Sorted strongest → weakest · yfinance RT ~5min delay · fallback: ECB daily</div>
+      </div>
+      <p>When intraday data is available (yfinance RT cache, ~5 min delay), strength is derived from 12 cross pairs (EUR/USD, GBP/USD, AUD/USD, NZD/USD, USD/JPY, USD/CHF, USD/CAD, EUR/GBP, EUR/JPY, GBP/JPY, AUD/JPY, CAD/JPY). Each currency's score is the average signed contribution across all pairs it appears in. If intraday data is unavailable, it falls back to ECB daily rates. Cells are color-coded by intensity: dark green (strong), light green (mild), flat (near zero), light red (mild weakness), dark red (weak).</p>
       <div class="callout">
-        <strong>How to read it:</strong> Scan the rows. A row that is mostly green indicates a broadly strong currency. A row that is mostly red indicates broad weakness. This is more informative than looking at any single pair in isolation, as it shows whether a move is idiosyncratic (one pair reacting) or systematic (one currency moving against the entire basket).
+        <strong>How to read it:</strong> Currencies on the left are outperforming; currencies on the right are underperforming. A large gap in scores between adjacent cells signals a decisive move. Compare the far left and far right to identify the highest-conviction long/short pair of the session.
       </div>
     </div>
 
@@ -412,8 +603,51 @@ a { color: inherit; text-decoration: none; }
       <h2>Left Sidebar</h2>
       <h3>FX Liquidity</h3>
       <p>A canvas-drawn chart showing estimated FX market liquidity across the 24-hour trading day. The curve peaks at London-New York overlap (~13:00–17:00 UTC), which historically accounts for the highest volume and tightest spreads. A vertical line marks the current UTC time. See the dedicated <a href="guide-fx-liquidity.html" style="color:var(--blue);">FX Liquidity &amp; Sessions guide</a> for a full explanation.</p>
+      <!-- MOCK: Liquidity chart -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">FX Liquidity</span>
+        </div>
+        <div style="padding:8px 8px 4px;position:relative;">
+          <svg viewBox="0 0 240 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+            <!-- Session fills -->
+            <rect x="0" y="0" width="36" height="70" fill="rgba(41,98,255,0.08)"/>
+            <rect x="80" y="0" width="68" height="70" fill="rgba(38,166,154,0.08)"/>
+            <rect x="108" y="0" width="80" height="70" fill="rgba(246,148,28,0.08)"/>
+            <!-- Liquidity curve -->
+            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60" fill="none" stroke="#2962ff" stroke-width="1.5" opacity="0.8"/>
+            <!-- Area fill -->
+            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60 L240,70 L0,70 Z" fill="rgba(41,98,255,0.1)"/>
+            <!-- Current time marker -->
+            <line x1="120" y1="0" x2="120" y2="70" stroke="#f6941c" stroke-width="1" stroke-dasharray="2,2"/>
+            <!-- Time labels -->
+            <text x="0" y="68" fill="#787b86" font-size="6" font-family="monospace">00:00</text>
+            <text x="55" y="68" fill="#787b86" font-size="6" font-family="monospace">08:00</text>
+            <text x="110" y="68" fill="#787b86" font-size="6" font-family="monospace">13:00</text>
+            <text x="170" y="68" fill="#787b86" font-size="6" font-family="monospace">18:00</text>
+            <text x="215" y="68" fill="#787b86" font-size="6" font-family="monospace">24:00</text>
+          </svg>
+          <div style="display:flex;gap:10px;margin-top:3px;">
+            <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(41,98,255,0.3);border-radius:1px;"></span>Tokyo</span>
+            <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.4);border-radius:1px;"></span>London</span>
+            <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.35);border-radius:1px;"></span>New York</span>
+          </div>
+        </div>
+      </div>
       <h3>Crosses</h3>
-      <p>Live prices and daily percentage changes for 14 cross pairs (EUR/JPY, GBP/JPY, AUD/JPY, CAD/JPY, CHF/JPY, EUR/CHF, EUR/CAD, EUR/AUD, GBP/CHF, GBP/CAD, AUD/NZD, AUD/CHF, NZD/JPY). Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <p>Live prices and daily percentage changes for 14 cross pairs (EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, GBP/JPY, GBP/CHF, GBP/CAD, AUD/JPY, AUD/NZD, AUD/CHF, CAD/JPY, CHF/JPY, NZD/JPY). Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <!-- MOCK: Crosses mini-list -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:220px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Crosses</span>
+        </div>
+        <div style="padding:2px 0;">
+          <div style="display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);font-size:10px;"><span style="color:var(--text);">EUR/JPY</span><span style="color:var(--text2);">162.48</span><span style="color:var(--up);">+0.11%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);font-size:10px;"><span style="color:var(--text);">GBP/JPY</span><span style="color:var(--text2);">193.72</span><span style="color:var(--down);">−0.22%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid var(--border);font-size:10px;"><span style="color:var(--text);">EUR/CHF</span><span style="color:var(--text2);">0.9612</span><span style="color:var(--down);">−0.08%</span></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 8px;font-size:10px;color:var(--text3);"><span>+ 11 more</span><span></span><span></span></div>
+        </div>
+      </div>
       <h3>Carry Trade — Top Pairs</h3>
       <p>A ranked list of the highest-yielding carry trade pair candidates, computed from current central bank rate differentials. A carry trade borrows a low-rate currency (historically JPY or CHF) and buys a high-rate currency (historically AUD or NZD). This section shows the net rate differential for the top pairs at current CB policy rates. See <a href="about.html" style="color:var(--blue);">data sources</a> for context.</p>
       <h3>Upcoming Events</h3>
@@ -422,19 +656,133 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="right-panel">
       <h2>Right Panel</h2>
+
       <h3>Central Bank Rates</h3>
       <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the current rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">→ Hold</span>.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Central Bank Rates</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="color:var(--text3);font-size:9px;">
+            <th style="text-align:left;padding:3px 8px;">Bank</th>
+            <th style="padding:3px 6px;">Rate</th>
+            <th style="padding:3px 6px;">Trend</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.65%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoE</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.00%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.25%</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hiking</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.35%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoC</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">SNB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">1.00%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">RBNZ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3>Key Correlations</h3>
-      <p>Rolling 60-day structural correlations between selected pairs and reference assets (EUR/USD vs. DXY, AUD/USD vs. Gold, USD/JPY vs. US 10Y Yield, etc.). Correlation values near +1 or -1 indicate strong relationships; values near 0 indicate the correlation has broken down, which can itself be a signal.</p>
+      <p>Rolling 60-day Pearson correlations between selected pairs and reference assets (EUR/USD vs. DXY, AUD/USD vs. Gold, USD/JPY vs. US 10Y Yield). Correlation values near +1 or −1 indicate strong relationships; values near 0 mean the correlation has broken down — which can itself be a signal worth noting.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Key Correlations</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="color:var(--text3);font-size:9px;">
+            <th style="text-align:left;padding:3px 8px;">Pair A</th>
+            <th style="padding:3px 6px;">Pair B</th>
+            <th style="padding:3px 6px;">Corr</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-weight:700;">−0.97</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">Gold</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+0.71</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">US10Y</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+0.83</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:2px 8px 5px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance</div>
+      </div>
+
       <h3>CB Rate Expectations</h3>
-      <p>Forward-looking rate expectations for each major central bank at their next scheduled meeting. Values are derived from futures market pricing and analyst consensus. This is distinct from the current rate — it reflects what the market expects to happen next.</p>
+      <p>Forward-looking rate expectations for major central banks at their next scheduled meeting, derived from futures market pricing and analyst consensus. This is distinct from the current rate — it reflects what the market expects to happen next, which is what drives FX pricing at the margin.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CB Rate Expectations</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="color:var(--text3);font-size:9px;">
+            <th style="text-align:left;padding:3px 8px;">Bank · Meeting</th>
+            <th style="padding:3px 6px;">Bias</th>
+            <th style="padding:3px 6px;">Fwd Rate</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed · May</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Cut</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.00%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB · Apr</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Cut</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.40%</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">BoJ · Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.25%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">ETF IV · COT</span></h3>
-      <p>A directional bias table for major pairs, synthesised from two inputs: ETF implied volatility (options market skew) and CFTC COT net speculative positioning. The 1W and 1M columns show short-term vs. medium-term bias. When ETF IV and COT agree on direction, the Bias signal is most reliable; disagreement (e.g. IV bullish, COT bearish) signals uncertainty or a positioning squeeze risk.</p>
+      <p>A directional bias table for major pairs, synthesised from ETF implied volatility (options market skew) and CFTC COT net speculative positioning. The 1W and 1M columns show short-term vs. medium-term bias. When ETF IV and COT agree on direction, the signal is most reliable. Disagreement — e.g. IV bullish but COT bearish — signals uncertainty or a positioning squeeze risk.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
+          <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Positioning Bias</span>
+          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> ETF IV · COT</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="color:var(--text3);font-size:9px;">
+            <th style="text-align:left;padding:3px 8px;">Pair</th>
+            <th style="padding:3px 6px;">1W</th>
+            <th style="padding:3px 6px;">1M</th>
+            <th style="padding:3px 6px;">Bias</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--up);text-align:center;">Bull</td><td style="padding:4px 6px;color:var(--up);text-align:center;">Bull</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">↑</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Bear</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td><td style="padding:4px 6px;color:var(--orange);text-align:center;font-weight:700;">~</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">GBP/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Bear</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Bear</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-weight:700;">↓</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="guide-section" id="news-feed">
       <h2>News Feed</h2>
       <p>FX-relevant headlines from FXStreet, ForexLive, ECB, BoE, Investing.com and others, filtered and sorted by estimated market impact. Each item shows the source, timestamp, and currency tags for the pairs most likely affected. The feed is updated every hour.</p>
+      <!-- MOCK: News feed -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">News Feed</span>
+          <span style="font-size:9px;color:var(--text3);">FX-relevant · sorted by impact</span>
+        </div>
+        <div style="padding:0;">
+          <div style="padding:8px 10px;border-bottom:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:var(--down);text-transform:uppercase;">HIGH</span>
+              <span style="font-size:9px;color:var(--text3);">FXStreet · 08:31</span>
+              <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">EUR</span>
+              <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">USD</span>
+            </div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5;">ECB holds rates at 3.65%, signals further cuts dependent on inflation trajectory</div>
+          </div>
+          <div style="padding:8px 10px;border-bottom:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;">MED</span>
+              <span style="font-size:9px;color:var(--text3);">ForexLive · 07:54</span>
+              <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">JPY</span>
+            </div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5;">BoJ's Ueda: no rush to raise rates further, watching wage data closely</div>
+          </div>
+          <div style="padding:8px 10px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;">LOW</span>
+              <span style="font-size:9px;color:var(--text3);">Investing.com · 07:12</span>
+              <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">GBP</span>
+            </div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;">UK retail sales beat expectations at +0.4% MoM vs +0.2% consensus</div>
+          </div>
+        </div>
+      </div>
       <p>The <strong>Economic Map</strong> to the right of the news feed is a TradingView world economics widget showing GDP, inflation, and other macro metrics by country in an interactive geographic view.</p>
     </div>
 
@@ -447,6 +795,54 @@ a { color: inherit; text-decoration: none; }
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Rationale</strong> — the cross-referencing logic (e.g., rate differential + COT positioning alignment + price confirmation)</li>
         <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Confidence</strong> — High / Medium / Low, based on degree of multi-factor alignment</li>
       </ul>
+      <!-- MOCK: Alerts & Signals panel -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0 0 18px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Alerts &amp; Market Signals</span>
+          <span style="font-size:9px;color:var(--text3);">AI · updated 08:30 UTC</span>
+        </div>
+        <div style="padding:0;">
+          <!-- Signal 1 -->
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
+            <div style="flex-shrink:0;margin-top:1px;">
+              <span style="display:inline-block;background:rgba(38,166,154,0.15);color:var(--up);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Bullish</span>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:700;color:var(--text);">EUR/USD</span>
+                <span style="font-size:9px;color:var(--up);background:rgba(38,166,154,0.1);padding:1px 6px;border-radius:2px;">High confidence</span>
+              </div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6;">ECB–Fed rate differential narrowing; COT shows spec longs building for 3rd consecutive week; price holding above 20-day MA after retest.</div>
+            </div>
+          </div>
+          <!-- Signal 2 -->
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
+            <div style="flex-shrink:0;margin-top:1px;">
+              <span style="display:inline-block;background:rgba(239,83,80,0.12);color:var(--down);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Bearish</span>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:700;color:var(--text);">GBP/USD</span>
+                <span style="font-size:9px;color:var(--orange);background:rgba(246,148,28,0.1);padding:1px 6px;border-radius:2px;">Medium confidence</span>
+              </div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6;">BoE cut path more aggressive than Fed implied; retail positioning heavily long GBP — crowded trade risk. VIX spike could amplify downside.</div>
+            </div>
+          </div>
+          <!-- Signal 3 -->
+          <div style="padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
+            <div style="flex-shrink:0;margin-top:1px;">
+              <span style="display:inline-block;background:rgba(120,123,134,0.15);color:var(--text3);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Watch</span>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:700;color:var(--text);">USD/JPY</span>
+                <span style="font-size:9px;color:var(--text3);background:rgba(120,123,134,0.1);padding:1px 6px;border-radius:2px;">Low confidence</span>
+              </div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6;">US–JP 10Y yield spread stable but BoJ rhetoric shifting hawkish. COT and IV diverge. Await NFP and BoJ meeting for directional clarity.</div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="callout callout-orange">
         <strong>Important:</strong> These signals are informational context, not trade recommendations. Confidence labels reflect internal cross-factor alignment, not a probability of directional outcome. Always apply your own analysis and risk management before acting on any market signal.
       </div>
