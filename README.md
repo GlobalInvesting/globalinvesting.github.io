@@ -19,6 +19,10 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **Central bank policy rates** — All G8 CBs with rate cycle direction
 - **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
 - **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias
+- **Pair detail panel** — Linked right-panel showing price, 1W change, HV30, ATM IV, IV−HV, LF net, AM net, carry differential, and LF/AM alignment badge for the currently selected chart pair (Eikon-style linked panel)
+- **Carry trade ranking** — All 28 G8 pair combinations ranked by CB rate differential, with proportional bar and clickable chart links; refreshes every 30 minutes
+- **Panel data export** — CSV and JSON export for FX pairs, COT positioning, yield curve, and carry ranking; timestamped filenames, downloaded client-side from in-memory caches
+- **Keyboard navigation** — `G`/`C`/`R`/`X`/`M`/`Y`/`K` jump to panels; `↑`/`↓` navigate FX table rows and load chart; `?` opens shortcut legend
 - **Economic calendar** — TradingView embed with real-time event actuals
 - **News feed** — FXStreet, ForexLive, Investing.com and others, filtered by FX relevance, updated hourly
 - **Market signals** — 5–7 AI-generated signals updated 8× daily
