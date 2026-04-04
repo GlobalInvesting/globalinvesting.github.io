@@ -431,6 +431,10 @@
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
         <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
+        <div class="export-btns" aria-label="Export FX pairs data">
+          <button class="export-btn" onclick="exportPanel('fx')" title="Export FX pairs as CSV">CSV</button>
+          <button class="export-btn" onclick="exportPanel('fx','json')" title="Export FX pairs as JSON">JSON</button>
+        </div>
       </div>
       <div style="overflow-x:auto;">
       <table aria-label="FX Pairs — Majors">
@@ -524,7 +528,7 @@
 
     <!-- COT POSITIONING — from cot-data/*.json -->
     <div class="panel" id="section-positioning">
-      <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span></div>
+      <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" onclick="exportPanel('cot')" title="Export COT data as CSV">CSV</button><button class="export-btn" onclick="exportPanel('cot','json')" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px;">
         <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 52px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
           <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span>6M</span>
@@ -659,6 +663,25 @@
 
   <!-- RIGHT PANEL -->
   <aside id="rightpanel" aria-label="Market data panels">
+
+    <!-- PAIR DETAIL — updated on every pair click (Eikon-style linked panel) -->
+    <div id="pair-detail" class="pd-empty" aria-label="Selected pair detail" aria-live="polite">
+      <div class="pd-placeholder">
+        <span class="pd-ph-icon">&#x25A1;</span>
+        <span class="pd-ph-text">Select a pair to view detail</span>
+      </div>
+    </div>
+
+    <!-- CARRY TRADE RANKING — G8 CB rate differential, top 10 -->
+    <div class="sb-head" style="margin-top:0;">
+      Carry Trade Ranking
+      <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">G8 &middot; CB rate differential</span>
+    </div>
+    <div id="carry-rank-rows">
+      <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading&hellip;</div>
+    </div>
+    <div style="padding:3px 8px 5px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);">+ = long base rate advantage &middot; CB policy rates</div>
+
     <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
     <table id="cbrates-table" aria-label="Central bank interest rates">
       <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
@@ -705,8 +728,11 @@
   <div style="display:flex;gap:4px;"><span class="sb-k">DELAY</span><span class="sb-v" style="color:var(--orange);">~5 MIN</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
-  <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v4.1</span></div>
+  <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
+    <span class="sb-v">FX Terminal v4.1</span>
+  </div>
 </footer>
 
 
