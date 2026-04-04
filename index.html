@@ -338,9 +338,7 @@
     </div>
     <div class="sb-section">
       <div class="sb-head">Carry Trade Ranking <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">G8 &middot; CB rate differential</span></div>
-      <div id="carry-rank-rows" style="padding:2px 0;">
-        <div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>
-      </div>
+      <div id="carry-rank-rows" style="padding:2px 0;"></div>
       <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">+ = long base rate advantage &middot; CB policy rates</div>
     </div>
   </aside>
@@ -724,7 +722,7 @@
     <!-- ALERTS BELL -->
     <div id="alerts-anchor" style="position:relative;">
       <button class="kb-hint-btn" id="alerts-bell-btn" onclick="toggleAlertsPopover()" title="Configure price alerts" aria-label="Price alerts" aria-haspopup="true" aria-expanded="false">
-        &#x1F514;<span id="alerts-fired-badge" style="display:none;" class="alert-notif-badge">0</span>
+        alerts<span id="alerts-fired-badge" style="display:none;" class="alert-notif-badge">0</span>
       </button>
       <!-- ALERTS POPOVER -->
       <div id="alerts-popover" role="dialog" aria-label="Price alerts" style="display:none;">
