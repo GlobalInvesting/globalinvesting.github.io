@@ -39,8 +39,8 @@ const PAIRS = [
   { id:'gbpnzd', base:'GBP', quote:'NZD', cross:['GBP','NZD'], dec:5 },
   { id:'audcad', base:'AUD', quote:'CAD', cross:['AUD','CAD'], dec:5 },
   { id:'cadchf', base:'CAD', quote:'CHF', cross:['CAD','CHF'], dec:5 },
-  { id:'cadnzd', base:'CAD', quote:'NZD', cross:['CAD','NZD'], dec:5 },
-  { id:'chfnzd', base:'CHF', quote:'NZD', cross:['CHF','NZD'], dec:5 },
+  { id:'nzdcad', base:'CAD', quote:'NZD', cross:['CAD','NZD'], dec:5 },
+  { id:'nzdchf', base:'CHF', quote:'NZD', cross:['CHF','NZD'], dec:5 },
 ];
 
 // CB rate config
@@ -284,7 +284,7 @@ function populateQuoteBar() {
 
 
 function populateCrossRows() {
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','cadnzd','chfnzd'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf'];
   crossIds.forEach(id => {
     const pair = PAIRS.find(p=>p.id===id);
     if (!pair) return;
@@ -826,8 +826,8 @@ const QB_STOOQ_PAIRS = [
   { sym: 'gbpnzd',  id: 'gbpnzd',  dec: 5 },
   { sym: 'audcad',  id: 'audcad',  dec: 5 },
   { sym: 'cadchf',  id: 'cadchf',  dec: 5 },
-  { sym: 'cadnzd',  id: 'cadnzd',  dec: 5 },
-  { sym: 'chfnzd',  id: 'chfnzd',  dec: 5 },
+  { sym: 'nzdcad',  id: 'nzdcad',  dec: 5 },
+  { sym: 'nzdchf',  id: 'nzdchf',  dec: 5 },
 ];
 
 // ── Intraday quotes cache (from GitHub Action — Twelve Data + Alpha Vantage) ──
@@ -992,7 +992,7 @@ function updateFxPairsTableRT() {
   }
 
   // ── Update Crosses sidebar from the same RT cache ──
-  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','cadnzd','chfnzd'];
+  const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf'];
   crossIds.forEach(id => {
     const data = STOOQ_RT_CACHE[id];
     if (!data) return;
