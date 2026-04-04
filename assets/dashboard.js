@@ -801,11 +801,11 @@ function buildNewsTicker(items) {
 // ═══════════════════════════════════════════════════════════════════
 const QB_STOOQ_PAIRS = [
   { sym: 'eurusd',  id: 'eurusd',  dec: 5 },
-  { sym: 'gbpusd',  id: 'gbpusd',  dec: 5 },
   { sym: 'usdjpy',  id: 'usdjpy',  dec: 3 },
+  { sym: 'gbpusd',  id: 'gbpusd',  dec: 5 },
   { sym: 'audusd',  id: 'audusd',  dec: 5 },
-  { sym: 'usdchf',  id: 'usdchf',  dec: 5 },
   { sym: 'usdcad',  id: 'usdcad',  dec: 5 },
+  { sym: 'usdchf',  id: 'usdchf',  dec: 5 },
   { sym: 'nzdusd',  id: 'nzdusd',  dec: 5 },
   { sym: 'eurgbp',  id: 'eurgbp',  dec: 5 },
   { sym: 'eurjpy',  id: 'eurjpy',  dec: 3 },
