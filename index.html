@@ -672,36 +672,6 @@
       </div>
     </div>
 
-    <!-- CONFIGURABLE ALERTS -->
-    <div class="sb-head" style="margin-top:2px;">
-      Alerts
-      <span style="font-size:9px;color:var(--text3);font-weight:normal;margin-left:4px;">threshold · browser notification</span>
-      <span id="alerts-fired-badge" style="display:none;" class="alert-notif-badge">0</span>
-    </div>
-    <div id="alerts-panel">
-      <div id="alerts-rows"><!-- populated by initAlerts() --></div>
-      <div class="alert-add-row">
-        <select id="alert-sym-sel" class="alert-select" aria-label="Alert instrument">
-          <option value="vix">VIX</option>
-          <option value="eurusd">EUR/USD</option>
-          <option value="usdjpy">USD/JPY</option>
-          <option value="gbpusd">GBP/USD</option>
-          <option value="audusd">AUD/USD</option>
-          <option value="usdchf">USD/CHF</option>
-          <option value="xauusd">Gold</option>
-          <option value="us10y">US 10Y</option>
-          <option value="move">MOVE</option>
-        </select>
-        <select id="alert-dir-sel" class="alert-select" style="width:40px;flex:none;" aria-label="Alert direction">
-          <option value="above">&gt;</option>
-          <option value="below">&lt;</option>
-        </select>
-        <input id="alert-val-inp" class="alert-input" type="number" step="any" placeholder="Value" aria-label="Alert threshold value">
-        <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
-      </div>
-    </div>
-    <div style="padding:2px 8px 5px;font-size:9px;color:var(--text3);border-bottom:1px solid var(--border);">Alerts check every 5 min · require browser permission</div>
-
     <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
     <table id="cbrates-table" aria-label="Central bank interest rates">
       <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
@@ -749,7 +719,44 @@
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+
+    <!-- ALERTS BELL -->
+    <div id="alerts-anchor" style="position:relative;">
+      <button class="kb-hint-btn" id="alerts-bell-btn" onclick="toggleAlertsPopover()" title="Configure price alerts" aria-label="Price alerts" aria-haspopup="true" aria-expanded="false">
+        &#x1F514;<span id="alerts-fired-badge" style="display:none;" class="alert-notif-badge">0</span>
+      </button>
+      <!-- ALERTS POPOVER -->
+      <div id="alerts-popover" role="dialog" aria-label="Price alerts" style="display:none;">
+        <div class="alp-head">
+          Price Alerts
+          <button class="alp-close" onclick="toggleAlertsPopover()" aria-label="Close alerts">&#x2715;</button>
+        </div>
+        <div id="alerts-rows" class="alp-rows"><!-- populated by initAlerts() --></div>
+        <div class="alp-add">
+          <select id="alert-sym-sel" class="alert-select" aria-label="Alert instrument">
+            <option value="vix">VIX</option>
+            <option value="eurusd">EUR/USD</option>
+            <option value="usdjpy">USD/JPY</option>
+            <option value="gbpusd">GBP/USD</option>
+            <option value="audusd">AUD/USD</option>
+            <option value="usdchf">USD/CHF</option>
+            <option value="nzdusd">NZD/USD</option>
+            <option value="xauusd">Gold</option>
+            <option value="us10y">US 10Y</option>
+            <option value="move">MOVE</option>
+          </select>
+          <select id="alert-dir-sel" class="alert-select alp-dir" aria-label="Alert direction">
+            <option value="above">&gt;</option>
+            <option value="below">&lt;</option>
+          </select>
+          <input id="alert-val-inp" class="alert-input" type="number" step="any" placeholder="Value" aria-label="Threshold value">
+          <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
+        </div>
+        <div class="alp-footer">Checks every 5 min · browser notification on trigger</div>
+      </div>
+    </div>
+
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
     <span class="sb-v">FX Terminal v4.1</span>
   </div>
