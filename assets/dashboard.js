@@ -630,6 +630,27 @@ async function fetchCBRates() {
 // ═══════════════════════════════════════════════════════════════════
 // COT DATA — from cot-data/*.json
 // ═══════════════════════════════════════════════════════════════════
+// Renders a sparkline SVG from history[] levNet values (26-week window).
+// Width 52px × 18px — fits the compact cot-row layout.
+function cotSparkline(history) {
+  if (!history || history.length < 2) return '<svg width="52" height="18"></svg>';
+  const vals = history.map(h => h.levNet || 0);
+  const min  = Math.min(...vals);
+  const max  = Math.max(...vals);
+  const range = max - min || 1;
+  const W = 52, H = 18, pad = 1;
+  const pts = vals.map((v, i) => {
+    const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
+    const y = H - pad - ((v - min) / range) * (H - pad * 2);
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  const lastVal = vals[vals.length - 1];
+  const color   = lastVal > 0 ? 'var(--up)' : lastVal < 0 ? 'var(--down)' : 'var(--text3)';
+  return '<svg width="' + W + '" height="' + H + '" style="display:block;overflow:visible" aria-hidden="true">'
+    + '<polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="1.2" stroke-linejoin="round"/>'
+    + '</svg>';
+}
+
 async function fetchCOTData() {
   const promises = COT_CURRENCIES.map(async ccy => {
     try {
@@ -643,33 +664,61 @@ async function fetchCOTData() {
   const results = (await Promise.all(promises)).filter(Boolean);
   if (!results.length) return;
 
-  // Update date label
+  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr"
   const latest = results[0];
-  if (latest.reportDate || latest.weekEnding) {
-    setEl('cot-date-sub', 'CFTC · week ending ' + (latest.weekEnding || latest.reportDate));
+  const weekEnd = latest.weekEnding || latest.reportDate || '';
+  let updLabel = 'CFTC · week ending ' + weekEnd;
+  if (latest.lastUpdate) {
+    try {
+      const d = new Date(latest.lastUpdate);
+      if (!isNaN(d)) {
+        updLabel += ' · updated ' + d.toLocaleDateString('en', { weekday: 'short', day: '2-digit', month: 'short' });
+      }
+    } catch {}
   }
+  setEl('cot-date-sub', updLabel);
 
   const container = document.getElementById('cot-rows');
   if (!container) return;
 
   container.innerHTML = results.map(d => {
-    const net  = d.netPosition || 0;
-    const long = d.longPositions || 0;
-    const short= d.shortPositions || 0;
+    const net   = d.netPosition || 0;
+    const long  = d.longPositions || 0;
+    const short = d.shortPositions || 0;
     const total = long + short;
-    const longPct  = total > 0 ? Math.round(long / total * 100) : 50;
-    const shortPct = 100 - longPct;
-    const cls  = net > 0 ? 'up' : net < 0 ? 'down' : 'flat';
+    const longPct = total > 0 ? Math.round(long / total * 100) : 50;
+    const cls   = net > 0 ? 'up' : net < 0 ? 'down' : 'flat';
     const netStr = (net >= 0 ? '+' : '') + net.toLocaleString();
-    return `<div class="cot-row">
-      <span class="cot-sym">${d.ccy}</span>
-      <div class="cot-bar-outer">
-        <div class="cot-long-fill" style="width:${longPct}%"></div>
-        <div class="cot-short-fill" style="width:${shortPct}%"></div>
-      </div>
-      <span class="cot-pct ${cls}">${longPct}%</span>
-      <span class="cot-net ${cls}">${netStr}</span>
-    </div>`;
+
+    // LF vs AM divergence dot — filled = aligned, hollow = diverge
+    const amNet = d.assetManagerNet;
+    let divHtml = '';
+    if (amNet != null) {
+      const lfDir = net > 0 ? 1 : net < 0 ? -1 : 0;
+      const amDir = amNet > 0 ? 1 : amNet < 0 ? -1 : 0;
+      if (lfDir !== 0 && amDir !== 0) {
+        if (lfDir === amDir) {
+          divHtml = '<span class="cot-div aligned" title="LF + AM aligned — ' + (lfDir > 0 ? 'both net long' : 'both net short') + '">●</span>';
+        } else {
+          divHtml = '<span class="cot-div diverge" title="LF/AM diverge — LF ' + (net > 0 ? 'long' : 'short') + ' · AM ' + (amNet > 0 ? 'long' : 'short') + '">○</span>';
+        }
+      }
+    }
+
+    // Sparkline from history[] (26-week rolling window)
+    const spark = cotSparkline(d.history);
+
+    return '<div class="cot-row">'
+      + '<span class="cot-sym">' + d.ccy + '</span>'
+      + '<div class="cot-bar-outer">'
+      + '<div class="cot-long-fill" style="width:' + longPct + '%"></div>'
+      + '<div class="cot-short-fill" style="width:' + (100 - longPct) + '%"></div>'
+      + '</div>'
+      + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
+      + '<span class="cot-net ' + cls + '">' + netStr + '</span>'
+      + divHtml
+      + '<span class="cot-spark" title="Leveraged Funds net position — 26-week history">' + spark + '</span>'
+      + '</div>';
   }).join('');
 }
 
@@ -2075,6 +2124,16 @@ async function renderRiskData(byId) {
     }
   }
 
+  // ── Yield Curve panel timestamp ─────────────────────────────────────
+  const yieldSub = document.getElementById('yield-panel-sub');
+  if (yieldSub) {
+    const now = new Date();
+    const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+    const yieldSrc = (byId.us2y && !byId.us2y.fromRepo) ? 'yfinance ~15min delay' : 'FRED DGS2 · daily batch';
+    yieldSub.textContent = 'Nominal yields · ' + yieldSrc + ' · updated ' + hhmm + ' ' + tzAbbr;
+  }
+
   // Gold/SPX ratio — computed in fetchCrossAssetData() after gold & SPX are fetched
   // US–EU Spread 10Y (uses byId from this scope)
   if (byId.us10y && byId.de10y) {
@@ -2112,6 +2171,15 @@ async function renderRiskData(byId) {
       }
     } catch {}
   }).catch(() => {});
+
+  // ── Risk Monitor panel timestamp ─────────────────────────────────────
+  const riskSub = document.getElementById('risk-panel-sub');
+  if (riskSub) {
+    const now = new Date();
+    const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+    riskSub.textContent = 'VIX · MOVE · HV30 · yfinance ~15min delay · updated ' + hhmm + ' ' + tzAbbr;
+  }
 }
 
 // Yield curve labels — fixed set of tenors we display
@@ -3170,7 +3238,12 @@ async function buildRichNarrative() {
               </div>`;
             }).join('');
           }
-          if (sub) sub.textContent = signals.length + ' active · sorted by priority · AI-generated';
+          if (sub) {
+            const now = new Date();
+            const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+            sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr;
+          }
         }
       }
     } catch {}

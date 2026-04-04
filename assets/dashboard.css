@@ -367,7 +367,7 @@
   /* COT */
   .cot-row {
     display: grid;
-    grid-template-columns: 36px 1fr 42px 64px;
+    grid-template-columns: 36px 1fr 42px 64px 14px 52px;
     align-items: center; gap: 8px;
     padding: 3px 0; border-bottom: 1px solid var(--border);
   }
@@ -378,6 +378,12 @@
   .cot-short-fill { position: absolute; right: 0; top: 0; height: 100%; background: var(--down); opacity: .75; }
   .cot-pct { font-size: 10px; font-family: var(--font-mono); }
   .cot-net { text-align: right; font-size: 10px; font-family: var(--font-mono); }
+  /* LF/AM divergence dot — filled circle = aligned, hollow = diverging */
+  .cot-div { font-size: 10px; text-align: center; cursor: help; line-height: 1; }
+  .cot-div.aligned { color: var(--up); }
+  .cot-div.diverge { color: var(--orange, #e8963c); }
+  /* 26-week sparkline cell */
+  .cot-spark { display: flex; align-items: center; overflow: hidden; }
 
   /* RATES GRID */
   .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
