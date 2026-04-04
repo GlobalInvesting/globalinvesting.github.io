@@ -163,7 +163,7 @@ VALIDATORS = {
     "gbpaud": lambda v: 1.4 < v < 2.5,
     "gbpnzd": lambda v: 1.6 < v < 2.8,
     "audcad": lambda v: 0.7 < v < 1.2,
-    "cadchf": lambda v: 0.6 < v < 1.0,
+    "cadchf": lambda v: 0.50 < v < 0.85,
     "cadnzd": lambda v: 0.9 < v < 1.5,
     "chfnzd": lambda v: 1.4 < v < 2.5,
 }
