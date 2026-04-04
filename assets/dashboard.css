@@ -449,6 +449,43 @@
   #rightpanel::-webkit-scrollbar { width: 3px; }
   #rightpanel::-webkit-scrollbar-thumb { background: var(--border2); }
 
+  /* ── PAIR DETAIL PANEL ───────────────────────────────────────── */
+  #pair-detail { border-bottom: 1px solid var(--border); background: var(--bg2); font-family: var(--font-ui); flex-shrink: 0; }
+  #pair-detail.pd-empty .pd-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:14px 8px; color:var(--text3); }
+  #pair-detail.pd-empty .pd-ph-icon { font-size:18px; opacity:.4; }
+  #pair-detail.pd-empty .pd-ph-text { font-size:10px; letter-spacing:.04em; }
+  .pd-header { display:flex; justify-content:space-between; align-items:center; padding:5px 8px 3px; background:var(--head-bg); border-bottom:1px solid var(--border); }
+  .pd-sym { font-size:12px; font-weight:700; color:var(--text); letter-spacing:.03em; }
+  .pd-source { font-size:9px; color:var(--text3); font-family:var(--font-mono); }
+  .pd-price-block { display:flex; align-items:baseline; gap:6px; padding:6px 8px 3px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .pd-price { font-size:18px; font-weight:700; font-family:var(--font-mono); color:var(--text); letter-spacing:-.01em; }
+  .pd-price.pd-dim { color:var(--text3); }
+  .pd-chg { font-size:12px; font-family:var(--font-mono); font-weight:600; }
+  .pd-range { width:100%; font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px; }
+  .pd-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:1px solid var(--border); }
+  .pd-cell { padding:5px 8px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .pd-cell:nth-child(even) { border-right:none; }
+  .pd-cell:nth-last-child(-n+2) { border-bottom:none; }
+  .pd-lbl { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
+  .pd-val { font-size:12px; font-family:var(--font-mono); color:var(--text); font-weight:600; }
+  .pd-up { color:var(--up); }
+  .pd-dn { color:var(--down); }
+  .pd-dim { color:var(--text3); }
+  .pd-footer { display:flex; align-items:center; gap:6px; padding:4px 8px; flex-wrap:wrap; }
+  .pd-badge { font-size:9px; padding:1px 6px; border-radius:20px; font-weight:600; letter-spacing:.03em; white-space:nowrap; }
+  .pd-aligned { background:rgba(38,166,154,.15); color:var(--up); border:1px solid rgba(38,166,154,.3); }
+  .pd-diverge { background:rgba(232,150,60,.12); color:var(--orange,#e8963c); border:1px solid rgba(232,150,60,.25); }
+
+  /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
+  .carry-rank-row { display:grid; grid-template-columns:16px 52px 1fr 40px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row:hover { background:var(--bg3); }
+  .carry-rank-row:last-child { border-bottom:none; }
+  .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:right; }
+  .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; }
+  .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+  .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
+  .cr-diff { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; }
+
   /* MACRO */
   .macro-row {
     display: grid; grid-template-columns: 32px 1fr 36px 36px 42px;
@@ -961,3 +998,73 @@ a:focus-visible,
   pointer-events: none;
 }
 #user-alerts-list button:hover { color:var(--down) !important; }
+
+/* ── KEYBOARD SHORTCUT LEGEND ─────────────────────────────────────── */
+#kb-legend {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.kbl-inner {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 18px 22px; min-width: 240px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  cursor: default;
+  font-family: var(--font-ui);
+}
+.kbl-title {
+  font-size: 12px; font-weight: 700; color: var(--text);
+  letter-spacing: .05em; text-transform: uppercase;
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.kbl-grid {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 6px 14px; align-items: center;
+}
+.kbl-key {
+  font-size: 11px; font-family: var(--font-mono);
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 3px; padding: 2px 7px;
+  color: var(--text); white-space: nowrap;
+  text-align: center;
+}
+.kbl-desc { font-size: 12px; color: var(--text2); }
+.kbl-footer {
+  margin-top: 12px; padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 10px; color: var(--text3); text-align: center;
+}
+
+/* ── KEYBOARD ROW FOCUS ────────────────────────────────────────────── */
+#fx-pairs-tbody tr.kb-focus {
+  background: var(--bg3) !important;
+  outline: 1px solid var(--blue);
+  outline-offset: -1px;
+}
+
+/* ── EXPORT BUTTONS ────────────────────────────────────────────────── */
+.export-btns {
+  display: flex; gap: 4px; align-items: center; margin-left: auto; flex-shrink: 0;
+}
+.export-btn {
+  font-size: 9px; font-family: var(--font-mono); font-weight: 600;
+  padding: 2px 7px; border-radius: 3px; cursor: pointer;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text3); letter-spacing: .05em;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.export-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── KEYBOARD HINT BUTTON (statusbar) ──────────────────────────────── */
+.kb-hint-btn {
+  font-size: 9px; font-family: var(--font-mono);
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text3); padding: 1px 7px; border-radius: 3px;
+  cursor: pointer; letter-spacing: .03em;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.kb-hint-btn:hover { border-color: var(--blue); color: var(--blue); }

@@ -2351,6 +2351,8 @@ function loadTVChart(sym) {
     t.classList.remove('active');
     if (t.dataset.sym === sym) t.classList.add('active');
   });
+  // Update pair detail panel (Eikon-style linked panels)
+  updatePairDetail(sym);
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
   wrap.innerHTML = '';
@@ -2418,6 +2420,133 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
   loadTVChart('CAPITALCOM:VIX');
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// PAIR DETAIL PANEL — Eikon-style linked panel, updates #pair-detail on every pair click
+// All data read from in-memory caches — zero additional fetches on click.
+// ═══════════════════════════════════════════════════════════════════
+const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding }
+
+(async function prefetchCOT() {
+  const CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+  await Promise.all(CCYS.map(async ccy => {
+    try {
+      const r = await fetch('./cot-data/' + ccy + '.json');
+      if (!r.ok) return;
+      const d = await r.json();
+      COT_DATA_CACHE[ccy] = {
+        net:        d.netPosition    ?? null,
+        long:       d.longPositions  ?? null,
+        short:      d.shortPositions ?? null,
+        amNet:      d.assetManagerNet ?? null,
+        weekEnding: d.weekEnding || d.reportDate || '',
+      };
+    } catch {}
+  }));
+})();
+
+function pairMetaFromSym(tvSym) {
+  const raw = tvSym.replace(/^(FX_IDC:|FX:|CAPITALCOM:)/i, '').toLowerCase();
+  return PAIRS.find(x => x.id === raw
+    || (x.base + x.quote).toLowerCase() === raw
+    || (x.quote + x.base).toLowerCase() === raw) || null;
+}
+
+async function updatePairDetail(tvSym) {
+  const panel = document.getElementById('pair-detail');
+  if (!panel) return;
+
+  const meta   = pairMetaFromSym(tvSym);
+  const label  = meta?.label || tvSym.replace(/^.*:/,'').replace(/(.{3})(.{3})/,'$1/$2').toUpperCase();
+  const pairId = meta?.id || null;
+  const base   = meta?.base  || null;
+  const quote  = meta?.quote || null;
+  const invert = meta?.invert ?? false;
+  const dec    = meta?.dec   ?? 5;
+
+  const rt    = pairId ? STOOQ_RT_CACHE[pairId] : null;
+  const price = rt?.close ?? null;
+  const pct1d = rt?.pct   ?? null;
+  const hv30  = rt?.hv30  ?? null;
+  const sessH = rt?.high  ?? null;
+  const sessL = rt?.low   ?? null;
+
+  // 1W from FX_PERF_CACHE
+  let pct1w = null;
+  if (meta && FX_PERF_CACHE[meta.base]?.fxPerformance1W != null) {
+    pct1w = meta.invert
+      ? -FX_PERF_CACHE[meta.base].fxPerformance1W
+      :  FX_PERF_CACHE[meta.base].fxPerformance1W;
+  }
+
+  // ATM IV from intraday cache
+  let atmIv = null;
+  try {
+    const intra  = await loadIntradayQuotes();
+    const ivEntry = intra?.fx_etf_iv?.[pairId];
+    if (ivEntry?.iv != null) atmIv = ivEntry.iv;
+  } catch {}
+
+  // COT
+  const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
+  const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  let cotNet = null, cotAmNet = null, cotWeek = '';
+  if (cotRaw) {
+    const flip = (invert && cotCcy === quote) ? -1 : 1;
+    cotNet   = cotRaw.net   != null ? cotRaw.net   * flip : null;
+    cotAmNet = cotRaw.amNet != null ? cotRaw.amNet * flip : null;
+    cotWeek  = cotRaw.weekEnding;
+  }
+
+  // Carry differential (CB rates)
+  const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
+  const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
+  let carryDiff = null;
+  if (cbBase != null && cbQuote != null)
+    carryDiff = invert ? (cbQuote - cbBase) : (cbBase - cbQuote);
+
+  const fmtPct = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+  const fmtNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+  const cls    = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
+
+  let alignHtml = '';
+  if (cotNet != null && cotAmNet != null) {
+    const lf = cotNet > 0 ? 1 : cotNet < 0 ? -1 : 0;
+    const am = cotAmNet > 0 ? 1 : cotAmNet < 0 ? -1 : 0;
+    if (lf !== 0 && am !== 0) {
+      alignHtml = lf === am
+        ? '<span class="pd-badge pd-aligned" title="LF + AM aligned">LF≡AM</span>'
+        : '<span class="pd-badge pd-diverge" title="LF and AM diverging">LF≠AM</span>';
+    }
+  }
+
+  panel.innerHTML = `
+    <div class="pd-header">
+      <span class="pd-sym">${label}</span>
+      <span class="pd-source">yfinance · ~15min</span>
+    </div>
+    <div class="pd-price-block">
+      <div class="pd-price ${price == null ? 'pd-dim' : ''}">${price != null ? price.toFixed(dec) : '—'}</div>
+      <span class="${cls(pct1d)} pd-chg">${fmtPct(pct1d)}</span>
+      ${sessH != null && sessL != null ? `<div class="pd-range">H ${sessH.toFixed(dec)} · L ${sessL.toFixed(dec)}</div>` : ''}
+    </div>
+    <div class="pd-grid">
+      <div class="pd-cell"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">ATM IV</div><div class="pd-val">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+      <div class="pd-cell"><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
+    </div>
+    <div class="pd-footer">
+      ${alignHtml}
+      ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + '</span>' : ''}
+    </div>`;
+
+  panel.classList.remove('pd-empty');
+}
+
 // TV CHART TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════════
 document.querySelectorAll('.tv-tab').forEach(tab => {
@@ -2452,6 +2581,8 @@ function minimizeTVLegend() {
 }
 // Run once after initial widget loads (give it ~4s to render)
 setTimeout(minimizeTVLegend, 4000);
+// Pre-populate pair detail for default chart
+setTimeout(() => updatePairDetail('FX_IDC:EURUSD'), 1500);
 // ─────────────────────────────────────────────────────────────────────────
 
 // ── HORIZONTAL SCROLL WITH MOUSE WHEEL (desktop) ─────────────────────────
@@ -2516,6 +2647,75 @@ document.querySelectorAll('.top-nav a').forEach(a => {
     this.classList.add('active');
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// CARRY TRADE RANKING — full G8 28-pair differential, rightpanel
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCarryRanking() {
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  function carryTV(long, short) {
+    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
+    if (long  === 'USD') return 'FX_IDC:USD' + short;
+    return 'FX_IDC:' + long + short;
+  }
+  const container = document.getElementById('carry-rank-rows');
+  if (!container) return;
+
+  try {
+    const rates = {};
+    await Promise.all(G8.map(async ccy => {
+      const cached = STATE.cbRates?.[ccy.toLowerCase()];
+      if (cached?.rate != null) { rates[ccy] = cached.rate; return; }
+      try {
+        const r = await fetch('./rates/' + ccy + '.json');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.observations?.[0]?.value) rates[ccy] = parseFloat(d.observations[0].value);
+      } catch {}
+    }));
+
+    if (Object.keys(rates).length < 4) {
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Rate data unavailable</div>';
+      return;
+    }
+
+    const allPairs = [];
+    for (let i = 0; i < G8.length; i++) {
+      for (let j = i + 1; j < G8.length; j++) {
+        const a = G8[i], b = G8[j];
+        const rA = rates[a] ?? null, rB = rates[b] ?? null;
+        if (rA == null || rB == null) continue;
+        const diff = rA - rB;
+        allPairs.push(diff >= 0
+          ? { long: a, short: b, diff,       rLong: rA, rShort: rB }
+          : { long: b, short: a, diff: -diff, rLong: rB, rShort: rA });
+      }
+    }
+    allPairs.sort((a, b) => b.diff - a.diff);
+
+    const top    = allPairs.slice(0, 10);
+    const maxDiff = top[0]?.diff || 1;
+
+    container.innerHTML = top.map((p, idx) => {
+      const sym = carryTV(p.long, p.short);
+      const bar = Math.round((p.diff / maxDiff) * 60);
+      const cls = p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim';
+      return `<div class="carry-rank-row" data-sym="${sym}" title="Open ${p.long}/${p.short} chart">
+        <span class="cr-rank">${idx + 1}</span>
+        <span class="cr-pair">${p.long}/${p.short}</span>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
+        <span class="cr-diff ${cls}">+${p.diff.toFixed(2)}%</span>
+      </div>`;
+    }).join('');
+
+    container.querySelectorAll('.carry-rank-row[data-sym]').forEach(row => {
+      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
+    });
+  } catch(e) {
+    console.warn('[CarryRanking]', e);
+    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // CARRY TRADE SIDEBAR — from rates/*.json + extended-data/*.json
@@ -3444,6 +3644,7 @@ async function boot() {
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
+  fetchCarryRanking();
   fetchNewsData();
   fetchReferenceSpreads();          // HV30+VIX+MOVE vol model — no external API, updates with intraday JSON
   computeSessionVol();              // HV30-derived session pip ranges — replaces static table
@@ -3824,6 +4025,7 @@ setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes
 // Crypto: every 90 seconds
 setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData, 30 * 60 * 1000);
+setInterval(fetchCarryRanking, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
@@ -4044,3 +4246,227 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   // TV events calendar (skeleton is on tvcal-inner, iframe appears inside tvcal-scale)
   watchForIframe(document.getElementById('tvcal-inner'));
 }());
+
+// ═══════════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// G → FX table   C → COT   R → Risk   X → Cross-Asset
+// M → Macro      Y → Rates  K → Calendar
+// ↑ / ↓ → navigate FX table rows (loads chart)
+// ? → toggle shortcut legend overlay
+// ═══════════════════════════════════════════════════════════════════
+(function initKeyboardShortcuts() {
+  const NAV_KEYS = {
+    g: 'section-fxpairs',
+    c: 'section-positioning',
+    r: 'section-risk',
+    x: 'section-crossasset',
+    m: 'section-econmap',
+    y: 'section-cbrates',
+    k: 'section-tvcalendar',
+  };
+
+  function navTo(target) {
+    const link = document.querySelector(`.top-nav a[data-target="${target}"]`);
+    if (link) link.click();
+  }
+
+  // FX table row navigation
+  let _focusedRow = -1;
+
+  function fxRows() {
+    return Array.from(document.querySelectorAll('#fx-pairs-tbody tr[data-sym]'));
+  }
+
+  function activateFxRow(idx) {
+    const rows = fxRows();
+    if (!rows.length) return;
+    _focusedRow = Math.max(0, Math.min(idx, rows.length - 1));
+    const row = rows[_focusedRow];
+    rows.forEach(r => r.classList.remove('kb-focus'));
+    row.classList.add('kb-focus');
+    row.scrollIntoView({ block: 'nearest' });
+    const sym = row.dataset.sym;
+    if (sym) loadTVChart(sym);
+  }
+
+  // Shortcut legend overlay
+  function toggleLegend() {
+    let overlay = document.getElementById('kb-legend');
+    if (overlay) { overlay.remove(); return; }
+    overlay = document.createElement('div');
+    overlay.id = 'kb-legend';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Keyboard shortcuts');
+    overlay.innerHTML = `
+      <div class="kbl-inner">
+        <div class="kbl-title">Keyboard shortcuts</div>
+        <div class="kbl-grid">
+          <span class="kbl-key">G</span><span class="kbl-desc">FX Pairs table</span>
+          <span class="kbl-key">C</span><span class="kbl-desc">COT Positioning</span>
+          <span class="kbl-key">R</span><span class="kbl-desc">Risk Monitor</span>
+          <span class="kbl-key">X</span><span class="kbl-desc">Cross-Asset</span>
+          <span class="kbl-key">M</span><span class="kbl-desc">Macro map</span>
+          <span class="kbl-key">Y</span><span class="kbl-desc">Rates &amp; Yield Curve</span>
+          <span class="kbl-key">K</span><span class="kbl-desc">Economic Calendar</span>
+          <span class="kbl-key">&uarr;&darr;</span><span class="kbl-desc">Navigate FX rows</span>
+          <span class="kbl-key">?</span><span class="kbl-desc">Close this panel</span>
+        </div>
+        <div class="kbl-footer">Press any key or click to close</div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', () => overlay.remove());
+  }
+
+  // Main keydown handler
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select'
+        || document.activeElement?.isContentEditable) return;
+
+    const key = e.key;
+
+    if (key === '?') { e.preventDefault(); toggleLegend(); return; }
+
+    // Close legend on any key if open
+    const legend = document.getElementById('kb-legend');
+    if (legend && key !== '?') { legend.remove(); }
+
+    if (NAV_KEYS[key.toLowerCase()]) {
+      e.preventDefault();
+      navTo(NAV_KEYS[key.toLowerCase()]);
+      return;
+    }
+
+    if (key === 'ArrowDown') {
+      e.preventDefault();
+      activateFxRow(_focusedRow < 0 ? 0 : _focusedRow + 1);
+      return;
+    }
+    if (key === 'ArrowUp') {
+      e.preventDefault();
+      activateFxRow(_focusedRow <= 0 ? 0 : _focusedRow - 1);
+      return;
+    }
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// CSV / JSON EXPORT
+// exportPanel(type, format) — reads in-memory caches, triggers download
+// Types: 'fx' | 'cot' | 'yield' | 'carry'   Format: 'csv' | 'json'
+// ═══════════════════════════════════════════════════════════════════
+function exportPanel(type, format = 'csv') {
+  const ts = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '');
+  let rows, headers, filename;
+
+  if (type === 'fx') {
+    headers = ['Pair', 'Price', '1D_Pct', '1W_Pct', 'HV30', 'Session_High', 'Session_Low'];
+    rows = PAIRS.map(p => {
+      const rt  = STOOQ_RT_CACHE[p.id];
+      const pf  = p.base ? FX_PERF_CACHE[p.base] : null;
+      const p1w = pf?.fxPerformance1W != null
+        ? (p.invert ? -pf.fxPerformance1W : pf.fxPerformance1W) : null;
+      return [
+        p.label || (p.base + '/' + p.quote),
+        rt?.close  ?? '',
+        rt?.pct    != null ? rt.pct.toFixed(4)  : '',
+        p1w        != null ? p1w.toFixed(4)      : '',
+        rt?.hv30   != null ? rt.hv30.toFixed(2) : '',
+        rt?.high   ?? '',
+        rt?.low    ?? '',
+      ];
+    }).filter(r => r[1] !== '');
+    filename = 'gi_fx_pairs_' + ts;
+  }
+
+  else if (type === 'cot') {
+    headers = ['Currency', 'LF_Net', 'Long_Pct', 'Short_Pct', 'AM_Net', 'Week_Ending'];
+    rows = Object.entries(COT_DATA_CACHE).map(([ccy, d]) => {
+      const total = (d.long || 0) + (d.short || 0);
+      const lPct  = total > 0 ? (d.long  / total * 100).toFixed(1) : '';
+      const sPct  = total > 0 ? (d.short / total * 100).toFixed(1) : '';
+      return [ccy, d.net ?? '', lPct, sPct, d.amNet ?? '', d.weekEnding ?? ''];
+    });
+    filename = 'gi_cot_' + ts;
+  }
+
+  else if (type === 'yield') {
+    headers = ['Tenor', 'Yield_Pct', 'Change'];
+    rows = [];
+    // Read from rendered DOM rows
+    document.querySelectorAll('#yield-tbody tr, #yield-table-body tr').forEach(tr => {
+      const cells = tr.querySelectorAll('td');
+      if (cells.length >= 2) {
+        const t = cells[0]?.textContent?.trim() || '';
+        const y = cells[1]?.textContent?.trim() || '';
+        const c = cells[2]?.textContent?.trim() || '';
+        if (t && y) rows.push([t, y, c]);
+      }
+    });
+    // Fallback: named yield cells
+    if (!rows.length) {
+      [['US 3M','yc-3m'],['US 2Y','yc-2y'],['US 5Y','yc-5y'],
+       ['US 10Y','yc-10y'],['US 30Y','yc-30y'],['DE 10Y','yc-de10y'],['JP 10Y','yc-jp10y']
+      ].forEach(([label, id]) => {
+        const el = document.getElementById(id);
+        const v = el?.textContent?.trim();
+        if (v && v !== '—') rows.push([label, v, '']);
+      });
+    }
+    filename = 'gi_yield_curve_' + ts;
+  }
+
+  else if (type === 'carry') {
+    headers = ['Long', 'Short', 'Carry_Diff_Pct', 'Long_Rate_Pct', 'Short_Rate_Pct'];
+    const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+    const rates = {};
+    G8.forEach(ccy => {
+      const r = STATE.cbRates?.[ccy.toLowerCase()]?.rate;
+      if (r != null) rates[ccy] = r;
+    });
+    const pairs = [];
+    for (let i = 0; i < G8.length; i++) {
+      for (let j = i + 1; j < G8.length; j++) {
+        const a = G8[i], b = G8[j];
+        if (rates[a] == null || rates[b] == null) continue;
+        const diff = rates[a] - rates[b];
+        pairs.push(diff >= 0
+          ? [a, b, diff.toFixed(4), rates[a].toFixed(2), rates[b].toFixed(2)]
+          : [b, a, (-diff).toFixed(4), rates[b].toFixed(2), rates[a].toFixed(2)]);
+      }
+    }
+    pairs.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2]));
+    rows = pairs;
+    filename = 'gi_carry_' + ts;
+  }
+
+  else { console.warn('[Export] Unknown panel type:', type); return; }
+
+  if (!rows || !rows.length) { console.warn('[Export] No data available for:', type); return; }
+
+  let blob_content, mime, ext;
+  if (format === 'json') {
+    const data = rows.map(r => {
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = r[i] !== '' ? r[i] : null; });
+      return obj;
+    });
+    blob_content = JSON.stringify({ exported: new Date().toISOString(), panel: type, data }, null, 2);
+    mime = 'application/json';
+    ext = '.json';
+  } else {
+    const esc = v => (v == null || v === '') ? '' : String(v).includes(',') ? '"' + String(v) + '"' : String(v);
+    blob_content = [headers, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
+    mime = 'text/csv';
+    ext = '.csv';
+  }
+
+  const blob = new Blob([blob_content], { type: mime });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename + ext;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
