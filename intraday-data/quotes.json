@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-03T23:55:17Z",
+  "updated": "2026-04-04T00:00:25Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -119,12 +119,12 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 66936.9531,
-      "prev_close": 66888.5703,
-      "chg": 48.3828,
-      "pct": 0.0723,
-      "high": 67268.6797,
-      "low": 66296.9531,
+      "close": 66888.5703,
+      "prev_close": 68078.5547,
+      "chg": -1189.9844,
+      "pct": -1.748,
+      "high": 68633.1484,
+      "low": 65725.2578,
       "source": "yfinance"
     },
     "ftse": {
@@ -452,37 +452,37 @@
   ],
   "fx_etf_iv": {
     "eurusd": {
-      "iv": 18.7,
+      "iv": 19.3,
       "expiry": "2026-04-17",
       "source": "FXE options",
       "atm": 106.0
     },
     "gbpusd": {
-      "iv": 15.3,
+      "iv": 15.8,
       "expiry": "2026-04-17",
       "source": "FXB options",
       "atm": 127.0
     },
     "usdjpy": {
-      "iv": 11.8,
+      "iv": 12.2,
       "expiry": "2026-04-17",
       "source": "FXY options",
       "atm": 58.0
     },
     "audusd": {
-      "iv": 26.2,
+      "iv": 27.1,
       "expiry": "2026-04-17",
       "source": "FXA options",
       "atm": 68.0
     },
     "usdchf": {
-      "iv": 19.6,
+      "iv": 20.3,
       "expiry": "2026-04-17",
       "source": "FXF options",
       "atm": 110.0
     },
     "usdcad": {
-      "iv": 10.1,
+      "iv": 10.4,
       "expiry": "2026-04-17",
       "source": "FXC options",
       "atm": 71.0
