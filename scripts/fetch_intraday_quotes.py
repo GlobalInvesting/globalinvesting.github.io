@@ -107,6 +107,14 @@ YFINANCE_SYMBOLS = {
     "cadjpy": "CADJPY=X",
     "chfjpy": "CHFJPY=X",
     "nzdjpy": "NZDJPY=X",
+    # New crosses — completing all 21 G8 cross pairs
+    "eurnzd": "EURNZD=X",
+    "gbpaud": "GBPAUD=X",
+    "gbpnzd": "GBPNZD=X",
+    "audcad": "AUDCAD=X",
+    "cadchf": "CADCHF=X",
+    "cadnzd": "CADNZD=X",
+    "chfnzd": "CHFNZD=X",
 }
 
 # Yields que Yahoo devuelve ×10 (^TNX=43.42 significa 4.342%) — dividir por 10
@@ -151,6 +159,13 @@ VALIDATORS = {
     "cadjpy": lambda v: 60 < v < 130,
     "chfjpy": lambda v: 100 < v < 220,
     "nzdjpy": lambda v: 40 < v < 110,
+    "eurnzd": lambda v: 1.0 < v < 2.5,
+    "gbpaud": lambda v: 1.4 < v < 2.5,
+    "gbpnzd": lambda v: 1.6 < v < 2.8,
+    "audcad": lambda v: 0.7 < v < 1.2,
+    "cadchf": lambda v: 0.6 < v < 1.0,
+    "cadnzd": lambda v: 0.9 < v < 1.5,
+    "chfnzd": lambda v: 1.4 < v < 2.5,
 }
 
 
@@ -161,6 +176,7 @@ HV30_FX_PAIRS = [
     "gbpjpy", "gbpchf", "gbpcad",
     "audjpy", "audnzd", "audchf",
     "cadjpy", "chfjpy", "nzdjpy",
+    "eurnzd", "gbpaud", "gbpnzd", "audcad", "cadchf", "cadnzd", "chfnzd",
 ]
 
 
