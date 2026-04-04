@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-04T03:15:22Z",
+  "updated": "2026-04-04T03:20:19Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 66881.5391,
+      "close": 66870.9141,
       "prev_close": 66888.5703,
-      "chg": -7.0312,
-      "pct": -0.0105,
+      "chg": -17.6562,
+      "pct": -0.0264,
       "high": 66937.25,
       "low": 66808.3438,
       "source": "yfinance"
@@ -414,23 +414,23 @@
       "source": "yfinance",
       "hv30": 5.66
     },
-    "cadnzd": {
-      "close": 1.2596,
-      "prev_close": 1.2531,
-      "chg": 0.0065,
-      "pct": 0.5167,
-      "high": 1.262,
-      "low": 1.2562,
+    "nzdcad": {
+      "close": 0.7936,
+      "prev_close": 0.7976,
+      "chg": -0.004,
+      "pct": -0.499,
+      "high": 0.7959,
+      "low": 0.7917,
       "source": "yfinance",
-      "hv30": 9.59
+      "hv30": 9.48
     },
-    "chfnzd": {
-      "close": 2.1955,
-      "prev_close": 2.1901,
-      "chg": 0.0054,
-      "pct": 0.2454,
-      "high": 2.1978,
-      "low": 2.1892,
+    "nzdchf": {
+      "close": 0.4555,
+      "prev_close": 0.4559,
+      "chg": -0.0004,
+      "pct": -0.0965,
+      "high": 0.4572,
+      "low": 0.4509,
       "source": "yfinance",
       "hv30": 7.79
     }
@@ -462,8 +462,8 @@
     "gbpnzd": 5.27,
     "audcad": 10.46,
     "cadchf": 5.66,
-    "cadnzd": 9.59,
-    "chfnzd": 7.79
+    "nzdcad": 9.48,
+    "nzdchf": 7.79
   },
   "correlations": [
     {
