@@ -2486,12 +2486,23 @@ async function fetchCarryData() {
 
     const container = document.getElementById('sb-carry-rows');
     if (!container) return;
+    // Map carry pair to TradingView FX_IDC symbol
+    // Convention: if USD is the quote (e.g. AUD/USD), symbol = FX_IDC:AUDUSD
+    // Otherwise standard cross: FX_IDC:AUDJPY etc.
+    function carrySymbol(long, short) {
+      // USD-based pairs: the non-USD currency is either base or quote
+      if (short === 'USD') return 'FX_IDC:' + long + 'USD';
+      if (long  === 'USD') return 'FX_IDC:USD' + short;
+      return 'FX_IDC:' + long + short;
+    }
+
     container.innerHTML = carryPairs.map(p => {
       const sign = p.diff >= 0 ? '+' : '';
       const cls = p.diff > 1 ? 'up' : p.diff < 0 ? 'down' : 'flat';
       const longRate = (rateData[p.long]??0).toFixed(2);
       const shortRate = (rateData[p.short]??0).toFixed(2);
-      return `<div class="sb-row">
+      const sym = carrySymbol(p.long, p.short);
+      return `<div class="sb-row" data-sym="${sym}" style="cursor:pointer;" title="Open ${p.long}/${p.short} chart">
         <span class="sb-sym">${p.long}/${p.short}</span>
         <span class="sb-price" style="font-size:8.5px;color:var(--text3);letter-spacing:-0.01em;">${longRate}% · ${shortRate}%</span>
         <span class="sb-chg ${cls}">${sign}${p.diff.toFixed(2)}%</span>
