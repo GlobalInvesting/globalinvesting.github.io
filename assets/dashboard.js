@@ -2649,6 +2649,75 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
+// ═══════════════════════════════════════════════════════════════════
+async function fetchCarryRanking() {
+  const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+  function carryTV(long, short) {
+    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
+    if (long  === 'USD') return 'FX_IDC:USD' + short;
+    return 'FX_IDC:' + long + short;
+  }
+  const container = document.getElementById('carry-rank-rows');
+  if (!container) return;
+
+  try {
+    const rates = {};
+    await Promise.all(G8.map(async ccy => {
+      const cached = STATE.cbRates?.[ccy.toLowerCase()];
+      if (cached?.rate != null) { rates[ccy] = cached.rate; return; }
+      try {
+        const r = await fetch('./rates/' + ccy + '.json');
+        if (!r.ok) return;
+        const d = await r.json();
+        if (d.observations?.[0]?.value) rates[ccy] = parseFloat(d.observations[0].value);
+      } catch {}
+    }));
+
+    if (Object.keys(rates).length < 4) {
+      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Rate data unavailable</div>';
+      return;
+    }
+
+    const allPairs = [];
+    for (let i = 0; i < G8.length; i++) {
+      for (let j = i + 1; j < G8.length; j++) {
+        const a = G8[i], b = G8[j];
+        const rA = rates[a] ?? null, rB = rates[b] ?? null;
+        if (rA == null || rB == null) continue;
+        const diff = rA - rB;
+        allPairs.push(diff >= 0
+          ? { long: a, short: b, diff,        rLong: rA, rShort: rB }
+          : { long: b, short: a, diff: -diff,  rLong: rB, rShort: rA });
+      }
+    }
+    allPairs.sort((a, b) => b.diff - a.diff);
+
+    const top     = allPairs.slice(0, 10);
+    const maxDiff = top[0]?.diff || 1;
+
+    container.innerHTML = top.map((p, idx) => {
+      const sym = carryTV(p.long, p.short);
+      const bar = Math.round((p.diff / maxDiff) * 60);
+      const cls = p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim';
+      return `<div class="carry-rank-row" data-sym="${sym}" title="Open ${p.long}/${p.short} chart">
+        <span class="cr-rank">${idx + 1}</span>
+        <span class="cr-pair">${p.long}/${p.short}</span>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
+        <span class="cr-diff ${cls}">+${p.diff.toFixed(2)}%</span>
+      </div>`;
+    }).join('');
+
+    container.querySelectorAll('.carry-rank-row[data-sym]').forEach(row => {
+      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
+    });
+  } catch(e) {
+    console.warn('[CarryRanking]', e);
+    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ETF OPTIONS IV — CBOE / yfinance implied volatility proxies, rightpanel
 // ═══════════════════════════════════════════════════════════════════
 // Tickers sourced from intraday quotes.json (yfinance) where available,
@@ -3644,6 +3713,7 @@ async function boot() {
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
+  fetchCarryRanking();
   fetchEtfIV();
   initAlerts();
   fetchNewsData();
@@ -4025,8 +4095,9 @@ window.addEventListener('resize', drawLiquidityChart);
 setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes(); fetchOptionSkew().then(() => attachRiskMonitorTooltips()); }, 2 * 60 * 1000);
 // Crypto: every 90 seconds
 setInterval(fetchCryptoQuotes, 90 * 1000);
-setInterval(fetchCarryData, 30 * 60 * 1000);
-setInterval(fetchEtfIV,    10 * 60 * 1000);  // refresh IV every 10 min
+setInterval(fetchCarryData,    30 * 60 * 1000);
+setInterval(fetchCarryRanking, 30 * 60 * 1000);
+setInterval(fetchEtfIV,        10 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
