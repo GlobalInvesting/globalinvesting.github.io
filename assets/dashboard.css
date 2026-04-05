@@ -493,6 +493,8 @@
   .pd-val { font-size:11px; font-family:var(--font-mono); color:var(--text); font-weight:600; }
   .pd-up { color:var(--up); }
   .pd-dn { color:var(--down); }
+  .pd-val.pd-up { color:var(--up); }
+  .pd-val.pd-dn { color:var(--down); }
   .pd-dim { color:var(--text3); }
   .pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; }
   .pd-badge { font-size:9px; padding:1px 6px; border-radius:20px; font-weight:600; letter-spacing:.03em; white-space:nowrap; }
