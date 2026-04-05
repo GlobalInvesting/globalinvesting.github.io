@@ -171,13 +171,35 @@
      ═══════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://api.frankfurter.app">
-<link rel="preconnect" href="https://s3.tradingview.com">
 <!-- Preload the two most-used Inter weights to avoid FOIT on first paint -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.7">
+<!-- Critical CSS inline — above-the-fold only -->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#9096a0;--text3:#8290a0;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
+#topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
+#tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
+#news-ticker{background:var(--head-bg);border-bottom:1px solid var(--border);height:22px;display:flex;align-items:center;overflow:hidden;flex-shrink:0}
+#layout{display:grid;grid-template-columns:180px 1fr 220px;height:calc(100vh - 92px);overflow:hidden}
+#sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;font-size:11px}
+#main{overflow-y:auto;overflow-x:hidden;background:var(--bg);display:flex;flex-direction:column;min-width:0}
+#narrative{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 10px;display:flex;gap:10px;align-items:flex-start;min-height:40px}
+.panel{border-bottom:1px solid var(--border)}
+.panel-head{background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
+.skip-link{position:absolute;left:-9999px;top:8px;z-index:9999;padding:4px 8px;background:var(--blue);color:#fff;font-size:12px;border-radius:3px}
+.skip-link:focus{left:8px}
+.tv-skeleton{background:var(--bg3);width:100%;height:100%}
+#tv-chart-wrap{height:290px;min-height:290px}
+#tvcal-inner{min-height:350px}
+.tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
+</style>
+<!-- Full stylesheet — non-blocking, eliminates render-blocking -->
+<link rel="preload" as="style" href="assets/dashboard.css?v=7.12.10" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="assets/dashboard.css?v=7.12.10"></noscript>
 
 <!-- Flag icons — non-blocking load to avoid render delay -->
 <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" onload="this.rel='stylesheet'">
