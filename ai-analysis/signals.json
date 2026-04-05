@@ -1,9 +1,9 @@
 [
   {
-    "time": "05:20",
+    "time": "07:35",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY trading above 159.00, BoJ intervention risk elevated as it approaches 160.00",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
       "USD/JPY: 159.632",
       "BoJ rate: 0.75%",
@@ -11,9 +11,9 @@
     ]
   },
   {
-    "time": "05:18",
+    "time": "07:30",
     "priority": "warning",
-    "title": "CB Rate Differential",
+    "title": "ECB vs Fed Rate Differential",
     "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (ON HOLD) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
@@ -22,36 +22,36 @@
     ]
   },
   {
-    "time": "05:15",
+    "time": "07:25",
     "priority": "warning",
-    "title": "Retail Sentiment Extreme",
-    "text": "NZD/USD 87% long, watch for contrarian reversal risk as retail is heavily positioned",
-    "evidence": [
-      "NZD/USD: 0.56940",
-      "NZD/USD retail sentiment: 87% long",
-      "CFTC NZD net: -17,798"
-    ]
-  },
-  {
-    "time": "05:10",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment",
+    "title": "VIX and S&P 500",
+    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, while S&P 500 trades at 6,583",
     "evidence": [
       "VIX: 23.9",
       "S&P 500: 6,583",
-      "MOVE Index: 81.8"
+      "DXY: 100.03"
     ]
   },
   {
-    "time": "05:05",
+    "time": "07:20",
     "priority": "info",
-    "title": "Yield Curve Context",
-    "text": "US 10Y-2Y spread at -42bp, watch for potential recession signals",
+    "title": "NZD/USD Retail Sentiment",
+    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze, diverging from CFTC NZD net short positioning",
     "evidence": [
+      "NZD/USD: 0.56940",
+      "CFTC NZD net: -17,798",
+      "NZD/USD retail sentiment: 87% long"
+    ]
+  },
+  {
+    "time": "07:15",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "MOVE Index at 81.8, US 10Y yield at 4.313% — bond market stress contained, for now",
+    "evidence": [
+      "MOVE Index: 81.8",
       "US 10Y yield: 4.313%",
-      "US 2Y yield: 3.790%",
-      "US 10Y-2Y spread: -42bp"
+      "US 2Y yield: 3.790%"
     ]
   }
 ]
