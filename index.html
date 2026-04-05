@@ -171,11 +171,13 @@
      ═══════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Preload critical WOFF2 fonts — browser has 100ms block period with display=optional,
-     these preloads ensure fonts arrive in time so no swap ever occurs → zero font CLS -->
+<!-- Preload Inter WOFF2 — browser has 100ms block period with display=optional;
+     this preload ensures Inter arrives in time so no swap occurs → zero font CLS.
+     Note: JetBrains Mono preload removed — Google Fonts serves UA-specific WOFF2 URLs
+     that vary by browser/OS; hardcoding a single URL causes 404s on non-matching UAs.
+     JetBrains Mono loads correctly via the @font-face rule in the Google Fonts stylesheet. -->
 <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4xD-IQ.woff2" crossorigin>
-<!-- Fonts: display=optional prevents swap (no CLS); preloads above guarantee font arrives in time -->
+<!-- Fonts: display=optional prevents swap (no CLS) -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=optional" rel="stylesheet"></noscript>
 <!-- Critical CSS inline — above-the-fold only -->
