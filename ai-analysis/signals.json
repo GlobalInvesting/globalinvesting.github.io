@@ -1,42 +1,31 @@
 [
   {
-    "time": "19:25",
+    "time": "21:50",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.632",
+      "USD/JPY: 159.721",
       "BoJ rate: 0.75%",
       "VIX: 23.9"
     ]
   },
   {
-    "time": "19:22",
+    "time": "21:48",
     "priority": "warning",
-    "title": "Fed vs ECB Rate Divergence",
+    "title": "ECB vs Fed Rate Differential",
     "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.15130"
+      "EUR/USD: 1.15250"
     ]
   },
   {
-    "time": "19:18",
+    "time": "21:45",
     "priority": "warning",
-    "title": "NZD/USD Retail Sentiment",
-    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze as it diverges from CFTC NZD net short -17,798",
-    "evidence": [
-      "NZD/USD: 0.56940",
-      "CFTC NZD net: -17,798",
-      "NZD/USD retail long: 87%"
-    ]
-  },
-  {
-    "time": "19:12",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, as S&P 500 trades near 6,583",
+    "title": "VIX and Risk Regime",
+    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, caution advised",
     "evidence": [
       "VIX: 23.9",
       "S&P 500: 6,583",
@@ -44,14 +33,25 @@
     ]
   },
   {
-    "time": "19:07",
+    "time": "21:42",
     "priority": "info",
-    "title": "Cross-Asset Observation",
-    "text": "WTI Oil surges 11.93% to $112.1, while Gold falls 1.68% to $4,703, indicating inflation concerns",
+    "title": "NZD/USD Retail Sentiment",
+    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze",
     "evidence": [
-      "WTI Oil: $112.1",
-      "Gold: $4,703",
-      "US 10Y yield: 4.313%"
+      "NZD/USD: 0.56950",
+      "NZD/USD retail long: 87%",
+      "CFTC NZD net: -17,798"
+    ]
+  },
+  {
+    "time": "21:40",
+    "priority": "info",
+    "title": "CFTC Speculative Positioning",
+    "text": "EUR net short positioning at -38,698 — institutional bearishness persists",
+    "evidence": [
+      "CFTC EUR net: -38,698",
+      "EUR/USD: 1.15250",
+      "VIX: 23.9"
     ]
   }
 ]
