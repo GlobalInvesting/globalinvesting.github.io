@@ -622,6 +622,69 @@ def main():
     # PASO 7: Implied volatility real desde FX ETF options (CBOE vía yfinance)
     fx_etf_iv = fetch_fx_etf_iv()
 
+    # PASO 7b: Acumular historial semanal de IV (máx 52 entradas) y calcular IV Rank / IV Percentile.
+    # iv_rank   = (current_iv - min_52w) / (max_52w - min_52w) × 100  → 0–100
+    # iv_pct    = % of weekly snapshots in the last 52w where IV was below current IV → 0–100
+    # Only runs once per calendar week (ISO week): guards against inflating history on intraday re-runs.
+    # History file: intraday-data/iv_history.json
+    try:
+        import os as _os
+        from datetime import date as _date
+        _iv_hist_path = _os.path.join(_os.path.dirname(out_file), "iv_history.json")
+        _today = _date.today()
+        _iso_week = _today.isocalendar()[:2]  # (year, week)
+
+        # Load existing history
+        _iv_hist = {}
+        if _os.path.exists(_iv_hist_path):
+            with open(_iv_hist_path) as _f:
+                _iv_hist = json.load(_f)
+
+        _last_week = tuple(_iv_hist.get("_last_week", [0, 0]))
+        _history_by_pair = _iv_hist.get("pairs", {})
+
+        # Append this week's snapshot (once per ISO week)
+        if tuple(_iso_week) != _last_week:
+            _week_key = f"{_iso_week[0]}-W{_iso_week[1]:02d}"
+            for _pair_id, _iv_entry in (fx_etf_iv or {}).items():
+                if _iv_entry and _iv_entry.get("iv") is not None:
+                    if _pair_id not in _history_by_pair:
+                        _history_by_pair[_pair_id] = []
+                    _history_by_pair[_pair_id].append({
+                        "week": _week_key,
+                        "iv":   _iv_entry["iv"],
+                    })
+                    # Keep last 52 weeks only
+                    _history_by_pair[_pair_id] = _history_by_pair[_pair_id][-52:]
+            _iv_hist = {"_last_week": list(_iso_week), "pairs": _history_by_pair}
+            with open(_iv_hist_path, "w") as _f:
+                json.dump(_iv_hist, _f, indent=2)
+            print(f"[IV-Rank] Snapshot appended for ISO week {_week_key}")
+        else:
+            print(f"[IV-Rank] Already have snapshot for ISO week {_last_week[0]}-W{_last_week[1]:02d} — skipping append")
+
+        # Compute iv_rank and iv_pct for each pair (uses all available history, even < 52w)
+        for _pair_id, _iv_entry in (fx_etf_iv or {}).items():
+            if not _iv_entry or _iv_entry.get("iv") is None:
+                continue
+            _hist = _history_by_pair.get(_pair_id, [])
+            if len(_hist) < 4:
+                # Need at least 4 data points for a meaningful rank
+                _iv_entry["iv_rank"]     = None
+                _iv_entry["iv_pct_rank"] = None
+                _iv_entry["iv_hist_n"]   = len(_hist)
+                continue
+            _ivs = [h["iv"] for h in _hist]
+            _cur = _iv_entry["iv"]
+            _lo, _hi = min(_ivs), max(_ivs)
+            _iv_entry["iv_rank"]     = round((_cur - _lo) / (_hi - _lo) * 100, 1) if _hi > _lo else 50.0
+            _iv_entry["iv_pct_rank"] = round(sum(1 for v in _ivs if v < _cur) / len(_ivs) * 100, 1)
+            _iv_entry["iv_hist_n"]   = len(_hist)
+            print(f"[IV-Rank] {_pair_id}: IV={_cur:.1f}% rank={_iv_entry['iv_rank']:.0f} pct={_iv_entry['iv_pct_rank']:.0f} (n={len(_ivs)})")
+
+    except Exception as _e:
+        print(f"[IV-Rank] Error computing IV history/rank: {_e}")
+
     output = {"updated": ts, "source": source_label, "quotes": quotes,
               "hv30": hv30_output, "correlations": correlations,
               "fx_etf_iv": fx_etf_iv}
