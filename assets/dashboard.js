@@ -2515,12 +2515,42 @@ async function updatePairDetail(tvSym) {
       :  FX_PERF_CACHE[meta.base].fxPerformance1W;
   }
 
-  // ATM IV from intraday cache
+  // ATM IV — direct ETF option chain for 6 USD majors; synthesised via triangulation for 21 crosses.
+  // Cross formula: IV_AB ≈ √(IV_A² + IV_B² − 2·ρ·IV_A·IV_B)
+  // ρ values are long-run empirical FX vol correlations (conservative, rounded to nearest 0.05).
+  const CROSS_IV_RHO = {
+    'eurgbp':0.65,'eurjpy':0.55,'eurchf':0.60,'eurcad':0.40,'euraud':0.35,'eurnzd':0.30,
+    'gbpjpy':0.45,'gbpchf':0.55,'gbpcad':0.30,'gbpaud':0.25,'gbpnzd':0.20,
+    'audjpy':0.40,'audnzd':0.55,'audchf':0.30,'audcad':0.50,
+    'cadjpy':0.35,'cadchf':0.25,'chfjpy':0.40,
+    'nzdjpy':0.35,'nzdcad':0.45,'nzdchf':0.20,
+  };
+  const USD_IV = {}; // non-USD ccy → IV%
   let atmIv = null;
   try {
-    const intra  = await loadIntradayQuotes();
-    const ivEntry = intra?.fx_etf_iv?.[pairId];
-    if (ivEntry?.iv != null) atmIv = ivEntry.iv;
+    const intra = await loadIntradayQuotes();
+    const etfIv = intra?.fx_etf_iv || {};
+    // Build USD_IV map from available ETF option data
+    for (const [pid, entry] of Object.entries(etfIv)) {
+      if (entry?.iv == null) continue;
+      const p = PAIRS.find(x => x.id === pid);
+      if (!p) continue;
+      const nonUsd = p.base !== 'USD' ? p.base : p.quote;
+      USD_IV[nonUsd] = entry.iv;
+    }
+    // Direct ETF IV for USD majors
+    const ivEntry = etfIv[pairId];
+    if (ivEntry?.iv != null) {
+      atmIv = ivEntry.iv;
+    } else if (pairId && meta?.cross) {
+      // Synthesise cross IV from component USD-pair IVs
+      const ivA = USD_IV[base]  ?? null;
+      const ivB = USD_IV[quote] ?? null;
+      if (ivA != null && ivB != null) {
+        const rho = CROSS_IV_RHO[pairId] ?? 0.40;
+        atmIv = Math.round(Math.sqrt(ivA * ivA + ivB * ivB - 2 * rho * ivA * ivB) * 10) / 10;
+      }
+    }
   } catch {}
 
   // COT
@@ -2569,7 +2599,7 @@ async function updatePairDetail(tvSym) {
     <div class="pd-grid">
       <div class="pd-cell" data-tip="Weekly % change vs prev Friday close"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
       <div class="pd-cell" data-tip="30-day historical (realised) volatility"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="30-day ATM implied vol from options market"><div class="pd-lbl">ATM IV</div><div class="pd-val">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation (√(IVa²+IVb²−2ρ·IVa·IVb)). Not OTC interbank — indicative only.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance)'}"><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style=\'font-size:8px;color:var(--text3);margin-left:2px;\'>~</span>' : ''}</div><div class="pd-val">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
       <div class="pd-cell" data-tip="IV minus HV: +ve = options expensive vs realised"><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
       <div class="pd-cell" data-tip="CFTC Leveraged Funds net contracts (speculative)"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
       <div class="pd-cell" data-tip="CFTC Asset Managers net contracts (institutional)"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
