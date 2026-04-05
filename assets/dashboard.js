@@ -1090,11 +1090,18 @@ function updateFxPairsTableRT() {
     const vEl = document.getElementById('ca-' + caId);
     const cEl = document.getElementById('cac-' + caId);
     if (!vEl || !cEl) return;
-    const cls = data.pct > 0.05 ? 'up' : data.pct < -0.05 ? 'down' : '';
-    const sign = data.pct >= 0 ? '+' : '';
+    const cls   = data.pct > 0.05 ? 'up' : data.pct < -0.05 ? 'down' : '';
+    const arrow = data.pct > 0.05 ? '▲' : data.pct < -0.05 ? '▼' : '→';
+    const sign  = data.pct >= 0 ? '+' : '';
     vEl.textContent = data.close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     vEl.className = 'ca-val ' + cls;
-    cEl.textContent = sign + data.pct.toFixed(2) + '%';
+    if (data.chg != null) {
+      const absSign = data.chg >= 0 ? '+' : '';
+      const absFmt  = Math.abs(data.chg) >= 10 ? (absSign + data.chg.toFixed(1)) : (absSign + data.chg.toFixed(2));
+      cEl.textContent = arrow + ' ' + absFmt + ' (' + sign + data.pct.toFixed(2) + '%)';
+    } else {
+      cEl.textContent = arrow + ' ' + sign + data.pct.toFixed(2) + '%';
+    }
     cEl.className = 'ca-chg ' + cls;
   }
   setCA_rt('gold', STOOQ_RT_CACHE['xauusd']);
@@ -3059,7 +3066,7 @@ async function fetchCarryData() {
 async function fetchCrossAssetData() {
   // stooq() helper removed — yfinance JSON used exclusively
 
-  function setCA(id, val, chgPct, isYield) {
+  function setCA(id, val, chgPct, isYield, chgAbs) {
     const vEl = document.getElementById('ca-' + id);
     const cEl = document.getElementById('cac-' + id);
     if (!vEl || !cEl) return;
@@ -3070,11 +3077,23 @@ async function fetchCrossAssetData() {
       cEl.textContent = '—'; cEl.className = 'ca-chg flat';
       return;
     }
-    const cls = chgPct > 0.05 ? 'up' : chgPct < -0.05 ? 'down' : '';
-    const sign = chgPct >= 0 ? '+' : '';
+    const cls   = chgPct > 0.05 ? 'up' : chgPct < -0.05 ? 'down' : '';
+    const arrow = chgPct > 0.05 ? '▲' : chgPct < -0.05 ? '▼' : '→';
+    const sign  = chgPct >= 0 ? '+' : '';
     vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
     vEl.className = 'ca-val ' + cls;
-    cEl.textContent = sign + chgPct.toFixed(2) + '%';
+    // Format: "▲ +18.4 (+0.35%)" when absolute available, "▲ +0.35%" when not
+    if (chgAbs != null && !isYield) {
+      const absSign = chgAbs >= 0 ? '+' : '';
+      const absFmt  = Math.abs(chgAbs) >= 1000
+        ? chgAbs.toLocaleString(undefined, { maximumFractionDigits: 0 })
+        : Math.abs(chgAbs) >= 10
+          ? (absSign + chgAbs.toFixed(1))
+          : (absSign + chgAbs.toFixed(2));
+      cEl.textContent = arrow + ' ' + absFmt + ' (' + sign + chgPct.toFixed(2) + '%)';
+    } else {
+      cEl.textContent = arrow + ' ' + sign + chgPct.toFixed(2) + '%';
+    }
     cEl.className = 'ca-chg ' + cls;
   }
 
@@ -3100,16 +3119,16 @@ async function fetchCrossAssetData() {
   let _caDxy    = _caIntraday ? intradayQuote(_caIntraday, 'dxy')    : null;
 
   // Render inmediato con JSON intraday — el usuario ve valores en <100ms.
-  if (_caSpx)    setCA('spx',    _caSpx.close,    _caSpx.pct,    false);
+  if (_caSpx)    setCA('spx',    _caSpx.close,    _caSpx.pct,    false, _caSpx.chg);
   if (_caGold) {
-    setCA('gold', _caGold.close, _caGold.pct, false);
+    setCA('gold', _caGold.close, _caGold.pct, false, _caGold.chg);
     const gEl = document.getElementById('q-xauusd'), gcEl = document.getElementById('qc-xauusd');
     if (gEl)  { gEl.textContent  = _caGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className  = 'q-price ' + clsDir(_caGold.chg); }
     if (gcEl) { gcEl.textContent = pctStr(_caGold.pct); gcEl.className = 'q-chg '   + clsDir(_caGold.chg); }
   }
-  if (_caWti)    setCA('wti',    _caWti.close,    _caWti.pct,    false);
-  if (_caNikkei) setCA('nikkei', _caNikkei.close, _caNikkei.pct, false);
-  if (_caStoxx)  setCA('stoxx',  _caStoxx.close,  _caStoxx.pct,  false);
+  if (_caWti)    setCA('wti',    _caWti.close,    _caWti.pct,    false, _caWti.chg);
+  if (_caNikkei) setCA('nikkei', _caNikkei.close, _caNikkei.pct, false, _caNikkei.chg);
+  if (_caStoxx)  setCA('stoxx',  _caStoxx.close,  _caStoxx.pct,  false, _caStoxx.chg);
   // US10Y desde intraday JSON — sobreescribe el valor de repo (que puede tener 1 día de delay)
   const _caUs10yEarly = _caIntraday ? intradayQuote(_caIntraday, 'us10y') : null;
   if (_caUs10yEarly && _caUs10yEarly.close > 0) setCA('us10y', _caUs10yEarly.close, _caUs10yEarly.pct, true);
@@ -3123,7 +3142,7 @@ async function fetchCrossAssetData() {
     setEl('ri-gold-spx-sig', sig, cls);
   }
   if (_caDxy) {
-    setCA('dxy', _caDxy.close, _caDxy.pct, false);
+    setCA('dxy', _caDxy.close, _caDxy.pct, false, _caDxy.chg);
     const dEl = document.getElementById('q-dxy'), dcEl = document.getElementById('qc-dxy');
     if (dEl)  { dEl.textContent  = _caDxy.close.toFixed(1); dEl.className  = 'q-price ' + clsDir(_caDxy.chg); }
     if (dcEl) { dcEl.textContent = pctStr(_caDxy.pct);      dcEl.className = 'q-chg '   + clsDir(_caDxy.chg); }
@@ -3135,7 +3154,17 @@ async function fetchCrossAssetData() {
     const bEl = document.getElementById('ca-btc'), bcEl = document.getElementById('cac-btc');
     const qbEl = document.getElementById('q-btcusd'), qbcEl = document.getElementById('qc-btcusd');
     if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val '  + clsDir(_caBtcEarly.chg); }
-    if (bcEl) { bcEl.textContent = pctStr(_caBtcEarly.pct); bcEl.className = 'ca-chg ' + clsDir(_caBtcEarly.chg); }
+    if (bcEl) {
+      const _btcArrow = (_caBtcEarly.chg??0) > 0 ? '▲' : (_caBtcEarly.chg??0) < 0 ? '▼' : '→';
+      const _btcSign  = (_caBtcEarly.pct??0) >= 0 ? '+' : '';
+      if (_caBtcEarly.chg != null) {
+        const _btcAbs = _caBtcEarly.chg.toLocaleString(undefined,{maximumFractionDigits:0});
+        bcEl.textContent = _btcArrow + ' ' + (_caBtcEarly.chg>=0?'+':'') + _btcAbs + ' (' + _btcSign + (_caBtcEarly.pct??0).toFixed(2) + '%)';
+      } else {
+        bcEl.textContent = _btcArrow + ' ' + _btcSign + (_caBtcEarly.pct??0).toFixed(2) + '%';
+      }
+      bcEl.className = 'ca-chg ' + clsDir(_caBtcEarly.chg);
+    }
     if (qbEl && qbEl.textContent === '—')  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
     if (qbcEl && qbcEl.textContent === '—') { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
   }
@@ -3151,21 +3180,21 @@ async function fetchCrossAssetData() {
   const finalDxy    = _caDxy;
   const us10y       = (_caIntraday ? intradayQuote(_caIntraday, 'us10y') : null) || _repoUs10y;
 
-  if (finalSpx)    setCA('spx',    finalSpx.close,    finalSpx.pct,    false);
+  if (finalSpx)    setCA('spx',    finalSpx.close,    finalSpx.pct,    false, finalSpx.chg);
   if (finalGold) {
-    setCA('gold', finalGold.close, finalGold.pct, false);
+    setCA('gold', finalGold.close, finalGold.pct, false, finalGold.chg);
     const gEl = document.getElementById('q-xauusd'), gcEl = document.getElementById('qc-xauusd');
     if (gEl)  { gEl.textContent  = finalGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className  = 'q-price ' + clsDir(finalGold.chg); }
     if (gcEl) { gcEl.textContent = pctStr(finalGold.pct); gcEl.className = 'q-chg ' + clsDir(finalGold.chg); }
   }
-  if (finalWti)    setCA('wti',    finalWti.close,    finalWti.pct,    false);
-  if (finalNikkei) setCA('nikkei', finalNikkei.close, finalNikkei.pct, false);
-  if (finalStoxx)  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false);
+  if (finalWti)    setCA('wti',    finalWti.close,    finalWti.pct,    false, finalWti.chg);
+  if (finalNikkei) setCA('nikkei', finalNikkei.close, finalNikkei.pct, false, finalNikkei.chg);
+  if (finalStoxx)  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false, finalStoxx.chg);
   if (us10y)       setCA('us10y',  us10y.close, us10y.fromRepo ? null : us10y.pct, true);
 
   const dxyData = finalDxy;
   if (dxyData) {
-    setCA('dxy', dxyData.close, dxyData.pct, false);
+    setCA('dxy', dxyData.close, dxyData.pct, false, dxyData.chg);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
     if (dEl) { dEl.textContent = dxyData.close.toFixed(1); dEl.className = 'q-price ' + clsDir(dxyData.chg); }
@@ -3182,7 +3211,17 @@ async function fetchCrossAssetData() {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
     btcEl.className    = 'ca-val ' + clsDir(_btcIntraday.chg);
-    if (btcCEl) { btcCEl.textContent = pctStr(_btcIntraday.pct); btcCEl.className = 'ca-chg ' + clsDir(_btcIntraday.chg); }
+    if (btcCEl) {
+      const _biArrow = (_btcIntraday.chg??0) > 0 ? '▲' : (_btcIntraday.chg??0) < 0 ? '▼' : '→';
+      const _biSign  = (_btcIntraday.pct??0) >= 0 ? '+' : '';
+      if (_btcIntraday.chg != null) {
+        const _biAbs = _btcIntraday.chg.toLocaleString(undefined,{maximumFractionDigits:0});
+        btcCEl.textContent = _biArrow + ' ' + (_btcIntraday.chg>=0?'+':'') + _biAbs + ' (' + _biSign + (_btcIntraday.pct??0).toFixed(2) + '%)';
+      } else {
+        btcCEl.textContent = _biArrow + ' ' + _biSign + (_btcIntraday.pct??0).toFixed(2) + '%';
+      }
+      btcCEl.className = 'ca-chg ' + clsDir(_btcIntraday.chg);
+    }
     // Also update topbar q-btcusd if still showing —
     if (qBtc && qBtc.textContent === '—') {
       qBtc.textContent  = btcFmt;
@@ -4084,7 +4123,8 @@ async function fetchLiquidityData() {
 
     // Build 48 half-hour buckets from session-overlap baseline, scaled by vol
     const nowUTC = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
-    const isWeekend = [0,6].includes(new Date().getUTCDay());
+    const _lwd = new Date().getUTCDay(), _lwh = new Date().getUTCHours();
+    const isWeekend = _lwd === 6 || (_lwd === 0 && _lwh < 21) || (_lwd === 5 && _lwh >= 21);
 
     const data = Array.from({length:48}, (_,i) => {
       if (isWeekend) return 2;
@@ -4102,7 +4142,8 @@ async function fetchLiquidityData() {
     _liqData = data;
   } catch(e) {
     // Fallback to baseline only
-    const isWeekend = [0,6].includes(new Date().getUTCDay());
+    const _lfwd = new Date().getUTCDay(), _lfwh = new Date().getUTCHours();
+    const isWeekend = _lfwd === 6 || (_lfwd === 0 && _lfwh < 21) || (_lfwd === 5 && _lfwh >= 21);
     _liqData = Array.from({length:48}, (_,i) => {
       if (isWeekend) return 2;
       const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
@@ -4121,7 +4162,8 @@ function drawLiquidityChart() {
   const ctx = canvas.getContext('2d');
 
   const utcDay = new Date().getUTCDay();
-  const isWeekend = utcDay === 0 || utcDay === 6;
+  const utcHour = new Date().getUTCHours();
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
   const hours = _liqData || Array.from({length:48}, (_,i) => {
     if (isWeekend) return 2;
