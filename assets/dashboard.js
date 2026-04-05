@@ -3842,7 +3842,6 @@ async function boot() {
   fetchFedExpectations();
   fetchOptionSkew().then(() => attachRiskMonitorTooltips());
   fetchCarryData();
-  fetchEtfIV();
   initAlerts();
   fetchNewsData();
   fetchReferenceSpreads();          // HV30+VIX+MOVE vol model — no external API, updates with intraday JSON
@@ -4225,7 +4224,6 @@ setInterval(() => { fetchRiskData(); fetchCrossAssetData(); fetchCommodityQuotes
 setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData,    30 * 60 * 1000);
 setInterval(fetchCarryRanking, 30 * 60 * 1000);
-setInterval(fetchEtfIV,        10 * 60 * 1000);
 // Refresh sentiment every 30 seconds
 setInterval(fetchSentiment, 30 * 1000);
 // Refresh calendar & expectations every 30 minutes
