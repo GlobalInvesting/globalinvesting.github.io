@@ -27,7 +27,8 @@
 
   function hideBanner() {
     var banner = document.getElementById('gdpr-banner');
-    if (banner) { banner.hidden = true; banner.style.display = 'none'; }
+    // Single style mutation avoids forced reflow from toggling hidden + display separately
+    if (banner) { banner.style.display = 'none'; banner.hidden = true; }
   }
 
   function applyConsent(choice) {
@@ -63,8 +64,9 @@
     } catch(e) {}
     var banner = document.getElementById('gdpr-banner');
     if (banner) {
-      banner.hidden = false;
+      // Batch style mutations: set display first (visible), then remove hidden in same task
       banner.style.display = 'flex';
+      banner.hidden = false;
       setTimeout(function() { var btn = document.getElementById('gdpr-accept'); if (btn) btn.focus(); }, 300);
     }
   }

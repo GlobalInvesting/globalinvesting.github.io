@@ -4040,7 +4040,9 @@ async function fetchLiquidityData() {
 function drawLiquidityChart() {
   const canvas = document.getElementById('liquidity-canvas');
   if (!canvas) return;
+  // Batch layout read before any DOM write to avoid forced reflow
   const W = canvas.parentElement.clientWidth - 16, H = 110;
+  // Assign dimensions in one batch — no DOM reads after this point until ctx ops
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
@@ -4229,14 +4231,17 @@ window.addEventListener('resize', drawLiquidityChart);
     const maxV = Math.max(...hours, 10);
     const v = hours[slot];
 
+    // Read tooltip dimensions BEFORE writing textContent — avoids forced reflow
+    // (reading offsetWidth after DOM mutation forces synchronous layout)
+    const ttW = tooltip.style.display === 'block' ? (tooltip.offsetWidth || 170) : 170;
+    const ttH = tooltip.style.display === 'block' ? (tooltip.offsetHeight || 56) : 56;
+
     document.getElementById('liq-tt-time').textContent = hh + ':' + mm + ' UTC  (' + localHH + ':' + localMM + ' ' + tzShort + ')';
     document.getElementById('liq-tt-session').textContent = '▸ ' + getActiveSessions(Math.floor(utcH));
     const isPast = slot <= Math.floor(new Date().getUTCHours()*2 + new Date().getUTCMinutes()/30);
     document.getElementById('liq-tt-vol').textContent = (isPast ? '⬤' : '○') + ' ' + (isPast ? '' : '(est.) ') + volLabel(v, maxV);
 
     // Position tooltip next to cursor using fixed coordinates
-    const ttW = tooltip.offsetWidth || 170;
-    const ttH = tooltip.offsetHeight || 56;
     let left = e.clientX + 14;
     let top  = e.clientY - ttH / 2;
     // Flip left if near right edge of viewport
