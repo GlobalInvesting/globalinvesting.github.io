@@ -760,19 +760,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   var _eventsLoaded = false;
   var _econmapLoaded = false;
 
+  // Rebuilds the TradingView chart widget from scratch inside #tv-chart-wrap.
+  // This matches exactly what dashboard.js does on symbol change, so both
+  // initial load and click-driven reloads use an identical DOM structure.
   function loadTVChart(sym) {
-    var container = document.querySelector('#tv-chart-widget');
-    if (!container) return;
+    var wrap = document.getElementById('tv-chart-wrap');
+    if (!wrap) return;
+    sym = sym || window._tvCurrentSym || 'FX_IDC:EURUSD';
+    // Clear any previous widget (skeleton, iframe, scripts)
+    wrap.innerHTML = '';
+    var container = document.createElement('div');
+    container.className = 'tradingview-widget-container';
+    container.style.cssText = 'height:100%;width:100%;';
+    var widget = document.createElement('div');
+    widget.id = 'tv-chart-widget';
+    widget.className = 'tradingview-widget-container__widget';
+    widget.style.cssText = 'height:100%;width:100%;';
+    container.appendChild(widget);
+    var copyright = document.createElement('div');
+    copyright.className = 'tradingview-widget-copyright';
+    copyright.style.display = 'none';
+    container.appendChild(copyright);
     var s = document.createElement('script');
     s.type = 'text/javascript';
     s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
     s.async = true;
-    var cfg = {"allow_symbol_change":false,"calendar":false,"details":true,"hide_side_toolbar":true,"hide_top_toolbar":true,"hide_legend":false,"hide_volume":true,"hotlist":false,"interval":"D","locale":"en","save_image":false,"style":"1","theme":"dark","timezone":"Etc/UTC","backgroundColor":"#131722","gridColor":"rgba(42,46,57,0.8)","watchlist":[],"withdateranges":false,"compareSymbols":[],"studies":[{"id":"MASimple@tv-basicstudies","inputs":{"length":20}}],"autosize":true};
-    cfg.symbol = sym || 'FX_IDC:EURUSD';
-    s.textContent = JSON.stringify(cfg);
-    var skel = container.querySelector('.tv-skeleton');
-    if (skel) skel.remove();
+    s.text = JSON.stringify({
+      allow_symbol_change: false, calendar: false, details: true,
+      hide_side_toolbar: true, hide_top_toolbar: true, hide_legend: false,
+      hide_volume: true, interval: 'D', locale: 'en', save_image: false,
+      style: '1', symbol: sym, theme: 'dark', timezone: 'Etc/UTC',
+      backgroundColor: '#131722', gridColor: 'rgba(42,46,57,0.8)',
+      withdateranges: false, autosize: true,
+      studies: [{id: 'MASimple@tv-basicstudies', inputs: {length: 20}}]
+    });
     container.appendChild(s);
+    wrap.appendChild(container);
     _chartLoaded = true;
   }
 
