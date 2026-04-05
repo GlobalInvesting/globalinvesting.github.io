@@ -440,6 +440,29 @@
   .a-info { background: var(--blue); }
   .a-text { color: var(--text); flex: 1; font-size: 11px; line-height: 1.45; font-family: var(--font-ui); }
   .a-text strong { color: #fff; font-weight: 700; }
+  /* Evidence chips — data traceability for AI signals. Hidden by default, toggled on row click. */
+  .a-evidence {
+    display: none; flex-wrap: wrap; gap: 4px;
+    margin-top: 5px; padding-top: 5px;
+    border-top: 1px solid var(--border2);
+  }
+  .a-evidence.a-evidence-open { display: flex; }
+  .a-ev-chip {
+    font-size: 9px; font-family: var(--font-mono);
+    padding: 2px 6px; border-radius: 3px;
+    background: var(--bg3); color: var(--text2);
+    border: 0.5px solid var(--border2);
+    white-space: nowrap;
+  }
+  /* Subtle indicator that the row is clickable when evidence is available */
+  .a-has-ev:hover .a-text { color: var(--text); }
+  .a-has-ev::after {
+    content: '▸'; font-size: 8px; color: var(--text3);
+    align-self: center; margin-left: auto; flex-shrink: 0;
+    transition: transform .15s;
+  }
+  .a-has-ev .a-evidence-open ~ .a-has-ev::after,
+  .a-has-ev:has(.a-evidence-open)::after { transform: rotate(90deg); }
 
   /* RIGHT PANEL */
   #rightpanel {

@@ -667,7 +667,7 @@ async function fetchCOTData() {
   const results = (await Promise.all(promises)).filter(Boolean);
   if (!results.length) return;
 
-  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr"
+  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ"
   const latest = results[0];
   const weekEnd = latest.weekEnding || latest.reportDate || '';
   let updLabel = 'CFTC · week ending ' + weekEnd;
@@ -679,6 +679,11 @@ async function fetchCOTData() {
       }
     } catch {}
   }
+  // Add local load timestamp so traders know data freshness in their timezone
+  const _cotNow = new Date();
+  const _cotHHMM = _cotNow.getHours().toString().padStart(2,'0') + ':' + _cotNow.getMinutes().toString().padStart(2,'0');
+  const _cotTZ = _cotNow.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+  updLabel += ' · loaded ' + _cotHHMM + ' ' + _cotTZ;
   setEl('cot-date-sub', updLabel);
 
   const container = document.getElementById('cot-rows');
@@ -1533,9 +1538,10 @@ function renderSentiment(pairs, sourceLabel, general) {
   const isHistorical = sourceLabel && sourceLabel.includes('Historical');
   const subEl = document.getElementById('sent-source-sub');
   if (subEl) {
-    if (isCOT) subEl.textContent = 'CFTC COT · speculative positioning (Myfxbook unavailable)';
-    else if (isHistorical) subEl.textContent = 'Static fallback · live feeds unavailable';
-    else subEl.textContent = 'Myfxbook · retail positioning';
+    const _sentTime = lh + ':' + lm + ' ' + tzAbbr2;
+    if (isCOT) subEl.textContent = `CFTC COT · speculative positioning · loaded ${_sentTime}`;
+    else if (isHistorical) subEl.textContent = `Static fallback · live feeds unavailable · loaded ${_sentTime}`;
+    else subEl.textContent = `Myfxbook · retail positioning · updated ${_sentTime}`;
   }
 }
 
@@ -2849,6 +2855,20 @@ async function fetchEtfIV() {
       row.style.cursor = 'pointer';
       row.addEventListener('click', () => loadTVChart(row.dataset.sym));
     });
+
+    // ── ETF IV panel timestamp ─────────────────────────────────────
+    const ivSub = document.getElementById('etf-iv-panel-sub');
+    if (ivSub) {
+      const now = new Date();
+      const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+      // Use actual data freshness from quotes.json updated field
+      const fileAge = intra?.updated
+        ? Math.round((Date.now() - new Date(intra.updated).getTime()) / 60000)
+        : null;
+      const ageLabel = fileAge != null ? ` · data ${fileAge}min ago` : '';
+      ivSub.textContent = `ETF options · CBOE · yfinance · updated ${hhmm} ${tzAbbr}${ageLabel}`;
+    }
   } catch(e) {
     console.warn('[EtfIV]', e);
     if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
@@ -3274,10 +3294,14 @@ async function fetchOptionSkew() {
 
     // Update thead to reflect what's actually showing
     const hasAnyEtfIv = pairs.some(p => etfIvMap[p.etfId]?.iv != null);
+    const hasIvRank   = pairs.some(p => etfIvMap[p.etfId]?.iv_rank != null);
     const thead = tbody.closest('table')?.querySelector('thead tr');
     if (thead) {
       if (hasAnyEtfIv) {
-        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
+        // IV Rank column shown when history is available (≥4 weeks)
+        thead.innerHTML = hasIvRank
+          ? '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col" title="IV Rank: position of current IV within 52-week range (0=historically low, 100=historically high)">IV Rnk</th><th scope="col">Direction</th>'
+          : '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
       } else {
         thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th>';
       }
@@ -3304,12 +3328,28 @@ async function fetchOptionSkew() {
         // ── ETF IV available: show real implied vol ──
         const ivStr  = etfIv.iv.toFixed(1) + '%';
         const ivCls  = etfIv.iv > 12 ? 'down' : etfIv.iv > 7 ? '' : 'up';
-        const cotStr = cotData ? fmtRR(cotSkew) : '—';
-        const cotCls = cotData ? (cotSkew >= 0 ? 'up' : 'down') : 'flat';
-        return `<tr title="ETF: ${etfIv.source} · exp ${etfIv.expiry} · ATM strike ${etfIv.atm}">
+
+        // IV Rank column: show when ≥4 weeks of history available
+        let col2Html, col2Title;
+        if (etfIv.iv_rank != null) {
+          const rnk    = etfIv.iv_rank;
+          const pct    = etfIv.iv_pct_rank ?? rnk;
+          const n      = etfIv.iv_hist_n   ?? '?';
+          const rnkCls = rnk > 75 ? 'down' : rnk < 25 ? 'up' : '';
+          const rnkStr = Math.round(rnk) + 'rnk';  // e.g. "82rnk"
+          col2Html  = `<td class="${rnkCls}" style="font-family:var(--font-mono);font-size:10px">${rnkStr}</td>`;
+          col2Title = `IV Rank ${rnk.toFixed(0)} (${n}w history) · IV Percentile ${pct.toFixed(0)} · High rank = historically expensive vol`;
+        } else {
+          const cotStr = cotData ? fmtRR(cotSkew) : '—';
+          const cotCls = cotData ? (cotSkew >= 0 ? 'up' : 'down') : 'flat';
+          col2Html  = `<td class="${cotCls}" style="font-size:10px">${cotStr}</td>`;
+          col2Title = `ETF: ${etfIv.source} · exp ${etfIv.expiry} · ATM strike ${etfIv.atm} · IV Rank building (need ≥4 weekly snapshots)`;
+        }
+
+        return `<tr title="${col2Title}">
           <td>${p.pair}</td>
           <td class="${ivCls}" style="font-family:var(--font-mono)">${ivStr}</td>
-          <td class="${cotCls}" style="font-size:10px">${cotStr}</td>
+          ${col2Html}
           <td class="${biasCls}">${bias}</td>
         </tr>`;
       } else {
@@ -3569,12 +3609,29 @@ async function buildRichNarrative() {
             container.innerHTML = signals.map(s => {
               const dotCls = s.priority === 'critical' ? 'a-crit' : s.priority === 'warning' ? 'a-warn' : 'a-info';
               const localTime = localizeSignalTime(s.time);
-              return `<div class="alert-row">
+              // evidence[]: "LABEL: VALUE" strings set by the engine for data traceability.
+              // Rendered as a collapsible row below the signal text — hidden by default,
+              // toggled by clicking the signal row. Tooltip on the row shows all evidence inline.
+              const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
+              const evTooltip = ev.length ? ev.join(' · ') : '';
+              const evHtml = ev.length
+                ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
+                : '';
+              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
-                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}</div>
+                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
               </div>`;
             }).join('');
+
+            // Toggle evidence chips on row click (expand/collapse)
+            container.querySelectorAll('.a-has-ev').forEach(row => {
+              row.style.cursor = 'pointer';
+              row.addEventListener('click', () => {
+                const evEl = row.querySelector('.a-evidence');
+                if (evEl) evEl.classList.toggle('a-evidence-open');
+              });
+            });
           }
           if (sub) {
             const now = new Date();
@@ -3680,11 +3737,14 @@ async function fetchReferenceSpreads() {
       }
     }
 
-    // Subtitle — vol regime label
+    // Subtitle — vol regime label + timestamp
     const sub = document.getElementById('spreads-sub');
     if (sub) {
+      const _sprNow = new Date();
+      const _sprHHMM = _sprNow.getHours().toString().padStart(2,'0') + ':' + _sprNow.getMinutes().toString().padStart(2,'0');
+      const _sprTZ = _sprNow.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
       const regime = vix < 20 ? 'Low vol' : vix < 28 ? 'Elevated vol' : 'High vol';
-      sub.textContent = `ECN est. · ${regime} · VIX ${vix.toFixed(1)}`;
+      sub.textContent = `ECN est. · ${regime} · VIX ${vix.toFixed(1)} · ${_sprHHMM} ${_sprTZ}`;
     }
 
   } catch(e) { console.warn('[Spreads] Failed:', e); }
