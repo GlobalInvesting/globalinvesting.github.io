@@ -161,23 +161,18 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // ═══════════════════════════════════════════════════════════════════
-// FRANKFURTER — ECB daily rates (free, no key)
+// FRANKFURTER — ECB daily rates (read from server-side cache to avoid CORS)
+// Cache is updated every 4h by the engine workflow update-frankfurter-cache.yml
+// and deposited at /fx-data/frankfurter.json in the public repo.
 // ═══════════════════════════════════════════════════════════════════
 async function fetchFrankfurter() {
   try {
-    const todayDate  = getLatestBizDate();
-    const prevDate   = getPrevBizDate();
-    const [todayRes, prevRes] = await Promise.all([
-      fetch('https://api.frankfurter.app/' + todayDate + '?from=USD'),
-      fetch('https://api.frankfurter.app/' + prevDate  + '?from=USD'),
-    ]);
-    if (!todayRes.ok) return;
-    const today = await todayRes.json();
-    let prev = null;
-    if (prevRes.ok) prev = await prevRes.json();
+    const res = await fetch('/fx-data/frankfurter.json');
+    if (!res.ok) return;
+    const data = await res.json();
 
-    STATE.rates = today.rates || {};
-    STATE.prevRates = (prev && prev.rates) ? prev.rates : {};
+    STATE.rates = (data.today && data.today.rates) ? data.today.rates : {};
+    STATE.prevRates = (data.prev && data.prev.rates) ? data.prev.rates : {};
 
     // Only use Frankfurter data to populate UI if intraday RT cache is not yet loaded
     // (avoids overwriting live yfinance prices with stale ECB daily rates)
@@ -187,13 +182,10 @@ async function fetchFrankfurter() {
       populateHeatmap();
       populateCrossRows();
       const updEl = document.getElementById('fx-table-updated');
-      if (updEl) updEl.textContent = 'ECB · updated ' + (today.date || todayDate) + ' · daily rate';
+      if (updEl) updEl.textContent = 'ECB · updated ' + (data.today.date || '') + ' · daily rate';
     }
   } catch(e) {
-    // Frankfurter is a fallback only — CORS blocks are expected when yfinance data is available
-    if (!(e instanceof TypeError && e.message.includes('fetch'))) {
-      console.warn('Frankfurter fetch failed:', e);
-    }
+    console.warn('Frankfurter cache fetch failed:', e);
   }
 }
 
@@ -3963,10 +3955,10 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
   });
 })();
 
-// ─── FX LIQUIDITY CANVAS — real intraday activity via Frankfurter ───────────
-// Strategy: fetch last 48 half-hour EUR/USD ticks from api.frankfurter.app
-// and map observed price-change magnitude → proxy for interbank volume.
-// Falls back to BIS/LSEG session-overlap baseline if fetch fails.
+// ─── FX LIQUIDITY CANVAS — real intraday activity via Frankfurter cache ──────
+// Strategy: reads ECB rate series from /fx-data/frankfurter.json (server-side cache,
+// updated every 4h by engine workflow) and maps daily price-change magnitude → proxy
+// for interbank volume. Falls back to BIS/LSEG session-overlap baseline if unavailable.
 
 const LIQ_BASE = [18,14,11,10,12,20,30,42,58,68,72,70,72,82,95,100,95,80,68,55,42,30,22,20];
 // Session definitions (UTC hours)
@@ -3981,18 +3973,11 @@ let _liqData = null; // cache: array of 48 values (half-hours, UTC 00:00→23:30
 
 async function fetchLiquidityData() {
   try {
-    // Frankfurter: timeseries last 5 days to compute daily range/volatility
-    const today = new Date();
-    const yyyy = today.getUTCFullYear();
-    const mm = String(today.getUTCMonth()+1).padStart(2,'0');
-    const dd = String(today.getUTCDate()).padStart(2,'0');
-    const startD = new Date(today); startD.setUTCDate(today.getUTCDate()-5);
-    const startDate = `${startD.getUTCFullYear()}-${String(startD.getUTCMonth()+1).padStart(2,'0')}-${String(startD.getUTCDate()).padStart(2,'0')}`;
-    const url = `https://api.frankfurter.app/${startDate}..${yyyy}-${mm}-${dd}?from=EUR&to=USD,GBP,JPY`;
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('fetch fail');
-    const json = await r.json();
-    const rates = Object.values(json.rates);
+    // Read from server-side cache (avoids CORS — updated every 4h by engine workflow)
+    const r = await fetch('/fx-data/frankfurter.json');
+    if (!r.ok) throw new Error('cache not available');
+    const cacheData = await r.json();
+    const rates = Object.values((cacheData.series && cacheData.series.rates) ? cacheData.series.rates : {});
 
     let volScalar = 1.0;
     if (rates.length >= 2) {
