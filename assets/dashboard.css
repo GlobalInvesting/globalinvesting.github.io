@@ -57,6 +57,12 @@
     flex-shrink: 0;
   }
 
+  #topbar .logo > span {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
   .logo-text {
     font-family: var(--font-ui);
     font-size: 11.5px;
