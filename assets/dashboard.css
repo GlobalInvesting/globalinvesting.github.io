@@ -251,6 +251,7 @@
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: background .1s;
+    position: relative;
   }
   .sb-row:hover { background: var(--bg3); }
   .sb-row:last-child { border-bottom: none; }
@@ -520,16 +521,22 @@
   .pd-retail-nums { font-size:10px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
   .pd-retail-sep { color:var(--text3); margin:0 3px; }
 
-  /* ⓘ info button — inline in pair cell / sb-row */
+  /* ⓘ info button — base style */
   .pd-info-btn {
     display: inline-flex; align-items:center; justify-content:center;
     width:13px; height:13px;
-    margin-left:4px; vertical-align:middle;
     background:none; border:1px solid var(--border2);
     border-radius:50%; color:var(--text3);
     font-size:9px; font-weight:700; line-height:1;
     cursor:pointer; opacity:0; transition:opacity .15s, color .15s, border-color .15s;
     pointer-events:auto; flex-shrink:0;
+  }
+  /* Inside FX table td — inline, margined */
+  td .pd-info-btn { margin-left:4px; vertical-align:middle; }
+  /* Inside sb-row — absolutely positioned, doesn't affect flex layout */
+  .sb-row .pd-info-btn {
+    position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    margin:0;
   }
   tr:hover .pd-info-btn,
   .sb-row:hover .pd-info-btn { opacity:1; }
