@@ -2538,6 +2538,11 @@ async function updatePairDetail(tvSym) {
       const nonUsd = p.base !== 'USD' ? p.base : p.quote;
       USD_IV[nonUsd] = entry.iv;
     }
+    // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × 1.08 (long-run NZD/AUD vol ratio).
+    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
+      USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+    }
+
     // Direct ETF IV for USD majors
     const ivEntry = etfIv[pairId];
     if (ivEntry?.iv != null) {
@@ -2599,8 +2604,8 @@ async function updatePairDetail(tvSym) {
     <div class="pd-grid">
       <div class="pd-cell" data-tip="Weekly % change vs prev Friday close"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
       <div class="pd-cell" data-tip="30-day historical (realised) volatility"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation (√(IVa²+IVb²−2ρ·IVa·IVb)). Not OTC interbank — indicative only.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance)'}"><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style=\'font-size:8px;color:var(--text3);margin-left:2px;\'>~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="IV minus HV: +ve = options expensive vs realised"><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation (√(IVa²+IVb²−2ρ·IVa·IVb)). Not OTC interbank — indicative only. Color = cost of hedging: green = cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance). Color = cost of hedging: green = historically cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.'}"><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style=\'font-size:8px;color:var(--text3);margin-left:2px;\'>~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pd-cell" data-tip="IV minus HV: difference between implied and realised vol. Positive = options expensive vs recent moves (hedging at a premium). Negative = options cheap vs realised. Not a directional signal."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
       <div class="pd-cell" data-tip="CFTC Leveraged Funds net contracts (speculative)"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
       <div class="pd-cell" data-tip="CFTC Asset Managers net contracts (institutional)"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
       <div class="pd-cell" data-tip="CB rate differential: base minus quote rate"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
