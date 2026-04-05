@@ -1,32 +1,57 @@
 [
   {
-    "time": "21:50",
+    "time": "02:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00; watch 160.00 level."
+    "text": "USD/JPY trading above 159.00, BoJ intervention risk elevated as it approaches 160.00",
+    "evidence": [
+      "USD/JPY: 159.632",
+      "BoJ rate: 0.75%",
+      "VIX: 23.9"
+    ]
   },
   {
-    "time": "21:48",
+    "time": "02:42",
     "priority": "warning",
-    "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD."
+    "title": "CFTC — EUR",
+    "text": "EUR net short positioning at -38,698, watch for potential squeeze as VIX signals elevated volatility",
+    "evidence": [
+      "EUR net short: -38,698",
+      "VIX: 23.9",
+      "EUR/USD: 1.15220"
+    ]
   },
   {
-    "time": "21:45",
+    "time": "02:40",
     "priority": "warning",
-    "title": "VIX",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment."
+    "title": "Fed vs ECB",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (ON HOLD) — 175bp spread continues to weigh on EUR/USD",
+    "evidence": [
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)",
+      "EUR/USD: 1.15220"
+    ]
   },
   {
-    "time": "21:40",
-    "priority": "info",
-    "title": "NZD/USD",
-    "text": "NZD/USD trading below 0.5708, with 87% of retail traders long; watch for potential squeeze."
-  },
-  {
-    "time": "21:35",
+    "time": "02:35",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "MOVE Index at 81.8, indicating moderate bond market stress; monitor for potential escalation."
+    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, MOVE Index at 81.8 indicates bond market stress",
+    "evidence": [
+      "VIX: 23.9",
+      "MOVE Index: 81.8",
+      "S&P 500: 6,583"
+    ]
+  },
+  {
+    "time": "02:30",
+    "priority": "info",
+    "title": "NZD/USD Retail Sentiment",
+    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze as it diverges from CFTC net short positioning",
+    "evidence": [
+      "NZD/USD: 87% long",
+      "NZD net short: -17,798",
+      "NZD/USD: 0.56940"
+    ]
   }
 ]
