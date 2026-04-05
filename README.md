@@ -18,15 +18,17 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
 - **Central bank policy rates** — All G8 CBs with rate cycle direction
 - **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
-- **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias
+- **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias. When ≥4 weeks of IV history are available, an IV Rank column (0–100 scale, where 100 = historically expensive vol) replaces the COT bias column.
 - **Pair detail panel** — Linked right-panel showing price, 1W change, HV30, ATM IV, IV−HV, LF net, AM net, carry differential, and LF/AM alignment badge for the currently selected chart pair (Eikon-style linked panel). Hover tooltips on every metric cell explain the data source and interpretation.
 - **ETF Options IV** — 8-row implied volatility panel: VIX, VIX9D, VVIX, MOVE, GLD IV, TLT IV, EEM IV, EFA IV. Colour-coded bar (red = elevated, amber = mid, green = low). Sources: CBOE indices and yfinance ETF options. Refreshes every 10 minutes.
 - **Configurable price alerts** — Threshold alerts for VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, Gold, US 10Y, and MOVE. Direction (`>` / `<`) and numeric threshold configurable per alert. Fires browser Notifications API on trigger. Persisted in localStorage across sessions. Checks every 5 minutes.
 - **Panel data export** — CSV and JSON export for FX pairs, COT positioning, yield curve, and carry data; timestamped filenames, downloaded client-side from in-memory caches
 - **Keyboard navigation** — `G`/`C`/`R`/`X`/`M`/`Y`/`K` jump to panels; `↑`/`↓` navigate FX table rows and load chart; `?` opens shortcut legend
+- **Per-panel timestamps** — Every data panel displays its source and last update time in the user's local timezone. Panels with AI-generated signals also show when the data was loaded from the engine.
+- **AI signal evidence traceability** — Each AI-generated market signal carries an `evidence[]` field listing the exact data values that motivated it (e.g. "VIX: 23.9", "Fed rate: 4.50%"). Evidence chips are hidden by default and revealed by clicking the signal row.
 - **Economic calendar** — TradingView embed with real-time event actuals
 - **News feed** — FXStreet, ForexLive, Investing.com and others, filtered by FX relevance, updated hourly
-- **Market signals** — 5–7 AI-generated signals updated 8× daily
+- **Market signals** — 4–5 AI-generated signals updated 8× daily
 
 ---
 
@@ -59,7 +61,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
 | `fx-performance/` | FX pair performance data | Engine — daily |
-| `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels | Engine — every 5 min |
+| `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels; `iv_history.json` — rolling 52-week IV snapshots per FX pair for IV Rank calculation | Engine — every 5 min (quotes); weekly append (iv_history) |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
