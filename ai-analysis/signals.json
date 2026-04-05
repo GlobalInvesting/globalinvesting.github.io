@@ -1,6 +1,6 @@
 [
   {
-    "time": "13:30",
+    "time": "15:55",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
@@ -11,47 +11,47 @@
     ]
   },
   {
-    "time": "13:28",
+    "time": "15:52",
     "priority": "warning",
-    "title": "ECB Policy Rate",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
+    "title": "CB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2% (CUTTING)",
+      "ECB rate: 2.00% (CUTTING)",
       "EUR/USD: 1.15220"
     ]
   },
   {
-    "time": "13:25",
+    "time": "15:49",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at -38,698, watch for potential squeeze as VIX signals elevated volatility",
-    "evidence": [
-      "CFTC EUR net: -38,698",
-      "VIX: 23.9",
-      "EUR/USD: 1.15220"
-    ]
-  },
-  {
-    "time": "13:20",
-    "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, while MOVE Index at 81.8 indicates bond market stress",
+    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, while S&P 500 is trading at 6,583",
     "evidence": [
       "VIX: 23.9",
-      "MOVE Index: 81.8",
-      "S&P 500: 6,583"
+      "S&P 500: 6,583",
+      "MOVE Index: 81.8"
     ]
   },
   {
-    "time": "13:15",
+    "time": "15:45",
     "priority": "info",
     "title": "Retail Sentiment",
-    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze as sentiment extremes often precede reversals",
+    "text": "NZD/USD shows extreme long bias with 87% of retail traders long, watch for potential reversal",
     "evidence": [
-      "NZD/USD: 87% long",
       "NZD/USD: 0.56940",
-      "AUD/NZD: 92% short"
+      "NZD/USD retail sentiment: 87% long",
+      "CFTC NZD net: -17,798"
+    ]
+  },
+  {
+    "time": "15:42",
+    "priority": "info",
+    "title": "Yield Curve Context",
+    "text": "US 10Y-2Y spread at -42bp, while US 10Y yield is at 4.313%",
+    "evidence": [
+      "US 10Y yield: 4.313%",
+      "US 2Y yield: 3.790%",
+      "US 10Y-2Y spread: -42bp"
     ]
   }
 ]
