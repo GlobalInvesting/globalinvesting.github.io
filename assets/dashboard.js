@@ -2625,8 +2625,8 @@ async function updatePairDetail(tvSym) {
     const TIP_MAP = [
       { lbl: '1W CHG',    title: '1-Week Change',              body: 'Weekly % change vs prev Friday close.' },
       { lbl: 'HV 30D',    title: 'Historical Volatility 30d',  body: '30-day realised (historical) volatility, annualised.' },
-      { lbl: 'ATM IV',    title: 'ATM Implied Volatility',     body: '30-day at-the-money implied vol derived from options market.' },
-      { lbl: 'IV − HV',   title: 'IV minus HV',                body: 'Options premium vs realised vol. Positive = options expensive relative to recent moves.' },
+      { lbl: 'ATM IV',    title: 'ATM Implied Volatility',     body: '30-day at-the-money implied vol from options market. Color = cost of hedging: green = cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.' },
+      { lbl: 'IV − HV',   title: 'IV minus HV',                body: 'Implied vol minus realised vol. Positive = options expensive vs recent moves (hedging at a premium). Negative = options cheap vs realised. Not a directional signal.' },
       { lbl: 'LF NET',    title: 'CFTC Leveraged Funds Net',   body: 'Net contracts held by Leveraged Funds (speculative). Source: CFTC Disaggregated TFF.' },
       { lbl: 'AM NET',    title: 'CFTC Asset Managers Net',    body: 'Net contracts held by Asset Managers (institutional). Source: CFTC Disaggregated TFF.' },
       { lbl: 'CARRY',     title: 'Carry Differential',         body: 'CB rate differential: base minus quote central bank policy rate.' },
