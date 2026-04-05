@@ -213,7 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.15">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.12.17">
 
 <!-- Flag icons — non-blocking load to avoid render delay -->
 <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" onload="this.rel='stylesheet'">
@@ -457,7 +457,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tr>
         </thead>
         <tbody id="fx-pairs-tbody">
-          <tr><td class="sym" colspan="9" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+          <!-- 7 skeleton rows — reserve exact height of real data, prevents CLS when JS loads -->
+          <tr><td class="sym">EUR/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">GBP/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/JPY</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">AUD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CHF</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">USD/CAD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="sym">NZD/USD</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         </tbody>
       </table>
       </div>
@@ -471,7 +478,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-sub">Relative performance vs USD basket · ECB daily</span>
       </div>
       <div class="heatmap" id="heatmap-grid">
-        <!-- populated by JS -->
+        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
+        <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
       </div>
     </div>
 
