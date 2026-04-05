@@ -728,6 +728,37 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="right-panel">
       <h2>Right Panel</h2>
 
+      <h3>Pair Detail</h3>
+      <p>When you click any pair in the FX Pairs table, the right panel's top section populates with a detailed data card for that pair. This is an Eikon-style linked panel — it updates instantly on every click with no page reload. Fields shown:</p>
+      <!-- MOCK: Pair Detail panel (EUR/USD example) -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;max-width:280px;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:var(--text);">EUR/USD</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">1.08430</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+          <div style="padding:8px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">1W Chg</div><div style="font-size:13px;font-weight:600;color:var(--down);">−0.44%</div></div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">HV 30d</div><div style="font-size:13px;font-weight:600;color:var(--text);">8.2%</div></div>
+          <div style="padding:8px 10px;border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">ATM IV</div><div style="font-size:13px;font-weight:600;color:var(--down);">20.0%</div></div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">IV − HV</div><div style="font-size:13px;font-weight:600;color:var(--up);">+11.8%</div></div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">LF Net</div><div style="font-size:13px;font-weight:600;color:var(--down);">−38,698</div></div>
+          <div style="padding:8px 10px;border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">AM Net</div><div style="font-size:13px;font-weight:600;color:var(--up);">+12,400</div></div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Carry</div><div style="font-size:13px;font-weight:600;color:var(--up);">+1.75%</div></div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">EUR Rate</div><div style="font-size:13px;font-weight:600;color:var(--text);">2.00%</div></div>
+          <div style="padding:8px 10px;"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;"> </div><div style="font-size:13px;font-weight:600;color:var(--text3);"> </div></div>
+        </div>
+      </div>
+      <ul style="list-style:none;padding:0;margin-bottom:20px;">
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">1W Chg</strong> Weekly % change vs prior Friday close.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">HV 30d</strong> 30-day historical (realised) volatility, annualised.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">ATM IV</strong> 30-day at-the-money implied vol from CBOE ETF options. Color = cost of hedging, not direction: <span style="color:var(--up);">green ≤7%</span> (cheap), <span style="color:var(--down);">red &gt;12%</span> (expensive).</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">IV − HV</strong> Implied minus realised vol. Positive = options expensive vs recent moves. Not a directional signal.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">LF Net</strong> CFTC Leveraged Funds net contracts (hedge funds / CTAs). Source: CFTC Disaggregated TFF.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">AM Net</strong> CFTC Asset Managers net contracts (institutional). Slower-moving; confirms or contradicts LF signal.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">Carry</strong> CB rate differential: base minus quote central bank policy rate.</li>
+        <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:90px;display:inline-block;">Base Rate</strong> Current policy rate of the base currency's central bank.</li>
+      </ul>
+
       <h3>Central Bank Rates</h3>
       <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the current rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">→ Hold</span>.</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
