@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-05T00:50:24Z",
+  "updated": "2026-04-05T00:55:20Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 67244.0703,
+      "close": 67232.5156,
       "prev_close": 66931.1016,
-      "chg": 312.9688,
-      "pct": 0.4676,
+      "chg": 301.4141,
+      "pct": 0.4503,
       "high": 67292.4062,
       "low": 67231.8516,
       "source": "yfinance"
@@ -532,37 +532,55 @@
       "iv": 20.0,
       "expiry": "2026-04-17",
       "source": "FXE options",
-      "atm": 106.0
+      "atm": 106.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     },
     "gbpusd": {
       "iv": 16.5,
       "expiry": "2026-04-17",
       "source": "FXB options",
-      "atm": 127.0
+      "atm": 127.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     },
     "usdjpy": {
       "iv": 12.6,
       "expiry": "2026-04-17",
       "source": "FXY options",
-      "atm": 58.0
+      "atm": 58.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     },
     "audusd": {
       "iv": 28.1,
       "expiry": "2026-04-17",
       "source": "FXA options",
-      "atm": 68.0
+      "atm": 68.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     },
     "usdchf": {
       "iv": 21.1,
       "expiry": "2026-04-17",
       "source": "FXF options",
-      "atm": 110.0
+      "atm": 110.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     },
     "usdcad": {
       "iv": 10.8,
       "expiry": "2026-04-17",
       "source": "FXC options",
-      "atm": 71.0
+      "atm": 71.0,
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
     }
   }
 }
