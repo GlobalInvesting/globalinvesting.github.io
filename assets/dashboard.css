@@ -533,10 +533,14 @@
   }
   /* Inside FX table td — inline, margined */
   td .pd-info-btn { margin-left:4px; vertical-align:middle; }
-  /* Inside sb-row — absolutely positioned, doesn't affect flex layout */
-  .sb-row .pd-info-btn {
-    position:absolute; right:6px; top:50%; transform:translateY(-50%);
-    margin:0;
+  /* Inside sb-sym — sits right of the pair label, away from the price columns */
+  .sb-sym {
+    display: inline-flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .sb-sym .pd-info-btn {
+    position: static; transform: none; margin: 0;
+    flex-shrink: 0;
   }
   tr:hover .pd-info-btn,
   .sb-row:hover .pd-info-btn { opacity:1; }
