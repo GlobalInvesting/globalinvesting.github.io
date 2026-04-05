@@ -741,14 +741,14 @@ a { color: inherit; text-decoration: none; }
             <th style="padding:3px 6px;">Trend</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.65%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoE</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.00%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.25%</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hiking</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.35%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoC</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">SNB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">1.00%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">RBNZ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoE</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.10%</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hiking</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoC</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">SNB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">RBNZ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
           </tbody>
         </table>
       </div>
@@ -795,7 +795,10 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">ETF IV · COT</span></h3>
-      <p>A directional bias table for major pairs, synthesised from ETF implied volatility (options market skew) and CFTC COT positioning. The <strong>ATM IV</strong> column shows the annualised implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) at the nearest expiry. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined source — as a directional proxy. When both signals agree, the read is most reliable. Disagreement — e.g. IV elevated but COT flat — signals uncertainty or a positioning squeeze risk.</p>
+      <p>A directional bias table for major pairs, synthesised from ETF implied volatility (options market skew) and CFTC COT positioning. The <strong>ATM IV</strong> column shows the annualised implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) at the nearest expiry. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined source — as a directional proxy on a ±1.5 scale. When both signals agree, the read is most reliable. Disagreement — e.g. IV elevated but COT flat — signals uncertainty or a positioning squeeze risk.</p>
+      <div class="callout callout-orange">
+        <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias.
+      </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Positioning Bias</span>
@@ -806,15 +809,15 @@ a { color: inherit; text-decoration: none; }
             <th style="text-align:left;padding:3px 8px;">Pair</th>
             <th style="padding:3px 6px;">ATM IV</th>
             <th style="padding:3px 6px;">COT bias</th>
-            <th style="padding:3px 6px;">Direction</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-family:var(--font-mono);">19.3%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+0.09</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">Neutral</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">GBP/USD</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-family:var(--font-mono);">15.8%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+0.72</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">GBP+</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-family:var(--font-mono);">12.2%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.11</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">USD+</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--text2);text-align:center;font-family:var(--font-mono);">27.1%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.26</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">AUD+</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">20.0%</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-size:10px;">−0.93</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">GBP/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">16.5%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+0.60</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">12.6%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.37</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">28.1%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.05</td></tr>
           </tbody>
         </table>
+        <div style="padding:4px 8px 5px;font-size:9px;color:var(--text3);">ATM IV: red &gt;12% (expensive) · neutral 7–12% · green ≤7% (cheap) · COT: ±1.5 scale</div>
       </div>
     </div>
 
@@ -866,55 +869,49 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="alerts">
       <h2>Alerts &amp; Market Signals</h2>
-      <p>The final section of the main panel shows 5–7 AI-generated market signals, updated 8× daily alongside the narrative (00:00, 03:30, 06:30, 08:30, 12:30, 15:30, 19:00, 21:30 UTC). Each signal includes:</p>
+      <p>The final section of the main panel shows AI-generated market signals, updated 8× daily alongside the narrative (00:00, 03:30, 06:30, 08:30, 12:30, 15:30, 19:00, 21:30 UTC). Each signal includes:</p>
       <ul style="list-style:none;padding:0;margin-bottom:14px;">
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Asset</strong> — the currency pair or instrument the signal refers to</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Direction</strong> — Bullish, Bearish, or Watch (monitoring without directional bias)</li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Rationale</strong> — the cross-referencing logic (e.g., rate differential + COT positioning alignment + price confirmation)</li>
-        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Confidence</strong> — High / Medium / Low, based on degree of multi-factor alignment</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Priority dot</strong> — a colored indicator: <span style="color:var(--down);">red = critical</span>, <span style="color:var(--orange);">amber = warning</span>, <span style="color:var(--blue);">blue = informational</span></li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Timestamp</strong> — time of the last update cycle (UTC)</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Title</strong> — a short label identifying the pair or theme</li>
+        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Text</strong> — the rationale: cross-referencing logic across rate differentials, COT positioning, and price action</li>
       </ul>
-      <!-- MOCK: Alerts & Signals panel -->
+      <!-- MOCK: Alerts & Signals panel — reflects actual signals.json structure (priority dot + timestamp + title + text) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0 0 18px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Alerts &amp; Market Signals</span>
           <span style="font-size:9px;color:var(--text3);">AI · updated 08:30 UTC</span>
         </div>
         <div style="padding:0;">
-          <!-- Signal 1 -->
+          <!-- Signal 1: critical -->
           <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
-            <div style="flex-shrink:0;margin-top:1px;">
-              <span style="display:inline-block;background:rgba(38,166,154,0.15);color:var(--up);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Bullish</span>
-            </div>
+            <span style="flex-shrink:0;margin-top:4px;width:7px;height:7px;border-radius:50%;background:var(--down);display:inline-block;"></span>
             <div style="flex:1;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:700;color:var(--text);">EUR/USD</span>
-                <span style="font-size:9px;color:var(--up);background:rgba(38,166,154,0.1);padding:1px 6px;border-radius:2px;">High confidence</span>
+                <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">08:30</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text);">EUR/USD — vol regime shift</span>
               </div>
-              <div style="font-size:11px;color:var(--text2);line-height:1.6;">ECB–Fed rate differential narrowing; COT shows spec longs building for 3rd consecutive week; price holding above 20-day MA after retest.</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6;">ATM IV at 20% — elevated cost of hedging. COT shows spec longs building for 3rd consecutive week. ECB–Fed rate differential narrowing; price holding above 20-day MA after retest.</div>
             </div>
           </div>
-          <!-- Signal 2 -->
+          <!-- Signal 2: warning -->
           <div style="padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
-            <div style="flex-shrink:0;margin-top:1px;">
-              <span style="display:inline-block;background:rgba(239,83,80,0.12);color:var(--down);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Bearish</span>
-            </div>
+            <span style="flex-shrink:0;margin-top:4px;width:7px;height:7px;border-radius:50%;background:var(--orange);display:inline-block;"></span>
             <div style="flex:1;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:700;color:var(--text);">GBP/USD</span>
-                <span style="font-size:9px;color:var(--orange);background:rgba(246,148,28,0.1);padding:1px 6px;border-radius:2px;">Medium confidence</span>
+                <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">08:30</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text);">GBP/USD — crowded positioning</span>
               </div>
               <div style="font-size:11px;color:var(--text2);line-height:1.6;">BoE cut path more aggressive than Fed implied; retail positioning heavily long GBP — crowded trade risk. VIX spike could amplify downside.</div>
             </div>
           </div>
-          <!-- Signal 3 -->
+          <!-- Signal 3: info -->
           <div style="padding:10px 12px;display:flex;gap:10px;align-items:flex-start;">
-            <div style="flex-shrink:0;margin-top:1px;">
-              <span style="display:inline-block;background:rgba(120,123,134,0.15);color:var(--text3);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;">Watch</span>
-            </div>
+            <span style="flex-shrink:0;margin-top:4px;width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block;"></span>
             <div style="flex:1;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:700;color:var(--text);">USD/JPY</span>
-                <span style="font-size:9px;color:var(--text3);background:rgba(120,123,134,0.1);padding:1px 6px;border-radius:2px;">Low confidence</span>
+                <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">08:30</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text);">USD/JPY — BoJ divergence watch</span>
               </div>
               <div style="font-size:11px;color:var(--text2);line-height:1.6;">US–JP 10Y yield spread stable but BoJ rhetoric shifting hawkish. COT and IV diverge. Await NFP and BoJ meeting for directional clarity.</div>
             </div>
