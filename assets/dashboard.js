@@ -2800,14 +2800,14 @@ async function fetchCarryRanking() {
 // colour-coded percentile bar (high IV = red, low IV = green).
 // ═══════════════════════════════════════════════════════════════════
 const ETF_IV_MANIFEST = [
-  { key:'vix',    label:'VIX',    desc:'S&P 500 30d implied vol (CBOE)',     tvSym:'TVC:VIX'          },
-  { key:'vix9d',  label:'VIX9D',  desc:'S&P 500 9-day implied vol (CBOE)',   tvSym:'CBOE:VIX9D'       },
-  { key:'vvix',   label:'VVIX',   desc:'Vol-of-vol: VIX options IV (CBOE)',  tvSym:'CBOE:VVIX'        },
-  { key:'move',   label:'MOVE',   desc:'US Treasury bond vol index (ICE)',   tvSym:'CBOE:MOVE'        },
-  { key:'gld_iv', label:'GLD IV', desc:'SPDR Gold ETF 30d implied vol',      tvSym:'AMEX:GLD'         },
-  { key:'tlt_iv', label:'TLT IV', desc:'20+ yr Treasury ETF 30d implied vol',tvSym:'NASDAQ:TLT'       },
-  { key:'eem_iv', label:'EEM IV', desc:'Emerging markets ETF 30d impl. vol', tvSym:'AMEX:EEM'         },
-  { key:'efa_iv', label:'EFA IV', desc:'EAFE developed markets ETF IV',      tvSym:'AMEX:EFA'         },
+  { key:'vix',   label:'VIX',    desc:'S&P 500 30d implied vol (CBOE)',      tvSym:'TVC:VIX'    },
+  { key:'move',  label:'MOVE',   desc:'US Treasury bond vol index (ICE)',     tvSym:'CBOE:MOVE'  },
+  { key:'spx',   label:'SPX',    desc:'S&P 500 index level',                  tvSym:'SP:SPX'     },
+  { key:'gold',  label:'Gold',   desc:'XAU/USD spot (USD/oz)',                tvSym:'TVC:GOLD'   },
+  { key:'wti',   label:'WTI',    desc:'Crude oil front-month (USD/bbl)',       tvSym:'TVC:USOIL'  },
+  { key:'dxy',   label:'DXY',    desc:'US Dollar Index',                       tvSym:'TVC:DXY'    },
+  { key:'us10y', label:'US 10Y', desc:'US 10-year Treasury yield (%)',         tvSym:'TVC:US10Y'  },
+  { key:'btc',   label:'BTC',    desc:'Bitcoin/USD spot',                      tvSym:'BITSTAMP:BTCUSD' },
 ];
 
 async function fetchEtfIV() {
@@ -2816,17 +2816,17 @@ async function fetchEtfIV() {
 
   try {
     const intra = await loadIntradayQuotes();
-    const ivCache = intra?.etf_iv || {};   // etf_iv block injected by engine
-    const vixVal  = STOOQ_RT_CACHE['vix']?.close ?? intra?.byId?.['vix']?.close ?? null;
+    // intra.quotes is the primary authoritative source — always populated by loadIntradayQuotes().
+    // STOOQ_RT_CACHE is populated asynchronously by fetchRiskData/fetchCrossAssetData and may be
+    // empty when fetchEtfIV runs on boot. Read quotes directly to avoid the race condition.
+    const q = intra?.quotes || {};
 
-    // Build rows from manifest; use etf_iv block first, then STOOQ_RT_CACHE
+    // Build rows from manifest. Priority: intra.quotes → STOOQ_RT_CACHE → null
     const rows = ETF_IV_MANIFEST.map(m => {
-      const cached = ivCache[m.key];
-      let iv  = cached?.iv  ?? STOOQ_RT_CACHE[m.key]?.close ?? null;
-      let chg = cached?.chg ?? STOOQ_RT_CACHE[m.key]?.pct   ?? null;
-      // VIX and MOVE are direct prices (not % IV), use as-is
-      if (m.key === 'vix' && iv == null) iv = vixVal;
-      if (m.key === 'move') iv = STOOQ_RT_CACHE['move']?.close ?? iv;
+      // Direct quotes keys: 'vix' and 'move' are in intra.quotes
+      const fromQuotes = q[m.key];
+      let iv  = fromQuotes?.close ?? STOOQ_RT_CACHE[m.key]?.close ?? null;
+      let chg = fromQuotes?.pct   ?? STOOQ_RT_CACHE[m.key]?.pct   ?? null;
       return { ...m, iv, chg };
     }).filter(r => r.iv != null);
 
