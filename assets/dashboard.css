@@ -14,8 +14,8 @@
     --blue: #4f7fff;
     --orange: #f6941c;
     --head-bg: #1a1d29;
-    --font-ui: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Arial, sans-serif;
-    --font-mono: 'Courier New', monospace;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
   body {
@@ -257,7 +257,7 @@
   .sb-row:last-child { border-bottom: none; }
   .sb-sym   { font-weight: 700; color: var(--text); font-size: 11px; font-family: var(--font-ui); }
   .sb-price { font-family: var(--font-mono); font-size: 11px; }
-  .sb-chg   { font-family: var(--font-mono); font-size: 11px; }
+  .sb-chg   { font-family: var(--font-mono); font-size: 10px; }
 
   .up      { color: var(--up);     }
   .down    { color: var(--down);   }
