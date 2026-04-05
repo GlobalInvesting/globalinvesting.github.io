@@ -479,10 +479,7 @@
   #rightpanel::-webkit-scrollbar-thumb { background: var(--border2); }
 
   /* ── PAIR DETAIL PANEL ───────────────────────────────────────── */
-  #pair-detail { border-bottom: 1px solid var(--border); background: var(--bg2); font-family: var(--font-ui); flex-shrink: 0; }
-  #pair-detail.pd-empty .pd-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:14px 8px; color:var(--text3); }
-  #pair-detail.pd-empty .pd-ph-icon { font-size:18px; opacity:.4; }
-  #pair-detail.pd-empty .pd-ph-text { font-size:10px; letter-spacing:.04em; }
+  /* #pair-detail removed v7.12.22 — replaced by #pd-popover floating overlay */
   .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
   .pd-sym { font-size:12px; font-weight:700; color:var(--text); letter-spacing:.03em; }
   .pd-source { font-size:9px; color:var(--text3); font-family:var(--font-mono); }
@@ -506,6 +503,39 @@
   .pd-badge { font-size:9px; padding:1px 6px; border-radius:20px; font-weight:600; letter-spacing:.03em; white-space:nowrap; }
   .pd-aligned { background:rgba(38,166,154,.15); color:var(--up); border:1px solid rgba(38,166,154,.3); }
   .pd-diverge { background:rgba(232,150,60,.12); color:var(--orange,#e8963c); border:1px solid rgba(232,150,60,.25); }
+
+  /* ── PAIR DETAIL POPOVER ─────────────────────────────────────── */
+  /* Popover header with close button */
+  #pd-popover .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
+  .pd-close { background:none; border:none; color:var(--text3); font-size:13px; line-height:1; cursor:pointer; padding:2px 4px; border-radius:2px; transition:color .1s; }
+  .pd-close:hover { color:var(--text); }
+
+  /* Wide cell spans both columns — for retail positioning bar */
+  .pd-cell--wide { grid-column: 1 / -1; border-right:none; }
+  .pd-cell--wide:last-child { border-bottom:none; }
+
+  /* Retail positioning bar */
+  .pd-retail-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:3px 0 2px; }
+  .pd-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
+  .pd-retail-nums { font-size:10px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
+  .pd-retail-sep { color:var(--text3); margin:0 3px; }
+
+  /* ⓘ info button — inline in pair cell / sb-row */
+  .pd-info-btn {
+    display: inline-flex; align-items:center; justify-content:center;
+    width:13px; height:13px;
+    margin-left:4px; vertical-align:middle;
+    background:none; border:1px solid var(--border2);
+    border-radius:50%; color:var(--text3);
+    font-size:9px; font-weight:700; line-height:1;
+    cursor:pointer; opacity:0; transition:opacity .15s, color .15s, border-color .15s;
+    pointer-events:auto; flex-shrink:0;
+  }
+  tr:hover .pd-info-btn,
+  .sb-row:hover .pd-info-btn { opacity:1; }
+  .pd-info-btn:hover { color:var(--text); border-color:var(--text2); }
+  /* Always visible on touch devices */
+  @media (hover:none) { .pd-info-btn { opacity:.6; } }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
   .carry-rank-row { display:grid; grid-template-columns:12px 52px 1fr 40px; align-items:center; gap:3px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }

@@ -424,7 +424,7 @@ function populateFxPairsTable() {
       ? `FX:${pair.base}${pair.quote}`
       : `FX:${pair.quote}${pair.base}`;
     return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Open chart">
-      <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
+      <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}<button class="pd-info-btn" aria-label="Detail ${pair.label || pair.base+'/'+pair.quote}" title="Pair detail" tabindex="-1">i</button></td>
       <td style="color:var(--text1)">${bid}</td>
       <td style="color:var(--text1)">${ask}</td>
       <td style="color:var(--text3);font-size:10px">${spreadStr}</td>
@@ -1163,6 +1163,9 @@ async function fetchCryptoQuotes() {
 // ═══════════════════════════════════════════════════════════════════
 // COT-derived sentiment cache
 const COT_SENTIMENT_CACHE = {};
+// Retail sentiment cache — populated by fetchSentiment() from myfxbook.json
+// keyed by normalised sym e.g. "EUR/USD" → { longPct, shortPct, longPos, shortPos, avgL, avgS }
+const RETAIL_SENTIMENT_CACHE = {};
 // Static sentiment fallback (last resort only)
 const SENTIMENT_FALLBACK = [
   { sym:'EUR/USD', buy:56, sell:44 }, { sym:'GBP/USD', buy:51, sell:49 },
@@ -1564,6 +1567,18 @@ async function fetchSentiment() {
           ? Math.round(ageMin) + 'min ago'
           : Math.round(ageMin / 60) + 'h ago';
         const general = d.general || null;
+        // Populate RETAIL_SENTIMENT_CACHE for use in pair detail popover
+        pairs.forEach(p => {
+          const key = (p.sym || '').toUpperCase().replace(/\./g, '/');
+          RETAIL_SENTIMENT_CACHE[key] = {
+            longPct:  p.buy  ?? null,
+            shortPct: p.sell ?? null,
+            longPos:  p.longPos  || 0,
+            shortPos: p.shortPos || 0,
+            avgL: p.avgL || 0,
+            avgS: p.avgS || 0,
+          };
+        });
         renderSentiment(pairs, 'Myfxbook · ' + ageLabel, general);
         return;
       }
@@ -2395,15 +2410,78 @@ document.getElementById('quotebar-inner')?.addEventListener('click', e => {
   if (sym) loadTVChart(sym);
 });
 
-// ── Sidebar crosses: click any row to open chart ──
+// ── Pair Detail Popover ─────────────────────────────────────────────────────
+// Floating panel triggered by the ⓘ button on each pair row.
+// Anchors near the trigger button, closes on Escape or outside-click.
+function openPairPopover(btn, tvSym) {
+  const pop = document.getElementById('pd-popover');
+  if (!pop) return;
+
+  // If same pair is already open, close it (toggle)
+  if (pop.dataset.sym === tvSym && pop.style.display !== 'none') {
+    closePairPopover();
+    return;
+  }
+
+  pop.dataset.sym = tvSym;
+  pop.style.display = 'block';
+
+  // Position: prefer right of the button, fall back to left if near right edge
+  const rect = btn.getBoundingClientRect();
+  const pw = 270, ph = 300;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let x = rect.right + 6;
+  let y = rect.top;
+  if (x + pw > vw - 8) x = rect.left - pw - 6;
+  if (x < 8) x = 8;
+  if (y + ph > vh - 8) y = vh - ph - 8;
+  if (y < 8) y = 8;
+  pop.style.left = x + 'px';
+  pop.style.top  = y + 'px';
+
+  updatePairDetail(tvSym);
+}
+
+function closePairPopover() {
+  const pop = document.getElementById('pd-popover');
+  if (pop) { pop.style.display = 'none'; pop.dataset.sym = ''; }
+}
+
+// Close on outside click
+document.addEventListener('click', e => {
+  const pop = document.getElementById('pd-popover');
+  if (!pop || pop.style.display === 'none') return;
+  if (!pop.contains(e.target) && !e.target.closest('.pd-info-btn')) closePairPopover();
+}, true);
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePairPopover();
+});
+
+// ── Sidebar crosses: click any row to open chart (ⓘ btn opens popover) ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
+  const btn = e.target.closest('.pd-info-btn');
+  if (btn) {
+    e.stopPropagation();
+    const row = btn.closest('[data-sym]');
+    if (row) openPairPopover(btn, row.dataset.sym);
+    return;
+  }
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
 });
 
-// ── FX Pairs table: click any row to open chart ──
+// ── FX Pairs table: click any row to open chart (ⓘ btn opens popover) ──
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
+  const btn = e.target.closest('.pd-info-btn');
+  if (btn) {
+    e.stopPropagation();
+    const row = btn.closest('tr[data-sym]');
+    if (row) openPairPopover(btn, row.dataset.sym);
+    return;
+  }
   const row = e.target.closest('tr[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
@@ -2453,7 +2531,7 @@ function pairMetaFromSym(tvSym) {
 }
 
 async function updatePairDetail(tvSym) {
-  const panel = document.getElementById('pair-detail');
+  const panel = document.getElementById('pd-popover');
   if (!panel) return;
 
   // Ensure #fx-tt tooltip engine is initialised (may not exist if sentiment hasn't loaded yet)
@@ -2583,10 +2661,17 @@ async function updatePairDetail(tvSym) {
     }
   }
 
+  // Retail sentiment from myfxbook cache
+  const retKey = label.replace('/', '/').toUpperCase();
+  const ret = RETAIL_SENTIMENT_CACHE[retKey] || null;
+  const retL = ret?.longPct ?? null;
+  const retS = ret?.shortPct ?? null;
+  const retBarL = retL != null ? retL : 50;
+
   panel.innerHTML = `
     <div class="pd-header">
       <span class="pd-sym">${label}</span>
-      <span class="pd-source">yfinance · ~5min</span>
+      <button class="pd-close" onclick="closePairPopover()" aria-label="Close pair detail">&#x2715;</button>
     </div>
     <div class="pd-price-block">
       <div class="pd-price ${price == null ? 'pd-dim' : ''}">${price != null ? price.toFixed(dec) : '—'}</div>
@@ -2602,13 +2687,17 @@ async function updatePairDetail(tvSym) {
       <div class="pd-cell" data-tip="CFTC Asset Managers net contracts (institutional)"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
       <div class="pd-cell" data-tip="CB rate differential: base minus quote rate"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
       <div class="pd-cell" data-tip="${base || 'Base'} central bank policy rate (annualised)"><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
+      <div class="pd-cell pd-cell--wide" data-tip="Retail client positioning from Myfxbook community outlook. Contrarian indicator: extreme retail long bias historically correlates with institutional short positioning. Source: Myfxbook · updated every 30min via workflow.">
+        <div class="pd-lbl">Retail Long</div>
+        <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:${retBarL}%"></div></div>
+        <div class="pd-retail-nums">${retL != null ? retL+'% L' : '—'}<span class="pd-retail-sep">/</span>${retS != null ? retS+'% S' : '—'}</div>
+      </div>
     </div>
     <div class="pd-footer">
       ${alignHtml}
       ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + '</span>' : ''}
     </div>`;
 
-  panel.classList.remove('pd-empty');
 
   // ── Attach #fx-tt tooltips to each pd-cell (position:fixed, escapes clipping) ──
   // The attachTip function is defined inside renderSentiment's closure.
@@ -2620,6 +2709,7 @@ async function updatePairDetail(tvSym) {
       { lbl: 'ATM IV',    title: 'ATM Implied Volatility',     body: '30-day at-the-money implied vol from options market. Color = cost of hedging: green = cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.' },
       { lbl: 'IV − HV',   title: 'IV minus HV',                body: 'Implied vol minus realised vol. Positive = options expensive vs recent moves (hedging at a premium). Negative = options cheap vs realised. Not a directional signal.' },
       { lbl: 'LF NET',    title: 'CFTC Leveraged Funds Net',   body: 'Net contracts held by Leveraged Funds (speculative). Source: CFTC Disaggregated TFF.' },
+      { lbl: 'RETAIL LONG', title: 'Retail Client Positioning',   body: 'Long/short ratio from Myfxbook community outlook. Contrarian indicator: extreme retail long bias often aligns with institutional short positioning. Source: Myfxbook · updated every 30min.' },
       { lbl: 'AM NET',    title: 'CFTC Asset Managers Net',    body: 'Net contracts held by Asset Managers (institutional). Source: CFTC Disaggregated TFF.' },
       { lbl: 'CARRY',     title: 'Carry Differential',         body: 'CB rate differential: base minus quote central bank policy rate.' },
     ];
@@ -2683,8 +2773,7 @@ function minimizeTVLegend() {
 }
 // Run once after initial widget loads (give it ~4s to render)
 setTimeout(minimizeTVLegend, 4000);
-// Pre-populate pair detail for default chart
-setTimeout(() => updatePairDetail('FX_IDC:EURUSD'), 1500);
+// Pair detail popover opens only on user action (ⓘ button) — no auto-populate.
 // ─────────────────────────────────────────────────────────────────────────
 
 // ── HORIZONTAL SCROLL WITH MOUSE WHEEL (desktop) ─────────────────────────
