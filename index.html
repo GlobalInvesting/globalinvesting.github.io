@@ -213,7 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.17">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.12.18">
 
 <!-- Flag icons — non-blocking load to avoid render delay -->
 <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" onload="this.rel='stylesheet'">
@@ -708,7 +708,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <table aria-label="Central bank rate expectations">
       <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col">Bias</th><th scope="col">Fwd Rate</th></tr></thead>
       <tbody id="fed-exp-tbody">
-        <tr><td colspan="3" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+        <!-- 8 skeleton rows — one per central bank, prevents CLS when JS loads -->
+        <tr><td style="white-space:nowrap;">Fed</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">ECB</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">BoE</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">BoJ</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">RBA</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">BoC</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">SNB</td><td>—</td><td>—</td></tr>
+        <tr><td style="white-space:nowrap;">RBNZ</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
 
@@ -716,7 +724,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <table aria-label="COT-derived directional positioning bias per pair">
       <thead><tr><th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th></tr></thead>
       <tbody id="skew-tbody">
-        <tr><td colspan="4" style="color:var(--text3);text-align:center;">Loading…</td></tr>
+        <!-- 4 skeleton rows — one per pair, prevents CLS when JS loads -->
+        <tr><td>EUR/USD</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>GBP/USD</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>USD/JPY</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>AUD/USD</td><td>—</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
 
