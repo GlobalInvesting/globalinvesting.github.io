@@ -169,21 +169,11 @@
 <!-- ═══════════════════════════════════════
      Preconnects for data sources
      ═══════════════════════════════════════ -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Preload Inter WOFF2 — browser has 100ms block period with display=optional;
-     this preload ensures Inter arrives in time so no swap occurs → zero font CLS.
-     Note: JetBrains Mono preload removed — Google Fonts serves UA-specific WOFF2 URLs
-     that vary by browser/OS; hardcoding a single URL causes 404s on non-matching UAs.
-     JetBrains Mono loads correctly via the @font-face rule in the Google Fonts stylesheet. -->
-<link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" crossorigin>
-<!-- Fonts: display=optional prevents swap (no CLS) -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=optional" rel="stylesheet"></noscript>
+
 <!-- Critical CSS inline — above-the-fold only -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'Courier New',monospace}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:-apple-system,BlinkMacSystemFont,'Trebuchet MS',Arial,sans-serif;--font-mono:'Courier New',monospace}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
@@ -213,7 +203,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.24">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.12.26">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
