@@ -477,10 +477,10 @@
   .pd-diverge { background:rgba(232,150,60,.12); color:var(--orange,#e8963c); border:1px solid rgba(232,150,60,.25); }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
-  .carry-rank-row { display:grid; grid-template-columns:16px 52px 1fr 40px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row { display:grid; grid-template-columns:12px 52px 1fr 40px; align-items:center; gap:3px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
-  .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:right; }
+  .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
   .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; }
   .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
@@ -1097,21 +1097,9 @@ a:focus-visible,
   width: 38px; text-align: right; flex-shrink: 0; color: var(--text3);
 }
 
-/* ── PAIR DETAIL — TOOLTIPS ─────────────────────────────────────── */
+/* ── PAIR DETAIL — TOOLTIPS (handled by #fx-tt engine in JS) ──────── */
 .pd-cell { position: relative; }
-.pd-cell[data-tip]:hover::after {
-  content: attr(data-tip);
-  position: absolute; bottom: calc(100% + 4px); left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg2, #1a1f2e); color: var(--text); border: 1px solid var(--border2);
-  font-size: 9px; line-height: 1.4; padding: 4px 7px; border-radius: 4px;
-  white-space: nowrap; z-index: 999; pointer-events: none;
-  font-family: var(--font-ui); letter-spacing: .01em;
-  box-shadow: 0 3px 10px rgba(0,0,0,.4);
-}
-/* keep tooltips inside viewport — 2-col grid: odd = left col, even = right col */
-.pd-cell[data-tip]:nth-child(odd):hover::after  { left: 0; transform: none; }
-.pd-cell[data-tip]:nth-child(even):hover::after { left: auto; right: 0; transform: none; }
+.pd-cell.fx-tip { cursor: help; }
 
 /* ── CONFIGURABLE ALERTS PANEL ──────────────────────────────────── */
 #alerts-panel {
@@ -1157,15 +1145,13 @@ a:focus-visible,
 
 /* ── ALERTS POPOVER (statusbar bell icon) ───────────────────────── */
 #alerts-popover {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
+  position: fixed;
   width: 280px;
   background: var(--bg2, #141820);
   border: 1px solid var(--border2);
   border-radius: 6px;
   box-shadow: 0 -4px 24px rgba(0,0,0,.55);
-  z-index: 1000;
+  z-index: 99999;
   font-family: var(--font-ui);
   overflow: hidden;
 }

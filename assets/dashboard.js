@@ -2458,6 +2458,34 @@ async function updatePairDetail(tvSym) {
   const panel = document.getElementById('pair-detail');
   if (!panel) return;
 
+  // Ensure #fx-tt tooltip engine is initialised (may not exist if sentiment hasn't loaded yet)
+  if (!document.getElementById('fx-tt')) {
+    const s = document.createElement('style');
+    s.id = 'fx-tt-style';
+    s.textContent = `#fx-tt{position:fixed;z-index:99999;width:min(240px,calc(100vw - 24px));background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:9px 11px;font-size:11px;color:var(--text);line-height:1.55;pointer-events:none;display:none;font-family:var(--font-ui);box-sizing:border-box;}#fx-tt .tt-title{font-weight:700;font-size:11px;color:#fff;margin-bottom:3px;}#fx-tt .tt-ex{margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic;}.fx-tip{cursor:help;}`;
+    document.head.appendChild(s);
+    const ttEl = document.createElement('div');
+    ttEl.id = 'fx-tt';
+    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
+    document.body.appendChild(ttEl);
+    window._fxTTPos = function(cx, cy) {
+      const tt = document.getElementById('fx-tt');
+      if (!tt) return;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const ttW = Math.min(240, vw - 24), ttH = tt.offsetHeight || 80, PAD = 8;
+      let x = cx + 14, y = cy + 14;
+      if (x + ttW > vw - PAD) x = cx - ttW - 8;
+      if (x < PAD) x = PAD;
+      if (y + ttH > vh - PAD) y = cy - ttH - 8;
+      if (y < PAD) y = PAD;
+      tt.style.left = x + 'px'; tt.style.top = y + 'px';
+    };
+    document.addEventListener('mousemove', ev => {
+      const tt = document.getElementById('fx-tt');
+      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
+    });
+  }
+
   const meta   = pairMetaFromSym(tvSym);
   const label  = meta?.label || tvSym.replace(/^.*:/,'').replace(/(.{3})(.{3})/,'$1/$2').toUpperCase();
   const pairId = meta?.id || null;
@@ -2548,6 +2576,44 @@ async function updatePairDetail(tvSym) {
     </div>`;
 
   panel.classList.remove('pd-empty');
+
+  // ── Attach #fx-tt tooltips to each pd-cell (position:fixed, escapes clipping) ──
+  // The attachTip function is defined inside renderSentiment's closure.
+  // We replicate inline here using the shared #fx-tt DOM element.
+  if (window._fxTTPos) {
+    const TIP_MAP = [
+      { lbl: '1W CHG',    title: '1-Week Change',              body: 'Weekly % change vs prev Friday close.' },
+      { lbl: 'HV 30D',    title: 'Historical Volatility 30d',  body: '30-day realised (historical) volatility, annualised.' },
+      { lbl: 'ATM IV',    title: 'ATM Implied Volatility',     body: '30-day at-the-money implied vol derived from options market.' },
+      { lbl: 'IV − HV',   title: 'IV minus HV',                body: 'Options premium vs realised vol. Positive = options expensive relative to recent moves.' },
+      { lbl: 'LF NET',    title: 'CFTC Leveraged Funds Net',   body: 'Net contracts held by Leveraged Funds (speculative). Source: CFTC Disaggregated TFF.' },
+      { lbl: 'AM NET',    title: 'CFTC Asset Managers Net',    body: 'Net contracts held by Asset Managers (institutional). Source: CFTC Disaggregated TFF.' },
+      { lbl: 'CARRY',     title: 'Carry Differential',         body: 'CB rate differential: base minus quote central bank policy rate.' },
+    ];
+    panel.querySelectorAll('.pd-cell').forEach(cell => {
+      const lbl = cell.querySelector('.pd-lbl');
+      if (!lbl) return;
+      const key = lbl.textContent.trim().toUpperCase();
+      // Last cell label is dynamic (e.g. "EUR Rate") — handle by fallback
+      const tip = TIP_MAP.find(t => key === t.lbl) ||
+        { title: lbl.textContent.trim() + ' Rate', body: 'Base currency central bank policy rate (annualised).' };
+      cell.classList.add('fx-tip');
+      cell.addEventListener('mouseenter', ev => {
+        const tt = document.getElementById('fx-tt');
+        if (!tt) return;
+        document.getElementById('fx-tt-title').textContent = tip.title;
+        document.getElementById('fx-tt-body').textContent  = tip.body;
+        const exEl = document.getElementById('fx-tt-ex');
+        exEl.textContent = ''; exEl.style.display = 'none';
+        tt.style.display = 'block';
+        requestAnimationFrame(() => window._fxTTPos(ev.clientX, ev.clientY));
+      });
+      cell.addEventListener('mouseleave', () => {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      });
+    });
+  }
 }
 
 // TV CHART TAB SWITCHING
@@ -4687,7 +4753,7 @@ function initAlerts() {
   alertsCheck();
   setInterval(alertsCheck, 5 * 60 * 1000);
 
-  // Close popover when clicking outside
+  // Close popover when clicking outside — bubble phase so button onclick fires first
   document.addEventListener('click', e => {
     const anchor = document.getElementById('alerts-anchor');
     if (anchor && !anchor.contains(e.target)) {
@@ -4696,7 +4762,7 @@ function initAlerts() {
       const btn = document.getElementById('alerts-bell-btn');
       if (btn) btn.setAttribute('aria-expanded', 'false');
     }
-  }, true);
+  });
 }
 
 function toggleAlertsPopover() {
@@ -4704,7 +4770,25 @@ function toggleAlertsPopover() {
   const btn = document.getElementById('alerts-bell-btn');
   if (!pop) return;
   const isOpen = pop.style.display !== 'none';
-  pop.style.display = isOpen ? 'none' : 'block';
-  if (btn) btn.setAttribute('aria-expanded', String(!isOpen));
-  if (!isOpen) alertsRender(); // refresh list when opening
+  if (isOpen) {
+    pop.style.display = 'none';
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  // Position above the button using fixed coords (escapes overflow:hidden parents)
+  alertsRender();
+  pop.style.display = 'block';
+  if (btn) btn.setAttribute('aria-expanded', 'true');
+  const rect = btn.getBoundingClientRect();
+  const popW = 280;
+  const PAD = 8;
+  let left = rect.right - popW;
+  if (left < PAD) left = PAD;
+  pop.style.left = left + 'px';
+  pop.style.top  = (rect.top - pop.offsetHeight - 8) + 'px';
+  // Re-adjust after render (offsetHeight may be 0 before display:block reflow)
+  requestAnimationFrame(() => {
+    const h = pop.offsetHeight;
+    pop.style.top = (rect.top - h - 8) + 'px';
+  });
 }
