@@ -213,7 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.21">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.12.22">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -348,27 +348,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sb-section">
       <div class="sb-head">Crosses</div>
       <div style="overflow-y:auto;max-height:342px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
-      <div class="sb-row" data-sym="FX_IDC:EURGBP" style="cursor:pointer;" title="Open EUR/GBP chart"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:EURJPY" style="cursor:pointer;" title="Open EUR/JPY chart"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:EURCHF" style="cursor:pointer;" title="Open EUR/CHF chart"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:EURCAD" style="cursor:pointer;" title="Open EUR/CAD chart"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:EURAUD" style="cursor:pointer;" title="Open EUR/AUD chart"><span class="sb-sym">EUR/AUD</span><span class="sb-price" id="sb-euraud">—</span><span class="sb-chg" id="sbc-euraud">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:EURNZD" style="cursor:pointer;" title="Open EUR/NZD chart"><span class="sb-sym">EUR/NZD</span><span class="sb-price" id="sb-eurnzd">—</span><span class="sb-chg" id="sbc-eurnzd">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:GBPJPY" style="cursor:pointer;" title="Open GBP/JPY chart"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:GBPCHF" style="cursor:pointer;" title="Open GBP/CHF chart"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:GBPCAD" style="cursor:pointer;" title="Open GBP/CAD chart"><span class="sb-sym">GBP/CAD</span><span class="sb-price" id="sb-gbpcad">—</span><span class="sb-chg" id="sbc-gbpcad">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:GBPAUD" style="cursor:pointer;" title="Open GBP/AUD chart"><span class="sb-sym">GBP/AUD</span><span class="sb-price" id="sb-gbpaud">—</span><span class="sb-chg" id="sbc-gbpaud">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:GBPNZD" style="cursor:pointer;" title="Open GBP/NZD chart"><span class="sb-sym">GBP/NZD</span><span class="sb-price" id="sb-gbpnzd">—</span><span class="sb-chg" id="sbc-gbpnzd">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:AUDJPY" style="cursor:pointer;" title="Open AUD/JPY chart"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:AUDNZD" style="cursor:pointer;" title="Open AUD/NZD chart"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:AUDCHF" style="cursor:pointer;" title="Open AUD/CHF chart"><span class="sb-sym">AUD/CHF</span><span class="sb-price" id="sb-audchf">—</span><span class="sb-chg" id="sbc-audchf">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:AUDCAD" style="cursor:pointer;" title="Open AUD/CAD chart"><span class="sb-sym">AUD/CAD</span><span class="sb-price" id="sb-audcad">—</span><span class="sb-chg" id="sbc-audcad">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:NZDJPY" style="cursor:pointer;" title="Open NZD/JPY chart"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:NZDCAD" style="cursor:pointer;" title="Open NZD/CAD chart"><span class="sb-sym">NZD/CAD</span><span class="sb-price" id="sb-nzdcad">—</span><span class="sb-chg" id="sbc-nzdcad">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:NZDCHF" style="cursor:pointer;" title="Open NZD/CHF chart"><span class="sb-sym">NZD/CHF</span><span class="sb-price" id="sb-nzdchf">—</span><span class="sb-chg" id="sbc-nzdchf">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;" title="Open CAD/JPY chart"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:CADCHF" style="cursor:pointer;" title="Open CAD/CHF chart"><span class="sb-sym">CAD/CHF</span><span class="sb-price" id="sb-cadchf">—</span><span class="sb-chg" id="sbc-cadchf">—</span></div>
-      <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;" title="Open CHF/JPY chart"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span></div>
+      <div class="sb-row" data-sym="FX_IDC:EURGBP" style="cursor:pointer;" title="Open EUR/GBP chart"><span class="sb-sym">EUR/GBP</span><span class="sb-price" id="sb-eurgbp">—</span><span class="sb-chg" id="sbc-eurgbp">—</span><button class="pd-info-btn" aria-label="Detail EUR/GBP" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:EURJPY" style="cursor:pointer;" title="Open EUR/JPY chart"><span class="sb-sym">EUR/JPY</span><span class="sb-price" id="sb-eurjpy">—</span><span class="sb-chg" id="sbc-eurjpy">—</span><button class="pd-info-btn" aria-label="Detail EUR/JPY" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:EURCHF" style="cursor:pointer;" title="Open EUR/CHF chart"><span class="sb-sym">EUR/CHF</span><span class="sb-price" id="sb-eurchf">—</span><span class="sb-chg" id="sbc-eurchf">—</span><button class="pd-info-btn" aria-label="Detail EUR/CHF" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:EURCAD" style="cursor:pointer;" title="Open EUR/CAD chart"><span class="sb-sym">EUR/CAD</span><span class="sb-price" id="sb-eurcad">—</span><span class="sb-chg" id="sbc-eurcad">—</span><button class="pd-info-btn" aria-label="Detail EUR/CAD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:EURAUD" style="cursor:pointer;" title="Open EUR/AUD chart"><span class="sb-sym">EUR/AUD</span><span class="sb-price" id="sb-euraud">—</span><span class="sb-chg" id="sbc-euraud">—</span><button class="pd-info-btn" aria-label="Detail EUR/AUD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:EURNZD" style="cursor:pointer;" title="Open EUR/NZD chart"><span class="sb-sym">EUR/NZD</span><span class="sb-price" id="sb-eurnzd">—</span><span class="sb-chg" id="sbc-eurnzd">—</span><button class="pd-info-btn" aria-label="Detail EUR/NZD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPJPY" style="cursor:pointer;" title="Open GBP/JPY chart"><span class="sb-sym">GBP/JPY</span><span class="sb-price" id="sb-gbpjpy">—</span><span class="sb-chg" id="sbc-gbpjpy">—</span><button class="pd-info-btn" aria-label="Detail GBP/JPY" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPCHF" style="cursor:pointer;" title="Open GBP/CHF chart"><span class="sb-sym">GBP/CHF</span><span class="sb-price" id="sb-gbpchf">—</span><span class="sb-chg" id="sbc-gbpchf">—</span><button class="pd-info-btn" aria-label="Detail GBP/CHF" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPCAD" style="cursor:pointer;" title="Open GBP/CAD chart"><span class="sb-sym">GBP/CAD</span><span class="sb-price" id="sb-gbpcad">—</span><span class="sb-chg" id="sbc-gbpcad">—</span><button class="pd-info-btn" aria-label="Detail GBP/CAD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPAUD" style="cursor:pointer;" title="Open GBP/AUD chart"><span class="sb-sym">GBP/AUD</span><span class="sb-price" id="sb-gbpaud">—</span><span class="sb-chg" id="sbc-gbpaud">—</span><button class="pd-info-btn" aria-label="Detail GBP/AUD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:GBPNZD" style="cursor:pointer;" title="Open GBP/NZD chart"><span class="sb-sym">GBP/NZD</span><span class="sb-price" id="sb-gbpnzd">—</span><span class="sb-chg" id="sbc-gbpnzd">—</span><button class="pd-info-btn" aria-label="Detail GBP/NZD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDJPY" style="cursor:pointer;" title="Open AUD/JPY chart"><span class="sb-sym">AUD/JPY</span><span class="sb-price" id="sb-audjpy">—</span><span class="sb-chg" id="sbc-audjpy">—</span><button class="pd-info-btn" aria-label="Detail AUD/JPY" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDNZD" style="cursor:pointer;" title="Open AUD/NZD chart"><span class="sb-sym">AUD/NZD</span><span class="sb-price" id="sb-audnzd">—</span><span class="sb-chg" id="sbc-audnzd">—</span><button class="pd-info-btn" aria-label="Detail AUD/NZD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDCHF" style="cursor:pointer;" title="Open AUD/CHF chart"><span class="sb-sym">AUD/CHF</span><span class="sb-price" id="sb-audchf">—</span><span class="sb-chg" id="sbc-audchf">—</span><button class="pd-info-btn" aria-label="Detail AUD/CHF" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:AUDCAD" style="cursor:pointer;" title="Open AUD/CAD chart"><span class="sb-sym">AUD/CAD</span><span class="sb-price" id="sb-audcad">—</span><span class="sb-chg" id="sbc-audcad">—</span><button class="pd-info-btn" aria-label="Detail AUD/CAD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:NZDJPY" style="cursor:pointer;" title="Open NZD/JPY chart"><span class="sb-sym">NZD/JPY</span><span class="sb-price" id="sb-nzdjpy">—</span><span class="sb-chg" id="sbc-nzdjpy">—</span><button class="pd-info-btn" aria-label="Detail NZD/JPY" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:NZDCAD" style="cursor:pointer;" title="Open NZD/CAD chart"><span class="sb-sym">NZD/CAD</span><span class="sb-price" id="sb-nzdcad">—</span><span class="sb-chg" id="sbc-nzdcad">—</span><button class="pd-info-btn" aria-label="Detail NZD/CAD" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:NZDCHF" style="cursor:pointer;" title="Open NZD/CHF chart"><span class="sb-sym">NZD/CHF</span><span class="sb-price" id="sb-nzdchf">—</span><span class="sb-chg" id="sbc-nzdchf">—</span><button class="pd-info-btn" aria-label="Detail NZD/CHF" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:CADJPY" style="cursor:pointer;" title="Open CAD/JPY chart"><span class="sb-sym">CAD/JPY</span><span class="sb-price" id="sb-cadjpy">—</span><span class="sb-chg" id="sbc-cadjpy">—</span><button class="pd-info-btn" aria-label="Detail CAD/JPY" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:CADCHF" style="cursor:pointer;" title="Open CAD/CHF chart"><span class="sb-sym">CAD/CHF</span><span class="sb-price" id="sb-cadchf">—</span><span class="sb-chg" id="sbc-cadchf">—</span><button class="pd-info-btn" aria-label="Detail CAD/CHF" title="Pair detail" tabindex="-1">i</button></div>
+      <div class="sb-row" data-sym="FX_IDC:CHFJPY" style="cursor:pointer;" title="Open CHF/JPY chart"><span class="sb-sym">CHF/JPY</span><span class="sb-price" id="sb-chfjpy">—</span><span class="sb-chg" id="sbc-chfjpy">—</span><button class="pd-info-btn" aria-label="Detail CHF/JPY" title="Pair detail" tabindex="-1">i</button></div>
     </div>
     </div>
     <div class="sb-section">
@@ -678,14 +678,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <!-- RIGHT PANEL -->
   <aside id="rightpanel" aria-label="Market data panels">
 
-    <!-- PAIR DETAIL — updated on every pair click (Eikon-style linked panel) -->
-    <div id="pair-detail" class="pd-empty" aria-label="Selected pair detail" aria-live="polite">
-      <div class="pd-placeholder">
-        <span class="pd-ph-icon">&#x25A1;</span>
-        <span class="pd-ph-text">Select a pair to view detail</span>
-      </div>
-    </div>
-
     <div id="section-cbrates" class="sb-head">Central Bank Rates</div>
     <table id="cbrates-table" aria-label="Central bank interest rates">
       <thead><tr><th style="text-align:left" scope="col">Bank</th><th scope="col">Rate</th><th scope="col">Trend</th></tr></thead>
@@ -918,5 +910,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   });
 })();
 </script>
+
+<!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
+<div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow:hidden;"></div>
+
 </body>
 </html>
