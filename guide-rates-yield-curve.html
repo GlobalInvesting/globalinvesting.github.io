@@ -279,23 +279,23 @@ a { color: inherit; text-decoration: none; }
         <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);">
           <div style="padding:10px 14px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">3M T-Bill</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.32%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.02</div>
+            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.29%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.01</div>
           </div>
           <div style="padding:10px 14px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">2Y Note</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3.98%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.04</div>
+            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">3.79%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.03</div>
           </div>
           <div style="padding:10px 14px;border-right:1px solid var(--border);">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">5Y Note</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.08%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.03</div>
+            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.02%</div>
+            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.02</div>
           </div>
           <div style="padding:10px 14px;">
             <div style="font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">10Y Bond</div>
-            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.18%</div>
-            <div style="font-size:10px;color:var(--down);margin-top:2px;">-0.04</div>
+            <div style="font-size:19px;font-weight:700;color:var(--text);font-family:var(--font-mono);">4.31%</div>
+            <div style="font-size:10px;color:var(--up);margin-top:2px;">+0.02</div>
           </div>
         </div>
         <!-- Yield curve canvas area -->
@@ -308,25 +308,25 @@ a { color: inherit; text-decoration: none; }
                 <stop offset="100%" stop-color="#2962ff" stop-opacity="0.02"/>
               </linearGradient>
             </defs>
-            <!-- normal (slightly steep) curve: 3M high, 2Y dips, 5Y rises, 10Y highest -->
-            <!-- y-axis: 3.8%=70, 4.0%=50, 4.2%=30, 4.4%=10  (scale: each 0.1%=10px, 0=90px) -->
-            <!-- 3M 4.32→y=26, 2Y 3.98→y=60, 5Y 4.08→y=50, 10Y 4.18→y=40 -->
-            <path d="M 80,28 C 200,60 350,50 620,40 L 620,88 L 80,88 Z" fill="url(#yc-grad)"/>
-            <path d="M 80,28 C 200,60 350,50 620,40" fill="none" stroke="#2962ff" stroke-width="2"/>
+            <!-- normal (steep) curve: 3M elevated, 2Y dips below, 5Y recovers, 10Y highest -->
+            <!-- y-axis: 3.6%=70, 3.8%=50, 4.0%=30, 4.3%=10  (scale: each 0.1%=~7px) -->
+            <!-- 3M 4.29→y=15, 2Y 3.79→y=51, 5Y 4.02→y=35, 10Y 4.31→y=13 -->
+            <path d="M 80,15 C 200,55 350,38 620,13 L 620,88 L 80,88 Z" fill="url(#yc-grad)"/>
+            <path d="M 80,15 C 200,55 350,38 620,13" fill="none" stroke="#2962ff" stroke-width="2"/>
             <!-- data points -->
-            <circle cx="80" cy="28" r="3.5" fill="#2962ff"/>
-            <circle cx="240" cy="60" r="3.5" fill="#2962ff"/>
-            <circle cx="430" cy="50" r="3.5" fill="#2962ff"/>
-            <circle cx="620" cy="40" r="3.5" fill="#2962ff"/>
+            <circle cx="80" cy="15" r="3.5" fill="#2962ff"/>
+            <circle cx="240" cy="51" r="3.5" fill="#2962ff"/>
+            <circle cx="430" cy="35" r="3.5" fill="#2962ff"/>
+            <circle cx="620" cy="13" r="3.5" fill="#2962ff"/>
             <!-- labels x-axis -->
             <text x="76" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">3M</text>
             <text x="240" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">2Y</text>
             <text x="430" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">5Y</text>
             <text x="620" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">10Y</text>
             <!-- labels y-axis -->
-            <text x="4" y="32" fill="#787b86" font-size="8.5" font-family="monospace">4.30%</text>
-            <text x="4" y="52" fill="#787b86" font-size="8.5" font-family="monospace">4.00%</text>
-            <text x="4" y="72" fill="#787b86" font-size="8.5" font-family="monospace">3.80%</text>
+            <text x="4" y="18" fill="#787b86" font-size="8.5" font-family="monospace">4.30%</text>
+            <text x="4" y="38" fill="#787b86" font-size="8.5" font-family="monospace">4.00%</text>
+            <text x="4" y="58" fill="#787b86" font-size="8.5" font-family="monospace">3.80%</text>
           </svg>
         </div>
         <!-- Spreads table -->
@@ -342,17 +342,17 @@ a { color: inherit; text-decoration: none; }
             <tbody>
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:6px 0;color:var(--text2);">2Y–10Y</td>
-                <td style="text-align:center;color:var(--down);font-family:var(--font-mono);padding:6px 0;">+20 bp</td>
+                <td style="text-align:center;color:var(--up);font-family:var(--font-mono);padding:6px 0;">+52 bp</td>
                 <td style="text-align:right;color:var(--up);font-size:10px;padding:6px 0;">Normal</td>
               </tr>
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:6px 0;color:var(--text2);">US–DE 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+214 bp</td>
+                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+131 bp</td>
                 <td style="text-align:right;color:var(--down);font-size:10px;padding:6px 0;">USD bid</td>
               </tr>
               <tr>
                 <td style="padding:6px 0;color:var(--text2);">US–JP 10Y</td>
-                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+368 bp</td>
+                <td style="text-align:center;font-family:var(--font-mono);padding:6px 0;">+199 bp</td>
                 <td style="text-align:right;color:var(--down);font-size:10px;padding:6px 0;">USD/JPY supported</td>
               </tr>
             </tbody>
