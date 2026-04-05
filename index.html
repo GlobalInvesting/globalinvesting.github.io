@@ -417,32 +417,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <div class="tv-skeleton"></div>
           </div>
           <div class="tradingview-widget-copyright" style="display:none;"></div>
-          <script id="tv-chart-script" type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-          {
-            "allow_symbol_change": false,
-            "calendar": false,
-            "details": true,
-            "hide_side_toolbar": true,
-            "hide_top_toolbar": true,
-            "hide_legend": false,
-            "hide_volume": true,
-            "hotlist": false,
-            "interval": "D",
-            "locale": "en",
-            "save_image": false,
-            "style": "1",
-            "symbol": "FX_IDC:EURUSD",
-            "theme": "dark",
-            "timezone": "Etc/UTC",
-            "backgroundColor": "#131722",
-            "gridColor": "rgba(42,46,57,0.8)",
-            "watchlist": [],
-            "withdateranges": false,
-            "compareSymbols": [],
-            "studies": [{"id":"MASimple@tv-basicstudies","inputs":{"length":20}}],
-            "autosize": true
-          }
-          </script>
+          <!-- TV chart loaded lazily — see initLazyWidgets() in dashboard.js -->
         </div>
       </div>
     </div>
@@ -603,17 +578,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <div class="tradingview-widget-container" style="width:100%;height:100%;">
                 <div class="tradingview-widget-container__widget" style="height:100%;"></div>
                 <div class="tradingview-widget-copyright" style="display:none;"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-                {
-                  "colorTheme": "dark",
-                  "isTransparent": true,
-                  "locale": "en",
-                  "countryFilter": "us,nz,au,ch,eu,ca,jp,gb",
-                  "importanceFilter": "-1,0,1",
-                  "width": "100%",
-                  "height": "100%"
-                }
-                </script>
+                <!-- Events calendar loaded lazily — see initLazyWidgets() in dashboard.js -->
               </div>
             </div>
           </div>
@@ -664,8 +629,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="panel-sub">TradingView · World Economics</span>
         </div>
         <div style="flex:1;overflow:hidden;background:#131722;display:flex;align-items:stretch;">
-          <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-economic-map.js"></script>
-          <tv-economic-map theme="dark" transparent style="width:100%;height:100%;min-height:380px;display:block;background:#131722;"></tv-economic-map>
+          <!-- Economic map loaded lazily — see initLazyWidgets() in dashboard.js -->
+          <div id="tv-econmap-placeholder" style="width:100%;height:100%;min-height:380px;background:#131722;"></div>
         </div>
       </div>
     </div>
@@ -788,5 +753,89 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
+
+<script>
+(function() {
+  var _chartLoaded = false;
+  var _eventsLoaded = false;
+  var _econmapLoaded = false;
+
+  function loadTVChart(sym) {
+    var container = document.querySelector('#tv-chart-widget');
+    if (!container) return;
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    s.async = true;
+    var cfg = {"allow_symbol_change":false,"calendar":false,"details":true,"hide_side_toolbar":true,"hide_top_toolbar":true,"hide_legend":false,"hide_volume":true,"hotlist":false,"interval":"D","locale":"en","save_image":false,"style":"1","theme":"dark","timezone":"Etc/UTC","backgroundColor":"#131722","gridColor":"rgba(42,46,57,0.8)","watchlist":[],"withdateranges":false,"compareSymbols":[],"studies":[{"id":"MASimple@tv-basicstudies","inputs":{"length":20}}],"autosize":true};
+    cfg.symbol = sym || 'FX_IDC:EURUSD';
+    s.textContent = JSON.stringify(cfg);
+    var skel = container.querySelector('.tv-skeleton');
+    if (skel) skel.remove();
+    container.appendChild(s);
+    _chartLoaded = true;
+  }
+
+  function loadTVEvents() {
+    var container = document.querySelector('#tvcal-scale .tradingview-widget-container__widget');
+    if (!container) return;
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+    s.async = true;
+    s.textContent = JSON.stringify({"colorTheme":"dark","isTransparent":true,"locale":"en","countryFilter":"us,nz,au,ch,eu,ca,jp,gb","importanceFilter":"-1,0,1","width":"100%","height":"100%"});
+    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
+    if (skel) skel.style.display = 'none';
+    container.appendChild(s);
+    _eventsLoaded = true;
+  }
+
+  function loadTVEconMap() {
+    var placeholder = document.getElementById('tv-econmap-placeholder');
+    if (!placeholder) return;
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.src = 'https://widgets.tradingview-widget.com/w/en/tv-economic-map.js';
+    var widget = document.createElement('tv-economic-map');
+    widget.setAttribute('theme', 'dark');
+    widget.setAttribute('transparent', '');
+    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:#131722;';
+    placeholder.replaceWith(widget);
+    document.head.appendChild(s);
+    _econmapLoaded = true;
+  }
+
+  // Intersection Observer — load each widget only when its container enters viewport
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      if (id === 'tv-chart-wrap' && !_chartLoaded) {
+        loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
+        io.unobserve(entry.target);
+      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
+        loadTVEvents();
+        io.unobserve(entry.target);
+      } else if (id === 'section-econmap' && !_econmapLoaded) {
+        loadTVEconMap();
+        io.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '150px' });
+
+  // Expose so dashboard.js can trigger chart reload on tab click
+  window.loadTVChart = loadTVChart;
+  window._chartLoaded = function() { return _chartLoaded; };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var chartWrap = document.getElementById('tv-chart-wrap');
+    var calInner  = document.getElementById('tvcal-inner');
+    var econMap   = document.getElementById('section-econmap');
+    if (chartWrap) io.observe(chartWrap);
+    if (calInner)  io.observe(calInner);
+    if (econMap)   io.observe(econMap);
+  });
+})();
+</script>
 </body>
 </html>
