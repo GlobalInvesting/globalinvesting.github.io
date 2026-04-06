@@ -461,29 +461,49 @@ def fetch_yfinance_all(symbols_map):
                     results[internal_id] = None
                     continue
 
-                # prev_close = last completed daily bar (always correct — never today's bar)
-                # Use iloc[-1] from daily as prev_close; fetch intraday for true current price.
-                # This fixes the Monday bug: period="5d" interval="1d" on Monday returns
-                # Friday as iloc[-1] and Thursday as iloc[-2], producing Thu→Fri change
-                # instead of the correct Fri→today change.
-                prev_close = float(closes.iloc[-1])
+                # ── 1D % change: intraday current price vs last completed daily close ────
+                # Root cause of Monday bug: period="5d" interval="1d" returns the Friday
+                # bar as iloc[-1] (last completed day) and Thursday as iloc[-2].
+                # Fix: use the daily bar only for prev_close; get current price from a
+                # short intraday fetch (period="2d" interval="1h" — reliable in CI).
+                #
+                # Strategy:
+                #   1. prev_close = closes.iloc[-1]  (last completed daily bar = prior session)
+                #   2. current price = latest bar from period="2d" interval="1h"
+                #      filtered to today's UTC date, so it's always today's intraday price.
+                #   3. Fallback to closes.iloc[-1] vs iloc[-2] if intraday fetch fails,
+                #      which preserves the old behaviour rather than producing 0.00%.
 
-                # Fetch intraday 1m for current price and today's high/low
-                hist_intra = ticker.history(period="1d", interval="1m", auto_adjust=True)
-                if not hist_intra.empty and len(hist_intra["Close"].dropna()) > 0:
-                    intra_closes = hist_intra["Close"].dropna()
-                    close    = float(intra_closes.iloc[-1])
-                    day_high = round(float(hist_intra["High"].dropna().iloc[-1]),  4)
-                    day_low  = round(float(hist_intra["Low"].dropna().iloc[-1]),   4)
-                    # Today's true high/low: max/min across all intraday bars
-                    day_high = round(float(hist_intra["High"].max()),  4)
-                    day_low  = round(float(hist_intra["Low"].min()),   4)
-                else:
-                    # Fallback: use daily bar (no intraday available — weekend, holiday, etc.)
-                    close    = prev_close
+                from datetime import date as _date
+                today_str = _date.today().isoformat()
+
+                prev_close = float(closes.iloc[-1])  # last completed daily close
+
+                close    = None
+                day_high = None
+                day_low  = None
+                try:
+                    hist_1h = ticker.history(period="2d", interval="1h", auto_adjust=True)
+                    if not hist_1h.empty:
+                        if hist_1h.index.tz is not None:
+                            hist_today = hist_1h[hist_1h.index.tz_convert("UTC").strftime("%Y-%m-%d") == today_str]
+                        else:
+                            hist_today = hist_1h[hist_1h.index.strftime("%Y-%m-%d") == today_str]
+                        if not hist_today.empty:
+                            intra_c = hist_today["Close"].dropna()
+                            if len(intra_c) > 0:
+                                close    = float(intra_c.iloc[-1])
+                                day_high = round(float(hist_today["High"].max()), 4)
+                                day_low  = round(float(hist_today["Low"].min()),  4)
+                except Exception:
+                    pass
+
+                if close is None:
+                    # Fallback: daily bars only — prev session vs session before that
+                    close      = prev_close
                     prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
-                    highs    = hist["High"].dropna()
-                    lows     = hist["Low"].dropna()
+                    highs = hist["High"].dropna()
+                    lows  = hist["Low"].dropna()
                     day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
                     day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
 
