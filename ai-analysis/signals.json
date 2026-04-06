@@ -1,57 +1,57 @@
 [
   {
-    "time": "13:50",
+    "time": "16:07",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 159.50 resistance; VIX at 24.6 signals elevated volatility",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.482",
-      "VIX: 24.6",
-      "BoJ rate: 0.75%"
+      "USD/JPY: 159.666",
+      "BoJ rate: 0.75% (ON HOLD)",
+      "VIX: 24.0"
     ]
   },
   {
-    "time": "13:48",
+    "time": "16:05",
     "priority": "warning",
-    "title": "ECB",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD",
+    "title": "CB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.15590"
+      "EUR/USD: 1.15490"
     ]
   },
   {
-    "time": "13:45",
+    "time": "16:03",
     "priority": "warning",
-    "title": "AUD/NZD",
-    "text": "AUD/NZD at 91% short bias — retail heavily positioned, watch for squeeze; AUD/USD trading above 0.6872",
+    "title": "VIX Level",
+    "text": "VIX at 24.0 signals elevated volatility — not a risk-on environment",
     "evidence": [
-      "AUD/NZD: 9% long / 91% short",
-      "AUD/USD: 0.69290",
-      "AUD/USD: 0.6872"
-    ]
-  },
-  {
-    "time": "13:40",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 24.6 signals elevated volatility — not a risk-on environment; S&P 500 trading at 6,595",
-    "evidence": [
-      "VIX: 24.6",
-      "S&P 500: 6,595",
+      "VIX: 24.0",
+      "S&P 500: 6,599",
       "MOVE Index: 81.8"
     ]
   },
   {
-    "time": "13:35",
+    "time": "16:00",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at -38,698 — institutional bearishness; EUR/USD holding above 1.1525",
+    "title": "Retail Sentiment",
+    "text": "AUD/NZD sentiment extreme with 91% short bias, watch for potential squeeze",
     "evidence": [
-      "CFTC EUR net: -38,698",
-      "EUR/USD: 1.15590",
-      "EUR/USD: 1.1525"
+      "AUD/NZD: 9% long / 91% short",
+      "CFTC AUD net: +43,837",
+      "CFTC NZD net: -17,798"
+    ]
+  },
+  {
+    "time": "15:55",
+    "priority": "info",
+    "title": "Yield Curve Context",
+    "text": "US 2Y-10Y spread at -22bp, watch for potential impact on USD",
+    "evidence": [
+      "US 10Y: 4.327%",
+      "US 2Y: 3.790%",
+      "US 2Y-10Y spread: -22bp"
     ]
   }
 ]
