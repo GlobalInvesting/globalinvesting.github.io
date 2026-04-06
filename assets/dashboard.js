@@ -56,7 +56,7 @@ const CB_CONFIG = [
 ];
 
 // COT currencies available
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','USD'];
+const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
@@ -638,6 +638,7 @@ const COT_TV_SYMBOLS = {
   AUD: 'COT:232741_FO_NCP_L',
   CAD: 'COT:090741_FO_NCP_L',
   CHF: 'COT:092741_FO_NCP_L',
+  NZD: 'COT:112741_FO_NCP_L',
   USD: 'COT:098662_FO_NCP_L',
 };
 
