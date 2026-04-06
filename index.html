@@ -552,8 +552,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="panel" id="section-positioning">
       <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" onclick="exportPanel('cot')" title="Export COT data as CSV">CSV</button><button class="export-btn" onclick="exportPanel('cot','json')" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px;">
-        <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
-          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span style="text-align:right" title="Leveraged Funds Open Interest (long + short contracts). Rising OI = new money entering; falling OI = position liquidation.">OI</span><span title="Open COT chart on TradingView">TV</span>
+        <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
+          <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span style="text-align:right" title="Leveraged Funds Open Interest (long + short). Rising = new money entering; falling = liquidation.">OI</span>
         </div>
         <div id="cot-rows">
           <div class="cot-row" style="color:var(--text3);">
