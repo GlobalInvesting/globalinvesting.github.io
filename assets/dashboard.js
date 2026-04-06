@@ -625,25 +625,22 @@ async function fetchCBRates() {
 // ═══════════════════════════════════════════════════════════════════
 // COT DATA — from cot-data/*.json
 // ═══════════════════════════════════════════════════════════════════
-// Renders a sparkline SVG from history[] levNet values (26-week window).
-// Width 52px × 18px — fits the compact cot-row layout.
-function cotSparkline(history) {
-  if (!history || history.length < 2) return '<svg width="52" height="18"></svg>';
-  const vals = history.map(h => h.levNet || 0);
-  const min  = Math.min(...vals);
-  const max  = Math.max(...vals);
-  const range = max - min || 1;
-  const W = 52, H = 18, pad = 1;
-  const pts = vals.map((v, i) => {
-    const x = pad + (i / (vals.length - 1)) * (W - pad * 2);
-    const y = H - pad - ((v - min) / range) * (H - pad * 2);
-    return x.toFixed(1) + ',' + y.toFixed(1);
-  }).join(' ');
-  const lastVal = vals[vals.length - 1];
-  const color   = lastVal > 0 ? 'var(--up)' : lastVal < 0 ? 'var(--down)' : 'var(--text3)';
-  return '<svg width="' + W + '" height="' + H + '" style="display:block;overflow:visible" aria-hidden="true">'
-    + '<polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="1.2" stroke-linejoin="round"/>'
-    + '</svg>';
+// TradingView COT chart symbols — CFTC futures+options combined, large traders
+const COT_TV_SYMBOLS = {
+  EUR: 'COT:098662_F_CP_L',
+  GBP: 'COT:096742_F_CP_L',
+  JPY: 'COT:097741_F_CP_L',
+  AUD: 'COT:232741_F_CP_L',
+  CAD: 'COT:090741_F_CP_L',
+  CHF: 'COT:092741_F_CP_L',
+};
+
+// Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
+function fmtOI(n) {
+  if (!n || n <= 0) return '—';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1000) return Math.round(n / 1000) + 'k';
+  return n.toString();
 }
 
 async function fetchCOTData() {
@@ -705,8 +702,29 @@ async function fetchCOTData() {
       }
     }
 
-    // Sparkline from history[] (26-week rolling window)
-    const spark = cotSparkline(d.history);
+    // Open Interest — LF long + short (total skin in the game)
+    const oi    = long + short;
+    const oiStr = fmtOI(oi);
+
+    // OI direction vs prior week (from history[1] if available)
+    let oiArrow = '';
+    if (d.history && d.history.length >= 2) {
+      const prevOI = (d.history[1].levLong || 0) + (d.history[1].levShort || 0);
+      if (prevOI > 0) {
+        const delta = oi - prevOI;
+        if (delta > 0)       oiArrow = '<span class="oi-up">▲</span>';
+        else if (delta < 0)  oiArrow = '<span class="oi-dn">▼</span>';
+      }
+    }
+
+    // TradingView COT chart link
+    const tvSym = COT_TV_SYMBOLS[d.ccy] || '';
+    const tvHref = tvSym
+      ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym)
+      : '#';
+    const tvLink = tvSym
+      ? '<a class="cot-tv-link" href="' + tvHref + '" target="_blank" rel="noopener" title="Open ' + d.ccy + ' COT chart on TradingView (' + tvSym + ')">↗</a>'
+      : '<span></span>';
 
     return '<div class="cot-row">'
       + '<span class="cot-sym">' + d.ccy + '</span>'
@@ -717,7 +735,8 @@ async function fetchCOTData() {
       + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
       + '<span class="cot-net ' + cls + '">' + netStr + '</span>'
       + divHtml
-      + '<span class="cot-spark" title="Leveraged Funds net position — 26-week history">' + spark + '</span>'
+      + '<span class="cot-oi" title="LF Open Interest: ' + oi.toLocaleString() + ' contracts (long + short). Rising OI signals new money; falling OI signals liquidation.">' + oiArrow + oiStr + '</span>'
+      + tvLink
       + '</div>';
   }).join('');
 }
