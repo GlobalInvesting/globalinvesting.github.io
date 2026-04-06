@@ -4445,8 +4445,9 @@ function drawLiquidityChart() {
     const rM = reopenDate.getMinutes().toString().padStart(2,'0');
     setEl('liq-peak-label', 'Sun ' + rH + ':' + rM);
   } else {
-    const peakH = hours.indexOf(Math.max(...hours));
-    const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakH/2), peakH%2===0?0:30, 0, 0);
+    const peakCanvasSlot = hours.indexOf(Math.max(...hours));
+    const peakArraySlot = (peakCanvasSlot + OFFSET) % 48;
+    const peakUTC = new Date(); peakUTC.setUTCHours(Math.floor(peakArraySlot/2), peakArraySlot%2===0?0:30, 0, 0);
     const pH = peakUTC.getHours().toString().padStart(2,'0');
     const pM = peakUTC.getMinutes().toString().padStart(2,'0');
     setEl('liq-peak-label', 'Peak ' + pH + ':' + pM);

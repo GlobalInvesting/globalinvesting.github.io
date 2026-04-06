@@ -635,7 +635,7 @@
   }
   /* Limit the wide DATA item so it doesn't crowd the centered copyright */
   #statusbar > div:first-child {
-    max-width: 220px;
+    max-width: 300px;
   }
   @media (max-width: 600px) {
     #statusbar {
