@@ -4097,16 +4097,61 @@ const LIQ_SESSIONS = [
   { name:'New York', start:13, end:22, color:'rgba(246,148,28,0.07)' },
 ];
 
-let _liqData = null; // cache: array of 48 values (half-hours, UTC 00:00→23:30)
+// _liqData:     48 half-hour values for the current day (real H-L range proxy when available)
+// _liqBaseline: 48 half-hour values for the 30-day rolling average (drawn as reference line)
+// _liqSource:   string for the panel subtitle label
+let _liqData     = null;
+let _liqBaseline = null;
+let _liqSource   = null;
+
+// Interpolate a 24-hour array to 48 half-hour slots
+function _liqTo48(arr24) {
+  return Array.from({length:48}, (_,i) => {
+    const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
+    return arr24[idx]*(1-frac) + arr24[next]*frac;
+  });
+}
 
 async function fetchLiquidityData() {
+  const utcDay = new Date().getUTCDay(), utcHour = new Date().getUTCHours();
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
+
+  // ── Primary: fx-liquidity.json (yfinance H-L range proxy, updated hourly) ──
   try {
-    // Read from server-side cache (avoids CORS — updated every 4h by engine workflow)
+    const r = await fetch('/fx-data/fx-liquidity.json');
+    if (!r.ok) throw new Error('fx-liquidity.json not available');
+    const d = await r.json();
+
+    if (!d.baseline_30d || d.baseline_30d.length !== 24) throw new Error('malformed baseline');
+
+    // Baseline: 30-day rolling average (always shown as reference)
+    _liqBaseline = _liqTo48(isWeekend ? Array(24).fill(2) : d.baseline_30d);
+
+    // Today: real H-L data for completed hours, baseline for future hours
+    const todayRaw = (d.today && d.today.length === 24) ? d.today : d.baseline_30d;
+    const hoursComplete = d.hours_complete || 0;
+    const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
+
+    const today24 = Array.from({length:24}, (_,h) => {
+      if (isWeekend) return 2;
+      if (h < hoursComplete && todayRaw[h] > 0) return todayRaw[h];   // real data
+      if (h >= Math.floor(nowH)) return d.baseline_30d[h] * 0.75;      // future: attenuated baseline
+      return d.baseline_30d[h];                                          // past gap: use baseline
+    });
+
+    _liqData   = _liqTo48(today24);
+    _liqSource = d.fallback ? 'Historical avg · fixed reference' : 'yfinance · H-L range proxy · 30d avg';
+    return;
+  } catch(e) {
+    // fall through to legacy fallback
+  }
+
+  // ── Fallback: frankfurter.json vol-scalar (legacy, kept for resilience) ──
+  try {
     const r = await fetch('/fx-data/frankfurter.json');
-    if (!r.ok) throw new Error('cache not available');
+    if (!r.ok) throw new Error('frankfurter.json not available');
     const cacheData = await r.json();
     const rates = Object.values((cacheData.series && cacheData.series.rates) ? cacheData.series.rates : {});
-
     let volScalar = 1.0;
     if (rates.length >= 2) {
       const changes = [];
@@ -4116,40 +4161,26 @@ async function fetchLiquidityData() {
         if (prev.GBP && cur.GBP) changes.push(Math.abs(cur.GBP - prev.GBP) / prev.GBP);
         if (prev.JPY && cur.JPY) changes.push(Math.abs(cur.JPY - prev.JPY) / prev.JPY);
       }
-      const avgChange = changes.reduce((a,b)=>a+b,0)/changes.length;
-      // Typical daily range ≈ 0.5% → volScalar=1.0; higher vol → boosted activity
+      const avgChange = changes.reduce((a,b)=>a+b,0)/changes.length || 0.005;
       volScalar = Math.min(2.0, Math.max(0.5, avgChange / 0.005));
     }
-
-    // Build 48 half-hour buckets from session-overlap baseline, scaled by vol
     const nowUTC = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
-    const _lwd = new Date().getUTCDay(), _lwh = new Date().getUTCHours();
-    const isWeekend = _lwd === 6 || (_lwd === 0 && _lwh < 21) || (_lwd === 5 && _lwh >= 21);
-
-    const data = Array.from({length:48}, (_,i) => {
-      if (isWeekend) return 2;
-      const h = i/2;
-      const idx = Math.floor(h) % 24;
-      const next = (idx+1) % 24;
-      const frac = h - Math.floor(h);
-      const v = LIQ_BASE[idx]*(1-frac) + LIQ_BASE[next]*frac;
-      // Fade future hours slightly (past = real vol driven, future = baseline)
-      const isFuture = h > nowUTC;
-      const scale = isFuture ? 0.75 : volScalar;
-      return Math.max(2, v * scale);
-    });
-
-    _liqData = data;
-  } catch(e) {
-    // Fallback to baseline only
-    const _lfwd = new Date().getUTCDay(), _lfwh = new Date().getUTCHours();
-    const isWeekend = _lfwd === 6 || (_lfwd === 0 && _lfwh < 21) || (_lfwd === 5 && _lfwh >= 21);
     _liqData = Array.from({length:48}, (_,i) => {
       if (isWeekend) return 2;
-      const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
-      return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac);
+      const h=i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
+      const v = LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac;
+      return Math.max(2, v * (h > nowUTC ? 0.75 : volScalar));
     });
-  }
+    _liqBaseline = _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
+    _liqSource   = 'Historical avg · fixed reference';
+    return;
+  } catch(e) { /* fall through */ }
+
+  // ── Last resort: pure LIQ_BASE ────────────────────────────────────────────
+  const base48 = _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
+  _liqData     = base48;
+  _liqBaseline = base48;
+  _liqSource   = 'Historical avg · fixed reference';
 }
 
 function drawLiquidityChart() {
@@ -4165,15 +4196,12 @@ function drawLiquidityChart() {
   const utcHour = new Date().getUTCHours();
   const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
-  const hours = _liqData || Array.from({length:48}, (_,i) => {
-    if (isWeekend) return 2;
-    const h = i/2, idx=Math.floor(h)%24, next=(idx+1)%24, frac=h-Math.floor(h);
-    return Math.max(2, LIQ_BASE[idx]*(1-frac)+LIQ_BASE[next]*frac);
-  });
+  const hours = _liqData || _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
+  const baseline = _liqBaseline || hours;
 
   const PAD_L=4, PAD_R=4, PAD_T=8, PAD_B=18;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const maxV=Math.max(...hours, 10);
+  const maxV=Math.max(...hours, ...baseline, 10);
   const px = i => PAD_L+(i/(hours.length-1))*cW;
   const py = v => PAD_T+(1-v/maxV)*cH;
 
@@ -4231,6 +4259,13 @@ function drawLiquidityChart() {
     for (let i=nowSlot+1; i<48; i++) ctx.lineTo(px(i),py(hours[i]));
     ctx.stroke(); ctx.setLineDash([]);
 
+    // ── BASELINE 30d: línea de referencia gris punteada ──────────────────
+    if (baseline !== hours) {
+      ctx.beginPath(); ctx.strokeStyle='rgba(120,123,134,0.45)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      for (let i=0; i<48; i++) i===0 ? ctx.moveTo(px(i),py(baseline[i])) : ctx.lineTo(px(i),py(baseline[i]));
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+
     // ── NOW-LINE: línea naranja vertical punteada — igual que el original ────
     ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
     ctx.beginPath(); ctx.moveTo(nowX, PAD_T); ctx.lineTo(nowX, PAD_T+cH); ctx.stroke();
@@ -4280,9 +4315,15 @@ function drawLiquidityChart() {
 }
 
 // Initial load: fetch real data then draw
-fetchLiquidityData().then(() => drawLiquidityChart());
+fetchLiquidityData().then(() => {
+  if (_liqSource) setEl('liq-source-label', _liqSource);
+  drawLiquidityChart();
+});
 // Refresh data every 30 min, redraw every 60 s
-setInterval(() => fetchLiquidityData().then(() => drawLiquidityChart()), 30 * 60 * 1000);
+setInterval(() => fetchLiquidityData().then(() => {
+  if (_liqSource) setEl('liq-source-label', _liqSource);
+  drawLiquidityChart();
+}), 30 * 60 * 1000);
 setInterval(drawLiquidityChart, 60 * 1000);
 window.addEventListener('resize', drawLiquidityChart);
 
