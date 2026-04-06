@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.5 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
+fetch_intraday_quotes.py  v2.6 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -461,64 +461,44 @@ def fetch_yfinance_all(symbols_map):
                     results[internal_id] = None
                     continue
 
-                # ── 1D % change: intraday current price vs last completed daily close ────
-                # Root cause of Monday bug: period="5d" interval="1d" returns the Friday
-                # bar as iloc[-1] (last completed day) and Thursday as iloc[-2].
-                # Fix: use the daily bar only for prev_close; get current price from a
-                # short intraday fetch (period="2d" interval="1h" — reliable in CI).
+                # ── 1D % change: fast_info last price vs last completed daily close ─────
                 #
-                # Strategy:
-                #   1. prev_close = closes.iloc[-1]  (last completed daily bar = prior session)
-                #   2. current price = latest bar from period="2d" interval="1h"
-                #      filtered to today's UTC date, so it's always today's intraday price.
-                #   3. Fallback to closes.iloc[-1] vs iloc[-2] if intraday fetch fails,
-                #      which preserves the old behaviour rather than producing 0.00%.
+                # Strategy (v2.6):
+                #   prev_close = closes.iloc[-1]  (last completed daily bar — e.g. Friday)
+                #   close      = ticker.fast_info["last_price"]  (real-time, no intraday bars needed)
+                #   day H/L    = ticker.fast_info["day_high"] / ["day_low"]
+                #
+                # Why fast_info instead of intraday bars:
+                #   - period="1d"/"2d" intraday intervals for FX include the Sunday 22:00 UTC
+                #     reopen bar with Friday's price — filtering by "today" still returns that
+                #     stale bar, producing close ≈ prev_close → +0.00%.
+                #   - fast_info always returns the true current market price without bar alignment
+                #     issues, and is available for all yfinance-supported symbols including FX.
+                #   - Fallback: if fast_info fails, use closes.iloc[-1] vs closes.iloc[-2]
+                #     (prev-session vs prior-session) which at least produces a real non-zero delta.
 
-                from datetime import datetime as _dt, timezone as _tz
-                today_str = _dt.now(_tz.utc).strftime("%Y-%m-%d")  # always UTC date
-
-                prev_close = float(closes.iloc[-1])  # last completed daily close
+                prev_close = float(closes.iloc[-1])  # last completed daily close (e.g. Friday)
 
                 close    = None
                 day_high = None
                 day_low  = None
 
-                def _extract_today(hist_intra):
-                    """Filter intraday bars to today's UTC date; return (close, high, low) or None."""
-                    if hist_intra.empty:
-                        return None
-                    idx = hist_intra.index
-                    if idx.tz is not None:
-                        dates = idx.tz_convert("UTC").strftime("%Y-%m-%d")
-                    else:
-                        dates = idx.strftime("%Y-%m-%d")
-                    subset = hist_intra[dates == today_str]
-                    if subset.empty:
-                        return None
-                    intra_c = subset["Close"].dropna()
-                    if len(intra_c) == 0:
-                        return None
-                    return (
-                        float(intra_c.iloc[-1]),
-                        round(float(subset["High"].max()), 4),
-                        round(float(subset["Low"].min()),  4),
-                    )
-
-                # Try 5m first (more granular, usually available for FX intraday),
-                # then 1h as fallback (more reliable in CI for some symbols).
-                for _period, _interval in [("1d", "5m"), ("2d", "1h")]:
-                    try:
-                        hist_intra = ticker.history(period=_period, interval=_interval, auto_adjust=True)
-                        result = _extract_today(hist_intra)
-                        if result is not None:
-                            close, day_high, day_low = result
-                            break
-                    except Exception:
-                        pass
+                try:
+                    fi = ticker.fast_info
+                    lp = fi.get("last_price") if hasattr(fi, "get") else getattr(fi, "last_price", None)
+                    if lp and VALIDATORS.get(internal_id, lambda x: True)(float(lp)):
+                        close = float(lp)
+                    dh = fi.get("day_high") if hasattr(fi, "get") else getattr(fi, "day_high", None)
+                    dl = fi.get("day_low")  if hasattr(fi, "get") else getattr(fi, "day_low",  None)
+                    if dh:
+                        day_high = round(float(dh), 4)
+                    if dl:
+                        day_low  = round(float(dl), 4)
+                except Exception:
+                    pass
 
                 if close is None:
-                    # Fallback: daily bars only — prev session vs session before that.
-                    # Avoids producing 0.00% by using real prior-session prices.
+                    # Fallback: prev session vs session before that.
                     close      = prev_close
                     prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
                     highs = hist["High"].dropna()
@@ -613,7 +593,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.5  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.6  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
