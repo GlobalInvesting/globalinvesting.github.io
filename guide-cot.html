@@ -374,11 +374,13 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="tv-chart">
       <h2>TradingView COT Chart</h2>
-      <p>The <strong>↗</strong> icon in the last column of each row opens the full TradingView COT chart for that currency in a new tab. TradingView displays the CFTC data series as an interactive chart with full zoom, indicators, and historical context going back years — far more useful for identifying multi-year extremes than the panel alone.</p>
+      <p>Clicking any currency row opens the full TradingView COT chart for that currency in the embedded chart widget. TradingView displays the CFTC data series with full zoom, indicators, and years of historical context — useful for identifying whether current positioning is at a multi-year extreme or merely elevated by recent standards.</p>
       <div class="info-box">
-        <strong>Symbol format:</strong> TradingView uses CFTC contract codes to identify each currency's COT series. For example, EUR futures use the symbol <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">COT:098662_F_CP_L</code> — where <code style="font-family:var(--font-mono);font-size:11px;">F</code> = futures, <code style="font-family:var(--font-mono);font-size:11px;">CP</code> = combined (futures + options), <code style="font-family:var(--font-mono);font-size:11px;">L</code> = large traders. This is the same underlying data the terminal panel displays, with full historical depth and charting capability.
+        <strong>Symbol format:</strong> TradingView uses CFTC contract codes to identify each currency's COT series. For example, EUR futures use the symbol <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">COT:099741_F_L</code> — where <code style="font-family:var(--font-mono);font-size:11px;">099741</code> = EUR/USD CME CFTC code, <code style="font-family:var(--font-mono);font-size:11px;">F</code> = futures, <code style="font-family:var(--font-mono);font-size:11px;">L</code> = Non-Commercial Long (speculative). This is the same trader category the terminal panel displays — Leveraged Funds / large speculators — not the Commercial (hedger) category.
       </div>
-      <p>Use the TradingView chart to assess whether current positioning is at a multi-year extreme, or merely elevated by recent standards — context the compact terminal panel cannot provide on its own.</p>
+      <div class="info-box" style="border-color:var(--orange);background:var(--bg2);">
+        <strong>Category alignment:</strong> The terminal panel shows <strong>Leveraged Funds</strong> (speculative) positioning. When reading the TradingView chart, make sure the symbol uses the <code style="font-family:var(--font-mono);font-size:11px;">_F_L</code> suffix (Non-Commercial), not <code style="font-family:var(--font-mono);font-size:11px;">_CP_L</code> (Commercial/hedgers). Commercial positions move inversely to speculative positions — comparing them directly leads to apparent divergences that are not real.
+      </div>
     </div>
 
     <div class="guide-section" id="net-contracts">
