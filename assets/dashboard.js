@@ -423,8 +423,8 @@ function populateFxPairsTable() {
     const tvSym = pair.invert
       ? `FX:${pair.base}${pair.quote}`
       : `FX:${pair.quote}${pair.base}`;
-    return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Open chart">
-      <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}<button class="pd-info-btn" aria-label="Detail ${pair.label || pair.base+'/'+pair.quote}" title="Pair detail" tabindex="-1">i</button></td>
+    return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Click: open chart · Double-click: pair detail">
+      <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
       <td style="color:var(--text1)">${bid}</td>
       <td style="color:var(--text1)">${ask}</td>
       <td style="color:var(--text3);font-size:10px">${spreadStr}</td>
@@ -2418,9 +2418,9 @@ document.getElementById('quotebar-inner')?.addEventListener('click', e => {
 });
 
 // ── Pair Detail Popover ─────────────────────────────────────────────────────
-// Floating panel triggered by the ⓘ button on each pair row.
-// Anchors near the trigger button, closes on Escape or outside-click.
-function openPairPopover(btn, tvSym) {
+// Floating panel triggered by double-click on any pair row (FX table or crosses).
+// Anchors near the row, closes on Escape or outside-click.
+function openPairPopover(rowEl, tvSym) {
   const pop = document.getElementById('pd-popover');
   if (!pop) return;
 
@@ -2433,8 +2433,8 @@ function openPairPopover(btn, tvSym) {
   pop.dataset.sym = tvSym;
   pop.style.display = 'block';
 
-  // Position: prefer right of the button, fall back to left if near right edge
-  const rect = btn.getBoundingClientRect();
+  // Position: prefer right of the row, fall back to left if near right edge
+  const rect = rowEl.getBoundingClientRect();
   const pw = 270, ph = 300;
   const vw = window.innerWidth, vh = window.innerHeight;
   let x = rect.right + 6;
@@ -2458,7 +2458,7 @@ function closePairPopover() {
 document.addEventListener('click', e => {
   const pop = document.getElementById('pd-popover');
   if (!pop || pop.style.display === 'none') return;
-  if (!pop.contains(e.target) && !e.target.closest('.pd-info-btn')) closePairPopover();
+  if (!pop.contains(e.target)) closePairPopover();
 }, true);
 
 // Close on Escape
@@ -2466,32 +2466,32 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click any row to open chart (ⓘ btn opens popover) ──
+// ── Sidebar crosses: click to open chart, double-click to open popover ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
-  const btn = e.target.closest('.pd-info-btn');
-  if (btn) {
-    e.stopPropagation();
-    const row = btn.closest('[data-sym]');
-    if (row) openPairPopover(btn, row.dataset.sym);
-    return;
-  }
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
 });
 
-// ── FX Pairs table: click any row to open chart (ⓘ btn opens popover) ──
+document.getElementById('sidebar')?.addEventListener('dblclick', e => {
+  e.preventDefault();
+  const row = e.target.closest('.sb-row[data-sym]');
+  if (!row) return;
+  openPairPopover(row, row.dataset.sym);
+});
+
+// ── FX Pairs table: click to open chart, double-click to open popover ──
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
-  const btn = e.target.closest('.pd-info-btn');
-  if (btn) {
-    e.stopPropagation();
-    const row = btn.closest('tr[data-sym]');
-    if (row) openPairPopover(btn, row.dataset.sym);
-    return;
-  }
   const row = e.target.closest('tr[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
+});
+
+document.getElementById('fx-pairs-tbody')?.addEventListener('dblclick', e => {
+  e.preventDefault();
+  const row = e.target.closest('tr[data-sym]');
+  if (!row) return;
+  openPairPopover(row, row.dataset.sym);
 });
 
 // ── Cross-Asset cells: click to open chart (US 10Y excluded — no TV symbol) ──
