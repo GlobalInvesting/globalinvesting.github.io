@@ -3051,7 +3051,7 @@ const ETF_IV_MANIFEST = [
   { key:'gold',  label:'Gold',   desc:'XAU/USD spot (USD/oz)',                tvSym:'FOREXCOM:GOLD'   },
   { key:'wti',   label:'WTI',    desc:'Crude oil front-month (USD/bbl)',       tvSym:'TVC:USOIL'  },
   { key:'dxy',   label:'DXY',    desc:'US Dollar Index',                       tvSym:'TVC:DXY'    },
-  { key:'us10y', label:'US 10Y', desc:'US 10-year Treasury yield (%)',         tvSym:'TVC:US10Y'  },
+  { key:'us10y', label:'US 10Y', desc:'US 10-year Treasury yield (%)',         tvSym:'FRED:DGS10' },
   { key:'btc',   label:'BTC',    desc:'Bitcoin/USD spot',                      tvSym:'BITSTAMP:BTCUSD' },
 ];
 
