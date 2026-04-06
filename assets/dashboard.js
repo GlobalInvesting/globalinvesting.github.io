@@ -2510,7 +2510,7 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
 // PAIR DETAIL PANEL — Eikon-style linked panel, updates #pair-detail on every pair click
 // All data read from in-memory caches — zero additional fetches on click.
 // ═══════════════════════════════════════════════════════════════════
-const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding }
+const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, prevOI }
 
 (async function prefetchCOT() {
   const CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
@@ -2519,12 +2519,20 @@ const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding }
       const r = await fetch('./cot-data/' + ccy + '.json');
       if (!r.ok) return;
       const d = await r.json();
+      // prevOI from history[1] when available (history[0] = current week)
+      let prevOI = null;
+      if (Array.isArray(d.history) && d.history.length >= 2) {
+        const prev = d.history[1];
+        if (prev.levLong != null && prev.levShort != null)
+          prevOI = prev.levLong + prev.levShort;
+      }
       COT_DATA_CACHE[ccy] = {
         net:        d.netPosition    ?? null,
         long:       d.longPositions  ?? null,
         short:      d.shortPositions ?? null,
         amNet:      d.assetManagerNet ?? null,
         weekEnding: d.weekEnding || d.reportDate || '',
+        prevOI,
       };
     } catch {}
   }));
@@ -2638,7 +2646,7 @@ async function updatePairDetail(tvSym) {
   // COT
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
-  let cotNet = null, cotAmNet = null, cotOI = null, cotWeek = '';
+  let cotNet = null, cotAmNet = null, cotOI = null, cotPrevOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
     cotNet   = cotRaw.net   != null ? cotRaw.net   * flip : null;
@@ -2646,6 +2654,7 @@ async function updatePairDetail(tvSym) {
     // OI = LF longs + LF shorts (futures+options combined, LF category)
     if (cotRaw.long != null && cotRaw.short != null)
       cotOI = cotRaw.long + cotRaw.short;
+    cotPrevOI = cotRaw.prevOI ?? null;
     cotWeek  = cotRaw.weekEnding;
   }
 
@@ -2733,7 +2742,15 @@ async function updatePairDetail(tvSym) {
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Considered speculative / trend-following positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded."><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="CFTC Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Considered structural / longer-term positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze."><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
-        ${cotOI != null ? `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;" data-tip-title="Open Interest (LF)" data-tip-body="Total open interest in the Leveraged Funds category: long contracts + short contracts. Rising OI = new money entering the market; falling OI = positions being closed. Source: CFTC TFF report." data-tip-ex="Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding."><div class="pd-lbl">LF Open Interest</div><div class="pd-val">${Math.round(cotOI).toLocaleString()}</div></div>` : ''}
+        ${cotOI != null ? (() => {
+          const oiDelta = (cotPrevOI != null) ? cotOI - cotPrevOI : null;
+          const oiArrow = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
+          const oiDeltaStr = oiDelta == null ? '' : ` <span class="pd-dim" style="font-size:9px;">(${oiDelta > 0 ? '+' : ''}${Math.round(oiDelta).toLocaleString()})</span>`;
+          const oiTipEx = oiDelta != null
+            ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}`
+            : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.';
+          return `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;" data-tip-title="Open Interest (LF)" data-tip-body="Total open interest in the Leveraged Funds category: long contracts + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report." data-tip-ex="${oiTipEx}"><div class="pd-lbl">LF Open Interest</div><div class="pd-val">${oiArrow}${Math.round(cotOI).toLocaleString()}${oiDeltaStr}</div></div>`;
+        })() : ''}
       </div>
       ${cotSummaryHtml}
     </div>

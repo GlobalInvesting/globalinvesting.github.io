@@ -506,6 +506,8 @@
   .pd-val.pd-up { color:var(--up); }
   .pd-val.pd-dn { color:var(--down); }
   .pd-dim { color:var(--text3); }
+  .pd-oi-up { color:var(--up); font-size:9px; }
+  .pd-oi-dn { color:var(--down); font-size:9px; }
   .pd-cot-summary { font-size:9px; font-family:var(--font-mono); color:var(--text3); padding:2px 8px 4px; border-top:1px solid var(--border); }
   .pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; border-top:1px solid var(--border); }
 
