@@ -4202,30 +4202,41 @@ function drawLiquidityChart() {
   const PAD_L=4, PAD_R=4, PAD_T=8, PAD_B=18;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const maxV=Math.max(...hours, ...baseline, 10);
-  const px = i => PAD_L+(i/(hours.length-1))*cW;
-  const py = v => PAD_T+(1-v/maxV)*cH;
 
-  // Current UTC time as slot index (0–47, cada slot = 30 min)
-  const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
-  const nowSlot = Math.min(47, Math.floor(nowH * 2));
-  const nowX = PAD_L + (nowH / 24) * cW;
+  // ── FX day starts at 22:00 UTC (Sydney open) ─────────────────────────────
+  // OFFSET=44 slots (22h × 2). Canvas slot i → array slot (i+OFFSET)%48
+  const OFFSET = 44; // 22:00 UTC in half-hour slots
+  const sa = i => (i + OFFSET) % 48;            // slot in array from canvas position
+  const sc = i => (i - OFFSET + 48) % 48;       // canvas position from array slot
 
-  ctx.clearRect(0,0,W,H);
+  const px = i => PAD_L + (i / 47) * cW;        // canvas X from canvas slot i
+  const py = v => PAD_T + (1 - v / maxV) * cH;
 
-  // Session bands
+  // Current time in canvas-slot coordinates
+  const nowH = new Date().getUTCHours() + new Date().getUTCMinutes() / 60;
+  const nowArraySlot = Math.min(47, Math.floor(nowH * 2));
+  const nowCanvasSlot = sc(nowArraySlot);
+  const nowX = PAD_L + (nowCanvasSlot / 47) * cW;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Session bands — convert UTC slot boundaries to canvas coordinates
+  // Sydney 22:00-07:00 UTC = array slots 44-14 (wraps)
+  // Tokyo  00:00-09:00 UTC = array slots 0-18
+  // London 08:00-17:00 UTC = array slots 16-34
+  // NY     13:00-22:00 UTC = array slots 26-44
   if (!isWeekend) {
-    // Session bands: start/end in half-hour slots (0=00:00 UTC, 18=09:00 UTC, etc.)
-    // Tokyo 00:00-09:00 UTC = slots 0-18 (blue)
-    // London 08:00-17:00 UTC = slots 16-34 (teal)
-    // NY 13:00-22:00 UTC = slots 26-44 (amber)
-    [
-      {start:0,  end:18, color:'rgba(41,98,255,0.07)'},
-      {start:16, end:34, color:'rgba(38,166,154,0.08)'},
-      {start:26, end:44, color:'rgba(246,148,28,0.06)'}
-    ].forEach(s => {
-      ctx.fillStyle=s.color;
-      ctx.fillRect(PAD_L+(s.start/48)*cW, PAD_T, (Math.min(s.end,48)-s.start)/48*cW, cH);
-    });
+    const drawBand = (aStart, aEnd, color) => {
+      // Convert array slots to canvas slots, handling wrap
+      let cStart = sc(aStart), cEnd = sc(aEnd);
+      if (cEnd <= cStart) cEnd = 47; // clamp wrap-arounds at right edge
+      ctx.fillStyle = color;
+      ctx.fillRect(PAD_L + (cStart/47)*cW, PAD_T, ((cEnd-cStart)/47)*cW, cH);
+    };
+    drawBand(44, 48+14, 'rgba(120,100,255,0.07)'); // Sydney (wraps — draw as 22→end)
+    drawBand(0,  18,    'rgba(41,98,255,0.07)');    // Tokyo
+    drawBand(16, 34,    'rgba(38,166,154,0.08)');   // London
+    drawBand(26, 44,    'rgba(246,148,28,0.06)');   // NY
   }
 
   if (!isWeekend) {
@@ -4234,8 +4245,11 @@ function drawLiquidityChart() {
     gradPast.addColorStop(0,'rgba(41,98,255,0.32)');
     gradPast.addColorStop(1,'rgba(41,98,255,0.03)');
     ctx.beginPath();
-    for (let i=0; i<=nowSlot; i++) i===0 ? ctx.moveTo(px(i),py(hours[i])) : ctx.lineTo(px(i),py(hours[i]));
-    ctx.lineTo(nowX, PAD_T+cH); ctx.lineTo(px(0), PAD_T+cH); ctx.closePath();
+    for (let ci=0; ci<=nowCanvasSlot; ci++) {
+      const v = hours[sa(ci)];
+      ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
+    }
+    ctx.lineTo(nowX,PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
     ctx.fillStyle=gradPast; ctx.fill();
 
     // ── FUTURE: filled area tenue ─────────────────────────────────────────
@@ -4243,25 +4257,28 @@ function drawLiquidityChart() {
     gradFut.addColorStop(0,'rgba(41,98,255,0.10)');
     gradFut.addColorStop(1,'rgba(41,98,255,0.01)');
     ctx.beginPath();
-    ctx.moveTo(nowX, py(hours[nowSlot]));
-    for (let i=nowSlot+1; i<48; i++) ctx.lineTo(px(i),py(hours[i]));
+    ctx.moveTo(nowX, py(hours[sa(nowCanvasSlot)]));
+    for (let ci=nowCanvasSlot+1; ci<48; ci++) ctx.lineTo(px(ci),py(hours[sa(ci)]));
     ctx.lineTo(px(47),PAD_T+cH); ctx.lineTo(nowX,PAD_T+cH); ctx.closePath();
     ctx.fillStyle=gradFut; ctx.fill();
 
     // ── PAST: línea sólida azul ───────────────────────────────────────────
     ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.5; ctx.setLineDash([]);
-    for (let i=0; i<=nowSlot; i++) i===0 ? ctx.moveTo(px(i),py(hours[i])) : ctx.lineTo(px(i),py(hours[i]));
+    for (let ci=0; ci<=nowCanvasSlot; ci++) {
+      const v = hours[sa(ci)];
+      ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
+    }
     ctx.stroke();
 
     // ── FUTURE: línea punteada azul tenue (datos: baseline 30d real) ─────
     ctx.beginPath(); ctx.strokeStyle='rgba(41,98,255,0.35)'; ctx.lineWidth=1.2; ctx.setLineDash([3,4]);
-    ctx.moveTo(nowX, py(hours[nowSlot]));
-    for (let i=nowSlot+1; i<48; i++) ctx.lineTo(px(i),py(hours[i]));
+    ctx.moveTo(nowX, py(hours[sa(nowCanvasSlot)]));
+    for (let ci=nowCanvasSlot+1; ci<48; ci++) ctx.lineTo(px(ci),py(hours[sa(ci)]));
     ctx.stroke(); ctx.setLineDash([]);
 
-    // ── NOW-LINE: línea naranja vertical punteada — igual que el original ────
+    // ── NOW-LINE ──────────────────────────────────────────────────────────
     ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
-    ctx.beginPath(); ctx.moveTo(nowX, PAD_T); ctx.lineTo(nowX, PAD_T+cH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(nowX,PAD_T); ctx.lineTo(nowX,PAD_T+cH); ctx.stroke();
     ctx.setLineDash([]);
 
   } else {
@@ -4269,19 +4286,26 @@ function drawLiquidityChart() {
     const grad=ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
     grad.addColorStop(0,'rgba(120,123,134,0.15)'); grad.addColorStop(1,'rgba(41,98,255,0.03)');
     ctx.beginPath();
-    hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
+    for (let ci=0; ci<48; ci++) {
+      const v = hours[sa(ci)];
+      ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
+    }
     ctx.lineTo(px(47),PAD_T+cH); ctx.lineTo(px(0),PAD_T+cH); ctx.closePath();
     ctx.fillStyle=grad; ctx.fill();
     ctx.beginPath(); ctx.strokeStyle='#363c4e'; ctx.lineWidth=1.5;
-    hours.forEach((v,i) => i===0 ? ctx.moveTo(px(i),py(v)) : ctx.lineTo(px(i),py(v)));
+    for (let ci=0; ci<48; ci++) {
+      const v = hours[sa(ci)];
+      ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
+    }
     ctx.stroke();
     ctx.fillStyle='rgba(120,123,134,0.5)'; ctx.font='9px Courier New'; ctx.textAlign='center';
     ctx.fillText('MARKET CLOSED — WEEKEND', W/2, PAD_T+cH/2);
   }
 
-  // Hour labels
+  // Hour labels — starting 22:00 UTC, every 4h: 22,02,06,10,14,18
   ctx.fillStyle='#4c525e'; ctx.font='8px Courier New'; ctx.textAlign='center';
-  ['00','06','12','18','24'].forEach((lbl,i) => ctx.fillText(lbl, PAD_L+(i/4)*cW, H-4));
+  [{lbl:'22',ci:0},{lbl:'02',ci:8},{lbl:'06',ci:16},{lbl:'10',ci:24},{lbl:'14',ci:32},{lbl:'18',ci:40},{lbl:'22',ci:47}]
+    .forEach(({lbl,ci}) => ctx.fillText(lbl, PAD_L+(ci/47)*cW, H-4));
 
 
   // Bottom labels
@@ -4365,9 +4389,11 @@ window.addEventListener('resize', drawLiquidityChart);
     const mouseX = (e.clientX - rect.left) * scaleX;
     if (mouseX < PAD_L || mouseX > W - PAD_R) { tooltip.style.display = 'none'; return; }
 
-    // Map x → slot index (0–47, each = 30 min)
+    // Map x → canvas slot (0–47). Canvas slot 0 = 22:00 UTC (OFFSET=44 array slots)
     const frac = (mouseX - PAD_L) / cW;
-    const slot = Math.max(0, Math.min(47, Math.round(frac * 47)));
+    const canvasSlot = Math.max(0, Math.min(47, Math.round(frac * 47)));
+    const OFFSET = 44;
+    const slot = (canvasSlot + OFFSET) % 48;  // array slot = UTC index
     const utcH = slot / 2;
 
     const hh = Math.floor(utcH).toString().padStart(2,'0');
@@ -4385,9 +4411,10 @@ window.addEventListener('resize', drawLiquidityChart);
     const vRef = baseline[slot];
     const pct  = Math.round((v / maxBaseline) * 100);
 
-    // Past vs future
-    const nowSlotCurrent = Math.floor(new Date().getUTCHours()*2 + new Date().getUTCMinutes()/30);
-    const isPast = slot <= nowSlotCurrent;
+    // Past vs future — compare in canvas-slot space
+    const nowArraySlot = Math.floor(new Date().getUTCHours()*2 + new Date().getUTCMinutes()/30);
+    const nowCanvasSlot = (nowArraySlot - OFFSET + 48) % 48;
+    const isPast = canvasSlot <= nowCanvasSlot;
 
     // vs 30d avg comparison (only meaningful for past slots with real data)
     let vsAvg = '';
