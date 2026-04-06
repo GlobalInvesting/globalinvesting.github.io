@@ -1,57 +1,57 @@
 [
   {
-    "time": "08:05",
+    "time": "09:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 160.00 resistance; rate divergence favours USD",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing the psychological 160.00 level.",
     "evidence": [
-      "USD/JPY: 159.406",
-      "BoJ rate: 0.75%",
-      "Fed rate: 3.75%"
+      "USD/JPY: 159.374",
+      "BoJ rate: 0.75% (ON HOLD)",
+      "VIX: 24.5"
     ]
   },
   {
-    "time": "08:03",
+    "time": "09:43",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading above 1.1525, ECB cutting rates may weigh on EUR; watch for 1.15690 resistance",
+    "title": "ECB",
+    "text": "ECB cutting stance continues to weigh on EUR/USD, with the pair holding below 1.1600.",
     "evidence": [
-      "EUR/USD: 1.15690",
-      "ECB rate: 2.00%",
+      "EUR/USD: 1.15590",
+      "ECB rate: 2.00% (CUTTING)",
       "US 10Y yield: 4.313%"
     ]
   },
   {
-    "time": "08:00",
+    "time": "09:40",
     "priority": "warning",
-    "title": "VIX",
-    "text": "VIX at 24.8 signals elevated volatility — not a risk-on environment",
+    "title": "CFTC — EUR",
+    "text": "EUR net short positioning at -38,698, with long% at 40.0%, may lead to a short squeeze if ECB surprises.",
     "evidence": [
-      "VIX: 24.8",
+      "EUR net short: -38,698",
+      "EUR long%: 40.0%",
+      "ECB rate: 2.00% (CUTTING)"
+    ]
+  },
+  {
+    "time": "09:35",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "VIX at 24.5 signals elevated volatility — not a risk-on environment, with S&P 500 trading flat.",
+    "evidence": [
+      "VIX: 24.5",
       "S&P 500: 6,583",
       "MOVE Index: 81.8"
     ]
   },
   {
-    "time": "07:58",
+    "time": "09:30",
     "priority": "info",
     "title": "AUD/NZD",
-    "text": "Retail sentiment extreme: 91% short AUD/NZD, watch for potential squeeze",
+    "text": "Retail sentiment extreme with 91% short bias, watch for potential squeeze as AUD/NZD trades near recent lows.",
     "evidence": [
       "AUD/NZD: 9% long / 91% short",
-      "AUD/USD: 0.69310",
-      "NZD/USD: 0.57270"
-    ]
-  },
-  {
-    "time": "07:55",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "Cross-asset context: DXY 99.83, Gold $4,708, WTI Oil $109.4; mixed signals on risk appetite",
-    "evidence": [
-      "DXY: 99.83",
-      "Gold: $4,708",
-      "WTI Oil: $109.4"
+      "AUD/USD: 0.69320",
+      "NZD/USD: 0.57240"
     ]
   }
 ]
