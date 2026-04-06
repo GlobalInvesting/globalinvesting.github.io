@@ -421,8 +421,8 @@ function populateFxPairsTable() {
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
 
     const tvSym = pair.invert
-      ? `FX:${pair.base}${pair.quote}`
-      : `FX:${pair.quote}${pair.base}`;
+      ? `FX_IDC:${pair.base}${pair.quote}`
+      : `FX_IDC:${pair.quote}${pair.base}`;
     return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Click: open chart · Double-click: pair detail">
       <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
       <td style="color:var(--text1)">${bid}</td>
