@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.4 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
+fetch_intraday_quotes.py  v2.5 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -474,32 +474,51 @@ def fetch_yfinance_all(symbols_map):
                 #   3. Fallback to closes.iloc[-1] vs iloc[-2] if intraday fetch fails,
                 #      which preserves the old behaviour rather than producing 0.00%.
 
-                from datetime import date as _date
-                today_str = _date.today().isoformat()
+                from datetime import datetime as _dt, timezone as _tz
+                today_str = _dt.now(_tz.utc).strftime("%Y-%m-%d")  # always UTC date
 
                 prev_close = float(closes.iloc[-1])  # last completed daily close
 
                 close    = None
                 day_high = None
                 day_low  = None
-                try:
-                    hist_1h = ticker.history(period="2d", interval="1h", auto_adjust=True)
-                    if not hist_1h.empty:
-                        if hist_1h.index.tz is not None:
-                            hist_today = hist_1h[hist_1h.index.tz_convert("UTC").strftime("%Y-%m-%d") == today_str]
-                        else:
-                            hist_today = hist_1h[hist_1h.index.strftime("%Y-%m-%d") == today_str]
-                        if not hist_today.empty:
-                            intra_c = hist_today["Close"].dropna()
-                            if len(intra_c) > 0:
-                                close    = float(intra_c.iloc[-1])
-                                day_high = round(float(hist_today["High"].max()), 4)
-                                day_low  = round(float(hist_today["Low"].min()),  4)
-                except Exception:
-                    pass
+
+                def _extract_today(hist_intra):
+                    """Filter intraday bars to today's UTC date; return (close, high, low) or None."""
+                    if hist_intra.empty:
+                        return None
+                    idx = hist_intra.index
+                    if idx.tz is not None:
+                        dates = idx.tz_convert("UTC").strftime("%Y-%m-%d")
+                    else:
+                        dates = idx.strftime("%Y-%m-%d")
+                    subset = hist_intra[dates == today_str]
+                    if subset.empty:
+                        return None
+                    intra_c = subset["Close"].dropna()
+                    if len(intra_c) == 0:
+                        return None
+                    return (
+                        float(intra_c.iloc[-1]),
+                        round(float(subset["High"].max()), 4),
+                        round(float(subset["Low"].min()),  4),
+                    )
+
+                # Try 5m first (more granular, usually available for FX intraday),
+                # then 1h as fallback (more reliable in CI for some symbols).
+                for _period, _interval in [("1d", "5m"), ("2d", "1h")]:
+                    try:
+                        hist_intra = ticker.history(period=_period, interval=_interval, auto_adjust=True)
+                        result = _extract_today(hist_intra)
+                        if result is not None:
+                            close, day_high, day_low = result
+                            break
+                    except Exception:
+                        pass
 
                 if close is None:
-                    # Fallback: daily bars only — prev session vs session before that
+                    # Fallback: daily bars only — prev session vs session before that.
+                    # Avoids producing 0.00% by using real prior-session prices.
                     close      = prev_close
                     prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
                     highs = hist["High"].dropna()
@@ -594,7 +613,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.3  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.5  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
