@@ -4344,8 +4344,7 @@ window.addEventListener('resize', drawLiquidityChart);
     return active.length ? active.join(' + ') : 'Inter-session';
   }
 
-  function volLabel(v, maxV) {
-    const pct = Math.round((v / maxV) * 100);
+  function volLabel(pct) {
     if (pct >= 85) return 'Very High (' + pct + '%)';
     if (pct >= 60) return 'High (' + pct + '%)';
     if (pct >= 35) return 'Moderate (' + pct + '%)';
@@ -4360,6 +4359,8 @@ window.addEventListener('resize', drawLiquidityChart);
   canvas.addEventListener('mousemove', function(e) {
     const hours = _liqData;
     if (!hours) return;
+    // Use baseline 30d as the reference max — gives a stable % across the day
+    const baseline = _liqBaseline || hours;
 
     const rect = canvas.getBoundingClientRect();
     const PAD_L = 4, PAD_R = 4, PAD_T = 8, PAD_B = 18;
@@ -4374,7 +4375,7 @@ window.addEventListener('resize', drawLiquidityChart);
     // Map x → slot index (0–47, each = 30 min)
     const frac = (mouseX - PAD_L) / cW;
     const slot = Math.max(0, Math.min(47, Math.round(frac * 47)));
-    const utcH = slot / 2; // e.g. slot 17 → 08:30 UTC
+    const utcH = slot / 2;
 
     const hh = Math.floor(utcH).toString().padStart(2,'0');
     const mm = utcH % 1 === 0 ? '00' : '30';
@@ -4385,18 +4386,32 @@ window.addEventListener('resize', drawLiquidityChart);
     const localMM = d.getMinutes().toString().padStart(2,'0');
     const tzShort = d.toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop() || 'LT';
 
-    const maxV = Math.max(...hours, 10);
-    const v = hours[slot];
+    // % relative to baseline 30d peak (stable denominator across all hours)
+    const maxBaseline = Math.max(...baseline, 10);
+    const v    = hours[slot];
+    const vRef = baseline[slot];
+    const pct  = Math.round((v / maxBaseline) * 100);
+
+    // Past vs future
+    const nowSlotCurrent = Math.floor(new Date().getUTCHours()*2 + new Date().getUTCMinutes()/30);
+    const isPast = slot <= nowSlotCurrent;
+
+    // vs 30d avg comparison (only meaningful for past slots with real data)
+    let vsAvg = '';
+    if (isPast && vRef > 0 && _liqBaseline && _liqBaseline !== _liqData) {
+      const diff = Math.round(((v - vRef) / vRef) * 100);
+      if (diff > 8)       vsAvg = '  ↑ +' + diff + '% vs 30d avg';
+      else if (diff < -8) vsAvg = '  ↓ ' + diff + '% vs 30d avg';
+      else                vsAvg = '  ≈ in line with 30d avg';
+    }
 
     // Read tooltip dimensions BEFORE writing textContent — avoids forced reflow
-    // (reading offsetWidth after DOM mutation forces synchronous layout)
     const ttW = tooltip.style.display === 'block' ? (tooltip.offsetWidth || 170) : 170;
     const ttH = tooltip.style.display === 'block' ? (tooltip.offsetHeight || 56) : 56;
 
     document.getElementById('liq-tt-time').textContent = hh + ':' + mm + ' UTC  (' + localHH + ':' + localMM + ' ' + tzShort + ')';
     document.getElementById('liq-tt-session').textContent = '▸ ' + getActiveSessions(Math.floor(utcH));
-    const isPast = slot <= Math.floor(new Date().getUTCHours()*2 + new Date().getUTCMinutes()/30);
-    document.getElementById('liq-tt-vol').textContent = (isPast ? '⬤' : '○') + ' ' + (isPast ? '' : '(est.) ') + volLabel(v, maxV);
+    document.getElementById('liq-tt-vol').textContent = (isPast ? '⬤' : '○') + ' ' + (isPast ? '' : '(est.) ') + volLabel(pct) + vsAvg;
 
     // Position tooltip next to cursor using fixed coordinates
     let left = e.clientX + 14;
