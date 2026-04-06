@@ -628,19 +628,17 @@ async function fetchCBRates() {
 // TradingView COT chart symbols — CFTC futures+options combined, large traders
 // Codes: EUR=099741 (EUR/USD futures), GBP=096742, JPY=097741, AUD=232741,
 //        CAD=090741, CHF=092741, USD=098662 (US Dollar Index futures)
-// COT: = Legacy report prefix (Financial/TFF Leveraged Funds series lives here in TV).
-// Suffix breakdown: _FO_ = Futures+Options Combined (matches our options_futures_combined
-// source), _LMP_ = Leveraged Funds Positions, _L = Long.
-// Confirmed via TradingView Symbol Search: "232741_FO_LMP_L" = 
-// "AUSTRALIAN DOLLAR - CME - Futures and Options - Leveraged Funds Positions Long"
+// COT: prefix + _FO_NCP_L suffix = Futures+Options Combined · NonCommercial Positions Long
+// NonCommercial = speculative category in Legacy COT report (equivalent to Leveraged Funds).
+// Format confirmed by user: "COT:232741_FO_NCP_L"
 const COT_TV_SYMBOLS = {
-  EUR: 'COT:099741_FO_LMP_L',
-  GBP: 'COT:096742_FO_LMP_L',
-  JPY: 'COT:097741_FO_LMP_L',
-  AUD: 'COT:232741_FO_LMP_L',
-  CAD: 'COT:090741_FO_LMP_L',
-  CHF: 'COT:092741_FO_LMP_L',
-  USD: 'COT:098662_FO_LMP_L',
+  EUR: 'COT:099741_FO_NCP_L',
+  GBP: 'COT:096742_FO_NCP_L',
+  JPY: 'COT:097741_FO_NCP_L',
+  AUD: 'COT:232741_FO_NCP_L',
+  CAD: 'COT:090741_FO_NCP_L',
+  CHF: 'COT:092741_FO_NCP_L',
+  USD: 'COT:098662_FO_NCP_L',
 };
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
@@ -3034,7 +3032,7 @@ const ETF_IV_MANIFEST = [
   { key:'vix',   label:'VIX',    desc:'S&P 500 30d implied vol (CBOE)',      tvSym:'TVC:VIX'    },
   { key:'move',  label:'MOVE',   desc:'US Treasury bond vol index (ICE)',     tvSym:'CBOE:MOVE'  },
   { key:'spx',   label:'SPX',    desc:'S&P 500 index level',                  tvSym:'SP:SPX'     },
-  { key:'gold',  label:'Gold',   desc:'XAU/USD spot (USD/oz)',                tvSym:'TVC:GOLD'   },
+  { key:'gold',  label:'Gold',   desc:'XAU/USD spot (USD/oz)',                tvSym:'FOREXCOM:GOLD'   },
   { key:'wti',   label:'WTI',    desc:'Crude oil front-month (USD/bbl)',       tvSym:'TVC:USOIL'  },
   { key:'dxy',   label:'DXY',    desc:'US Dollar Index',                       tvSym:'TVC:DXY'    },
   { key:'us10y', label:'US 10Y', desc:'US 10-year Treasury yield (%)',         tvSym:'TVC:US10Y'  },
