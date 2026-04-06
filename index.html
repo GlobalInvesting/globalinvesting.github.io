@@ -518,6 +518,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
               <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
               <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
+              <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
+              <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -695,22 +697,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="sb-head" style="margin-top:2px;">Key Correlations</div>
     <table aria-label="Key FX correlations">
-      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col">Corr</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col">60d</th><th scope="col" title="Current vs 252-day historical norm">vs norm</th></tr></thead>
       <tbody id="correlations-tbody">
         <!-- 10 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
-        <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>AUD/USD</td><td>Gold</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/JPY</td><td>US 10Y</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/JPY</td><td>VIX</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>USD/CAD</td><td>WTI Oil</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>GBP/USD</td><td>FTSE 100</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>AUD/USD</td><td>ASX 200</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>NZD/USD</td><td>NZX 50</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>EUR/USD</td><td>EuroStoxx</td><td style="color:var(--text3)">—</td></tr>
-        <tr><td>GBP/USD</td><td>Gold</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>AUD/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/JPY</td><td>US 10Y</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/JPY</td><td>VIX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>USD/CAD</td><td>WTI Oil</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>GBP/USD</td><td>FTSE 100</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>AUD/USD</td><td>ASX 200</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>NZD/USD</td><td>NZX 50</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>EUR/USD</td><td>EuroStoxx</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>GBP/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
       </tbody>
     </table>
-    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance</div>
+    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance · vs norm = z-score vs 252d</div>
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table aria-label="Central bank rate expectations">
