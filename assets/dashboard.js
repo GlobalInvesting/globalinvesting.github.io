@@ -3987,6 +3987,9 @@ async function buildRichNarrative() {
             const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
             sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr;
           }
+
+          // Notify user if signal set changed and notifications are enabled
+          maybeNotifyNewSignals(signals);
         }
       }
     } catch {}
@@ -5132,6 +5135,85 @@ const ALERTS_LABELS = {
   audusd:'AUD/USD', usdchf:'USD/CHF', xauusd:'Gold', us10y:'US 10Y', move:'MOVE',
 };
 
+// ── Signal Notifications — browser push for new AI signals ────────────────────
+// Storage: localStorage key 'gi_sig_notif' → 'on' | 'off'  (default: 'off')
+// Tracks last-seen signal fingerprint to detect new signals on each 15-min refresh.
+const SIG_NOTIF_KEY       = 'gi_sig_notif';
+const SIG_NOTIF_SEEN_KEY  = 'gi_sig_seen';   // fingerprint of last-rendered signal set
+
+function sigNotifEnabled() {
+  return localStorage.getItem(SIG_NOTIF_KEY) === 'on';
+}
+
+function updateSignalNotifBtn() {
+  const btn   = document.getElementById('sig-notif-btn');
+  const label = document.getElementById('sig-notif-label');
+  if (!btn) return;
+  const on = sigNotifEnabled();
+  const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.setAttribute('aria-label', on ? 'Signal notifications on' : 'Signal notifications off');
+  btn.classList.toggle('sig-notif-on', on);
+  btn.classList.toggle('sig-notif-blocked', blocked);
+  btn.title = blocked
+    ? 'Notifications blocked by browser — enable in site settings'
+    : on ? 'Signal notifications ON — click to disable' : 'Signal notifications OFF — click to enable';
+  if (label) label.textContent = blocked ? 'Blocked' : on ? 'Notifying' : 'Notify';
+}
+
+async function toggleSignalNotifications() {
+  const wasOn = sigNotifEnabled();
+  if (!wasOn) {
+    // Turning on — request permission if needed
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') { updateSignalNotifBtn(); return; }
+    }
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+      updateSignalNotifBtn(); return;
+    }
+    localStorage.setItem(SIG_NOTIF_KEY, 'on');
+  } else {
+    localStorage.setItem(SIG_NOTIF_KEY, 'off');
+  }
+  updateSignalNotifBtn();
+}
+
+// Fingerprint a signals array → stable string for change detection
+function sigFingerprint(signals) {
+  if (!Array.isArray(signals) || !signals.length) return '';
+  return signals.map(s => `${s.time}|${s.title}|${s.priority}`).join(';;');
+}
+
+// Called by buildRichNarrative after rendering new signals.
+// Fires a browser notification if: notif enabled + permission granted + signals changed.
+function maybeNotifyNewSignals(signals) {
+  if (!sigNotifEnabled()) return;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const fp     = sigFingerprint(signals);
+  const lastFp = localStorage.getItem(SIG_NOTIF_SEEN_KEY) || '';
+  if (fp === lastFp || !fp) return;   // nothing new
+  localStorage.setItem(SIG_NOTIF_SEEN_KEY, fp);
+  if (!lastFp) return;                // first load — don't notify, just record baseline
+
+  // Find signals that weren't in the previous set
+  const critCount = signals.filter(s => s.priority === 'critical').length;
+  const warnCount = signals.filter(s => s.priority === 'warning').length;
+  const parts = [];
+  if (critCount) parts.push(`${critCount} critical`);
+  if (warnCount) parts.push(`${warnCount} warning`);
+  const body = parts.length
+    ? `${signals.length} signals — ${parts.join(', ')}`
+    : `${signals.length} market signals updated`;
+  try {
+    new Notification('GI Terminal — New Signals', {
+      body,
+      icon: '/favicon-192x192.png',
+      tag : 'gi-signals-update',   // replaces previous notification instead of stacking
+    });
+  } catch {}
+}
+
 function alertsLoad() {
   try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '[]'); } catch { return []; }
 }
@@ -5236,6 +5318,9 @@ function initAlerts() {
   // Check immediately, then every 5 min
   alertsCheck();
   setInterval(alertsCheck, 5 * 60 * 1000);
+
+  // Init signal notification button state from localStorage
+  updateSignalNotifBtn();
 
   // Close popover when clicking outside — bubble phase so button onclick fires first
   document.addEventListener('click', e => {
