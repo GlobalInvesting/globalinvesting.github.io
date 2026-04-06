@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.7 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
+fetch_intraday_quotes.py  v2.8 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v2.8 vs v2.7:
+  - fetch_correlations() ahora descarga 252d (1 año) en vez de 90d.
+  - Calcula norm: media de Pearson en ventanas de 30d sobre el año histórico.
+  - Calcula z_score: (corr60d - norm) / std — cuántas sigmas fuera de norma.
+  - Agrega 2 pares nuevos: DXY/SPX y Gold/DXY (señales de régimen).
+  - PASO 6b: genera signals de rotura de correlación en ai-analysis/signals.json
+    cuando |z_score| > 1.5 (determinista, sin LLM). Se limpian en cada ejecución.
 
 MEJORAS v2.7 vs v2.6:
   - 1D % change ahora usa ticker.info["regularMarketChangePercent"] como fuente primaria
@@ -224,6 +232,9 @@ CORRELATION_PAIRS = [
     ("nzdusd", "nzx"),     # NZD/USD vs NZX 50   (domestic equity proxy)
     ("eurusd", "stoxx"),   # EUR/USD vs EuroStoxx 50 (ECB/EU equity link)
     ("gbpusd", "gold"),    # GBP/USD vs Gold      (safe-haven vs sterling)
+    # Dynamic correlation pairs — added v2.8 (regime-break signals)
+    ("dxy", "spx"),        # DXY vs SPX: positive = USD funding stress (breaks normal negative)
+    ("gold", "dxy"),       # Gold vs DXY: positive = safe-haven model broken or real inflation
 ]
 
 # Human-readable labels for the frontend
@@ -239,6 +250,9 @@ CORRELATION_LABELS = {
     ("nzdusd", "nzx"):    ("NZD/USD", "NZX 50"),
     ("eurusd", "stoxx"):  ("EUR/USD", "EuroStoxx"),
     ("gbpusd", "gold"):   ("GBP/USD", "Gold"),
+    # Dynamic
+    ("dxy", "spx"):       ("DXY", "SPX"),
+    ("gold", "dxy"):      ("Gold", "DXY"),
 }
 
 # All unique symbols needed for correlation (merged with FX pairs)
@@ -262,19 +276,22 @@ def pearson(x, y):
 
 def fetch_correlations():
     """
-    Downloads 90 days of daily closes for each symbol used in correlation pairs
-    and computes rolling 60-day Pearson correlation.
-    Returns a list of dicts ready for quotes.json:
-      [{ "a": "EUR/USD", "b": "DXY", "corr": -0.97, "n": 60 }, ...]
+    Downloads 270 days of daily closes for each symbol used in correlation pairs.
+    Computes:
+      - corr:    rolling 60-day Pearson (current regime)
+      - norm:    mean of all 30-day rolling Pearson windows over 252 days (historical baseline)
+      - z_score: (corr - norm) / std_dev — how many std devs current is from historical norm
+                 |z| > 1.5 = correlation break worth flagging as a signal
+    Returns a list of dicts ready for quotes.json.
     """
-    print("\n[Correlations] Computing rolling 60-day correlations...")
+    print("\n[Correlations] Computing rolling correlations with historical norm...")
 
-    # Fetch 90d history for all needed symbols
+    # Fetch 270d history (252 trading days + buffer) for all needed symbols
     series = {}
     for sym_id, yf_sym in CORR_SYMBOLS.items():
         try:
             ticker = yf.Ticker(yf_sym)
-            hist = ticker.history(period="3mo", interval="1d", auto_adjust=True)
+            hist = ticker.history(period="1y", interval="1d", auto_adjust=True)
             if hist.empty or len(hist) < 15:
                 print(f"[Correlations] {sym_id}: insufficient data ({len(hist)} days)")
                 continue
@@ -288,16 +305,48 @@ def fetch_correlations():
         labels = CORRELATION_LABELS[(sym_a, sym_b)]
         if sym_a not in series or sym_b not in series:
             print(f"[Correlations] Skipping {sym_a}/{sym_b} — missing data")
-            results.append({"a": labels[0], "b": labels[1], "corr": None, "n": 0})
+            results.append({"a": labels[0], "b": labels[1], "corr": None, "n": 0,
+                            "norm": None, "z_score": None})
             continue
-        # Align to shortest series, use last 60 points
+
         sa, sb = series[sym_a], series[sym_b]
-        n = min(len(sa), len(sb), 60)
-        sa60, sb60 = sa[-n:], sb[-n:]
-        corr = pearson(sa60, sb60)
+        aligned = min(len(sa), len(sb))
+        sa_all, sb_all = sa[-aligned:], sb[-aligned:]
+
+        # Current 60-day correlation
+        n60 = min(aligned, 60)
+        corr = pearson(sa_all[-n60:], sb_all[-n60:])
+
+        # Historical norm: compute all 30-day rolling Pearson windows over last 252 points
+        # Use 30-day windows (not 60) for the norm to get more samples and smoother baseline
+        norm_window = 30
+        hist_corrs = []
+        hist_points = min(aligned, 252)
+        sa_hist, sb_hist = sa_all[-hist_points:], sb_all[-hist_points:]
+        for i in range(hist_points - norm_window + 1):
+            c = pearson(sa_hist[i:i + norm_window], sb_hist[i:i + norm_window])
+            if c is not None:
+                hist_corrs.append(c)
+
+        norm = None
+        z_score = None
+        if len(hist_corrs) >= 10:
+            norm = round(sum(hist_corrs) / len(hist_corrs), 3)
+            variance = sum((c - norm) ** 2 for c in hist_corrs) / (len(hist_corrs) - 1)
+            std = math.sqrt(variance)
+            if std > 0 and corr is not None:
+                z_score = round((corr - norm) / std, 2)
+
         status = f"{corr:+.3f}" if corr is not None else "N/A"
-        print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: {status}  (n={n})")
-        results.append({"a": labels[0], "b": labels[1], "corr": corr, "n": n})
+        norm_s = f"norm={norm:+.3f}" if norm is not None else "norm=N/A"
+        z_s = f"z={z_score:+.2f}" if z_score is not None else "z=N/A"
+        print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: {status}  {norm_s}  {z_s}  (n={n60})")
+
+        results.append({
+            "a": labels[0], "b": labels[1],
+            "corr": corr, "n": n60,
+            "norm": norm, "z_score": z_score,
+        })
 
     return results
 
@@ -649,7 +698,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.6  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.8  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
@@ -709,8 +758,101 @@ def main():
         if pair_id in quotes and hv is not None:
             quotes[pair_id]["hv30"] = hv
 
-    # PASO 6: Calcular correlaciones rolling 60d
+    # PASO 6: Calcular correlaciones rolling 60d con norma histórica
     correlations = fetch_correlations()
+
+    # PASO 6b: Generar signals de rotura de correlación para Alerts & Market Signals
+    # Regla: |z_score| > 1.5 = correlación fuera de norma → signal determinista (no LLM)
+    # Se acumulan en signals.json junto con los signals de AI (se añaden al inicio de la lista)
+    try:
+        import os as _os
+        _signals_path = _os.path.join(site_path, "ai-analysis", "signals.json")
+        _existing_signals = []
+        if _os.path.exists(_signals_path):
+            with open(_signals_path) as _sf:
+                _existing_signals = json.load(_sf)
+            # Remove stale corr-break signals from previous run (re-computed each time)
+            _existing_signals = [s for s in _existing_signals
+                                  if not s.get("source") == "corr_break"]
+
+        _now_utc = datetime.now(timezone.utc)
+        _time_str = _now_utc.strftime("%H:%M")
+
+        # Descriptions for each pair explaining why the break matters for FX
+        _corr_context = {
+            ("USD/JPY", "VIX"):    {
+                "normal": "negative",
+                "break_pos": "USD/JPY acting as risk asset, not safe haven. JPY not being bought on stress — unusual.",
+                "break_neg": "USD/JPY falling despite low volatility. JPY bid for reasons outside risk sentiment.",
+            },
+            ("DXY", "SPX"):        {
+                "normal": "negative",
+                "break_pos": "DXY and equities rising together — USD funding stress or stagflation signal.",
+                "break_neg": "DXY falling with equities — broad risk-on, USD losing safe-haven premium.",
+            },
+            ("Gold", "DXY"):       {
+                "normal": "negative",
+                "break_pos": "Gold and USD rising together — real inflation or deep safe-haven demand.",
+                "break_neg": "Gold falling with USD — risk-on, safe-haven unwind.",
+            },
+            ("EUR/USD", "EuroStoxx"): {
+                "normal": "positive",
+                "break_pos": "EUR/USD and EuroStoxx in unusually strong lockstep — EUR purely tracking risk appetite.",
+                "break_neg": "EUR/USD falling while European equities hold — ECB policy divergence signal.",
+            },
+            ("AUD/USD", "Gold"):   {
+                "normal": "positive",
+                "break_pos": "AUD and Gold unusually correlated — commodity FX regime dominant.",
+                "break_neg": "Gold rising but AUD falling — China/domestic risk overriding commodity link.",
+            },
+        }
+
+        _new_corr_signals = []
+        for c in correlations:
+            z = c.get("z_score")
+            if z is None or abs(z) < 1.5:
+                continue
+            pair_key = (c["a"], c["b"])
+            ctx = _corr_context.get(pair_key, {})
+            direction = "above" if z > 0 else "below"
+            norm_str = f"{c['norm']:+.2f}" if c.get("norm") is not None else "hist. avg"
+            corr_str = f"{c['corr']:+.2f}" if c.get("corr") is not None else "—"
+
+            # Select description based on direction of break
+            if ctx:
+                desc = ctx["break_pos"] if z > 0 else ctx["break_neg"]
+            else:
+                norm_dir = "positive" if (c.get("norm") or 0) > 0 else "negative"
+                desc = f"Correlation {direction} historical norm ({norm_str}). Normal relationship is {norm_dir}."
+
+            priority = "critical" if abs(z) > 2.5 else "warning"
+            _new_corr_signals.append({
+                "source":   "corr_break",
+                "time":     _time_str,
+                "priority": priority,
+                "title":    f"{c['a']} / {c['b']} correlation break",
+                "text":     desc,
+                "evidence": [
+                    f"60d corr: {corr_str}",
+                    f"Hist. norm: {norm_str}",
+                    f"Z-score: {z:+.2f}σ",
+                ],
+            })
+            print(f"[CorrSignal] {c['a']} vs {c['b']}: z={z:+.2f} → {priority} signal")
+
+        if _new_corr_signals:
+            _final_signals = _new_corr_signals + _existing_signals
+            with open(_signals_path, "w") as _sf:
+                json.dump(_final_signals, _sf, indent=2)
+            print(f"[CorrSignal] {len(_new_corr_signals)} correlation break signal(s) added to signals.json")
+        else:
+            print("[CorrSignal] No correlation breaks detected (all |z| < 1.5)")
+            # Still write to remove stale corr_break signals from previous run
+            if _os.path.exists(_signals_path):
+                with open(_signals_path, "w") as _sf:
+                    json.dump(_existing_signals, _sf, indent=2)
+    except Exception as _e:
+        print(f"[CorrSignal] Error generating correlation signals: {_e}")
 
     # PASO 7: Implied volatility real desde FX ETF options (CBOE vía yfinance)
     fx_etf_iv = fetch_fx_etf_iv()
