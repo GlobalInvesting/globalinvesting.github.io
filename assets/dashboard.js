@@ -4135,7 +4135,7 @@ async function fetchLiquidityData() {
     const today24 = Array.from({length:24}, (_,h) => {
       if (isWeekend) return 2;
       if (h < hoursComplete && todayRaw[h] > 0) return todayRaw[h];   // real data
-      if (h >= Math.floor(nowH)) return d.baseline_30d[h] * 0.75;      // future: attenuated baseline
+      if (h >= Math.floor(nowH)) return d.baseline_30d[h];             // future: 30d real baseline
       return d.baseline_30d[h];                                          // past gap: use baseline
     });
 
@@ -4253,18 +4253,11 @@ function drawLiquidityChart() {
     for (let i=0; i<=nowSlot; i++) i===0 ? ctx.moveTo(px(i),py(hours[i])) : ctx.lineTo(px(i),py(hours[i]));
     ctx.stroke();
 
-    // ── FUTURE: línea punteada azul tenue ────────────────────────────────
+    // ── FUTURE: línea punteada azul tenue (datos: baseline 30d real) ─────
     ctx.beginPath(); ctx.strokeStyle='rgba(41,98,255,0.35)'; ctx.lineWidth=1.2; ctx.setLineDash([3,4]);
     ctx.moveTo(nowX, py(hours[nowSlot]));
     for (let i=nowSlot+1; i<48; i++) ctx.lineTo(px(i),py(hours[i]));
     ctx.stroke(); ctx.setLineDash([]);
-
-    // ── BASELINE 30d: línea de referencia gris punteada ──────────────────
-    if (baseline !== hours) {
-      ctx.beginPath(); ctx.strokeStyle='rgba(120,123,134,0.45)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
-      for (let i=0; i<48; i++) i===0 ? ctx.moveTo(px(i),py(baseline[i])) : ctx.lineTo(px(i),py(baseline[i]));
-      ctx.stroke(); ctx.setLineDash([]);
-    }
 
     // ── NOW-LINE: línea naranja vertical punteada — igual que el original ────
     ctx.strokeStyle='rgba(246,148,28,0.6)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
