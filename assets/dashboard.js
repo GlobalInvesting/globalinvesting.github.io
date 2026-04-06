@@ -2457,22 +2457,38 @@ function openPairPopover(rowEl, tvSym) {
   }
 
   pop.dataset.sym = tvSym;
-  pop.style.display = 'block';
 
-  // Position: prefer right of the row, fall back to left if near right edge
-  const rect = rowEl.getBoundingClientRect();
-  const pw = 270, ph = 300;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  let x = rect.right + 6;
-  let y = rect.top;
-  if (x + pw > vw - 8) x = rect.left - pw - 6;
-  if (x < 8) x = 8;
-  if (y + ph > vh - 8) y = vh - ph - 8;
-  if (y < 8) y = 8;
-  pop.style.left = x + 'px';
-  pop.style.top  = y + 'px';
+  // Render off-screen first to measure real dimensions
+  pop.style.visibility = 'hidden';
+  pop.style.display = 'block';
+  pop.style.left = '0px';
+  pop.style.top  = '0px';
 
   updatePairDetail(tvSym);
+
+  // After paint: read real size and clamp within viewport
+  requestAnimationFrame(() => {
+    const rect = rowEl.getBoundingClientRect();
+    const popRect = pop.getBoundingClientRect();
+    const pw = popRect.width  || 270;
+    const ph = popRect.height || 400;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const GAP = 6, MARGIN = 8;
+
+    // Prefer right of row; fall back to left if it would overflow
+    let x = rect.right + GAP;
+    if (x + pw > vw - MARGIN) x = rect.left - pw - GAP;
+    if (x < MARGIN) x = MARGIN;
+
+    // Align top of popup with row; shift up if it overflows bottom
+    let y = rect.top;
+    if (y + ph > vh - MARGIN) y = vh - ph - MARGIN;
+    if (y < MARGIN) y = MARGIN;
+
+    pop.style.left = x + 'px';
+    pop.style.top  = y + 'px';
+    pop.style.visibility = 'visible';
+  });
 }
 
 function closePairPopover() {
