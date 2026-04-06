@@ -5138,8 +5138,8 @@ const ALERTS_LABELS = {
 // ── Signal Notifications — browser push for new AI signals ────────────────────
 // Storage: localStorage key 'gi_sig_notif' → 'on' | 'off'  (default: 'off')
 // Tracks last-seen signal fingerprint to detect new signals on each 15-min refresh.
-const SIG_NOTIF_KEY       = 'gi_sig_notif';
-const SIG_NOTIF_SEEN_KEY  = 'gi_sig_seen';   // fingerprint of last-rendered signal set
+const SIG_NOTIF_KEY      = 'gi_sig_notif';
+const SIG_NOTIF_SEEN_KEY = 'gi_sig_seen';   // fingerprint of last-rendered signal set
 
 function sigNotifEnabled() {
   return localStorage.getItem(SIG_NOTIF_KEY) === 'on';
@@ -5149,11 +5149,11 @@ function updateSignalNotifBtn() {
   const btn   = document.getElementById('sig-notif-btn');
   const label = document.getElementById('sig-notif-label');
   if (!btn) return;
-  const on = sigNotifEnabled();
+  const on      = sigNotifEnabled();
   const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
   btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   btn.setAttribute('aria-label', on ? 'Signal notifications on' : 'Signal notifications off');
-  btn.classList.toggle('sig-notif-on', on);
+  btn.classList.toggle('sig-notif-on',      on && !blocked);
   btn.classList.toggle('sig-notif-blocked', blocked);
   btn.title = blocked
     ? 'Notifications blocked by browser — enable in site settings'
@@ -5164,7 +5164,6 @@ function updateSignalNotifBtn() {
 async function toggleSignalNotifications() {
   const wasOn = sigNotifEnabled();
   if (!wasOn) {
-    // Turning on — request permission if needed
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       const perm = await Notification.requestPermission();
       if (perm !== 'granted') { updateSignalNotifBtn(); return; }
@@ -5179,24 +5178,19 @@ async function toggleSignalNotifications() {
   updateSignalNotifBtn();
 }
 
-// Fingerprint a signals array → stable string for change detection
 function sigFingerprint(signals) {
   if (!Array.isArray(signals) || !signals.length) return '';
   return signals.map(s => `${s.time}|${s.title}|${s.priority}`).join(';;');
 }
 
-// Called by buildRichNarrative after rendering new signals.
-// Fires a browser notification if: notif enabled + permission granted + signals changed.
 function maybeNotifyNewSignals(signals) {
   if (!sigNotifEnabled()) return;
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   const fp     = sigFingerprint(signals);
   const lastFp = localStorage.getItem(SIG_NOTIF_SEEN_KEY) || '';
-  if (fp === lastFp || !fp) return;   // nothing new
+  if (fp === lastFp || !fp) return;
   localStorage.setItem(SIG_NOTIF_SEEN_KEY, fp);
-  if (!lastFp) return;                // first load — don't notify, just record baseline
-
-  // Find signals that weren't in the previous set
+  if (!lastFp) return;   // first load — record baseline, don't notify
   const critCount = signals.filter(s => s.priority === 'critical').length;
   const warnCount = signals.filter(s => s.priority === 'warning').length;
   const parts = [];
@@ -5209,7 +5203,7 @@ function maybeNotifyNewSignals(signals) {
     new Notification('GI Terminal — New Signals', {
       body,
       icon: '/favicon-192x192.png',
-      tag : 'gi-signals-update',   // replaces previous notification instead of stacking
+      tag : 'gi-signals-update',
     });
   } catch {}
 }
@@ -5235,6 +5229,15 @@ function alertsRender() {
   const container = document.getElementById('alerts-rows');
   if (!container) return;
   const arr = alertsLoad();
+
+  // Always update badge first — even when arr is empty (removes stale count)
+  const firedCount = arr.filter(a => a.fired).length;
+  const badge = document.getElementById('alerts-fired-badge');
+  if (badge) {
+    badge.textContent = firedCount;
+    badge.style.display = firedCount > 0 ? 'inline-block' : 'none';
+  }
+
   if (!arr.length) {
     container.innerHTML = '<div style="padding:5px 8px;font-size:10px;color:var(--text3);">No alerts set. Add one below.</div>';
     return;
@@ -5250,14 +5253,6 @@ function alertsRender() {
       <span class="alert-del" title="Remove alert" onclick="alertsRemove('${a.id}')">✕</span>
     </div>`;
   }).join('');
-
-  // Update fired badge count
-  const firedCount = arr.filter(a => a.fired).length;
-  const badge = document.getElementById('alerts-fired-badge');
-  if (badge) {
-    badge.textContent = firedCount;
-    badge.style.display = firedCount > 0 ? 'inline-block' : 'none';
-  }
 }
 
 function alertsRemove(id) {
@@ -5315,7 +5310,6 @@ function alertsCheck() {
 
 function initAlerts() {
   alertsRender();
-  // Check immediately, then every 5 min
   alertsCheck();
   setInterval(alertsCheck, 5 * 60 * 1000);
 

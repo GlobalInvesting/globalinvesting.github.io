@@ -312,13 +312,13 @@
     cursor: pointer; transition: color .15s, border-color .15s, background .15s;
     white-space: nowrap;
   }
-  .sig-notif-toggle:hover { color: var(--text); border-color: var(--text3); }
+  .sig-notif-toggle:hover { color: var(--blue); border-color: var(--blue); }
   .sig-notif-toggle svg { flex-shrink: 0; }
   .sig-notif-toggle.sig-notif-on {
-    color: var(--up); border-color: var(--up);
-    background: rgba(38,166,154,.08);
+    color: var(--blue); border-color: var(--blue);
+    background: rgba(41,98,255,.08);
   }
-  .sig-notif-toggle.sig-notif-on:hover { background: rgba(38,166,154,.14); }
+  .sig-notif-toggle.sig-notif-on:hover { background: rgba(41,98,255,.14); }
   .sig-notif-toggle.sig-notif-blocked {
     color: var(--down); border-color: var(--down);
     opacity: .7; cursor: not-allowed;
@@ -682,15 +682,6 @@
 
   /* Flag icons in sidebar tables */
   .fi { width: 16px; height: 12px; display: inline-block; }
-
-  /* Key Correlations — compact layout to fit 12 rows without clipping */
-  table[aria-label="Key FX correlations"] td {
-    font-size: 10px;
-    padding: 2px 4px;
-  }
-  table[aria-label="Key FX correlations"] th {
-    padding: 3px 4px;
-  }
 
   /* SENTIMENT PANEL — native render (no iframe) */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
