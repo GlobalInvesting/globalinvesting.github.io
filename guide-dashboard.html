@@ -826,24 +826,35 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <h3>Key Correlations</h3>
-      <p>Rolling 60-day Pearson correlations between selected pairs and reference assets (EUR/USD vs. DXY, AUD/USD vs. Gold, USD/JPY vs. US 10Y Yield). Correlation values near +1 or −1 indicate strong relationships; values near 0 mean the correlation has broken down — which can itself be a signal worth noting.</p>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
+      <p>Rolling 60-day Pearson correlations between 12 FX-relevant pairs and reference assets, computed from yfinance data. The table includes a <strong>vs norm</strong> column showing how far the current correlation deviates from its 252-day historical baseline, expressed as a z-score. Pairs deviating more than 1.5σ from their historical norm are flagged as potential regime breaks — a broken correlation is often as informative as the correlation itself.</p>
+      <p>Two pairs monitor macro regime specifically: <strong>DXY vs SPX</strong> (normally negative — a positive reading signals USD funding stress) and <strong>Gold vs DXY</strong> (normally negative — a positive reading signals the safe-haven model is broken or inflation is driving both).</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Key Correlations</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;">Pair A</th>
+            <th style="text-align:left;padding:3px 6px;">Pair A</th>
             <th style="padding:3px 6px;">Pair B</th>
-            <th style="padding:3px 6px;">Corr</th>
+            <th style="padding:3px 6px;">60d</th>
+            <th style="padding:3px 6px;color:var(--text3);" title="z-score vs 252d norm">vs norm</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR/USD</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-weight:700;">−0.97</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">Gold</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+0.71</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">USD/JPY</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">US10Y</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-weight:700;">+0.83</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">EUR/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.94</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">AUD/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">Gold</td><td style="padding:3px 6px;color:var(--up);text-align:center;font-weight:700;">+0.66</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">USD/JPY</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">US 10Y</td><td style="padding:3px 6px;color:var(--up);text-align:center;font-weight:700;">+0.50</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">~ stretched</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">USD/JPY</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">VIX</td><td style="padding:3px 6px;color:var(--up);text-align:center;font-weight:700;">+0.58</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-size:9px;">↯ break</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">USD/CAD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">WTI Oil</td><td style="padding:3px 6px;text-align:center;font-weight:700;">+0.29</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">GBP/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">FTSE 100</td><td style="padding:3px 6px;text-align:center;font-weight:700;">+0.06</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">AUD/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">ASX 200</td><td style="padding:3px 6px;text-align:center;font-weight:700;">+0.26</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">NZD/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">NZX 50</td><td style="padding:3px 6px;color:var(--up);text-align:center;font-weight:700;">+0.31</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-size:9px;">~ stretched</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">EUR/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">EuroStoxx</td><td style="padding:3px 6px;color:var(--up);text-align:center;font-weight:700;">+0.68</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-size:9px;">~ stretched</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">GBP/USD</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">Gold</td><td style="padding:3px 6px;text-align:center;font-weight:700;">+0.34</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:3px 6px;color:var(--text);">DXY</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">SPX</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.73</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
+            <tr><td style="padding:3px 6px;color:var(--text);">Gold</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.51</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
           </tbody>
         </table>
-        <div style="padding:2px 8px 5px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance</div>
+        <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance · vs norm = z-score vs 252d</div>
       </div>
 
       <h3>CB Rate Expectations</h3>
@@ -944,10 +955,15 @@ a { color: inherit; text-decoration: none; }
       <p>The final section of the main panel shows AI-generated market signals, updated 8× daily alongside the narrative (00:00, 03:30, 06:30, 08:30, 12:30, 15:30, 19:00, 21:30 UTC). Each signal includes:</p>
       <ul style="list-style:none;padding:0;margin-bottom:14px;">
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Priority dot</strong> — a colored indicator: <span style="color:var(--down);">red = critical</span>, <span style="color:var(--orange);">amber = warning</span>, <span style="color:var(--blue);">blue = informational</span></li>
-        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Timestamp</strong> — time of the last update cycle (UTC)</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Timestamp</strong> — time of the last update cycle, converted to your local timezone</li>
         <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Title</strong> — a short label identifying the pair or theme</li>
-        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Text</strong> — the rationale: cross-referencing logic across rate differentials, COT positioning, and price action</li>
+        <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Text</strong> — the rationale: cross-referencing logic across rate differentials, COT positioning, and price action</li>
+        <li style="padding:6px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);">Evidence chips</strong> — click any signal row to expand the data points that triggered it (e.g. "VIX: 24.1", "EUR/USD: 1.0823")</li>
       </ul>
+      <h3>Signal Notifications</h3>
+      <p>A bell icon button in the panel header lets you opt into browser notifications for new AI signals. When enabled, the button turns blue and the browser will notify you each time the signal set updates with new content — one notification per update cycle, summarising the count by priority. The preference is saved in your browser's local storage. To disable, click the bell again. If your browser has blocked notifications for this site, the button shows a red "blocked" state — re-enable notifications in your browser's site settings to use this feature.</p>
+      <h3>Price Alerts</h3>
+      <p>Configurable threshold alerts for key instruments are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. Set a price level and direction (above / below) for VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, NZD/USD, Gold, US 10Y, or MOVE. When triggered, the alert fires a browser notification and highlights in the panel. Alerts check every 5 minutes and persist across sessions in local storage.</p>
       <!-- MOCK: Alerts & Signals panel — reflects actual signals.json structure (priority dot + timestamp + title + text) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0 0 18px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
