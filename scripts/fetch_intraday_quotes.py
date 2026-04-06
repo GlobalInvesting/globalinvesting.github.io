@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.6 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
+fetch_intraday_quotes.py  v2.7 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v2.7 vs v2.6:
+  - 1D % change ahora usa ticker.info["regularMarketChangePercent"] como fuente primaria
+    (mismo número que muestra Yahoo Finance) — elimina definitivamente el bug +0.00% en FX.
+  - Cascade: info → fast_info.previous_close → daily history (fallback final).
+  - fast_info.previous_close en STEP B en vez de closes.iloc[-1] — evita la contaminación
+    de la barra de reapertura del domingo 22:00 UTC para pares FX en lunes.
 
 FUENTES POR SÍMBOLO:
   VIX     → yfinance  ^VIX          (CBOE, real-time diferido)
@@ -461,53 +468,102 @@ def fetch_yfinance_all(symbols_map):
                     results[internal_id] = None
                     continue
 
-                # ── 1D % change: fast_info last price vs last completed daily close ─────
+                # ── 1D % change: Strategy v2.7 ─────────────────────────────────────────
                 #
-                # Strategy (v2.6):
-                #   prev_close = closes.iloc[-1]  (last completed daily bar — e.g. Friday)
-                #   close      = ticker.fast_info["last_price"]  (real-time, no intraday bars needed)
-                #   day H/L    = ticker.fast_info["day_high"] / ["day_low"]
+                # Root cause of the persistent +0.00% bug for FX pairs:
+                #   v2.6 used closes.iloc[-1] as prev_close, but for FX on Monday,
+                #   yfinance daily history includes a bar from Sunday 22:00 UTC (market reopen)
+                #   with Friday's price as its close. So closes.iloc[-1] == fast_info.last_price
+                #   → chg = 0 → pct = 0.00%.
                 #
-                # Why fast_info instead of intraday bars:
-                #   - period="1d"/"2d" intraday intervals for FX include the Sunday 22:00 UTC
-                #     reopen bar with Friday's price — filtering by "today" still returns that
-                #     stale bar, producing close ≈ prev_close → +0.00%.
-                #   - fast_info always returns the true current market price without bar alignment
-                #     issues, and is available for all yfinance-supported symbols including FX.
-                #   - Fallback: if fast_info fails, use closes.iloc[-1] vs closes.iloc[-2]
-                #     (prev-session vs prior-session) which at least produces a real non-zero delta.
-
-                prev_close = float(closes.iloc[-1])  # last completed daily close (e.g. Friday)
+                # Fix (v2.7) — cascade strategy, same logic Yahoo Finance uses:
+                #
+                #   STEP A (primary): ticker.info["regularMarketChangePercent"]
+                #     • This is Yahoo Finance's own official 1D % — identical to what the
+                #       user sees on finance.yahoo.com. No bar alignment issues.
+                #     • ticker.info["regularMarketPrice"] → close
+                #     • ticker.info["regularMarketPreviousClose"] → prev_close
+                #     • ticker.info["regularMarketChange"] → chg (pre-calculated by Yahoo)
+                #     • Downside: .info() is slower (~1–2s per ticker). Acceptable since
+                #       we already fetch individual tickers for HV30 and correlations.
+                #
+                #   STEP B (fallback): fast_info.previous_close (NOT closes.iloc[-1])
+                #     • fast_info.previous_close is Yahoo's official prev-session close,
+                #       the same value used in regularMarketChangePercent calculations.
+                #     • fast_info.last_price / fast_info.previous_close → correct chg/pct.
+                #     • Avoids the closes.iloc[-1] Monday-reopen-bar contamination.
+                #
+                #   STEP C (last resort): closes.iloc[-1] vs closes.iloc[-2]
+                #     • Pure yfinance daily history as final fallback.
+                #     • Less accurate on Mondays due to the reopen bar, but better than 0%.
 
                 close    = None
+                prev_close = None
+                chg      = None
+                pct      = None
                 day_high = None
                 day_low  = None
 
+                # STEP A: ticker.info (most accurate — same numbers as Yahoo Finance website)
                 try:
-                    fi = ticker.fast_info
-                    lp = fi.get("last_price") if hasattr(fi, "get") else getattr(fi, "last_price", None)
-                    if lp and VALIDATORS.get(internal_id, lambda x: True)(float(lp)):
-                        close = float(lp)
-                    dh = fi.get("day_high") if hasattr(fi, "get") else getattr(fi, "day_high", None)
-                    dl = fi.get("day_low")  if hasattr(fi, "get") else getattr(fi, "day_low",  None)
-                    if dh:
-                        day_high = round(float(dh), 4)
-                    if dl:
-                        day_low  = round(float(dl), 4)
-                except Exception:
-                    pass
+                    info = ticker.info
+                    rmp  = info.get("regularMarketPrice")
+                    rmpc = info.get("regularMarketPreviousClose")
+                    rmch = info.get("regularMarketChange")
+                    rmpct= info.get("regularMarketChangePercent")
+                    rmdh = info.get("dayHigh")
+                    rmdl = info.get("dayLow")
 
+                    if rmp and rmpc and VALIDATORS.get(internal_id, lambda x: True)(float(rmp)):
+                        close      = float(rmp)
+                        prev_close = float(rmpc)
+                        chg        = float(rmch)  if rmch  is not None else (close - prev_close)
+                        pct        = float(rmpct) if rmpct is not None else ((chg / prev_close * 100) if prev_close else 0.0)
+                        if rmdh:
+                            day_high = round(float(rmdh), 4)
+                        if rmdl:
+                            day_low  = round(float(rmdl), 4)
+                        print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via info]")
+                except Exception:
+                    pass  # fall through to STEP B
+
+                # STEP B: fast_info with fast_info.previous_close (not closes.iloc[-1])
                 if close is None:
-                    # Fallback: prev session vs session before that.
-                    close      = prev_close
-                    prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
+                    try:
+                        fi = ticker.fast_info
+                        lp = fi.get("last_price")      if hasattr(fi, "get") else getattr(fi, "last_price",      None)
+                        pc = fi.get("previous_close")  if hasattr(fi, "get") else getattr(fi, "previous_close",  None)
+                        dh = fi.get("day_high")        if hasattr(fi, "get") else getattr(fi, "day_high",        None)
+                        dl = fi.get("day_low")         if hasattr(fi, "get") else getattr(fi, "day_low",         None)
+
+                        if lp and pc and VALIDATORS.get(internal_id, lambda x: True)(float(lp)):
+                            close      = float(lp)
+                            prev_close = float(pc)
+                            chg        = close - prev_close
+                            pct        = (chg / prev_close * 100) if prev_close != 0 else 0.0
+                            if dh:
+                                day_high = round(float(dh), 4)
+                            if dl:
+                                day_low  = round(float(dl), 4)
+                            print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via fast_info]")
+                    except Exception:
+                        pass  # fall through to STEP C
+
+                # STEP C: daily history fallback (closes.iloc[-1] vs iloc[-2])
+                if close is None:
+                    if len(closes) >= 2:
+                        close      = float(closes.iloc[-1])
+                        prev_close = float(closes.iloc[-2])
+                    elif len(closes) == 1:
+                        close      = float(closes.iloc[-1])
+                        prev_close = close
+                    chg = close - prev_close
+                    pct = (chg / prev_close * 100) if prev_close != 0 else 0.0
                     highs = hist["High"].dropna()
                     lows  = hist["Low"].dropna()
                     day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
                     day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
-
-                chg = close - prev_close
-                pct = (chg / prev_close * 100) if prev_close != 0 else 0.0
+                    print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via daily hist fallback]")
 
                 validator = VALIDATORS.get(internal_id)
                 if validator and not validator(close):
