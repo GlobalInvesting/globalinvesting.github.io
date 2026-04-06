@@ -1,39 +1,39 @@
 [
   {
-    "time": "02:45",
+    "time": "05:35",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.591",
+      "USD/JPY: 159.558",
       "BoJ rate: 0.75%",
       "VIX: 23.9"
     ]
   },
   {
-    "time": "02:42",
+    "time": "05:32",
     "priority": "warning",
-    "title": "ECB vs Fed Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1500, ECB cutting rates may weigh on EUR",
     "evidence": [
-      "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.15250"
+      "EUR/USD: 1.15300",
+      "ECB rate: 2.00% (CUTTING)",
+      "US 10Y yield: 4.313%"
     ]
   },
   {
-    "time": "02:40",
+    "time": "05:29",
     "priority": "warning",
-    "title": "NZD/USD Retail Sentiment",
-    "text": "NZD/USD 88% long — retail heavily positioned, watch for squeeze",
+    "title": "CFTC — EUR",
+    "text": "EUR net short positioning at -38,698, institutional selling may continue",
     "evidence": [
-      "NZD/USD: 0.57040",
-      "NZD/USD retail long: 88%",
-      "CFTC NZD net: -17,798"
+      "CFTC EUR net: -38,698",
+      "EUR/USD: 1.15300",
+      "ECB rate: 2.00% (CUTTING)"
     ]
   },
   {
-    "time": "02:35",
+    "time": "05:25",
     "priority": "info",
     "title": "Risk Regime",
     "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "02:30",
+    "time": "05:20",
     "priority": "info",
-    "title": "Yield Curve Context",
-    "text": "US 10Y-2Y spread at -22bp, indicating potential economic slowdown",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD sentiment extreme, 91% of retail traders short, watch for squeeze",
     "evidence": [
-      "US 10Y yield: 4.313%",
-      "US 2Y yield: 3.790%",
-      "US 10Y-2Y spread: -22bp"
+      "AUD/NZD: 9% long / 91% short",
+      "AUD/USD: 0.69110",
+      "NZD/USD: 0.57060"
     ]
   }
 ]
