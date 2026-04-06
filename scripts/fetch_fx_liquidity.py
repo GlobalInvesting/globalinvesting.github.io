@@ -203,8 +203,10 @@ def main():
             today_raw.append(median(vals) if vals else 0.0)
         today_profile = normalize_to_100(today_raw)
 
-    # Cuántas horas del día actual tienen datos reales (hora < hora actual)
-    hours_complete = now_utc.hour  # horas 0 .. (now-1) ya cerraron
+    # Cuántas horas del día actual tienen datos reales.
+    # La hora actual (now_utc.hour) ya tiene una vela cerrada en yfinance 1h,
+    # por eso se usa hour + 1 como límite superior exclusivo.
+    hours_complete = now_utc.hour + 1
 
     # ── PASO 3: Serializar ────────────────────────────────────────────────────
     payload = {
