@@ -699,7 +699,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <table aria-label="Key FX correlations">
       <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col">60d</th><th scope="col" title="Current vs 252-day historical norm">vs norm</th></tr></thead>
       <tbody id="correlations-tbody">
-        <!-- 10 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
+        <!-- 12 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
         <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
         <tr><td>AUD/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
         <tr><td>USD/JPY</td><td>US 10Y</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
@@ -710,6 +710,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <tr><td>NZD/USD</td><td>NZX 50</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
         <tr><td>EUR/USD</td><td>EuroStoxx</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
         <tr><td>GBP/USD</td><td>Gold</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>DXY</td><td>SPX</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
+        <tr><td>Gold</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
       </tbody>
     </table>
     <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance · vs norm = z-score vs 252d</div>
