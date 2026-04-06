@@ -2638,20 +2638,25 @@ async function updatePairDetail(tvSym) {
   // COT
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
-  let cotNet = null, cotAmNet = null, cotWeek = '';
+  let cotNet = null, cotAmNet = null, cotOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
     cotNet   = cotRaw.net   != null ? cotRaw.net   * flip : null;
     cotAmNet = cotRaw.amNet != null ? cotRaw.amNet * flip : null;
+    // OI = LF longs + LF shorts (futures+options combined, LF category)
+    if (cotRaw.long != null && cotRaw.short != null)
+      cotOI = cotRaw.long + cotRaw.short;
     cotWeek  = cotRaw.weekEnding;
   }
 
   // Carry differential (CB rates)
+  // invert:true  = CCY/USD pair (EUR/USD) → numerator = base (EUR) → carry = cbBase − cbQuote
+  // invert:false = USD/CCY pair (USD/JPY) → numerator = USD (quote) → carry = cbQuote − cbBase
   const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
   const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
   let carryDiff = null;
   if (cbBase != null && cbQuote != null)
-    carryDiff = invert ? (cbQuote - cbBase) : (cbBase - cbQuote);
+    carryDiff = invert ? (cbBase - cbQuote) : (cbQuote - cbBase);
 
   const fmtPct = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
   const fmtNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
@@ -2707,7 +2712,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Price</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close. Source: FX performance cache."><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="Central bank policy rate differential: ${base || 'base'} rate minus ${quote || 'quote'} rate. Positive = base currency yields more. Persistent carry differentials drive medium-term FX flows."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="Central bank policy rate differential: numerator currency rate minus denominator currency rate. Positive = pair&apos;s leading currency yields more, carry favours holding long." data-tip-ex="USD/JPY carry = Fed Funds (4.5%) − BoJ rate (0.5%) = +4.0%. Positive carry = long USD/JPY earns the differential."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Indicates typical intraday movement — useful for stop and target sizing." data-tip-ex="ADR of 85 pip on EUR/USD means the pair moves ~85 pip on an average day."><div class="pd-lbl">ADR</div><div class="pd-val">${adr != null ? adr + ' pip' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised). Source: CB rates cache."><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
       </div>
@@ -2728,6 +2733,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Considered speculative / trend-following positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded."><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="CFTC Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Considered structural / longer-term positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze."><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
+        ${cotOI != null ? `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;" data-tip-title="Open Interest (LF)" data-tip-body="Total open interest in the Leveraged Funds category: long contracts + short contracts. Rising OI = new money entering the market; falling OI = positions being closed. Source: CFTC TFF report." data-tip-ex="Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding."><div class="pd-lbl">LF Open Interest</div><div class="pd-val">${Math.round(cotOI).toLocaleString()}</div></div>` : ''}
       </div>
       ${cotSummaryHtml}
     </div>
