@@ -271,7 +271,7 @@
     background: var(--bg);
     display: flex;
     flex-direction: column;
-    padding-bottom: 0;
+    padding-bottom: 24px;
     min-width: 0;
   }
   #main::-webkit-scrollbar { width: 4px; }
@@ -635,7 +635,7 @@
   }
   /* Limit the wide DATA item so it doesn't crowd the centered copyright */
   #statusbar > div:first-child {
-    max-width: 300px;
+    max-width: 220px;
   }
   @media (max-width: 600px) {
     #statusbar {
