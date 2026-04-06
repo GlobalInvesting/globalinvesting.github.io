@@ -305,7 +305,7 @@ a { color: inherit; text-decoration: none; }
       <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">How to read it</h3>
       <p>The chart is divided into two visual zones separated by a dashed orange vertical line marking the <strong>current UTC time</strong>:</p>
       <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:1.9;">
-        <li><strong style="color:#2962ff;">Solid blue area (left of the line)</strong> — the past. Activity levels already observed today, scaled by real EUR/USD, GBP/EUR, and JPY/EUR daily volatility from the yfinance data feed. Higher volatility days push the curve up; quieter days pull it down.</li>
+        <li><strong style="color:#2962ff;">Solid blue area (left of the line)</strong> — the past. Activity levels already observed today, scaled by a volatility scalar derived from the 30-day average daily H-L range for EUR/USD, GBP/USD, and USD/JPY (source: <code style="font-family:var(--font-mono);font-size:11px;">yfinance · H-L range proxy · 30d avg</code> when available). Higher volatility environments push the curve up; quieter markets pull it down.</li>
         <li><strong style="color:rgba(41,98,255,0.5);">Dashed blue line (right of the line)</strong> — the projected remainder of the day, based on historical BIS/LSEG session-overlap patterns. This is an estimate, not a live feed.</li>
         <li><strong style="color:#f6941c;">Orange dashed vertical line</strong> — the current UTC moment. Everything to its left has happened; everything to its right is projected.</li>
       </ul>
@@ -314,8 +314,17 @@ a { color: inherit; text-decoration: none; }
       <p>Hover anywhere on the canvas to see a tooltip showing the UTC time for that point, the active trading session(s) at that hour, and the relative activity level as a percentage of the day's peak — labeled Very High, High, Moderate, Low, or Very Low. Points in the projected future are marked <em>(est.)</em>.</p>
 
       <h3 style="font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px;">Data source &amp; refresh</h3>
-      <p>The liquidity chart scales its amplitude using recent daily volatility computed from the yfinance data feed (EUR/USD, GBP/USD, USD/JPY). This scalar is applied to the BIS/LSEG session-overlap baseline to reflect whether the current market environment is active or subdued. The chart redraws every 60 seconds. If data is unavailable, the chart falls back silently to the baseline curve.</p>
-      <p>On weekends (Saturday–Sunday UTC), the chart displays a flat line with a "MARKET CLOSED" label, since FX spot trading is inactive.</p>
+      <p>The liquidity chart scales its baseline curve using a volatility scalar derived from recent EUR/USD, GBP/USD, and USD/JPY daily ranges. Higher-volatility market environments push the curve up; quieter periods pull it down. The chart redraws every 60 seconds.</p>
+      <p>The terminal resolves the scalar through a three-tier fallback chain, and the active source is shown in the small label below the chart legend:</p>
+      <ul style="padding-left:20px;color:var(--text2);font-size:13px;line-height:2.0;margin-bottom:14px;">
+        <li><strong style="color:var(--text);">yfinance · H-L range proxy · 30d avg</strong> — primary source. A server-side cache file (<code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">fx-liquidity.json</code>) is updated hourly by the data pipeline, computing the 30-day average daily High-Low range for EUR/USD, GBP/USD, and USD/JPY via yfinance. When this file is fresh and valid, the panel uses it directly — no browser-side API call needed.</li>
+        <li><strong style="color:var(--text);">Frankfurter fallback</strong> — if <code style="font-family:var(--font-mono);font-size:11px;">fx-liquidity.json</code> is unavailable, the terminal derives a rougher volatility scalar from the ECB Frankfurter rate series (7-day EUR base), which is cached server-side for other panels. Less precise than the yfinance H-L proxy but still directionally useful.</li>
+        <li><strong style="color:var(--text);">Historical avg · fixed reference</strong> — if both upstream sources are unavailable, the chart falls back to a static BIS/LSEG session-overlap baseline with no volatility scaling. The curve shape remains accurate; only the amplitude scaling is lost. This label is also shown on initial page load before the data fetch completes.</li>
+      </ul>
+      <div class="callout">
+        <strong>Reading the source label:</strong> The small label below the chart legend (e.g. <code style="font-family:var(--font-mono);font-size:11px;">yfinance · H-L range proxy · 30d avg</code>) updates dynamically after each data fetch. If you see <code style="font-family:var(--font-mono);font-size:11px;">Historical avg · fixed reference</code> after the page has fully loaded, it means the live data pipeline is temporarily unavailable — the chart shape is still accurate, just not amplitude-scaled to current volatility.
+      </div>
+      <p>On weekends (Saturday–Sunday UTC), the chart displays a flat baseline with a "MARKET CLOSED" label, since FX spot trading is inactive.</p>
     </div>
 
     <div class="guide-section" id="reading">
