@@ -5147,7 +5147,6 @@ function sigNotifEnabled() {
 
 function updateSignalNotifBtn() {
   const btn   = document.getElementById('sig-notif-btn');
-  const label = document.getElementById('sig-notif-label');
   if (!btn) return;
   const on      = sigNotifEnabled();
   const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
@@ -5158,7 +5157,6 @@ function updateSignalNotifBtn() {
   btn.title = blocked
     ? 'Notifications blocked by browser — enable in site settings'
     : on ? 'Signal notifications ON — click to disable' : 'Signal notifications OFF — click to enable';
-  if (label) label.textContent = blocked ? 'Blocked' : on ? 'Notifying' : 'Notify';
 }
 
 async function toggleSignalNotifications() {

@@ -302,18 +302,15 @@
 
   /* Signal notification toggle — in Alerts & Market Signals panel-head */
   .sig-notif-toggle {
-    display: inline-flex; align-items: center; gap: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
     margin-left: auto;
-    padding: 2px 7px; border-radius: 3px;
-    font-size: 9px; font-family: var(--font-ui); font-weight: 600;
-    letter-spacing: .04em; text-transform: uppercase;
+    padding: 3px 5px; border-radius: 3px;
     color: var(--text3); background: transparent;
     border: 1px solid var(--border2);
     cursor: pointer; transition: color .15s, border-color .15s, background .15s;
-    white-space: nowrap;
   }
   .sig-notif-toggle:hover { color: var(--blue); border-color: var(--blue); }
-  .sig-notif-toggle svg { flex-shrink: 0; }
+  .sig-notif-toggle svg { flex-shrink: 0; display: block; }
   .sig-notif-toggle.sig-notif-on {
     color: var(--blue); border-color: var(--blue);
     background: rgba(41,98,255,.08);
