@@ -1,17 +1,17 @@
 [
   {
-    "time": "21:50",
+    "time": "02:45",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.721",
+      "USD/JPY: 159.591",
       "BoJ rate: 0.75%",
       "VIX: 23.9"
     ]
   },
   {
-    "time": "21:48",
+    "time": "02:42",
     "priority": "warning",
     "title": "ECB vs Fed Rate Differential",
     "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
@@ -22,10 +22,21 @@
     ]
   },
   {
-    "time": "21:45",
+    "time": "02:40",
     "priority": "warning",
-    "title": "VIX and Risk Regime",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment, caution advised",
+    "title": "NZD/USD Retail Sentiment",
+    "text": "NZD/USD 88% long — retail heavily positioned, watch for squeeze",
+    "evidence": [
+      "NZD/USD: 0.57040",
+      "NZD/USD retail long: 88%",
+      "CFTC NZD net: -17,798"
+    ]
+  },
+  {
+    "time": "02:35",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment",
     "evidence": [
       "VIX: 23.9",
       "S&P 500: 6,583",
@@ -33,25 +44,14 @@
     ]
   },
   {
-    "time": "21:42",
+    "time": "02:30",
     "priority": "info",
-    "title": "NZD/USD Retail Sentiment",
-    "text": "NZD/USD 87% long — retail heavily positioned, watch for squeeze",
+    "title": "Yield Curve Context",
+    "text": "US 10Y-2Y spread at -22bp, indicating potential economic slowdown",
     "evidence": [
-      "NZD/USD: 0.56950",
-      "NZD/USD retail long: 87%",
-      "CFTC NZD net: -17,798"
-    ]
-  },
-  {
-    "time": "21:40",
-    "priority": "info",
-    "title": "CFTC Speculative Positioning",
-    "text": "EUR net short positioning at -38,698 — institutional bearishness persists",
-    "evidence": [
-      "CFTC EUR net: -38,698",
-      "EUR/USD: 1.15250",
-      "VIX: 23.9"
+      "US 10Y yield: 4.313%",
+      "US 2Y yield: 3.790%",
+      "US 10Y-2Y spread: -22bp"
     ]
   }
 ]
