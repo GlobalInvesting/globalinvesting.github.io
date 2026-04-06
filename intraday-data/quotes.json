@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-06T22:20:22Z",
+  "updated": "2026-04-06T22:25:20Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -21,20 +21,20 @@
       "source": "yfinance"
     },
     "gold": {
-      "close": 4693.4,
+      "close": 4690.8,
       "prev_close": 4684.7,
-      "chg": 8.6997,
-      "pct": 0.1857,
+      "chg": 6.0996,
+      "pct": 0.1302,
       "high": 4694.9,
       "low": 4675.6,
       "source": "yfinance"
     },
     "wti": {
-      "close": 112.68,
+      "close": 112.8,
       "prev_close": 112.41,
-      "chg": 0.27,
-      "pct": 0.2402,
-      "high": 112.85,
+      "chg": 0.39,
+      "pct": 0.3469,
+      "high": 112.89,
       "low": 112.51,
       "source": "yfinance"
     },
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 69466.07,
+      "close": 69397.72,
       "prev_close": 68978.914,
-      "chg": 1891.4453,
-      "pct": 2.799,
+      "chg": 2045.0078,
+      "pct": 3.0363,
       "high": 70237.1,
       "low": 68780.35,
       "source": "yfinance"
@@ -146,11 +146,11 @@
       "source": "yfinance"
     },
     "nzx": {
-      "close": 12981.47,
+      "close": 12996.13,
       "prev_close": 12902.15,
-      "chg": 79.3193,
-      "pct": 0.6186,
-      "high": 12981.47,
+      "chg": 93.9795,
+      "pct": 0.7284,
+      "high": 12996.13,
       "low": 12902.15,
       "source": "yfinance"
     },
@@ -525,7 +525,7 @@
     {
       "a": "NZD/USD",
       "b": "NZX 50",
-      "corr": 0.305,
+      "corr": 0.304,
       "n": 60,
       "norm": -0.286,
       "z_score": 1.58
@@ -541,10 +541,10 @@
     {
       "a": "GBP/USD",
       "b": "Gold",
-      "corr": 0.344,
+      "corr": 0.345,
       "n": 60,
       "norm": 0.196,
-      "z_score": 0.34
+      "z_score": 0.35
     },
     {
       "a": "DXY",
@@ -557,7 +557,7 @@
     {
       "a": "Gold",
       "b": "DXY",
-      "corr": -0.508,
+      "corr": -0.509,
       "n": 60,
       "norm": -0.327,
       "z_score": -0.39
