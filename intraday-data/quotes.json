@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-06T22:10:22Z",
+  "updated": "2026-04-06T22:15:22Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -21,20 +21,20 @@
       "source": "yfinance"
     },
     "gold": {
-      "close": 4683.0,
+      "close": 4690.2,
       "prev_close": 4684.7,
-      "chg": -1.7002,
-      "pct": -0.0363,
-      "high": 4683.0,
+      "chg": 5.5,
+      "pct": 0.1174,
+      "high": 4693.1,
       "low": 4675.6,
       "source": "yfinance"
     },
     "wti": {
-      "close": 112.72,
+      "close": 112.78,
       "prev_close": 112.41,
-      "chg": 0.31,
-      "pct": 0.2758,
-      "high": 112.75,
+      "chg": 0.37,
+      "pct": 0.3291,
+      "high": 112.85,
       "low": 112.51,
       "source": "yfinance"
     },
@@ -66,10 +66,10 @@
       "source": "yfinance"
     },
     "dxy": {
-      "close": 99.995,
+      "close": 99.99,
       "prev_close": 100.028,
-      "chg": -0.033,
-      "pct": -0.033,
+      "chg": -0.038,
+      "pct": -0.038,
       "high": 100.286,
       "low": 99.757,
       "source": "yfinance"
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 69474.55,
+      "close": 69557.87,
       "prev_close": 68978.914,
-      "chg": 1795.3906,
-      "pct": 2.6528,
+      "chg": 2059.6094,
+      "pct": 3.0514,
       "high": 70237.1,
       "low": 68780.35,
       "source": "yfinance"
@@ -541,10 +541,10 @@
     {
       "a": "GBP/USD",
       "b": "Gold",
-      "corr": 0.345,
+      "corr": 0.344,
       "n": 60,
       "norm": 0.196,
-      "z_score": 0.35
+      "z_score": 0.34
     },
     {
       "a": "DXY",
@@ -557,7 +557,7 @@
     {
       "a": "Gold",
       "b": "DXY",
-      "corr": -0.509,
+      "corr": -0.508,
       "n": 60,
       "norm": -0.327,
       "z_score": -0.39
