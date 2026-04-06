@@ -1,57 +1,57 @@
 [
   {
-    "time": "05:35",
+    "time": "08:05",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 160.00 resistance; rate divergence favours USD",
     "evidence": [
-      "USD/JPY: 159.558",
+      "USD/JPY: 159.406",
       "BoJ rate: 0.75%",
-      "VIX: 23.9"
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "05:32",
+    "time": "08:03",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1500, ECB cutting rates may weigh on EUR",
+    "text": "EUR/USD trading above 1.1525, ECB cutting rates may weigh on EUR; watch for 1.15690 resistance",
     "evidence": [
-      "EUR/USD: 1.15300",
-      "ECB rate: 2.00% (CUTTING)",
+      "EUR/USD: 1.15690",
+      "ECB rate: 2.00%",
       "US 10Y yield: 4.313%"
     ]
   },
   {
-    "time": "05:29",
+    "time": "08:00",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at -38,698, institutional selling may continue",
+    "title": "VIX",
+    "text": "VIX at 24.8 signals elevated volatility — not a risk-on environment",
     "evidence": [
-      "CFTC EUR net: -38,698",
-      "EUR/USD: 1.15300",
-      "ECB rate: 2.00% (CUTTING)"
-    ]
-  },
-  {
-    "time": "05:25",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 23.9 signals elevated volatility — not a risk-on environment",
-    "evidence": [
-      "VIX: 23.9",
+      "VIX: 24.8",
       "S&P 500: 6,583",
       "MOVE Index: 81.8"
     ]
   },
   {
-    "time": "05:20",
+    "time": "07:58",
     "priority": "info",
     "title": "AUD/NZD",
-    "text": "AUD/NZD sentiment extreme, 91% of retail traders short, watch for squeeze",
+    "text": "Retail sentiment extreme: 91% short AUD/NZD, watch for potential squeeze",
     "evidence": [
       "AUD/NZD: 9% long / 91% short",
-      "AUD/USD: 0.69110",
-      "NZD/USD: 0.57060"
+      "AUD/USD: 0.69310",
+      "NZD/USD: 0.57270"
+    ]
+  },
+  {
+    "time": "07:55",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "Cross-asset context: DXY 99.83, Gold $4,708, WTI Oil $109.4; mixed signals on risk appetite",
+    "evidence": [
+      "DXY: 99.83",
+      "Gold: $4,708",
+      "WTI Oil: $109.4"
     ]
   }
 ]
