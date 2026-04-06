@@ -70,12 +70,7 @@ OUTPUT_PATH = os.path.join(
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def normalize_to_100(values: list[float]) -> list[float]:
-    """Normaliza una lista de valores al rango 0–100 por su máximo."""
-    max_v = max(values) if values else 1.0
-    if max_v == 0:
-        return [0.0] * len(values)
-    return [round(v / max_v * 100, 1) for v in values]
+
 
 
 def build_hourly_profile(df_1h, n_days: int) -> list[float]:
@@ -191,9 +186,11 @@ def main():
                 next_v = next((baseline_raw[(h + i) % 24] for i in range(1, 12) if baseline_raw[(h + i) % 24] > 0), 0)
                 baseline_raw[h] = (prev_v + next_v) / 2 if prev_v and next_v else (prev_v or next_v)
 
-        baseline_30d = normalize_to_100(baseline_raw)
+        baseline_max = max(baseline_raw) if any(v > 0 for v in baseline_raw) else 1.0
+        baseline_30d = [round(v / baseline_max * 100, 1) for v in baseline_raw]
 
-    # Today profile
+    # Today profile — normalized with same denominator as baseline_30d
+    # Avoids artificial 100% spike when only 1–2 hours of data exist
     if len(profiles_today) < 2:
         today_profile = [0.0] * 24
     else:
@@ -201,7 +198,8 @@ def main():
         for h in range(24):
             vals = [p[h] for p in profiles_today if p[h] > 0]
             today_raw.append(median(vals) if vals else 0.0)
-        today_profile = normalize_to_100(today_raw)
+        norm_max = baseline_max if not fallback else max((max(today_raw) if today_raw else 1.0), 1.0)
+        today_profile = [round(v / norm_max * 100, 1) for v in today_raw]
 
     # Cuántas horas del día actual tienen datos reales.
     # La hora actual (now_utc.hour) ya tiene una vela cerrada en yfinance 1h,
