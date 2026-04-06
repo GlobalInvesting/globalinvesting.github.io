@@ -625,21 +625,20 @@ async function fetchCBRates() {
 // ═══════════════════════════════════════════════════════════════════
 // COT DATA — from cot-data/*.json
 // ═══════════════════════════════════════════════════════════════════
-// TradingView COT chart symbols — CFTC futures+options combined, large traders
-// Codes: EUR=099741 (EUR/USD futures), GBP=096742, JPY=097741, AUD=232741,
-//        CAD=090741, CHF=092741, USD=098662 (US Dollar Index futures)
-// COT: prefix + _FO_NCP_L suffix = Futures+Options Combined · NonCommercial Positions Long
-// NonCommercial = speculative category in Legacy COT report (equivalent to Leveraged Funds).
-// Format confirmed by user: "COT:232741_FO_NCP_L"
+// TradingView COT chart symbols — CFTC Traders in Financial Futures (TFF) report
+// COT3 prefix = Financial/TFF report · suffix _FO_L_L = Futures+Options Combined · Leveraged Funds · Long
+// This matches the panel data source: CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined
+// Codes: EUR=099741, GBP=096742, JPY=097741, AUD=232741,
+//        CAD=090741, CHF=092741, NZD=112741, USD=098662 (US Dollar Index futures)
 const COT_TV_SYMBOLS = {
-  EUR: 'COT:099741_FO_NCP_L',
-  GBP: 'COT:096742_FO_NCP_L',
-  JPY: 'COT:097741_FO_NCP_L',
-  AUD: 'COT:232741_FO_NCP_L',
-  CAD: 'COT:090741_FO_NCP_L',
-  CHF: 'COT:092741_FO_NCP_L',
-  NZD: 'COT:112741_FO_NCP_L',
-  USD: 'COT:098662_FO_NCP_L',
+  EUR: 'COT3:099741_FO_L_L',
+  GBP: 'COT3:096742_FO_L_L',
+  JPY: 'COT3:097741_FO_L_L',
+  AUD: 'COT3:232741_FO_L_L',
+  CAD: 'COT3:090741_FO_L_L',
+  CHF: 'COT3:092741_FO_L_L',
+  NZD: 'COT3:112741_FO_L_L',
+  USD: 'COT3:098662_FO_L_L',
 };
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
