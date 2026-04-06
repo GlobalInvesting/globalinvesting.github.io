@@ -628,14 +628,17 @@ async function fetchCBRates() {
 // TradingView COT chart symbols — CFTC futures+options combined, large traders
 // Codes: EUR=099741 (EUR/USD futures), GBP=096742, JPY=097741, AUD=232741,
 //        CAD=090741, CHF=092741, USD=098662 (US Dollar Index futures)
+// _F_L = Non-Commercial Long (speculative/large traders) — matches Leveraged Funds
+// category shown in the panel. _CP_L would open Commercial (hedgers), which is a
+// different trader category and diverges from the panel data.
 const COT_TV_SYMBOLS = {
-  EUR: 'COT:099741_F_CP_L',
-  GBP: 'COT:096742_F_CP_L',
-  JPY: 'COT:097741_F_CP_L',
-  AUD: 'COT:232741_F_CP_L',
-  CAD: 'COT:090741_F_CP_L',
-  CHF: 'COT:092741_F_CP_L',
-  USD: 'COT:098662_F_CP_L',
+  EUR: 'COT:099741_F_L',
+  GBP: 'COT:096742_F_L',
+  JPY: 'COT:097741_F_L',
+  AUD: 'COT:232741_F_L',
+  CAD: 'COT:090741_F_L',
+  CHF: 'COT:092741_F_L',
+  USD: 'COT:098662_F_L',
 };
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
