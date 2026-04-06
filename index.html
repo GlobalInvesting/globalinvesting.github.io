@@ -207,7 +207,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.31">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.12.32">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -336,6 +336,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(41,98,255,0.35);border-radius:1px;"></span>Tokyo</span>
           <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>London</span>
           <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>New York</span>
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:16px;height:1px;background:rgba(120,123,134,0.6);border-top:1px dashed rgba(120,123,134,0.6);margin-top:1px;"></span>30d avg</span>
+        </div>
+        <div style="margin-top:3px;padding:0 1px;">
+          <span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span>
         </div>
       </div>
     </div>
@@ -793,7 +797,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.12.31" defer></script>
+<script src="assets/dashboard.js?v=7.12.32" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
