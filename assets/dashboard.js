@@ -2657,15 +2657,14 @@ async function updatePairDetail(tvSym) {
   const fmtNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
   const cls    = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
 
-  let alignHtml = '';
-  if (cotNet != null && cotAmNet != null) {
-    const lf = cotNet > 0 ? 1 : cotNet < 0 ? -1 : 0;
-    const am = cotAmNet > 0 ? 1 : cotAmNet < 0 ? -1 : 0;
-    if (lf !== 0 && am !== 0) {
-      alignHtml = lf === am
-        ? '<span class="pd-badge pd-aligned" title="LF + AM aligned">LF≡AM</span>'
-        : '<span class="pd-badge pd-diverge" title="LF and AM diverging">LF≠AM</span>';
-    }
+  // Spread
+  const spreadPips = pairId ? TYPICAL_SPREADS[pairId] : null;
+
+  // ADR — derived from HV30: daily range ≈ close × (HV30/100) / √252, converted to pips
+  let adr = null;
+  if (hv30 != null && price != null) {
+    const pipSize = dec === 3 ? 0.01 : 0.0001; // JPY pairs have 3 decimals, pip = 0.01
+    adr = Math.round(price * (hv30 / 100) / Math.sqrt(252) / pipSize);
   }
 
   // Retail sentiment from myfxbook cache
@@ -2675,66 +2674,92 @@ async function updatePairDetail(tvSym) {
   const retS = ret?.shortPct ?? null;
   const retBarL = retL != null ? retL : 50;
 
+  // COT positioning summary text (replaces badge)
+  let cotSummaryHtml = '';
+  if (cotNet != null && cotAmNet != null) {
+    const lfDir = cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
+    const amDir = cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
+    if (lfDir && amDir) {
+      const aligned = lfDir === amDir;
+      const lfCls   = cotNet   > 0 ? 'pd-up' : 'pd-dn';
+      const amCls   = cotAmNet > 0 ? 'pd-up' : 'pd-dn';
+      const alignStr = aligned ? 'aligned' : 'diverging';
+      cotSummaryHtml = `<div class="pd-cot-summary">LF <span class="${lfCls}">${lfDir}</span> · AM <span class="${amCls}">${amDir}</span> · <span class="pd-dim">${alignStr}</span></div>`;
+    }
+  }
+
   panel.innerHTML = `
     <div class="pd-header">
       <span class="pd-sym">${label}</span>
       <button class="pd-close" onclick="closePairPopover()" aria-label="Close pair detail">&#x2715;</button>
     </div>
+
     <div class="pd-price-block">
-      <div class="pd-price ${price == null ? 'pd-dim' : ''}">${price != null ? price.toFixed(dec) : '—'}</div>
-      <span class="${cls(pct1d)} pd-chg">${fmtPct(pct1d)}</span>
+      <div class="pd-price-row">
+        <div class="pd-price ${price == null ? 'pd-dim' : ''}">${price != null ? price.toFixed(dec) : '—'}</div>
+        <span class="${cls(pct1d)} pd-chg">${fmtPct(pct1d)}</span>
+      </div>
       ${sessH != null && sessL != null ? `<div class="pd-range">H ${sessH.toFixed(dec)} · L ${sessL.toFixed(dec)}</div>` : ''}
+      <div class="pd-spread-row">${spreadPips != null ? 'Spread ' + spreadPips.toFixed(1) + ' pip' : ''}${spreadPips != null && adr != null ? ' · ' : ''}${adr != null ? 'ADR ' + adr + ' pip' : ''}</div>
     </div>
-    <div class="pd-grid">
-      <div class="pd-cell" data-tip="Weekly % change vs prev Friday close"><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
-      <div class="pd-cell" data-tip="30-day historical (realised) volatility"><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation (√(IVa²+IVb²−2ρ·IVa·IVb)). Not OTC interbank — indicative only. Color = cost of hedging: green = cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance). Color = cost of hedging: green = historically cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.'}"><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style=\'font-size:8px;color:var(--text3);margin-left:2px;\'>~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="IV minus HV: difference between implied and realised vol. Positive = options expensive vs recent moves (hedging at a premium). Negative = options cheap vs realised. Not a directional signal."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="CFTC Leveraged Funds net contracts (speculative)"><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
-      <div class="pd-cell" data-tip="CFTC Asset Managers net contracts (institutional)"><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
-      <div class="pd-cell" data-tip="CB rate differential: base minus quote rate"><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
-      <div class="pd-cell" data-tip="${base || 'Base'} central bank policy rate (annualised)"><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
-      <div class="pd-cell pd-cell--wide" data-tip="Retail client positioning from Myfxbook community outlook. Contrarian indicator: extreme retail long bias historically correlates with institutional short positioning. Source: Myfxbook · updated every 30min via workflow.">
-        <div class="pd-lbl">Retail Long</div>
+
+    <div class="pd-section">
+      <div class="pd-section-lbl">Price</div>
+      <div class="pd-grid">
+        <div class="pd-cell fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close. Source: FX performance cache."><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="Central bank policy rate differential: ${base || 'base'} rate minus ${quote || 'quote'} rate. Positive = base currency yields more. Persistent carry differentials drive medium-term FX flows."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Indicates typical intraday movement — useful for stop and target sizing." data-tip-ex="ADR of 85 pip on EUR/USD means the pair moves ~85 pip on an average day."><div class="pd-lbl">ADR</div><div class="pd-val">${adr != null ? adr + ' pip' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised). Source: CB rates cache."><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
+      </div>
+    </div>
+
+    <div class="pd-section">
+      <div class="pd-section-lbl">Volatility</div>
+      <div class="pd-grid">
+        <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Not OTC interbank — indicative only.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance).'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically means hedging costs are elevated. Traders may sell vol strategies in this environment."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
+      </div>
+    </div>
+
+    <div class="pd-section">
+      <div class="pd-section-lbl">COT Positioning</div>
+      <div class="pd-grid">
+        <div class="pd-cell fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Considered speculative / trend-following positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded."><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="CFTC Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Considered structural / longer-term positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze."><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
+      </div>
+      ${cotSummaryHtml}
+    </div>
+
+    <div class="pd-section pd-section--last">
+      <div class="pd-section-lbl">Retail Sentiment</div>
+      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="When >70% of retail traders are long, institutional desks are often positioned short — price tends to move against the retail crowd over time.">
         <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:${retBarL}%"></div></div>
         <div class="pd-retail-nums">${retL != null ? retL+'% L' : '—'}<span class="pd-retail-sep">/</span>${retS != null ? retS+'% S' : '—'}</div>
       </div>
     </div>
+
     <div class="pd-footer">
-      ${alignHtml}
-      ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + '</span>' : ''}
+      ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + ' · Myfxbook</span>' : '<span class="pd-dim">Myfxbook</span>'}
     </div>`;
 
 
-  // ── Attach #fx-tt tooltips to each pd-cell (position:fixed, escapes clipping) ──
-  // The attachTip function is defined inside renderSentiment's closure.
-  // We replicate inline here using the shared #fx-tt DOM element.
+  // ── Attach #fx-tt tooltips to each .fx-tip cell ──────────────────────────
   if (window._fxTTPos) {
-    const TIP_MAP = [
-      { lbl: '1W CHG',    title: '1-Week Change',              body: 'Weekly % change vs prev Friday close.' },
-      { lbl: 'HV 30D',    title: 'Historical Volatility 30d',  body: '30-day realised (historical) volatility, annualised.' },
-      { lbl: 'ATM IV',    title: 'ATM Implied Volatility',     body: '30-day at-the-money implied vol from options market. Color = cost of hedging: green = cheap vol (≤7%), red = expensive vol (>12%). Not a directional signal.' },
-      { lbl: 'IV − HV',   title: 'IV minus HV',                body: 'Implied vol minus realised vol. Positive = options expensive vs recent moves (hedging at a premium). Negative = options cheap vs realised. Not a directional signal.' },
-      { lbl: 'LF NET',    title: 'CFTC Leveraged Funds Net',   body: 'Net contracts held by Leveraged Funds (speculative). Source: CFTC Disaggregated TFF.' },
-      { lbl: 'RETAIL LONG', title: 'Retail Client Positioning',   body: 'Long/short ratio from Myfxbook community outlook. Contrarian indicator: extreme retail long bias often aligns with institutional short positioning. Source: Myfxbook · updated every 30min.' },
-      { lbl: 'AM NET',    title: 'CFTC Asset Managers Net',    body: 'Net contracts held by Asset Managers (institutional). Source: CFTC Disaggregated TFF.' },
-      { lbl: 'CARRY',     title: 'Carry Differential',         body: 'CB rate differential: base minus quote central bank policy rate.' },
-    ];
-    panel.querySelectorAll('.pd-cell').forEach(cell => {
-      const lbl = cell.querySelector('.pd-lbl');
-      if (!lbl) return;
-      const key = lbl.textContent.trim().toUpperCase();
-      // Last cell label is dynamic (e.g. "EUR Rate") — handle by fallback
-      const tip = TIP_MAP.find(t => key === t.lbl) ||
-        { title: lbl.textContent.trim() + ' Rate', body: 'Base currency central bank policy rate (annualised).' };
-      cell.classList.add('fx-tip');
+    panel.querySelectorAll('.fx-tip').forEach(cell => {
+      const title = cell.dataset.tipTitle || '';
+      const body  = cell.dataset.tipBody  || '';
+      const ex    = cell.dataset.tipEx    || '';
+      if (!title && !body) return;
       cell.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
         if (!tt) return;
-        document.getElementById('fx-tt-title').textContent = tip.title;
-        document.getElementById('fx-tt-body').textContent  = tip.body;
+        document.getElementById('fx-tt-title').textContent = title;
+        document.getElementById('fx-tt-body').textContent  = body;
         const exEl = document.getElementById('fx-tt-ex');
-        exEl.textContent = ''; exEl.style.display = 'none';
+        if (ex) { exEl.textContent = ex; exEl.style.display = 'block'; }
+        else    { exEl.textContent = ''; exEl.style.display = 'none';  }
         tt.style.display = 'block';
         requestAnimationFrame(() => window._fxTTPos(ev.clientX, ev.clientY));
       });

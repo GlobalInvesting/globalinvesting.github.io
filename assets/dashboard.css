@@ -484,15 +484,21 @@
   .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
   .pd-sym { font-size:12px; font-weight:700; color:var(--text); letter-spacing:.03em; }
   .pd-source { font-size:9px; color:var(--text3); font-family:var(--font-mono); }
-  .pd-price-block { display:flex; align-items:baseline; gap:5px; padding:4px 8px 2px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .pd-price-block { padding:4px 8px 5px; border-bottom:1px solid var(--border); }
+  .pd-price-row { display:flex; align-items:baseline; gap:5px; }
   .pd-price { font-size:15px; font-weight:700; font-family:var(--font-mono); color:var(--text); letter-spacing:-.01em; }
   .pd-price.pd-dim { color:var(--text3); }
   .pd-chg { font-size:11px; font-family:var(--font-mono); font-weight:600; }
-  .pd-range { width:100%; font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:0; }
-  .pd-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; border-bottom:1px solid var(--border); }
+  .pd-range { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px; }
+  .pd-spread-row { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px; }
+  .pd-section { border-bottom:1px solid var(--border); }
+  .pd-section--last { border-bottom:none; }
+  .pd-section-lbl { font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); padding:3px 8px 1px; }
+  .pd-grid { display:grid; grid-template-columns:1fr 1fr; }
   .pd-cell { padding:3px 8px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
   .pd-cell:nth-child(even) { border-right:none; }
-  .pd-cell:nth-last-child(-n+2) { border-bottom:none; }
+  .pd-cell:last-child { border-bottom:none; }
+  .pd-cell:nth-last-child(2):nth-child(odd) { border-bottom:none; }
   .pd-lbl { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:0; }
   .pd-val { font-size:11px; font-family:var(--font-mono); color:var(--text); font-weight:600; }
   .pd-up { color:var(--up); }
@@ -500,10 +506,8 @@
   .pd-val.pd-up { color:var(--up); }
   .pd-val.pd-dn { color:var(--down); }
   .pd-dim { color:var(--text3); }
-  .pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; }
-  .pd-badge { font-size:9px; padding:1px 6px; border-radius:20px; font-weight:600; letter-spacing:.03em; white-space:nowrap; }
-  .pd-aligned { background:rgba(38,166,154,.15); color:var(--up); border:1px solid rgba(38,166,154,.3); }
-  .pd-diverge { background:rgba(232,150,60,.12); color:var(--orange,#e8963c); border:1px solid rgba(232,150,60,.25); }
+  .pd-cot-summary { font-size:9px; font-family:var(--font-mono); color:var(--text3); padding:2px 8px 4px; border-top:1px solid var(--border); }
+  .pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; border-top:1px solid var(--border); }
 
   /* ── PAIR DETAIL POPOVER ─────────────────────────────────────── */
   /* Popover header with close button */
