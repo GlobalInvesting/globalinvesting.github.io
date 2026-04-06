@@ -334,12 +334,36 @@ async function populateCorrelations() {
     if (!tbody) return;
     const corrs = data?.correlations;
     if (!Array.isArray(corrs) || corrs.length === 0) return;
+
     tbody.innerHTML = corrs.map(c => {
       const v = c.corr;
-      if (v == null) return `<tr><td>${c.a}</td><td>${c.b}</td><td style="color:var(--text3)">—</td></tr>`;
-      const sign = v >= 0 ? '+' : '';
-      const cls = v >= 0.3 ? 'up' : v <= -0.3 ? 'down' : '';
-      return `<tr><td>${c.a}</td><td>${c.b}</td><td class="${cls}">${sign}${v.toFixed(2)}</td></tr>`;
+      const corrCell = v == null
+        ? `<td style="color:var(--text3)">—</td>`
+        : (() => {
+            const sign = v >= 0 ? '+' : '';
+            const cls = v >= 0.3 ? 'up' : v <= -0.3 ? 'down' : '';
+            return `<td class="${cls}">${sign}${v.toFixed(2)}</td>`;
+          })();
+
+      // vs norm cell: badge based on z_score
+      const z = c.z_score;
+      let normCell;
+      if (z == null || c.norm == null) {
+        normCell = `<td style="color:var(--text3)">—</td>`;
+      } else {
+        const absZ = Math.abs(z);
+        const normSign = c.norm >= 0 ? '+' : '';
+        // Badge: green = normal (|z|<1), amber = stretched (1–1.5), red = broken (>1.5)
+        let badgeCls, badgeLabel;
+        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '⚠ broken'; }
+        else if (absZ >= 1.5) { badgeCls = 'down'; badgeLabel = '↯ break'; }
+        else if (absZ >= 1.0) { badgeCls = '';     badgeLabel = '~ stretched'; }
+        else                  { badgeCls = 'flat'; badgeLabel = '● normal'; }
+        const title = `Norm (252d): ${normSign}${c.norm.toFixed(2)} · Z-score: ${z >= 0 ? '+' : ''}${z.toFixed(2)}σ`;
+        normCell = `<td class="${badgeCls}" title="${title}" style="font-size:9px;white-space:nowrap;">${badgeLabel}</td>`;
+      }
+
+      return `<tr><td>${c.a}</td><td>${c.b}</td>${corrCell}${normCell}</tr>`;
     }).join('');
   } catch (e) {
     console.warn('[Correlations] Failed to load:', e);
@@ -1802,6 +1826,16 @@ function attachRiskMonitorTooltips() {
       body:  'Rolling 60-day Pearson correlation between USD/JPY and VIX, computed from real price data. Normally negative (−0.3 to −0.7): when VIX spikes (risk-off), JPY is bid and USD/JPY falls. A positive reading is unusual.',
       ex:    'Positive correlation means USD and volatility are rising together — typically a USD funding stress episode (2020, 2008). Neutral (near 0) means the relationship has broken down temporarily.'
     },
+    {
+      title: 'DXY vs SPX — 60d Correlation',
+      body:  'Rolling 60-day Pearson correlation between the Dollar Index and S&P 500. The normal relationship is negative: risk-on rallies tend to weaken USD, risk-off bids USD as safe haven.',
+      ex:    'Positive reading (both rising together) = USD funding stress or stagflation regime. Sustained positive correlation above +0.3 has preceded episodes of EM FX stress and sharp USD squeezes.'
+    },
+    {
+      title: 'Gold vs DXY — 60d Correlation',
+      body:  'Rolling 60-day Pearson correlation between Gold and the Dollar Index. The normal relationship is negative: Gold is priced in USD, so a stronger dollar typically suppresses gold prices.',
+      ex:    'Persistent positive correlation means gold is rallying despite USD strength — a signal of real inflation demand, central bank buying, or deep safe-haven flows that override the USD pricing mechanism.'
+    },
   ];
   riRows.forEach((row, i) => {
     if (riTips[i]) attachRiskTip(row, riTips[i].title, riTips[i].body, riTips[i].ex);
@@ -2217,6 +2251,43 @@ async function renderRiskData(byId) {
       } else {
         setEl('ri-usdjpy-nk', '—');
         setEl('ri-usdjpy-nk-sig', 'No data', 'flat');
+      }
+
+      // DXY vs SPX — positive = funding stress (breaks normal negative relationship)
+      const dxySpxEntry = corrs.find(c =>
+        (c.a === 'DXY' && c.b === 'SPX') || (c.a === 'SPX' && c.b === 'DXY')
+      );
+      if (dxySpxEntry?.corr != null) {
+        const v = dxySpxEntry.corr;
+        const sign = v >= 0 ? '+' : '';
+        const corrLabel = sign + v.toFixed(2) + 'r';
+        // Normal relationship is negative (USD safe haven, equities risk)
+        // Positive = stress break. Tooltip via title attr on the row is handled by JS tooltips.
+        const corrSig = v > 0.3 ? 'Stress break' : v < -0.3 ? 'Normal' : 'Neutral';
+        const corrCls = v > 0.3 ? 'down' : v < -0.3 ? 'up' : 'flat';
+        setEl('ri-dxy-spx', corrLabel);
+        setEl('ri-dxy-spx-sig', corrSig, corrCls);
+      } else {
+        setEl('ri-dxy-spx', '—');
+        setEl('ri-dxy-spx-sig', 'No data', 'flat');
+      }
+
+      // Gold vs DXY — positive = safe-haven model broken or real inflation bid
+      const goldDxyEntry = corrs.find(c =>
+        (c.a === 'Gold' && c.b === 'DXY') || (c.a === 'DXY' && c.b === 'Gold')
+      );
+      if (goldDxyEntry?.corr != null) {
+        const v = goldDxyEntry.corr;
+        const sign = v >= 0 ? '+' : '';
+        const corrLabel = sign + v.toFixed(2) + 'r';
+        // Normal relationship is negative (gold priced in USD, inverse)
+        const corrSig = v > 0.2 ? 'Inflation bid' : v < -0.3 ? 'Normal' : 'Neutral';
+        const corrCls = v > 0.2 ? 'down' : v < -0.3 ? 'up' : 'flat';
+        setEl('ri-gold-dxy', corrLabel);
+        setEl('ri-gold-dxy-sig', corrSig, corrCls);
+      } else {
+        setEl('ri-gold-dxy', '—');
+        setEl('ri-gold-dxy-sig', 'No data', 'flat');
       }
     } catch {}
   }).catch(() => {});
