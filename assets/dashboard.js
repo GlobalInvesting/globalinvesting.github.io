@@ -628,18 +628,19 @@ async function fetchCBRates() {
 // TradingView COT chart symbols — CFTC futures+options combined, large traders
 // Codes: EUR=099741 (EUR/USD futures), GBP=096742, JPY=097741, AUD=232741,
 //        CAD=090741, CHF=092741, USD=098662 (US Dollar Index futures)
-// COT3: = TradingView prefix for the Financial/TFF report (Traders in Financial Futures).
-// This is the same report source as our panel data (Disaggregated TFF, LF category).
-// Suffix _FO_TLF_L = Futures+Options Combined · Leveraged Funds · Long positions.
-// This matches the panel's Options+Futures Combined source and Leveraged Funds category.
+// COT: = Legacy report prefix (Financial/TFF Leveraged Funds series lives here in TV).
+// Suffix breakdown: _FO_ = Futures+Options Combined (matches our options_futures_combined
+// source), _LMP_ = Leveraged Funds Positions, _L = Long.
+// Confirmed via TradingView Symbol Search: "232741_FO_LMP_L" = 
+// "AUSTRALIAN DOLLAR - CME - Futures and Options - Leveraged Funds Positions Long"
 const COT_TV_SYMBOLS = {
-  EUR: 'COT3:099741_FO_TLF_L',
-  GBP: 'COT3:096742_FO_TLF_L',
-  JPY: 'COT3:097741_FO_TLF_L',
-  AUD: 'COT3:232741_FO_TLF_L',
-  CAD: 'COT3:090741_FO_TLF_L',
-  CHF: 'COT3:092741_FO_TLF_L',
-  USD: 'COT3:098662_FO_TLF_L',
+  EUR: 'COT:099741_FO_LMP_L',
+  GBP: 'COT:096742_FO_LMP_L',
+  JPY: 'COT:097741_FO_LMP_L',
+  AUD: 'COT:232741_FO_LMP_L',
+  CAD: 'COT:090741_FO_LMP_L',
+  CHF: 'COT:092741_FO_LMP_L',
+  USD: 'COT:098662_FO_LMP_L',
 };
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
