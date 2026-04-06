@@ -1,0 +1,101 @@
+name: Update FX Liquidity Profile
+
+# ESTRATEGIA DE TRIGGER
+#
+# Corre cada hora en días de semana durante horario de mercado FX:
+#   - Domingo 21:00 UTC (Sydney open) → Viernes 21:00 UTC (NY close)
+#   - Schedule: cada hora, 7 días (el script ignora fins de semana en el output)
+#
+# Adicionalmente: workflow_dispatch para test manual.
+#
+# DURACIÓN ESTIMADA: ~45 seg (5 pares × 35d × 1h = ~840 filas por par, yfinance batch)
+# Sin riesgo de solapamiento a 1h de intervalo.
+#
+# PLACEMENT: público repo — yfinance, sin API keys, sin ventaja competitiva.
+# Minutos de Actions ilimitados en el repo público.
+
+on:
+  schedule:
+    # Cada hora, todos los días — el script maneja fins de semana internamente
+    # (si no hay datos intraday, el fallback LIQ_BASE se activa automáticamente)
+    - cron: '0 * * * *'
+
+  workflow_dispatch:   # trigger manual desde GitHub UI para test
+
+concurrency:
+  group: update-fx-liquidity
+  cancel-in-progress: false   # no cancelar un fetch en curso — esperar
+
+permissions:
+  contents: write   # necesario para git push al mismo repo
+
+jobs:
+  fetch-fx-liquidity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p fx-data
+
+      - name: Fetch FX liquidity profile
+        env:
+          SITE_PATH: .
+        run: python3 scripts/fetch_fx_liquidity.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "       FX LIQUIDITY PROFILE SUMMARY"
+          echo "========================================"
+          if [ -f "fx-data/fx-liquidity.json" ]; then
+            python3 -c "
+          import json
+          with open('fx-data/fx-liquidity.json') as f:
+              d = json.load(f)
+          print(f'  Updated:        {d[\"updated\"]}')
+          print(f'  Source:         {d[\"source\"]}')
+          print(f'  Fallback:       {d[\"fallback\"]}')
+          print(f'  Hours complete: {d[\"hours_complete\"]}')
+          b = d['baseline_30d']
+          peak_h = b.index(max(b))
+          print(f'  Baseline peak:  {peak_h:02d}:00 UTC  (val={max(b)})')
+          today = d['today']
+          real = [(i, v) for i, v in enumerate(today) if v > 0]
+          print(f'  Today real hrs: {len(real)} ({[f\"{h}:00\" for h,v in real[:3]]}...)')
+          "
+          else
+            echo "  fx-data/fx-liquidity.json NOT created"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fx-data/fx-liquidity.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "FX liquidity profile $(date +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git push && echo "Push succeeded" && exit 0
+            echo "Push rejected (attempt $i) — rebasing..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((i * 3))
+          done
+          echo "All push attempts failed." && exit 1
