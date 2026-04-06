@@ -374,10 +374,12 @@
   /* COT */
   .cot-row {
     display: grid;
-    grid-template-columns: 36px 1fr 42px 64px 14px 68px 24px;
+    grid-template-columns: 36px 1fr 42px 64px 14px 68px;
     align-items: center; gap: 8px;
     padding: 3px 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .1s;
   }
+  .cot-row:hover { background: var(--bg3); }
   .cot-row:last-child { border-bottom: none; }
   .cot-sym { font-weight: 700; color: #fff; font-family: var(--font-ui); }
   .cot-bar-outer { height: 10px; background: var(--bg3); position: relative; overflow: hidden; }
@@ -393,13 +395,6 @@
   .cot-oi { font-size: 10px; font-family: var(--font-mono); color: var(--text2); text-align: right; }
   .cot-oi .oi-up { color: var(--up); font-size: 8px; }
   .cot-oi .oi-dn { color: var(--down); font-size: 8px; }
-  /* TradingView COT chart link */
-  .cot-tv-link {
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text3); font-size: 11px; text-decoration: none;
-    line-height: 1; transition: color .15s;
-  }
-  .cot-tv-link:hover { color: var(--accent, #2962ff); }
 
   /* RATES GRID */
   .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }

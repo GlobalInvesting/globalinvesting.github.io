@@ -56,7 +56,7 @@ const CB_CONFIG = [
 ];
 
 // COT currencies available
-const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF'];
+const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','USD'];
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITIES
@@ -626,13 +626,16 @@ async function fetchCBRates() {
 // COT DATA — from cot-data/*.json
 // ═══════════════════════════════════════════════════════════════════
 // TradingView COT chart symbols — CFTC futures+options combined, large traders
+// Codes: EUR=099741 (EUR/USD futures), GBP=096742, JPY=097741, AUD=232741,
+//        CAD=090741, CHF=092741, USD=098662 (US Dollar Index futures)
 const COT_TV_SYMBOLS = {
-  EUR: 'COT:098662_F_CP_L',
+  EUR: 'COT:099741_F_CP_L',
   GBP: 'COT:096742_F_CP_L',
   JPY: 'COT:097741_F_CP_L',
   AUD: 'COT:232741_F_CP_L',
   CAD: 'COT:090741_F_CP_L',
   CHF: 'COT:092741_F_CP_L',
+  USD: 'COT:098662_F_CP_L',
 };
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
@@ -717,16 +720,10 @@ async function fetchCOTData() {
       }
     }
 
-    // TradingView COT chart link
+    // TradingView COT chart symbol for row click
     const tvSym = COT_TV_SYMBOLS[d.ccy] || '';
-    const tvHref = tvSym
-      ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym)
-      : '#';
-    const tvLink = tvSym
-      ? '<a class="cot-tv-link" href="' + tvHref + '" target="_blank" rel="noopener" title="Open ' + d.ccy + ' COT chart on TradingView (' + tvSym + ')">↗</a>'
-      : '<span></span>';
 
-    return '<div class="cot-row">'
+    return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" title="Click to open ' + d.ccy + ' COT chart">'
       + '<span class="cot-sym">' + d.ccy + '</span>'
       + '<div class="cot-bar-outer">'
       + '<div class="cot-long-fill" style="width:' + longPct + '%"></div>'
@@ -736,9 +733,16 @@ async function fetchCOTData() {
       + '<span class="cot-net ' + cls + '">' + netStr + '</span>'
       + divHtml
       + '<span class="cot-oi" title="LF Open Interest: ' + oi.toLocaleString() + ' contracts (long + short). Rising OI signals new money; falling OI signals liquidation.">' + oiArrow + oiStr + '</span>'
-      + tvLink
       + '</div>';
   }).join('');
+
+  // Click any COT row → load its COT chart in the embedded TV widget
+  container.querySelectorAll('.cot-row[data-sym]').forEach(row => {
+    row.addEventListener('click', () => {
+      const sym = row.dataset.sym;
+      if (sym) loadTVChart(sym);
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
