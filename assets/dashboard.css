@@ -659,6 +659,15 @@
   /* Flag icons in sidebar tables */
   .fi { width: 16px; height: 12px; display: inline-block; }
 
+  /* Key Correlations — compact layout to fit 12 rows without clipping */
+  table[aria-label="Key FX correlations"] td {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+  table[aria-label="Key FX correlations"] th {
+    padding: 3px 4px;
+  }
+
   /* SENTIMENT PANEL — native render (no iframe) */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
