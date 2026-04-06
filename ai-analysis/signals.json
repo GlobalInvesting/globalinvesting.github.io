@@ -1,57 +1,57 @@
 [
   {
-    "time": "16:07",
+    "time": "19:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, watch 160.00 level",
     "evidence": [
-      "USD/JPY: 159.666",
+      "USD/JPY: 159.711",
       "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 24.0"
+      "VIX: 24.5"
     ]
   },
   {
-    "time": "16:05",
+    "time": "19:38",
     "priority": "warning",
-    "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
+    "title": "EUR/USD",
+    "text": "EUR/USD testing 1.15460 resistance, ECB cutting stance may weigh on pair",
     "evidence": [
-      "Fed rate: 3.75% (ON HOLD)",
+      "EUR/USD: 1.15460",
       "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.15490"
+      "US 10Y yield: 4.335%"
     ]
   },
   {
-    "time": "16:03",
+    "time": "19:35",
     "priority": "warning",
-    "title": "VIX Level",
-    "text": "VIX at 24.0 signals elevated volatility — not a risk-on environment",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD at extreme short bias, watch for potential squeeze",
     "evidence": [
-      "VIX: 24.0",
-      "S&P 500: 6,599",
+      "AUD/NZD: 9% long / 91% short",
+      "AUD/USD: 0.69190",
+      "NZD/USD: 0.57150"
+    ]
+  },
+  {
+    "time": "19:30",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "VIX at 24.5 signals elevated volatility — not a risk-on environment",
+    "evidence": [
+      "VIX: 24.5",
+      "S&P 500: 6,605",
       "MOVE Index: 81.8"
     ]
   },
   {
-    "time": "16:00",
+    "time": "19:25",
     "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "AUD/NZD sentiment extreme with 91% short bias, watch for potential squeeze",
+    "title": "Cross-Asset Correlation",
+    "text": "USD/JPY vs VIX correlation break suggests JPY no longer acting as safe haven",
     "evidence": [
-      "AUD/NZD: 9% long / 91% short",
-      "CFTC AUD net: +43,837",
-      "CFTC NZD net: -17,798"
-    ]
-  },
-  {
-    "time": "15:55",
-    "priority": "info",
-    "title": "Yield Curve Context",
-    "text": "US 2Y-10Y spread at -22bp, watch for potential impact on USD",
-    "evidence": [
-      "US 10Y: 4.327%",
-      "US 2Y: 3.790%",
-      "US 2Y-10Y spread: -22bp"
+      "USD/JPY vs VIX: corr=+0.580",
+      "USD/JPY: 159.711",
+      "VIX: 24.5"
     ]
   }
 ]
