@@ -461,22 +461,40 @@ def fetch_yfinance_all(symbols_map):
                     results[internal_id] = None
                     continue
 
-                close      = float(closes.iloc[-1])
-                prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
-                chg        = close - prev_close
-                pct        = (chg / prev_close * 100) if prev_close != 0 else 0.0
+                # prev_close = last completed daily bar (always correct — never today's bar)
+                # Use iloc[-1] from daily as prev_close; fetch intraday for true current price.
+                # This fixes the Monday bug: period="5d" interval="1d" on Monday returns
+                # Friday as iloc[-1] and Thursday as iloc[-2], producing Thu→Fri change
+                # instead of the correct Fri→today change.
+                prev_close = float(closes.iloc[-1])
+
+                # Fetch intraday 1m for current price and today's high/low
+                hist_intra = ticker.history(period="1d", interval="1m", auto_adjust=True)
+                if not hist_intra.empty and len(hist_intra["Close"].dropna()) > 0:
+                    intra_closes = hist_intra["Close"].dropna()
+                    close    = float(intra_closes.iloc[-1])
+                    day_high = round(float(hist_intra["High"].dropna().iloc[-1]),  4)
+                    day_low  = round(float(hist_intra["Low"].dropna().iloc[-1]),   4)
+                    # Today's true high/low: max/min across all intraday bars
+                    day_high = round(float(hist_intra["High"].max()),  4)
+                    day_low  = round(float(hist_intra["Low"].min()),   4)
+                else:
+                    # Fallback: use daily bar (no intraday available — weekend, holiday, etc.)
+                    close    = prev_close
+                    prev_close = float(closes.iloc[-2]) if len(closes) >= 2 else close
+                    highs    = hist["High"].dropna()
+                    lows     = hist["Low"].dropna()
+                    day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
+                    day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
+
+                chg = close - prev_close
+                pct = (chg / prev_close * 100) if prev_close != 0 else 0.0
 
                 validator = VALIDATORS.get(internal_id)
                 if validator and not validator(close):
                     print(f"[yfinance] {internal_id} fuera de rango: {close}")
                     results[internal_id] = None
                     continue
-
-                # high/low del día más reciente disponible
-                highs = hist["High"].dropna()
-                lows  = hist["Low"].dropna()
-                day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
-                day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
 
                 results[internal_id] = {
                     "close":      round(close, 4),
