@@ -2740,16 +2740,48 @@ async function updatePairDetail(tvSym) {
     <div class="pd-section">
       <div class="pd-section-lbl">COT Positioning</div>
       <div class="pd-grid">
-        <div class="pd-cell fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Considered speculative / trend-following positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded."><div class="pd-lbl">LF Net</div><div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="CFTC Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Considered structural / longer-term positioning. Source: CFTC Disaggregated TFF report." data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze."><div class="pd-lbl">AM Net</div><div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div></div>
+        ${(() => {
+          // For crosses (EUR/GBP, GBP/JPY…) COT data tracks cotCcy vs USD — clarify in label and tooltip
+          const isCross = !!meta?.cross;
+          const ccyTag  = cotCcy ? ` (${cotCcy})` : '';
+          const crossNote = isCross
+            ? ` CFTC tracks ${cotCcy} futures vs USD — not this cross specifically. Use as a proxy for ${cotCcy} sentiment broadly.`
+            : '';
+          return `
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Leveraged Funds Net${ccyTag}"
+              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
+              <div class="pd-lbl">LF Net${ccyTag}</div>
+              <div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Asset Managers Net${ccyTag}"
+              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
+              <div class="pd-lbl">AM Net${ccyTag}</div>
+              <div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div>
+            </div>`;
+        })()}
         ${cotOI != null ? (() => {
-          const oiDelta = (cotPrevOI != null) ? cotOI - cotPrevOI : null;
-          const oiArrow = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
+          const isCross   = !!meta?.cross;
+          const ccyTag    = cotCcy ? ` (${cotCcy})` : '';
+          const crossNote = isCross
+            ? ` CFTC tracks ${cotCcy} futures vs USD — use as a proxy for ${cotCcy} market participation broadly.`
+            : '';
+          const oiDelta    = (cotPrevOI != null) ? cotOI - cotPrevOI : null;
+          const oiArrow    = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
           const oiDeltaStr = oiDelta == null ? '' : ` <span class="pd-dim" style="font-size:9px;">(${oiDelta > 0 ? '+' : ''}${Math.round(oiDelta).toLocaleString()})</span>`;
-          const oiTipEx = oiDelta != null
+          const oiTipEx    = oiDelta != null
             ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}`
             : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.';
-          return `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;" data-tip-title="Open Interest (LF)" data-tip-body="Total open interest in the Leveraged Funds category: long contracts + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report." data-tip-ex="${oiTipEx}"><div class="pd-lbl">LF Open Interest</div><div class="pd-val">${oiArrow}${Math.round(cotOI).toLocaleString()}${oiDeltaStr}</div></div>`;
+          return `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;"
+            data-tip-title="LF Open Interest${ccyTag}"
+            data-tip-body="Total open interest in the Leveraged Funds category: long + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report.${crossNote}"
+            data-tip-ex="${oiTipEx}">
+            <div class="pd-lbl">LF Open Interest${ccyTag}</div>
+            <div class="pd-val">${oiArrow}${Math.round(cotOI).toLocaleString()}${oiDeltaStr}</div>
+          </div>`;
         })() : ''}
       </div>
       ${cotSummaryHtml}
