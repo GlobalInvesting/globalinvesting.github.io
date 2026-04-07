@@ -803,14 +803,17 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
-    /* TV Events calendar: fixed height on mobile so iframe fills space properly */
+    /* TV Events calendar: scale down on mobile to preserve desktop aesthetics */
     #section-tvcalendar { min-height: 0 !important; flex: none !important; }
-    #mql5cal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
+    #mql5cal-inner { height: 380px !important; flex: none !important; min-height: 0 !important; overflow: hidden !important; }
     #tvcal-scale {
-      transform: scale(0.88) !important;
-      width: 113.6% !important;
-      height: 113.6% !important;
+      transform: scale(0.72) !important;
+      transform-origin: top left !important;
+      width: 138.9% !important;  /* 1 / 0.72 = ~138.9% to fill container */
+      height: 138.9% !important;
     }
+    #tvcal-scale iframe,
+    #tvcal-scale #economicCalendarWidget { width: 100% !important; height: 100% !important; }
 
     /* Sessions table: compact */
     #sessions-table table { min-width: unset; }
