@@ -926,6 +926,20 @@
     #statusbar .footer-copy { position: static; transform: none; width: 100%; order: 10; text-align: center; }
   }
 
+  /* ══════════════════════════════════════════════
+     LAPTOP / MEDIUM SCREENS — 901px to 1400px
+     Calendar widget gets too large at these widths
+  ══════════════════════════════════════════════ */
+  @media (min-width: 901px) and (max-width: 1400px) {
+    #mql5cal-inner { overflow: hidden !important; }
+    #tvcal-scale {
+      transform: scale(0.78) !important;
+      transform-origin: top left !important;
+      width: 128.2% !important;   /* 1 / 0.78 */
+      height: 128.2% !important;
+    }
+  }
+
   @media (max-width: 480px) {
     /* Extra-small: single column everything */
     .ca-grid { grid-template-columns: 1fr 1fr !important; }
