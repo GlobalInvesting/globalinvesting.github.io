@@ -854,10 +854,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   function loadMQL5Calendar() {
     var inner = document.getElementById('mql5cal-inner');
     if (!inner) return;
-    // Use the actual rendered height of the container (flex:1 inside a 780px grid
-    // minus the static sections above = ~490px). Fall back to 490 if layout
-    // hasn't settled yet. Width is intentionally omitted (defaults to 100%).
-    var h = inner.offsetHeight > 100 ? inner.offsetHeight : 490;
+    // On mobile (narrow viewport) the container has explicit 350px via CSS.
+    // On desktop, use the actual rendered height (flex:1 inside the grid).
+    // Fall back to 490 if layout hasn't settled yet.
+    var isMobile = window.innerWidth <= 900;
+    var h = isMobile ? 350 : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
     var s = document.createElement('script');
     s.async = true;
     s.type = 'text/javascript';
