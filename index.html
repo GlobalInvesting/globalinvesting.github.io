@@ -189,7 +189,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .skip-link:focus{left:8px}
 .tv-skeleton{background:var(--bg3);width:100%;height:100%}
 #tv-chart-wrap{height:290px;min-height:290px}
-#mql5cal-inner{flex:1;min-height:0;position:relative}
+#tvcal-inner{min-height:350px}
 .tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
 @media(max-width:900px){
 #topbar{height:auto;flex-wrap:wrap;padding:0 6px}
@@ -566,7 +566,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <!-- SESSIONS + SPREADS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:740px;align-items:stretch;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:580px;">
       <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:100%;">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
@@ -600,12 +600,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
           </div>
-          <div id="mql5cal-inner" style="position:relative;flex:1;min-height:0;background:var(--bg);overflow:hidden;">
-            <div id="tvcal-scale" style="width:100%;height:100%;transform-origin:top left;">
-            <div id="economicCalendarWidget" style="width:100%;height:100%;"></div>
-            </div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:var(--bg);display:flex;align-items:center;justify-content:flex-end;padding:0 10px;pointer-events:none;z-index:2;">
-              <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);letter-spacing:.05em;">MQL5</span>
+          <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;min-height:350px;">
+            <div class="tv-skeleton" style="position:absolute;inset:0;z-index:1;"></div>
+            <div id="tvcal-scale" style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
+              <div class="tradingview-widget-container" style="width:100%;height:100%;">
+                <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+                <div class="tradingview-widget-copyright" style="display:none;"></div>
+                <!-- Events calendar loaded lazily — see initLazyWidgets() in dashboard.js -->
+              </div>
             </div>
           </div>
         </div>
@@ -853,42 +855,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     _chartLoaded = true;
   }
 
-  function loadMQL5Calendar() {
-    var inner = document.getElementById('mql5cal-inner');
-    if (!inner) return;
-    var vw = window.innerWidth;
-    var isMobile = vw <= 900;
-    var isLaptop = !isMobile && vw <= 1400;
-    // CSS zoom (not transform:scale) is the only way to visually shrink a cross-origin iframe.
-    // We inflate the widget dimensions then apply zoom to the iframe after it is injected.
-    var zoom = isMobile ? 0.72 : isLaptop ? 0.78 : 1;
-    var baseH = inner.offsetHeight > 100 ? inner.offsetHeight : 490;
-    var containerW = inner.offsetWidth > 50 ? inner.offsetWidth : 460;
-    var h = isMobile ? Math.round(380 / zoom) : Math.round(baseH / zoom);
-    var w = zoom < 1 ? Math.round(containerW / zoom) : containerW;
+  function loadTVEvents() {
+    var container = document.querySelector('#tvcal-scale .tradingview-widget-container__widget');
+    if (!container) return;
     var s = document.createElement('script');
-    s.async = true;
     s.type = 'text/javascript';
-    s.setAttribute('data-type', 'calendar-widget');
-    s.src = 'https://www.tradays.com/c/js/widgets/calendar/widget.js?v=15';
-    s.textContent = JSON.stringify({"width": w, "height": h, "mode":"2","fw":"html","theme":1});
-    inner.insertBefore(s, inner.querySelector('.ecw-copyright'));
+    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+    s.async = true;
+    s.textContent = JSON.stringify({"colorTheme":"dark","isTransparent":true,"locale":"en","countryFilter":"us,nz,au,ch,eu,ca,jp,gb","importanceFilter":"-1,0,1","width":"100%","height":"100%"});
+    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
+    if (skel) skel.style.display = 'none';
+    container.appendChild(s);
     _eventsLoaded = true;
-    // Poll for the iframe the widget injects, then apply zoom directly to it
-    if (zoom < 1) {
-      var attempts = 0;
-      var poll = setInterval(function() {
-        var iframe = inner.querySelector('iframe');
-        if (iframe) {
-          clearInterval(poll);
-          iframe.style.zoom = zoom;
-          iframe.style.width = w + 'px';
-          iframe.style.height = h + 'px';
-          inner.style.overflow = 'hidden';
-        }
-        if (++attempts > 40) clearInterval(poll);
-      }, 100);
-    }
   }
 
   function loadTVEconMap() {
@@ -914,8 +892,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       if (id === 'tv-chart-wrap' && !_chartLoaded) {
         loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
         io.unobserve(entry.target);
-      } else if (id === 'mql5cal-inner' && !_eventsLoaded) {
-        loadMQL5Calendar();
+      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
+        loadTVEvents();
         io.unobserve(entry.target);
       } else if (id === 'section-econmap' && !_econmapLoaded) {
         loadTVEconMap();
@@ -930,7 +908,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
   document.addEventListener('DOMContentLoaded', function() {
     var chartWrap = document.getElementById('tv-chart-wrap');
-    var calInner  = document.getElementById('mql5cal-inner');
+    var calInner  = document.getElementById('tvcal-inner');
     var econMap   = document.getElementById('section-econmap');
     if (chartWrap) io.observe(chartWrap);
     if (calInner)  io.observe(calInner);
