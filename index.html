@@ -596,13 +596,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </table>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">HV30-derived · session ratios BIS 2022</div>
         </div>
-        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;overflow:visible;">
+        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
           </div>
-          <div id="mql5cal-inner" style="overflow:visible;flex:1;position:relative;min-height:350px;background:var(--bg);">
-            <div id="economicCalendarWidget" style="width:100%;height:100%;min-height:350px;"></div>
-            <div class="ecw-copyright" style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 8px 3px;text-align:right;flex-shrink:0;"><a href="https://www.mql5.com/?utm_source=calendar.widget&utm_medium=link&utm_term=economic.calendar&utm_content=visit.mql5.calendar&utm_campaign=202.calendar.widget" rel="noopener nofollow" target="_blank" style="color:var(--text3);text-decoration:none;">MQL5</a></div>
+          <div id="mql5cal-inner" style="overflow:hidden;flex:1;position:relative;min-height:350px;background:var(--bg);">
+            <div id="economicCalendarWidget" style="width:100%;height:calc(100% + 26px);min-height:350px;"></div>
           </div>
         </div>
       </div>
