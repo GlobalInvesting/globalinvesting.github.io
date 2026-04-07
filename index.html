@@ -601,7 +601,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <span class="panel-title">Upcoming Events</span>
           </div>
           <div id="mql5cal-inner" style="overflow:hidden;flex:1;position:relative;min-height:350px;background:var(--bg);">
-            <div id="economicCalendarWidget" style="width:100%;height:calc(100% + 26px);min-height:350px;"></div>
+            <div id="economicCalendarWidget" style="width:100%;height:100%;min-height:350px;"></div>
+            <div id="mql5cal-footer-mask" style="position:absolute;bottom:0;left:0;right:0;height:26px;background:var(--bg2);z-index:5;pointer-events:none;border-top:1px solid var(--border);"></div>
           </div>
         </div>
       </div>
@@ -857,7 +858,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     s.setAttribute('data-type', 'calendar-widget');
     s.src = 'https://www.tradays.com/c/js/widgets/calendar/widget.js?v=15';
     s.textContent = JSON.stringify({"width":"100%","height":"100%","mode":"2","fw":"html","theme":1});
-    inner.insertBefore(s, inner.querySelector('.ecw-copyright'));
+    inner.appendChild(s);
+
+    // When the MQL5 popup opens, the iframe triggers a scroll on ancestor scrollable
+    // elements via scrollIntoView. Lock #main scroll position while the iframe is
+    // taller than its container (popup open), then restore it on close.
+    var main = document.getElementById('main');
+    if (main) {
+      var _savedScroll = 0;
+      var _popupOpen = false;
+      var ro = new ResizeObserver(function() {
+        var iframe = inner.querySelector('iframe');
+        if (!iframe) return;
+        var iframeH = iframe.offsetHeight;
+        var innerH = inner.offsetHeight;
+        if (iframeH > innerH + 10 && !_popupOpen) {
+          // Popup just opened — freeze scroll
+          _popupOpen = true;
+          _savedScroll = main.scrollTop;
+          main.style.overflow = 'hidden';
+        } else if (iframeH <= innerH + 10 && _popupOpen) {
+          // Popup closed — restore scroll
+          _popupOpen = false;
+          main.style.overflow = '';
+          main.scrollTop = _savedScroll;
+        }
+      });
+      ro.observe(inner);
+    }
+
     _eventsLoaded = true;
   }
 
