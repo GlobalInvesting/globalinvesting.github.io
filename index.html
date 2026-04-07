@@ -859,34 +859,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     s.src = 'https://www.tradays.com/c/js/widgets/calendar/widget.js?v=15';
     s.textContent = JSON.stringify({"width":"100%","height":"100%","mode":"2","fw":"html","theme":1});
     inner.appendChild(s);
-
-    // The MQL5 iframe calls scrollIntoView when the filter popup opens, which
-    // scrolls #main upward. Fix: whenever #main scrolls while the iframe has
-    // focus (user is interacting with the widget), immediately snap it back.
-    var main = document.getElementById('main');
-    if (main) {
-      var _lockedScroll = null;
-
-      // iframe receives focus when clicked — start locking
-      window.addEventListener('blur', function() {
-        var iframe = inner.querySelector('iframe');
-        if (document.activeElement === iframe) {
-          _lockedScroll = main.scrollTop;
-        }
-      }, true);
-
-      // iframe loses focus when Apply/Cancel clicked or click outside — stop locking
-      window.addEventListener('focus', function() {
-        _lockedScroll = null;
-      }, true);
-
-      main.addEventListener('scroll', function() {
-        if (_lockedScroll !== null) {
-          main.scrollTop = _lockedScroll;
-        }
-      }, { passive: false });
-    }
-
     _eventsLoaded = true;
   }
 
