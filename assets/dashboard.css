@@ -792,7 +792,7 @@
     /* Cross-asset + Risk monitor panels: fixed height → auto */
     div[style*="height:320px"] { height: auto !important; max-height: none !important; }
     div[style*="max-height:320px"] { max-height: none !important; }
-    div[style*="height:740px"] { height: auto !important; min-height: 0 !important; }
+    div[style*="height:580px"] { height: auto !important; }
 
     /* News + Economic map: stack */
     div[style*="height:440px"] { height: auto !important; flex-direction: column !important; }
@@ -803,9 +803,14 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
-    /* TV Events calendar: JS applies CSS zoom to iframe directly on small screens */
+    /* TV Events calendar: fixed height on mobile so iframe fills space properly */
     #section-tvcalendar { min-height: 0 !important; flex: none !important; }
-    #mql5cal-inner { height: 380px !important; flex: none !important; min-height: 0 !important; overflow: hidden !important; }
+    #tvcal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
+    #tvcal-scale {
+      transform: scale(0.88) !important;
+      width: 113.6% !important;
+      height: 113.6% !important;
+    }
 
     /* Sessions table: compact */
     #sessions-table table { min-width: unset; }
