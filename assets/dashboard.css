@@ -805,7 +805,7 @@
 
     /* TV Events calendar: fixed height on mobile so iframe fills space properly */
     #section-tvcalendar { min-height: 0 !important; flex: none !important; }
-    #tvcal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
+    #mql5cal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
     #tvcal-scale {
       transform: scale(0.88) !important;
       width: 113.6% !important;
