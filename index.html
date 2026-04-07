@@ -858,10 +858,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     if (!inner) return;
     // On mobile (narrow viewport) the container has explicit 380px via CSS,
     // but we scale the inner wrapper to 0.72 so the widget needs ~528px of content height.
+    // On laptop (901-1400px) we scale to 0.78 — pass extra height so content isn't clipped.
     // On desktop, use the actual rendered height (flex:1 inside the grid).
     // Fall back to 490 if layout hasn't settled yet.
     var isMobile = window.innerWidth <= 900;
-    var h = isMobile ? 528 : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
+    var isLaptop = !isMobile && window.innerWidth <= 1400;
+    var h = isMobile ? 528
+          : isLaptop ? Math.round((inner.offsetHeight > 100 ? inner.offsetHeight : 490) / 0.78)
+          : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
     var s = document.createElement('script');
     s.async = true;
     s.type = 'text/javascript';
