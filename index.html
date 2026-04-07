@@ -600,8 +600,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span class="panel-title">Upcoming Events</span>
           </div>
-          <div id="mql5cal-inner" style="position:relative;flex:1;min-height:0;background:var(--bg);">
+          <div id="mql5cal-inner" style="position:relative;flex:1;min-height:0;background:var(--bg);overflow:hidden;">
+            <div id="tvcal-scale" style="width:100%;height:100%;transform-origin:top left;">
             <div id="economicCalendarWidget" style="width:100%;height:100%;"></div>
+            </div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:26px;background:var(--bg);display:flex;align-items:center;justify-content:flex-end;padding:0 10px;pointer-events:none;z-index:2;">
               <span style="font-size:9px;color:var(--text3);font-family:var(--font-ui);letter-spacing:.05em;">MQL5</span>
             </div>
@@ -854,11 +856,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   function loadMQL5Calendar() {
     var inner = document.getElementById('mql5cal-inner');
     if (!inner) return;
-    // On mobile (narrow viewport) the container has explicit 350px via CSS.
+    // On mobile (narrow viewport) the container has explicit 380px via CSS,
+    // but we scale the inner wrapper to 0.72 so the widget needs ~528px of content height.
     // On desktop, use the actual rendered height (flex:1 inside the grid).
     // Fall back to 490 if layout hasn't settled yet.
     var isMobile = window.innerWidth <= 900;
-    var h = isMobile ? 350 : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
+    var h = isMobile ? 528 : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
     var s = document.createElement('script');
     s.async = true;
     s.type = 'text/javascript';
