@@ -1,57 +1,57 @@
 [
   {
-    "time": "07:50",
+    "time": "09:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.60, testing 160.00 resistance",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.872",
-      "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 25.1"
+      "USD/JPY: 159.6",
+      "BoJ rate: 0.75%",
+      "VIX: 24.5"
     ]
   },
   {
-    "time": "07:48",
+    "time": "09:38",
     "priority": "warning",
-    "title": "ECB",
-    "text": "ECB's Radev comments on potential rate hike in April meeting, EUR/USD holding above 1.15490",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1500, ECB cutting rates may weigh on EUR, while Fed holds at 3.75%",
     "evidence": [
-      "EUR/USD: 1.15490",
-      "ECB rate: 2% (CUTTING)",
-      "VIX: 25.1"
+      "EUR/USD: 1.1525",
+      "ECB rate: 2.00% (CUTTING)",
+      "Fed rate: 3.75% (ON HOLD)"
     ]
   },
   {
-    "time": "07:45",
+    "time": "09:35",
     "priority": "warning",
-    "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, z=+1.24σ",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.606",
-      "z=+1.24σ",
-      "VIX: 25.1"
+      "USD/JPY vs VIX: corr=+0.604",
+      "norm=+0.121",
+      "z=+1.24σ"
     ]
   },
   {
-    "time": "07:42",
+    "time": "09:30",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 25.1 signals elevated volatility — not a risk-on environment, MOVE Index at 81.7",
+    "text": "VIX at 24.5 signals elevated volatility — not a risk-on environment, MOVE Index at 81.7",
     "evidence": [
-      "VIX: 25.1",
+      "VIX: 24.5",
       "MOVE Index: 81.7",
       "S&P 500: 6,612"
     ]
   },
   {
-    "time": "07:38",
+    "time": "09:25",
     "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "AUD/NZD sentiment extreme, 92% of retail traders short, watch for potential squeeze",
+    "title": "NZD/USD",
+    "text": "NZD/USD retail sentiment extreme with 85% long, watch for potential squeeze",
     "evidence": [
-      "AUD/NZD: 8% long / 92% short",
-      "AUD/NZD: 92% SHORT — retail heavily positioned",
-      "EUR/NZD: 88% SHORT"
+      "NZD/USD: 0.5708",
+      "NZD/USD retail sentiment: 85% long",
+      "CFTC NZD net: -17,798"
     ]
   }
 ]
