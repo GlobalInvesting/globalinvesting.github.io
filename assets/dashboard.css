@@ -803,17 +803,9 @@
     /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
 
-    /* TV Events calendar: scale down on mobile to preserve desktop aesthetics */
+    /* TV Events calendar: JS applies CSS zoom to iframe directly on small screens */
     #section-tvcalendar { min-height: 0 !important; flex: none !important; }
     #mql5cal-inner { height: 380px !important; flex: none !important; min-height: 0 !important; overflow: hidden !important; }
-    #tvcal-scale {
-      transform: scale(0.72) !important;
-      transform-origin: top left !important;
-      width: 138.9% !important;  /* 1 / 0.72 = ~138.9% to fill container */
-      height: 138.9% !important;
-    }
-    #tvcal-scale iframe,
-    #tvcal-scale #economicCalendarWidget { width: 100% !important; height: 100% !important; }
 
     /* Sessions table: compact */
     #sessions-table table { min-width: unset; }
@@ -924,20 +916,6 @@
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
     #statusbar .footer-copy { position: static; transform: none; width: 100%; order: 10; text-align: center; }
-  }
-
-  /* ══════════════════════════════════════════════
-     LAPTOP / MEDIUM SCREENS — 901px to 1400px
-     Calendar widget gets too large at these widths
-  ══════════════════════════════════════════════ */
-  @media (min-width: 901px) and (max-width: 1400px) {
-    #mql5cal-inner { overflow: hidden !important; }
-    #tvcal-scale {
-      transform: scale(0.78) !important;
-      transform-origin: top left !important;
-      width: 128.2% !important;   /* 1 / 0.78 */
-      height: 128.2% !important;
-    }
   }
 
   @media (max-width: 480px) {
