@@ -856,24 +856,39 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   function loadMQL5Calendar() {
     var inner = document.getElementById('mql5cal-inner');
     if (!inner) return;
-    // On mobile (narrow viewport) the container has explicit 380px via CSS,
-    // but we scale the inner wrapper to 0.72 so the widget needs ~528px of content height.
-    // On laptop (901-1400px) we scale to 0.78 — pass extra height so content isn't clipped.
-    // On desktop, use the actual rendered height (flex:1 inside the grid).
-    // Fall back to 490 if layout hasn't settled yet.
-    var isMobile = window.innerWidth <= 900;
-    var isLaptop = !isMobile && window.innerWidth <= 1400;
-    var h = isMobile ? 528
-          : isLaptop ? Math.round((inner.offsetHeight > 100 ? inner.offsetHeight : 490) / 0.78)
-          : (inner.offsetHeight > 100 ? inner.offsetHeight : 490);
+    var vw = window.innerWidth;
+    var isMobile = vw <= 900;
+    var isLaptop = !isMobile && vw <= 1400;
+    // CSS zoom (not transform:scale) is the only way to visually shrink a cross-origin iframe.
+    // We inflate the widget dimensions then apply zoom to the iframe after it is injected.
+    var zoom = isMobile ? 0.72 : isLaptop ? 0.78 : 1;
+    var baseH = inner.offsetHeight > 100 ? inner.offsetHeight : 490;
+    var containerW = inner.offsetWidth > 50 ? inner.offsetWidth : 460;
+    var h = isMobile ? Math.round(380 / zoom) : Math.round(baseH / zoom);
+    var w = zoom < 1 ? Math.round(containerW / zoom) : containerW;
     var s = document.createElement('script');
     s.async = true;
     s.type = 'text/javascript';
     s.setAttribute('data-type', 'calendar-widget');
     s.src = 'https://www.tradays.com/c/js/widgets/calendar/widget.js?v=15';
-    s.textContent = JSON.stringify({"width":"100%","height":h,"mode":"2","fw":"html","theme":1});
+    s.textContent = JSON.stringify({"width": w, "height": h, "mode":"2","fw":"html","theme":1});
     inner.insertBefore(s, inner.querySelector('.ecw-copyright'));
     _eventsLoaded = true;
+    // Poll for the iframe the widget injects, then apply zoom directly to it
+    if (zoom < 1) {
+      var attempts = 0;
+      var poll = setInterval(function() {
+        var iframe = inner.querySelector('iframe');
+        if (iframe) {
+          clearInterval(poll);
+          iframe.style.zoom = zoom;
+          iframe.style.width = w + 'px';
+          iframe.style.height = h + 'px';
+          inner.style.overflow = 'hidden';
+        }
+        if (++attempts > 40) clearInterval(poll);
+      }, 100);
+    }
   }
 
   function loadTVEconMap() {
