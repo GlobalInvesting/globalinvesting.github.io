@@ -792,7 +792,7 @@
     /* Cross-asset + Risk monitor panels: fixed height → auto */
     div[style*="height:320px"] { height: auto !important; max-height: none !important; }
     div[style*="max-height:320px"] { max-height: none !important; }
-    div[style*="height:620px"] { height: auto !important; min-height: 0 !important; }
+    div[style*="height:680px"] { height: auto !important; min-height: 0 !important; }
 
     /* News + Economic map: stack */
     div[style*="height:440px"] { height: auto !important; flex-direction: column !important; }
