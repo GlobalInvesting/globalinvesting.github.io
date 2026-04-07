@@ -1,41 +1,41 @@
 [
   {
-    "time": "21:55",
+    "time": "02:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, watch 160.00 level",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 159.611",
+      "USD/JPY: 159.896",
       "BoJ rate: 0.75% (ON HOLD)",
       "VIX: 24.2"
     ]
   },
   {
-    "time": "21:52",
+    "time": "02:38",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD testing 1.15460 resistance, ECB cutting stance may weigh on pair",
+    "title": "ECB vs Fed Rate Divergence",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
-      "EUR/USD: 1.15460",
+      "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2% (CUTTING)",
-      "US 10Y yield: 4.335%"
+      "EUR/USD: 1.15340"
     ]
   },
   {
-    "time": "21:49",
+    "time": "02:35",
     "priority": "warning",
-    "title": "AUD/NZD",
-    "text": "AUD/NZD sentiment extreme, 91% of retail traders short, watch for squeeze",
+    "title": "USD/JPY vs VIX Correlation Break",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
     "evidence": [
-      "AUD/NZD: 9% long / 91% short",
-      "AUD/USD: 0.69190",
-      "NZD/USD: 0.57160"
+      "USD/JPY vs VIX: corr=+0.570",
+      "VIX: 24.2",
+      "USD/JPY: 159.896"
     ]
   },
   {
-    "time": "21:46",
+    "time": "02:30",
     "priority": "info",
-    "title": "Risk Regime",
+    "title": "VIX Level",
     "text": "VIX at 24.2 signals elevated volatility — not a risk-on environment",
     "evidence": [
       "VIX: 24.2",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "21:43",
+    "time": "02:25",
     "priority": "info",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven",
+    "title": "AUD/NZD Sentiment Extreme",
+    "text": "AUD/NZD 91% short bias may lead to squeeze, watch for potential reversal",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.579",
-      "USD/JPY: 159.611",
-      "VIX: 24.2"
+      "AUD/NZD: 9% long / 91% short",
+      "AUD/USD: 0.69080",
+      "NZD/USD: 0.56980"
     ]
   }
 ]
