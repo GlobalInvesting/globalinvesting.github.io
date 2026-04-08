@@ -1,39 +1,39 @@
 [
   {
-    "time": "02:40",
+    "time": "05:20",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades near 158.52, above the psychological 158.00 level",
+    "text": "BoJ intervention risk elevated as USD/JPY trades near 158.00; watch for verbal intervention",
     "evidence": [
-      "USD/JPY: 158.522",
+      "USD/JPY: 158.347",
       "BoJ rate: 0.75% (ON HOLD)",
       "VIX: 25.8"
     ]
   },
   {
-    "time": "02:38",
+    "time": "05:18",
     "priority": "warning",
-    "title": "EUR/JPY",
-    "text": "EUR/JPY sentiment extreme with 88% of retail traders short, watch for potential squeeze",
+    "title": "EUR/USD",
+    "text": "EUR/USD testing 1.16840 resistance, ECB cutting rates may weigh on EUR",
     "evidence": [
-      "EUR/JPY: 185.032",
-      "EUR/JPY sentiment: 88% short",
-      "VIX: 25.8"
+      "EUR/USD: 1.16840",
+      "ECB rate: 2% (CUTTING)",
+      "Fed rate: 3.75% (ON HOLD)"
     ]
   },
   {
-    "time": "02:35",
+    "time": "05:15",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, z=+1.44σ",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.609",
-      "z=+1.44σ",
+      "USD/JPY vs VIX: corr=+0.567",
+      "z=+1.42σ",
       "VIX: 25.8"
     ]
   },
   {
-    "time": "02:30",
+    "time": "05:10",
     "priority": "info",
     "title": "Risk Regime",
     "text": "VIX at 25.8 signals elevated volatility — not a risk-on environment",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "02:25",
+    "time": "05:05",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at -38,698, watch for potential squeeze",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD sentiment extreme, 92% of retail traders short, watch for squeeze",
     "evidence": [
-      "EUR net short: -38,698",
-      "EUR/USD: 1.16750",
-      "CFTC EUR long%: 40.0%"
+      "AUD/NZD: 92% short",
+      "AUD/USD: 0.70670",
+      "NZD/USD: 0.58360"
     ]
   }
 ]
