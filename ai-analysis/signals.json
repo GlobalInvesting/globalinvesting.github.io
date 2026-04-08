@@ -1,57 +1,57 @@
 [
   {
-    "time": "07:55",
+    "time": "09:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 158.00 resistance, with USD/JPY vs VIX correlation break signaling JPY has lost safe-haven function",
+    "text": "BoJ intervention risk elevated as USD/JPY trades above 158.00, testing 160.00 resistance",
     "evidence": [
-      "USD/JPY: 158.135",
-      "VIX: 20.9",
-      "USD/JPY vs VIX: corr=+0.649"
+      "USD/JPY: 158.372",
+      "BoJ rate: 0.75% (ON HOLD)",
+      "VIX: 20.3"
     ]
   },
   {
-    "time": "07:52",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading above 1.1700, driven by ECB hawkish stance and US-Iran ceasefire, with EUR/USD vs EuroStoxx correlation break indicating regime shift",
-    "evidence": [
-      "EUR/USD: 1.17010",
-      "ECB rate: 2% (CUTTING)",
-      "EUR/USD vs EuroStoxx: corr=+0.701"
-    ]
-  },
-  {
-    "time": "07:49",
+    "time": "09:38",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD testing 0.7100 resistance, with extreme retail short bias (89% short) and AUD/USD vs US 10Y yield correlation, watch for potential squeeze",
+    "text": "Retail sentiment extreme short at 89%, diverging from CFTC AUD net long positioning, watch for squeeze",
     "evidence": [
-      "AUD/USD: 0.70640",
-      "US 10Y yield: 4.343%",
-      "AUD/USD retail sentiment: 11% long / 89% short"
+      "AUD/USD: 0.70430",
+      "CFTC AUD net: +43,837",
+      "Retail AUD/USD sentiment: 11% long / 89% short"
     ]
   },
   {
-    "time": "07:45",
+    "time": "09:35",
+    "priority": "warning",
+    "title": "USD/JPY vs VIX",
+    "text": "Correlation break: USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function, z=+1.33σ",
+    "evidence": [
+      "USD/JPY vs VIX corr: +0.647",
+      "z-score: +1.33σ",
+      "VIX: 20.3"
+    ]
+  },
+  {
+    "time": "09:30",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 20.9 signals elevated volatility — not a risk-on environment, with MOVE Index at 83.1 indicating bond market stress",
+    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment, MOVE Index at 83.1 indicates bond market stress",
     "evidence": [
-      "VIX: 20.9",
+      "VIX: 20.3",
       "MOVE Index: 83.1",
       "S&P 500: 6,617"
     ]
   },
   {
-    "time": "07:42",
+    "time": "09:25",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at -38,698, with CFTC speculative positioning indicating institutional bearishness, while retail sentiment shows strong short bias",
+    "title": "CB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD, rate divergence favours USD",
     "evidence": [
-      "EUR net short: -38,698",
-      "EUR/USD retail sentiment: 30% long / 70% short",
-      "CFTC EUR lev_net: -38,698"
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (CUTTING)",
+      "EUR/USD: 1.16890"
     ]
   }
 ]
