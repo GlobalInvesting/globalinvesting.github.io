@@ -121,6 +121,18 @@
   }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+  #clock {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    display: inline-block;
+    min-width: 9ch;
+    white-space: nowrap;
+  }
+
+  #session-label {
+    white-space: nowrap;
+  }
+
   /* ── QUOTE BAR ── */
   #tv-ticker-wrap {
     background: var(--bg2);
