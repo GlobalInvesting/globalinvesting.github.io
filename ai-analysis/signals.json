@@ -1,57 +1,57 @@
 [
   {
-    "time": "09:40",
+    "time": "14:05",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 158.00, testing 160.00 resistance",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 160.00 resistance; watch for verbal intervention",
     "evidence": [
-      "USD/JPY: 158.372",
+      "USD/JPY: 158.252",
       "BoJ rate: 0.75% (ON HOLD)",
       "VIX: 20.3"
     ]
   },
   {
-    "time": "09:38",
+    "time": "14:03",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "Retail sentiment extreme short at 89%, diverging from CFTC AUD net long positioning, watch for squeeze",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1557 support, testing 1.1700 resistance; ECB cutting stance supports EUR",
     "evidence": [
-      "AUD/USD: 0.70430",
-      "CFTC AUD net: +43,837",
-      "Retail AUD/USD sentiment: 11% long / 89% short"
+      "EUR/USD: 1.17030",
+      "ECB rate: 2% (CUTTING)",
+      "US 10Y yield: 4.258%"
     ]
   },
   {
-    "time": "09:35",
+    "time": "14:01",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "Correlation break: USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function, z=+1.33σ",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.647",
-      "z-score: +1.33σ",
-      "VIX: 20.3"
+      "USD/JPY vs VIX: corr=+0.648",
+      "VIX: 20.3",
+      "USD/JPY: 158.252"
     ]
   },
   {
-    "time": "09:30",
+    "time": "13:58",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment, MOVE Index at 83.1 indicates bond market stress",
+    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment; watch for market swings",
     "evidence": [
       "VIX: 20.3",
-      "MOVE Index: 83.1",
-      "S&P 500: 6,617"
+      "S&P 500: 6,774",
+      "MOVE Index: 83.1"
     ]
   },
   {
-    "time": "09:25",
+    "time": "13:55",
     "priority": "info",
-    "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD, rate divergence favours USD",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading above 0.6935 support, testing 0.7058 resistance; RBA hiking stance supports AUD",
     "evidence": [
-      "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2.00% (CUTTING)",
-      "EUR/USD: 1.16890"
+      "AUD/USD: 0.70580",
+      "RBA rate: 4.10% (HIKING)",
+      "US 10Y yield: 4.258%"
     ]
   }
 ]
