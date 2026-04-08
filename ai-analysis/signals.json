@@ -1,57 +1,57 @@
 [
   {
-    "time": "05:20",
+    "time": "07:55",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades near 158.00; watch for verbal intervention",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 158.00 resistance, with USD/JPY vs VIX correlation break signaling JPY has lost safe-haven function",
     "evidence": [
-      "USD/JPY: 158.347",
-      "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 25.8"
+      "USD/JPY: 158.135",
+      "VIX: 20.9",
+      "USD/JPY vs VIX: corr=+0.649"
     ]
   },
   {
-    "time": "05:18",
+    "time": "07:52",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD testing 1.16840 resistance, ECB cutting rates may weigh on EUR",
+    "text": "EUR/USD trading above 1.1700, driven by ECB hawkish stance and US-Iran ceasefire, with EUR/USD vs EuroStoxx correlation break indicating regime shift",
     "evidence": [
-      "EUR/USD: 1.16840",
+      "EUR/USD: 1.17010",
       "ECB rate: 2% (CUTTING)",
-      "Fed rate: 3.75% (ON HOLD)"
+      "EUR/USD vs EuroStoxx: corr=+0.701"
     ]
   },
   {
-    "time": "05:15",
+    "time": "07:49",
     "priority": "warning",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
+    "title": "AUD/USD",
+    "text": "AUD/USD testing 0.7100 resistance, with extreme retail short bias (89% short) and AUD/USD vs US 10Y yield correlation, watch for potential squeeze",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.567",
-      "z=+1.42σ",
-      "VIX: 25.8"
+      "AUD/USD: 0.70640",
+      "US 10Y yield: 4.343%",
+      "AUD/USD retail sentiment: 11% long / 89% short"
     ]
   },
   {
-    "time": "05:10",
+    "time": "07:45",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 25.8 signals elevated volatility — not a risk-on environment",
+    "text": "VIX at 20.9 signals elevated volatility — not a risk-on environment, with MOVE Index at 83.1 indicating bond market stress",
     "evidence": [
-      "VIX: 25.8",
-      "S&P 500: 6,617",
-      "MOVE Index: 83.1"
+      "VIX: 20.9",
+      "MOVE Index: 83.1",
+      "S&P 500: 6,617"
     ]
   },
   {
-    "time": "05:05",
+    "time": "07:42",
     "priority": "info",
-    "title": "AUD/NZD",
-    "text": "AUD/NZD sentiment extreme, 92% of retail traders short, watch for squeeze",
+    "title": "CFTC — EUR",
+    "text": "EUR net short positioning at -38,698, with CFTC speculative positioning indicating institutional bearishness, while retail sentiment shows strong short bias",
     "evidence": [
-      "AUD/NZD: 92% short",
-      "AUD/USD: 0.70670",
-      "NZD/USD: 0.58360"
+      "EUR net short: -38,698",
+      "EUR/USD retail sentiment: 30% long / 70% short",
+      "CFTC EUR lev_net: -38,698"
     ]
   }
 ]
