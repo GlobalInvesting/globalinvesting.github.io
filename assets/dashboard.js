@@ -39,8 +39,8 @@ const PAIRS = [
   { id:'gbpnzd', base:'GBP', quote:'NZD', cross:['GBP','NZD'], dec:5 },
   { id:'audcad', base:'AUD', quote:'CAD', cross:['AUD','CAD'], dec:5 },
   { id:'cadchf', base:'CAD', quote:'CHF', cross:['CAD','CHF'], dec:5 },
-  { id:'nzdcad', base:'CAD', quote:'NZD', cross:['CAD','NZD'], dec:5 },
-  { id:'nzdchf', base:'CHF', quote:'NZD', cross:['CHF','NZD'], dec:5 },
+  { id:'nzdcad', base:'NZD', quote:'CAD', cross:['NZD','CAD'], dec:5 },
+  { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
 // CB rate config
@@ -2772,13 +2772,24 @@ async function updatePairDetail(tvSym) {
   }
 
   // Carry differential (CB rates)
-  // invert:true  = CCY/USD pair (EUR/USD) → numerator = base (EUR) → carry = cbBase − cbQuote
-  // invert:false = USD/CCY pair (USD/JPY) → numerator = USD (quote) → carry = cbQuote − cbBase
+  // For USD major pairs:
+  //   invert:true  = CCY/USD pair (EUR/USD) → numerator = base (EUR) → carry = cbBase − cbQuote
+  //   invert:false = USD/CCY pair (USD/JPY) → numerator = USD (quote) → carry = cbQuote − cbBase
+  // For cross pairs (no invert field):
+  //   The pair label is always BASE/QUOTE (e.g. AUD/CHF), so numerator = base
+  //   carry = cbBase − cbQuote  (AUD rate − CHF rate = 4.10% − 0% = +4.10%)
+  //   Using meta.cross to detect cross pairs and always apply cbBase − cbQuote.
   const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
   const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
   let carryDiff = null;
-  if (cbBase != null && cbQuote != null)
-    carryDiff = invert ? (cbBase - cbQuote) : (cbQuote - cbBase);
+  if (cbBase != null && cbQuote != null) {
+    if (meta?.cross) {
+      // Cross pair: base is always the numerator currency in the pair label
+      carryDiff = cbBase - cbQuote;
+    } else {
+      carryDiff = invert ? (cbBase - cbQuote) : (cbQuote - cbBase);
+    }
+  }
 
   const fmtPct = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
   const fmtNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
