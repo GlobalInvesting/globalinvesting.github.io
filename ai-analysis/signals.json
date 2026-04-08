@@ -1,57 +1,57 @@
 [
   {
-    "time": "14:05",
+    "time": "16:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 160.00 resistance; watch for verbal intervention",
+    "text": "BoJ intervention risk elevated as USD/JPY trades near 160.00; watch for verbal intervention",
     "evidence": [
-      "USD/JPY: 158.252",
-      "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 20.3"
+      "USD/JPY: 158.422",
+      "BoJ rate: 0.75%",
+      "VIX: 21.1"
     ]
   },
   {
-    "time": "14:03",
+    "time": "16:38",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1557 support, testing 1.1700 resistance; ECB cutting stance supports EUR",
+    "text": "EUR/USD testing 1.16850 resistance as ECB cuts rates; watch for break",
     "evidence": [
-      "EUR/USD: 1.17030",
-      "ECB rate: 2% (CUTTING)",
-      "US 10Y yield: 4.258%"
+      "EUR/USD: 1.16850",
+      "ECB rate: 2.00%",
+      "VIX: 21.1"
     ]
   },
   {
-    "time": "14:01",
+    "time": "16:35",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
     "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.648",
-      "VIX: 20.3",
-      "USD/JPY: 158.252"
+      "USD/JPY vs VIX: corr=+0.649",
+      "VIX: 21.1",
+      "USD/JPY: 158.422"
     ]
   },
   {
-    "time": "13:58",
+    "time": "16:30",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment; watch for market swings",
+    "text": "VIX at 21.1 signals normal volatility — risk-on environment",
     "evidence": [
-      "VIX: 20.3",
-      "S&P 500: 6,774",
-      "MOVE Index: 83.1"
+      "VIX: 21.1",
+      "S&P 500: 6,781",
+      "DXY: 98.91"
     ]
   },
   {
-    "time": "13:55",
+    "time": "16:25",
     "priority": "info",
     "title": "AUD/USD",
-    "text": "AUD/USD trading above 0.6935 support, testing 0.7058 resistance; RBA hiking stance supports AUD",
+    "text": "AUD/USD sentiment extreme with 88% short; watch for contrarian reversal",
     "evidence": [
-      "AUD/USD: 0.70580",
-      "RBA rate: 4.10% (HIKING)",
-      "US 10Y yield: 4.258%"
+      "AUD/USD: 0.70570",
+      "AUD/USD sentiment: 12% long / 88% short",
+      "RBA rate: 4.10%"
     ]
   }
 ]
