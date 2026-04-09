@@ -294,7 +294,10 @@
   .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }
   /* Kill any bottom spacing inside TV chart container */
   #tv-chart-wrap .tradingview-widget-container { margin-bottom:0 !important; padding-bottom:0 !important; }
-  #tv-chart-wrap iframe { display:block; }
+  #tv-chart-wrap iframe { display:block; pointer-events:auto; }
+  /* pointer-events:none on wrap kills the 32px margin-bottom overlap intercept;
+     restored on iframe so chart pan/zoom/interaction still works */
+  #tv-chart-wrap { pointer-events:none; }
 
   .panel-head {
     background: var(--head-bg);
