@@ -1812,8 +1812,8 @@ function attachRiskMonitorTooltips() {
   const regCell = document.querySelector('#section-risk .risk-cell:nth-child(4)');
   if (regCell) attachRiskTip(regCell,
     'Market Regime',
-    'Composite live assessment based on: VIX level, yield curve shape (inverted = stress), gold safe-haven demand, S&P 500 daily performance, and MOVE index. Updates in real time.',
-    'RISK-ON: all signals green, risk assets bid. MIXED: conflicting signals, trade smaller. CAUTION: elevated vol + 1–2 stress factors. RISK-OFF: high stress, USD/JPY/CHF bid, equities sold.'
+    'Composite live assessment: VIX level (primary driver), yield curve shape, gold intraday demand (>2% = stress signal), S&P 500 daily move (< -1.5% = stress), and MOVE index (>100 = elevated per BofA/ICE). Updates in real time.',
+    'RISK-ON: VIX <18, no stress signals active. MIXED: 1 stress factor (e.g. VIX 18–25). CAUTION: 2–3 factors. RISK-OFF: 4+ factors — high stress, USD/JPY/CHF bid, equities sold.'
   );
 
   // ── Risk Indicators table rows ───────────────────────────────────
@@ -2154,12 +2154,12 @@ async function renderRiskData(byId) {
     else if (vix > 25) stressScore += 2;
     else if (vix > 18) stressScore += 1;
     if (isInverted) stressScore += 1;
-    // Gold up strongly (>1%) as safe-haven = additional stress signal
-    if (byId.gold && byId.gold.pct > 1.0) stressScore += 1;
-    // SPX down (>0.5%) on the day = risk pressure
-    if (byId.spx && byId.spx.pct < -0.5) stressScore += 1;
-    // MOVE index elevated = bond market stress
-    if (byId.move && byId.move.close > 120) stressScore += 1;
+    // Gold up strongly (>2%) as safe-haven = stress signal (intraday; >1% too noisy on normal days)
+    if (byId.gold && byId.gold.pct > 2.0) stressScore += 1;
+    // SPX down (>1.5%) on the day = meaningful risk pressure (>0.5% too sensitive to routine dips)
+    if (byId.spx && byId.spx.pct < -1.5) stressScore += 1;
+    // MOVE index elevated = bond market stress (>100 = elevated per BofA/ICE; >120 is late-stage crisis)
+    if (byId.move && byId.move.close > 100) stressScore += 1;
 
     let regime, regimeSub;
     if (stressScore >= 4)      { regime = 'RISK-OFF'; regimeSub = `High stress · VIX ${vix.toFixed(1)}`; }
