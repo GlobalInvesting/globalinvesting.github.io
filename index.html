@@ -488,62 +488,64 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <!-- CROSS ASSET + RISK -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
-      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);align-self:start;">
-        <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
-        <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
-          <!-- Populated by fetchCrossAssetData() -->
-          <div class="ca-cell" data-sym="VANTAGE:SP500" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
-          <div class="ca-cell" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
-          <div class="ca-cell" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
-          <div class="ca-cell" data-sym="BITSTAMP:BTCUSD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
-          <div class="ca-cell" data-sym="OSE:NK2251!" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
-          <div class="ca-cell" data-sym="GOMARKETS:STOXX50" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
-          <div class="ca-cell" data-sym="FXOPEN:DXY" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
-          <div class="ca-cell" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
-        </div>
-        <!-- VaR / CVaR Panel — Historical Simulation 95%, 1-day horizon -->
-        <div style="padding:4px 8px 6px;border-top:1px solid var(--border);overflow-x:auto;">
-          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
-            <span>Historical VaR 95% · 1-day · 252d window</span>
-            <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
+    <div style="border-bottom:1px solid var(--border);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+        <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
+          <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
+          <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
+            <!-- Populated by fetchCrossAssetData() -->
+            <div class="ca-cell" data-sym="VANTAGE:SP500" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
+            <div class="ca-cell" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
+            <div class="ca-cell" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
+            <div class="ca-cell" data-sym="BITSTAMP:BTCUSD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
+            <div class="ca-cell" data-sym="OSE:NK2251!" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
+            <div class="ca-cell" data-sym="GOMARKETS:STOXX50" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
+            <div class="ca-cell" data-sym="FXOPEN:DXY" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">DXY Index</div><div class="ca-val" id="ca-dxy">—</div><div class="ca-chg" id="cac-dxy">loading</div></div>
+            <div class="ca-cell" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">US 10Y Yield</div><div class="ca-val" id="ca-us10y">—</div><div class="ca-chg" id="cac-us10y">loading</div></div>
           </div>
-          <table aria-label="Historical VaR and CVaR by instrument" style="width:100%;">
-            <thead>
-              <tr>
-                <th style="text-align:left;font-size:9px;" scope="col">Instrument</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days.">VaR 95%</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="Expected Shortfall (CVaR): mean loss in the worst 5% of days. Always ≥ VaR.">CVaR 95%</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="CVaR ÷ VaR ratio. Above 2.0 = fat tails present in this instrument.">ES/VaR</th>
-                <th style="font-size:9px;text-align:right;" scope="col" title="Number of daily returns used (target: 252 trading days = 1 year).">n</th>
-              </tr>
-            </thead>
-            <tbody id="var-cvar-tbody">
-              <tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">Loading VaR data…</td></tr>
-            </tbody>
-          </table>
+        </div>
+        <div class="panel" id="section-risk" style="border-bottom:none;" role="region" aria-label="Risk Monitor">
+          <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime</span></div>
+          <div class="risk-grid" aria-live="polite" aria-atomic="false">
+            <div class="risk-cell" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
+            <div class="risk-cell"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
+            <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
+            <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
+          </div>
+          <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
+            <table aria-label="Risk indicators">
+              <thead><tr><th style="text-align:left" scope="col">Indicator</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
+              <tbody id="risk-indicators-tbody">
+                <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
+                <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
+                <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
+                <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
+                <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div class="panel" id="section-risk" style="border-bottom:none;align-self:start;" role="region" aria-label="Risk Monitor">
-        <div class="panel-head"><span class="panel-title">Risk Monitor</span><span class="panel-sub" id="risk-panel-sub">Volatility &amp; regime</span></div>
-        <div class="risk-grid" aria-live="polite" aria-atomic="false">
-          <div class="risk-cell" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="risk-lbl">VIX</div><div class="risk-val" id="risk-vix">—</div><div class="risk-sub" id="risk-vix-sub">Loading…</div></div>
-          <div class="risk-cell"><div class="risk-lbl">MOVE Index</div><div class="risk-val" id="risk-move">—</div><div class="risk-sub" id="risk-move-sub">Bond vol</div></div>
-          <div class="risk-cell"><div class="risk-lbl">EUR/USD HV 30d</div><div class="risk-val" id="risk-eurusd-iv">—</div><div class="risk-sub" id="risk-eurusd-iv-sub">Hist. volatility</div></div>
-          <div class="risk-cell"><div class="risk-lbl">Regime</div><div class="risk-val up" id="risk-regime" style="font-size:16px" aria-live="assertive" aria-label="Regime">—</div><div class="risk-sub" id="risk-regime-sub">—</div></div>
+      <!-- VaR / CVaR Panel — full width below both columns -->
+      <div style="padding:4px 8px 6px;overflow-x:auto;">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+          <span>Historical VaR 95% · 1-day · 252d window</span>
+          <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
         </div>
-        <div style="padding:4px 8px 0;border-top:1px solid var(--border);overflow-x:auto;">
-          <table aria-label="Risk indicators">
-            <thead><tr><th style="text-align:left" scope="col">Indicator</th><th scope="col">Value</th><th class="signal-col" scope="col">Signal</th></tr></thead>
-            <tbody id="risk-indicators-tbody">
-              <tr><td>US–EU Spread 10Y</td><td id="ri-us-eu">—</td><td id="ri-us-eu-sig" class="flat">—</td></tr>
-              <tr><td>Gold / SPX ratio</td><td id="ri-gold-spx">—</td><td id="ri-gold-spx-sig" class="flat">—</td></tr>
-              <tr><td>USD/JPY vs VIX 60d</td><td id="ri-usdjpy-nk">—</td><td id="ri-usdjpy-nk-sig" class="flat">—</td></tr>
-              <tr><td>DXY vs SPX 60d</td><td id="ri-dxy-spx">—</td><td id="ri-dxy-spx-sig" class="flat">—</td></tr>
-              <tr><td>Gold vs DXY 60d</td><td id="ri-gold-dxy">—</td><td id="ri-gold-dxy-sig" class="flat">—</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <table aria-label="Historical VaR and CVaR by instrument" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left;font-size:9px;" scope="col">Instrument</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days.">VaR 95%</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="Expected Shortfall (CVaR): mean loss in the worst 5% of days. Always ≥ VaR.">CVaR 95%</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="CVaR ÷ VaR ratio. Above 2.0 = fat tails present in this instrument.">ES/VaR</th>
+              <th style="font-size:9px;text-align:right;" scope="col" title="Number of daily returns used (target: 252 trading days = 1 year).">n</th>
+            </tr>
+          </thead>
+          <tbody id="var-cvar-tbody">
+            <tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">Loading VaR data…</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
