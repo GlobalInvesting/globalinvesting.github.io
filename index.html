@@ -11,7 +11,7 @@
 <!-- ═══════════════════════════════════════
      SEO — Core
      ═══════════════════════════════════════ -->
-<meta name="description" content="Professional FX terminal — live forex rates, currency strength heatmap, US Treasury yield curve, COT positioning, central bank rates, cross-asset risk monitor and AI market signals.">
+<meta name="description" content="Professional FX terminal — ~5-minute delayed FX rates, currency strength heatmap, US Treasury yield curve, COT positioning, central bank rates, cross-asset risk monitor and AI market signals.">
 <meta name="keywords" content="fx terminal, forex dashboard 2026, real-time forex rates, currency strength meter, yield curve monitor, cross asset risk, COT positioning CFTC, central bank rates live, FX liquidity sessions, DXY dollar index, forex spread monitor, VIX MOVE index, forex market signals, professional forex tools, global investing fx">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="author" content="Santiago Plá Casuriaga — Global Investing">
@@ -32,7 +32,7 @@
 <meta property="og:url" content="https://globalinvesting.github.io/">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="Global Investing FX Terminal | Professional Forex Dashboard 2026">
-<meta property="og:description" content="Real-time FX terminal with currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT positioning, central bank rates, AI signals and session liquidity map.">
+<meta property="og:description" content="Professional FX terminal with ~5-minute delayed FX rates, currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT positioning, central bank rates, AI signals and session liquidity map.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -45,11 +45,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://globalinvesting.github.io/">
 <meta name="twitter:title" content="Global Investing FX Terminal | Professional Forex Dashboard 2026">
-<meta name="twitter:description" content="Real-time FX rates, yield curve, cross-asset risk, COT positioning, FX liquidity &amp; AI signals. Professional forex terminal.">
+<meta name="twitter:description" content="FX rates (~5min delayed), yield curve, cross-asset risk, COT positioning, FX liquidity &amp; AI signals. Professional forex terminal.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <meta name="twitter:image:alt" content="Global Investing FX Terminal">
-<meta name="twitter:creator" content="@GlobalInvesting">
-<meta name="twitter:site" content="@GlobalInvesting">
+
 
 <!-- ═══════════════════════════════════════
      Favicon
@@ -67,17 +66,16 @@
   "@type": "WebApplication",
   "name": "Global Investing FX Terminal",
   "url": "https://globalinvesting.github.io/",
-  "description": "Professional FX terminal with live forex rates, currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT CFTC positioning, central bank rates, FX session liquidity map and AI-powered market signals.",
+  "description": "Professional FX terminal with ~5-minute delayed FX rates, currency strength heatmap, US Treasury yield curve, cross-asset risk monitor, COT CFTC positioning, central bank rates, FX session liquidity map and AI-powered market signals.",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "featureList": [
-    "Real-time FX rates (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, XAU/USD, WTI, BTC)",
+    "FX rates (EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD, XAU/USD, WTI, BTC) — ~5min delayed",
     "Currency Strength Heatmap — computed from ECB rates",
     "US Treasury Yield Curve (3M to 30Y) with 2Y-10Y spread",
     "Cross-Asset Risk Monitor — SPX, Gold, WTI, BTC, Nikkei, Stoxx, DXY, US10Y",
-    "Volatility Risk Monitor — VIX, MOVE Index, EUR/USD IV",
+    "Volatility Risk Monitor — VIX, MOVE Index, EUR/USD HV 30d",
     "CFTC COT Net Speculative Positioning",
     "FX Session Liquidity Map — Tokyo, London, New York",
     "Central Bank Interest Rates Live",
@@ -617,7 +615,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <tr><td>New York</td><td id="svol-ny-eur" class="up">±71p</td><td id="svol-ny-jpy" class="up">±66p</td></tr>
             </tbody>
           </table>
-          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">HV30-derived · session ratios BIS 2022</div>
+          <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">5yr historical avg · fixed reference</div>
         </div>
         <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
           <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
@@ -882,122 +880,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v4.1</span>
+    <span class="sb-v">FX Terminal v7.13</span>
   </div>
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.12.42" defer></script>
+<script src="assets/dashboard.js?v=7.13.36" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
 
-<script>
-(function() {
-  var _chartLoaded = false;
-  var _eventsLoaded = false;
-  var _econmapLoaded = false;
-
-  // Rebuilds the TradingView chart widget from scratch inside #tv-chart-wrap.
-  // This matches exactly what dashboard.js does on symbol change, so both
-  // initial load and click-driven reloads use an identical DOM structure.
-  function loadTVChart(sym) {
-    var wrap = document.getElementById('tv-chart-wrap');
-    if (!wrap) return;
-    sym = sym || window._tvCurrentSym || 'FX_IDC:EURUSD';
-    // Clear any previous widget (skeleton, iframe, scripts)
-    wrap.innerHTML = '';
-    var container = document.createElement('div');
-    container.className = 'tradingview-widget-container';
-    container.style.cssText = 'height:100%;width:100%;';
-    var widget = document.createElement('div');
-    widget.id = 'tv-chart-widget';
-    widget.className = 'tradingview-widget-container__widget';
-    widget.style.cssText = 'height:100%;width:100%;';
-    container.appendChild(widget);
-    var copyright = document.createElement('div');
-    copyright.className = 'tradingview-widget-copyright';
-    copyright.style.display = 'none';
-    container.appendChild(copyright);
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    s.async = true;
-    s.text = JSON.stringify({
-      allow_symbol_change: false, calendar: false, details: true,
-      hide_side_toolbar: true, hide_top_toolbar: true, hide_legend: false,
-      hide_volume: true, interval: 'D', locale: 'en', save_image: false,
-      style: '1', symbol: sym, theme: 'dark', timezone: 'Etc/UTC',
-      backgroundColor: '#131722', gridColor: 'rgba(42,46,57,0.8)',
-      withdateranges: false, autosize: true,
-      studies: [{id: 'MASimple@tv-basicstudies', inputs: {length: 20}}]
-    });
-    container.appendChild(s);
-    wrap.appendChild(container);
-    _chartLoaded = true;
-  }
-
-  function loadTVEvents() {
-    var container = document.querySelector('#tvcal-scale .tradingview-widget-container__widget');
-    if (!container) return;
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
-    s.async = true;
-    s.textContent = JSON.stringify({"colorTheme":"dark","isTransparent":true,"locale":"en","countryFilter":"us,nz,au,ch,eu,ca,jp,gb","importanceFilter":"-1,0,1","width":"100%","height":"100%"});
-    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
-    if (skel) skel.style.display = 'none';
-    container.appendChild(s);
-    _eventsLoaded = true;
-  }
-
-  function loadTVEconMap() {
-    var placeholder = document.getElementById('tv-econmap-placeholder');
-    if (!placeholder) return;
-    var s = document.createElement('script');
-    s.type = 'module';
-    s.src = 'https://widgets.tradingview-widget.com/w/en/tv-economic-map.js';
-    var widget = document.createElement('tv-economic-map');
-    widget.setAttribute('theme', 'dark');
-    widget.setAttribute('transparent', '');
-    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:#131722;';
-    placeholder.replaceWith(widget);
-    document.head.appendChild(s);
-    _econmapLoaded = true;
-  }
-
-  // Intersection Observer — load each widget only when its container enters viewport
-  var io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (!entry.isIntersecting) return;
-      var id = entry.target.id;
-      if (id === 'tv-chart-wrap' && !_chartLoaded) {
-        loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
-        io.unobserve(entry.target);
-      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
-        loadTVEvents();
-        io.unobserve(entry.target);
-      } else if (id === 'section-econmap' && !_econmapLoaded) {
-        loadTVEconMap();
-        io.unobserve(entry.target);
-      }
-    });
-  }, { rootMargin: '150px' });
-
-  // Expose so dashboard.js can trigger chart reload on tab click
-  window.loadTVChart = loadTVChart;
-  window._chartLoaded = function() { return _chartLoaded; };
-
-  document.addEventListener('DOMContentLoaded', function() {
-    var chartWrap = document.getElementById('tv-chart-wrap');
-    var calInner  = document.getElementById('tvcal-inner');
-    var econMap   = document.getElementById('section-econmap');
-    if (chartWrap) io.observe(chartWrap);
-    if (calInner)  io.observe(calInner);
-    if (econMap)   io.observe(econMap);
-  });
-})();
-</script>
+<!-- TradingView lazy-loader and IntersectionObserver logic moved to assets/dashboard.js (initTVWidgets) -->
 
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
