@@ -3611,7 +3611,8 @@ async function fetchFedExpectations() {
 
       // ── Bias: prefer explicit market-consensus field from meetings.json ──
       // meetings.bias = 'cut' | 'hold' | 'hike' (set by engine weekly, reflects OIS/futures consensus)
-      // Fall back to rate-trajectory trend when bias field absent, prefixed with ~ to signal estimation
+      // Always compute trendDir for use in FWD projection — bias field only overrides the label
+      const trendDir    = computeCBTrend(obs);   // 'up' | 'down' | 'flat' — always needed for FWD
       const meetingsBias = meetings?.bias;
       let biasLabel;
       if (meetingsBias === 'cut') {
@@ -3621,11 +3622,10 @@ async function fetchFedExpectations() {
       } else if (meetingsBias === 'hold') {
         biasLabel = '<span class="flat">→ Hold</span>';
       } else {
-        // Fallback: derive from historical rate trajectory — label with ~ to indicate estimation
-        const trendDir = computeCBTrend(obs);
-        biasLabel = trendDir === 'down' ? '<span class="down" title="Est. from rate trajectory">~ Cut</span>'
-                  : trendDir === 'up'   ? '<span class="up" title="Est. from rate trajectory">~ Hike</span>'
-                  :                       '<span class="flat" title="Est. from rate trajectory">~ Hold</span>';
+        // Fallback: derive from historical rate trajectory
+        biasLabel = trendDir === 'down' ? '<span class="down">↓ Cut</span>'
+                  : trendDir === 'up'   ? '<span class="up">↑ Hike</span>'
+                  :                       '<span class="flat">→ Hold</span>';
       }
 
       // ── Forward rate via Covered Interest Parity (CIP) ───────────
@@ -3639,11 +3639,19 @@ async function fetchFedExpectations() {
       } else {
         const cipCfg = cipSpot[ccy];
         if (cipCfg) {
-          // Try intraday quotes cache first, then STATE.rates (Frankfurter)
+          // Spot rate: try STOOQ_RT_CACHE first (already awaited at boot),
+          // then STATE.rates (Frankfurter — may not be ready on first render)
+          const midFromCache = (() => {
+            try {
+              const rt = STOOQ_RT_CACHE[cipCfg.pair];
+              if (rt?.close && rt.close > 0) return rt.close;
+            } catch { /* fall through */ }
+            return null;
+          })();
           const midFromState = (() => {
             try {
               const fr = STATE.rates;   // Frankfurter USD-base: { EUR: 0.92, JPY: 151.x, … }
-              if (!fr) return null;
+              if (!fr || !Object.keys(fr).length) return null;
               if (!cipCfg.usdIsBase) {
                 // EURUSD = 1 / fr.EUR  (Frankfurter gives EUR per USD)
                 return fr[ccy] ? 1 / fr[ccy] : null;
@@ -3654,7 +3662,7 @@ async function fetchFedExpectations() {
             } catch { return null; }
           })();
 
-          const S = midFromState;
+          const S = midFromCache || midFromState;
           if (S && S > 0) {
             const r_f = current / 100;
             if (!cipCfg.usdIsBase) {
