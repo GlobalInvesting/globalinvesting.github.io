@@ -25,8 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -236,7 +235,7 @@ a { color: inherit; text-decoration: none; }
 
 <main id="main">
 <div class="guide-wrap">
-  <nav class="guide-toc">
+  <nav class="toc"><div class="toc-inner">
     <div class="toc-head">Contents</div>
     <a class="toc-item" href="#layout">Terminal Layout</a>
     <a class="toc-item" href="#topbar-guide">Topbar &amp; Quote Bar</a>
@@ -254,7 +253,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="guide-market-sentiment.html">→ Market Sentiment</a>
     <a class="toc-item" href="guide-fx-liquidity.html">→ FX Liquidity</a>
     <a class="toc-item" href="guide-cot.html">→ COT Positioning</a>
-  </nav>
+  </div></nav>
 
   <div class="guide-content">
     <div class="page-hero">
@@ -315,7 +314,8 @@ a { color: inherit; text-decoration: none; }
       <div style="display:flex;flex-direction:column;gap:5px;">
         <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">AI Narrative &amp; Regime Label</div>
         <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Price Chart (TradingView) · FX Pairs Table</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Heatmap · Cross-Asset · Risk Monitor</div>
+        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Heatmap · Cross-Asset + Risk Monitor</div>
+        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Historical VaR 95% · 1-day · 252d window (full width)</div>
         <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Rates · COT · Sessions · Spreads · Sentiment</div>
         <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">News · Economic Map · Signals</div>
       </div>
