@@ -205,7 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.12.42">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.13.37">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -437,8 +437,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span class="panel-title">FX Pairs — Majors</span>
         <span class="panel-sub" id="fx-table-updated">Bid / Ask · Spread · 1D · 1W · HV 30d · Session Range</span>
         <div class="export-btns" aria-label="Export FX pairs data">
-          <button class="export-btn" onclick="exportPanel('fx')" title="Export FX pairs as CSV">CSV</button>
-          <button class="export-btn" onclick="exportPanel('fx','json')" title="Export FX pairs as JSON">JSON</button>
+          <button class="export-btn" id="export-fx-csv" title="Export FX pairs as CSV">CSV</button>
+          <button class="export-btn" id="export-fx-json" title="Export FX pairs as JSON">JSON</button>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -573,7 +573,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- COT POSITIONING — from cot-data/*.json -->
     <div class="panel" id="section-positioning">
-      <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" onclick="exportPanel('cot')" title="Export COT data as CSV">CSV</button><button class="export-btn" onclick="exportPanel('cot','json')" title="Export COT data as JSON">JSON</button></div></div>
+      <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px;">
         <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
           <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span style="text-align:right" title="Leveraged Funds Open Interest (long + short). Rising = new money entering; falling = liquidation.">OI</span>
