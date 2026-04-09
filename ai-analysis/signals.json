@@ -1,57 +1,57 @@
 [
   {
-    "time": "19:55",
+    "time": "22:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.07 resistance, BoJ intervention risk elevated if breaks 160.00",
+    "text": "USD/JPY testing 158.98 resistance, BoJ intervention risk elevated if pair breaks 160.00",
     "evidence": [
-      "USD/JPY: 159.067",
+      "USD/JPY: 158.978",
       "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 19.7"
+      "VIX: 19.5"
     ]
   },
   {
-    "time": "19:53",
+    "time": "21:58",
     "priority": "warning",
-    "title": "ECB vs Fed Rate Differential",
+    "title": "CB Rate Differential",
     "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.17050"
+      "EUR/USD: 1.17040"
     ]
   },
   {
-    "time": "19:50",
+    "time": "21:55",
     "priority": "warning",
-    "title": "AUD/USD Retail Sentiment",
-    "text": "AUD/USD 87% short bias, watch for contrarian reversal risk",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function, watch for regime shift",
     "evidence": [
-      "AUD/USD: 0.70850",
-      "AUD/USD retail sentiment: 13% long / 87% short",
-      "CFTC AUD net: +43,837"
+      "USD/JPY vs VIX: corr=+0.659",
+      "norm=+0.059",
+      "z=+1.55σ"
     ]
   },
   {
-    "time": "19:45",
+    "time": "21:48",
     "priority": "info",
-    "title": "VIX and Risk Regime",
-    "text": "VIX at 19.7 signals normal volatility — risk-on environment",
+    "title": "Risk Regime",
+    "text": "VIX at 19.5 signals low volatility — risk-on environment, but watch for regime shift",
     "evidence": [
-      "VIX: 19.7",
+      "VIX: 19.5",
       "S&P 500: 6,825",
-      "MOVE Index: 78.7"
+      "MOVE Index: 74.0"
     ]
   },
   {
-    "time": "19:40",
+    "time": "21:42",
     "priority": "info",
-    "title": "USD/JPY vs VIX Correlation Break",
-    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven",
+    "title": "Retail Sentiment",
+    "text": "AUD/USD 88% short, watch for potential squeeze as retail is heavily positioned",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.666",
-      "norm=+0.131",
-      "z=+1.37σ"
+      "AUD/USD: 0.70830",
+      "AUD/USD sentiment: 88% short",
+      "CFTC AUD net: +43,837"
     ]
   }
 ]
