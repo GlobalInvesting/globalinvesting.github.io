@@ -523,6 +523,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </tbody>
           </table>
         </div>
+        <!-- VaR / CVaR Panel — Historical Simulation 95%, 1-day horizon -->
+        <div style="padding:4px 8px 6px;border-top:1px solid var(--border);overflow-x:auto;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+            <span>Historical VaR 95% · 1-day · 252d window</span>
+            <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
+          </div>
+          <table aria-label="Historical VaR and CVaR by instrument" style="width:100%;">
+            <thead>
+              <tr>
+                <th style="text-align:left;font-size:9px;" scope="col">Instrument</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days.">VaR 95%</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="Expected Shortfall (CVaR): mean loss in the worst 5% of days. Always ≥ VaR.">CVaR 95%</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="CVaR ÷ VaR ratio. Above 2.0 = fat tails present in this instrument.">ES/VaR</th>
+                <th style="font-size:9px;text-align:right;" scope="col" title="Number of daily returns used (target: 252 trading days = 1 year).">n</th>
+              </tr>
+            </thead>
+            <tbody id="var-cvar-tbody">
+              <tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">Loading VaR data…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -771,29 +792,88 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <!-- ALERTS POPOVER -->
       <div id="alerts-popover" role="dialog" aria-label="Price alerts" style="display:none;">
         <div class="alp-head">
-          Price Alerts
+          Alerts
           <button class="alp-close" onclick="toggleAlertsPopover()" aria-label="Close alerts">&#x2715;</button>
         </div>
         <div id="alerts-rows" class="alp-rows"><!-- populated by initAlerts() --></div>
         <div class="alp-add">
-          <select id="alert-sym-sel" class="alert-select" aria-label="Alert instrument">
-            <option value="vix">VIX</option>
-            <option value="eurusd">EUR/USD</option>
-            <option value="usdjpy">USD/JPY</option>
-            <option value="gbpusd">GBP/USD</option>
-            <option value="audusd">AUD/USD</option>
-            <option value="usdchf">USD/CHF</option>
-            <option value="nzdusd">NZD/USD</option>
-            <option value="xauusd">Gold</option>
-            <option value="us10y">US 10Y</option>
-            <option value="move">MOVE</option>
+          <!-- Row 1: Alert type selector -->
+          <select id="alert-type-sel" class="alert-select" aria-label="Alert type" style="width:100%;margin-bottom:4px;"
+            onchange="(function(){
+              const t=this.value;
+              document.getElementById('alp-price-row').style.display=(t==='price')?'flex':'none';
+              document.getElementById('alp-adv-row').style.display=(t!=='price'&&t!=='regime')?'flex':'none';
+              document.getElementById('alp-regime-row').style.display=(t==='regime')?'flex':'none';
+              const symSel=document.getElementById('alert-sym-sel');
+              if(symSel&&t!=='price'&&t!=='regime'){
+                const opts=Object.entries(window._ADV_OPTS||{}).filter(([k,v])=>v.category===t);
+                symSel.innerHTML=opts.map(([k,v])=>`<option value='${k}'>${v.label}</option>`).join('');
+              }
+            }).call(this)">
+            <option value="price">Price / Level</option>
+            <option value="spread">HV30 vs IV spread</option>
+            <option value="ivrank">IV Rank</option>
+            <option value="corr">Correlation Z-score</option>
+            <option value="var">VaR 95% (1d)</option>
+            <option value="regime">Regime change</option>
           </select>
-          <select id="alert-dir-sel" class="alert-select alp-dir" aria-label="Alert direction">
-            <option value="above">&gt;</option>
-            <option value="below">&lt;</option>
-          </select>
-          <input id="alert-val-inp" class="alert-input" type="number" step="any" placeholder="Value" aria-label="Threshold value">
-          <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
+          <!-- Row 2: Price alert (default visible) -->
+          <div id="alp-price-row" style="display:flex;gap:4px;flex-wrap:wrap;">
+            <select id="alert-sym-price" class="alert-select" aria-label="Alert instrument">
+              <option value="vix">VIX</option>
+              <option value="eurusd">EUR/USD</option>
+              <option value="usdjpy">USD/JPY</option>
+              <option value="gbpusd">GBP/USD</option>
+              <option value="audusd">AUD/USD</option>
+              <option value="usdchf">USD/CHF</option>
+              <option value="usdcad">USD/CAD</option>
+              <option value="nzdusd">NZD/USD</option>
+              <option value="xauusd">Gold</option>
+              <option value="wti">WTI</option>
+              <option value="dxy">DXY</option>
+              <option value="spx">SPX</option>
+              <option value="btc">BTC</option>
+              <option value="us10y">US 10Y</option>
+              <option value="move">MOVE</option>
+            </select>
+            <select id="alert-dir-price" class="alert-select alp-dir" aria-label="Alert direction">
+              <option value="above">&gt;</option>
+              <option value="below">&lt;</option>
+            </select>
+            <input id="alert-val-price" class="alert-input" type="number" step="any" placeholder="Value" aria-label="Threshold value">
+            <button class="alert-add-btn" onclick="(function(){
+              const s=document.getElementById('alert-sym-price')?.value;
+              const d=document.getElementById('alert-dir-price')?.value;
+              const v=parseFloat(document.getElementById('alert-val-price')?.value);
+              if(!s||!d||isNaN(v))return;
+              const arr=alertsLoad();
+              arr.push({id:Date.now().toString(36),type:'price',sym:s,dir:d,threshold:v,label:(window.ALERTS_LABELS||{})[s]||s,fired:false,firedAt:null});
+              alertsSave(arr);document.getElementById('alert-val-price').value='';alertsRender(null);
+              if(typeof Notification!=='undefined'&&Notification.permission==='default')Notification.requestPermission();
+            })()">+ Add</button>
+          </div>
+          <!-- Row 3: Advanced (spread / ivrank / corr / var) -->
+          <div id="alp-adv-row" style="display:none;gap:4px;flex-wrap:wrap;">
+            <select id="alert-sym-sel" class="alert-select" aria-label="Alert instrument" style="flex:2;min-width:120px;">
+              <!-- populated dynamically by type selector onchange -->
+            </select>
+            <select id="alert-dir-sel" class="alert-select alp-dir" aria-label="Alert direction">
+              <option value="above">&gt;</option>
+              <option value="below">&lt;</option>
+            </select>
+            <input id="alert-val-inp" class="alert-input" type="number" step="any" placeholder="Threshold" aria-label="Threshold value">
+            <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
+          </div>
+          <!-- Row 4: Regime change -->
+          <div id="alp-regime-row" style="display:none;gap:4px;">
+            <select id="alert-regime-sel" class="alert-select" aria-label="Target regime" style="flex:1;">
+              <option value="RISK-OFF">RISK-OFF</option>
+              <option value="CAUTION">CAUTION</option>
+              <option value="MIXED">MIXED</option>
+              <option value="RISK-ON">RISK-ON</option>
+            </select>
+            <button class="alert-add-btn" onclick="alertsAddFromUI()">+ Add</button>
+          </div>
         </div>
         <div class="alp-footer">Checks every 5 min · browser notification on trigger</div>
       </div>
