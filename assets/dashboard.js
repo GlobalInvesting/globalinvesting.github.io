@@ -2317,7 +2317,7 @@ async function renderVarCvarPanel() {
   const vc = intra?.var_cvar;
 
   if (!vc || !Object.keys(vc).length) {
-    container.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">VaR data not yet available — runs with daily engine update</td></tr>';
+    container.innerHTML = '<tr style="display:table;width:100%;table-layout:fixed;"><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">VaR data not yet available — runs with daily engine update</td></tr>';
     return;
   }
 
@@ -2355,7 +2355,7 @@ async function renderVarCvarPanel() {
       ? `<span title="60d VaR (${v60?.toFixed(3)}%) elevated vs 252d baseline — regime stress" style="color:var(--amber,#EF9F27);margin-left:3px;font-size:9px;">⚠</span>`
       : '';
 
-    return `<tr>
+    return `<tr style="display:table;width:100%;table-layout:fixed;">
       <td style="font-family:var(--font-mono);font-size:10px;white-space:nowrap;">${row.label}</td>
       <td class="${varCls}" style="font-family:var(--font-mono);font-size:10px;text-align:right;">${var95.toFixed(3)}%${stressFlag}</td>
       <td style="font-family:var(--font-mono);font-size:10px;text-align:right;color:var(--text2);">${cvar95.toFixed(3)}%</td>

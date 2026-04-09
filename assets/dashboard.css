@@ -608,6 +608,9 @@
   #news-feed-items::-webkit-scrollbar { width: 3px; }
   #news-feed-items::-webkit-scrollbar-track { background: var(--bg); }
   #news-feed-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  #var-cvar-tbody::-webkit-scrollbar { width: 3px; }
+  #var-cvar-tbody::-webkit-scrollbar-track { background: transparent; }
+  #var-cvar-tbody::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   #news-feed-items { scrollbar-width: thin; scrollbar-color: var(--border2) var(--bg); }
 
   /* NEWS FEED */
