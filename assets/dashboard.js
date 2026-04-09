@@ -2543,6 +2543,7 @@ function loadTVChart(sym) {
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
   const widget = document.createElement('div');
+  widget.id = 'tv-chart-widget';
   widget.className = 'tradingview-widget-container__widget';
   widget.style.cssText = 'height:100%;width:100%;';
   container.appendChild(widget);
@@ -4946,6 +4947,98 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   watchForIframe(document.getElementById('tv-chart-widget'));
   // TV events calendar (skeleton is on tvcal-inner, iframe appears inside tvcal-scale)
   watchForIframe(document.getElementById('tvcal-inner'));
+}());
+
+// ═══════════════════════════════════════════════════════════════════
+// TV WIDGET LAZY-LOADER
+// IntersectionObserver boots each TradingView widget only when its
+// container scrolls into view. Migrated from index.html inline script
+// per GUIDELINES architecture rule (no inline JS in index.html).
+// ═══════════════════════════════════════════════════════════════════
+(function initTVWidgets() {
+  var _chartLoaded   = false;
+  var _eventsLoaded  = false;
+  var _econmapLoaded = false;
+
+  function loadTVEvents() {
+    var scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    var container = scaleWrap.querySelector('.tradingview-widget-container__widget');
+    if (!container) return;
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src  = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+    s.async = true;
+    s.textContent = JSON.stringify({
+      colorTheme: 'dark', isTransparent: true, locale: 'en',
+      countryFilter: 'us,nz,au,ch,eu,ca,jp,gb',
+      importanceFilter: '-1,0,1', width: '100%', height: '100%'
+    });
+    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
+    if (skel) skel.style.display = 'none';
+    container.appendChild(s);
+    _eventsLoaded = true;
+  }
+
+  function loadTVEconMap() {
+    var placeholder = document.getElementById('tv-econmap-placeholder');
+    if (!placeholder) return;
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.src  = 'https://widgets.tradingview-widget.com/w/en/tv-economic-map.js';
+    var widget = document.createElement('tv-economic-map');
+    widget.setAttribute('theme', 'dark');
+    widget.setAttribute('transparent', '');
+    widget.style.cssText = 'width:100%;height:100%;min-height:380px;display:block;background:#131722;';
+    placeholder.replaceWith(widget);
+    document.head.appendChild(s);
+    _econmapLoaded = true;
+  }
+
+  if (typeof IntersectionObserver === 'undefined') {
+    // Fallback for very old browsers: load everything immediately
+    if (typeof loadTVChart === 'function') loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
+    loadTVEvents();
+    loadTVEconMap();
+    return;
+  }
+
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      if (id === 'tv-chart-wrap' && !_chartLoaded) {
+        if (typeof loadTVChart === 'function') {
+          loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
+        }
+        _chartLoaded = true;
+        io.unobserve(entry.target);
+      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
+        loadTVEvents();
+        io.unobserve(entry.target);
+      } else if (id === 'section-econmap' && !_econmapLoaded) {
+        loadTVEconMap();
+        io.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '150px' });
+
+  // defer scripts run after DOM is parsed — DOMContentLoaded may have already fired.
+  // Guard: if readyState is already 'interactive' or 'complete', attach observers immediately.
+  function attachObservers() {
+    var chartWrap = document.getElementById('tv-chart-wrap');
+    var calInner  = document.getElementById('tvcal-inner');
+    var econMap   = document.getElementById('section-econmap');
+    if (chartWrap) io.observe(chartWrap);
+    if (calInner)  io.observe(calInner);
+    if (econMap)   io.observe(econMap);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachObservers);
+  } else {
+    attachObservers();
+  }
 }());
 
 // ═══════════════════════════════════════════════════════════════════
