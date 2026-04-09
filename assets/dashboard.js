@@ -2322,17 +2322,17 @@ async function renderVarCvarPanel() {
   }
 
   const ROWS = [
-    { id:'eurusd', label:'EUR/USD',  pip: 0.0001 },
-    { id:'gbpusd', label:'GBP/USD',  pip: 0.0001 },
-    { id:'usdjpy', label:'USD/JPY',  pip: 0.01   },
-    { id:'audusd', label:'AUD/USD',  pip: 0.0001 },
-    { id:'usdchf', label:'USD/CHF',  pip: 0.0001 },
-    { id:'usdcad', label:'USD/CAD',  pip: 0.0001 },
-    { id:'nzdusd', label:'NZD/USD',  pip: 0.0001 },
-    { id:'gold',   label:'XAU/USD',  pip: 0.1    },
-    { id:'spx',    label:'SPX',      pip: 1      },
-    { id:'dxy',    label:'DXY',      pip: 0.01   },
-    { id:'vix',    label:'VIX',      pip: 0.01   },
+    { id:'eurusd', label:'EUR/USD',  pip: 0.0001, tip:'Most liquid FX pair. VaR reflects daily move risk in EUR terms. Benchmark for G10 vol regime.' },
+    { id:'gbpusd', label:'GBP/USD',  pip: 0.0001, tip:'Cable. Higher vol than EUR/USD; sensitive to UK macro and BoE policy divergence vs Fed.' },
+    { id:'usdjpy', label:'USD/JPY',  pip: 0.01,   tip:'Key risk-sentiment pair. Yen acts as safe-haven; elevated VaR signals risk-off pressure or BoJ intervention risk.' },
+    { id:'audusd', label:'AUD/USD',  pip: 0.0001, tip:'Commodity and China-proxy currency. VaR spikes with commodity sell-offs or CNY stress.' },
+    { id:'usdchf', label:'USD/CHF',  pip: 0.0001, tip:'Swiss franc is a safe-haven. Low VaR in calm markets; can gap sharply on SNB intervention or crisis flows.' },
+    { id:'usdcad', label:'USD/CAD',  pip: 0.0001, tip:'Petro-currency pair. VaR driven by WTI moves and BoC vs Fed policy divergence.' },
+    { id:'nzdusd', label:'NZD/USD',  pip: 0.0001, tip:'Highest-beta G10 pair. Sensitive to risk appetite, dairy prices, and RBNZ rate path.' },
+    { id:'gold',   label:'XAU/USD',  pip: 0.1,    tip:'Safe-haven and inflation hedge. Tail events can move 2-3% in a session; ES/VaR ratio often elevated.' },
+    { id:'spx',    label:'SPX',      pip: 1,       tip:'S&P 500 index. Cross-asset risk anchor - SPX vol regime drives correlated moves across G10 pairs.' },
+    { id:'dxy',    label:'DXY',      pip: 0.01,   tip:'USD index vs G6 basket. VaR here captures broad dollar vol, useful as normalisation benchmark for FX pairs.' },
+    { id:'vix',    label:'VIX',      pip: 0.01,   tip:'CBOE Volatility Index. VaR on VIX itself measures how much implied vol can move in a day - a vol-of-vol indicator.' },
   ];
 
   container.innerHTML = ROWS.map(row => {
@@ -2356,7 +2356,7 @@ async function renderVarCvarPanel() {
       : '';
 
     return `<tr style="display:table;width:100%;table-layout:fixed;">
-      <td style="font-family:var(--font-mono);font-size:10px;white-space:nowrap;">${row.label}</td>
+      <td title="${row.tip}" style="font-family:var(--font-mono);font-size:10px;white-space:nowrap;cursor:default;">${row.label}</td>
       <td class="${varCls}" style="font-family:var(--font-mono);font-size:10px;text-align:right;">${var95.toFixed(3)}%${stressFlag}</td>
       <td style="font-family:var(--font-mono);font-size:10px;text-align:right;color:var(--text2);">${cvar95.toFixed(3)}%</td>
       <td class="${ratioCls}" style="font-family:var(--font-mono);font-size:10px;text-align:right;">${ratio != null ? ratio.toFixed(2) + 'x' : '—'}</td>
