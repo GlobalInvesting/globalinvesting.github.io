@@ -634,12 +634,14 @@ async function fetchCBRates() {
     };
     const trendMap = { up:'<span class="up">↑</span>', down:'<span class="down">↓</span>', flat:'<span class="flat">—</span>' };
     tbody.innerHTML = results.filter(Boolean).map(res => {
-      const info  = bankInfo[res.id] || { flag: '', name: res.label, short: res.label };
-      const trend = computeCBTrend(res.obs);           // ← dynamic, replaces static CB_TREND
-      const flag  = info.flag ? `<span class="fi fi-${info.flag}" style="margin-right:5px;border-radius:2px;"></span>` : '';
+      const info      = bankInfo[res.id] || { flag: '', name: res.label, short: res.label };
+      const trend     = computeCBTrend(res.obs);           // ← dynamic, replaces static CB_TREND
+      const flag      = info.flag ? `<span class="fi fi-${info.flag}" style="margin-right:5px;border-radius:2px;"></span>` : '';
+      // Rate color: up = hiking cycle, down = cutting cycle, flat = neutral (var(--text))
+      const rateClass = trend === 'up' ? 'up' : trend === 'down' ? 'down' : '';
       return `<tr title="${info.name}">
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${info.short}</span></td>
-        <td class="up">${res.rate.toFixed(2)}%</td>
+        <td${rateClass ? ` class="${rateClass}"` : ''}>${res.rate.toFixed(2)}%</td>
         <td>${trendMap[trend]||'—'}</td>
       </tr>`;
     }).join('');
@@ -3607,11 +3609,24 @@ async function fetchFedExpectations() {
       const meetings = meetingsRes?.meetings?.[ccy];
       const nextMtg  = meetings?.allMeetingsFormatted?.[0] || '—';
 
-      // ── Bias: computed dynamically from rate trajectory ──────────
-      const trendDir  = computeCBTrend(obs);   // 'up' | 'down' | 'flat'
-      const biasLabel = trendDir === 'down' ? '<span class="down">↓ Cut</span>'
-                      : trendDir === 'up'   ? '<span class="up">↑ Hike</span>'
-                      :                       '<span class="flat">→ Hold</span>';
+      // ── Bias: prefer explicit market-consensus field from meetings.json ──
+      // meetings.bias = 'cut' | 'hold' | 'hike' (set by engine weekly, reflects OIS/futures consensus)
+      // Fall back to rate-trajectory trend when bias field absent, prefixed with ~ to signal estimation
+      const meetingsBias = meetings?.bias;
+      let biasLabel;
+      if (meetingsBias === 'cut') {
+        biasLabel = '<span class="down">↓ Cut</span>';
+      } else if (meetingsBias === 'hike') {
+        biasLabel = '<span class="up">↑ Hike</span>';
+      } else if (meetingsBias === 'hold') {
+        biasLabel = '<span class="flat">→ Hold</span>';
+      } else {
+        // Fallback: derive from historical rate trajectory — label with ~ to indicate estimation
+        const trendDir = computeCBTrend(obs);
+        biasLabel = trendDir === 'down' ? '<span class="down" title="Est. from rate trajectory">~ Cut</span>'
+                  : trendDir === 'up'   ? '<span class="up" title="Est. from rate trajectory">~ Hike</span>'
+                  :                       '<span class="flat" title="Est. from rate trajectory">~ Hold</span>';
+      }
 
       // ── Forward rate via Covered Interest Parity (CIP) ───────────
       // F = S × (1 + r_f × T) / (1 + r_d × T)
