@@ -2300,6 +2300,69 @@ async function renderRiskData(byId) {
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     riskSub.textContent = 'VIX · MOVE · HV30 · yfinance ~5min delay · updated ' + hhmm + ' ' + tzAbbr;
   }
+
+  // ── VaR/CVaR panel ───────────────────────────────────────────────────
+  renderVarCvarPanel();
+}
+
+// ── VaR/CVaR Panel renderer ───────────────────────────────────────────────────
+// Reads var_cvar key from quotes.json (populated by fetch_intraday_quotes.py PASO 8).
+// Displays 1d Historical VaR 95% and CVaR 95% per instrument with regime-shift flag
+// when rolling 60d VaR is >25% above the 252d baseline.
+async function renderVarCvarPanel() {
+  const container = document.getElementById('var-cvar-tbody');
+  if (!container) return;
+
+  const intra = await loadIntradayQuotes().catch(() => null);
+  const vc = intra?.var_cvar;
+
+  if (!vc || !Object.keys(vc).length) {
+    container.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">VaR data not yet available — runs with daily engine update</td></tr>';
+    return;
+  }
+
+  const ROWS = [
+    { id:'eurusd', label:'EUR/USD',  pip: 0.0001 },
+    { id:'gbpusd', label:'GBP/USD',  pip: 0.0001 },
+    { id:'usdjpy', label:'USD/JPY',  pip: 0.01   },
+    { id:'audusd', label:'AUD/USD',  pip: 0.0001 },
+    { id:'usdchf', label:'USD/CHF',  pip: 0.0001 },
+    { id:'usdcad', label:'USD/CAD',  pip: 0.0001 },
+    { id:'nzdusd', label:'NZD/USD',  pip: 0.0001 },
+    { id:'gold',   label:'XAU/USD',  pip: 0.1    },
+    { id:'spx',    label:'SPX',      pip: 1      },
+    { id:'dxy',    label:'DXY',      pip: 0.01   },
+    { id:'vix',    label:'VIX',      pip: 0.01   },
+  ];
+
+  container.innerHTML = ROWS.map(row => {
+    const d = vc[row.id];
+    if (!d) return '';
+
+    const var95  = d.var_pct;
+    const cvar95 = d.cvar_pct;
+    const v60    = d.var60_pct;
+
+    // Regime flag: 60d VaR > 125% of 252d baseline = stress
+    const stressed = v60 != null && var95 > 0 && (v60 / var95) > 1.25;
+    // CVaR / VaR ratio: tail risk multiplier (healthy ~1.2–1.5; above 2 = fat tails)
+    const ratio = (var95 > 0) ? (cvar95 / var95) : null;
+    const ratioCls = ratio == null ? '' : ratio > 2 ? 'down' : ratio > 1.5 ? '' : 'up';
+
+    // VaR colour: green < 0.5%, amber 0.5–1%, red > 1%
+    const varCls = var95 > 1.0 ? 'down' : var95 > 0.5 ? '' : 'up';
+    const stressFlag = stressed
+      ? `<span title="60d VaR (${v60?.toFixed(3)}%) elevated vs 252d baseline — regime stress" style="color:var(--amber,#EF9F27);margin-left:3px;font-size:9px;">⚠</span>`
+      : '';
+
+    return `<tr>
+      <td style="font-family:var(--font-mono);font-size:10px;white-space:nowrap;">${row.label}</td>
+      <td class="${varCls}" style="font-family:var(--font-mono);font-size:10px;text-align:right;">${var95.toFixed(3)}%${stressFlag}</td>
+      <td style="font-family:var(--font-mono);font-size:10px;text-align:right;color:var(--text2);">${cvar95.toFixed(3)}%</td>
+      <td class="${ratioCls}" style="font-family:var(--font-mono);font-size:10px;text-align:right;">${ratio != null ? ratio.toFixed(2) + 'x' : '—'}</td>
+      <td style="font-family:var(--font-mono);font-size:10px;text-align:right;color:var(--text3);">${d.n}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
 }
 
 // Yield curve labels — fixed set of tenors we display
@@ -5136,15 +5199,182 @@ function exportPanel(type, format = 'csv') {
 // CONFIGURABLE ALERTS — threshold monitoring with Notifications API
 // ═══════════════════════════════════════════════════════════════════
 // Storage: localStorage key 'gi_alerts' → JSON array of alert objects
-// Alert object: { id, sym, dir:'above'|'below', threshold, label, fired:bool, firedAt }
-// Check cycle: every 5 minutes (piggybacks on fetchQuoteBarRT interval)
+//
+// Alert types:
+//   PRICE  { type:'price',  sym, dir:'above'|'below', threshold }
+//   SPREAD { type:'spread', sym, dir:'above'|'below', threshold }
+//          sym = 'hv_iv_eurusd' | 'hv_iv_gbpusd' | 'hv_iv_usdjpy' | 'hv_iv_audusd'
+//          Fires when HV30 > ATM IV (vol is cheap) or HV30 < ATM IV (vol is expensive)
+//   IVRANK { type:'ivrank', sym, dir:'above'|'below', threshold }
+//          sym = 'ivrank_eurusd' | etc.  threshold 0–100
+//   REGIME { type:'regime', target:'RISK-OFF'|'CAUTION'|'MIXED'|'RISK-ON' }
+//          Fires when computed live regime matches target
+//   CORR   { type:'corr',   pair, dir:'above'|'below', threshold }
+//          pair = 'usdjpy_vix' | 'dxy_spx' | 'gold_dxy' etc. (z-score threshold)
+//   VAR    { type:'var',    sym, dir:'above'|'below', threshold }
+//          Fires when current 1d VaR95% crosses threshold
 // ═══════════════════════════════════════════════════════════════════
 
 const ALERTS_KEY = 'gi_alerts';
+
+// Price-alert labels (legacy + extended)
 const ALERTS_LABELS = {
   vix:'VIX', eurusd:'EUR/USD', usdjpy:'USD/JPY', gbpusd:'GBP/USD',
   audusd:'AUD/USD', usdchf:'USD/CHF', xauusd:'Gold', us10y:'US 10Y', move:'MOVE',
+  nzdusd:'NZD/USD', usdcad:'USD/CAD', dxy:'DXY', spx:'SPX', wti:'WTI', btc:'BTC',
 };
+
+// ── Advanced alert type definitions ──────────────────────────────────────────
+
+const ADV_ALERT_TYPES = {
+  // ── HV30 vs ATM IV spread alerts ────────────────────────────────────
+  'hv_iv_eurusd': {
+    label: 'EUR/USD HV30 vs IV', category: 'spread',
+    description: 'Fires when realised vol (HV30) diverges from implied vol (ATM IV). HV > IV = vol is cheap; HV < IV = vol is expensive.',
+    getValue(intra) {
+      const hv = STOOQ_RT_CACHE['eurusd']?.hv30 ?? null;
+      const iv = intra?.fx_etf_iv?.eurusd?.iv ?? null;
+      return (hv != null && iv != null) ? parseFloat((hv - iv).toFixed(2)) : null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)} vol pts`,
+  },
+  'hv_iv_gbpusd': {
+    label: 'GBP/USD HV30 vs IV', category: 'spread',
+    description: 'HV30 minus ATM IV for GBP/USD. Positive = realised vol above implied (vol cheap).',
+    getValue(intra) {
+      const hv = STOOQ_RT_CACHE['gbpusd']?.hv30 ?? null;
+      const iv = intra?.fx_etf_iv?.gbpusd?.iv ?? null;
+      return (hv != null && iv != null) ? parseFloat((hv - iv).toFixed(2)) : null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)} vol pts`,
+  },
+  'hv_iv_usdjpy': {
+    label: 'USD/JPY HV30 vs IV', category: 'spread',
+    description: 'HV30 minus ATM IV for USD/JPY. Positive = vol cheap relative to implied.',
+    getValue(intra) {
+      const hv = STOOQ_RT_CACHE['usdjpy']?.hv30 ?? null;
+      const iv = intra?.fx_etf_iv?.usdjpy?.iv ?? null;
+      return (hv != null && iv != null) ? parseFloat((hv - iv).toFixed(2)) : null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)} vol pts`,
+  },
+  'hv_iv_audusd': {
+    label: 'AUD/USD HV30 vs IV', category: 'spread',
+    description: 'HV30 minus ATM IV for AUD/USD.',
+    getValue(intra) {
+      const hv = STOOQ_RT_CACHE['audusd']?.hv30 ?? null;
+      const iv = intra?.fx_etf_iv?.audusd?.iv ?? null;
+      return (hv != null && iv != null) ? parseFloat((hv - iv).toFixed(2)) : null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)} vol pts`,
+  },
+
+  // ── IV Rank alerts ───────────────────────────────────────────────────
+  'ivrank_eurusd': {
+    label: 'EUR/USD IV Rank', category: 'ivrank',
+    description: 'IV Rank 0–100. Above 70 = historically expensive vol. Below 30 = historically cheap vol.',
+    getValue(intra) { return intra?.fx_etf_iv?.eurusd?.iv_rank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'ivrank_gbpusd': {
+    label: 'GBP/USD IV Rank', category: 'ivrank',
+    description: 'IV Rank for GBP/USD (0–100 scale).',
+    getValue(intra) { return intra?.fx_etf_iv?.gbpusd?.iv_rank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'ivrank_usdjpy': {
+    label: 'USD/JPY IV Rank', category: 'ivrank',
+    description: 'IV Rank for USD/JPY.',
+    getValue(intra) { return intra?.fx_etf_iv?.usdjpy?.iv_rank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'ivrank_audusd': {
+    label: 'AUD/USD IV Rank', category: 'ivrank',
+    description: 'IV Rank for AUD/USD.',
+    getValue(intra) { return intra?.fx_etf_iv?.audusd?.iv_rank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+
+  // ── Correlation Z-score break alerts ────────────────────────────────
+  'corr_usdjpy_vix': {
+    label: 'USD/JPY vs VIX corr Z', category: 'corr',
+    description: 'Z-score of rolling 60d correlation between USD/JPY and VIX vs its 252d historical norm. |Z| > 1.5 = regime break.',
+    getValue(intra) {
+      const c = (intra?.correlations || []).find(r => r.a === 'USD/JPY' && r.b === 'VIX');
+      return c?.z_score ?? null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}σ`,
+  },
+  'corr_dxy_spx': {
+    label: 'DXY vs SPX corr Z', category: 'corr',
+    description: 'Z-score of DXY/SPX rolling correlation. Positive = both rising together (USD funding stress).',
+    getValue(intra) {
+      const c = (intra?.correlations || []).find(r => r.a === 'DXY' && r.b === 'SPX');
+      return c?.z_score ?? null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}σ`,
+  },
+  'corr_gold_dxy': {
+    label: 'Gold vs DXY corr Z', category: 'corr',
+    description: 'Z-score of Gold/DXY rolling correlation. Positive break = Gold and USD rising together (inflation/safe-haven demand).',
+    getValue(intra) {
+      const c = (intra?.correlations || []).find(r => r.a === 'Gold' && r.b === 'DXY');
+      return c?.z_score ?? null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}σ`,
+  },
+  'corr_audusd_gold': {
+    label: 'AUD/USD vs Gold corr Z', category: 'corr',
+    description: 'Z-score of AUD/USD vs Gold correlation. Break signals China/domestic risk overriding the commodity link.',
+    getValue(intra) {
+      const c = (intra?.correlations || []).find(r => r.a === 'AUD/USD' && r.b === 'Gold');
+      return c?.z_score ?? null;
+    },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}σ`,
+  },
+
+  // ── Historical VaR 95% alerts ────────────────────────────────────────
+  'var_eurusd': {
+    label: 'EUR/USD VaR 95% (1d)', category: 'var',
+    description: '1-day Historical VaR 95% for EUR/USD, expressed as % of price. Rises during stressed regimes.',
+    getValue(intra) { return intra?.var_cvar?.eurusd?.var_pct ?? null; },
+    formatValue: v => `${v.toFixed(3)}%`,
+  },
+  'var_usdjpy': {
+    label: 'USD/JPY VaR 95% (1d)', category: 'var',
+    description: '1-day Historical VaR 95% for USD/JPY.',
+    getValue(intra) { return intra?.var_cvar?.usdjpy?.var_pct ?? null; },
+    formatValue: v => `${v.toFixed(3)}%`,
+  },
+  'var_gbpusd': {
+    label: 'GBP/USD VaR 95% (1d)', category: 'var',
+    description: '1-day Historical VaR 95% for GBP/USD.',
+    getValue(intra) { return intra?.var_cvar?.gbpusd?.var_pct ?? null; },
+    formatValue: v => `${v.toFixed(3)}%`,
+  },
+  'var_xauusd': {
+    label: 'Gold VaR 95% (1d)', category: 'var',
+    description: '1-day Historical VaR 95% for Gold (XAU/USD).',
+    getValue(intra) { return intra?.var_cvar?.gold?.var_pct ?? null; },
+    formatValue: v => `${v.toFixed(3)}%`,
+  },
+  'var_spx': {
+    label: 'SPX VaR 95% (1d)', category: 'var',
+    description: '1-day Historical VaR 95% for S&P 500.',
+    getValue(intra) { return intra?.var_cvar?.spx?.var_pct ?? null; },
+    formatValue: v => `${v.toFixed(3)}%`,
+  },
+};
+
+// ── Regime alert — special singleton type ────────────────────────────────────
+// Stored as { type:'regime', id, target:'RISK-OFF'|'CAUTION'|'MIXED'|'RISK-ON', fired, firedAt }
+// Evaluated against the live computed regime (DOM element #risk-regime)
+function _liveRegime() {
+  return document.getElementById('risk-regime')?.textContent?.trim() ?? null;
+}
+
+// Expose to window for inline onchange handlers in the popover HTML
+window._ADV_OPTS = ADV_ALERT_TYPES;
 
 // ── Signal Notifications — browser push for new AI signals ────────────────────
 // Storage: localStorage key 'gi_sig_notif' → 'on' | 'off'  (default: 'off')
@@ -5223,23 +5453,54 @@ function alertsLoad() {
 function alertsSave(arr) {
   try { localStorage.setItem(ALERTS_KEY, JSON.stringify(arr)); } catch {}
 }
-function alertsCurrentValue(sym) {
-  if (sym === 'vix')  return STOOQ_RT_CACHE['vix']?.close  ?? null;
-  if (sym === 'move') return STOOQ_RT_CACHE['move']?.close ?? null;
-  if (sym === 'us10y') {
-    const el = document.getElementById('yc-10y');
-    const v  = parseFloat(el?.textContent);
-    return isNaN(v) ? null : v;
+
+// ── Value resolvers ───────────────────────────────────────────────────────────
+
+function alertsCurrentValue(a, intra) {
+  if (a.type === 'price' || !a.type) {
+    // Legacy + new price alerts
+    const sym = a.sym;
+    if (sym === 'vix')   return STOOQ_RT_CACHE['vix']?.close  ?? null;
+    if (sym === 'move')  return STOOQ_RT_CACHE['move']?.close ?? null;
+    if (sym === 'us10y') {
+      const el = document.getElementById('yc-10y');
+      const v  = parseFloat(el?.textContent);
+      return isNaN(v) ? null : v;
+    }
+    return STOOQ_RT_CACHE[sym]?.close ?? null;
   }
-  return STOOQ_RT_CACHE[sym]?.close ?? null;
+  if (a.type === 'regime') {
+    return _liveRegime();
+  }
+  // All advanced types require intraday data
+  const def = ADV_ALERT_TYPES[a.sym];
+  if (!def) return null;
+  return def.getValue(intra);
 }
 
-function alertsRender() {
+function alertFormatValue(a, v) {
+  if (v == null) return null;
+  if (a.type === 'regime') return v;
+  const def = ADV_ALERT_TYPES[a.sym];
+  if (def?.formatValue) return def.formatValue(v);
+  // Price alert: standard numeric
+  return v.toFixed(v > 10 ? 2 : 5);
+}
+
+function alertDescribeCondition(a) {
+  if (a.type === 'regime') return `Regime = ${a.target}`;
+  const label = ADV_ALERT_TYPES[a.sym]?.label ?? ALERTS_LABELS[a.sym] ?? a.sym;
+  const dirSym = a.dir === 'above' ? '>' : '<';
+  return `${label} ${dirSym} ${a.threshold}`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function alertsRender(intra) {
   const container = document.getElementById('alerts-rows');
   if (!container) return;
   const arr = alertsLoad();
 
-  // Always update badge first — even when arr is empty (removes stale count)
   const firedCount = arr.filter(a => a.fired).length;
   const badge = document.getElementById('alerts-fired-badge');
   if (badge) {
@@ -5251,14 +5512,20 @@ function alertsRender() {
     container.innerHTML = '<div style="padding:5px 8px;font-size:10px;color:var(--text3);">No alerts set. Add one below.</div>';
     return;
   }
+
   container.innerHTML = arr.map(a => {
-    const dirSym = a.dir === 'above' ? '>' : '<';
-    const cls    = a.fired ? 'alert-row alert-row-active' : 'alert-row';
+    const cls      = a.fired ? 'alert-row alert-row-active' : 'alert-row';
     const firedTxt = a.fired ? ` <span class="alert-fired">⚡ FIRED ${a.firedAt || ''}</span>` : '';
-    const cur    = alertsCurrentValue(a.sym);
-    const curTxt = cur != null ? ` · now ${cur.toFixed(cur > 10 ? 2 : 5)}` : '';
+    const cur      = alertsCurrentValue(a, intra);
+    const curFmt   = alertFormatValue(a, cur);
+    const curTxt   = curFmt != null ? ` · now ${curFmt}` : '';
+    const condTxt  = alertDescribeCondition(a);
+    // Category badge
+    const cat = a.type === 'regime' ? 'regime' : (ADV_ALERT_TYPES[a.sym]?.category ?? 'price');
+    const catColors = { price:'var(--text2)', spread:'#1D9E75', ivrank:'#185FA5', corr:'#854F0B', var:'#A32D2D', regime:'#533AB7' };
+    const catStyle  = `color:${catColors[cat]||'var(--text2)'};font-size:9px;margin-right:4px;`;
     return `<div class="${cls}" data-id="${a.id}">
-      <span class="alert-lbl">${ALERTS_LABELS[a.sym] || a.sym} ${dirSym} ${a.threshold}${curTxt}${firedTxt}</span>
+      <span class="alert-lbl"><span style="${catStyle}">[${cat.toUpperCase()}]</span>${condTxt}${curTxt}${firedTxt}</span>
       <span class="alert-del" title="Remove alert" onclick="alertsRemove('${a.id}')">✕</span>
     </div>`;
   }).join('');
@@ -5266,47 +5533,89 @@ function alertsRender() {
 
 function alertsRemove(id) {
   alertsSave(alertsLoad().filter(a => a.id !== id));
-  alertsRender();
+  alertsRender(null);
 }
 
+// ── Add from UI ───────────────────────────────────────────────────────────────
+
 function alertsAddFromUI() {
-  const sym  = document.getElementById('alert-sym-sel')?.value;
-  const dir  = document.getElementById('alert-dir-sel')?.value;
-  const val  = parseFloat(document.getElementById('alert-val-inp')?.value);
-  if (!sym || !dir || isNaN(val)) return;
+  const typeEl  = document.getElementById('alert-type-sel');
+  const symEl   = document.getElementById('alert-sym-sel');
+  const dirEl   = document.getElementById('alert-dir-sel');
+  const valEl   = document.getElementById('alert-val-inp');
+  const regEl   = document.getElementById('alert-regime-sel');
+
+  const alertType = typeEl?.value || 'price';
+
   const arr = alertsLoad();
-  arr.push({ id: Date.now().toString(36), sym, dir, threshold: val, label: ALERTS_LABELS[sym] || sym, fired: false, firedAt: null });
+
+  if (alertType === 'regime') {
+    const target = regEl?.value;
+    if (!target) return;
+    // Only one regime alert per target
+    if (arr.find(a => a.type === 'regime' && a.target === target)) return;
+    arr.push({ id: Date.now().toString(36), type: 'regime', target, fired: false, firedAt: null });
+  } else {
+    const sym = symEl?.value;
+    const dir = dirEl?.value;
+    const val = parseFloat(valEl?.value);
+    if (!sym || !dir || isNaN(val)) return;
+    const label = ADV_ALERT_TYPES[sym]?.label ?? ALERTS_LABELS[sym] ?? sym;
+    arr.push({ id: Date.now().toString(36), type: alertType, sym, dir, threshold: val, label, fired: false, firedAt: null });
+    if (valEl) valEl.value = '';
+  }
+
   alertsSave(arr);
-  document.getElementById('alert-val-inp').value = '';
-  alertsRender();
-  // Request notification permission on first alert add
+  alertsRender(null);
   if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
     Notification.requestPermission();
   }
 }
 
-function alertsCheck() {
+// ── Check cycle ───────────────────────────────────────────────────────────────
+
+async function alertsCheck() {
   const arr = alertsLoad();
   if (!arr.length) return;
+
+  // Load intraday data once for all advanced alerts (uses 90s cache — no extra fetch)
+  let intra = null;
+  const needsIntra = arr.some(a => a.type && a.type !== 'price' && a.type !== 'regime');
+  if (needsIntra) {
+    intra = await loadIntradayQuotes().catch(() => null);
+  }
+
   let changed = false;
 
   arr.forEach(a => {
-    if (a.fired) return;   // already fired — don't re-fire
-    const cur = alertsCurrentValue(a.sym);
+    if (a.fired) return;
+    const cur = alertsCurrentValue(a, intra);
     if (cur == null) return;
-    const triggered = (a.dir === 'above' && cur > a.threshold) ||
-                      (a.dir === 'below' && cur < a.threshold);
+
+    let triggered = false;
+
+    if (a.type === 'regime') {
+      triggered = (cur === a.target);
+    } else {
+      // All numeric types: price, spread, ivrank, corr, var
+      triggered = (a.dir === 'above' && cur > a.threshold) ||
+                  (a.dir === 'below' && cur < a.threshold);
+    }
+
     if (!triggered) return;
 
     a.fired   = true;
-    a.firedAt = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    a.firedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     changed   = true;
 
     // Browser notification
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      const curFmt  = alertFormatValue(a, cur);
+      const condTxt = alertDescribeCondition(a);
+      const body    = curFmt ? `${condTxt}  ·  Now: ${curFmt}` : condTxt;
       try {
         new Notification('GI Terminal Alert', {
-          body: `${ALERTS_LABELS[a.sym] || a.sym} ${a.dir === 'above' ? '>' : '<'} ${a.threshold}  ·  Now: ${cur.toFixed(cur > 10 ? 2 : 5)}`,
+          body,
           icon: '/favicon-192x192.png',
           tag : 'gi-alert-' + a.id,
         });
@@ -5314,11 +5623,11 @@ function alertsCheck() {
     }
   });
 
-  if (changed) { alertsSave(arr); alertsRender(); }
+  if (changed) { alertsSave(arr); alertsRender(intra); }
 }
 
 function initAlerts() {
-  alertsRender();
+  alertsRender(null);
   alertsCheck();
   setInterval(alertsCheck, 5 * 60 * 1000);
 
