@@ -488,8 +488,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <!-- CROSS ASSET + RISK -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:320px;max-height:320px;">
-      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);min-height:320px;">
+      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);align-self:start;">
         <div class="panel-head"><span class="panel-title">Cross-Asset</span><span class="panel-sub" id="ca-updated">Multi-source · daily updated</span></div>
         <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
           <!-- Populated by fetchCrossAssetData() -->
