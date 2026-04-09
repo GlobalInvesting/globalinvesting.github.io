@@ -527,14 +527,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <!-- VaR / CVaR Panel — full width below both columns -->
-      <div style="padding:4px 8px 6px;overflow-x:auto;">
+      <div style="padding:4px 8px 6px;">
         <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
           <span>Historical VaR 95% · 1-day · 252d window</span>
           <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
         </div>
-        <table aria-label="Historical VaR and CVaR by instrument" style="width:100%;">
+        <table id="var-cvar-table" aria-label="Historical VaR and CVaR by instrument" style="width:100%;table-layout:fixed;">
           <thead>
-            <tr>
+            <tr style="display:table;width:100%;table-layout:fixed;">
               <th style="text-align:left;font-size:9px;" scope="col">Instrument</th>
               <th style="font-size:9px;text-align:right;" scope="col" title="1-day Historical VaR at 95% confidence. Loss not exceeded on 95% of trading days.">VaR 95%</th>
               <th style="font-size:9px;text-align:right;" scope="col" title="Expected Shortfall (CVaR): mean loss in the worst 5% of days. Always ≥ VaR.">CVaR 95%</th>
@@ -542,8 +542,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <th style="font-size:9px;text-align:right;" scope="col" title="Number of daily returns used (target: 252 trading days = 1 year).">n</th>
             </tr>
           </thead>
-          <tbody id="var-cvar-tbody">
-            <tr><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">Loading VaR data…</td></tr>
+          <tbody id="var-cvar-tbody" style="display:block;overflow-y:auto;max-height:92px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
+            <tr style="display:table;width:100%;table-layout:fixed;"><td colspan="5" style="color:var(--text3);padding:6px 8px;font-size:10px;">Loading VaR data…</td></tr>
           </tbody>
         </table>
       </div>
