@@ -219,6 +219,78 @@ def compute_hv30(closes_series):
         return None
 
 
+def compute_var_cvar(closes_series, confidence=0.95, lookback=252):
+    """
+    Historical VaR and CVaR from daily log-returns.
+
+    Parameters
+    ----------
+    closes_series : list or pandas Series
+        Daily closing prices (any order, ascending preferred).
+    confidence : float
+        Confidence level, e.g. 0.95 for 95%, 0.99 for 99%.
+    lookback : int
+        Number of trading days to use (default 252 = 1 year).
+
+    Returns
+    -------
+    dict with keys:
+        var_pct  : VaR as a positive percentage of price (e.g. 0.83 means 0.83%)
+        cvar_pct : CVaR (Expected Shortfall) as a positive percentage
+        n        : number of daily returns used
+        confidence: confidence level used
+    or None if insufficient data.
+
+    Methodology — Historical Simulation (non-parametric):
+        1. Compute log-returns for the lookback window.
+        2. Sort ascending (worst first).
+        3. VaR  = -percentile(returns, 1 - confidence)  [the cut-off loss]
+        4. CVaR = -mean(returns < VaR cut-off)           [mean of tail losses]
+    Both expressed as % of price (multiply by 100).
+    No distributional assumption: captures fat tails present in actual FX returns.
+    """
+    try:
+        prices = [float(c) for c in closes_series if c is not None and float(c) > 0]
+        # Need at least lookback + 1 prices to get lookback returns
+        if len(prices) < max(lookback + 1, 30):
+            return None
+        window = prices[-(lookback + 1):]
+        returns = [math.log(window[i] / window[i - 1]) for i in range(1, len(window))]
+        n = len(returns)
+        if n < 20:
+            return None
+
+        sorted_r = sorted(returns)   # ascending: worst losses first
+
+        # VaR: the loss at the (1 - confidence) quantile
+        # e.g. for 95%: cutoff index = floor(0.05 * n)
+        cutoff_idx = max(0, int(math.floor((1 - confidence) * n)) - 1)
+        var_return = sorted_r[cutoff_idx]   # negative number (a loss)
+        var_pct    = round(-var_return * 100, 4)   # positive %
+
+        # CVaR: mean of all returns worse than (or equal to) the VaR cut-off
+        tail = sorted_r[: cutoff_idx + 1]
+        cvar_return = sum(tail) / len(tail) if tail else var_return
+        cvar_pct    = round(-cvar_return * 100, 4)   # positive %
+
+        # Rolling 60-day VaR for regime comparison (shorter window)
+        var60_pct = None
+        if n >= 60:
+            window60  = sorted(returns[-60:])
+            ci60_idx  = max(0, int(math.floor((1 - confidence) * 60)) - 1)
+            var60_pct = round(-window60[ci60_idx] * 100, 4)
+
+        return {
+            "var_pct":    var_pct,
+            "cvar_pct":   cvar_pct,
+            "var60_pct":  var60_pct,   # 60d rolling VaR — regime shift indicator
+            "n":          n,
+            "confidence": confidence,
+        }
+    except Exception:
+        return None
+
+
 # Pairs for which we compute rolling 60-day Pearson correlation
 CORRELATION_PAIRS = [
     ("eurusd", "dxy"),
@@ -272,6 +344,74 @@ def pearson(x, y):
     if den_x == 0 or den_y == 0:
         return None
     return round(num / (den_x * den_y), 3)
+
+
+def fetch_var_cvar():
+    """
+    Downloads 270 days of daily closes for key instruments and computes
+    Historical VaR 95% and CVaR 95% (1-day, expressed as % of price).
+
+    Instruments covered:
+        FX:          EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD, NZD/USD
+        Cross-asset: SPX, Gold, WTI, DXY, US 10Y yield, BTC
+        Vol indices: VIX, MOVE
+
+    Returns a dict  { instrument_id: { var_pct, cvar_pct, var60_pct, n, confidence } }
+    ready to be written into quotes.json under key "var_cvar".
+    """
+    VAR_SYMBOLS = {
+        # FX majors
+        "eurusd": "EURUSD=X",
+        "gbpusd": "GBPUSD=X",
+        "usdjpy": "JPY=X",
+        "audusd": "AUDUSD=X",
+        "usdchf": "CHF=X",
+        "usdcad": "CAD=X",
+        "nzdusd": "NZDUSD=X",
+        # Cross-asset
+        "spx":    "^GSPC",
+        "gold":   "GC=F",
+        "wti":    "CL=F",
+        "dxy":    "DX-Y.NYB",
+        "us10y":  "^TNX",
+        "btc":    "BTC-USD",
+        "vix":    "^VIX",
+        "move":   "^MOVE",
+    }
+    LOOKBACK = 252     # 1 year of trading days
+    PERIOD   = "390d"  # download buffer: ~15 months -> reliable 252-day window
+
+    print("\n[VaR/CVaR] Computing Historical VaR 95% and CVaR 95%...")
+    results = {}
+    try:
+        tickers = list(set(VAR_SYMBOLS.values()))
+        raw = yf.download(tickers, period=PERIOD, auto_adjust=True, progress=False)
+        closes_df = raw["Close"] if "Close" in raw.columns.get_level_values(0) else raw
+
+        for inst_id, ticker in VAR_SYMBOLS.items():
+            try:
+                if hasattr(closes_df, 'columns') and ticker in closes_df.columns:
+                    series = closes_df[ticker].dropna().tolist()
+                else:
+                    series = []
+                if not series:
+                    print(f"  {inst_id:10s}: no data")
+                    continue
+                vc = compute_var_cvar(series, confidence=0.95, lookback=LOOKBACK)
+                if vc:
+                    results[inst_id] = vc
+                    regime = ""
+                    if vc.get("var60_pct") and vc["var60_pct"] > vc["var_pct"] * 1.25:
+                        regime = "  [!] 60d VaR elevated vs 252d baseline"
+                    print(f"  {inst_id:10s}: VaR95={vc['var_pct']:.3f}%  CVaR95={vc['cvar_pct']:.3f}%  n={vc['n']}{regime}")
+                else:
+                    print(f"  {inst_id:10s}: insufficient data (got {len(series)} closes)")
+            except Exception as e:
+                print(f"  {inst_id:10s}: error -- {e}")
+    except Exception as e:
+        print(f"[VaR/CVaR] Download failed: {e}")
+
+    return results
 
 
 def fetch_correlations():
@@ -920,9 +1060,12 @@ def main():
     except Exception as _e:
         print(f"[IV-Rank] Error computing IV history/rank: {_e}")
 
+    # PASO 8: Historical VaR 95% and CVaR 95% per instrument
+    var_cvar_data = fetch_var_cvar()
+
     output = {"updated": ts, "source": source_label, "quotes": quotes,
               "hv30": hv30_output, "correlations": correlations,
-              "fx_etf_iv": fx_etf_iv}
+              "fx_etf_iv": fx_etf_iv, "var_cvar": var_cvar_data}
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
