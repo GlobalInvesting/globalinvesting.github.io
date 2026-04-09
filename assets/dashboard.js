@@ -957,40 +957,48 @@ const QB_STOOQ_PAIRS = [
 // ── Intraday quotes cache (from GitHub Action — Twelve Data + Alpha Vantage) ──
 // Loaded once per refresh cycle and shared between fetchRiskData and fetchCrossAssetData.
 // Avoids double-fetching the same JSON in the same 2-min cycle.
-let _intradayCacheTime = 0;
-let _intradayCache     = null;
+let _intradayCacheTime  = 0;
+let _intradayCache      = null;
+let _intradayInFlight   = null;  // promise dedup: prevents concurrent callers from each firing a separate fetch
 
 async function loadIntradayQuotes() {
   const now = Date.now();
   // Re-use cache for up to 90 seconds within the same refresh cycle
   if (_intradayCache && (now - _intradayCacheTime) < 90_000) return _intradayCache;
+  // If a fetch is already in flight, wait for it instead of firing a duplicate request
+  if (_intradayInFlight) return _intradayInFlight;
 
-  try {
-    const r = await fetch('./intraday-data/quotes.json?_=' + Math.floor(now / 60000), {
-      signal: AbortSignal.timeout(5000)
-    });
-    if (!r.ok) return null;
-    const data = await r.json();
-    if (!data?.quotes) return null;
+  _intradayInFlight = (async () => {
+    try {
+      const r = await fetch('./intraday-data/quotes.json?_=' + Math.floor(now / 60000), {
+        signal: AbortSignal.timeout(5000)
+      });
+      if (!r.ok) return null;
+      const data = await r.json();
+      if (!data?.quotes) return null;
 
-    // Validate freshness — reject if file is older than 35 minutes
-    if (data.updated) {
-      const age = (now - new Date(data.updated).getTime()) / 60000;
-      if (age > 35) {
-        console.warn(`[Intraday] File is ${age.toFixed(0)}min old — treating as stale`);
-        // Still return it but mark all quotes as stale so UI shows note
-        Object.values(data.quotes).forEach(q => q.stale = true);
+      // Validate freshness — warn if file is older than 35 minutes
+      if (data.updated) {
+        const age = (now - new Date(data.updated).getTime()) / 60000;
+        if (age > 35) {
+          console.warn(`[Intraday] File is ${age.toFixed(0)}min old — treating as stale`);
+          Object.values(data.quotes).forEach(q => q.stale = true);
+        }
       }
-    }
 
-    _intradayCache     = data;
-    _intradayCacheTime = now;
-    console.log(`[Intraday] ✓ Loaded ${Object.keys(data.quotes).length} quotes — source: ${data.source}`);
-    return data;
-  } catch (e) {
-    console.warn('[Intraday] Could not load quotes.json:', e.message);
-    return null;
-  }
+      _intradayCache     = data;
+      _intradayCacheTime = now;
+      console.log(`[Intraday] Loaded ${Object.keys(data.quotes).length} quotes — source: ${data.source}`);
+      return data;
+    } catch (e) {
+      console.warn('[Intraday] Could not load quotes.json:', e.message);
+      return null;
+    } finally {
+      _intradayInFlight = null;  // release lock so next cycle can fetch fresh data
+    }
+  })();
+
+  return _intradayInFlight;
 }
 
 // Helper: extract a standardised quote object from intraday cache
@@ -4729,7 +4737,7 @@ setInterval(fetchCryptoQuotes, 90 * 1000);
 setInterval(fetchCarryData,    30 * 60 * 1000);
 setInterval(fetchCarryRanking, 30 * 60 * 1000);
 // Refresh sentiment every 30 seconds
-setInterval(fetchSentiment, 30 * 1000);
+setInterval(fetchSentiment, 10 * 60 * 1000);   // every 10 min — sentiment source updates every 30min
 // Refresh calendar & expectations every 30 minutes
 setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
