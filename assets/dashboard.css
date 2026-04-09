@@ -806,6 +806,8 @@
     div[style*="max-height:320px"] { max-height: none !important; }
     div[style*="min-height:320px"] { min-height: 0 !important; }
     div[style*="height:580px"] { height: auto !important; }
+    /* When stacked as flex column, both panels must stretch to full width */
+    #section-crossasset, #section-risk { align-self: stretch !important; width: 100% !important; border-right: none !important; }
 
     /* News + Economic map: stack */
     div[style*="height:440px"] { height: auto !important; flex-direction: column !important; }
