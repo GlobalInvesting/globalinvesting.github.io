@@ -5298,13 +5298,17 @@ function exportPanel(type, format = 'csv') {
     ext = '.csv';
   }
 
-  const blob = new Blob([blob_content], { type: mime });
-  const url  = URL.createObjectURL(blob);
+  // Use data: URL instead of blob: URL — Edge Enhanced Tracking Prevention silently
+  // blocks programmatic blob: URL navigation triggered by a.click(), whereas
+  // data: URLs are not subject to the same restriction.
+  const encoded = 'data:' + mime + ';charset=utf-8,' + encodeURIComponent(blob_content);
   const a    = document.createElement('a');
-  a.href = url; a.download = filename + ext;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  a.href = encoded;
+  a.download = filename + ext;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 500);
 
   // Visual feedback — flash ✓ on every matching button in this panel
   document.querySelectorAll('.export-btn').forEach(b => {
