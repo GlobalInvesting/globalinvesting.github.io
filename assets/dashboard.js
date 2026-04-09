@@ -5158,6 +5158,26 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
 // ═══════════════════════════════════════════════════════════════════
 // CSV / JSON EXPORT
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT BUTTON WIRING
+// Uses addEventListener instead of onclick="" attributes to avoid
+// inline handler restrictions in Edge Enhanced Tracking Prevention.
+// ═══════════════════════════════════════════════════════════════════
+(function wireExportButtons() {
+  function bind(id, type, format) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      exportPanel(type, format);
+    });
+  }
+  bind('export-fx-csv',   'fx',    'csv');
+  bind('export-fx-json',  'fx',    'json');
+  bind('export-cot-csv',  'cot',   'csv');
+  bind('export-cot-json', 'cot',   'json');
+}());
+
 // exportPanel(type, format) — reads in-memory caches, triggers download
 // Types: 'fx' | 'cot' | 'yield' | 'carry'   Format: 'csv' | 'json'
 // ═══════════════════════════════════════════════════════════════════

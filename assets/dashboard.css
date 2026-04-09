@@ -310,7 +310,7 @@
     text-transform: uppercase; letter-spacing: .06em;
     font-family: var(--font-ui);
   }
-  .panel-sub { font-size: 10px; color: var(--text2); font-family: var(--font-ui); margin-left: 8px; }
+  .panel-sub { font-size: 10px; color: var(--text2); font-family: var(--font-ui); margin-left: 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Key Correlations — compact layout to fit 12 rows without clipping */
   table[aria-label="Key FX correlations"] td {
