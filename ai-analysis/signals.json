@@ -1,57 +1,57 @@
 [
   {
-    "time": "14:15",
+    "time": "16:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 159.00 resistance; watch for verbal intervention near 160.00",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 158.00 resistance, watch for 160.00 psychological level",
     "evidence": [
-      "USD/JPY: 159.027",
+      "USD/JPY: 158.15",
       "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 20.9"
+      "VIX: 20.0"
     ]
   },
   {
-    "time": "14:13",
+    "time": "16:43",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD trading above 1.16890, driven by ECB cutting stance vs Fed on hold; watch for 1.1706 resistance",
+    "text": "EUR/USD trading above 1.1706, ECB cutting rates may further boost EUR, watch for 1.1800 resistance",
     "evidence": [
-      "EUR/USD: 1.16890",
+      "EUR/USD: 1.17150",
       "ECB rate: 2% (CUTTING)",
-      "Fed rate: 3.75% (ON HOLD)"
+      "US 10Y yield: 4.268%"
     ]
   },
   {
-    "time": "14:10",
+    "time": "16:40",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.672",
-      "VIX: 20.9",
-      "USD/JPY: 159.027"
+      "USD/JPY vs VIX: corr=+0.670",
+      "VIX: 20.0",
+      "USD/JPY: 158.720"
     ]
   },
   {
-    "time": "14:05",
+    "time": "16:35",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 20.9 signals elevated volatility — not a risk-on environment; watch for cross-asset implications",
+    "text": "VIX at 20.0 signals elevated volatility — not a risk-on environment, watch for market swings",
     "evidence": [
-      "VIX: 20.9",
-      "S&P 500: 6,770",
+      "VIX: 20.0",
+      "S&P 500: 6,817",
       "MOVE Index: 78.7"
     ]
   },
   {
-    "time": "14:00",
+    "time": "16:30",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.70570, despite strong short bias from retail traders; watch for potential squeeze",
+    "title": "AUD/JPY",
+    "text": "AUD/JPY sentiment extreme, 85% of retail traders short, watch for potential squeeze",
     "evidence": [
-      "AUD/USD: 0.70570",
-      "AUD/USD retail sentiment: 17% long / 83% short",
-      "RBA rate: 4.10% (HIKING)"
+      "AUD/JPY: 15% long / 85% short",
+      "AUD/JPY intraday price: not available",
+      "VIX: 20.0"
     ]
   }
 ]
