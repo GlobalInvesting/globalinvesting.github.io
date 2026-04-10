@@ -1,57 +1,57 @@
 [
   {
-    "time": "05:35",
+    "time": "08:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY tests 159.24 resistance; watch for 160.00 psychological level",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 159.30 resistance, watch for 160.00 psychological level",
     "evidence": [
-      "USD/JPY: 159.240",
+      "USD/JPY: 159.328",
       "BoJ rate: 0.75% (ON HOLD)",
-      "VIX: 19.5"
+      "VIX: 19.6"
     ]
   },
   {
-    "time": "05:32",
+    "time": "07:58",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "Retail sentiment extreme short at 86% — contrarian reversal risk; AUD/USD holding above 0.7069",
+    "text": "Retail sentiment extreme short at 85%, contrarian reversal risk, watch for squeeze",
     "evidence": [
-      "AUD/USD: 0.70690",
-      "AUD/USD retail sentiment: 86% short",
+      "AUD/USD: 0.70540",
+      "Retail sentiment: 15% long / 85% short",
       "CFTC AUD net: +43,837"
     ]
   },
   {
-    "time": "05:29",
+    "time": "07:55",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven; USD/JPY trading above 159.00",
+    "text": "Correlation break: USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function, z=+1.40σ",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.657",
-      "USD/JPY: 159.240",
-      "VIX: 19.5"
+      "USD/JPY vs VIX: corr=+0.682",
+      "norm=+0.135",
+      "z=+1.40σ"
     ]
   },
   {
-    "time": "05:25",
+    "time": "07:50",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.5 signals normal volatility — not a risk-on environment; S&P 500 trading near 6,825",
+    "text": "VIX at 19.6 signals normal volatility, not a risk-on environment",
     "evidence": [
-      "VIX: 19.5",
+      "VIX: 19.6",
       "S&P 500: 6,825",
       "MOVE Index: 74.0"
     ]
   },
   {
-    "time": "05:20",
+    "time": "07:45",
     "priority": "info",
     "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD, rate divergence favours USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2.00% (CUTTING)",
-      "EUR/USD: 1.16930"
+      "EUR/USD: 1.16840"
     ]
   }
 ]
