@@ -1424,9 +1424,14 @@ function renderSentiment(pairs, sourceLabel, general) {
     const distCol  = trapped ? 'var(--down)' : 'var(--up)';
     const distSign = distPct !== null && distPct >= 0 ? '+' : '';
 
+    // ── TV symbol: "EUR/USD" → "FX_IDC:EURUSD" ──
+    const tvSym = 'FX_IDC:' + p.sym.replace('/', '');
+
     // ── Outer wrapper: two-row layout ──
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'border-bottom:1px solid var(--border);padding:5px 0 4px;';
+    wrap.style.cssText = 'border-bottom:1px solid var(--border);padding:5px 0 4px;cursor:pointer;';
+    wrap.title = 'Click to open ' + p.sym + ' chart';
+    wrap.addEventListener('click', () => loadTVChart(tvSym));
 
     // Row 1: sym | bar | %L %S bias
     const row1 = document.createElement('div');
