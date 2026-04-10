@@ -391,7 +391,7 @@ function populateFxPairsTable() {
     const rate = computeRate(pair);
     const prev = computePrevRate(pair);
 
-    // 1D change — fuente primaria: RT cache (quotes.json yfinance, prev_close real)
+    // 1D change — primary source: RT cache (quotes.json yfinance, real prev_close)
     // Fallback: ECB Frankfurter (solo si RT cache no está disponible aún)
     let chg1d = '—', cls1d = 'flat';
     const rtD1 = STOOQ_RT_CACHE[pair.id];
@@ -1043,7 +1043,7 @@ function intradayQuote(cache, id) {
   if (!cache?.quotes?.[id]) return null;
   const q = cache.quotes[id];
   if (!q.close || isNaN(q.close) || q.close <= 0) return null;
-  // chg/pct solo son válidos si prev_close existe — de lo contrario null (evita +0.00% falso)
+  // chg/pct are only valid when prev_close exists — otherwise null (avoids spurious +0.00% display)
   const hasPrev = q.prev_close != null && q.prev_close > 0;
   return {
     close:      q.close,
@@ -1067,9 +1067,9 @@ const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 // fetchStooqQuoteSingle removed — yfinance JSON is sole source
 
 async function fetchQuoteBarRT() {
-  // ── PASO 1: intraday quotes.json (yfinance via GitHub Action — fuente primaria) ──
-  // Cubre los 35 símbolos incluyendo todos los pares FX con prev_close real (chg/pct real).
-  // No depende de CORS proxies, es same-origin y siempre disponible.
+  // ── STEP 1: intraday quotes.json (yfinance via GitHub Action — primary source) ──
+  // Covers all 35 symbols including every FX pair with a real prev_close (real chg/pct).
+  // No CORS proxies required — same-origin, always available.
   const intradayData = await loadIntradayQuotes();
   let updatedFromIntraday = 0;
 
@@ -1077,7 +1077,7 @@ async function fetchQuoteBarRT() {
     for (const pair of QB_STOOQ_PAIRS) {
       const q = intradayData.quotes[pair.id];
       if (!q?.close || isNaN(q.close) || q.close <= 0) continue;
-      // chg/pct solo válidos si prev_close existe — null evita mostrar +0.00% falso
+      // chg/pct only valid when prev_close exists — null prevents a spurious +0.00% display
       const hasPrev = q.prev_close != null && q.prev_close > 0;
       const data = {
         close: q.close,
@@ -2044,7 +2044,7 @@ async function renderRiskData(byId) {
     }
   }
 
-  // EUR/USD HV 30d — fuente primaria: HV30 calculada por fetch_intraday_quotes.py
+  // EUR/USD HV 30d — primary source: HV30 computed by fetch_intraday_quotes.py
   // Fallback: proxy VIX × 0.22 (relación empírica documentada)
   {
     const eurusdHV = STOOQ_RT_CACHE['eurusd']?.hv30 ?? null;
@@ -2233,12 +2233,14 @@ async function renderRiskData(byId) {
       const currentText = narrRegEl.textContent.toUpperCase().replace('__STALE__','');
       const currentRank = REGIME_RANK[currentText] ?? -1;
       const isCurrentStale = narrRegEl.classList.contains('stale');
-      // AI-vs-live divergence: positive = AI more bearish than live
-      const aiLiveDivergence = currentRank - liveRank;
+      // Override rule — canonical form per GUIDELINES.md:
+      //   isCurrentStale     → AI JSON > 4h old, live is authoritative
+      //   !_aiRegimeFresh    → AI JSON not loaded yet, live is authoritative
+      //   liveRank > currentRank && liveRank >= 2 → live is more bearish AND at CAUTION/RISK-OFF level
+      //     (liveRank >= 2 guard prevents MIXED (rank 1) from overriding a valid AI badge)
       const shouldOverride = isCurrentStale
         || !_aiRegimeFresh
-        || (liveRank > currentRank)          // live is more bearish → conservative rule
-        || (aiLiveDivergence >= 2);          // AI is 2+ steps more bearish than live → data contradiction
+        || (liveRank > currentRank && liveRank >= 2); // conservative: only override when live ≥ CAUTION
       if (shouldOverride) {
         const isOn  = regime === 'RISK-ON';
         const isOff = regime === 'RISK-OFF';
@@ -2246,8 +2248,7 @@ async function renderRiskData(byId) {
         narrRegEl.className = 'narr-regime';
         narrRegEl.style.borderColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
         narrRegEl.style.color       = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-        const overrideReason = (aiLiveDivergence >= 2) ? 'AI-live divergence override' : 'Live assessment';
-        narrRegEl.title = `${overrideReason} · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
+        narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
       }
     }
   }
@@ -2965,7 +2966,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Not OTC interbank — indicative only.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance).'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically means hedging costs are elevated. Traders may sell vol strategies in this environment."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
       </div>
     </div>
@@ -3657,10 +3658,12 @@ async function fetchFedExpectations() {
       } else if (meetingsBias === 'hold') {
         biasLabel = '<span class="flat">→ Hold</span>';
       } else {
-        // Fallback: derive from historical rate trajectory
-        biasLabel = trendDir === 'down' ? '<span class="down">↓ Cut</span>'
-                  : trendDir === 'up'   ? '<span class="up">↑ Hike</span>'
-                  :                       '<span class="flat">→ Hold</span>';
+        // Fallback: derive from historical rate trajectory (no OIS/futures data available).
+        // ~ prefix signals this is an estimate, not a curated market-consensus value —
+        // per GUIDELINES.md: "prefixes the label with ~ to signal estimation".
+        biasLabel = trendDir === 'down' ? '<span class="down">~ ↓ Cut</span>'
+                  : trendDir === 'up'   ? '<span class="up">~ ↑ Hike</span>'
+                  :                       '<span class="flat">~ → Hold</span>';
       }
 
       // ── Forward rate via Covered Interest Parity (CIP) ───────────
@@ -4316,14 +4319,14 @@ async function boot() {
 
   // PHASE 2: Parallel — all remaining data loads simultaneously
 
-  // Pre-cargar intraday JSON ahora (same-origin, ~0ms) para que fetchRiskData
-  // y fetchCrossAssetData lo encuentren en caché cuando lo necesiten.
-  // await garantiza que el JSON esté listo ANTES de que fetchRiskData/fetchCrossAssetData
-  // lo soliciten — evita que cada función haga su propio fetch en paralelo y compitan.
+  // Pre-load intraday JSON now (same-origin, ~0ms) so that fetchRiskData
+  // and fetchCrossAssetData find it in cache when they need it.
+  // await guarantees the JSON is ready BEFORE fetchRiskData/fetchCrossAssetData
+  // request it — prevents each function from issuing its own parallel fetch and racing.
   await loadIntradayQuotes();
 
   // fetchQuoteBarRT popula STOOQ_RT_CACHE (precios RT + hv30).
-  // Se awaita para que populateFxPairsTable encuentre el cache listo al renderizar.
+  // Awaited so populateFxPairsTable finds the RT cache ready when it renders.
   await fetchQuoteBarRT();
   loadFxPerfData().then(() => populateFxPairsTable()); // 1W perf data, re-render when ready
   populateCorrelations(); // 60-day rolling correlations from quotes.json
