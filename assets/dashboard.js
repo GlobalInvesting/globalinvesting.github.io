@@ -392,7 +392,7 @@ function populateFxPairsTable() {
     const prev = computePrevRate(pair);
 
     // 1D change — primary source: RT cache (quotes.json yfinance, real prev_close)
-    // Fallback: ECB Frankfurter (solo si RT cache no está disponible aún)
+    // Fallback: ECB Frankfurter (only if RT cache is not yet available)
     let chg1d = '—', cls1d = 'flat';
     const rtD1 = STOOQ_RT_CACHE[pair.id];
     if (rtD1?.pct != null) {
@@ -428,9 +428,9 @@ function populateFxPairsTable() {
     const ask = rate != null ? fmt(rate + halfSpread, pair.dec) : '—';
     const spreadStr = rate != null ? spreadPips.toFixed(1) : '—';
 
-    // HV30 — volatilidad histórica 30 días calculada por fetch_intraday_quotes.py
+    // HV30 — 30-day historical volatility computed by fetch_intraday_quotes.py
     // Fuente: quotes.json campo hv30 por par, inyectado en STOOQ_RT_CACHE
-    // Reemplaza EST_IV (hardcodeado). Muestra '—' si aún no está disponible.
+    // Replaces hardcoded EST_IV. Shows '—' if not yet available.
     const rtDhv = STOOQ_RT_CACHE[pair.id];
     const hv30val = rtDhv?.hv30 ?? null;
     const ivStr = hv30val != null ? hv30val.toFixed(1) + '%' : '—';
@@ -1150,7 +1150,7 @@ function updateFxPairsTableRT() {
         tds[4].textContent = '—';
         tds[4].className   = 'flat';
       }
-      // HV30: actualizar si el dato está disponible en el cache (columna índice 6)
+      // HV30: update if data is available in cache (column index 6)
       if (tds[6] && data.hv30 != null) {
         tds[6].textContent = data.hv30.toFixed(1) + '%';
       }
@@ -1957,8 +1957,8 @@ async function fetchRiskData() {
   } catch {}
 
   // ── STEP 1.5: Load intraday quotes JSON (GitHub Action — yfinance) ──
-  // Same-origin fetch — instantáneo si boot() ya lo pre-cargó (caché 90s).
-  // Enriquece byId con datos intraday frescos ANTES del primer render.
+  // Same-origin fetch — instant if boot() already pre-loaded it (90s cache).
+  // Enriches byId with fresh intraday data BEFORE the first render.
   const _intradayData = await loadIntradayQuotes();
   if (_intradayData) {
     const _iq = (id) => intradayQuote(_intradayData, id);
@@ -2045,7 +2045,7 @@ async function renderRiskData(byId) {
   }
 
   // EUR/USD HV 30d — primary source: HV30 computed by fetch_intraday_quotes.py
-  // Fallback: proxy VIX × 0.22 (relación empírica documentada)
+  // Fallback: proxy VIX × 0.22 (documented empirical relationship)
   {
     const eurusdHV = STOOQ_RT_CACHE['eurusd']?.hv30 ?? null;
     if (eurusdHV != null && eurusdHV > 1 && eurusdHV < 40) {
@@ -2054,7 +2054,7 @@ async function renderRiskData(byId) {
       const signal = eurusdHV > 10 ? 'Stress elevated' : eurusdHV > 7 ? 'Moderate' : 'Low vol';
       setEl('risk-eurusd-iv-sub', signal + ' · HV 30d');
     } else if (byId.vix) {
-      // Proxy empírico: EUR/USD HV ≈ VIX × 0.22
+      // Empirical proxy: EUR/USD HV ≈ VIX × 0.22
       const estIV = (byId.vix.close * 0.22).toFixed(1);
       const fNum = parseFloat(estIV);
       const cls = fNum > 10 ? 'risk-val down' : fNum > 7 ? 'risk-val' : 'risk-val up';
