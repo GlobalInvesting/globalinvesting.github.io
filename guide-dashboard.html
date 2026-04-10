@@ -801,7 +801,7 @@ a { color: inherit; text-decoration: none; }
       </ul>
 
       <h3>Central Bank Rates</h3>
-      <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the current rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">→ Hold</span>.</p>
+      <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the most recent rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">— Hold</span>. Consistent with Bloomberg Terminal convention, the trend resets to neutral (—) after approximately 90 days without a policy move — regardless of the prior cycle direction.</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Central Bank Rates</span>
@@ -813,14 +813,14 @@ a { color: inherit; text-decoration: none; }
             <th style="padding:3px 6px;">Trend</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoE</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.10%</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hiking</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoC</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">SNB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">RBNZ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--down);text-align:center;">↓ Cutting</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoE</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.75%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.10%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoC</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">SNB</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.00%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">RBNZ</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">—</td></tr>
           </tbody>
         </table>
       </div>
@@ -858,7 +858,7 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <h3>CB Rate Expectations</h3>
-      <p>Forward-looking rate expectations for major central banks at their next scheduled meeting, derived from futures market pricing and analyst consensus. This is distinct from the current rate — it reflects what the market expects to happen next, which is what drives FX pricing at the margin.</p>
+      <p>Forward-looking rate expectations for major central banks at their next scheduled meeting, sourced from OIS and futures market pricing — not analyst forecasts. This is distinct from the current rate: it reflects what the market is pricing for the <em>next</em> decision, which is what drives FX at the margin. When the <code>bias</code> field is absent from the data, the terminal estimates the direction from historical rate trajectory and prefixes the label with <code>~</code> to signal it is an estimate, not a curated market-consensus value.</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CB Rate Expectations</span>
@@ -870,9 +870,9 @@ a { color: inherit; text-decoration: none; }
             <th style="padding:3px 6px;">Fwd Rate</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed · May</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Cut</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">5.00%</td></tr>
-            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB · Apr</td><td style="padding:4px 6px;color:var(--down);text-align:center;">Cut</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.40%</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">BoJ · Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">0.25%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed · 29 Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB · 30 Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.00%</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">BoJ · 28 Apr</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hike</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">1.00%</td></tr>
           </tbody>
         </table>
       </div>
