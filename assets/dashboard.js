@@ -3163,17 +3163,60 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // ═══════════════════════════════════════════════════════════════════
 // CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
 // ═══════════════════════════════════════════════════════════════════
+// Institutional-grade carry ranking aligned with Bloomberg Carry Monitor
+// and JP Morgan GBI conventions:
+//
+//   Primary sort:  carry-to-vol ratio = rate differential / HV30
+//                  (vol-adjusted carry — the industry standard metric)
+//   Secondary col: raw rate differential (basis for the bar width)
+//   Regime badge:  ↑ hiking  ↓ cutting  → hold  for each leg,
+//                  derived from computeCBTrend() — same logic as CB Rates panel
+//   Tooltip:       long rate / short rate / HV30 / carry-to-vol
+//
+// HV30 source: intraday-data/quotes.json → hv30 field per pair (same
+// source used by the main FX table and the pair detail popover).
+// Falls back to gross differential ranking when HV30 unavailable.
+// ═══════════════════════════════════════════════════════════════════
 async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD'];
+
+  // TradingView symbol for a given long/short ccy pair
   function carryTV(long, short) {
     if (short === 'USD') return 'FX_IDC:' + long + 'USD';
     if (long  === 'USD') return 'FX_IDC:USD' + short;
     return 'FX_IDC:' + long + short;
   }
+
+  // Canonical pair ID used in quotes.json / hv30 map (always alphabetical
+  // except USD-majors which follow market convention — same as HV30_FX_PAIRS)
+  function pairId(a, b) {
+    const USD_MAJORS = {
+      'EURUSD':1,'GBPUSD':1,'AUDUSD':1,'NZDUSD':1,
+      'USDJPY':1,'USDCHF':1,'USDCAD':1,
+    };
+    const c1 = a + b, c2 = b + a;
+    if (USD_MAJORS[c1]) return c1.toLowerCase();
+    if (USD_MAJORS[c2]) return c2.toLowerCase();
+    // Cross pairs: alphabetical
+    return (a < b ? a + b : b + a).toLowerCase();
+  }
+
+  // Rate-cycle regime arrow for a currency, derived from STATE.cbRates trend
+  // (same source as the CB Rates panel trend arrow — no double-computation)
+  function regimeArrow(ccy) {
+    const entry = STATE.cbRates?.[ccy.toLowerCase()];
+    if (!entry) return '';
+    const trend = entry.trend; // 'up' | 'down' | 'flat' | undefined
+    if (trend === 'up')   return '<span class="cr-regime cr-hike">↑</span>';
+    if (trend === 'down') return '<span class="cr-regime cr-cut">↓</span>';
+    return '<span class="cr-regime cr-hold">→</span>';
+  }
+
   const container = document.getElementById('carry-rank-rows');
   if (!container) return;
 
   try {
+    // ── 1. CB rates ──────────────────────────────────────────────
     const rates = {};
     await Promise.all(G8.map(async ccy => {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
@@ -3191,32 +3234,99 @@ async function fetchCarryRanking() {
       return;
     }
 
+    // ── 2. HV30 per pair from intraday cache ─────────────────────
+    // quotes.json hv30 field is authoritative — same source used in FX table
+    const intra = await loadIntradayQuotes().catch(() => null);
+    const hv30Map = {};
+    if (intra?.hv30) {
+      Object.assign(hv30Map, intra.hv30);
+    }
+    // Also pull from STOOQ_RT_CACHE (populated by fetchQuoteBarRT) as supplement
+    for (const [id, entry] of Object.entries(STOOQ_RT_CACHE)) {
+      if (entry?.hv30 != null && hv30Map[id] == null) hv30Map[id] = entry.hv30;
+    }
+
+    // ── 3. Build all 28 G8 pairs ─────────────────────────────────
     const allPairs = [];
     for (let i = 0; i < G8.length; i++) {
       for (let j = i + 1; j < G8.length; j++) {
         const a = G8[i], b = G8[j];
         const rA = rates[a] ?? null, rB = rates[b] ?? null;
         if (rA == null || rB == null) continue;
+
         const diff = rA - rB;
-        allPairs.push(diff >= 0
-          ? { long: a, short: b, diff,        rLong: rA, rShort: rB }
-          : { long: b, short: a, diff: -diff,  rLong: rB, rShort: rA });
+        const long  = diff >= 0 ? a : b;
+        const short = diff >= 0 ? b : a;
+        const rLong  = diff >= 0 ? rA : rB;
+        const rShort = diff >= 0 ? rB : rA;
+        const absDiff = Math.abs(diff);
+
+        const pid  = pairId(long, short);
+        const hv30 = hv30Map[pid] ?? null;
+
+        // Carry-to-vol: annualised rate diff / annualised HV30
+        // Interpretation: units of carry earned per unit of realised vol risk
+        // Bloomberg Carry Monitor uses this as primary ranking metric
+        const carryVol = (hv30 != null && hv30 > 0) ? absDiff / hv30 : null;
+
+        allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, pid });
       }
     }
-    allPairs.sort((a, b) => b.diff - a.diff);
+
+    // ── 4. Sort by carry-to-vol (primary); fall back to gross diff ─
+    const hasVolData = allPairs.some(p => p.carryVol != null);
+    allPairs.sort((a, b) => {
+      if (hasVolData) {
+        const cvA = a.carryVol ?? -Infinity;
+        const cvB = b.carryVol ?? -Infinity;
+        return cvB - cvA;
+      }
+      return b.diff - a.diff;
+    });
 
     const top     = allPairs.slice(0, 10);
-    const maxDiff = top[0]?.diff || 1;
+    const maxDiff = Math.max(...top.map(p => p.diff)) || 1;
+    const maxCV   = hasVolData ? (Math.max(...top.map(p => p.carryVol ?? 0)) || 1) : 1;
+
+    // Update panel subtitle to reflect sort method
+    const headSpan = container.closest('.sb-section')
+      ?.querySelector('.sb-head span');
+    if (headSpan) {
+      headSpan.textContent = hasVolData
+        ? 'G8 · carry-to-vol ratio'
+        : 'G8 · CB rate differential';
+    }
 
     container.innerHTML = top.map((p, idx) => {
-      const sym = carryTV(p.long, p.short);
-      const bar = Math.round((p.diff / maxDiff) * 60);
-      const cls = p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim';
-      return `<div class="carry-rank-row" data-sym="${sym}" title="Open ${p.long}/${p.short} chart">
+      const sym  = carryTV(p.long, p.short);
+      // Bar width represents the vol-adjusted carry (or gross diff as fallback)
+      const barVal = hasVolData && p.carryVol != null ? p.carryVol / maxCV : p.diff / maxDiff;
+      const bar    = Math.round(barVal * 60);
+
+      // Color: strong carry-to-vol (>0.3) = green; moderate = neutral; weak = dim
+      const cls = hasVolData && p.carryVol != null
+        ? (p.carryVol > 0.30 ? 'pd-up' : p.carryVol > 0.12 ? '' : 'pd-dim')
+        : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
+
+      const rArrowL = regimeArrow(p.long);
+      const rArrowS = regimeArrow(p.short);
+
+      // Tooltip: full institutional detail (rates, vol, carry-to-vol, regime)
+      const cvStr  = p.carryVol != null ? p.carryVol.toFixed(2) : 'n/a';
+      const hvStr  = p.hv30     != null ? p.hv30.toFixed(1) + '%' : 'n/a';
+      const tip = `${p.long}/${p.short} · Long ${p.rLong.toFixed(2)}% / Short ${p.rShort.toFixed(2)}% · Diff ${p.diff.toFixed(2)}bp · HV30 ${hvStr} · Carry/Vol ${cvStr}`;
+
+      // Display: show carry-to-vol when available, gross diff otherwise
+      const displayVal = hasVolData && p.carryVol != null
+        ? p.carryVol.toFixed(2)
+        : '+' + p.diff.toFixed(2) + '%';
+
+      return `<div class="carry-rank-row" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
+        <span class="cr-regimes">${rArrowL}<span class="cr-regime-sep">/</span>${rArrowS}</span>
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
-        <span class="cr-diff ${cls}">+${p.diff.toFixed(2)}%</span>
+        <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
     }).join('');
 
@@ -3225,89 +3335,6 @@ async function fetchCarryRanking() {
     });
   } catch(e) {
     console.warn('[CarryRanking]', e);
-    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// ETF OPTIONS IV — CBOE / yfinance implied volatility proxies, rightpanel
-// ═══════════════════════════════════════════════════════════════════
-// Tickers sourced from intraday quotes.json (yfinance) where available,
-// with VIX as anchor.  Displays IV alongside 1-day change and a
-// colour-coded percentile bar (high IV = red, low IV = green).
-// ═══════════════════════════════════════════════════════════════════
-const ETF_IV_MANIFEST = [
-  { key:'vix',   label:'VIX',    desc:'S&P 500 30d implied vol (CBOE)',      tvSym:'TVC:VIX'    },
-  { key:'move',  label:'MOVE',   desc:'US Treasury bond vol index (ICE)',     tvSym:'CBOE:MOVE'  },
-  { key:'spx',   label:'SPX',    desc:'S&P 500 index level',                  tvSym:'SP:SPX'     },
-  { key:'gold',  label:'Gold',   desc:'XAU/USD spot (USD/oz)',                tvSym:'FOREXCOM:GOLD'   },
-  { key:'wti',   label:'WTI',    desc:'Crude oil front-month (USD/bbl)',       tvSym:'TVC:USOIL'  },
-  { key:'dxy',   label:'DXY',    desc:'US Dollar Index',                       tvSym:'TVC:DXY'    },
-  { key:'us10y', label:'US 10Y', desc:'US 10-year Treasury yield (%)',         tvSym:'FRED:DGS10' },
-  { key:'btc',   label:'BTC',    desc:'Bitcoin/USD spot',                      tvSym:'BITSTAMP:BTCUSD' },
-];
-
-async function fetchEtfIV() {
-  const container = document.getElementById('etf-iv-rows');
-  if (!container) return;
-
-  try {
-    const intra = await loadIntradayQuotes();
-    // intra.quotes is the primary authoritative source — always populated by loadIntradayQuotes().
-    // STOOQ_RT_CACHE is populated asynchronously by fetchRiskData/fetchCrossAssetData and may be
-    // empty when fetchEtfIV runs on boot. Read quotes directly to avoid the race condition.
-    const q = intra?.quotes || {};
-
-    // Build rows from manifest. Priority: intra.quotes → STOOQ_RT_CACHE → null
-    const rows = ETF_IV_MANIFEST.map(m => {
-      // Direct quotes keys: 'vix' and 'move' are in intra.quotes
-      const fromQuotes = q[m.key];
-      let iv  = fromQuotes?.close ?? STOOQ_RT_CACHE[m.key]?.close ?? null;
-      let chg = fromQuotes?.pct   ?? STOOQ_RT_CACHE[m.key]?.pct   ?? null;
-      return { ...m, iv, chg };
-    }).filter(r => r.iv != null);
-
-    if (!rows.length) {
-      container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Awaiting data…</div>';
-      return;
-    }
-
-    // Percentile bar: scale 0–100 relative to max IV in current set
-    const maxIv = Math.max(...rows.map(r => r.iv));
-
-    container.innerHTML = rows.map(r => {
-      const barW  = Math.round((r.iv / maxIv) * 68);
-      const barCls = r.iv > 30 ? 'etf-iv-bar-high' : r.iv > 18 ? 'etf-iv-bar-mid' : 'etf-iv-bar-low';
-      const chgCls = r.chg == null ? '' : r.chg > 0 ? 'pd-up' : r.chg < 0 ? 'pd-dn' : '';
-      const chgTxt = r.chg != null ? (r.chg >= 0 ? '+' : '') + r.chg.toFixed(1) + '%' : '';
-      return `<div class="etf-iv-row" data-sym="${r.tvSym}" title="${r.desc}">
-        <span class="etf-iv-lbl">${r.label}</span>
-        <div class="etf-iv-bar-wrap"><div class="etf-iv-bar ${barCls}" style="width:${barW}px"></div></div>
-        <span class="etf-iv-val">${r.iv.toFixed(1)}</span>
-        ${chgTxt ? `<span class="etf-iv-chg ${chgCls}">${chgTxt}</span>` : '<span class="etf-iv-chg"></span>'}
-      </div>`;
-    }).join('');
-
-    container.querySelectorAll('.etf-iv-row[data-sym]').forEach(row => {
-      row.style.cursor = 'pointer';
-      row.addEventListener('click', () => loadTVChart(row.dataset.sym));
-    });
-
-    // ── ETF IV panel timestamp ─────────────────────────────────────
-    const ivSub = document.getElementById('etf-iv-panel-sub');
-    if (ivSub) {
-      const now = new Date();
-      const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-      const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-      // Use actual data freshness from quotes.json updated field
-      const fileAge = intra?.updated
-        ? Math.round((Date.now() - new Date(intra.updated).getTime()) / 60000)
-        : null;
-      const ageLabel = fileAge != null ? ` · data ${fileAge}min ago` : '';
-      ivSub.textContent = `ETF options · CBOE · yfinance · updated ${hhmm} ${tzAbbr}${ageLabel}`;
-    }
-  } catch(e) {
-    console.warn('[EtfIV]', e);
     if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
   }
 }

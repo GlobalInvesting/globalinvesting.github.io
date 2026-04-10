@@ -580,11 +580,17 @@
   .sb-sym { flex-shrink: 0; }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
-  .carry-rank-row { display:grid; grid-template-columns:12px 52px 1fr 40px; align-items:center; gap:3px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row { display:grid; grid-template-columns:12px 52px 28px 1fr 40px; align-items:center; gap:3px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
   .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; }
+  .cr-regimes { display:flex; align-items:center; gap:0; font-size:9px; white-space:nowrap; }
+  .cr-regime { font-size:9px; font-weight:700; line-height:1; }
+  .cr-hike  { color:var(--up); }
+  .cr-cut   { color:var(--down); }
+  .cr-hold  { color:var(--text3); }
+  .cr-regime-sep { color:var(--text3); font-size:8px; margin:0 1px; }
   .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; }
