@@ -299,19 +299,7 @@
      restored on iframe so chart pan/zoom/interaction still works */
   #tv-chart-wrap { pointer-events:none; }
 
-  /* ── STICKY PRICE CHART ──────────────────────────────────────────
-     Anchors the Price Chart panel to the top of #main while the user
-     scrolls through COT, Sessions, and lower panels — exactly the
-     Bloomberg paradigm of a persistent chart alongside data panels.
-     z-index:10 keeps it above scrolling content; must stay below
-     #topbar (z-index:200) and popovers (z-index:1000+).           */
-  #section-fxpairs {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--bg);
-  }
+
 
   .panel-head {
     background: var(--head-bg);
