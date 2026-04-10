@@ -2610,9 +2610,19 @@ function loadTVChart(sym) {
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll chart into view
-  const chartSection = document.getElementById('section-chart') || wrap.closest('.panel') || wrap;
-  chartSection.scrollIntoView({ behavior:'smooth', block:'start' });
+  // #section-fxpairs is sticky — chart is always visible once the user has
+  // scrolled past the top. Only scroll to top when the chart panel itself
+  // is currently out of the sticky viewport (i.e. user is above it).
+  const chartPanel = document.getElementById('section-fxpairs');
+  if (chartPanel) {
+    const rect = chartPanel.getBoundingClientRect();
+    // If the panel top is above the topbar (rect.top < 0 would mean scrolled past it,
+    // but sticky keeps it at top:0 so rect.top === 0 when stuck).
+    // Only force-scroll when the user is above the chart panel (not yet scrolled to it).
+    if (rect.top > 60) {
+      chartPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
   setTimeout(minimizeTVLegend, 3000);
 }
 
