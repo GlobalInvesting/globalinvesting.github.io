@@ -52,6 +52,10 @@ on:
   # quotes.json → git rebase fallaba las 4 veces → exit 1 → email de fallo repetido.
   # cron-job.org es suficiente como reloj primario. Si falla, el gap máximo es
   # el intervalo configurado en cron-job.org (5 min) — completamente aceptable.
+  #
+  # (v7.14.5): el exit 1 del paso de push fue reemplazado por exit 0.
+  # Un fallo de push no es fatal: el siguiente run (5 min) trae datos frescos.
+  # exit 1 → GitHub envía email de fallo; exit 0 → silencioso. Sin impacto en datos.
 
   workflow_dispatch:                   # trigger manual desde GitHub UI
 
@@ -123,5 +127,8 @@ jobs:
             fi
           done
 
-          echo "❌ All push attempts failed — will retry on next scheduled run."
-          exit 1
+          # Exit 0 (not 1) — a push failure is not fatal: the next cron-job.org
+          # dispatch (5 min) will bring fresh data. Exiting with 1 sends GitHub
+          # failure-notification emails on every collision, which pollutes the inbox.
+          echo "⚠️  All push attempts failed — data will refresh on next run (no email sent)."
+          exit 0
