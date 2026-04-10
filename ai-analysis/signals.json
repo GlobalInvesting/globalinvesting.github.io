@@ -1,42 +1,42 @@
 [
   {
-    "time": "22:00",
+    "time": "02:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.98 resistance, BoJ intervention risk elevated if pair breaks 160.00",
+    "text": "BoJ intervention risk elevated as USD/JPY tests 159.14 resistance, watch 160.00 psychological level",
     "evidence": [
-      "USD/JPY: 158.978",
-      "BoJ rate: 0.75% (ON HOLD)",
+      "USD/JPY: 159.138",
+      "BoJ rate: 0.75%",
       "VIX: 19.5"
     ]
   },
   {
-    "time": "21:58",
+    "time": "02:42",
     "priority": "warning",
-    "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading near 0.7072, retail sentiment at 87% short, watch for contrarian reversal risk",
     "evidence": [
-      "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2% (CUTTING)",
-      "EUR/USD: 1.17040"
+      "AUD/USD: 0.70720",
+      "AUD net positioning: +43,837",
+      "Retail AUD/USD sentiment: 13% long / 87% short"
     ]
   },
   {
-    "time": "21:55",
+    "time": "02:38",
     "priority": "warning",
-    "title": "Cross-Asset Correlation Break",
-    "text": "USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function, watch for regime shift",
+    "title": "USD/JPY vs VIX",
+    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven, z=+1.55σ",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.659",
-      "norm=+0.059",
-      "z=+1.55σ"
+      "USD/JPY vs VIX corr: +0.658",
+      "z-score: +1.55σ",
+      "VIX: 19.5"
     ]
   },
   {
-    "time": "21:48",
+    "time": "02:30",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.5 signals low volatility — risk-on environment, but watch for regime shift",
+    "text": "VIX at 19.5 signals normal volatility, not a risk-on environment, watch for regime shifts",
     "evidence": [
       "VIX: 19.5",
       "S&P 500: 6,825",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "21:42",
+    "time": "02:25",
     "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "AUD/USD 88% short, watch for potential squeeze as retail is heavily positioned",
+    "title": "CB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING), 175bp spread continues to weigh on EUR/USD",
     "evidence": [
-      "AUD/USD: 0.70830",
-      "AUD/USD sentiment: 88% short",
-      "CFTC AUD net: +43,837"
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (CUTTING)",
+      "EUR/USD: 1.16950"
     ]
   }
 ]
