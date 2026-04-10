@@ -47,8 +47,11 @@ on:
   repository_dispatch:
     types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
 
-  schedule:
-    - cron: '*/15 * * * *'             # fallback cada 15 min — red de seguridad si cron-job.org falla
+  # schedule eliminado (v7.14.4): el cron de GitHub cada 15 min colisionaba con
+  # cron-job.org cada 5 min → dos runs simultáneos intentaban push al mismo
+  # quotes.json → git rebase fallaba las 4 veces → exit 1 → email de fallo repetido.
+  # cron-job.org es suficiente como reloj primario. Si falla, el gap máximo es
+  # el intervalo configurado en cron-job.org (5 min) — completamente aceptable.
 
   workflow_dispatch:                   # trigger manual desde GitHub UI
 
