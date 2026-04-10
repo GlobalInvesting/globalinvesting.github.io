@@ -578,23 +578,58 @@ function populateHeatmap() {
 
 /**
  * Compute CB trend direction dynamically from rates/*.json observations.
- * Compares latest rate vs 2 observations back (~2 months).
+ * Uses two-layer logic matching the workflow bias detection standard:
+ *
+ * Layer 1 — Recent momentum: did the rate move in the last ~90 days?
+ *   If obs[0] is older than PAUSE_DAYS, skip — stale data should not imply trend.
+ *   If rate rose vs obs[1] or obs[2] → 'up'. If fell → 'down'.
+ *
+ * Layer 2 — Pause detection: if the rate has been flat for PAUSE_DAYS or more,
+ *   return 'flat' regardless of the longer-run direction.
+ *   This prevents the ECB (last cut Jun 2025, ~10 months ago) from showing ↓.
+ *
  * Returns 'up' | 'down' | 'flat'.
- * - Any cut  (diff ≤ -0.05pp) → 'down'
- * - Any hike (diff ≥ +0.05pp) → 'up'
- * - No change or data gap > 6 months → 'flat'
  */
 function computeCBTrend(obs) {
-  if (!obs || obs.length < 3) return 'flat';
+  if (!obs || obs.length < 2) return 'flat';
+  const PAUSE_DAYS = 90;  // 3 months — consistent with workflow PAUSE_MONTHS = 3
+  const today = new Date();
+
   const latest = parseFloat(obs[0].value);
-  const ref    = parseFloat(obs[Math.min(2, obs.length - 1)].value);
-  if (isNaN(latest) || isNaN(ref)) return 'flat';
-  // Guard: if the two observations are more than 180 days apart, data is stale — don't infer
-  const d0 = new Date(obs[0].date), dN = new Date(obs[Math.min(2, obs.length - 1)].date);
-  if ((d0 - dN) / 86400000 > 180) return 'flat';
-  const diff = latest - ref;
-  if (diff <= -0.05) return 'down';
-  if (diff >=  0.05) return 'up';
+  if (isNaN(latest)) return 'flat';
+
+  // Age of the most recent data point in days
+  const d0 = new Date(obs[0].date);
+  const dataAgeDays = (today - d0) / 86400000;
+
+  const r1 = obs.length > 1 ? parseFloat(obs[1].value) : latest;
+  const r2 = obs.length > 2 ? parseFloat(obs[2].value) : r1;
+
+  // Layer 1: only apply momentum if the data is recent enough
+  if (dataAgeDays <= PAUSE_DAYS) {
+    const recentUp   = latest > r1 || latest > r2;
+    const recentDown = latest < r1 || latest < r2;
+    if (recentUp  && !recentDown) return 'up';
+    if (recentDown && !recentUp)  return 'down';
+  }
+
+  // Layer 2: count consecutive flat months from obs[0]
+  let flatMonths = 0;
+  for (let i = 1; i < obs.length; i++) {
+    if (parseFloat(obs[i].value) === latest) flatMonths++;
+    else break;
+  }
+  // effective flat = max(consecutive flat periods, data age in months − 1)
+  const dataAgeMonths = Math.floor(dataAgeDays / 30);
+  const effectiveFlat = Math.max(flatMonths, dataAgeMonths - 1);
+  if (effectiveFlat >= 3) return 'flat';
+
+  // Short pause: use 6-obs trend direction as tiebreaker
+  const oldest = parseFloat(obs[Math.min(5, obs.length - 1)].value);
+  if (!isNaN(oldest)) {
+    if (latest - oldest >=  0.05) return 'up';
+    if (latest - oldest <= -0.05) return 'down';
+  }
   return 'flat';
 }
 
