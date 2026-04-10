@@ -720,7 +720,52 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <h3>Carry Trade — Top Pairs</h3>
-      <p>A ranked list of the highest-yielding carry trade pair candidates, computed from current central bank rate differentials. A carry trade borrows a low-rate currency (historically JPY or CHF) and buys a high-rate currency (historically AUD or NZD). This section shows the net rate differential for the top pairs at current CB policy rates. See <a href="about.html" style="color:var(--blue);">data sources</a> for context.</p>
+      <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric used in Bloomberg's Carry Monitor and JP Morgan GBI: rate differential divided by realised 30-day historical volatility (HV30). This is a vol-adjusted carry measure that reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
+      <p>Each row shows a regime badge for both legs of the pair (↑ hiking · ↓ cutting · → hold), derived from the same central bank trend logic used in the CB Rates panel. Clicking any row opens the pair chart in TradingView. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
+      <!-- MOCK: Carry Trade Ranking — v7.14.0 institutional layout with carry-to-vol + regime badges -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:280px;font-size:11px;">
+        <div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:6px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-ui);">Carry Trade Ranking</span>
+          <span style="font-size:9px;color:var(--text3);">G8 · carry-to-vol ratio</span>
+        </div>
+        <!-- rows: rank / pair / regime badges / bar / carry-to-vol value -->
+        <div style="display:grid;grid-template-columns:12px 52px 28px 1fr 40px;align-items:center;gap:3px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);font-size:11px;cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">1</span>
+          <span style="font-weight:700;color:var(--text);">AUD/JPY</span>
+          <span style="display:flex;align-items:center;font-size:9px;"><span style="color:var(--up);font-weight:700;">↑</span><span style="color:var(--text3);font-size:8px;margin:0 1px;">/</span><span style="color:var(--down);font-weight:700;">↓</span></span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:60px;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:10px;text-align:right;color:var(--up);">0.52</span>
+        </div>
+        <div style="display:grid;grid-template-columns:12px 52px 28px 1fr 40px;align-items:center;gap:3px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);font-size:11px;cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">2</span>
+          <span style="font-weight:700;color:var(--text);">NZD/JPY</span>
+          <span style="display:flex;align-items:center;font-size:9px;"><span style="color:var(--text3);font-weight:700;">→</span><span style="color:var(--text3);font-size:8px;margin:0 1px;">/</span><span style="color:var(--down);font-weight:700;">↓</span></span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:50px;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:10px;text-align:right;color:var(--up);">0.43</span>
+        </div>
+        <div style="display:grid;grid-template-columns:12px 52px 28px 1fr 40px;align-items:center;gap:3px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);font-size:11px;cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">3</span>
+          <span style="font-weight:700;color:var(--text);">USD/JPY</span>
+          <span style="display:flex;align-items:center;font-size:9px;"><span style="color:var(--text3);font-weight:700;">→</span><span style="color:var(--text3);font-size:8px;margin:0 1px;">/</span><span style="color:var(--down);font-weight:700;">↓</span></span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:42px;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:10px;text-align:right;color:var(--up);">0.36</span>
+        </div>
+        <div style="display:grid;grid-template-columns:12px 52px 28px 1fr 40px;align-items:center;gap:3px;padding:4px 8px;border-bottom:1px solid var(--border);font-family:var(--font-ui);font-size:11px;cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">4</span>
+          <span style="font-weight:700;color:var(--text);">CAD/JPY</span>
+          <span style="display:flex;align-items:center;font-size:9px;"><span style="color:var(--text3);font-weight:700;">→</span><span style="color:var(--text3);font-size:8px;margin:0 1px;">/</span><span style="color:var(--down);font-weight:700;">↓</span></span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:35px;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:10px;text-align:right;">0.28</span>
+        </div>
+        <div style="display:grid;grid-template-columns:12px 52px 28px 1fr 40px;align-items:center;gap:3px;padding:4px 8px;font-family:var(--font-ui);font-size:11px;cursor:pointer;">
+          <span style="font-size:9px;color:var(--text3);font-family:monospace;">5</span>
+          <span style="font-weight:700;color:var(--text);">GBP/JPY</span>
+          <span style="display:flex;align-items:center;font-size:9px;"><span style="color:var(--text3);font-weight:700;">→</span><span style="color:var(--text3);font-size:8px;margin:0 1px;">/</span><span style="color:var(--down);font-weight:700;">↓</span></span>
+          <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--up);border-radius:2px;opacity:.7;width:28px;max-width:100%;"></div></div>
+          <span style="font-family:monospace;font-size:10px;text-align:right;color:var(--text3);">0.19</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">Color coding: <span style="color:var(--up);">green</span> = carry-to-vol &gt; 0.30 (strong), neutral = 0.12–0.30, <span style="color:var(--text3);">dim</span> = &lt; 0.12 (weak). Regime badges: <span style="color:var(--up);font-weight:700;">↑</span> hiking · <span style="color:var(--down);font-weight:700;">↓</span> cutting · <span style="color:var(--text3);font-weight:700;">→</span> hold.</p>
       <h3>Upcoming Events</h3>
       <p>A TradingView economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times in UTC. Use this to anticipate volatility windows before they arrive.</p>
     </div>
