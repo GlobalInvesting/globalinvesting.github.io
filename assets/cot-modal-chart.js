@@ -108,11 +108,6 @@
 }
 #p-net.on .cot-cw > .cot-chart-area,
 #p-split.on .cot-cw > .cot-chart-area { position:relative; }
-/* Chart.js sets inline style height/width on the canvas — override with !important */
-#c-net, #c-split {
-  width: 100% !important;
-  height: 100% !important;
-}
 
 /* Participants: chart has fixed height, description scrolls below */
 #p-participants.on { overflow-y:auto; }
@@ -665,14 +660,20 @@ function openCOTModal(ccy, data) {
 
     if (tabId === 'net') {
       const cv = document.getElementById('c-net');
-      if (cv) _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }]);
+      if (cv) {
+        const chart = _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }]);
+        if (chart) { const r = cv.parentElement.getBoundingClientRect(); chart.resize(r.width, r.height); }
+      }
     }
     if (tabId === 'split') {
       const cv = document.getElementById('c-split');
-      if (cv) _lineChart(cv, labels, [
-        { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,.08)', fill: true, tension: .3, pointRadius: 2 },
-        { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,.08)',  fill: true, tension: .3, pointRadius: 2 },
-      ]);
+      if (cv) {
+        const chart = _lineChart(cv, labels, [
+          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,.08)', fill: true, tension: .3, pointRadius: 2 },
+          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,.08)',  fill: true, tension: .3, pointRadius: 2 },
+        ]);
+        if (chart) { const r = cv.parentElement.getBoundingClientRect(); chart.resize(r.width, r.height); }
+      }
     }
     if (tabId === 'participants') {
       const cv = document.getElementById('c-part');
