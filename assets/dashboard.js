@@ -701,6 +701,17 @@ const COT_TV_SYMBOLS = {
   NZD: 'COT3:112741_FO_LMP_L',
   USD: 'COT3:098662_FO_LMP_L',
 };
+// Short counterparts (same contract codes, suffix _FO_LMP_S)
+const COT_TV_SYMBOLS_SHORT = {
+  EUR: 'COT3:099741_FO_LMP_S',
+  GBP: 'COT3:096742_FO_LMP_S',
+  JPY: 'COT3:097741_FO_LMP_S',
+  AUD: 'COT3:232741_FO_LMP_S',
+  CAD: 'COT3:090741_FO_LMP_S',
+  CHF: 'COT3:092741_FO_LMP_S',
+  NZD: 'COT3:112741_FO_LMP_S',
+  USD: 'COT3:098662_FO_LMP_S',
+};
 
 // Formats Open Interest as abbreviated number: 193390 → "193k", 1200000 → "1.2M"
 function fmtOI(n) {
@@ -843,11 +854,11 @@ async function fetchCOTData() {
       + '</div>';
   }).join('');
 
-  // Click any COT row → load its COT chart in the embedded TV widget
+  // Click any COT row → load its COT chart (Long + Short overlaid on same scale)
   container.querySelectorAll('.cot-row[data-sym]').forEach(row => {
     row.addEventListener('click', () => {
       const sym = row.dataset.sym;
-      if (sym) loadTVChart(sym);
+      if (sym) loadCOTChart(sym);
     });
   });
 }
@@ -2620,6 +2631,58 @@ window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDr
 
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// loadCOTChart — COT Long+Short overlaid on same scale in TV widget
+// ═══════════════════════════════════════════════════════════════════
+function loadCOTChart(longSym) {
+  // Derive Short symbol: replace trailing _L with _S
+  const shortSym = longSym.replace(/_L$/, '_S');
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const container = document.createElement('div');
+  container.className = 'tradingview-widget-container';
+  container.style.cssText = 'height:100%;width:100%;';
+  const widget = document.createElement('div');
+  widget.className = 'tradingview-widget-container__widget';
+  widget.style.cssText = 'height:100%;width:100%;';
+  container.appendChild(widget);
+  const copyright = document.createElement('div');
+  copyright.className = 'tradingview-widget-copyright';
+  copyright.style.display = 'none';
+  container.appendChild(copyright);
+  const script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
+  script.text = JSON.stringify({
+    allow_symbol_change: false,
+    calendar: false,
+    details: false,
+    hide_side_toolbar: true,
+    hide_top_toolbar: true,
+    hide_legend: false,
+    hide_volume: true,
+    interval: 'W',
+    locale: 'en',
+    save_image: true,
+    style: '3',
+    symbol: longSym,
+    theme: 'dark',
+    timezone: 'Etc/UTC',
+    backgroundColor: '#0F0F0F',
+    gridColor: 'rgba(242, 242, 242, 0.06)',
+    withdateranges: false,
+    compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
+    studies: [],
+    autosize: true,
+  });
+  container.appendChild(script);
+  wrap.appendChild(container);
+  // Scroll chart into view
+  const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
+  chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // SHARED: load any symbol into the TradingView chart + scroll to it
 // ═══════════════════════════════════════════════════════════════════
 function loadTVChart(sym) {
