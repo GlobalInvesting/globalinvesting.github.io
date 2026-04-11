@@ -25,7 +25,7 @@
   border:1px solid rgba(255,255,255,.1);
   border-radius:10px;
   width:min(920px,100%);
-  max-height:90vh;
+  height:min(680px,90vh);
   display:flex;flex-direction:column;
   overflow:hidden;
   animation:cot-su .2s ease;
@@ -67,7 +67,9 @@
   display:flex;padding:0 18px;
   border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;overflow-x:auto;
+  scrollbar-width:none;
 }
+#cot-m-tabs::-webkit-scrollbar { display:none; }
 .cot-tab {
   font-size:11px;padding:9px 13px;cursor:pointer;
   color:var(--text3,#6b7280);border-bottom:2px solid transparent;
@@ -77,30 +79,35 @@
 .cot-tab:hover { color:var(--text2,#9096a0); }
 .cot-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
 
-/* Body */
+/* Body: always fills remaining height, never changes size between tabs */
 #cot-m-body {
-  overflow-y:auto;flex:1;padding:14px 16px;
+  flex:1;min-height:0;
+  overflow-y:auto;
+  padding:14px 16px;
+  display:flex;flex-direction:column;
   scrollbar-width:thin;
   scrollbar-color:rgba(255,255,255,.12) transparent;
-  display:flex;flex-direction:column;
 }
 #cot-m-body::-webkit-scrollbar { width:5px; }
 #cot-m-body::-webkit-scrollbar-track { background:transparent; }
 #cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
 
-/* Panels: hidden by default; single-chart panels fill the body */
-.cot-panel { display:none;flex:1;flex-direction:column; }
-.cot-panel.on { display:flex; }
+/* All panels fill the body completely */
+.cot-panel { display:none; }
+.cot-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
 
-/* Multi-section panels (Overview, Participants, History) scroll normally */
-#p-overview.on, #p-participants.on, #p-history.on { display:block;flex:none; }
+/* Multi-section panels scroll their own content */
+#p-overview.on, #p-history.on { display:block; }
 
-/* Single-chart panels: cot-cw and canvas both stretch to fill */
-#p-net.on .cot-cw, #p-split.on .cot-cw {
-  flex:1;display:flex;flex-direction:column;margin-bottom:0;
+/* Single-chart panels: chart wrapper and canvas fill remaining space */
+#p-net.on .cot-cw,
+#p-split.on .cot-cw,
+#p-participants.on .cot-cw:first-child {
+  flex:1;display:flex;flex-direction:column;margin-bottom:0;min-height:0;
 }
 #p-net.on .cot-cw > div,
-#p-split.on .cot-cw > div { flex:1;min-height:0; }
+#p-split.on .cot-cw > div,
+#p-participants.on .cot-cw:first-child > div { flex:1;min-height:0; }
 
 /* Chart wrapper */
 .cot-cw {
@@ -108,7 +115,7 @@
   border:1px solid rgba(255,255,255,.06);
   border-radius:6px;padding:12px 14px;margin-bottom:10px;
 }
-.cot-ct { font-size:10px;color:var(--text2,#9096a0);margin-bottom:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.03em; }
+.cot-ct { font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.03em; }
 
 /* Gauge */
 .cot-gauge-track {
@@ -172,8 +179,7 @@
 @media(max-width:600px) {
   #cot-m-metrics { grid-template-columns:repeat(3,1fr); }
   .cot-mm-val { font-size:11px; }
-}
-`;
+}`;
   document.head.appendChild(s);
 })();
 
@@ -237,9 +243,8 @@ const _chartDefaults = {
   layout: { padding: { top: 8, right: 4, bottom: 0, left: 0 } },
   plugins: {
     legend: {
-      position: 'top',
-      align: 'start',
-      labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 12, padding: 16 }
+      position: 'top', align: 'start',
+      labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 14, padding: 14 }
     },
     tooltip: {
       backgroundColor: '#1e222d', titleColor: '#d1d4dc', bodyColor: '#9096a0',
@@ -599,7 +604,36 @@ function openCOTModal(ccy, data) {
         const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 }];
         if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [4, 4], borderWidth: 2 });
         if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [2, 4], borderWidth: 2 });
-        _lineChart(cv, labels, ds);
+        // Custom inline legend drawn inside the chart area — prevents Chart.js legend from stealing horizontal space
+        const inlineLegend = {
+          id: 'inlineLegend',
+          afterDraw(chart) {
+            const { ctx, chartArea } = chart;
+            const x0 = chartArea.left + 8;
+            let x = x0;
+            const y = chartArea.top + 10;
+            ctx.save();
+            ctx.font = `10px 'JetBrains Mono','Courier New',monospace`;
+            chart.data.datasets.forEach(ds => {
+              ctx.setLineDash(ds.borderDash || []);
+              ctx.strokeStyle = ds.borderColor;
+              ctx.lineWidth = 2;
+              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 20, y); ctx.stroke();
+              ctx.setLineDash([]);
+              ctx.fillStyle = '#9096a0';
+              ctx.fillText(ds.label, x + 24, y + 4);
+              x += ctx.measureText(ds.label).width + 52;
+            });
+            ctx.restore();
+          }
+        };
+        const cfg = JSON.parse(JSON.stringify(_chartDefaults));
+        cfg.type = 'line';
+        cfg.data = { labels, datasets: ds };
+        cfg.plugins.legend = { display: false };
+        cfg.layout = { padding: { top: 28, right: 4, bottom: 0, left: 0 } };
+        const c = new Chart(cv, { ...cfg, plugins: [inlineLegend] });
+        _cotCharts.push(c);
       }
     }
   }
