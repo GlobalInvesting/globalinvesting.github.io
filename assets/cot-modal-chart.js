@@ -629,12 +629,25 @@ function openCOTModal(ccy, data) {
             ctx.restore();
           }
         };
-        const cfg = JSON.parse(JSON.stringify(_chartDefaults));
-        cfg.type = 'line';
-        cfg.data = { labels, datasets: ds };
-        cfg.plugins.legend = { display: false };
-        cfg.layout = { padding: { top: 28, right: 4, bottom: 0, left: 0 } };
-        const c = new Chart(cv, { ...cfg, plugins: [inlineLegend] });
+        // Build config explicitly — do NOT use spread `{ ...cfg, plugins: [inlineLegend] }`
+        // because that overwrites cfg.plugins (an options-level object) with the plugins array,
+        // making Chart.js restore the native legend. The correct Chart.js API separates
+        // `options.plugins` (configuration) from top-level `plugins` (plugin instances).
+        const partCfg = JSON.parse(JSON.stringify(_chartDefaults));
+        const c = new Chart(cv, {
+          type: 'line',
+          data: { labels, datasets: ds },
+          options: {
+            responsive: partCfg.responsive,
+            maintainAspectRatio: partCfg.maintainAspectRatio,
+            animation: partCfg.animation,
+            interaction: partCfg.interaction,
+            layout: { padding: { top: 28, right: 4, bottom: 0, left: 0 } },
+            plugins: { legend: { display: false }, tooltip: partCfg.plugins.tooltip },
+            scales: partCfg.scales
+          },
+          plugins: [inlineLegend]
+        });
         _cotCharts.push(c);
       }
     }
