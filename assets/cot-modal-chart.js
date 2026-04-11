@@ -78,7 +78,14 @@
 .cot-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
 
 /* Body */
-#cot-m-body { overflow-y:auto;flex:1;padding:14px 16px; }
+#cot-m-body {
+  overflow-y:auto;flex:1;padding:14px 16px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
+}
+#cot-m-body::-webkit-scrollbar { width:5px; }
+#cot-m-body::-webkit-scrollbar-track { background:transparent; }
+#cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
 .cot-panel { display:none; }
 .cot-panel.on { display:block; }
 
@@ -214,6 +221,7 @@ const _chartDefaults = {
   responsive: true, maintainAspectRatio: false,
   animation: { duration: 350 },
   interaction: { mode: 'index', intersect: false },
+  layout: { padding: { top: 8, right: 4, bottom: 0, left: 0 } },
   plugins: {
     legend: { labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 12, padding: 10 } },
     tooltip: {
@@ -461,7 +469,7 @@ function openCOTModal(ccy, data) {
     <div id="p-split" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
-        <div style="height:260px"><canvas id="c-split"></canvas></div>
+        <div style="height:320px"><canvas id="c-split"></canvas></div>
       </div>
     </div>
 
@@ -469,7 +477,7 @@ function openCOTModal(ccy, data) {
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LF vs AM vs DEALER · NET BY CATEGORY</div>
-        <div style="height:260px"><canvas id="c-part"></canvas></div>
+        <div style="height:300px;padding-bottom:4px"><canvas id="c-part"></canvas></div>
       </div>
       <div class="cot-cw">
         <div style="font-size:10px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.7">
@@ -484,7 +492,7 @@ function openCOTModal(ccy, data) {
     <div id="p-history" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">WEEKLY HISTORY · ${nWks} WEEKS</div>
-        <div style="overflow-x:auto">
+        <div style="overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent">
           <table class="cot-tbl" aria-label="Weekly COT history">
             <thead><tr>
               <th scope="col">Week</th><th scope="col">Net LF</th><th scope="col">WoW Δ</th><th scope="col">Longs</th><th scope="col">Shorts</th><th scope="col">Long%</th><th scope="col">Net%OI</th><th scope="col">AM Net</th><th scope="col">Dealer</th>
@@ -571,9 +579,9 @@ function openCOTModal(ccy, data) {
     if (tabId === 'participants') {
       const cv = document.getElementById('c-part');
       if (cv) {
-        const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: 'var(--blue,#4f7fff)', backgroundColor: 'transparent', tension: .3, pointRadius: 2 }];
-        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [4, 4] });
-        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: 'var(--down,#ef5350)', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [2, 4] });
+        const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 }];
+        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [4, 4], borderWidth: 2 });
+        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [2, 4], borderWidth: 2 });
         _lineChart(cv, labels, ds);
       }
     }

@@ -843,7 +843,7 @@ async function fetchCOTData() {
     // TradingView COT chart symbol for row click
     const tvSym = COT_TV_SYMBOLS[d.ccy] || '';
 
-    return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" data-ccy="' + d.ccy + '" title="Click to open ' + d.ccy + ' COT chart">'
+    return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" data-ccy="' + d.ccy + '" title="Click to open ' + d.ccy + ' COT positioning detail">'
       + '<span class="cot-sym">' + d.ccy + '</span>'
       + '<div class="cot-bar-outer">'
       + '<div class="cot-long-fill" style="width:' + longPct + '%"></div>'
