@@ -1,7 +1,16 @@
 {
-  "updated": "2026-04-11T15:00:24Z",
+  "updated": "2026-04-11T15:05:25Z",
   "source": "mixed",
   "quotes": {
+    "vix": {
+      "close": 19.23,
+      "prev_close": 19.49,
+      "chg": -0.26,
+      "pct": -1.334,
+      "high": 20.28,
+      "low": 18.83,
+      "source": "yfinance"
+    },
     "spx": {
       "close": 6816.89,
       "prev_close": 6824.66,
@@ -110,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 72746.875,
+      "close": 72735.78,
       "prev_close": 72974.195,
-      "chg": -144.1328,
-      "pct": -0.1977,
+      "chg": -249.9531,
+      "pct": -0.3425,
       "high": 73083.59,
       "low": 72624.25,
       "source": "yfinance"
@@ -424,14 +433,6 @@
       "low": 0.4589,
       "source": "yfinance",
       "hv30": 8.02
-    },
-    "vix": {
-      "close": 19.49,
-      "prev_close": 19.49,
-      "chg": 0,
-      "pct": 0,
-      "source": "repo",
-      "stale": true
     }
   },
   "hv30": {
