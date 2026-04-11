@@ -99,15 +99,17 @@
 /* Multi-section panels scroll their own content */
 #p-overview.on, #p-history.on { display:block; }
 
-/* Single-chart panels: chart wrapper and canvas fill remaining space */
+/* Net Position and Long/Short: single-chart panels fill entire body */
 #p-net.on .cot-cw,
-#p-split.on .cot-cw,
-#p-participants.on .cot-cw:first-child {
+#p-split.on .cot-cw {
   flex:1;display:flex;flex-direction:column;margin-bottom:0;min-height:0;
 }
-#p-net.on .cot-cw > div,
-#p-split.on .cot-cw > div,
-#p-participants.on .cot-cw:first-child > div { flex:1;min-height:0; }
+#p-net.on .cot-cw > .cot-chart-area,
+#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0;position:relative; }
+
+/* Participants: chart has fixed height, description scrolls below */
+#p-participants.on { overflow-y:auto; }
+#p-participants .cot-chart-area { height:260px;position:relative; }
 
 /* Chart wrapper */
 .cot-cw {
@@ -483,7 +485,7 @@ function openCOTModal(ccy, data) {
     <div id="p-net" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div>
-        <div><canvas id="c-net"></canvas></div>
+        <div class="cot-chart-area"><canvas id="c-net"></canvas></div>
       </div>
     </div>
 
@@ -491,7 +493,7 @@ function openCOTModal(ccy, data) {
     <div id="p-split" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
-        <div><canvas id="c-split"></canvas></div>
+        <div class="cot-chart-area"><canvas id="c-split"></canvas></div>
       </div>
     </div>
 
@@ -499,7 +501,7 @@ function openCOTModal(ccy, data) {
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LF vs AM vs DEALER · NET BY CATEGORY</div>
-        <div style="height:300px;padding-bottom:4px"><canvas id="c-part"></canvas></div>
+        <div class="cot-chart-area"><canvas id="c-part"></canvas></div>
       </div>
       <div class="cot-cw">
         <div style="font-size:10px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.7">
