@@ -48,8 +48,8 @@ jobs:
           echo "========================================"
           echo "COT HISTORICAL BACKFILL -- 52 weeks"
           echo "Source: CFTC annual TFF ZIP files"
-          echo "  Options+Futures: fin_com_txt_YYYY.zip"
-          echo "  Futures Only:    fin_fut_txt_YYYY.zip"
+          echo "  Options+Futures: com_fin_txt_YYYY.zip"
+          echo "  Futures Only:    fut_fin_txt_YYYY.zip"
           echo "========================================"
           python3 cot_backfill_52w.py --verbose
 
