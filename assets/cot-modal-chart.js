@@ -179,8 +179,45 @@
 .badge-ok   { background:rgba(38,166,154,.12);color:var(--up,#26a69a); }
 
 @media(max-width:600px) {
+  /* Modal: use full screen on mobile with small inset */
+  #cot-bd { padding:0; align-items:flex-end; }
+  #cot-modal {
+    width:100%;
+    height:92vh;
+    border-radius:12px 12px 0 0;
+    border-bottom:none;
+  }
+
+  /* Header: tighter padding, title on one line */
+  #cot-m-hd { padding:10px 14px 9px; }
+  #cot-m-title { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100% - 36px); }
+  #cot-m-sub { font-size:9px; }
+
+  /* Metrics: 3 columns, 2 rows, tighter cells */
   #cot-m-metrics { grid-template-columns:repeat(3,1fr); }
+  .cot-mm { padding:7px 10px; }
   .cot-mm-val { font-size:11px; }
+  .cot-mm-lbl { font-size:8px; }
+  .cot-mm-sub { font-size:8px; }
+
+  /* Tabs: smaller font so all 5 fit */
+  #cot-m-tabs { padding:0 10px; }
+  .cot-tab { font-size:10px; padding:8px 9px; }
+
+  /* Body: tighter padding */
+  #cot-m-body { padding:10px 10px; }
+  .cot-cw { padding:10px 10px; }
+  .cot-ct { font-size:9px; }
+
+  /* Overview Participants table: scroll horizontally instead of clipping */
+  #p-overview .cot-cw:last-child { overflow-x:auto; }
+  #p-overview .cot-tbl { min-width:420px; }
+
+  /* History table: always scroll horizontally */
+  #p-history .cot-cw div { overflow-x:auto; }
+  #p-history .cot-tbl { min-width:560px; font-size:9px; }
+  #p-history .cot-tbl th,
+  #p-history .cot-tbl td { padding:3px 6px; }
 }`;
   document.head.appendChild(s);
 })();
