@@ -959,12 +959,13 @@
     .cot-scroll-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      padding: 0 10px 6px 10px;
     }
     .cot-header,
     .cot-row {
       grid-template-columns: 32px 80px 36px 54px 46px 12px 42px 58px;
       gap: 4px;
-      min-width: 380px;
+      min-width: 360px;
     }
     .cot-header { display: grid !important; }
     .cot-sym { font-size: 10px; }
