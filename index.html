@@ -576,7 +576,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="panel-head"><span class="panel-title">CFTC Positioning (COT)</span><span class="panel-sub" id="cot-date-sub">Speculative net contracts · weekly · source: CFTC.gov</span><div class="export-btns" aria-label="Export COT data"><button class="export-btn" id="export-cot-csv" title="Export COT data as CSV">CSV</button><button class="export-btn" id="export-cot-json" title="Export COT data as JSON">JSON</button></div></div>
       <div style="padding:6px 10px 0 10px;">
         <div class="cot-scroll-wrap">
-        <div class="cot-header" style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
+        <div class="cot-header" style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding-bottom:4px;border-bottom:1px solid var(--border2);gap:8px;margin-bottom:4px;">
           <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span style="text-align:right" title="Week-over-week change in LF net contracts. Primary momentum signal.">WoW Δ</span><span title="LF/AM alignment: filled = aligned, hollow = diverging">&#x25CF;</span><span style="text-align:right" title="LF net as % of LF Open Interest. Normalises positioning across currencies with different contract sizes.">Net%OI</span><span style="text-align:right" title="Leveraged Funds Open Interest (long + short). Rising = new money entering; falling = liquidation.">OI</span>
         </div>
         <div id="cot-rows">
