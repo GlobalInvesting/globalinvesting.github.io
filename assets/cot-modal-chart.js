@@ -609,7 +609,7 @@ function openCOTModal(ccy, data) {
   const shrtData = history.map(h => h.levShort);
   const amData   = history.map(h => h.assetManagerNet);
   const ddData   = history.map(h => h.dealerNet);
-  const barCols  = netData.map(v => v >= 0 ? 'rgba(38,166,154,.75)' : 'rgba(239,83,80,.75)');
+  const barCols  = netData.map(v => v >= 0 ? 'rgba(79,127,255,.85)' : 'rgba(79,127,255,.35)');
 
   // ── Build history table ───────────────────────────────────────────────────
   const tbody = document.getElementById('cot-hist-body');
