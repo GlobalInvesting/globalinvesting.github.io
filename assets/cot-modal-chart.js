@@ -91,6 +91,8 @@
 #cot-m-body::-webkit-scrollbar { width:5px; }
 #cot-m-body::-webkit-scrollbar-track { background:transparent; }
 #cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
+/* Disable scroll when a single-chart tab is active so flex-fill reaches the canvas */
+#cot-m-body.cot-body--chart { overflow-y:hidden; }
 
 /* All panels fill the body completely */
 .cot-panel { display:none; }
@@ -209,9 +211,8 @@
   .cot-ct { font-size:9px; }
 
   /* Net / Long/Short: body must NOT have overflow-y:auto so flex-fill works on canvas.
-     These single-chart panels disable body scroll and let the chart fill completely. */
-  #cot-m-body:has(#p-net.on),
-  #cot-m-body:has(#p-split.on) { overflow-y:hidden; }
+     Class toggled by cotTab() JS — avoids :has() which has uneven mobile support */
+  #cot-m-body.cot-body--chart { overflow-y:hidden; }
 
   /* Participants: taller chart on mobile so data is visible */
   #p-participants .cot-chart-area { height:220px; }
@@ -727,6 +728,13 @@ function cotTab(el, tabId) {
   el.setAttribute('aria-selected', 'true');
   const panel = document.getElementById('p-' + tabId);
   if (panel) panel.classList.add('on');
+  // Toggle class on body so CSS can target single-chart vs multi-section tabs
+  // without relying on :has() which has uneven mobile browser support
+  const body = document.getElementById('cot-m-body');
+  if (body) {
+    const isChart = tabId === 'net' || tabId === 'split';
+    body.classList.toggle('cot-body--chart', isChart);
+  }
   const bd = document.getElementById('cot-bd');
   if (bd && bd._build) setTimeout(() => bd._build(tabId), 30);
 }
