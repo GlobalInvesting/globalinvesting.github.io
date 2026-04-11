@@ -2665,20 +2665,16 @@ function loadCOTChart(longSym) {
     interval: 'W',
     locale: 'en',
     save_image: true,
-    style: '3',
-    symbol: shortSym,
+    style: '2',
+    symbol: longSym,
     theme: 'dark',
     timezone: 'Etc/UTC',
     backgroundColor: '#131722',
     gridColor: 'rgba(42,46,57,0.8)',
     withdateranges: false,
-    compareSymbols: [{ symbol: longSym, position: 'NewPriceScale' }],
+    compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
     studies: [],
     autosize: true,
-    overrides: {
-      'mainSeriesProperties.lineStyle.color': '#e84040',
-      'mainSeriesProperties.lineStyle.linewidth': 2,
-    },
   });
   container.appendChild(script);
   wrap.appendChild(container);
