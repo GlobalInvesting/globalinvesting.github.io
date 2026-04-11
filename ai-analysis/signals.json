@@ -1,6 +1,6 @@
 [
   {
-    "time": "22:00",
+    "time": "02:30",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk elevated as USD/JPY trades above 158.00, testing 159.25 resistance",
@@ -11,32 +11,32 @@
     ]
   },
   {
-    "time": "21:58",
-    "priority": "warning",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, watch for further USD/JPY gains",
-    "evidence": [
-      "USD/JPY vs VIX: corr=+0.680",
-      "VIX: 19.2",
-      "USD/JPY: 159.245"
-    ]
-  },
-  {
-    "time": "21:55",
+    "time": "02:25",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD testing 0.70620 support, retail sentiment extreme short bias at 86% short",
+    "text": "Retail sentiment extreme short bias at 86% short, watch for contrarian reversal risk",
     "evidence": [
       "AUD/USD: 0.70620",
       "AUD/USD retail sentiment: 86% short",
-      "RBA rate: 4.10% (HIKING)"
+      "CFTC AUD net: +41,458"
     ]
   },
   {
-    "time": "21:50",
+    "time": "02:20",
+    "priority": "warning",
+    "title": "USD/JPY vs VIX",
+    "text": "Correlation break: USD/JPY vs VIX correlation turns positive, indicating JPY no longer acting as safe haven",
+    "evidence": [
+      "USD/JPY vs VIX: corr=+0.680",
+      "z=+1.39σ",
+      "VIX: 19.2"
+    ]
+  },
+  {
+    "time": "02:15",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals low volatility, not a risk-on environment",
+    "text": "VIX at 19.2 signals normal volatility — risk-on environment",
     "evidence": [
       "VIX: 19.2",
       "S&P 500: 6,817",
@@ -44,13 +44,13 @@
     ]
   },
   {
-    "time": "21:45",
+    "time": "02:10",
     "priority": "info",
     "title": "CB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (CUTTING) — 175bp spread continues to weigh on EUR/USD",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2% (CUTTING)",
+      "ECB rate: 2.00% (CUTTING)",
       "EUR/USD: 1.17290"
     ]
   }
