@@ -796,24 +796,33 @@ async function fetchCOTData() {
       }
     }
 
-    // Week-over-week net change — primary momentum signal
-    const wow    = d.wowNetChange;
+    // Week-over-week net change — read from root if present, else derive from history.
+    // History is sorted oldest→newest; prior week = second-to-last entry.
+    let wow = d.wowNetChange ?? null;
+    if (wow == null && d.history && d.history.length >= 2) {
+      const prevSnap = d.history[d.history.length - 2];
+      const prevNet  = prevSnap.levNet ?? ((prevSnap.levLong || 0) - (prevSnap.levShort || 0));
+      wow = net - prevNet;
+    }
     let wowHtml  = '<span class="cot-wow">—</span>';
     if (wow != null) {
       const wowCls = wow > 0 ? 'up' : wow < 0 ? 'down' : 'flat';
       const wowStr = (wow > 0 ? '+' : '') + (Math.abs(wow) >= 1000
-        ? (wow > 0 ? '+' : '') + Math.round(wow / 1000) + 'k'
+        ? Math.round(wow / 1000) + 'k'
         : wow.toLocaleString());
       wowHtml = '<span class="cot-wow ' + wowCls + '" title="Week-over-week change in LF net contracts. Positive = specs adding longs/covering shorts. Negative = specs adding shorts/reducing longs.">' + wowStr + '</span>';
     }
 
-    // Net as % of LF OI — cross-currency comparable proxy
-    const pctOI    = d.levNetPctOI;
+    // Net as % of LF OI — read from root if present, else derive from current long+short.
+    let pctOI = d.levNetPctOI ?? null;
+    if (pctOI == null && oi > 0) {
+      pctOI = Math.round(net / oi * 1000) / 10; // one decimal
+    }
     let pctOIHtml  = '<span class="cot-pcoi">—</span>';
     if (pctOI != null) {
       const pctCls = pctOI > 0 ? 'up' : pctOI < 0 ? 'down' : 'flat';
       const pctStr = (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%';
-      pctOIHtml = '<span class="cot-pcoi ' + pctCls + '" title="LF net as % of total market Open Interest. Normalised across currencies — comparable regardless of contract size differences.">' + pctStr + '</span>';
+      pctOIHtml = '<span class="cot-pcoi ' + pctCls + '" title="LF net as % of LF Open Interest. Normalised across currencies — comparable regardless of contract size differences.">' + pctStr + '</span>';
     }
 
     // TradingView COT chart symbol for row click
@@ -2781,13 +2790,22 @@ const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, p
       const r = await fetch('./cot-data/' + ccy + '.json');
       if (!r.ok) return;
       const d = await r.json();
-      // prevOI from second-to-last history entry (history sorted oldest→newest)
+      // prevOI and wowNetChange from history (history sorted oldest→newest)
       let prevOI = null;
+      let wowNetChange = d.wowNetChange ?? null;
       if (Array.isArray(d.history) && d.history.length >= 2) {
-        const prev = d.history[d.history.length - 2]; // ← fixed: was history[1]
+        const prev = d.history[d.history.length - 2]; // prior week
         if (prev.levLong != null && prev.levShort != null)
           prevOI = prev.levLong + prev.levShort;
+        // Derive WoW if not in root
+        if (wowNetChange == null && d.netPosition != null) {
+          const prevNet = prev.levNet ?? ((prev.levLong || 0) - (prev.levShort || 0));
+          wowNetChange = d.netPosition - prevNet;
+        }
       }
+      // Derive levNetPctOI if not in root
+      const levOI = (d.longPositions || 0) + (d.shortPositions || 0);
+      const levNetPctOI = d.levNetPctOI ?? (levOI > 0 ? Math.round(d.netPosition / levOI * 1000) / 10 : null);
       COT_DATA_CACHE[ccy] = {
         net:          d.netPosition    ?? null,
         long:         d.longPositions  ?? null,
@@ -2795,9 +2813,9 @@ const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, p
         amNet:        d.assetManagerNet ?? null,
         weekEnding:   d.weekEnding || d.reportDate || '',
         prevOI,
-        wowNetChange:  d.wowNetChange   ?? null,
+        wowNetChange,
         totalOI:       d.totalOpenInterest ?? null,
-        levNetPctOI:   d.levNetPctOI    ?? null,
+        levNetPctOI,
       };
     } catch {}
   }));
