@@ -3473,10 +3473,14 @@ async function fetchCarryRanking() {
         ? p.carryVol.toFixed(2)
         : '+' + p.diff.toFixed(2) + '%';
 
+      // Spread label: show gross rate differential (e.g. +4.00%) — industry standard
+      // for carry screens (Bloomberg/Refinitiv show rate spread, not CB trend arrows)
+      const spreadLabel = (p.diff >= 0 ? '+' : '') + p.diff.toFixed(2) + '%';
+
       return `<div class="carry-rank-row" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
-        <span class="cr-regimes">${rArrowL}<span class="cr-regime-sep">/</span>${rArrowS}</span>
+        <span class="cr-spread">${spreadLabel}</span>
         <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
