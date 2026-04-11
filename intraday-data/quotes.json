@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-11T01:10:21Z",
+  "updated": "2026-04-11T01:20:25Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -119,12 +119,12 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 72846.39,
+      "close": 72723.46,
       "prev_close": 72974.195,
-      "chg": 972.1016,
-      "pct": 1.3525,
+      "chg": 749.8984,
+      "pct": 1.0419,
       "high": 72974.195,
-      "low": 72844.016,
+      "low": 72723.46,
       "source": "yfinance"
     },
     "ftse": {
@@ -509,18 +509,18 @@
     {
       "a": "GBP/USD",
       "b": "FTSE 100",
-      "corr": -0.003,
+      "corr": 0.022,
       "n": 60,
-      "norm": -0.094,
-      "z_score": 0.17
+      "norm": -0.067,
+      "z_score": 0.16
     },
     {
       "a": "AUD/USD",
       "b": "ASX 200",
-      "corr": 0.316,
+      "corr": 0.286,
       "n": 60,
-      "norm": 0.149,
-      "z_score": 0.38
+      "norm": 0.155,
+      "z_score": 0.29
     },
     {
       "a": "NZD/USD",
@@ -533,9 +533,9 @@
     {
       "a": "EUR/USD",
       "b": "EuroStoxx",
-      "corr": 0.665,
+      "corr": 0.722,
       "n": 60,
-      "norm": -0.159,
+      "norm": -0.136,
       "z_score": 1.68
     },
     {
