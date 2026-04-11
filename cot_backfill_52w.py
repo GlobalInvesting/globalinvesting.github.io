@@ -5,48 +5,25 @@ COT HISTORICAL BACKFILL — 52 WEEKS
 Downloads annual historical TFF files from CFTC.gov and builds up to 52 weeks
 of history for each currency in cot-data/*.json.
 
-CFTC publishes annual ZIPs at (comma-separated text, NOT HTML):
+CFTC publishes annual ZIPs at (comma-separated text):
   Options+Futures Combined: https://www.cftc.gov/files/dea/history/com_fin_txt_YYYY.zip
   Futures Only:             https://www.cftc.gov/files/dea/history/fut_fin_txt_YYYY.zip
 
-Column layout (Disaggregated TFF, positions "All" = O+F combined or FO):
+Column layout (Disaggregated TFF annual CSV, 87 columns):
   [0]  Market_and_Exchange_Names
-  [1]  As_of_Date_in_Form_YYMMDD
-  [2]  Report_Date_as_MM_DD_YYYY       ← weekEnding source
-  [3]  CFTC_Contract_Market_Code
-  [4]  CFTC_Market_Code
-  [5]  CFTC_Region_Code
-  [6]  CFTC_Commodity_Code
+  [1]  As_of_Date_in_Form_YYMMDD          (e.g. 250408)
+  [2]  Report_Date_as_YYYY-MM-DD           (e.g. 2025-04-08)
   [7]  Open_Interest_All
   [8]  Dealer_Positions_Long_All
   [9]  Dealer_Positions_Short_All
-  [10] Dealer_Positions_Spread_All
   [11] Asset_Mgr_Positions_Long_All
   [12] Asset_Mgr_Positions_Short_All
-  [13] Asset_Mgr_Positions_Spread_All
-  [14] Lev_Money_Positions_Long_All    ← primary signal
-  [15] Lev_Money_Positions_Short_All   ← primary signal
-  [16] Lev_Money_Positions_Spread_All
-  ...
+  [14] Lev_Money_Positions_Long_All
+  [15] Lev_Money_Positions_Short_All
 
 IMPORTANT — CFTC.GOV ACCESS:
   The CFTC blocks downloads from residential/non-datacenter IP addresses.
-  If you get HTTP 403 or connection errors running this script locally,
-  run it instead via the GitHub Actions workflow:
-    engine repo -> Actions -> "Backfill COT History (52 weeks)" -> Run workflow
-
-  GitHub Actions IPs are not blocked by CFTC. The production weekly workflow
-  already proves this.
-
-USAGE (from the root of globalinvesting.github.io repo):
-  pip install requests
-  python3 cot_backfill_52w.py
-
-  # Dry run (no files written):
-  python3 cot_backfill_52w.py --dry-run
-
-  # Verbose output (shows week counts per currency):
-  python3 cot_backfill_52w.py --dry-run --verbose
+  Run this script via GitHub Actions (engine repo -> Actions -> 'Backfill COT History').
 """
 
 import argparse
@@ -54,7 +31,6 @@ import csv
 import io
 import json
 import os
-import re
 import sys
 import zipfile
 from collections import defaultdict
@@ -67,9 +43,6 @@ import requests
 TARGET_WEEKS   = 52
 OUTPUT_DIR     = "cot-data"
 CURRENT_YEAR   = date.today().year
-# Fetch 2 prior years + current year to guarantee 52 weeks regardless of
-# when in the year the backfill is run. CFTC publishes YTD files for the
-# current year at the same URL pattern as completed years.
 YEARS_TO_FETCH = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR]
 
 HEADERS = {
@@ -79,34 +52,35 @@ HEADERS = {
     )
 }
 
-# Match substrings in the Market_and_Exchange_Names column (case-insensitive)
+# Keywords to match in Market_and_Exchange_Names (case-insensitive substring)
+# Using very short substrings to survive any capitalization or spacing variation
 CURRENCY_PATTERNS = {
-    "USD": ["usd index", "u.s. dollar index", "us dollar index"],
+    "USD": ["usd index", "dollar index"],
     "EUR": ["euro fx"],
     "GBP": ["british pound"],
     "JPY": ["japanese yen"],
     "CAD": ["canadian dollar"],
     "CHF": ["swiss franc"],
     "AUD": ["australian dollar"],
-    "NZD": ["new zealand dollar", "n.z. dollar", "nz dollar"],
+    "NZD": ["new zealand", "n.z. dollar", "nz dollar"],
 }
 
-# Column indices in the annual CSV (0-based, confirmed from CFTC header row)
-COL_MARKET_NAME  = 0
-COL_DATE_MMDDYY  = 2   # Report_Date_as_MM_DD_YYYY  e.g. "04/08/2025"
-COL_OI           = 7
-COL_DD_LONG      = 8
-COL_DD_SHORT     = 9
-COL_AM_LONG      = 11
-COL_AM_SHORT     = 12
-COL_LF_LONG      = 14
-COL_LF_SHORT     = 15
+# Column indices (confirmed from live header row in GitHub Actions log)
+COL_MARKET_NAME = 0
+COL_DATE        = 2    # Report_Date_as_YYYY-MM-DD
+COL_DATE_ALT    = 1    # As_of_Date_in_Form_YYMMDD  (fallback)
+COL_DD_LONG     = 8
+COL_DD_SHORT    = 9
+COL_AM_LONG     = 11
+COL_AM_SHORT    = 12
+COL_LF_LONG     = 14
+COL_LF_SHORT    = 15
 
-# ── CSV parser ───────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 def match_currency(market_name):
-    """Return the CCY code for a market name, or None if not a tracked pair."""
-    name_lower = market_name.lower()
+    """Return CCY code if market_name matches a tracked currency, else None."""
+    name_lower = market_name.lower().strip()
     for ccy, patterns in CURRENCY_PATTERNS.items():
         for pat in patterns:
             if pat in name_lower:
@@ -115,16 +89,35 @@ def match_currency(market_name):
 
 
 def parse_int(val):
-    """Parse a formatted integer string like '123,456' or '123456'."""
     try:
         return int(str(val).replace(",", "").strip())
     except (ValueError, AttributeError):
         return None
 
 
-def parse_date(val):
-    """Parse MM/DD/YYYY into YYYY-MM-DD."""
+def parse_date_col(val):
+    """Parse date from col[2] (YYYY-MM-DD) or col[1] (YYMMDD or YYYYMMDD)."""
     val = str(val).strip()
+    # Try ISO format first (col[2])
+    if len(val) == 10 and val[4] == "-":
+        try:
+            datetime.strptime(val, "%Y-%m-%d")
+            return val  # already in our target format
+        except ValueError:
+            pass
+    # Try YYYYMMDD (col[1] sometimes)
+    if len(val) == 8:
+        try:
+            return datetime.strptime(val, "%Y%m%d").strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    # Try YYMMDD (CFTC compact format)
+    if len(val) == 6:
+        try:
+            return datetime.strptime(val, "%y%m%d").strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    # Legacy MM/DD/YYYY
     for fmt in ("%m/%d/%Y", "%m/%d/%y"):
         try:
             return datetime.strptime(val, fmt).strftime("%Y-%m-%d")
@@ -133,11 +126,13 @@ def parse_date(val):
     return None
 
 
+# ── CSV parser ────────────────────────────────────────────────────────────────
+
 def parse_annual_csv(content, verbose=False):
     """
-    Parse an annual CFTC TFF CSV file (comma-separated, header row present).
-    Returns a list of dicts: {weekEnding, ccy, levLong, levShort, levNet,
-                               assetManagerNet, dealerNet}.
+    Parse an annual CFTC TFF CSV.
+    Returns list of dicts: {weekEnding, ccy, levLong, levShort, levNet,
+                             assetManagerNet, dealerNet}.
     """
     reader = csv.reader(io.StringIO(content))
     rows   = list(reader)
@@ -146,29 +141,48 @@ def parse_annual_csv(content, verbose=False):
         print("  ERROR: empty file")
         return []
 
-    # Find the header row (first row that contains "Market_and_Exchange_Names")
-    header_idx = None
+    # Detect header row
+    header_idx = 0
     for i, row in enumerate(rows[:5]):
-        if row and "market_and_exchange_names" in row[0].lower():
+        if row and "market" in row[0].lower():
             header_idx = i
             break
 
-    if header_idx is None:
-        # No standard header — try to detect by column count (≥17 columns expected)
-        header_idx = 0
-
     if verbose:
-        print(f"  Header row: {header_idx}  |  Columns: {len(rows[header_idx])}")
-        # Show the column names we care about
         hdr = rows[header_idx]
-        for idx in [COL_MARKET_NAME, COL_DATE_MMDDYY, COL_OI,
+        print(f"  Header row: {header_idx}  |  Total columns: {len(hdr)}")
+        for idx in [COL_MARKET_NAME, COL_DATE, COL_DATE_ALT,
                     COL_DD_LONG, COL_DD_SHORT, COL_AM_LONG, COL_AM_SHORT,
                     COL_LF_LONG, COL_LF_SHORT]:
             if idx < len(hdr):
                 print(f"    col[{idx:2d}] = {hdr[idx]}")
 
+    # Print first 5 unique market names for diagnosis
+    sample_names = []
+    for row in rows[header_idx + 1: header_idx + 200]:
+        if row and row[0].strip() and row[0].strip() not in sample_names:
+            sample_names.append(row[0].strip())
+        if len(sample_names) >= 8:
+            break
+    print(f"  Sample Market_and_Exchange_Names (first {len(sample_names)} unique):")
+    for n in sample_names:
+        ccy = match_currency(n)
+        print(f"    {'[' + ccy + ']' if ccy else '[---]'} {repr(n[:80])}")
+
+    # Also print first data row's date columns
+    if len(rows) > header_idx + 1:
+        first_data = rows[header_idx + 1]
+        if len(first_data) > max(COL_DATE, COL_DATE_ALT):
+            raw_date  = first_data[COL_DATE]
+            raw_date2 = first_data[COL_DATE_ALT]
+            parsed    = parse_date_col(raw_date) or parse_date_col(raw_date2)
+            print(f"  First data row dates: col[{COL_DATE}]={repr(raw_date)}  "
+                  f"col[{COL_DATE_ALT}]={repr(raw_date2)}  -> parsed={parsed}")
+
     results = []
     counts  = defaultdict(int)
+    date_fail = 0
+    int_fail  = 0
 
     for row in rows[header_idx + 1:]:
         if len(row) <= COL_LF_SHORT:
@@ -179,13 +193,18 @@ def parse_annual_csv(content, verbose=False):
         if ccy is None:
             continue
 
-        week_ending = parse_date(row[COL_DATE_MMDDYY])
+        # Try primary date col, then fallback
+        week_ending = parse_date_col(row[COL_DATE])
         if not week_ending:
+            week_ending = parse_date_col(row[COL_DATE_ALT])
+        if not week_ending:
+            date_fail += 1
             continue
 
         lf_long  = parse_int(row[COL_LF_LONG])
         lf_short = parse_int(row[COL_LF_SHORT])
         if lf_long is None or lf_short is None:
+            int_fail += 1
             continue
         lf_net = lf_long - lf_short
 
@@ -211,11 +230,15 @@ def parse_annual_csv(content, verbose=False):
     if verbose:
         for ccy in sorted(CURRENCY_PATTERNS):
             print(f"  {ccy}: {counts[ccy]} rows parsed")
+        if date_fail:
+            print(f"  Date parse failures: {date_fail}")
+        if int_fail:
+            print(f"  Int parse failures:  {int_fail}")
 
     return results
 
 
-# ── Download ─────────────────────────────────────────────────────────────────
+# ── Download ──────────────────────────────────────────────────────────────────
 
 def fetch_annual_zip(year, report_type="com"):
     url = f"https://www.cftc.gov/files/dea/history/{report_type}_fin_txt_{year}.zip"
@@ -235,11 +258,7 @@ def fetch_annual_zip(year, report_type="com"):
         status = e.response.status_code
         if status == 403:
             print(f" FAILED -- HTTP 403 (IP blocked by CFTC)")
-            print()
-            print("  ** CFTC blocks downloads from residential/non-datacenter IPs.    **")
-            print("  ** Run the backfill via GitHub Actions instead:                  **")
-            print("  ** engine repo -> Actions -> 'Backfill COT History (52 weeks)'  **")
-            print("  ** Click 'Run workflow' -> Run workflow                          **")
+            print("  ** Run the backfill via GitHub Actions (engine repo -> Actions). **")
         else:
             print(f" FAILED -- HTTP {status}")
         return None
@@ -248,7 +267,7 @@ def fetch_annual_zip(year, report_type="com"):
         return None
 
 
-# ── Main ─────────────────────────────────────────────────────────────────────
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="COT Historical Backfill -- 52 weeks")
@@ -273,7 +292,8 @@ def main():
             content = fetch_annual_zip(year, report_type)
             if content:
                 print(f"  Parsing ({report_type}) as CSV...")
-                blocks = parse_annual_csv(content, verbose=args.verbose)
+                # Always pass verbose=True for backfill runs so we get diagnostics
+                blocks = parse_annual_csv(content, verbose=True)
                 unique_weeks = len(set(b["weekEnding"] for b in blocks))
                 print(f"  -> {len(blocks)} records ({unique_weeks} unique weeks, "
                       f"{len(set(b['ccy'] for b in blocks))} currencies)")
@@ -289,15 +309,8 @@ def main():
         print()
         print("ERROR: No data downloaded.")
         if any_blocked:
-            print()
             print("Most likely cause: CFTC.gov is blocking your IP address.")
-            print("This is expected when running locally from a residential connection.")
-            print()
-            print("Solution -- run the backfill via GitHub Actions:")
-            print("  1. Go to the ENGINE repo on GitHub")
-            print("  2. Click Actions -> 'Backfill COT History (52 weeks)'")
-            print("  3. Click 'Run workflow' -> Run workflow")
-            print("  4. The workflow downloads data and commits it to the site repo")
+            print("Solution: engine repo -> Actions -> 'Backfill COT History (52 weeks)' -> Run workflow")
         return 1
 
     # Group by currency, deduplicate, sort
@@ -350,7 +363,6 @@ def main():
             except Exception:
                 pass
 
-        # Merge new history with any newer weeks already in the existing file
         existing_history = existing.get("history", [])
         combined = {h["weekEnding"]: h for h in new_history}
         for h in existing_history:
@@ -372,25 +384,25 @@ def main():
         lev_net_pct_oi = round(lev_net / lev_oi * 100, 1) if lev_oi else None
 
         updated = {
-            "netPosition":    lev_net,
-            "longPositions":  lev_long,
-            "shortPositions": lev_short,
-            "positionCategory": "Leveraged Funds (speculative)",
+            "netPosition":       lev_net,
+            "longPositions":     lev_long,
+            "shortPositions":    lev_short,
+            "positionCategory":  "Leveraged Funds (speculative)",
             "assetManagerNet":   latest.get("assetManagerNet"),
             "assetManagerLong":  existing.get("assetManagerLong"),
             "assetManagerShort": existing.get("assetManagerShort"),
-            "dealerNet":   latest.get("dealerNet"),
-            "dealerLong":  existing.get("dealerLong"),
-            "dealerShort": existing.get("dealerShort"),
-            "wowNetChange":   wow_net_change,
-            "levNetPctOI":    lev_net_pct_oi,
-            "history":        history,
-            "sourceType":     existing.get("sourceType", "options_futures_combined"),
-            "source":         "CFTC Official",
-            "sourceUrl":      "https://www.cftc.gov/dea/options/financial_lof.htm",
-            "reportDate":     date.today().isoformat(),
-            "lastUpdate":     date.today().isoformat(),
-            "weekEnding":     latest["weekEnding"],
+            "dealerNet":         latest.get("dealerNet"),
+            "dealerLong":        existing.get("dealerLong"),
+            "dealerShort":       existing.get("dealerShort"),
+            "wowNetChange":      wow_net_change,
+            "levNetPctOI":       lev_net_pct_oi,
+            "history":           history,
+            "sourceType":        existing.get("sourceType", "options_futures_combined"),
+            "source":            "CFTC Official",
+            "sourceUrl":         "https://www.cftc.gov/dea/options/financial_lof.htm",
+            "reportDate":        date.today().isoformat(),
+            "lastUpdate":        date.today().isoformat(),
+            "weekEnding":        latest["weekEnding"],
         }
         updated = {k: v for k, v in updated.items() if v is not None}
 
