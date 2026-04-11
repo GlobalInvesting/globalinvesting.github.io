@@ -745,6 +745,16 @@ async function fetchCOTData() {
   const container = document.getElementById('cot-rows');
   if (!container) return;
 
+  // Sort rows by Long% descending — industry standard (Bloomberg, FXSSI Pro)
+  // Most bullishly positioned currencies appear at the top for quick scanning
+  results.sort((a, b) => {
+    const totalA = (a.longPositions || 0) + (a.shortPositions || 0);
+    const totalB = (b.longPositions || 0) + (b.shortPositions || 0);
+    const pctA = totalA > 0 ? (a.longPositions || 0) / totalA : 0.5;
+    const pctB = totalB > 0 ? (b.longPositions || 0) / totalB : 0.5;
+    return pctB - pctA;
+  });
+
   container.innerHTML = results.map(d => {
     const net   = d.netPosition || 0;
     const long  = d.longPositions || 0;
