@@ -594,15 +594,15 @@
   .sb-sym { flex-shrink: 0; }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
-  .carry-rank-row { display:grid; grid-template-columns:12px 52px 48px 1fr 40px; align-items:center; gap:6px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row { display:grid; grid-template-columns:10px 46px 36px 1fr 34px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
-  .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; }
-  .cr-spread { font-family:var(--font-mono); font-size:9px; color:var(--text2); white-space:nowrap; }
-  .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+  .cr-pair { font-weight:700; color:var(--text); white-space:nowrap; letter-spacing:.01em; font-size:10.5px; }
+  .cr-spread { font-family:var(--font-mono); font-size:8px; color:var(--text2); white-space:nowrap; }
+  .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
-  .cr-diff { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; }
+  .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
 
   /* MACRO */
   .macro-row {
