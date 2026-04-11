@@ -5,11 +5,29 @@ COT HISTORICAL BACKFILL — 52 WEEKS
 Downloads annual historical TFF files from CFTC.gov and builds up to 52 weeks
 of history for each currency in cot-data/*.json.
 
-CFTC publishes annual ZIPs at:
+CFTC publishes annual ZIPs at (comma-separated text, NOT HTML):
   Options+Futures Combined: https://www.cftc.gov/files/dea/history/com_fin_txt_YYYY.zip
   Futures Only:             https://www.cftc.gov/files/dea/history/fut_fin_txt_YYYY.zip
 
-Uses the same parser (extract_tff_block) as the production weekly workflow.
+Column layout (Disaggregated TFF, positions "All" = O+F combined or FO):
+  [0]  Market_and_Exchange_Names
+  [1]  As_of_Date_in_Form_YYMMDD
+  [2]  Report_Date_as_MM_DD_YYYY       ← weekEnding source
+  [3]  CFTC_Contract_Market_Code
+  [4]  CFTC_Market_Code
+  [5]  CFTC_Region_Code
+  [6]  CFTC_Commodity_Code
+  [7]  Open_Interest_All
+  [8]  Dealer_Positions_Long_All
+  [9]  Dealer_Positions_Short_All
+  [10] Dealer_Positions_Spread_All
+  [11] Asset_Mgr_Positions_Long_All
+  [12] Asset_Mgr_Positions_Short_All
+  [13] Asset_Mgr_Positions_Spread_All
+  [14] Lev_Money_Positions_Long_All    ← primary signal
+  [15] Lev_Money_Positions_Short_All   ← primary signal
+  [16] Lev_Money_Positions_Spread_All
+  ...
 
 IMPORTANT — CFTC.GOV ACCESS:
   The CFTC blocks downloads from residential/non-datacenter IP addresses.
@@ -32,6 +50,7 @@ USAGE (from the root of globalinvesting.github.io repo):
 """
 
 import argparse
+import csv
 import io
 import json
 import os
@@ -60,131 +79,138 @@ HEADERS = {
     )
 }
 
-CURRENCY_NAMES = {
-    "USD": [
-        "USD INDEX - ICE FUTURES U.S.",
-        "U.S. DOLLAR INDEX - ICE FUTURES U.S.",
-        "US DOLLAR INDEX - ICE FUTURES U.S.",
-    ],
-    "EUR": ["EURO FX - CHICAGO MERCANTILE EXCHANGE"],
-    "GBP": ["BRITISH POUND - CHICAGO MERCANTILE EXCHANGE"],
-    "JPY": ["JAPANESE YEN - CHICAGO MERCANTILE EXCHANGE"],
-    "CAD": ["CANADIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE"],
-    "CHF": ["SWISS FRANC - CHICAGO MERCANTILE EXCHANGE"],
-    "AUD": ["AUSTRALIAN DOLLAR - CHICAGO MERCANTILE EXCHANGE"],
-    "NZD": [
-        "NEW ZEALAND DOLLAR - CHICAGO MERCANTILE EXCHANGE",
-        "N.Z. DOLLAR - CHICAGO MERCANTILE EXCHANGE",
-        "NZ DOLLAR - CHICAGO MERCANTILE EXCHANGE",
-        "NEW ZEALAND DOLLAR - CME",
-    ],
+# Match substrings in the Market_and_Exchange_Names column (case-insensitive)
+CURRENCY_PATTERNS = {
+    "USD": ["usd index", "u.s. dollar index", "us dollar index"],
+    "EUR": ["euro fx"],
+    "GBP": ["british pound"],
+    "JPY": ["japanese yen"],
+    "CAD": ["canadian dollar"],
+    "CHF": ["swiss franc"],
+    "AUD": ["australian dollar"],
+    "NZD": ["new zealand dollar", "n.z. dollar", "nz dollar"],
 }
 
-# ── Helpers (identical to production workflow) ───────────────────────────────
+# Column indices in the annual CSV (0-based, confirmed from CFTC header row)
+COL_MARKET_NAME  = 0
+COL_DATE_MMDDYY  = 2   # Report_Date_as_MM_DD_YYYY  e.g. "04/08/2025"
+COL_OI           = 7
+COL_DD_LONG      = 8
+COL_DD_SHORT     = 9
+COL_AM_LONG      = 11
+COL_AM_SHORT     = 12
+COL_LF_LONG      = 14
+COL_LF_SHORT     = 15
 
-def parse_numbers(line):
-    return [int(s.replace(",", "")) for s in re.findall(r"[\d,]+", line)]
+# ── CSV parser ───────────────────────────────────────────────────────────────
 
-
-def extract_week_ending_from_snippet(snippet):
-    for pattern in (
-        r"[Aa]s\s+of\s+\w+,\s+(\w+\s+\d+,\s*\d{4})",
-        r"[Pp]ositions\s+as\s+of\s+(\w+\s+\d+,\s*\d{4})",
-        r"(\w+\s+\d+,\s*\d{4})",
-    ):
-        m = re.search(pattern, snippet[:500])
-        if m:
-            try:
-                return datetime.strptime(m.group(1).strip(), "%B %d, %Y").strftime("%Y-%m-%d")
-            except Exception:
-                pass
+def match_currency(market_name):
+    """Return the CCY code for a market name, or None if not a tracked pair."""
+    name_lower = market_name.lower()
+    for ccy, patterns in CURRENCY_PATTERNS.items():
+        for pat in patterns:
+            if pat in name_lower:
+                return ccy
     return None
 
 
-def extract_tff_block(content, currency_code, aliases, verbose=False):
-    for name in aliases:
-        m = re.compile(re.escape(name.upper()), re.IGNORECASE | re.DOTALL).search(content)
-        if not m:
+def parse_int(val):
+    """Parse a formatted integer string like '123,456' or '123456'."""
+    try:
+        return int(str(val).replace(",", "").strip())
+    except (ValueError, AttributeError):
+        return None
+
+
+def parse_date(val):
+    """Parse MM/DD/YYYY into YYYY-MM-DD."""
+    val = str(val).strip()
+    for fmt in ("%m/%d/%Y", "%m/%d/%y"):
+        try:
+            return datetime.strptime(val, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    return None
+
+
+def parse_annual_csv(content, verbose=False):
+    """
+    Parse an annual CFTC TFF CSV file (comma-separated, header row present).
+    Returns a list of dicts: {weekEnding, ccy, levLong, levShort, levNet,
+                               assetManagerNet, dealerNet}.
+    """
+    reader = csv.reader(io.StringIO(content))
+    rows   = list(reader)
+
+    if not rows:
+        print("  ERROR: empty file")
+        return []
+
+    # Find the header row (first row that contains "Market_and_Exchange_Names")
+    header_idx = None
+    for i, row in enumerate(rows[:5]):
+        if row and "market_and_exchange_names" in row[0].lower():
+            header_idx = i
+            break
+
+    if header_idx is None:
+        # No standard header — try to detect by column count (≥17 columns expected)
+        header_idx = 0
+
+    if verbose:
+        print(f"  Header row: {header_idx}  |  Columns: {len(rows[header_idx])}")
+        # Show the column names we care about
+        hdr = rows[header_idx]
+        for idx in [COL_MARKET_NAME, COL_DATE_MMDDYY, COL_OI,
+                    COL_DD_LONG, COL_DD_SHORT, COL_AM_LONG, COL_AM_SHORT,
+                    COL_LF_LONG, COL_LF_SHORT]:
+            if idx < len(hdr):
+                print(f"    col[{idx:2d}] = {hdr[idx]}")
+
+    results = []
+    counts  = defaultdict(int)
+
+    for row in rows[header_idx + 1:]:
+        if len(row) <= COL_LF_SHORT:
             continue
 
-        snippet = content[m.start(): m.start() + 4000]
-        lines   = snippet.splitlines()
-        week_ending = extract_week_ending_from_snippet(snippet)
+        market_name = row[COL_MARKET_NAME].strip()
+        ccy = match_currency(market_name)
+        if ccy is None:
+            continue
 
-        for i, line in enumerate(lines):
-            if re.match(r"\s*Positions\s*$", line, re.IGNORECASE):
-                collected = []
-                for j in range(i + 1, min(i + 8, len(lines))):
-                    raw  = lines[j].strip()
-                    if not raw:
-                        continue
-                    nums = parse_numbers(raw)
-                    if not nums:
-                        break
-                    collected.extend(nums)
-                    if len(collected) >= 14:
-                        break
+        week_ending = parse_date(row[COL_DATE_MMDDYY])
+        if not week_ending:
+            continue
 
-                if len(collected) < 8:
-                    continue
+        lf_long  = parse_int(row[COL_LF_LONG])
+        lf_short = parse_int(row[COL_LF_SHORT])
+        if lf_long is None or lf_short is None:
+            continue
+        lf_net = lf_long - lf_short
 
-                lev_long  = collected[6]
-                lev_short = collected[7]
-                lev_net   = lev_long - lev_short
-                am_long   = collected[3] if len(collected) > 4 else None
-                am_short  = collected[4] if len(collected) > 4 else None
-                am_net    = (am_long - am_short) if (am_long is not None and am_short is not None) else None
-                dd_long   = collected[0] if len(collected) > 1 else None
-                dd_short  = collected[1] if len(collected) > 1 else None
-                dd_net    = (dd_long - dd_short) if (dd_long is not None and dd_short is not None) else None
+        am_long  = parse_int(row[COL_AM_LONG])
+        am_short = parse_int(row[COL_AM_SHORT])
+        am_net   = (am_long - am_short) if (am_long is not None and am_short is not None) else None
 
-                return {
-                    "weekEnding":   week_ending,
-                    "leveraged":    {"long": lev_long,  "short": lev_short, "net": lev_net},
-                    "assetManager": {"long": am_long,   "short": am_short,  "net": am_net},
-                    "dealer":       {"long": dd_long,   "short": dd_short,  "net": dd_net},
-                }
-    return None
+        dd_long  = parse_int(row[COL_DD_LONG])
+        dd_short = parse_int(row[COL_DD_SHORT])
+        dd_net   = (dd_long - dd_short) if (dd_long is not None and dd_short is not None) else None
 
+        results.append({
+            "weekEnding":      week_ending,
+            "ccy":             ccy,
+            "levLong":         lf_long,
+            "levShort":        lf_short,
+            "levNet":          lf_net,
+            "assetManagerNet": am_net,
+            "dealerNet":       dd_net,
+        })
+        counts[ccy] += 1
 
-def extract_all_weeks_from_annual(content, verbose=False):
-    results = []
-
-    for ccy, aliases in CURRENCY_NAMES.items():
-        all_positions = []
-        for name in aliases:
-            pattern = re.compile(re.escape(name.upper()), re.IGNORECASE)
-            for m in pattern.finditer(content):
-                all_positions.append(m.start())
-
-        all_positions = sorted(set(all_positions))
-
-        if verbose:
-            print(f"  {ccy}: {len(all_positions)} occurrences found")
-
-        for pos in all_positions:
-            snippet = content[pos: pos + 4000]
-            block   = extract_tff_block(snippet, ccy, aliases)
-            if block is None:
-                continue
-
-            week_ending = block.get("weekEnding") or extract_week_ending_from_snippet(snippet)
-            if not week_ending:
-                continue
-
-            lev = block["leveraged"]
-            am  = block["assetManager"]
-            dd  = block["dealer"]
-
-            results.append({
-                "weekEnding":      week_ending,
-                "ccy":             ccy,
-                "levLong":         lev["long"],
-                "levShort":        lev["short"],
-                "levNet":          lev["net"],
-                "assetManagerNet": am["net"],
-                "dealerNet":       dd["net"],
-            })
+    if verbose:
+        for ccy in sorted(CURRENCY_PATTERNS):
+            print(f"  {ccy}: {counts[ccy]} rows parsed")
 
     return results
 
@@ -242,18 +268,21 @@ def main():
 
     for year in YEARS_TO_FETCH:
         print(f"\n[{year}]")
+        got_data = False
         for report_type in ("com", "fut"):
             content = fetch_annual_zip(year, report_type)
             if content:
-                print(f"  Parsing ({report_type})...")
-                blocks = extract_all_weeks_from_annual(content, verbose=args.verbose)
+                print(f"  Parsing ({report_type}) as CSV...")
+                blocks = parse_annual_csv(content, verbose=args.verbose)
                 unique_weeks = len(set(b["weekEnding"] for b in blocks))
-                print(f"  -> {len(blocks)} records ({unique_weeks} unique weeks)")
+                print(f"  -> {len(blocks)} records ({unique_weeks} unique weeks, "
+                      f"{len(set(b['ccy'] for b in blocks))} currencies)")
                 all_blocks.extend(blocks)
+                got_data = True
                 break
             else:
                 any_blocked = True
-        else:
+        if not got_data:
             print(f"  WARNING: No data obtained for {year}")
 
     if not all_blocks:
@@ -279,7 +308,7 @@ def main():
     print(f"\n{'='*65}")
     print("DATA DOWNLOADED")
     print(f"{'='*65}")
-    for ccy in sorted(CURRENCY_NAMES):
+    for ccy in sorted(CURRENCY_PATTERNS):
         entries = sorted(by_ccy[ccy].values(), key=lambda x: x["weekEnding"])
         if entries:
             print(f"  {ccy:3s}: {len(entries):2d} weeks  "
@@ -293,7 +322,7 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    for ccy in CURRENCY_NAMES:
+    for ccy in CURRENCY_PATTERNS:
         path = os.path.join(args.output_dir, f"{ccy}.json")
 
         raw_entries = sorted(by_ccy[ccy].values(), key=lambda x: x["weekEnding"])
@@ -321,7 +350,7 @@ def main():
             except Exception:
                 pass
 
-        # Merge new history with any newer weeks in the existing file
+        # Merge new history with any newer weeks already in the existing file
         existing_history = existing.get("history", [])
         combined = {h["weekEnding"]: h for h in new_history}
         for h in existing_history:
