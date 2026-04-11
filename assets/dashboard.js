@@ -766,6 +766,10 @@ async function fetchCOTData() {
     return pctB - pctA;
   });
 
+  // Expose full COT data for the modal chart
+  window.COT_DATA_STORE = window.COT_DATA_STORE || {};
+  results.forEach(d => { window.COT_DATA_STORE[d.ccy] = d; });
+
   container.innerHTML = results.map(d => {
     const net   = d.netPosition || 0;
     const long  = d.longPositions || 0;
@@ -839,7 +843,7 @@ async function fetchCOTData() {
     // TradingView COT chart symbol for row click
     const tvSym = COT_TV_SYMBOLS[d.ccy] || '';
 
-    return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" title="Click to open ' + d.ccy + ' COT chart">'
+    return '<div class="cot-row" style="cursor:pointer;" data-sym="' + tvSym + '" data-ccy="' + d.ccy + '" title="Click to open ' + d.ccy + ' COT chart">'
       + '<span class="cot-sym">' + d.ccy + '</span>'
       + '<div class="cot-bar-outer">'
       + '<div class="cot-long-fill" style="width:' + longPct + '%"></div>'
@@ -854,11 +858,17 @@ async function fetchCOTData() {
       + '</div>';
   }).join('');
 
-  // Click any COT row → load its COT chart (Long + Short overlaid on same scale)
+  // Click any COT row → open institutional modal chart (fallback: TradingView widget)
   container.querySelectorAll('.cot-row[data-sym]').forEach(row => {
     row.addEventListener('click', () => {
-      const sym = row.dataset.sym;
-      if (sym) loadCOTChart(sym);
+      const ccy  = row.dataset.ccy;
+      const data = window.COT_DATA_STORE && window.COT_DATA_STORE[ccy];
+      if (ccy && data && typeof openCOTModal === 'function') {
+        openCOTModal(ccy, data);
+      } else {
+        const sym = row.dataset.sym;
+        if (sym) loadCOTChart(sym);
+      }
     });
   });
 }
