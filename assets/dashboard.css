@@ -594,7 +594,7 @@
   .sb-sym { flex-shrink: 0; }
 
   /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
-  .carry-rank-row { display:grid; grid-template-columns:12px 52px 44px 1fr 40px; align-items:center; gap:3px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
+  .carry-rank-row { display:grid; grid-template-columns:12px 52px 48px 1fr 40px; align-items:center; gap:6px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
   .cr-rank { font-size:9px; color:var(--text3); font-family:var(--font-mono); text-align:left; }
