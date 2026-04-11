@@ -3453,7 +3453,8 @@ async function fetchCarryRanking() {
       const sym  = carryTV(p.long, p.short);
       // Bar width represents the vol-adjusted carry (or gross diff as fallback)
       const barVal = hasVolData && p.carryVol != null ? p.carryVol / maxCV : p.diff / maxDiff;
-      const bar    = Math.round(barVal * 60);
+      // Bar width: percentage of the bar-wrap container (proportional to top pair)
+      const barPct = Math.round(barVal * 100);
 
       // Color: strong carry-to-vol (>0.3) = green; moderate = neutral; weak = dim
       const cls = hasVolData && p.carryVol != null
@@ -3481,7 +3482,7 @@ async function fetchCarryRanking() {
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
         <span class="cr-spread">${spreadLabel}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${bar}px"></div></div>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
     }).join('');
