@@ -6,8 +6,8 @@ Downloads annual historical TFF files from CFTC.gov and builds up to 52 weeks
 of history for each currency in cot-data/*.json.
 
 CFTC publishes annual ZIPs at:
-  Options+Futures Combined: https://www.cftc.gov/files/dea/history/fin_com_txt_YYYY.zip
-  Futures Only:             https://www.cftc.gov/files/dea/history/fin_fut_txt_YYYY.zip
+  Options+Futures Combined: https://www.cftc.gov/files/dea/history/com_fin_txt_YYYY.zip
+  Futures Only:             https://www.cftc.gov/files/dea/history/fut_fin_txt_YYYY.zip
 
 Uses the same parser (extract_tff_block) as the production weekly workflow.
 
@@ -48,7 +48,10 @@ import requests
 TARGET_WEEKS   = 52
 OUTPUT_DIR     = "cot-data"
 CURRENT_YEAR   = date.today().year
-YEARS_TO_FETCH = [CURRENT_YEAR - 1, CURRENT_YEAR]
+# Fetch 2 prior years + current year to guarantee 52 weeks regardless of
+# when in the year the backfill is run. CFTC publishes YTD files for the
+# current year at the same URL pattern as completed years.
+YEARS_TO_FETCH = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR]
 
 HEADERS = {
     "User-Agent": (
@@ -189,7 +192,7 @@ def extract_all_weeks_from_annual(content, verbose=False):
 # ── Download ─────────────────────────────────────────────────────────────────
 
 def fetch_annual_zip(year, report_type="com"):
-    url = f"https://www.cftc.gov/files/dea/history/fin_{report_type}_txt_{year}.zip"
+    url = f"https://www.cftc.gov/files/dea/history/{report_type}_fin_txt_{year}.zip"
     print(f"  GET {url}", end="", flush=True)
     try:
         r = requests.get(url, headers=HEADERS, timeout=90)
