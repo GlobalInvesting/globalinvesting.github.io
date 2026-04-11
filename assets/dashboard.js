@@ -779,19 +779,41 @@ async function fetchCOTData() {
       }
     }
 
-    // Open Interest — LF long + short (total skin in the game)
+    // Open Interest — LF long + short
     const oi    = long + short;
     const oiStr = fmtOI(oi);
 
-    // OI direction vs prior week (from history[1] if available)
+    // OI direction vs prior week.
+    // History is sorted chronologically oldest→newest; prior week = second-to-last entry.
     let oiArrow = '';
     if (d.history && d.history.length >= 2) {
-      const prevOI = (d.history[1].levLong || 0) + (d.history[1].levShort || 0);
+      const prev = d.history[d.history.length - 2]; // ← fixed: was history[1]
+      const prevOI = (prev.levLong || 0) + (prev.levShort || 0);
       if (prevOI > 0) {
         const delta = oi - prevOI;
         if (delta > 0)       oiArrow = '<span class="oi-up">▲</span>';
         else if (delta < 0)  oiArrow = '<span class="oi-dn">▼</span>';
       }
+    }
+
+    // Week-over-week net change — primary momentum signal (Bloomberg standard)
+    const wow    = d.wowNetChange;
+    let wowHtml  = '<span class="cot-wow">—</span>';
+    if (wow != null) {
+      const wowCls = wow > 0 ? 'up' : wow < 0 ? 'down' : 'flat';
+      const wowStr = (wow > 0 ? '+' : '') + (Math.abs(wow) >= 1000
+        ? (wow > 0 ? '+' : '') + Math.round(wow / 1000) + 'k'
+        : wow.toLocaleString());
+      wowHtml = '<span class="cot-wow ' + wowCls + '" title="Week-over-week change in LF net contracts. Positive = specs adding longs/covering shorts. Negative = specs adding shorts/reducing longs.">' + wowStr + '</span>';
+    }
+
+    // Net as % of Total OI — cross-currency comparable (Bloomberg "Net % OI")
+    const pctOI    = d.levNetPctOI;
+    let pctOIHtml  = '<span class="cot-pcoi">—</span>';
+    if (pctOI != null) {
+      const pctCls = pctOI > 0 ? 'up' : pctOI < 0 ? 'down' : 'flat';
+      const pctStr = (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%';
+      pctOIHtml = '<span class="cot-pcoi ' + pctCls + '" title="LF net as % of total market Open Interest. Normalised across currencies — comparable regardless of contract size differences.">' + pctStr + '</span>';
     }
 
     // TradingView COT chart symbol for row click
@@ -805,7 +827,9 @@ async function fetchCOTData() {
       + '</div>'
       + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
       + '<span class="cot-net ' + cls + '">' + netStr + '</span>'
+      + wowHtml
       + divHtml
+      + pctOIHtml
       + '<span class="cot-oi" title="LF Open Interest: ' + oi.toLocaleString() + ' contracts (long + short). Rising OI signals new money; falling OI signals liquidation.">' + oiArrow + oiStr + '</span>'
       + '</div>';
   }).join('');
@@ -2748,7 +2772,7 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
 // PAIR DETAIL PANEL — Eikon-style linked panel, updates #pair-detail on every pair click
 // All data read from in-memory caches — zero additional fetches on click.
 // ═══════════════════════════════════════════════════════════════════
-const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, prevOI }
+const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, prevOI, wowNetChange, totalOI, levNetPctOI }
 
 (async function prefetchCOT() {
   const CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
@@ -2757,20 +2781,23 @@ const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, p
       const r = await fetch('./cot-data/' + ccy + '.json');
       if (!r.ok) return;
       const d = await r.json();
-      // prevOI from history[1] when available (history[0] = current week)
+      // prevOI from second-to-last history entry (history sorted oldest→newest)
       let prevOI = null;
       if (Array.isArray(d.history) && d.history.length >= 2) {
-        const prev = d.history[1];
+        const prev = d.history[d.history.length - 2]; // ← fixed: was history[1]
         if (prev.levLong != null && prev.levShort != null)
           prevOI = prev.levLong + prev.levShort;
       }
       COT_DATA_CACHE[ccy] = {
-        net:        d.netPosition    ?? null,
-        long:       d.longPositions  ?? null,
-        short:      d.shortPositions ?? null,
-        amNet:      d.assetManagerNet ?? null,
-        weekEnding: d.weekEnding || d.reportDate || '',
+        net:          d.netPosition    ?? null,
+        long:         d.longPositions  ?? null,
+        short:        d.shortPositions ?? null,
+        amNet:        d.assetManagerNet ?? null,
+        weekEnding:   d.weekEnding || d.reportDate || '',
         prevOI,
+        wowNetChange:  d.wowNetChange   ?? null,
+        totalOI:       d.totalOpenInterest ?? null,
+        levNetPctOI:   d.levNetPctOI    ?? null,
       };
     } catch {}
   }));
@@ -2885,15 +2912,19 @@ async function updatePairDetail(tvSym) {
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
   let cotNet = null, cotAmNet = null, cotOI = null, cotPrevOI = null, cotWeek = '';
+  let cotWow = null, cotPctOI = null, cotTotalOI = null;
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
-    cotNet   = cotRaw.net   != null ? cotRaw.net   * flip : null;
-    cotAmNet = cotRaw.amNet != null ? cotRaw.amNet * flip : null;
+    cotNet      = cotRaw.net   != null ? cotRaw.net   * flip : null;
+    cotAmNet    = cotRaw.amNet != null ? cotRaw.amNet * flip : null;
+    cotWow      = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
+    cotPctOI    = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
+    cotTotalOI  = cotRaw.totalOI      ?? null;
     // OI = LF longs + LF shorts (futures+options combined, LF category)
     if (cotRaw.long != null && cotRaw.short != null)
       cotOI = cotRaw.long + cotRaw.short;
     cotPrevOI = cotRaw.prevOI ?? null;
-    cotWeek  = cotRaw.weekEnding;
+    cotWeek   = cotRaw.weekEnding;
   }
 
   // Carry differential (CB rates)
@@ -3005,12 +3036,27 @@ async function updatePairDetail(tvSym) {
               <div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div>
             </div>
             <div class="pd-cell fx-tip"
+              data-tip-title="LF WoW Change${ccyTag}"
+              data-tip-body="Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs. The primary momentum signal in institutional COT analysis.${crossNote}"
+              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. A reversal in WoW change is often the earliest signal of a positioning shift.">
+              <div class="pd-lbl">LF WoW Δ${ccyTag}</div>
+              <div class="pd-val ${cls(cotWow)}">${cotWow != null ? (cotWow > 0 ? '+' : '') + Math.round(cotWow).toLocaleString() : '—'}</div>
+            </div>
+            <div class="pd-cell fx-tip"
               data-tip-title="CFTC Asset Managers Net${ccyTag}"
               data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
               data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
               <div class="pd-lbl">AM Net${ccyTag}</div>
               <div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="LF Net as % of Total OI${ccyTag}"
+              data-tip-body="LF net contracts divided by total market Open Interest (all categories). Bloomberg equivalent: Net % OI. Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
+              data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
+              <div class="pd-lbl">Net % OI${ccyTag}</div>
+              <div class="pd-val ${cls(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
             </div>`;
+        })()}
         })()}
         ${cotOI != null ? (() => {
           const isCross   = !!meta?.cross;
