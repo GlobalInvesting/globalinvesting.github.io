@@ -745,7 +745,7 @@ async function fetchCOTData() {
   const container = document.getElementById('cot-rows');
   if (!container) return;
 
-  // Sort rows by Long% descending — industry standard (Bloomberg, FXSSI Pro)
+  // Sort rows by Long% descending — industry standard for COT panels
   // Most bullishly positioned currencies appear at the top for quick scanning
   results.sort((a, b) => {
     const totalA = (a.longPositions || 0) + (a.shortPositions || 0);
@@ -796,7 +796,7 @@ async function fetchCOTData() {
       }
     }
 
-    // Week-over-week net change — primary momentum signal (Bloomberg standard)
+    // Week-over-week net change — primary momentum signal
     const wow    = d.wowNetChange;
     let wowHtml  = '<span class="cot-wow">—</span>';
     if (wow != null) {
@@ -807,7 +807,7 @@ async function fetchCOTData() {
       wowHtml = '<span class="cot-wow ' + wowCls + '" title="Week-over-week change in LF net contracts. Positive = specs adding longs/covering shorts. Negative = specs adding shorts/reducing longs.">' + wowStr + '</span>';
     }
 
-    // Net as % of Total OI — cross-currency comparable (Bloomberg "Net % OI")
+    // Net as % of LF OI — cross-currency comparable proxy
     const pctOI    = d.levNetPctOI;
     let pctOIHtml  = '<span class="cot-pcoi">—</span>';
     if (pctOI != null) {
@@ -826,7 +826,7 @@ async function fetchCOTData() {
       + '<div class="cot-short-fill" style="width:' + (100 - longPct) + '%"></div>'
       + '</div>'
       + '<span class="cot-pct ' + cls + '">' + longPct + '%</span>'
-      + '<span class="cot-net ' + cls + '">' + netStr + '</span>'
+      + '<span class="cot-net ' + cls + '" title="LF net contracts (longs minus shorts). Positive = net long speculative positioning; negative = net short. Primary directional signal from CFTC Disaggregated TFF report.">' + netStr + '</span>'
       + wowHtml
       + divHtml
       + pctOIHtml
@@ -3051,7 +3051,7 @@ async function updatePairDetail(tvSym) {
             </div>
             <div class="pd-cell fx-tip"
               data-tip-title="LF Net as % of Total OI${ccyTag}"
-              data-tip-body="LF net contracts divided by total market Open Interest (all categories). Bloomberg equivalent: Net % OI. Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
+              data-tip-body="LF net contracts divided by LF Open Interest (long + short). Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
               data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
               <div class="pd-lbl">Net % OI${ccyTag}</div>
               <div class="pd-val ${cls(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
@@ -3224,7 +3224,7 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 // ═══════════════════════════════════════════════════════════════════
 // CARRY TRADE RANKING — full G8 28-pair differential, left sidebar
 // ═══════════════════════════════════════════════════════════════════
-// Institutional-grade carry ranking aligned with Bloomberg Carry Monitor
+// Institutional-grade carry ranking
 // and JP Morgan GBI conventions:
 //
 //   Primary sort:  carry-to-vol ratio = rate differential / HV30
@@ -3327,7 +3327,7 @@ async function fetchCarryRanking() {
 
         // Carry-to-vol: annualised rate diff / annualised HV30
         // Interpretation: units of carry earned per unit of realised vol risk
-        // Bloomberg Carry Monitor uses this as primary ranking metric
+        // Primary ranking metric for carry panels
         const carryVol = (hv30 != null && hv30 > 0) ? absDiff / hv30 : null;
 
         allPairs.push({ long, short, diff: absDiff, rLong, rShort, hv30, carryVol, pid });
