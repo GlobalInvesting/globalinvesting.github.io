@@ -82,12 +82,25 @@
   overflow-y:auto;flex:1;padding:14px 16px;
   scrollbar-width:thin;
   scrollbar-color:rgba(255,255,255,.12) transparent;
+  display:flex;flex-direction:column;
 }
 #cot-m-body::-webkit-scrollbar { width:5px; }
 #cot-m-body::-webkit-scrollbar-track { background:transparent; }
 #cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
-.cot-panel { display:none; }
-.cot-panel.on { display:block; }
+
+/* Panels: hidden by default; single-chart panels fill the body */
+.cot-panel { display:none;flex:1;flex-direction:column; }
+.cot-panel.on { display:flex; }
+
+/* Multi-section panels (Overview, Participants, History) scroll normally */
+#p-overview.on, #p-participants.on, #p-history.on { display:block;flex:none; }
+
+/* Single-chart panels: cot-cw and canvas both stretch to fill */
+#p-net.on .cot-cw, #p-split.on .cot-cw {
+  flex:1;display:flex;flex-direction:column;margin-bottom:0;
+}
+#p-net.on .cot-cw > div,
+#p-split.on .cot-cw > div { flex:1;min-height:0; }
 
 /* Chart wrapper */
 .cot-cw {
@@ -461,7 +474,7 @@ function openCOTModal(ccy, data) {
     <div id="p-net" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div>
-        <div style="height:260px"><canvas id="c-net"></canvas></div>
+        <div><canvas id="c-net"></canvas></div>
       </div>
     </div>
 
@@ -469,7 +482,7 @@ function openCOTModal(ccy, data) {
     <div id="p-split" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
-        <div style="height:320px"><canvas id="c-split"></canvas></div>
+        <div><canvas id="c-split"></canvas></div>
       </div>
     </div>
 
