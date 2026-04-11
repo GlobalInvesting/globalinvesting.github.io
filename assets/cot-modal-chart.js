@@ -236,7 +236,11 @@ const _chartDefaults = {
   interaction: { mode: 'index', intersect: false },
   layout: { padding: { top: 8, right: 4, bottom: 0, left: 0 } },
   plugins: {
-    legend: { labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 12, padding: 10 } },
+    legend: {
+      position: 'top',
+      align: 'start',
+      labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 12, padding: 16 }
+    },
     tooltip: {
       backgroundColor: '#1e222d', titleColor: '#d1d4dc', bodyColor: '#9096a0',
       borderColor: 'rgba(255,255,255,.1)', borderWidth: 1, padding: 10, cornerRadius: 6,
