@@ -757,6 +757,8 @@ function cotTab(el, tabId) {
           nonChartH += parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
           const h = Math.max(bodyRect.height - nonChartH, 120);
           chartArea.style.height = h + 'px';
+          const existingChart = typeof Chart !== 'undefined' && Chart.getChart(canvas);
+          if (existingChart) { existingChart.resize(chartArea.getBoundingClientRect().width, h); return; }
         }
       }
       bd._build(tabId);
