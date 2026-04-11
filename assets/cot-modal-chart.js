@@ -108,6 +108,11 @@
 }
 #p-net.on .cot-cw > .cot-chart-area,
 #p-split.on .cot-cw > .cot-chart-area { position:relative; }
+/* Chart.js sets inline style height/width on the canvas — override with !important */
+#c-net, #c-split {
+  width: 100% !important;
+  height: 100% !important;
+}
 
 /* Participants: chart has fixed height, description scrolls below */
 #p-participants.on { overflow-y:auto; }
