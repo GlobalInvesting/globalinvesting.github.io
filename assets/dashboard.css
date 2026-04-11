@@ -419,6 +419,14 @@
   .h-s-down { background: #3a1a1a; }
 
   /* COT */
+  .cot-header {
+    display: grid;
+    grid-template-columns: 36px 1fr 42px 64px 52px 14px 46px 68px;
+    align-items: center; gap: 8px;
+    padding: 3px 0 4px 0;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 4px;
+  }
   .cot-row {
     display: grid;
     grid-template-columns: 36px 1fr 42px 64px 52px 14px 46px 68px;
@@ -963,11 +971,10 @@
     }
     .cot-header,
     .cot-row {
-      grid-template-columns: 32px 80px 36px 54px 46px 12px 42px 58px;
+      grid-template-columns: 32px 76px 34px 52px 44px 12px 42px 56px;
       gap: 4px;
-      min-width: 360px;
+      min-width: 356px;
     }
-    .cot-header { display: grid !important; }
     .cot-sym { font-size: 10px; }
     .cot-pct, .cot-net, .cot-wow, .cot-pcoi, .cot-oi { font-size: 9px; }
     .cot-div { font-size: 9px; }
