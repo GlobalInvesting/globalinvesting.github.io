@@ -444,8 +444,8 @@
   .cot-pcoi { font-size: 10px; font-family: var(--font-mono); text-align: right; }
   /* Open Interest cell */
   .cot-oi { font-size: 10px; font-family: var(--font-mono); color: var(--text2); text-align: right; }
-  .cot-oi .oi-up { color: var(--up); font-size: 8px; }
-  .cot-oi .oi-dn { color: var(--down); font-size: 8px; }
+  .cot-oi .oi-up { color: var(--up); font-size: 8px; margin-right: 2px; }
+  .cot-oi .oi-dn { color: var(--down); font-size: 8px; margin-right: 2px; }
 
   /* RATES GRID */
   .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
