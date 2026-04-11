@@ -107,7 +107,7 @@
   flex:1;display:flex;flex-direction:column;margin-bottom:0;min-height:0;
 }
 #p-net.on .cot-cw > .cot-chart-area,
-#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0;position:relative; }
+#p-split.on .cot-cw > .cot-chart-area { position:relative; }
 
 /* Participants: chart has fixed height, description scrolls below */
 #p-participants.on { overflow-y:auto; }
@@ -732,13 +732,31 @@ function cotTab(el, tabId) {
         const canvas = document.getElementById(areaId);
         const bodyEl = document.getElementById('cot-m-body');
         if (canvas && bodyEl) {
-          // Calculate exact available height in px and set it explicitly
-          // so Chart.js (which needs a px-height parent) can measure correctly
-          const cw  = canvas.closest('.cot-cw');
-          const ct  = cw ? cw.querySelector('.cot-ct') : null;
-          const used = (ct ? ct.getBoundingClientRect().height : 16) + 24 + 20; // label + cw padding + body padding
-          const h = Math.max(bodyEl.getBoundingClientRect().height - used, 120);
-          canvas.parentElement.style.height = h + 'px';
+          // Measure all siblings of the chart-area within its .cot-cw,
+          // plus the .cot-cw border/padding, to get the exact non-chart space.
+          // This is fully responsive — works at any screen size.
+          const chartArea = canvas.parentElement;
+          const cw = chartArea.closest('.cot-cw');
+          const bodyRect = bodyEl.getBoundingClientRect();
+          let nonChartH = 0;
+          if (cw) {
+            const cwStyle = getComputedStyle(cw);
+            nonChartH += parseFloat(cwStyle.paddingTop) + parseFloat(cwStyle.paddingBottom)
+                       + parseFloat(cwStyle.borderTopWidth) + parseFloat(cwStyle.borderBottomWidth);
+            // Add height of all siblings of chartArea inside cw (e.g. .cot-ct label)
+            Array.from(cw.children).forEach(child => {
+              if (child !== chartArea) {
+                const cr = child.getBoundingClientRect();
+                const cs = getComputedStyle(child);
+                nonChartH += cr.height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
+              }
+            });
+          }
+          // Also account for body's own padding
+          const bodyStyle = getComputedStyle(bodyEl);
+          nonChartH += parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
+          const h = Math.max(bodyRect.height - nonChartH, 120);
+          chartArea.style.height = h + 'px';
         }
       }
       bd._build(tabId);
