@@ -321,17 +321,18 @@ const _chartDefaults = {
   }
 };
 
-function _lineChart(canvas, labels, datasets) {
+function _lineChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const cfg = JSON.parse(JSON.stringify(_chartDefaults));
   cfg.type = 'line';
   cfg.data = { labels, datasets };
+  if (overrides) Object.assign(cfg, overrides);
   const c = new Chart(canvas, cfg);
   _cotCharts.push(c);
   return c;
 }
 
-function _barChart(canvas, labels, datasets) {
+function _barChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const cfg = JSON.parse(JSON.stringify(_chartDefaults));
   cfg.type = 'bar';
@@ -350,6 +351,7 @@ function _barChart(canvas, labels, datasets) {
       }
     }
   };
+  if (overrides) Object.assign(cfg, overrides);
   const c = new Chart(canvas, cfg);
   _cotCharts.push(c);
   return c;
@@ -664,18 +666,26 @@ function openCOTModal(ccy, data) {
     if (tabId === 'net') {
       const cv = document.getElementById('c-net');
       if (cv) {
-        const chart = _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }]);
-        if (chart) { const r = cv.parentElement.getBoundingClientRect(); chart.resize(r.width, r.height); }
+        const r = cv.parentElement.getBoundingClientRect();
+        cv.width = r.width * (window.devicePixelRatio || 1);
+        cv.height = r.height * (window.devicePixelRatio || 1);
+        cv.style.width = r.width + 'px';
+        cv.style.height = r.height + 'px';
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }], { responsive: false });
       }
     }
     if (tabId === 'split') {
       const cv = document.getElementById('c-split');
       if (cv) {
-        const chart = _lineChart(cv, labels, [
+        const r = cv.parentElement.getBoundingClientRect();
+        cv.width = r.width * (window.devicePixelRatio || 1);
+        cv.height = r.height * (window.devicePixelRatio || 1);
+        cv.style.width = r.width + 'px';
+        cv.style.height = r.height + 'px';
+        _lineChart(cv, labels, [
           { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,.08)', fill: true, tension: .3, pointRadius: 2 },
           { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,.08)',  fill: true, tension: .3, pointRadius: 2 },
-        ]);
-        if (chart) { const r = cv.parentElement.getBoundingClientRect(); chart.resize(r.width, r.height); }
+        ], { responsive: false });
       }
     }
     if (tabId === 'participants') {
