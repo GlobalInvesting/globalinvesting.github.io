@@ -1,0 +1,90 @@
+name: Backfill COT History (52 weeks)
+
+# Manual trigger only — run once to populate 52 weeks of COT history.
+# After running, the weekly update-cot-cftc-all.yml workflow continues
+# accumulating data automatically up to the 52-week limit.
+#
+# Why this workflow exists:
+#   The CFTC blocks downloads from residential/non-datacenter IP addresses.
+#   Running cot_backfill_52w.py locally returns HTTP 403. GitHub Actions IPs
+#   are not blocked, so this workflow performs the same download from within
+#   the GitHub infrastructure.
+#
+# How to run:
+#   Actions -> "Backfill COT History (52 weeks)" -> Run workflow -> Run workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
+
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Run COT backfill (52 weeks)
+        working-directory: site
+        run: |
+          echo "========================================"
+          echo "COT HISTORICAL BACKFILL -- 52 weeks"
+          echo "Source: CFTC annual TFF ZIP files"
+          echo "  Options+Futures: fin_com_txt_YYYY.zip"
+          echo "  Futures Only:    fin_fut_txt_YYYY.zip"
+          echo "========================================"
+          python3 cot_backfill_52w.py --verbose
+
+      - name: Verify output
+        working-directory: site
+        run: |
+          echo ""
+          echo "=== HISTORY DEPTH AFTER BACKFILL ==="
+          for ccy in USD EUR GBP JPY AUD CAD CHF NZD; do
+            if [ -f "cot-data/$ccy.json" ]; then
+              weeks=$(python3 -c "import json; d=json.load(open('cot-data/$ccy.json')); print(len(d.get('history', [])))")
+              first=$(python3 -c "import json; d=json.load(open('cot-data/$ccy.json')); h=d.get('history',[]); print(h[0]['weekEnding'] if h else 'n/a')")
+              last=$(python3 -c "import json; d=json.load(open('cot-data/$ccy.json')); h=d.get('history',[]); print(h[-1]['weekEnding'] if h else 'n/a')")
+              echo "  $ccy: ${weeks}w  ($first -> $last)"
+            else
+              echo "  $ccy: WARNING -- file not found"
+            fi
+          done
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add cot-data/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "COT backfill $(date +'%Y-%m-%d') -- 52w historical data from CFTC annual files"
+          for i in 1 2 3; do
+            git push && echo "Push succeeded" && exit 0
+            echo "Push rejected (attempt $i) -- rebasing..."
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "ERROR: All push attempts failed."
+          exit 1
