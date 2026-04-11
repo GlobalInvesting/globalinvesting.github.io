@@ -179,45 +179,59 @@
 .badge-ok   { background:rgba(38,166,154,.12);color:var(--up,#26a69a); }
 
 @media(max-width:600px) {
-  /* Modal: use full screen on mobile with small inset */
+  /* Modal: bottom sheet pattern */
   #cot-bd { padding:0; align-items:flex-end; }
   #cot-modal {
     width:100%;
-    height:92vh;
+    height:93vh;
     border-radius:12px 12px 0 0;
     border-bottom:none;
   }
 
-  /* Header: tighter padding, title on one line */
+  /* Header: tighter, title single line with ellipsis */
   #cot-m-hd { padding:10px 14px 9px; }
   #cot-m-title { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100% - 36px); }
-  #cot-m-sub { font-size:9px; }
+  #cot-m-sub { font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-  /* Metrics: 3 columns, 2 rows, tighter cells */
+  /* Metrics: 3-col compact */
   #cot-m-metrics { grid-template-columns:repeat(3,1fr); }
-  .cot-mm { padding:7px 10px; }
+  .cot-mm { padding:6px 10px; }
   .cot-mm-val { font-size:11px; }
-  .cot-mm-lbl { font-size:8px; }
-  .cot-mm-sub { font-size:8px; }
+  .cot-mm-lbl, .cot-mm-sub { font-size:8px; }
 
-  /* Tabs: smaller font so all 5 fit */
-  #cot-m-tabs { padding:0 10px; }
-  .cot-tab { font-size:10px; padding:8px 9px; }
+  /* Tabs: all 5 fit */
+  #cot-m-tabs { padding:0 8px; }
+  .cot-tab { font-size:10px; padding:8px 8px; }
 
-  /* Body: tighter padding */
-  #cot-m-body { padding:10px 10px; }
-  .cot-cw { padding:10px 10px; }
+  /* Body: tighter padding, must remain flex column with min-height:0 for chart fill */
+  #cot-m-body { padding:8px; }
+  .cot-cw { padding:9px 10px; margin-bottom:8px; }
   .cot-ct { font-size:9px; }
 
-  /* Overview Participants table: scroll horizontally instead of clipping */
-  #p-overview .cot-cw:last-child { overflow-x:auto; }
-  #p-overview .cot-tbl { min-width:420px; }
+  /* Net / Long/Short: body must NOT have overflow-y:auto so flex-fill works on canvas.
+     These single-chart panels disable body scroll and let the chart fill completely. */
+  #cot-m-body:has(#p-net.on),
+  #cot-m-body:has(#p-split.on) { overflow-y:hidden; }
 
-  /* History table: always scroll horizontally */
-  #p-history .cot-cw div { overflow-x:auto; }
-  #p-history .cot-tbl { min-width:560px; font-size:9px; }
+  /* Participants: taller chart on mobile so data is visible */
+  #p-participants .cot-chart-area { height:220px; }
+  /* Description text compact */
+  #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
+
+  /* Overview: gauge section compact */
+  #p-overview .cot-cw:first-child .cot-gauge-lbls { font-size:8px; }
+
+  /* Overview Participants table: horizontal scroll, no text wrap in cells */
+  #p-overview .cot-cw:last-child { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  #p-overview .cot-tbl { min-width:380px; }
+  #p-overview .cot-tbl td,
+  #p-overview .cot-tbl th { white-space:nowrap; font-size:9px; padding:4px 6px; }
+
+  /* History: horizontal scroll */
+  #p-history .cot-cw > div { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  #p-history .cot-tbl { min-width:540px; font-size:9px; }
   #p-history .cot-tbl th,
-  #p-history .cot-tbl td { padding:3px 6px; }
+  #p-history .cot-tbl td { padding:3px 5px; }
 }`;
   document.head.appendChild(s);
 })();
@@ -648,20 +662,27 @@ function openCOTModal(ccy, data) {
           id: 'inlineLegend',
           afterDraw(chart) {
             const { ctx, chartArea } = chart;
-            const x0 = chartArea.left + 8;
-            let x = x0;
-            const y = chartArea.top + 10;
+            const lineH = 16, gap = 10, lineW = 20, textOff = 24;
+            const maxX = chartArea.right - 4;
+            let x = chartArea.left + 8;
+            let y = chartArea.top + 10;
             ctx.save();
             ctx.font = `10px 'JetBrains Mono','Courier New',monospace`;
             chart.data.datasets.forEach(ds => {
+              const labelW = ctx.measureText(ds.label).width;
+              // Wrap to next line if this item would overflow
+              if (x + lineW + textOff + labelW > maxX && x > chartArea.left + 8) {
+                x = chartArea.left + 8;
+                y += lineH;
+              }
               ctx.setLineDash(ds.borderDash || []);
               ctx.strokeStyle = ds.borderColor;
               ctx.lineWidth = 2;
-              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 20, y); ctx.stroke();
+              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + lineW, y); ctx.stroke();
               ctx.setLineDash([]);
               ctx.fillStyle = '#9096a0';
-              ctx.fillText(ds.label, x + 24, y + 4);
-              x += ctx.measureText(ds.label).width + 52;
+              ctx.fillText(ds.label, x + textOff, y + 4);
+              x += lineW + textOff + labelW + gap;
             });
             ctx.restore();
           }
@@ -679,7 +700,7 @@ function openCOTModal(ccy, data) {
             maintainAspectRatio: partCfg.maintainAspectRatio,
             animation: partCfg.animation,
             interaction: partCfg.interaction,
-            layout: { padding: { top: 28, right: 4, bottom: 0, left: 0 } },
+            layout: { padding: { top: 38, right: 4, bottom: 0, left: 0 } },
             plugins: { legend: { display: false }, tooltip: partCfg.plugins.tooltip },
             scales: partCfg.scales
           },
