@@ -954,6 +954,17 @@
     /* Footer: wrap cleanly */
     #statusbar { flex-wrap: wrap; gap: 4px; font-size: 9px; padding: 4px 8px; }
     #statusbar .footer-copy { position: static; transform: none; width: 100%; order: 10; text-align: center; }
+
+    /* COT panel: horizontal scroll so all 8 columns stay readable */
+    #cot-rows { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .cot-row {
+      grid-template-columns: 32px 80px 36px 54px 46px 12px 42px 58px;
+      gap: 4px;
+      min-width: 380px;
+    }
+    .cot-sym { font-size: 10px; }
+    .cot-pct, .cot-net, .cot-wow, .cot-pcoi, .cot-oi { font-size: 9px; }
+    .cot-div { font-size: 9px; }
   }
 
   @media (max-width: 480px) {
