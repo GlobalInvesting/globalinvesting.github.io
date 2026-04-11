@@ -701,7 +701,7 @@ function openCOTModal(ccy, data) {
             maintainAspectRatio: partCfg.maintainAspectRatio,
             animation: partCfg.animation,
             interaction: partCfg.interaction,
-            layout: { padding: { top: 38, right: 4, bottom: 0, left: 0 } },
+            layout: { padding: { top: 44, right: 4, bottom: 0, left: 0 } },
             plugins: { legend: { display: false }, tooltip: partCfg.plugins.tooltip },
             scales: partCfg.scales
           },
@@ -713,7 +713,9 @@ function openCOTModal(ccy, data) {
   }
 
   bd._build = buildChart;
-  setTimeout(() => buildChart('net'), 60);
+  // Do NOT pre-build any chart here — charts must be built lazily when the user
+  // clicks a tab, so that (a) the panel is visible, (b) cot-body--chart class is set,
+  // and (c) Chart.js can measure the canvas at its actual rendered size.
 }
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
@@ -736,7 +738,7 @@ function cotTab(el, tabId) {
     body.classList.toggle('cot-body--chart', isChart);
   }
   const bd = document.getElementById('cot-bd');
-  if (bd && bd._build) setTimeout(() => bd._build(tabId), 30);
+  if (bd && bd._build) setTimeout(() => bd._build(tabId), 80);
 }
 
 // ── Close ─────────────────────────────────────────────────────────────────────
