@@ -643,13 +643,18 @@ function openCOTModal(ccy, data) {
     const isChartTab = tabId === 'net' || tabId === 'split';
     if (built[tabId] && !isChartTab) return;
     if (built[tabId] && isChartTab) {
-      // Destroy existing chart instance so we can rebuild at correct size
-      const idx = tabId === 'net' ? 0 : 1;
-      const existing = _cotCharts.find((c, i) => {
-        const cv = tabId === 'net' ? document.getElementById('c-net') : document.getElementById('c-split');
-        return cv && c.canvas === cv;
-      });
+      // Destroy existing chart instance and replace the canvas element entirely.
+      // Chart.js leaves stale width/height attributes on the canvas after destroy;
+      // a fresh canvas element guarantees Chart.js measures the container cleanly.
+      const canvasId = tabId === 'net' ? 'c-net' : 'c-split';
+      const cv = document.getElementById(canvasId);
+      const existing = cv && _cotCharts.find(c => c.canvas === cv);
       if (existing) { existing.destroy(); _cotCharts.splice(_cotCharts.indexOf(existing), 1); }
+      if (cv) {
+        const fresh = document.createElement('canvas');
+        fresh.id = canvasId;
+        cv.parentElement.replaceChild(fresh, cv);
+      }
     }
     built[tabId] = true;
 
@@ -757,8 +762,6 @@ function cotTab(el, tabId) {
           nonChartH += parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
           const h = Math.max(bodyRect.height - nonChartH, 120);
           chartArea.style.height = h + 'px';
-          const existingChart = typeof Chart !== 'undefined' && Chart.getChart(canvas);
-          if (existingChart) { existingChart.resize(chartArea.getBoundingClientRect().width, h); return; }
         }
       }
       bd._build(tabId);
