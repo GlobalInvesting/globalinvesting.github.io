@@ -2669,10 +2669,10 @@ function loadCOTChart(longSym) {
     symbol: longSym,
     theme: 'dark',
     timezone: 'Etc/UTC',
-    backgroundColor: '#0F0F0F',
-    gridColor: 'rgba(242, 242, 242, 0.06)',
+    backgroundColor: '#131722',
+    gridColor: 'rgba(42,46,57,0.8)',
     withdateranges: false,
-    compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
+    compareSymbols: [{ symbol: shortSym, position: 'SameScale', lineColor: '#e84040', lineWidth: 2 }],
     studies: [],
     autosize: true,
   });
