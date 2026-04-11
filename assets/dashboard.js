@@ -2675,6 +2675,14 @@ function loadCOTChart(longSym) {
     compareSymbols: [{ symbol: shortSym, position: 'NewPriceScale' }],
     studies: [],
     autosize: true,
+    overrides: {
+      'mainSeriesProperties.lineStyle.color': '#2962ff',
+      'mainSeriesProperties.lineStyle.linewidth': 2,
+    },
+    compareOverrides: {
+      'lineStyle.color': '#e84040',
+      'lineStyle.linewidth': 2,
+    },
   });
   container.appendChild(script);
   wrap.appendChild(container);
