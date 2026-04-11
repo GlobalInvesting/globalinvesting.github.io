@@ -22,17 +22,17 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Checkout PUBLIC site repo
-        uses: actions/checkout@v4
-        with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.PAT_TOKEN }}
-          path: site
-
       - name: Checkout THIS private repo (scripts)
         uses: actions/checkout@v4
         with:
           path: engine
+
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+          path: site
 
       - name: Setup Python
         uses: actions/setup-python@v5
