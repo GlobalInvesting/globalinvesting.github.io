@@ -2672,7 +2672,7 @@ function loadCOTChart(longSym) {
     backgroundColor: '#131722',
     gridColor: 'rgba(42,46,57,0.8)',
     withdateranges: false,
-    compareSymbols: [{ symbol: shortSym, position: 'SameScale', lineColor: '#e84040', lineWidth: 2 }],
+    compareSymbols: [{ symbol: shortSym, position: 'NewPriceScale' }],
     studies: [],
     autosize: true,
   });
