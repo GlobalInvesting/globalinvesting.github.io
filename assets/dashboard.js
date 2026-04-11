@@ -3057,7 +3057,6 @@ async function updatePairDetail(tvSym) {
               <div class="pd-val ${cls(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
             </div>`;
         })()}
-        })()}
         ${cotOI != null ? (() => {
           const isCross   = !!meta?.cross;
           const ccyTag    = cotCcy ? ` (${cotCcy})` : '';
