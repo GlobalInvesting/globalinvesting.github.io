@@ -729,14 +729,6 @@ function cotTab(el, tabId) {
   el.setAttribute('aria-selected', 'true');
   const panel = document.getElementById('p-' + tabId);
   if (panel) panel.classList.add('on');
-  // Toggle class on body so CSS can target single-chart vs multi-section tabs
-  // without relying on :has() which has uneven mobile browser support
-  const body = document.getElementById('cot-m-body');
-  if (body) {
-    const isChart = tabId === 'net' || tabId === 'split';
-    body.classList.toggle('cot-body--chart', isChart);
-  }
-  // Set body overflow and explicitly size chart containers before building
   const body = document.getElementById('cot-m-body');
   const isChartTab = tabId === 'net' || tabId === 'split';
   if (body) body.classList.toggle('cot-body--chart', isChartTab);
@@ -744,9 +736,6 @@ function cotTab(el, tabId) {
   const bd = document.getElementById('cot-bd');
   if (bd && bd._build) {
     setTimeout(() => {
-      // For single-chart tabs: measure available body height and apply to chart area
-      // This is necessary because Chart.js requires a px height on the parent element;
-      // flex:1 alone does not give Chart.js a measurable height in all browsers.
       if (isChartTab) {
         const bodyEl = document.getElementById('cot-m-body');
         const areaId = tabId === 'net' ? 'c-net' : 'c-split';
@@ -755,8 +744,8 @@ function cotTab(el, tabId) {
           const cw = canvas.closest('.cot-cw');
           const ct = cw ? cw.querySelector('.cot-ct') : null;
           const ctH = ct ? ct.offsetHeight + 8 : 20;
-          const cwPad = 24; // top+bottom padding of .cot-cw
-          const bodyPad = 16; // top+bottom padding of #cot-m-body (mobile: 8+8=16)
+          const cwPad = 24;
+          const bodyPad = 16;
           const availH = bodyEl.clientHeight - bodyPad - cwPad - ctH;
           const chartArea = canvas.parentElement;
           if (chartArea) chartArea.style.height = Math.max(availH, 120) + 'px';
