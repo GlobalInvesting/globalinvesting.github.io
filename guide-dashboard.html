@@ -684,7 +684,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <h3>Crosses</h3>
-      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by Bloomberg/Reuters ISO hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by standard ISO currency hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
       <!-- MOCK: Crosses full list (21 pairs, ISO hierarchy) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:260px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
@@ -720,7 +720,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
       <h3>Carry Trade — Top Pairs</h3>
-      <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric used in Bloomberg's Carry Monitor and JP Morgan GBI: rate differential divided by realised 30-day historical volatility (HV30). This is a vol-adjusted carry measure that reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
+      <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric for vol-adjusted carry: rate differential divided by realised 30-day historical volatility (HV30). This reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
       <p>Each row shows a regime badge for both legs of the pair (↑ hiking · ↓ cutting · → hold), derived from the same central bank trend logic used in the CB Rates panel. Clicking any row opens the pair chart in TradingView. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
       <!-- MOCK: Carry Trade Ranking — v7.14.0 institutional layout with carry-to-vol + regime badges -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:280px;font-size:11px;">
@@ -846,7 +846,7 @@ a { color: inherit; text-decoration: none; }
       </ul>
 
       <h3>Central Bank Rates</h3>
-      <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the most recent rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">— Hold</span>. Consistent with Bloomberg Terminal convention, the trend resets to neutral (—) after approximately 90 days without a policy move — regardless of the prior cycle direction.</p>
+      <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the most recent rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">— Hold</span>. The trend resets to neutral (—) after approximately 90 days without a policy move — regardless of the prior cycle direction.</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Central Bank Rates</span>

@@ -275,90 +275,108 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="the-panel">
       <h2>Reading the COT Panel</h2>
-      <p>The terminal displays COT data for EUR, GBP, JPY, AUD, CAD, and CHF futures (all quoted vs. USD). Each row shows the long/short bar, Long%, net contracts, an LF/AM alignment dot, Leveraged Funds Open Interest, and a link to the full TradingView COT chart:</p>
-      <!-- MOCK: Full COT panel — v7.13.0 layout (OI column + TV link, no sparkline) -->
+      <p>The terminal displays COT data for AUD, CAD, CHF, EUR, GBP, JPY, NZD, and USD futures (all quoted vs. USD). Each row shows the long/short bar, Long%, net contracts, the week-over-week net change (WoW Δ), an LF/AM alignment dot, net as % of LF open interest (Net%OI), and total LF open interest (OI):</p>
+      <!-- MOCK: Full COT panel — v7.15 layout (8 columns: CCY, bar, Long%, Net, WoW Δ, dot, Net%OI, OI) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">CFTC Positioning (COT)</span>
-          <span style="font-size:9.5px;color:var(--text3);">CFTC · week ending 2026-03-31 · loaded 00:16 GMT-3</span>
+          <span style="font-size:9.5px;color:var(--text3);">CFTC · week ending 2026-04-07 · loaded 22:25 GMT-3</span>
         </div>
         <div style="padding:6px 12px;">
-          <!-- Header row — 7 columns -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding-bottom:5px;border-bottom:1px solid var(--border2);margin-bottom:4px;">
-            <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span title="LF/AM alignment">&#x25CF;</span><span style="text-align:right" title="LF Open Interest">OI</span><span title="TradingView chart">TV</span>
+          <!-- Header row — 8 columns -->
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding-bottom:5px;border-bottom:1px solid var(--border2);margin-bottom:4px;">
+            <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span style="text-align:right">WoW Δ</span><span title="LF/AM alignment">&#x25CF;</span><span style="text-align:right">Net%OI</span><span style="text-align:right">OI</span>
           </div>
-          <!-- EUR -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">EUR</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:40%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:60%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">40%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-38,698</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM long">○</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">193k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+          <!-- AUD -->
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">AUD</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:71%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:29%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">71%</span>
+            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+41,458</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--up);" title="LF + AM aligned — both net long">●</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 98k</span>
           </div>
           <!-- GBP -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">GBP</span>
             <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:65%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:35%;height:100%;background:var(--down);opacity:.75;"></div></div>
             <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">65%</span>
-            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+24,859</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge">○</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">81k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+25,864</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF long · AM short">○</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 84k</span>
+          </div>
+          <!-- CHF -->
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CHF</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:47%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:53%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">47%</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-1,225</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 19k</span>
+          </div>
+          <!-- EUR -->
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">EUR</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:42%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:58%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">42%</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-31,777</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM long">○</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▼ 198k</span>
           </div>
           <!-- JPY -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">JPY</span>
             <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:35%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:65%;height:100%;background:var(--down);opacity:.75;"></div></div>
             <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">35%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-57,183</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-60,210</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
             <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">194k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▼ 199k</span>
           </div>
-          <!-- AUD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">AUD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:73%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:27%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">73%</span>
-            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+43,837</span>
-            <span style="font-size:10px;color:var(--up);" title="LF + AM aligned — both net long">●</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">97k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+          <!-- USD -->
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">USD</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:35%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:65%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">35%</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-8,724</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM long">○</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 28k</span>
           </div>
           <!-- CAD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CAD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:23%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:77%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">23%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-50,097</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge">○</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">94k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
-          </div>
-          <!-- CHF -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CHF</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:49%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:51%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">49%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-368</span>
-            <span style="font-size:10px;color:var(--up);" title="LF + AM aligned — both net short">●</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">18k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:27%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:73%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">27%</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-47,911</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM short">●</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 106k</span>
           </div>
           <!-- NZD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 14px 68px 24px;gap:8px;align-items:center;padding:7px 0;">
+          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;">
             <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">NZD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:20%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:80%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">20%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-17,798</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge">○</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">29k</span>
-            <span style="font-size:11px;color:var(--text3);">↗</span>
+            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:27%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:73%;height:100%;background:var(--down);opacity:.75;"></div></div>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">27%</span>
+            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-15,824</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
+            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 34k</span>
           </div>
         </div>
-        <div style="padding:4px 12px 6px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">● LF+AM aligned · ○ LF/AM diverge · OI = LF open interest (long + short) · TV ↗ = open chart on TradingView</div>
+        <div style="padding:4px 12px 6px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">● LF+AM aligned · ○ LF/AM diverge · WoW Δ and Net%OI populate after 2+ weeks of history · OI = LF open interest (long + short)</div>
       </div>
       <p>The horizontal bar visualizes the long/short split. Green fills from the left (longs), red fills from the right (shorts). A bar extending past the midpoint on the green side means more speculative longs than shorts. Past the midpoint on the red side means net short positioning.</p>
     </div>
