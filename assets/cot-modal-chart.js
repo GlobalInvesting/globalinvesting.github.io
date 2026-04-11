@@ -216,6 +216,9 @@
 
   /* Participants: taller chart on mobile so data is visible */
   #p-participants .cot-chart-area { height:220px; }
+  /* Net/Long-Short: fixed height matching available body space (bodyH≈424 minus chrome) */
+  #p-net .cot-chart-area,
+  #p-split .cot-chart-area { height:360px; }
   /* Description text compact */
   #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
 
