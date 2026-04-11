@@ -656,8 +656,8 @@ function openCOTModal(ccy, data) {
       const cv = document.getElementById('c-part');
       if (cv) {
         const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 }];
-        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [4, 4], borderWidth: 2 });
-        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderDash: [2, 4], borderWidth: 2 });
+        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 });
+        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 });
         // Custom inline legend drawn inside the chart area — prevents Chart.js legend from stealing horizontal space
         const inlineLegend = {
           id: 'inlineLegend',
@@ -676,11 +676,10 @@ function openCOTModal(ccy, data) {
                 x = chartArea.left + 8;
                 y += lineH;
               }
-              ctx.setLineDash(ds.borderDash || []);
               ctx.strokeStyle = ds.borderColor;
               ctx.lineWidth = 2;
-              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + lineW, y); ctx.stroke();
               ctx.setLineDash([]);
+              ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + lineW, y); ctx.stroke();
               ctx.fillStyle = '#9096a0';
               ctx.fillText(ds.label, x + textOff, y + 4);
               x += lineW + textOff + labelW + gap;
@@ -737,8 +736,35 @@ function cotTab(el, tabId) {
     const isChart = tabId === 'net' || tabId === 'split';
     body.classList.toggle('cot-body--chart', isChart);
   }
+  // Set body overflow and explicitly size chart containers before building
+  const body = document.getElementById('cot-m-body');
+  const isChartTab = tabId === 'net' || tabId === 'split';
+  if (body) body.classList.toggle('cot-body--chart', isChartTab);
+
   const bd = document.getElementById('cot-bd');
-  if (bd && bd._build) setTimeout(() => bd._build(tabId), 80);
+  if (bd && bd._build) {
+    setTimeout(() => {
+      // For single-chart tabs: measure available body height and apply to chart area
+      // This is necessary because Chart.js requires a px height on the parent element;
+      // flex:1 alone does not give Chart.js a measurable height in all browsers.
+      if (isChartTab) {
+        const bodyEl = document.getElementById('cot-m-body');
+        const areaId = tabId === 'net' ? 'c-net' : 'c-split';
+        const canvas = document.getElementById(areaId);
+        if (bodyEl && canvas) {
+          const cw = canvas.closest('.cot-cw');
+          const ct = cw ? cw.querySelector('.cot-ct') : null;
+          const ctH = ct ? ct.offsetHeight + 8 : 20;
+          const cwPad = 24; // top+bottom padding of .cot-cw
+          const bodyPad = 16; // top+bottom padding of #cot-m-body (mobile: 8+8=16)
+          const availH = bodyEl.clientHeight - bodyPad - cwPad - ctH;
+          const chartArea = canvas.parentElement;
+          if (chartArea) chartArea.style.height = Math.max(availH, 120) + 'px';
+        }
+      }
+      bd._build(tabId);
+    }, 80);
+  }
 }
 
 // ── Close ─────────────────────────────────────────────────────────────────────
