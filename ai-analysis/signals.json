@@ -1,9 +1,9 @@
 [
   {
-    "time": "21:50",
+    "time": "02:35",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk elevated as USD/JPY trades above 159.00, testing 160.00 resistance",
+    "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
@@ -11,32 +11,32 @@
     ]
   },
   {
-    "time": "21:48",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1700, with ECB cutting rates and Fed on hold, EUR/USD may extend gains",
-    "evidence": [
-      "EUR/USD: 1.1711",
-      "ECB rate: 2.00% (CUTTING)",
-      "Fed rate: 3.75% (ON HOLD)"
-    ]
-  },
-  {
-    "time": "21:45",
+    "time": "02:30",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "Leveraged Fund net long EUR at 77.3%, a multi-year extreme, watch for potential long squeeze",
+    "text": "EUR net long positioning at 77.3% long, with leveraged funds holding +1,029 contracts, may lead to a squeeze if market sentiment shifts.",
     "evidence": [
-      "CFTC EUR net: +1,029",
-      "long%=77.3%",
-      "week ending: 2026-04-07"
+      "EUR net long: +1,029",
+      "long%: 77.3%",
+      "CFTC week ending: 2026-04-07"
     ]
   },
   {
-    "time": "21:40",
+    "time": "02:25",
+    "priority": "warning",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding above 0.7072, with RBA hiking rates, AUD carry supported; however, retail sentiment is 86% short, indicating potential for a contrarian reversal.",
+    "evidence": [
+      "AUD/USD: 0.7072",
+      "RBA rate: 4.10%",
+      "AUD/USD retail sentiment: 86% short"
+    ]
+  },
+  {
+    "time": "02:20",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals low volatility, not a risk-on environment, while MOVE Index at 72.2 indicates low bond market stress",
+    "text": "VIX at 19.2 signals normal volatility — not a risk-on environment, while MOVE Index at 72.2 indicates relatively low bond market stress.",
     "evidence": [
       "VIX: 19.2",
       "MOVE Index: 72.2",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "21:35",
+    "time": "02:15",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading below 0.7100, with RBA hiking rates, watch for potential further declines",
+    "title": "Cross-Asset Correlation Breaks",
+    "text": "USD/JPY vs VIX correlation break, with z = +1.39σ, indicates JPY no longer acting as a safe haven, potentially impacting USD/JPY positioning.",
     "evidence": [
-      "AUD/USD: 0.7072",
-      "RBA rate: 4.10% (HIKING)",
-      "US 10Y yield: 4.29%"
+      "USD/JPY vs VIX corr: +0.680",
+      "z: +1.39σ",
+      "norm: +0.135"
     ]
   }
 ]
