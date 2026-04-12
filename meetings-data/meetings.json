@@ -1,21 +1,17 @@
 {
-  "lastUpdate": "2026-04-10",
+  "lastUpdate": "2026-04-12",
   "meetings": {
     "USD": {
-      "nextMeeting": "29 Apr",
-      "nextMeetingISO": "2026-04-29",
+      "nextMeeting": "26 Jan",
+      "nextMeetingISO": "2028-01-26",
       "allMeetings": [
-        "2026-04-29",
-        "2026-09-16",
-        "2026-10-28"
+        "2028-01-26"
       ],
       "allMeetingsFormatted": [
-        "29 Apr",
-        "16 Sep",
-        "28 Oct"
+        "26 Jan"
       ],
-      "bias": "hold",
-      "source": "federalreserve.gov (pending next run)"
+      "source": "federalreserve.gov",
+      "bias": "hold"
     },
     "EUR": {
       "nextMeeting": "30 Apr",
@@ -36,8 +32,8 @@
         "29 Oct",
         "17 Dec"
       ],
-      "bias": "hold",
-      "source": "ecb.europa.eu (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hold"
     },
     "GBP": {
       "nextMeeting": "30 Apr",
@@ -58,8 +54,8 @@
         "5 Nov",
         "17 Dec"
       ],
-      "bias": "hold",
-      "source": "bankofengland.co.uk (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hold"
     },
     "JPY": {
       "nextMeeting": "28 Apr",
@@ -78,8 +74,8 @@
         "18 Sep",
         "30 Oct"
       ],
-      "bias": "hike",
-      "source": "boj.or.jp (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hike"
     },
     "AUD": {
       "nextMeeting": "5 May",
@@ -100,8 +96,8 @@
         "3 Nov",
         "8 Dec"
       ],
-      "bias": "hike",
-      "source": "rba.gov.au (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hike"
     },
     "CAD": {
       "nextMeeting": "29 Apr",
@@ -122,8 +118,8 @@
         "28 Oct",
         "9 Dec"
       ],
-      "bias": "hold",
-      "source": "bankofcanada.ca (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hold"
     },
     "CHF": {
       "nextMeeting": "18 Jun",
@@ -138,8 +134,8 @@
         "24 Sep",
         "10 Dec"
       ],
-      "bias": "hold",
-      "source": "snb.ch (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hold"
     },
     "NZD": {
       "nextMeeting": "26 May",
@@ -158,8 +154,8 @@
         "28 Oct",
         "9 Dec"
       ],
-      "bias": "hold",
-      "source": "rbnz.govt.nz (pending next run)"
+      "source": "cbrates.com (fallback)",
+      "bias": "hold"
     }
   }
 }
