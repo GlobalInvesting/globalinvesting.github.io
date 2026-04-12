@@ -327,6 +327,30 @@ const TYPICAL_SPREADS = new Proxy({}, {
 const FX_PERF_CACHE = {};
 
 // ── Key Correlations — populated from intraday-data/quotes.json (computed by Python script) ──
+// Supports three selectable windows: 30d, 60d (default), 90d.
+// The Python script emits corr30/corr90 alongside corr (60d) in every correlation entry.
+
+let _corrWindow = 60;  // active window; toggled by setCorrWindow()
+
+function setCorrWindow(w) {
+  if (w === _corrWindow) return;
+  _corrWindow = w;
+  // Update button styles
+  [30, 60, 90].forEach(n => {
+    const btn = document.getElementById('corr-btn-' + n);
+    if (!btn) return;
+    const active = n === w;
+    btn.style.background = active ? 'var(--accent)' : 'var(--bg3)';
+    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border2)';
+    btn.style.color       = active ? '#fff'          : 'var(--text3)';
+  });
+  // Update column header
+  const th = document.getElementById('corr-th-window');
+  if (th) th.textContent = w + 'd';
+  // Re-render with cached data
+  populateCorrelations();
+}
+
 async function populateCorrelations() {
   try {
     const data = await loadIntradayQuotes();
@@ -336,7 +360,12 @@ async function populateCorrelations() {
     if (!Array.isArray(corrs) || corrs.length === 0) return;
 
     tbody.innerHTML = corrs.map(c => {
-      const v = c.corr;
+      // Pick the value for the active window
+      let v;
+      if (_corrWindow === 30)      v = c.corr30 ?? c.corr ?? null;
+      else if (_corrWindow === 90) v = c.corr90 ?? c.corr ?? null;
+      else                         v = c.corr ?? null;
+
       const corrCell = v == null
         ? `<td style="color:var(--text3)">—</td>`
         : (() => {
@@ -345,7 +374,7 @@ async function populateCorrelations() {
             return `<td class="${cls}">${sign}${v.toFixed(2)}</td>`;
           })();
 
-      // vs norm cell: badge based on z_score
+      // vs norm cell: badge based on z_score (always uses 60d corr as baseline — unchanged)
       const z = c.z_score;
       let normCell;
       if (z == null || c.norm == null) {
@@ -353,7 +382,6 @@ async function populateCorrelations() {
       } else {
         const absZ = Math.abs(z);
         const normSign = c.norm >= 0 ? '+' : '';
-        // Badge: green = normal (|z|<1), amber = stretched (1–1.5), red = broken (>1.5)
         let badgeCls, badgeLabel;
         if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '⚠ broken'; }
         else if (absZ >= 1.5) { badgeCls = 'down'; badgeLabel = '↯ break'; }
@@ -735,7 +763,7 @@ async function fetchCOTData() {
   const results = (await Promise.all(promises)).filter(Boolean);
   if (!results.length) return;
 
-  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ"
+  // Timestamp label — "CFTC · week ending 2026-03-28 · updated Sat 04 Apr · loaded HH:MM TZ · N days ago"
   const latest = results[0];
   const weekEnd = latest.weekEnding || latest.reportDate || '';
   let updLabel = 'CFTC · week ending ' + weekEnd;
@@ -752,7 +780,26 @@ async function fetchCOTData() {
   const _cotHHMM = _cotNow.getHours().toString().padStart(2,'0') + ':' + _cotNow.getMinutes().toString().padStart(2,'0');
   const _cotTZ = _cotNow.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
   updLabel += ' · loaded ' + _cotHHMM + ' ' + _cotTZ;
-  setEl('cot-date-sub', updLabel);
+
+  // ── Lag indicator: days since week-ending date ──────────────────────────────
+  // COT data has a structural lag: CFTC reports Tuesday positions on Friday,
+  // terminal updates Saturday. Show the lag visually so traders can judge staleness.
+  let lagHtml = '';
+  if (weekEnd) {
+    try {
+      const msPerDay = 86400000;
+      const lagDays  = Math.floor((_cotNow.getTime() - new Date(weekEnd + 'T00:00:00Z').getTime()) / msPerDay);
+      if (lagDays >= 0) {
+        // Freshness: ≤7d = green (just published), ≤14d = amber (one cycle old), >14d = red (stale)
+        const lagColor = lagDays <= 7 ? 'var(--up)' : lagDays <= 14 ? '#c8952a' : 'var(--down)';
+        const lagDot   = lagDays <= 7 ? '●' : lagDays <= 14 ? '◐' : '○';
+        lagHtml = ` · <span title="Days since week-ending date · CFTC publishes Fri, terminal updates Sat" style="color:${lagColor};font-variant-numeric:tabular-nums;">${lagDot} ${lagDays}d lag</span>`;
+      }
+    } catch {}
+  }
+
+  const subEl = document.getElementById('cot-date-sub');
+  if (subEl) subEl.innerHTML = updLabel + lagHtml;
 
   const container = document.getElementById('cot-rows');
   if (!container) return;
@@ -3845,13 +3892,23 @@ async function fetchFedExpectations() {
       // Always compute trendDir for use in FWD projection — bias field only overrides the label
       const trendDir    = computeCBTrend(obs);   // 'up' | 'down' | 'flat' — always needed for FWD
       const meetingsBias = meetings?.bias;
+
+      // ── Market-implied cut probability (CME/ASX where available; null otherwise) ──
+      const cutProb = meetings?.cutProb ?? null;  // number (0–100) or null
+      let probSuffix = '';
+      if (cutProb !== null) {
+        // Show as small chip: e.g. "42% cut" — sourced from OIS/futures via engine
+        const probCls = cutProb >= 60 ? 'down' : cutProb >= 40 ? '' : 'flat';
+        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;" title="Market-implied probability of a cut at next meeting · CME FedWatch / ASX Rate Indicator">${cutProb}%↓</span>`;
+      }
+
       let biasLabel;
       if (meetingsBias === 'cut') {
-        biasLabel = '<span class="down">↓ Cut</span>';
+        biasLabel = '<span class="down">↓ Cut</span>' + probSuffix;
       } else if (meetingsBias === 'hike') {
-        biasLabel = '<span class="up">↑ Hike</span>';
+        biasLabel = '<span class="up">↑ Hike</span>' + probSuffix;
       } else if (meetingsBias === 'hold') {
-        biasLabel = '<span class="flat">→ Hold</span>';
+        biasLabel = '<span class="flat">→ Hold</span>' + probSuffix;
       } else {
         // Fallback: derive from historical rate trajectory (no OIS/futures data available).
         // ~ prefix signals this is an estimate, not a curated market-consensus value —
@@ -3859,6 +3916,7 @@ async function fetchFedExpectations() {
         biasLabel = trendDir === 'down' ? '<span class="down">~ ↓ Cut</span>'
                   : trendDir === 'up'   ? '<span class="up">~ ↑ Hike</span>'
                   :                       '<span class="flat">~ → Hold</span>';
+        biasLabel += probSuffix;
       }
 
       // ── Forward rate via Covered Interest Parity (CIP) ───────────
