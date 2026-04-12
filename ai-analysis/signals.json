@@ -1,9 +1,9 @@
 [
   {
-    "time": "13:35",
+    "time": "16:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.19 resistance, BoJ intervention risk rising as it approaches the 160.00 level",
+    "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
@@ -11,47 +11,47 @@
     ]
   },
   {
-    "time": "13:33",
+    "time": "15:58",
     "priority": "warning",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1711, with ECB rate at 2% and Fed rate at 3.75%; rate divergence may weigh on EUR/USD.",
+    "evidence": [
+      "EUR/USD: 1.1711",
+      "ECB rate: 2%",
+      "Fed rate: 3.75%"
+    ]
+  },
+  {
+    "time": "15:55",
+    "priority": "warning",
+    "title": "CFTC — EUR",
+    "text": "EUR net long position at 77.3% (lev_net=+1,029); watch for potential long squeeze.",
+    "evidence": [
+      "CFTC EUR net: +1,029",
+      "EUR long%: 77.3%",
+      "week ending: 2026-04-07"
+    ]
+  },
+  {
+    "time": "15:50",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "VIX at 19.2 signals normal volatility — not a risk-on environment.",
+    "evidence": [
+      "VIX: 19.2",
+      "S&P 500: 6,817",
+      "MOVE Index: 72.2"
+    ]
+  },
+  {
+    "time": "15:45",
+    "priority": "info",
     "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7072, RBA hiking rates supports AUD carry, but watch for growth/risk-off factors",
+    "text": "AUD/USD trading below 0.7072, with RBA hiking rates; AUD carry supported, but growth concerns may dominate.",
     "evidence": [
       "AUD/USD: 0.7072",
       "RBA rate: 4.10%",
       "US 10Y yield: 4.29%"
-    ]
-  },
-  {
-    "time": "13:30",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading above 1.1711, ECB on hold, watch for EUR/USD squeeze risk with Leveraged Fund net long 77.3%",
-    "evidence": [
-      "EUR/USD: 1.1711",
-      "ECB rate: 2.00%",
-      "CFTC EUR net: +1,029"
-    ]
-  },
-  {
-    "time": "13:25",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 19.2 signals low volatility, but watch for regime change with MOVE Index at 72.2",
-    "evidence": [
-      "VIX: 19.2",
-      "MOVE Index: 72.2",
-      "S&P 500: 6,817"
-    ]
-  },
-  {
-    "time": "13:20",
-    "priority": "info",
-    "title": "USD/JPY Correlation Break",
-    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven, watch for FX positioning implications",
-    "evidence": [
-      "USD/JPY vs VIX: corr=+0.680",
-      "z=+1.39σ",
-      "VIX: 19.2"
     ]
   }
 ]
