@@ -353,37 +353,180 @@ function _destroyCharts() {
 
 const _monoFont = "'JetBrains Mono','Courier New',monospace";
 
+// ── TradingView-style chart theme ─────────────────────────────────────────────
+// Grid: very subtle 6% white — matches TW's rgba(242,242,242,0.06)
+// Ticks: right-aligned Y axis, compact mono labels
+// Crosshair: vertical line on hover (custom plugin below)
+// Tooltip: TW-style dark card, monospaced values, colored per dataset
+// Border: chart area border disabled — TW uses no box, just grid lines
+// ─────────────────────────────────────────────────────────────────────────────
+
+const _TV_GRID     = 'rgba(242,242,242,0.06)';
+const _TV_TICK     = '#787b86';
+const _TV_BG_TIP   = '#1e222d';
+const _TV_BDR_TIP  = 'rgba(255,255,255,0.12)';
+
+// Crosshair plugin — vertical dashed line at hover position
+const _crosshairPlugin = {
+  id: 'tvCrosshair',
+  afterDraw(chart) {
+    const { ctx, chartArea, tooltip } = chart;
+    if (!tooltip || !tooltip._active || !tooltip._active.length) return;
+    const x = tooltip._active[0].element.x;
+    if (x < chartArea.left || x > chartArea.right) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, chartArea.top);
+    ctx.lineTo(x, chartArea.bottom);
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
+// Y-axis price badge plugin — draws a filled rect + value label at the last data point
+// Mirrors TradingView's right-side price badge on the current bar
+const _priceBadgePlugin = {
+  id: 'tvPriceBadge',
+  afterDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!scales.y) return;
+    chart.data.datasets.forEach((ds, i) => {
+      const meta = chart.getDatasetMeta(i);
+      if (!meta.visible) return;
+      const vals = ds.data.filter(v => v != null);
+      if (!vals.length) return;
+      // Find the last non-null data point
+      let lastIdx = -1;
+      for (let k = ds.data.length - 1; k >= 0; k--) {
+        if (ds.data[k] != null) { lastIdx = k; break; }
+      }
+      if (lastIdx < 0) return;
+      const val = ds.data[lastIdx];
+      const yPx = scales.y.getPixelForValue(val);
+      if (yPx < chartArea.top || yPx > chartArea.bottom) return;
+      const color  = ds.borderColor || ds.backgroundColor || '#9096a0';
+      const label  = _cotFmt(val);
+      const fSize  = 9;
+      ctx.font     = `${fSize}px ${_monoFont}`;
+      const tw     = ctx.measureText(label).width;
+      const bW     = tw + 10, bH = 14;
+      const bX     = chartArea.right + 2;
+      const bY     = yPx - bH / 2;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(bX, bY, bW, bH, 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, bX + 5, yPx);
+      ctx.restore();
+    });
+  }
+};
+
 const _chartDefaults = {
   responsive: true, maintainAspectRatio: false,
-  animation: { duration: 350 },
+  animation: { duration: 300, easing: 'easeOutQuart' },
   interaction: { mode: 'index', intersect: false },
-  layout: { padding: { top: 8, right: 4, bottom: 0, left: 0 } },
+  layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } },  // right padding for badge
   plugins: {
     legend: {
       position: 'top', align: 'start',
-      labels: { color: '#9096a0', font: { family: _monoFont, size: 10 }, boxWidth: 14, padding: 14 }
+      labels: {
+        color: _TV_TICK,
+        font: { family: _monoFont, size: 10 },
+        boxWidth: 16, boxHeight: 2, padding: 14,
+        usePointStyle: false,
+        generateLabels(chart) {
+          // Custom: render a thin line swatch instead of a box
+          return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(item => {
+            item.lineWidth = 2;
+            return item;
+          });
+        }
+      }
     },
     tooltip: {
-      backgroundColor: '#1e222d', titleColor: '#d1d4dc', bodyColor: '#9096a0',
-      borderColor: 'rgba(255,255,255,.1)', borderWidth: 1, padding: 10, cornerRadius: 6,
-      callbacks: { label: ctx => ` ${ctx.dataset.label}: ${_cotFmt(ctx.raw)}` }
-    }
+      backgroundColor: _TV_BG_TIP,
+      titleColor: '#d1d4dc',
+      bodyColor: '#9096a0',
+      borderColor: _TV_BDR_TIP,
+      borderWidth: 1,
+      padding: { x: 12, y: 8 },
+      cornerRadius: 4,
+      caretSize: 5,
+      usePointStyle: true,
+      callbacks: {
+        label(ctx) {
+          const col = ctx.dataset.borderColor || ctx.dataset.backgroundColor;
+          return ` ${ctx.dataset.label}: ${_cotFmt(ctx.raw)}`;
+        },
+        labelColor(ctx) {
+          const c = ctx.dataset.borderColor || ctx.dataset.backgroundColor || '#9096a0';
+          return { borderColor: c, backgroundColor: c };
+        }
+      }
+    },
+    tvCrosshair: _crosshairPlugin,
+    tvPriceBadge: _priceBadgePlugin,
   },
   scales: {
     x: {
-      ticks: { color: '#6b7280', font: { family: _monoFont, size: 9 }, maxRotation: 45, maxTicksLimit: 14 },
-      grid:  { color: 'rgba(255,255,255,.04)' }
+      ticks: {
+        color: _TV_TICK,
+        font: { family: _monoFont, size: 9 },
+        maxRotation: 0, autoSkip: true, maxTicksLimit: 12,
+        padding: 4
+      },
+      grid:  { color: _TV_GRID, drawBorder: false },
+      border: { display: false }
     },
     y: {
-      ticks: { color: '#6b7280', font: { family: _monoFont, size: 9 }, callback: v => _cotFmt(v) },
-      grid:  { color: 'rgba(255,255,255,.06)' }
+      position: 'right',
+      ticks: {
+        color: _TV_TICK,
+        font: { family: _monoFont, size: 9 },
+        callback: v => _cotFmt(v),
+        padding: 6, maxTicksLimit: 8
+      },
+      grid:  { color: _TV_GRID, drawBorder: false },
+      border: { display: false }
     }
   }
 };
 
+// ── Register custom plugins globally ─────────────────────────────────────────
+// Must run after Chart.js is loaded. dashboard.js loads Chart.js synchronously
+// before this file, so Chart is guaranteed to be available here.
+if (typeof Chart !== 'undefined') {
+  Chart.register(_crosshairPlugin, _priceBadgePlugin);
+  // Disable Chart.js default box drawing for legend — use line style
+  Chart.defaults.plugins.legend.labels.usePointStyle = false;
+}
+
 function _lineChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const cfg = JSON.parse(JSON.stringify(_chartDefaults));
+  // Re-attach non-serialisable plugin references lost in JSON round-trip
+  cfg.plugins.tvCrosshair  = _crosshairPlugin;
+  cfg.plugins.tvPriceBadge = _priceBadgePlugin;
+  // TradingView-style dataset defaults: smooth bezier, area fill, visible points on last
+  datasets = datasets.map(ds => Object.assign({
+    tension:       0.4,
+    borderWidth:   2,
+    pointRadius:   2,
+    pointHoverRadius: 4,
+    pointBackgroundColor: ds.borderColor,
+    pointBorderColor:     ds.borderColor,
+    pointBorderWidth: 0,
+    fill: false,
+    backgroundColor: 'transparent',
+    spanGaps: true,
+  }, ds));
   cfg.type = 'line';
   cfg.data = { labels, datasets };
   if (overrides) Object.assign(cfg, overrides);
@@ -395,22 +538,37 @@ function _lineChart(canvas, labels, datasets, overrides) {
 function _barChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const cfg = JSON.parse(JSON.stringify(_chartDefaults));
-  cfg.type = 'bar';
-  cfg.data = { labels, datasets };
-  cfg.plugins = cfg.plugins || {};
+  cfg.plugins.tvCrosshair  = _crosshairPlugin;
+  cfg.plugins.tvPriceBadge = _priceBadgePlugin;
+  // Zero line: solid white 1px — TW convention for bar charts
   cfg.plugins.zeroLine = {
     id: 'zeroLine',
     afterDraw(chart) {
       const { ctx, chartArea, scales } = chart;
       const y0 = scales.y.getPixelForValue(0);
-      if (y0 >= chartArea.top && y0 <= chartArea.bottom) {
-        ctx.save(); ctx.beginPath();
-        ctx.moveTo(chartArea.left, y0); ctx.lineTo(chartArea.right, y0);
-        ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]); ctx.stroke(); ctx.restore();
-      }
+      if (y0 < chartArea.top || y0 > chartArea.bottom) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(chartArea.left, y0);
+      ctx.lineTo(chartArea.right, y0);
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.restore();
     }
   };
+  // TW bar style: no border radius, 70% opacity, full saturation colors
+  datasets = datasets.map(ds => Object.assign({
+    borderWidth:   0,
+    borderRadius:  2,
+    borderSkipped: false,
+    hoverBackgroundColor: undefined,   // let Chart.js compute hover from backgroundColor
+    barPercentage: 0.85,
+    categoryPercentage: 0.9,
+  }, ds));
+  cfg.type = 'bar';
+  cfg.data = { labels, datasets };
   if (overrides) Object.assign(cfg, overrides);
   const c = new Chart(canvas, cfg);
   _cotCharts.push(c);
@@ -431,14 +589,19 @@ function _cotSparkline(history, nWeeks) {
   const pts = vals.map((v, i) => x(i) + ',' + y(v)).join(' ');
   const last = vals[vals.length - 1];
   const col = last >= 0 ? '#26a69a' : '#ef5350';
+  const fillCol = last >= 0 ? 'rgba(38,166,154,0.12)' : 'rgba(239,83,80,0.12)';
+  // Area fill polygon: line path + bottom-right + bottom-left corner
+  const firstX = x(0), lastX = x(vals.length - 1);
+  const fillPts = pts + ` ${lastX},${H - pad} ${firstX},${H - pad}`;
   const zeroY = (H - pad - ((0 - mn) / range) * (H - pad * 2));
   const zeroLine = (zeroY >= pad && zeroY <= H - pad)
-    ? `<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W - pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`
+    ? `<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W - pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`
     : '';
   return `<svg viewBox="0 0 ${W} ${H}" class="cot-spark" aria-hidden="true">
     ${zeroLine}
+    <polygon points="${fillPts}" fill="${fillCol}"/>
     <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="3" fill="${col}"/>
+    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="2.5" fill="${col}" stroke="${col}" stroke-width="1"/>
   </svg>`;
 }
 
@@ -889,17 +1052,17 @@ function openCOTModal(ccy, data) {
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
         _lineChart(cv, labels, [
-          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,.08)', fill: true, tension: .3, pointRadius: 2 },
-          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,.08)',  fill: true, tension: .3, pointRadius: 2 },
+          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,0.12)', fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 },
+          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.12)',  fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 },
         ], { responsive: false });
       }
     }
     if (tabId === 'participants') {
       const cv = document.getElementById('c-part');
       if (cv) {
-        const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 }];
-        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 });
-        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: .3, pointRadius: 2, borderWidth: 2 });
+        const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 }];
+        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 });
+        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 });
 
         // Build HTML legend above the chart — avoids any canvas overlap
         const legendEl = document.getElementById('cot-part-legend');
