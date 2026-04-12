@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// COT MODAL CHART  v1.1
+// COT MODAL CHART  v1.2
 // File: assets/cot-modal-chart.js
 // Loaded AFTER dashboard.js and Chart.js (see index.html)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -180,6 +180,30 @@
 .badge-warn { background:rgba(255,152,0,.15);color:#ff9800; }
 .badge-ok   { background:rgba(38,166,154,.12);color:var(--up,#26a69a); }
 
+
+/* Overview v2: 2-col top grid + 3-col bottom row */
+.cot-ov-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
+}
+.cot-ov-bottom {
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+}
+@media(max-width:600px) {
+  .cot-ov-grid { grid-template-columns:1fr; }
+  .cot-ov-bottom { grid-template-columns:1fr; }
+}
+/* Right card in top grid: stacked sections */
+.cot-ov-r-divider {
+  border-top:1px solid rgba(255,255,255,.06);margin-top:10px;padding-top:10px;
+}
+/* Signal dot */
+.cot-sig-dot {
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:6px;flex-shrink:0;vertical-align:middle;
+}
+/* Sparkline SVG */
+.cot-spark { display:block;width:100%;height:44px; }
+
 @media(max-width:600px) {
   /* Modal: bottom sheet pattern */
   #cot-bd { padding:0; align-items:flex-end; }
@@ -222,14 +246,12 @@
   /* Description text compact */
   #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
 
-  /* Overview: gauge section compact */
-  #p-overview .cot-cw:first-child .cot-gauge-lbls { font-size:8px; }
-
-  /* Overview Participants table: horizontal scroll, no text wrap in cells */
-  #p-overview .cot-cw:last-child { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  #p-overview .cot-tbl { min-width:380px; }
+  /* Overview: gauge compact on mobile */
+  #p-overview .cot-gauge-lbls { font-size:8px; }
+  /* Overview: participants table scroll */
+  #p-overview .cot-tbl { min-width:280px; }
   #p-overview .cot-tbl td,
-  #p-overview .cot-tbl th { white-space:nowrap; font-size:9px; padding:4px 6px; }
+  #p-overview .cot-tbl th { white-space:nowrap; font-size:9px; padding:3px 5px; }
 
   /* History: horizontal scroll */
   #p-history .cot-cw > div { overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -357,6 +379,95 @@ function _barChart(canvas, labels, datasets, overrides) {
   return c;
 }
 
+
+// ── Overview helper functions ─────────────────────────────────────────────────
+
+function _cotSparkline(history, nWeeks) {
+  const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)));
+  if (vals.length < 2) return '<div style="height:44px;display:flex;align-items:center;font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
+  const mn = Math.min(...vals), mx = Math.max(...vals);
+  const range = mx - mn || 1;
+  const W = 200, H = 44, pad = 4;
+  const x = (i) => (pad + (i / (vals.length - 1)) * (W - pad * 2)).toFixed(1);
+  const y = (v)  => (H - pad - ((v - mn) / range) * (H - pad * 2)).toFixed(1);
+  const pts = vals.map((v, i) => x(i) + ',' + y(v)).join(' ');
+  const last = vals[vals.length - 1];
+  const col = last >= 0 ? '#26a69a' : '#ef5350';
+  const zeroY = (H - pad - ((0 - mn) / range) * (H - pad * 2));
+  const zeroLine = (zeroY >= pad && zeroY <= H - pad)
+    ? \`<line x1="\${pad}" y1="\${zeroY.toFixed(1)}" x2="\${W - pad}" y2="\${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.1)" stroke-width="0.5" stroke-dasharray="3,3"/>\`
+    : '';
+  return \`<svg viewBox="0 0 \${W} \${H}" class="cot-spark" aria-hidden="true">
+    \${zeroLine}
+    <polyline points="\${pts}" fill="none" stroke="\${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="\${x(vals.length-1)}" cy="\${y(last)}" r="3" fill="\${col}"/>
+  </svg>\`;
+}
+
+function _cotTrendLabel(history) {
+  const n = Math.min(history.length, 4);
+  if (n < 2) return '—';
+  const recent = history.slice(-n).map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)));
+  let up = 0, dn = 0;
+  for (let i = 1; i < recent.length; i++) {
+    if (recent[i] > recent[i-1]) up++; else if (recent[i] < recent[i-1]) dn++;
+  }
+  const streak = up === n - 1 ? 'Accumulating' : dn === n - 1 ? 'Distributing' : 'Mixed';
+  return streak + ' · ' + (n - 1) + ' consecutive weeks';
+}
+
+function _cotRangeCard(history, current) {
+  const vals = history.map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0))).filter(v => v != null);
+  if (vals.length < 2) return '<div style="font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
+  const hi = Math.max(...vals), lo = Math.min(...vals);
+  const rows = [
+    { label: vals.length + 'w High', val: hi,     cls: 'cu' },
+    { label: 'Current',              val: current, cls: _cotCls(current) },
+    { label: vals.length + 'w Low',  val: lo,      cls: 'cd' },
+  ];
+  // Range bar: where is current in [lo, hi]
+  const pct = hi !== lo ? Math.round((current - lo) / (hi - lo) * 100) : 50;
+  const bar = \`<div style="margin:8px 0 6px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;">
+    <div style="position:absolute;left:0;top:0;height:100%;width:\${pct}%;background:var(--up,#26a69a);border-radius:2px;"></div>
+    <div style="position:absolute;top:-3px;left:calc(\${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg,#131722);"></div>
+  </div>\`;
+  const rowsHtml = rows.map(r =>
+    \`<div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:2px 0;">
+      <span style="color:var(--text3,#6b7280)">\${r.label}</span>
+      <span class="\${r.cls}">\${_cotFmt(r.val)}</span>
+    </div>\`
+  ).join('');
+  return bar + rowsHtml;
+}
+
+function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore) {
+  const signals = [];
+  // LF direction
+  if (net > 0) signals.push({ col: '#26a69a', text: 'LF net long — bullish signal' });
+  else if (net < 0) signals.push({ col: '#ef5350', text: 'LF net short — bearish signal' });
+  else signals.push({ col: '#9096a0', text: 'LF neutral' });
+  // LF/AM alignment
+  if (amNet != null) {
+    if (aligned) signals.push({ col: '#26a69a', text: 'LF/AM aligned — reinforced' });
+    else signals.push({ col: '#ff9800', text: 'LF/AM diverging — exercise caution' });
+  }
+  // Crowding
+  if (isCrowded) signals.push({ col: '#ff9800', text: 'Crowded trade (z ≥ 1.5σ)' });
+  else signals.push({ col: '#26a69a', text: 'Not crowded (z < 1.5σ)' });
+  // Dealer contrarian
+  if (ddNet != null) {
+    const contra = (net > 0 && ddNet < 0) || (net < 0 && ddNet > 0);
+    if (contra) signals.push({ col: '#ff9800', text: 'Dealers contra-positioned' });
+    else signals.push({ col: '#9096a0', text: 'Dealers aligned with LF' });
+  }
+  return signals.map(s =>
+    \`<div style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:3px 0;">
+      <span class="cot-sig-dot" style="background:\${s.col}"></span>
+      <span style="color:var(--text2,#9096a0)">\${s.text}</span>
+    </div>\`
+  ).join('');
+}
+
 // ── Build modal HTML ──────────────────────────────────────────────────────────
 
 function openCOTModal(ccy, data) {
@@ -466,76 +577,102 @@ function openCOTModal(ccy, data) {
     <!-- OVERVIEW ──────────────────────────────────────────── -->
     <div id="p-overview" class="cot-panel on">
 
-      <div class="cot-cw">
-        <div class="cot-ct">POSITIONING GAUGE · Z-SCORE VS ${nWks}-WEEK HISTORY</div>
-        <div class="cot-gauge-track">
-          <div class="cot-gauge-pin" id="cot-pin" style="left:50%"></div>
-        </div>
-        <div class="cot-gauge-lbls">
-          <span>Extreme Short<br>(&lt;−2σ)</span>
-          <span style="text-align:center">Short<br>(−1.5σ)</span>
-          <span style="text-align:center">Neutral</span>
-          <span style="text-align:center">Long<br>(+1.5σ)</span>
-          <span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--text2,#9096a0);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6">
-          Positioning: <strong style="color:${zInfo.color}">${zInfo.text}</strong>
-          ${pctHist != null ? ` · Historical percentile <strong>${pctHist}%</strong>` : ''}
-          ${isCrowded ? `<span class="badge-ext badge-warn">CROWDED TRADE</span>` : `<span class="badge-ext badge-ok">Within normal range</span>`}
-        </div>
-      </div>
+      <div class="cot-ov-grid">
 
-      <div class="cot-cw">
-        <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OPEN INTEREST</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-          <span style="font-size:10px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px">${long_.toLocaleString()}</span>
-          <div class="cot-posbar">
-            <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
-            <div class="cot-posbar-mid"></div>
+        <!-- LEFT: gauge -->
+        <div class="cot-cw" style="margin-bottom:0">
+          <div class="cot-ct">POSITIONING GAUGE · Z-SCORE VS ${nWks}-WEEK HISTORY</div>
+          <div class="cot-gauge-track">
+            <div class="cot-gauge-pin" id="cot-pin" style="left:50%"></div>
           </div>
-          <span style="font-size:10px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px;text-align:right">${short_.toLocaleString()}</span>
+          <div class="cot-gauge-lbls">
+            <span>Extreme Short<br>(&lt;−2σ)</span>
+            <span style="text-align:center">Short<br>(−1.5σ)</span>
+            <span style="text-align:center">Neutral</span>
+            <span style="text-align:center">Long<br>(+1.5σ)</span>
+            <span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--text2,#9096a0);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6">
+            Positioning: <strong style="color:\${zInfo.color}">\${zInfo.text}</strong>
+            \${pctHist != null ? \` · Percentile <strong>\${pctHist}%</strong>\` : ''}
+            \${isCrowded ? \`<span class="badge-ext badge-warn">CROWDED TRADE</span>\` : \`<span class="badge-ext badge-ok">Within normal range</span>\`}
+          </div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">
-          <span>LONGS ${lPct}%</span><span>SHORTS ${100 - lPct}%</span>
+
+        <!-- RIGHT: Long/Short bar + Participants table -->
+        <div class="cot-cw" style="margin-bottom:0">
+          <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span style="font-size:10px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px">\${long_.toLocaleString()}</span>
+            <div class="cot-posbar">
+              <div class="cot-posbar-fill" style="width:\${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
+              <div class="cot-posbar-mid"></div>
+            </div>
+            <span style="font-size:10px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px;text-align:right">\${short_.toLocaleString()}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">
+            <span>LONGS \${lPct}%</span><span>SHORTS \${100 - lPct}%</span>
+          </div>
+
+          <div class="cot-ov-r-divider">
+            <div class="cot-ct" style="margin-bottom:6px">PARTICIPANTS · NET BY CATEGORY</div>
+            <table class="cot-tbl" aria-label="COT positioning by participant category">
+              <thead><tr>
+                <th scope="col">Category</th><th scope="col">Net</th><th scope="col">Dir</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td>Leveraged Funds</td>
+                  <td class="\${_cotCls(net)}">\${_cotFmt(net)}</td>
+                  <td class="\${_cotCls(net)}">\${net > 0 ? '▲ Long' : net < 0 ? '▼ Short' : '— Neutral'}</td>
+                </tr>
+                \${amNet != null ? \`<tr>
+                  <td>Asset Managers</td>
+                  <td class="\${_cotCls(amNet)}">\${_cotFmt(amNet)}</td>
+                  <td class="\${_cotCls(amNet)}">\${amNet > 0 ? '▲ Long' : amNet < 0 ? '▼ Short' : '— Neutral'}</td>
+                </tr>\` : ''}
+                \${ddNet != null ? \`<tr>
+                  <td>Dealers</td>
+                  <td class="\${_cotCls(ddNet)}">\${_cotFmt(ddNet)}</td>
+                  <td class="\${_cotCls(ddNet)}">\${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
+                </tr>\` : ''}
+                \${amNet != null ? \`<tr>
+                  <td style="color:var(--text2,#9096a0);font-size:9px" colspan="3">
+                    <span style="color:\${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">\${aligned ? '● Aligned' : '○ Diverging'}</span>
+                    — LF and AM \${aligned ? 'both in same direction' : 'are opposed · exercise caution'}
+                  </td>
+                </tr>\` : ''}
+              </tbody>
+            </table>
+          </div>
         </div>
+
       </div>
 
-      <div class="cot-cw">
-        <div class="cot-ct">PARTICIPANTS · NET BY CATEGORY</div>
-        <table class="cot-tbl" aria-label="COT positioning by participant category">
-          <thead><tr>
-            <th scope="col">Category</th><th scope="col">Net</th><th scope="col">Direction</th><th scope="col">Note</th>
-          </tr></thead>
-          <tbody>
-            <tr>
-              <td>Leveraged Funds</td>
-              <td class="${_cotCls(net)}">${_cotFmt(net)}</td>
-              <td class="${_cotCls(net)}">${net > 0 ? '▲ Long' : net < 0 ? '▼ Short' : '— Neutral'}</td>
-              <td style="font-size:9px;color:var(--text3,#6b7280)">Hedge funds / CTAs — primary signal</td>
-            </tr>
-            ${amNet != null ? `<tr>
-              <td>Asset Managers</td>
-              <td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td>
-              <td class="${_cotCls(amNet)}">${amNet > 0 ? '▲ Long' : amNet < 0 ? '▼ Short' : '— Neutral'}</td>
-              <td style="font-size:9px;color:var(--text3,#6b7280)">Mutual funds / pensions — slow trend follower</td>
-            </tr>` : ''}
-            ${ddNet != null ? `<tr>
-              <td>Dealers</td>
-              <td class="${_cotCls(ddNet)}">${_cotFmt(ddNet)}</td>
-              <td class="${_cotCls(ddNet)}">${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
-              <td style="font-size:9px;color:var(--text3,#6b7280)">Market-makers — contrarian signal</td>
-            </tr>` : ''}
-            ${amNet != null ? `<tr>
-              <td style="color:var(--text2,#9096a0)">LF / AM</td>
-              <td colspan="3" style="color:${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">
-                ${aligned
-                  ? '● Aligned — both in the same direction (reinforced signal)'
-                  : '○ Diverging — LF and AM are opposed (exercise caution)'}
-              </td>
-            </tr>` : ''}
-          </tbody>
-        </table>
+      <!-- BOTTOM ROW: trend sparkline + 52w extremes + signal summary -->
+      <div class="cot-ov-bottom">
+
+        <!-- Net trend sparkline -->
+        <div class="cot-cw" style="margin-bottom:0">
+          <div class="cot-ct">NET POSITION TREND · \${Math.min(nWks, 8)}W</div>
+          \${_cotSparkline(history, 8)}
+          <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">\${_cotTrendLabel(history)}</div>
+        </div>
+
+        <!-- 52w extremes -->
+        <div class="cot-cw" style="margin-bottom:0">
+          <div class="cot-ct">POSITIONING RANGE · \${nWks}W</div>
+          \${_cotRangeCard(history, net)}
+        </div>
+
+        <!-- Signal summary -->
+        <div class="cot-cw" style="margin-bottom:0">
+          <div class="cot-ct">SIGNAL SUMMARY</div>
+          \${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}
+        </div>
+
       </div>
+
     </div>
 
     <!-- NET POSITION ──────────────────────────────────────── -->
