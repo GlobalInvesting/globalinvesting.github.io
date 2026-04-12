@@ -335,14 +335,11 @@ let _corrWindow = 60;  // active window; toggled by setCorrWindow()
 function setCorrWindow(w) {
   if (w === _corrWindow) return;
   _corrWindow = w;
-  // Update button styles
+  // Update button styles — active: white text on bg3 (matches .tv-tab.active); inactive: text3
   [30, 60, 90].forEach(n => {
     const btn = document.getElementById('corr-btn-' + n);
     if (!btn) return;
-    const active = n === w;
-    btn.style.background = active ? 'var(--accent)' : 'var(--bg3)';
-    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border2)';
-    btn.style.color       = active ? '#fff'          : 'var(--text3)';
+    btn.style.color = n === w ? '#fff' : 'var(--text3)';
   });
   // Update column header
   const th = document.getElementById('corr-th-window');
