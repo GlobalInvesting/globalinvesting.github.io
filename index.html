@@ -721,9 +721,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </tbody>
     </table>
 
-    <div class="sb-head" style="margin-top:2px;">Key Correlations</div>
+    <div class="sb-head" style="margin-top:2px;display:flex;align-items:center;justify-content:space-between;">
+      <span>Key Correlations</span>
+      <span id="corr-window-btns" style="display:flex;gap:2px;" role="group" aria-label="Correlation window">
+        <button id="corr-btn-30" onclick="setCorrWindow(30)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">30d</button>
+        <button id="corr-btn-60" onclick="setCorrWindow(60)" style="font-size:8px;padding:1px 5px;background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:2px;cursor:pointer;line-height:1.4;">60d</button>
+        <button id="corr-btn-90" onclick="setCorrWindow(90)" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">90d</button>
+      </span>
+    </div>
     <table aria-label="Key FX correlations">
-      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col">60d</th><th scope="col" title="Current vs 252-day historical norm">vs norm</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Pair A</th><th scope="col">Pair B</th><th scope="col" id="corr-th-window">60d</th><th scope="col" title="Current vs 252-day historical norm">vs norm</th></tr></thead>
       <tbody id="correlations-tbody">
         <!-- 12 skeleton rows — exact real pairs from quotes.json to prevent CLS -->
         <tr><td>EUR/USD</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
@@ -740,11 +747,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <tr><td>Gold</td><td>DXY</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>
       </tbody>
     </table>
-    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance · vs norm = z-score vs 252d</div>
+    <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · yfinance · vs norm = z-score vs 252d</div>
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table aria-label="Central bank rate expectations">
-      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col">Bias</th><th scope="col">Fwd Rate</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)">Bias</th><th scope="col">Fwd Rate</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <!-- 8 skeleton rows — exact structure matches JS render to prevent CLS -->
         <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">—</td></tr>
