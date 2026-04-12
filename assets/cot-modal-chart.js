@@ -129,7 +129,9 @@
   flex:1;display:flex;flex-direction:column;margin-bottom:0;min-height:0;
 }
 #p-net.on .cot-cw > .cot-chart-area,
-#p-split.on .cot-cw > .cot-chart-area { position:relative; }
+#p-split.on .cot-cw > .cot-chart-area {
+  position:relative;flex:1;min-height:0;height:100%;
+}
 
 /* Participants: chart has fixed height, description scrolls below */
 #p-participants.on { overflow-y:auto; }
@@ -271,9 +273,6 @@
 
   /* Participants: taller chart on mobile so data is visible */
   #p-participants .cot-chart-area { height:260px; }
-  /* Net/Long-Short: use more of the available body space */
-  #p-net .cot-chart-area,
-  #p-split .cot-chart-area { height:400px; }
   /* Description text compact */
   #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
 
@@ -1097,31 +1096,24 @@ function openCOTModal(ccy, data) {
     }
     built[tabId] = true;
 
+    const isMob = window.innerWidth < 600;
+
     if (tabId === 'net') {
       const cv = document.getElementById('c-net');
       if (cv) {
-        const r = cv.parentElement.getBoundingClientRect();
-        cv.width = r.width * (window.devicePixelRatio || 1);
-        cv.height = r.height * (window.devicePixelRatio || 1);
-        cv.style.width = r.width + 'px';
-        cv.style.height = r.height + 'px';
-        const isMob = window.innerWidth < 600;
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }], { responsive: false, layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
+        // responsive:true — Chart.js reads DPR and sizes the canvas correctly.
+        // The parent .cot-chart-area has flex:1;height:100% so Chart.js gets the right container size.
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }],
+          { layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'split') {
       const cv = document.getElementById('c-split');
       if (cv) {
-        const r = cv.parentElement.getBoundingClientRect();
-        cv.width = r.width * (window.devicePixelRatio || 1);
-        cv.height = r.height * (window.devicePixelRatio || 1);
-        cv.style.width = r.width + 'px';
-        cv.style.height = r.height + 'px';
-        const isMob = window.innerWidth < 600;
         _lineChart(cv, labels, [
           { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
           { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
-        ], { responsive: false, layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
+        ], { layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'participants') {
@@ -1182,40 +1174,8 @@ function cotTab(el, tabId) {
 
   const bd = document.getElementById('cot-bd');
   if (bd && bd._build) {
-    // Use rAF x2 to ensure panel is fully painted before Chart.js measures
+    // Use rAF x2 to ensure panel is fully painted before Chart.js measures the container
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (isChartTab) {
-        const areaId = tabId === 'net' ? 'c-net' : 'c-split';
-        const canvas = document.getElementById(areaId);
-        const bodyEl = document.getElementById('cot-m-body');
-        if (canvas && bodyEl) {
-          // Measure all siblings of the chart-area within its .cot-cw,
-          // plus the .cot-cw border/padding, to get the exact non-chart space.
-          // This is fully responsive — works at any screen size.
-          const chartArea = canvas.parentElement;
-          const cw = chartArea.closest('.cot-cw');
-          const bodyRect = bodyEl.getBoundingClientRect();
-          let nonChartH = 0;
-          if (cw) {
-            const cwStyle = getComputedStyle(cw);
-            nonChartH += parseFloat(cwStyle.paddingTop) + parseFloat(cwStyle.paddingBottom)
-                       + parseFloat(cwStyle.borderTopWidth) + parseFloat(cwStyle.borderBottomWidth);
-            // Add height of all siblings of chartArea inside cw (e.g. .cot-ct label)
-            Array.from(cw.children).forEach(child => {
-              if (child !== chartArea) {
-                const cr = child.getBoundingClientRect();
-                const cs = getComputedStyle(child);
-                nonChartH += cr.height + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
-              }
-            });
-          }
-          // Also account for body's own padding
-          const bodyStyle = getComputedStyle(bodyEl);
-          nonChartH += parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
-          const h = Math.max(bodyRect.height - nonChartH, 120);
-          chartArea.style.height = h + 'px';
-        }
-      }
       bd._build(tabId);
     }));
   }
