@@ -769,6 +769,16 @@ def fetch_yfinance_all(symbols_map):
                     "low":        day_low,
                     "source":     "yfinance",
                 }
+
+                # Sanity check: high == low means yfinance returned an incomplete intraday
+                # bar (e.g. a weekend-open quote or a stale tick where H=L=close).
+                # Set both to None so the frontend shows '—' instead of a collapsed range.
+                if (results[internal_id]["high"] is not None
+                        and results[internal_id]["low"]  is not None
+                        and results[internal_id]["high"] == results[internal_id]["low"]):
+                    results[internal_id]["high"] = None
+                    results[internal_id]["low"]  = None
+                    print(f"[yfinance] ⚠ {internal_id:8s}: high==low ({day_high}) — clearing H/L (incomplete bar)")
                 print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%")
 
             except Exception as e:
