@@ -107,12 +107,12 @@
   display:flex;flex-direction:column;flex:1;min-height:0;
 }
 #p-overview .cot-ov-grid {
-  flex:1;min-height:0;
+  flex:none;
   display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
   align-items:stretch;
 }
 #p-overview .cot-ov-grid > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow:hidden;
+  display:flex;flex-direction:column;margin-bottom:0;
 }
 #p-overview .cot-ov-bottom {
   flex:1;min-height:0;
@@ -120,7 +120,7 @@
   align-items:stretch;
 }
 #p-overview .cot-ov-bottom > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow:hidden;
+  display:flex;flex-direction:column;margin-bottom:0;min-height:0;
 }
 
 /* Net Position and Long/Short: single-chart panels fill entire body */
