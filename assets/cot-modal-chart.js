@@ -517,6 +517,21 @@ if (typeof Chart !== 'undefined') {
   Chart.defaults.plugins.legend.labels.usePointStyle = false;
 }
 
+// Build a TradingView-style vertical gradient for area fill.
+// Uses the canvas LOGICAL height (style.height, not canvas.height which is DPR-scaled).
+function _tvGradFromCanvas(canvas, hexColor, alphaTop) {
+  const ctx = canvas.getContext('2d');
+  const logH = parseInt(canvas.style.height, 10) || canvas.height;
+  const g = ctx.createLinearGradient(0, 0, 0, logH);
+  const r = parseInt(hexColor.slice(1,3),16);
+  const gb = parseInt(hexColor.slice(3,5),16);
+  const b = parseInt(hexColor.slice(5,7),16);
+  g.addColorStop(0,   `rgba(${r},${gb},${b},${alphaTop})`);
+  g.addColorStop(0.6, `rgba(${r},${gb},${b},0.03)`);
+  g.addColorStop(1,   `rgba(${r},${gb},${b},0)`);
+  return g;
+}
+
 function _lineChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const cfg = JSON.parse(JSON.stringify(_chartDefaults));
@@ -524,20 +539,32 @@ function _lineChart(canvas, labels, datasets, overrides) {
   cfg.plugins.tvCrosshair  = _crosshairPlugin;
   cfg.plugins.tvPriceBadge = _priceBadgePlugin;
   // TradingView-style dataset defaults: smooth bezier, area fill, visible points on last
-  datasets = datasets.map(ds => Object.assign({
-    tension:       0.4,
-    borderWidth:   2,
-    pointRadius:   2,
-    pointHoverRadius: 4,
-    pointBackgroundColor: ds.borderColor,
-    pointBorderColor:     ds.borderColor,
-    pointBorderWidth: 0,
-    fill: false,
-    backgroundColor: 'transparent',
-    spanGaps: true,
-  }, ds));
+  datasets = datasets.map(ds => {
+    // If dataset requests fill and has a hex borderColor, build a canvas gradient for the area
+    const wantsFill = ds.fill === true || ds.fill === 'start' || ds.fill === 'origin';
+    const hexColor = typeof ds.borderColor === 'string' && ds.borderColor.startsWith('#') ? ds.borderColor : null;
+    const bgFill = wantsFill && hexColor
+      ? _tvGradFromCanvas(canvas, hexColor, 0.22)
+      : (ds.backgroundColor || 'transparent');
+    return Object.assign({
+      tension:       0.4,
+      borderWidth:   2,
+      pointRadius:   2,
+      pointHoverRadius: 4,
+      pointBackgroundColor: ds.borderColor,
+      pointBorderColor:     ds.borderColor,
+      pointBorderWidth: 0,
+      fill: false,
+      backgroundColor: 'transparent',
+      spanGaps: true,
+    }, ds, { backgroundColor: bgFill });
+  });
   cfg.type = 'line';
   cfg.data = { labels, datasets };
+  cfg.scales.x.grid.drawBorder = false;
+  cfg.scales.y.grid.drawBorder = false;
+  cfg.scales.x.border = { display: false };
+  cfg.scales.y.border = { display: false };
   if (overrides) Object.assign(cfg, overrides);
   const c = new Chart(canvas, cfg);
   _cotCharts.push(c);
@@ -570,7 +597,7 @@ function _barChart(canvas, labels, datasets, overrides) {
   // TW bar style: no border radius, 70% opacity, full saturation colors
   datasets = datasets.map(ds => Object.assign({
     borderWidth:   0,
-    borderRadius:  2,
+    borderRadius:  0,
     borderSkipped: false,
     hoverBackgroundColor: undefined,   // let Chart.js compute hover from backgroundColor
     barPercentage: 0.85,
@@ -578,6 +605,11 @@ function _barChart(canvas, labels, datasets, overrides) {
   }, ds));
   cfg.type = 'bar';
   cfg.data = { labels, datasets };
+  // Ensure scales inherit TV grid even when responsive:false
+  cfg.scales.x.grid.drawBorder = false;
+  cfg.scales.y.grid.drawBorder = false;
+  cfg.scales.x.border = { display: false };
+  cfg.scales.y.border = { display: false };
   if (overrides) Object.assign(cfg, overrides);
   const c = new Chart(canvas, cfg);
   _cotCharts.push(c);
@@ -1061,24 +1093,9 @@ function openCOTModal(ccy, data) {
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
 
-        // TradingView gradient fill: color at top (25% opacity) → transparent at bottom
-        // Must be created AFTER canvas has real dimensions
-        const ctx2 = cv.getContext('2d');
-        function _tvGrad(hexColor, alphaTop) {
-          const g = ctx2.createLinearGradient(0, 0, 0, cv.height);
-          // Parse hex to RGB
-          const r2 = parseInt(hexColor.slice(1,3),16);
-          const g2 = parseInt(hexColor.slice(3,5),16);
-          const b2 = parseInt(hexColor.slice(5,7),16);
-          g.addColorStop(0,   `rgba(${r2},${g2},${b2},${alphaTop})`);
-          g.addColorStop(0.6, `rgba(${r2},${g2},${b2},0.04)`);
-          g.addColorStop(1,   `rgba(${r2},${g2},${b2},0)`);
-          return g;
-        }
-
         _lineChart(cv, labels, [
-          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: _tvGrad('#26a69a', 0.22), fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
-          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: _tvGrad('#ef5350', 0.22), fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
+          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
+          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
         ], { responsive: false });
       }
     }
