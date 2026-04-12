@@ -4704,7 +4704,9 @@ function _liqTo48(arr24) {
 
 async function fetchLiquidityData() {
   const utcDay = new Date().getUTCDay(), utcHour = new Date().getUTCHours();
-  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
+  // Canvas OFFSET=44 means left edge = 22:00 UTC. Keep weekend mode until 22:00 UTC Sunday
+  // so that nowCanvasSlot starts at 0 (far left) when the chart begins — not 47 (far right).
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 22) || (utcDay === 5 && utcHour >= 21);
 
   // ── Primary: fx-liquidity.json (yfinance H-L range proxy, updated hourly) ──
   try {
@@ -4784,7 +4786,9 @@ function drawLiquidityChart() {
 
   const utcDay = new Date().getUTCDay();
   const utcHour = new Date().getUTCHours();
-  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
+  // Canvas left edge = 22:00 UTC (OFFSET=44 slots). Keep weekend mode until 22:00 UTC Sunday
+  // so nowCanvasSlot starts at 0 (far left) on market open, not 47 (far right).
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 22) || (utcDay === 5 && utcHour >= 21);
 
   const hours = _liqData || _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
   const baseline = _liqBaseline || hours;
