@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-12T18:55:24Z",
+  "updated": "2026-04-12T19:00:25Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 71160.97,
+      "close": 71171.336,
       "prev_close": 73057.16,
-      "chg": -2383.2969,
-      "pct": -3.2406,
+      "chg": -2369.3828,
+      "pct": -3.2219,
       "high": 73103.04,
       "low": 70739.6,
       "source": "yfinance"
@@ -182,7 +182,7 @@
       "high": 159.374,
       "low": 158.848,
       "source": "yfinance",
-      "hv30": 7.34
+      "hv30": 7.21
     },
     "audusd": {
       "close": 0.7062,
@@ -205,12 +205,12 @@
       "hv30": 7.83
     },
     "usdcad": {
-      "close": 1.3838,
+      "close": 1.3831,
       "prev_close": 1.3813,
-      "chg": 0.0025,
-      "pct": 0.1795,
+      "chg": 0.0018,
+      "pct": 0.1289,
       "high": 1.384,
-      "low": 1.3838,
+      "low": 1.3831,
       "source": "yfinance",
       "hv30": 4.06
     },
@@ -295,24 +295,24 @@
       "hv30": 6.77
     },
     "gbpcad": {
-      "close": 1.8631,
+      "close": 1.862,
       "prev_close": 1.8546,
-      "chg": 0.0085,
-      "pct": 0.4556,
+      "chg": 0.0074,
+      "pct": 0.3979,
       "high": 1.8631,
-      "low": 1.8631,
+      "low": 1.862,
       "source": "yfinance",
-      "hv30": 7.47
+      "hv30": 7.45
     },
     "audjpy": {
-      "close": 112.473,
+      "close": 112.539,
       "prev_close": 112.563,
-      "chg": -0.09,
-      "pct": -0.08,
-      "high": 112.865,
-      "low": 112.316,
+      "chg": -0.024,
+      "pct": -0.0213,
+      "high": 112.539,
+      "low": 112.539,
       "source": "yfinance",
-      "hv30": 9.93
+      "hv30": 9.97
     },
     "audnzd": {
       "close": 1.2096,
@@ -355,14 +355,14 @@
       "hv30": 7.03
     },
     "nzdjpy": {
-      "close": 92.946,
+      "close": 93.001,
       "prev_close": 93.165,
-      "chg": -0.219,
-      "pct": -0.2351,
-      "high": 93.378,
-      "low": 92.911,
+      "chg": -0.164,
+      "pct": -0.176,
+      "high": 93.001,
+      "low": 93.001,
       "source": "yfinance",
-      "hv30": 7.13
+      "hv30": 7.22
     },
     "eurnzd": {
       "close": 2.0085,
@@ -425,20 +425,20 @@
       "hv30": 9.94
     },
     "nzdchf": {
-      "close": 0.4589,
+      "close": 0.4575,
       "prev_close": 0.4622,
-      "chg": -0.0033,
-      "pct": -0.7097,
+      "chg": -0.0047,
+      "pct": -1.0126,
       "high": 0.4589,
-      "low": 0.4589,
+      "low": 0.4568,
       "source": "yfinance",
-      "hv30": 8.02
+      "hv30": 8.33
     }
   },
   "hv30": {
     "eurusd": 8.84,
     "gbpusd": 9.1,
-    "usdjpy": 7.34,
+    "usdjpy": 7.21,
     "audusd": 13.17,
     "usdchf": 7.83,
     "usdcad": 4.06,
@@ -450,20 +450,20 @@
     "euraud": 7.96,
     "gbpjpy": 5.66,
     "gbpchf": 6.77,
-    "gbpcad": 7.47,
-    "audjpy": 9.93,
+    "gbpcad": 7.45,
+    "audjpy": 9.97,
     "audnzd": 6.02,
     "audchf": 10.44,
     "cadjpy": 7.35,
     "chfjpy": 7.03,
-    "nzdjpy": 7.13,
+    "nzdjpy": 7.22,
     "eurnzd": 5.31,
     "gbpaud": 7.78,
     "gbpnzd": 5.49,
     "audcad": 11.32,
     "cadchf": 5.99,
     "nzdcad": 9.94,
-    "nzdchf": 8.02
+    "nzdchf": 8.33
   },
   "correlations": [
     {
@@ -493,26 +493,26 @@
     {
       "a": "USD/JPY",
       "b": "US 10Y",
-      "corr30": 0.823,
+      "corr30": 0.74,
       "n30": 30,
-      "corr": 0.555,
+      "corr": 0.483,
       "n": 60,
-      "corr90": 0.543,
+      "corr90": 0.478,
       "n90": 90,
-      "norm": 0.08,
-      "z_score": 1.37
+      "norm": 0.015,
+      "z_score": 1.26
     },
     {
       "a": "USD/JPY",
       "b": "VIX",
-      "corr30": 0.524,
+      "corr30": 0.236,
       "n30": 30,
-      "corr": 0.68,
+      "corr": 0.656,
       "n": 60,
-      "corr90": 0.551,
+      "corr90": 0.526,
       "n90": 90,
-      "norm": 0.135,
-      "z_score": 1.39
+      "norm": 0.061,
+      "z_score": 1.54
     },
     {
       "a": "USD/CAD",
@@ -521,7 +521,7 @@
       "n30": 30,
       "corr": 0.577,
       "n": 60,
-      "corr90": 0.191,
+      "corr90": 0.19,
       "n90": 90,
       "norm": -0.061,
       "z_score": 1.49
