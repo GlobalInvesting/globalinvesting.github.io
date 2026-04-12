@@ -112,7 +112,7 @@
   align-items:stretch;
 }
 #p-overview .cot-ov-grid > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow-y:auto;
+  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow:hidden;
 }
 #p-overview .cot-ov-bottom {
   flex:1;min-height:0;
@@ -120,7 +120,7 @@
   align-items:stretch;
 }
 #p-overview .cot-ov-bottom > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow-y:auto;
+  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow:hidden;
 }
 
 /* Net Position and Long/Short: single-chart panels fill entire body */
@@ -210,7 +210,7 @@
 }
 /* Right card in top grid: stacked sections */
 .cot-ov-r-divider {
-  border-top:1px solid rgba(255,255,255,.06);margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.06);margin-top:8px;padding-top:8px;
 }
 /* Signal dot */
 .cot-sig-dot {
@@ -636,31 +636,31 @@ function openCOTModal(ccy, data) {
         <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
 
-          <!-- L/S numbers large -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 10px">
+          <!-- L/S numbers -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
             <div>
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Longs</div>
-              <div style="font-size:26px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
-              <div style="font-size:12px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${lPct}%</div>
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Longs</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
+              <div style="font-size:11px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${lPct}%</div>
             </div>
-            <div style="font-size:16px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
+            <div style="font-size:13px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
             <div style="text-align:right">
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Shorts</div>
-              <div style="font-size:26px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
-              <div style="font-size:12px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${100 - lPct}%</div>
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Shorts</div>
+              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
+              <div style="font-size:11px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${100 - lPct}%</div>
             </div>
           </div>
 
           <!-- Bar -->
-          <div class="cot-posbar" style="height:10px;margin-bottom:16px">
+          <div class="cot-posbar" style="height:8px;margin-bottom:10px">
             <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
             <div class="cot-posbar-mid"></div>
           </div>
 
           <!-- Participants table -->
           <div class="cot-ov-r-divider" style="flex:1">
-            <div class="cot-ct" style="margin-bottom:8px">PARTICIPANTS · NET BY CATEGORY</div>
-            <table class="cot-tbl" style="font-size:12px" aria-label="COT positioning by participant category">
+            <div class="cot-ct" style="margin-bottom:6px">PARTICIPANTS · NET BY CATEGORY</div>
+            <table class="cot-tbl" style="font-size:11px" aria-label="COT positioning by participant category">
               <thead><tr>
                 <th scope="col">Category</th><th scope="col">Net</th><th scope="col">Dir</th>
               </tr></thead>
