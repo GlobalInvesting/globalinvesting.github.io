@@ -385,17 +385,19 @@ const _crosshairPlugin = {
   }
 };
 
-// Y-axis price badge plugin — draws a filled rect + value label at the last data point
-// Mirrors TradingView's right-side price badge on the current bar
+// Y-axis price badge plugin
+// With scales.y at position:'right', chartArea.right = left edge of the Y axis tick area.
+// The badge is drawn starting at chartArea.right, overlapping the tick labels.
+// No extra layout padding is needed for this — the Y axis area provides the space.
 const _priceBadgePlugin = {
   id: 'tvPriceBadge',
   afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
     if (!scales.y) return;
+    const fSize = window.innerWidth < 600 ? 9 : 10;
     chart.data.datasets.forEach((ds, i) => {
       const meta = chart.getDatasetMeta(i);
       if (!meta.visible) return;
-      // Find the last non-null data point index
       let lastIdx = -1;
       for (let k = ds.data.length - 1; k >= 0; k--) {
         if (ds.data[k] != null) { lastIdx = k; break; }
@@ -404,33 +406,75 @@ const _priceBadgePlugin = {
       const val = ds.data[lastIdx];
       const yPx = scales.y.getPixelForValue(val);
       if (yPx < chartArea.top || yPx > chartArea.bottom) return;
-      // Pick color: for line charts use borderColor; for bar charts pick the color at lastIdx
       let color = ds.borderColor;
       if (!color || color === 'transparent') {
         const bg = ds.backgroundColor;
         color = Array.isArray(bg) ? bg[lastIdx] : bg;
       }
-      if (!color || color === 'transparent') color = '#9096a0';
-      // Strip alpha for badge background — make it fully opaque
-      const solidColor = typeof color === 'string' && color.startsWith('rgba')
-        ? color.replace(/[\d.]+\)$/, '1)')
-        : color;
-      const label  = _cotFmt(val);
-      const fSize  = window.innerWidth < 600 ? 8 : 9;
-      ctx.font     = `600 ${fSize}px ${_monoFont}`;
-      const tw     = ctx.measureText(label).width;
-      const bW     = tw + 10, bH = 15;
-      const bX     = chartArea.right + 2;
-      const bY     = yPx - bH / 2;
+      if (!color || color === 'transparent') color = '#787b86';
+      const solid = typeof color === 'string' && color.startsWith('rgba')
+        ? color.replace(/[\d.]+\)$/, '1)') : color;
+      const label = _cotFmt(val);
       ctx.save();
-      ctx.fillStyle = solidColor;
+      ctx.font = `600 ${fSize}px ${_monoFont}`;
+      const tw = ctx.measureText(label).width;
+      const bW = tw + 10, bH = 16;
+      const bX = chartArea.right + 2;
+      const bY = yPx - bH / 2;
+      ctx.fillStyle = solid;
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 2);
       else ctx.rect(bX, bY, bW, bH);
       ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
       ctx.fillText(label, bX + 5, yPx);
+      ctx.restore();
+    });
+  }
+};
+
+// Gradient fill plugin — draws area fill MANUALLY by tracing the dataset's rendered path.
+// Runs in afterDatasetsDraw (Chart.js has already drawn lines; we paint fills on top
+// using clipping so they stay within chartArea). This avoids the timing issue where
+// backgroundColor gradients created before chart init have wrong canvas dimensions.
+const _gradFillPlugin = {
+  id: 'tvGradFill',
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea, canvas, scales } = chart;
+    if (!scales.y) return;
+    chart.data.datasets.forEach((ds, i) => {
+      if (!ds._gradHex) return;
+      const meta = chart.getDatasetMeta(i);
+      if (!meta.visible || !meta.data || meta.data.length < 2) return;
+      // Build gradient in physical pixel space (canvas.height is DPR-scaled)
+      const hex = ds._gradHex;
+      const rv = parseInt(hex.slice(1,3),16);
+      const gv = parseInt(hex.slice(3,5),16);
+      const bv = parseInt(hex.slice(5,7),16);
+      const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+      g.addColorStop(0,   `rgba(${rv},${gv},${bv},0.22)`);
+      g.addColorStop(0.6, `rgba(${rv},${gv},${bv},0.05)`);
+      g.addColorStop(1,   `rgba(${rv},${gv},${bv},0)`);
+      const baseline = scales.y.getPixelForValue(0);
+      const clampedBase = Math.min(Math.max(baseline, chartArea.top), chartArea.bottom);
+      ctx.save();
+      // Clip to chartArea so fill doesn't bleed into axes
+      ctx.beginPath();
+      ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+      ctx.clip();
+      // Trace the rendered line points
+      ctx.beginPath();
+      const pts = meta.data;
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+      // Close down to baseline
+      ctx.lineTo(pts[pts.length - 1].x, clampedBase);
+      ctx.lineTo(pts[0].x, clampedBase);
+      ctx.closePath();
+      ctx.fillStyle = g;
+      ctx.fill();
       ctx.restore();
     });
   }
@@ -440,7 +484,7 @@ const _chartDefaults = {
   responsive: true, maintainAspectRatio: false,
   animation: { duration: 300, easing: 'easeOutQuart' },
   interaction: { mode: 'index', intersect: false },
-  layout: { padding: { top: 6, right: 44, bottom: 0, left: 0 } },  // right: space for price badge
+  layout: { padding: { top: 6, right: 0, bottom: 0, left: 0 } },
   plugins: {
     legend: {
       position: 'top', align: 'start',
@@ -514,35 +558,6 @@ if (typeof Chart !== 'undefined') {
   Chart.register(_crosshairPlugin, _priceBadgePlugin, _gradFillPlugin);
   Chart.defaults.plugins.legend.labels.usePointStyle = false;
 }
-
-// Build a TradingView-style vertical gradient for area fill.
-// MUST be called after Chart.js has sized the canvas (e.g. inside a plugin hook).
-// canvas.height is in physical pixels (DPR-scaled) — matches the 2D context space.
-function _tvGrad(ctx, canvas, hexColor, alphaTop) {
-  const physH = canvas.height;
-  const g = ctx.createLinearGradient(0, 0, 0, physH);
-  const r = parseInt(hexColor.slice(1,3),16);
-  const gb = parseInt(hexColor.slice(3,5),16);
-  const b = parseInt(hexColor.slice(5,7),16);
-  g.addColorStop(0,    `rgba(${r},${gb},${b},${alphaTop})`);
-  g.addColorStop(0.55, `rgba(${r},${gb},${b},0.06)`);
-  g.addColorStop(1,    `rgba(${r},${gb},${b},0)`);
-  return g;
-}
-
-// Gradient fill plugin — regenerates gradients before each draw so they always
-// use the correct canvas dimensions (safe with responsive:true).
-const _gradFillPlugin = {
-  id: 'tvGradFill',
-  beforeDatasetsDraw(chart) {
-    chart.data.datasets.forEach((ds, i) => {
-      if (!ds._gradHex) return; // only datasets that opt-in
-      const meta = chart.getDatasetMeta(i);
-      if (!meta.visible) return;
-      ds.backgroundColor = _tvGrad(chart.ctx, chart.canvas, ds._gradHex, 0.22);
-    });
-  }
-};
 
 // ── Chart.js canonical config builder ────────────────────────────────────────
 // _chartDefaults contains ONLY options (no type/data).
@@ -1146,7 +1161,7 @@ function openCOTModal(ccy, data) {
         }
 
         // Build chart with native legend disabled (HTML legend used instead)
-        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 44, bottom: 0, left: 0 } } });
+        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 0, bottom: 0, left: 0 } } });
         partOpts.plugins.legend = { display: false };
         const c = new Chart(cv, {
           type: 'line',
