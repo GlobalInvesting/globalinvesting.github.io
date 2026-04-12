@@ -209,6 +209,16 @@
   #p-overview .cot-ov-grid   { grid-template-columns:1fr 1fr; gap:6px; }
   /* Bottom row stacks to 1-col on mobile */
   #p-overview .cot-ov-bottom { grid-template-columns:1fr; gap:6px; }
+  /* Both top cards must not overflow their column */
+  #p-overview .cot-ov-grid > .cot-cw { overflow:hidden; min-width:0; }
+  /* Truncate long .cot-ct labels in overview top row */
+  #p-overview .cot-ov-grid .cot-ct { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* Hide DIR column in participants table on mobile — no room */
+  #p-overview .cot-tbl th:last-child,
+  #p-overview .cot-tbl td:last-child { display:none; }
+  /* L/S layout: stack vertically instead of row on mobile */
+  #p-overview .cot-ls-row { flex-direction:column !important; gap:4px !important; align-items:flex-start !important; }
+  #p-overview .cot-ls-vs { display:none !important; }
 }
 /* Right card in top grid: stacked sections */
 .cot-ov-r-divider {
@@ -647,13 +657,13 @@ function openCOTModal(ccy, data) {
           <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
 
           <!-- L/S numbers -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
+          <div class="cot-ls-row" style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
             <div>
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Longs</div>
               <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
               <div style="font-size:11px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${lPct}%</div>
             </div>
-            <div style="font-size:13px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
+            <div class="cot-ls-vs" style="font-size:13px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
             <div style="text-align:right">
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Shorts</div>
               <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
