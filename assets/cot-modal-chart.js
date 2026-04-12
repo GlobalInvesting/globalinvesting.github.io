@@ -444,14 +444,14 @@ function _cotRangeCard(history, current) {
   ];
   // Range bar: where is current in [lo, hi]
   const pct = hi !== lo ? Math.round((current - lo) / (hi - lo) * 100) : 50;
-  const bar = `<div style="margin:8px 0 6px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;">
-    <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:2px;"></div>
-    <div style="position:absolute;top:-3px;left:calc(${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg,#131722);"></div>
+  const bar = `<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;position:relative;">
+    <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:3px;"></div>
+    <div style="position:absolute;top:-4px;left:calc(${pct}% - 5px);width:10px;height:10px;border-radius:50%;background:#d1d4dc;border:2px solid var(--bg,#131722);box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
   </div>`;
   const rowsHtml = rows.map(r =>
-    `<div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:2px 0;">
-      <span style="color:var(--text3,#6b7280)">${r.label}</span>
-      <span class="${r.cls}">${_cotFmt(r.val)}</span>
+    `<div style="display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span style="font-size:11px;color:var(--text3,#6b7280)">${r.label}</span>
+      <span style="font-size:14px;font-weight:600" class="${r.cls}">${_cotFmt(r.val)}</span>
     </div>`
   ).join('');
   return bar + rowsHtml;
@@ -478,8 +478,8 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore) {
     else signals.push({ col: '#9096a0', text: 'Dealers aligned with LF' });
   }
   return signals.map(s =>
-    `<div style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:3px 0;">
-      <span class="cot-sig-dot" style="background:${s.col}"></span>
+    `<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span class="cot-sig-dot" style="background:${s.col};width:9px;height:9px;flex-shrink:0"></span>
       <span style="color:var(--text2,#9096a0)">${s.text}</span>
     </div>`
   ).join('');
@@ -596,44 +596,71 @@ function openCOTModal(ccy, data) {
 
       <div class="cot-ov-grid">
 
-        <!-- LEFT: gauge -->
-        <div class="cot-cw" style="margin-bottom:0">
+        <!-- LEFT: gauge + big z/pct numbers -->
+        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">POSITIONING GAUGE · Z-SCORE VS ${nWks}-WEEK HISTORY</div>
+
+          <!-- Big numbers row -->
+          <div style="display:flex;gap:0;margin:12px 0 16px">
+            <div style="flex:1;border-right:1px solid rgba(255,255,255,.07);padding-right:16px">
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Z-Score</div>
+              <div style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${zStr}</div>
+              <div style="font-size:11px;color:${zInfo.color};font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${zInfo.text}</div>
+            </div>
+            <div style="flex:1;padding-left:16px">
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Percentile</div>
+              <div style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${pStr}</div>
+              <div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${nWks}w history</div>
+            </div>
+          </div>
+
+          <!-- Gauge bar -->
           <div class="cot-gauge-track">
             <div class="cot-gauge-pin" id="cot-pin" style="left:50%"></div>
           </div>
-          <div class="cot-gauge-lbls">
+          <div class="cot-gauge-lbls" style="margin-top:8px">
             <span>Extreme Short<br>(&lt;−2σ)</span>
             <span style="text-align:center">Short<br>(−1.5σ)</span>
             <span style="text-align:center">Neutral</span>
             <span style="text-align:center">Long<br>(+1.5σ)</span>
             <span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
           </div>
-          <div style="margin-top:10px;font-size:11px;color:var(--text2,#9096a0);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6">
-            Positioning: <strong style="color:${zInfo.color}">${zInfo.text}</strong>
-            ${pctHist != null ? ` · Percentile <strong>${pctHist}%</strong>` : ''}
+
+          <!-- Badge -->
+          <div style="margin-top:14px">
             ${isCrowded ? `<span class="badge-ext badge-warn">CROWDED TRADE</span>` : `<span class="badge-ext badge-ok">Within normal range</span>`}
           </div>
         </div>
 
         <!-- RIGHT: Long/Short bar + Participants table -->
-        <div class="cot-cw" style="margin-bottom:0">
+        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-            <span style="font-size:10px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px">${long_.toLocaleString()}</span>
-            <div class="cot-posbar">
-              <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
-              <div class="cot-posbar-mid"></div>
+
+          <!-- L/S numbers large -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 10px">
+            <div>
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Longs</div>
+              <div style="font-size:26px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
+              <div style="font-size:12px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${lPct}%</div>
             </div>
-            <span style="font-size:10px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px;text-align:right">${short_.toLocaleString()}</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">
-            <span>LONGS ${lPct}%</span><span>SHORTS ${100 - lPct}%</span>
+            <div style="font-size:16px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
+            <div style="text-align:right">
+              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Shorts</div>
+              <div style="font-size:26px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
+              <div style="font-size:12px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${100 - lPct}%</div>
+            </div>
           </div>
 
-          <div class="cot-ov-r-divider">
-            <div class="cot-ct" style="margin-bottom:6px">PARTICIPANTS · NET BY CATEGORY</div>
-            <table class="cot-tbl" aria-label="COT positioning by participant category">
+          <!-- Bar -->
+          <div class="cot-posbar" style="height:10px;margin-bottom:16px">
+            <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
+            <div class="cot-posbar-mid"></div>
+          </div>
+
+          <!-- Participants table -->
+          <div class="cot-ov-r-divider" style="flex:1">
+            <div class="cot-ct" style="margin-bottom:8px">PARTICIPANTS · NET BY CATEGORY</div>
+            <table class="cot-tbl" style="font-size:12px" aria-label="COT positioning by participant category">
               <thead><tr>
                 <th scope="col">Category</th><th scope="col">Net</th><th scope="col">Dir</th>
               </tr></thead>
@@ -654,7 +681,7 @@ function openCOTModal(ccy, data) {
                   <td class="${_cotCls(ddNet)}">${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
                 </tr>` : ''}
                 ${amNet != null ? `<tr>
-                  <td style="color:var(--text2,#9096a0);font-size:9px" colspan="3">
+                  <td style="color:var(--text2,#9096a0);font-size:10px" colspan="3">
                     <span style="color:${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">${aligned ? '● Aligned' : '○ Diverging'}</span>
                     — LF and AM ${aligned ? 'both in same direction' : 'are opposed · exercise caution'}
                   </td>
@@ -670,22 +697,22 @@ function openCOTModal(ccy, data) {
       <div class="cot-ov-bottom">
 
         <!-- Net trend sparkline -->
-        <div class="cot-cw" style="margin-bottom:0">
+        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">NET POSITION TREND · ${Math.min(nWks, 8)}W</div>
-          ${_cotSparkline(history, 8)}
-          <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${_cotTrendLabel(history)}</div>
+          <div style="flex:1;display:flex;align-items:center;padding:6px 0">${_cotSparkline(history, 8)}</div>
+          <div style="font-size:10px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${_cotTrendLabel(history)}</div>
         </div>
 
         <!-- 52w extremes -->
-        <div class="cot-cw" style="margin-bottom:0">
+        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">POSITIONING RANGE · ${nWks}W</div>
-          ${_cotRangeCard(history, net)}
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center">${_cotRangeCard(history, net)}</div>
         </div>
 
         <!-- Signal summary -->
-        <div class="cot-cw" style="margin-bottom:0">
+        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
           <div class="cot-ct">SIGNAL SUMMARY</div>
-          ${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}</div>
         </div>
 
       </div>
