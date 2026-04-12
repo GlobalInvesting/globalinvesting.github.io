@@ -270,10 +270,10 @@
   #cot-m-body.cot-body--overview { overflow-y:auto; }
 
   /* Participants: taller chart on mobile so data is visible */
-  #p-participants .cot-chart-area { height:220px; }
-  /* Net/Long-Short: fixed height matching available body space (bodyH≈424 minus chrome) */
+  #p-participants .cot-chart-area { height:260px; }
+  /* Net/Long-Short: use more of the available body space */
   #p-net .cot-chart-area,
-  #p-split .cot-chart-area { height:360px; }
+  #p-split .cot-chart-area { height:400px; }
   /* Description text compact */
   #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
 
@@ -417,7 +417,7 @@ const _priceBadgePlugin = {
         ? color.replace(/[\d.]+\)$/, '1)')
         : color;
       const label  = _cotFmt(val);
-      const fSize  = 9;
+      const fSize  = window.innerWidth < 600 ? 8 : 9;
       ctx.font     = `600 ${fSize}px ${_monoFont}`;
       const tw     = ctx.measureText(label).width;
       const bW     = tw + 10, bH = 15;
@@ -518,16 +518,17 @@ if (typeof Chart !== 'undefined') {
 }
 
 // Build a TradingView-style vertical gradient for area fill.
-// Uses the canvas LOGICAL height (style.height, not canvas.height which is DPR-scaled).
+// createLinearGradient operates in the canvas's physical pixel space (DPR-scaled),
+// so we use canvas.height (physical) not style.height (CSS logical).
 function _tvGradFromCanvas(canvas, hexColor, alphaTop) {
   const ctx = canvas.getContext('2d');
-  const logH = parseInt(canvas.style.height, 10) || canvas.height;
-  const g = ctx.createLinearGradient(0, 0, 0, logH);
+  const physH = canvas.height; // already DPR-scaled — matches gradient coordinate space
+  const g = ctx.createLinearGradient(0, 0, 0, physH);
   const r = parseInt(hexColor.slice(1,3),16);
   const gb = parseInt(hexColor.slice(3,5),16);
   const b = parseInt(hexColor.slice(5,7),16);
   g.addColorStop(0,   `rgba(${r},${gb},${b},${alphaTop})`);
-  g.addColorStop(0.6, `rgba(${r},${gb},${b},0.03)`);
+  g.addColorStop(0.55, `rgba(${r},${gb},${b},0.06)`);
   g.addColorStop(1,   `rgba(${r},${gb},${b},0)`);
   return g;
 }
@@ -549,6 +550,21 @@ function _buildOptions(extraOptions) {
   opts.scales.y.grid.drawBorder = false;
   opts.scales.x.border = { display: false };
   opts.scales.y.border = { display: false };
+  // Mobile overrides: larger ticks, fewer labels, touch events, bigger tooltip
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
+  if (isMobile) {
+    opts.scales.x.ticks.font.size = 10;
+    opts.scales.x.ticks.maxTicksLimit = 7;
+    opts.scales.x.ticks.padding = 6;
+    opts.scales.y.ticks.font.size = 10;
+    opts.scales.y.ticks.padding = 8;
+    opts.scales.y.ticks.maxTicksLimit = 6;
+    opts.plugins.tooltip.padding = { x: 14, y: 10 };
+    opts.plugins.tooltip.bodyFont = { family: _monoFont, size: 11 };
+    opts.plugins.tooltip.titleFont = { family: _monoFont, size: 11 };
+    // Enable touch interaction
+    opts.events = ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'];
+  }
   if (extraOptions) {
     // Deep-merge layout and plugins; shallow-merge everything else
     if (extraOptions.layout) opts.layout = Object.assign({}, opts.layout, extraOptions.layout);
@@ -1089,7 +1105,8 @@ function openCOTModal(ccy, data) {
         cv.height = r.height * (window.devicePixelRatio || 1);
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }], { responsive: false, layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } } });
+        const isMob = window.innerWidth < 600;
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }], { responsive: false, layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'split') {
@@ -1100,11 +1117,11 @@ function openCOTModal(ccy, data) {
         cv.height = r.height * (window.devicePixelRatio || 1);
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
-
+        const isMob = window.innerWidth < 600;
         _lineChart(cv, labels, [
-          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
-          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
-        ], { responsive: false });
+          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
+          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
+        ], { responsive: false, layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'participants') {
