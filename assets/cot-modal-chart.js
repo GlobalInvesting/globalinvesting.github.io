@@ -440,7 +440,7 @@ const _chartDefaults = {
   responsive: true, maintainAspectRatio: false,
   animation: { duration: 300, easing: 'easeOutQuart' },
   interaction: { mode: 'index', intersect: false },
-  layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } },  // right padding for badge
+  layout: { padding: { top: 6, right: 44, bottom: 0, left: 0 } },  // right: space for price badge
   plugins: {
     legend: {
       position: 'top', align: 'start',
@@ -511,26 +511,38 @@ const _chartDefaults = {
 // Must run after Chart.js is loaded. dashboard.js loads Chart.js synchronously
 // before this file, so Chart is guaranteed to be available here.
 if (typeof Chart !== 'undefined') {
-  Chart.register(_crosshairPlugin, _priceBadgePlugin);
-  // Disable Chart.js default box drawing for legend — use line style
+  Chart.register(_crosshairPlugin, _priceBadgePlugin, _gradFillPlugin);
   Chart.defaults.plugins.legend.labels.usePointStyle = false;
 }
 
 // Build a TradingView-style vertical gradient for area fill.
-// createLinearGradient operates in the canvas's physical pixel space (DPR-scaled),
-// so we use canvas.height (physical) not style.height (CSS logical).
-function _tvGradFromCanvas(canvas, hexColor, alphaTop) {
-  const ctx = canvas.getContext('2d');
-  const physH = canvas.height; // already DPR-scaled — matches gradient coordinate space
+// MUST be called after Chart.js has sized the canvas (e.g. inside a plugin hook).
+// canvas.height is in physical pixels (DPR-scaled) — matches the 2D context space.
+function _tvGrad(ctx, canvas, hexColor, alphaTop) {
+  const physH = canvas.height;
   const g = ctx.createLinearGradient(0, 0, 0, physH);
   const r = parseInt(hexColor.slice(1,3),16);
   const gb = parseInt(hexColor.slice(3,5),16);
   const b = parseInt(hexColor.slice(5,7),16);
-  g.addColorStop(0,   `rgba(${r},${gb},${b},${alphaTop})`);
+  g.addColorStop(0,    `rgba(${r},${gb},${b},${alphaTop})`);
   g.addColorStop(0.55, `rgba(${r},${gb},${b},0.06)`);
-  g.addColorStop(1,   `rgba(${r},${gb},${b},0)`);
+  g.addColorStop(1,    `rgba(${r},${gb},${b},0)`);
   return g;
 }
+
+// Gradient fill plugin — regenerates gradients before each draw so they always
+// use the correct canvas dimensions (safe with responsive:true).
+const _gradFillPlugin = {
+  id: 'tvGradFill',
+  beforeDatasetsDraw(chart) {
+    chart.data.datasets.forEach((ds, i) => {
+      if (!ds._gradHex) return; // only datasets that opt-in
+      const meta = chart.getDatasetMeta(i);
+      if (!meta.visible) return;
+      ds.backgroundColor = _tvGrad(chart.ctx, chart.canvas, ds._gradHex, 0.22);
+    });
+  }
+};
 
 // ── Chart.js canonical config builder ────────────────────────────────────────
 // _chartDefaults contains ONLY options (no type/data).
@@ -578,15 +590,11 @@ function _buildOptions(extraOptions) {
 function _lineChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
   const opts = _buildOptions(overrides);
-  // TradingView-style dataset defaults: smooth bezier, area fill, visible points on last
+  // TradingView-style dataset defaults: smooth bezier, area fill, visible points
   datasets = datasets.map(ds => {
-    // If dataset requests fill and has a hex borderColor, build a canvas gradient
     const wantsFill = ds.fill === true || ds.fill === 'start' || ds.fill === 'origin';
     const hexColor = typeof ds.borderColor === 'string' && ds.borderColor.startsWith('#') ? ds.borderColor : null;
-    const bgFill = wantsFill && hexColor
-      ? _tvGradFromCanvas(canvas, hexColor, 0.22)
-      : (ds.backgroundColor || 'transparent');
-    return Object.assign({
+    const base = Object.assign({
       tension:       0.4,
       borderWidth:   2,
       pointRadius:   2,
@@ -597,7 +605,14 @@ function _lineChart(canvas, labels, datasets, overrides) {
       fill: false,
       backgroundColor: 'transparent',
       spanGaps: true,
-    }, ds, { backgroundColor: bgFill });
+    }, ds);
+    // Tag for gradient plugin — gradient is built lazily in beforeDatasetsDraw
+    // so canvas dimensions are guaranteed to be final (safe with responsive:true)
+    if (wantsFill && hexColor) {
+      base._gradHex = hexColor;
+      base.backgroundColor = 'transparent'; // placeholder until first draw
+    }
+    return base;
   });
   const c = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: opts });
   _cotCharts.push(c);
@@ -1101,10 +1116,7 @@ function openCOTModal(ccy, data) {
     if (tabId === 'net') {
       const cv = document.getElementById('c-net');
       if (cv) {
-        // responsive:true — Chart.js reads DPR and sizes the canvas correctly.
-        // The parent .cot-chart-area has flex:1;height:100% so Chart.js gets the right container size.
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }],
-          { layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }]);
       }
     }
     if (tabId === 'split') {
@@ -1113,7 +1125,7 @@ function openCOTModal(ccy, data) {
         _lineChart(cv, labels, [
           { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
           { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
-        ], { layout: { padding: { top: 6, right: isMob ? 52 : 64, bottom: 0, left: 0 } } });
+        ]);
       }
     }
     if (tabId === 'participants') {
@@ -1134,7 +1146,7 @@ function openCOTModal(ccy, data) {
         }
 
         // Build chart with native legend disabled (HTML legend used instead)
-        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 64, bottom: 0, left: 0 } } });
+        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 44, bottom: 0, left: 0 } } });
         partOpts.plugins.legend = { display: false };
         const c = new Chart(cv, {
           type: 'line',
