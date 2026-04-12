@@ -532,15 +532,40 @@ function _tvGradFromCanvas(canvas, hexColor, alphaTop) {
   return g;
 }
 
+// ── Chart.js canonical config builder ────────────────────────────────────────
+// _chartDefaults contains ONLY options (no type/data).
+// Wrappers build { type, data, options } — the canonical Chart.js form.
+// This avoids Chart.js silently ignoring top-level scale config when
+// responsive:false is used with a manually-sized canvas.
+
+function _buildOptions(extraOptions) {
+  // Deep clone options only
+  const opts = JSON.parse(JSON.stringify(_chartDefaults));
+  // Re-attach non-serialisable references lost in JSON round-trip
+  opts.plugins.tvCrosshair  = _crosshairPlugin;
+  opts.plugins.tvPriceBadge = _priceBadgePlugin;
+  // Explicit border suppression — must survive responsive:false
+  opts.scales.x.grid.drawBorder = false;
+  opts.scales.y.grid.drawBorder = false;
+  opts.scales.x.border = { display: false };
+  opts.scales.y.border = { display: false };
+  if (extraOptions) {
+    // Deep-merge layout and plugins; shallow-merge everything else
+    if (extraOptions.layout) opts.layout = Object.assign({}, opts.layout, extraOptions.layout);
+    if (extraOptions.plugins) Object.assign(opts.plugins, extraOptions.plugins);
+    const rest = Object.assign({}, extraOptions);
+    delete rest.layout; delete rest.plugins;
+    Object.assign(opts, rest);
+  }
+  return opts;
+}
+
 function _lineChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
-  const cfg = JSON.parse(JSON.stringify(_chartDefaults));
-  // Re-attach non-serialisable plugin references lost in JSON round-trip
-  cfg.plugins.tvCrosshair  = _crosshairPlugin;
-  cfg.plugins.tvPriceBadge = _priceBadgePlugin;
+  const opts = _buildOptions(overrides);
   // TradingView-style dataset defaults: smooth bezier, area fill, visible points on last
   datasets = datasets.map(ds => {
-    // If dataset requests fill and has a hex borderColor, build a canvas gradient for the area
+    // If dataset requests fill and has a hex borderColor, build a canvas gradient
     const wantsFill = ds.fill === true || ds.fill === 'start' || ds.fill === 'origin';
     const hexColor = typeof ds.borderColor === 'string' && ds.borderColor.startsWith('#') ? ds.borderColor : null;
     const bgFill = wantsFill && hexColor
@@ -559,25 +584,16 @@ function _lineChart(canvas, labels, datasets, overrides) {
       spanGaps: true,
     }, ds, { backgroundColor: bgFill });
   });
-  cfg.type = 'line';
-  cfg.data = { labels, datasets };
-  cfg.scales.x.grid.drawBorder = false;
-  cfg.scales.y.grid.drawBorder = false;
-  cfg.scales.x.border = { display: false };
-  cfg.scales.y.border = { display: false };
-  if (overrides) Object.assign(cfg, overrides);
-  const c = new Chart(canvas, cfg);
+  const c = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: opts });
   _cotCharts.push(c);
   return c;
 }
 
 function _barChart(canvas, labels, datasets, overrides) {
   if (typeof Chart === 'undefined') return null;
-  const cfg = JSON.parse(JSON.stringify(_chartDefaults));
-  cfg.plugins.tvCrosshair  = _crosshairPlugin;
-  cfg.plugins.tvPriceBadge = _priceBadgePlugin;
-  // Zero line: solid white 1px — TW convention for bar charts
-  cfg.plugins.zeroLine = {
+  const opts = _buildOptions(overrides);
+  // Zero line: solid white — TW convention for bar charts
+  opts.plugins.zeroLine = {
     id: 'zeroLine',
     afterDraw(chart) {
       const { ctx, chartArea, scales } = chart;
@@ -594,24 +610,16 @@ function _barChart(canvas, labels, datasets, overrides) {
       ctx.restore();
     }
   };
-  // TW bar style: no border radius, 70% opacity, full saturation colors
+  // TW bar style: no radius, Bloomberg green/red convention
   datasets = datasets.map(ds => Object.assign({
     borderWidth:   0,
     borderRadius:  0,
     borderSkipped: false,
-    hoverBackgroundColor: undefined,   // let Chart.js compute hover from backgroundColor
+    hoverBackgroundColor: undefined,
     barPercentage: 0.85,
     categoryPercentage: 0.9,
   }, ds));
-  cfg.type = 'bar';
-  cfg.data = { labels, datasets };
-  // Ensure scales inherit TV grid even when responsive:false
-  cfg.scales.x.grid.drawBorder = false;
-  cfg.scales.y.grid.drawBorder = false;
-  cfg.scales.x.border = { display: false };
-  cfg.scales.y.border = { display: false };
-  if (overrides) Object.assign(cfg, overrides);
-  const c = new Chart(canvas, cfg);
+  const c = new Chart(canvas, { type: 'bar', data: { labels, datasets }, options: opts });
   _cotCharts.push(c);
   return c;
 }
@@ -1081,7 +1089,7 @@ function openCOTModal(ccy, data) {
         cv.height = r.height * (window.devicePixelRatio || 1);
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }], { responsive: false, layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } } });
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }], { responsive: false, layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'split') {
@@ -1117,24 +1125,12 @@ function openCOTModal(ccy, data) {
         }
 
         // Build chart with native legend disabled (HTML legend used instead)
-        const partCfg = JSON.parse(JSON.stringify(_chartDefaults));
+        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 64, bottom: 0, left: 0 } } });
+        partOpts.plugins.legend = { display: false };
         const c = new Chart(cv, {
           type: 'line',
           data: { labels, datasets: ds },
-          options: {
-            responsive: partCfg.responsive,
-            maintainAspectRatio: partCfg.maintainAspectRatio,
-            animation: partCfg.animation,
-            interaction: partCfg.interaction,
-            layout: { padding: { top: 4, right: 64, bottom: 0, left: 0 } },
-            plugins: {
-              legend: { display: false },
-              tooltip: partCfg.plugins.tooltip,
-              tvCrosshair: _crosshairPlugin,
-              tvPriceBadge: _priceBadgePlugin,
-            },
-            scales: partCfg.scales
-          }
+          options: partOpts
         });
         _cotCharts.push(c);
       }
