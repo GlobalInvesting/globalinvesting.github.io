@@ -387,10 +387,6 @@ function populateFxPairsTable() {
   const _d = new Date().getUTCDay(), _h = new Date().getUTCHours();
   const isWeekend = _d === 6 || (_d === 0 && _h < 21) || (_d === 5 && _h >= 21);
 
-  // Show/hide MARKET CLOSED badge
-  const fxStatusBadge = document.getElementById('fx-market-status');
-  if (fxStatusBadge) fxStatusBadge.style.display = isWeekend ? 'inline-block' : 'none';
-
   const rows = PAIRS.filter(p=>!p.cross).map(pair => {
     const rate = computeRate(pair);
     const prev = computePrevRate(pair);
@@ -1193,9 +1189,7 @@ function updateFxPairsTableRT() {
   const _rtDay2 = new Date().getUTCDay(), _rtH2 = new Date().getUTCHours();
   const _isWeekendRT = _rtDay2 === 6 || (_rtDay2 === 0 && _rtH2 < 21) || (_rtDay2 === 5 && _rtH2 >= 21);
 
-  // Show/hide MARKET CLOSED badge
-  const fxStatusBadge = document.getElementById('fx-market-status');
-  if (fxStatusBadge) fxStatusBadge.style.display = _isWeekendRT ? 'inline-block' : 'none';
+  // Show/hide MARKET CLOSED badge — removed; weekend state communicated via timestamp only
 
   const tbody = document.getElementById('fx-pairs-tbody');
   if (tbody) {
