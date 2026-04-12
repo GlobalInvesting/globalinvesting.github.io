@@ -205,8 +205,10 @@
 
 /* Overview v2: responsive overrides for mobile */
 @media(max-width:600px) {
-  #p-overview .cot-ov-grid   { grid-template-columns:1fr; }
-  #p-overview .cot-ov-bottom { grid-template-columns:1fr; }
+  /* Top grid stays 2-col on mobile — saves vertical space vs stacking */
+  #p-overview .cot-ov-grid   { grid-template-columns:1fr 1fr; gap:6px; }
+  /* Bottom row stacks to 1-col on mobile */
+  #p-overview .cot-ov-bottom { grid-template-columns:1fr; gap:6px; }
 }
 /* Right card in top grid: stacked sections */
 .cot-ov-r-divider {
@@ -252,8 +254,9 @@
 
   /* Net / Long/Short: body must NOT have overflow-y:auto so flex-fill works on canvas.
      Class toggled by cotTab() JS — avoids :has() which has uneven mobile support */
-  #cot-m-body.cot-body--chart,
-  #cot-m-body.cot-body--overview { overflow-y:hidden; }
+  #cot-m-body.cot-body--chart { overflow-y:hidden; }
+  /* Overview on mobile: allow vertical scroll — stacked content exceeds 93vh */
+  #cot-m-body.cot-body--overview { overflow-y:auto; }
 
   /* Participants: taller chart on mobile so data is visible */
   #p-participants .cot-chart-area { height:220px; }
@@ -263,12 +266,19 @@
   /* Description text compact */
   #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
 
-  /* Overview: gauge compact on mobile */
-  #p-overview .cot-gauge-lbls { font-size:8px; }
-  /* Overview: participants table scroll */
-  #p-overview .cot-tbl { min-width:280px; }
+  /* Overview mobile: bottom row no longer needs flex:1 since body scrolls */
+  #p-overview { flex:none; }
+  #p-overview .cot-ov-bottom { flex:none; }
+  /* Scale down big z/pct numbers */
+  #p-overview .cot-ov-bignum { font-size:20px !important; }
+  /* Gauge compact on mobile */
+  #p-overview .cot-gauge-lbls { font-size:7.5px; }
+  /* L/S numbers compact */
+  #p-overview .cot-ls-num { font-size:16px !important; }
+  /* Participants table: no forced min-width, compact */
+  #p-overview .cot-tbl { min-width:0; }
   #p-overview .cot-tbl td,
-  #p-overview .cot-tbl th { white-space:nowrap; font-size:9px; padding:3px 5px; }
+  #p-overview .cot-tbl th { font-size:9px; padding:3px 4px; white-space:nowrap; }
 
   /* History: horizontal scroll */
   #p-history .cot-cw > div { overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -604,12 +614,12 @@ function openCOTModal(ccy, data) {
           <div style="display:flex;gap:0;margin:12px 0 16px">
             <div style="flex:1;border-right:1px solid rgba(255,255,255,.07);padding-right:16px">
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Z-Score</div>
-              <div style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${zStr}</div>
+              <div class="cot-ov-bignum" style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${zStr}</div>
               <div style="font-size:11px;color:${zInfo.color};font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${zInfo.text}</div>
             </div>
             <div style="flex:1;padding-left:16px">
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Percentile</div>
-              <div style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${pStr}</div>
+              <div class="cot-ov-bignum" style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${pStr}</div>
               <div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${nWks}w history</div>
             </div>
           </div>
@@ -640,13 +650,13 @@ function openCOTModal(ccy, data) {
           <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
             <div>
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Longs</div>
-              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
+              <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
               <div style="font-size:11px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${lPct}%</div>
             </div>
             <div style="font-size:13px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
             <div style="text-align:right">
               <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Shorts</div>
-              <div style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
+              <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
               <div style="font-size:11px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${100 - lPct}%</div>
             </div>
           </div>
