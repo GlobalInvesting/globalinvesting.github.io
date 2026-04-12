@@ -409,71 +409,111 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <h3>Overview tab</h3>
-      <p>The default tab. Contains three stacked sections:</p>
+      <p>The default tab. Organized in two rows:</p>
       <ul>
-        <li><strong>Positioning Gauge:</strong> A visual spectrum from Extreme Short (&lt;−2σ) to Extreme Long (&gt;+2σ), with a pin showing where current LF net positioning falls within the trailing 52-week history. Below the gauge: the z-score label (e.g. <em>Moderately Short</em>), the historical percentile (e.g. <em>18th percentile</em>), and a badge — <strong style="color:#f6941c;">CROWDED TRADE</strong> when |z| &gt; 1.8, or <strong style="color:#26a69a;">Within normal range</strong> otherwise.</li>
-        <li><strong>Long / Short Split:</strong> A horizontal bar showing the proportional split between LF long and short contracts for the most recent week, with absolute contract counts on each side.</li>
-        <li><strong>Participants · Net by Category:</strong> A three-row table showing net contracts and direction for Leveraged Funds (primary signal), Asset Managers (slow trend-followers), and Dealers (contrarian/squeeze indicator). An LF/AM alignment row at the bottom signals whether the two main institutional categories agree or diverge.</li>
+        <li><strong>Positioning Gauge</strong> (top-left): A visual spectrum from Extreme Short (&lt;−2σ) to Extreme Long (&gt;+2σ), with a pin showing where current LF net positioning falls within the trailing 52-week history. Below the gauge: the z-score label (e.g. <em>Moderately Short</em>), the historical percentile (e.g. <em>18th percentile</em>), and a badge — <strong style="color:#f6941c;">CROWDED TRADE</strong> when |z| ≥ 1.5, or <strong style="color:#26a69a;">Within normal range</strong> otherwise.</li>
+        <li><strong>Long / Short Split + Participants</strong> (top-right): The proportional bar between LF long and short contracts, combined with the three-row participants table (Leveraged Funds, Asset Managers, Dealers) and LF/AM alignment signal — consolidated into a single card.</li>
+        <li><strong>Net Position Trend sparkline</strong> (bottom-left): An 8-week sparkline showing the trajectory of LF net contracts, with a trend label (e.g. <em>Accumulating · 3 consecutive weeks</em>).</li>
+        <li><strong>Positioning Range (52w)</strong> (bottom-center): A range bar and table showing where the current net position sits between the 52-week high and low.</li>
+        <li><strong>Signal Summary</strong> (bottom-right): Up to 4 color-coded bullets — LF direction, LF/AM alignment, crowding status, and dealer contra-positioning — without requiring tab navigation.</li>
       </ul>
 
-      <!-- MOCK: COT Modal — Overview tab -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:18px 0;max-width:460px;font-size:11px;">
+      <!-- MOCK: COT Modal — Overview tab v1.2 (2-col top + 3-col bottom) -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:18px 0;font-size:11px;">
+        <!-- Header -->
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;">
-          <div style="display:flex;flex-direction:column;gap:1px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);font-family:var(--font-ui);">EUR · COT Positioning</span>
-            <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">CFTC · week ending 2026-04-07</span>
+          <div>
+            <span style="font-size:13px;font-weight:700;color:var(--text);font-family:var(--font-ui);">CFTC Positioning · EUR · Leveraged Funds</span><br>
+            <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">week ending 2026-04-07 · 52w history · CFTC TFF Disaggregated</span>
           </div>
-          <span style="font-size:14px;color:var(--text3);cursor:pointer;">✕</span>
+          <span style="font-size:14px;color:var(--text3);">✕</span>
         </div>
         <!-- Tabs -->
-        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 8px;overflow-x:auto;">
-          <div style="padding:7px 12px;font-size:11px;font-weight:700;color:var(--text);border-bottom:2px solid var(--blue);white-space:nowrap;font-family:var(--font-ui);">Overview</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--font-ui);">Net Position</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--font-ui);">Long / Short</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--font-ui);">Participants</div>
-          <div style="padding:7px 12px;font-size:11px;color:var(--text3);white-space:nowrap;font-family:var(--font-ui);">History</div>
+        <div style="display:flex;border-bottom:1px solid var(--border);padding:0 8px;">
+          <div style="padding:7px 12px;font-size:11px;color:var(--text);border-bottom:2px solid var(--blue);font-family:var(--font-ui);">Overview</div>
+          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Net Position</div>
+          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Long / Short</div>
+          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Participants</div>
+          <div style="padding:7px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">History</div>
         </div>
-        <!-- Gauge -->
-        <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;font-family:var(--font-ui);">POSITIONING GAUGE · Z-SCORE VS 52-WEEK HISTORY</div>
-          <div style="background:linear-gradient(to right,#ef5350,#9096a0 50%,#26a69a);border-radius:4px;height:8px;position:relative;margin-bottom:6px;">
-            <div style="position:absolute;left:30%;top:-3px;width:2px;height:14px;background:#fff;border-radius:1px;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;">
-            <span>Extreme Short<br>(&lt;−2σ)</span><span style="text-align:center">Short<br>(−1.5σ)</span><span style="text-align:center">Neutral</span><span style="text-align:center">Long<br>(+1.5σ)</span><span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
-          </div>
-          <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">
-            Positioning: <strong style="color:#ef5350;">Moderately Short</strong> · Historical percentile <strong>22%</strong>
-            <span style="display:inline-block;margin-left:6px;font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(38,166,154,.12);color:#26a69a;border:1px solid rgba(38,166,154,.2);">WITHIN NORMAL RANGE</span>
-          </div>
-        </div>
-        <!-- Long/Short bar -->
-        <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;font-family:var(--font-ui);">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);min-width:52px;">82,140</span>
-            <div style="flex:1;background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;">
-              <div style="position:absolute;left:0;top:0;width:42%;height:100%;background:var(--up);opacity:.8;"></div>
-              <div style="position:absolute;right:0;top:0;width:58%;height:100%;background:var(--down);opacity:.8;"></div>
+        <!-- Body: 2-col top -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0;">
+          <!-- Left: Gauge -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">POSITIONING GAUGE · 52W HISTORY</div>
+            <div style="background:linear-gradient(to right,#ef5350 0%,#ef5350 20%,#ff9800 20%,#ff9800 35%,#888 35%,#888 65%,#4caf50 65%,#4caf50 80%,#26a69a 80%);border-radius:4px;height:8px;position:relative;margin-bottom:6px;">
+              <div style="position:absolute;left:calc(30% - 7px);top:-5px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--bg2);box-shadow:0 0 0 2px #ef5350;"></div>
             </div>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);min-width:52px;text-align:right;">113,917</span>
+            <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;">
+              <span>Extreme Short<br>&lt;−2σ</span><span style="text-align:center">Short<br>−1.5σ</span><span style="text-align:center">Neutral</span><span style="text-align:center">Long<br>+1.5σ</span><span style="text-align:right">Extreme Long<br>&gt;+2σ</span>
+            </div>
+            <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">
+              Positioning: <strong style="color:#ef5350;">Moderately Short</strong> · Percentile <strong>22%</strong>
+              <span style="display:inline-block;margin-left:4px;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(38,166,154,.12);color:#26a69a;border:1px solid rgba(38,166,154,.2);">Within normal range</span>
+            </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;"><span>LONGS 42%</span><span>SHORTS 58%</span></div>
+          <!-- Right: Long/Short + Participants -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">LONG / SHORT SPLIT · LF OI</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);min-width:44px;">82,140</span>
+              <div style="flex:1;height:8px;background:rgba(239,83,80,.25);border-radius:3px;overflow:hidden;position:relative;">
+                <div style="position:absolute;left:0;top:0;height:100%;width:42%;background:rgba(38,166,154,.7);"></div>
+              </div>
+              <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);min-width:44px;text-align:right;">113,917</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;"><span>LONGS 42%</span><span>SHORTS 58%</span></div>
+            <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px;">
+              <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);">PARTICIPANTS · NET BY CATEGORY</div>
+              <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
+                <thead><tr style="color:var(--text3);font-size:8px;">
+                  <th style="text-align:left;padding:2px 0;">Category</th><th style="text-align:right;padding:2px 0;">Net</th><th style="text-align:right;padding:2px 0;">Dir</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td style="padding:3px 0;color:var(--text2);">Leveraged Funds</td><td style="padding:3px 0;color:var(--down);text-align:right;">−31,777</td><td style="padding:3px 0;color:var(--down);text-align:right;">▼ Short</td></tr>
+                  <tr><td style="padding:3px 0;color:var(--text2);">Asset Managers</td><td style="padding:3px 0;color:var(--up);text-align:right;">+18,420</td><td style="padding:3px 0;color:var(--up);text-align:right;">▲ Long</td></tr>
+                  <tr><td style="padding:3px 0;color:var(--text2);">Dealers</td><td style="padding:3px 0;color:var(--up);text-align:right;">+9,244</td><td style="padding:3px 0;color:var(--up);text-align:right;">▲ Long</td></tr>
+                  <tr><td colspan="3" style="padding:3px 0;font-size:9px;color:#f6941c;">○ Diverging — LF and AM opposed · exercise caution</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <!-- Participants table -->
-        <div style="padding:12px 14px;">
-          <div style="font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;font-family:var(--font-ui);">PARTICIPANTS · NET BY CATEGORY</div>
-          <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
-            <thead><tr style="color:var(--text3);font-size:8.5px;text-transform:uppercase;letter-spacing:.06em;">
-              <th style="text-align:left;padding:3px 6px;">Category</th><th style="text-align:right;padding:3px 6px;">Net</th><th style="text-align:right;padding:3px 6px;">Direction</th><th style="text-align:left;padding:3px 6px;font-size:8px;">Note</th>
-            </tr></thead>
-            <tbody>
-              <tr><td style="padding:5px 6px;color:var(--text);">Leveraged Funds</td><td style="padding:5px 6px;color:var(--down);text-align:right;">-31,777</td><td style="padding:5px 6px;color:var(--down);text-align:right;">▼ Short</td><td style="padding:5px 6px;color:var(--text3);font-size:8.5px;">Hedge funds / CTAs — primary signal</td></tr>
-              <tr><td style="padding:5px 6px;color:var(--text);">Asset Managers</td><td style="padding:5px 6px;color:var(--up);text-align:right;">+18,420</td><td style="padding:5px 6px;color:var(--up);text-align:right;">▲ Long</td><td style="padding:5px 6px;color:var(--text3);font-size:8.5px;">Mutual funds / pensions — slow trend follower</td></tr>
-              <tr><td style="padding:5px 6px;color:var(--text);">Dealers</td><td style="padding:5px 6px;color:var(--up);text-align:right;">+9,244</td><td style="padding:5px 6px;color:var(--up);text-align:right;">▲ Long</td><td style="padding:5px 6px;color:var(--text3);font-size:8.5px;">Market-makers — contrarian signal</td></tr>
-              <tr><td style="padding:5px 6px;color:var(--text2);">LF / AM</td><td colspan="3" style="padding:5px 6px;color:#f6941c;">○ Diverging — LF and AM are opposed (exercise caution)</td></tr>
-            </tbody>
-          </table>
+        <!-- Body: 3-col bottom row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:10px 14px 14px;">
+          <!-- Sparkline -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:6px;font-family:var(--font-mono);">NET TREND · 8W</div>
+            <svg viewBox="0 0 160 40" style="width:100%;height:40px;">
+              <polyline points="0,32 20,28 40,35 60,22 80,18 100,25 120,14 140,20 160,12" fill="none" stroke="#ef5350" stroke-width="1.5" stroke-linejoin="round"/>
+              <line x1="0" y1="36" x2="160" y2="36" stroke="rgba(255,255,255,.07)" stroke-width="0.5"/>
+              <circle cx="160" cy="12" r="3" fill="#ef5350"/>
+            </svg>
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:3px;">Distributing · 3 weeks</div>
+          </div>
+          <!-- Range -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">RANGE · 52W</div>
+            <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px;position:relative;">
+              <div style="position:absolute;left:0;height:100%;width:28%;background:var(--down);border-radius:2px;"></div>
+              <div style="position:absolute;left:calc(28% - 4px);top:-2px;width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg2);"></div>
+            </div>
+            <div style="font-size:10px;font-family:var(--font-mono);display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">52w High</span><span style="color:var(--up);">+42k</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">Current</span><span style="color:var(--text);">−31k</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--text3);">52w Low</span><span style="color:var(--down);">−85k</span></div>
+            </div>
+          </div>
+          <!-- Signals -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;font-family:var(--font-mono);">SIGNAL SUMMARY</div>
+            <div style="display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);">
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#ef5350;flex-shrink:0;"></span><span style="color:var(--text2);">LF net short</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#f6941c;flex-shrink:0;"></span><span style="color:var(--text2);">LF/AM diverging</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#26a69a;flex-shrink:0;"></span><span style="color:var(--text2);">Not crowded</span></div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;"><span style="width:6px;height:6px;border-radius:50%;background:#f6941c;flex-shrink:0;"></span><span style="color:var(--text2);">Dealers contra</span></div>
+            </div>
+          </div>
         </div>
       </div>
 
