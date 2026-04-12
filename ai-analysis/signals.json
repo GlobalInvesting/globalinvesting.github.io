@@ -1,6 +1,6 @@
 [
   {
-    "time": "02:35",
+    "time": "02:50",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
@@ -11,46 +11,46 @@
     ]
   },
   {
-    "time": "02:30",
+    "time": "02:48",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% long, with leveraged funds holding +1,029 contracts, may lead to a squeeze if market sentiment shifts.",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1711, with ECB rate at 2% and Fed rate at 3.75%; rate divergence may continue to weigh on EUR/USD.",
     "evidence": [
-      "EUR net long: +1,029",
-      "long%: 77.3%",
-      "CFTC week ending: 2026-04-07"
+      "EUR/USD: 1.1711",
+      "ECB rate: 2%",
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "02:25",
+    "time": "02:45",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7072, with RBA hiking rates, AUD carry supported; however, retail sentiment is 86% short, indicating potential for a contrarian reversal.",
+    "title": "CFTC — AUD",
+    "text": "Leveraged Fund net position in AUD at +41,458, long% at 71.1%; watch for potential long squeeze.",
     "evidence": [
-      "AUD/USD: 0.7072",
-      "RBA rate: 4.10%",
-      "AUD/USD retail sentiment: 86% short"
+      "AUD net: +41,458",
+      "AUD long%: 71.1%",
+      "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "02:20",
+    "time": "02:40",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals normal volatility — not a risk-on environment, while MOVE Index at 72.2 indicates relatively low bond market stress.",
+    "text": "VIX at 19.2 signals normal volatility — risk-on environment intact, but watch for potential shifts.",
     "evidence": [
       "VIX: 19.2",
-      "MOVE Index: 72.2",
-      "S&P 500: 6,817"
+      "S&P 500: 6,817",
+      "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "02:15",
+    "time": "02:35",
     "priority": "info",
     "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break, with z = +1.39σ, indicates JPY no longer acting as a safe haven, potentially impacting USD/JPY positioning.",
+    "text": "USD/JPY vs VIX correlation break at +1.39σ; JPY no longer acting as safe haven, impacting USD/JPY positioning.",
     "evidence": [
       "USD/JPY vs VIX corr: +0.680",
-      "z: +1.39σ",
+      "z-score: +1.39σ",
       "norm: +0.135"
     ]
   }
