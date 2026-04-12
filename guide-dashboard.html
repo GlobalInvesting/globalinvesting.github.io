@@ -18,7 +18,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="How to Use the FX Terminal — Global Investing">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
-<meta name="twitter:site" content="@GlobalInvesting">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -871,7 +870,7 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <h3>Key Correlations</h3>
-      <p>Rolling 60-day Pearson correlations between 12 FX-relevant pairs and reference assets, computed from yfinance data. The table includes a <strong>vs norm</strong> column showing how far the current correlation deviates from its 252-day historical baseline, expressed as a z-score. Pairs deviating more than 1.5σ from their historical norm are flagged as potential regime breaks — a broken correlation is often as informative as the correlation itself.</p>
+      <p>Rolling Pearson correlations between 12 FX-relevant pairs and reference assets, computed from yfinance data. Three lookback windows are available — <strong>30d</strong>, <strong>60d</strong>, and <strong>90d</strong> — selectable via the buttons in the panel header (60d is the default). The table includes a <strong>vs norm</strong> column showing how far the current correlation deviates from its 252-day historical baseline, expressed as a z-score. The z-score is always computed against the 60d baseline regardless of which window is active, keeping the historical norm stable across window switches. Pairs deviating more than 1.5σ from their historical norm are flagged as potential regime breaks — a broken correlation is often as informative as the correlation itself.</p>
       <p>Two pairs monitor macro regime specifically: <strong>DXY vs SPX</strong> (normally negative — a positive reading signals USD funding stress) and <strong>Gold vs DXY</strong> (normally negative — a positive reading signals the safe-haven model is broken or inflation is driving both).</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
@@ -899,25 +898,28 @@ a { color: inherit; text-decoration: none; }
             <tr><td style="padding:3px 6px;color:var(--text);">Gold</td><td style="padding:3px 6px;color:var(--text2);text-align:center;">DXY</td><td style="padding:3px 6px;color:var(--down);text-align:center;font-weight:700;">−0.51</td><td style="padding:3px 6px;color:var(--text3);text-align:center;font-size:9px;">● normal</td></tr>
           </tbody>
         </table>
-        <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling 60-day Pearson · yfinance · vs norm = z-score vs 252d</div>
+        <div style="padding:2px 6px 5px;font-size:9px;color:var(--text3);">Rolling Pearson · 30d / 60d / 90d · yfinance · vs norm = z-score vs 252d</div>
       </div>
 
       <h3>CB Rate Expectations</h3>
       <p>Forward-looking rate expectations for major central banks at their next scheduled meeting, sourced from OIS and futures market pricing — not analyst forecasts. This is distinct from the current rate: it reflects what the market is pricing for the <em>next</em> decision, which is what drives FX at the margin. When the <code>bias</code> field is absent from the data, the terminal estimates the direction from historical rate trajectory and prefixes the label with <code>~</code> to signal it is an estimate, not a curated market-consensus value.</p>
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:280px;">
+      <p>Where market-implied cut probabilities are available (USD from CME FedWatch, AUD from the ASX Rate Indicator), a small monospace chip — e.g. <code style="font-family:var(--font-mono);font-size:11px;">42%↓</code> — appears next to the Bias label. The chip is color-coded: red (≥60%, cut likely), neutral (40–59%), muted (&lt;40%). It renders only when live data is available; all other rows show the Bias label unchanged.</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CB Rate Expectations</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
-            <th style="text-align:left;padding:3px 8px;">Bank · Meeting</th>
-            <th style="padding:3px 6px;">Bias</th>
+            <th style="text-align:left;padding:3px 8px;" title="Bank and next scheduled meeting date">Bank · Meeting</th>
+            <th style="padding:3px 6px;" title="Market-implied direction at next meeting. %↓ chip = CME FedWatch (USD) or ASX Rate Indicator (AUD) cut probability">Bias</th>
             <th style="padding:3px 6px;">Fwd Rate</th>
           </tr></thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">Fed · 29 Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">3.75%</td></tr>
             <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">ECB · 30 Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.00%</td></tr>
-            <tr><td style="padding:4px 8px;color:var(--text);">BoJ · 28 Apr</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hike</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">1.00%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">BoJ · 28 Apr</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hike</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">1.00%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">RBA · 5 May</td><td style="padding:4px 6px;color:var(--up);text-align:center;">↑ Hike</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">4.35%</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">BoC · 29 Apr</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">→ Hold</td><td style="padding:4px 6px;color:var(--text2);text-align:center;">2.25%</td></tr>
           </tbody>
         </table>
       </div>
@@ -1063,7 +1065,7 @@ a { color: inherit; text-decoration: none; }
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.13</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.21</span></div>
 </footer>
 
 
