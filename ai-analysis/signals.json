@@ -1,9 +1,9 @@
 [
   {
-    "time": "19:30",
+    "time": "21:55",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.19 resistance, BoJ intervention risk rising on a sustained break above 160.00",
+    "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
@@ -11,46 +11,46 @@
     ]
   },
   {
-    "time": "19:28",
+    "time": "21:53",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1711, ECB policy on hold, watch for rate divergence impact",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3% — watch for potential squeeze risk as institutional sentiment diverges from retail.",
     "evidence": [
-      "EUR/USD: 1.1711",
-      "ECB rate: 2.00%",
-      "Fed rate: 3.75%"
+      "CFTC EUR net: +1,029",
+      "EUR/USD: 1.16800",
+      "VIX: 19.2"
     ]
   },
   {
-    "time": "19:25",
+    "time": "21:51",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD trading below 0.7072, RBA hiking rates, AUD carry supported",
+    "text": "AUD/USD trading below 0.7072 — retail sentiment at 86% short, watch for contrarian reversal risk.",
     "evidence": [
-      "AUD/USD: 0.7072",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.29%"
+      "AUD/USD: 0.70100",
+      "AUD net long: +41,458",
+      "VIX: 19.2"
     ]
   },
   {
-    "time": "19:20",
+    "time": "21:49",
     "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 19.2 signals low volatility, not a risk-on environment",
+    "title": "Risk Regime",
+    "text": "VIX at 19.2 signals low volatility — not a risk-off environment.",
     "evidence": [
       "VIX: 19.2",
       "S&P 500: 6,817",
-      "MOVE Index: 72.2"
+      "DXY: 98.70"
     ]
   },
   {
-    "time": "19:15",
+    "time": "21:47",
     "priority": "info",
     "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven, watch for regime shift",
+    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, watch for regime shift implications.",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.655",
-      "z=+1.54σ",
+      "USD/JPY vs VIX: corr=+0.654",
+      "z=+1.53σ",
       "VIX: 19.2"
     ]
   }
