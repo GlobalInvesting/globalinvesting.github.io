@@ -123,7 +123,7 @@ jobs:
               echo "Rebase conflict — resolving by keeping our fetched data..."
               git checkout --theirs intraday-data/quotes.json
               git add intraday-data/quotes.json
-              git rebase --continue --no-edit || git rebase --skip
+              GIT_EDITOR=true git rebase --continue || git rebase --skip
             fi
           done
 
