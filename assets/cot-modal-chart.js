@@ -91,15 +91,37 @@
 #cot-m-body::-webkit-scrollbar { width:5px; }
 #cot-m-body::-webkit-scrollbar-track { background:transparent; }
 #cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
-/* Disable scroll when a single-chart tab is active so flex-fill reaches the canvas */
-#cot-m-body.cot-body--chart { overflow-y:hidden; }
+/* Disable scroll when overview or a single-chart tab is active so flex-fill reaches cards/canvas */
+#cot-m-body.cot-body--chart,
+#cot-m-body.cot-body--overview { overflow-y:hidden; }
 
 /* All panels fill the body completely */
 .cot-panel { display:none; }
 .cot-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
 
-/* Multi-section panels scroll their own content */
-#p-overview.on, #p-history.on { display:block; }
+/* History scrolls its own content */
+#p-history.on { display:block; }
+
+/* Overview: flex-column, fills body, rows share space equally */
+#p-overview.on {
+  display:flex;flex-direction:column;flex:1;min-height:0;
+}
+#p-overview .cot-ov-grid {
+  flex:1;min-height:0;
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
+  align-items:stretch;
+}
+#p-overview .cot-ov-grid > .cot-cw {
+  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow-y:auto;
+}
+#p-overview .cot-ov-bottom {
+  flex:1;min-height:0;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+  align-items:stretch;
+}
+#p-overview .cot-ov-bottom > .cot-cw {
+  display:flex;flex-direction:column;margin-bottom:0;min-height:0;overflow-y:auto;
+}
 
 /* Net Position and Long/Short: single-chart panels fill entire body */
 #p-net.on .cot-cw,
@@ -181,16 +203,10 @@
 .badge-ok   { background:rgba(38,166,154,.12);color:var(--up,#26a69a); }
 
 
-/* Overview v2: 2-col top grid + 3-col bottom row */
-.cot-ov-grid {
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
-}
-.cot-ov-bottom {
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
-}
+/* Overview v2: responsive overrides for mobile */
 @media(max-width:600px) {
-  .cot-ov-grid { grid-template-columns:1fr; }
-  .cot-ov-bottom { grid-template-columns:1fr; }
+  #p-overview .cot-ov-grid   { grid-template-columns:1fr; }
+  #p-overview .cot-ov-bottom { grid-template-columns:1fr; }
 }
 /* Right card in top grid: stacked sections */
 .cot-ov-r-divider {
@@ -236,7 +252,8 @@
 
   /* Net / Long/Short: body must NOT have overflow-y:auto so flex-fill works on canvas.
      Class toggled by cotTab() JS — avoids :has() which has uneven mobile support */
-  #cot-m-body.cot-body--chart { overflow-y:hidden; }
+  #cot-m-body.cot-body--chart,
+  #cot-m-body.cot-body--overview { overflow-y:hidden; }
 
   /* Participants: taller chart on mobile so data is visible */
   #p-participants .cot-chart-area { height:220px; }
@@ -727,6 +744,10 @@ function openCOTModal(ccy, data) {
 
   document.body.appendChild(bd);
 
+  // Overview is the initial tab — set its body class immediately
+  const initBody = document.getElementById('cot-m-body');
+  if (initBody) initBody.classList.add('cot-body--overview');
+
   // Close on backdrop click or Escape
   bd.addEventListener('click', e => { if (e.target === bd) closeCOTModal(); });
   const esc = e => { if (e.key === 'Escape') closeCOTModal(); };
@@ -882,7 +903,11 @@ function cotTab(el, tabId) {
   if (panel) panel.classList.add('on');
   const body = document.getElementById('cot-m-body');
   const isChartTab = tabId === 'net' || tabId === 'split';
-  if (body) body.classList.toggle('cot-body--chart', isChartTab);
+  const isOverview = tabId === 'overview';
+  if (body) {
+    body.classList.toggle('cot-body--chart', isChartTab);
+    body.classList.toggle('cot-body--overview', isOverview);
+  }
 
   const bd = document.getElementById('cot-bd');
   if (bd && bd._build) {
