@@ -387,6 +387,10 @@ function populateFxPairsTable() {
   const _d = new Date().getUTCDay(), _h = new Date().getUTCHours();
   const isWeekend = _d === 6 || (_d === 0 && _h < 21) || (_d === 5 && _h >= 21);
 
+  // Show/hide MARKET CLOSED badge
+  const fxStatusBadge = document.getElementById('fx-market-status');
+  if (fxStatusBadge) fxStatusBadge.style.display = isWeekend ? 'inline-block' : 'none';
+
   const rows = PAIRS.filter(p=>!p.cross).map(pair => {
     const rate = computeRate(pair);
     const prev = computePrevRate(pair);
@@ -436,11 +440,12 @@ function populateFxPairsTable() {
     const ivStr = hv30val != null ? hv30val.toFixed(1) + '%' : '—';
 
     // Session High/Low — from intraday RT cache (STOOQ_RT_CACHE populated by yfinance JSON).
-    // yfinance period="5d" returns daily OHLC — high/low not yet stored in quotes.json,
-    // so we show '—' rather than invent synthetic ranges. Will populate when script adds high/low.
+    // On weekdays: intraday high/low for current session.
+    // On weekends: last Friday close values — shown dimmed per Bloomberg/Eikon convention.
     const rtD = STOOQ_RT_CACHE[pair.id];
     const sessH = (rtD?.high  != null) ? fmt(rtD.high,  pair.dec) : '—';
     const sessL = (rtD?.low   != null) ? fmt(rtD.low,   pair.dec) : '—';
+    const sessStyle = isWeekend ? 'color:var(--text3);font-size:10px' : 'color:var(--text1);font-size:10px';
 
     const rateFmt = rate != null ? fmt(rate, pair.dec) : '—';
 
@@ -455,8 +460,8 @@ function populateFxPairsTable() {
       <td class="${cls1d}">${chg1d}</td>
       <td class="${cls1w}">${chg1w}</td>
       <td style="color:var(--text2);font-size:10px">${ivStr}</td>
-      <td style="color:var(--text1);font-size:10px">${sessH}</td>
-      <td style="color:var(--text1);font-size:10px">${sessL}</td>
+      <td style="${sessStyle}">${sessH}</td>
+      <td style="${sessStyle}">${sessL}</td>
     </tr>`;
   });
   tbody.innerHTML = rows.join('');
@@ -464,7 +469,7 @@ function populateFxPairsTable() {
   if (upd) {
     const now = new Date();
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    upd.textContent = 'ECB · ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}) + ' ' + tzAbbr + (isWeekend ? ' · last close' : '');
+    upd.textContent = 'ECB · ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}) + ' ' + tzAbbr + (isWeekend ? ' · Last close: Fri' : '');
   }
 }
 
@@ -1185,6 +1190,13 @@ async function fetchQuoteBarRT() {
 // Update FX pairs table with real-time yfinance prices (from intraday JSON)
 function updateFxPairsTableRT() {
   // ── Update FX Pairs — Majors table ──
+  const _rtDay2 = new Date().getUTCDay(), _rtH2 = new Date().getUTCHours();
+  const _isWeekendRT = _rtDay2 === 6 || (_rtDay2 === 0 && _rtH2 < 21) || (_rtDay2 === 5 && _rtH2 >= 21);
+
+  // Show/hide MARKET CLOSED badge
+  const fxStatusBadge = document.getElementById('fx-market-status');
+  if (fxStatusBadge) fxStatusBadge.style.display = _isWeekendRT ? 'inline-block' : 'none';
+
   const tbody = document.getElementById('fx-pairs-tbody');
   if (tbody) {
     const rows = tbody.querySelectorAll('tr');
@@ -1218,9 +1230,10 @@ function updateFxPairsTableRT() {
       if (tds[6] && data.hv30 != null) {
         tds[6].textContent = data.hv30.toFixed(1) + '%';
       }
-      // SESS H / SESS L — populate from high/low if available in intraday data
-      if (tds[7]) tds[7].textContent = (data.high  != null) ? fmt(data.high,  pairCfg.dec) : '—';
-      if (tds[8]) tds[8].textContent = (data.low   != null) ? fmt(data.low,   pairCfg.dec) : '—';
+      // SESS H / SESS L — populate from high/low; dim on weekends (last close values)
+      const sessColor = _isWeekendRT ? 'var(--text3)' : 'var(--text1)';
+      if (tds[7]) { tds[7].textContent = (data.high != null) ? fmt(data.high, pairCfg.dec) : '—'; tds[7].style.color = sessColor; }
+      if (tds[8]) { tds[8].textContent = (data.low  != null) ? fmt(data.low,  pairCfg.dec) : '—'; tds[8].style.color = sessColor; }
     });
   }
 
@@ -1276,7 +1289,11 @@ function updateFxPairsTableRT() {
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    upd.textContent = `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
+    const _rtDay = now.getUTCDay(), _rtH = now.getUTCHours();
+    const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
+    upd.textContent = _rtWeekend
+      ? `yfinance · Last close: Fri · ~5min delay`
+      : `yfinance · ${hh}:${mm} ${tzAbbr} · ~5min delay`;
   }
 }
 
