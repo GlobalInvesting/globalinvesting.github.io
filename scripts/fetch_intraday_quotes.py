@@ -456,9 +456,13 @@ def fetch_correlations():
         aligned = min(len(sa), len(sb))
         sa_all, sb_all = sa[-aligned:], sb[-aligned:]
 
-        # Current 60-day correlation
+        # Current correlations at three windows — 30d, 60d, 90d
+        n30 = min(aligned, 30)
         n60 = min(aligned, 60)
-        corr = pearson(sa_all[-n60:], sb_all[-n60:])
+        n90 = min(aligned, 90)
+        corr30 = pearson(sa_all[-n30:], sb_all[-n30:])
+        corr   = pearson(sa_all[-n60:], sb_all[-n60:])   # default window (60d)
+        corr90 = pearson(sa_all[-n90:], sb_all[-n90:])
 
         # Historical norm: compute all 30-day rolling Pearson windows over last 252 points
         # Use 30-day windows (not 60) for the norm to get more samples and smoother baseline
@@ -483,11 +487,15 @@ def fetch_correlations():
         status = f"{corr:+.3f}" if corr is not None else "N/A"
         norm_s = f"norm={norm:+.3f}" if norm is not None else "norm=N/A"
         z_s = f"z={z_score:+.2f}" if z_score is not None else "z=N/A"
-        print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: {status}  {norm_s}  {z_s}  (n={n60})")
+        c30s = f"{corr30:+.3f}" if corr30 is not None else "N/A"
+        c90s = f"{corr90:+.3f}" if corr90 is not None else "N/A"
+        print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: 30d={c30s}  60d={status}  90d={c90s}  {norm_s}  {z_s}")
 
         results.append({
             "a": labels[0], "b": labels[1],
-            "corr": corr, "n": n60,
+            "corr30": corr30, "n30": n30,
+            "corr":   corr,   "n":   n60,
+            "corr90": corr90, "n90": n90,
             "norm": norm, "z_score": z_score,
         })
 
