@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.8 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
+fetch_intraday_quotes.py  v2.9 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v2.9 vs v2.8:
+  - Sess H/L sanity check: no anula H=L en fin de semana (H=L=close del viernes es válido).
 
 MEJORAS v2.8 vs v2.7:
   - fetch_correlations() ahora descarga 252d (1 año) en vez de 90d.
@@ -771,9 +774,12 @@ def fetch_yfinance_all(symbols_map):
                 }
 
                 # Sanity check: high == low means yfinance returned an incomplete intraday
-                # bar (e.g. a weekend-open quote or a stale tick where H=L=close).
-                # Set both to None so the frontend shows '—' instead of a collapsed range.
-                if (results[internal_id]["high"] is not None
+                # bar (e.g. a stale tick where H=L=close).
+                # Exception: on weekends H=L=close is valid (last Friday close) — keep it
+                # so the frontend can show last-close range in Sess H/L.
+                _is_weekend_hl = datetime.now(timezone.utc).weekday() >= 5  # 5=Sat, 6=Sun
+                if (not _is_weekend_hl
+                        and results[internal_id]["high"] is not None
                         and results[internal_id]["low"]  is not None
                         and results[internal_id]["high"] == results[internal_id]["low"]):
                     results[internal_id]["high"] = None
@@ -848,7 +854,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.8  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.9  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
