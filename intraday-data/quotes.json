@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-12T05:45:27Z",
+  "updated": "2026-04-12T05:50:27Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -77,8 +77,8 @@
     "us3m": {
       "close": 3.593,
       "prev_close": 3.588,
-      "chg": 0.005,
-      "pct": 0.1393,
+      "chg": -3.588,
+      "pct": -49.9652,
       "high": null,
       "low": null,
       "source": "yfinance"
@@ -86,16 +86,16 @@
     "us2y": {
       "close": 3.78,
       "prev_close": 3.588,
-      "chg": 0.005,
-      "pct": 0.1393,
+      "chg": -3.588,
+      "pct": -49.9652,
       "source": "fred_dgs2",
       "sourceDate": "2026-04-09"
     },
     "us5y": {
       "close": 3.939,
       "prev_close": 3.915,
-      "chg": 0.024,
-      "pct": 0.613,
+      "chg": -3.915,
+      "pct": -49.8472,
       "high": null,
       "low": null,
       "source": "yfinance"
@@ -119,10 +119,10 @@
       "source": "yfinance"
     },
     "btc": {
-      "close": 71657.49,
+      "close": 71667.14,
       "prev_close": 73057.16,
-      "chg": -1203.8281,
-      "pct": -1.6522,
+      "chg": -1146.8672,
+      "pct": -1.5751,
       "high": 73103.04,
       "low": 71408.8,
       "source": "yfinance"
