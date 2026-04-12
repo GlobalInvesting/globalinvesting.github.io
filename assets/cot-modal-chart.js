@@ -216,9 +216,10 @@
   /* Hide DIR column in participants table on mobile — no room */
   #p-overview .cot-tbl th:last-child,
   #p-overview .cot-tbl td:last-child { display:none; }
-  /* L/S layout: stack vertically instead of row on mobile */
-  #p-overview .cot-ls-row { flex-direction:column !important; gap:4px !important; align-items:flex-start !important; }
-  #p-overview .cot-ls-vs { display:none !important; }
+  /* L/S layout: keep row but use equal 3-col layout (Longs | vs | Shorts) */
+  #p-overview .cot-ls-row { display:grid !important; grid-template-columns:1fr auto 1fr !important; align-items:center !important; gap:4px !important; }
+  #p-overview .cot-ls-row > div:last-child { text-align:right; }
+  #p-overview .cot-ls-vs { display:block !important; text-align:center; }
 }
 /* Right card in top grid: stacked sections */
 .cot-ov-r-divider {
@@ -245,7 +246,7 @@
   /* Header: tighter, title single line with ellipsis */
   #cot-m-hd { padding:10px 14px 9px; }
   #cot-m-title { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100% - 36px); }
-  #cot-m-sub { font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #cot-m-sub { font-size:9px; white-space:normal; line-height:1.4; }
 
   /* Metrics: 3-col compact */
   #cot-m-metrics { grid-template-columns:repeat(3,1fr); }
