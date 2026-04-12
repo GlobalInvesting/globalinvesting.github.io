@@ -395,13 +395,13 @@ function _cotSparkline(history, nWeeks) {
   const col = last >= 0 ? '#26a69a' : '#ef5350';
   const zeroY = (H - pad - ((0 - mn) / range) * (H - pad * 2));
   const zeroLine = (zeroY >= pad && zeroY <= H - pad)
-    ? \`<line x1="\${pad}" y1="\${zeroY.toFixed(1)}" x2="\${W - pad}" y2="\${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.1)" stroke-width="0.5" stroke-dasharray="3,3"/>\`
+    ? `<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W - pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`
     : '';
-  return \`<svg viewBox="0 0 \${W} \${H}" class="cot-spark" aria-hidden="true">
-    \${zeroLine}
-    <polyline points="\${pts}" fill="none" stroke="\${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="\${x(vals.length-1)}" cy="\${y(last)}" r="3" fill="\${col}"/>
-  </svg>\`;
+  return `<svg viewBox="0 0 ${W} ${H}" class="cot-spark" aria-hidden="true">
+    ${zeroLine}
+    <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="3" fill="${col}"/>
+  </svg>`;
 }
 
 function _cotTrendLabel(history) {
@@ -427,15 +427,15 @@ function _cotRangeCard(history, current) {
   ];
   // Range bar: where is current in [lo, hi]
   const pct = hi !== lo ? Math.round((current - lo) / (hi - lo) * 100) : 50;
-  const bar = \`<div style="margin:8px 0 6px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;">
-    <div style="position:absolute;left:0;top:0;height:100%;width:\${pct}%;background:var(--up,#26a69a);border-radius:2px;"></div>
-    <div style="position:absolute;top:-3px;left:calc(\${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg,#131722);"></div>
-  </div>\`;
+  const bar = `<div style="margin:8px 0 6px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;">
+    <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:2px;"></div>
+    <div style="position:absolute;top:-3px;left:calc(${pct}% - 4px);width:8px;height:8px;border-radius:50%;background:#d1d4dc;border:1.5px solid var(--bg,#131722);"></div>
+  </div>`;
   const rowsHtml = rows.map(r =>
-    \`<div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:2px 0;">
-      <span style="color:var(--text3,#6b7280)">\${r.label}</span>
-      <span class="\${r.cls}">\${_cotFmt(r.val)}</span>
-    </div>\`
+    `<div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:2px 0;">
+      <span style="color:var(--text3,#6b7280)">${r.label}</span>
+      <span class="${r.cls}">${_cotFmt(r.val)}</span>
+    </div>`
   ).join('');
   return bar + rowsHtml;
 }
@@ -461,10 +461,10 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore) {
     else signals.push({ col: '#9096a0', text: 'Dealers aligned with LF' });
   }
   return signals.map(s =>
-    \`<div style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:3px 0;">
-      <span class="cot-sig-dot" style="background:\${s.col}"></span>
-      <span style="color:var(--text2,#9096a0)">\${s.text}</span>
-    </div>\`
+    `<div style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:3px 0;">
+      <span class="cot-sig-dot" style="background:${s.col}"></span>
+      <span style="color:var(--text2,#9096a0)">${s.text}</span>
+    </div>`
   ).join('');
 }
 
@@ -593,9 +593,9 @@ function openCOTModal(ccy, data) {
             <span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
           </div>
           <div style="margin-top:10px;font-size:11px;color:var(--text2,#9096a0);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.6">
-            Positioning: <strong style="color:\${zInfo.color}">\${zInfo.text}</strong>
-            \${pctHist != null ? \` · Percentile <strong>\${pctHist}%</strong>\` : ''}
-            \${isCrowded ? \`<span class="badge-ext badge-warn">CROWDED TRADE</span>\` : \`<span class="badge-ext badge-ok">Within normal range</span>\`}
+            Positioning: <strong style="color:${zInfo.color}">${zInfo.text}</strong>
+            ${pctHist != null ? ` · Percentile <strong>${pctHist}%</strong>` : ''}
+            ${isCrowded ? `<span class="badge-ext badge-warn">CROWDED TRADE</span>` : `<span class="badge-ext badge-ok">Within normal range</span>`}
           </div>
         </div>
 
@@ -603,15 +603,15 @@ function openCOTModal(ccy, data) {
         <div class="cot-cw" style="margin-bottom:0">
           <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-            <span style="font-size:10px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px">\${long_.toLocaleString()}</span>
+            <span style="font-size:10px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px">${long_.toLocaleString()}</span>
             <div class="cot-posbar">
-              <div class="cot-posbar-fill" style="width:\${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
+              <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
               <div class="cot-posbar-mid"></div>
             </div>
-            <span style="font-size:10px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px;text-align:right">\${short_.toLocaleString()}</span>
+            <span style="font-size:10px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);min-width:50px;text-align:right">${short_.toLocaleString()}</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">
-            <span>LONGS \${lPct}%</span><span>SHORTS \${100 - lPct}%</span>
+            <span>LONGS ${lPct}%</span><span>SHORTS ${100 - lPct}%</span>
           </div>
 
           <div class="cot-ov-r-divider">
@@ -623,25 +623,25 @@ function openCOTModal(ccy, data) {
               <tbody>
                 <tr>
                   <td>Leveraged Funds</td>
-                  <td class="\${_cotCls(net)}">\${_cotFmt(net)}</td>
-                  <td class="\${_cotCls(net)}">\${net > 0 ? '▲ Long' : net < 0 ? '▼ Short' : '— Neutral'}</td>
+                  <td class="${_cotCls(net)}">${_cotFmt(net)}</td>
+                  <td class="${_cotCls(net)}">${net > 0 ? '▲ Long' : net < 0 ? '▼ Short' : '— Neutral'}</td>
                 </tr>
-                \${amNet != null ? \`<tr>
+                ${amNet != null ? `<tr>
                   <td>Asset Managers</td>
-                  <td class="\${_cotCls(amNet)}">\${_cotFmt(amNet)}</td>
-                  <td class="\${_cotCls(amNet)}">\${amNet > 0 ? '▲ Long' : amNet < 0 ? '▼ Short' : '— Neutral'}</td>
-                </tr>\` : ''}
-                \${ddNet != null ? \`<tr>
+                  <td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td>
+                  <td class="${_cotCls(amNet)}">${amNet > 0 ? '▲ Long' : amNet < 0 ? '▼ Short' : '— Neutral'}</td>
+                </tr>` : ''}
+                ${ddNet != null ? `<tr>
                   <td>Dealers</td>
-                  <td class="\${_cotCls(ddNet)}">\${_cotFmt(ddNet)}</td>
-                  <td class="\${_cotCls(ddNet)}">\${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
-                </tr>\` : ''}
-                \${amNet != null ? \`<tr>
+                  <td class="${_cotCls(ddNet)}">${_cotFmt(ddNet)}</td>
+                  <td class="${_cotCls(ddNet)}">${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
+                </tr>` : ''}
+                ${amNet != null ? `<tr>
                   <td style="color:var(--text2,#9096a0);font-size:9px" colspan="3">
-                    <span style="color:\${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">\${aligned ? '● Aligned' : '○ Diverging'}</span>
-                    — LF and AM \${aligned ? 'both in same direction' : 'are opposed · exercise caution'}
+                    <span style="color:${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">${aligned ? '● Aligned' : '○ Diverging'}</span>
+                    — LF and AM ${aligned ? 'both in same direction' : 'are opposed · exercise caution'}
                   </td>
-                </tr>\` : ''}
+                </tr>` : ''}
               </tbody>
             </table>
           </div>
@@ -654,21 +654,21 @@ function openCOTModal(ccy, data) {
 
         <!-- Net trend sparkline -->
         <div class="cot-cw" style="margin-bottom:0">
-          <div class="cot-ct">NET POSITION TREND · \${Math.min(nWks, 8)}W</div>
-          \${_cotSparkline(history, 8)}
-          <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">\${_cotTrendLabel(history)}</div>
+          <div class="cot-ct">NET POSITION TREND · ${Math.min(nWks, 8)}W</div>
+          ${_cotSparkline(history, 8)}
+          <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${_cotTrendLabel(history)}</div>
         </div>
 
         <!-- 52w extremes -->
         <div class="cot-cw" style="margin-bottom:0">
-          <div class="cot-ct">POSITIONING RANGE · \${nWks}W</div>
-          \${_cotRangeCard(history, net)}
+          <div class="cot-ct">POSITIONING RANGE · ${nWks}W</div>
+          ${_cotRangeCard(history, net)}
         </div>
 
         <!-- Signal summary -->
         <div class="cot-cw" style="margin-bottom:0">
           <div class="cot-ct">SIGNAL SUMMARY</div>
-          \${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}
+          ${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}
         </div>
 
       </div>
