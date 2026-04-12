@@ -1,9 +1,9 @@
 [
   {
-    "time": "16:00",
+    "time": "19:30",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 159.19 resistance, BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
@@ -11,32 +11,32 @@
     ]
   },
   {
-    "time": "15:58",
+    "time": "19:28",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1711, with ECB rate at 2% and Fed rate at 3.75%; rate divergence may weigh on EUR/USD.",
+    "text": "EUR/USD holding above 1.1711, ECB policy on hold, watch for rate divergence impact",
     "evidence": [
       "EUR/USD: 1.1711",
-      "ECB rate: 2%",
+      "ECB rate: 2.00%",
       "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "15:55",
+    "time": "19:25",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long position at 77.3% (lev_net=+1,029); watch for potential long squeeze.",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading below 0.7072, RBA hiking rates, AUD carry supported",
     "evidence": [
-      "CFTC EUR net: +1,029",
-      "EUR long%: 77.3%",
-      "week ending: 2026-04-07"
+      "AUD/USD: 0.7072",
+      "RBA rate: 4.10%",
+      "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "15:50",
+    "time": "19:20",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 19.2 signals normal volatility — not a risk-on environment.",
+    "title": "VIX",
+    "text": "VIX at 19.2 signals low volatility, not a risk-on environment",
     "evidence": [
       "VIX: 19.2",
       "S&P 500: 6,817",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "15:45",
+    "time": "19:15",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading below 0.7072, with RBA hiking rates; AUD carry supported, but growth concerns may dominate.",
+    "title": "Cross-Asset Correlation Breaks",
+    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven, watch for regime shift",
     "evidence": [
-      "AUD/USD: 0.7072",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.29%"
+      "USD/JPY vs VIX: corr=+0.655",
+      "z=+1.54σ",
+      "VIX: 19.2"
     ]
   }
 ]
