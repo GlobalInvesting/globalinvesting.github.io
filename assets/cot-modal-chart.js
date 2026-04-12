@@ -396,9 +396,7 @@ const _priceBadgePlugin = {
     chart.data.datasets.forEach((ds, i) => {
       const meta = chart.getDatasetMeta(i);
       if (!meta.visible) return;
-      const vals = ds.data.filter(v => v != null);
-      if (!vals.length) return;
-      // Find the last non-null data point
+      // Find the last non-null data point index
       let lastIdx = -1;
       for (let k = ds.data.length - 1; k >= 0; k--) {
         if (ds.data[k] != null) { lastIdx = k; break; }
@@ -407,18 +405,29 @@ const _priceBadgePlugin = {
       const val = ds.data[lastIdx];
       const yPx = scales.y.getPixelForValue(val);
       if (yPx < chartArea.top || yPx > chartArea.bottom) return;
-      const color  = ds.borderColor || ds.backgroundColor || '#9096a0';
+      // Pick color: for line charts use borderColor; for bar charts pick the color at lastIdx
+      let color = ds.borderColor;
+      if (!color || color === 'transparent') {
+        const bg = ds.backgroundColor;
+        color = Array.isArray(bg) ? bg[lastIdx] : bg;
+      }
+      if (!color || color === 'transparent') color = '#9096a0';
+      // Strip alpha for badge background — make it fully opaque
+      const solidColor = typeof color === 'string' && color.startsWith('rgba')
+        ? color.replace(/[\d.]+\)$/, '1)')
+        : color;
       const label  = _cotFmt(val);
       const fSize  = 9;
-      ctx.font     = `${fSize}px ${_monoFont}`;
+      ctx.font     = `600 ${fSize}px ${_monoFont}`;
       const tw     = ctx.measureText(label).width;
-      const bW     = tw + 10, bH = 14;
+      const bW     = tw + 10, bH = 15;
       const bX     = chartArea.right + 2;
       const bY     = yPx - bH / 2;
       ctx.save();
-      ctx.fillStyle = color;
+      ctx.fillStyle = solidColor;
       ctx.beginPath();
-      ctx.roundRect(bX, bY, bW, bH, 2);
+      if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 2);
+      else ctx.rect(bX, bY, bW, bH);
       ctx.fill();
       ctx.fillStyle = '#fff';
       ctx.textBaseline = 'middle';
@@ -978,7 +987,7 @@ function openCOTModal(ccy, data) {
   const shrtData = history.map(h => h.levShort);
   const amData   = history.map(h => h.assetManagerNet);
   const ddData   = history.map(h => h.dealerNet);
-  const barCols  = netData.map(v => v >= 0 ? 'rgba(79,127,255,.85)' : 'rgba(79,127,255,.35)');
+  const barCols  = netData.map(v => v >= 0 ? 'rgba(38,166,154,0.80)' : 'rgba(239,83,80,0.80)');
 
   // ── Build history table ───────────────────────────────────────────────────
   const tbody = document.getElementById('cot-hist-body');
@@ -1040,7 +1049,7 @@ function openCOTModal(ccy, data) {
         cv.height = r.height * (window.devicePixelRatio || 1);
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }], { responsive: false });
+        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0, borderRadius: 2 }], { responsive: false, layout: { padding: { top: 6, right: 64, bottom: 0, left: 0 } } });
       }
     }
     if (tabId === 'split') {
@@ -1051,9 +1060,25 @@ function openCOTModal(ccy, data) {
         cv.height = r.height * (window.devicePixelRatio || 1);
         cv.style.width = r.width + 'px';
         cv.style.height = r.height + 'px';
+
+        // TradingView gradient fill: color at top (25% opacity) → transparent at bottom
+        // Must be created AFTER canvas has real dimensions
+        const ctx2 = cv.getContext('2d');
+        function _tvGrad(hexColor, alphaTop) {
+          const g = ctx2.createLinearGradient(0, 0, 0, cv.height);
+          // Parse hex to RGB
+          const r2 = parseInt(hexColor.slice(1,3),16);
+          const g2 = parseInt(hexColor.slice(3,5),16);
+          const b2 = parseInt(hexColor.slice(5,7),16);
+          g.addColorStop(0,   `rgba(${r2},${g2},${b2},${alphaTop})`);
+          g.addColorStop(0.6, `rgba(${r2},${g2},${b2},0.04)`);
+          g.addColorStop(1,   `rgba(${r2},${g2},${b2},0)`);
+          return g;
+        }
+
         _lineChart(cv, labels, [
-          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: 'rgba(38,166,154,0.12)', fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 },
-          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.12)',  fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 },
+          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', backgroundColor: _tvGrad('#26a69a', 0.22), fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
+          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', backgroundColor: _tvGrad('#ef5350', 0.22), fill: true, tension: 0.4, pointRadius: 2, pointHoverRadius: 5, borderWidth: 2 },
         ], { responsive: false });
       }
     }
@@ -1084,8 +1109,13 @@ function openCOTModal(ccy, data) {
             maintainAspectRatio: partCfg.maintainAspectRatio,
             animation: partCfg.animation,
             interaction: partCfg.interaction,
-            layout: { padding: { top: 4, right: 4, bottom: 0, left: 0 } },
-            plugins: { legend: { display: false }, tooltip: partCfg.plugins.tooltip },
+            layout: { padding: { top: 4, right: 64, bottom: 0, left: 0 } },
+            plugins: {
+              legend: { display: false },
+              tooltip: partCfg.plugins.tooltip,
+              tvCrosshair: _crosshairPlugin,
+              tvPriceBadge: _priceBadgePlugin,
+            },
             scales: partCfg.scales
           }
         });
