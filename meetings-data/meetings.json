@@ -22,8 +22,8 @@
       ],
       "source": "federalreserve.gov",
       "bias": "hold",
-      "biasSource": "rate trajectory (OIS source unavailable)",
-      "biasMethod": "heuristic",
+      "biasSource": "FRED SOFR vs DFF (Fed Funds)",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-13",
       "cutProb": null
     },
@@ -48,7 +48,7 @@
       ],
       "source": "ecb.europa.eu",
       "bias": "cut",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "FRED ESTER vs ECB DFR",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -74,7 +74,7 @@
       ],
       "source": "bankofengland.co.uk",
       "bias": "hold",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "FRED SONIA vs Bank Rate",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -100,7 +100,7 @@
       ],
       "source": "boj.or.jp",
       "bias": "hike",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "rate trajectory (TONA not in FRED)",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -126,7 +126,7 @@
       ],
       "source": "rba.gov.au",
       "bias": "hike",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "rate trajectory (ASX IB futures blocks GH runners)",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -152,7 +152,7 @@
       ],
       "source": "bankofcanada.ca",
       "bias": "hold",
-      "biasSource": "BoC Valet API (CORRA overnight)",
+      "biasSource": "BoC Valet API (CORRA overnight V122514)",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -172,7 +172,7 @@
       ],
       "source": "snb.ch",
       "bias": "hold",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "rate trajectory (SARON — SNB quarterly)",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -196,7 +196,7 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasSource": "rate trajectory (RBNZ blocks GH runners)",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
