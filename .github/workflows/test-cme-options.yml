@@ -1,12 +1,22 @@
-name: Test CME FX Options
-on: workflow_dispatch
+name: "[TEST] CME FX Options via yfinance"
+on:
+  workflow_dispatch:
+
 jobs:
-  test:
+  test-cme-options:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install yfinance --break-system-packages
-      - run: python3 test_cme_fx_options.py
+
+      - name: Install dependencies
+        run: pip install yfinance --break-system-packages
+
+      - name: Run CME FX options probe
+        run: python3 scripts/test_cme_fx_options.py
