@@ -1,6 +1,6 @@
 [
   {
-    "time": "10:10",
+    "time": "11:45",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
@@ -11,47 +11,47 @@
     ]
   },
   {
-    "time": "10:08",
+    "time": "11:43",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — a multi-year extreme; watch for potential long squeeze.",
+    "text": "EUR net long positioning at 77.3% long, institutional divergence with Asset Managers net short; watch for potential squeeze.",
     "evidence": [
       "EUR net long: +1,029",
-      "long%: 77.3%",
-      "week ending: 2026-04-07"
+      "EUR long%: 77.3%",
+      "CFTC week ending: 2026-04-07"
     ]
   },
   {
-    "time": "10:05",
+    "time": "11:40",
     "priority": "warning",
     "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, watch for USD/JPY upside on risk-off.",
+    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, positive correlation signals risk-on environment.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.685",
-      "z: +1.40σ",
+      "USD/JPY vs VIX corr: +0.684",
+      "z-score: +1.39σ",
       "norm: +0.139"
     ]
   },
   {
-    "time": "10:02",
+    "time": "11:38",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 21.2 signals normal volatility — not a risk-on environment.",
+    "text": "VIX at 21.2 signals normal volatility — risk environment not extreme.",
     "evidence": [
       "VIX: 21.2",
       "S&P 500: 6,817",
-      "DXY: 98.98"
+      "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "09:58",
+    "time": "11:35",
     "priority": "info",
     "title": "Retail Sentiment",
-    "text": "AUD/NZD sentiment extreme: 89% short — retail heavily positioned, watch for squeeze.",
+    "text": "AUD/NZD at 89% short, retail heavily positioned, watch for squeeze.",
     "evidence": [
       "AUD/NZD: 89% short",
-      "AUD/NZD price: 1.21 (implied)",
-      "sentiment update: 2026-04-13T09:53:50Z"
+      "AUD/NZD sentiment extreme",
+      "Myfxbook update: 2026-04-13T11:14:37Z"
     ]
   }
 ]
