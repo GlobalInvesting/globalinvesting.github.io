@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v2.9 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
+fetch_intraday_quotes.py  v3.0 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
+
+MEJORAS v3.0 vs v2.9:
+  - pct1m (cambio % vs cierre de hace ~30 días) añadido a los 7 pares FX majors.
+    Calculado dentro de fetch_hv30_fx() reutilizando el historial 3mo ya descargado
+    (sin llamada API extra). Ventana de búsqueda ±2d para absorber festivos y fines
+    de semana. Permite eliminar update-fx-performance.yml como fuente de datos del
+    script de narrativa AI — generate_narrative_signals.py ahora lee spot, 1W y 1M
+    directamente de quotes.json (yfinance, actualización c/5 min) en lugar de
+    fx-performance/*.json (ECB/Frankfurter, actualización diaria).
 
 MEJORAS v2.9 vs v2.8:
   - Sess H/L sanity check: no anula H=L en fin de semana (H=L=close del viernes es válido).
@@ -504,10 +513,16 @@ def fetch_correlations():
 
 def fetch_hv30_fx(fx_pairs):
     """
-    Descarga 90 días de historia diaria para cada par FX y calcula HV30.
-    Retorna dict { pair_id: hv30_value_or_None }.
+    Descarga 90 días de historia diaria para cada par FX y calcula HV30 y pct1m.
+    Retorna dict { pair_id: {"hv30": float|None, "pct1m": float|None, "pct1m_date": str|None} }.
+
+    pct1m — cambio % vs cierre de hace ~30 días naturales (convención Bloomberg):
+      Busca el primer cierre disponible en el rango [today-32d, today-28d] — ventana
+      de ±2d para absorber fines de semana y festivos sin saltar a un mes diferente.
+      Se calcula aquí porque fetch_yfinance_all() solo descarga 10d (suficiente para
+      1W pero no para 1M).  El historial 3mo ya está disponible en este paso.
     """
-    print("\n[HV30] Calculando volatilidad histórica 30d para pares FX...")
+    print("\n[HV30] Calculando HV30 y pct1m para pares FX...")
     hv30_results = {}
     yf_map = {k: v for k, v in YFINANCE_SYMBOLS.items() if k in fx_pairs}
 
@@ -517,16 +532,47 @@ def fetch_hv30_fx(fx_pairs):
             hist = ticker.history(period="3mo", interval="1d", auto_adjust=True)
             if hist.empty or len(hist) < 22:
                 print(f"[HV30] {pair_id}: insuficientes datos ({len(hist)} días)")
-                hv30_results[pair_id] = None
+                hv30_results[pair_id] = {"hv30": None, "pct1m": None, "pct1m_date": None}
                 continue
-            closes = hist["Close"].dropna().tolist()
-            hv = compute_hv30(closes)
-            hv30_results[pair_id] = hv
+
+            closes = hist["Close"].dropna()
+            hv = compute_hv30(closes.tolist())
             status = f"{hv:.2f}%" if hv is not None else "N/A"
             print(f"[HV30] ✓ {pair_id:8s} ({yf_sym}): {status}  ({len(closes)} cierres)")
+
+            # ── pct1m: cierre de hace ~30 días naturales ──────────────────────
+            # Busca el primer cierre disponible en la ventana [today-32d, today-28d].
+            # La ventana de ±2d absorbe fines de semana y festivos sin saltar de mes.
+            pct1m = None
+            pct1m_date = None
+            try:
+                today_date = datetime.now(timezone.utc).date()
+                target_lo  = today_date - timedelta(days=32)
+                target_hi  = today_date - timedelta(days=28)
+                hist_dates = [d.date() if hasattr(d, "date") else d for d in closes.index]
+                # Buscar el cierre más cercano a 30d dentro de la ventana
+                ref_close = None
+                ref_date  = None
+                for i, d in enumerate(hist_dates):
+                    if target_lo <= d <= target_hi:
+                        ref_close = float(closes.iloc[i])
+                        ref_date  = d
+                        break  # primer match en orden cronológico = más antiguo = más correcto
+                if ref_close and ref_close != 0:
+                    current_close = float(closes.iloc[-1])
+                    pct1m = round((current_close / ref_close - 1.0) * 100.0, 4)
+                    pct1m_date = str(ref_date)
+                    print(f"[1M] ✓ {pair_id:8s}: {current_close:.4f} vs {ref_date} {ref_close:.4f} → {pct1m:+.4f}%")
+                else:
+                    print(f"[1M] ⚠ {pair_id:8s}: no se encontró cierre en ventana [{target_lo}, {target_hi}]")
+            except Exception as _e1m:
+                print(f"[1M] ⚠ {pair_id:8s}: {_e1m}")
+
+            hv30_results[pair_id] = {"hv30": hv, "pct1m": pct1m, "pct1m_date": pct1m_date}
+
         except Exception as e:
             print(f"[HV30] Error en {pair_id}: {e}")
-            hv30_results[pair_id] = None
+            hv30_results[pair_id] = {"hv30": None, "pct1m": None, "pct1m_date": None}
 
     return hv30_results
 
@@ -947,13 +993,20 @@ def main():
     sources = set(q.get("source") for q in quotes.values())
     source_label = "yfinance" if sources <= {"yfinance"} else ("repo" if sources == {"repo"} else "mixed")
 
-    # PASO 5: Calcular HV30 para pares FX e inyectar en cada quote
+    # PASO 5: Calcular HV30 + pct1m para pares FX e inyectar en cada quote
     hv30_data = fetch_hv30_fx(HV30_FX_PAIRS)
     hv30_output = {}
-    for pair_id, hv in hv30_data.items():
+    for pair_id, result in hv30_data.items():
+        hv       = result.get("hv30")
+        p1m      = result.get("pct1m")
+        p1m_date = result.get("pct1m_date")
         hv30_output[pair_id] = hv  # None si no se pudo calcular
-        if pair_id in quotes and hv is not None:
-            quotes[pair_id]["hv30"] = hv
+        if pair_id in quotes:
+            if hv is not None:
+                quotes[pair_id]["hv30"] = hv
+            if p1m is not None:
+                quotes[pair_id]["pct1m"]      = p1m
+                quotes[pair_id]["pct1m_date"] = p1m_date
 
     # PASO 6: Calcular correlaciones rolling 60d con norma histórica
     correlations = fetch_correlations()
