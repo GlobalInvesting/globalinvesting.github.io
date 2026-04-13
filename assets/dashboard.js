@@ -396,14 +396,10 @@ async function populateCorrelations() {
 }
 
 async function loadFxPerfData() {
-  // Load fx-performance/*.json for each major currency to get 1W change
-  const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD'];
-  await Promise.all(ccys.map(async ccy => {
-    try {
-      const r = await fetch('./fx-performance/' + ccy + '.json');
-      if (r.ok) FX_PERF_CACHE[ccy] = await r.json();
-    } catch {}
-  }));
+  // 1W CHG is now sourced directly from quotes.json (pct1w field per FX pair),
+  // calculated by fetch_intraday_quotes.py using the prior-Friday-close convention.
+  // This function is kept as a no-op for backward compatibility.
+  // fx-performance/*.json is no longer used for the 1W column.
 }
 
 function populateFxPairsTable() {
@@ -429,20 +425,17 @@ function populateFxPairsTable() {
       cls1d = clsDir(pct);
     }
 
-    // 1W change — from fx-performance repo data
-    // fxPerformance1W[CCY] = % change of CCY vs USD (positive = CCY strengthened vs USD)
-    // pair.invert = false → pair is CCY/USD (EUR/USD, GBP/USD, AUD/USD, NZD/USD)
-    //               → 1W = +perf[pair.base]  (EUR stronger = EUR/USD up)
-    // pair.invert = true  → pair is USD/CCY (USD/JPY, USD/CHF, USD/CAD)
-    //               → 1W = -perf[pair.base]  (JPY stronger = USD/JPY down → invert)
+    // 1W change — from quotes.json pct1w field (prior-Friday-close convention)
+    // Calculated by fetch_intraday_quotes.py every 5 min via yfinance daily history.
+    // pct1w is already expressed as % change of the pair (EUR/USD positive = pair up,
+    // USD/JPY positive = pair up — yfinance USDJPY=X goes up when USD strengthens).
+    // No inversion needed: yfinance returns the pair's own price, so pct1w directly
+    // reflects the pair's move.
     let chg1w = '—', cls1w = 'flat';
-    const perfNonUSD = FX_PERF_CACHE[pair.base]; // pair.base is always the non-USD currency
-    if (perfNonUSD && perfNonUSD.fxPerformance1W != null) {
-      const p1w = pair.invert
-        ? -perfNonUSD.fxPerformance1W   // USD/JPY: JPY up = pair down
-        :  perfNonUSD.fxPerformance1W;  // EUR/USD: EUR up = pair up
-      chg1w = pctStr(p1w);
-      cls1w = clsDir(p1w);
+    const rtD1w = STOOQ_RT_CACHE[pair.id];
+    if (rtD1w?.pct1w != null) {
+      chg1w = pctStr(rtD1w.pct1w);
+      cls1w = clsDir(rtD1w.pct1w);
     }
 
     // Bid / Ask — rate ± half-spread
@@ -3004,12 +2997,10 @@ async function updatePairDetail(tvSym) {
   const sessH = rt?.high  ?? null;
   const sessL = rt?.low   ?? null;
 
-  // 1W from FX_PERF_CACHE
+  // 1W from quotes.json pct1w field (prior-Friday-close convention, same source as FX table)
   let pct1w = null;
-  if (meta && FX_PERF_CACHE[meta.base]?.fxPerformance1W != null) {
-    pct1w = meta.invert
-      ? -FX_PERF_CACHE[meta.base].fxPerformance1W
-      :  FX_PERF_CACHE[meta.base].fxPerformance1W;
+  if (rt?.pct1w != null) {
+    pct1w = rt.pct1w;
   }
 
   // ATM IV — direct ETF option chain for 6 USD majors; synthesised via triangulation for 21 crosses.
@@ -5523,9 +5514,7 @@ function exportPanel(type, format = 'csv') {
     headers = ['Pair', 'Price', '1D_Pct', '1W_Pct', 'HV30', 'Session_High', 'Session_Low'];
     rows = PAIRS.map(p => {
       const rt  = STOOQ_RT_CACHE[p.id];
-      const pf  = p.base ? FX_PERF_CACHE[p.base] : null;
-      const p1w = pf?.fxPerformance1W != null
-        ? (p.invert ? -pf.fxPerformance1W : pf.fxPerformance1W) : null;
+      const p1w = rt?.pct1w ?? null;
       return [
         p.label || (p.base + '/' + p.quote),
         rt?.close  ?? '',
