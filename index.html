@@ -291,8 +291,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="q-item" data-sym="FX_IDC:USDCHF" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">USD/CHF</span><span class="q-price" id="q-usdchf">—</span><span class="q-chg" id="qc-usdchf">—</span></div>
       <div class="q-item" data-sym="FX_IDC:NZDUSD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">NZD/USD</span><span class="q-price" id="q-nzdusd">—</span><span class="q-chg" id="qc-nzdusd">—</span></div>
       <div class="q-item" data-sym="FX_IDC:EURGBP" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">EUR/GBP</span><span class="q-price" id="q-eurgbp">—</span><span class="q-chg" id="qc-eurgbp">—</span></div>
-      <div class="q-item" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">XAU/USD</span><span class="q-price" id="q-xauusd">—</span><span class="q-chg" id="qc-xauusd">—</span></div>
-      <div class="q-item" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">WTI</span><span class="q-price" id="q-wti">—</span><span class="q-chg" id="qc-wti">—</span></div>
+      <div class="q-item" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Gold front-month futures · GC=F · Click: chart · Double-click: detail"><span class="q-sym">GOLD FUT</span><span class="q-price" id="q-xauusd">—</span><span class="q-chg" id="qc-xauusd">—</span></div>
+      <div class="q-item" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="WTI Crude front-month futures · CL=F · Click: chart · Double-click: detail"><span class="q-sym">WTI FUT</span><span class="q-price" id="q-wti">—</span><span class="q-chg" id="qc-wti">—</span></div>
       <div class="q-item" data-sym="COINBASE:BTCUSD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">BTC/USD</span><span class="q-price" id="q-btcusd">—</span><span class="q-chg" id="qc-btcusd">—</span></div>
       <div class="q-item" data-sym="FRED:DGS10" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">US 10Y</span><span class="q-price" id="q-us10y">—</span><span class="q-chg" id="qc-us10y">—</span></div>
       <div class="q-item" data-sym="PEPPERSTONE:USDX" style="cursor:pointer;" title="Click: chart · Double-click: detail"><span class="q-sym">DXY</span><span class="q-price" id="q-dxy">—</span><span class="q-chg" id="qc-dxy">—</span></div>
@@ -407,8 +407,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:GBPJPY">GBP/JPY</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:EURCHF">EUR/CHF</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="FX_IDC:AUDJPY">AUD/JPY</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:GOLD">XAU/USD</button>
-            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FPMARKETS:WTI">WTI</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FOREXCOM:GOLD">Gold FUT</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="FPMARKETS:WTI">WTI FUT</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="PEPPERSTONE:USDX">DXY</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="VANTAGE:SP500">S&P 500</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="CFI:US100">Nasdaq</button>
@@ -493,8 +493,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div id="cross-asset-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;">
             <!-- Populated by fetchCrossAssetData() -->
             <div class="ca-cell" data-sym="VANTAGE:SP500" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">S&amp;P 500</div><div class="ca-val" id="ca-spx">—</div><div class="ca-chg" id="cac-spx">loading</div></div>
-            <div class="ca-cell" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Gold XAU/USD</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
-            <div class="ca-cell" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">WTI Crude</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
+            <div class="ca-cell" data-sym="FOREXCOM:GOLD" style="cursor:pointer;" title="Gold front-month futures · GC=F · Click: chart · Double-click: detail"><div class="ca-name">Gold Futures</div><div class="ca-val" id="ca-gold">—</div><div class="ca-chg" id="cac-gold">loading</div></div>
+            <div class="ca-cell" data-sym="FPMARKETS:WTI" style="cursor:pointer;" title="WTI Crude front-month futures · CL=F · Click: chart · Double-click: detail"><div class="ca-name">WTI Futures</div><div class="ca-val" id="ca-wti">—</div><div class="ca-chg" id="cac-wti">loading</div></div>
             <div class="ca-cell" data-sym="BITSTAMP:BTCUSD" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">BTC/USD</div><div class="ca-val" id="ca-btc">—</div><div class="ca-chg" id="cac-btc">loading</div></div>
             <div class="ca-cell" data-sym="OSE:NK2251!" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">Nikkei 225</div><div class="ca-val" id="ca-nikkei">—</div><div class="ca-chg" id="cac-nikkei">loading</div></div>
             <div class="ca-cell" data-sym="GOMARKETS:STOXX50" style="cursor:pointer;" title="Click: chart · Double-click: detail"><div class="ca-name">EUR Stoxx 50</div><div class="ca-val" id="ca-stoxx">—</div><div class="ca-chg" id="cac-stoxx">loading</div></div>
