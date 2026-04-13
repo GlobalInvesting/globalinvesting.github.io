@@ -1,57 +1,57 @@
 [
   {
-    "time": "14:10",
+    "time": "15:50",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
-      "VIX: 20.3"
+      "VIX: 20.0"
     ]
   },
   {
-    "time": "14:08",
+    "time": "15:48",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1707, with ECB rate at 2% and Fed at 3.75%; rate divergence favours USD, but EUR/USD may consolidate near current levels.",
+    "text": "EUR/USD holding above 1.1711, with ECB on hold and market bias towards hold; watch for potential rate divergence impact on the pair.",
     "evidence": [
-      "EUR/USD: 1.17070",
-      "ECB rate: 2%",
+      "EUR/USD: 1.1711",
+      "ECB rate: 2.00%",
       "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "14:05",
+    "time": "15:45",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% (lev_net=+1,029); watch for potential long squeeze if EUR/USD breaks below 1.1650.",
+    "text": "EUR net long positioning at 77.3% long, with leveraged funds net long +1,029 contracts; watch for potential squeeze risk.",
     "evidence": [
       "CFTC EUR net: +1,029",
-      "EUR/USD: 1.17070",
+      "EUR long%: 77.3%",
       "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "14:02",
+    "time": "15:42",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment; MOVE Index at 72.2 indicates relatively low bond market stress.",
+    "text": "VIX at 20.0 signals elevated volatility — not a risk-on environment; watch for potential impact on FX markets.",
     "evidence": [
-      "VIX: 20.3",
-      "MOVE Index: 72.2",
-      "S&P 500: 6,817"
+      "VIX: 20.0",
+      "S&P 500: 6,818",
+      "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "13:59",
+    "time": "15:38",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading near 0.7060, with RBA hiking rates; AUD carry supported, but watch for potential pullback if AUD/USD breaks below 0.7000.",
+    "title": "USD/JPY vs VIX",
+    "text": "USD/JPY vs VIX correlation break at +1.38σ, indicating JPY no longer acting as safe haven; watch for potential regime shift implications.",
     "evidence": [
-      "AUD/USD: 0.70600",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.311%"
+      "USD/JPY vs VIX corr: +0.678",
+      "z-score: +1.38σ",
+      "norm: +0.139"
     ]
   }
 ]
