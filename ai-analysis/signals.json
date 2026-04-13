@@ -1,57 +1,57 @@
 [
   {
-    "time": "11:45",
+    "time": "14:10",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
-      "VIX: 21.2"
+      "VIX: 20.3"
     ]
   },
   {
-    "time": "11:43",
+    "time": "14:08",
+    "priority": "warning",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1707, with ECB rate at 2% and Fed at 3.75%; rate divergence favours USD, but EUR/USD may consolidate near current levels.",
+    "evidence": [
+      "EUR/USD: 1.17070",
+      "ECB rate: 2%",
+      "Fed rate: 3.75%"
+    ]
+  },
+  {
+    "time": "14:05",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% long, institutional divergence with Asset Managers net short; watch for potential squeeze.",
+    "text": "EUR net long positioning at 77.3% (lev_net=+1,029); watch for potential long squeeze if EUR/USD breaks below 1.1650.",
     "evidence": [
-      "EUR net long: +1,029",
-      "EUR long%: 77.3%",
-      "CFTC week ending: 2026-04-07"
+      "CFTC EUR net: +1,029",
+      "EUR/USD: 1.17070",
+      "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "11:40",
-    "priority": "warning",
-    "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, positive correlation signals risk-on environment.",
-    "evidence": [
-      "USD/JPY vs VIX corr: +0.684",
-      "z-score: +1.39σ",
-      "norm: +0.139"
-    ]
-  },
-  {
-    "time": "11:38",
+    "time": "14:02",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 21.2 signals normal volatility — risk environment not extreme.",
+    "text": "VIX at 20.3 signals elevated volatility — not a risk-on environment; MOVE Index at 72.2 indicates relatively low bond market stress.",
     "evidence": [
-      "VIX: 21.2",
-      "S&P 500: 6,817",
-      "MOVE Index: 72.2"
+      "VIX: 20.3",
+      "MOVE Index: 72.2",
+      "S&P 500: 6,817"
     ]
   },
   {
-    "time": "11:35",
+    "time": "13:59",
     "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "AUD/NZD at 89% short, retail heavily positioned, watch for squeeze.",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading near 0.7060, with RBA hiking rates; AUD carry supported, but watch for potential pullback if AUD/USD breaks below 0.7000.",
     "evidence": [
-      "AUD/NZD: 89% short",
-      "AUD/NZD sentiment extreme",
-      "Myfxbook update: 2026-04-13T11:14:37Z"
+      "AUD/USD: 0.70600",
+      "RBA rate: 4.10%",
+      "US 10Y yield: 4.311%"
     ]
   }
 ]
