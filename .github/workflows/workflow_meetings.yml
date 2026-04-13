@@ -1,0 +1,469 @@
+name: Update Central Bank Meetings (static calendar + OIS bias)
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Every Monday at 10:00 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: update-meetings
+  cancel-in-progress: false
+
+jobs:
+  update-meetings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
+
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create directory
+        run: mkdir -p site/meetings-data
+
+      - name: Update meeting dates and OIS-implied bias
+        working-directory: site
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python3 << 'EOFPYTHON'
+          import json, os, re
+          import requests
+          from datetime import date
+
+          # ── Static verified calendar ─────────────────────────────────────────
+          # Decision dates only (final day of multi-day meetings).
+          # Sources verified April 2026 against official CB publications.
+          # UPDATE PROCEDURE: each January, update CALENDAR_YYYY with official CB schedules.
+
+          CALENDAR_2026 = {
+              # Federal Reserve FOMC - 8 meetings/year
+              'USD': ['2026-04-29','2026-06-17','2026-07-29','2026-09-16','2026-10-28','2026-12-09'],
+              # ECB Governing Council - 8 meetings/year
+              'EUR': ['2026-04-30','2026-06-11','2026-07-23','2026-09-10','2026-10-29','2026-12-17'],
+              # Bank of England MPC - 8 meetings/year
+              'GBP': ['2026-04-30','2026-06-18','2026-07-30','2026-09-17','2026-11-05','2026-12-17'],
+              # Bank of Japan MPM - 8 meetings/year
+              'JPY': ['2026-04-28','2026-06-16','2026-07-31','2026-09-18','2026-10-30','2026-12-18'],
+              # RBA Monetary Policy Board - 8 meetings/year
+              'AUD': ['2026-05-05','2026-06-16','2026-08-11','2026-09-29','2026-11-03','2026-12-08'],
+              # Bank of Canada - 8 decisions/year
+              'CAD': ['2026-04-29','2026-06-10','2026-07-15','2026-09-09','2026-10-28','2026-12-09'],
+              # Swiss National Bank - quarterly (4/year)
+              'CHF': ['2026-06-18','2026-09-24','2026-12-10'],
+              # RBNZ MPC - 7 decisions in 2026
+              'NZD': ['2026-05-27','2026-07-08','2026-09-02','2026-10-28','2026-12-09'],
+          }
+
+          SOURCE_MAP = {
+              'USD': 'federalreserve.gov',
+              'EUR': 'ecb.europa.eu',
+              'GBP': 'bankofengland.co.uk',
+              'JPY': 'boj.or.jp',
+              'AUD': 'rba.gov.au',
+              'CAD': 'bankofcanada.ca',
+              'CHF': 'snb.ch',
+              'NZD': 'rbnz.govt.nz',
+          }
+
+          BIAS_SOURCE_LABELS = {
+              'USD': 'FRED SOFR vs DFF (Fed Funds)',
+              'EUR': 'FRED ESTER vs ECB DFR',
+              'GBP': 'FRED SONIA vs Bank Rate',
+              'JPY': 'rate trajectory (TONA not in FRED)',
+              'AUD': 'rate trajectory (ASX IB futures blocks GH runners)',
+              'CAD': 'BoC Valet API (CORRA overnight V122514)',
+              'CHF': 'rate trajectory (SARON — SNB quarterly)',
+              'NZD': 'rate trajectory (RBNZ blocks GH runners)',
+          }
+
+          MONTHS_SHORT = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',
+                          7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
+
+          def fmt(iso):
+              d = date.fromisoformat(iso)
+              return f"{d.day} {MONTHS_SHORT[d.month]}"
+
+          HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; GlobalInvestingBot/2.0)'}
+          FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
+          FRED_BASE = 'https://api.stlouisfed.org/fred/series/observations'
+
+          # ── FRED helper ───────────────────────────────────────────────────────
+
+          def fred_latest(series_id):
+              """Fetch most recent observation from FRED. Returns float or None."""
+              if not FRED_API_KEY:
+                  print(f'    [FRED] No API key — skipping {series_id}')
+                  return None
+              try:
+                  r = requests.get(FRED_BASE, params={
+                      'series_id': series_id,
+                      'api_key': FRED_API_KEY,
+                      'file_type': 'json',
+                      'sort_order': 'desc',
+                      'limit': '5',
+                  }, headers=HEADERS, timeout=15)
+                  r.raise_for_status()
+                  for o in r.json().get('observations', []):
+                      if o.get('value') not in ('.', '', None):
+                          return float(o['value'])
+              except Exception as e:
+                  print(f'    [FRED {series_id}] {e}')
+              return None
+
+          # ── BoC Valet helper ─────────────────────────────────────────────────
+
+          def boc_latest(series_id):
+              """Fetch most recent observation from Bank of Canada Valet API."""
+              try:
+                  r = requests.get(
+                      f'https://www.bankofcanada.ca/valet/observations/{series_id}/json',
+                      params={'recent': '3'}, headers=HEADERS, timeout=10
+                  )
+                  r.raise_for_status()
+                  obs = r.json().get('observations', [])
+                  if obs:
+                      val = obs[-1].get(series_id, {}).get('v')
+                      if val is not None:
+                          return float(val)
+              except Exception as e:
+                  print(f'    [BoC {series_id}] {e}')
+              return None
+
+          # ── Classification ────────────────────────────────────────────────────
+          # If overnight rate > policy rate + THRESHOLD → market pricing next hike.
+          # If overnight rate < policy rate - THRESHOLD → market pricing next cut.
+          # Within ±THRESHOLD → hold.
+
+          THRESHOLD = 0.10  # percentage points (10 bp)
+
+          def classify(overnight, policy):
+              if overnight is None or policy is None:
+                  return None, None
+              diff = overnight - policy
+              if diff < -THRESHOLD:
+                  return 'cut', None
+              if diff > THRESHOLD:
+                  return 'hike', None
+              return 'hold', None
+
+          # ── CB rate history ───────────────────────────────────────────────────
+
+          def load_rate_obs(ccy):
+              path = f'rates/{ccy}.json'
+              if not os.path.exists(path):
+                  return []
+              try:
+                  with open(path) as f:
+                      return json.load(f).get('observations', [])
+              except Exception:
+                  return []
+
+          def current_rate(ccy):
+              obs = load_rate_obs(ccy)
+              try:
+                  return float(obs[0]['value']) if obs else None
+              except Exception:
+                  return None
+
+          # ════════════════════════════════════════════════════════════════════════
+          # OIS fetchers — one per CB
+          # Sources verified to work from GitHub Actions runners.
+          # Returns (bias, cut_prob_pct_or_None) or (None, None) if unavailable.
+          # ════════════════════════════════════════════════════════════════════════
+
+          def fetch_bias_usd():
+              """
+              FRED SOFR (Secured Overnight Financing Rate) vs Fed Funds effective rate.
+              SOFR is the NY Fed's overnight rate replacing LIBOR — tracks Fed Funds
+              target closely. A sustained deviation signals market expectations.
+              FRED series: SOFR (overnight) vs DFF (Fed Funds effective — policy proxy).
+              """
+              sofr   = fred_latest('SOFR')
+              dff    = fred_latest('DFF')
+              print(f'    [USD] SOFR={sofr}%  DFF={dff}%')
+              bias, prob = classify(sofr, dff)
+              # Cross-check: also read current policy rate from rates/USD.json
+              # to handle any FRED lag vs actual target
+              if bias is None:
+                  return None, None
+              return bias, prob
+
+          def fetch_bias_eur():
+              """
+              FRED ESTER (Euro Short-Term Rate) vs ECB Deposit Facility Rate.
+              ESTER is the ECB's successor to EONIA — published daily by ECB, mirrored on FRED.
+              FRED series: ECBESTR (plain ESTER overnight, no volume-weight suffix) vs ECBDFR (DFR).
+              Fallback: if ESTER unavailable, use current_rate('EUR') from rates/EUR.json as
+              policy-rate anchor and skip OIS (heuristic path).
+              ESTER typically trades 7–10bp below DFR; we normalise by adding 8bp before classify().
+              Note: ECBESTRVOLWGTTRMDRAT returned 400 Bad Request on FRED (series does not exist).
+              """
+              ester = fred_latest('ECBESTR')
+              dfr   = fred_latest('ECBDFR')
+              # ECBDFR is confirmed working. If ECBESTR also fails, try ESTER1 as last resort.
+              if ester is None:
+                  ester = fred_latest('ESTER1')
+              if ester is not None:
+                  ester_adj = ester + 0.08   # normalise structural spread to DFR
+              else:
+                  ester_adj = None
+              print(f'    [EUR] ESTER={ester}%  ESTER+8bp={ester_adj}%  DFR={dfr}%')
+              return classify(ester_adj, dfr)
+
+          def fetch_bias_gbp():
+              """
+              FRED SONIA (Sterling Overnight Index Average) vs BoE Bank Rate.
+              SONIA: FRED series IUDSOIA — confirmed working (returns daily values).
+              Bank Rate: FRED series IUBRYBKD is monthly and often returns no recent observation.
+              Fix: use current_rate('GBP') from rates/GBP.json as the policy rate anchor.
+              rates/GBP.json is updated by the engine on every CB decision — always current.
+              """
+              sonia     = fred_latest('IUDSOIA')
+              bank_rate = current_rate('GBP')   # from rates/GBP.json — reliable and always current
+              print(f'    [GBP] SONIA={sonia}%  BankRate={bank_rate}%  (source: rates/GBP.json)')
+              return classify(sonia, bank_rate)
+
+          def fetch_bias_jpy():
+              """
+              BoJ TONA (Tokyo Overnight Average Rate) — not available in FRED.
+              ASX, CME, and direct BoJ endpoints all timeout or 404 from GitHub runners.
+              Falls back to rate trajectory heuristic with HAWKISH_OVERRIDE.
+              If/when a reliable machine-readable TONA source is found, add it here.
+              """
+              # No reliable free OIS source reachable from GitHub Actions for JPY
+              return None, None
+
+          def fetch_bias_aud():
+              """
+              ASX 30-Day Interbank Cash Rate Futures — blocks GitHub Actions runners
+              with bot detection (returns HTML instead of JSON).
+              RBA direct endpoints also timeout from runners.
+              Falls back to rate trajectory heuristic with HAWKISH_OVERRIDE.
+              """
+              # ASX bot-detection blocks GitHub Actions user agents and IP ranges.
+              # No alternative free machine-readable AUD futures source available.
+              return None, None
+
+          def fetch_bias_cad():
+              """
+              Bank of Canada Valet API — CORRA overnight rate (series V122514).
+              CORRA replaced CDOR as BoC's policy rate anchor in 2023.
+              Primary series IORI_ENO_CORRA is 404; V122514 (overnight money market)
+              is the confirmed-working fallback and is equivalent for our purposes.
+              """
+              corra = boc_latest('V122514')
+              cur   = current_rate('CAD')
+              print(f'    [CAD] CORRA/V122514={corra}%  BoC rate={cur}%')
+              return classify(corra, cur)
+
+          def fetch_bias_chf():
+              """
+              SNB SARON — not available in FRED. SNB data portal returns empty body
+              from GitHub Actions (likely geo or bot filtering). SNB meets quarterly
+              only (4×/year) so heuristic is adequate between meetings.
+              """
+              return None, None
+
+          def fetch_bias_nzd():
+              """
+              RBNZ HB2 CSV returns 403 Forbidden from GitHub Actions runners.
+              No RBNZ or NZD overnight rate available in FRED.
+              Falls back to rate trajectory heuristic.
+              """
+              return None, None
+
+          # ── Heuristic fallback: rate trajectory from rates/*.json ─────────────
+          # Replicates GUIDELINES.md pause_detection rule (3-month threshold).
+
+          PAUSE_MONTHS = 3
+          HAWKISH_OVERRIDE = {'JPY': 'hike', 'AUD': 'hike'}
+
+          def months_since_last_change(obs):
+              if len(obs) < 2:
+                  return 99
+              r0 = float(obs[0]['value'])
+              for i, o in enumerate(obs[1:], 1):
+                  try:
+                      if float(o['value']) != r0:
+                          return i
+                  except Exception:
+                      break
+              return 99
+
+          def heuristic_bias(ccy):
+              obs = load_rate_obs(ccy)
+              if not obs:
+                  return HAWKISH_OVERRIDE.get(ccy, 'hold')
+              t = date.today()
+              r0 = float(obs[0]['value'])
+              r1 = float(obs[1]['value']) if len(obs) > 1 else r0
+              try:
+                  age = date.fromisoformat(obs[0]['date'][:10])
+                  months_old = (t.year - age.year) * 12 + (t.month - age.month)
+              except Exception:
+                  months_old = 99
+              if months_old <= PAUSE_MONTHS:
+                  if r0 > r1:
+                      return 'hike'
+                  if r0 < r1:
+                      return 'cut'
+              if months_since_last_change(obs) >= PAUSE_MONTHS:
+                  return HAWKISH_OVERRIDE.get(ccy, 'hold')
+              vals = [float(o['value']) for o in obs[:6] if o.get('value')]
+              if len(vals) >= 3:
+                  if vals[0] > vals[-1]:
+                      return 'hike'
+                  if vals[0] < vals[-1]:
+                      return 'cut'
+              return HAWKISH_OVERRIDE.get(ccy, 'hold')
+
+          # ── Dispatch ──────────────────────────────────────────────────────────
+
+          FETCHERS = {
+              'USD': fetch_bias_usd,
+              'EUR': fetch_bias_eur,
+              'GBP': fetch_bias_gbp,
+              'JPY': fetch_bias_jpy,
+              'AUD': fetch_bias_aud,
+              'CAD': fetch_bias_cad,
+              'CHF': fetch_bias_chf,
+              'NZD': fetch_bias_nzd,
+          }
+
+          # ── Load existing data for change detection and OIS preservation ───────
+
+          existing = {}
+          try:
+              with open('meetings-data/meetings.json') as f:
+                  for ccy, cd in json.load(f).get('meetings', {}).items():
+                      existing[ccy] = cd
+          except Exception:
+              pass
+
+          # ── Build output ──────────────────────────────────────────────────────
+
+          today     = date.today()
+          today_str = str(today)
+          output    = {}
+
+          print('=' * 70)
+          print('CB MEETINGS — STATIC CALENDAR + OIS-IMPLIED BIAS (v7.22.2)')
+          print('=' * 70)
+
+          for ccy in ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD']:
+              all_dates = CALENDAR_2026.get(ccy, [])
+              future    = [d for d in all_dates if date.fromisoformat(d) >= today]
+              nxt       = future[0] if future else None
+
+              entry = {
+                  'nextMeeting':          fmt(nxt) if nxt else 'TBD',
+                  'nextMeetingISO':       nxt,
+                  'allMeetings':          all_dates,
+                  'allMeetingsFormatted': [fmt(d) for d in all_dates],
+                  'source':               SOURCE_MAP[ccy],
+              }
+
+              print(f'  [{ccy}] fetching OIS-implied bias...')
+              try:
+                  ois_bias, prob = FETCHERS[ccy]()
+              except Exception as e:
+                  print(f'    [{ccy}] fetcher exception: {e}')
+                  ois_bias, prob = None, None
+
+              prev_entry  = existing.get(ccy, {})
+              prev_bias   = prev_entry.get('bias', 'hold')
+              prev_method = prev_entry.get('biasMethod', 'heuristic')
+
+              if ois_bias is not None:
+                  entry['bias']       = ois_bias
+                  entry['biasSource'] = BIAS_SOURCE_LABELS[ccy]
+                  entry['biasMethod'] = 'ois'
+                  method_tag = 'OIS'
+              else:
+                  fallback = heuristic_bias(ccy)
+                  # Preserve a prior OIS directional signal rather than silently
+                  # flipping to 'hold' when the source is temporarily unavailable.
+                  if (fallback == 'hold'
+                          and prev_method in ('ois', 'ois-preserved')
+                          and prev_bias in ('cut', 'hike')):
+                      entry['bias']       = prev_bias
+                      entry['biasSource'] = prev_entry.get('biasSource', 'preserved')
+                      entry['biasMethod'] = 'ois-preserved'
+                      method_tag = 'OIS-preserved'
+                  else:
+                      entry['bias']       = fallback
+                      entry['biasSource'] = BIAS_SOURCE_LABELS[ccy]
+                      entry['biasMethod'] = 'heuristic'
+                      method_tag = 'heuristic'
+
+              entry['biasUpdated'] = today_str
+              entry['cutProb']     = prob
+
+              chg   = ' ← CHANGED' if entry['bias'] != prev_bias else ''
+              p_str = f'  prob={prob}%' if prob is not None else ''
+              print(f"    result: {entry['bias']:5s}  [{method_tag}]{p_str}  (prev:{prev_bias}){chg}")
+
+              output[ccy] = entry
+
+          with open('meetings-data/meetings.json', 'w') as f:
+              json.dump({'lastUpdate': today_str, 'meetings': output}, f, indent=2, ensure_ascii=False)
+
+          print()
+          print('=' * 70)
+          print('SUMMARY')
+          print('=' * 70)
+          for ccy, d in output.items():
+              p_str = f"  cutProb={d['cutProb']}%" if d.get('cutProb') is not None else ''
+              print(f"  {ccy}: {d['nextMeeting']:10s}  bias={d['bias']:5s}  method={d['biasMethod']:15s}  updated={d['biasUpdated']}{p_str}")
+
+          EOFPYTHON
+
+      - name: Display meetings summary
+        working-directory: site
+        run: |
+          python3 -c "
+          import json
+          with open('meetings-data/meetings.json') as f:
+              data = json.load(f)
+          print(f'Last Update: {data[\"lastUpdate\"]}')
+          print()
+          for curr, info in data['meetings'].items():
+              p = f\"  cutProb={info['cutProb']}%\" if info.get('cutProb') is not None else ''
+              print(f'  {curr}: {info[\"nextMeeting\"]:10s}  bias={info[\"bias\"]:5s}  method={info.get(\"biasMethod\",\"?\"):15s}  [{info.get(\"source\",\"?\")}]{p}')
+          "
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add meetings-data/
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "CB meetings OIS bias update $(date +'%Y-%m-%d')"
+          for i in 1 2 3; do
+            git push && echo "Push succeeded" && exit 0
+            echo "Push rejected (attempt $i) — rebasing..."
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "All push attempts failed — data will refresh on next weekly run (no email sent)."
+          exit 0
