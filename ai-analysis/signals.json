@@ -1,6 +1,6 @@
 [
   {
-    "time": "08:25",
+    "time": "10:10",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 159.19 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
@@ -11,47 +11,47 @@
     ]
   },
   {
-    "time": "08:23",
+    "time": "10:08",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1697, with ECB rate at 2.00% and Fed at 3.75%; rate differential continues to weigh on EUR/USD.",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3% — a multi-year extreme; watch for potential long squeeze.",
     "evidence": [
-      "EUR/USD: 1.16970",
-      "ECB rate: 2.00%",
-      "Fed rate: 3.75%"
-    ]
-  },
-  {
-    "time": "08:20",
-    "priority": "warning",
-    "title": "CFTC — JPY",
-    "text": "JPY net short positioning at 60,210 contracts, 34.8% long; potential for squeeze if sentiment reverses.",
-    "evidence": [
-      "JPY net short: -60,210",
-      "JPY long%: 34.8%",
+      "EUR net long: +1,029",
+      "long%: 77.3%",
       "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "08:18",
-    "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 21.2 signals normal volatility — risk regime remains stable.",
+    "time": "10:05",
+    "priority": "warning",
+    "title": "Cross-Asset Correlation Breaks",
+    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, watch for USD/JPY upside on risk-off.",
     "evidence": [
-      "VIX: 21.2",
-      "S&P 500: 6,817",
-      "MOVE Index: 72.2"
+      "USD/JPY vs VIX corr: +0.685",
+      "z: +1.40σ",
+      "norm: +0.139"
     ]
   },
   {
-    "time": "08:15",
+    "time": "10:02",
     "priority": "info",
-    "title": "Cross-Asset Correlation Break",
-    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, with corr=+0.685, z=+1.40σ.",
+    "title": "Risk Regime",
+    "text": "VIX at 21.2 signals normal volatility — not a risk-on environment.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.685",
-      "z-score: +1.40σ",
-      "norm: +0.139"
+      "VIX: 21.2",
+      "S&P 500: 6,817",
+      "DXY: 98.98"
+    ]
+  },
+  {
+    "time": "09:58",
+    "priority": "info",
+    "title": "Retail Sentiment",
+    "text": "AUD/NZD sentiment extreme: 89% short — retail heavily positioned, watch for squeeze.",
+    "evidence": [
+      "AUD/NZD: 89% short",
+      "AUD/NZD price: 1.21 (implied)",
+      "sentiment update: 2026-04-13T09:53:50Z"
     ]
   }
 ]
