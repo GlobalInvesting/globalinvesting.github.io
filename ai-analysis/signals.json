@@ -3,7 +3,7 @@
     "time": "20:15",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.41, BoJ intervention risk rising as it approaches the 160.00 level",
+    "text": "USD/JPY at 159.41 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 159.41",
       "BoJ rate: 0.75%",
@@ -11,32 +11,32 @@
     ]
   },
   {
-    "time": "20:12",
+    "time": "20:10",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD trading above 1.1765, ECB rate at 2% and Fed rate at 3.75% may weigh on pair",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1765.",
     "evidence": [
       "EUR/USD: 1.1765",
-      "ECB rate: 2%",
-      "Fed rate: 3.75%"
-    ]
-  },
-  {
-    "time": "20:09",
-    "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7098, RBA hiking rates may support AUD carry",
-    "evidence": [
-      "AUD/USD: 0.7098",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.29%"
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)"
     ]
   },
   {
     "time": "20:05",
+    "priority": "warning",
+    "title": "AUD/USD",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7098.",
+    "evidence": [
+      "AUD/USD: 0.7098",
+      "RBA rate: 4.10% (HIKING)",
+      "US 10Y yield: 4.29%"
+    ]
+  },
+  {
+    "time": "20:00",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.1 signals normal volatility, not a risk-off environment",
+    "text": "VIX at 19.1 signals normal volatility — risk-on environment.",
     "evidence": [
       "VIX: 19.1",
       "S&P 500: 6,886",
@@ -44,10 +44,10 @@
     ]
   },
   {
-    "time": "20:01",
+    "time": "19:55",
     "priority": "info",
     "title": "CFTC — EUR",
-    "text": "EUR net long position at 77.3% may indicate overcrowding, watch for potential squeeze",
+    "text": "EUR net long positioning at 77.3% — watch for potential squeeze.",
     "evidence": [
       "CFTC EUR net: +1,029",
       "EUR/USD: 1.1765",
