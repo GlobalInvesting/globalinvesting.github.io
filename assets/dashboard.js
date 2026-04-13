@@ -4266,25 +4266,18 @@ async function buildRichNarrative() {
       if (title.length > 20) headlineSnippet = title + (title.length === 100 ? '…' : '');
     }
 
-    // Compose final narrative — show Groq narrative as primary, enrich with live rates if fresh
+    // Compose final narrative — Groq narrative is authoritative; fxLines is fallback only.
+    // The engine now sends real price levels — appending Frankfurter-derived fxLines
+    // produces contradictory language ("USD broadly offered" after "USD mixed") and
+    // grows the narrative beyond the 2-line layout budget. Removed in v7.23.10.
     let finalNarrative = '';
 
     if (baseNarrative.length > 40) {
-      // Use Groq narrative as primary (engine now sends real price levels)
+      // Use Groq narrative as-is — it already contains current price levels and catalysts.
+      // No Frankfurter enrichment: legacy fxLines used stale/different rates and contradicted Groq.
       finalNarrative = baseNarrative;
-      // Append live rate context only if it adds something not already in the narrative
-      if (fxLines.length) {
-        const enrichments = fxLines.filter(l => {
-          // Only add lines whose pair/direction is NOT already mentioned in the narrative
-          const pair = l.split(' ')[0]; // e.g. "EUR/USD"
-          return !baseNarrative.includes(pair);
-        });
-        if (enrichments.length) {
-          finalNarrative += ' · ' + enrichments.join(' · ');
-        }
-      }
     } else if (fxLines.length || headlineSnippet) {
-      // No Groq narrative available — build from live data
+      // No Groq narrative available — build from live data as fallback
       const parts = [];
       if (fxLines.length) parts.push(fxLines.join('. '));
       if (topCur.length && topCur.length <= 4) parts.push(`${topCur.join(', ')} in focus`);
