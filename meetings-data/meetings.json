@@ -48,7 +48,7 @@
       ],
       "source": "ecb.europa.eu",
       "bias": "hold",
-      "biasSource": "FRED ESTER vs ECB DFR",
+      "biasSource": "ECB Data Portal ESTER (EST.B.EU000A2X2A25.WT) vs FRED ECBDFR",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -74,7 +74,7 @@
       ],
       "source": "bankofengland.co.uk",
       "bias": "hold",
-      "biasSource": "FRED SONIA vs Bank Rate",
+      "biasSource": "FRED SONIA (IUDSOIA) vs BoE Bank Rate (rates/GBP.json)",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -100,7 +100,7 @@
       ],
       "source": "boj.or.jp",
       "bias": "hike",
-      "biasSource": "rate trajectory (TONA not in FRED)",
+      "biasSource": "SNB zimoma TONA (monthly) vs BoJ rate (rates/JPY.json)",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -126,7 +126,7 @@
       ],
       "source": "rba.gov.au",
       "bias": "hike",
-      "biasSource": "rate trajectory (ASX IB futures blocks GH runners)",
+      "biasSource": "RBA Table F1 AONIA (FIRMMCRIIA · daily) vs cash rate target",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -172,7 +172,7 @@
       ],
       "source": "snb.ch",
       "bias": "hold",
-      "biasSource": "rate trajectory (SARON — SNB quarterly)",
+      "biasSource": "SNB data portal SARON (snbgwdzid · daily) vs sight deposit rate",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
@@ -196,7 +196,7 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "rate trajectory (RBNZ blocks GH runners)",
+      "biasSource": "RBNZ B2 overnight interbank rate (hb2-daily.csv) vs OCR",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-13",
       "cutProb": null
