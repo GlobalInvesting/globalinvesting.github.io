@@ -1,57 +1,57 @@
 [
   {
-    "time": "19:50",
+    "time": "20:10",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.36 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 159.4 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.36",
+      "USD/JPY: 159.4",
       "BoJ rate: 0.75%",
-      "VIX: 19.2"
+      "VIX: 19.0"
     ]
   },
   {
-    "time": "19:48",
+    "time": "20:08",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7097, with RBA hiking rates — AUD carry supported; watch for further gains.",
+    "title": "EUR/USD",
+    "text": "EUR/USD holding above 1.1766, with ECB rate at 2.00% and Fed at 3.75%; rate differential continues to weigh on EUR/USD, but recent gains may signal a shift in market sentiment.",
     "evidence": [
-      "AUD/USD: 0.7097",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.29%"
+      "EUR/USD: 1.1766",
+      "ECB rate: 2.00%",
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "19:45",
+    "time": "20:05",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net long position at 77.3% — institutional long bias; watch for potential squeeze.",
+    "text": "EUR net long positioning at 77.3% (lev_net=+1,029); watch for potential squeeze as institutional sentiment diverges from retail.",
     "evidence": [
-      "EUR net: +1,029",
-      "EUR long%: 77.3%",
-      "CFTC week ending: 2026-04-07"
+      "EUR net long: 77.3%",
+      "lev_net: +1,029",
+      "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "19:42",
+    "time": "20:02",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals normal volatility — risk-on environment, but watch for potential shifts.",
+    "text": "VIX at 19.0 signals normal volatility — a risk-on environment, with S&P 500 up 1.02% and MOVE Index at 72.2.",
     "evidence": [
-      "VIX: 19.2",
-      "S&P 500: 6,872",
+      "VIX: 19.0",
+      "S&P 500: 6,886",
       "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "19:39",
+    "time": "19:58",
     "priority": "info",
-    "title": "USD/CHF",
-    "text": "USD/CHF trading below 0.7836, with SNB on hold — CHF carry not supported; watch for further declines.",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading near 0.7099, with RBA hiking rates; AUD carry supported, but watch for potential reversal as retail sentiment is extremely short (87%).",
     "evidence": [
-      "USD/CHF: 0.7836",
-      "SNB rate: 0%",
-      "US 10Y yield: 4.29%"
+      "AUD/USD: 0.7099",
+      "RBA rate: 4.10%",
+      "AUD retail sentiment: 87% short"
     ]
   }
 ]
