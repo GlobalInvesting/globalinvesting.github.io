@@ -1,57 +1,57 @@
 [
   {
-    "time": "20:10",
+    "time": "20:15",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.4 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 159.41, BoJ intervention risk rising as it approaches the 160.00 level",
     "evidence": [
-      "USD/JPY: 159.4",
+      "USD/JPY: 159.41",
       "BoJ rate: 0.75%",
-      "VIX: 19.0"
+      "VIX: 19.1"
     ]
   },
   {
-    "time": "20:08",
+    "time": "20:12",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1766, with ECB rate at 2.00% and Fed at 3.75%; rate differential continues to weigh on EUR/USD, but recent gains may signal a shift in market sentiment.",
+    "text": "EUR/USD trading above 1.1765, ECB rate at 2% and Fed rate at 3.75% may weigh on pair",
     "evidence": [
-      "EUR/USD: 1.1766",
-      "ECB rate: 2.00%",
+      "EUR/USD: 1.1765",
+      "ECB rate: 2%",
       "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "20:05",
+    "time": "20:09",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% (lev_net=+1,029); watch for potential squeeze as institutional sentiment diverges from retail.",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding above 0.7098, RBA hiking rates may support AUD carry",
     "evidence": [
-      "EUR net long: 77.3%",
-      "lev_net: +1,029",
-      "week ending: 2026-04-07"
+      "AUD/USD: 0.7098",
+      "RBA rate: 4.10%",
+      "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "20:02",
+    "time": "20:05",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.0 signals normal volatility — a risk-on environment, with S&P 500 up 1.02% and MOVE Index at 72.2.",
+    "text": "VIX at 19.1 signals normal volatility, not a risk-off environment",
     "evidence": [
-      "VIX: 19.0",
+      "VIX: 19.1",
       "S&P 500: 6,886",
       "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "19:58",
+    "time": "20:01",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading near 0.7099, with RBA hiking rates; AUD carry supported, but watch for potential reversal as retail sentiment is extremely short (87%).",
+    "title": "CFTC — EUR",
+    "text": "EUR net long position at 77.3% may indicate overcrowding, watch for potential squeeze",
     "evidence": [
-      "AUD/USD: 0.7099",
-      "RBA rate: 4.10%",
-      "AUD retail sentiment: 87% short"
+      "CFTC EUR net: +1,029",
+      "EUR/USD: 1.1765",
+      "week ending: 2026-04-07"
     ]
   }
 ]
