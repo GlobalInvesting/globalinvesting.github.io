@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-12",
+  "lastUpdate": "2026-04-13",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Apr",
@@ -22,6 +22,9 @@
       ],
       "source": "federalreserve.gov",
       "bias": "hold",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "EUR": {
@@ -44,7 +47,10 @@
         "17 Dec"
       ],
       "source": "ecb.europa.eu",
-      "bias": "hold",
+      "bias": "cut",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "GBP": {
@@ -68,6 +74,9 @@
       ],
       "source": "bankofengland.co.uk",
       "bias": "hold",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "JPY": {
@@ -91,6 +100,9 @@
       ],
       "source": "boj.or.jp",
       "bias": "hike",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "AUD": {
@@ -114,6 +126,9 @@
       ],
       "source": "rba.gov.au",
       "bias": "hike",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "CAD": {
@@ -137,6 +152,9 @@
       ],
       "source": "bankofcanada.ca",
       "bias": "hold",
+      "biasSource": "BoC Valet API (CORRA overnight)",
+      "biasMethod": "ois",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "CHF": {
@@ -154,6 +172,9 @@
       ],
       "source": "snb.ch",
       "bias": "hold",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     },
     "NZD": {
@@ -175,6 +196,9 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
+      "biasSource": "rate trajectory (OIS source unavailable)",
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-13",
       "cutProb": null
     }
   }
