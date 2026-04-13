@@ -1,42 +1,42 @@
 [
   {
-    "time": "22:35",
+    "time": "23:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.4 resistance — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 159.24 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.4",
+      "USD/JPY: 159.24",
       "BoJ rate: 0.75%",
       "VIX: 19.1"
     ]
   },
   {
-    "time": "22:30",
+    "time": "23:38",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1765.",
+    "title": "AUD/USD Retail Sentiment",
+    "text": "AUD/USD sentiment at 13% long / 87% short — extreme short bias, contrarian reversal risk.",
+    "evidence": [
+      "AUD/USD sentiment: 13% long / 87% short",
+      "CFTC AUD net: +41,458",
+      "AUD/USD: 0.71"
+    ]
+  },
+  {
+    "time": "23:35",
+    "priority": "warning",
+    "title": "Fed-ECB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD.",
     "evidence": [
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2% (ON HOLD)",
-      "EUR/USD: 1.1765"
+      "EUR/USD: 1.1769"
     ]
   },
   {
-    "time": "22:25",
-    "priority": "warning",
-    "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.71.",
-    "evidence": [
-      "RBA rate: 4.10% (HIKING)",
-      "AUD/USD: 0.71",
-      "US 10Y yield: 4.29%"
-    ]
-  },
-  {
-    "time": "22:20",
+    "time": "23:30",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 19.1 signals normal volatility — risk-on environment.",
+    "title": "VIX Level",
+    "text": "VIX at 19.1 signals normal volatility — not a risk-on environment.",
     "evidence": [
       "VIX: 19.1",
       "S&P 500: 6,886",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "22:15",
+    "time": "23:25",
     "priority": "info",
-    "title": "USD/JPY Correlation Break",
-    "text": "USD/JPY vs VIX positive correlation signals JPY has lost safe-haven function — watch for further USD/JPY gains.",
+    "title": "USD/JPY vs VIX Correlation Break",
+    "text": "USD/JPY vs VIX correlation at +0.655, z=+1.53σ — JPY no longer acting as safe haven, watch for regime shift.",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.675",
-      "z=+1.37σ",
-      "USD/JPY: 159.4"
+      "USD/JPY vs VIX corr: +0.655",
+      "z-score: +1.53σ",
+      "USD/JPY: 159.24"
     ]
   }
 ]
