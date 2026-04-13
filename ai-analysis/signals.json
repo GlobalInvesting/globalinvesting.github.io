@@ -1,57 +1,57 @@
 [
   {
-    "time": "02:55",
+    "time": "06:05",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.718 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 159.19 resistance — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.718",
+      "USD/JPY: 159.19",
       "BoJ rate: 0.75%",
       "VIX: 19.2"
     ]
   },
   {
-    "time": "02:53",
+    "time": "06:03",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.16920, with ECB rate at 2% and Fed at 3.75% — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD.",
+    "text": "EUR/USD holding above 1.1711 — ECB rate at 2% and Fed rate at 3.75% may weigh on EUR/USD; rate divergence favours USD.",
     "evidence": [
-      "EUR/USD: 1.16920",
-      "ECB rate: 2%",
+      "EUR/USD: 1.1711",
+      "ECB rate: 2.00%",
       "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "02:51",
+    "time": "06:01",
     "priority": "warning",
-    "title": "CFTC — JPY",
-    "text": "JPY net short positioning at 60,210 contracts, 34.8% long — institutional bearishness may drive further JPY weakness.",
+    "title": "CFTC — EUR",
+    "text": "EUR net long position at 77.3% — institutional positioning may lead to a squeeze; watch for potential reversal.",
     "evidence": [
-      "JPY net short: -60,210",
-      "JPY long%: 34.8%",
+      "EUR net position: +1,029",
+      "long%: 77.3%",
       "week ending: 2026-04-07"
     ]
   },
   {
-    "time": "02:49",
+    "time": "05:58",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals low volatility — risk-on environment, but watch for potential shifts with WTI oil price surging 8.63%.",
+    "text": "VIX at 19.2 signals low volatility — not a risk-off environment; S&P 500 trading at 6,817.",
     "evidence": [
       "VIX: 19.2",
-      "WTI Oil: $104.9",
-      "DXY: 99.03"
+      "S&P 500: 6,817",
+      "DXY: 99.02"
     ]
   },
   {
-    "time": "02:47",
+    "time": "05:55",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading below 0.70330, with RBA hiking rates — AUD carry supported, but cross-asset flows may overwhelm carry.",
+    "title": "USD/JPY vs VIX",
+    "text": "USD/JPY vs VIX correlation break at +0.654 — JPY no longer acting as safe haven; watch for potential regime shift.",
     "evidence": [
-      "AUD/USD: 0.70330",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.317%"
+      "USD/JPY vs VIX corr: +0.654",
+      "norm: +0.061",
+      "z: +1.53σ"
     ]
   }
 ]
