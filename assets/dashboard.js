@@ -2038,8 +2038,8 @@ function attachRiskMonitorTooltips() {
   const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
     'Positioning Bias — ETF IV + COT',
-    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) when available — real market-implied vol from nearest expiry ≥4 days. COT bias column shows CFTC Disaggregated TFF net positioning of Leveraged Funds (hedge funds, CTAs) — Options+Futures Combined source. Falls back to COT-only model if ETF IV unavailable.',
-    'ETF options have lower liquidity than OTC FX interbank options — IV may differ 1–3 vol points from true 25d RR. Direction always comes from Leveraged Funds net positioning (most reactive speculative category).'
+    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. These are exchange-listed ETF options, not OTC interbank FX options. OTC interbank vol (used by Bloomberg and Eikon) is not publicly available; ETF IV serves as the closest free proxy. COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined.',
+    'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels, particularly for less-traded pairs. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   const skewPairTips = {
@@ -3158,7 +3158,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Not OTC interbank — indicative only.' : '30-day ATM implied vol from CBOE FX ETF option chain (yfinance).'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
       </div>
@@ -3885,34 +3885,53 @@ async function fetchFedExpectations() {
       const nextMtg  = meetings?.allMeetingsFormatted?.[0] || '—';
 
       // ── Bias: prefer explicit market-consensus field from meetings.json ──
-      // meetings.bias = 'cut' | 'hold' | 'hike' (set by engine weekly, reflects OIS/futures consensus)
+      // meetings.bias       = 'cut' | 'hold' | 'hike' — OIS/overnight rate implied direction
+      // meetings.biasMethod = 'ois' | 'ois-preserved' | 'heuristic'
+      // meetings.biasSource = human-readable source label (e.g. "CME FedWatch (SOFR futures)")
+      // meetings.biasUpdated = ISO date the bias was last computed by the engine
       // Always compute trendDir for use in FWD projection — bias field only overrides the label
-      const trendDir    = computeCBTrend(obs);   // 'up' | 'down' | 'flat' — always needed for FWD
+      const trendDir     = computeCBTrend(obs);   // 'up' | 'down' | 'flat' — always needed for FWD
       const meetingsBias = meetings?.bias;
+      const biasMethod   = meetings?.biasMethod ?? null;
+      const biasSource   = meetings?.biasSource ?? null;
+      const biasUpdated  = meetings?.biasUpdated ?? null;
+
+      // Build tooltip: method + source + freshness
+      function buildBiasTooltip() {
+        const isOIS  = biasMethod === 'ois' || biasMethod === 'ois-preserved';
+        const src    = biasSource || (isOIS ? 'OIS/overnight rate' : 'rate trajectory');
+        const upd    = biasUpdated ? ` · updated ${biasUpdated}` : '';
+        const pres   = biasMethod === 'ois-preserved' ? ' (OIS source temporarily unavailable — last known signal preserved)' : '';
+        const heur   = biasMethod === 'heuristic' ? ' (OIS source unavailable — estimated from rate trajectory)' : '';
+        return `Market forward direction · ${src}${upd}${pres}${heur}`;
+      }
+      const biasTip = buildBiasTooltip();
 
       // ── Market-implied cut probability (CME/ASX where available; null otherwise) ──
       const cutProb = meetings?.cutProb ?? null;  // number (0–100) or null
       let probSuffix = '';
       if (cutProb !== null) {
-        // Show as small chip: e.g. "42% cut" — sourced from OIS/futures via engine
+        // Show as small chip: e.g. "42%↓" — sourced from OIS/futures via engine
         const probCls = cutProb >= 60 ? 'down' : cutProb >= 40 ? '' : 'flat';
-        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;" title="Market-implied probability of a cut at next meeting · CME FedWatch / ASX Rate Indicator">${cutProb}%↓</span>`;
+        const probSrc = biasSource || 'OIS/futures';
+        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cutProb}%↓</span>`;
       }
 
       let biasLabel;
       if (meetingsBias === 'cut') {
-        biasLabel = '<span class="down">↓ Cut</span>' + probSuffix;
+        biasLabel = `<span class="down" title="${biasTip}">↓ Cut</span>` + probSuffix;
       } else if (meetingsBias === 'hike') {
-        biasLabel = '<span class="up">↑ Hike</span>' + probSuffix;
+        biasLabel = `<span class="up" title="${biasTip}">↑ Hike</span>` + probSuffix;
       } else if (meetingsBias === 'hold') {
-        biasLabel = '<span class="flat">→ Hold</span>' + probSuffix;
+        biasLabel = `<span class="flat" title="${biasTip}">→ Hold</span>` + probSuffix;
       } else {
         // Fallback: derive from historical rate trajectory (no OIS/futures data available).
-        // ~ prefix signals this is an estimate, not a curated market-consensus value —
+        // ~ prefix signals this is an estimate, not a market-consensus value —
         // per GUIDELINES.md: "prefixes the label with ~ to signal estimation".
-        biasLabel = trendDir === 'down' ? '<span class="down">~ ↓ Cut</span>'
-                  : trendDir === 'up'   ? '<span class="up">~ ↑ Hike</span>'
-                  :                       '<span class="flat">~ → Hold</span>';
+        const fbTip = 'Estimated from rate trajectory · OIS source unavailable';
+        biasLabel = trendDir === 'down' ? `<span class="down" title="${fbTip}">~ ↓ Cut</span>`
+                  : trendDir === 'up'   ? `<span class="up" title="${fbTip}">~ ↑ Hike</span>`
+                  :                       `<span class="flat" title="${fbTip}">~ → Hold</span>`;
         biasLabel += probSuffix;
       }
 
@@ -4112,9 +4131,9 @@ async function fetchOptionSkew() {
       ?.previousElementSibling?.querySelector('span[style*="text3"]')
       || document.querySelector('.sb-head span[style*="text3"]');
     if (hasAnyEtfIv && panelHead) {
-      panelHead.textContent = 'ETF options IV · CBOE';
+      panelHead.textContent = 'ETF options IV · CBOE (proxy)';
     } else if (panelHead) {
-      panelHead.textContent = 'COT-derived · not IV';
+      panelHead.textContent = 'COT-derived · IV unavailable';
     }
 
   } catch(e) { console.warn('Option skew failed:', e); }
