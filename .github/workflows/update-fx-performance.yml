@@ -87,24 +87,10 @@ jobs:
 
           today    = date.today()
           ref_date = today - timedelta(days=1)   # ayer = sesión cerrada confirmada
+          days_to_prev_friday = (ref_date.weekday() - 4) % 7 or 7
+          date_7d  = ref_date - timedelta(days=days_to_prev_friday)
           date_30d = ref_date - timedelta(days=30)
           date_90d = ref_date - timedelta(days=90)
-
-          # ── 1W: viernes de la semana anterior (convención Bloomberg/TradingView) ──
-          # "1W CHG" = precio actual vs cierre del viernes de la semana anterior.
-          # NO es "hace 7 días calendario", porque eso varía según el día de la semana
-          # (martes comparado contra lunes 8 días atrás = ventana de 10 días de mercado).
-          # Frankfurter/ECB devuelve el viernes más cercano si se pide un fin de semana.
-          # Días hasta el viernes anterior desde ref_date:
-          #   ref_date.weekday(): Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
-          #   Si ref_date es lunes (0) → viernes anterior = 3 días atrás
-          #   Si ref_date es martes (1) → viernes anterior = 4 días atrás
-          #   ...
-          #   Si ref_date es domingo (6) → viernes anterior = 2 días atrás
-          #   Si ref_date es sábado (5) → viernes anterior = 1 día atrás
-          days_to_prev_friday = (ref_date.weekday() - 4) % 7 or 7
-          # Si ref_date ya es viernes: days_to_prev_friday = 7 (el viernes anterior, no hoy)
-          date_7d = ref_date - timedelta(days=days_to_prev_friday)
 
           print("=" * 70)
           print("FX PERFORMANCE — C8: Frankfurter/ECB — composite 90% 1M + 10% 3M")
@@ -112,7 +98,7 @@ jobs:
           print(f"Referencia: {ref_date} (ayer, sesión cerrada)")
           print(f"30d:        {date_30d}")
           print(f"90d:        {date_90d}")
-          print(f"1W ref:     {date_7d} (viernes semana anterior — convención Bloomberg/TradingView)")
+          print(f"7d:         {date_7d}")
           print("=" * 70)
 
           def fetch_rate(target_date, currency, retries=3, backoff=4):
@@ -362,8 +348,7 @@ jobs:
           for i in 1 2 3; do
             git push && echo "✅ Push succeeded" && exit 0
             echo "Push rejected (attempt $i) — rebasing..."
-            git fetch origin main
-            git rebase origin/main
+            git pull --rebase origin main
           done
           echo "❌ All push attempts failed — data not published."
           exit 1
