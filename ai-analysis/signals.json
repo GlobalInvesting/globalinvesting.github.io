@@ -1,17 +1,17 @@
 [
   {
-    "time": "20:25",
+    "time": "20:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.43 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 159.44 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.43",
+      "USD/JPY: 159.44",
       "BoJ rate: 0.75%",
-      "VIX: 19.2"
+      "VIX: 19.1"
     ]
   },
   {
-    "time": "20:23",
+    "time": "20:43",
     "priority": "warning",
     "title": "EUR/USD",
     "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1763.",
@@ -22,36 +22,36 @@
     ]
   },
   {
-    "time": "20:20",
+    "time": "20:40",
     "priority": "warning",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3% — watch for potential squeeze.",
+    "evidence": [
+      "CFTC EUR net: +1,029",
+      "EUR/USD: 1.1763",
+      "week ending: 2026-04-07"
+    ]
+  },
+  {
+    "time": "20:38",
+    "priority": "info",
+    "title": "Risk Regime",
+    "text": "VIX at 19.1 signals normal volatility — risk-on environment.",
+    "evidence": [
+      "VIX: 19.1",
+      "S&P 500: 6,886",
+      "DXY: 98.41"
+    ]
+  },
+  {
+    "time": "20:35",
+    "priority": "info",
     "title": "AUD/USD",
     "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7097.",
     "evidence": [
       "AUD/USD: 0.7097",
       "RBA rate: 4.10% (HIKING)",
       "US 10Y yield: 4.29%"
-    ]
-  },
-  {
-    "time": "20:18",
-    "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 19.2 signals normal volatility — risk-on environment.",
-    "evidence": [
-      "VIX: 19.2",
-      "S&P 500: 6,886",
-      "MOVE Index: 72.2"
-    ]
-  },
-  {
-    "time": "20:15",
-    "priority": "info",
-    "title": "USD/JPY Correlation Break",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function, z=+1.37σ.",
-    "evidence": [
-      "USD/JPY vs VIX: corr=+0.676",
-      "norm=+0.139",
-      "z=+1.37σ"
     ]
   }
 ]
