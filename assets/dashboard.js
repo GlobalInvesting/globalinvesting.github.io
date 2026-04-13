@@ -1189,6 +1189,8 @@ async function fetchQuoteBarRT() {
         high:  (q.high  != null && q.high  > 0) ? q.high  : null,
         low:   (q.low   != null && q.low   > 0) ? q.low   : null,
         hv30:  (q.hv30  != null) ? q.hv30 : (intradayData.hv30?.[pair.id] ?? null),
+        pct1w: (q.pct1w != null) ? q.pct1w : null,
+        pct1w_date: q.pct1w_date ?? null,
         fromIntraday: true,
         stale: q.stale ?? false,
       };
