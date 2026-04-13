@@ -656,7 +656,7 @@ def fetch_yfinance_all(symbols_map):
         for internal_id, yf_sym in symbols_map.items():
             try:
                 ticker = yf.Ticker(yf_sym)
-                hist = ticker.history(period="5d", interval="1d", auto_adjust=True)
+                hist = ticker.history(period="10d", interval="1d", auto_adjust=True)
 
                 if hist.empty:
                     print(f"[yfinance] Sin datos para {yf_sym}")
@@ -780,6 +780,39 @@ def fetch_yfinance_all(symbols_map):
                     "low":        day_low,
                     "source":     "yfinance",
                 }
+
+                # ── 1W CHG: prior-Friday-close convention (Bloomberg/TradingView) ──────
+                # Only computed for FX major pairs. Uses the daily history already
+                # downloaded — no extra API call needed.
+                # Finds the most recent Friday in the history that is strictly before
+                # today's session (i.e. last week's Friday close).
+                FX_MAJORS_1W = {"eurusd", "gbpusd", "usdjpy", "audusd", "usdchf", "usdcad", "nzdusd"}
+                if internal_id in FX_MAJORS_1W:
+                    try:
+                        # hist index is tz-aware; normalize to date for weekday comparison
+                        hist_dates = [d.date() if hasattr(d, "date") else d for d in hist.index]
+                        hist_closes = hist["Close"].dropna()
+                        today_date = datetime.now(timezone.utc).date()
+                        # Find the most recent Friday strictly before today
+                        prior_friday = None
+                        prior_friday_close = None
+                        for i in range(len(hist_dates) - 1, -1, -1):
+                            d = hist_dates[i]
+                            if d < today_date and d.weekday() == 4:  # 4 = Friday
+                                prior_friday = d
+                                prior_friday_close = float(hist_closes.iloc[i])
+                                break
+                        if prior_friday_close and prior_friday_close != 0:
+                            pct1w = round((close / prior_friday_close - 1.0) * 100.0, 4)
+                            results[internal_id]["pct1w"] = pct1w
+                            results[internal_id]["pct1w_date"] = str(prior_friday)
+                            print(f"[1W] ✓ {internal_id:8s}: {close:.4f} vs Friday {prior_friday} {prior_friday_close:.4f} → {pct1w:+.4f}%")
+                        else:
+                            results[internal_id]["pct1w"] = None
+                            print(f"[1W] ⚠ {internal_id:8s}: no prior Friday found in {len(hist_dates)}d history")
+                    except Exception as _e1w:
+                        results[internal_id]["pct1w"] = None
+                        print(f"[1W] ⚠ {internal_id:8s}: {_e1w}")
 
                 # Sanity check: high == low means yfinance returned an incomplete intraday
                 # bar (e.g. a stale tick where H=L=close).
