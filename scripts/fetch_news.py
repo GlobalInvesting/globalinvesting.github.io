@@ -351,6 +351,7 @@ FEEDS = [
     { "source": "Nasdaq FX",        "url": "https://www.nasdaq.com/feed/rssoutbound?category=currencies",      "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
+    { "source": "Barchart",         "url": "https://www.barchart.com/news/rss/financials/fx",                   "lang": "en" },
 
     # ── GOOGLE NEWS vía NewsData.io API — 1 query por divisa (v5.7) ──────────
     # NewsData.io: plan gratuito: 200 créditos/día, sin delay.
