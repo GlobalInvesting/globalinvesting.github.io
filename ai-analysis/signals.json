@@ -1,57 +1,57 @@
 [
   {
-    "time": "19:45",
+    "time": "19:50",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 159.34 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 159.36 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.34",
+      "USD/JPY: 159.36",
       "BoJ rate: 0.75%",
       "VIX: 19.2"
     ]
   },
   {
-    "time": "19:43",
+    "time": "19:48",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7096, with RBA hiking rates — AUD carry supported; watch for further gains.",
+    "text": "AUD/USD holding above 0.7097, with RBA hiking rates — AUD carry supported; watch for further gains.",
     "evidence": [
-      "AUD/USD: 0.7096",
-      "RBA rate: 4.10% (HIKING)",
+      "AUD/USD: 0.7097",
+      "RBA rate: 4.10%",
       "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "19:40",
+    "time": "19:45",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — watch for potential squeeze risk, especially if ECB holds rates at 2% on April 30.",
+    "text": "EUR net long position at 77.3% — institutional long bias; watch for potential squeeze.",
     "evidence": [
-      "CFTC EUR net: +1,029",
-      "ECB rate: 2% (ON HOLD)",
-      "EUR/USD: 1.1763"
+      "EUR net: +1,029",
+      "EUR long%: 77.3%",
+      "CFTC week ending: 2026-04-07"
     ]
   },
   {
-    "time": "19:38",
+    "time": "19:42",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 19.2 signals normal volatility — risk-on environment, but watch for potential shifts in market sentiment.",
+    "text": "VIX at 19.2 signals normal volatility — risk-on environment, but watch for potential shifts.",
     "evidence": [
       "VIX: 19.2",
-      "S&P 500: 6,865",
+      "S&P 500: 6,872",
       "MOVE Index: 72.2"
     ]
   },
   {
-    "time": "19:35",
+    "time": "19:39",
     "priority": "info",
-    "title": "Cross-Asset Correlation Breaks",
-    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, watch for implications on USD/JPY positioning.",
+    "title": "USD/CHF",
+    "text": "USD/CHF trading below 0.7836, with SNB on hold — CHF carry not supported; watch for further declines.",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.677",
-      "z=+1.38σ",
-      "VIX: 19.2"
+      "USD/CHF: 0.7836",
+      "SNB rate: 0%",
+      "US 10Y yield: 4.29%"
     ]
   }
 ]
