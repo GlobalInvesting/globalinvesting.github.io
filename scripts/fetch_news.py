@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.6
+fetch_news.py — v5.8
 Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
 
 CAMBIOS v5.7 (sobre v5.6):
@@ -12,6 +12,18 @@ CAMBIOS v5.7 (sobre v5.6):
     · Requiere secret NEWSDATA_API_KEY en GitHub Actions (Settings → Secrets).
     · Si la key no está configurada, el script continúa sin NewsData (no falla).
     · fetch_newsdata() corre secuencialmente con 2s entre queries.
+
+CAMBIOS v5.8 (sobre v5.7):
+  BARCHART Y FUENTES TA — IMPACT CORRECTO:
+    · Barchart, BabyPips, InvestMacro y ForexCrunch son fuentes de análisis técnico.
+    · Artículos TA puros (sin keywords macro/CB/geopolíticos) ahora se clasifican como
+      "med" en lugar de "high" — evita que análisis de Elliott Wave compita con noticias
+      reales de alto impacto en smart_select().
+    · Excepción: si el artículo de Barchart contiene "iran", "hormuz", "war", "fomc",
+      "central bank", "inflation", etc. → se mantiene "high".
+  CAPS AMPLIADOS:
+    · MAX_NEWS: 48 → 52 para absorber noticias geopolíticas USD sin desplazar otras divisas.
+    · MAX_PER_CUR: 8 → 10 para permitir más cobertura USD en días de eventos de primer orden.
 
 CAMBIOS v5.4 (sobre v5.3):
   CALIDAD DE FUENTES:
@@ -38,10 +50,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fx_config import CURRENCIES
 
 # ─────────────────────────────────────────────
-MAX_NEWS              = 48          # v5.3: subido de 40 para absorber nuevos feeds
+MAX_NEWS              = 52          # v5.8: subido de 48 para absorber noticias geopolíticas USD de alto impacto
 MAX_AGE_DAYS          = 4
 GUARANTEED_PER_CUR    = 3
-MAX_PER_CUR           = 8
+MAX_PER_CUR           = 10         # v5.8: subido de 8; USD puede tener más artículos en días de eventos geopolíticos
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
 INSTAFOREX_MAX        = 2           # v5.4: InstaForex limitado a 2 artículos por ejecución
@@ -412,6 +424,16 @@ MED_IMPACT_KW = [
     "australia business", "australia consumer", "anz australia",
     "westpac australia", "nab business", "swiss kof",
     "swiss manufacturing", "swiss retail",
+]
+
+# Sources that primarily produce technical analysis — TA-only articles
+# get impact capped at "med" unless they contain genuine macro/CB keywords.
+TECHNICAL_ANALYSIS_SOURCES = {"Barchart", "BabyPips", "InvestMacro", "ForexCrunch"}
+TA_MACRO_OVERRIDE_KW = [
+    "central bank", "federal reserve", "ecb", "boe", "boj", "rba", "rbnz", "boc", "snb",
+    "rate decision", "rate hike", "rate cut", "fomc", "inflation", "cpi", "gdp",
+    "nonfarm", "non-farm", "unemployment", "monetary policy",
+    "iran", "hormuz", "sanctions", "war", "geopolitical", "opec",
 ]
 
 SOURCE_CURRENCY = {
@@ -904,6 +926,13 @@ def main():
                 if instaforex_count >= INSTAFOREX_MAX:
                     continue
                 instaforex_count += 1
+
+            # v5.8: TA sources — cap impact at "med" unless article contains genuine
+            # macro/CB/geopolitical keywords (those remain "high" as-is).
+            if source in TECHNICAL_ANALYSIS_SOURCES and impact == "high":
+                combined = (title + " " + summary).lower()
+                if not any(kw in combined for kw in TA_MACRO_OVERRIDE_KW):
+                    impact = "med"
 
             expand    = summary[:350] + ("..." if len(summary) > 350 else "")
             age_hours = (now_utc - pub_date).total_seconds() / 3600
