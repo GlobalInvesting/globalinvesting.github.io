@@ -1,57 +1,57 @@
 [
   {
-    "time": "09:55",
+    "time": "11:30",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.93 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
+    "text": "USD/JPY at 158.75 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 158.93",
+      "USD/JPY: 158.75",
       "BoJ rate: 0.75%",
-      "VIX: 18.6"
+      "VIX: 18.4"
     ]
   },
   {
-    "time": "09:53",
+    "time": "11:28",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD holding above 1.1791 — ECB's Rehn comments on inflation risks and medium-term uncertainty.",
+    "text": "EUR/USD holds at 1.1805 as ECB's Rehn notes Middle East war raises inflation risks; ECB-BoE rate differential may weigh on the pair.",
     "evidence": [
-      "EUR/USD: 1.1791",
+      "EUR/USD: 1.1805",
       "ECB rate: 2.00%",
-      "US 10Y yield: 4.31%"
+      "BoE rate: 3.75%"
     ]
   },
   {
-    "time": "09:51",
+    "time": "11:25",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD trading above 0.7113 — RBA hiking rates supports AUD carry, but retail sentiment is extremely short.",
+    "text": "AUD/USD trading at 0.7127 with RBA hiking rates — AUD carry supported; however, 88% of retail traders are short, indicating potential squeeze risk.",
     "evidence": [
-      "AUD/USD: 0.7113",
+      "AUD/USD: 0.7127",
       "RBA rate: 4.10%",
-      "AUD net long: +41,458"
+      "AUD net short: 88%"
     ]
   },
   {
-    "time": "09:49",
+    "time": "11:20",
     "priority": "info",
     "title": "VIX",
-    "text": "VIX at 18.6 signals normal volatility — risk-on environment, S&P 500 up +1.02%.",
+    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.02%.",
     "evidence": [
-      "VIX: 18.6",
+      "VIX: 18.4",
       "S&P 500: 6,886",
-      "DXY: 98.14"
+      "DXY: 98.05"
     ]
   },
   {
-    "time": "09:47",
+    "time": "11:15",
     "priority": "info",
     "title": "Cross-Asset Correlation",
-    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, z=+1.38σ.",
+    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, z=+1.39σ; monitor for regime shift implications.",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.680",
+      "USD/JPY vs VIX: corr=+0.681",
       "norm=+0.140",
-      "z=+1.38σ"
+      "z=+1.39σ"
     ]
   }
 ]
