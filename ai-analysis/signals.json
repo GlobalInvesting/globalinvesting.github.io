@@ -1,57 +1,57 @@
 [
   {
-    "time": "00:00",
+    "time": "02:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.25 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
+    "text": "USD/JPY testing 159.18, approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 159.25",
+      "USD/JPY: 159.18",
       "BoJ rate: 0.75%",
       "VIX: 19.1"
     ]
   },
   {
-    "time": "00:02",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.177.",
-    "evidence": [
-      "EUR/USD: 1.177",
-      "Fed rate: 3.75% (ON HOLD)",
-      "ECB rate: 2.00% (ON HOLD)"
-    ]
-  },
-  {
-    "time": "00:04",
+    "time": "02:42",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7099.",
+    "text": "AUD/USD holding below 0.7090, Australian business confidence plunges to -29 as Iran war shock hits outlook, RBA’s Hauser warns of stagflation risk.",
     "evidence": [
-      "AUD/USD: 0.7099",
-      "RBA rate: 4.10% (HIKING)",
-      "US 10Y yield: 4.29%"
+      "AUD/USD: 0.7085",
+      "RBA rate: 4.10%",
+      "Australia business confidence: -29"
     ]
   },
   {
-    "time": "00:08",
+    "time": "02:39",
+    "priority": "warning",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading at 1.1763, war drags on, recession risk rises, and global trade growth slows sharply, EUR net long positioning at 77.3%.",
+    "evidence": [
+      "EUR/USD: 1.1763",
+      "CFTC EUR net: +1,029",
+      "EUR long%: 77.3%"
+    ]
+  },
+  {
+    "time": "02:35",
     "priority": "info",
-    "title": "Risk Regime",
+    "title": "VIX",
     "text": "VIX at 19.1 signals normal volatility — risk-on environment, S&P 500 up +1.02%.",
     "evidence": [
       "VIX: 19.1",
       "S&P 500: 6,886",
-      "DXY: 98.35"
+      "S&P 500 1D:+1.02%"
     ]
   },
   {
-    "time": "00:12",
-    "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — watch for potential long squeeze.",
+    "time": "02:30",
+    "priority": "info",
+    "title": "USD/JPY Correlation Break",
+    "text": "USD/JPY vs VIX correlation break, JPY no longer acting as safe haven, z=+1.53σ.",
     "evidence": [
-      "EUR net long: +1,029",
-      "long%: 77.3%",
-      "week ending: 2026-04-07"
+      "USD/JPY vs VIX corr: +0.656",
+      "norm: +0.062",
+      "z: +1.53σ"
     ]
   }
 ]
