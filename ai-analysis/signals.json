@@ -1,56 +1,56 @@
 [
   {
-    "time": "17:15",
+    "time": "19:25",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings",
+    "text": "USD/JPY trading near 158.86, approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 158.85",
+      "USD/JPY: 158.86",
       "BoJ rate: 0.75%",
       "VIX: 18.4"
     ]
   },
   {
-    "time": "17:12",
+    "time": "19:23",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD long positioning at 77.3% — watch for potential squeeze",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1797; rate divergence favours USD.",
     "evidence": [
-      "EUR/USD: 1.1798",
-      "CFTC EUR net: +1,029",
-      "VIX: 18.4"
+      "EUR/USD: 1.1797",
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)"
     ]
   },
   {
-    "time": "17:09",
+    "time": "19:21",
+    "priority": "warning",
+    "title": "AUD/USD",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7128.",
+    "evidence": [
+      "AUD/USD: 0.7128",
+      "RBA rate: 4.10% (HIKING)",
+      "US 10Y yield: 4.256%"
+    ]
+  },
+  {
+    "time": "19:19",
+    "priority": "info",
+    "title": "VIX",
+    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.15%.",
+    "evidence": [
+      "VIX: 18.4",
+      "S&P 500: 6,965",
+      "DXY: 98.13"
+    ]
+  },
+  {
+    "time": "19:17",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function",
+    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven; USD/JPY correlation with VIX at +0.680, z=+1.38σ.",
     "evidence": [
       "USD/JPY vs VIX: corr=+0.680",
       "z=+1.38σ",
-      "VIX: 18.4"
-    ]
-  },
-  {
-    "time": "17:05",
-    "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.03%",
-    "evidence": [
-      "VIX: 18.4",
-      "S&P 500: 6,957",
-      "DXY: 98.12"
-    ]
-  },
-  {
-    "time": "17:01",
-    "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "EUR/USD 85% short — retail heavily positioned, watch for squeeze",
-    "evidence": [
-      "EUR/USD: 15% long / 85% short",
-      "CFTC EUR net: +1,029",
       "VIX: 18.4"
     ]
   }
