@@ -1,57 +1,57 @@
 [
   {
-    "time": "15:45",
+    "time": "17:15",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings",
     "evidence": [
-      "USD/JPY: 158.83",
+      "USD/JPY: 158.85",
       "BoJ rate: 0.75%",
-      "VIX: 18.2"
+      "VIX: 18.4"
     ]
   },
   {
-    "time": "15:42",
+    "time": "17:12",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD long positioning at 77.3% — watch for potential unwind",
+    "text": "EUR/USD long positioning at 77.3% — watch for potential squeeze",
     "evidence": [
-      "EUR/USD: 1.1797",
+      "EUR/USD: 1.1798",
       "CFTC EUR net: +1,029",
-      "VIX: 18.2"
+      "VIX: 18.4"
     ]
   },
   {
-    "time": "15:40",
+    "time": "17:09",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
     "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.679",
+      "USD/JPY vs VIX: corr=+0.680",
       "z=+1.38σ",
-      "VIX: 18.2"
+      "VIX: 18.4"
     ]
   },
   {
-    "time": "15:35",
+    "time": "17:05",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +0.97%",
+    "title": "VIX",
+    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.03%",
     "evidence": [
-      "VIX: 18.2",
-      "S&P 500: 6,953",
-      "DXY: 98.07"
+      "VIX: 18.4",
+      "S&P 500: 6,957",
+      "DXY: 98.12"
     ]
   },
   {
-    "time": "15:30",
+    "time": "17:01",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7098",
+    "title": "Retail Sentiment",
+    "text": "EUR/USD 85% short — retail heavily positioned, watch for squeeze",
     "evidence": [
-      "AUD/USD: 0.7135",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.31%"
+      "EUR/USD: 15% long / 85% short",
+      "CFTC EUR net: +1,029",
+      "VIX: 18.4"
     ]
   }
 ]
