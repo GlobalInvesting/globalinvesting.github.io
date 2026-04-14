@@ -1,57 +1,57 @@
 [
   {
-    "time": "23:50",
+    "time": "00:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.23 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 159.25 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
     "evidence": [
-      "USD/JPY: 159.23",
+      "USD/JPY: 159.25",
       "BoJ rate: 0.75%",
       "VIX: 19.1"
     ]
   },
   {
-    "time": "23:48",
+    "time": "00:02",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — institutional long bias, watch for potential squeeze if EUR/USD breaks below 1.1769.",
+    "title": "EUR/USD",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.177.",
     "evidence": [
-      "EUR net long: +1,029",
-      "EUR/USD: 1.1769",
-      "CFTC week ending: 2026-04-07"
+      "EUR/USD: 1.177",
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)"
     ]
   },
   {
-    "time": "23:45",
+    "time": "00:04",
     "priority": "warning",
-    "title": "AUD/USD Retail Sentiment",
-    "text": "AUD/USD at 87% short bias — extreme retail short positioning, contrarian reversal risk if AUD/USD breaks above 0.7099.",
+    "title": "AUD/USD",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7099.",
     "evidence": [
       "AUD/USD: 0.7099",
-      "AUD/USD retail short: 87%",
-      "AUD net long: +41,458"
+      "RBA rate: 4.10% (HIKING)",
+      "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "23:42",
+    "time": "00:08",
     "priority": "info",
     "title": "Risk Regime",
     "text": "VIX at 19.1 signals normal volatility — risk-on environment, S&P 500 up +1.02%.",
     "evidence": [
       "VIX: 19.1",
       "S&P 500: 6,886",
-      "DXY: 98.37"
+      "DXY: 98.35"
     ]
   },
   {
-    "time": "23:40",
-    "priority": "info",
-    "title": "USD/JPY vs VIX Correlation Break",
-    "text": "USD/JPY vs VIX correlation at +0.655 — JPY no longer acting as safe haven, watch for regime shift implications.",
+    "time": "00:12",
+    "priority": "warning",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3% — watch for potential long squeeze.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.655",
-      "z-score: +1.53σ",
-      "VIX: 19.1"
+      "EUR net long: +1,029",
+      "long%: 77.3%",
+      "week ending: 2026-04-07"
     ]
   }
 ]
