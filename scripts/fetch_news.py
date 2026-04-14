@@ -1,17 +1,34 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.8
-Obtiene noticias forex desde múltiples fuentes RSS (ES + EN) y genera news.json.
+fetch_news.py — v5.9
+Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
 
-CAMBIOS v5.7 (sobre v5.6):
-  GNEWS → NEWSDATA.IO:
-    · GNews plan gratuito tiene 12h de delay — inutilizable para noticias FX.
-    · Reemplazado por NewsData.io (https://newsdata.io) — plan gratuito:
-      200 créditos/día, sin delay, artículos en tiempo real.
-    · 3 ejecuciones/día × 8 divisas = 24 créditos — margen del 88% sobre límite.
-    · Requiere secret NEWSDATA_API_KEY en GitHub Actions (Settings → Secrets).
-    · Si la key no está configurada, el script continúa sin NewsData (no falla).
-    · fetch_newsdata() corre secuencialmente con 2s entre queries.
+CAMBIOS v5.9 (sobre v5.8):
+  FUENTES EN ESPAÑOL — ELIMINADAS:
+    · DailyForex ES (4 feeds) y Investing.com ES (3 feeds) removidos.
+    · Razón: el pipeline de narrativa y señales opera en inglés. Las fuentes en español
+      introducían artículos que pasaban la mayoría de los filtros pero llegaban al LLM
+      como contenido duplicado o semánticament débil — en ES en lugar de EN.
+    · El estándar institucional (Bloomberg, Reuters, Eikon) es inglés como idioma
+      operacional para FX desks. Las fuentes primarias en español son traducciones
+      retrasadas de los feeds EN originales.
+    · Impacto: campo lang_counts.es volverá a 0 en producción. El campo se mantiene
+      en el schema de news.json por compatibilidad hacia adelante.
+
+  NUEVAS FUENTES INSTITUCIONALES — AÑADIDAS:
+    · DailyFX (3 feeds): dailyfx.com/feeds/all, market-news, top-stories.
+      Fuente institucional de primer orden — propiedad de IG Group. Cubre
+      noticias de mercado en tiempo real, análisis macro y cobertura de CBs.
+      Clasificado como TECHNICAL_ANALYSIS_SOURCES para cap de impact en TA puro.
+    · Federal Reserve (2 feeds): speeches.xml + press_monetary.xml.
+      Fuente primaria oficial — discursos de gobernadores y comunicados de política
+      monetaria de la Fed. Forzado a USD con impact siempre "high".
+    · Bank of Canada (1 feed): bankofcanada.ca/rss/press-releases/.
+      Fuente primaria oficial BoC — comunicados de política monetaria. Forzado a CAD.
+    · Reuters Markets (1 feed): reuters.com/finance/markets/rss.
+      Reuters es la agencia de referencia institucional para FX. Feed de mercados.
+      Complementa el feed de divisas ya existente (reuters/currenciesNews).
+    · The Fed (DailyFX alias para Federal Reserve ya en SOURCE_CURRENCY map).
 
 CAMBIOS v5.8 (sobre v5.7):
   BARCHART Y FUENTES TA — IMPACT CORRECTO:
@@ -313,17 +330,8 @@ FALSE_POSITIVE_GUARDS = [
 # FEEDS
 # ─────────────────────────────────────────────
 FEEDS = [
-    # ── ESPAÑOL ──────────────────────────────────────────────────────────────
-    # v5.4: FXStreet ES eliminado — duplicaba contenido de FXStreet EN traducido
-    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/forexnews.xml",                "lang": "es" },
-    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/TechnicalAnalysis.xml",        "lang": "es" },
-    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/FundamentalAnalysis.xml",      "lang": "es" },
-    { "source": "DailyForex ES",    "url": "https://es.dailyforex.com/rss/es/forexarticles.xml",            "lang": "es" },
-    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_1.rss",                        "lang": "es" },
-    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_25.rss",                       "lang": "es" },
-    { "source": "Investing.com ES", "url": "https://es.investing.com/rss/news_14.rss",                       "lang": "es" },
-
     # ── INGLÉS — fuentes existentes ──────────────────────────────────────────
+    # v5.9: DailyForex ES + Investing.com ES eliminados — ver docstring
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/news",                              "lang": "en" },
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss/analysis",                          "lang": "en" },
     { "source": "FXStreet",         "url": "https://www.fxstreet.com/rss",                                    "lang": "en" },
@@ -333,6 +341,9 @@ FEEDS = [
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/press.html",                        "lang": "en" },
     { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/news",                        "lang": "en" },
     { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
+    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexarticles.xml",               "lang": "en" },
+    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/technicalanalysis.xml",           "lang": "en" },
+    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/fundamentalanalysis.xml",         "lang": "en" },
     { "source": "ActionForex",      "url": "https://www.actionforex.com/category/live-comments/feed/",        "lang": "en" },
     { "source": "ActionForex",      "url": "https://www.actionforex.com/category/action-insight/feed/",       "lang": "en" },
     { "source": "InvestingLive",    "url": "https://investinglive.com/feed/centralbank/",                     "lang": "en" },
@@ -356,14 +367,30 @@ FEEDS = [
     { "source": "SNB",              "url": "https://www.snb.ch/en/snb/medmit/medienmitteilungen/id/rss",       "lang": "en" },
     { "source": "Bank of Japan",    "url": "https://www.boj.or.jp/en/about/press/index.htm/rss.xml",           "lang": "en" },
 
+    # ── INGLÉS — bancos centrales oficiales añadidos (v5.9) ──────────────────
+    # Federal Reserve: fuente primaria oficial (speeches + monetary policy press releases)
+    # Forzado a USD — cualquier comunicado de la Fed es directamente relevante para USD.
+    { "source": "Federal Reserve",  "url": "https://www.federalreserve.gov/feeds/speeches.xml",               "lang": "en" },
+    { "source": "Federal Reserve",  "url": "https://www.federalreserve.gov/feeds/press_monetary.xml",         "lang": "en" },
+    # Bank of Canada: fuente primaria oficial BoC
+    { "source": "Bank of Canada",   "url": "https://www.bankofcanada.ca/rss/press-releases/",                  "lang": "en" },
+
     # ── INGLÉS — fuentes de análisis (v5.2) ─────────────────────────────────
     { "source": "MarketPulse",      "url": "https://www.marketpulse.com/feed/",                               "lang": "en" },
     { "source": "MarketPulse",      "url": "https://www.marketpulse.com/forex/feed/",                         "lang": "en" },
     { "source": "Reuters FX",       "url": "https://feeds.reuters.com/reuters/currenciesNews",                 "lang": "en" },
+    { "source": "Reuters Markets",  "url": "https://feeds.reuters.com/reuters/businessNews",                   "lang": "en" },
     { "source": "Nasdaq FX",        "url": "https://www.nasdaq.com/feed/rssoutbound?category=currencies",      "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=news",   "lang": "en" },
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
     { "source": "Barchart",         "url": "https://www.barchart.com/news/rss/financials/fx",                   "lang": "en" },
+
+    # ── INGLÉS — fuentes institucionales de primer orden añadidas (v5.9) ─────
+    # DailyFX: propiedad de IG Group — cobertura institucional de mercados FX en tiempo real.
+    # Clasificado como TECHNICAL_ANALYSIS_SOURCES: TA puro → "med"; macro/CB/geopolítico → "high".
+    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/all",                               "lang": "en" },
+    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/market-news",                       "lang": "en" },
+    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/top-stories",                       "lang": "en" },
 
     # ── GOOGLE NEWS vía NewsData.io API — 1 query por divisa (v5.7) ──────────
     # NewsData.io: plan gratuito: 200 créditos/día, sin delay.
@@ -428,7 +455,11 @@ MED_IMPACT_KW = [
 
 # Sources that primarily produce technical analysis — TA-only articles
 # get impact capped at "med" unless they contain genuine macro/CB keywords.
-TECHNICAL_ANALYSIS_SOURCES = {"Barchart", "BabyPips", "InvestMacro", "ForexCrunch"}
+# v5.9: DailyFX added — IG Group's institutional FX platform publishes both real-time
+# macro news (should be "high") and TA/price level articles (cap at "med").
+# DailyForex added — now has dedicated technicalanalysis.xml and fundamentalanalysis.xml
+# feeds; TA/FA-only articles capped at "med", genuine macro/CB articles keep "high".
+TECHNICAL_ANALYSIS_SOURCES = {"Barchart", "BabyPips", "InvestMacro", "ForexCrunch", "DailyFX", "DailyForex"}
 TA_MACRO_OVERRIDE_KW = [
     "central bank", "federal reserve", "ecb", "boe", "boj", "rba", "rbnz", "boc", "snb",
     "rate decision", "rate hike", "rate cut", "fomc", "inflation", "cpi", "gdp",
@@ -453,14 +484,18 @@ SOURCE_CURRENCY = {
     "NewsData CAD": "CAD",
     "NewsData CHF": "CHF",
     "NewsData NZD": "NZD",
+    # v5.9: new CB feeds — force-assign currency
+    "Bank of Canada": "CAD",
 }
 
 FOREX_SOURCES = {
-    "FXStreet", "ForexLive", "DailyForex ES", "DailyForex",
+    "FXStreet", "ForexLive", "DailyForex",
     "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
-    "Federal Reserve", "ActionForex", "InvestingLive", "MyFXBook",
+    "Federal Reserve", "Bank of Canada",
+    "ActionForex", "InvestingLive", "MyFXBook",
     "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
-    "Investing.com ES", "MarketPulse", "Reuters FX", "Nasdaq FX", "FX Empire",
+    "MarketPulse", "Reuters FX", "Reuters Markets", "Nasdaq FX", "FX Empire",
+    "Barchart", "DailyFX",
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
