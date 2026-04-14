@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-13",
+  "lastUpdate": "2026-04-14",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Apr",
@@ -24,7 +24,7 @@
       "bias": "hold",
       "biasSource": "FRED SOFR vs DFF (Fed Funds)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "EUR": {
@@ -50,7 +50,7 @@
       "bias": "hold",
       "biasSource": "ECB Data Portal ESTER (EST.B.EU000A2X2A25.WT) vs FRED ECBDFR",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "GBP": {
@@ -76,7 +76,7 @@
       "bias": "hold",
       "biasSource": "FRED SONIA (IUDSOIA) vs BoE Bank Rate (rates/GBP.json)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "JPY": {
@@ -102,7 +102,7 @@
       "bias": "hold",
       "biasSource": "SNB zimoma TONA (monthly) vs BoJ rate (rates/JPY.json)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "AUD": {
@@ -125,10 +125,10 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hike",
+      "bias": "cut",
       "biasSource": "RBA Table F1 AONIA (FIRMMCRIIA · daily) vs cash rate target",
-      "biasMethod": "heuristic",
-      "biasUpdated": "2026-04-13",
+      "biasMethod": "ois",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "CAD": {
@@ -154,7 +154,7 @@
       "bias": "hold",
       "biasSource": "BoC Valet API (CORRA overnight V122514)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "CHF": {
@@ -174,7 +174,7 @@
       "bias": "hold",
       "biasSource": "SNB data portal SARON (snbgwdzid · daily) vs sight deposit rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     },
     "NZD": {
@@ -198,7 +198,7 @@
       "bias": "hike",
       "biasSource": "FRED IR3TIB01NZM156N (NZ 3M interbank, OECD) vs OCR",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-13",
+      "biasUpdated": "2026-04-14",
       "cutProb": null
     }
   }
