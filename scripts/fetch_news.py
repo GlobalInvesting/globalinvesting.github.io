@@ -1,7 +1,45 @@
 #!/usr/bin/env python3
 """
-fetch_news.py — v5.9
+fetch_news.py — v5.11
 Obtiene noticias forex desde múltiples fuentes RSS (EN) y genera news.json.
+
+CAMBIOS v5.11 (sobre v5.10):
+  CALIDAD DE FUENTES — AUDITORÍA Y ADICIÓN:
+    · InstaForex removido completamente (2 feeds: news + analytics).
+      Razón: broker retail ruso sin producción editorial propia. Los artículos eran
+      siempre impact=low (forzado en v5.4) con cap de 2 — contribución neta mínima
+      que no justifica el fetch. Eliminados feeds, constante INSTAFOREX_MAX, contador
+      instaforex_count, lógica de cap, y referencia en FOREX_SOURCES.
+    · InvestingLive reducido: de 3 feeds a 2. Feed raíz /feed/ eliminado —
+      duplica contenido de /feed/centralbank/ y /feed/technicalanalysis/ con artículos
+      de menor relevancia FX. Los 2 feeds restantes reclasificados como
+      TECHNICAL_ANALYSIS_SOURCES: el TA puro se capará a "med"; artículos de
+      bancos centrales con keywords macro mantienen "high".
+    · Marc to Market añadido (1 feed): marctomarket.com — blog diario de Marc Chandler,
+      ex-jefe global de estrategia FX en HSBC y Brown Brothers Harriman (14 años),
+      actual Chief Market Strategist en Bannockburn Global Forex. Publica análisis macro
+      FX diario con cobertura de CBs, política monetaria y flujos de capital. Nivel
+      institucional equivalente a un estratega senior de sell-side. Feed: Blogger RSS
+      estándar en /feeds/posts/default. No clasificado en TECHNICAL_ANALYSIS_SOURCES —
+      es análisis macro fundamental, no TA de precio.
+
+CAMBIOS v5.10 (sobre v5.9):
+  CORRECCIONES DE CLASIFICACIÓN Y FUENTES:
+    · DailyForex split: "DailyForex" (forexnews.xml — macro/CB) separado de
+      "DailyForex TA" (technicalanalysis.xml + fundamentalanalysis.xml — TA puro).
+      Fix crítico: antes ambos subsets compartían source="DailyForex", lo que causaba
+      que el cap TECHNICAL_ANALYSIS_SOURCES afectara también al feed macro forexnews.xml.
+      Ahora solo "DailyForex TA" está en TECHNICAL_ANALYSIS_SOURCES; "DailyForex" macro
+      se comporta como ForexLive/FXStreet sin cap de TA.
+    · DailyForex forexarticles.xml removido: feed evergreen/educativo (estrategias,
+      tutoriales) — no aporta contenido de mercado en tiempo real. Elimina ruido de
+      artículos sin relación con el movimiento de divisas actual.
+    · DailyFX (3 feeds) removidos: dailyfx.com redirige a ig.com/uk — los feeds
+      dailyfx.com/feeds/* no devuelven XML válido. URLs inactivos confirmados.
+      Pendiente: verificar si ig.com expone feeds RSS directos; añadir en v5.11 si se
+      confirma un URL activo.
+    · Bank of Canada URL corregido: de bankofcanada.ca/rss/press-releases/ (404) a
+      bankofcanada.ca/feed/?content_type=press-releases (WordPress CMS correcto).
 
 CAMBIOS v5.9 (sobre v5.8):
   FUENTES EN ESPAÑOL — ELIMINADAS:
@@ -73,7 +111,7 @@ GUARANTEED_PER_CUR    = 3
 MAX_PER_CUR           = 10         # v5.8: subido de 8; USD puede tener más artículos en días de eventos geopolíticos
 OUTPUT_FILE           = "news-data/news.json"
 IMPACT_ORDER          = {"high": 0, "med": 1, "low": 2}
-INSTAFOREX_MAX        = 2           # v5.4: InstaForex limitado a 2 artículos por ejecución
+INSTAFOREX_MAX        = 2           # v5.4: InstaForex limitado a 2 artículos por ejecución — ELIMINADO en v5.11 (InstaForex removido)
 # FIX C-01: CURRENCIES importado desde fx_config.py (ver imports al inicio del archivo)
 FETCH_TIMEOUT         = 12
 FETCH_WORKERS         = 14          # v5.3: subido para más feeds en paralelo
@@ -340,22 +378,22 @@ FEEDS = [
     { "source": "ForexLive",        "url": "https://www.forexlive.com/feed/analysis",                         "lang": "en" },
     { "source": "ECB",              "url": "https://www.ecb.europa.eu/rss/press.html",                        "lang": "en" },
     { "source": "Bank of England",  "url": "https://www.bankofengland.co.uk/rss/news",                        "lang": "en" },
+    # v5.10: split — "DailyForex" (macro) no tiene cap TA; "DailyForex TA" sí
+    # forexarticles.xml removido (evergreen/educativo, no market-moving)
     { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexnews.xml",                   "lang": "en" },
-    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/forexarticles.xml",               "lang": "en" },
-    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/technicalanalysis.xml",           "lang": "en" },
-    { "source": "DailyForex",       "url": "https://www.dailyforex.com/rss/fundamentalanalysis.xml",         "lang": "en" },
+    { "source": "DailyForex TA",    "url": "https://www.dailyforex.com/rss/technicalanalysis.xml",           "lang": "en" },
+    { "source": "DailyForex TA",    "url": "https://www.dailyforex.com/rss/fundamentalanalysis.xml",         "lang": "en" },
     { "source": "ActionForex",      "url": "https://www.actionforex.com/category/live-comments/feed/",        "lang": "en" },
     { "source": "ActionForex",      "url": "https://www.actionforex.com/category/action-insight/feed/",       "lang": "en" },
+    # v5.11: InvestingLive reducido — feed raíz /feed/ eliminado (duplica contenido con menor relevancia FX).
+    # Reclasificado en TECHNICAL_ANALYSIS_SOURCES: TA puro → "med"; CB/macro → "high".
     { "source": "InvestingLive",    "url": "https://investinglive.com/feed/centralbank/",                     "lang": "en" },
     { "source": "InvestingLive",    "url": "https://investinglive.com/feed/technicalanalysis/",               "lang": "en" },
-    { "source": "InvestingLive",    "url": "https://investinglive.com/feed/",                                  "lang": "en" },
     { "source": "MyFXBook",         "url": "https://www.myfxbook.com/rss/latest-forex-news",                  "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Technical.rss",               "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Fundamental.rss",             "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Opinion.rss",                 "lang": "en" },
     { "source": "Investing.com",    "url": "https://www.investing.com/rss/forex_Signals.rss",                 "lang": "en" },
-    { "source": "InstaForex",       "url": "https://news.instaforex.com/news",                                "lang": "en" },
-    { "source": "InstaForex",       "url": "https://news.instaforex.com/analytics",                           "lang": "en" },
     { "source": "BabyPips",         "url": "https://www.babypips.com/feed.rss",                               "lang": "en" },
     { "source": "InvestMacro",      "url": "https://investmacro.com/feed/",                                    "lang": "en" },
     { "source": "ForexCrunch",      "url": "https://forexcrunch.com/feed/",                                    "lang": "en" },
@@ -372,8 +410,8 @@ FEEDS = [
     # Forzado a USD — cualquier comunicado de la Fed es directamente relevante para USD.
     { "source": "Federal Reserve",  "url": "https://www.federalreserve.gov/feeds/speeches.xml",               "lang": "en" },
     { "source": "Federal Reserve",  "url": "https://www.federalreserve.gov/feeds/press_monetary.xml",         "lang": "en" },
-    # Bank of Canada: fuente primaria oficial BoC
-    { "source": "Bank of Canada",   "url": "https://www.bankofcanada.ca/rss/press-releases/",                  "lang": "en" },
+    # Bank of Canada: fuente primaria oficial BoC — v5.10: URL corregido (WordPress CMS)
+    { "source": "Bank of Canada",   "url": "https://www.bankofcanada.ca/feed/?content_type=press-releases",  "lang": "en" },
 
     # ── INGLÉS — fuentes de análisis (v5.2) ─────────────────────────────────
     { "source": "MarketPulse",      "url": "https://www.marketpulse.com/feed/",                               "lang": "en" },
@@ -385,12 +423,16 @@ FEEDS = [
     { "source": "FX Empire",        "url": "https://www.fxempire.com/api/v1/en/articles/rss?category=forecast", "lang": "en" },
     { "source": "Barchart",         "url": "https://www.barchart.com/news/rss/financials/fx",                   "lang": "en" },
 
-    # ── INGLÉS — fuentes institucionales de primer orden añadidas (v5.9) ─────
-    # DailyFX: propiedad de IG Group — cobertura institucional de mercados FX en tiempo real.
-    # Clasificado como TECHNICAL_ANALYSIS_SOURCES: TA puro → "med"; macro/CB/geopolítico → "high".
-    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/all",                               "lang": "en" },
-    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/market-news",                       "lang": "en" },
-    { "source": "DailyFX",          "url": "https://www.dailyfx.com/feeds/top-stories",                       "lang": "en" },
+    # ── INGLÉS — análisis macro institucional añadido (v5.11) ────────────────
+    # Marc to Market: blog diario de Marc Chandler, ex-jefe global FX strategy en HSBC
+    # y Brown Brothers Harriman (14 años). Actual CMO en Bannockburn Global Forex.
+    # Nivel sell-side senior: análisis macro FX, política monetaria, flujos de capital.
+    # Quoted en FT, WSJ, Barron's, Bloomberg. Publica todos los días de mercado.
+    # NO en TECHNICAL_ANALYSIS_SOURCES — es macro fundamental, no análisis de precio.
+    { "source": "Marc to Market",   "url": "https://www.marctomarket.com/feeds/posts/default",                 "lang": "en" },
+
+    # v5.10: DailyFX (3 feeds) removidos — dailyfx.com/feeds/* redirige a ig.com/uk,
+    # los URLs no devuelven XML válido. Pendiente verificar feeds RSS en ig.com para v5.11.
 
     # ── GOOGLE NEWS vía NewsData.io API — 1 query por divisa (v5.7) ──────────
     # NewsData.io: plan gratuito: 200 créditos/día, sin delay.
@@ -455,11 +497,12 @@ MED_IMPACT_KW = [
 
 # Sources that primarily produce technical analysis — TA-only articles
 # get impact capped at "med" unless they contain genuine macro/CB keywords.
-# v5.9: DailyFX added — IG Group's institutional FX platform publishes both real-time
-# macro news (should be "high") and TA/price level articles (cap at "med").
-# DailyForex added — now has dedicated technicalanalysis.xml and fundamentalanalysis.xml
-# feeds; TA/FA-only articles capped at "med", genuine macro/CB articles keep "high".
-TECHNICAL_ANALYSIS_SOURCES = {"Barchart", "BabyPips", "InvestMacro", "ForexCrunch", "DailyFX", "DailyForex"}
+# v5.10: "DailyForex TA" replaces "DailyForex" — only the TA/FA feeds are capped;
+# the macro forexnews.xml feed runs as plain "DailyForex" without TA cap.
+# DailyFX removed (feeds inactive — URLs redirect to ig.com/uk).
+# v5.11: InvestingLive added — centralbank/ and technicalanalysis/ feeds produce
+# mixed content; TA articles capped at "med", CB/macro articles kept at "high".
+TECHNICAL_ANALYSIS_SOURCES = {"Barchart", "BabyPips", "InvestMacro", "ForexCrunch", "DailyForex TA", "InvestingLive"}
 TA_MACRO_OVERRIDE_KW = [
     "central bank", "federal reserve", "ecb", "boe", "boj", "rba", "rbnz", "boc", "snb",
     "rate decision", "rate hike", "rate cut", "fomc", "inflation", "cpi", "gdp",
@@ -489,13 +532,13 @@ SOURCE_CURRENCY = {
 }
 
 FOREX_SOURCES = {
-    "FXStreet", "ForexLive", "DailyForex",
+    "FXStreet", "ForexLive", "DailyForex", "DailyForex TA",
     "ECB", "Bank of England", "Bank of Japan", "RBA", "RBNZ", "SNB",
     "Federal Reserve", "Bank of Canada",
     "ActionForex", "InvestingLive", "MyFXBook",
-    "Investing.com", "InstaForex", "BabyPips", "InvestMacro", "ForexCrunch",
+    "Investing.com", "BabyPips", "InvestMacro", "ForexCrunch",
     "MarketPulse", "Reuters FX", "Reuters Markets", "Nasdaq FX", "FX Empire",
-    "Barchart", "DailyFX",
+    "Barchart", "Marc to Market",
     # v5.7: NewsData API
     "NewsData USD", "NewsData EUR", "NewsData GBP", "NewsData JPY",
     "NewsData AUD", "NewsData CAD", "NewsData CHF", "NewsData NZD",
@@ -877,7 +920,7 @@ def main():
     filtered_quality     = 0
     filtered_relevance   = 0
     filtered_no_currency = 0
-    instaforex_count     = 0          # v5.4: contador para cap de InstaForex
+    # v5.11: instaforex_count removed — InstaForex feeds eliminated
 
     print(f"[{now_utc.strftime('%Y-%m-%d %H:%M')} UTC] fetch_news.py v5.7 — {len(FEEDS)} feeds")
 
@@ -954,13 +997,6 @@ def main():
                 continue
 
             impact    = detect_impact(title, summary)
-
-            # v5.4: InstaForex — forzar impacto low y limitar a INSTAFOREX_MAX artículos
-            if source == "InstaForex":
-                impact = "low"
-                if instaforex_count >= INSTAFOREX_MAX:
-                    continue
-                instaforex_count += 1
 
             # v5.8: TA sources — cap impact at "med" unless article contains genuine
             # macro/CB/geopolitical keywords (those remain "high" as-is).
