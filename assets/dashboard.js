@@ -5869,10 +5869,15 @@ function maybeNotifyNewSignals(signals) {
   if (!sigNotifEnabled()) return;
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   const fp     = sigFingerprint(signals);
+  if (!fp) return;
   const lastFp = localStorage.getItem(SIG_NOTIF_SEEN_KEY) || '';
-  if (fp === lastFp || !fp) return;
+  if (!lastFp) {
+    // First load — record baseline only, no notification
+    localStorage.setItem(SIG_NOTIF_SEEN_KEY, fp);
+    return;
+  }
+  if (fp === lastFp) return;
   localStorage.setItem(SIG_NOTIF_SEEN_KEY, fp);
-  if (!lastFp) return;   // first load — record baseline, don't notify
   const critCount = signals.filter(s => s.priority === 'critical').length;
   const warnCount = signals.filter(s => s.priority === 'warning').length;
   const parts = [];
@@ -6071,7 +6076,14 @@ async function alertsCheck() {
 
 function initAlerts() {
   alertsRender(null);
-  alertsCheck();
+  // Delay the initial check so fetchRiskData / fetchCrossAssetData have time to
+  // populate STOOQ_RT_CACHE before alertsCurrentValue() reads from it.
+  // Without this, the very first check always returns cur==null for every price
+  // alert and silently skips them — the 5-min interval then works correctly, but
+  // the first evaluation on page load is always a no-op.
+  // 8 s is well within the observed p95 round-trip for fetchQuoteBarRT (~2–3 s)
+  // and fetchRiskData (~3–5 s), so the cache is reliably warm by then.
+  setTimeout(alertsCheck, 8000);
   setInterval(alertsCheck, 5 * 60 * 1000);
 
   // Init signal notification button state from localStorage
