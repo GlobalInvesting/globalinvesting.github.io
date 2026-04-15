@@ -179,7 +179,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #layout{display:grid;grid-template-columns:180px 1fr 220px;height:calc(100vh - 92px);overflow:hidden}
 #sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;font-size:11px}
 #main{overflow-y:auto;overflow-x:hidden;background:var(--bg);display:flex;flex-direction:column;min-width:0}
-#narrative{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 10px;display:flex;gap:10px;align-items:flex-start;min-height:54px}
+#narrative{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 10px;display:flex;gap:10px;align-items:flex-start;min-height:54px;height:auto}
 .panel{border-bottom:1px solid var(--border)}
 .panel-head{background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between}
 .panel-title{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
@@ -197,7 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #news-ticker{display:none}
 #layout{display:flex;flex-direction:column;height:auto;overflow:visible}
 #main{overflow-y:visible;overflow-x:hidden}
-#narrative{height:auto;min-height:84px;overflow:hidden;flex-direction:column;gap:6px}
+#narrative{height:auto;min-height:96px;flex-direction:column;gap:6px}
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
