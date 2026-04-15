@@ -367,8 +367,7 @@
     font-size: 12px; color: var(--text); line-height: 1.5; flex: 1;
     font-family: var(--font-ui); word-wrap: break-word; overflow-wrap: break-word;
     white-space: normal; min-width: 0;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: block;
   }
   .narr-regime {
     font-size: 10px; font-weight: 700;
@@ -805,7 +804,7 @@
     /* Narrative: stack label on top, full width text */
     #narrative { flex-direction: column; gap: 6px; }
     .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; }
-    .narr-text { font-size: 11px; width: 100%; -webkit-line-clamp: 3; }
+    .narr-text { font-size: 11px; width: 100%; }
     .narr-regime { align-self: flex-start; }
 
     /* 2-col grids that should become 1-col on mobile */
