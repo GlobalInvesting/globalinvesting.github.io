@@ -1,55 +1,55 @@
 [
   {
-    "time": "19:25",
+    "time": "20:40",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY holds near 159.00, BoJ intervention risk rising as it approaches the 160.00 level that has previously triggered verbal warnings",
+    "text": "USD/JPY testing 159.00 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 159.0",
+      "USD/JPY: 158.96",
       "BoJ rate: 0.75%",
-      "VIX: 17.9"
+      "VIX: 18.2"
     ]
   },
   {
-    "time": "19:23",
+    "time": "20:38",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "EUR/USD long positioning at 77.3% in CFTC data, watch for potential squeeze as ECB policymakers are wary of April rate hike",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1801",
     "evidence": [
-      "EUR/USD: 1.1805",
-      "CFTC EUR net: +1,029",
-      "ECB rate: 2%"
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)",
+      "EUR/USD: 1.1801"
     ]
   },
   {
-    "time": "19:20",
+    "time": "20:35",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD retail sentiment at 90% short, contrarian reversal risk as RBA is hiking rates — AUD carry supported",
+    "text": "AUD/USD long% at 71.1% — institutional positioning divergence risk",
     "evidence": [
-      "AUD/USD: 0.7174",
-      "RBA rate: 4.10%",
-      "Myfxbook AUD/USD sentiment: 10% long / 90% short"
+      "AUD net long: +41,458",
+      "AUD long%: 71.1%",
+      "CFTC AUD positioning: week ending 2026-04-07"
     ]
   },
   {
-    "time": "19:18",
+    "time": "20:32",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 17.9 signals normal volatility — risk-on environment, S&P 500 up +0.80%",
+    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +0.80%",
     "evidence": [
-      "VIX: 17.9",
+      "VIX: 18.2",
       "S&P 500: 7,023",
-      "DXY: 98.06"
+      "1D:+0.80%"
     ]
   },
   {
-    "time": "19:15",
+    "time": "20:29",
     "priority": "info",
-    "title": "USD/JPY Correlation Break",
-    "text": "USD/JPY vs VIX correlation breaks at +1.38σ, JPY no longer acting as safe haven",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, z=+1.38σ",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.678",
+      "USD/JPY vs VIX: corr=+0.680",
       "norm=+0.141",
       "z=+1.38σ"
     ]
