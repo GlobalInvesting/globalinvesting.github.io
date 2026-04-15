@@ -1,0 +1,147 @@
+name: Update Intraday Quotes — v1.4 (Twelve Data + Alpha Vantage)
+
+# ESTRATEGIA DE TRIGGER — v1.4
+#
+# El cron nativo de GitHub Actions (schedule) NO es confiable para intervalos cortos:
+# en la práctica salta ejecuciones bajo carga del sistema de GitHub.
+#
+# Solución: cron-job.org (gratuito) actúa como reloj externo y dispara este workflow
+# exactamente cada 5 minutos vía HTTP POST al endpoint de repository_dispatch.
+#
+# FLUJO:
+#   cron-job.org (cada 5 min)
+#     → POST https://api.github.com/repos/<owner>/<repo>/dispatches
+#     → event_type: "trigger-intraday-quotes"
+#     → Este workflow se ejecuta ✅
+#
+# El schedule de GitHub se mantiene como RED DE SEGURIDAD (fallback),
+# pero corriendo solo cada 5 min — así si cron-job.org falla, el gap máximo es 5 min.
+#
+# ✅ Duración promedio del job: ~30 seg → sin riesgo de solapamiento a 5 min de intervalo.
+#
+# SETUP REQUERIDO (una sola vez):
+#   1. Crear un Personal Access Token (PAT) en GitHub:
+#      → GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+#      → Permissions: "Actions" = Read and Write  (o "workflows" + "contents")
+#      → Guardar el token como secret CRONJOB_PAT en este repo
+#
+#   2. Crear un job en https://cron-job.org con:
+#      → URL:    https://api.github.com/repos/<OWNER>/<REPO>/dispatches
+#      → Method: POST
+#      → Headers:
+#            Authorization: Bearer <tu-PAT>
+#            Accept: application/vnd.github+json
+#            Content-Type: application/json
+#            X-GitHub-Api-Version: 2022-11-28
+#      → Body:   {"event_type":"trigger-intraday-quotes"}
+#      → Schedule: cada 5 minutos
+#
+# ✅ cron-job.org free tier: hasta 60 jobs, ejecuciones cada 1 min mínimo — más que suficiente.
+# ✅ yfinance sin límite formal. Twelve Data fallback: < 10 calls/día del free tier (800/día).
+#
+# API usage estimate (24/7 a 5 min):
+#   288 runs/día × 1 batch yfinance call = 288 calls yfinance (sin límite formal) ✅
+#   Twelve Data: solo fallback gold → estimado < 10 calls/día ✅
+
+on:
+  repository_dispatch:
+    types: [trigger-intraday-quotes]   # ← disparado por cron-job.org cada 5 min exactos
+
+  # schedule eliminado (v7.14.4): el cron de GitHub cada 15 min colisionaba con
+  # cron-job.org cada 5 min → dos runs simultáneos intentaban push al mismo
+  # quotes.json → git rebase fallaba las 4 veces → exit 1 → email de fallo repetido.
+  # cron-job.org es suficiente como reloj primario. Si falla, el gap máximo es
+  # el intervalo configurado en cron-job.org (5 min) — completamente aceptable.
+  #
+  # (v7.14.5): el exit 1 del paso de push fue reemplazado por exit 0.
+  # Un fallo de push no es fatal: el siguiente run (5 min) trae datos frescos.
+  # exit 1 → GitHub envía email de fallo; exit 0 → silencioso. Sin impacto en datos.
+
+  workflow_dispatch:                   # trigger manual desde GitHub UI
+
+concurrency:
+  group: update-intraday-quotes
+  cancel-in-progress: false            # no cancelar un fetch en curso — esperar
+
+permissions:
+  contents: write                      # necesario para hacer git push al mismo repo
+
+jobs:
+  fetch-intraday-quotes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance requests --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p intraday-data
+
+      - name: Fetch intraday quotes
+        env:
+          TWELVE_DATA_API_KEY:   ${{ secrets.TWELVE_DATA_API_KEY }}
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          SITE_PATH: .
+        run: python3 scripts/fetch_intraday_quotes.py
+
+      - name: Commit and push quotes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add intraday-data/quotes.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit (data unchanged)"
+            exit 0
+          fi
+
+          TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
+          git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
+
+          # Push with up to 4 retries to handle race conditions with concurrent runs.
+          # Strategy: use git pull --rebase to integrate remote changes, then
+          # overwrite quotes.json with our freshly-fetched version and amend
+          # the commit so our data always wins on conflict.
+          for i in 1 2 3 4; do
+            echo "Push attempt $i..."
+            git push && echo "✅ Push succeeded" && exit 0
+
+            echo "Push rejected — pulling remote changes (attempt $i)..."
+
+            # Stash our commit's data before pulling
+            cp intraday-data/quotes.json /tmp/quotes_ours.json
+
+            # Pull with rebase — integrates remote commits cleanly
+            if ! git pull --rebase origin main; then
+              echo "Rebase conflict detected — aborting and using our data..."
+              git rebase --abort || true
+            fi
+
+            # Restore our freshly-fetched quotes (our data is always most current)
+            cp /tmp/quotes_ours.json intraday-data/quotes.json
+            git add intraday-data/quotes.json
+
+            # If the rebase left us with a clean tree (no commit to amend),
+            # create a new commit; otherwise amend the existing one.
+            if git diff --staged --quiet; then
+              echo "Remote already has equivalent data, nothing to push."
+              exit 0
+            fi
+            git commit -m "📈 Intraday quotes — ${TIMESTAMP}" || \
+              git commit --amend --no-edit
+
+          done
+
+          # Exit 0 (not 1) — a push failure is not fatal: the next cron-job.org
+          # dispatch (5 min) will bring fresh data. Exiting with 1 sends GitHub
+          # failure-notification emails on every collision, which pollutes the inbox.
+          echo "⚠️  All push attempts failed — data will refresh on next run (no email sent)."
+          exit 0
