@@ -1171,7 +1171,39 @@ def main():
         print(f"[IV-Rank] Error computing IV history/rank: {_e}")
 
     # PASO 8: Historical VaR 95% and CVaR 95% per instrument
-    var_cvar_data = fetch_var_cvar()
+    # Throttle: only recompute once per calendar day (UTC). VaR uses 252 days of
+    # daily closes — running it every 5 minutes is wasteful and the download can
+    # time out under load, silently wiping the last good values with an empty dict.
+    # Strategy:
+    #   1. Load the existing quotes.json to recover the last good var_cvar.
+    #   2. If the existing data was computed today (UTC), reuse it (skip fetch).
+    #   3. Otherwise run fetch_var_cvar(); if it returns a non-empty result, use it.
+    #   4. If it returns empty (download failure), fall back to the preserved value.
+    _prev_var_cvar = {}
+    _prev_var_date = None
+    try:
+        if os.path.exists(out_file):
+            with open(out_file) as _pf:
+                _prev = json.load(_pf)
+            _prev_var_cvar = _prev.get("var_cvar") or {}
+            _prev_ts = _prev.get("updated", "")
+            _prev_var_date = _prev_ts[:10] if _prev_ts else None  # "YYYY-MM-DD"
+    except Exception:
+        pass
+
+    _today_utc = ts[:10]  # "YYYY-MM-DD" from the current run timestamp
+
+    if _prev_var_cvar and _prev_var_date == _today_utc:
+        # Already computed today — reuse without fetching
+        var_cvar_data = _prev_var_cvar
+        print(f"[VaR/CVaR] Reusing today's cached result ({len(var_cvar_data)} instruments)")
+    else:
+        # New day (or first run) — fetch fresh data
+        var_cvar_data = fetch_var_cvar()
+        if not var_cvar_data and _prev_var_cvar:
+            # Fetch failed; preserve last good values rather than writing empty dict
+            var_cvar_data = _prev_var_cvar
+            print(f"[VaR/CVaR] Fetch returned empty — preserving last good data ({len(var_cvar_data)} instruments)")
 
     output = {"updated": ts, "source": source_label, "quotes": quotes,
               "hv30": hv30_output, "correlations": correlations,
