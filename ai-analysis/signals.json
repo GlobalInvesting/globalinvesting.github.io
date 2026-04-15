@@ -1,57 +1,57 @@
 [
   {
-    "time": "11:30",
+    "time": "14:09",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY trading above 158.00, approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 159.00 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 158.96",
+      "USD/JPY: 158.98",
       "BoJ rate: 0.75%",
-      "VIX: 18.2"
+      "VIX: 17.8"
     ]
   },
   {
-    "time": "11:28",
+    "time": "14:07",
     "priority": "warning",
-    "title": "Geopolitical Risk",
-    "text": "IRGC warns to stop all imports and exports in the Gulf of Oman if US continues blockade, driving crude bid and supporting commodity bloc (AUD, CAD, NOK); monitor for supply-shock escalation.",
+    "title": "EUR/USD",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1799",
     "evidence": [
-      "WTI Oil: $92.6",
-      "USD/JPY: 158.96",
-      "VIX: 18.2"
+      "EUR/USD: 1.1799",
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)"
     ]
   },
   {
-    "time": "11:25",
+    "time": "14:05",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% long, a multi-year extreme; watch for potential long squeeze, especially if ECB guidance surprises.",
+    "title": "AUD/USD",
+    "text": "AUD/USD long positioning extreme at 71.1% — watch for potential squeeze",
     "evidence": [
-      "CFTC EUR net: +1,029",
-      "EUR/USD: 1.178",
-      "ECB rate: 2%"
+      "AUD/USD: 0.7147",
+      "CFTC AUD net: +41,458",
+      "CFTC AUD long%: 71.1%"
     ]
   },
   {
-    "time": "11:20",
+    "time": "14:02",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +1.18%.",
+    "text": "VIX at 17.8 signals normal volatility — risk-on environment, S&P 500 up +0.17%",
     "evidence": [
-      "VIX: 18.2",
-      "S&P 500: 6,967",
-      "DXY: 98.24"
+      "VIX: 17.8",
+      "S&P 500: 6,979",
+      "DXY: 98.15"
     ]
   },
   {
-    "time": "11:15",
+    "time": "13:59",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7137, supported by RBA hiking rates — AUD carry supported.",
+    "title": "Cross-Asset Correlation",
+    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven",
     "evidence": [
-      "AUD/USD: 0.7137",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.256%"
+      "USD/JPY vs VIX: corr=+0.677",
+      "norm=+0.141",
+      "z=+1.37σ"
     ]
   }
 ]
