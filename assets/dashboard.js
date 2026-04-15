@@ -2875,7 +2875,7 @@ document.querySelectorAll('#cross-asset-grid .ca-cell[data-sym]').forEach(cell =
 
 // ── Risk Monitor VIX cell: click to open chart ──
 document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('click', () => {
-  loadTVChart('CAPITALCOM:VIX');
+  loadTVChart('FXOPEN:VIX');
 });
 
 // ═══════════════════════════════════════════════════════════════════
