@@ -1318,7 +1318,11 @@ a:focus-visible,
 .alp-close:hover { color: var(--text); }
 .alp-rows {
   max-height: 180px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
 }
+.alp-rows::-webkit-scrollbar { width: 3px; }
+.alp-rows::-webkit-scrollbar-track { background: transparent; }
+.alp-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 .alp-add {
   display: flex; gap: 4px; padding: 6px 8px;
   align-items: center; border-top: 1px solid var(--border);
