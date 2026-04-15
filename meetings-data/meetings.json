@@ -125,8 +125,8 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "cut",
-      "biasSource": "FRED IR3TIB01AUM156N (Australia 3M interbank, OECD) vs RBA target",
+      "bias": "hike",
+      "biasSource": "rates/AUD.json trajectory (RBA cash rate history)",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-15",
       "cutProb": null
