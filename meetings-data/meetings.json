@@ -125,9 +125,9 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hike",
-      "biasSource": "ASX 30-Day IB Futures implied yield (ASX PDF pdfminer.six → heuristic)",
-      "biasMethod": "heuristic",
+      "bias": "cut",
+      "biasSource": "FRED IR3TIB01AUM156N (Australia 3M interbank, OECD) vs RBA target",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-15",
       "cutProb": null
     },
