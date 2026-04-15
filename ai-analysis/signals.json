@@ -1,57 +1,57 @@
 [
   {
-    "time": "08:10",
+    "time": "09:55",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.83 resistance — BoJ intervention risk rising on a sustained break above 160.00",
+    "text": "USD/JPY testing 159.00 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 158.83",
+      "USD/JPY: 158.91",
       "BoJ rate: 0.75%",
-      "VIX: 18.0"
+      "VIX: 18.3"
     ]
   },
   {
-    "time": "08:08",
+    "time": "09:53",
     "priority": "warning",
-    "title": "WTI Oil / Geopolitical Risk",
-    "text": "WTI Oil picks up to $90.00 as US announces a total blockade of Hormuz — commodity bloc (AUD, CAD, NOK) supported; monitor for supply-shock escalation",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding above 0.7098 — RBA hiking rates supports AUD carry",
     "evidence": [
-      "WTI Oil: $90.8",
-      "USD/JPY: 158.83",
-      "AUD/USD: 0.7144"
+      "AUD/USD: 0.7139",
+      "RBA rate: 4.10%",
+      "CFTC AUD net: +41,458"
     ]
   },
   {
-    "time": "08:06",
+    "time": "09:51",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1791",
+    "text": "EUR/USD trading above 1.1765 — ECB-Fed rate differential weighs on pair",
     "evidence": [
-      "EUR/USD: 1.1791",
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%"
+      "EUR/USD: 1.1784",
+      "ECB rate: 2.00%",
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "08:04",
+    "time": "09:49",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 18.0 signals normal volatility — risk-on environment, S&P 500 up +1.18%",
+    "title": "VIX",
+    "text": "VIX at 18.3 signals normal volatility — risk-on environment, S&P 500 up +1.18%",
     "evidence": [
-      "VIX: 18.0",
+      "VIX: 18.3",
       "S&P 500: 6,967",
-      "DXY: 98.16"
+      "DXY: 98.20"
     ]
   },
   {
-    "time": "08:02",
+    "time": "09:47",
     "priority": "info",
-    "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7144",
+    "title": "Retail Sentiment",
+    "text": "AUD/USD sentiment extreme: 89% short — retail heavily positioned, watch for squeeze",
     "evidence": [
-      "AUD/USD: 0.7144",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.31%"
+      "AUD/USD sentiment: 89% short",
+      "CFTC AUD net: +41,458",
+      "AUD/USD: 0.7139"
     ]
   }
 ]
