@@ -1,57 +1,57 @@
 [
   {
-    "time": "22:35",
+    "time": "02:45",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk rising as USD/JPY approaches the 160.00 level; watch for verbal warnings.",
+    "text": "USD/JPY testing 159.03 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 158.82",
+      "USD/JPY: 159.03",
       "BoJ rate: 0.75%",
       "VIX: 18.4"
     ]
   },
   {
-    "time": "22:30",
+    "time": "02:42",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD long positioning at 71.1% — watch for potential squeeze as retail sentiment is extremely short at 89%.",
+    "text": "AUD/USD holding above 0.7127 — RBA hiking rates supports AUD carry, but watch for labour market impact from Iran war",
     "evidence": [
       "AUD/USD: 0.7127",
-      "CFTC AUD net: +41,458",
-      "Retail AUD/USD sentiment: 11% long / 89% short"
+      "RBA rate: 4.10%",
+      "US 10Y yield: 4.31%"
     ]
   },
   {
-    "time": "22:25",
+    "time": "02:40",
     "priority": "warning",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for implications on USD/JPY.",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading above 1.1787 — ECB- Fed rate differential weighs on pair, but EU data beats support EUR",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.680",
-      "z-score: +1.38σ",
-      "VIX: 18.4"
+      "EUR/USD: 1.1787",
+      "ECB rate: 2.00%",
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "22:20",
+    "time": "02:35",
     "priority": "info",
     "title": "VIX",
-    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.18%.",
+    "text": "VIX at 18.4 signals normal volatility — risk-on environment, S&P 500 up +1.18%",
     "evidence": [
       "VIX: 18.4",
       "S&P 500: 6,967",
-      "1D change: +1.18%"
+      "DXY: 98.23"
     ]
   },
   {
-    "time": "22:15",
+    "time": "02:30",
     "priority": "info",
-    "title": "Fed-ECB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (ON HOLD) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD.",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3% — institutional long bias, but watch for divergence with retail sentiment",
     "evidence": [
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%",
-      "EUR/USD: 1.1798"
+      "CFTC EUR net: +1,029",
+      "EUR/USD: 1.1787",
+      "VIX: 18.4"
     ]
   }
 ]
