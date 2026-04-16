@@ -962,6 +962,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   var upper  = document.getElementById('split-upper');   // left column
   var lower  = document.getElementById('split-lower');   // right column
 
+  // Alerts panel split-mode relocation
+  var alertsPanel       = document.getElementById('section-macro');
+  var alertsOrigParent  = alertsPanel ? alertsPanel.parentNode : null;
+  var alertsOrigNext    = alertsPanel ? alertsPanel.nextSibling : null;
+
   function applyState(active, leftPct){
     if(!main||!btn||!handle||!upper||!lower) return;
     if(active){
@@ -972,6 +977,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       var pct = leftPct || 55;
       upper.style.width = pct + '%';
       upper.style.flex  = 'none';
+      // Move alerts panel into left column (below heatmap)
+      if(alertsPanel && alertsPanel.parentNode !== upper){
+        upper.appendChild(alertsPanel);
+      }
     } else {
       main.classList.remove('split-layout');
       btn.classList.remove('active');
@@ -979,6 +988,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       handle.style.display = 'none';
       upper.style.width = '';
       upper.style.flex  = '';
+      // Restore alerts panel to original position in right column
+      if(alertsPanel && alertsOrigParent && alertsPanel.parentNode !== alertsOrigParent){
+        alertsOrigParent.insertBefore(alertsPanel, alertsOrigNext);
+      }
     }
   }
 
