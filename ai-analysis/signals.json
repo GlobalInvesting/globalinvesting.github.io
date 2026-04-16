@@ -1,57 +1,57 @@
 [
   {
-    "time": "17:20",
+    "time": "19:20",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY edges higher as geopolitical risks and policy divergence support the US Dollar; BoJ intervention risk rising near 160.00 level",
+    "text": "USD/JPY testing 159.18 resistance — BoJ intervention risk rising near 160.00 level",
     "evidence": [
-      "USD/JPY: 159.25",
+      "USD/JPY: 159.18",
       "BoJ rate: 0.75%",
-      "VIX: 18.7"
+      "VIX: 18.0"
     ]
   },
   {
-    "time": "17:18",
+    "time": "19:18",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD faces headwinds from extreme retail short bias; 90% of retail traders are short, watch for squeeze",
+    "text": "AUD/USD holding above 0.716 — RBA hiking rates supports AUD carry",
     "evidence": [
-      "AUD/USD: 0.7155",
-      "Retail sentiment: 10% long / 90% short",
-      "CFTC AUD net: +41,458"
+      "AUD/USD: 0.716",
+      "RBA rate: 4.10%",
+      "US 10Y yield: 4.309%"
     ]
   },
   {
-    "time": "17:15",
+    "time": "19:15",
     "priority": "warning",
-    "title": "Fed-ECB Policy Divergence",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD; rate divergence favours USD",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading below 1.1786 — Fed-ECB 175bp differential weighs on pair",
     "evidence": [
+      "EUR/USD: 1.1786",
       "Fed rate: 3.75%",
-      "ECB rate: 2.00%",
-      "EUR/USD: 1.1774"
+      "ECB rate: 2.00%"
     ]
   },
   {
-    "time": "17:12",
+    "time": "19:10",
     "priority": "info",
-    "title": "VIX and S&P 500",
-    "text": "VIX at 18.7 signals normal volatility — risk-on environment, S&P 500 up +0.02%",
+    "title": "Risk Regime",
+    "text": "VIX at 18.0 signals normal volatility — risk-on environment, S&P 500 up +0.16%",
     "evidence": [
-      "VIX: 18.7",
-      "S&P 500: 7,025",
-      "1D:+0.02%"
+      "VIX: 18.0",
+      "S&P 500: 7,034",
+      "DXY: 98.19"
     ]
   },
   {
-    "time": "17:08",
-    "priority": "info",
-    "title": "Cross-Asset Correlation Break",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
+    "time": "19:05",
+    "priority": "warning",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD extreme short retail sentiment — contrarian reversal risk, watch for squeeze",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.670",
-      "norm=+0.142",
-      "z=+1.35σ"
+      "AUD/NZD: 92% short",
+      "AUD/USD: 90% short",
+      "NZD/USD: 0.5892"
     ]
   }
 ]
