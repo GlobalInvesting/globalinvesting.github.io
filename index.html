@@ -177,8 +177,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
 #news-ticker{background:var(--head-bg);border-bottom:1px solid var(--border);height:22px;display:flex;align-items:center;overflow:hidden;flex-shrink:0}
 #layout{display:grid;grid-template-columns:180px 1fr 220px;height:calc(100vh - 92px);overflow:hidden}
-#sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;font-size:11px}
-#main{overflow-y:auto;overflow-x:hidden;background:var(--bg);display:flex;flex-direction:column;min-width:0}
+#sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;font-size:11px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#sidebar::-webkit-scrollbar{width:3px}
+#sidebar::-webkit-scrollbar-track{background:transparent}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#main{overflow-y:auto;overflow-x:hidden;background:var(--bg);display:flex;flex-direction:column;min-width:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#main::-webkit-scrollbar{width:3px}
+#main::-webkit-scrollbar-track{background:transparent}
+#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 #narrative{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 10px;display:flex;gap:10px;align-items:flex-start;flex-shrink:0;height:auto}
 .panel{border-bottom:1px solid var(--border)}
 .panel-head{background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between}
@@ -190,19 +196,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #tvcal-inner{min-height:350px}
 
 /* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
-#main.split-layout{display:flex;flex-direction:column;height:calc(100vh - 92px);overflow:hidden}
-#main.split-layout #split-upper{display:flex;flex-direction:column;overflow-y:auto;border-bottom:3px solid var(--border2);flex-shrink:0;height:45%;min-height:100px}
-#main.split-layout #split-lower{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;min-height:0;flex:1;}
-#main.split-layout #split-lower-left{overflow-y:auto;border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
-#main.split-layout #split-lower-right{overflow-y:auto;display:flex;flex-direction:column;min-height:0}
-#main.split-layout #tv-chart-wrap{height:320px;min-height:320px}
-.split-toggle-btn{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-family:var(--font-mono);font-weight:600;padding:2px 7px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);letter-spacing:.05em;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
-.split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
-.split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.1)}
-.split-drag-handle{height:4px;background:var(--border2);cursor:row-resize;flex-shrink:0;transition:background .1s;position:relative}
+/* SPLIT LAYOUT — vertical left/right split */
+#main.split-layout{display:flex;flex-direction:row;height:calc(100vh - 92px);overflow:hidden}
+#main.split-layout #split-upper{display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;width:55%;min-width:300px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#main.split-layout #split-upper::-webkit-scrollbar{width:3px}
+#main.split-layout #split-upper::-webkit-scrollbar-track{background:transparent}
+#main.split-layout #split-upper::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#main.split-layout #split-lower{display:flex;flex-direction:column;overflow-y:auto;flex:1;min-width:0;border-left:1px solid var(--border2);scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#main.split-layout #split-lower::-webkit-scrollbar{width:3px}
+#main.split-layout #split-lower::-webkit-scrollbar-track{background:transparent}
+#main.split-layout #split-lower::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#main.split-layout #split-lower-left{display:contents}
+#main.split-layout #split-lower-right{display:contents}
+#main.split-layout #tv-chart-wrap{height:300px;min-height:300px}
+/* drag handle — vertical bar between left and right */
+.split-drag-handle{width:4px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .1s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
-.split-drag-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:2px;border-radius:1px;background:var(--border2);transition:background .1s}
+.split-drag-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:28px;width:2px;border-radius:1px;background:var(--border2);transition:background .1s}
 .split-drag-handle:hover::after,.split-drag-handle.dragging::after{background:var(--blue)}
+/* toggle btn — subtle icon only */
+.split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0}
+.split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
+.split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.08)}
 .tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
 @media(max-width:900px){
 #topbar{height:auto;flex-wrap:wrap;padding:0 6px}
@@ -409,9 +424,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;">
           <span class="panel-title">Price Chart</span>
           <span class="panel-sub">TradingView · live data</span>
-          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout: chart on top, data panels below" aria-pressed="false" style="margin-left:auto;">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="1" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="1" y="6.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="6.5" y="6.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/></svg>
-            Split
+          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout" style="margin-left:6px;">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0.5" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/><rect x="6" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/></svg>
           </button>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
@@ -450,6 +464,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="tradingview-widget-copyright" style="display:none;"></div>
           <!-- TV chart loaded lazily — see initLazyWidgets() in dashboard.js -->
         </div>
+      </div>
+    </div><!-- /#split-upper chart panel -->
+
+    <!-- CURRENCY STRENGTH HEATMAP — in left column, below chart -->
+    <div class="panel" id="split-upper-heatmap">
+      <div class="panel-head">
+        <span class="panel-title">Currency Strength Heatmap</span>
+        <span class="panel-sub">Relative performance vs USD basket · ECB daily</span>
+      </div>
+      <div class="heatmap" id="heatmap-grid">
+        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
+        <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
       </div>
     </div>
 
@@ -496,25 +529,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-
-    <!-- CURRENCY STRENGTH HEATMAP — computed from Frankfurter data -->
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-title">Currency Strength Heatmap</span>
-        <span class="panel-sub">Relative performance vs USD basket · ECB daily</span>
-      </div>
-      <div class="heatmap" id="heatmap-grid">
-        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
-        <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
-      </div>
-    </div><!-- /#section-rates -->
 
       </div><!-- /#split-lower-left -->
       <div id="split-lower-right">
@@ -940,97 +954,90 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <!-- TradingView lazy-loader and IntersectionObserver logic moved to assets/dashboard.js (initTVWidgets) -->
 
-<!-- SPLIT LAYOUT JS — toggle + drag handle resize -->
+<!-- SPLIT LAYOUT JS — vertical left/right toggle + drag handle resize -->
 <script>
 (function(){
   var LS_KEY = 'gi_split_layout';
-  var main = document.getElementById('main');
-  var btn  = document.getElementById('split-layout-btn');
+  var main   = document.getElementById('main');
+  var btn    = document.getElementById('split-layout-btn');
   var handle = document.getElementById('split-drag-handle');
-  var upper  = document.getElementById('split-upper');
-  var lower  = document.getElementById('split-lower');
+  var upper  = document.getElementById('split-upper');   // left column
+  var lower  = document.getElementById('split-lower');   // right column
 
-  function applyState(active, upperPct){
+  function applyState(active, leftPct){
     if(!main||!btn||!handle||!upper||!lower) return;
     if(active){
       main.classList.add('split-layout');
       btn.classList.add('active');
       btn.setAttribute('aria-pressed','true');
       handle.style.display = '';
-      var pct = upperPct || 45;
-      upper.style.height = pct + '%';
-      upper.style.flex = 'none';
-      lower.style.height = (100 - pct) + '%';
+      var pct = leftPct || 55;
+      upper.style.width = pct + '%';
+      upper.style.flex  = 'none';
     } else {
       main.classList.remove('split-layout');
       btn.classList.remove('active');
       btn.setAttribute('aria-pressed','false');
       handle.style.display = 'none';
-      upper.style.height = '';
-      upper.style.flex   = '';
-      lower.style.height = '';
+      upper.style.width = '';
+      upper.style.flex  = '';
     }
   }
 
   // Restore saved state
   try {
     var saved = JSON.parse(localStorage.getItem(LS_KEY)||'null');
-    if(saved && saved.active) applyState(true, saved.upperPct||45);
+    if(saved && saved.active) applyState(true, saved.leftPct||55);
   } catch(e){}
 
   if(btn){
     btn.addEventListener('click', function(){
       var isActive = main.classList.contains('split-layout');
-      var newState = !isActive;
-      applyState(newState, 45);
-      try { localStorage.setItem(LS_KEY, JSON.stringify({active:newState, upperPct:45})); } catch(e){}
+      applyState(!isActive, 55);
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
     });
   }
 
-  // Drag handle resize
+  // Horizontal drag handle resize
   if(handle){
-    var dragging = false, startY = 0, startUpperH = 0;
+    var dragging = false, startX = 0, startW = 0;
     handle.addEventListener('mousedown', function(e){
       dragging = true;
-      startY = e.clientY;
-      startUpperH = upper.offsetHeight;
+      startX = e.clientX;
+      startW = upper.offsetWidth;
       handle.classList.add('dragging');
       document.body.style.userSelect = 'none';
       e.preventDefault();
     });
     document.addEventListener('mousemove', function(e){
       if(!dragging) return;
-      var dy = e.clientY - startY;
-      var mainH = main.offsetHeight;
-      var newH = Math.min(Math.max(startUpperH + dy, 100), mainH - 80);
-      var pct = (newH / mainH * 100).toFixed(1);
-      upper.style.height = pct + '%';
-      lower.style.height = (100 - pct) + '%';
+      var dx    = e.clientX - startX;
+      var mainW = main.offsetWidth;
+      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
+      var pct   = (newW / mainW * 100).toFixed(1);
+      upper.style.width = pct + '%';
     });
     document.addEventListener('mouseup', function(){
       if(!dragging) return;
       dragging = false;
       handle.classList.remove('dragging');
       document.body.style.userSelect = '';
-      var mainH = main.offsetHeight;
-      var pct = parseFloat((upper.offsetHeight / mainH * 100).toFixed(1));
-      try { localStorage.setItem(LS_KEY, JSON.stringify({active:true, upperPct:pct})); } catch(e){}
+      var pct = parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1));
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:pct})); } catch(e){}
     });
     // Touch support
     handle.addEventListener('touchstart', function(e){
       dragging = true;
-      startY = e.touches[0].clientY;
-      startUpperH = upper.offsetHeight;
+      startX = e.touches[0].clientX;
+      startW = upper.offsetWidth;
       handle.classList.add('dragging');
     }, {passive:true});
     document.addEventListener('touchmove', function(e){
       if(!dragging) return;
-      var dy = e.touches[0].clientY - startY;
-      var mainH = main.offsetHeight;
-      var newH = Math.min(Math.max(startUpperH + dy, 100), mainH - 80);
-      var pct = (newH / mainH * 100).toFixed(1);
-      upper.style.height = pct + '%';
-      lower.style.height = (100 - pct) + '%';
+      var dx    = e.touches[0].clientX - startX;
+      var mainW = main.offsetWidth;
+      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
+      upper.style.width = (newW / mainW * 100).toFixed(1) + '%';
     }, {passive:true});
     document.addEventListener('touchend', function(){
       if(!dragging) return;
