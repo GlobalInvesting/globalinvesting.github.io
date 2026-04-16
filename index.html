@@ -216,7 +216,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
 .split-drag-handle::after{display:none}
 /* toggle btn — subtle icon only */
-.split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0}
+.split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0;position:relative}
+#split-tip{position:absolute;top:calc(100% + 7px);right:0;background:var(--head-bg);border:1px solid var(--blue);border-radius:4px;padding:6px 9px;white-space:nowrap;font-size:10px;color:var(--text2);pointer-events:none;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;transform:translateY(-3px);transition:opacity .2s,transform .2s}
+#split-tip.visible{opacity:1;transform:translateY(0)}
+#split-tip::before{content:'';position:absolute;top:-5px;right:6px;width:8px;height:8px;background:var(--head-bg);border-left:1px solid var(--blue);border-top:1px solid var(--blue);transform:rotate(45deg)}
 .split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
 .split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.08)}
 .tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
@@ -427,6 +430,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="panel-sub">TradingView · live data</span>
           <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout" style="margin-left:6px;">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0.5" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/><rect x="6" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/></svg>
+            <div id="split-tip" role="tooltip">Toggle split view</div>
           </button>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
@@ -994,14 +998,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     }
   }
 
-  // Restore saved state
+  // Restore saved state — split layout is ON by default for first-time visitors
   try {
     var saved = JSON.parse(localStorage.getItem(LS_KEY)||'null');
-    if(saved && saved.active) applyState(true, saved.leftPct||55);
+    if(saved === null){
+      applyState(true, 55);
+      localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:55}));
+    } else if(saved.active){
+      applyState(true, saved.leftPct||55);
+    }
+  } catch(e){ applyState(true, 55); }
+
+  // Split tooltip — shown once to first-time visitors, dismissed on click
+  var TIP_KEY = 'gi_split_tip_seen';
+  var tip = document.getElementById('split-tip');
+  function hideTip(){
+    if(!tip) return;
+    tip.classList.remove('visible');
+    try { localStorage.setItem(TIP_KEY,'1'); } catch(e){}
+  }
+  try {
+    if(!localStorage.getItem(TIP_KEY) && tip){
+      setTimeout(function(){ tip.classList.add('visible'); }, 800);
+      setTimeout(function(){ hideTip(); }, 6000);
+    }
   } catch(e){}
 
   if(btn){
     btn.addEventListener('click', function(){
+      hideTip();
       var isActive = main.classList.contains('split-layout');
       applyState(!isActive, 55);
       try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
