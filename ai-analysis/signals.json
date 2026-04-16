@@ -1,57 +1,57 @@
 [
   {
-    "time": "08:10",
+    "time": "09:55",
     "priority": "critical",
-    "title": "USD/JPY",
-    "text": "USD/JPY testing 159.00 resistance — BoJ intervention risk rising on a sustained break above 160.00",
+    "title": "EUR/USD",
+    "text": "Eurozone inflation jumps to 2.6%, driving EUR/USD above 1.1780; ECB rate decision implications.",
     "evidence": [
-      "USD/JPY: 158.92",
-      "BoJ rate: 0.75%",
-      "VIX: 18.0"
+      "EUR/USD: 1.1784",
+      "Eurozone CPI: 2.6% yoy",
+      "ECB rate: 2%"
     ]
   },
   {
-    "time": "08:08",
+    "time": "09:53",
+    "priority": "warning",
+    "title": "USD/JPY",
+    "text": "USD/JPY testing 159.00 resistance, BoJ intervention risk rising as pair approaches 160.00.",
+    "evidence": [
+      "USD/JPY: 159.04",
+      "BoJ rate: 0.75%",
+      "VIX: 18.1"
+    ]
+  },
+  {
+    "time": "09:51",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7170 — RBA hiking rates supports AUD carry",
+    "text": "AUD/USD holding above 0.7160, RBA hiking rates supports AUD carry; AUD/USD consolidating.",
     "evidence": [
-      "AUD/USD: 0.7179",
+      "AUD/USD: 0.7169",
       "RBA rate: 4.10%",
-      "CFTC AUD net: +41,458"
+      "US 10Y yield: 4.26%"
     ]
   },
   {
-    "time": "08:06",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading below 1.1800 — ECB rate hold and Goldman Sachs pushing back rate hike timing weigh on EUR",
-    "evidence": [
-      "EUR/USD: 1.1792",
-      "ECB rate: 2.00%",
-      "Goldman Sachs ECB rate hike call"
-    ]
-  },
-  {
-    "time": "08:04",
+    "time": "09:49",
     "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 18.0 signals normal volatility — risk-on environment, S&P 500 up +0.80%",
+    "title": "Risk Regime",
+    "text": "VIX at 18.1 signals normal volatility — risk-on environment, S&P 500 up +0.80%.",
     "evidence": [
-      "VIX: 18.0",
+      "VIX: 18.1",
       "S&P 500: 7,023",
-      "DXY: 98.10"
+      "DXY: 98.21"
     ]
   },
   {
-    "time": "08:02",
+    "time": "09:47",
     "priority": "info",
-    "title": "USD/JPY Correlation Break",
-    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, USD/JPY correlation with VIX at +0.669",
+    "title": "CFTC — EUR",
+    "text": "EUR net long positioning at 77.3%, institutional divergence from retail short bias.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.669",
-      "VIX: 18.0",
-      "USD/JPY: 158.92"
+      "EUR net long: +1,029",
+      "EUR/USD: 1.1784",
+      "CFTC week ending: 2026-04-07"
     ]
   }
 ]
