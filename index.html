@@ -206,8 +206,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #split-lower::-webkit-scrollbar{width:3px}
 #main.split-layout #split-lower::-webkit-scrollbar-track{background:transparent}
 #main.split-layout #split-lower::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-#main.split-layout #split-lower-left{display:contents}
+#main.split-layout #split-lower-left{display:none}
 #main.split-layout #split-lower-right{display:contents}
+#main.split-layout .panel,#main.split-layout #split-upper>div{min-width:0;max-width:100%}
+#main.split-layout #split-upper .panel table,#main.split-layout #split-lower table{width:100%}
 #main.split-layout #tv-chart-wrap{height:300px;min-height:300px}
 /* drag handle — vertical bar between left and right */
 .split-drag-handle{width:4px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .1s;position:relative;height:100%}
@@ -467,35 +469,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div><!-- /#split-upper chart panel -->
 
-    <!-- CURRENCY STRENGTH HEATMAP — in left column, below chart -->
-    <div class="panel" id="split-upper-heatmap">
-      <div class="panel-head">
-        <span class="panel-title">Currency Strength Heatmap</span>
-        <span class="panel-sub">Relative performance vs USD basket · ECB daily</span>
-      </div>
-      <div class="heatmap" id="heatmap-grid">
-        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
-        <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
-        <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
-      </div>
-    </div>
-
-    </div><!-- /#split-upper -->
-
-    <!-- SPLIT DRAG HANDLE — only visible in split mode -->
-    <div id="split-drag-handle" class="split-drag-handle" role="separator" aria-label="Resize panels" style="display:none;"></div>
-
-    <!-- SPLIT LOWER: left column + right column -->
-    <div id="split-lower">
-      <div id="split-lower-left">
-
-    <!-- FX PAIRS TABLE — Frankfurter + fx-performance repo data -->
+    <!-- FX PAIRS TABLE — in left column, below chart -->
     <div class="panel" id="section-fxtable">
       <div class="panel-head">
         <span class="panel-title">FX Pairs — Majors</span>
@@ -529,8 +503,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
+    <!-- CURRENCY STRENGTH HEATMAP — in left column, below FX table -->
+    <div class="panel" id="split-upper-heatmap">
+      <div class="panel-head">
+        <span class="panel-title">Currency Strength Heatmap</span>
+        <span class="panel-sub">Relative performance vs USD basket · ECB daily</span>
+      </div>
+      <div class="heatmap" id="heatmap-grid">
+        <!-- 8 skeleton cells — reserve exact height of real data, prevents CLS when JS loads -->
+        <div class="hm-cell h-flat"><span class="hm-sym">EUR</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">USD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">GBP</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">JPY</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">AUD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CAD</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
+        <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
+      </div>
+    </div>
 
-      </div><!-- /#split-lower-left -->
+    </div><!-- /#split-upper -->
+
+    <!-- SPLIT DRAG HANDLE — only visible in split mode -->
+    <div id="split-drag-handle" class="split-drag-handle" role="separator" aria-label="Resize panels" style="display:none;"></div>
+
+    <!-- SPLIT LOWER: left column + right column -->
+    <div id="split-lower">
       <div id="split-lower-right">
 
     <!-- CROSS ASSET + RISK -->
