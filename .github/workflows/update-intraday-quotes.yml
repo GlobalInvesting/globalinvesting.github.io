@@ -1,6 +1,6 @@
-name: Update Intraday Quotes — v1.4 (Twelve Data + Alpha Vantage)
+name: Update Intraday Quotes — v1.5 (Twelve Data + Alpha Vantage)
 
-# ESTRATEGIA DE TRIGGER — v1.4
+# ESTRATEGIA DE TRIGGER — v1.5
 #
 # El cron nativo de GitHub Actions (schedule) NO es confiable para intervalos cortos:
 # en la práctica salta ejecuciones bajo carga del sistema de GitHub.
@@ -97,38 +97,52 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add intraday-data/quotes.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit (data unchanged)"
-            exit 0
-          fi
+
+          # Save the freshly-fetched file to a temp path so we can safely reset
+          # the working tree without losing our new data in the retry loop.
+          cp intraday-data/quotes.json /tmp/quotes_fresh.json
 
           TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
-          git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
 
-          # Push with up to 4 retries to handle race conditions with concurrent runs.
-          # Strategy: rebase on top of remote, then re-stage our file if needed.
-          for i in 1 2 3 4; do
-            echo "Push attempt $i..."
-            git push && echo "✅ Push succeeded" && exit 0
+          # Push loop — up to 5 attempts to handle concurrent-run collisions.
+          #
+          # Per-attempt strategy (no rebase — avoids "unstaged changes" errors):
+          #   1. Hard-reset to current remote HEAD so git history is clean.
+          #   2. Re-apply the fresh file (our data always wins — it is the newest).
+          #   3. Commit only if there is a real diff vs remote HEAD.
+          #   4. Push.  If rejected, another run beat us in the window — loop.
+          #
+          # Exit 0 on all paths: a push collision is not a real failure.
+          # The next cron-job.org dispatch (≤5 min) will carry fresh data.
+          # Exiting with non-zero would trigger GitHub failure emails on every
+          # concurrent-run collision, which is the problem this block fixes.
 
-            echo "Push rejected — pulling remote changes (attempt $i)..."
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+
+            # Sync local HEAD to remote without rebasing
             git fetch origin main
+            git reset --hard origin/main
 
-            # Rebase our commit on top of remote. If there's a conflict on
-            # quotes.json (two runs updating the same file), ours wins: we
-            # keep the version we just fetched (most recent data) by taking
-            # "theirs" (remote) as base and re-applying our new payload.
-            if ! git rebase origin/main; then
-              echo "Rebase conflict — resolving by keeping our fetched data..."
-              git checkout --theirs intraday-data/quotes.json
-              git add intraday-data/quotes.json
-              GIT_EDITOR=true git rebase --continue || git rebase --skip
+            # Re-apply our freshly-fetched data
+            cp /tmp/quotes_fresh.json intraday-data/quotes.json
+            git add intraday-data/quotes.json
+
+            if git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — data already current, skipping commit."
+              exit 0
             fi
+
+            git commit -m "📈 Intraday quotes — ${TIMESTAMP}"
+
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+
+            echo "Push rejected on attempt $i — another run committed first. Retrying in $((i * 2))s..."
+            sleep $((i * 2))
           done
 
-          # Exit 0 (not 1) — a push failure is not fatal: the next cron-job.org
-          # dispatch (5 min) will bring fresh data. Exiting with 1 sends GitHub
-          # failure-notification emails on every collision, which pollutes the inbox.
-          echo "⚠️  All push attempts failed — data will refresh on next run (no email sent)."
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
           exit 0
