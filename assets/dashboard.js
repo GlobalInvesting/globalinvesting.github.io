@@ -2749,11 +2749,12 @@ function loadTVChart(sym) {
   const script = document.createElement('script');
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
+  const chartStyle = sym === 'FRED:DGS10' ? '3' : '1';
   script.text = JSON.stringify({
     allow_symbol_change:false, calendar:false, details:true,
     hide_side_toolbar:true, hide_top_toolbar:true, hide_legend:false,
     hide_volume:true, interval:'D', locale:'en', save_image:false,
-    style:'1', symbol:sym, theme:'dark', timezone:'Etc/UTC',
+    style:chartStyle, symbol:sym, theme:'dark', timezone:'Etc/UTC',
     backgroundColor:'#131722', gridColor:'rgba(42,46,57,0.8)',
     withdateranges:false, studies:[{id:'MASimple@tv-basicstudies',inputs:{length:20}}], autosize:true
   });
