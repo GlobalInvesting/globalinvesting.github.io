@@ -1,57 +1,57 @@
 [
   {
-    "time": "11:30",
+    "time": "14:15",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY edges up above 159.00 as Strait of Hormuz curbs risk appetite; BoJ intervention risk rising",
+    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; verbal warnings likely on a sustained break above 160",
     "evidence": [
-      "USD/JPY: 158.94",
+      "USD/JPY: 159.1",
       "BoJ rate: 0.75%",
-      "VIX: 18.2"
+      "VIX: 18.9"
     ]
   },
   {
-    "time": "11:28",
+    "time": "14:10",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD 360 pips rally at risk of minor mean reversion decline below 0.7200; RBA hiking rates supports AUD carry",
+    "text": "AUD/USD long positioning extreme at 91% short in retail sentiment; watch for squeeze risk",
     "evidence": [
-      "AUD/USD: 0.7172",
-      "RBA rate: 4.10%",
-      "VIX: 18.2"
+      "AUD/USD: 0.7177",
+      "CFTC AUD net: +41,458",
+      "Retail sentiment: 9% long / 91% short"
     ]
   },
   {
-    "time": "11:25",
+    "time": "14:05",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "Eurozone inflation jumps to 2.6%, energy and services drive; ECB rate hold weighs on EUR/USD",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD; pair holds at 1.1781",
     "evidence": [
-      "EUR/USD: 1.179",
-      "ECB rate: 2.00%",
-      "Eurozone CPI: 2.6%"
+      "EUR/USD: 1.1781",
+      "Fed rate: 3.75%",
+      "ECB rate: 2.00%"
     ]
   },
   {
-    "time": "11:20",
+    "time": "14:00",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +0.80%",
+    "text": "VIX at 18.9 signals normal volatility — risk-on environment, S&P 500 up slightly",
     "evidence": [
-      "VIX: 18.2",
-      "S&P 500: 7,023",
-      "DXY: 98.17"
+      "VIX: 18.9",
+      "S&P 500: 7,022",
+      "DXY: 98.23"
     ]
   },
   {
-    "time": "11:15",
+    "time": "13:55",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% long; institutional divergence with Asset Managers net short",
+    "title": "USD/JPY Correlation Break",
+    "text": "USD/JPY vs VIX correlation break signals JPY no longer acting as safe haven; watch for implications on USD/JPY",
     "evidence": [
-      "EUR net long: +1,029",
-      "EUR long%: 77.3%",
-      "Asset Manager EUR net: -7,340"
+      "USD/JPY vs VIX: corr=+0.672",
+      "norm=+0.142",
+      "z=+1.36σ"
     ]
   }
 ]
