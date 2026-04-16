@@ -1,57 +1,57 @@
 [
   {
-    "time": "09:55",
+    "time": "11:30",
     "priority": "critical",
-    "title": "EUR/USD",
-    "text": "Eurozone inflation jumps to 2.6%, driving EUR/USD above 1.1780; ECB rate decision implications.",
-    "evidence": [
-      "EUR/USD: 1.1784",
-      "Eurozone CPI: 2.6% yoy",
-      "ECB rate: 2%"
-    ]
-  },
-  {
-    "time": "09:53",
-    "priority": "warning",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.00 resistance, BoJ intervention risk rising as pair approaches 160.00.",
+    "text": "USD/JPY edges up above 159.00 as Strait of Hormuz curbs risk appetite; BoJ intervention risk rising",
     "evidence": [
-      "USD/JPY: 159.04",
+      "USD/JPY: 158.94",
       "BoJ rate: 0.75%",
-      "VIX: 18.1"
+      "VIX: 18.2"
     ]
   },
   {
-    "time": "09:51",
+    "time": "11:28",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7160, RBA hiking rates supports AUD carry; AUD/USD consolidating.",
+    "text": "AUD/USD 360 pips rally at risk of minor mean reversion decline below 0.7200; RBA hiking rates supports AUD carry",
     "evidence": [
-      "AUD/USD: 0.7169",
+      "AUD/USD: 0.7172",
       "RBA rate: 4.10%",
-      "US 10Y yield: 4.26%"
+      "VIX: 18.2"
     ]
   },
   {
-    "time": "09:49",
+    "time": "11:25",
+    "priority": "warning",
+    "title": "EUR/USD",
+    "text": "Eurozone inflation jumps to 2.6%, energy and services drive; ECB rate hold weighs on EUR/USD",
+    "evidence": [
+      "EUR/USD: 1.179",
+      "ECB rate: 2.00%",
+      "Eurozone CPI: 2.6%"
+    ]
+  },
+  {
+    "time": "11:20",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 18.1 signals normal volatility — risk-on environment, S&P 500 up +0.80%.",
+    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +0.80%",
     "evidence": [
-      "VIX: 18.1",
+      "VIX: 18.2",
       "S&P 500: 7,023",
-      "DXY: 98.21"
+      "DXY: 98.17"
     ]
   },
   {
-    "time": "09:47",
+    "time": "11:15",
     "priority": "info",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3%, institutional divergence from retail short bias.",
+    "text": "EUR net long positioning at 77.3% long; institutional divergence with Asset Managers net short",
     "evidence": [
       "EUR net long: +1,029",
-      "EUR/USD: 1.1784",
-      "CFTC week ending: 2026-04-07"
+      "EUR long%: 77.3%",
+      "Asset Manager EUR net: -7,340"
     ]
   }
 ]
