@@ -188,6 +188,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .tv-skeleton{background:var(--bg3);width:100%;height:100%}
 #tv-chart-wrap{height:290px;min-height:290px}
 #tvcal-inner{min-height:350px}
+
+/* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
+#main.split-layout{display:flex;flex-direction:column;height:calc(100vh - 92px);overflow:hidden}
+#main.split-layout #split-upper{display:flex;flex-direction:column;overflow-y:auto;border-bottom:3px solid var(--border2);flex-shrink:0;height:45%;min-height:100px}
+#main.split-layout #split-lower{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;min-height:0;flex:1;}
+#main.split-layout #split-lower-left{overflow-y:auto;border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+#main.split-layout #split-lower-right{overflow-y:auto;display:flex;flex-direction:column;min-height:0}
+#main.split-layout #tv-chart-wrap{height:320px;min-height:320px}
+.split-toggle-btn{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-family:var(--font-mono);font-weight:600;padding:2px 7px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);letter-spacing:.05em;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+.split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
+.split-toggle-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(79,127,255,.1)}
+.split-drag-handle{height:4px;background:var(--border2);cursor:row-resize;flex-shrink:0;transition:background .1s;position:relative}
+.split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
+.split-drag-handle::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:2px;border-radius:1px;background:var(--border2);transition:background .1s}
+.split-drag-handle:hover::after,.split-drag-handle.dragging::after{background:var(--blue)}
 .tv-econmap-wrap{min-height:380px;background:#131722;display:flex;align-items:stretch;width:100%;height:100%}
 @media(max-width:900px){
 #topbar{height:auto;flex-wrap:wrap;padding:0 6px}
@@ -378,6 +393,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <!-- MAIN PANEL -->
   <main id="main" role="main" aria-label="Dashboard">
 
+    <!-- SPLIT UPPER: narrative + chart (always visible) -->
+    <div id="split-upper">
+
     <!-- NARRATIVE (AI-powered from ai-analysis/index.json) -->
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
       <div class="narr-label">Narrative</div>
@@ -391,6 +409,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;">
           <span class="panel-title">Price Chart</span>
           <span class="panel-sub">TradingView · live data</span>
+          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout: chart on top, data panels below" aria-pressed="false" style="margin-left:auto;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="1" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="1" y="6.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/><rect x="6.5" y="6.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="1.1"/></svg>
+            Split
+          </button>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
           <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
@@ -430,6 +452,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
     </div>
+
+    </div><!-- /#split-upper -->
+
+    <!-- SPLIT DRAG HANDLE — only visible in split mode -->
+    <div id="split-drag-handle" class="split-drag-handle" role="separator" aria-label="Resize panels" style="display:none;"></div>
+
+    <!-- SPLIT LOWER: left column + right column -->
+    <div id="split-lower">
+      <div id="split-lower-left">
 
     <!-- FX PAIRS TABLE — Frankfurter + fx-performance repo data -->
     <div class="panel" id="section-fxtable">
@@ -483,7 +514,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="hm-cell h-flat"><span class="hm-sym">CHF</span><span class="hm-val flat">—</span></div>
         <div class="hm-cell h-flat"><span class="hm-sym">NZD</span><span class="hm-val flat">—</span></div>
       </div>
-    </div>
+    </div><!-- /#section-rates -->
+
+      </div><!-- /#split-lower-left -->
+      <div id="split-lower-right">
 
     <!-- CROSS ASSET + RISK -->
     <div style="border-bottom:1px solid var(--border);">
@@ -698,7 +732,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="alerts-container" role="log" aria-live="polite" aria-label="Alerts and Market Signals" aria-relevant="additions">
         <div class="alert-row" style="color:var(--text3);">Fetching AI-generated market signals…</div>
       </div>
-    </div>
+    </div><!-- /#section-macro (alerts) -->
+
+      </div><!-- /#split-lower-right -->
+    </div><!-- /#split-lower -->
 
   </main>
 
@@ -902,6 +939,107 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <!-- TradingView lazy-loader and IntersectionObserver logic moved to assets/dashboard.js (initTVWidgets) -->
+
+<!-- SPLIT LAYOUT JS — toggle + drag handle resize -->
+<script>
+(function(){
+  var LS_KEY = 'gi_split_layout';
+  var main = document.getElementById('main');
+  var btn  = document.getElementById('split-layout-btn');
+  var handle = document.getElementById('split-drag-handle');
+  var upper  = document.getElementById('split-upper');
+  var lower  = document.getElementById('split-lower');
+
+  function applyState(active, upperPct){
+    if(!main||!btn||!handle||!upper||!lower) return;
+    if(active){
+      main.classList.add('split-layout');
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed','true');
+      handle.style.display = '';
+      var pct = upperPct || 45;
+      upper.style.height = pct + '%';
+      upper.style.flex = 'none';
+      lower.style.height = (100 - pct) + '%';
+    } else {
+      main.classList.remove('split-layout');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed','false');
+      handle.style.display = 'none';
+      upper.style.height = '';
+      upper.style.flex   = '';
+      lower.style.height = '';
+    }
+  }
+
+  // Restore saved state
+  try {
+    var saved = JSON.parse(localStorage.getItem(LS_KEY)||'null');
+    if(saved && saved.active) applyState(true, saved.upperPct||45);
+  } catch(e){}
+
+  if(btn){
+    btn.addEventListener('click', function(){
+      var isActive = main.classList.contains('split-layout');
+      var newState = !isActive;
+      applyState(newState, 45);
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:newState, upperPct:45})); } catch(e){}
+    });
+  }
+
+  // Drag handle resize
+  if(handle){
+    var dragging = false, startY = 0, startUpperH = 0;
+    handle.addEventListener('mousedown', function(e){
+      dragging = true;
+      startY = e.clientY;
+      startUpperH = upper.offsetHeight;
+      handle.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      var dy = e.clientY - startY;
+      var mainH = main.offsetHeight;
+      var newH = Math.min(Math.max(startUpperH + dy, 100), mainH - 80);
+      var pct = (newH / mainH * 100).toFixed(1);
+      upper.style.height = pct + '%';
+      lower.style.height = (100 - pct) + '%';
+    });
+    document.addEventListener('mouseup', function(){
+      if(!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.userSelect = '';
+      var mainH = main.offsetHeight;
+      var pct = parseFloat((upper.offsetHeight / mainH * 100).toFixed(1));
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:true, upperPct:pct})); } catch(e){}
+    });
+    // Touch support
+    handle.addEventListener('touchstart', function(e){
+      dragging = true;
+      startY = e.touches[0].clientY;
+      startUpperH = upper.offsetHeight;
+      handle.classList.add('dragging');
+    }, {passive:true});
+    document.addEventListener('touchmove', function(e){
+      if(!dragging) return;
+      var dy = e.touches[0].clientY - startY;
+      var mainH = main.offsetHeight;
+      var newH = Math.min(Math.max(startUpperH + dy, 100), mainH - 80);
+      var pct = (newH / mainH * 100).toFixed(1);
+      upper.style.height = pct + '%';
+      lower.style.height = (100 - pct) + '%';
+    }, {passive:true});
+    document.addEventListener('touchend', function(){
+      if(!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+    });
+  }
+})();
+</script>
 
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
