@@ -212,10 +212,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout #split-upper .panel table,#main.split-layout #split-lower table{width:100%}
 #main.split-layout #tv-chart-wrap{height:300px;min-height:300px}
 /* drag handle — vertical bar between left and right */
-.split-drag-handle{width:4px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .1s;position:relative;height:100%}
+.split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--blue)}
-.split-drag-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);height:28px;width:2px;border-radius:1px;background:var(--border2);transition:background .1s}
-.split-drag-handle:hover::after,.split-drag-handle.dragging::after{background:var(--blue)}
+.split-drag-handle::after{display:none}
 /* toggle btn — subtle icon only */
 .split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0}
 .split-toggle-btn:hover{border-color:var(--blue);color:var(--blue)}
