@@ -427,11 +427,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div style="background:var(--head-bg);border-bottom:1px solid var(--border);">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;">
           <span class="panel-title">Price Chart</span>
+          <div style="display:flex;align-items:center;gap:8px;">
           <span class="panel-sub">TradingView · live data</span>
-          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout" style="margin-left:6px;">
+          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0.5" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/><rect x="6" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/></svg>
             <div id="split-tip" role="tooltip">Toggle split view</div>
           </button>
+          </div>
         </div>
         <div id="tv-tabs-outer" style="display:flex;align-items:stretch;border-top:1px solid var(--border);position:relative;">
           <button id="tv-tabs-prev" aria-label="Scroll chart tabs left" style="display:none;flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-right:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;align-items:center;justify-content:center;">&#8249;</button>
