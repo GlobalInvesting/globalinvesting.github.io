@@ -1752,11 +1752,13 @@ function renderSentiment(pairs, sourceLabel, general) {
 
   const isCOT = sourceLabel && sourceLabel.includes('COT');
   const isHistorical = sourceLabel && sourceLabel.includes('Historical');
+  const isDukascopy = sourceLabel && sourceLabel.includes('Dukascopy');
   const subEl = document.getElementById('sent-source-sub');
   if (subEl) {
     const _sentTime = lh + ':' + lm + ' ' + tzAbbr2;
     if (isCOT) subEl.textContent = `CFTC COT · speculative positioning · loaded ${_sentTime}`;
     else if (isHistorical) subEl.textContent = `Static fallback · live feeds unavailable · loaded ${_sentTime}`;
+    else if (isDukascopy) subEl.textContent = `Dukascopy · retail positioning · updated ${_sentTime}`;
     else subEl.textContent = `Myfxbook · retail positioning · updated ${_sentTime}`;
   }
 }
@@ -1765,11 +1767,15 @@ async function fetchSentiment() {
   // Pre-load intraday quotes so renderSentiment can access _intradayCache for price distances
   await loadIntradayQuotes().catch(() => null);
 
-  // ── SOURCE 1: Myfxbook community outlook (primary — updated every 30min via GitHub Action) ──
+  // ── SOURCE 1: Myfxbook community outlook (primary — updated every hour via GitHub Action) ──
+  // Skipped automatically when apiBlocked=true (GitHub Actions IPs blocked by provider).
+  // In that case the dashboard promotes Dukascopy to SOURCE 2 for real-time retail sentiment.
   try {
     const r = await fetch('./sentiment-data/myfxbook.json');
     if (r.ok) {
       const d = await r.json();
+      // If Myfxbook API is blocking GitHub Actions IPs, skip to Dukascopy immediately.
+      if (d.apiBlocked) throw new Error('apiBlocked');
       // Freshness check: reject if data is older than 15 hours (covers overnight/weekend gaps between workflow runs)
       const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
       const ageMin = (Date.now() - updatedMs) / 60000;
@@ -1806,38 +1812,10 @@ async function fetchSentiment() {
     }
   } catch {}
 
-  // ── SOURCE 2: CFTC COT positioning (weekly, same-origin, reliable) ──
-  try {
-    const cotData = await buildCOTSentiment();
-    if (Object.keys(cotData).length >= 4) {
-      const PAIR_MAP = [
-        { sym:'EUR/USD', base:'EUR', invert:false },
-        { sym:'GBP/USD', base:'GBP', invert:false },
-        { sym:'USD/JPY', base:'JPY', invert:true  },
-        { sym:'AUD/USD', base:'AUD', invert:false },
-        { sym:'USD/CAD', base:'CAD', invert:true  },
-        { sym:'USD/CHF', base:'CHF', invert:true  },
-        { sym:'NZD/USD', base:'NZD', invert:false },
-        { sym:'EUR/GBP', base:'EUR', invert:false },
-        { sym:'EUR/JPY', base:'EUR', invert:false },
-        { sym:'GBP/JPY', base:'GBP', invert:false },
-      ];
-      const cotPairs = PAIR_MAP.map(pm => {
-        const c = cotData[pm.base];
-        if (!c) return null;
-        const buy  = pm.invert ? c.sell : c.buy;
-        const sell = pm.invert ? c.buy  : c.sell;
-        return { sym: pm.sym, buy, sell };
-      }).filter(Boolean);
-      if (cotPairs.length >= 5) {
-        const lastDate = Object.values(cotData)[0]?.date || '';
-        renderSentiment(cotPairs, 'CFTC COT · ' + lastDate);
-        return;
-      }
-    }
-  } catch {}
-
-  // ── SOURCE 3: Dukascopy live sentiment (CORS-allowed, real-time) ──
+  // ── SOURCE 2: Dukascopy live sentiment (CORS-allowed, real-time) ──
+  // Promoted above COT: Dukascopy provides real-time retail positioning,
+  // which is semantically equivalent to Myfxbook. COT (weekly, speculative)
+  // is a weaker substitute for retail sentiment and is kept as last resort.
   try {
     const r = await fetch('https://freeserv.dukascopy.com/2.0/api?path=sentiment/list&prettyprint=true&jsonp=false', {mode:'cors'});
     if (r.ok) {
@@ -1853,7 +1831,10 @@ async function fetchSentiment() {
     }
   } catch {}
 
-  // ── SOURCE 4: Static reference fallback ──
+  // ── SOURCE 3: Static reference fallback ──
+  // COT data is intentionally excluded from this fallback pipeline:
+  // it belongs to its own dedicated section in the terminal and has
+  // different semantics (speculative positioning, weekly) vs retail sentiment.
   renderSentiment(SENTIMENT_FALLBACK, 'Static fallback · live feeds unavailable');
 }
 
