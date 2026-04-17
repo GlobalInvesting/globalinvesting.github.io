@@ -1262,8 +1262,28 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
 
       <h3>CB Rate Expectations</h3>
-      <p>Forward-looking rate expectations for major central banks at their next scheduled meeting, sourced from OIS and futures market pricing — not analyst forecasts. This is distinct from the current rate: it reflects what the market is pricing for the <em>next</em> decision, which is what drives FX at the margin. When the <code>bias</code> field is absent from the data, the terminal estimates the direction from historical rate trajectory and prefixes the label with <code>~</code> to signal it is an estimate, not a curated market-consensus value.</p>
-      <p>Where market-implied cut probabilities are available (USD from CME FedWatch, AUD from the ASX Rate Indicator), a small monospace chip — e.g. <code style="font-family:var(--font-mono);font-size:11px;">42%↓</code> — appears next to the Bias label. The chip is color-coded: red (≥60%, cut likely), neutral (40–59%), muted (&lt;40%). It renders only when live data is available; all other rows show the Bias label unchanged.</p>
+      <p>Forward-looking rate expectations for all eight G8 central banks at their next scheduled meeting, sourced from OIS (Overnight Index Swap) and futures market pricing — not analyst forecasts, not editorial opinion. This panel is <strong>distinct from the CB Rates table above it</strong>: the CB Rates table shows what the rate <em>is</em> today; this panel shows what the market expects the rate <em>to become</em> at the next meeting. FX reacts to expectations, not to the current rate — which is why this signal matters at the margin.</p>
+      <p>Each Bias field is computed from the overnight rate market specific to that currency:</p>
+      <div style="overflow-x:auto;margin:10px 0 16px;">
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="color:var(--text3);font-size:9px;border-bottom:1px solid var(--border);">
+            <th style="text-align:left;padding:4px 8px;" scope="col">Currency</th>
+            <th style="text-align:left;padding:4px 8px;" scope="col">OIS Instrument</th>
+            <th style="text-align:left;padding:4px 8px;" scope="col">Source</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">USD</td><td style="padding:4px 8px;color:var(--text2);">SOFR futures (ZQ)</td><td style="padding:4px 8px;color:var(--text2);">CME FedWatch</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">EUR</td><td style="padding:4px 8px;color:var(--text2);">ESTER overnight (+7bp DFR normalisation)</td><td style="padding:4px 8px;color:var(--text2);">ECB Statistical Data Warehouse</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">GBP</td><td style="padding:4px 8px;color:var(--text2);">SONIA overnight</td><td style="padding:4px 8px;color:var(--text2);">Bank of England public database</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">JPY</td><td style="padding:4px 8px;color:var(--text2);">TONA overnight</td><td style="padding:4px 8px;color:var(--text2);">Bank of Japan daily CSV</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">AUD</td><td style="padding:4px 8px;color:var(--text2);">30-day IB cash rate futures</td><td style="padding:4px 8px;color:var(--text2);">ASX Rate Indicator</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">CAD</td><td style="padding:4px 8px;color:var(--text2);">CORRA overnight</td><td style="padding:4px 8px;color:var(--text2);">Bank of Canada Valet API</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 8px;color:var(--text);">CHF</td><td style="padding:4px 8px;color:var(--text2);">SARON overnight</td><td style="padding:4px 8px;color:var(--text2);">SNB data portal</td></tr>
+            <tr><td style="padding:4px 8px;color:var(--text);">NZD</td><td style="padding:4px 8px;color:var(--text2);">OCR interbank overnight (HB2)</td><td style="padding:4px 8px;color:var(--text2);">RBNZ daily CSV</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Classification: if the OIS/overnight rate is more than 10bp below the current policy rate → <span class="down">↓ Cut</span>; more than 10bp above → <span class="up">↑ Hike</span>; within ±10bp → <span class="flat">→ Hold</span>. The label is prefixed with <code>~</code> when the OIS source is unavailable and the terminal falls back to estimating from historical rate trajectory. Where market-implied cut probabilities are available (USD via CME FedWatch, AUD via ASX), a small chip — e.g. <code style="font-family:var(--font-mono);font-size:11px;">42%↓</code> — appears next to the Bias. The chip is color-coded: red (≥60%, cut likely), neutral (40–59%), muted (&lt;40%).</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">CB Rate Expectations</span>
@@ -1287,15 +1307,15 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </table>
       </div>
 
-      <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">ETF IV · COT</span></h3>
-      <p>A directional bias table for major pairs, synthesised from ETF implied volatility (options market skew) and CFTC COT positioning. The <strong>ATM IV</strong> column shows the annualised implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) at the nearest expiry. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined source — as a directional proxy on a ±1.5 scale. When both signals agree, the read is most reliable. Disagreement — e.g. IV elevated but COT flat — signals uncertainty or a positioning squeeze risk.</p>
+      <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">ETF IV · COT · 25d RR</span></h3>
+      <p>A directional bias table for major pairs, synthesised from three complementary sources. The <strong>ATM IV</strong> column shows annualised implied volatility from CBOE-listed FX ETF options (FXE → EUR/USD, FXB → GBP/USD, FXY → USD/JPY, FXA → AUD/USD) at the nearest expiry. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined — as a directional proxy on a ±1.5 scale. The <strong>25d RR</strong> chip in the Direction cell shows the 25-delta Risk Reversal from Saxo Bank's public options page (1M tenor, indicative mid-market): positive means calls are bid over puts — the market is skewed for upside on the base currency; negative means puts are bid — downside protection is dominant. When all three signals align, the read is most reliable. Divergence — e.g. IV elevated, COT flat, RR neutral — signals uncertainty or a positioning squeeze risk.</p>
       <div class="callout callout-orange">
-        <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias.
+        <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias. The 25d RR chip is the directional signal from the options market: its sign shows which side (calls or puts) investors are paying a premium to own.
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Positioning Bias</span>
-          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> ETF options IV · CBOE</span>
+          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> ETF IV · CBOE · 25d RR · Saxo</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
@@ -1310,7 +1330,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <tr><td style="padding:4px 8px;color:var(--text);">AUD/USD</td><td style="padding:4px 6px;color:var(--down);text-align:center;font-family:var(--font-mono);">28.1%</td><td style="padding:4px 6px;color:var(--up);text-align:center;font-size:10px;">+1.05</td></tr>
           </tbody>
         </table>
-        <div style="padding:4px 8px 5px;font-size:9px;color:var(--text3);">ATM IV: red &gt;12% (expensive) · neutral 7–12% · green ≤7% (cheap) · COT: ±1.5 scale</div>
+        <div style="padding:4px 8px 5px;font-size:9px;color:var(--text3);">ATM IV: red &gt;12% · neutral 7–12% · green ≤7% (cheap) · COT: ±1.5 scale · 25d RR: + = calls bid · − = puts bid</div>
       </div>
     </div>
 
