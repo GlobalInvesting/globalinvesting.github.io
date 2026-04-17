@@ -1,15 +1,21 @@
-name: Update Myfxbook Sentiment — v1.2
+name: Update Myfxbook Sentiment — v1.3
 
 # Runs every hour, 24/7, Mon–Sun.
 #
-# ⚠️  LÍMITE DE API: Myfxbook free tier = 100 requests/24h.
-#     Cada run = 3 calls (login + outlook + logout).
-#     Corriendo cada 60 min × 24h × 7d = 24 runs/día = 72 calls/día ✅ (dentro del límite)
-#     NO usar cada 15 min: 96 runs/día × 3 = 288 calls → excede el límite 2.8x.
+# ⚠️  API LIMIT: Myfxbook free tier = 100 requests/24h.
+#     Each run = 3 calls (login + outlook + logout).
+#     Running every 60 min × 24h × 7d = 24 runs/day = 72 calls/day ✅ (within limit)
+#     DO NOT use every 15 min: 96 runs/day × 3 = 288 calls → exceeds limit 2.8x.
 #
 # ✅ Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
 #    No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is enough
 #    because the workflow and output data live in the same repo.
+#
+# GRACEFUL DEGRADATION (v1.3):
+#    If Myfxbook API returns 403 (GitHub Actions IPs may be blocked by the provider),
+#    the script exits 0 (non-fatal). Existing myfxbook.json is preserved with
+#    apiBlocked=true. The dashboard automatically falls back to COT / Dukascopy sources.
+#    The workflow run will show as SUCCESS — no email notifications for API blocks.
 #
 # SECRETS REQUIRED (set in repo Settings → Secrets → Actions):
 #   MYFXBOOK_EMAIL    — email address of your Myfxbook account
@@ -17,20 +23,26 @@ name: Update Myfxbook Sentiment — v1.2
 #
 # OUTPUT: sentiment-data/myfxbook.json (committed to repo, served via GitHub Pages)
 #
-# NOTA: El posicionamiento retail cambia muy lentamente (datos de comunidad acumulados).
-#       Actualizar cada hora es más que suficiente — no hay pérdida de calidad vs 15 min.
+# NOTE: Retail positioning changes very slowly (community-accumulated data).
+#       Updating every hour is more than sufficient — no quality loss vs 15 min.
 
 on:
   schedule:
-    - cron: '0 * * * *'    # cada hora en punto, todos los días, toda la semana
-  workflow_dispatch:        # manual trigger desde GitHub UI
+    - cron: '0 * * * *'    # every hour on the hour, all days, all week
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+# Opt into Node.js 24 now to avoid deprecation warnings from actions/* packages.
+# actions/checkout@v4 and actions/setup-python@v5 currently run on Node.js 20,
+# which will be removed from GitHub Actions runners on 2026-09-16.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: update-myfxbook-sentiment
-  cancel-in-progress: false   # nunca cancelar un fetch en curso — esperar
+  cancel-in-progress: false   # never cancel an in-progress fetch — wait
 
 permissions:
-  contents: write             # necesario para git push al mismo repo
+  contents: write             # required for git push to the same repo
 
 jobs:
   fetch-myfxbook-sentiment:
@@ -71,10 +83,10 @@ jobs:
           TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
           git commit -m "Sentiment update — ${TIMESTAMP}"
           for i in 1 2 3; do
-            git push && echo "✅ Push succeeded" && exit 0
+            git push && echo "Push succeeded" && exit 0
             echo "Push rejected (attempt $i) — rebasing..."
             git fetch origin main
             git rebase origin/main
           done
-          echo "❌ All push attempts failed — data not published."
+          echo "All push attempts failed — data not published."
           exit 1
