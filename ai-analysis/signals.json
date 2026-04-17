@@ -1,57 +1,57 @@
 [
   {
-    "time": "19:10",
+    "time": "20:35",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.39 resistance — BoJ intervention risk rising on a sustained break above 160.00",
+    "text": "USD/JPY at 158.59 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 158.39",
+      "USD/JPY: 158.59",
       "BoJ rate: 0.75%",
-      "VIX: 17.6"
+      "VIX: 17.5"
     ]
   },
   {
-    "time": "19:08",
+    "time": "20:32",
+    "priority": "warning",
+    "title": "EUR/USD",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD — pair holds at 1.1772.",
+    "evidence": [
+      "EUR/USD: 1.1772",
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)"
+    ]
+  },
+  {
+    "time": "20:29",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7177 — RBA hiking rates supports AUD carry",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7169.",
     "evidence": [
-      "AUD/USD: 0.7177",
-      "RBA rate: 4.10%",
-      "CFTC AUD net: +41,458"
+      "AUD/USD: 0.7169",
+      "RBA rate: 4.10% (HIKING)",
+      "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "19:06",
-    "priority": "warning",
-    "title": "USD/CAD",
-    "text": "USD/CAD correlation with WTI Oil breaks at +0.728 — CAD commodity exposure increases",
-    "evidence": [
-      "USD/CAD: 1.3672",
-      "WTI Oil: $83.3",
-      "USD/CAD vs WTI Oil corr: +0.728"
-    ]
-  },
-  {
-    "time": "19:04",
+    "time": "20:24",
     "priority": "info",
     "title": "VIX",
-    "text": "VIX at 17.6 signals normal volatility — risk-on environment, S&P 500 up +1.09%",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
     "evidence": [
-      "VIX: 17.6",
-      "S&P 500: 7,118",
-      "1D:+1.09%"
+      "VIX: 17.5",
+      "S&P 500: 7,126",
+      "DXY: 98.18"
     ]
   },
   {
-    "time": "19:02",
+    "time": "20:20",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at +1,029 contracts — institutional long bias",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX correlation break: JPY no longer acting as safe haven, USD/JPY correlation with VIX at +0.672, z=+1.36σ.",
     "evidence": [
-      "CFTC EUR net: +1,029",
-      "EUR/USD: 1.1787",
-      "week ending 2026-04-07"
+      "USD/JPY vs VIX: corr=+0.672",
+      "norm=+0.143",
+      "z=+1.36σ"
     ]
   }
 ]
