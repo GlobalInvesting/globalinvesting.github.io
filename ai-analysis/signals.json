@@ -1,57 +1,57 @@
 [
   {
-    "time": "02:45",
+    "time": "04:35",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.38 resistance — BoJ intervention risk rises on a sustained break above 160.00",
+    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings",
     "evidence": [
-      "USD/JPY: 159.38",
+      "USD/JPY: 159.44",
       "BoJ rate: 0.75%",
       "VIX: 17.9"
     ]
   },
   {
-    "time": "02:42",
+    "time": "04:32",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holds above 0.7162 — RBA hiking rates supports AUD carry",
+    "text": "AUD/USD long positioning extreme at 71.1% — watch for potential squeeze",
     "evidence": [
-      "AUD/USD: 0.7162",
-      "RBA rate: 4.10%",
-      "US 10Y yield: 4.26%"
+      "AUD/USD: 0.7168",
+      "CFTC AUD net: +41,458",
+      "RBA rate: 4.10%"
     ]
   },
   {
-    "time": "02:40",
+    "time": "04:29",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading near 1.178 — Fed-ECB 175bp differential weighs on the pair",
+    "title": "USD/JPY vs VIX",
+    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
     "evidence": [
-      "EUR/USD: 1.178",
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%"
+      "USD/JPY vs VIX: corr=+0.653",
+      "VIX: 17.9",
+      "USD/JPY: 159.44"
     ]
   },
   {
-    "time": "02:35",
+    "time": "04:24",
     "priority": "info",
-    "title": "Risk Regime",
+    "title": "VIX",
     "text": "VIX at 17.9 signals normal volatility — risk-on environment, S&P 500 up +0.26%",
     "evidence": [
       "VIX: 17.9",
       "S&P 500: 7,041",
-      "DXY: 98.26"
+      "DXY: 98.21"
     ]
   },
   {
-    "time": "02:30",
+    "time": "04:20",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — institutional long bias",
+    "title": "RBA",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7098",
     "evidence": [
-      "EUR net long: +1,029",
-      "long%: 77.3%",
-      "week ending: 2026-04-07"
+      "RBA rate: 4.10%",
+      "AUD/USD: 0.7168",
+      "US 10Y yield: 4.309%"
     ]
   }
 ]
