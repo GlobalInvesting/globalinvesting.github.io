@@ -2799,6 +2799,14 @@ function openPairPopover(rowEl, tvSym) {
 
   // After paint: read real size and clamp within viewport
   requestAnimationFrame(() => {
+    // On mobile the CSS converts the popover into a bottom sheet — no JS positioning needed
+    if (window.innerWidth <= 900) {
+      pop.style.left = '';
+      pop.style.top  = '';
+      pop.style.visibility = 'visible';
+      return;
+    }
+
     const rect = rowEl.getBoundingClientRect();
     const popRect = pop.getBoundingClientRect();
     const pw = popRect.width  || 270;
