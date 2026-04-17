@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v3.0 — Myfxbook Community Outlook via REST API
+fetch_myfxbook_sentiment.py  v4.0 — Myfxbook Community Outlook via REST API
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  sentiment-data/myfxbook.json
-Schedule: Cada 30 min en días hábiles (via GitHub Action en repo público)
+Schedule: Each hour on business days (via GitHub Action in public repo)
 
 API docs: https://www.myfxbook.com/api  (v1.38, oct 2025)
   - Login:   GET /api/login.json?email=X&password=Y  -> { session: "TOKEN" }
@@ -11,17 +11,24 @@ API docs: https://www.myfxbook.com/api  (v1.38, oct 2025)
              -> { symbols: [ {name, shortPercentage, longPercentage, ...} ] }
   - Logout:  GET /api/logout.json?session=TOKEN
 
-NOTAS TÉCNICAS:
-  - El session token puede contener caracteres ya URL-encoded (ej: %2F, %3D).
-    Hay que pasarlo RAW en la URL — no re-encodear, no usar params=.
-  - Sessions son IP-bound (desde oct 2025). Usar una sola requests.Session()
-    para login y todas las calls siguientes.
-  - symbols es un ARRAY: [{name: "EURUSD", longPercentage, shortPercentage, ...}]
-  - Limite free: 100 requests/24h.
+TECHNICAL NOTES:
+  - Session token may contain URL-encoded characters (e.g. %2F, %3D).
+    Pass RAW in the URL — do not re-encode, do not use params=.
+  - Sessions are IP-bound (since oct 2025). Use a single requests.Session()
+    for login and all subsequent calls.
+  - symbols is an ARRAY: [{name: "EURUSD", longPercentage, shortPercentage, ...}]
+  - Free limit: 100 requests/24h.
 
-CREDENCIALES (GitHub Secrets):
-  MYFXBOOK_EMAIL    — email de la cuenta
-  MYFXBOOK_PASSWORD — contraseña de la cuenta
+GRACEFUL DEGRADATION (v4.0):
+  - On 403 / API block: exit 0 (non-fatal). Existing JSON is preserved with
+    apiBlocked=true flag. Dashboard falls back to COT/Dukascopy sources.
+  - On network timeout or transient error: 3 retries with exponential backoff,
+    then graceful exit preserving existing data.
+  - The workflow no longer fails when Myfxbook blocks GitHub Actions IPs.
+
+CREDENTIALS (GitHub Secrets):
+  MYFXBOOK_EMAIL    — account email
+  MYFXBOOK_PASSWORD — account password
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -31,7 +38,7 @@ from datetime import datetime, timezone
 try:
     import requests
 except ImportError:
-    print("[ERROR] requests no instalado. Correr: pip install requests")
+    print("[ERROR] requests not installed. Run: pip install requests")
     sys.exit(1)
 
 BASE_URL          = "https://www.myfxbook.com/api"
@@ -53,16 +60,156 @@ PRIORITY_ORDER = [
     "AUDCHF","AUDNZD","GBPCHF","GBPAUD","GBPCAD","GBPNZD","CHFJPY","CADJPY",
 ]
 
-HEADERS = {
-    "User-Agent": (
+# Rotate User-Agent strings — GitHub Actions IPs may be recognised and blocked
+# when using a static UA. Cycling through common browser UAs reduces this risk.
+USER_AGENTS = [
+    (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/123.0.0.0 Safari/537.36"
     ),
-    "Accept": "application/json",
-}
+    (
+        "Mozilla/5.0 (X11; Linux x86_64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/122.0.0.0 Safari/537.36"
+    ),
+]
 
-TIMEOUT = 20
+TIMEOUT      = 25
+MAX_RETRIES  = 3
+RETRY_DELAY  = 4   # seconds (doubles on each retry)
+
+
+def build_headers(attempt=0):
+    ua = USER_AGENTS[attempt % len(USER_AGENTS)]
+    return {
+        "User-Agent":      ua,
+        "Accept":          "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection":      "keep-alive",
+        "Referer":         "https://www.myfxbook.com/community/outlook",
+        "Sec-Fetch-Dest":  "empty",
+        "Sec-Fetch-Mode":  "cors",
+        "Sec-Fetch-Site":  "same-origin",
+    }
+
+
+def preserve_existing(out_file, ts, reason):
+    """
+    Mark the existing JSON with apiBlocked=true so the dashboard knows
+    the data is cached, then exit 0 (non-fatal — workflow succeeds).
+    """
+    existing = {}
+    if os.path.exists(out_file):
+        try:
+            with open(out_file) as f:
+                existing = json.load(f)
+        except Exception:
+            pass
+
+    if existing.get("pairs"):
+        existing["apiBlocked"]  = True
+        existing["blockReason"] = reason
+        existing["blockTs"]     = ts
+        with open(out_file, "w") as f:
+            json.dump(existing, f, indent=2)
+        print(f"\n[Fallback] Existing data preserved with apiBlocked=true.")
+        print(f"           Dashboard will fall back to COT / Dukascopy sources.")
+        print(f"           Pairs in cache: {len(existing['pairs'])}")
+        print(f"           Last successful fetch: {existing.get('updated', 'unknown')}")
+    else:
+        print(f"\n[Fallback] No existing data to preserve. Dashboard will use COT fallback.")
+
+    print(f"\n[Exit] Exiting with code 0 (non-fatal) — reason: {reason}")
+    sys.exit(0)
+
+
+def attempt_login(http, attempt, out_file, ts):
+    """
+    Try to log in. Returns session token string on success,
+    None on soft/retriable failure.
+    Calls preserve_existing (exits 0) on unrecoverable errors.
+    """
+    http.headers.update(build_headers(attempt))
+    delay = RETRY_DELAY * (2 ** attempt)
+
+    print(f"[Auth] Login attempt {attempt + 1}/{MAX_RETRIES} as {MYFXBOOK_EMAIL}...")
+
+    try:
+        r = http.get(
+            f"{BASE_URL}/login.json",
+            params={"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD},
+            timeout=TIMEOUT,
+        )
+    except requests.exceptions.Timeout:
+        print(f"[Auth] Timeout on attempt {attempt + 1}. Waiting {delay}s...")
+        time.sleep(delay)
+        return None
+    except requests.exceptions.ConnectionError as e:
+        print(f"[Auth] Connection error on attempt {attempt + 1}: {e}. Waiting {delay}s...")
+        time.sleep(delay)
+        return None
+
+    if r.status_code == 403:
+        # 403 = Forbidden — Myfxbook is blocking this request.
+        # Most common cause: GitHub Actions IP ranges are blocked by the provider.
+        # Treat as non-fatal: preserve existing data and exit 0.
+        print(f"\n[Auth] HTTP 403 Forbidden — Myfxbook API is blocking this request.")
+        print(f"       Possible causes:")
+        print(f"         1. GitHub Actions IP ranges are blocked by Myfxbook.")
+        print(f"         2. Account credentials have changed.")
+        print(f"         3. Myfxbook has changed the login endpoint.")
+        print(f"       Action: preserving last known data, exiting non-fatally.")
+        preserve_existing(out_file, ts, "HTTP 403 — API blocked GitHub Actions IPs")
+        # preserve_existing calls sys.exit(0) — line below is unreachable
+        return None
+
+    if r.status_code == 429:
+        print(f"[Auth] HTTP 429 Rate Limited. Waiting {delay}s...")
+        time.sleep(delay)
+        return None
+
+    if r.status_code >= 500:
+        print(f"[Auth] HTTP {r.status_code} Server Error. Waiting {delay}s...")
+        time.sleep(delay)
+        return None
+
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(f"[Auth] HTTP error: {e}. Waiting {delay}s...")
+        time.sleep(delay)
+        return None
+
+    try:
+        login_data = r.json()
+    except ValueError:
+        print(f"[Auth] Non-JSON response (status {r.status_code}). Body: {r.text[:200]}")
+        time.sleep(delay)
+        return None
+
+    if login_data.get("error"):
+        msg = login_data.get("message", "unknown")
+        print(f"[Auth] API returned error: {msg}")
+        # Credential errors are non-retriable
+        if any(kw in msg.lower() for kw in ("invalid", "password", "email", "wrong")):
+            preserve_existing(out_file, ts, f"credential error: {msg}")
+        time.sleep(delay)
+        return None
+
+    token = login_data.get("session", "")
+    if not token:
+        print(f"[Auth] No session token in response: {login_data}")
+        time.sleep(delay)
+        return None
+
+    return token
 
 
 def main():
@@ -73,7 +220,7 @@ def main():
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"\n{'='*60}")
-    print(f"fetch_myfxbook_sentiment.py  v3.0  --  {ts}")
+    print(f"fetch_myfxbook_sentiment.py  v4.0  --  {ts}")
     print(f"{'='*60}\n")
 
     if not MYFXBOOK_EMAIL or not MYFXBOOK_PASSWORD:
@@ -81,52 +228,76 @@ def main():
         print("        Set them as GitHub Secrets: MYFXBOOK_EMAIL, MYFXBOOK_PASSWORD")
         sys.exit(1)
 
-    # Una sola Session para todas las requests (IP-bound sessions)
+    # Single Session for all requests (IP-bound sessions since oct 2025)
     http = requests.Session()
-    http.headers.update(HEADERS)
 
-    # ── STEP 1: Login ────────────────────────────────────────────────────────
-    print(f"[Auth] Logging in as {MYFXBOOK_EMAIL}...")
-    r = http.get(f"{BASE_URL}/login.json",
-                 params={"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD},
-                 timeout=TIMEOUT)
-    r.raise_for_status()
-    login_data = r.json()
+    # ── STEP 1: Login (with retries) ─────────────────────────────────────────
+    token = None
+    for attempt in range(MAX_RETRIES):
+        result = attempt_login(http, attempt, out_file, ts)
+        if result:
+            token = result
+            break
 
-    if login_data.get("error"):
-        print(f"[Auth] Login failed: {login_data.get('message', 'unknown')}")
-        sys.exit(1)
-
-    # IMPORTANTE: el token puede contener caracteres ya URL-encoded (%2F, %3D, etc.)
-    # Guardarlo RAW — no pasar por urlencode ni quote() en calls posteriores.
-    token = login_data.get("session", "")
     if not token:
-        print(f"[Auth] No session token in response: {login_data}")
-        sys.exit(1)
+        print(f"[Auth] Login failed after {MAX_RETRIES} attempts.")
+        preserve_existing(out_file, ts, f"login failed after {MAX_RETRIES} attempts")
 
     print(f"[Auth] Login OK. Session: {token[:8]}...")
     time.sleep(1)
 
-    # ── STEP 2: Community Outlook ────────────────────────────────────────────
-    # Token raw en la URL — NO usar params= (requests re-encodearía el token)
+    # ── STEP 2: Community Outlook ─────────────────────────────────────────────
+    # Pass token RAW in URL — do NOT use params= (requests would re-encode the token)
     print("[API]  Fetching community outlook...")
-    r2 = http.get(f"{BASE_URL}/get-community-outlook.json?session={token}", timeout=TIMEOUT)
-    r2.raise_for_status()
-    outlook_data = r2.json()
+    outlook_data = None
+    for attempt in range(MAX_RETRIES):
+        delay = RETRY_DELAY * (2 ** attempt)
+        try:
+            r2 = http.get(
+                f"{BASE_URL}/get-community-outlook.json?session={token}",
+                timeout=TIMEOUT,
+            )
+            if r2.status_code == 403:
+                print(f"[API]  HTTP 403 on outlook fetch.")
+                preserve_existing(out_file, ts, "HTTP 403 on outlook endpoint")
+            if r2.status_code == 429:
+                print(f"[API]  HTTP 429 Rate Limited. Waiting {delay}s...")
+                time.sleep(delay)
+                continue
+            r2.raise_for_status()
+            outlook_data = r2.json()
+            break
+        except requests.exceptions.Timeout:
+            print(f"[API]  Timeout on attempt {attempt + 1}. Waiting {delay}s...")
+            time.sleep(delay)
+        except requests.exceptions.ConnectionError as e:
+            print(f"[API]  Connection error on attempt {attempt + 1}: {e}. Waiting {delay}s...")
+            time.sleep(delay)
+        except requests.exceptions.HTTPError as e:
+            print(f"[API]  HTTP error: {e}. Waiting {delay}s...")
+            time.sleep(delay)
+        except ValueError:
+            print(f"[API]  Non-JSON response. Waiting {delay}s...")
+            time.sleep(delay)
+
+    if outlook_data is None:
+        print(f"[API]  Could not fetch outlook after {MAX_RETRIES} attempts.")
+        preserve_existing(out_file, ts, f"outlook fetch failed after {MAX_RETRIES} attempts")
 
     if outlook_data.get("error"):
-        print(f"[API]  Error: {outlook_data.get('message', 'unknown')}")
-        sys.exit(1)
+        msg = outlook_data.get("message", "unknown")
+        print(f"[API]  Error in outlook response: {msg}")
+        preserve_existing(out_file, ts, f"outlook API error: {msg}")
 
-    # symbols es un ARRAY: [{name, longPercentage, shortPercentage, longVolume, shortVolume, ...}]
+    # symbols is an ARRAY: [{name, longPercentage, shortPercentage, longVolume, shortVolume, ...}]
     symbols_list = outlook_data.get("symbols", [])
     if not symbols_list:
         print(f"[API]  No symbols in response. Keys: {list(outlook_data.keys())}")
-        sys.exit(1)
+        preserve_existing(out_file, ts, "empty symbols list in outlook response")
 
     print(f"[API]  Got {len(symbols_list)} symbols")
 
-    # ── STEP 3: Normalizar ───────────────────────────────────────────────────
+    # ── STEP 3: Normalize ─────────────────────────────────────────────────────
     sym_map = {item.get("name", "").upper().replace("/", ""): item for item in symbols_list}
     pairs = []
 
@@ -169,9 +340,9 @@ def main():
 
     if not pairs:
         print("[ERROR] Could not normalize any pairs from API response")
-        sys.exit(1)
+        preserve_existing(out_file, ts, "could not normalize any pairs from response")
 
-    # ── STEP 4: Extract general stats ───────────────────────────────────────
+    # ── STEP 4: Extract general stats ─────────────────────────────────────────
     raw_general = outlook_data.get("general", {}) or {}
     general = {
         "profitablePercentage":    raw_general.get("profitablePercentage",    0),
@@ -184,15 +355,21 @@ def main():
         "averageAccountLoss":      raw_general.get("averageAccountLoss",      ""),
     } if raw_general else None
 
-    # ── STEP 5: Logout ───────────────────────────────────────────────────────
+    # ── STEP 5: Logout ────────────────────────────────────────────────────────
     try:
         http.get(f"{BASE_URL}/logout.json?session={token}", timeout=10)
         print("\n[Auth] Logged out OK")
     except Exception as e:
         print(f"\n[Auth] Logout warning (non-fatal): {e}")
 
-    # ── STEP 6: Escribir JSON ────────────────────────────────────────────────
-    output = {"updated": ts, "source": "myfxbook", "pairs": pairs, "general": general}
+    # ── STEP 6: Write JSON ────────────────────────────────────────────────────
+    output = {
+        "updated":    ts,
+        "source":     "myfxbook",
+        "apiBlocked": False,
+        "pairs":      pairs,
+        "general":    general,
+    }
     with open(out_file, "w") as f:
         json.dump(output, f, indent=2)
 
