@@ -60,7 +60,6 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
-| `fx-performance/` | FX pair performance data | Engine — daily |
 | `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels; `iv_history.json` — rolling 52-week IV snapshots per FX pair for IV Rank calculation | Engine — every 5 min (quotes); weekly append (iv_history) |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
