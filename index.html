@@ -232,6 +232,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #layout{display:flex;flex-direction:column;height:auto;overflow:visible}
 #main{overflow-y:visible;overflow-x:hidden}
 #narrative{height:auto;flex-direction:column;gap:6px}
+#split-layout-btn{display:none!important}
+#split-tip{display:none!important}
+#split-drag-handle{display:none!important}
+/* Force-disable split layout on mobile even if the class is active */
+#main.split-layout{display:block!important;flex-direction:unset!important;height:auto!important;overflow:visible!important}
+#main.split-layout #split-upper{width:100%!important;min-width:0!important;overflow-y:visible!important;flex-shrink:unset!important}
+#main.split-layout #split-lower{border-left:none!important;overflow-y:visible!important}
+.split-drag-handle{display:none!important}
 }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
@@ -429,7 +437,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="panel-title">Price Chart</span>
           <div style="display:flex;align-items:center;gap:8px;">
           <span class="panel-sub">TradingView · live data</span>
-          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout">
+          <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout" style="display:none;"">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0.5" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/><rect x="6" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/></svg>
             <div id="split-tip" role="tooltip">Toggle split view</div>
           </button>
@@ -972,8 +980,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   var alertsOrigParent  = alertsPanel ? alertsPanel.parentNode : null;
   var alertsOrigNext    = alertsPanel ? alertsPanel.nextSibling : null;
 
+  function isMobile(){ return window.innerWidth <= 900; }
+
   function applyState(active, leftPct){
     if(!main||!btn||!handle||!upper||!lower) return;
+    // Never activate split layout on mobile
+    if(isMobile()) active = false;
+    // Show/hide button based on viewport
+    btn.style.display = isMobile() ? 'none' : '';
     if(active){
       main.classList.add('split-layout');
       btn.classList.add('active');
@@ -1034,6 +1048,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
     });
   }
+
+  // Deactivate split layout if viewport shrinks to mobile (e.g. rotation)
+  window.addEventListener('resize', function(){
+    btn.style.display = isMobile() ? 'none' : '';
+    if(isMobile() && main.classList.contains('split-layout')){
+      applyState(false);
+    }
+  });
 
   // Horizontal drag handle resize
   if(handle){
