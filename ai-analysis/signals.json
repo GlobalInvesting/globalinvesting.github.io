@@ -1,57 +1,57 @@
 [
   {
-    "time": "16:55",
+    "time": "19:10",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.00 resistance — BoJ verbal intervention risk rising on a sustained break above 160.00",
+    "text": "USD/JPY testing 158.39 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 158.02",
+      "USD/JPY: 158.39",
       "BoJ rate: 0.75%",
-      "VIX: 17.5"
+      "VIX: 17.6"
     ]
   },
   {
-    "time": "16:53",
+    "time": "19:08",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD extends gains above 0.7190 — RBA hiking rates supports AUD carry",
+    "text": "AUD/USD holding above 0.7177 — RBA hiking rates supports AUD carry",
     "evidence": [
-      "AUD/USD: 0.7191",
+      "AUD/USD: 0.7177",
       "RBA rate: 4.10%",
-      "US 10Y yield: 4.29%"
+      "CFTC AUD net: +41,458"
     ]
   },
   {
-    "time": "16:51",
+    "time": "19:06",
     "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD holds at 1.1800 — Fed-ECB 175bp differential weighs on pair",
+    "title": "USD/CAD",
+    "text": "USD/CAD correlation with WTI Oil breaks at +0.728 — CAD commodity exposure increases",
     "evidence": [
-      "EUR/USD: 1.1802",
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%"
+      "USD/CAD: 1.3672",
+      "WTI Oil: $83.3",
+      "USD/CAD vs WTI Oil corr: +0.728"
     ]
   },
   {
-    "time": "16:49",
+    "time": "19:04",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.47%",
+    "title": "VIX",
+    "text": "VIX at 17.6 signals normal volatility — risk-on environment, S&P 500 up +1.09%",
     "evidence": [
-      "VIX: 17.5",
-      "S&P 500: 7,145",
-      "DXY: 97.92"
+      "VIX: 17.6",
+      "S&P 500: 7,118",
+      "1D:+1.09%"
     ]
   },
   {
-    "time": "16:47",
-    "priority": "warning",
+    "time": "19:02",
+    "priority": "info",
     "title": "CFTC — EUR",
-    "text": "EUR net long positioning at 77.3% — institutional long bias, watch for potential squeeze",
+    "text": "EUR net long positioning at +1,029 contracts — institutional long bias",
     "evidence": [
       "CFTC EUR net: +1,029",
-      "EUR/USD: 1.1802",
-      "week ending: 2026-04-07"
+      "EUR/USD: 1.1787",
+      "week ending 2026-04-07"
     ]
   }
 ]
