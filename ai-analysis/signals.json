@@ -1,57 +1,57 @@
 [
   {
-    "time": "05:55",
+    "time": "08:05",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 159.46, BoJ intervention risk rising as it approaches the 160.00 level",
+    "text": "USD/JPY testing 159.25 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
-      "USD/JPY: 159.46",
+      "USD/JPY: 159.25",
       "BoJ rate: 0.75%",
-      "VIX: 17.9"
+      "VIX: 18.2"
     ]
   },
   {
-    "time": "05:53",
+    "time": "08:03",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD holds above 0.7169, RBA hike bets grow, but retail sentiment is extremely short at 90%",
+    "text": "AUD/USD holding above 0.7172 — RBA hiking rates supports AUD carry",
     "evidence": [
-      "AUD/USD: 0.7169",
+      "AUD/USD: 0.7172",
       "RBA rate: 4.10%",
-      "AUD/USD retail sentiment: 10% long / 90% short"
+      "CFTC AUD net: +41,458"
     ]
   },
   {
-    "time": "05:51",
+    "time": "08:01",
     "priority": "warning",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation breaks at +0.653, z=+1.53σ, JPY no longer acting as safe haven",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading above 1.1787 — ECB-Fed rate differential weighs on pair",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.653",
-      "z=+1.53σ",
-      "VIX: 17.9"
+      "EUR/USD: 1.1787",
+      "ECB rate: 2.00%",
+      "Fed rate: 3.75%"
     ]
   },
   {
-    "time": "05:49",
+    "time": "07:58",
     "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 17.9 signals normal volatility — risk-on environment, S&P 500 up +0.26%",
+    "title": "Risk Regime",
+    "text": "VIX at 18.2 signals normal volatility — risk-on environment, S&P 500 up +0.26%",
     "evidence": [
-      "VIX: 17.9",
+      "VIX: 18.2",
       "S&P 500: 7,041",
-      "1D:+0.26%"
+      "DXY: 98.21"
     ]
   },
   {
-    "time": "05:47",
+    "time": "07:55",
     "priority": "info",
-    "title": "CFTC — EUR",
-    "text": "EUR net long at +1,029, long% at 77.3%, institutional positioning supports EUR/USD",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD sentiment extreme: 92% short — retail heavily positioned, watch for squeeze",
     "evidence": [
-      "EUR net: +1,029",
-      "long%: 77.3%",
-      "EUR/USD: 1.1787"
+      "AUD/NZD: 92% short",
+      "CFTC AUD net: +41,458",
+      "CFTC NZD net: -15,824"
     ]
   }
 ]
