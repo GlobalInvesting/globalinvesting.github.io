@@ -74,7 +74,7 @@ import os
 import json
 import sys
 import math
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 try:
     import yfinance as yf
@@ -941,7 +941,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v2.9  —  {ts}\n{'='*60}\n")
+    print(f"\n{'='*60}\nfetch_intraday_quotes.py  v3.0  —  {ts}\n{'='*60}\n")
 
     quotes = {}
 
