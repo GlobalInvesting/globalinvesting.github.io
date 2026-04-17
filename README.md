@@ -17,8 +17,9 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
 - **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
 - **Central bank policy rates** — All G8 CBs with rate cycle direction
+- **CB Rate Expectations** — OIS-derived forward consensus direction (Cut/Hold/Hike) and 30-day CIP forward rate for each G8 central bank at their next meeting; sourced from CME FedWatch, ECB SDW ESTER, BoE SONIA, BoJ TONA, ASX Rate Indicator, BoC CORRA, SNB SARON, and RBNZ OCR overnight
 - **FX liquidity & sessions** — 24-hour liquidity profile with live session indicator
-- **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias. When ≥4 weeks of IV history are available, an IV Rank column (0–100 scale, where 100 = historically expensive vol) replaces the COT bias column.
+- **Positioning Bias** — ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) combined with COT Leveraged Funds directional bias and 25-delta Risk Reversals from Saxo Bank (1M tenor, indicative mid-market). When ≥4 weeks of IV history are available, an IV Rank column (0–100 scale, where 100 = historically expensive vol) replaces the COT bias column.
 - **Pair detail panel** — Linked right-panel showing price, 1W change, HV30, ATM IV, IV−HV, LF net, AM net, carry differential, and LF/AM alignment badge for the currently selected chart pair (Eikon-style linked panel). Hover tooltips on every metric cell explain the data source and interpretation.
 - **ETF Options IV** — 8-row implied volatility panel: VIX, VIX9D, VVIX, MOVE, GLD IV, TLT IV, EEM IV, EFA IV. Colour-coded bar (red = elevated, amber = mid, green = low). Sources: CBOE indices and yfinance ETF options. Refreshes every 10 minutes.
 - **Configurable price alerts** — Threshold alerts for VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, Gold, US 10Y, and MOVE. Direction (`>` / `<`) and numeric threshold configurable per alert. Fires browser Notifications API on trigger. Persisted in localStorage across sessions. Checks every 5 minutes.
@@ -65,6 +66,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
+| `rr-data/` | `rr.json` — 25-delta Risk Reversal quotes (4 G8 pairs, 1M tenor) from Saxo Bank | Engine — Mon–Fri daily |
 | `sentiment-data/` | `myfxbook.json` — retail positioning | Engine — hourly |
 
 ---
