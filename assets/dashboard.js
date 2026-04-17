@@ -2013,9 +2013,9 @@ function attachRiskMonitorTooltips() {
   // Header row
   const skewHead = document.querySelector('table[aria-label="COT-derived directional positioning bias per pair"] thead tr');
   if (skewHead) attachRiskTip(skewHead,
-    'Positioning Bias — ETF IV + COT',
-    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. These are exchange-listed ETF options, not OTC interbank FX options. OTC interbank vol (used by Bloomberg and Eikon) is not publicly available; ETF IV serves as the closest free proxy. COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined.',
-    'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels, particularly for less-traded pairs. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
+    'Positioning Bias — ETF IV + COT + 25d RR',
+    'ATM implied volatility from CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) — nearest expiry ≥4 days. ETF IV is the closest free proxy for OTC interbank implied vol (not publicly available). COT bias from CFTC Disaggregated TFF · Leveraged Funds · Options+Futures Combined. 25-delta Risk Reversal from Saxo Bank public options page (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).',
+    'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels. RR from Saxo is indicative mid-market, updated during European hours; treat as directional context, not a tradeable quote. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
   const skewPairTips = {
@@ -3962,19 +3962,24 @@ async function fetchFedExpectations() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// POSITIONING BIAS — primary: real ATM IV from FX ETF options (quotes.json fx_etf_iv)
-// Fallback: COT net positioning proxy (original behavior) when ETF IV unavailable.
+// POSITIONING BIAS — three data sources, rendered in priority order:
 //
-// ETF IV source (CBOE, via yfinance — fetch_intraday_quotes.py):
+// SOURCE 1 — ETF IV (primary): real ATM implied vol from CBOE FX ETF options (quotes.json).
 //   FXE → EUR/USD  FXB → GBP/USD  FXY → USD/JPY  FXA → AUD/USD
-// COT fallback: netToSkew() maps CFTC net spec position to ±1.5 directional bias.
-//   The 1W/1M column distinction is preserved but both now show real IV when available.
+//   When available: shows ATM IV column + IV Rank (when ≥4w history) or COT bias fallback.
 //
-// Column semantics when ETF IV is available:
-//   IV col  = ATM implied vol (annualised %, from nearest CBOE expiry ≥4d out)
-//   Bias    = directional bias from COT net (unchanged — positioning, not vol)
-// Column semantics when COT fallback only (ETF IV unavailable):
-//   1W/1M   = COT-derived positioning proxy (original behavior)
+// SOURCE 2 — COT (always loaded): CFTC Disaggregated TFF · Leveraged Funds net positioning.
+//   Used as directional bias proxy and fallback when ETF IV is unavailable.
+//
+// SOURCE 3 — 25d Risk Reversal (supplemental): Saxo Bank public options page · 1M tenor.
+//   rr-data/rr.json — updated Mon–Fri 08:30 UTC.
+//   25d RR = 25d call IV − 25d put IV. Positive → base currency calls bid (upside skew).
+//   Shown as a small chip below the Direction cell when available. Does not add a column.
+//
+// Column layout (when ETF IV available):
+//   Pair | ATM IV | IV Rnk or COT bias | Direction [+ 25d RR chip if available]
+// Column layout (COT fallback only):
+//   Pair | 1W | 1M | Bias [+ 25d RR chip if available]
 // ═══════════════════════════════════════════════════════════════════
 async function fetchOptionSkew() {
   try {
@@ -3982,10 +3987,10 @@ async function fetchOptionSkew() {
     if (!tbody) return;
 
     const pairs = [
-      { pair:'EUR/USD', cot:'EUR', etfId:'eurusd' },
-      { pair:'GBP/USD', cot:'GBP', etfId:'gbpusd' },
-      { pair:'USD/JPY', cot:'JPY', etfId:'usdjpy' },
-      { pair:'AUD/USD', cot:'AUD', etfId:'audusd' },
+      { pair:'EUR/USD', cot:'EUR', etfId:'eurusd', rrKey:'EURUSD' },
+      { pair:'GBP/USD', cot:'GBP', etfId:'gbpusd', rrKey:'GBPUSD' },
+      { pair:'USD/JPY', cot:'JPY', etfId:'usdjpy', rrKey:'USDJPY' },
+      { pair:'AUD/USD', cot:'AUD', etfId:'audusd', rrKey:'AUDUSD' },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
@@ -4004,6 +4009,18 @@ async function fetchOptionSkew() {
     }));
     const cotMap = {};
     cotResults.filter(Boolean).forEach(c => { cotMap[c.ccy] = c; });
+
+    // ── SOURCE 3: 25d Risk Reversals from Saxo Bank (supplemental) ──
+    // rr-data/rr.json — updated Mon–Fri 08:30 UTC by update-saxo-rr.yml
+    // Graceful: if file missing or fetch fails, rrMap stays empty and RR chips are hidden.
+    let rrMap = {};
+    try {
+      const rrRes = await fetch('./rr-data/rr.json').catch(() => null);
+      if (rrRes?.ok) {
+        const rrJson = await rrRes.json();
+        if (rrJson?.pairs) rrMap = rrJson.pairs;  // { EURUSD: { rr25d: -0.45 }, … }
+      }
+    } catch { /* RR unavailable — continue without it */ }
 
     // COT → directional bias proxy (used for Bias column + fallback 1W/1M)
     function netToSkew(net, invert) {
@@ -4067,33 +4084,52 @@ async function fetchOptionSkew() {
           col2Title = `ETF: ${etfIv.source} · exp ${etfIv.expiry} · ATM strike ${etfIv.atm} · IV Rank building (need ≥4 weekly snapshots)`;
         }
 
+        // 25d RR chip — shown below bias label when Saxo data available
+        const rrEntry  = rrMap[p.rrKey];
+        const rrVal    = rrEntry?.rr25d ?? null;
+        const rrChip   = rrVal !== null
+          ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrVal > 0 ? 'var(--up)' : rrVal < 0 ? 'var(--down)' : 'var(--text3)'};"
+              title="25-delta Risk Reversal (1M) · Saxo Bank · ${rrVal > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}"
+             >RR ${rrVal >= 0 ? '+' : ''}${rrVal.toFixed(2)}</div>`
+          : '';
+
         return `<tr title="${col2Title}">
           <td>${p.pair}</td>
           <td class="${ivCls}" style="font-family:var(--font-mono)">${ivStr}</td>
           ${col2Html}
-          <td class="${biasCls}">${bias}</td>
+          <td class="${biasCls}" style="line-height:1.3;">${bias}${rrChip}</td>
         </tr>`;
       } else {
         // ── COT fallback: original behavior ──
         const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
         const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
+        // 25d RR chip — shown below bias label when Saxo data available
+        const rrEntryCot = rrMap[p.rrKey];
+        const rrValCot   = rrEntryCot?.rr25d ?? null;
+        const rrChipCot  = rrValCot !== null
+          ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrValCot > 0 ? 'var(--up)' : rrValCot < 0 ? 'var(--down)' : 'var(--text3)'};"
+              title="25-delta Risk Reversal (1M) · Saxo Bank · ${rrValCot > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}"
+             >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
+          : '';
+
         return `<tr title="COT positioning proxy — ETF IV unavailable">
           <td>${p.pair}</td>
           <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
           <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
-          <td class="${biasCls}">${bias}</td>
+          <td class="${biasCls}" style="line-height:1.3;">${bias}${rrChipCot}</td>
         </tr>`;
       }
     }).join('');
 
     // Update panel subtitle to reflect actual source
-    const panelHead = tbody.closest('.card, section, div')
-      ?.previousElementSibling?.querySelector('span[style*="text3"]')
-      || document.querySelector('.sb-head span[style*="text3"]');
-    if (hasAnyEtfIv && panelHead) {
-      panelHead.textContent = 'ETF options IV · CBOE (proxy)';
-    } else if (panelHead) {
-      panelHead.textContent = 'COT-derived · IV unavailable';
+    const panelHead = document.getElementById('skew-source-label');
+    const hasRR = Object.keys(rrMap).length > 0;
+    if (panelHead) {
+      if (hasAnyEtfIv) {
+        panelHead.textContent = hasRR ? 'ETF IV · CBOE · 25d RR · Saxo' : 'ETF options IV · CBOE (proxy)';
+      } else {
+        panelHead.textContent = hasRR ? 'COT · 25d RR · Saxo' : 'COT-derived · IV unavailable';
+      }
     }
 
   } catch(e) { console.warn('Option skew failed:', e); }
