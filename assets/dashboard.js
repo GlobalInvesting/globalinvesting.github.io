@@ -2023,13 +2023,16 @@ function attachRiskMonitorTooltips() {
     'GBP/USD': { body: 'GBP/USD skew from CFTC Leveraged Funds net GBP positioning. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
     'USD/JPY': { body: 'USD/JPY skew from CFTC Leveraged Funds net JPY positioning (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
     'AUD/USD': { body: 'AUD/USD skew from CFTC Leveraged Funds net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
+    'USD/CAD': { body: 'USD/CAD bias from CFTC Leveraged Funds net CAD positioning (inverted). Positive = USD calls bid / CAD puts bid (USD upside, CAD weakness). Negative = CAD demand dominant, often driven by oil strength or risk-on.', ex: 'CAD is tightly linked to WTI crude. Watch for divergence between COT bias and oil price direction — that spread often resolves in oil\'s favour.' },
+    'USD/CHF': { body: 'USD/CHF bias from CFTC Leveraged Funds net CHF positioning (inverted). Positive = USD calls bid / CHF puts bid. Negative = CHF safe-haven demand dominant.', ex: 'CHF safe-haven flows can override COT positioning quickly during risk-off episodes. Treat CHF bias as a risk sentiment barometer alongside JPY.' },
+    'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
   };
   skewRows.forEach(row => {
     const pairCell = row.querySelector('td:first-child');
     if (!pairCell) return;
     const pair = pairCell.textContent.trim();
     const tip  = skewPairTips[pair];
-    if (tip) attachRiskTip(row, pair + ' — Option Skew', tip.body, tip.ex);
+    if (tip) attachRiskTip(row, pair + ' — Positioning Bias', tip.body, tip.ex);
   });
 }
 
@@ -3991,6 +3994,9 @@ async function fetchOptionSkew() {
       { pair:'GBP/USD', cot:'GBP', etfId:'gbpusd', rrKey:'GBPUSD' },
       { pair:'USD/JPY', cot:'JPY', etfId:'usdjpy', rrKey:'USDJPY' },
       { pair:'AUD/USD', cot:'AUD', etfId:'audusd', rrKey:'AUDUSD' },
+      { pair:'USD/CAD', cot:'CAD', etfId:null,     rrKey:'USDCAD' },
+      { pair:'USD/CHF', cot:'CHF', etfId:null,     rrKey:'USDCHF' },
+      { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
@@ -3998,7 +4004,7 @@ async function fetchOptionSkew() {
     const etfIvMap = intradayData?.fx_etf_iv || {};
 
     // ── SOURCE 2: COT positioning (bias direction + fallback values) ──
-    const cotFiles = ['EUR','GBP','JPY','AUD','CAD'];
+    const cotFiles = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD'];
     const cotResults = await Promise.all(cotFiles.map(async ccy => {
       try {
         const r = await fetch('./cot-data/' + ccy + '.json');
