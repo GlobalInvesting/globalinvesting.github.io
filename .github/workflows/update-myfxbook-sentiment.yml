@@ -1,39 +1,42 @@
-name: Update Myfxbook Sentiment — v1.3
+name: Update Myfxbook Sentiment — v1.4
 
 # Runs every hour, 24/7, Mon–Sun.
 #
-# ⚠️  API LIMIT: Myfxbook free tier = 100 requests/24h.
-#     Each run = 3 calls (login + outlook + logout).
-#     Running every 60 min × 24h × 7d = 24 runs/day = 72 calls/day ✅ (within limit)
-#     DO NOT use every 15 min: 96 runs/day × 3 = 288 calls → exceeds limit 2.8x.
+# API LIMIT: Myfxbook free tier = 100 requests/24h.
+#   Each run = 3 calls (login + outlook + logout).
+#   Running every 60 min × 24h = 24 runs/day = 72 calls/day (within limit).
+#   DO NOT use every 15 min: 96 runs/day × 3 = 288 calls — exceeds limit.
 #
-# ✅ Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
-#    No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is enough
-#    because the workflow and output data live in the same repo.
+# Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
+#   No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is sufficient
+#   because the workflow and output data live in the same repo.
 #
-# GRACEFUL DEGRADATION (v1.3):
-#    If Myfxbook API returns 403 (GitHub Actions IPs may be blocked by the provider),
-#    the script exits 0 (non-fatal). Existing myfxbook.json is preserved with
-#    apiBlocked=true. The dashboard automatically falls back to COT / Dukascopy sources.
-#    The workflow run will show as SUCCESS — no email notifications for API blocks.
+# CLOUDFLARE WORKER PROXY (v1.4):
+#   Myfxbook blocks GitHub Actions IP ranges at the Cloudflare WAF level.
+#   This workflow routes all Myfxbook API calls through a Cloudflare Worker
+#   that acts as a proxy from CF's own edge IP range (not on the denylist).
+#   Architecture: GHA → CF Worker → Myfxbook → Worker → GHA
+#
+# GRACEFUL DEGRADATION (v1.4):
+#   If the Worker or Myfxbook returns an unrecoverable error, the script
+#   exits 0 (non-fatal). Existing myfxbook.json is preserved with
+#   apiBlocked=true. The dashboard automatically falls back to Dukascopy.
+#   Workflow run shows as SUCCESS — no spurious failure notifications.
 #
 # SECRETS REQUIRED (set in repo Settings → Secrets → Actions):
 #   MYFXBOOK_EMAIL    — email address of your Myfxbook account
 #   MYFXBOOK_PASSWORD — password of your Myfxbook account
+#   CF_WORKER_URL     — URL of deployed Cloudflare Worker
+#                       e.g. https://myfxbook-proxy.YOUR_SUBDOMAIN.workers.dev
+#   CF_WORKER_SECRET  — shared secret (must match WORKER_SECRET in CF Worker env vars)
 #
 # OUTPUT: sentiment-data/myfxbook.json (committed to repo, served via GitHub Pages)
-#
-# NOTE: Retail positioning changes very slowly (community-accumulated data).
-#       Updating every hour is more than sufficient — no quality loss vs 15 min.
 
 on:
   schedule:
     - cron: '0 * * * *'    # every hour on the hour, all days, all week
   workflow_dispatch:        # manual trigger from GitHub UI
 
-# Opt into Node.js 24 now to avoid deprecation warnings from actions/* packages.
-# actions/checkout@v4 and actions/setup-python@v5 currently run on Node.js 20,
-# which will be removed from GitHub Actions runners on 2026-09-16.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -64,10 +67,12 @@ jobs:
       - name: Create output directory
         run: mkdir -p sentiment-data
 
-      - name: Fetch Myfxbook community outlook
+      - name: Fetch Myfxbook community outlook via CF Worker
         env:
           MYFXBOOK_EMAIL:    ${{ secrets.MYFXBOOK_EMAIL }}
           MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
+          CF_WORKER_URL:     ${{ secrets.CF_WORKER_URL }}
+          CF_WORKER_SECRET:  ${{ secrets.CF_WORKER_SECRET }}
           SITE_PATH: .
         run: python3 scripts/fetch_myfxbook_sentiment.py
 
