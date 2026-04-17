@@ -1,57 +1,57 @@
 [
   {
-    "time": "11:10",
+    "time": "14:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings on a sustained break above 160",
+    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings",
     "evidence": [
-      "USD/JPY: 159.16",
+      "USD/JPY: 158.2",
       "BoJ rate: 0.75%",
-      "VIX: 18.1"
+      "VIX: 17.8"
     ]
   },
   {
-    "time": "11:08",
+    "time": "13:58",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD; pair holds at 1.1798",
+    "text": "Fed-ECB 175bp differential weighs on EUR/USD; pair holds at 1.1837",
     "evidence": [
-      "EUR/USD: 1.1798",
+      "EUR/USD: 1.1837",
       "Fed rate: 3.75% (ON HOLD)",
       "ECB rate: 2.00% (ON HOLD)"
     ]
   },
   {
-    "time": "11:05",
+    "time": "13:55",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7170",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7211",
     "evidence": [
-      "AUD/USD: 0.717",
+      "AUD/USD: 0.7211",
       "RBA rate: 4.10% (HIKING)",
       "US 10Y yield: 4.29%"
     ]
   },
   {
-    "time": "11:02",
+    "time": "13:50",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 18.1 signals normal volatility — risk-on environment, S&P 500 up +0.26%",
+    "title": "VIX",
+    "text": "VIX at 17.8 signals normal volatility — risk-on environment, S&P 500 up +0.93%",
     "evidence": [
-      "VIX: 18.1",
-      "S&P 500: 7,041",
-      "DXY: 98.12"
+      "VIX: 17.8",
+      "S&P 500: 7,107",
+      "DXY: 97.79"
     ]
   },
   {
-    "time": "10:59",
-    "priority": "warning",
+    "time": "13:45",
+    "priority": "info",
     "title": "AUD/NZD",
-    "text": "Retail sentiment extreme: 92% short — watch for squeeze; AUD/NZD trading at 1.2204",
+    "text": "AUD/NZD sentiment extreme: 92% short — retail heavily positioned, watch for squeeze",
     "evidence": [
-      "AUD/NZD: 1.2204",
-      "Retail sentiment: 92% short",
-      "CFTC AUD net: +41,458"
+      "AUD/NZD: 92% short",
+      "AUD/USD: 90% short",
+      "EUR/JPY: 89% short"
     ]
   }
 ]
