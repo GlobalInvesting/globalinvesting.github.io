@@ -1,57 +1,57 @@
 [
   {
-    "time": "04:35",
+    "time": "05:55",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "BoJ intervention risk rising as USD/JPY approaches 160.00; watch for verbal warnings",
+    "text": "USD/JPY testing 159.46, BoJ intervention risk rising as it approaches the 160.00 level",
     "evidence": [
-      "USD/JPY: 159.44",
+      "USD/JPY: 159.46",
       "BoJ rate: 0.75%",
       "VIX: 17.9"
     ]
   },
   {
-    "time": "04:32",
+    "time": "05:53",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "AUD/USD long positioning extreme at 71.1% — watch for potential squeeze",
+    "text": "AUD/USD holds above 0.7169, RBA hike bets grow, but retail sentiment is extremely short at 90%",
     "evidence": [
-      "AUD/USD: 0.7168",
-      "CFTC AUD net: +41,458",
-      "RBA rate: 4.10%"
+      "AUD/USD: 0.7169",
+      "RBA rate: 4.10%",
+      "AUD/USD retail sentiment: 10% long / 90% short"
     ]
   },
   {
-    "time": "04:29",
+    "time": "05:51",
     "priority": "warning",
     "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break signals JPY has lost safe-haven function; watch for further USD/JPY gains",
+    "text": "USD/JPY vs VIX correlation breaks at +0.653, z=+1.53σ, JPY no longer acting as safe haven",
     "evidence": [
       "USD/JPY vs VIX: corr=+0.653",
-      "VIX: 17.9",
-      "USD/JPY: 159.44"
+      "z=+1.53σ",
+      "VIX: 17.9"
     ]
   },
   {
-    "time": "04:24",
+    "time": "05:49",
     "priority": "info",
     "title": "VIX",
     "text": "VIX at 17.9 signals normal volatility — risk-on environment, S&P 500 up +0.26%",
     "evidence": [
       "VIX: 17.9",
       "S&P 500: 7,041",
-      "DXY: 98.21"
+      "1D:+0.26%"
     ]
   },
   {
-    "time": "04:20",
+    "time": "05:47",
     "priority": "info",
-    "title": "RBA",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7098",
+    "title": "CFTC — EUR",
+    "text": "EUR net long at +1,029, long% at 77.3%, institutional positioning supports EUR/USD",
     "evidence": [
-      "RBA rate: 4.10%",
-      "AUD/USD: 0.7168",
-      "US 10Y yield: 4.309%"
+      "EUR net: +1,029",
+      "long%: 77.3%",
+      "EUR/USD: 1.1787"
     ]
   }
 ]
