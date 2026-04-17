@@ -12,7 +12,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 
 - **Real-time price feeds** — Major FX pairs, commodities (XAU, WTI), crypto (BTC), DXY, and US 10Y yield
 - **Currency strength heatmap** — 8×8 grid showing G8 currency performance across all pairs
-- **AI market narrative** — 2–3 sentence regime summary updated 8× daily alongside market signals
+- **AI market narrative** — 2–3 sentence regime summary updated 12× daily alongside market signals
 - **CFTC COT positioning** — Leveraged Funds net positioning (Disaggregated TFF, Options+Futures Combined) from CFTC.gov, updated weekly
 - **US Treasury yield curve** — 3M, 2Y, 5Y, 10Y, 30Y, updated daily
 - **Cross-asset risk monitor** — SPX, Gold, WTI, BTC, DXY, Nikkei, Stoxx correlations with stress scoring
@@ -28,7 +28,7 @@ A professional-grade foreign exchange monitoring platform for serious market par
 - **AI signal evidence traceability** — Each AI-generated market signal carries an `evidence[]` field listing the exact data values that motivated it (e.g. "VIX: 23.9", "Fed rate: 4.50%"). Evidence chips are hidden by default and revealed by clicking the signal row.
 - **Economic calendar** — TradingView embed with real-time event actuals
 - **News feed** — FXStreet, ForexLive, Investing.com and others, filtered by FX relevance, updated hourly
-- **Market signals** — 4–5 AI-generated signals updated 8× daily
+- **Market signals** — 4–5 AI-generated signals updated 12× daily
 
 ---
 
@@ -55,15 +55,17 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 
 | Directory | Contents | Updated by |
 |-----------|----------|------------|
-| `ai-analysis/signals.json` | AI narrative and market signals | Engine — 8× daily |
-| `calendar-data/` | Economic calendar events | Engine — daily |
+| `ai-analysis/` | `index.json` — AI regime label + narrative; `signals.json` — market signals | Engine — 12× daily |
+| `calendar-data/` | Economic calendar events — written by engine, consumed by `update_extended_data.py` for PMI/CPI enrichment (not consumed directly by frontend) | Engine — daily |
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
+| `fx-data/` | `frankfurter.json` (ECB rates cache) + `fx-liquidity.json` | Engine — daily |
 | `intraday-data/` | `quotes.json` — primary intraday source for cross-asset panels; `iv_history.json` — rolling 52-week IV snapshots per FX pair for IV Rank calculation | Engine — every 5 min (quotes); weekly append (iv_history) |
 | `meetings-data/` | CB meeting schedules | Engine — weekly |
 | `news-data/` | News feed headlines | Engine — hourly |
 | `rates/` | FX rates cache | Engine — daily |
+| `sentiment-data/` | `myfxbook.json` — retail positioning | Engine — hourly |
 
 ---
 
