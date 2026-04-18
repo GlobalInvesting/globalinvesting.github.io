@@ -615,8 +615,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="rate-cell"><div class="rate-cty">5Y Note</div><div class="rate-val" id="rate-5y">—</div><div class="rate-chg flat" id="rate-5y-chg">—</div></div>
         <div class="rate-cell"><div class="rate-cty">10Y Bond</div><div class="rate-val" id="rate-10y">—</div><div class="rate-chg flat" id="rate-10y-chg">—</div></div>
       </div>
-      <div class="yield-canvas-wrap">
-        <canvas id="yield-canvas" height="100"></canvas>
+      <div class="yield-canvas-wrap"
+           style="cursor:pointer;"
+           title="Click to view full yield curve detail"
+           onclick="(function(){ var d=window._STATE_ycTenors; if(d&&d.length&&typeof openYCModal==='function') openYCModal(d); })()">
+        <canvas id="yield-canvas" height="100" style="pointer-events:none;"></canvas>
       </div>
       <div style="padding:0 10px 6px;overflow-x:auto;">
         <table aria-label="Yield spreads">
@@ -960,6 +963,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.16.19" defer></script>
 <script src="assets/cb-rates-modal.js?v=1.0.0" defer></script>
+<script src="assets/corr-modal.js?v=1.0.0" defer></script>
+<script src="assets/yc-modal.js?v=1.0.0" defer></script>
 
 <div id="sr-announce" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
