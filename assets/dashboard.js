@@ -2032,7 +2032,17 @@ function attachRiskMonitorTooltips() {
     if (!pairCell) return;
     const pair = pairCell.textContent.trim();
     const tip  = skewPairTips[pair];
-    if (tip) attachRiskTip(row, pair + ' — Positioning Bias', tip.body, tip.ex);
+    if (!tip) return;
+
+    // Consolidate all info into a single tooltip body:
+    // base COT body + col2 context (IV Rank / proxy note) + RR direction
+    const col2Tip = row.dataset.col2Tip || '';
+    const rrTip   = row.dataset.rrTip   || '';
+    let fullBody  = tip.body;
+    if (col2Tip) fullBody += '\n\n' + col2Tip;
+    if (rrTip)   fullBody += '\n\n' + rrTip;
+
+    attachRiskTip(row, pair + ' — Positioning Bias', fullBody, tip.ex);
   });
 }
 
@@ -4091,15 +4101,19 @@ async function fetchOptionSkew() {
         }
 
         // 25d RR chip — shown below bias label when Saxo data available
+        // Note: no native browser title= here — tooltip is consolidated into the row's #fx-tt tooltip
         const rrEntry  = rrMap[p.rrKey];
         const rrVal    = rrEntry?.rr25d ?? null;
+        const rrTipText = rrVal !== null
+          ? `25-delta Risk Reversal (1M) · Saxo Bank · ${rrVal > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}`
+          : '';
         const rrChip   = rrVal !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrVal > 0 ? 'var(--up)' : rrVal < 0 ? 'var(--down)' : 'var(--text3)'};"
-              title="25-delta Risk Reversal (1M) · Saxo Bank · ${rrVal > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}"
+              data-rr-tip="${rrTipText}"
              >RR ${rrVal >= 0 ? '+' : ''}${rrVal.toFixed(2)}</div>`
           : '';
 
-        return `<tr title="${col2Title}">
+        return `<tr data-col2-tip="${col2Title}"${rrTipText ? ` data-rr-tip="${rrTipText}"` : ''}>
           <td>${p.pair}</td>
           <td class="${ivCls}" style="font-family:var(--font-mono)">${ivStr}</td>
           ${col2Html}
@@ -4110,15 +4124,19 @@ async function fetchOptionSkew() {
         const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
         const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
         // 25d RR chip — shown below bias label when Saxo data available
+        // Note: no native browser title= here — tooltip is consolidated into the row's #fx-tt tooltip
         const rrEntryCot = rrMap[p.rrKey];
         const rrValCot   = rrEntryCot?.rr25d ?? null;
+        const rrTipTextCot = rrValCot !== null
+          ? `25-delta Risk Reversal (1M) · Saxo Bank · ${rrValCot > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}`
+          : '';
         const rrChipCot  = rrValCot !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrValCot > 0 ? 'var(--up)' : rrValCot < 0 ? 'var(--down)' : 'var(--text3)'};"
-              title="25-delta Risk Reversal (1M) · Saxo Bank · ${rrValCot > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}"
+              data-rr-tip="${rrTipTextCot}"
              >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
           : '';
 
-        return `<tr title="COT positioning proxy — ETF IV unavailable">
+        return `<tr data-col2-tip="COT positioning proxy — ETF IV unavailable"${rrTipTextCot ? ` data-rr-tip="${rrTipTextCot}"` : ''}>
           <td>${p.pair}</td>
           <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
           <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
