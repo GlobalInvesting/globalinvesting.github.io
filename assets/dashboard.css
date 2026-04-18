@@ -596,6 +596,54 @@
   .pd-retail-nums { font-size:10px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
   .pd-retail-sep { color:var(--text3); margin:0 3px; }
 
+  /* ── EXPAND-IN-ROW (inline accordion) ───────────────────────── */
+  /* The expansion row sits immediately below the selected pair row */
+  tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); }
+  tr.pd-expand-row td > div {
+    overflow:hidden;
+    max-height:0;
+    transition:max-height 0.18s ease-out;
+  }
+  tr.pd-expand-row.pd-open td > div { max-height:160px; }
+  /* Inner layout: horizontal groups separated by dividers */
+  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); }
+  /* Price block left: pair, price, chg */
+  .pd-inline-price {
+    display:flex; flex-direction:column; justify-content:center;
+    padding:6px 12px 6px 10px;
+    border-right:1px solid var(--border2);
+    min-width:110px; flex-shrink:0;
+  }
+  .pd-inline-sym { font-size:13px; font-weight:700; color:var(--text); letter-spacing:.02em; line-height:1; }
+  .pd-inline-rate { font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--text); line-height:1.2; margin-top:3px; }
+  .pd-inline-chg { font-size:10px; font-family:var(--font-mono); font-weight:600; line-height:1; margin-top:2px; }
+  .pd-inline-meta { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:2px; }
+  /* Metric groups */
+  .pd-inline-group {
+    display:flex; flex-direction:column; justify-content:flex-start;
+    padding:5px 10px 5px 10px;
+    border-right:1px solid var(--border2);
+    flex-shrink:0;
+  }
+  .pd-inline-group-lbl {
+    font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--text3); margin-bottom:4px; white-space:nowrap;
+  }
+  .pd-inline-metrics { display:flex; gap:14px; flex-wrap:nowrap; }
+  .pd-inline-metric { display:flex; flex-direction:column; }
+  .pd-inline-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; margin-bottom:1px; }
+  .pd-inline-val { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
+  /* Retail bar in inline layout */
+  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex-shrink:0; }
+  .pd-inline-retail-bar { height:3px; width:72px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
+  .pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
+  .pd-inline-retail-nums { font-size:9px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
+  /* Footer strip */
+  .pd-inline-footer { font-size:8px; color:var(--text3); font-family:var(--font-mono); padding:2px 10px; border-top:1px solid var(--border); background:var(--bg2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* Expand indicator on the pair row */
+  tr.pd-selected td { background:var(--bg3) !important; }
+  tr.pd-selected td.sym::after { content:' ▾'; font-size:8px; color:var(--text3); }
+
   /* Double-click on any row opens pair detail popover (Refinitiv Eikon pattern) */
   .sb-sym { flex-shrink: 0; }
 
@@ -1006,6 +1054,11 @@
       margin: 8px auto 4px;
       flex-shrink: 0;
     }
+
+    /* Expand-in-row: allow horizontal scroll on narrow screens */
+    tr.pd-expand-row td > div { overflow-x: auto; overflow-y: hidden; }
+    tr.pd-expand-row.pd-open td > div { max-height: 200px; }
+    .pd-inline { min-width: max-content; }
   }
 
   @media (max-width: 480px) {
