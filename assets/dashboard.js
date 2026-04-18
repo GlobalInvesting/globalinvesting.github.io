@@ -466,7 +466,7 @@ function populateFxPairsTable() {
     const tvSym = pair.invert
       ? `FX_IDC:${pair.base}${pair.quote}`
       : `FX_IDC:${pair.quote}${pair.base}`;
-    return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Click: open chart · Double-click: pair detail">
+    return `<tr data-sym="${tvSym}" style="cursor:pointer;" title="Click: chart + expand detail · Click again: collapse">
       <td class="sym" style="font-weight:600">${pair.label || (pair.base+'/'+pair.quote)}</td>
       <td style="color:var(--text1)">${bid}</td>
       <td style="color:var(--text1)">${ask}</td>
@@ -2761,6 +2761,245 @@ document.getElementById('quotebar-inner')?.addEventListener('click', e => {
 });
 
 // ── Pair Detail Popover ─────────────────────────────────────────────────────
+// ── INLINE EXPAND-IN-ROW DETAIL (FX Pairs table) ─────────────────────────
+// Clicking a pair row in the FX Pairs table expands an inline detail strip
+// immediately below the row — no overlay, no focus loss, chart + table coexist.
+// Pattern: Bloomberg/Refinitiv inline expansion for compact terminal tables.
+
+function toggleInlineDetail(row) {
+  const tvSym = row.dataset.sym;
+  const tbody = row.closest('tbody');
+  if (!tbody) return;
+
+  // If this row is already open, collapse it
+  const existingExpand = tbody.querySelector('tr.pd-expand-row');
+  const wasThisRow = existingExpand?.dataset.forSym === tvSym;
+
+  // Always remove any existing expand row first
+  if (existingExpand) {
+    const inner = existingExpand.querySelector('td > div');
+    if (inner) inner.style.maxHeight = '0';
+    setTimeout(() => existingExpand.remove(), 180);
+    tbody.querySelector('tr.pd-selected')?.classList.remove('pd-selected');
+  }
+
+  if (wasThisRow) return; // toggle off
+
+  // Mark selected row
+  row.classList.add('pd-selected');
+
+  // Insert expansion row after selected row
+  const expandRow = document.createElement('tr');
+  expandRow.className = 'pd-expand-row';
+  expandRow.dataset.forSym = tvSym;
+  const td = document.createElement('td');
+  td.colSpan = 9;
+  const inner = document.createElement('div');
+  inner.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:var(--text3);">Loading…</div>';
+  td.appendChild(inner);
+  expandRow.appendChild(td);
+  row.after(expandRow);
+
+  // Animate open
+  requestAnimationFrame(() => {
+    expandRow.classList.add('pd-open');
+    inner.style.maxHeight = '160px';
+  });
+
+  // Populate with real data
+  buildInlineDetail(tvSym, inner);
+}
+
+async function buildInlineDetail(tvSym, container) {
+  const meta   = pairMetaFromSym(tvSym);
+  const label  = meta?.label || tvSym.replace(/^.*:/,'').replace(/(.{3})(.{3})/,'$1/$2').toUpperCase();
+  const pairId = meta?.id || null;
+  const base   = meta?.base  || null;
+  const quote  = meta?.quote || null;
+  const invert = meta?.invert ?? false;
+  const dec    = meta?.dec   ?? 5;
+
+  const rt    = pairId ? STOOQ_RT_CACHE[pairId] : null;
+  const price = rt?.close ?? null;
+  const pct1d = rt?.pct   ?? null;
+  const pct1w = rt?.pct1w ?? null;
+  const hv30  = rt?.hv30  ?? null;
+  const sessH = rt?.high  ?? null;
+  const sessL = rt?.low   ?? null;
+
+  const pipVal     = dec === 3 ? 0.01 : 0.0001;
+  const spreadPips = pairId ? (TYPICAL_SPREADS[pairId] || null) : null;
+  let adr = null;
+  if (hv30 != null && price != null) {
+    adr = Math.round(price * (hv30 / 100) / Math.sqrt(252) / pipVal);
+  }
+
+  // ATM IV (reuse same logic as updatePairDetail)
+  const CROSS_IV_RHO = {
+    'eurgbp':0.65,'eurjpy':0.55,'eurchf':0.60,'eurcad':0.40,'euraud':0.35,'eurnzd':0.30,
+    'gbpjpy':0.45,'gbpchf':0.55,'gbpcad':0.30,'gbpaud':0.25,'gbpnzd':0.20,
+    'audjpy':0.40,'audnzd':0.55,'audchf':0.30,'audcad':0.50,
+    'cadjpy':0.35,'cadchf':0.25,'chfjpy':0.40,'nzdjpy':0.35,'nzdcad':0.45,'nzdchf':0.20,
+  };
+  const USD_IV = {};
+  let atmIv = null;
+  try {
+    const intra = await loadIntradayQuotes();
+    const etfIv = intra?.fx_etf_iv || {};
+    for (const [pid, entry] of Object.entries(etfIv)) {
+      if (entry?.iv == null) continue;
+      const p = PAIRS.find(x => x.id === pid);
+      if (!p) continue;
+      const nonUsd = p.base !== 'USD' ? p.base : p.quote;
+      USD_IV[nonUsd] = entry.iv;
+    }
+    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+    const ivEntry = etfIv[pairId];
+    if (ivEntry?.iv != null) {
+      atmIv = ivEntry.iv;
+    } else if (pairId && meta?.cross) {
+      const ivA = USD_IV[base] ?? null, ivB = USD_IV[quote] ?? null;
+      if (ivA != null && ivB != null) {
+        const rho = CROSS_IV_RHO[pairId] ?? 0.40;
+        atmIv = Math.round(Math.sqrt(ivA*ivA + ivB*ivB - 2*rho*ivA*ivB) * 10) / 10;
+      }
+    }
+  } catch {}
+
+  // COT
+  const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
+  const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  let cotNet = null, cotAmNet = null, cotWow = null, cotPctOI = null, cotWeek = '';
+  if (cotRaw) {
+    const flip = (invert && cotCcy === quote) ? -1 : 1;
+    cotNet   = cotRaw.net   != null ? cotRaw.net   * flip : null;
+    cotAmNet = cotRaw.amNet != null ? cotRaw.amNet * flip : null;
+    cotWow   = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
+    cotPctOI = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
+    cotWeek  = cotRaw.weekEnding || '';
+  }
+
+  // Carry
+  const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
+  const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
+  let carryDiff = null;
+  if (cbBase != null && cbQuote != null) {
+    carryDiff = meta?.cross ? cbBase - cbQuote : (invert ? cbBase - cbQuote : cbQuote - cbBase);
+  }
+
+  // RR
+  const rrKey = base && quote ? (base + quote).toUpperCase() : null;
+  const rrVal = rrKey ? (RR_DATA_CACHE[rrKey]?.rr25d ?? null) : null;
+
+  // Retail
+  const retKey = label.toUpperCase();
+  const ret  = RETAIL_SENTIMENT_CACHE[retKey] || null;
+  const retL = ret?.longPct ?? null;
+  const retS = ret?.shortPct ?? null;
+
+  // Formatting helpers
+  const fmtP  = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+  const fmtN  = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+  const cls   = v => v == null ? '' : v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
+  const clsI  = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
+  const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
+  const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
+
+  // COT summary tag
+  const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
+  const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
+  const aligned = lfDir && amDir && lfDir === amDir;
+  const cotTag = lfDir && amDir
+    ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
+    : '—';
+
+  const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
+
+  container.innerHTML = `
+    <div class="pd-inline">
+      <div class="pd-inline-price">
+        <div class="pd-inline-sym">${label}</div>
+        <div class="pd-inline-rate">${price != null ? price.toFixed(dec) : '—'}</div>
+        <div class="pd-inline-chg ${cls(pct1d)}">${fmtP(pct1d)}</div>
+        ${sessH != null && sessL != null ? `<div class="pd-inline-meta">H ${sessH.toFixed(dec)} · L ${sessL.toFixed(dec)}</div>` : ''}
+      </div>
+
+      <div class="pd-inline-group">
+        <div class="pd-inline-group-lbl">Price</div>
+        <div class="pd-inline-metrics">
+          <div class="pd-inline-metric fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close.">
+            <div class="pd-inline-lbl">1W Chg</div><div class="pd-inline-val ${cls(pct1w)}">${fmtP(pct1w)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Carry Differential" data-tip-body="CB rate differential: base minus quote. Positive = carry favours long." data-tip-ex="USD/JPY carry = Fed 4.5% − BoJ 0.5% = +4.0%.">
+            <div class="pd-inline-lbl">Carry</div><div class="pd-inline-val ${clsI(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2) + '%' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated avg daily range in pips from HV 30d. Useful for stop/target sizing.">
+            <div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">${adr != null ? adr + ' pip' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised).">
+            <div class="pd-inline-lbl">${base || 'Base'} Rate</div><div class="pd-inline-val">${cbBase != null ? cbBase.toFixed(2) + '%' : '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-inline-group">
+        <div class="pd-inline-group-lbl">Volatility</div>
+        <div class="pd-inline-metrics">
+          <div class="pd-inline-metric fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised volatility, annualised. Measures recent actual movement.">
+            <div class="pd-inline-lbl">HV 30d</div><div class="pd-inline-val">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE FX ETF options. Proxy for OTC interbank IV. Green ≤7%; red >12%.">
+            <div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val ${ivCls(atmIv)}">${atmIv != null ? atmIv.toFixed(1) + '%' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied minus realised vol. Positive = options expensive vs recent moves.">
+            <div class="pd-inline-lbl">IV − HV</div><div class="pd-inline-val ${atmIv != null && hv30 != null ? clsI(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1) + '%' : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="25d Risk Reversal · Saxo Bank (1M)" data-tip-body="25d call IV minus 25d put IV. Positive = calls bid, upside skew on ${base || label.split('/')[0]}. Negative = puts bid, downside protection dominant.">
+            <div class="pd-inline-lbl">25d RR</div><div class="pd-inline-val ${clsI(rrVal)}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips.">
+            <div class="pd-inline-lbl">Spread</div><div class="pd-inline-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-inline-group">
+        <div class="pd-inline-group-lbl">COT Positioning</div>
+        <div class="pd-inline-metrics">
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
+            <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change" data-tip-body="Change in LF net contracts vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
+            <div class="pd-inline-lbl">LF WoW Δ</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural / longer-term positioning." data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
+            <div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val ${clsI(cotAmNet)}">${fmtN(cotAmNet)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of Open Interest" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies for direct comparison." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
+            <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
+          </div>
+        </div>
+        <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
+      </div>
+
+      <div class="pd-inline-retail fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community. Contrarian indicator — extreme retail long historically aligns with institutional short." data-tip-ex="When >70% retail long, price tends to move against the crowd over time.">
+        <div class="pd-inline-group-lbl">Retail</div>
+        <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></div></div>
+        <div class="pd-inline-retail-nums">${retL != null ? retL + '% L' : '—'} / ${retS != null ? retS + '% S' : '—'}</div>
+      </div>
+    </div>
+    <div class="pd-inline-footer">${footerSources}</div>`;
+
+  // Attach #fx-tt tooltips to each metric cell
+  container.querySelectorAll('.fx-tip').forEach(cell => {
+    const title = cell.dataset.tipTitle || '';
+    const body  = cell.dataset.tipBody  || '';
+    const ex    = cell.dataset.tipEx    || '';
+    if (!title && !body) return;
+    attachRiskTip(cell, title, body, ex);
+  });
+}
+
 // Floating panel triggered by double-click on any pair row (FX table or crosses).
 // Anchors near the row, closes on Escape or outside-click.
 function openPairPopover(rowEl, tvSym) {
@@ -2847,18 +3086,12 @@ document.getElementById('sidebar')?.addEventListener('dblclick', e => {
   openPairPopover(row, row.dataset.sym);
 });
 
-// ── FX Pairs table: click to open chart, double-click to open popover ──
+// ── FX Pairs table: click = chart + expand detail inline ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
   const row = e.target.closest('tr[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
-});
-
-document.getElementById('fx-pairs-tbody')?.addEventListener('dblclick', e => {
-  e.preventDefault();
-  const row = e.target.closest('tr[data-sym]');
-  if (!row) return;
-  openPairPopover(row, row.dataset.sym);
+  toggleInlineDetail(row);
 });
 
 // ── Cross-Asset cells: click to open chart (US 10Y excluded — no TV symbol) ──
