@@ -2985,14 +2985,16 @@ async function buildInlineDetail(tvSym, container) {
         <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
       </div>
 
-      <div class="pd-inline-retail fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community. Contrarian indicator — extreme retail long historically aligns with institutional short." data-tip-ex="When >70% retail long, price tends to move against the crowd over time.">
-        <div class="pd-inline-group-lbl">Retail</div>
-        <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></div></div>
-        <div class="pd-inline-retail-nums">${retL != null ? retL + '% L' : '—'} / ${retS != null ? retS + '% S' : '—'}</div>
-      </div>
     </div>
     </div>
-    <div class="pd-inline-footer">${footerSources}</div>`;
+    <div class="pd-inline-footer pd-inline-footer--with-retail">
+      <span class="pd-inline-footer-sources">${footerSources}</span>
+      <span class="pd-inline-footer-retail fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community. Contrarian indicator — extreme retail long historically aligns with institutional short." data-tip-ex="When >70% retail long, price tends to move against the crowd over time.">
+        <span class="pd-inline-retail-lbl">Retail</span>
+        <span class="pd-inline-retail-bar--sm"><span class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></span></span>
+        <span class="pd-inline-retail-nums">${retL != null ? retL + '% L' : '—'} / ${retS != null ? retS + '% S' : '—'}</span>
+      </span>
+    </div>`;
 
   // Attach #fx-tt tooltips to each metric cell
   container.querySelectorAll('.fx-tip').forEach(cell => {
