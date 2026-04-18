@@ -2918,6 +2918,7 @@ async function buildInlineDetail(tvSym, container) {
   const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
 
   container.innerHTML = `
+    <div class="pd-inline-scroll">
     <div class="pd-inline">
       <div class="pd-inline-price">
         <div class="pd-inline-sym">${label}</div>
@@ -2989,6 +2990,7 @@ async function buildInlineDetail(tvSym, container) {
         <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></div></div>
         <div class="pd-inline-retail-nums">${retL != null ? retL + '% L' : '—'} / ${retS != null ? retS + '% S' : '—'}</div>
       </div>
+    </div>
     </div>
     <div class="pd-inline-footer">${footerSources}</div>`;
 

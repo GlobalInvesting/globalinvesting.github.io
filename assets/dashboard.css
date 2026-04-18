@@ -598,17 +598,25 @@
 
   /* ── EXPAND-IN-ROW (inline accordion) ───────────────────────── */
   /* The expansion row sits immediately below the selected pair row */
-  tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); width:100%; }
+  tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); }
   tr.pd-expand-row td > div {
     overflow:hidden;
     max-height:0;
     transition:max-height 0.18s ease-out;
+  }
+  tr.pd-expand-row.pd-open td > div { max-height:160px; }
+  /* Scroll wrapper fills the full td width; pd-inline is min-width:max-content
+     so it never wraps — scrolls horizontally on narrow screens (split mode).
+     On wide screens the wrapper is wider than pd-inline so we use
+     justify-content:stretch via a flex trick on the wrapper. */
+  .pd-inline-scroll {
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
     width:100%;
     box-sizing:border-box;
   }
-  tr.pd-expand-row.pd-open td > div { max-height:160px; }
-  /* Inner layout: horizontal groups separated by dividers */
-  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); width:100%; box-sizing:border-box; }
+  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); min-width:max-content; flex:1; }
   /* Price block left: pair, price, chg */
   .pd-inline-price {
     display:flex; flex-direction:column; justify-content:center;
@@ -1059,10 +1067,8 @@
       flex-shrink: 0;
     }
 
-    /* Expand-in-row: allow horizontal scroll on narrow screens */
-    tr.pd-expand-row td > div { overflow-x: auto; overflow-y: hidden; }
+    /* Expand-in-row: horizontal scroll already built into pd-inline-scroll */
     tr.pd-expand-row.pd-open td > div { max-height: 200px; }
-    .pd-inline { min-width: max-content; }
   }
 
   @media (max-width: 480px) {
