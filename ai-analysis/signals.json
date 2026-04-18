@@ -1,6 +1,6 @@
 [
   {
-    "time": "13:35",
+    "time": "15:00",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY testing 158.58 resistance — BoJ intervention risk rising on a sustained break above 160.00",
@@ -11,47 +11,47 @@
     ]
   },
   {
-    "time": "13:30",
+    "time": "14:58",
     "priority": "warning",
-    "title": "AUD/USD Sentiment Extreme",
-    "text": "AUD/USD sentiment at 9% long / 91% short — contrarian reversal risk, watch for squeeze",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding above 0.7168 — RBA hiking rates supports AUD carry",
     "evidence": [
       "AUD/USD: 0.7168",
-      "AUD/USD sentiment: 9% long / 91% short",
-      "CFTC AUD net: +41,675"
+      "RBA rate: 4.10%",
+      "US 10Y: 4.32%"
     ]
   },
   {
-    "time": "13:25",
+    "time": "14:55",
     "priority": "warning",
-    "title": "USD/CAD Correlation Break",
-    "text": "USD/CAD vs WTI Oil correlation breaks at +0.726 — z=+1.76σ, potential regime signal",
+    "title": "CFTC — EUR",
+    "text": "EUR net short positioning at 50.0% long — institutional divergence risk",
     "evidence": [
-      "USD/CAD: 1.3693",
-      "WTI Oil: $82.6",
-      "USD/CAD vs WTI Oil corr: +0.726"
+      "EUR net: -72",
+      "EUR long%: 50.0%",
+      "CFTC week ending: 2026-04-14"
     ]
   },
   {
-    "time": "13:20",
+    "time": "14:50",
     "priority": "info",
-    "title": "VIX and S&P 500",
+    "title": "Risk Regime",
     "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%",
     "evidence": [
       "VIX: 17.5",
       "S&P 500: 7,126",
-      "S&P 500 1D: +1.20%"
+      "DXY: 98.23"
     ]
   },
   {
-    "time": "13:15",
+    "time": "14:45",
     "priority": "info",
-    "title": "Yield Curve Regime",
-    "text": "2s10s spread at +46.6bp — bull flattener regime, recession pricing / risk-off",
+    "title": "Cross-Asset Correlation",
+    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, z=+1.36σ",
     "evidence": [
-      "US 10Y: 4.32%",
-      "US 2Y: 3.78%",
-      "2s10s spread: +46.6bp"
+      "USD/JPY vs VIX: +0.672",
+      "norm: +0.143",
+      "z: +1.36σ"
     ]
   }
 ]
