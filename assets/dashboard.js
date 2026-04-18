@@ -2018,31 +2018,23 @@ function attachRiskMonitorTooltips() {
     'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels. RR from Saxo is indicative mid-market, updated during European hours; treat as directional context, not a tradeable quote. Direction signal always comes from Leveraged Funds net positioning (most reactive speculative category in CFTC data).'
   );
   const skewRows = document.querySelectorAll('#skew-tbody tr');
-  const skewPairTips = {
-    'EUR/USD': { body: 'EUR/USD skew derived from CFTC Leveraged Funds net EUR positioning (Options+Futures Combined). Positive = EUR calls bid (market positioned for EUR upside). Negative = EUR puts bid (downside protection).', ex: 'Most reliable when Leveraged Funds and Asset Manager positioning agree in direction. Divergence between the two signals uncertainty or a potential positioning squeeze.' },
-    'GBP/USD': { body: 'GBP/USD skew from CFTC Leveraged Funds net GBP positioning. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
-    'USD/JPY': { body: 'USD/JPY skew from CFTC Leveraged Funds net JPY positioning (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
-    'AUD/USD': { body: 'AUD/USD skew from CFTC Leveraged Funds net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
-    'USD/CAD': { body: 'USD/CAD bias from CFTC Leveraged Funds net CAD positioning (inverted). Positive = USD calls bid / CAD puts bid (USD upside, CAD weakness). Negative = CAD demand dominant, often driven by oil strength or risk-on.', ex: 'CAD is tightly linked to WTI crude. Watch for divergence between COT bias and oil price direction — that spread often resolves in oil\'s favour.' },
-    'USD/CHF': { body: 'USD/CHF bias from CFTC Leveraged Funds net CHF positioning (inverted). Positive = USD calls bid / CHF puts bid. Negative = CHF safe-haven demand dominant.', ex: 'CHF safe-haven flows can override COT positioning quickly during risk-off episodes. Treat CHF bias as a risk sentiment barometer alongside JPY.' },
-    'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
-  };
   skewRows.forEach(row => {
-    const pairCell = row.querySelector('td:first-child');
-    if (!pairCell) return;
-    const pair = pairCell.textContent.trim();
-    const tip  = skewPairTips[pair];
-    if (!tip) return;
+    // Attach tooltip to each <td> individually — tooltip changes per cell hovered
+    row.querySelectorAll('td').forEach(td => {
+      const title = td.dataset.tipTitle || '';
+      const body  = td.dataset.tipBody  || '';
+      const ex    = td.dataset.tipEx    || '';
+      if (!title && !body) return;
+      attachRiskTip(td, title, body, ex);
+    });
 
-    // Consolidate all info into a single tooltip body:
-    // base COT body + col2 context (IV Rank / proxy note) + RR direction
-    const col2Tip = row.dataset.col2Tip || '';
-    const rrTip   = row.dataset.rrTip   || '';
-    let fullBody  = tip.body;
-    if (col2Tip) fullBody += '\n\n' + col2Tip;
-    if (rrTip)   fullBody += '\n\n' + rrTip;
-
-    attachRiskTip(row, pair + ' — Positioning Bias', fullBody, tip.ex);
+    // Attach tooltip to the RR chip <div> inside the bias cell — uses its own tip data
+    const rrChip = row.querySelector('[data-rr-tip-title]');
+    if (rrChip) {
+      const rrTitle = rrChip.dataset.rrTipTitle || '';
+      const rrBody  = rrChip.dataset.rrTipBody  || '';
+      if (rrTitle || rrBody) attachRiskTip(rrChip, rrTitle, rrBody, '');
+    }
   });
 }
 
@@ -4073,6 +4065,17 @@ async function fetchOptionSkew() {
       }
     }
 
+    // Per-cell tooltip content — indexed by pair label, used inside pairs.map() below
+    const skewCellTips = {
+      'EUR/USD': { body: 'EUR/USD skew derived from CFTC Leveraged Funds net EUR positioning (Options+Futures Combined). Positive = EUR calls bid (market positioned for EUR upside). Negative = EUR puts bid (downside protection).', ex: 'Most reliable when Leveraged Funds and Asset Manager positioning agree in direction. Divergence between the two signals uncertainty or a potential positioning squeeze.' },
+      'GBP/USD': { body: 'GBP/USD skew from CFTC Leveraged Funds net GBP positioning. Reflects speculative appetite for sterling vs dollar.', ex: 'GBP skew is especially sensitive to UK macro surprises (CPI, PMI). Watch for regime shifts around BoE meetings.' },
+      'USD/JPY': { body: 'USD/JPY skew from CFTC Leveraged Funds net JPY positioning (inverted). Positive = USD calls bid / JPY puts bid (USD upside expected). Negative = JPY safe-haven demand dominant.', ex: 'Risk-off events flip USD/JPY skew negative quickly as JPY is bought as safe haven. Monitor against VIX for confirmation.' },
+      'AUD/USD': { body: 'AUD/USD skew from CFTC Leveraged Funds net AUD positioning. AUD is a risk/commodity proxy — positive skew aligns with global risk appetite and commodity strength.', ex: 'AUD skew often leads iron ore and copper price expectations. Negative skew on AUD/USD with rising VIX = classic risk-off setup.' },
+      'USD/CAD': { body: 'USD/CAD bias from CFTC Leveraged Funds net CAD positioning (inverted). Positive = USD calls bid / CAD puts bid (USD upside, CAD weakness). Negative = CAD demand dominant, often driven by oil strength or risk-on.', ex: 'CAD is tightly linked to WTI crude. Watch for divergence between COT bias and oil price direction — that spread often resolves in oil\'s favour.' },
+      'USD/CHF': { body: 'USD/CHF bias from CFTC Leveraged Funds net CHF positioning (inverted). Positive = USD calls bid / CHF puts bid. Negative = CHF safe-haven demand dominant.', ex: 'CHF safe-haven flows can override COT positioning quickly during risk-off episodes. Treat CHF bias as a risk sentiment barometer alongside JPY.' },
+      'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
+    };
+
     tbody.innerHTML = pairs.map(p => {
       const cotData = cotMap[p.cot];
       const etfIv   = etfIvMap[p.etfId];
@@ -4113,7 +4116,7 @@ async function fetchOptionSkew() {
         }
 
         // 25d RR chip — shown below bias label when Saxo data available
-        // Note: no native browser title= here — tooltip is consolidated into the row's #fx-tt tooltip
+        // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
         const rrEntry  = rrMap[p.rrKey];
         const rrVal    = rrEntry?.rr25d ?? null;
         const rrTipText = rrVal !== null
@@ -4121,22 +4124,37 @@ async function fetchOptionSkew() {
           : '';
         const rrChip   = rrVal !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrVal > 0 ? 'var(--up)' : rrVal < 0 ? 'var(--down)' : 'var(--text3)'};"
-              data-rr-tip="${rrTipText}"
+              data-rr-tip-title="25d RR · Saxo Bank (1M)"
+              data-rr-tip-body="${rrTipText}"
              >RR ${rrVal >= 0 ? '+' : ''}${rrVal.toFixed(2)}</div>`
           : '';
 
-        return `<tr data-col2-tip="${col2Title}"${rrTipText ? ` data-rr-tip="${rrTipText}"` : ''}>
-          <td>${p.pair}</td>
-          <td class="${ivCls}" style="font-family:var(--font-mono)">${ivStr}</td>
-          ${col2Html}
-          <td class="${biasCls}" style="line-height:1.3;">${bias}${rrChip}</td>
+        // Per-cell tooltip data — td[0]=Pair, td[1]=ATM IV, td[2]=IV Rank or COT skew, td[3]=Bias
+        const pairTip  = skewCellTips[p.pair];
+        const td0Title = p.pair + ' — Positioning Bias';
+        const td0Body  = pairTip?.body || '';
+        const td0Ex    = pairTip?.ex   || '';
+        const td1Title = 'ATM Implied Volatility · ' + p.pair;
+        const td1Body  = `ATM IV ${ivStr} from CBOE FX ETF options (${etfIv.source || 'ETF'}) — nearest expiry ≥4 days. Proxy for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
+        const td1Ex    = 'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels.';
+        const td3Title = p.pair + ' — Directional Bias';
+        const td3Body  = pairTip?.body || '';
+        const td3Ex    = pairTip?.ex   || '';
+
+        return `<tr>
+          <td data-tip-title="${td0Title}" data-tip-body="${td0Body}" data-tip-ex="${td0Ex}">${p.pair}</td>
+          <td class="${ivCls}" style="font-family:var(--font-mono)"
+              data-tip-title="${td1Title}" data-tip-body="${td1Body}" data-tip-ex="${td1Ex}">${ivStr}</td>
+          ${col2Html.replace('<td ', `<td data-tip-title="IV Rank · ${p.pair}" data-tip-body="${col2Title}" `)}
+          <td class="${biasCls}" style="line-height:1.3;"
+              data-tip-title="${td3Title}" data-tip-body="${td3Body}" data-tip-ex="${td3Ex}">${bias}${rrChip}</td>
         </tr>`;
       } else {
         // ── COT fallback: original behavior ──
         const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
         const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
         // 25d RR chip — shown below bias label when Saxo data available
-        // Note: no native browser title= here — tooltip is consolidated into the row's #fx-tt tooltip
+        // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
         const rrEntryCot = rrMap[p.rrKey];
         const rrValCot   = rrEntryCot?.rr25d ?? null;
         const rrTipTextCot = rrValCot !== null
@@ -4144,15 +4162,30 @@ async function fetchOptionSkew() {
           : '';
         const rrChipCot  = rrValCot !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrValCot > 0 ? 'var(--up)' : rrValCot < 0 ? 'var(--down)' : 'var(--text3)'};"
-              data-rr-tip="${rrTipTextCot}"
+              data-rr-tip-title="25d RR · Saxo Bank (1M)"
+              data-rr-tip-body="${rrTipTextCot}"
              >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
           : '';
 
-        return `<tr data-col2-tip="COT positioning proxy — ETF IV unavailable"${rrTipTextCot ? ` data-rr-tip="${rrTipTextCot}"` : ''}>
-          <td>${p.pair}</td>
-          <td class="${skew1w >= 0 ? 'up':'down'}">${fmtRR(skew1w)}</td>
-          <td class="${skew1m >= 0 ? 'up':'down'}">${fmtRR(skew1m)}</td>
-          <td class="${biasCls}" style="line-height:1.3;">${bias}${rrChipCot}</td>
+        // Per-cell tooltip data — COT fallback mode: td[1]=1W skew, td[2]=1M skew, td[3]=Bias
+        const pairTipCot = skewCellTips[p.pair];
+        const td0TitleCot = p.pair + ' — Positioning Bias';
+        const td0BodyCot  = pairTipCot?.body || '';
+        const td0ExCot    = pairTipCot?.ex   || '';
+        const td12Title   = 'COT Directional Skew · ' + p.pair;
+        const td12Body    = 'COT-derived skew proxy — ETF IV unavailable for this pair. Derived from CFTC Leveraged Funds net positioning. 1W = current week net skew; 1M = smoothed (×0.85 decay).';
+        const td3TitleCot = p.pair + ' — Directional Bias';
+        const td3BodyCot  = pairTipCot?.body || '';
+        const td3ExCot    = pairTipCot?.ex   || '';
+
+        return `<tr>
+          <td data-tip-title="${td0TitleCot}" data-tip-body="${td0BodyCot}" data-tip-ex="${td0ExCot}">${p.pair}</td>
+          <td class="${skew1w >= 0 ? 'up':'down'}"
+              data-tip-title="${td12Title}" data-tip-body="${td12Body}">${fmtRR(skew1w)}</td>
+          <td class="${skew1m >= 0 ? 'up':'down'}"
+              data-tip-title="${td12Title} (1M)" data-tip-body="${td12Body}">${fmtRR(skew1m)}</td>
+          <td class="${biasCls}" style="line-height:1.3;"
+              data-tip-title="${td3TitleCot}" data-tip-body="${td3BodyCot}" data-tip-ex="${td3ExCot}">${bias}${rrChipCot}</td>
         </tr>`;
       }
     }).join('');
