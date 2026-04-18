@@ -4256,7 +4256,7 @@ async function fetchFedExpectations() {
 
       rows.push(`<tr title="Next meeting: ${nextMtg} · CIP 30d fwd">
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
-        <td>${biasLabel}</td>
+        <td style="white-space:nowrap;">${biasLabel}</td>
         <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">${fwdDisplay}</td>
       </tr>`);
     });
