@@ -598,15 +598,17 @@
 
   /* ── EXPAND-IN-ROW (inline accordion) ───────────────────────── */
   /* The expansion row sits immediately below the selected pair row */
-  tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); }
+  tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); width:100%; }
   tr.pd-expand-row td > div {
     overflow:hidden;
     max-height:0;
     transition:max-height 0.18s ease-out;
+    width:100%;
+    box-sizing:border-box;
   }
   tr.pd-expand-row.pd-open td > div { max-height:160px; }
   /* Inner layout: horizontal groups separated by dividers */
-  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); }
+  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); width:100%; box-sizing:border-box; }
   /* Price block left: pair, price, chg */
   .pd-inline-price {
     display:flex; flex-direction:column; justify-content:center;
@@ -636,7 +638,7 @@
   .pd-inline-val.pd-up { color:var(--up); }
   .pd-inline-val.pd-dn { color:var(--down); }
   /* Retail bar in inline layout */
-  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex-shrink:0; }
+  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex:1; }
   .pd-inline-retail-bar { height:3px; width:72px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
   .pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
   .pd-inline-retail-nums { font-size:9px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
