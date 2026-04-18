@@ -1,42 +1,42 @@
 [
   {
-    "time": "16:50",
+    "time": "19:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY trading at 158.58 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 158.58 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
       "USD/JPY: 158.58",
-      "BoJ rate: 0.75% (ON HOLD)",
+      "BoJ rate: 0.75%",
       "VIX: 17.5"
     ]
   },
   {
-    "time": "16:48",
+    "time": "18:58",
     "priority": "warning",
-    "title": "Geopolitical Risk",
-    "text": "Strait of Hormuz closure drives crude oil volatility — commodity bloc (AUD, CAD, NOK) faces headwinds; monitor for supply-shock escalation.",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding above 0.7168 — RBA hiking rates supports AUD carry",
     "evidence": [
-      "WTI Oil: $82.6",
-      "USD: NET SHORT, lev_net=-3,130",
-      "VIX: 17.5"
+      "AUD/USD: 0.7168",
+      "RBA rate: 4.10%",
+      "US 10Y: 4.32%"
     ]
   },
   {
-    "time": "16:45",
+    "time": "18:55",
     "priority": "warning",
-    "title": "CFTC — EUR",
-    "text": "EUR net short positioning at 50.0% long — institutional divergence risk as Asset Managers are net long; EUR/USD holds at 1.1767.",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading below 1.1767 — Fed-ECB 175bp differential weighs on pair",
     "evidence": [
-      "EUR: NET SHORT, lev_net=-72",
       "EUR/USD: 1.1767",
-      "CFTC EUR net: -72"
+      "Fed rate: 3.75%",
+      "ECB rate: 2.00%"
     ]
   },
   {
-    "time": "16:42",
+    "time": "18:50",
     "priority": "info",
-    "title": "Risk Regime",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
+    "title": "VIX",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%",
     "evidence": [
       "VIX: 17.5",
       "S&P 500: 7,126",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "16:38",
-    "priority": "info",
-    "title": "AUD/USD",
-    "text": "AUD/USD trading at 0.7168 — RBA hiking rates supports AUD carry; AUD/USD consolidating above 0.7098.",
+    "time": "18:45",
+    "priority": "warning",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD sentiment extreme — 92% of retail traders short, watch for squeeze",
     "evidence": [
-      "AUD/USD: 0.7168",
-      "RBA rate: 4.10% (HIKING)",
-      "AUD: NET LONG, lev_net=+41,675"
+      "AUD/NZD: 92% short",
+      "AUD/USD: 91% short",
+      "NZD/USD: 0.5885"
     ]
   }
 ]
