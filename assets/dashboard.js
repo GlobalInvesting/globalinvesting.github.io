@@ -4521,6 +4521,9 @@ async function loadAIRegime() {
     const regEl = document.getElementById('narrative-regime');
     if (!regEl) return;
 
+    // 'CLOSED' is a legacy value — regime is macro, not market-hours. Skip badge update.
+    if (regime === 'CLOSED') return;
+
     if (isStale) {
       _aiRegimeFresh = false;
       regEl.textContent = regime;
@@ -4656,6 +4659,8 @@ async function buildRichNarrative() {
     // Update regime badge
     const regEl = document.getElementById('narrative-regime');
     if (regEl && regime) {
+      // 'CLOSED' is a legacy value — regime is macro, not market-hours. Skip badge update.
+      if (regime === 'CLOSED' || regime === '__STALE__CLOSED') return;
       const isStale = regime.startsWith('__STALE__');
       const cleanRegime = isStale ? regime.replace('__STALE__', '') : regime;
       const isOn = cleanRegime.toLowerCase().includes('on') && !cleanRegime.toLowerCase().includes('off');
