@@ -331,6 +331,8 @@ const FX_PERF_CACHE = {};
 // The Python script emits corr30/corr90 alongside corr (60d) in every correlation entry.
 
 let _corrWindow = 60;  // active window; toggled by setCorrWindow()
+let _corrDataCache = []; // correlation objects cached for modal access
+window._corrDataCache = _corrDataCache; // expose globally for onclick handlers
 
 function setCorrWindow(w) {
   if (w === _corrWindow) return;
@@ -350,6 +352,7 @@ function setCorrWindow(w) {
 
 async function populateCorrelations() {
   try {
+    _corrDataCache.length = 0; // reset on each render (keeps window reference intact)
     const data = await loadIntradayQuotes();
     const tbody = document.getElementById('correlations-tbody');
     if (!tbody) return;
@@ -388,7 +391,15 @@ async function populateCorrelations() {
         normCell = `<td class="${badgeCls}" title="${title}" style="font-size:9px;white-space:nowrap;">${badgeLabel}</td>`;
       }
 
-      return `<tr><td>${c.a}</td><td>${c.b}</td>${corrCell}${normCell}</tr>`;
+      // Store corr object on window so onclick can retrieve it without embedding JSON in HTML
+      const corrIdx = _corrDataCache.length;
+      _corrDataCache.push(c);
+      return `<tr
+        style="cursor:pointer;"
+        title="Click to view correlation detail · ${c.a} vs ${c.b}"
+        onclick="(function(el){ var idx=+el.dataset.corrIdx; var d=window._corrDataCache&&window._corrDataCache[idx]; if(d&&typeof openCorrModal==='function') openCorrModal(d); })(this)"
+        data-corr-idx="${corrIdx}"
+      ><td>${c.a}</td><td>${c.b}</td>${corrCell}${normCell}</tr>`;
     }).join('');
   } catch (e) {
     console.warn('[Correlations] Failed to load:', e);
@@ -2292,6 +2303,14 @@ async function renderRiskData(byId) {
     priorPoints.forEach(p => { pLookup[p.label] = p.val; });
     STATIC_YIELDS = STATIC_LABELS.map(l => pLookup[l] ?? null);
   }
+
+  // Expose tenor data globally for the yield curve modal
+  window._STATE_ycTenors = REAL_TENORS.map(t => ({
+    label:      t.label,
+    close:      byId[t.key]?.close ?? null,
+    prev_close: byId[t.key]?.prev_close ?? null,
+    chg:        byId[t.key]?.chg ?? null,
+  })).filter(t => t.close !== null);
 
   if (realPoints.length >= 2) {
     drawYieldCurveAndCache(realPoints, priorPoints.length >= 2 ? priorPoints : null);

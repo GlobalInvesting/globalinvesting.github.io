@@ -559,6 +559,21 @@
   #cbrates-tbody tr[data-cbr-id]:hover td {
     background: var(--bg3);
   }
+
+  /* Correlations — clickable rows */
+  #correlations-tbody tr[data-corr-idx]:hover td {
+    background: var(--bg3);
+  }
+  #correlations-tbody tr[data-corr-idx] td:first-child::after {
+    content: ' ›';
+    color: var(--text3);
+    font-size: 9px;
+  }
+
+  /* Yield curve canvas — hover hint */
+  .yield-canvas-wrap:hover {
+    opacity: 0.88;
+  }
   #cbrates-tbody tr[data-cbr-id] td:first-child::after {
     content: ' ›';
     color: var(--text3);
