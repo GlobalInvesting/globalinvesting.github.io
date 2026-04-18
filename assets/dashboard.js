@@ -2886,6 +2886,7 @@ document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('cl
 // All data read from in-memory caches — zero additional fetches on click.
 // ═══════════════════════════════════════════════════════════════════
 const COT_DATA_CACHE = {};   // ccy → { net, long, short, amNet, weekEnding, prevOI, wowNetChange, totalOI, levNetPctOI }
+const RR_DATA_CACHE  = {};   // rrKey (e.g. 'EURUSD') → { rr25d: number } — populated by fetchOptionSkew()
 
 (async function prefetchCOT() {
   const CCYS = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
@@ -3088,6 +3089,14 @@ async function updatePairDetail(tvSym) {
   const retS = ret?.shortPct ?? null;
   const retBarL = retL != null ? retL : 50;
 
+  // 25d Risk Reversal — from RR_DATA_CACHE (populated by fetchOptionSkew)
+  // rrKey = base+quote uppercase, no slash (e.g. EURUSD, USDJPY)
+  // Saxo data covers the 7 majors in the Positioning Bias table; crosses show '—'
+  const rrKey  = base && quote ? (base + quote).toUpperCase() : null;
+  const rrVal  = rrKey ? (RR_DATA_CACHE[rrKey]?.rr25d ?? null) : null;
+  // Direction label from base-currency perspective (same convention as RR chip in positioning table)
+  const rrBase = base || (label.split('/')[0] || '');
+
   // COT positioning summary text (replaces badge)
   let cotSummaryHtml = '';
   if (cotNet != null && cotAmNet != null) {
@@ -3133,6 +3142,7 @@ async function updatePairDetail(tvSym) {
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
       </div>
     </div>
@@ -3210,7 +3220,7 @@ async function updatePairDetail(tvSym) {
     </div>
 
     <div class="pd-footer">
-      ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + ' · Myfxbook</span>' : '<span class="pd-dim">Myfxbook</span>'}
+      ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + ' · Myfxbook' + (rrVal != null ? ' · Saxo RR' : '') + '</span>' : '<span class="pd-dim">Myfxbook' + (rrVal != null ? ' · Saxo RR' : '') + '</span>'}
     </div>`;
 
 
@@ -4035,6 +4045,8 @@ async function fetchOptionSkew() {
       if (rrRes?.ok) {
         const rrJson = await rrRes.json();
         if (rrJson?.pairs) rrMap = rrJson.pairs;  // { EURUSD: { rr25d: -0.45 }, … }
+        // Populate global cache so pair detail popover can read RR without extra fetches
+        Object.assign(RR_DATA_CACHE, rrMap);
       }
     } catch { /* RR unavailable — continue without it */ }
 
