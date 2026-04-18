@@ -596,7 +596,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <div class="guide-wrap">
   <nav class="toc"><div class="toc-inner">
     <div class="toc-head">Contents</div>
-    <a class="toc-item" href="#layout">Terminal Layout</a>
+    <a class="toc-item" href="#layout">Terminal Layout &amp; Split Mode</a>
     <a class="toc-item" href="#topbar-guide">Topbar &amp; Quote Bar</a>
     <a class="toc-item" href="#narrative">AI Narrative &amp; Regime</a>
     <a class="toc-item" href="#price-chart">Price Chart</a>
@@ -623,7 +623,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="layout">
       <h2>Terminal Layout</h2>
-      <p>The terminal uses a three-column layout at full width. Understanding the structure helps you navigate quickly:</p>
+      <p>The terminal uses a three-column layout at full width — a left sidebar, a wide main content area, and a right panel. By default it loads in <strong>split layout mode</strong>: the main area is divided into a left column (chart, FX table, heatmap) and a right column (risk, rates, COT, sessions, news). Understanding the structure helps you navigate quickly:</p>
       <div class="layout-visual" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px;">
   <!-- Topbar row -->
   <div style="background:#1a1d29;border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;">
@@ -647,7 +647,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <span style="font-size:10px;color:var(--text2);">GBP/USD <span style="color:#26a69a;">1.2934</span></span>
     <span style="font-size:10px;color:var(--text2);">AUD/USD <span style="color:#ef5350;">0.6521</span></span>
     <span style="font-size:10px;color:var(--text2);">USD/CAD <span style="color:#ef5350;">1.3612</span></span>
-    <span style="font-size:10px;color:var(--text2);">XAU/USD <span style="color:#26a69a;">2,341</span></span>
+    <span style="font-size:10px;color:var(--text2);">GOLD FUT <span style="color:#26a69a;">3,341</span></span>
     <span style="font-size:10px;color:var(--text2);">US10Y <span style="color:#f6941c;">4.28%</span></span>
     <span style="font-size:10px;color:var(--text2);">DXY <span style="color:#ef5350;">104.2</span></span>
   </div>
@@ -655,43 +655,65 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <div style="background:#131722;border-bottom:1px solid var(--border);padding:4px 14px;font-size:10px;color:var(--text3);">
     <span style="color:var(--blue);font-weight:700;margin-right:6px;">LIVE</span>Fed holds rates steady · ECB minutes signal caution · JPY weakens on BoJ commentary · Gold hits session high ···
   </div>
-  <!-- Three column layout -->
-  <div style="display:grid;grid-template-columns:160px 1fr 160px;min-height:200px;">
+  <!-- Three column layout — split mode shown in main area -->
+  <div style="display:grid;grid-template-columns:130px 1fr 130px;min-height:240px;">
     <!-- Left sidebar -->
-    <div style="border-right:1px solid var(--border);padding:10px 10px;">
-      <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">Left Sidebar</div>
-      <div style="font-size:10px;color:var(--text2);line-height:2;display:flex;flex-direction:column;gap:2px;">
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--blue);border-radius:2px;display:inline-block;"></span>FX Liquidity</span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Crosses <span style="font-size:8px;color:var(--text3);">(21 pairs)</span></span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Carry Top Pairs</span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Upcoming Events</span>
+    <div style="border-right:1px solid var(--border);padding:8px 8px;">
+      <div style="font-size:8px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Left Sidebar</div>
+      <div style="font-size:9px;color:var(--text2);display:flex;flex-direction:column;gap:5px;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>FX Liquidity</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Crosses (21 pairs)</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Carry Ranking</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Events Calendar</span>
       </div>
     </div>
-    <!-- Main content -->
-    <div style="padding:10px 14px;">
-      <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">Main Content Area</div>
-      <div style="display:flex;flex-direction:column;gap:5px;">
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">AI Narrative &amp; Regime Label</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Price Chart (TradingView) · FX Pairs Table</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Heatmap · Cross-Asset + Risk Monitor</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Historical VaR 95% · 1-day · 252d window (full width)</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">Rates · COT · Sessions · Spreads · Sentiment</div>
-        <div style="background:var(--bg3);border-radius:3px;padding:5px 8px;font-size:10px;color:var(--text2);">News · Economic Map · Signals</div>
+    <!-- Main content — split into two sub-columns -->
+    <div style="padding:0;">
+      <div style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;padding:5px 10px 4px;background:rgba(79,127,255,0.06);border-bottom:1px solid rgba(79,127,255,0.15);display:flex;align-items:center;gap:5px;">
+        <span>Main Area</span><span style="color:rgba(79,127,255,0.5);">·</span><span style="color:var(--text3);font-weight:400;">split layout (default)</span>
+        <span style="margin-left:auto;display:inline-flex;align-items:center;justify-content:center;width:16px;height:13px;border:1px solid rgba(79,127,255,0.5);border-radius:2px;font-size:8px;color:rgba(79,127,255,0.8);">⊟</span>
+      </div>
+      <div style="display:grid;grid-template-columns:55% 2px 1fr;min-height:200px;">
+        <!-- Left column (split-upper) -->
+        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8px;font-weight:600;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em;">Left column (55%)</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">AI Narrative · Regime</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Price Chart (TradingView)</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">FX Pairs Table</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Currency Strength Heatmap</div>
+          <div style="background:rgba(239,83,80,0.07);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text3);">Alerts &amp; Signals (in split)</div>
+        </div>
+        <!-- Drag handle -->
+        <div style="background:rgba(79,127,255,0.3);cursor:col-resize;position:relative;">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:20px;background:rgba(79,127,255,0.6);border-radius:2px;"></div>
+        </div>
+        <!-- Right column (split-lower) -->
+        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:8px;font-weight:600;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em;">Right column (45%)</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Cross-Asset + Risk Monitor</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Historical VaR · Rates</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">COT Positioning</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Sessions · Spreads · Sentiment</div>
+          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">News · Economic Map</div>
+        </div>
       </div>
     </div>
     <!-- Right panel -->
-    <div style="border-left:1px solid var(--border);padding:10px 10px;">
-      <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">Right Panel</div>
-      <div style="font-size:10px;color:var(--text2);line-height:2;display:flex;flex-direction:column;gap:2px;">
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--orange);border-radius:2px;display:inline-block;"></span>CB Rates</span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Correlations</span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Rate Expectations</span>
-        <span style="display:flex;align-items:center;gap:5px;"><span style="width:3px;height:10px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Positioning Bias</span>
+    <div style="border-left:1px solid var(--border);padding:8px 8px;">
+      <div style="font-size:8px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Right Panel</div>
+      <div style="font-size:9px;color:var(--text2);display:flex;flex-direction:column;gap:5px;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>CB Rates</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Correlations</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Rate Expectations</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Positioning Bias</span>
       </div>
     </div>
   </div>
 </div>
-      <p>On screens narrower than 1100px the layout collapses into a single scrollable column. On mobile, the sidebar and right panel fold into the main flow.</p>
+      <h3>Split Layout</h3>
+      <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, news, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>
+      <p>To toggle split mode on or off, click the <strong>split icon button</strong> <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:16px;border:1px solid var(--border2);border-radius:3px;vertical-align:middle;font-size:9px;color:var(--text2);">⊟</span> in the top-right corner of the Price Chart panel header — next to the panel subtitle. When split layout is active, the button is highlighted in blue. Clicking it again collapses back to a single full-width scroll. Split layout is disabled automatically on mobile viewports.</p>
+      <p>On mobile, the layout collapses into a single scrollable column regardless of the split setting. The sidebar and right panel fold into the main flow.</p>
       <p>The sticky topbar navigation links jump you directly to major sections: <strong>FX Pairs</strong>, <strong>Macro</strong>, <strong>Rates</strong>, <strong>Cross-Asset</strong>, <strong>Risk</strong>, <strong>Positioning</strong>, and <strong>Calendar</strong>.</p>
     </div>
 
@@ -720,8 +742,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">USD/CHF <span style="color:#26a69a;font-weight:600;">0.8971</span></span>
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">NZD/USD <span style="color:#ef5350;font-weight:600;">0.6012</span></span>
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">EUR/GBP <span style="color:#26a69a;font-weight:600;">0.8382</span></span>
-          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">XAU/USD <span style="color:#26a69a;font-weight:600;">2,341</span></span>
-          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">WTI <span style="color:#ef5350;font-weight:600;">78.40</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">GOLD FUT <span style="color:#26a69a;font-weight:600;">3,341</span></span>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;">WTI FUT <span style="color:#ef5350;font-weight:600;">62.40</span></span>
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">BTC/USD <span style="color:#26a69a;font-weight:600;">67,420</span></span>
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">US10Y <span style="color:#f6941c;font-weight:600;">4.28%</span></span>
           <span style="font-size:10px;color:var(--text2);white-space:nowrap;">DXY <span style="color:#ef5350;font-weight:600;">104.2</span></span>
@@ -735,7 +757,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Session indicator</h3>
       <p>The top-right of the topbar shows the current active trading session (Sydney, Tokyo, London, New York, or an overlap) based on your browser's local time converted to UTC. A blinking green dot indicates the clock is live.</p>
       <h3>Quote bar</h3>
-      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, XAU/USD, WTI Crude, BTC/USD, US 10Y Yield, and DXY. Prices are sourced from yfinance (~5 min delay during market hours). Frankfurter/ECB rates serve as a silent fallback only when yfinance data is unavailable.</p>
+      <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. Prices are sourced from yfinance (~5 min delay during market hours). Frankfurter/ECB rates serve as a silent fallback only when yfinance data is unavailable.</p>
       <div class="callout">
         <strong>Update cadence:</strong> FX rates in the quote bar are sourced from yfinance and update every 5 minutes during market hours. The quote bar displays the most recently committed data (~5 min delay). For real-time tick data, use the TradingView price chart in the main panel.
       </div>
@@ -773,7 +795,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="price-chart">
       <h2>Price Chart</h2>
-      <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, XAU/USD, WTI, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD. FX pairs use ICE Data Services as the data source for TradingView (e.g. <code>FX_IDC:EURUSD</code>), providing reliable real-time quotes directly on the chart.</p>
+      <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, Gold FUT, WTI FUT, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD. FX pairs use ICE Data Services as the data source for TradingView (e.g. <code>FX_IDC:EURUSD</code>), providing reliable real-time quotes directly on the chart.</p>
       <p>The chart is embedded in a focused read-only view — fixed to candlestick style and Daily timeframe, with a 20-period MA overlay. Toolbars are intentionally hidden to keep the layout compact.</p>
       <!-- MOCK: Price chart widget — mirrors actual TradingView embed (ICE source, EUR/USD 1D) -->
       <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
@@ -789,7 +811,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/GBP</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/JPY</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">XAU/USD</div>
+          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">Gold FUT</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">DXY</div>
         </div>
         <!-- Chart area — realistic TradingView-style with y-axis, peak in Feb, decline to Apr -->
@@ -1081,7 +1103,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Carry Trade — Top Pairs</h3>
       <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric for vol-adjusted carry: rate differential divided by realised 30-day historical volatility (HV30). This reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
       <p>Each row shows the gross rate differential between the two legs (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+4.00%</code> = long-leg rate minus short-leg rate), giving an instant read on the raw carry available. Clicking any row opens the pair chart in TradingView. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
-      <!-- MOCK: Carry Trade Ranking — v7.21 columns resized for 180px sidebar -->
+      <!-- MOCK: Carry Trade Ranking -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:180px;font-size:11px;">
         <div style="padding:5px 8px 4px;border-bottom:1px solid var(--border);background:var(--head-bg);display:flex;flex-direction:column;gap:1px;">
           <span style="font-size:9px;font-weight:700;color:var(--text2);font-family:var(--font-ui);text-transform:uppercase;letter-spacing:.08em;">Carry Trade Ranking</span>
@@ -1134,7 +1156,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <h3>Pair Detail</h3>
       <p>When you click any pair in the FX Pairs table, the right panel's top section populates with a detailed data card for that pair. This is an Eikon-style linked panel — it updates instantly on every click with no page reload. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
-      <!-- MOCK: Pair Detail panel (EUR/USD example) — v7.21 sectioned layout -->
+      <!-- MOCK: Pair Detail panel (EUR/USD example) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:220px;font-size:12px;">
 
         <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border);">
@@ -1203,6 +1225,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Retail Sentiment</strong> Long/short ratio from Myfxbook community — retail traders only. Contrarian indicator: extreme retail long bias typically precedes institutional short positioning.</li>
         <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Carry</strong> Numerator currency rate minus denominator currency rate. Positive = holding long earns the differential. For USD/JPY: Fed Funds − BoJ rate.</li>
       </ul>
+      <div class="callout callout-green">
+        <strong>Tip:</strong> Click once to expand the inline detail row. Click again to collapse it. The panel stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place in the table.
+      </div>
 
       <h3>Central Bank Rates</h3>
       <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the most recent rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">— Hold</span>. The trend resets to neutral (—) after approximately 90 days without a policy move — regardless of the prior cycle direction.</p>
@@ -1392,8 +1417,26 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </ul>
       <h3>Signal Notifications</h3>
       <p>A bell icon button in the panel header lets you opt into browser notifications for new AI signals. When enabled, the button turns blue and the browser will notify you each time the signal set updates with new content — one notification per update cycle, summarising the count by priority. The preference is saved in your browser's local storage. To disable, click the bell again. If your browser has blocked notifications for this site, the button shows a red "blocked" state — re-enable notifications in your browser's site settings to use this feature.</p>
-      <h3>Price Alerts</h3>
-      <p>Configurable threshold alerts for key instruments are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. Set a price level and direction (above / below) for VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, NZD/USD, Gold, US 10Y, or MOVE. When triggered, the alert fires a browser notification and highlights in the panel. Alerts check every 5 minutes and persist across sessions in local storage.</p>
+      <h3>Price &amp; Advanced Alerts</h3>
+      <p>Configurable alerts are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. An alert type selector lets you choose from six categories:</p>
+      <div style="overflow-x:auto;margin:12px 0 16px;">
+        <table class="data-table">
+          <thead><tr>
+            <th scope="col">Type</th>
+            <th scope="col">What it monitors</th>
+            <th scope="col">Instruments</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Price / Level</td><td>Fires when a price or index crosses a threshold (above or below)</td><td>VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, NZD/USD, Gold, WTI, DXY, SPX, BTC, US 10Y, MOVE</td></tr>
+            <tr><td>HV30 vs IV spread</td><td>Fires when the gap between realised (HV30) and implied (IV) volatility crosses a threshold — useful for identifying options mispricing</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD</td></tr>
+            <tr><td>IV Rank</td><td>Fires when the current implied volatility percentile rank crosses a threshold (0–100 scale) — helps identify historically cheap or expensive options</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD</td></tr>
+            <tr><td>Correlation Z-score</td><td>Fires when a correlation deviates from its 252-day norm beyond a z-score threshold — signals potential regime breaks</td><td>All 12 correlation pairs (EUR/USD vs DXY, AUD/USD vs Gold, etc.)</td></tr>
+            <tr><td>VaR 95% (1d)</td><td>Fires when the 1-day historical VaR at 95% confidence for an instrument exceeds a threshold — signals elevated tail risk</td><td>EUR/USD, USD/JPY, GBP/USD, AUD/USD, Gold, WTI, SPX, BTC</td></tr>
+            <tr><td>Regime change</td><td>Fires when the live stress score triggers a transition to a specific regime label</td><td>RISK-OFF, CAUTION, MIXED, RISK-ON</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>All alerts check every 5 minutes, fire a browser notification on trigger, and persist across sessions in local storage. Click the alert row in the popover to delete it. If your browser has blocked notifications, the alerts button shows a red state — re-enable from your browser's site settings.</p>
       <!-- MOCK: Alerts & Signals panel — reflects actual signals.json structure (priority dot + timestamp + title + text) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0 0 18px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;align-items:center;">
@@ -1448,7 +1491,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.21</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.24</span></div>
 </footer>
 
 

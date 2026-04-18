@@ -637,7 +637,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="guide-section" id="the-panel">
       <h2>Reading the COT Panel</h2>
       <p>The terminal displays COT data for AUD, CAD, CHF, EUR, GBP, JPY, NZD, and USD futures (all quoted vs. USD). Each row shows the long/short bar, Long%, net contracts, the week-over-week net change (WoW Δ), an LF/AM alignment dot, net as % of LF open interest (Net%OI), and total LF open interest (OI):</p>
-      <!-- MOCK: Full COT panel — v7.15 layout (8 columns: CCY, bar, Long%, Net, WoW Δ, dot, Net%OI, OI) -->
+      <!-- MOCK: Full COT panel — current layout (8 columns: CCY, bar, Long%, Net, WoW Δ, dot, Net%OI, OI) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">CFTC Positioning (COT)</span>
@@ -986,7 +986,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li><strong style="color:var(--text);">COT + Yield Spreads:</strong> Institutions net long USD while US–DE or US–JP spread is widening = double confirmation of USD strength thesis. Strongest signal when all three align: COT, yields, and price.</li>
       </ul>
       <div class="callout callout-green">
-        <strong>Best practice workflow:</strong> Check the COT panel at the start of each week (Friday or Monday, when fresh data is available). Identify which currencies have extreme or strongly directional positioning. Then use the rest of the terminal during the week to look for setups that align with — or intelligently fade — that institutional positioning.
+        <strong>Best practice workflow:</strong> The terminal updates COT data on Friday evenings (approximately 21:30 UTC), about an hour after the CFTC publishes the report. Check the COT panel on Friday evening or over the weekend for the freshest read. Identify which currencies have extreme or strongly directional positioning. Then use the rest of the terminal during the following week to look for setups that align with — or intelligently fade — that institutional positioning.
       </div>
     </div>
 
@@ -997,7 +997,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.21</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.24</span></div>
 </footer>
 
 
