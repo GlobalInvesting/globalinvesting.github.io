@@ -226,6 +226,13 @@
     height: calc(100vh - 92px);
     overflow: hidden;
   }
+  /* When rightpanel is hidden, collapse its grid column */
+  #layout.layout--no-right {
+    grid-template-columns: 180px 1fr 0;
+  }
+  #layout.layout--no-right #rightpanel {
+    display: none;
+  }
 
   /* ── SIDEBAR ── */
   #sidebar {
@@ -646,7 +653,7 @@
   .pd-inline-val.pd-up { color:var(--up); }
   .pd-inline-val.pd-dn { color:var(--down); }
   /* Retail bar in inline layout */
-  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex:1; }
+  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex:1; flex-shrink:0; min-width:100px; }
   .pd-inline-retail-bar { height:3px; width:72px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
   .pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
   .pd-inline-retail-nums { font-size:9px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
