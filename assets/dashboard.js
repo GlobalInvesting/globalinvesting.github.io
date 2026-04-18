@@ -4205,10 +4205,19 @@ async function fetchFedExpectations() {
       }
 
       // ── Implied policy rate — expected rate at next meeting ─────────
-      // Shows the market-implied next-step rate for all currencies uniformly.
-      // Logic: current rate ± one standard step (25bp) based on OIS bias direction.
-      // If meetings.json has an explicit fwdRate (OIS-derived), that takes priority.
-      // This is the same concept shown on Bloomberg's WIRP / IRPR panels.
+      // Industry standard (Bloomberg WIRP / CME FedWatch): probability-weighted
+      // expected rate = Σ(scenario_prob × scenario_rate).
+      //
+      // Three-scenario model: cut / hold / hike.
+      // Each scenario assumes one standard 25bp step.
+      //   implied = current
+      //             + (hikeProb/100 × +0.25)
+      //             − (cutProb/100  × +0.25)
+      //   holdProb = 100 − cutProb − hikeProb  (residual, not stored separately)
+      //
+      // Priority 1: explicit fwdRate from meetings.json (OIS-derived — future use)
+      // Priority 2: probability-weighted if cutProb or hikeProb available (≥1 field)
+      // Priority 3: ±25bp naive step with ~ prefix (only when no probabilities at all)
       let fwdDisplay = '—';
       const meetingBias = (() => {
         if (!meetings) return null;
@@ -4222,10 +4231,24 @@ async function fetchFedExpectations() {
       if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
         fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
       } else {
-        // Priority 2: derive from trend direction — one 25bp step
-        const dir = meetingBias ?? trendDir;
-        const step = dir === 'down' ? -0.25 : dir === 'up' ? 0.25 : 0;
-        fwdDisplay = Math.max(0, current + step).toFixed(2) + '%';
+        const pCut  = (meetings?.cutProb  != null && !isNaN(meetings.cutProb))  ? Math.min(100, Math.max(0, meetings.cutProb))  : null;
+        const pHike = (meetings?.hikeProb != null && !isNaN(meetings.hikeProb)) ? Math.min(100, Math.max(0, meetings.hikeProb)) : null;
+
+        if (pCut !== null || pHike !== null) {
+          // Priority 2: probability-weighted — Bloomberg WIRP standard
+          const cut  = pCut  ?? 0;
+          const hike = pHike ?? 0;
+          // Clamp residual so probabilities never exceed 100%
+          const cutC  = Math.min(cut,  100);
+          const hikeC = Math.min(hike, 100 - cutC);
+          const implied = current + (hikeC / 100) * 0.25 - (cutC / 100) * 0.25;
+          fwdDisplay = Math.max(0, implied).toFixed(2) + '%';
+        } else {
+          // Priority 3: no probabilities available — naive ±25bp step, ~ signals estimate
+          const dir  = meetingBias ?? trendDir;
+          const step = dir === 'down' ? -0.25 : dir === 'up' ? 0.25 : 0;
+          fwdDisplay = '~' + Math.max(0, current + step).toFixed(2) + '%';
+        }
       }
 
       const meta = bankMeta[ccy];
