@@ -840,13 +840,19 @@ def fetch_yfinance_all(symbols_map):
                         # must share the same positional index. dropna() would misalign them.
                         hist_dates      = [d.date() if hasattr(d, "date") else d for d in hist.index]
                         hist_close_full = hist["Close"]  # keep NaN rows to preserve positional alignment
-                        today_date = datetime.now(timezone.utc).date()
-                        # Find the most recent Friday strictly before today
+                        # Use last-bar-relative search, NOT datetime.now(utc).date().
+                        # Rationale: when the script runs after midnight UTC on Saturday,
+                        # now().date() is already Saturday but the last yfinance bar is
+                        # still Friday. Using now() would find *that* Friday as "prior Friday"
+                        # → close / close = 1.0 → pct1w = 0.00%. Instead, always skip the
+                        # last bar and search backwards for the nearest Friday among the
+                        # remaining bars — that is always the prior-week Friday close.
+                        last_bar_idx = len(hist_dates) - 1
                         prior_friday = None
                         prior_friday_close = None
-                        for i in range(len(hist_dates) - 1, -1, -1):
+                        for i in range(last_bar_idx - 1, -1, -1):  # skip last bar
                             d = hist_dates[i]
-                            if d < today_date and d.weekday() == 4:  # 4 = Friday
+                            if d.weekday() == 4:  # 4 = Friday
                                 v = hist_close_full.iloc[i]
                                 if v is not None and not (hasattr(v, '__float__') and v != v):  # not NaN
                                     prior_friday = d
