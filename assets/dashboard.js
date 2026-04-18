@@ -4262,9 +4262,9 @@ async function fetchFedExpectations() {
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
       rows.push(`<tr title="Next meeting: ${nextMtg} · CIP 30d fwd">
-        <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
-        <td style="white-space:nowrap;">${biasLabel}</td>
-        <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">${fwdDisplay}</td>
+        <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
+        <td style="overflow:hidden;white-space:nowrap;">${biasLabel}</td>
+        <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">${fwdDisplay}</td>
       </tr>`);
     });
 
