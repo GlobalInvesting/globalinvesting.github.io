@@ -1,20 +1,20 @@
 [
   {
-    "time": "04:20",
+    "time": "05:25",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY trading above 158.00, approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 158.58 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
     "evidence": [
       "USD/JPY: 158.58",
       "BoJ rate: 0.75%",
-      "VIX: 17.5"
+      "VIX: 17.5 — normal volatility"
     ]
   },
   {
-    "time": "04:18",
+    "time": "05:23",
     "priority": "warning",
     "title": "AUD/USD Retail Sentiment",
-    "text": "AUD/USD retail sentiment at 9% long / 91% short, indicating an extreme short bias; contrarian reversal risk is high.",
+    "text": "AUD/USD retail sentiment at 9% long / 91% short — extreme short bias, watch for contrarian reversal risk.",
     "evidence": [
       "AUD/USD: 0.7168",
       "AUD/USD retail sentiment: 9% long / 91% short",
@@ -22,36 +22,36 @@
     ]
   },
   {
-    "time": "04:15",
+    "time": "05:21",
     "priority": "warning",
-    "title": "Fed-ECB Rate Differential",
-    "text": "Fed-ECB 175bp differential weighs on EUR/USD; pair holds at 1.1767.",
+    "title": "USD/JPY vs VIX Correlation Break",
+    "text": "USD/JPY vs VIX correlation breaks at +0.672 — JPY no longer acting as safe haven, watch for regime shift.",
     "evidence": [
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%",
-      "EUR/USD: 1.1767"
+      "USD/JPY vs VIX corr: +0.672",
+      "z-score: +1.36σ",
+      "VIX: 17.5 — normal volatility"
     ]
   },
   {
-    "time": "04:10",
+    "time": "05:18",
     "priority": "info",
     "title": "VIX and S&P 500",
     "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
     "evidence": [
-      "VIX: 17.5",
+      "VIX: 17.5 — normal volatility",
       "S&P 500: 7,126",
-      "VIX description: normal volatility"
+      "1D:+1.20%"
     ]
   },
   {
-    "time": "04:05",
+    "time": "05:15",
     "priority": "info",
-    "title": "USD/JPY vs VIX Correlation Break",
-    "text": "USD/JPY vs VIX correlation breaks at +0.672, indicating JPY no longer acting as a safe haven; z-score at +1.36σ.",
+    "title": "Fed-ECB Rate Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (ON HOLD) — 175bp spread continues to weigh on EUR/USD.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.672",
-      "z-score: +1.36σ",
-      "VIX: 17.5"
+      "Fed rate: 3.75% (ON HOLD)",
+      "ECB rate: 2.00% (ON HOLD)",
+      "EUR/USD: 1.1767"
     ]
   }
 ]
