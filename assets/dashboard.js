@@ -7,9 +7,6 @@ const STATE = {
   cbRates: {},    // Central bank rates from rates/*.json
   cotData: {},    // COT data from cot-data/*.json
 };
-// True when buildRichNarrative has set the regime badge from a fresh AI JSON (< 4h old).
-// fetchRiskData will not overwrite the narrative-regime badge in that case.
-let _aiRegimeFresh = false;
 
 // Currency config: which pairs to compute from Frankfurter USD-base
 const PAIRS = [
@@ -2366,7 +2363,10 @@ async function renderRiskData(byId) {
       narrRegEl.className = 'narr-regime';
       narrRegEl.style.borderColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
       narrRegEl.style.color       = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-      narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}`;
+      const narrTsLabel = _narrativeGeneratedAt
+        ? ` · AI narrative: ${new Date(_narrativeGeneratedAt).toUTCString().slice(17, 22)} UTC`
+        : '';
+      narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}${narrTsLabel}`;
     }
   }
 
@@ -3308,8 +3308,10 @@ async function updatePairDetail(tvSym) {
       USD_IV[nonUsd] = entry.iv;
     }
     // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × 1.08 (long-run NZD/AUD vol ratio).
+    let nzdProxy = false;
     if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
       USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+      nzdProxy = true;
     }
 
     // Direct ETF IV for USD majors
@@ -3438,7 +3440,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${meta?.cross && atmIv != null ? ' (synthesised)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${meta?.cross && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD ETF IV × 1.08 (long-run NZD/AUD vol ratio). No CBOE-listed NZD ETF options available — treat as directional context only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
@@ -4176,14 +4178,19 @@ async function fetchFedExpectations() {
       }
       const biasTip = buildBiasTooltip();
 
-      // ── Market-implied cut probability (CME/ASX where available; null otherwise) ──
-      const cutProb = meetings?.cutProb ?? null;  // number (0–100) or null
+      // ── Market-implied move probability (CME/ASX where available; null otherwise) ──
+      // Show cut probability chip for cut/hold bias; hike probability chip for hike bias.
+      // Bloomberg WIRP standard: display the probability of the expected direction.
+      const cutProb  = meetings?.cutProb  ?? null;  // number (0–100) or null
+      const hikeProb = meetings?.hikeProb ?? null;  // number (0–100) or null
+      const probSrc  = biasSource || 'OIS/futures';
       let probSuffix = '';
-      if (cutProb !== null) {
-        // Show as small chip: e.g. "42%↓" — sourced from OIS/futures via engine
+      if (meetingsBias === 'hike' && hikeProb !== null) {
+        const probCls = hikeProb >= 60 ? 'up' : hikeProb >= 40 ? '' : 'flat';
+        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a hike at next meeting · ${probSrc}">${hikeProb}%↑</span>`;
+      } else if (cutProb !== null) {
         const probCls = cutProb >= 60 ? 'down' : cutProb >= 40 ? '' : 'flat';
-        const probSrc = biasSource || 'OIS/futures';
-        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cutProb}%↓</span>`;
+        probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cutProb}%↓</span>`;
       }
 
       let biasLabel;
@@ -4497,55 +4504,19 @@ async function fetchOptionSkew() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-// LOAD AI REGIME — fast-path: set narrative badge BEFORE fetchRiskData runs.
-// Called with await in boot() so _aiRegimeFresh is populated and the badge
-// shows the correct regime on first paint, with zero flicker.
-// buildRichNarrative() runs afterwards to fill in the full narrative text.
+// LOAD AI REGIME — fast-path: prime narrative text from cached AI JSON.
+// Primes the narrative text from cached AI JSON before buildRichNarrative() runs.
+// Regime badges (#risk-regime, #narrative-regime) are exclusively owned by
+// renderRiskData() — always reflecting the live VIX stress score.
 // ═══════════════════════════════════════════════════════════════════
 async function loadAIRegime() {
   try {
     const res = await fetch('./ai-analysis/index.json');
     if (!res.ok) return;
     const d = await res.json();
-    let regime = (d.regime || 'RISK-OFF').toUpperCase();
-    const generatedAt = d.generated_at || null;
-
-    // Staleness check — same 4-hour threshold as buildRichNarrative
-    let isStale = false;
-    if (generatedAt) {
-      const ageMinutes = (Date.now() - new Date(generatedAt).getTime()) / 60000;
-      if (ageMinutes > 240) isStale = true;
-    }
-
-    const regEl = document.getElementById('narrative-regime');
-    if (!regEl) return;
-
-    // 'CLOSED' is a legacy value — regime is macro, not market-hours. Skip badge update.
-    if (regime === 'CLOSED') return;
-
-    if (isStale) {
-      _aiRegimeFresh = false;
-      regEl.textContent = regime;
-      regEl.className = 'narr-regime stale';
-      regEl.title = 'AI signal stale — live VIX assessment active';
-    } else {
-      _aiRegimeFresh = true;
-      const isOn  = regime === 'RISK-ON';
-      const isOff = regime === 'RISK-OFF';
-      const badgeColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-      regEl.textContent = regime;
-      regEl.className = 'narr-regime';
-      regEl.style.borderColor = badgeColor;
-      regEl.style.color       = badgeColor;
-      regEl.title = '';
-
-      // Also prime the Risk Monitor badge so both panels are in sync from first paint
-      const riskCls = isOn ? 'risk-val up' : isOff ? 'risk-val down' : 'risk-val warning';
-      setEl('risk-regime', regime, riskCls);
-      setEl('risk-regime-sub', isOn ? 'Risk appetite active' : isOff ? 'Risk aversion elevated' : 'Elevated caution');
-    }
-  } catch { /* silently skip — renderRiskData will handle the badge via live data */ }
+    // Store generated_at so buildRichNarrative can compute staleness
+    if (d.generated_at) _narrativeGeneratedAt = d.generated_at;
+  } catch { /* silently skip */ }
 }
 
 // RICH AI NARRATIVE — build from ai-analysis/index.json + live data
@@ -4560,7 +4531,7 @@ async function buildRichNarrative() {
 
     let baseNarrative = '';
     let regime = 'RISK-OFF';
-    let _narrativeGeneratedAt = null; // kept in outer scope for stale age display
+    // _narrativeGeneratedAt is module-level — do not re-declare here
 
     if (narRes.ok) {
       const d = await narRes.json();
@@ -4652,51 +4623,11 @@ async function buildRichNarrative() {
       finalNarrative = parts.join('. ') + '.';
     }
 
-    // Update DOM
+    // Update narrative text only.
+    // Regime badges (#risk-regime, #narrative-regime) are exclusively owned by
+    // renderRiskData() — always live VIX stress score. Never written here.
     const el = document.getElementById('narrative-text');
     if (el && finalNarrative) el.textContent = finalNarrative;
-
-    // Update regime badge
-    const regEl = document.getElementById('narrative-regime');
-    if (regEl && regime) {
-      // 'CLOSED' is a legacy value — regime is macro, not market-hours. Skip badge update.
-      if (regime === 'CLOSED' || regime === '__STALE__CLOSED') return;
-      const isStale = regime.startsWith('__STALE__');
-      const cleanRegime = isStale ? regime.replace('__STALE__', '') : regime;
-      const isOn = cleanRegime.toLowerCase().includes('on') && !cleanRegime.toLowerCase().includes('off');
-
-      if (isStale) {
-        // Stale AI regime — show the badge greyed-out with age indicator.
-        // fetchRiskData() drives the authoritative live assessment.
-        _aiRegimeFresh = false;
-        const ageHours = _narrativeGeneratedAt
-          ? Math.round((Date.now() - new Date(_narrativeGeneratedAt).getTime()) / 3600000)
-          : null;
-        const ageLabel = ageHours != null ? (ageHours >= 1 ? `${ageHours}h ago` : 'stale') : 'stale';
-        regEl.textContent = cleanRegime.toUpperCase();
-        regEl.className = 'narr-regime stale';
-        regEl.title = `AI signal from ${ageLabel} — live VIX assessment shown in Risk Monitor`;
-        const riskRegEl = document.getElementById('risk-regime');
-        if (riskRegEl) riskRegEl.style.opacity = '0.5';
-        setEl('risk-regime-sub', `AI signal from ${ageLabel} · live assessment active`);
-      } else {
-        // Fresh AI regime — set narrative badge and mark as authoritative
-        _aiRegimeFresh = true;
-        const isOff = cleanRegime.toUpperCase().includes('OFF');
-        const isCaution = !isOn && !isOff; // CAUTION or MIXED
-        const badgeColor = isOn ? 'var(--up)' : isCaution ? 'var(--orange)' : 'var(--down)';
-        regEl.textContent = cleanRegime.toUpperCase();
-        regEl.className = 'narr-regime';
-        regEl.style.borderColor = badgeColor;
-        regEl.style.color       = badgeColor;
-        regEl.title = '';
-        const riskRegEl = document.getElementById('risk-regime');
-        if (riskRegEl) riskRegEl.style.opacity = '';
-        const riskCls = isOn ? 'risk-val up' : isCaution ? 'risk-val warning' : 'risk-val down';
-        setEl('risk-regime', cleanRegime.toUpperCase(), riskCls);
-        setEl('risk-regime-sub', isOn ? 'Risk appetite active' : isCaution ? 'Elevated caution' : 'Risk aversion elevated');
-      }
-    }
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
     try {
@@ -4968,8 +4899,8 @@ async function boot() {
 
   // ── CRITICAL: Load AI regime badge FIRST, before fetchRiskData touches the narrative badge.
   // loadAIRegime() is a lightweight fetch of ai-analysis/index.json (~same-origin, <50ms).
-  // By awaiting it here, _aiRegimeFresh is set and the badge shows the correct regime
-  // on first paint — fetchRiskData will see _aiRegimeFresh=true and not overwrite it.
+  // Awaited so _narrativeGeneratedAt is populated before buildRichNarrative runs.
+  // Regime badges are set exclusively by renderRiskData() via the live VIX stress score.
   await loadAIRegime();
 
   // External API data — all in parallel.
@@ -5067,6 +4998,7 @@ const LIQ_SESSIONS = [
 let _liqData     = null;
 let _liqBaseline = null;
 let _liqSource   = null;
+let _narrativeGeneratedAt = null; // ISO timestamp of last AI narrative — written by loadAIRegime() and buildRichNarrative()
 
 // Interpolate a 24-hour array to 48 half-hour slots
 function _liqTo48(arr24) {
