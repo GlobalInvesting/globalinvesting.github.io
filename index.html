@@ -989,7 +989,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     if(isMobile()) active = false;
     // Show/hide button based on viewport
     btn.style.display = isMobile() ? 'none' : '';
-    var layout = document.getElementById('layout');
     if(active){
       main.classList.add('split-layout');
       btn.classList.remove('active');
@@ -998,9 +997,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       var pct = leftPct || 55;
       upper.style.width = pct + '%';
       upper.style.flex  = 'none';
-      // Show rightpanel — restore grid column
-      if(layout) layout.classList.remove('layout--no-right');
-      // Move alerts panel into left column (below heatmap)
+      // Move alerts panel into left column (below heatmap) in split mode
       if(alertsPanel && alertsPanel.parentNode !== upper){
         upper.appendChild(alertsPanel);
       }
@@ -1011,13 +1008,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       handle.style.display = 'none';
       upper.style.width = '';
       upper.style.flex  = '';
-      // Hide rightpanel — collapse its grid column to remove empty space
-      if(layout) layout.classList.add('layout--no-right');
-      // Restore alerts panel to original position in right column
+      // Restore alerts panel to its original position in split-lower
       if(alertsPanel && alertsOrigParent && alertsPanel.parentNode !== alertsOrigParent){
         alertsOrigParent.insertBefore(alertsPanel, alertsOrigNext);
       }
     }
+    // rightpanel (CB Rates, Carry, Rate Expectations) is always visible regardless of split state
   }
 
   // Restore saved state — split layout is ON by default for first-time visitors
