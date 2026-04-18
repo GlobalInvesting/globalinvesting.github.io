@@ -623,7 +623,7 @@
     width:100%;
     box-sizing:border-box;
   }
-  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); min-width:max-content; flex:1; }
+  .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); width:100%; }
   /* Price block left: pair, price, chg */
   .pd-inline-price {
     display:flex; flex-direction:column; justify-content:center;
@@ -640,31 +640,24 @@
     display:flex; flex-direction:column; justify-content:flex-start;
     padding:5px 8px 5px 8px;
     border-right:1px solid var(--border2);
-    flex-shrink:0;
+    flex:1; min-width:0;
   }
   .pd-inline-group-lbl {
     font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
     color:var(--text3); margin-bottom:4px; white-space:nowrap;
   }
-  .pd-inline-metrics { display:flex; gap:10px; flex-wrap:nowrap; }
+  .pd-inline-metrics { display:flex; gap:8px; flex-wrap:wrap; }
   .pd-inline-metric { display:flex; flex-direction:column; }
   .pd-inline-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; margin-bottom:1px; }
   .pd-inline-val { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
   .pd-inline-val.pd-up { color:var(--up); }
   .pd-inline-val.pd-dn { color:var(--down); }
-  /* Retail bar in inline layout — kept for potential reuse */
-  .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex-shrink:0; min-width:100px; }
-  .pd-inline-retail-bar { height:3px; width:72px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
+  /* Retail bar in inline layout */
+  .pd-inline-retail-bar { height:3px; width:100%; max-width:80px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
   .pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
-  .pd-inline-retail-nums { font-size:9px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
-  /* Footer strip — now hosts retail + sources on one line */
+  .pd-inline-retail-nums { font-size:9px; font-family:var(--font-mono); color:var(--text2); font-weight:600; white-space:nowrap; }
+  /* Footer strip */
   .pd-inline-footer { font-size:8px; color:var(--text3); font-family:var(--font-mono); padding:2px 10px; border-top:1px solid var(--border); background:var(--bg2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .pd-inline-footer--with-retail { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:3px 10px; overflow:visible; }
-  .pd-inline-footer-sources { flex-shrink:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:8px; color:var(--text3); font-family:var(--font-mono); }
-  .pd-inline-footer-retail { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; cursor:help; }
-  .pd-inline-retail-lbl { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); white-space:nowrap; }
-  .pd-inline-retail-bar--sm { display:inline-block; width:48px; height:3px; background:var(--bg3); border-radius:2px; overflow:hidden; vertical-align:middle; flex-shrink:0; }
-  .pd-inline-retail-bar--sm .pd-inline-retail-fill { display:block; height:100%; background:var(--up); border-radius:2px; opacity:.7; }
   /* Expand indicator on the pair row */
   tr.pd-selected td { background:var(--bg3) !important; }
   tr.pd-selected td.sym::after { content:' ▾'; font-size:8px; color:var(--text3); }
