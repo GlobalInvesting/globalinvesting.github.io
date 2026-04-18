@@ -1,9 +1,9 @@
 [
   {
-    "time": "09:10",
+    "time": "11:00",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.58 resistance — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 158.58 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 158.58",
       "BoJ rate: 0.75%",
@@ -11,31 +11,31 @@
     ]
   },
   {
-    "time": "09:08",
+    "time": "10:58",
     "priority": "warning",
-    "title": "AUD/USD Retail Sentiment",
-    "text": "AUD/USD sentiment at 9% long / 91% short — extreme short bias, watch for squeeze as retail is heavily positioned.",
+    "title": "AUD/USD",
+    "text": "AUD/USD sentiment extreme: 91% of retail traders are short — contrarian reversal risk; AUD/USD holds above 0.7168.",
     "evidence": [
       "AUD/USD: 0.7168",
       "AUD/USD sentiment: 9% long / 91% short",
-      "CFTC AUD net: +41,675"
+      "RBA rate: 4.10%"
     ]
   },
   {
-    "time": "09:05",
+    "time": "10:55",
     "priority": "warning",
-    "title": "USD/JPY vs VIX Correlation Break",
-    "text": "USD/JPY vs VIX correlation breaks at +0.672 — JPY no longer acting as safe haven, watch for regime shift implications.",
+    "title": "USD/CAD",
+    "text": "USD/CAD correlation break: USD/CAD vs WTI Oil correlation at +0.726, deviating from historical norm; CAD commodity exposure may drive pair.",
     "evidence": [
-      "USD/JPY: 158.58",
-      "VIX: 17.5",
-      "USD/JPY vs VIX corr: +0.672"
+      "USD/CAD: 1.3693",
+      "USD/CAD vs WTI Oil: corr=+0.726",
+      "WTI Oil: $82.6"
     ]
   },
   {
-    "time": "09:02",
+    "time": "10:50",
     "priority": "info",
-    "title": "VIX Level",
+    "title": "VIX",
     "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
     "evidence": [
       "VIX: 17.5",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "08:58",
+    "time": "10:45",
     "priority": "info",
-    "title": "Fed-ECB Rate Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2.00% (ON HOLD) — 175bp spread continues to weigh on EUR/USD; rate divergence favours USD.",
+    "title": "Yield Curve",
+    "text": "US 2s10s spread at +46.6bp, bull flattener regime — recession pricing / risk-off narrative.",
     "evidence": [
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%",
-      "EUR/USD: 1.1767"
+      "US 10Y: 4.246%",
+      "US 2Y: 3.780%",
+      "2s10s spread: +46.6bp"
     ]
   }
 ]
