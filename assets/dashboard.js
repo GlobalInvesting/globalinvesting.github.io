@@ -689,8 +689,9 @@ async function fetchCBRates() {
       cad: { flag: 'ca', name: 'Bank of Canada',           short: 'BoC'  },
       nzd: { flag: 'nz', name: 'Reserve Bank of NZ',       short: 'RBNZ' },
     };
+    // Expose bankInfo globally so onclick handlers can look it up without embedding JSON in HTML
+    window._STATE_bankInfo = bankInfo;
     const trendMap = { up:'<span class="up">↑</span>', down:'<span class="down">↓</span>', flat:'<span class="flat">—</span>' };
-    const biMap = JSON.stringify(bankInfo);
     tbody.innerHTML = results.filter(Boolean).map(res => {
       const info      = bankInfo[res.id] || { flag: '', name: res.label, short: res.label };
       const trend     = computeCBTrend(res.obs);
@@ -705,7 +706,7 @@ async function fetchCBRates() {
           var st  = window._STATE_cbRates;
           var r   = st && st[id];
           if (!r || typeof openCBRatesModal !== 'function') return;
-          var bi  = ${biMap}[id] || {};
+          var bi  = (window._STATE_bankInfo && window._STATE_bankInfo[id]) || {};
           var mtg = window._STATE_meetings && window._STATE_meetings[id.toUpperCase()];
           openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
         })(this)"
