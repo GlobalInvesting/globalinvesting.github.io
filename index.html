@@ -816,7 +816,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table aria-label="Central bank rate expectations">
-      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)">Bias</th><th scope="col">Fwd Rate</th></tr></thead>
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)">Bias</th><th scope="col" title="Expected policy rate at next meeting · derived from OIS markets where available, otherwise from trend bias (±25bp step)">Implied</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <!-- 8 skeleton rows — exact structure matches JS render to prevent CLS -->
         <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;">—</td></tr>
