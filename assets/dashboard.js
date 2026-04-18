@@ -674,6 +674,9 @@ async function fetchCBRates() {
   });
 
   // Populate right-panel CB rates table
+  // Expose cbRates state globally so the modal can access obs arrays on click
+  window._STATE_cbRates = STATE.cbRates;
+
   const tbody = document.getElementById('cbrates-tbody');
   if (tbody) {
     const bankInfo = {
@@ -687,13 +690,26 @@ async function fetchCBRates() {
       nzd: { flag: 'nz', name: 'Reserve Bank of NZ',       short: 'RBNZ' },
     };
     const trendMap = { up:'<span class="up">↑</span>', down:'<span class="down">↓</span>', flat:'<span class="flat">—</span>' };
+    const biMap = JSON.stringify(bankInfo);
     tbody.innerHTML = results.filter(Boolean).map(res => {
       const info      = bankInfo[res.id] || { flag: '', name: res.label, short: res.label };
-      const trend     = computeCBTrend(res.obs);           // ← dynamic, replaces static CB_TREND
+      const trend     = computeCBTrend(res.obs);
       const flag      = info.flag ? `<span class="fi fi-${info.flag}" style="margin-right:5px;border-radius:2px;"></span>` : '';
-      // Rate color: up = hiking cycle, down = cutting cycle, flat = neutral (var(--text))
       const rateClass = trend === 'up' ? 'up' : trend === 'down' ? 'down' : '';
-      return `<tr title="${info.name}">
+      return `<tr
+        title="Click to view rate history · ${info.name}"
+        style="cursor:pointer;"
+        data-cbr-id="${res.id}"
+        onclick="(function(el){
+          var id  = el.dataset.cbrId;
+          var st  = window._STATE_cbRates;
+          var r   = st && st[id];
+          if (!r || typeof openCBRatesModal !== 'function') return;
+          var bi  = ${biMap}[id] || {};
+          var mtg = window._STATE_meetings && window._STATE_meetings[id.toUpperCase()];
+          openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
+        })(this)"
+      >
         <td style="white-space:nowrap;">${flag}<span style="font-size:10px;">${info.short}</span></td>
         <td${rateClass ? ` class="${rateClass}"` : ''}>${res.rate.toFixed(2)}%</td>
         <td>${trendMap[trend]||'—'}</td>
@@ -701,7 +717,6 @@ async function fetchCBRates() {
     }).join('');
   }
 }
-
 // ═══════════════════════════════════════════════════════════════════
 // COT DATA — from cot-data/*.json
 // ═══════════════════════════════════════════════════════════════════
@@ -4244,6 +4259,9 @@ async function fetchFedExpectations() {
     });
 
     if (rows.length) tbody.innerHTML = rows.join('');
+
+    // Expose meetings data globally so cb-rates-modal can read bias/fwdRate on click
+    if (meetingsRes?.meetings) window._STATE_meetings = meetingsRes.meetings;
   } catch(e) { console.warn('CB expectations failed:', e); }
 }
 

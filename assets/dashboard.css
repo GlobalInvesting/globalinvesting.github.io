@@ -555,6 +555,21 @@
   #rightpanel::-webkit-scrollbar { width: 3px; }
   #rightpanel::-webkit-scrollbar-thumb { background: var(--border2); }
 
+  /* ── CB RATES CLICKABLE ROWS ──────────────────────────────────── */
+  #cbrates-tbody tr[data-cbr-id]:hover td {
+    background: var(--bg3);
+  }
+  #cbrates-tbody tr[data-cbr-id] td:first-child::after {
+    content: ' ›';
+    color: var(--text3);
+    font-size: 9px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  #cbrates-tbody tr[data-cbr-id]:hover td:first-child::after {
+    opacity: 1;
+  }
+
   /* ── PAIR DETAIL PANEL ───────────────────────────────────────── */
   /* #pair-detail removed v7.12.22 — replaced by #pd-popover floating overlay */
   .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
