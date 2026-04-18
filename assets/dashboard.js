@@ -2900,7 +2900,9 @@ async function buildInlineDetail(tvSym, container) {
   // Formatting helpers
   const fmtP  = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
   const fmtN  = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
-  const cls   = v => v == null ? '' : v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
+  // Use pd-up/pd-dn throughout — these have explicit .pd-val.pd-up rules that
+  // override the base color:var(--text) on .pd-inline-val without specificity fights.
+  const cls   = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
   const clsI  = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
   const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';

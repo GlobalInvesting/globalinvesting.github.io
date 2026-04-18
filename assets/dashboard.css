@@ -633,6 +633,8 @@
   .pd-inline-metric { display:flex; flex-direction:column; }
   .pd-inline-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; margin-bottom:1px; }
   .pd-inline-val { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
+  .pd-inline-val.pd-up { color:var(--up); }
+  .pd-inline-val.pd-dn { color:var(--down); }
   /* Retail bar in inline layout */
   .pd-inline-retail { display:flex; flex-direction:column; justify-content:center; padding:5px 10px; flex-shrink:0; }
   .pd-inline-retail-bar { height:3px; width:72px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:4px 0 2px; }
