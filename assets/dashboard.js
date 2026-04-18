@@ -2893,9 +2893,31 @@ async function buildInlineDetail(tvSym, container) {
 
   // Retail
   const retKey = label.toUpperCase();
-  const ret  = RETAIL_SENTIMENT_CACHE[retKey] || null;
-  const retL = ret?.longPct ?? null;
-  const retS = ret?.shortPct ?? null;
+  const ret     = RETAIL_SENTIMENT_CACHE[retKey] || null;
+  const retL    = ret?.longPct  ?? null;
+  const retS    = ret?.shortPct ?? null;
+  const retAvgL = ret?.avgL     ?? null;   // avg entry price of retail longs
+  const retAvgS = ret?.avgS     ?? null;   // avg entry price of retail shorts
+  const retLPos = ret?.longPos  ?? null;   // number of long positions
+  const retSPos = ret?.shortPos ?? null;   // number of short positions
+  // Contrarian skew label (IG / Bloomberg convention: >65% = extreme)
+  const retSkew = retL == null ? null
+    : retL >= 75 ? 'Heavily Long'
+    : retL >= 65 ? 'Majority Long'
+    : retL <= 25 ? 'Heavily Short'
+    : retL <= 35 ? 'Majority Short'
+    : 'Mixed';
+  const retSkewCls = retL == null ? ''
+    : retL >= 65 ? 'pd-dn'   // contrarian = bearish signal when heavily long
+    : retL <= 35 ? 'pd-up'   // contrarian = bullish signal when heavily short
+    : 'pd-dim';
+  // Avg entry vs current price: are retail longs underwater?
+  const retLUnder = (retAvgL != null && price != null && retL != null && retL >= 50)
+    ? price < retAvgL   // longs are underwater if price below avg entry
+    : null;
+  const retSUnder = (retAvgS != null && price != null && retS != null && retS > 50)
+    ? price > retAvgS   // shorts are underwater if price above avg entry
+    : null;
 
   // Formatting helpers
   const fmtP  = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
@@ -2985,11 +3007,22 @@ async function buildInlineDetail(tvSym, container) {
         <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
       </div>
 
-      <div class="pd-inline-group pd-inline-group--retail fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community. Contrarian indicator — extreme retail long historically aligns with institutional short." data-tip-ex="When >70% retail long, price tends to move against the crowd over time."
-        style="border-right:none; justify-content:center;">
-        <div class="pd-inline-group-lbl">Retail</div>
-        <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></div></div>
-        <div class="pd-inline-retail-nums">${retL != null ? retL + '% L' : '—'} / ${retS != null ? retS + '% S' : '—'}</div>
+      <div class="pd-inline-group pd-inline-group--retail fx-tip"
+        data-tip-title="Retail Client Positioning · Myfxbook"
+        data-tip-body="Long/short % from Myfxbook community (retail traders only). Contrarian indicator — extreme retail long bias historically aligns with institutional short positioning. Avg entry shows where the dominant side opened; if price has moved against them, a stop-hunt or squeeze becomes more likely."
+        data-tip-ex="Heavily Long (>65%) = contrarian bearish signal. Heavily Short (<35% long) = contrarian bullish signal. Avg entry underwater = retail under pressure, reversal risk elevated."
+        style="border-right:none; justify-content:flex-start;">
+        <div class="pd-inline-group-lbl">Retail <span class="pd-inline-retail-skew ${retSkewCls}">${retSkew || ''}</span></div>
+        <div class="pd-inline-retail-bar" style="margin-bottom:3px;"><div class="pd-inline-retail-fill" style="width:${retL != null ? retL : 50}%"></div></div>
+        <div class="pd-inline-retail-row">
+          <span class="pd-inline-val ${retL != null && retL >= 65 ? 'pd-dn' : retL != null && retL <= 35 ? 'pd-up' : ''}">${retL != null ? retL + '% L' : '—'}</span>
+          <span class="pd-dim"> / </span>
+          <span>${retS != null ? retS + '% S' : '—'}</span>
+        </div>
+        ${retAvgL != null || retAvgS != null ? `<div class="pd-inline-retail-avg">
+          ${retAvgL != null && retL != null && retL >= 50 ? `<span class="pd-inline-lbl">Avg L </span><span class="pd-inline-val ${retLUnder ? 'pd-dn' : 'pd-up'}">${retAvgL.toFixed(dec)}${retLUnder ? ' ▼' : ' ▲'}</span>` : ''}
+          ${retAvgS != null && retS != null && retS >= 50 ? `<span class="pd-inline-lbl">Avg S </span><span class="pd-inline-val ${retSUnder ? 'pd-dn' : 'pd-up'}">${retAvgS.toFixed(dec)}${retSUnder ? ' ▼' : ' ▲'}</span>` : ''}
+        </div>` : ''}
       </div>
     </div>
     </div>
