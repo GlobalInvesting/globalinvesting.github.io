@@ -816,8 +816,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="sb-head" style="margin-top:2px;">CB Rate Expectations</div>
     <table aria-label="Central bank rate expectations" style="table-layout:fixed;width:100%;">
-      <colgroup><col style="width:52%;"><col style="width:30%;"><col style="width:18%;"></colgroup>
-      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)">Bias</th><th scope="col" title="Expected policy rate at next meeting · derived from OIS markets where available, otherwise from trend bias (±25bp step)">Implied</th></tr></thead>
+      <colgroup><col style="width:42%;"><col style="width:33%;"><col style="width:25%;"></colgroup>
+      <thead><tr><th style="text-align:left" scope="col">Bank · Meeting</th><th scope="col" title="Market consensus direction · % chip = market-implied cut probability (CME/ASX where available)" style="overflow:hidden;">Bias</th><th scope="col" title="Expected policy rate at next meeting · derived from OIS markets where available, otherwise from trend bias (±25bp step)" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Impl.</th></tr></thead>
       <tbody id="fed-exp-tbody">
         <!-- 8 skeleton rows — exact structure matches JS render to prevent CLS -->
         <tr><td style="white-space:nowrap;"><span class="fi fi-us" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span><span style="font-size:10px;">Fed</span> <span style="color:var(--text3);font-size:9px;">—</span></td><td style="overflow:hidden;white-space:nowrap;"><span class="flat">→ —</span></td><td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;">—</td></tr>
