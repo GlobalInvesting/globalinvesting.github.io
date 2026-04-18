@@ -580,6 +580,15 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   </div>
 
   <div class="section">
+    <h2>Methodology</h2>
+    <p>Every panel in this terminal is benchmarked against institutional-grade FX and macro tools. Where industry conventions are well-established, we follow them exactly. Where a deliberate deviation is warranted, it is documented internally. This is the minimum bar — not an aspiration.</p>
+    <p><strong style="color:var(--text);">Rate expectations from OIS markets, not forecasts.</strong> The CB Rate Expectations panel is derived exclusively from overnight index swap (OIS) markets — SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, and equivalent instruments for AUD, CAD, CHF, and NZD. This is the same methodology used by institutional rate monitors and professional FX desks. Analyst consensus forecasts and editorial opinions are explicitly excluded. The classification threshold is ±10bp from the current policy rate — consistent with standard practice on institutional rate-monitoring platforms.</p>
+    <p><strong style="color:var(--text);">Central bank rate direction from recent decisions, not raw data.</strong> The rate trend arrow in the CB Rates panel reflects the direction of the most recent policy decision — not a naive numeric comparison. Standard practice on institutional platforms resets the directional indicator to neutral after a sustained period without a move; this terminal applies the same pause-detection logic. A bank that cut last year but has held for nine months shows neutral (—), not a lingering down arrow.</p>
+    <p><strong style="color:var(--text);">Estimated data is always labeled.</strong> Any value that is derived, proxied, or not sourced from a live feed carries an explicit label. ATM implied volatility estimated from COT data is labeled <em>est. via COT</em>. NZD implied volatility derived from AUD options carries a <em>~</em> marker and tooltip. Session volatility baselines derived from historical averages are labeled <em>5yr historical avg · fixed reference</em>. Removing these labels to make data appear more authoritative than it is would be a methodological failure.</p>
+    <p><strong style="color:var(--text);">No artificial noise.</strong> All displayed values are deterministic and reproducible. No random variation is applied to any indicator, baseline, or chart value. If real data is unavailable, the terminal shows the static reference value with a clear label — it does not simulate live-looking fluctuations.</p>
+  </div>
+
+  <div class="section">
     <h2>AI in the terminal</h2>
     <p>AI is used for two specific outputs in the terminal, both clearly labeled:</p>
     <div class="grid-2">
@@ -593,6 +602,13 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
     </div>
     <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
+  </div>
+
+  <div class="section">
+    <h2>Editorial standards</h2>
+    <p>The terminal follows a strict separation between description and prescription. Signal subtexts describe market conditions — they do not recommend positions. "VIX elevated · high fear regime" is a description. "Reduce exposure" would be investment advice; it does not appear anywhere in this terminal.</p>
+    <p>Regime labels (RISK-ON, RISK-OFF, MIXED, CAUTION) are computed from a deterministic scoring model applied to live cross-asset data: VIX level, yield curve shape, gold and equity intraday performance, and bond market volatility. The AI narrative provides qualitative context beneath the regime label — it does not override the quantitative score. Both the regime badge and the narrative section always reflect the same live assessment.</p>
+    <p>Terminology follows institutional FX desk conventions throughout: <em>Hold</em>, <em>Cut</em>, <em>Hike</em> — not Pause, Ease, Tighten. Direction arrows mean ↑ hike, ↓ cut, → hold. Basis points are expressed as bp. These are not stylistic preferences — they are the standard vocabulary of professional FX and rates markets, and using them consistently reduces the risk of misreading a signal.</p>
   </div>
 
   <div class="section">
@@ -619,7 +635,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.21</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.25.12</span></div>
 </footer>
 
 
