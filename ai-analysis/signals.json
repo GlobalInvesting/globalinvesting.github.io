@@ -1,42 +1,42 @@
 [
   {
-    "time": "15:00",
+    "time": "16:50",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY testing 158.58 resistance — BoJ intervention risk rising on a sustained break above 160.00",
+    "text": "USD/JPY trading at 158.58 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
       "USD/JPY: 158.58",
-      "BoJ rate: 0.75%",
+      "BoJ rate: 0.75% (ON HOLD)",
       "VIX: 17.5"
     ]
   },
   {
-    "time": "14:58",
+    "time": "16:48",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding above 0.7168 — RBA hiking rates supports AUD carry",
+    "title": "Geopolitical Risk",
+    "text": "Strait of Hormuz closure drives crude oil volatility — commodity bloc (AUD, CAD, NOK) faces headwinds; monitor for supply-shock escalation.",
     "evidence": [
-      "AUD/USD: 0.7168",
-      "RBA rate: 4.10%",
-      "US 10Y: 4.32%"
+      "WTI Oil: $82.6",
+      "USD: NET SHORT, lev_net=-3,130",
+      "VIX: 17.5"
     ]
   },
   {
-    "time": "14:55",
+    "time": "16:45",
     "priority": "warning",
     "title": "CFTC — EUR",
-    "text": "EUR net short positioning at 50.0% long — institutional divergence risk",
+    "text": "EUR net short positioning at 50.0% long — institutional divergence risk as Asset Managers are net long; EUR/USD holds at 1.1767.",
     "evidence": [
-      "EUR net: -72",
-      "EUR long%: 50.0%",
-      "CFTC week ending: 2026-04-14"
+      "EUR: NET SHORT, lev_net=-72",
+      "EUR/USD: 1.1767",
+      "CFTC EUR net: -72"
     ]
   },
   {
-    "time": "14:50",
+    "time": "16:42",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
     "evidence": [
       "VIX: 17.5",
       "S&P 500: 7,126",
@@ -44,14 +44,14 @@
     ]
   },
   {
-    "time": "14:45",
+    "time": "16:38",
     "priority": "info",
-    "title": "Cross-Asset Correlation",
-    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, z=+1.36σ",
+    "title": "AUD/USD",
+    "text": "AUD/USD trading at 0.7168 — RBA hiking rates supports AUD carry; AUD/USD consolidating above 0.7098.",
     "evidence": [
-      "USD/JPY vs VIX: +0.672",
-      "norm: +0.143",
-      "z: +1.36σ"
+      "AUD/USD: 0.7168",
+      "RBA rate: 4.10% (HIKING)",
+      "AUD: NET LONG, lev_net=+41,675"
     ]
   }
 ]
