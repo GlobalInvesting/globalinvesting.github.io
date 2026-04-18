@@ -439,7 +439,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="panel-sub">TradingView · live data</span>
           <button id="split-layout-btn" class="split-toggle-btn" title="Toggle split layout" aria-pressed="false" aria-label="Toggle split layout">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="0.5" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/><rect x="6" y="0.5" width="4.5" height="10" rx="1" stroke="currentColor" stroke-width="1"/></svg>
-            <div id="split-tip" role="tooltip">Toggle split view</div>
+            <div id="split-tip" role="tooltip">Expand to full screen</div>
           </button>
           </div>
         </div>
@@ -990,7 +990,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     btn.style.display = isMobile() ? 'none' : '';
     if(active){
       main.classList.add('split-layout');
-      btn.classList.add('active');
+      btn.classList.remove('active');
       btn.setAttribute('aria-pressed','true');
       handle.style.display = '';
       var pct = leftPct || 55;
@@ -1002,7 +1002,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       }
     } else {
       main.classList.remove('split-layout');
-      btn.classList.remove('active');
+      btn.classList.add('active');
       btn.setAttribute('aria-pressed','false');
       handle.style.display = 'none';
       upper.style.width = '';
