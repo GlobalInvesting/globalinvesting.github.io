@@ -4138,20 +4138,8 @@ async function fetchFedExpectations() {
     // CIP spot sources — quote convention (how many USD per 1 unit of ccy, or inverse)
     // EUR/GBP/AUD/NZD: spot is direct (EURUSD etc.) → base currency is the foreign one
     // JPY/CHF/CAD:     spot is inverse (USDJPY etc.) → USD is the base
-    const cipSpot = {
-      EUR: { pair:'eurusd', usdIsBase: false },
-      GBP: { pair:'gbpusd', usdIsBase: false },
-      AUD: { pair:'audusd', usdIsBase: false },
-      NZD: { pair:'nzdusd', usdIsBase: false },
-      JPY: { pair:'usdjpy', usdIsBase: true  },
-      CHF: { pair:'usdchf', usdIsBase: true  },
-      CAD: { pair:'usdcad', usdIsBase: true  },
-    };
-
-    // USD rate (domestic) for CIP denominator — use STATE.cbRates if already loaded
-    const usdObs  = rateResponses[0]?.observations || [];
-    const r_usd   = (usdObs.length ? parseFloat(usdObs[0].value) : (STATE.cbRates?.usd?.rate ?? 4.33)) / 100;
-    const T30     = 30 / 360;   // 30-day forward period
+    // USD rate — kept for potential future use; cipSpot/CIP removed in v7.25.4
+    // (Column now shows uniform implied policy rate for all currencies)
 
     const rows = [];
     currencies.forEach((ccy, i) => {
@@ -4216,56 +4204,28 @@ async function fetchFedExpectations() {
         biasLabel += probSuffix;
       }
 
-      // ── Forward rate via Covered Interest Parity (CIP) ───────────
-      // F = S × (1 + r_f × T) / (1 + r_d × T)
-      // For USD row we show the expected next rate level instead of CIP
+      // ── Implied policy rate — expected rate at next meeting ─────────
+      // Shows the market-implied next-step rate for all currencies uniformly.
+      // Logic: current rate ± one standard step (25bp) based on OIS bias direction.
+      // If meetings.json has an explicit fwdRate (OIS-derived), that takes priority.
+      // This is the same concept shown on Bloomberg's WIRP / IRPR panels.
       let fwdDisplay = '—';
-      if (ccy === 'USD') {
-        // For USD show next-step projection (no spot needed)
-        const step = trendDir === 'down' ? -0.25 : trendDir === 'up' ? 0.25 : 0;
-        fwdDisplay = Math.max(0, current + step).toFixed(2) + '%';
+      const meetingBias = (() => {
+        if (!meetings) return null;
+        const b = meetings.bias;
+        if (!b) return null;
+        if (/cut|dovish/i.test(b))  return 'down';
+        if (/hike|hawkish/i.test(b)) return 'up';
+        return 'flat';
+      })();
+      // Priority 1: explicit fwdRate from meetings.json (OIS-derived)
+      if (meetings?.fwdRate != null && !isNaN(meetings.fwdRate) && meetings.fwdRate > 0) {
+        fwdDisplay = meetings.fwdRate.toFixed(2) + '%';
       } else {
-        const cipCfg = cipSpot[ccy];
-        if (cipCfg) {
-          // Spot rate: try STOOQ_RT_CACHE first (already awaited at boot),
-          // then STATE.rates (Frankfurter — may not be ready on first render)
-          const midFromCache = (() => {
-            try {
-              const rt = STOOQ_RT_CACHE[cipCfg.pair];
-              if (rt?.close && rt.close > 0) return rt.close;
-            } catch { /* fall through */ }
-            return null;
-          })();
-          const midFromState = (() => {
-            try {
-              const fr = STATE.rates;   // Frankfurter USD-base: { EUR: 0.92, JPY: 151.x, … }
-              if (!fr || !Object.keys(fr).length) return null;
-              if (!cipCfg.usdIsBase) {
-                // EURUSD = 1 / fr.EUR  (Frankfurter gives EUR per USD)
-                return fr[ccy] ? 1 / fr[ccy] : null;
-              } else {
-                // USDJPY = fr.JPY
-                return fr[ccy] || null;
-              }
-            } catch { return null; }
-          })();
-
-          const S = midFromCache || midFromState;
-          if (S && S > 0) {
-            const r_f = current / 100;
-            if (!cipCfg.usdIsBase) {
-              // S = units of USD per 1 foreign (e.g. EURUSD = 1.08)
-              // F_foreign_in_USD = S × (1 + r_f×T) / (1 + r_usd×T)
-              const F = S * (1 + r_f * T30) / (1 + r_usd * T30);
-              fwdDisplay = F.toFixed(4);
-            } else {
-              // S = units of foreign per 1 USD (e.g. USDJPY = 150)
-              // F_usd_in_foreign = S × (1 + r_f×T) / (1 + r_usd×T)  [same formula, different read]
-              const F = S * (1 + r_f * T30) / (1 + r_usd * T30);
-              fwdDisplay = F.toFixed(ccy === 'JPY' ? 2 : 4);
-            }
-          }
-        }
+        // Priority 2: derive from trend direction — one 25bp step
+        const dir = meetingBias ?? trendDir;
+        const step = dir === 'down' ? -0.25 : dir === 'up' ? 0.25 : 0;
+        fwdDisplay = Math.max(0, current + step).toFixed(2) + '%';
       }
 
       const meta = bankMeta[ccy];
