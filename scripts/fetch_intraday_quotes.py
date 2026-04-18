@@ -702,7 +702,7 @@ def fetch_yfinance_all(symbols_map):
         for internal_id, yf_sym in symbols_map.items():
             try:
                 ticker = yf.Ticker(yf_sym)
-                hist = ticker.history(period="10d", interval="1d", auto_adjust=True)
+                hist = ticker.history(period="15d", interval="1d", auto_adjust=True)
 
                 if hist.empty:
                     print(f"[yfinance] Sin datos para {yf_sym}")
@@ -835,9 +835,11 @@ def fetch_yfinance_all(symbols_map):
                 FX_MAJORS_1W = {"eurusd", "gbpusd", "usdjpy", "audusd", "usdchf", "usdcad", "nzdusd"}
                 if internal_id in FX_MAJORS_1W:
                     try:
-                        # hist index is tz-aware; normalize to date for weekday comparison
-                        hist_dates = [d.date() if hasattr(d, "date") else d for d in hist.index]
-                        hist_closes = hist["Close"].dropna()
+                        # hist index is tz-aware; normalize to date for weekday comparison.
+                        # IMPORTANT: do NOT dropna() here — hist_dates and hist_close_full
+                        # must share the same positional index. dropna() would misalign them.
+                        hist_dates      = [d.date() if hasattr(d, "date") else d for d in hist.index]
+                        hist_close_full = hist["Close"]  # keep NaN rows to preserve positional alignment
                         today_date = datetime.now(timezone.utc).date()
                         # Find the most recent Friday strictly before today
                         prior_friday = None
@@ -845,8 +847,10 @@ def fetch_yfinance_all(symbols_map):
                         for i in range(len(hist_dates) - 1, -1, -1):
                             d = hist_dates[i]
                             if d < today_date and d.weekday() == 4:  # 4 = Friday
-                                prior_friday = d
-                                prior_friday_close = float(hist_closes.iloc[i])
+                                v = hist_close_full.iloc[i]
+                                if v is not None and not (hasattr(v, '__float__') and v != v):  # not NaN
+                                    prior_friday = d
+                                    prior_friday_close = float(v)
                                 break
                         if prior_friday_close and prior_friday_close != 0:
                             pct1w = round((close / prior_friday_close - 1.0) * 100.0, 4)
