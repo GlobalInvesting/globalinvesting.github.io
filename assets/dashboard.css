@@ -564,6 +564,10 @@
   #correlations-tbody tr[data-corr-idx]:hover td {
     background: var(--bg3);
   }
+  #correlations-tbody tr[data-corr-idx] td:first-child,
+  #correlations-tbody tr[data-corr-idx] td:nth-child(2) {
+    white-space: nowrap;
+  }
   #correlations-tbody tr[data-corr-idx] td:first-child::after {
     content: ' ›';
     color: var(--text3);
