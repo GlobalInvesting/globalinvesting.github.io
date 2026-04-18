@@ -1,9 +1,9 @@
 [
   {
-    "time": "11:00",
+    "time": "13:35",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 158.58 — approaching the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY testing 158.58 resistance — BoJ intervention risk rising on a sustained break above 160.00",
     "evidence": [
       "USD/JPY: 158.58",
       "BoJ rate: 0.75%",
@@ -11,46 +11,46 @@
     ]
   },
   {
-    "time": "10:58",
+    "time": "13:30",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD sentiment extreme: 91% of retail traders are short — contrarian reversal risk; AUD/USD holds above 0.7168.",
+    "title": "AUD/USD Sentiment Extreme",
+    "text": "AUD/USD sentiment at 9% long / 91% short — contrarian reversal risk, watch for squeeze",
     "evidence": [
       "AUD/USD: 0.7168",
       "AUD/USD sentiment: 9% long / 91% short",
-      "RBA rate: 4.10%"
+      "CFTC AUD net: +41,675"
     ]
   },
   {
-    "time": "10:55",
+    "time": "13:25",
     "priority": "warning",
-    "title": "USD/CAD",
-    "text": "USD/CAD correlation break: USD/CAD vs WTI Oil correlation at +0.726, deviating from historical norm; CAD commodity exposure may drive pair.",
+    "title": "USD/CAD Correlation Break",
+    "text": "USD/CAD vs WTI Oil correlation breaks at +0.726 — z=+1.76σ, potential regime signal",
     "evidence": [
       "USD/CAD: 1.3693",
-      "USD/CAD vs WTI Oil: corr=+0.726",
-      "WTI Oil: $82.6"
+      "WTI Oil: $82.6",
+      "USD/CAD vs WTI Oil corr: +0.726"
     ]
   },
   {
-    "time": "10:50",
+    "time": "13:20",
     "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
+    "title": "VIX and S&P 500",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%",
     "evidence": [
       "VIX: 17.5",
       "S&P 500: 7,126",
-      "DXY: 98.23"
+      "S&P 500 1D: +1.20%"
     ]
   },
   {
-    "time": "10:45",
+    "time": "13:15",
     "priority": "info",
-    "title": "Yield Curve",
-    "text": "US 2s10s spread at +46.6bp, bull flattener regime — recession pricing / risk-off narrative.",
+    "title": "Yield Curve Regime",
+    "text": "2s10s spread at +46.6bp — bull flattener regime, recession pricing / risk-off",
     "evidence": [
-      "US 10Y: 4.246%",
-      "US 2Y: 3.780%",
+      "US 10Y: 4.32%",
+      "US 2Y: 3.78%",
       "2s10s spread: +46.6bp"
     ]
   }
