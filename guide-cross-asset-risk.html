@@ -621,6 +621,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#flows">Asset Flow Logic</a>
     <a class="toc-item" href="#divergence">Divergence Signals</a>
     <a class="toc-item" href="#var-cvar">Historical VaR / CVaR</a>
+    <a class="toc-item" href="#regime-episodes">Regime Episodes</a>
+    <a class="toc-item" href="#crypto-risk">Crypto as Risk Indicator</a>
     <div class="toc-divider"></div>
     <a class="toc-item" href="guide-dashboard.html">← Terminal Overview</a>
     <a class="toc-item" href="guide-rates-yield-curve.html">→ Rates &amp; Yield Curve</a>
@@ -926,6 +928,112 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
     </div>
 
+    <div class="guide-section" id="regime-episodes">
+      <h2>Regime Episodes — Cross-Asset Flow Relationships</h2>
+      <p>The interaction between rates, equities, commodities, and FX is most visible during documented regime transitions. The following episodes illustrate how cross-asset flows transmit across markets — and how the signals available in this terminal would have characterized each regime in real time.</p>
+      <p>These are not backtested strategies. They are historical descriptions of how asset class relationships behaved, drawn from publicly documented market data. The purpose is calibration: understanding what each indicator looked like during an actual stress episode makes the live readings more interpretable.</p>
+
+      <h3>2022 — Rates shock: simultaneous equity and bond selloff</h3>
+      <p>The Fed's fastest hiking cycle since the 1980s produced a regime that broke the standard equity/bond correlation. Bonds and equities fell together — the traditional 60/40 diversification mechanism failed. Cross-asset implications were severe and unusual.</p>
+      <table class="threshold-table">
+        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+        <tbody>
+          <tr><td>VIX</td><td>Ranged 20–36, repeatedly spiked but did not sustain crisis levels</td><td>Intermittent JPY/CHF bids, no sustained safe-haven flow</td></tr>
+          <tr><td>MOVE Index</td><td>Sustained above 130; peaked near 160 in Oct 2022</td><td>USD dominant — policy uncertainty drove USD liquidity premium across all pairs</td></tr>
+          <tr><td>DXY vs SPX 60d corr.</td><td>Turned positive — both USD and equities moved together at times</td><td>Classic USD funding stress signal; EUR/USD broke parity in September 2022</td></tr>
+          <tr><td>Gold vs DXY 60d corr.</td><td>Remained negative — gold sold off with risk assets</td><td>AUD/USD and NZD/USD under sustained pressure; commodity price rally partially offset</td></tr>
+          <tr><td>US 10Y yield</td><td>Rose from 1.5% to 4.25% through the year</td><td>USD carry premium dominated; JPY hit multi-decade lows vs USD</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-orange">
+        <strong>Key diagnostic:</strong> MOVE sustained above 130 with VIX below 30 is the signature of a rates-driven regime — not an equity-driven one. In this environment, USD strength is the primary FX theme, not JPY/CHF flight. The MOVE/VIX divergence was the critical differentiator between a conventional risk-off episode and a policy-driven repricing.
+      </div>
+
+      <h3>2023 Q1 — Regional banking stress: MOVE spike, VIX lagged</h3>
+      <p>The failure of Silicon Valley Bank and Signature Bank in March 2023 generated acute stress in US regional bank credit — but equity markets recovered quickly. MOVE spiked to 180 (its highest since the 2008–09 crisis) while VIX peaked near 26 and retreated. This divergence had specific FX consequences.</p>
+      <table class="threshold-table">
+        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+        <tbody>
+          <tr><td>MOVE Index</td><td>Spiked to 180 in March 2023 — highest since GFC</td><td>USD initially weakened as rate cut expectations surged; the market priced Fed pivoting within months</td></tr>
+          <tr><td>VIX</td><td>Peaked near 26, then retreated below 20 by April</td><td>Equity market did not treat this as a systemic crisis — carry trades recovered quickly</td></tr>
+          <tr><td>Gold vs DXY</td><td>Both rallied simultaneously in March — positive correlation</td><td>Rare signal: geopolitical/credit stress, not a standard risk-off move. EUR/USD rose alongside gold despite USD volatility</td></tr>
+          <tr><td>US 2Y yield</td><td>Fell 100bp in five trading days — the fastest drop since 1987</td><td>USD weakened sharply; EUR/USD jumped from 1.055 to 1.090 in the episode</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-red">
+        <strong>Key diagnostic:</strong> MOVE high / VIX moderate = credit or policy stress, not broad risk-off. In this configuration, the usual safe-haven playbook (long JPY/CHF, short AUD/NZD) is unreliable. The primary FX signal is the rate expectation repricing — tracked in the CB Rate Expectations panel — not the equity volatility gauge.
+      </div>
+
+      <h3>2024 August — JPY carry unwind: VIX spike, Nikkei collapse</h3>
+      <p>In early August 2024, the Bank of Japan raised rates and signaled further tightening. The JPY carry trade — where investors borrow in JPY at near-zero rates to fund positions in higher-yielding assets — unwound at speed. The episode is the canonical example of how a single CB policy shift can trigger cross-asset deleveraging.</p>
+      <table class="threshold-table">
+        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+        <tbody>
+          <tr><td>VIX</td><td>Spiked from 16 to 65 intraday on 5 August — fastest spike in the index's history</td><td>Extreme risk-off; all carry trades unwound simultaneously</td></tr>
+          <tr><td>Nikkei 225</td><td>Fell 12.4% on 5 August — largest single-day drop since 1987</td><td>USD/JPY fell from 158 to 142 within days; JPY strengthened across all crosses</td></tr>
+          <tr><td>AUD/JPY, NZD/JPY</td><td>Both fell 10%+ in the episode — largest carry pairs most affected</td><td>High-yield currencies vs JPY are the primary expression of carry trade positioning</td></tr>
+          <tr><td>BTC/USD</td><td>Fell 15% on 5 August, preceding the Nikkei open</td><td>BTC as leading carry risk indicator — the move preceded the equity selloff by hours</td></tr>
+          <tr><td>MOVE Index</td><td>Remained moderate — this was not a bond market stress event</td><td>Confirmed as equity/carry unwind, not a rates or credit crisis; bond markets were calm</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-red">
+        <strong>Key diagnostic:</strong> VIX spike / MOVE stable = equity-driven carry unwind, not a bond or credit crisis. The FX expression is JPY and CHF strength, not broad USD dominance. AUD/JPY and NZD/JPY are the most direct carry unwind pairs to monitor. The BTC move preceding the Nikkei open by several hours was consistent with crypto's role as a high-beta leading indicator in Asia session.
+      </div>
+
+      <h3>2025 Q1 — Tariff shock: gold/USD positive correlation</h3>
+      <p>The announcement of broad US import tariffs in early 2025 produced a cross-asset configuration that was initially misread by markets: the USD weakened while gold rallied, and US equities fell while European equities outperformed. This violated several standard risk-off assumptions.</p>
+      <table class="threshold-table">
+        <thead><tr><th>Indicator</th><th>Observed behavior</th><th>FX implication</th></tr></thead>
+        <tbody>
+          <tr><td>Gold vs DXY 60d corr.</td><td>Turned sharply positive — gold and USD moving in the same direction was rare</td><td>USD funding stress signal; markets questioned USD reserve status in the medium term</td></tr>
+          <tr><td>DXY vs SPX 60d corr.</td><td>Also turned positive — USD weakened alongside equities</td><td>Unusual: typically USD strengthens in risk-off. Suggested US-specific risk premium</td></tr>
+          <tr><td>EUR/USD</td><td>Rose from 1.03 to 1.12 through Q1 2025 — one of the sharpest quarterly moves since 2017</td><td>EUR outperformed despite European growth concerns; tariffs seen as a greater US growth risk</td></tr>
+          <tr><td>VIX</td><td>Elevated (25–35) but not crisis levels</td><td>Sustained caution regime; carry trades impaired but not fully unwound</td></tr>
+          <tr><td>Gold</td><td>Set successive all-time highs above $3,000 through Q1</td><td>Gold/USD positive correlation alongside DXY weakness = structural USD confidence erosion, not a typical risk-off episode</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-orange">
+        <strong>Key diagnostic:</strong> When gold and DXY are both rising, the standard framework (gold up = USD down) has broken down — typically a geopolitical or fiscal stress signal rather than a cyclical one. When gold rises while DXY falls, it indicates USD-specific concern. The correlation rows in the Risk Monitor panel are designed to surface this distinction in real time.
+      </div>
+    </div>
+
+    <div class="guide-section" id="crypto-risk">
+      <h2>Crypto as a Cross-Asset Risk Indicator</h2>
+      <p>Bitcoin and the broader crypto market occupy a structurally specific role in the cross-asset framework: they function as a high-beta, 24/7 risk sentiment proxy, with particular relevance during the Asia session when traditional risk assets are closed. This role is distinct from crypto's intrinsic investment case and does not require any view on its long-term value.</p>
+      <p>The mechanism is straightforward. BTC/USD trades continuously and is held disproportionately by speculative participants who also hold leveraged positions in equities, carry trades, and risk assets. When margin calls or risk-off impulses hit in the Asia session, crypto is often the first liquid market to reflect the move — before Tokyo or Sydney equity markets open. Professional FX desks monitor BTC as a leading indicator for this reason, not as a primary position.</p>
+
+      <h3>The Asia session leading indicator</h3>
+      <p>The most operationally relevant BTC/FX relationship occurs between approximately 18:00 and 02:00 UTC — the period when US and European equity markets are closed but Asia equity markets are either approaching open (Tokyo: 00:00 UTC) or in early session. During this window, BTC/USD is one of the only continuously traded, institutionally relevant risk assets available.</p>
+      <table class="threshold-table">
+        <thead><tr><th>BTC behavior</th><th>Asia session implication</th><th>FX pairs to watch</th></tr></thead>
+        <tbody>
+          <tr><td>BTC falls &gt;3% in Asia pre-session (18:00–00:00 UTC)</td><td>Risk-off impulse likely to carry into Nikkei open; USD/JPY may weaken as Tokyo opens</td><td>USD/JPY, AUD/JPY, AUD/USD</td></tr>
+          <tr><td>BTC rallies &gt;3% with Nikkei futures bid</td><td>Risk-on Asia session; carry trades supported through London open</td><td>AUD/USD, NZD/USD, AUD/JPY</td></tr>
+          <tr><td>BTC sells off sharply while gold rallies</td><td>Flight to traditional safe havens; not a crypto-specific move — systemic signal</td><td>JPY, CHF, gold-sensitive pairs</td></tr>
+          <tr><td>BTC and DXY both falling together</td><td>Rare — risk-on with non-USD flows; capital rotating toward EM and commodity currencies</td><td>AUD/USD, NZD/USD, EM broadly</td></tr>
+        </tbody>
+      </table>
+
+      <h3>BTC and AUD/USD — structural positive correlation</h3>
+      <p>Among G8 FX pairs, AUD/USD has shown the most consistent positive correlation with BTC/USD over rolling 60-day windows. Both assets are high-beta risk proxies with significant Asia-Pacific institutional ownership. The correlation is not static — it strengthens during risk-off episodes (both fall together) and weakens during crypto-specific narratives (e.g., ETF approvals, halving events) when BTC moves independently of macro conditions.</p>
+      <p>The 60-day Pearson correlation between BTC/USD and AUD/USD is computed and displayed in the Correlations table of the terminal's Risk Monitor panel. A reading above +0.5 indicates the structural relationship is active; readings that collapse toward zero or turn negative typically coincide with crypto-specific catalysts decoupling BTC from macro.</p>
+      <div class="callout">
+        <strong>How to use this in practice:</strong> Monitor BTC/USD intraday change alongside the AUD/USD rate in the quote bar. If BTC is down more than 5% on the session and AUD/USD has not yet moved proportionally, the FX market may be lagging — a potential leading signal. If BTC has already moved and AUD/USD has followed, the cross-asset transmission has occurred and the setup is less actionable.
+      </div>
+
+      <h3>Limits of the indicator</h3>
+      <p>The BTC/FX relationship is probabilistic and regime-dependent, not mechanical. Several conditions cause it to break down:</p>
+      <ul>
+        <li><strong style="color:var(--text);">Crypto-specific catalysts</strong> — regulatory decisions, ETF flows, protocol upgrades, and exchange-specific events move BTC independently of macro. During these episodes, the leading-indicator property is suspended.</li>
+        <li><strong style="color:var(--text);">Low-liquidity gaps</strong> — weekend moves in crypto do not always transmit to FX on Monday open. Monday open gaps in FX are more often driven by weekend CB decisions, geopolitical events, or economic data releases than by crypto price action.</li>
+        <li><strong style="color:var(--text);">Late-cycle carry regimes</strong> — in strongly trending carry environments (e.g., early 2024), FX carry pairs can maintain their trend even as BTC corrects, because the carry differential outweighs the risk sentiment signal.</li>
+        <li><strong style="color:var(--text);">Crisis-level VIX</strong> — when VIX is above 40, traditional safe-haven flows (JPY, CHF, USD) dominate and the BTC signal is subsumed by the broader risk-off environment. At extreme stress levels, all correlations compress and cross-asset relationships become unreliable.</li>
+      </ul>
+      <div class="callout callout-orange">
+        <strong>Institutional framing:</strong> Professional FX desks use BTC as one of several Asia session risk monitors alongside Nikkei futures, US equity futures (CME Globex), and CFTC COT positioning — not as a standalone signal. Its value is as a real-time, continuously available sentiment proxy during the session gap, weighted alongside other inputs. This terminal's cross-asset panel is designed to support exactly this multi-signal approach.
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -943,7 +1051,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · CROSS-ASSET</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.2</span></div>
 </footer>
 
 
