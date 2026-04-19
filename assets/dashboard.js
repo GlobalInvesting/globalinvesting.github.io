@@ -6733,3 +6733,77 @@ if (document.readyState === 'loading') {
     }
   });
 }());
+
+// ═══════════════════════════════════════════════════════════════════
+// COT DIGEST — WEEKLY PUSH NOTIFICATION
+// Reads cot-data/digest.json after the COT workflow runs (Fri ~21:30 UTC).
+// Fires a push notification if:
+//   1. Browser notifications are permitted
+//   2. The digest weekEnding is newer than the last one seen by this user
+// Storage key: 'gi_cot_notif_seen' → last weekEnding string sent
+// ═══════════════════════════════════════════════════════════════════
+(function initCOTDigestNotification() {
+  'use strict';
+  var SEEN_KEY = 'gi_cot_notif_seen';
+
+  // Only run if SW is registered (required for showNotification)
+  // and notifications are supported
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+
+  // Don't run if permission was explicitly denied
+  if (Notification.permission === 'denied') return;
+
+  async function checkDigest() {
+    // Fetch the digest — this is a same-origin static file, no CORS
+    var res;
+    try {
+      res = await fetch('/cot-data/digest.json', { cache: 'no-cache' });
+      if (!res.ok) return;
+    } catch (_) { return; }
+
+    var digest;
+    try { digest = await res.json(); } catch (_) { return; }
+
+    var weekEnding = digest.weekEnding;
+    if (!weekEnding) return;
+
+    // Already notified for this week?
+    var lastSeen = '';
+    try { lastSeen = localStorage.getItem(SEEN_KEY) || ''; } catch (_) {}
+    if (lastSeen === weekEnding) return;
+
+    // Only notify if permission is already granted.
+    // We do NOT request permission here — that only happens via the onboarding
+    // tooltip ("SET ALERT") so the user has explicitly opted in.
+    if (Notification.permission !== 'granted') return;
+
+    // Get the SW registration to call showNotification
+    var reg;
+    try { reg = await navigator.serviceWorker.ready; } catch (_) { return; }
+    if (!reg) return;
+
+    var message = digest.message ||
+      'COT data updated for week ending ' + weekEnding;
+
+    try {
+      await reg.showNotification('COT Update — ' + weekEnding, {
+        body: message,
+        icon: '/favicon-192x192.png',
+        badge: '/favicon-32x32.png',
+        tag: 'gi-cot-' + weekEnding,   // prevents duplicate if tab reloads
+        renotify: false,
+        data: { url: 'https://globalinvesting.github.io/#section-positioning' },
+      });
+    } catch (_) { return; }
+
+    // Mark this week as seen so we never re-fire for the same weekEnding
+    try { localStorage.setItem(SEEN_KEY, weekEnding); } catch (_) {}
+  }
+
+  // Run after page load — no urgency, don't block anything
+  if (document.readyState === 'complete') {
+    setTimeout(checkDigest, 3000);
+  } else {
+    window.addEventListener('load', function() { setTimeout(checkDigest, 3000); });
+  }
+}());
