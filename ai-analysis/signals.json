@@ -1,52 +1,57 @@
 [
   {
-    "time": "04:40",
+    "time": "22:25",
     "priority": "critical",
-    "title": "Oil / Geopolitical",
-    "text": "Watch for oil price impact at the open after Hormuz closure, Friday close: $82.6",
+    "title": "USD/JPY",
+    "text": "USD/JPY testing 159.01 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
     "evidence": [
-      "Hormuz Closes Again, Oil Signals Path Into Ceasefire Cliff",
-      "WTI Oil: $82.6  1D:-9.41%"
+      "USD/JPY: 159.01",
+      "BoJ rate: 0.75%",
+      "VIX: 17.5"
     ]
   },
   {
-    "time": "04:35",
+    "time": "22:23",
     "priority": "warning",
-    "title": "USD/JPY Watch",
-    "text": "Watch for USD/JPY at the open, key level 158.58, Friday close: 158.58",
+    "title": "AUD/USD",
+    "text": "AUD/USD holding below 0.7132 — RBA hiking rates supports AUD carry, but AUD/USD faces headwinds from extreme retail short positioning.",
     "evidence": [
-      "USD/JPY: 158.58  1W:-0.33%  1M:-0.19%",
-      "USD/JPY vs VIX: corr=+0.672  norm=+0.143  z=+1.36σ"
+      "AUD/USD: 0.7132",
+      "RBA rate: 4.10%",
+      "AUD/USD retail sentiment: 9% long / 91% short"
     ]
   },
   {
-    "time": "04:30",
+    "time": "22:21",
     "priority": "warning",
-    "title": "AUD/USD Setup",
-    "text": "Setup into Sydney open, watch for AUD/USD bounce, Friday close: 0.7168",
+    "title": "EUR/USD",
+    "text": "EUR/USD trading near 1.1736 — ECB-Fed rate differential weighs on EUR/USD, with Fed-ECB 175bp spread continuing to favor USD.",
     "evidence": [
-      "AUD/USD: 0.7168  1W:+0.13%  1M:+0.83%",
-      "AUD/USD: 9% long / 91% short  ⚠ EXTREME SHORT — contrarian reversal risk"
+      "EUR/USD: 1.1736",
+      "Fed rate: 3.75%",
+      "ECB rate: 2.00%"
     ]
   },
   {
-    "time": "04:25",
+    "time": "22:18",
     "priority": "info",
-    "title": "Yield Curve Note",
-    "text": "Bull flattener yield curve regime, watch for implications, 2s10s spread: +46.6bp",
+    "title": "Risk Regime",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
     "evidence": [
-      "2s10s spread: +46.6bp  | Regime: BULL FLATTENER",
-      "US 10Y: 4.32%"
+      "VIX: 17.5",
+      "S&P 500: 7,126",
+      "DXY: 98.28"
     ]
   },
   {
-    "time": "04:20",
+    "time": "22:15",
     "priority": "info",
-    "title": "BoJ — This Week",
-    "text": "BoJ meeting this week, watch for implications, Friday close: USD/JPY 158.58",
+    "title": "Cross-Asset Correlation",
+    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, with positive correlation indicating risk-on environment.",
     "evidence": [
-      "BoJ (JPY): 0.75%  (as of 2026-03-01) [ON HOLD] | Next meeting: 28 Apr",
-      "USD/JPY: 158.58  1W:-0.33%  1M:-0.19%"
+      "USD/JPY vs VIX: corr=+0.627",
+      "VIX: 17.5",
+      "USD/JPY: 159.01"
     ]
   }
 ]
