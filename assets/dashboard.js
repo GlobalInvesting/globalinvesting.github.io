@@ -6429,3 +6429,138 @@ function toggleAlertsPopover() {
     pop.style.top = (rect.top - h - 8) + 'px';
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// SPLIT LAYOUT — vertical left/right toggle + drag handle resize
+// Migrated from inline <script> in index.html (v7.26.0)
+// ═══════════════════════════════════════════════════════════════════
+(function initSplitLayout(){
+  var LS_KEY = 'gi_split_layout';
+  var main   = document.getElementById('main');
+  var btn    = document.getElementById('split-layout-btn');
+  var handle = document.getElementById('split-drag-handle');
+  var upper  = document.getElementById('split-upper');
+  var lower  = document.getElementById('split-lower');
+
+  var alertsPanel      = document.getElementById('section-macro');
+  var alertsOrigParent = alertsPanel ? alertsPanel.parentNode : null;
+  var alertsOrigNext   = alertsPanel ? alertsPanel.nextSibling : null;
+
+  function isMobile(){ return window.innerWidth <= 900; }
+
+  function applyState(active, leftPct){
+    if(!main||!btn||!handle||!upper||!lower) return;
+    if(isMobile()) active = false;
+    btn.style.display = isMobile() ? 'none' : '';
+    if(active){
+      main.classList.add('split-layout');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed','true');
+      handle.style.display = '';
+      var pct = leftPct || 55;
+      upper.style.width = pct + '%';
+      upper.style.flex  = 'none';
+      if(alertsPanel && alertsPanel.parentNode !== upper){
+        upper.appendChild(alertsPanel);
+      }
+    } else {
+      main.classList.remove('split-layout');
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed','false');
+      handle.style.display = 'none';
+      upper.style.width = '';
+      upper.style.flex  = '';
+      if(alertsPanel && alertsOrigParent && alertsPanel.parentNode !== alertsOrigParent){
+        alertsOrigParent.insertBefore(alertsPanel, alertsOrigNext);
+      }
+    }
+  }
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(LS_KEY)||'null');
+    if(saved === null){
+      applyState(true, 55);
+      localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:55}));
+    } else if(saved.active){
+      applyState(true, saved.leftPct||55);
+    } else {
+      applyState(false);
+    }
+  } catch(e){ applyState(true, 55); }
+
+  var TIP_KEY = 'gi_split_tip_seen';
+  var tip = document.getElementById('split-tip');
+  function hideTip(){
+    if(!tip) return;
+    tip.classList.remove('visible');
+    try { localStorage.setItem(TIP_KEY,'1'); } catch(e){}
+  }
+  try {
+    if(!localStorage.getItem(TIP_KEY) && tip){
+      setTimeout(function(){ tip.classList.add('visible'); }, 800);
+      setTimeout(function(){ hideTip(); }, 6000);
+    }
+  } catch(e){}
+
+  if(btn){
+    btn.addEventListener('click', function(){
+      hideTip();
+      var isActive = main.classList.contains('split-layout');
+      applyState(!isActive, 55);
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
+    });
+  }
+
+  window.addEventListener('resize', function(){
+    btn.style.display = isMobile() ? 'none' : '';
+    if(isMobile() && main.classList.contains('split-layout')){
+      applyState(false);
+    }
+  });
+
+  if(handle){
+    var dragging = false, startX = 0, startW = 0;
+    handle.addEventListener('mousedown', function(e){
+      dragging = true;
+      startX = e.clientX;
+      startW = upper.offsetWidth;
+      handle.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if(!dragging) return;
+      var dx    = e.clientX - startX;
+      var mainW = main.offsetWidth;
+      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
+      var pct   = (newW / mainW * 100).toFixed(1);
+      upper.style.width = pct + '%';
+    });
+    document.addEventListener('mouseup', function(){
+      if(!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.userSelect = '';
+      var pct = parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1));
+      try { localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:pct})); } catch(e){}
+    });
+    handle.addEventListener('touchstart', function(e){
+      dragging = true;
+      startX = e.touches[0].clientX;
+      startW = upper.offsetWidth;
+      handle.classList.add('dragging');
+    }, {passive:true});
+    document.addEventListener('touchmove', function(e){
+      if(!dragging) return;
+      var dx    = e.touches[0].clientX - startX;
+      var mainW = main.offsetWidth;
+      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
+      upper.style.width = (newW / mainW * 100).toFixed(1) + '%';
+    }, {passive:true});
+    document.addEventListener('touchend', function(){
+      if(!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+    });
+  }
+})();
