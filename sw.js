@@ -99,3 +99,25 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+
+// ── Notification click — open/focus the terminal ──────────────────
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  var targetUrl = (event.notification.data && event.notification.data.url)
+    ? event.notification.data.url
+    : '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      // Focus existing tab if already open
+      for (var i = 0; i < list.length; i++) {
+        var c = list[i];
+        if (c.url.includes('globalinvesting.github.io') && 'focus' in c) {
+          return c.focus();
+        }
+      }
+      // Otherwise open a new tab
+      if (clients.openWindow) return clients.openWindow(targetUrl);
+    })
+  );
+});
