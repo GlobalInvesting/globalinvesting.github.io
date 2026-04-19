@@ -1,10 +1,18 @@
 User-agent: *
 Allow: /
+Disallow: /news.html
+Disallow: /en.html
+Disallow: /guia-cot.html
+Disallow: /tecnico-vs-fundamental.html
 
 Sitemap: https://globalinvesting.github.io/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
+Disallow: /news.html
+Disallow: /en.html
+Disallow: /guia-cot.html
+Disallow: /tecnico-vs-fundamental.html
 
 User-agent: Bingbot
 Allow: /
