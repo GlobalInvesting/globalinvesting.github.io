@@ -31,8 +31,8 @@
   --bg: #0b0e14; --bg2: #151921; --bg3: #2a2e39;
   --border: #2a2e39; --border2: #363c4e;
   --text: #c5cdd9; --text2: #8b98ad; --text3: #7a869a;
-  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
-  --head-bg: #10131a; --accent: #2962ff;
+  --up: #26a69a; --down: #ef5350; --blue: #4f7fff; --orange: #f6941c;
+  --head-bg: #10131a; --accent: #4f7fff;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
@@ -126,7 +126,7 @@ a { color: inherit; text-decoration: none; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
 /* ── Info / warn boxes ── */
-.info-box { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.info-box { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .warn-box { background: rgba(246,148,28,.05); border: 1px solid rgba(246,148,28,.18); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 
 /* ── Data tables ── */
@@ -147,7 +147,7 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
 .callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
 .callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
@@ -514,8 +514,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
 /* ── Disclaimer box (terms) ── */
 .disclaimer-box {
-  background: rgba(41,98,255,.07);
-  border: 1px solid rgba(41,98,255,.25);
+  background: rgba(79,127,255,.07);
+  border: 1px solid rgba(79,127,255,.25);
   border-left: 3px solid var(--blue);
   border-radius: 4px;
   padding: 16px 20px; margin-bottom: 36px;
@@ -636,7 +636,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <!-- ── TOPBAR ── -->
   <rect x="0" y="0" width="680" height="32" fill="#1a1d29"/>
-  <rect x="8" y="6" width="20" height="20" rx="3" fill="none" stroke="#2962ff" stroke-width="0.8" stroke-opacity="0.5"/>
+  <rect x="8" y="6" width="20" height="20" rx="3" fill="none" stroke="#4f7fff" stroke-width="0.8" stroke-opacity="0.5"/>
   <text x="34" y="21" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#d1d4dc">Global Investing</text>
   <text x="148" y="20" font-family="Inter,-apple-system,sans-serif" font-size="8" fill="#787b86" letter-spacing="0.08em">FX TERMINAL</text>
   <text x="220" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">FX Pairs</text>
@@ -658,7 +658,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <!-- ── NEWS TICKER ── -->
   <rect x="0" y="54" width="680" height="18" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
-  <text x="10" y="67" font-family="Inter,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#2962ff">HEADLINES</text>
+  <text x="10" y="67" font-family="Inter,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#4f7fff">HEADLINES</text>
   <text x="80" y="67" font-family="Inter,-apple-system,sans-serif" font-size="7.5" fill="#6b7280">Fed holds rates steady · ECB minutes signal caution · JPY weakens on BoJ commentary ···</text>
 
   <!-- ── THREE-COLUMN LAYOUT ── -->
@@ -669,23 +669,23 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <rect x="0" y="72" width="112" height="18" fill="#1a1d29"/>
   <text x="8" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#6b7280" letter-spacing="0.06em">LEFT SIDEBAR</text>
   <!-- sidebar items -->
-  <rect x="6" y="97" width="3" height="9" rx="1" fill="#2962ff"/>
+  <rect x="6" y="97" width="3" height="9" rx="1" fill="#4f7fff"/>
   <text x="14" y="106" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">FX Liquidity</text>
-  <rect x="6" y="114" width="3" height="9" rx="1" fill="#2962ff"/>
+  <rect x="6" y="114" width="3" height="9" rx="1" fill="#4f7fff"/>
   <text x="14" y="123" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Crosses (21 pairs)</text>
-  <rect x="6" y="131" width="3" height="9" rx="1" fill="#2962ff"/>
+  <rect x="6" y="131" width="3" height="9" rx="1" fill="#4f7fff"/>
   <text x="14" y="140" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Carry Ranking</text>
-  <rect x="6" y="148" width="3" height="9" rx="1" fill="#2962ff"/>
+  <rect x="6" y="148" width="3" height="9" rx="1" fill="#4f7fff"/>
   <text x="14" y="157" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Events Calendar</text>
 
   <!-- MAIN AREA — x=112, w=452 -->
   <!-- Main header bar -->
-  <rect x="112" y="72" width="452" height="18" fill="rgba(41,98,255,0.08)" stroke="rgba(41,98,255,0.18)" stroke-width="0.5"/>
-  <text x="120" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#2962ff" letter-spacing="0.06em">MAIN AREA</text>
+  <rect x="112" y="72" width="452" height="18" fill="rgba(79,127,255,0.08)" stroke="rgba(79,127,255,0.18)" stroke-width="0.5"/>
+  <text x="120" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#4f7fff" letter-spacing="0.06em">MAIN AREA</text>
   <text x="185" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" fill="#6b7280">· split layout (default)</text>
   <!-- split icon -->
-  <rect x="544" y="76" width="14" height="11" rx="2" fill="none" stroke="rgba(41,98,255,0.5)" stroke-width="0.8"/>
-  <line x1="551" y1="76" x2="551" y2="87" stroke="rgba(41,98,255,0.5)" stroke-width="0.8"/>
+  <rect x="544" y="76" width="14" height="11" rx="2" fill="none" stroke="rgba(79,127,255,0.5)" stroke-width="0.8"/>
+  <line x1="551" y1="76" x2="551" y2="87" stroke="rgba(79,127,255,0.5)" stroke-width="0.8"/>
 
   <!-- LEFT COLUMN (split-upper) — x=112, w=248 -->
   <rect x="112" y="90" width="248" height="280" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
@@ -703,8 +703,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <text x="124" y="211" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#6b7280">Alerts &amp; Signals (in split)</text>
 
   <!-- DRAG HANDLE -->
-  <rect x="360" y="90" width="4" height="280" fill="rgba(41,98,255,0.25)"/>
-  <rect x="361" y="218" width="2" height="22" rx="1" fill="rgba(41,98,255,0.55)"/>
+  <rect x="360" y="90" width="4" height="280" fill="rgba(79,127,255,0.25)"/>
+  <rect x="361" y="218" width="2" height="22" rx="1" fill="rgba(79,127,255,0.55)"/>
 
   <!-- RIGHT COLUMN (split-lower) — x=364, w=200 -->
   <rect x="364" y="90" width="200" height="280" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
@@ -752,7 +752,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;">
         <!-- Topbar -->
         <div style="background:#1a1d29;border-bottom:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;gap:10px;">
-          <div style="width:24px;height:24px;background:#2962ff22;border:1px solid #2962ff44;border-radius:4px;flex-shrink:0;"></div>
+          <div style="width:24px;height:24px;background:#4f7fff22;border:1px solid #4f7fff44;border-radius:4px;flex-shrink:0;"></div>
           <span style="font-size:11px;font-weight:700;color:#fff;">Global Investing</span>
           <span style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;">FX Terminal</span>
           <div style="margin-left:auto;display:flex;align-items:center;gap:5px;">
@@ -780,7 +780,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <!-- News ticker -->
         <div style="background:#131722;padding:4px 12px;font-size:10px;color:var(--text3);display:flex;gap:8px;overflow:hidden;">
           <span style="color:var(--blue);font-weight:700;flex-shrink:0;">LIVE</span>
-          <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">Fed holds rates steady · <span style="color:#2962ff44;background:#2962ff11;padding:0 3px;border-radius:2px;">EUR</span> ECB minutes signal caution · JPY weakens on BoJ commentary · <span style="color:#26a69a22;background:#26a69a11;padding:0 3px;border-radius:2px;">XAU</span> Gold hits session high ···</span>
+          <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">Fed holds rates steady · <span style="color:#4f7fff44;background:#4f7fff11;padding:0 3px;border-radius:2px;">EUR</span> ECB minutes signal caution · JPY weakens on BoJ commentary · <span style="color:#26a69a22;background:#26a69a11;padding:0 3px;border-radius:2px;">XAU</span> Gold hits session high ···</span>
         </div>
       </div>
       <h3>Session indicator</h3>
@@ -830,7 +830,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
         <!-- Tab row -->
         <div style="background:#1a1d29;border-bottom:1px solid #2a2e39;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
-          <div style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #2962ff;white-space:nowrap;cursor:pointer;">EUR/USD</div>
+          <div style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #4f7fff;white-space:nowrap;cursor:pointer;">EUR/USD</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/JPY</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/USD</div>
           <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">AUD/USD</div>
@@ -851,7 +851,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <span style="font-size:10px;color:#ef5350;">-0.00214 (-0.19%)</span>
           </div>
           <div style="padding:2px 10px 6px;">
-            <span style="font-size:10px;color:#2962ff;font-family:monospace;">MA 20  close</span>
+            <span style="font-size:10px;color:#4f7fff;font-family:monospace;">MA 20  close</span>
           </div>
           <!-- Main chart SVG -->
           <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
@@ -911,7 +911,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <line x1="384" y1="126" x2="384" y2="146" stroke="#ef5350" stroke-width="1"/><rect x="381" y="129" width="7" height="12" fill="#ef5350"/>
             <line x1="397" y1="120" x2="397" y2="140" stroke="#26a69a" stroke-width="1"/><rect x="394" y="123" width="7" height="12" fill="#26a69a"/>
             <!-- MA 20 line: rises Dec→Feb peak, falls Mar→Apr -->
-            <polyline points="15,160 67,148 95,132 147,112 178,68 204,30 230,36 262,62 288,88 327,114 358,132 397,124" fill="none" stroke="#2962ff" stroke-width="1.5" opacity="0.85"/>
+            <polyline points="15,160 67,148 95,132 147,112 178,68 204,30 230,36 262,62 288,88 327,114 358,132 397,124" fill="none" stroke="#4f7fff" stroke-width="1.5" opacity="0.85"/>
             <!-- Right side price badges -->
             <rect x="613" y="116" width="54" height="15" rx="2" fill="#ef5350"/>
             <text x="616" y="127" fill="#fff" font-size="8.5" font-family="monospace">1.15439</text>
@@ -921,7 +921,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <line x1="0" y1="131" x2="612" y2="131" stroke="#ef5350" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.6"/>
             <!-- TradingView TV logo bottom left -->
             <rect x="8" y="174" width="22" height="18" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
-            <text x="11" y="187" fill="#2962ff" font-size="9" font-weight="bold" font-family="sans-serif">TV</text>
+            <text x="11" y="187" fill="#4f7fff" font-size="9" font-weight="bold" font-family="sans-serif">TV</text>
             <!-- ICE badge top right -->
             <rect x="594" y="4" width="30" height="14" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
             <text x="597" y="14" fill="#787b86" font-size="8" font-family="monospace">ICE</text>
@@ -1070,13 +1070,13 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <div style="padding:8px 8px 4px;position:relative;">
           <svg viewBox="0 0 240 70" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
             <!-- Session fills -->
-            <rect x="0" y="0" width="36" height="70" fill="rgba(41,98,255,0.08)"/>
+            <rect x="0" y="0" width="36" height="70" fill="rgba(79,127,255,0.08)"/>
             <rect x="80" y="0" width="68" height="70" fill="rgba(38,166,154,0.08)"/>
             <rect x="108" y="0" width="80" height="70" fill="rgba(246,148,28,0.08)"/>
             <!-- Liquidity curve -->
-            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60" fill="none" stroke="#2962ff" stroke-width="1.5" opacity="0.8"/>
+            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60" fill="none" stroke="#4f7fff" stroke-width="1.5" opacity="0.8"/>
             <!-- Area fill -->
-            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60 L240,70 L0,70 Z" fill="rgba(41,98,255,0.1)"/>
+            <path d="M0,60 C10,58 20,52 36,44 C50,37 60,34 80,22 C95,13 108,8 130,6 C148,4 160,8 175,18 C188,26 200,38 220,50 C230,55 236,58 240,60 L240,70 L0,70 Z" fill="rgba(79,127,255,0.1)"/>
             <!-- Current time marker -->
             <line x1="120" y1="0" x2="120" y2="70" stroke="#f6941c" stroke-width="1" stroke-dasharray="2,2"/>
             <!-- Time labels -->
@@ -1087,7 +1087,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <text x="215" y="68" fill="#787b86" font-size="6" font-family="monospace">24:00</text>
           </svg>
           <div style="display:flex;gap:10px;margin-top:3px;">
-            <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(41,98,255,0.3);border-radius:1px;"></span>Tokyo</span>
+            <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(79,127,255,0.3);border-radius:1px;"></span>Tokyo</span>
             <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.4);border-radius:1px;"></span>London</span>
             <span style="font-size:8px;color:#787b86;display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.35);border-radius:1px;"></span>New York</span>
           </div>
@@ -1404,8 +1404,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <div>
               <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">ECB holds rates, signals further cuts dependent on inflation trajectory</div>
               <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">EUR</span>
-                <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">USD</span>
+                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">EUR</span>
+                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">USD</span>
                 <span style="font-size:9px;color:var(--text3);">FXStreet · 04 Apr</span>
               </div>
             </div>
@@ -1415,7 +1415,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <div>
               <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">BoJ's Ueda: no rush to raise rates further, watching wage data closely</div>
               <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">JPY</span>
+                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">JPY</span>
                 <span style="font-size:9px;color:var(--text3);">ForexLive · 04 Apr</span>
               </div>
             </div>
@@ -1425,7 +1425,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <div>
               <div style="font-size:12px;color:var(--text);line-height:1.5;margin-bottom:3px;">UK retail sales beat expectations at +0.4% MoM vs +0.2% consensus</div>
               <div style="display:flex;align-items:center;gap:5px;">
-                <span style="font-size:9px;background:rgba(41,98,255,0.12);color:#2962ff;padding:1px 5px;border-radius:2px;">GBP</span>
+                <span style="font-size:9px;background:rgba(79,127,255,0.12);color:#4f7fff;padding:1px 5px;border-radius:2px;">GBP</span>
                 <span style="font-size:9px;color:var(--text3);">Investing.com · 04 Apr</span>
               </div>
             </div>

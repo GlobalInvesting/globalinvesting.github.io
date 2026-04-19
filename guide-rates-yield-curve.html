@@ -31,8 +31,8 @@
   --bg: #0b0e14; --bg2: #151921; --bg3: #2a2e39;
   --border: #2a2e39; --border2: #363c4e;
   --text: #c5cdd9; --text2: #8b98ad; --text3: #7a869a;
-  --up: #26a69a; --down: #ef5350; --blue: #2962ff; --orange: #f6941c;
-  --head-bg: #10131a; --accent: #2962ff;
+  --up: #26a69a; --down: #ef5350; --blue: #4f7fff; --orange: #f6941c;
+  --head-bg: #10131a; --accent: #4f7fff;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 }
@@ -126,7 +126,7 @@ a { color: inherit; text-decoration: none; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
 /* ── Info / warn boxes ── */
-.info-box { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.info-box { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .warn-box { background: rgba(246,148,28,.05); border: 1px solid rgba(246,148,28,.18); border-left: 3px solid var(--orange); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 
 /* ── Data tables ── */
@@ -147,7 +147,7 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
 
 /* ── Callouts ── */
-.callout { background: rgba(41,98,255,.06); border: 1px solid rgba(41,98,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
+.callout { background: rgba(79,127,255,.06); border: 1px solid rgba(79,127,255,.18); border-left: 3px solid var(--blue); border-radius: 4px; padding: 14px 18px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-orange { background: rgba(246,148,28,.05); border-color: rgba(246,148,28,.18); border-left-color: var(--orange); }
 .callout-green  { background: rgba(38,166,154,.05); border-color: rgba(38,166,154,.18); border-left-color: var(--up); }
 .callout-red    { background: rgba(239,83,80,.05);  border-color: rgba(239,83,80,.18);  border-left-color: var(--down); }
@@ -522,8 +522,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
 /* ── Disclaimer box (terms) ── */
 .disclaimer-box {
-  background: rgba(41,98,255,.07);
-  border: 1px solid rgba(41,98,255,.25);
+  background: rgba(79,127,255,.07);
+  border: 1px solid rgba(79,127,255,.25);
   border-left: 3px solid var(--blue);
   border-radius: 4px;
   padding: 16px 20px; margin-bottom: 36px;
@@ -664,20 +664,20 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
             <!-- area fill under curve -->
             <defs>
               <linearGradient id="yc-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#2962ff" stop-opacity="0.18"/>
-                <stop offset="100%" stop-color="#2962ff" stop-opacity="0.02"/>
+                <stop offset="0%" stop-color="#4f7fff" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#4f7fff" stop-opacity="0.02"/>
               </linearGradient>
             </defs>
             <!-- normal (steep) curve: 3M elevated, 2Y dips below, 5Y recovers, 10Y highest -->
             <!-- y-axis: 3.6%=70, 3.8%=50, 4.0%=30, 4.3%=10  (scale: each 0.1%=~7px) -->
             <!-- 3M 4.29→y=15, 2Y 3.79→y=51, 5Y 4.02→y=35, 10Y 4.31→y=13 -->
             <path d="M 80,15 C 200,55 350,38 620,13 L 620,88 L 80,88 Z" fill="url(#yc-grad)"/>
-            <path d="M 80,15 C 200,55 350,38 620,13" fill="none" stroke="#2962ff" stroke-width="2"/>
+            <path d="M 80,15 C 200,55 350,38 620,13" fill="none" stroke="#4f7fff" stroke-width="2"/>
             <!-- data points -->
-            <circle cx="80" cy="15" r="3.5" fill="#2962ff"/>
-            <circle cx="240" cy="51" r="3.5" fill="#2962ff"/>
-            <circle cx="430" cy="35" r="3.5" fill="#2962ff"/>
-            <circle cx="620" cy="13" r="3.5" fill="#2962ff"/>
+            <circle cx="80" cy="15" r="3.5" fill="#4f7fff"/>
+            <circle cx="240" cy="51" r="3.5" fill="#4f7fff"/>
+            <circle cx="430" cy="35" r="3.5" fill="#4f7fff"/>
+            <circle cx="620" cy="13" r="3.5" fill="#4f7fff"/>
             <!-- labels x-axis -->
             <text x="76" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">3M</text>
             <text x="240" y="84" fill="#787b86" font-size="9" font-family="monospace" text-anchor="middle">2Y</text>

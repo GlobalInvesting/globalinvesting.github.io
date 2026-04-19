@@ -171,7 +171,7 @@
 <!-- Critical CSS inline — above-the-fold only -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#2962ff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
@@ -365,7 +365,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="liq-tooltip" style="display:none;position:fixed;z-index:999;background:#1e222d;border:1px solid #363c4e;border-radius:3px;padding:4px 7px;font-family:'JetBrains Mono','Courier New',monospace;font-size:9px;line-height:1.6;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);">
           <span id="liq-tt-time" style="color:#787b86;"></span><br>
           <span id="liq-tt-session" style="color:#f6941c;font-size:8px;"></span><br>
-          <span id="liq-tt-vol" style="color:#2962ff;font-weight:600;"></span>
+          <span id="liq-tt-vol" style="color:#4f7fff;font-weight:600;"></span>
         </div>
         <canvas id="liquidity-canvas" height="110" style="display:block;width:100%;cursor:crosshair;"></canvas>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
@@ -373,10 +373,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span id="liq-peak-label" style="font-size:9px;color:var(--blue);text-align:right;"></span>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;padding:0 1px;">
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(41,98,255,0.35);border-radius:1px;"></span>Tokyo</span>
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(79,127,255,0.35);border-radius:1px;"></span>Tokyo</span>
           <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(38,166,154,0.45);border-radius:1px;"></span>London</span>
           <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:8px;height:8px;background:rgba(246,148,28,0.4);border-radius:1px;"></span>NY</span>
-          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:16px;height:1px;border-top:1px dashed rgba(41,98,255,0.5);margin-top:1px;"></span>30d avg</span>
+          <span style="font-size:8px;color:#787b86;font-family:var(--font-mono);display:flex;align-items:center;gap:3px;"><span style="display:inline-block;width:16px;height:1px;border-top:1px dashed rgba(79,127,255,0.5);margin-top:1px;"></span>30d avg</span>
         </div>
         <div style="margin-top:3px;padding:0 1px;">
           <span id="liq-source-label" style="font-size:7.5px;color:var(--text3);font-family:var(--font-mono);">Historical avg · fixed reference</span>
