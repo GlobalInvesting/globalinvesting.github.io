@@ -827,48 +827,46 @@ def fetch_yfinance_all(symbols_map):
                     "source":     "yfinance",
                 }
 
-                # ── 1W CHG: prior-Friday-close convention (Bloomberg/TradingView) ──────
-                # Only computed for FX major pairs. Uses the daily history already
-                # downloaded — no extra API call needed.
+                # ── 1W CHG: prior-Friday-close convention (Bloomberg/Refinitiv) ──────
+                # Computed for all FX pairs (majors and crosses). Uses the daily history
+                # already downloaded for HV30 — no extra API call needed.
                 # Finds the most recent Friday in the history that is strictly before
                 # today's session (i.e. last week's Friday close).
-                FX_MAJORS_1W = {"eurusd", "gbpusd", "usdjpy", "audusd", "usdchf", "usdcad", "nzdusd"}
-                if internal_id in FX_MAJORS_1W:
-                    try:
-                        # hist index is tz-aware; normalize to date for weekday comparison.
-                        # IMPORTANT: do NOT dropna() here — hist_dates and hist_close_full
-                        # must share the same positional index. dropna() would misalign them.
-                        hist_dates      = [d.date() if hasattr(d, "date") else d for d in hist.index]
-                        hist_close_full = hist["Close"]  # keep NaN rows to preserve positional alignment
-                        # Use last-bar-relative search, NOT datetime.now(utc).date().
-                        # Rationale: when the script runs after midnight UTC on Saturday,
-                        # now().date() is already Saturday but the last yfinance bar is
-                        # still Friday. Using now() would find *that* Friday as "prior Friday"
-                        # → close / close = 1.0 → pct1w = 0.00%. Instead, always skip the
-                        # last bar and search backwards for the nearest Friday among the
-                        # remaining bars — that is always the prior-week Friday close.
-                        last_bar_idx = len(hist_dates) - 1
-                        prior_friday = None
-                        prior_friday_close = None
-                        for i in range(last_bar_idx - 1, -1, -1):  # skip last bar
-                            d = hist_dates[i]
-                            if d.weekday() == 4:  # 4 = Friday
-                                v = hist_close_full.iloc[i]
-                                if v is not None and not (hasattr(v, '__float__') and v != v):  # not NaN
-                                    prior_friday = d
-                                    prior_friday_close = float(v)
-                                break
-                        if prior_friday_close and prior_friday_close != 0:
-                            pct1w = round((close / prior_friday_close - 1.0) * 100.0, 4)
-                            results[internal_id]["pct1w"] = pct1w
-                            results[internal_id]["pct1w_date"] = str(prior_friday)
-                            print(f"[1W] ✓ {internal_id:8s}: {close:.4f} vs Friday {prior_friday} {prior_friday_close:.4f} → {pct1w:+.4f}%")
-                        else:
-                            results[internal_id]["pct1w"] = None
-                            print(f"[1W] ⚠ {internal_id:8s}: no prior Friday found in {len(hist_dates)}d history")
-                    except Exception as _e1w:
+                try:
+                    # hist index is tz-aware; normalize to date for weekday comparison.
+                    # IMPORTANT: do NOT dropna() here — hist_dates and hist_close_full
+                    # must share the same positional index. dropna() would misalign them.
+                    hist_dates      = [d.date() if hasattr(d, "date") else d for d in hist.index]
+                    hist_close_full = hist["Close"]  # keep NaN rows to preserve positional alignment
+                    # Use last-bar-relative search, NOT datetime.now(utc).date().
+                    # Rationale: when the script runs after midnight UTC on Saturday,
+                    # now().date() is already Saturday but the last yfinance bar is
+                    # still Friday. Using now() would find *that* Friday as "prior Friday"
+                    # → close / close = 1.0 → pct1w = 0.00%. Instead, always skip the
+                    # last bar and search backwards for the nearest Friday among the
+                    # remaining bars — that is always the prior-week Friday close.
+                    last_bar_idx = len(hist_dates) - 1
+                    prior_friday = None
+                    prior_friday_close = None
+                    for i in range(last_bar_idx - 1, -1, -1):  # skip last bar
+                        d = hist_dates[i]
+                        if d.weekday() == 4:  # 4 = Friday
+                            v = hist_close_full.iloc[i]
+                            if v is not None and not (hasattr(v, '__float__') and v != v):  # not NaN
+                                prior_friday = d
+                                prior_friday_close = float(v)
+                            break
+                    if prior_friday_close and prior_friday_close != 0:
+                        pct1w = round((close / prior_friday_close - 1.0) * 100.0, 4)
+                        results[internal_id]["pct1w"] = pct1w
+                        results[internal_id]["pct1w_date"] = str(prior_friday)
+                        print(f"[1W] ✓ {internal_id:8s}: {close:.4f} vs Friday {prior_friday} {prior_friday_close:.4f} → {pct1w:+.4f}%")
+                    else:
                         results[internal_id]["pct1w"] = None
-                        print(f"[1W] ⚠ {internal_id:8s}: {_e1w}")
+                        print(f"[1W] ⚠ {internal_id:8s}: no prior Friday found in {len(hist_dates)}d history")
+                except Exception as _e1w:
+                    results[internal_id]["pct1w"] = None
+                    print(f"[1W] ⚠ {internal_id:8s}: {_e1w}")
 
                 # Sanity check: high == low means yfinance returned an incomplete intraday
                 # bar (e.g. a stale tick where H=L=close).
