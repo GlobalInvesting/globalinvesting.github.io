@@ -6564,3 +6564,107 @@ function toggleAlertsPopover() {
     });
   }
 })();
+
+// ── Onboarding Tooltip — surfaces the alerts feature to first-time users ──────
+// Shows once after a 4-second delay on first visit (no existing alerts configured
+// and no prior dismissal). Dismissed permanently via localStorage key 'gi_ob_done'.
+// "SET ALERT" button: requests notification permission, adds a REGIME→RISK-OFF
+// alert, opens the alerts popover briefly so the user sees it was added, then
+// dismisses the tooltip.
+
+const GI_OB_KEY = 'gi_ob_done';
+
+function giOnboardShouldShow() {
+  // Already dismissed or acted upon
+  if (localStorage.getItem(GI_OB_KEY)) return false;
+  // User already has alerts configured — they know the feature exists
+  try {
+    const existing = JSON.parse(localStorage.getItem('gi_alerts') || '[]');
+    if (existing.length > 0) return false;
+  } catch { /* ignore */ }
+  return true;
+}
+
+function giOnboardDismiss() {
+  localStorage.setItem(GI_OB_KEY, '1');
+  const el = document.getElementById('gi-onboard');
+  if (el) {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity .2s';
+    setTimeout(() => { el.style.display = 'none'; }, 220);
+  }
+}
+
+async function giOnboardActivate() {
+  const btn = document.getElementById('gi-onboard-cta');
+  if (btn) { btn.textContent = '…'; btn.disabled = true; }
+
+  // Request browser notification permission
+  if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+
+  // Add REGIME → RISK-OFF alert directly
+  try {
+    const arr = alertsLoad();
+    const alreadyHasRegime = arr.some(a => a.type === 'regime' && a.target === 'RISK-OFF');
+    if (!alreadyHasRegime) {
+      arr.push({
+        id: Date.now().toString(36),
+        type: 'regime',
+        target: 'RISK-OFF',
+        label: 'Regime: RISK-OFF',
+        fired: false,
+        firedAt: null
+      });
+      alertsSave(arr);
+      alertsRender(null);
+    }
+  } catch (e) {
+    console.warn('giOnboardActivate: could not add alert', e);
+  }
+
+  // Open alerts popover briefly so user sees the alert was added
+  const pop = document.getElementById('alerts-popover');
+  const bellBtn = document.getElementById('alerts-bell-btn');
+  if (pop && bellBtn) {
+    toggleAlertsPopover();
+    // Scroll popover into view in case it's off-screen
+    setTimeout(() => {
+      pop.scrollIntoView && pop.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+
+  // Mark onboarding done and hide tooltip
+  giOnboardDismiss();
+}
+
+function giOnboardInit() {
+  if (!giOnboardShouldShow()) return;
+  // Delay 4s — let the terminal finish loading data so it doesn't compete visually
+  setTimeout(() => {
+    if (!giOnboardShouldShow()) return; // re-check in case state changed during load
+    const el = document.getElementById('gi-onboard');
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.display = 'block';
+    // Fade in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = 'opacity .35s ease';
+        el.style.opacity = '1';
+      });
+    });
+    // Auto-dismiss after 18s if user ignores it (non-intrusive)
+    setTimeout(() => {
+      if (el.style.display !== 'none') giOnboardDismiss();
+    }, 18000);
+  }, 4000);
+}
+
+// Hook into DOMContentLoaded — dashboard.js is deferred so DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', giOnboardInit);
+} else {
+  giOnboardInit();
+}
