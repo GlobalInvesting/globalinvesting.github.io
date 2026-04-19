@@ -11,7 +11,7 @@
     --text3: #8290a0;
     --up: #26a69a;
     --down: #ef5350;
-    --blue: #2962ff;
+    --blue: #4f7fff;
     --orange: #f6941c;
     --head-bg: #1a1d29;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -346,9 +346,9 @@
   .sig-notif-toggle svg { flex-shrink: 0; display: block; }
   .sig-notif-toggle.sig-notif-on {
     color: var(--blue); border-color: var(--blue);
-    background: rgba(41,98,255,.08);
+    background: rgba(79,127,255,.08);
   }
-  .sig-notif-toggle.sig-notif-on:hover { background: rgba(41,98,255,.14); }
+  .sig-notif-toggle.sig-notif-on:hover { background: rgba(79,127,255,.14); }
   .sig-notif-toggle.sig-notif-blocked {
     color: var(--down); border-color: var(--down);
     opacity: .7; cursor: not-allowed;
@@ -1181,7 +1181,7 @@
 
   #gdpr-banner {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999;
-    background: #1a1f2e; border-top: 2px solid #2962ff;
+    background: #1a1f2e; border-top: 2px solid #4f7fff;
     padding: 14px 20px; display: none; flex-wrap: wrap;
     align-items: center; gap: 12px; font-family: Arial, sans-serif;
     font-size: 13px; color: #d0d6e8; box-shadow: 0 -4px 20px rgba(0,0,0,.5);
@@ -1193,7 +1193,7 @@
     padding: 8px 18px; border-radius: 4px; border: none;
     cursor: pointer; font-size: 13px; font-weight: 600;
   }
-  #gdpr-accept { background: #2962ff; color: #fff; }
+  #gdpr-accept { background: #4f7fff; color: #fff; }
   #gdpr-accept:hover { background: #1a4fd8; }
   #gdpr-reject { background: transparent; color: #d0d6e8; border: 1px solid #4a5568 !important; }
   #gdpr-reject:hover { background: #2d3748; }
@@ -1226,13 +1226,13 @@
 
 /* ── Focus visible (WCAG 2.4.7) — restore outline stripped by reset ── */
 :focus-visible {
-  outline: 2px solid var(--accent, #2962ff);
+  outline: 2px solid var(--accent, #4f7fff);
   outline-offset: 2px;
 }
 button:focus-visible,
 a:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--accent, #2962ff);
+  outline: 2px solid var(--accent, #4f7fff);
   outline-offset: 2px;
   border-radius: 2px;
 }

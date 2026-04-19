@@ -2636,10 +2636,10 @@ function drawYieldCurve(points, priorPoints) {
     ctx.lineTo(curPts[curPts.length-1][0], PAD_T+cH);
     ctx.lineTo(PAD_L, PAD_T+cH);
     ctx.closePath();
-    ctx.fillStyle='#2962ff12'; ctx.fill();
+    ctx.fillStyle='#4f7fff12'; ctx.fill();
 
     // Current curve line
-    ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.strokeStyle='#4f7fff'; ctx.lineWidth=1.8;
     curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
     ctx.stroke();
 
@@ -2648,7 +2648,7 @@ function drawYieldCurve(points, priorPoints) {
       if (v == null) return;
       const x = px(i), y = py(v);
       ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
-      ctx.fillStyle='#2962ff'; ctx.fill();
+      ctx.fillStyle='#4f7fff'; ctx.fill();
     });
   }
 
@@ -4987,7 +4987,7 @@ const LIQ_BASE = [18,14,11,10,12,20,30,42,58,68,72,70,72,82,95,100,95,80,68,55,4
 // Session definitions (UTC hours)
 const LIQ_SESSIONS = [
   { name:'Sydney',   start:22, end:7,  color:'rgba(120,100,255,0.10)' },
-  { name:'Tokyo',    start:0,  end:9,  color:'rgba(41,98,255,0.08)'  },
+  { name:'Tokyo',    start:0,  end:9,  color:'rgba(79,127,255,0.08)'  },
   { name:'London',   start:8,  end:17, color:'rgba(38,166,154,0.10)' },
   { name:'New York', start:13, end:22, color:'rgba(246,148,28,0.07)' },
 ];
@@ -5134,7 +5134,7 @@ function drawLiquidityChart() {
       ctx.fillRect(PAD_L + (cStart/47)*cW, PAD_T, ((cEnd-cStart)/47)*cW, cH);
     };
     drawBand(44, 48+14, 'rgba(120,100,255,0.07)'); // Sydney (wraps — draw as 22→end)
-    drawBand(0,  18,    'rgba(41,98,255,0.07)');    // Tokyo
+    drawBand(0,  18,    'rgba(79,127,255,0.07)');    // Tokyo
     drawBand(16, 34,    'rgba(38,166,154,0.08)');   // London
     drawBand(26, 44,    'rgba(246,148,28,0.06)');   // NY
   }
@@ -5142,8 +5142,8 @@ function drawLiquidityChart() {
   if (!isWeekend) {
     // ── PAST: filled area sólida ──────────────────────────────────────────
     const gradPast = ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-    gradPast.addColorStop(0,'rgba(41,98,255,0.32)');
-    gradPast.addColorStop(1,'rgba(41,98,255,0.03)');
+    gradPast.addColorStop(0,'rgba(79,127,255,0.32)');
+    gradPast.addColorStop(1,'rgba(79,127,255,0.03)');
     ctx.beginPath();
     for (let ci=0; ci<=nowCanvasSlot; ci++) {
       const v = hours[sa(ci)];
@@ -5154,8 +5154,8 @@ function drawLiquidityChart() {
 
     // ── FUTURE: filled area tenue ─────────────────────────────────────────
     const gradFut = ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-    gradFut.addColorStop(0,'rgba(41,98,255,0.10)');
-    gradFut.addColorStop(1,'rgba(41,98,255,0.01)');
+    gradFut.addColorStop(0,'rgba(79,127,255,0.10)');
+    gradFut.addColorStop(1,'rgba(79,127,255,0.01)');
     ctx.beginPath();
     ctx.moveTo(nowX, py(hours[sa(nowCanvasSlot)]));
     for (let ci=nowCanvasSlot+1; ci<48; ci++) ctx.lineTo(px(ci),py(hours[sa(ci)]));
@@ -5163,7 +5163,7 @@ function drawLiquidityChart() {
     ctx.fillStyle=gradFut; ctx.fill();
 
     // ── PAST: línea sólida azul ───────────────────────────────────────────
-    ctx.beginPath(); ctx.strokeStyle='#2962ff'; ctx.lineWidth=1.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.strokeStyle='#4f7fff'; ctx.lineWidth=1.5; ctx.setLineDash([]);
     for (let ci=0; ci<=nowCanvasSlot; ci++) {
       const v = hours[sa(ci)];
       ci===0 ? ctx.moveTo(px(ci),py(v)) : ctx.lineTo(px(ci),py(v));
@@ -5171,7 +5171,7 @@ function drawLiquidityChart() {
     ctx.stroke();
 
     // ── FUTURE: línea punteada azul tenue (datos: baseline 30d real) ─────
-    ctx.beginPath(); ctx.strokeStyle='rgba(41,98,255,0.35)'; ctx.lineWidth=1.2; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.strokeStyle='rgba(79,127,255,0.35)'; ctx.lineWidth=1.2; ctx.setLineDash([3,4]);
     ctx.moveTo(nowX, py(hours[sa(nowCanvasSlot)]));
     for (let ci=nowCanvasSlot+1; ci<48; ci++) ctx.lineTo(px(ci),py(hours[sa(ci)]));
     ctx.stroke(); ctx.setLineDash([]);
@@ -5184,7 +5184,7 @@ function drawLiquidityChart() {
   } else {
     // Weekend: curva plana, fill gris
     const grad=ctx.createLinearGradient(0,PAD_T,0,PAD_T+cH);
-    grad.addColorStop(0,'rgba(120,123,134,0.15)'); grad.addColorStop(1,'rgba(41,98,255,0.03)');
+    grad.addColorStop(0,'rgba(120,123,134,0.15)'); grad.addColorStop(1,'rgba(79,127,255,0.03)');
     ctx.beginPath();
     for (let ci=0; ci<48; ci++) {
       const v = hours[sa(ci)];
