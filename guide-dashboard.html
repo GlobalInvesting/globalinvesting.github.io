@@ -624,91 +624,120 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="guide-section" id="layout">
       <h2>Terminal Layout</h2>
       <p>The terminal uses a three-column layout at full width — a left sidebar, a wide main content area, and a right panel. By default it loads in <strong>split layout mode</strong>: the main area is divided into a left column (chart, FX table, heatmap) and a right column (risk, rates, COT, sessions, news). Understanding the structure helps you navigate quickly:</p>
-      <div class="layout-visual" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px;">
-  <!-- Topbar row -->
-  <div style="background:#1a1d29;border-bottom:1px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:8px;">
-    <div style="width:28px;height:28px;background:#2962ff22;border:1px solid #2962ff44;border-radius:5px;flex-shrink:0;"></div>
-    <span style="font-size:11px;font-weight:700;color:#fff;">Global Investing</span>
-    <span style="font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;">FX Terminal</span>
-    <div style="display:flex;gap:1px;margin-left:8px;">
-      <span style="font-size:10px;color:var(--text2);padding:0 8px;border-right:1px solid var(--border);">FX Pairs</span>
-      <span style="font-size:10px;color:var(--text2);padding:0 8px;border-right:1px solid var(--border);">Macro</span>
-      <span style="font-size:10px;color:var(--text2);padding:0 8px;border-right:1px solid var(--border);">Rates</span>
-      <span style="font-size:10px;color:var(--text2);padding:0 8px;">Risk</span>
-    </div>
-    <div style="margin-left:auto;font-size:10px;color:var(--up);display:flex;align-items:center;gap:4px;">
-      <span style="width:6px;height:6px;background:var(--up);border-radius:50%;display:inline-block;"></span>LIVE · London
-    </div>
-  </div>
-  <!-- Quote bar -->
-  <div style="background:#181b26;border-bottom:1px solid var(--border);padding:5px 14px;display:flex;gap:14px;overflow:hidden;">
-    <span style="font-size:10px;color:var(--text2);">EUR/USD <span style="color:#26a69a;">1.1512</span></span>
-    <span style="font-size:10px;color:var(--text2);">USD/JPY <span style="color:#ef5350;">149.82</span></span>
-    <span style="font-size:10px;color:var(--text2);">GBP/USD <span style="color:#26a69a;">1.2934</span></span>
-    <span style="font-size:10px;color:var(--text2);">AUD/USD <span style="color:#ef5350;">0.6521</span></span>
-    <span style="font-size:10px;color:var(--text2);">USD/CAD <span style="color:#ef5350;">1.3612</span></span>
-    <span style="font-size:10px;color:var(--text2);">GOLD FUT <span style="color:#26a69a;">3,341</span></span>
-    <span style="font-size:10px;color:var(--text2);">US10Y <span style="color:#f6941c;">4.28%</span></span>
-    <span style="font-size:10px;color:var(--text2);">DXY <span style="color:#ef5350;">104.2</span></span>
-  </div>
-  <!-- News ticker -->
-  <div style="background:#131722;border-bottom:1px solid var(--border);padding:4px 14px;font-size:10px;color:var(--text3);">
-    <span style="color:var(--blue);font-weight:700;margin-right:6px;">LIVE</span>Fed holds rates steady · ECB minutes signal caution · JPY weakens on BoJ commentary · Gold hits session high ···
-  </div>
-  <!-- Three column layout — split mode shown in main area -->
-  <div style="display:grid;grid-template-columns:130px 1fr 130px;min-height:240px;">
-    <!-- Left sidebar -->
-    <div style="border-right:1px solid var(--border);padding:8px 8px;">
-      <div style="font-size:8px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Left Sidebar</div>
-      <div style="font-size:9px;color:var(--text2);display:flex;flex-direction:column;gap:5px;">
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>FX Liquidity</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Crosses (21 pairs)</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Carry Ranking</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Events Calendar</span>
-      </div>
-    </div>
-    <!-- Main content — split into two sub-columns -->
-    <div style="padding:0;">
-      <div style="font-size:8px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;padding:5px 10px 4px;background:rgba(79,127,255,0.06);border-bottom:1px solid rgba(79,127,255,0.15);display:flex;align-items:center;gap:5px;">
-        <span>Main Area</span><span style="color:rgba(79,127,255,0.5);">·</span><span style="color:var(--text3);font-weight:400;">split layout (default)</span>
-        <span style="margin-left:auto;display:inline-flex;align-items:center;justify-content:center;width:16px;height:13px;border:1px solid rgba(79,127,255,0.5);border-radius:2px;font-size:8px;color:rgba(79,127,255,0.8);">⊟</span>
-      </div>
-      <div style="display:grid;grid-template-columns:55% 2px 1fr;min-height:200px;">
-        <!-- Left column (split-upper) -->
-        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:8px;font-weight:600;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em;">Left column (55%)</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">AI Narrative · Regime</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Price Chart (TradingView)</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">FX Pairs Table</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Currency Strength Heatmap</div>
-          <div style="background:rgba(239,83,80,0.07);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text3);">Alerts &amp; Signals (in split)</div>
-        </div>
-        <!-- Drag handle -->
-        <div style="background:rgba(79,127,255,0.3);cursor:col-resize;position:relative;">
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:20px;background:rgba(79,127,255,0.6);border-radius:2px;"></div>
-        </div>
-        <!-- Right column (split-lower) -->
-        <div style="padding:6px 8px;display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:8px;font-weight:600;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em;">Right column (45%)</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Cross-Asset + Risk Monitor</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Historical VaR · Rates</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">COT Positioning</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">Sessions · Spreads · Sentiment</div>
-          <div style="background:var(--bg3);border-radius:2px;padding:4px 6px;font-size:9px;color:var(--text2);">News · Economic Map</div>
-        </div>
-      </div>
-    </div>
-    <!-- Right panel -->
-    <div style="border-left:1px solid var(--border);padding:8px 8px;">
-      <div style="font-size:8px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);">Right Panel</div>
-      <div style="font-size:9px;color:var(--text2);display:flex;flex-direction:column;gap:5px;">
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>CB Rates</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Correlations</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Rate Expectations</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:3px;height:9px;background:var(--orange);border-radius:2px;display:inline-block;"></span>Positioning Bias</span>
-      </div>
-    </div>
-  </div>
+      <div class="layout-visual">
+<svg width="100%" viewBox="0 0 680 370" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>FX Terminal layout diagram — three-column split view</title>
+  <desc>Three-column terminal layout: left sidebar (FX Liquidity, Crosses, Carry), main area split into left column (chart, FX table, heatmap) and right column (cross-asset, risk, rates, COT, sessions, news), and right panel (CB Rates, Correlations, Rate Expectations, Positioning Bias).</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ── TOPBAR ── -->
+  <rect x="0" y="0" width="680" height="32" fill="#1a1d29"/>
+  <rect x="8" y="6" width="20" height="20" rx="3" fill="none" stroke="#2962ff" stroke-width="0.8" stroke-opacity="0.5"/>
+  <text x="34" y="21" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#d1d4dc">Global Investing</text>
+  <text x="148" y="20" font-family="Inter,-apple-system,sans-serif" font-size="8" fill="#787b86" letter-spacing="0.08em">FX TERMINAL</text>
+  <text x="220" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">FX Pairs</text>
+  <text x="268" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Macro</text>
+  <text x="308" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Rates</text>
+  <text x="344" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Risk</text>
+  <circle cx="598" cy="16" r="3" fill="#26a69a"/>
+  <text x="604" y="20" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#26a69a">LIVE · London</text>
+  <text x="648" y="20" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Menu</text>
+
+  <!-- ── QUOTE BAR ── -->
+  <rect x="0" y="32" width="680" height="22" fill="#181b26"/>
+  <text x="10" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">EUR/USD <tspan fill="#26a69a">1.1512</tspan></text>
+  <text x="105" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">USD/JPY <tspan fill="#ef5350">149.82</tspan></text>
+  <text x="200" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">GBP/USD <tspan fill="#26a69a">1.2934</tspan></text>
+  <text x="300" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">GOLD FUT <tspan fill="#26a69a">3,341</tspan></text>
+  <text x="410" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">US10Y <tspan fill="#f6941c">4.28%</tspan></text>
+  <text x="495" y="47" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#787b86">DXY <tspan fill="#ef5350">104.2</tspan></text>
+
+  <!-- ── NEWS TICKER ── -->
+  <rect x="0" y="54" width="680" height="18" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
+  <text x="10" y="67" font-family="Inter,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#2962ff">HEADLINES</text>
+  <text x="80" y="67" font-family="Inter,-apple-system,sans-serif" font-size="7.5" fill="#6b7280">Fed holds rates steady · ECB minutes signal caution · JPY weakens on BoJ commentary ···</text>
+
+  <!-- ── THREE-COLUMN LAYOUT ── -->
+
+  <!-- LEFT SIDEBAR — x=0, w=112 -->
+  <rect x="0" y="72" width="112" height="298" fill="#1e222d" stroke="#2a2e39" stroke-width="0.5"/>
+  <!-- sidebar header -->
+  <rect x="0" y="72" width="112" height="18" fill="#1a1d29"/>
+  <text x="8" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#6b7280" letter-spacing="0.06em">LEFT SIDEBAR</text>
+  <!-- sidebar items -->
+  <rect x="6" y="97" width="3" height="9" rx="1" fill="#2962ff"/>
+  <text x="14" y="106" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">FX Liquidity</text>
+  <rect x="6" y="114" width="3" height="9" rx="1" fill="#2962ff"/>
+  <text x="14" y="123" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Crosses (21 pairs)</text>
+  <rect x="6" y="131" width="3" height="9" rx="1" fill="#2962ff"/>
+  <text x="14" y="140" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Carry Ranking</text>
+  <rect x="6" y="148" width="3" height="9" rx="1" fill="#2962ff"/>
+  <text x="14" y="157" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Events Calendar</text>
+
+  <!-- MAIN AREA — x=112, w=452 -->
+  <!-- Main header bar -->
+  <rect x="112" y="72" width="452" height="18" fill="rgba(41,98,255,0.08)" stroke="rgba(41,98,255,0.18)" stroke-width="0.5"/>
+  <text x="120" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#2962ff" letter-spacing="0.06em">MAIN AREA</text>
+  <text x="185" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" fill="#6b7280">· split layout (default)</text>
+  <!-- split icon -->
+  <rect x="544" y="76" width="14" height="11" rx="2" fill="none" stroke="rgba(41,98,255,0.5)" stroke-width="0.8"/>
+  <line x1="551" y1="76" x2="551" y2="87" stroke="rgba(41,98,255,0.5)" stroke-width="0.8"/>
+
+  <!-- LEFT COLUMN (split-upper) — x=112, w=248 -->
+  <rect x="112" y="90" width="248" height="280" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
+  <text x="118" y="104" font-family="Inter,-apple-system,sans-serif" font-size="7.5" font-weight="600" fill="#6b7280" letter-spacing="0.06em">LEFT COLUMN (55%)</text>
+  <!-- panels left -->
+  <rect x="118" y="110" width="236" height="18" rx="2" fill="#2a2e39"/>
+  <text x="124" y="123" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">AI Narrative · Regime</text>
+  <rect x="118" y="132" width="236" height="18" rx="2" fill="#2a2e39"/>
+  <text x="124" y="145" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Price Chart (TradingView)</text>
+  <rect x="118" y="154" width="236" height="18" rx="2" fill="#2a2e39"/>
+  <text x="124" y="167" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">FX Pairs Table</text>
+  <rect x="118" y="176" width="236" height="18" rx="2" fill="#2a2e39"/>
+  <text x="124" y="189" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Currency Strength Heatmap</text>
+  <rect x="118" y="198" width="236" height="18" rx="2" fill="rgba(239,83,80,0.07)"/>
+  <text x="124" y="211" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#6b7280">Alerts &amp; Signals (in split)</text>
+
+  <!-- DRAG HANDLE -->
+  <rect x="360" y="90" width="4" height="280" fill="rgba(41,98,255,0.25)"/>
+  <rect x="361" y="218" width="2" height="22" rx="1" fill="rgba(41,98,255,0.55)"/>
+
+  <!-- RIGHT COLUMN (split-lower) — x=364, w=200 -->
+  <rect x="364" y="90" width="200" height="280" fill="#131722" stroke="#2a2e39" stroke-width="0.5"/>
+  <text x="370" y="104" font-family="Inter,-apple-system,sans-serif" font-size="7.5" font-weight="600" fill="#6b7280" letter-spacing="0.06em">RIGHT COLUMN (45%)</text>
+  <!-- panels right -->
+  <rect x="370" y="110" width="188" height="18" rx="2" fill="#2a2e39"/>
+  <text x="376" y="123" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Cross-Asset + Risk Monitor</text>
+  <rect x="370" y="132" width="188" height="18" rx="2" fill="#2a2e39"/>
+  <text x="376" y="145" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Historical VaR · Rates</text>
+  <rect x="370" y="154" width="188" height="18" rx="2" fill="#2a2e39"/>
+  <text x="376" y="167" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">COT Positioning</text>
+  <rect x="370" y="176" width="188" height="18" rx="2" fill="#2a2e39"/>
+  <text x="376" y="189" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Sessions · Spreads · Sentiment</text>
+  <rect x="370" y="198" width="188" height="18" rx="2" fill="#2a2e39"/>
+  <text x="376" y="211" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">News · Economic Map</text>
+
+  <!-- RIGHT PANEL — x=564, w=116 -->
+  <rect x="564" y="72" width="116" height="298" fill="#1e222d" stroke="#2a2e39" stroke-width="0.5"/>
+  <rect x="564" y="72" width="116" height="18" fill="#1a1d29"/>
+  <text x="572" y="85" font-family="Inter,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#6b7280" letter-spacing="0.06em">RIGHT PANEL</text>
+  <!-- right panel items -->
+  <rect x="570" y="97" width="3" height="9" rx="1" fill="#f6941c"/>
+  <text x="578" y="106" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">CB Rates</text>
+  <rect x="570" y="114" width="3" height="9" rx="1" fill="#f6941c"/>
+  <text x="578" y="123" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Correlations</text>
+  <rect x="570" y="131" width="3" height="9" rx="1" fill="#f6941c"/>
+  <text x="578" y="140" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Rate Expectations</text>
+  <rect x="570" y="148" width="3" height="9" rx="1" fill="#f6941c"/>
+  <text x="578" y="157" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#787b86">Positioning Bias</text>
+
+  <!-- STATUS BAR -->
+  <rect x="0" y="370" width="680" height="0" fill="#1a1d29"/>
+</svg>
 </div>
       <h3>Split Layout</h3>
       <p>The main content area is split into two scrollable columns by default — the chart, FX table, and heatmap on the left; cross-asset, risk, rates, COT, sessions, news, and signals on the right. This is the recommended view on desktop as it keeps the chart visible while scrolling through data panels on the right. The split ratio is adjustable: drag the vertical divider bar between the two columns left or right to resize. Your preferred split width is saved automatically.</p>

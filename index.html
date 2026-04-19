@@ -149,7 +149,7 @@
       "name": "What is the COT positioning data?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly. The CFTC publishes on Friday afternoons; the terminal updates overnight Friday–Saturday with the latest data."
+        "text": "COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly. The CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication."
       }
     },
     {
@@ -171,7 +171,7 @@
 <!-- Critical CSS inline — above-the-fold only -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#2962ff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
@@ -247,7 +247,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.16.26">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.26.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -955,12 +955,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v7.21</span>
+    <span class="sb-v">FX Terminal v7.26.0</span>
   </div>
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.16.26" defer></script>
+<script src="assets/dashboard.js?v=7.26.0" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.16.19" defer></script>
 <script src="assets/cb-rates-modal.js?v=1.0.0" defer></script>
@@ -971,151 +971,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <!-- TradingView lazy-loader and IntersectionObserver logic moved to assets/dashboard.js (initTVWidgets) -->
-
-<!-- SPLIT LAYOUT JS — vertical left/right toggle + drag handle resize -->
-<script>
-(function(){
-  var LS_KEY = 'gi_split_layout';
-  var main   = document.getElementById('main');
-  var btn    = document.getElementById('split-layout-btn');
-  var handle = document.getElementById('split-drag-handle');
-  var upper  = document.getElementById('split-upper');   // left column
-  var lower  = document.getElementById('split-lower');   // right column
-
-  // Alerts panel split-mode relocation
-  var alertsPanel       = document.getElementById('section-macro');
-  var alertsOrigParent  = alertsPanel ? alertsPanel.parentNode : null;
-  var alertsOrigNext    = alertsPanel ? alertsPanel.nextSibling : null;
-
-  function isMobile(){ return window.innerWidth <= 900; }
-
-  function applyState(active, leftPct){
-    if(!main||!btn||!handle||!upper||!lower) return;
-    // Never activate split layout on mobile
-    if(isMobile()) active = false;
-    // Show/hide button based on viewport
-    btn.style.display = isMobile() ? 'none' : '';
-    if(active){
-      main.classList.add('split-layout');
-      btn.classList.remove('active');
-      btn.setAttribute('aria-pressed','true');
-      handle.style.display = '';
-      var pct = leftPct || 55;
-      upper.style.width = pct + '%';
-      upper.style.flex  = 'none';
-      // Move alerts panel into left column (below heatmap) in split mode
-      if(alertsPanel && alertsPanel.parentNode !== upper){
-        upper.appendChild(alertsPanel);
-      }
-    } else {
-      main.classList.remove('split-layout');
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed','false');
-      handle.style.display = 'none';
-      upper.style.width = '';
-      upper.style.flex  = '';
-      // Restore alerts panel to its original position in split-lower
-      if(alertsPanel && alertsOrigParent && alertsPanel.parentNode !== alertsOrigParent){
-        alertsOrigParent.insertBefore(alertsPanel, alertsOrigNext);
-      }
-    }
-    // rightpanel (CB Rates, Carry, Rate Expectations) is always visible regardless of split state
-  }
-
-  // Restore saved state — split layout is ON by default for first-time visitors
-  try {
-    var saved = JSON.parse(localStorage.getItem(LS_KEY)||'null');
-    if(saved === null){
-      applyState(true, 55);
-      localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:55}));
-    } else if(saved.active){
-      applyState(true, saved.leftPct||55);
-    } else {
-      applyState(false);
-    }
-  } catch(e){ applyState(true, 55); }
-
-  // Split tooltip — shown once to first-time visitors, dismissed on click
-  var TIP_KEY = 'gi_split_tip_seen';
-  var tip = document.getElementById('split-tip');
-  function hideTip(){
-    if(!tip) return;
-    tip.classList.remove('visible');
-    try { localStorage.setItem(TIP_KEY,'1'); } catch(e){}
-  }
-  try {
-    if(!localStorage.getItem(TIP_KEY) && tip){
-      setTimeout(function(){ tip.classList.add('visible'); }, 800);
-      setTimeout(function(){ hideTip(); }, 6000);
-    }
-  } catch(e){}
-
-  if(btn){
-    btn.addEventListener('click', function(){
-      hideTip();
-      var isActive = main.classList.contains('split-layout');
-      applyState(!isActive, 55);
-      try { localStorage.setItem(LS_KEY, JSON.stringify({active:!isActive, leftPct:55})); } catch(e){}
-    });
-  }
-
-  // Deactivate split layout if viewport shrinks to mobile (e.g. rotation)
-  window.addEventListener('resize', function(){
-    btn.style.display = isMobile() ? 'none' : '';
-    if(isMobile() && main.classList.contains('split-layout')){
-      applyState(false);
-    }
-  });
-
-  // Horizontal drag handle resize
-  if(handle){
-    var dragging = false, startX = 0, startW = 0;
-    handle.addEventListener('mousedown', function(e){
-      dragging = true;
-      startX = e.clientX;
-      startW = upper.offsetWidth;
-      handle.classList.add('dragging');
-      document.body.style.userSelect = 'none';
-      e.preventDefault();
-    });
-    document.addEventListener('mousemove', function(e){
-      if(!dragging) return;
-      var dx    = e.clientX - startX;
-      var mainW = main.offsetWidth;
-      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
-      var pct   = (newW / mainW * 100).toFixed(1);
-      upper.style.width = pct + '%';
-    });
-    document.addEventListener('mouseup', function(){
-      if(!dragging) return;
-      dragging = false;
-      handle.classList.remove('dragging');
-      document.body.style.userSelect = '';
-      var pct = parseFloat((upper.offsetWidth / main.offsetWidth * 100).toFixed(1));
-      try { localStorage.setItem(LS_KEY, JSON.stringify({active:true, leftPct:pct})); } catch(e){}
-    });
-    // Touch support
-    handle.addEventListener('touchstart', function(e){
-      dragging = true;
-      startX = e.touches[0].clientX;
-      startW = upper.offsetWidth;
-      handle.classList.add('dragging');
-    }, {passive:true});
-    document.addEventListener('touchmove', function(e){
-      if(!dragging) return;
-      var dx    = e.touches[0].clientX - startX;
-      var mainW = main.offsetWidth;
-      var newW  = Math.min(Math.max(startW + dx, 240), mainW - 200);
-      upper.style.width = (newW / mainW * 100).toFixed(1) + '%';
-    }, {passive:true});
-    document.addEventListener('touchend', function(){
-      if(!dragging) return;
-      dragging = false;
-      handle.classList.remove('dragging');
-    });
-  }
-})();
-</script>
 
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>

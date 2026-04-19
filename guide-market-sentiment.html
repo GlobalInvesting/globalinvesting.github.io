@@ -625,7 +625,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="page-hero">
       <div class="page-hero-label">Guide</div>
       <h1>Retail FX Positioning</h1>
-      <p>The <strong>Retail FX Positioning</strong> panel shows where retail traders are positioned right now — how many are long vs. short each pair, how many positions are open, where they entered, and whether they're currently winning or losing. The data comes from the Myfxbook community platform and updates every 30 minutes via a server-side script.</p>
+      <p>The <strong>Retail FX Positioning</strong> panel shows where retail traders are positioned right now — how many are long vs. short each pair, how many positions are open, where they entered, and whether they're currently winning or losing. The data comes from the Myfxbook community platform and updates every hour via a server-side script.</p>
     </div>
 
     <div class="guide-section" id="overview">
@@ -661,7 +661,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <thead><tr><th>Property</th><th>Detail</th></tr></thead>
         <tbody>
           <tr><td>What it measures</td><td>The current open position balance of Myfxbook-connected accounts — not recent trade flow, not closed trades.</td></tr>
-          <tr><td>Update frequency</td><td>Every 30 minutes. The timestamp shown in the panel footer reflects the age of the data.</td></tr>
+          <tr><td>Update frequency</td><td>Every hour. The timestamp shown in the panel footer reflects the age of the data.</td></tr>
           <tr><td>Sample size</td><td>Typically 10,000–60,000 open positions per major pair. EUR/USD is always the largest sample.</td></tr>
           <tr><td>Who is included</td><td>Retail traders who connected live or demo accounts to Myfxbook. Not representative of the full retail market — see Limitations.</td></tr>
           <tr><td>Pairs shown</td><td>24 pairs sorted by total open positions. Majors (EUR/USD, GBP/USD, USD/JPY…) plus selected crosses.</td></tr>
@@ -823,7 +823,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li><strong style="color:var(--text);">Sample bias.</strong> Only Myfxbook-connected accounts are included. Active, platform-engaged traders may behave differently from the broader retail population. The sample skews toward more engaged, technically-oriented traders.</li>
         <li><strong style="color:var(--text);">Not institutional.</strong> This data says nothing about hedge fund, bank, or proprietary-desk positioning. For institutional positioning, use the COT panel in the terminal.</li>
         <li><strong style="color:var(--text);">Positions, not flow.</strong> Sentiment shows the stock of currently open positions, not the rate of new orders. A high long reading might reflect stubborn longs who haven't closed yet — not fresh bullish conviction. Always check the avg entry price to distinguish.</li>
-        <li><strong style="color:var(--text);">30-minute data lag.</strong> The data updates every 30 minutes via a scheduled server script. In fast-moving markets, the snapshot can be meaningfully stale. The panel footer shows the age of the current data.</li>
+        <li><strong style="color:var(--text);">Up to 1-hour data lag.</strong> The data updates every hour via a scheduled server script. In fast-moving markets, the snapshot can be meaningfully stale. The panel footer shows the age of the current data.</li>
         <li><strong style="color:var(--text);">No causal mechanism.</strong> High retail short interest does not automatically cause a squeeze. You need a catalyst — a data release, central bank comment, or technical break — to trigger the move. Sentiment tells you the fuel is there, not when it will ignite.</li>
       </ul>
     </div>
