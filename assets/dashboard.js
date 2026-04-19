@@ -3189,9 +3189,9 @@ function toggleSidebarDetail(row, tvSym) {
   expandDiv.appendChild(inner);
   row.after(expandDiv);
 
-  // Animate open
+  // Animate open — vertical layout is taller than the horizontal table expand
   requestAnimationFrame(() => {
-    inner.style.maxHeight = '160px';
+    inner.style.maxHeight = '420px';
   });
 
   buildInlineDetail(tvSym, inner);

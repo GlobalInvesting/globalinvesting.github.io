@@ -280,7 +280,29 @@
   .sb-row.sb-selected { background: var(--bg3) !important; }
   .sb-row.sb-selected .sb-sym::after { content: ' ▾'; font-size: 8px; color: var(--text3); }
   .sb-expand-row { border-bottom: 1px solid var(--border2); background: var(--bg2); overflow: hidden; }
-  .sb-expand-inner { max-height: 0; overflow: hidden; transition: max-height .18s ease; }
+  .sb-expand-inner { max-height: 0; overflow: hidden; transition: max-height .22s ease; }
+
+  /* ── Sidebar expand: vertical layout override ──
+     pd-inline is designed for horizontal scroll in the wide FX table.
+     Inside the 180px sidebar we restack all groups vertically. */
+  .sb-expand-inner .pd-inline-scroll { overflow-x: hidden; }
+  .sb-expand-inner .pd-inline { flex-direction: column; width: 100%; }
+  /* Hide the price block — symbol, rate and chg are already visible in the sb-row above */
+  .sb-expand-inner .pd-inline-price { display: none; }
+  /* Each group becomes a full-width row */
+  .sb-expand-inner .pd-inline-group {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 8px;
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .sb-expand-inner .pd-inline-group:last-of-type { border-bottom: none; }
+  /* Metrics wrap tightly in the narrow column */
+  .sb-expand-inner .pd-inline-metrics { gap: 6px 10px; flex-wrap: wrap; }
+  /* Footer sits flush at the bottom */
+  .sb-expand-inner .pd-inline-footer { position: static; }
 
   .up      { color: var(--up);     }
   .down    { color: var(--down);   }
