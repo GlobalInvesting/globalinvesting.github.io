@@ -6668,3 +6668,68 @@ if (document.readyState === 'loading') {
 } else {
   giOnboardInit();
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// UI STATE PERSISTENCE
+// Saves and restores: last chart symbol + last visited section.
+// Split layout state is handled separately by initSplitLayout().
+// Storage key: 'gi_ui_state' → { sym, section }
+// ═══════════════════════════════════════════════════════════════════
+(function initUIStatePersistence() {
+  'use strict';
+  var STATE_KEY = 'gi_ui_state';
+  var DEFAULT_SYM = 'FX_IDC:EURUSD';
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch { return null; }
+  }
+
+  function saveState(patch) {
+    try {
+      var current = loadState() || {};
+      localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign(current, patch)));
+    } catch (_) {}
+  }
+
+  // ── Restore last chart symbol ──────────────────────────────────────
+  // Wrap loadTVChart to intercept every symbol change and persist it.
+  var _origLoadTV = typeof loadTVChart === 'function' ? loadTVChart : null;
+  if (_origLoadTV) {
+    window.loadTVChart = function(sym) {
+      _origLoadTV(sym);
+      saveState({ sym: sym });
+      window._tvCurrentSym = sym;
+    };
+  }
+
+  // ── Restore last nav section ───────────────────────────────────────
+  // Intercept top-nav link clicks to persist the target section.
+  document.querySelectorAll('.top-nav a[data-target]').forEach(function(link) {
+    link.addEventListener('click', function() {
+      var t = this.dataset.target;
+      if (t && t !== 'top') saveState({ section: t });
+    });
+  });
+
+  // ── Apply saved state on load ──────────────────────────────────────
+  // Defer until after boot() and all panels have initialized.
+  window.addEventListener('load', function() {
+    var state = loadState();
+    if (!state) return;
+
+    // Restore chart symbol (only if different from default to avoid redundant reload)
+    var sym = (state.sym && state.sym !== DEFAULT_SYM) ? state.sym : null;
+    if (sym && typeof window.loadTVChart === 'function') {
+      // Small delay: let the initial boot chart render first, then replace
+      setTimeout(function() { window.loadTVChart(sym); }, 800);
+    }
+
+    // Restore last section (scroll into view via nav link)
+    if (state.section) {
+      setTimeout(function() {
+        var link = document.querySelector('.top-nav a[data-target="' + state.section + '"]');
+        if (link) link.click();
+      }, 1000);
+    }
+  });
+}());
