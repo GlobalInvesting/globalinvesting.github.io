@@ -16,6 +16,11 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="author" content="Santiago Plá Casuriaga — Global Investing">
 <meta name="theme-color" content="#0d1117">
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GI Terminal">
 <link rel="canonical" href="https://globalinvesting.github.io/">
 <link rel="sitemap" type="application/xml" href="https://globalinvesting.github.io/sitemap.xml">
 
@@ -247,11 +252,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.26.2">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.26.3">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 
+<script src="assets/sw-register.js" defer></script>
 </head>
 <body>
 
@@ -955,12 +961,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v7.26.2</span>
+    <span class="sb-v">FX Terminal v7.26.3</span>
   </div>
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.26.2" defer></script>
+<script src="assets/dashboard.js?v=7.26.3" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.16.19" defer></script>
 <script src="assets/cb-rates-modal.js?v=1.0.0" defer></script>
