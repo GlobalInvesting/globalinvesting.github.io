@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GBP/JPY Bias Guide: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing</title>
+<title>GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing</title>
 <meta name="description" content="What drives GBP/JPY directional bias: how to combine CFTC COT data for GBP and JPY futures, BoE vs BoJ rate differentials, cross-asset risk regime, and retail sentiment to read medium-term currency bias.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-gbpjpy-cot.html">
@@ -11,12 +11,12 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://globalinvesting.github.io/guide-gbpjpy-cot.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
-<meta property="og:title" content="GBP/JPY Bias Guide: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
+<meta property="og:title" content="GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
 <meta property="og:description" content="What drives GBP/JPY directional bias: how to combine CFTC COT data for GBP and JPY futures, BoE vs BoJ rate differentials, cross-asset risk regime, and retail sentiment to read medium-term currency bias.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GBP/JPY Bias Guide: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
+<meta name="twitter:title" content="GBP/JPY Bias Factors: COT Positioning, Rate Differentials, and Cross-Asset Signals — Global Investing">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -195,7 +195,7 @@ a { color: inherit; text-decoration: none; }
 
 <main id="main">
 <div class="guide-wrap">
-  <nav class="toc" aria-label="Guide sections">
+  <nav class="toc" aria-label="Market Research sections">
     <div class="toc-inner">
       <div class="toc-head">Contents</div>
       <a class="toc-item" href="#why-gbpjpy">Why GBP/JPY Is Complex</a>
@@ -216,7 +216,7 @@ a { color: inherit; text-decoration: none; }
 
   <div class="guide-content">
     <div class="page-hero">
-      <div class="page-hero-label">Guide</div>
+      <div class="page-hero-label">Market Research</div>
       <h1>GBP/JPY Bias Factors</h1>
       <p>GBP/JPY is one of the most volatile G8 pairs — driven by a four-way interaction between BoE and BoJ policy, institutional COT positioning in two separate futures markets, and global risk appetite. This guide explains each factor and how to combine them into a coherent directional bias using the terminal's data panels.</p>
     </div>
@@ -256,7 +256,7 @@ a { color: inherit; text-decoration: none; }
           </tr>
           <tr>
             <td>Net%OI</td>
-            <td>Net position as a percentage of total open interest — the Bloomberg-standard normalization. Values above +15% indicate strong directional conviction; above +25% signal potential crowding.</td>
+            <td>Net position as a percentage of total open interest — the standard institutional normalization for COT data. Values above +15% indicate strong directional conviction; above +25% signal potential crowding.</td>
           </tr>
           <tr>
             <td>LF/AM dot</td>
@@ -351,10 +351,10 @@ a { color: inherit; text-decoration: none; }
       <p>GBP/JPY is highly correlated with global risk appetite because JPY functions as the primary G8 safe-haven and carry-funding currency. The terminal's Cross-Asset Risk Monitor scores the current regime (RISK-ON / MIXED / CAUTION / RISK-OFF) based on VIX, the MOVE Index, gold, SPX, and the yield curve.</p>
       <p>The regime directly modulates how to read the COT signals:</p>
       <ul>
-        <li><strong style="color:var(--text);">RISK-ON regime:</strong> Carry trades are rewarded. GBP/JPY tends to trend in the direction of the COT bias without sharp reversals. Net short JPY positions can be sustained and extended.</li>
-        <li><strong style="color:var(--text);">MIXED regime:</strong> Signals are contradictory. COT direction is less reliable. Expect choppy, range-bound behavior without a strong catalyst. Wait for regime clarification.</li>
-        <li><strong style="color:var(--text);">CAUTION regime (VIX 18–30):</strong> Carry unwind risk is elevated. Even if COT data is bullish GBP/JPY, a sustained CAUTION reading suggests the risk of a sharp reversal is non-trivial. Reduce confidence in medium-term GBP/JPY longs.</li>
-        <li><strong style="color:var(--text);">RISK-OFF regime (VIX 30+):</strong> JPY strength dominates all other signals. COT data from the prior week is essentially irrelevant — the most important factor is the pace of JPY short liquidation. GBP/JPY can drop hundreds of pips in a single session. Do not fight this regime.</li>
+        <li><strong style="color:var(--text);">RISK-ON regime:</strong> Carry trades are rewarded. GBP/JPY tends to trend in the direction of the COT bias without sharp reversals. Net short JPY positions historically persist and extend in this regime.</li>
+        <li><strong style="color:var(--text);">MIXED regime:</strong> Signals are contradictory. COT direction is less reliable. Range-bound behavior without a strong catalyst is the historical pattern in this regime.</li>
+        <li><strong style="color:var(--text);">CAUTION regime (VIX 18–30):</strong> Carry unwind risk is elevated. A sustained CAUTION reading indicates that the probability of a sharp reversal is non-trivial — COT directional signals are historically less reliable in this environment.</li>
+        <li><strong style="color:var(--text);">RISK-OFF regime (VIX 30+):</strong> JPY strength dominates all other signals. COT data from the prior week loses predictive relevance — the most important variable is the pace of JPY short liquidation. GBP/JPY has historically dropped hundreds of pips in a single session during this regime.</li>
       </ul>
       <div class="callout callout-orange">
         <strong>VIX 25 threshold:</strong> Historical analysis of GBP/JPY behavior shows that moves above VIX 25 are associated with a statistically significant shift in the pair's short-term behavior — mean reversion accelerates, trend persistence drops, and intraday volatility expands. The terminal scores VIX 25–30 as +2 points toward a CAUTION regime.
@@ -376,17 +376,17 @@ a { color: inherit; text-decoration: none; }
         <tbody>
           <tr>
             <td>Above 70% long</td>
-            <td>Retail heavily long, likely chasing or bag-holding a rally</td>
+            <td>Retail heavily long, accumulated into a rally</td>
             <td>Historically precedes pullbacks or reversals; aligns with institutional short GBP/JPY if confirmed by COT</td>
           </tr>
           <tr>
             <td>40–60% long</td>
             <td>Neutral — no strong crowd bias</td>
-            <td>Retail signal is not informative; rely on COT and rate differential</td>
+            <td>Retail signal is not informative; COT and rate differential carry more weight</td>
           </tr>
           <tr>
             <td>Below 30% long</td>
-            <td>Retail heavily short, likely fading a downtrend or positioned for a reversal</td>
+            <td>Retail heavily short, accumulated into a decline</td>
             <td>Historically precedes recoveries; aligns with institutional long GBP/JPY if confirmed by COT</td>
           </tr>
         </tbody>
@@ -396,7 +396,7 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="combining">
       <h2>Multi-Factor Framework</h2>
-      <p>High-conviction GBP/JPY reads require alignment across at least three of the four factors. Use this framework to score the current environment:</p>
+      <p>Cross-referencing all four factors produces a more reliable directional read than any single signal in isolation. The table below maps each factor's bullish and bearish signal and its source in the terminal:</p>
       <table class="data-table" aria-label="GBP/JPY multi-factor bias scoring framework">
         <thead>
           <tr>
@@ -440,7 +440,7 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
       <div class="callout callout-green">
-        <strong>Strongest setup — all factors aligned bullish:</strong> GBP net long COT with rising WoW Δ + JPY net short COT + BoE on hold while BoJ expected to hold + RISK-ON regime + retail heavily short GBP/JPY. This combination has historically preceded the most sustained GBP/JPY uptrends. Three-of-four alignment is sufficient for a directional bias; fewer than three warrants staying neutral.
+        <strong>Maximum factor alignment — all signals pointing in the same direction:</strong> GBP net long COT with rising WoW Δ + JPY net short COT + BoE on hold while BoJ expected to hold + RISK-ON regime + retail heavily short GBP/JPY. This combination has historically coincided with the most sustained GBP/JPY upward moves. Alignment across three or more factors produces a stronger directional read than one or two factors in isolation.
       </div>
     </div>
 
@@ -486,9 +486,9 @@ a { color: inherit; text-decoration: none; }
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
-  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · GBP/JPY</span></div>
+  <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">MARKET RESEARCH · GBP/JPY</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.3</span></div>
 </footer>
 
 <script>
