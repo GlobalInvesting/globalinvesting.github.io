@@ -3145,7 +3145,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click to open chart, double-click to open popover ──
+// ── Sidebar crosses: click to open chart, double-click to expand inline detail ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
@@ -3156,8 +3156,46 @@ document.getElementById('sidebar')?.addEventListener('dblclick', e => {
   e.preventDefault();
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
-  openPairPopover(row, row.dataset.sym);
+  toggleSidebarDetail(row, row.dataset.sym);
 });
+
+// ── Sidebar inline expand — mirrors toggleInlineDetail for FX Pairs table ──
+function toggleSidebarDetail(row, tvSym) {
+  const container = row.parentElement;
+  if (!container) return;
+
+  // If same row already open, collapse and return
+  const existing = container.querySelector('.sb-expand-row');
+  const wasThisRow = existing?.dataset.forSym === tvSym;
+
+  if (existing) {
+    const inner = existing.querySelector('.sb-expand-inner');
+    if (inner) inner.style.maxHeight = '0';
+    setTimeout(() => existing.remove(), 180);
+    container.querySelector('.sb-row.sb-selected')?.classList.remove('sb-selected');
+  }
+
+  if (wasThisRow) return;
+
+  row.classList.add('sb-selected');
+
+  const expandDiv = document.createElement('div');
+  expandDiv.className = 'sb-expand-row';
+  expandDiv.dataset.forSym = tvSym;
+
+  const inner = document.createElement('div');
+  inner.className = 'sb-expand-inner';
+  inner.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:var(--text3);">Loading\u2026</div>';
+  expandDiv.appendChild(inner);
+  row.after(expandDiv);
+
+  // Animate open
+  requestAnimationFrame(() => {
+    inner.style.maxHeight = '160px';
+  });
+
+  buildInlineDetail(tvSym, inner);
+}
 
 // ── FX Pairs table: click = chart + expand detail inline ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {

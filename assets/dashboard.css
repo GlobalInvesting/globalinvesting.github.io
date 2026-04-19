@@ -277,6 +277,10 @@
   .sb-sym   { font-weight: 700; color: var(--text); font-size: 11px; font-family: var(--font-ui); }
   .sb-price { font-family: var(--font-mono); font-size: 11px; }
   .sb-chg   { font-family: var(--font-mono); font-size: 10px; }
+  .sb-row.sb-selected { background: var(--bg3) !important; }
+  .sb-row.sb-selected .sb-sym::after { content: ' ▾'; font-size: 8px; color: var(--text3); }
+  .sb-expand-row { border-bottom: 1px solid var(--border2); background: var(--bg2); overflow: hidden; }
+  .sb-expand-inner { max-height: 0; overflow: hidden; transition: max-height .18s ease; }
 
   .up      { color: var(--up);     }
   .down    { color: var(--down);   }
