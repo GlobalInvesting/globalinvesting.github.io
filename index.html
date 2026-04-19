@@ -247,7 +247,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.26.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.26.2">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -955,12 +955,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v7.26.0</span>
+    <span class="sb-v">FX Terminal v7.26.2</span>
   </div>
 </footer>
 
 
-<script src="assets/dashboard.js?v=7.26.0" defer></script>
+<script src="assets/dashboard.js?v=7.26.2" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.16.19" defer></script>
 <script src="assets/cb-rates-modal.js?v=1.0.0" defer></script>
@@ -971,6 +971,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <!-- TradingView lazy-loader and IntersectionObserver logic moved to assets/dashboard.js (initTVWidgets) -->
+
+<!-- ONBOARDING TOOLTIP — shown once to new users to surface the alerts feature -->
+<div id="gi-onboard" role="dialog" aria-label="Set up your first alert" aria-modal="false" style="display:none;position:fixed;bottom:52px;right:16px;z-index:2000;width:280px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,0.6);font-family:var(--font-ui);padding:14px 16px 12px;">
+  <button onclick="giOnboardDismiss()" aria-label="Dismiss" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;line-height:1;">&#x2715;</button>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+    <span style="font-size:18px;">🔔</span>
+    <span style="font-size:12px;font-weight:700;color:var(--text);letter-spacing:.04em;">STAY INFORMED</span>
+  </div>
+  <p style="margin:0 0 10px;font-size:12px;color:var(--text2);line-height:1.6;">Get a browser notification when the macro regime shifts to <strong style="color:var(--down);">RISK-OFF</strong> — even with this tab closed.</p>
+  <div style="display:flex;gap:8px;">
+    <button id="gi-onboard-cta" onclick="giOnboardActivate()" style="flex:1;padding:6px 0;background:var(--blue);color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-ui);letter-spacing:.04em;">SET ALERT</button>
+    <button onclick="giOnboardDismiss()" style="flex:1;padding:6px 0;background:none;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-size:11px;cursor:pointer;font-family:var(--font-ui);">Maybe later</button>
+  </div>
+</div>
 
 <!-- PAIR DETAIL POPOVER — triggered by ⓘ button on pair rows, position:fixed overlay -->
 <div id="pd-popover" role="dialog" aria-label="Pair detail" aria-modal="false" style="display:none;position:fixed;z-index:1000;width:270px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:var(--font-ui);overflow-y:auto;max-height:calc(100vh - 16px);"></div>
