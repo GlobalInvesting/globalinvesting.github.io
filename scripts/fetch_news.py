@@ -529,6 +529,15 @@ SOURCE_CURRENCY = {
     "NewsData NZD": "NZD",
     # v5.9: new CB feeds — force-assign currency
     "Bank of Canada": "CAD",
+    # Google News — divisa ya asignada en fetch function, fallback defensivo (mirrors NewsData pattern)
+    "Google News USD": "USD",
+    "Google News EUR": "EUR",
+    "Google News GBP": "GBP",
+    "Google News JPY": "JPY",
+    "Google News AUD": "AUD",
+    "Google News CAD": "CAD",
+    "Google News CHF": "CHF",
+    "Google News NZD": "NZD",
 }
 
 FOREX_SOURCES = {
