@@ -1097,7 +1097,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
       <h3>Crosses</h3>
-      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by standard ISO currency hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by standard ISO currency hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart and expand its inline detail strip — the same data card available in the FX Pairs table (Price · Volatility · COT Positioning · Retail Sentiment). Click the same row again to collapse it. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
       <!-- MOCK: Crosses full list (21 pairs, ISO hierarchy) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:260px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
@@ -1187,7 +1187,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h2>Right Panel</h2>
 
       <h3>Pair Detail</h3>
-      <p>When you click any pair in the FX Pairs table, the right panel's top section populates with a detailed data card for that pair. It updates instantly on every click with no page reload. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
+      <p>When you click any pair in the FX Pairs table or any cross in the sidebar, an inline detail strip expands directly below the selected row. It updates instantly on every click with no page reload — click the same row again to collapse it. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
       <!-- MOCK: Pair Detail panel (EUR/USD example) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:220px;font-size:12px;">
 
@@ -1244,7 +1244,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
 
         <div style="padding:4px 10px;">
-          <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">COT 2026-03-31 · Myfxbook</span>
+          <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">COT 2026-03-31 · Myfxbook · Saxo RR</span>
         </div>
 
       </div>
@@ -1253,12 +1253,12 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Price block</strong> Live price, daily % change, session H/L, spread and ADR in pips.</li>
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Price section</strong> 1W Chg · Carry differential · ADR · Base currency policy rate.</li>
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Volatility</strong> HV 30d · ATM IV · IV−HV · Bid-Ask Spread. ATM IV color: <span style="color:var(--up);">green ≤7%</span> (cheap), <span style="color:var(--down);">red &gt;12%</span> (expensive).</li>
-        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">COT Positioning</strong> LF Net (ccy) · AM Net (ccy) · LF Open Interest (ccy) from CFTC Disaggregated TFF. Labels show the tracked currency in parentheses — for cross pairs (EUR/GBP) the data reflects the base currency vs USD, not the cross directly. Footer line shows alignment: <em>LF Short · AM Long · diverging</em> or <em>aligned</em>.</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">COT Positioning</strong> For USD majors: LF Net (ccy) · AM Net (ccy) · LF Open Interest (ccy) from CFTC Disaggregated TFF — one leg, base currency vs USD. For cross pairs (EUR/GBP, GBP/JPY, etc.): two independent COT legs shown — base currency and quote currency separately, both in raw CFTC values as reported. Footer line shows alignment across both legs: <em>GBP LF Long · JPY LF Short · aligned</em> (both favour the same directional bias for the cross).</li>
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Retail Sentiment</strong> Long/short ratio from Myfxbook community — retail traders only. Contrarian indicator: extreme retail long bias typically precedes institutional short positioning.</li>
         <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Carry</strong> Numerator currency rate minus denominator currency rate. Positive = holding long earns the differential. For USD/JPY: Fed Funds − BoJ rate.</li>
       </ul>
       <div class="callout callout-green">
-        <strong>Tip:</strong> Click once to expand the inline detail row. Click again to collapse it. The panel stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place in the table.
+        <strong>Tip:</strong> Click once on any major or cross to open the chart and expand the inline detail. Click the same row again to collapse it. The strip stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place.
       </div>
 
       <h3>Central Bank Rates</h3>
@@ -1534,7 +1534,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.28.3</span></div>
 </footer>
 
 

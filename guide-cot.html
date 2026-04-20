@@ -607,6 +607,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="toc-head">Contents</div>
     <a class="toc-item" href="#what-is-cot">What Is the COT Report</a>
     <a class="toc-item" href="#the-panel">Reading the Panel</a>
+    <a class="toc-item" href="#cot-cross-pairs">COT in Cross Pairs</a>
     <a class="toc-item" href="#net-contracts">Net Contracts</a>
     <a class="toc-item" href="#long-pct">Long %</a>
     <a class="toc-item" href="#open-interest">Open Interest</a>
@@ -743,6 +744,16 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <div style="padding:4px 12px 6px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">● LF+AM aligned · ○ LF/AM diverge · WoW Δ and Net%OI populate after 2+ weeks of history · OI = LF open interest (long + short)</div>
       </div>
       <p>The horizontal bar visualizes the long/short split. Green fills from the left (longs), red fills from the right (shorts). A bar extending past the midpoint on the green side means more speculative longs than shorts. Past the midpoint on the red side means net short positioning.</p>
+
+      <h3 id="cot-cross-pairs">COT in the Pair Detail strip — dual-leg display for cross pairs</h3>
+      <p>When you click any pair to expand its inline detail, the COT Positioning section adapts to the pair type:</p>
+      <ul style="padding-left:20px;font-size:14px;color:var(--text2);line-height:1.8;">
+        <li><strong style="color:var(--text);">USD majors (EUR/USD, GBP/USD, etc.):</strong> Single leg — LF Net, AM Net, and LF Open Interest for the base currency vs USD. The CFTC data directly reflects the pair.</li>
+        <li><strong style="color:var(--text);">Cross pairs (EUR/GBP, GBP/JPY, etc.):</strong> Two independent legs shown — base currency and quote currency separately, each with its own LF Net, LF WoW Δ, and Net%OI. Both values are raw CFTC figures as reported (no inversion). The footer line summarises alignment: <em>GBP LF Long · JPY LF Short · aligned</em> means both legs favour the same directional bias for the cross (long base, short quote = bullish cross).</li>
+      </ul>
+      <div class="callout callout-orange">
+        <strong>Reading raw values on crosses:</strong> Because the CFTC tracks each currency vs USD, a JPY net short (large negative number) means speculators are short JPY futures — which is bearish JPY and therefore <em>bullish</em> GBP/JPY. The terminal shows the raw CFTC values so you can cross-reference directly with the main COT panel. The footer alignment label does the directional interpretation for you.
+      </div>
     </div>
 
     <div class="guide-section" id="open-interest">
@@ -1010,7 +1021,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.27.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.28.3</span></div>
 </footer>
 
 

@@ -570,7 +570,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>CFTC COT Positioning</td><td>CFTC.gov</td><td><span class="badge-weekly">WEEKLY</span></td></tr>
         <tr><td>Positioning Bias (ETF IV · COT · 25d RR)</td><td>CBOE ETF options (FXE, FXB, FXY, FXA) · CFTC.gov · Saxo Bank (25-delta Risk Reversals, 1M tenor)</td><td><span class="badge-weekly">WEEKLY / DAILY</span></td></tr>
         <tr><td>Reference Spreads</td><td>Typical ECN · session average</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
-        <tr><td>FX Liquidity Canvas</td><td>Frankfurter API (ECB) · BIS/LSEG session baseline</td><td><span class="badge-daily">30 MIN</span></td></tr>
+        <tr><td>FX Liquidity Canvas</td><td>yfinance · H-L range proxy · 30d avg (fallback: Frankfurter API · historical baseline)</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
         <tr><td>FX Retail Market Sentiment</td><td>Myfxbook</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
         <tr><td>Cross-Asset Monitor</td><td>yfinance</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>US Treasury Yield Curve</td><td>yfinance</td><td><span class="badge-daily">DAILY</span></td></tr>
@@ -638,7 +638,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.26.0</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.28.3</span></div>
 </footer>
 
 
