@@ -1,44 +1,45 @@
 {
-  "generated_at": "2026-04-20T19:55:14Z",
+  "generated_at": "2026-04-20T20:07:30Z",
   "signals": [
     {
-      "time": "19:50",
+      "time": "20:05",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.82; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.86; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 158.82",
-        "JPY COT LF net short −65,309"
+        "USD/JPY: 158.86",
+        "JPY COT LF net short: -65,309"
       ]
     },
     {
-      "time": "19:47",
+      "time": "20:02",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "HV30 at 7.5%, ATM IV (FXE chain) at 8.2% — options pricing a 0.7 vol-pt premium over realized. 25d RR at −0.08: mild put skew. CFTC LF net long +41,675 (week Apr 14), long%=72.0%; AM not reducing. AUD/USD at 0.7179, price stalling — late-trend caution signal. Watch for LF delta turning negative to invalidate.",
+      "text": "AUD/USD long% at 72.0% (CFTC) and retail short at 89% — extreme positioning on both sides. HV30 at 6.5%, ATM IV at 8.1% — options pricing a 1.6 vol-pt premium over realized. AUD/USD at 0.7179, price action stalling — late-trend caution signal. Watch for LF delta turning positive or volatility compression to shift the read.",
       "evidence": [
-        "AUD/USD: 0.7179",
-        "CFTC LF net long +41,675"
+        "AUD/USD COT LF net long: +41,675",
+        "AUD/USD retail short: 89%"
       ]
     },
     {
-      "time": "19:40",
+      "time": "19:55",
       "priority": "info",
-      "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426; AM constructive — positioning aligned with the carry read. GBP/USD at 1.3538 mid-range; 1.3600 is the next resistance on a continuation.",
+      "title": "GBP/USD — CB + Yield",
+      "text": "BoE at 3.75% vs Fed at 3.75% — 0bp GBP-USD yield differential; structural support neutral. GBP LF net long +28,426 (CFTC); AM constructive — positioning aligned with carry. GBP/USD at 1.3531 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
-        "GBP/USD: 1.3538",
-        "BoE 4.50% vs Fed 3.75%"
+        "GBP/USD: 1.3531",
+        "BoE: 3.75%",
+        "Fed: 3.75%"
       ]
     },
     {
-      "time": "19:48",
+      "time": "19:50",
       "priority": "info",
-      "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% (ON HOLD) vs Fed at 3.75% (ON HOLD) — 150bp CAD carry disadvantage. USD/CAD at 1.3643, testing the 1.3650 level. Positioning net short (CFTC, week ending Apr 14). The technical level and CB differential suggest structural USD/CAD upside; watch for a break above 1.3650.",
+      "title": "NZD/USD — Retail Sentiment",
+      "text": "NZD/USD retail short at 63% — short bias but not extreme. NZD/USD COT LF net short −17,090; AM −38,519. NZD/USD at 0.5892; price action contained. No major data releases scheduled today — watch for technical levels.",
       "evidence": [
-        "BOC 2.25% VS FED 3.75%",
-        "USD/CAD 1.3643"
+        "NZD/USD retail short: 63%",
+        "NZD/USD COT LF net short: -17,090"
       ]
     }
   ]
