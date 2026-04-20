@@ -1,54 +1,53 @@
 [
   {
-    "time": "08:30",
+    "time": "10:15",
     "priority": "critical",
     "title": "USD/JPY",
-    "text": "USD/JPY at 158.95 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "text": "USD/JPY at 158.92 — BoJ meeting on April 28; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "USD/JPY: 158.95",
+      "USD/JPY: 158.92",
       "BoJ rate: 0.75%"
     ]
   },
   {
-    "time": "08:28",
+    "time": "10:12",
     "priority": "warning",
     "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7151.",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7160, holding above recent low of 0.7145.",
     "evidence": [
-      "RBA rate: 4.10%",
-      "AUD/USD: 0.7151"
+      "AUD/USD: 0.7160",
+      "RBA rate: 4.10%"
     ]
   },
   {
-    "time": "08:25",
+    "time": "10:10",
     "priority": "warning",
     "title": "EUR/USD",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR/USD; pair holds at 1.1758.",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports USD; EUR/USD at 1.1769, testing 1.1750.",
     "evidence": [
+      "EUR/USD: 1.1769",
       "Fed rate: 3.75%",
-      "ECB rate: 2%",
-      "EUR/USD: 1.1758"
+      "ECB rate: 2%"
     ]
   },
   {
-    "time": "08:20",
+    "time": "10:08",
     "priority": "info",
-    "title": "AUD/NZD",
-    "text": "AUD/NZD: retail heavily positioned — 91% SHORT; contrarian reversal risk.",
+    "title": "AUD/USD",
+    "text": "AUD/USD vs AUD/JPY correlation break: corr=+0.421 vs norm=+0.123 (z=+1.21σ) — AUD no longer acting as risk proxy; AUD/USD at 0.7160.",
     "evidence": [
-      "AUD/NZD: 0.1216",
-      "retail sentiment: 91% SHORT"
+      "AUD/USD: 0.7160",
+      "AUD/JPY: 186.983"
     ]
   },
   {
-    "time": "08:15",
+    "time": "10:05",
     "priority": "info",
-    "title": "USD/JPY vs VIX",
-    "text": "USD/JPY vs VIX correlation break: corr=+0.628 vs norm=+0.061 (z=+1.46σ) — JPY no longer acting as safe haven; carry position at 158.95 not attracting risk-off unwind.",
+    "title": "Retail Sentiment",
+    "text": "AUD/USD retail sentiment extreme: 17% long / 83% short — contrarian signal suggests potential reversal; AUD/USD at 0.7160.",
     "evidence": [
-      "USD/JPY: 158.95",
-      "VIX: 17.5",
-      "corr: +0.628"
+      "AUD/USD: 0.7160",
+      "AUD/USD sentiment: 17% long"
     ]
   }
 ]
