@@ -2988,12 +2988,20 @@ async function buildInlineDetail(tvSym, container) {
   const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
   const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
   const aligned = lfDir && amDir && lfDir === amDir;
-  const lfDir2 = cotNet2 == null ? null : cotNet2 > 0 ? 'Long' : cotNet2 < 0 ? 'Short' : null;
+  // lfDir2Raw: label derived from the RAW (uninverted) CFTC value so it always reflects the actual
+  // reported position (e.g. "JPY LF Short" matches the CFTC table, even though the numeric display
+  // is shown inverted for cross-perspective readability). "aligned" means both base and quote COT
+  // readings are directionally consistent with the cross being bullish (base long + quote short).
+  const cotRawNet2 = cotRaw2?.net ?? null;
+  const lfDir2Raw  = cotRawNet2 == null ? null : cotRawNet2 > 0 ? 'Long' : cotRawNet2 < 0 ? 'Short' : null;
+  const lfDir2     = cotNet2    == null ? null : cotNet2    > 0 ? 'Long' : cotNet2    < 0 ? 'Short' : null; // cross-perspective (inverted for JPY/CHF)
   let cotTag;
-  if (isCross && lfDir && lfDir2) {
-    const leg2Aligned = lfDir === lfDir2;
+  if (isCross && lfDir && lfDir2Raw) {
+    // "aligned" = base LF long AND quote LF short (both favour the cross going up)
+    const leg2Aligned = (lfDir === 'Long') && (lfDir2Raw === 'Short') ||
+                        (lfDir === 'Short') && (lfDir2Raw === 'Long');
     cotTag = `<span style="color:var(--text3);font-size:8px;">${cotCcy} LF </span><span class="${clsI(cotNet)}">${lfDir}</span>`
-           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2}</span>`
+           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2Raw}</span>`
            + ` <span style="color:var(--text3);font-size:8px;">· ${leg2Aligned ? 'aligned' : 'diverging'}</span>`;
   } else if (lfDir && amDir) {
     cotTag = `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`;
