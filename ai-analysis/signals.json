@@ -1,52 +1,54 @@
 [
   {
-    "time": "18:50",
+    "time": "18:55",
     "priority": "critical",
     "title": "USD/JPY — Geopolitical + Carry",
-    "text": "Middle East tensions drive safe-haven bid — JPY COT LF net short -65,309; USD/JPY retreating from 158.82 toward 158.50 as carry unwinds; BoJ watch level at 160.00 still relevant — risk-off flow supports JPY.",
+    "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.87; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
     "evidence": [
-      "USD/JPY: 158.82",
-      "Middle East tensions escalate"
+      "USD/JPY: 158.87",
+      "JPY COT LF net short: -65,309"
     ]
   },
   {
-    "time": "18:47",
+    "time": "18:52",
     "priority": "warning",
     "title": "AUD/USD — Positioning + Vol",
-    "text": "AUD LF net long 41,675 (72% long) — extreme positioning; ATM IV 10.3% vs HV30 9.5% with 25d RR at -0.21 — market hedging downside; AUD/USD holding at 0.7176 — watch for squeeze.",
+    "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), AM not reducing — positioning stalling. HV30 at 6.5%, ATM IV (FXE chain) at 8.1% — options pricing a 1.6 vol-pt premium over realized. 25d RR at −0.21: mild put skew. Price at 0.7176; late-trend caution signal. Watch for LF delta turning positive t",
     "evidence": [
-      "AUD/USD: 0.7176",
-      "AUD COT LF net long: 41,675"
+      "AUD LF net long: +41,675",
+      "HV30: 6.5%",
+      "ATM IV: 8.1%"
+    ]
+  },
+  {
+    "time": "18:48",
+    "priority": "info",
+    "title": "GBP/USD — CB + Technical",
+    "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3535 mid-range; 1.3600 is the next resistance on a continuation.",
+    "evidence": [
+      "BoE: 4.50%",
+      "Fed: 3.75%",
+      "GBP LF net long: +28,426"
     ]
   },
   {
     "time": "18:45",
     "priority": "warning",
-    "title": "EUR/USD — CB Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR; EUR/USD at 1.1786 — testing 1.1800 resistance; ECB meeting on April 30 — policy divergence remains a key theme.",
+    "title": "EUR/USD — Positioning + Vol",
+    "text": "EUR LF net short −72, long%=50.0% (CFTC, week ending Apr 14) — flat positioning. HV30 at 8.2%, ATM IV (FXE chain) at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew. Price bid; positioning stalling — late-trend caution signal. Watch for LF delta turning posi",
     "evidence": [
-      "Fed rate: 3.75%",
-      "ECB rate: 2%"
-    ]
-  },
-  {
-    "time": "18:42",
-    "priority": "info",
-    "title": "GBP/USD — Info",
-    "text": "GBP LF net long 28,426 (66.1% long); GBP/USD at 1.3536 — mid-range; ATM IV 9.5% vs HV30 9.2% — no directional conviction in options.",
-    "evidence": [
-      "GBP/USD: 1.3536",
-      "GBP COT LF net long: 28,426"
+      "EUR LF net short: -72",
+      "HV30: 8.2%",
+      "ATM IV: 9.4%"
     ]
   },
   {
     "time": "18:40",
     "priority": "info",
-    "title": "USD/CAD — Positioning",
-    "text": "CAD LF net short -63,570 (19.6% long); USD/CAD at 1.364 — testing 1.3650 resistance; WTI oil price surge supports CAD — commodity currency dynamics at play.",
+    "title": "AUD/USD — Retail Sentiment",
+    "text": "AUD/USD retail sentiment 12% long / 88% short — extreme short bias. Contrarian reversal risk; watch for squeeze.",
     "evidence": [
-      "USD/CAD: 1.364",
-      "CAD COT LF net short: -63,570"
+      "AUD/USD retail sentiment: 12% long / 88% short"
     ]
   }
 ]
