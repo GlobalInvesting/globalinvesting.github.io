@@ -3001,8 +3001,9 @@ async function buildInlineDetail(tvSym, container) {
     // "aligned" = base LF long AND quote LF short (both favour the cross going up)
     const leg2Aligned = (lfDir === 'Long') && (lfDir2Raw === 'Short') ||
                         (lfDir === 'Short') && (lfDir2Raw === 'Long');
+    // clsI uses raw net for color so label color matches direction ("Short" = red, not green)
     cotTag = `<span style="color:var(--text3);font-size:8px;">${cotCcy} LF </span><span class="${clsI(cotNet)}">${lfDir}</span>`
-           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2Raw}</span>`
+           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotRawNet2)}">${lfDir2Raw}</span>`
            + ` <span style="color:var(--text3);font-size:8px;">· ${leg2Aligned ? 'aligned' : 'diverging'}</span>`;
   } else if (lfDir && amDir) {
     cotTag = `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`;
