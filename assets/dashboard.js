@@ -2918,20 +2918,16 @@ async function buildInlineDetail(tvSym, container) {
   }
 
   // Second leg — only for crosses (quote currency, never USD).
-  // For ANY cross, short quote = pair goes up, so we always invert the quote leg numerically
-  // so +ve always reads as bullish for the cross (cross-perspective readability).
-  // FUNDING_CCYS (JPY, CHF) get an additional superscript and a funding-specific tooltip.
-  const FUNDING_CCYS  = new Set(['JPY', 'CHF']);
-  const cotCcy2       = isCross ? quote : null;
-  const cotRaw2       = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
+  // Values shown as-is from CFTC, identical to the COT Positioning panel.
+  // GBP +28,426 Long and JPY −65,389 Short read directly, no inversion applied.
+  const cotCcy2 = isCross ? quote : null;
+  const cotRaw2 = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
   let cotNet2 = null, cotAmNet2 = null, cotWow2 = null, cotPctOI2 = null;
-  const cot2Inverted  = isCross; // always invert quote leg for all crosses
-  const cot2IsFunding = isCross && FUNDING_CCYS.has(quote); // JPY/CHF: extra label marker
   if (cotRaw2) {
-    cotNet2   = cotRaw2.net          != null ? cotRaw2.net          * -1 : null;
-    cotAmNet2 = cotRaw2.amNet        != null ? cotRaw2.amNet        * -1 : null;
-    cotWow2   = cotRaw2.wowNetChange != null ? cotRaw2.wowNetChange * -1 : null;
-    cotPctOI2 = cotRaw2.levNetPctOI  != null ? cotRaw2.levNetPctOI  * -1 : null;
+    cotNet2   = cotRaw2.net          ?? null;
+    cotAmNet2 = cotRaw2.amNet        ?? null;
+    cotWow2   = cotRaw2.wowNetChange ?? null;
+    cotPctOI2 = cotRaw2.levNetPctOI  ?? null;
     if (cotRaw2.weekEnding && !cotWeek) cotWeek = cotRaw2.weekEnding;
   }
 
@@ -2989,21 +2985,15 @@ async function buildInlineDetail(tvSym, container) {
   const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
   const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
   const aligned = lfDir && amDir && lfDir === amDir;
-  // lfDir2Raw: label derived from the RAW (uninverted) CFTC value so it always reflects the actual
-  // reported position (e.g. "JPY LF Short" matches the CFTC table, even though the numeric display
-  // is shown inverted for cross-perspective readability). "aligned" means both base and quote COT
-  // readings are directionally consistent with the cross being bullish (base long + quote short).
-  const cotRawNet2 = cotRaw2?.net ?? null;
-  const lfDir2Raw  = cotRawNet2 == null ? null : cotRawNet2 > 0 ? 'Long' : cotRawNet2 < 0 ? 'Short' : null;
-  const lfDir2     = cotNet2    == null ? null : cotNet2    > 0 ? 'Long' : cotNet2    < 0 ? 'Short' : null; // cross-perspective (inverted for JPY/CHF)
+  // Summary tag for crosses: both legs shown with raw CFTC direction, matching the COT panel.
+  // 'aligned' = base Long + quote Short (or vice versa) — both legs favour the same cross direction.
+  const lfDir2 = cotNet2 == null ? null : cotNet2 > 0 ? 'Long' : cotNet2 < 0 ? 'Short' : null;
   let cotTag;
-  if (isCross && lfDir && lfDir2Raw) {
-    // "aligned" = base LF long AND quote LF short (both favour the cross going up)
-    const leg2Aligned = (lfDir === 'Long') && (lfDir2Raw === 'Short') ||
-                        (lfDir === 'Short') && (lfDir2Raw === 'Long');
-    // clsI uses raw net for color so label color matches direction ("Short" = red, not green)
+  if (isCross && lfDir && lfDir2) {
+    const leg2Aligned = (lfDir === 'Long' && lfDir2 === 'Short') ||
+                        (lfDir === 'Short' && lfDir2 === 'Long');
     cotTag = `<span style="color:var(--text3);font-size:8px;">${cotCcy} LF </span><span class="${clsI(cotNet)}">${lfDir}</span>`
-           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotRawNet2)}">${lfDir2Raw}</span>`
+           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2}</span>`
            + ` <span style="color:var(--text3);font-size:8px;">· ${leg2Aligned ? 'aligned' : 'diverging'}</span>`;
   } else if (lfDir && amDir) {
     cotTag = `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`;
@@ -3072,11 +3062,11 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy}" data-tip-body="Week-over-week change in ${cotCcy} Leveraged Funds net contracts. Primary momentum signal in institutional COT analysis.">
             <div class="pd-inline-lbl">WoW Δ ${cotCcy}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2} (inverted)" data-tip-body="${cot2IsFunding ? `${cotCcy2} is a safe-haven/funding currency. Net short ${cotCcy2} futures = institutions favour ${cotCcy2} weakness = bullish ${label}. Value shown inverted: +ve always means bullish for ${label}.` : `Net LF contracts in ${cotCcy2} futures (CME), shown inverted. Short ${cotCcy2} = bullish ${label}. +ve = net short ${cotCcy2} = directionally positive for ${label}.`}">
-            <div class="pd-inline-lbl">LF Net ${cotCcy2}${cot2IsFunding ? ' ⁻¹' : ' ⁻¹'}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2}" data-tip-body="Net contracts held by Leveraged Funds in ${cotCcy2} futures (CME). Shown as reported by CFTC — same values as the COT Positioning panel.">
+            <div class="pd-inline-lbl">LF Net ${cotCcy2}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2} (inverted)" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts, inverted. +ve = specs reducing ${cotCcy2} longs or adding shorts = bullish ${label}.">
-            <div class="pd-inline-lbl">WoW Δ ${cotCcy2} ⁻¹</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2}" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts. Shown as reported by CFTC.">
+            <div class="pd-inline-lbl">WoW Δ ${cotCcy2}</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
           </div>
           ` : `
           <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
