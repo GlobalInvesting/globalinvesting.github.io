@@ -1,56 +1,52 @@
 [
   {
-    "time": "18:25",
+    "time": "18:50",
     "priority": "critical",
-    "title": "USD/JPY — Intervention Watch",
-    "text": "USD/JPY at 158.71 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
+    "title": "USD/JPY — Geopolitical + Carry",
+    "text": "Middle East tensions drive safe-haven bid — JPY COT LF net short -65,309; USD/JPY retreating from 158.82 toward 158.50 as carry unwinds; BoJ watch level at 160.00 still relevant — risk-off flow supports JPY.",
     "evidence": [
-      "USD/JPY: 158.71",
-      "BoJ rate: 0.75%"
+      "USD/JPY: 158.82",
+      "Middle East tensions escalate"
     ]
   },
   {
-    "time": "18:23",
+    "time": "18:47",
     "priority": "warning",
-    "title": "AUD/USD — RBA Hike vs Retail Positioning",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7179. Retail positioning extreme: 88% short, contrarian reversal risk.",
+    "title": "AUD/USD — Positioning + Vol",
+    "text": "AUD LF net long 41,675 (72% long) — extreme positioning; ATM IV 10.3% vs HV30 9.5% with 25d RR at -0.21 — market hedging downside; AUD/USD holding at 0.7176 — watch for squeeze.",
     "evidence": [
-      "RBA rate: 4.10%",
-      "AUD/USD: 0.7179",
-      "AUD/USD retail: 12% long / 88% short"
+      "AUD/USD: 0.7176",
+      "AUD COT LF net long: 41,675"
     ]
   },
   {
-    "time": "18:20",
+    "time": "18:45",
     "priority": "warning",
     "title": "EUR/USD — CB Differential",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports USD; EUR/USD at 1.1791.",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR; EUR/USD at 1.1786 — testing 1.1800 resistance; ECB meeting on April 30 — policy divergence remains a key theme.",
     "evidence": [
       "Fed rate: 3.75%",
-      "ECB rate: 2%",
-      "EUR/USD: 1.1791"
+      "ECB rate: 2%"
     ]
   },
   {
-    "time": "18:15",
+    "time": "18:42",
     "priority": "info",
-    "title": "GBP/USD — Positioning + Vol",
-    "text": "GBP LF net long, AM constructive — positioning aligned; ATM IV 9.5% slightly above HV, 25d RR near flat — no directional conviction in options. Pair at 1.354.",
+    "title": "GBP/USD — Info",
+    "text": "GBP LF net long 28,426 (66.1% long); GBP/USD at 1.3536 — mid-range; ATM IV 9.5% vs HV30 9.2% — no directional conviction in options.",
     "evidence": [
-      "GBP/USD LF net: +28,426",
-      "ATM IV: 9.5%",
-      "GBP/USD: 1.354"
+      "GBP/USD: 1.3536",
+      "GBP COT LF net long: 28,426"
     ]
   },
   {
-    "time": "18:10",
+    "time": "18:40",
     "priority": "info",
-    "title": "Cross-Asset Correlation Break",
-    "text": "USD/JPY vs VIX correlation break: corr=+0.647 vs norm=+0.144 (z=+1.29σ) — JPY no longer acting as safe haven; carry position at 158.71 not attracting risk-off unwind.",
+    "title": "USD/CAD — Positioning",
+    "text": "CAD LF net short -63,570 (19.6% long); USD/CAD at 1.364 — testing 1.3650 resistance; WTI oil price surge supports CAD — commodity currency dynamics at play.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.647",
-      "norm: +0.144",
-      "z: +1.29σ"
+      "USD/CAD: 1.364",
+      "CAD COT LF net short: -63,570"
     ]
   }
 ]
