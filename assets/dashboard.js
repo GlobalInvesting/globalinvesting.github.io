@@ -4747,19 +4747,24 @@ async function buildRichNarrative() {
               const evHtml = ev.length
                 ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
                 : '';
-              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
+              // Body (text + evidence) is collapsible — hidden by default, expanded on row click.
+              // All rows are clickable when there is body content (text or evidence).
+              const hasBody = (s.text && s.text.trim()) || ev.length;
+              const bodyHtml = hasBody
+                ? `<div class="a-body" aria-label="Signal details">${s.text ? `<p class="a-body-text">${s.text}</p>` : ''}${evHtml}</div>`
+                : '';
+              return `<div class="alert-row${hasBody ? ' a-has-body' : ''}" ${evTooltip && !hasBody ? `title="${evTooltip}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
-                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
+                <div class="a-text"><strong>${s.title || (s.text || '')}</strong></div>
+                ${bodyHtml}
               </div>`;
             }).join('');
 
-            // Toggle evidence chips on row click (expand/collapse)
-            container.querySelectorAll('.a-has-ev').forEach(row => {
-              row.style.cursor = 'pointer';
+            // Toggle body on row click (expand/collapse)
+            container.querySelectorAll('.a-has-body').forEach(row => {
               row.addEventListener('click', () => {
-                const evEl = row.querySelector('.a-evidence');
-                if (evEl) evEl.classList.toggle('a-evidence-open');
+                row.classList.toggle('a-body-open');
               });
             });
           }
