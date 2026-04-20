@@ -1,6 +1,6 @@
 [
   {
-    "time": "06:07",
+    "time": "08:30",
     "priority": "critical",
     "title": "USD/JPY",
     "text": "USD/JPY at 158.95 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
@@ -10,7 +10,7 @@
     ]
   },
   {
-    "time": "06:05",
+    "time": "08:28",
     "priority": "warning",
     "title": "AUD/USD",
     "text": "RBA hiking rates — AUD carry supported; AUD/USD consolidating above 0.7151.",
@@ -20,7 +20,7 @@
     ]
   },
   {
-    "time": "06:04",
+    "time": "08:25",
     "priority": "warning",
     "title": "EUR/USD",
     "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR/USD; pair holds at 1.1758.",
@@ -31,23 +31,24 @@
     ]
   },
   {
-    "time": "06:03",
+    "time": "08:20",
     "priority": "info",
-    "title": "AUD/JPY",
-    "text": "AUD/JPY at 113.67 — retail heavily short AUD/JPY (87% short); contrarian reversal risk.",
+    "title": "AUD/NZD",
+    "text": "AUD/NZD: retail heavily positioned — 91% SHORT; contrarian reversal risk.",
     "evidence": [
-      "AUD/JPY: 113.67",
-      "AUD/JPY retail sentiment: 13% long / 87% short"
+      "AUD/NZD: 0.1216",
+      "retail sentiment: 91% SHORT"
     ]
   },
   {
-    "time": "06:02",
+    "time": "08:15",
     "priority": "info",
-    "title": "VIX",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up 1.20%.",
+    "title": "USD/JPY vs VIX",
+    "text": "USD/JPY vs VIX correlation break: corr=+0.628 vs norm=+0.061 (z=+1.46σ) — JPY no longer acting as safe haven; carry position at 158.95 not attracting risk-off unwind.",
     "evidence": [
+      "USD/JPY: 158.95",
       "VIX: 17.5",
-      "S&P 500: 7,126"
+      "corr: +0.628"
     ]
   }
 ]
