@@ -3189,17 +3189,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click to open chart, double-click to expand inline detail ──
+// ── Sidebar crosses: click to open chart + expand inline detail (mirrors FX Pairs table 1-click UX) ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
-});
-
-document.getElementById('sidebar')?.addEventListener('dblclick', e => {
-  e.preventDefault();
-  const row = e.target.closest('.sb-row[data-sym]');
-  if (!row) return;
   toggleSidebarDetail(row, row.dataset.sym);
 });
 
