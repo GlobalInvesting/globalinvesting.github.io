@@ -4334,6 +4334,13 @@ async function fetchFedExpectations() {
         }
       }
 
+      // Inject computed fwdDisplay back into meetings object so _STATE_meetings carries
+      // fwdRate for openCBRatesModal — meetings.json only has cutProb/hikeProb, not the
+      // derived implied rate string. Without this the modal always shows — for FWD RATE.
+      if (meetingsRes?.meetings?.[ccy]) {
+        meetingsRes.meetings[ccy].fwdRate = fwdDisplay;
+      }
+
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
