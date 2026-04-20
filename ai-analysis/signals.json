@@ -1,54 +1,52 @@
 [
   {
-    "time": "18:55",
+    "time": "19:05",
     "priority": "critical",
     "title": "USD/JPY — Geopolitical + Carry",
-    "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.87; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+    "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.85; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
     "evidence": [
-      "USD/JPY: 158.87",
-      "JPY COT LF net short: -65,309"
+      "USD/JPY: 158.85",
+      "JPY COT LF net short −65,309"
     ]
   },
   {
-    "time": "18:52",
+    "time": "19:02",
     "priority": "warning",
     "title": "AUD/USD — Positioning + Vol",
-    "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), AM not reducing — positioning stalling. HV30 at 6.5%, ATM IV (FXE chain) at 8.1% — options pricing a 1.6 vol-pt premium over realized. 25d RR at −0.21: mild put skew. Price at 0.7176; late-trend caution signal. Watch for LF delta turning positive t",
+    "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7177; late-trend caution signal as price stalling near highs. Watch for LF delta turning negative to inva",
     "evidence": [
-      "AUD LF net long: +41,675",
-      "HV30: 6.5%",
-      "ATM IV: 8.1%"
+      "AUD LF net long +41,675",
+      "HV30 at 6.5%",
+      "ATM IV at 8.2%"
     ]
   },
   {
-    "time": "18:48",
+    "time": "18:58",
+    "priority": "warning",
+    "title": "EUR/USD — COT + Technical",
+    "text": "EUR LF net short −72 (CFTC, week ending Apr 14), long%=50.0% — neutral positioning. EUR/USD at 1.1787; testing 1.1800 resistance. ECB's Lagarde comments on Iran conflict risks — market hedging rather than chasing. Watch 1.1850 for confirmation of breakout.",
+    "evidence": [
+      "EUR LF net short −72",
+      "EUR/USD: 1.1787"
+    ]
+  },
+  {
+    "time": "18:55",
     "priority": "info",
     "title": "GBP/USD — CB + Technical",
-    "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3535 mid-range; 1.3600 is the next resistance on a continuation.",
+    "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426 (CFTC, week ending Apr 14); positioning aligned with carry. GBP/USD at 1.3536; mid-range, next resistance at 1.3600. ATM IV 9.5% near HV — options neutral.",
     "evidence": [
-      "BoE: 4.50%",
-      "Fed: 3.75%",
-      "GBP LF net long: +28,426"
+      "BoE 4.50% vs Fed 3.75%",
+      "GBP LF net long +28,426"
     ]
   },
   {
-    "time": "18:45",
-    "priority": "warning",
-    "title": "EUR/USD — Positioning + Vol",
-    "text": "EUR LF net short −72, long%=50.0% (CFTC, week ending Apr 14) — flat positioning. HV30 at 8.2%, ATM IV (FXE chain) at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew. Price bid; positioning stalling — late-trend caution signal. Watch for LF delta turning posi",
-    "evidence": [
-      "EUR LF net short: -72",
-      "HV30: 8.2%",
-      "ATM IV: 9.4%"
-    ]
-  },
-  {
-    "time": "18:40",
+    "time": "18:50",
     "priority": "info",
-    "title": "AUD/USD — Retail Sentiment",
-    "text": "AUD/USD retail sentiment 12% long / 88% short — extreme short bias. Contrarian reversal risk; watch for squeeze.",
+    "title": "AUD/NZD — Retail Sentiment",
+    "text": "AUD/NZD: 9% long / 91% short — retail heavily positioned. Watch for contrarian squeeze. NZD/USD at 0.5892; cross-asset move driven by risk sentiment.",
     "evidence": [
-      "AUD/USD retail sentiment: 12% long / 88% short"
+      "AUD/NZD: 9% long / 91% short"
     ]
   }
 ]
