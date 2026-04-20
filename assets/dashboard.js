@@ -4716,7 +4716,10 @@ async function buildRichNarrative() {
     try {
       const sigR = await fetch('./ai-analysis/signals.json');
       if (sigR.ok) {
-        const signals = await sigR.json();
+        const sigData = await sigR.json();
+        // Handle both new format {generated_at, signals} and legacy plain array
+        const signals = Array.isArray(sigData) ? sigData : (sigData.signals || []);
+        const sigGeneratedAt = Array.isArray(sigData) ? null : (sigData.generated_at || null);
         if (Array.isArray(signals) && signals.length) {
           const container = document.getElementById('alerts-container');
           const sub = document.getElementById('alerts-sub');
@@ -4772,7 +4775,21 @@ async function buildRichNarrative() {
             const now = new Date();
             const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-            sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr;
+            // Show signal generation time if available, plus stale warning if > 2h old
+            let subText = signals.length + ' active · AI-generated';
+            if (sigGeneratedAt) {
+              try {
+                const genDt = new Date(sigGeneratedAt);
+                const genLocal = genDt.toLocaleTimeString(navigator.language || 'en', {
+                  hour: '2-digit', minute: '2-digit', hour12: false
+                });
+                const ageMin = (now - genDt) / 60000;
+                const staleFlag = ageMin > 120 ? ' <span style="color:var(--text3)">· stale</span>' : '';
+                subText += ' · as of ' + genLocal + staleFlag;
+              } catch {}
+            }
+            subText += ' · loaded ' + hhmm + ' ' + tzAbbr;
+            sub.innerHTML = subText;
           }
 
           // Notify user if signal set changed and notifications are enabled
