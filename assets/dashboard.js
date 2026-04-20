@@ -2917,20 +2917,21 @@ async function buildInlineDetail(tvSym, container) {
     cotWeek  = cotRaw.weekEnding || '';
   }
 
-  // Second leg — only for crosses (quote currency, never USD)
-  // JPY and CHF function as funding/safe-haven currencies: net short = bearish JPY/CHF = bullish cross.
-  // We invert their display so the sign always reads from the cross's perspective.
-  const FUNDING_CCYS = new Set(['JPY', 'CHF']);
-  const cotCcy2  = isCross ? quote : null;
-  const cotRaw2  = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
+  // Second leg — only for crosses (quote currency, never USD).
+  // For ANY cross, short quote = pair goes up, so we always invert the quote leg numerically
+  // so +ve always reads as bullish for the cross (cross-perspective readability).
+  // FUNDING_CCYS (JPY, CHF) get an additional superscript and a funding-specific tooltip.
+  const FUNDING_CCYS  = new Set(['JPY', 'CHF']);
+  const cotCcy2       = isCross ? quote : null;
+  const cotRaw2       = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
   let cotNet2 = null, cotAmNet2 = null, cotWow2 = null, cotPctOI2 = null;
-  const cot2Inverted = isCross && FUNDING_CCYS.has(quote); // display inverted for funding ccys
+  const cot2Inverted  = isCross; // always invert quote leg for all crosses
+  const cot2IsFunding = isCross && FUNDING_CCYS.has(quote); // JPY/CHF: extra label marker
   if (cotRaw2) {
-    const flip2 = cot2Inverted ? -1 : 1; // invert JPY/CHF so +ve = bullish for the cross
-    cotNet2   = cotRaw2.net   != null ? cotRaw2.net   * flip2 : null;
-    cotAmNet2 = cotRaw2.amNet != null ? cotRaw2.amNet * flip2 : null;
-    cotWow2   = cotRaw2.wowNetChange != null ? cotRaw2.wowNetChange * flip2 : null;
-    cotPctOI2 = cotRaw2.levNetPctOI  != null ? cotRaw2.levNetPctOI  * flip2 : null;
+    cotNet2   = cotRaw2.net          != null ? cotRaw2.net          * -1 : null;
+    cotAmNet2 = cotRaw2.amNet        != null ? cotRaw2.amNet        * -1 : null;
+    cotWow2   = cotRaw2.wowNetChange != null ? cotRaw2.wowNetChange * -1 : null;
+    cotPctOI2 = cotRaw2.levNetPctOI  != null ? cotRaw2.levNetPctOI  * -1 : null;
     if (cotRaw2.weekEnding && !cotWeek) cotWeek = cotRaw2.weekEnding;
   }
 
@@ -3070,11 +3071,11 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy}" data-tip-body="Week-over-week change in ${cotCcy} Leveraged Funds net contracts. Primary momentum signal in institutional COT analysis.">
             <div class="pd-inline-lbl">WoW Δ ${cotCcy}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2}${cot2Inverted ? ' (inverted)' : ''}" data-tip-body="${cot2Inverted ? `${cotCcy2} functions as a funding/safe-haven currency. Net short ${cotCcy2} futures = institutions expect ${cotCcy2} weakness = bullish ${label}. Values shown inverted so +ve always means bullish for ${label}.` : `Net contracts held by Leveraged Funds in ${cotCcy2} futures (CME). CFTC tracks ${cotCcy2} vs USD — proxy for ${cotCcy2} directional bias.`}">
-            <div class="pd-inline-lbl">LF Net ${cotCcy2}${cot2Inverted ? ' ⁻¹' : ''}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2} (inverted)" data-tip-body="${cot2IsFunding ? `${cotCcy2} is a safe-haven/funding currency. Net short ${cotCcy2} futures = institutions favour ${cotCcy2} weakness = bullish ${label}. Value shown inverted: +ve always means bullish for ${label}.` : `Net LF contracts in ${cotCcy2} futures (CME), shown inverted. Short ${cotCcy2} = bullish ${label}. +ve = net short ${cotCcy2} = directionally positive for ${label}.`}">
+            <div class="pd-inline-lbl">LF Net ${cotCcy2}${cot2IsFunding ? ' ⁻¹' : ' ⁻¹'}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2}${cot2Inverted ? ' (inverted)' : ''}" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts.${cot2Inverted ? ` Inverted: +ve = specs reducing ${cotCcy2} longs or adding shorts = bullish ${label}.` : ''}">
-            <div class="pd-inline-lbl">WoW Δ ${cotCcy2}${cot2Inverted ? ' ⁻¹' : ''}</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2} (inverted)" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts, inverted. +ve = specs reducing ${cotCcy2} longs or adding shorts = bullish ${label}.">
+            <div class="pd-inline-lbl">WoW Δ ${cotCcy2} ⁻¹</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
           </div>
           ` : `
           <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
