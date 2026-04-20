@@ -1,57 +1,57 @@
 [
   {
-    "time": "22:25",
+    "time": "00:38",
     "priority": "critical",
-    "title": "USD/JPY",
-    "text": "USD/JPY testing 159.01 resistance — BoJ intervention risk rising on a sustained break above 160.00.",
+    "title": "USD/JPY — BoJ Watch",
+    "text": "USD/JPY at 159.17 — BoJ intervention risk rising as it approaches the 160.00 level that has previously triggered verbal warnings.",
     "evidence": [
-      "USD/JPY: 159.01",
+      "USD/JPY: 159.17",
       "BoJ rate: 0.75%",
       "VIX: 17.5"
     ]
   },
   {
-    "time": "22:23",
+    "time": "00:36",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD holding below 0.7132 — RBA hiking rates supports AUD carry, but AUD/USD faces headwinds from extreme retail short positioning.",
+    "title": "AUD/USD — Retail Extreme",
+    "text": "AUD/USD retail sentiment at 91% short — extreme reading diverges from CFTC net long positioning; contrarian squeeze risk.",
     "evidence": [
-      "AUD/USD: 0.7132",
-      "RBA rate: 4.10%",
-      "AUD/USD retail sentiment: 9% long / 91% short"
+      "AUD/USD: 0.7137",
+      "CFTC AUD net: +41,675",
+      "Retail AUD/USD: 91% short"
     ]
   },
   {
-    "time": "22:21",
-    "priority": "warning",
-    "title": "EUR/USD",
-    "text": "EUR/USD trading near 1.1736 — ECB-Fed rate differential weighs on EUR/USD, with Fed-ECB 175bp spread continuing to favor USD.",
-    "evidence": [
-      "EUR/USD: 1.1736",
-      "Fed rate: 3.75%",
-      "ECB rate: 2.00%"
-    ]
-  },
-  {
-    "time": "22:18",
+    "time": "00:35",
     "priority": "info",
     "title": "Risk Regime",
-    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%.",
+    "text": "VIX at 17.5 signals normal volatility — risk-on environment, S&P 500 up +1.20%; MOVE at 65.7 within normal range, no bond stress.",
     "evidence": [
       "VIX: 17.5",
       "S&P 500: 7,126",
-      "DXY: 98.28"
+      "MOVE: 65.7"
     ]
   },
   {
-    "time": "22:15",
-    "priority": "info",
-    "title": "Cross-Asset Correlation",
-    "text": "USD/JPY vs VIX correlation break — JPY no longer acting as safe haven, with positive correlation indicating risk-on environment.",
+    "time": "00:34",
+    "priority": "warning",
+    "title": "EUR/USD — Institutional Positioning",
+    "text": "CFTC EUR net short at -72, long% at 50.0% — positioning extreme; potential for sharp correction.",
     "evidence": [
-      "USD/JPY vs VIX: corr=+0.627",
+      "EUR/USD: 1.1748",
+      "CFTC EUR net: -72",
+      "CFTC EUR long%: 50.0%"
+    ]
+  },
+  {
+    "time": "00:33",
+    "priority": "info",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX correlation break: corr=+0.627 (z=+1.47σ) signals JPY has lost safe-haven function; monitor for further deviations.",
+    "evidence": [
+      "USD/JPY: 159.17",
       "VIX: 17.5",
-      "USD/JPY: 159.01"
+      "Corr USD/JPY VIX: +0.627"
     ]
   }
 ]
