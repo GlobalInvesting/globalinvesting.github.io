@@ -1,52 +1,54 @@
 [
   {
-    "time": "15:50",
+    "time": "17:10",
     "priority": "critical",
-    "title": "USD/JPY",
-    "text": "USD/JPY at 158.65 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
-    "evidence": [
-      "USD/JPY: 158.65",
-      "BoJ rate: 0.75%"
-    ]
-  },
-  {
-    "time": "15:48",
-    "priority": "warning",
     "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7175 holds above recent low of 0.7160.",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7174 holds above recent low of 0.7160.",
     "evidence": [
-      "AUD/USD: 0.7175",
+      "AUD/USD: 0.7174",
       "RBA rate: 4.10%"
     ]
   },
   {
-    "time": "15:45",
+    "time": "17:08",
     "priority": "warning",
-    "title": "Geopolitics",
-    "text": "US-Iran war tensions rise — safe-haven USD demand boosts DXY; EUR/USD at 1.1788.",
+    "title": "USD/JPY",
+    "text": "USD/JPY at 158.66 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "DXY: 98.02",
-      "EUR/USD: 1.1788"
+      "USD/JPY: 158.66",
+      "BoJ rate: 0.75%"
     ]
   },
   {
-    "time": "15:42",
+    "time": "17:06",
+    "priority": "warning",
+    "title": "AUD/USD",
+    "text": "AUD/USD retail sentiment extreme: 85% short; contrarian reversal risk; COT net long at 72.0%.",
+    "evidence": [
+      "AUD/USD retail: 15% long / 85% short",
+      "AUD/USD COT: 72.0% long"
+    ]
+  },
+  {
+    "time": "17:04",
     "priority": "info",
     "title": "EUR/USD",
-    "text": "EUR/USD vs EuroStoxx correlation break: corr=+0.751 vs norm=-0.128 (z=+1.70σ) — potential regime signal.",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR/USD; pair at 1.1792.",
     "evidence": [
-      "EUR/USD: 1.1788",
-      "EuroStoxx: 5,984"
+      "Fed rate: 3.75%",
+      "ECB rate: 2%",
+      "EUR/USD: 1.1792"
     ]
   },
   {
-    "time": "15:40",
+    "time": "17:02",
     "priority": "info",
-    "title": "Retail Sentiment",
-    "text": "AUD/USD retail sentiment extreme: 16% long / 84% short — contrarian reversal risk.",
+    "title": "USD/JPY",
+    "text": "USD/JPY vs VIX correlation break: corr=+0.648 vs norm=+0.144 (z=+1.29σ) — JPY no longer acting as safe haven; carry position at 158.66 not attracting risk-off unwind.",
     "evidence": [
-      "AUD/USD: 0.7175",
-      "AUD/USD sentiment: 16% long"
+      "USD/JPY vs VIX corr: +0.648",
+      "norm: +0.144",
+      "z: +1.29σ"
     ]
   }
 ]
