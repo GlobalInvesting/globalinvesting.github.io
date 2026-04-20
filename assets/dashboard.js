@@ -2901,9 +2901,12 @@ async function buildInlineDetail(tvSym, container) {
     }
   } catch {}
 
-  // COT
-  const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
-  const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  // COT — single leg for USD pairs, dual leg for crosses
+  const isCross = !!meta?.cross;
+
+  // Primary leg (always base, unless base=USD in which case quote)
+  const cotCcy  = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
+  const cotRaw  = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
   let cotNet = null, cotAmNet = null, cotWow = null, cotPctOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
@@ -2912,6 +2915,23 @@ async function buildInlineDetail(tvSym, container) {
     cotWow   = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
     cotPctOI = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
     cotWeek  = cotRaw.weekEnding || '';
+  }
+
+  // Second leg — only for crosses (quote currency, never USD)
+  // JPY and CHF function as funding/safe-haven currencies: net short = bearish JPY/CHF = bullish cross.
+  // We invert their display so the sign always reads from the cross's perspective.
+  const FUNDING_CCYS = new Set(['JPY', 'CHF']);
+  const cotCcy2  = isCross ? quote : null;
+  const cotRaw2  = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
+  let cotNet2 = null, cotAmNet2 = null, cotWow2 = null, cotPctOI2 = null;
+  const cot2Inverted = isCross && FUNDING_CCYS.has(quote); // display inverted for funding ccys
+  if (cotRaw2) {
+    const flip2 = cot2Inverted ? -1 : 1; // invert JPY/CHF so +ve = bullish for the cross
+    cotNet2   = cotRaw2.net   != null ? cotRaw2.net   * flip2 : null;
+    cotAmNet2 = cotRaw2.amNet != null ? cotRaw2.amNet * flip2 : null;
+    cotWow2   = cotRaw2.wowNetChange != null ? cotRaw2.wowNetChange * flip2 : null;
+    cotPctOI2 = cotRaw2.levNetPctOI  != null ? cotRaw2.levNetPctOI  * flip2 : null;
+    if (cotRaw2.weekEnding && !cotWeek) cotWeek = cotRaw2.weekEnding;
   }
 
   // Carry
@@ -2964,13 +2984,22 @@ async function buildInlineDetail(tvSym, container) {
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
   const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
 
-  // COT summary tag
+  // COT summary tag — for crosses shows both legs; for USD pairs shows single leg
   const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
   const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
   const aligned = lfDir && amDir && lfDir === amDir;
-  const cotTag = lfDir && amDir
-    ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
-    : '—';
+  const lfDir2 = cotNet2 == null ? null : cotNet2 > 0 ? 'Long' : cotNet2 < 0 ? 'Short' : null;
+  let cotTag;
+  if (isCross && lfDir && lfDir2) {
+    const leg2Aligned = lfDir === lfDir2;
+    cotTag = `<span style="color:var(--text3);font-size:8px;">${cotCcy} LF </span><span class="${clsI(cotNet)}">${lfDir}</span>`
+           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2}</span>`
+           + ` <span style="color:var(--text3);font-size:8px;">· ${leg2Aligned ? 'aligned' : 'diverging'}</span>`;
+  } else if (lfDir && amDir) {
+    cotTag = `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`;
+  } else {
+    cotTag = '—';
+  }
 
   const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
 
@@ -3026,6 +3055,20 @@ async function buildInlineDetail(tvSym, container) {
       <div class="pd-inline-group">
         <div class="pd-inline-group-lbl">COT Positioning</div>
         <div class="pd-inline-metrics">
+          ${isCross ? `
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy}" data-tip-body="Net contracts held by Leveraged Funds in ${cotCcy} futures (CME). CFTC tracks ${cotCcy} vs USD — proxy for ${cotCcy} directional bias." data-tip-ex="Extreme net long historically precedes reversals as the speculative crowd becomes crowded.">
+            <div class="pd-inline-lbl">LF Net ${cotCcy}</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy}" data-tip-body="Week-over-week change in ${cotCcy} Leveraged Funds net contracts. Primary momentum signal in institutional COT analysis.">
+            <div class="pd-inline-lbl">WoW Δ ${cotCcy}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2}${cot2Inverted ? ' (inverted)' : ''}" data-tip-body="${cot2Inverted ? `${cotCcy2} functions as a funding/safe-haven currency. Net short ${cotCcy2} futures = institutions expect ${cotCcy2} weakness = bullish ${label}. Values shown inverted so +ve always means bullish for ${label}.` : `Net contracts held by Leveraged Funds in ${cotCcy2} futures (CME). CFTC tracks ${cotCcy2} vs USD — proxy for ${cotCcy2} directional bias.`}">
+            <div class="pd-inline-lbl">LF Net ${cotCcy2}${cot2Inverted ? ' ⁻¹' : ''}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2}${cot2Inverted ? ' (inverted)' : ''}" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts.${cot2Inverted ? ` Inverted: +ve = specs reducing ${cotCcy2} longs or adding shorts = bullish ${label}.` : ''}">
+            <div class="pd-inline-lbl">WoW Δ ${cotCcy2}${cot2Inverted ? ' ⁻¹' : ''}</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
+          </div>
+          ` : `
           <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
             <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
           </div>
@@ -3038,6 +3081,7 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of Open Interest" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies for direct comparison." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
             <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
           </div>
+          `}
         </div>
         <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
       </div>
