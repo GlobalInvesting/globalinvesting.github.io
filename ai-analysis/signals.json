@@ -1,52 +1,54 @@
 [
   {
-    "time": "17:10",
+    "time": "18:25",
     "priority": "critical",
-    "title": "AUD/USD",
-    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7174 holds above recent low of 0.7160.",
+    "title": "USD/JPY — Intervention Watch",
+    "text": "USD/JPY at 158.71 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
     "evidence": [
-      "AUD/USD: 0.7174",
-      "RBA rate: 4.10%"
-    ]
-  },
-  {
-    "time": "17:08",
-    "priority": "warning",
-    "title": "USD/JPY",
-    "text": "USD/JPY at 158.66 — 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160.",
-    "evidence": [
-      "USD/JPY: 158.66",
+      "USD/JPY: 158.71",
       "BoJ rate: 0.75%"
     ]
   },
   {
-    "time": "17:06",
+    "time": "18:23",
     "priority": "warning",
-    "title": "AUD/USD",
-    "text": "AUD/USD retail sentiment extreme: 85% short; contrarian reversal risk; COT net long at 72.0%.",
+    "title": "AUD/USD — RBA Hike vs Retail Positioning",
+    "text": "RBA hiking rates — AUD carry supported; AUD/USD at 0.7179. Retail positioning extreme: 88% short, contrarian reversal risk.",
     "evidence": [
-      "AUD/USD retail: 15% long / 85% short",
-      "AUD/USD COT: 72.0% long"
+      "RBA rate: 4.10%",
+      "AUD/USD: 0.7179",
+      "AUD/USD retail: 12% long / 88% short"
     ]
   },
   {
-    "time": "17:04",
-    "priority": "info",
-    "title": "EUR/USD",
-    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports EUR/USD; pair at 1.1792.",
+    "time": "18:20",
+    "priority": "warning",
+    "title": "EUR/USD — CB Differential",
+    "text": "Fed 3.75% (ON HOLD) vs ECB 2% (ON HOLD) — 175bp spread supports USD; EUR/USD at 1.1791.",
     "evidence": [
       "Fed rate: 3.75%",
       "ECB rate: 2%",
-      "EUR/USD: 1.1792"
+      "EUR/USD: 1.1791"
     ]
   },
   {
-    "time": "17:02",
+    "time": "18:15",
     "priority": "info",
-    "title": "USD/JPY",
-    "text": "USD/JPY vs VIX correlation break: corr=+0.648 vs norm=+0.144 (z=+1.29σ) — JPY no longer acting as safe haven; carry position at 158.66 not attracting risk-off unwind.",
+    "title": "GBP/USD — Positioning + Vol",
+    "text": "GBP LF net long, AM constructive — positioning aligned; ATM IV 9.5% slightly above HV, 25d RR near flat — no directional conviction in options. Pair at 1.354.",
     "evidence": [
-      "USD/JPY vs VIX corr: +0.648",
+      "GBP/USD LF net: +28,426",
+      "ATM IV: 9.5%",
+      "GBP/USD: 1.354"
+    ]
+  },
+  {
+    "time": "18:10",
+    "priority": "info",
+    "title": "Cross-Asset Correlation Break",
+    "text": "USD/JPY vs VIX correlation break: corr=+0.647 vs norm=+0.144 (z=+1.29σ) — JPY no longer acting as safe haven; carry position at 158.71 not attracting risk-off unwind.",
+    "evidence": [
+      "USD/JPY vs VIX corr: +0.647",
       "norm: +0.144",
       "z: +1.29σ"
     ]
