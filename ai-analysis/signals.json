@@ -1,48 +1,48 @@
 {
-  "generated_at": "2026-04-21T17:11:15Z",
+  "generated_at": "2026-04-21T19:21:53Z",
   "signals": [
     {
-      "time": "17:10",
+      "time": "19:20",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.53; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.35; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.53",
+        "USD/JPY at 159.35",
         "JPY COT LF net short −65,309",
-        "Fed 3.75% vs BoJ 0.75%"
+        "Fed-BoJ rate differential: 375bp"
       ]
     },
     {
-      "time": "17:07",
+      "time": "19:18",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 (week Apr 14), long%=72.0% — extreme long positioning. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. AUD/USD at 0.7145; 25d RR at −0.28: mild put skew. Late-trend caution signal — watch for LF delta turning negative to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7156; 25d RR at −0.28: mild put skew. Late-trend caution signal — watch for LF delta turning negative or volatility to decrease.",
       "evidence": [
-        "AUD/USD COT LF net long +41,675",
-        "HV30 at 10.3%",
-        "ATM IV at 11.2%"
+        "AUD LF net long +41,675",
+        "HV30 at 6.5%",
+        "ATM IV at 8.2%"
       ]
     },
     {
-      "time": "17:03",
+      "time": "19:12",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.349; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium/discount. GBP LF net long +28,426 (CFTC, week ending Apr 14) — constructive positioning. GBP/USD at 1.3505; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
       "evidence": [
-        "BoE 4.50% vs Fed 3.75%",
+        "BoE 3.75% vs Fed 3.75%",
         "GBP LF net long +28,426",
-        "GBP/USD: 1.349"
+        "GBP/USD at 1.3505"
       ]
     },
     {
-      "time": "17:09",
+      "time": "19:08",
       "priority": "info",
       "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% (ON HOLD) vs Fed at 3.75% (ON HOLD) — 150bp CAD yield disadvantage. USD/CAD at 1.3668, testing the 1.3700 level. Positioning neutral (CFTC). A sustained break above 1.3700 could signal further USD strength, while a drop below 1.3600 might relieve some pressure on CAD.",
+      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD carry disadvantage. USD/CAD at 1.3658, testing the 50-day moving average. Positioning neutral; next key level at 1.3700. Implication: range-bound with a slight USD bias.",
       "evidence": [
         "BOC 2.25%",
         "FED 3.75%",
-        "USD/CAD 1.3668"
+        "USD/CAD 1.3658"
       ]
     }
   ]
