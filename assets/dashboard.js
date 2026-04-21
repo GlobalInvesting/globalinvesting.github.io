@@ -5658,7 +5658,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
   // TV advanced chart
   watchForIframe(document.getElementById('tv-chart-widget'));
-  // TV events calendar replaced by Investing.com iframe (static, no JS init needed)
+  // TV events calendar replaced by Trading Economics — loaded lazily via IntersectionObserver
   // watchForIframe(document.getElementById('tvcal-inner')); — removed v7.30.2
 }());
 
@@ -5670,7 +5670,17 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 // ═══════════════════════════════════════════════════════════════════
 (function initTVWidgets() {
   var _chartLoaded   = false;
+  var _teCalLoaded   = false;
   var _econmapLoaded = false;
+
+  // Trading Economics calendar — injected lazily when panel enters viewport
+  function loadTECalendar() {
+    var s = document.createElement('script');
+    s.src   = 'https://widget.tradingeconomics.com/widget.js';
+    s.async = true;
+    document.head.appendChild(s);
+    _teCalLoaded = true;
+  }
 
   function loadTVEconMap() {
     var placeholder = document.getElementById('tv-econmap-placeholder');
@@ -5690,6 +5700,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   if (typeof IntersectionObserver === 'undefined') {
     // Fallback for very old browsers: load everything immediately
     if (typeof loadTVChart === 'function') loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
+    loadTECalendar();
     loadTVEconMap();
     return;
   }
@@ -5703,6 +5714,9 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
           loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
         }
         _chartLoaded = true;
+        io.unobserve(entry.target);
+      } else if (id === 'tvcal-inner' && !_teCalLoaded) {
+        loadTECalendar();
         io.unobserve(entry.target);
       } else if (id === 'section-econmap' && !_econmapLoaded) {
         loadTVEconMap();
