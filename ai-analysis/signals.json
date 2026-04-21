@@ -1,45 +1,47 @@
 {
-  "generated_at": "2026-04-21T14:15:39Z",
+  "generated_at": "2026-04-21T15:50:47Z",
   "signals": [
     {
-      "time": "14:10",
+      "time": "15:50",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.11; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Implication: risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.41; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.11",
-        "JPY COT LF net short −65,309"
+        "USD/JPY: 159.41",
+        "JPY COT LF net short −65,309",
+        "Fed 3.75% vs BoJ 0.75%"
       ]
     },
     {
-      "time": "14:05",
+      "time": "15:47",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7177; 25d RR at −0.21: mild put skew. Implication: late-trend caution signal — watch for LF delta turning negative to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.8%, ATM IV (FXE chain) at 8.2% — options pricing a 1.4 vol-pt premium over realized. AUD/USD at 0.7162; 25d RR at −0.21: mild put skew. Late-trend caution signal — watch for LF delta turning negative to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
-        "HV30 at 6.5%",
+        "HV30 at 6.8%",
         "ATM IV at 8.2%"
       ]
     },
     {
-      "time": "13:45",
+      "time": "15:42",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3523 mid-range; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.351; 1.3600 is the next resistance on a continuation.",
       "evidence": [
-        "BoE 4.50% vs Fed 3.75%",
-        "GBP LF net long +28,426"
+        "BoE 3.75% vs Fed 3.75%",
+        "GBP LF net long +28,426",
+        "ATM IV 9.5%"
       ]
     },
     {
-      "time": "13:58",
-      "priority": "info",
-      "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD carry disadvantage. USD/CAD at 1.3639, testing the 50-day MA at 1.3645. A break above could see a move towards 1.3700. Implication: USD supported on carry, but technical resistance ahead.",
+      "time": "15:45",
+      "priority": "warning",
+      "title": "NZD/USD — Positioning + Retail Sentiment",
+      "text": "NZD net short positioning at -17,090 (21.7% long) — not an extreme but aligned with price action. Retail sentiment shows an extreme short bias at 33% long / 67% short. The combination of net short positioning and retail sentiment extreme suggests potential for a short squeeze. Watch for a move above 0.5930 to confirm.",
       "evidence": [
-        "BOC 2.25% vs FED 3.75%",
-        "USD/CAD AT 1.3639"
+        "NZD/USD COT net short -17,090",
+        "Retail sentiment 33% long / 67% short"
       ]
     }
   ]
