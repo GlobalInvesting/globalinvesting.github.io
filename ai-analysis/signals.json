@@ -1,48 +1,48 @@
 {
-  "generated_at": "2026-04-21T19:21:53Z",
+  "generated_at": "2026-04-21T20:42:17Z",
   "signals": [
     {
-      "time": "19:20",
+      "time": "20:40",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.35; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.34; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 450bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY at 159.35",
+        "USD/JPY: 159.34",
         "JPY COT LF net short −65,309",
-        "Fed-BoJ rate differential: 375bp"
+        "Fed 3.75% vs BoJ 0.75%"
       ]
     },
     {
-      "time": "19:18",
+      "time": "20:37",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7156; 25d RR at −0.28: mild put skew. Late-trend caution signal — watch for LF delta turning negative or volatility to decrease.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14); AM not reducing. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. 25d RR at −0.22: mild put skew despite the bullish price trend — market hedging rather than chasing. AUD/USD at 0.7157; late-trend caution signal. Watch for LF delta turning positive to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
-        "HV30 at 6.5%",
-        "ATM IV at 8.2%"
+        "HV30 at 10.3%",
+        "AUD/USD: 0.7157"
       ]
     },
     {
-      "time": "19:12",
+      "time": "20:35",
+      "priority": "warning",
+      "title": "EUR/USD — Positioning",
+      "text": "EUR LF net short −72 (CFTC, week ending Apr 14); long%=50.0%. Positioning neutral but CFTC data shows a WoW delta −1,101 for the second consecutive week; AM not reducing. EUR/USD at 1.1751; price action stalling. Watch for LF delta turning positive or AM reducing to shift the read.",
+      "evidence": [
+        "EUR LF net short −72",
+        "long%=50.0%",
+        "EUR/USD: 1.1751"
+      ]
+    },
+    {
+      "time": "20:30",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium/discount. GBP LF net long +28,426 (CFTC, week ending Apr 14) — constructive positioning. GBP/USD at 1.3505; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426 (CFTC, week ending Apr 14); AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3508 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
         "BoE 3.75% vs Fed 3.75%",
         "GBP LF net long +28,426",
-        "GBP/USD at 1.3505"
-      ]
-    },
-    {
-      "time": "19:08",
-      "priority": "info",
-      "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD carry disadvantage. USD/CAD at 1.3658, testing the 50-day moving average. Positioning neutral; next key level at 1.3700. Implication: range-bound with a slight USD bias.",
-      "evidence": [
-        "BOC 2.25%",
-        "FED 3.75%",
-        "USD/CAD 1.3658"
+        "GBP/USD: 1.3508"
       ]
     }
   ]
