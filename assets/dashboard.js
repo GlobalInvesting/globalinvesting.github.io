@@ -5513,6 +5513,20 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     wrap.appendChild(container);
   }
 
+  // Helper: reload the Economic Calendar widget by re-injecting its script
+  function reloadTVCalendar() {
+    const scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    // Remove existing iframe/content and re-create the widget container
+    const container = scaleWrap.querySelector('.tradingview-widget-container');
+    if (!container) return;
+    const existingScript = container.querySelector('script');
+    if (!existingScript) return;
+    // Clone the widget container content to force re-init
+    const clone = container.cloneNode(true);
+    container.parentNode.replaceChild(clone, container);
+  }
+
   // FX Liquidity chart: force redraw when visible
   function redrawLiquidityIfVisible() {
     const canvas = document.getElementById('liquidity-canvas');
@@ -5530,8 +5544,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
+      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
       if (isMobile) {
         reloadActiveTVChart();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
   });
@@ -5547,8 +5564,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     }
     setTimeout(function() {
       redrawLiquidityIfVisible();
+      // Mobile only: widgets may have gone blank after bfcache restore
       if (isMobile) {
         reloadActiveTVChart();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
   });
@@ -5658,8 +5678,8 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
   // TV advanced chart
   watchForIframe(document.getElementById('tv-chart-widget'));
-  // TV events calendar replaced by Trading Economics — loaded lazily via IntersectionObserver
-  // watchForIframe(document.getElementById('tvcal-inner')); — removed v7.30.2
+  // TV events calendar (skeleton is on tvcal-inner, iframe appears inside tvcal-scale)
+  watchForIframe(document.getElementById('tvcal-inner'));
 }());
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5670,16 +5690,27 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 // ═══════════════════════════════════════════════════════════════════
 (function initTVWidgets() {
   var _chartLoaded   = false;
-  var _teCalLoaded   = false;
+  var _eventsLoaded  = false;
   var _econmapLoaded = false;
 
-  // Trading Economics calendar — injected lazily when panel enters viewport
-  function loadTECalendar() {
+  function loadTVEvents() {
+    var scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    var container = scaleWrap.querySelector('.tradingview-widget-container__widget');
+    if (!container) return;
     var s = document.createElement('script');
-    s.src   = 'https://widgets.tradingeconomics.com/widget.js';
+    s.type = 'text/javascript';
+    s.src  = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
     s.async = true;
-    document.head.appendChild(s);
-    _teCalLoaded = true;
+    s.textContent = JSON.stringify({
+      colorTheme: 'dark', isTransparent: true, locale: 'en',
+      countryFilter: 'us,nz,au,ch,eu,ca,jp,gb',
+      importanceFilter: '-1,0,1', width: '100%', height: '100%'
+    });
+    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
+    if (skel) skel.style.display = 'none';
+    container.appendChild(s);
+    _eventsLoaded = true;
   }
 
   function loadTVEconMap() {
@@ -5700,7 +5731,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   if (typeof IntersectionObserver === 'undefined') {
     // Fallback for very old browsers: load everything immediately
     if (typeof loadTVChart === 'function') loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
-    loadTECalendar();
+    loadTVEvents();
     loadTVEconMap();
     return;
   }
@@ -5715,8 +5746,8 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
         }
         _chartLoaded = true;
         io.unobserve(entry.target);
-      } else if (id === 'tvcal-inner' && !_teCalLoaded) {
-        loadTECalendar();
+      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
+        loadTVEvents();
         io.unobserve(entry.target);
       } else if (id === 'section-econmap' && !_econmapLoaded) {
         loadTVEconMap();
