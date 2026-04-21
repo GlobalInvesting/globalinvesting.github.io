@@ -5676,7 +5676,7 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   // Trading Economics calendar — injected lazily when panel enters viewport
   function loadTECalendar() {
     var s = document.createElement('script');
-    s.src   = 'https://widget.tradingeconomics.com/widget.js';
+    s.src   = 'https://widgets.tradingeconomics.com/widget.js';
     s.async = true;
     document.head.appendChild(s);
     _teCalLoaded = true;
