@@ -1,22 +1,21 @@
 {
-  "generated_at": "2026-04-21T02:51:21Z",
+  "generated_at": "2026-04-21T05:56:57Z",
   "signals": [
     {
-      "time": "02:50",
+      "time": "05:55",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.95; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. BoJ survey shows flat loan demand, highlighting fragile Japan growth and cautious outlook. Watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 158.9; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 158.95",
-        "JPY COT LF net short −65,309",
-        "BOJ survey shows flat loan demand"
+        "USD/JPY: 158.9",
+        "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "02:48",
+      "time": "05:52",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7171; 25d RR at −0.21: mild put skew despite the bullish price trend — market hedging rather than chasing. Watch for LF delta turning negative to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7168, price stalling at 2026 highs — late-trend caution signal. Watch for LF delta turning negative to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
         "HV30 at 6.5%",
@@ -24,36 +23,23 @@
       ]
     },
     {
-      "time": "02:45",
-      "priority": "warning",
-      "title": "NZD/USD — Inflation + COT",
-      "text": "NZ CPI held at 3.1% yoy in Q1, above target, with electricity and petrol driving gains. NZD COT LF net short −17,090, long%=21.7% — short positioning extreme. NZD/USD at 0.5913; RBNZ rate hike expected. Watch 0.6000 as the next resistance level.",
-      "evidence": [
-        "NZ CPI at 3.1%",
-        "NZD COT LF net short −17,090",
-        "NZD/USD: 0.5913"
-      ]
-    },
-    {
-      "time": "02:40",
+      "time": "05:45",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3521; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV, 25d RR flat — options neutral.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry differential supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3519 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
-        "BoE 4.50% vs Fed 3.75%",
-        "GBP LF net long +28,426",
-        "GBP/USD: 1.3521"
+        "BoE 3.75%",
+        "GBP LF net long +28,426"
       ]
     },
     {
-      "time": "02:35",
+      "time": "05:40",
       "priority": "info",
-      "title": "EUR/USD — Positioning",
-      "text": "EUR LF net short −72, long%=50.0% — flat positioning. EUR/USD at 1.1781; VIX at 18.9 (normal volatility) — cross-asset stress contained. Watch for COT positioning to become extreme to generate a signal.",
+      "title": "NZD/USD — Inflation + COT",
+      "text": "New Zealand Q1 2026 inflation came in above forecasts — NZD/USD at 0.5910. NZD COT LF net short −17,090, long%=21.7% — short positioning. RBNZ rate hike bets picked up — watch 0.6000 as the next level on a sustained move.",
       "evidence": [
-        "EUR LF net short −72",
-        "long%=50.0%",
-        "EUR/USD: 1.1781"
+        "NZD/USD: 0.5910",
+        "NZD COT LF net short −17,090"
       ]
     }
   ]
