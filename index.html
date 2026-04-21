@@ -695,14 +695,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <span class="panel-title">Upcoming Events</span>
           </div>
           <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;min-height:350px;">
-            <div class="tv-skeleton" style="position:absolute;inset:0;z-index:1;"></div>
-            <div id="tvcal-scale" style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
-              <div class="tradingview-widget-container" style="width:100%;height:100%;">
-                <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-                <div class="tradingview-widget-copyright" style="display:none;"></div>
-                <!-- Events calendar loaded lazily — see initLazyWidgets() in dashboard.js -->
-              </div>
-            </div>
+            <iframe
+              src="https://sslecal2.investing.com?ecoDayBackground=%231a1d29&defaultFont=%23d1d4dc&innerBorderColor=%232a2e39&CalendarPageBackground=%23131722&boldTitle=%23d1d4dc&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,6,72,35,43,12,4,5&calType=week&timeZone=8&lang=1"
+              width="100%" height="100%"
+              frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"
+              style="display:block;min-height:350px;border:none;"
+              title="Economic Calendar — Investing.com">
+            </iframe>
           </div>
         </div>
       </div>
