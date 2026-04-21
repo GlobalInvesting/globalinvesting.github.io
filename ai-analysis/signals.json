@@ -1,46 +1,48 @@
 {
-  "generated_at": "2026-04-21T08:14:57Z",
+  "generated_at": "2026-04-21T10:00:59Z",
   "signals": [
     {
-      "time": "08:10",
+      "time": "10:00",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.08; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. The 450bp Fed-BoJ carry differential supports USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.2; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. BoJ expected to hold rates steady at 0.75% in April. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.08",
-        "JPY COT LF net short −65,309 (week ending 2026-04-14)"
+        "USD/JPY at 159.2",
+        "JPY COT LF net short −65,309",
+        "BoJ rate at 0.75%"
       ]
     },
     {
-      "time": "08:07",
+      "time": "09:45",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (week ending 2026-04-14), long%=72.0% — extreme long positioning. HV30 at 7.1%, ATM IV (FXE chain) at 8.3% — options pricing a 1.2 vol-pt premium over realized. AUD/USD at 0.7147; retail sentiment 12% long / 88% short, extreme short bias. Late-trend caution signal — watch for LF delta turning negative or volatility expansion.",
+      "text": "AUD/USD at 0.7154 — CFTC LF net long +41,675 (72% long). HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. 25d RR at −0.08: mild put skew. Price action stalling at 0.7154; late-trend caution signal. Watch for LF delta turning negative to invalidate.",
       "evidence": [
-        "AUD LF net long +41,675",
-        "HV30 at 7.1%",
-        "AUD/USD: 0.7147"
+        "AUD/USD at 0.7154",
+        "CFTC LF net long +41,675",
+        "HV30 at 6.5%"
       ]
     },
     {
-      "time": "08:03",
+      "time": "09:30",
+      "priority": "warning",
+      "title": "EUR/USD — Positioning + Technical",
+      "text": "EUR/USD at 1.1763 — EUR LF net short −72 (50% long). Price testing 1.1750 support; ECB's Guindos sees private credit as key risk to financial stability. ECB rate at 2% vs Fed 3.75% — 175bp spread favors USD. Watch 1.1700 for a potential breakdown.",
+      "evidence": [
+        "EUR/USD at 1.1763",
+        "EUR LF net short −72",
+        "ECB rate at 2%"
+      ]
+    },
+    {
+      "time": "09:15",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3493; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3503 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
         "BoE 4.50% vs Fed 3.75%",
         "GBP LF net long +28,426",
-        "GBP/USD: 1.3493"
-      ]
-    },
-    {
-      "time": "08:01",
-      "priority": "info",
-      "title": "NZD/USD — Inflation + Technical",
-      "text": "New Zealand inflation at 3.1% year-on-year — NZD supported. NZD/USD at 0.5900; 0.6000 is the next resistance on a continuation. RBNZ rate hike bets increase — watch for further NZD gains.",
-      "evidence": [
-        "New Zealand inflation at 3.1% year-on-year",
-        "NZD/USD: 0.5900"
+        "GBP/USD at 1.3503"
       ]
     }
   ]
