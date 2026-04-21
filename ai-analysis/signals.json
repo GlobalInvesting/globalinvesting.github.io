@@ -1,48 +1,45 @@
 {
-  "generated_at": "2026-04-21T20:42:17Z",
+  "generated_at": "2026-04-21T22:33:29Z",
   "signals": [
     {
-      "time": "20:40",
+      "time": "22:30",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.34; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 450bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.37; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. The 450bp Fed-BoJ carry differential supports USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.34",
-        "JPY COT LF net short −65,309",
-        "Fed 3.75% vs BoJ 0.75%"
+        "USD/JPY: 159.37",
+        "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "20:37",
+      "time": "22:25",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14); AM not reducing. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. 25d RR at −0.22: mild put skew despite the bullish price trend — market hedging rather than chasing. AUD/USD at 0.7157; late-trend caution signal. Watch for LF delta turning positive to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme positioning. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. AUD/USD at 0.7153; mild put skew (25d RR at −0.08) despite bullish price trend — market hedging rather than chasing. Watch for LF delta turning positive to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
         "HV30 at 10.3%",
-        "AUD/USD: 0.7157"
+        "ATM IV at 11.2%"
       ]
     },
     {
-      "time": "20:35",
-      "priority": "warning",
-      "title": "EUR/USD — Positioning",
-      "text": "EUR LF net short −72 (CFTC, week ending Apr 14); long%=50.0%. Positioning neutral but CFTC data shows a WoW delta −1,101 for the second consecutive week; AM not reducing. EUR/USD at 1.1751; price action stalling. Watch for LF delta turning positive or AM reducing to shift the read.",
-      "evidence": [
-        "EUR LF net short −72",
-        "long%=50.0%",
-        "EUR/USD: 1.1751"
-      ]
-    },
-    {
-      "time": "20:30",
+      "time": "22:15",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426 (CFTC, week ending Apr 14); AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3508 mid-range; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3502 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
-        "BoE 3.75% vs Fed 3.75%",
-        "GBP LF net long +28,426",
-        "GBP/USD: 1.3508"
+        "BoE 4.50% vs Fed 3.75%",
+        "GBP LF net long +28,426"
+      ]
+    },
+    {
+      "time": "22:18",
+      "priority": "info",
+      "title": "USD/CAD — CB + Technical",
+      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD yield disadvantage. USD/CAD at 1.3663, testing the 1.3700 level. Positioning data shows a net short 63,570 contracts (CFTC, week ending Apr 14). The yield differential and technical level suggest a range-bound market. Watch for a break above 1.3700 to shift the read.",
+      "evidence": [
+        "BOC 2.25% VS FED 3.75%",
+        "USD/CAD 1.3663"
       ]
     }
   ]
