@@ -1,47 +1,48 @@
 {
-  "generated_at": "2026-04-21T15:50:47Z",
+  "generated_at": "2026-04-21T17:11:15Z",
   "signals": [
     {
-      "time": "15:50",
+      "time": "17:10",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.41; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.53; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 375bp carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.41",
+        "USD/JPY: 159.53",
         "JPY COT LF net short −65,309",
         "Fed 3.75% vs BoJ 0.75%"
       ]
     },
     {
-      "time": "15:47",
+      "time": "17:07",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.8%, ATM IV (FXE chain) at 8.2% — options pricing a 1.4 vol-pt premium over realized. AUD/USD at 0.7162; 25d RR at −0.21: mild put skew. Late-trend caution signal — watch for LF delta turning negative to invalidate.",
+      "text": "AUD/USD COT LF net long +41,675 (week Apr 14), long%=72.0% — extreme long positioning. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. AUD/USD at 0.7145; 25d RR at −0.28: mild put skew. Late-trend caution signal — watch for LF delta turning negative to invalidate.",
       "evidence": [
-        "AUD LF net long +41,675",
-        "HV30 at 6.8%",
-        "ATM IV at 8.2%"
+        "AUD/USD COT LF net long +41,675",
+        "HV30 at 10.3%",
+        "ATM IV at 11.2%"
       ]
     },
     {
-      "time": "15:42",
+      "time": "17:03",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.351; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.349; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
       "evidence": [
-        "BoE 3.75% vs Fed 3.75%",
+        "BoE 4.50% vs Fed 3.75%",
         "GBP LF net long +28,426",
-        "ATM IV 9.5%"
+        "GBP/USD: 1.349"
       ]
     },
     {
-      "time": "15:45",
-      "priority": "warning",
-      "title": "NZD/USD — Positioning + Retail Sentiment",
-      "text": "NZD net short positioning at -17,090 (21.7% long) — not an extreme but aligned with price action. Retail sentiment shows an extreme short bias at 33% long / 67% short. The combination of net short positioning and retail sentiment extreme suggests potential for a short squeeze. Watch for a move above 0.5930 to confirm.",
+      "time": "17:09",
+      "priority": "info",
+      "title": "USD/CAD — CB + Technical",
+      "text": "BoC at 2.25% (ON HOLD) vs Fed at 3.75% (ON HOLD) — 150bp CAD yield disadvantage. USD/CAD at 1.3668, testing the 1.3700 level. Positioning neutral (CFTC). A sustained break above 1.3700 could signal further USD strength, while a drop below 1.3600 might relieve some pressure on CAD.",
       "evidence": [
-        "NZD/USD COT net short -17,090",
-        "Retail sentiment 33% long / 67% short"
+        "BOC 2.25%",
+        "FED 3.75%",
+        "USD/CAD 1.3668"
       ]
     }
   ]
