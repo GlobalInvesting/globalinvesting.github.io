@@ -4784,8 +4784,7 @@ async function buildRichNarrative() {
                   hour: '2-digit', minute: '2-digit', hour12: false
                 });
                 const ageMin = (now - genDt) / 60000;
-                const staleFlag = ageMin > 120 ? ' <span style="color:var(--text3)">· stale</span>' : '';
-                subText += ' · as of ' + genLocal + staleFlag;
+                subText += ' · as of ' + genLocal;
               } catch {}
             }
             subText += ' · loaded ' + hhmm + ' ' + tzAbbr;
