@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.0 — Intraday quotes via yfinance (+ FX pairs, ETF IV, extended correlations + historical norms)
+fetch_intraday_quotes.py  v3.1 — Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -56,7 +56,7 @@ SALIDAS CLAVE:
   quotes        — precios intraday de todos los símbolos
   hv30          — volatilidad histórica 30d por par FX
   correlations  — Pearson 60d rolling (10 pares, incluye GBP/FTSE, AUD/ASX, NZD/NZX, EUR/STOXX)
-  fx_etf_iv     — IV real de ATM options en ETFs de divisa CBOE (FXE, FXB, FXY, FXA, FXF, FXC)
+  fx_etf_iv     — IV real de ATM options: CME FX futures (6E, 6B, 6J, 6A, 6S, 6C) con fallback a ETFs CBOE
 
 Por qué yfinance y no Twelve Data/Alpha Vantage:
   • yfinance funciona server-side en GitHub Actions sin CORS ni proxies
@@ -577,118 +577,211 @@ def fetch_hv30_fx(fx_pairs):
     return hv30_results
 
 
-# ── FX ETF Implied Volatility ─────────────────────────────────────────────────
-# Source: CBOE-listed currency ETF options via yfinance (free, no key)
-# ETF → FX pair mapping:
-#   FXE → EUR/USD    FXB → GBP/USD    FXY → USD/JPY (inverted ETF convention)
-#   FXA → AUD/USD    FXF → USD/CHF (inverted)    FXC → USD/CAD (inverted)
-# Method: ATM implied vol from nearest expiry with ≥4 days to expiration.
-# Limitation: ETF option liquidity is lower than OTC FX interbank options.
-#   IV may deviate 1–3 vol points from true OTC 25d RR. Label accordingly.
+# ── FX Implied Volatility — CME Futures Options (primary) + CBOE ETF (fallback) ─
+#
+# Primary source: CME FX futures option chains via yfinance
+#   6E=F → EUR/USD   6B=F → GBP/USD   6J=F → USD/JPY (JPY/USD contract, inverted)
+#   6A=F → AUD/USD   6S=F → USD/CHF (CHF/USD contract, inverted)
+#   6C=F → USD/CAD (CAD/USD contract, inverted)   6N=F → NZD/USD
+#
+# Why CME futures over CBOE ETFs:
+#   CME FX futures options are the institutional benchmark for FX implied volatility.
+#   Daily open interest on 6E alone exceeds 400,000 contracts. CBOE ETF options
+#   (FXE, FXB, FXY) are retail-oriented instruments with substantially lower
+#   liquidity; yfinance frequently returns impliedVolatility=0.0 for ATM strikes
+#   when bid/ask spread is zero (illiquid chain). CME futures options price
+#   continuously during active US/EU session hours and match OTC interbank vol
+#   within 0.5–1 vol point for major pairs.
+#
+# Candidate cascade per pair:
+#   1. Continuous front-month (6E=F) — most liquid, always try first
+#   2. Next IMM quarterly (e.g. 6EM26 for Jun 2026) — explicit contract, more
+#      reliable option chain listing on yfinance when front-month rolls
+#   3. Following IMM quarterly — safety net for near-expiry windows
+#   4. CBOE ETF fallback (FXE, FXB, …) — retained for continuity; used only if
+#      all CME candidates return null IV
+#
+# IMM quarter months: Mar(H), Jun(M), Sep(U), Dec(Z)
+# yfinance month codes: same as CME standard (H/M/U/Z)
+#
 # Output in quotes.json under key "fx_etf_iv":
-#   { "eurusd": { "iv": 7.4, "expiry": "2025-04-18", "source": "FXE options" }, ... }
-FX_ETF_MAP = {
-    "eurusd": {"etf": "FXE", "invert": False},
-    "gbpusd": {"etf": "FXB", "invert": False},
-    "usdjpy": {"etf": "FXY", "invert": True },  # FXY = JPY/USD → invert for USD/JPY
-    "audusd": {"etf": "FXA", "invert": False},
-    "usdchf": {"etf": "FXF", "invert": True },  # FXF = CHF/USD
-    "usdcad": {"etf": "FXC", "invert": True },  # FXC = CAD/USD
+#   { "eurusd": { "iv": 7.4, "expiry": "2026-06-20", "source": "CME 6E=F options" }, ... }
+#
+# IV plausibility gate: 3.0%–40.0% (covers normal FX vol range 4–20% plus stress)
+# yfinance IV convention: decimal fraction (0.074 → 7.4%) — multiply by 100
+
+from datetime import date as _iv_date
+
+_IV_MIN, _IV_MAX = 3.0, 40.0
+_IV_MIN_DAYS_EXP = 4  # avoid pin-risk distortion in final days before expiry
+
+_CME_MONTH_CODE = {3: "H", 6: "M", 9: "U", 12: "Z"}
+
+def _imm_contracts(root, n=2):
+    """Return next n quarterly IMM contract symbols (Mar/Jun/Sep/Dec)."""
+    contracts = []
+    yr, mo = _iv_date.today().year, _iv_date.today().month
+    for _ in range(n * 4):
+        mo += 1
+        if mo > 12:
+            mo = 1
+            yr += 1
+        if mo in _CME_MONTH_CODE:
+            contracts.append(f"{root}{_CME_MONTH_CODE[mo]}{str(yr)[2:]}")
+        if len(contracts) >= n:
+            break
+    return contracts
+
+def _atm_iv_from_ticker(sym, label):
+    """
+    Extract ATM implied volatility from a yfinance option chain.
+    Returns dict { iv, expiry, atm, source } or None.
+    IV plausibility gate: _IV_MIN–_IV_MAX %.
+    """
+    today = _iv_date.today()
+    try:
+        ticker = yf.Ticker(sym)
+
+        # Spot price — needed for ATM strike selection
+        hist = ticker.history(period="2d", interval="1d")
+        if hist.empty:
+            print(f"    [{label}] no price history")
+            return None
+        spot = float(hist["Close"].iloc[-1])
+        if spot <= 0:
+            return None
+
+        # Available expirations
+        exps = ticker.options
+        if not exps:
+            print(f"    [{label}] no options listed")
+            return None
+
+        # Pick nearest expiry with ≥ _IV_MIN_DAYS_EXP days remaining
+        chosen_exp = None
+        for exp_str in exps:
+            try:
+                if (_iv_date.fromisoformat(exp_str) - today).days >= _IV_MIN_DAYS_EXP:
+                    chosen_exp = exp_str
+                    break
+            except ValueError:
+                continue
+
+        if not chosen_exp:
+            print(f"    [{label}] no valid expiry (all < {_IV_MIN_DAYS_EXP}d)")
+            return None
+
+        chain = ticker.option_chain(chosen_exp)
+        calls = chain.calls
+        if calls.empty:
+            print(f"    [{label}] empty calls chain for {chosen_exp}")
+            return None
+
+        # ATM strike = closest to spot
+        strikes = calls["strike"].dropna().tolist()
+        if not strikes:
+            return None
+        atm_strike = min(strikes, key=lambda s: abs(s - spot))
+
+        # Extract IV: ATM call first, fall back to ATM put
+        iv_raw = None
+        atm_calls = calls[calls["strike"] == atm_strike]
+        if not atm_calls.empty:
+            v = atm_calls["impliedVolatility"].iloc[0]
+            if v and v == v and v > 0:  # truthy + not NaN + positive
+                iv_raw = v
+
+        if iv_raw is None:
+            puts = chain.puts
+            atm_puts = puts[puts["strike"] == atm_strike]
+            if not atm_puts.empty:
+                v = atm_puts["impliedVolatility"].iloc[0]
+                if v and v == v and v > 0:
+                    iv_raw = v
+
+        if iv_raw is None:
+            print(f"    [{label}] IV null at ATM K={atm_strike}  spot={spot:.5f}")
+            return None
+
+        # yfinance returns IV as decimal fraction — convert to percentage
+        iv_pct = round(float(iv_raw) * 100, 1)
+
+        if not (_IV_MIN <= iv_pct <= _IV_MAX):
+            print(f"    [{label}] IV {iv_pct:.1f}% outside plausible range [{_IV_MIN},{_IV_MAX}]")
+            return None
+
+        days_left = (_iv_date.fromisoformat(chosen_exp) - today).days
+        print(f"    [{label}] ✓ IV={iv_pct:.1f}%  spot={spot:.5f}  K={atm_strike}  exp={chosen_exp} ({days_left}d)  n={len(calls)}")
+        return {
+            "iv":     iv_pct,
+            "expiry": chosen_exp,
+            "atm":    round(atm_strike, 6),
+            "source": f"{label} options",
+        }
+
+    except Exception as e:
+        print(f"    [{label}] exception — {e}")
+        return None
+
+
+# Pair configuration — CME root, ETF fallback, invert flag
+# invert=True: the futures contract is quoted as foreign/USD (e.g. JPY/USD)
+#   → IV is the same regardless of quote direction; flag retained for clarity
+_FX_IV_MAP = {
+    "eurusd": {"cme": "6E", "etf": "FXE", "invert": False},
+    "gbpusd": {"cme": "6B", "etf": "FXB", "invert": False},
+    "usdjpy": {"cme": "6J", "etf": "FXY", "invert": True },
+    "audusd": {"cme": "6A", "etf": "FXA", "invert": False},
+    "usdchf": {"cme": "6S", "etf": "FXF", "invert": True },
+    "usdcad": {"cme": "6C", "etf": "FXC", "invert": True },
 }
+
 
 def fetch_fx_etf_iv():
     """
-    Fetches ATM implied volatility from CBOE-listed FX ETF option chains via yfinance.
-    Returns dict { pair_id: { "iv": float_pct, "expiry": str, "source": str } | None }.
-    Falls back gracefully to None per pair if options are illiquid or unavailable.
+    Fetches ATM implied volatility for the 6 major FX pairs.
+
+    Source cascade per pair:
+      1. CME front-month futures options (6E=F, 6B=F, …) — institutional benchmark
+      2. Next 2 IMM quarterly contracts — fallback when front-month rolls thin
+      3. CBOE ETF options (FXE, FXB, …) — last resort; frequently illiquid
+
+    Returns dict { pair_id: { "iv": float_pct, "expiry": str, "source": str,
+                               "atm": float } | None }.
     """
-    from datetime import date as _date
-    print("\n[ETF-IV] Fetching FX ETF implied volatility...")
+    print("\n[FX-IV] Fetching ATM implied volatility (CME futures → ETF fallback)...")
     results = {}
-    today = _date.today()
 
-    for pair_id, cfg in FX_ETF_MAP.items():
-        etf_sym = cfg["etf"]
-        try:
-            ticker = yf.Ticker(etf_sym)
-            exps = ticker.options
-            if not exps:
-                print(f"[ETF-IV] {etf_sym}: no options available")
-                results[pair_id] = None
-                continue
+    for pair_id, cfg in _FX_IV_MAP.items():
+        cme_root = cfg["cme"]
+        etf_sym  = cfg["etf"]
 
-            # Pick nearest expiry with ≥4 days to go (avoid pin-risk distortion near expiry)
-            chosen_exp = None
-            for exp_str in exps:
-                try:
-                    exp_date = _date.fromisoformat(exp_str)
-                    if (exp_date - today).days >= 4:
-                        chosen_exp = exp_str
-                        break
-                except ValueError:
-                    continue
+        # Build candidate list: continuous + next 2 IMM quarterlies + ETF
+        candidates = [
+            (f"{cme_root}=F",          f"CME {cme_root}=F"),
+        ] + [
+            (sym, f"CME {sym}") for sym in _imm_contracts(cme_root, n=2)
+        ] + [
+            (etf_sym, etf_sym),
+        ]
 
-            if not chosen_exp:
-                print(f"[ETF-IV] {etf_sym}: no valid expiry found")
-                results[pair_id] = None
-                continue
+        print(f"  [{pair_id}] trying: {[c[0] for c in candidates]}")
+        result = None
+        for sym, label in candidates:
+            result = _atm_iv_from_ticker(sym, label)
+            if result:
+                break
 
-            chain = ticker.option_chain(chosen_exp)
-            calls = chain.calls
-
-            # Current spot for ATM strike selection
-            spot_info = ticker.history(period="2d", interval="1d")
-            if spot_info.empty:
-                results[pair_id] = None
-                continue
-            spot = float(spot_info["Close"].iloc[-1])
-
-            # Nearest strike to spot = ATM
-            strikes = calls["strike"].dropna().tolist()
-            if not strikes:
-                results[pair_id] = None
-                continue
-            atm_strike = min(strikes, key=lambda s: abs(s - spot))
-
-            # IV from ATM call; fallback to ATM put if call IV is bad
-            atm_call = calls[calls["strike"] == atm_strike]
-            iv_raw = None
-            if not atm_call.empty:
-                iv_raw = atm_call["impliedVolatility"].iloc[0]
-
-            if iv_raw is None or (iv_raw != iv_raw) or iv_raw <= 0:
-                puts = chain.puts
-                atm_put = puts[puts["strike"] == atm_strike]
-                if not atm_put.empty:
-                    iv_raw = atm_put["impliedVolatility"].iloc[0]
-
-            if iv_raw is None or (iv_raw != iv_raw) or iv_raw <= 0 or iv_raw > 1.5:
-                print(f"[ETF-IV] {etf_sym}: IV out of range ({iv_raw})")
-                results[pair_id] = None
-                continue
-
-            # yfinance returns IV as decimal (0.074 → 7.4%)
-            iv_pct = round(float(iv_raw) * 100, 1)
-            # FX ETF IV plausibility gate: 3–40%
-            if not (3.0 <= iv_pct <= 40.0):
-                print(f"[ETF-IV] {etf_sym}: IV {iv_pct}% outside plausible range")
-                results[pair_id] = None
-                continue
-
-            results[pair_id] = {
-                "iv":     iv_pct,
-                "expiry": chosen_exp,
-                "source": f"{etf_sym} options",
-                "atm":    round(atm_strike, 4),
-            }
-            print(f"[ETF-IV] ✓ {pair_id:8s} ({etf_sym}): ATM IV={iv_pct:.1f}%  exp={chosen_exp}  K={atm_strike}")
-
-        except Exception as e:
-            print(f"[ETF-IV] {etf_sym} ({pair_id}): {e}")
-            results[pair_id] = None
+        results[pair_id] = result
+        if result:
+            src_type = "CME" if "CME" in result["source"] else "ETF"
+            print(f"  [FX-IV] ✓ {pair_id:8s}: IV={result['iv']:.1f}%  source={result['source']}  [{src_type}]")
+        else:
+            print(f"  [FX-IV] — {pair_id:8s}: no IV from any source")
 
     valid = sum(1 for v in results.values() if v is not None)
-    print(f"[ETF-IV] {valid}/{len(FX_ETF_MAP)} pairs with real IV")
+    cme_sourced = sum(1 for v in results.values() if v and "CME" in v["source"])
+    print(f"[FX-IV] {valid}/{len(_FX_IV_MAP)} pairs resolved  ({cme_sourced} via CME, {valid-cme_sourced} via ETF)")
     return results
 
 
@@ -1028,10 +1121,20 @@ def main():
         _existing_signals = []
         if _os.path.exists(_signals_path):
             with open(_signals_path) as _sf:
-                _existing_signals = json.load(_sf)
-            # Remove stale corr-break signals from previous run (re-computed each time)
+                _loaded = json.load(_sf)
+            # signals.json may be a bare list (legacy, written by this script) or a
+            # dict { "generated_at": ..., "signals": [...] } (written by
+            # generate_narrative_signals.py). Normalise to list before processing.
+            if isinstance(_loaded, dict):
+                _existing_signals = _loaded.get("signals", [])
+            elif isinstance(_loaded, list):
+                _existing_signals = _loaded
+            else:
+                _existing_signals = []
+            # Guard: drop any non-dict entries (corrupt/unexpected items) and all
+            # stale corr-break signals from the previous run (recomputed every run)
             _existing_signals = [s for s in _existing_signals
-                                  if not s.get("source") == "corr_break"]
+                                  if isinstance(s, dict) and s.get("source") != "corr_break"]
 
         _now_utc = datetime.now(timezone.utc)
         _time_str = _now_utc.strftime("%H:%M")
@@ -1112,7 +1215,7 @@ def main():
     except Exception as _e:
         print(f"[CorrSignal] Error generating correlation signals: {_e}")
 
-    # PASO 7: Implied volatility real desde FX ETF options (CBOE vía yfinance)
+    # PASO 7: ATM implied volatility — CME FX futures options (primary) + CBOE ETF (fallback)
     fx_etf_iv = fetch_fx_etf_iv()
 
     # PASO 7b: Acumular historial semanal de IV (máx 52 entradas) y calcular IV Rank / IV Percentile.
