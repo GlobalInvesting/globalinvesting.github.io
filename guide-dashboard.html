@@ -1365,15 +1365,15 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </table>
       </div>
 
-      <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">CME IV · COT · 25d RR</span></h3>
-      <p>A directional bias table for major pairs, synthesised from three complementary sources. The <strong>ATM IV</strong> column shows annualised implied volatility sourced primarily from CME FX futures options (6E for EUR/USD, 6B for GBP/USD, 6J for USD/JPY, 6A for AUD/USD) — the institutional benchmark for FX implied volatility, with daily open interest exceeding 400,000 contracts on 6E alone. CBOE-listed FX ETF options (FXE, FXB, FXY, FXA) serve as a fallback source when CME data is unavailable. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined — as a directional proxy on a ±1.5 scale. The <strong>25d RR</strong> chip in the Direction cell shows the 25-delta Risk Reversal from Saxo Bank's public options page (1M tenor, indicative mid-market): positive means calls are bid over puts — the market is skewed for upside on the base currency; negative means puts are bid — downside protection is dominant. When all three signals align, the read is most reliable. Divergence — e.g. IV elevated, COT flat, RR neutral — signals uncertainty or a positioning squeeze risk.</p>
+      <h3>Positioning Bias <span style="font-weight:normal;color:var(--text3);">CBOE/CME Vol · COT · 25d RR</span></h3>
+      <p>A directional bias table for major pairs, synthesised from three complementary sources. The <strong>ATM IV</strong> column shows annualised implied volatility sourced primarily from the <strong>CBOE/CME FX Volatility Indexes</strong> (^EUVIX for EUR/USD, ^BPVIX for GBP/USD, ^JYVIX for USD/JPY, ^AUDVIX for AUD/USD) — the same variance-swap replication methodology used by the VIX, published jointly by CBOE and CME, and the underlying benchmark for Bloomberg BVOL FX. These are clean index values, not derived from bid/ask option chains, and carry a ~15-minute delay. For USD/CHF and USD/CAD (no dedicated CBOE/CME index), the cascade falls back to CME FX futures options (6S, 6C) and then CBOE ETF options as a last resort. NZD/USD is derived from ^AUDVIX × 1.08 (long-run NZD/AUD realised vol ratio) and labeled as estimated. The <strong>COT bias</strong> column shows the net position of <strong>Leveraged Funds</strong> (hedge funds, CTAs) from the CFTC Disaggregated TFF report — Options+Futures Combined — as a directional proxy on a ±1.5 scale. The <strong>25d RR</strong> chip in the Direction cell shows the 25-delta Risk Reversal from Saxo Bank's public options page (1M tenor, indicative mid-market): positive means calls are bid over puts — the market is skewed for upside on the base currency; negative means puts are bid — downside protection is dominant. When all three signals align, the read is most reliable. Divergence — e.g. IV elevated, COT flat, RR neutral — signals uncertainty or a positioning squeeze risk.</p>
       <div class="callout callout-orange">
         <strong>ATM IV color = cost of hedging, not direction.</strong> Green (≤7%) means options are historically cheap; red (&gt;12%) means hedging is expensive. In a risk-off or high-uncertainty environment, all pairs may show red — that is accurate information, not a bearish signal on the pair. Do not confuse elevated IV with a short bias. The 25d RR chip is the directional signal from the options market: its sign shows which side (calls or puts) investors are paying a premium to own.
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 0;max-width:280px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
           <span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Positioning Bias</span>
-          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> CME IV · CME/ETF · 25d RR · Saxo</span>
+          <span style="font-size:9px;color:var(--text3);font-weight:normal;"> CBOE/CME Vol · 25d RR · Saxo</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:10px;">
           <thead><tr style="color:var(--text3);font-size:9px;">
@@ -1534,7 +1534,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.30.8</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.31.0</span></div>
 </footer>
 
 
