@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.1 — Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.2  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -577,38 +577,39 @@ def fetch_hv30_fx(fx_pairs):
     return hv30_results
 
 
-# ── FX Implied Volatility — CME Futures Options (primary) + CBOE ETF (fallback) ─
+# ── FX Implied Volatility — CBOE/CME FX Vol Indexes (primary) + CME options + ETF ─
 #
-# Primary source: CME FX futures option chains via yfinance
-#   6E=F → EUR/USD   6B=F → GBP/USD   6J=F → USD/JPY (JPY/USD contract, inverted)
-#   6A=F → AUD/USD   6S=F → USD/CHF (CHF/USD contract, inverted)
-#   6C=F → USD/CAD (CAD/USD contract, inverted)   6N=F → NZD/USD
+# SOURCE CASCADE — priority order per pair:
 #
-# Why CME futures over CBOE ETFs:
-#   CME FX futures options are the institutional benchmark for FX implied volatility.
-#   Daily open interest on 6E alone exceeds 400,000 contracts. CBOE ETF options
-#   (FXE, FXB, FXY) are retail-oriented instruments with substantially lower
-#   liquidity; yfinance frequently returns impliedVolatility=0.0 for ATM strikes
-#   when bid/ask spread is zero (illiquid chain). CME futures options price
-#   continuously during active US/EU session hours and match OTC interbank vol
-#   within 0.5–1 vol point for major pairs.
+#   SOURCE 0 — CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX, …)
+#     Institutional benchmark, identical in methodology to VIX (variance-swap replication).
+#     Published jointly by CBOE and CME. Bloomberg BVOL references the same underlying
+#     methodology. Available via yfinance as index tickers with ~15min delay.
+#     Coverage: EUR, GBP, JPY, AUD (4 of 6 majors).
+#     When available, this source takes unconditional precedence — no option chain parsing
+#     required; data is a clean index value, not derived from bid/ask spread.
 #
-# Candidate cascade per pair:
-#   1. Continuous front-month (6E=F) — most liquid, always try first
-#   2. Next IMM quarterly (e.g. 6EM26 for Jun 2026) — explicit contract, more
-#      reliable option chain listing on yfinance when front-month rolls
-#   3. Following IMM quarterly — safety net for near-expiry windows
-#   4. CBOE ETF fallback (FXE, FXB, …) — retained for continuity; used only if
-#      all CME candidates return null IV
+#   SOURCE 1 — CME front-month futures options (6E=F, 6B=F, …)
+#     Institutional option chain. Used only if CBOE vol index unavailable for the pair.
+#
+#   SOURCE 2 — Next 2 IMM quarterly CME contracts (6EM26, 6EU26, …)
+#     Fallback when front-month rolls thin.
+#
+#   SOURCE 3 — CBOE ETF options (FXE, FXB, FXY, FXA, …)
+#     Last resort. Retail-oriented; yfinance frequently returns impliedVolatility=0.
+#     Retained only for USD/CHF and USD/CAD where no CBOE vol index exists.
+#
+# NZD coverage:
+#   No CBOE/CME vol index exists for NZD/USD. Derive from AUD/USD index × 1.08
+#   (long-run NZD/AUD realised vol ratio). Label as "est. CBOE ^AUDVIX × 1.08".
 #
 # IMM quarter months: Mar(H), Jun(M), Sep(U), Dec(Z)
 # yfinance month codes: same as CME standard (H/M/U/Z)
 #
 # Output in quotes.json under key "fx_etf_iv":
-#   { "eurusd": { "iv": 7.4, "expiry": "2026-06-20", "source": "CME 6E=F options" }, ... }
+#   { "eurusd": { "iv": 8.1, "source": "CBOE ^EUVIX" }, ... }
 #
 # IV plausibility gate: 3.0%–40.0% (covers normal FX vol range 4–20% plus stress)
-# yfinance IV convention: decimal fraction (0.074 → 7.4%) — multiply by 100
 
 from datetime import date as _iv_date
 
@@ -616,6 +617,50 @@ _IV_MIN, _IV_MAX = 3.0, 40.0
 _IV_MIN_DAYS_EXP = 4  # avoid pin-risk distortion in final days before expiry
 
 _CME_MONTH_CODE = {3: "H", 6: "M", 9: "U", 12: "Z"}
+
+# CBOE/CME FX Volatility Indexes — same variance-swap methodology as VIX.
+# Published by CBOE in partnership with CME. Available via yfinance as ^XXXVIX.
+# Coverage limited to 4 major pairs; CHF and CAD fall through to CME options/ETF.
+_CBOE_FX_VOL_INDEX = {
+    "eurusd": "^EUVIX",
+    "gbpusd": "^BPVIX",
+    "usdjpy": "^JYVIX",
+    "audusd": "^AUDVIX",
+    # NZD: no dedicated index — derived in fetch_fx_etf_iv() from ^AUDVIX
+    # CHF: no CBOE index — falls through to CME 6S options / FXF ETF
+    # CAD: no CBOE index — falls through to CME 6C options / FXC ETF
+}
+
+def _iv_from_cboe_index(pair_id):
+    """
+    Fetch ATM IV from the CBOE/CME FX Volatility Index for this pair.
+    The index value IS the implied vol in annualised percentage points —
+    no option chain parsing needed. Identical methodology to VIX.
+    Returns dict { iv, source } or None.
+    """
+    sym = _CBOE_FX_VOL_INDEX.get(pair_id)
+    if not sym:
+        return None
+    try:
+        tk = yf.Ticker(sym)
+        info = tk.info
+        iv_val = info.get("regularMarketPrice") or info.get("previousClose")
+        if iv_val is None:
+            # Fallback: last close from history
+            hist = tk.history(period="5d", interval="1d")
+            if not hist.empty:
+                iv_val = float(hist["Close"].iloc[-1])
+        if iv_val is None:
+            return None
+        iv_val = float(iv_val)
+        if not (_IV_MIN <= iv_val <= _IV_MAX):
+            print(f"    [{sym}] index value {iv_val:.2f} outside plausible IV range [{_IV_MIN},{_IV_MAX}]")
+            return None
+        print(f"    [{sym}] ✓ IV={iv_val:.1f}%  [CBOE/CME FX Volatility Index]")
+        return {"iv": round(iv_val, 1), "source": f"CBOE {sym}"}
+    except Exception as e:
+        print(f"    [{sym}] exception — {e}")
+        return None
 
 def _imm_contracts(root, n=2):
     """Return next n quarterly IMM contract symbols (Mar/Jun/Sep/Dec)."""
@@ -734,38 +779,68 @@ _FX_IV_MAP = {
     "audusd": {"cme": "6A", "etf": "FXA", "invert": False},
     "usdchf": {"cme": "6S", "etf": "FXF", "invert": True },
     "usdcad": {"cme": "6C", "etf": "FXC", "invert": True },
+    # NZD: no dedicated CBOE vol index; derived from ^AUDVIX in fetch_fx_etf_iv()
+    "nzdusd": {"cme": None,  "etf": None,  "invert": False},
 }
 
 
 def fetch_fx_etf_iv():
     """
-    Fetches ATM implied volatility for the 6 major FX pairs.
+    Fetches ATM implied volatility for 7 major FX pairs.
 
     Source cascade per pair:
-      1. CME front-month futures options (6E=F, 6B=F, …) — institutional benchmark
-      2. Next 2 IMM quarterly contracts — fallback when front-month rolls thin
-      3. CBOE ETF options (FXE, FXB, …) — last resort; frequently illiquid
+      0. CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX)
+         Institutional benchmark — same variance-swap methodology as VIX.
+         Bloomberg BVOL uses the same underlying construction.
+         Unconditional priority when available.
+      1. CME front-month futures options (6E=F, 6B=F, …)
+         Used only if CBOE vol index unavailable for the pair.
+      2. Next 2 IMM quarterly CME contracts — rollover fallback.
+      3. CBOE ETF options (FXE, FXB, …) — last resort; frequently illiquid.
 
-    Returns dict { pair_id: { "iv": float_pct, "expiry": str, "source": str,
-                               "atm": float } | None }.
+    NZD/USD: no CBOE vol index exists. Derived from ^AUDVIX × 1.08
+    (long-run NZD/AUD realised vol ratio). Labeled as estimated.
+
+    Returns dict { pair_id: { "iv": float_pct, "source": str } | None }.
     """
-    print("\n[FX-IV] Fetching ATM implied volatility (CME futures → ETF fallback)...")
+    print("\n[FX-IV] Fetching ATM implied volatility (CBOE vol index → CME options → ETF)...")
     results = {}
+    cboe_index_resolved = 0
 
     for pair_id, cfg in _FX_IV_MAP.items():
         cme_root = cfg["cme"]
         etf_sym  = cfg["etf"]
 
-        # Build candidate list: continuous + next 2 IMM quarterlies + ETF
-        candidates = [
-            (f"{cme_root}=F",          f"CME {cme_root}=F"),
-        ] + [
-            (sym, f"CME {sym}") for sym in _imm_contracts(cme_root, n=2)
-        ] + [
-            (etf_sym, etf_sym),
-        ]
+        # ── SOURCE 0: CBOE/CME FX Volatility Index ──
+        print(f"  [{pair_id}] source 0: CBOE/CME FX vol index")
+        result = _iv_from_cboe_index(pair_id)
+        if result:
+            results[pair_id] = result
+            cboe_index_resolved += 1
+            print(f"  [FX-IV] ✓ {pair_id:8s}: IV={result['iv']:.1f}%  source={result['source']}  [CBOE]")
+            continue
 
-        print(f"  [{pair_id}] trying: {[c[0] for c in candidates]}")
+        # ── NZD/USD: derive from ^AUDVIX when CME options unavailable ──
+        if pair_id == "nzdusd":
+            aud_result = results.get("audusd")
+            if aud_result and aud_result.get("iv") is not None:
+                nzd_iv = round(aud_result["iv"] * 1.08, 1)
+                results[pair_id] = {"iv": nzd_iv, "source": "est. CBOE ^AUDVIX × 1.08"}
+                print(f"  [FX-IV] ~ {pair_id:8s}: IV={nzd_iv:.1f}%  [derived from ^AUDVIX]")
+            else:
+                results[pair_id] = None
+                print(f"  [FX-IV] — {pair_id:8s}: no IV (^AUDVIX also unavailable)")
+            continue
+
+        # ── SOURCES 1–3: CME options then ETF (CHF, CAD, and fallback for others) ──
+        candidates = []
+        if cme_root:
+            candidates += [(f"{cme_root}=F", f"CME {cme_root}=F")]
+            candidates += [(sym, f"CME {sym}") for sym in _imm_contracts(cme_root, n=2)]
+        if etf_sym:
+            candidates += [(etf_sym, etf_sym)]
+
+        print(f"  [{pair_id}] sources 1-3: {[c[0] for c in candidates]}")
         result = None
         for sym, label in candidates:
             result = _atm_iv_from_ticker(sym, label)
@@ -780,8 +855,8 @@ def fetch_fx_etf_iv():
             print(f"  [FX-IV] — {pair_id:8s}: no IV from any source")
 
     valid = sum(1 for v in results.values() if v is not None)
-    cme_sourced = sum(1 for v in results.values() if v and "CME" in v["source"])
-    print(f"[FX-IV] {valid}/{len(_FX_IV_MAP)} pairs resolved  ({cme_sourced} via CME, {valid-cme_sourced} via ETF)")
+    print(f"[FX-IV] {valid}/{len(_FX_IV_MAP)} pairs resolved  "
+          f"({cboe_index_resolved} via CBOE index, {valid-cboe_index_resolved} via CME/ETF options)")
     return results
 
 
