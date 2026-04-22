@@ -198,7 +198,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .skip-link:focus{left:8px}
 .tv-skeleton{background:var(--bg3);width:100%;height:100%}
 #tv-chart-wrap{height:290px;min-height:290px}
-#tvcal-inner{min-height:350px}
+#tvcal-inner{overflow:hidden}
 
 /* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
 /* SPLIT LAYOUT — vertical left/right split */
@@ -690,21 +690,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </table>
           <div style="padding:2px 8px 4px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" id="svol-sub">5yr historical avg · fixed reference</div>
         </div>
-        <div id="section-tvcalendar" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;min-height:0;">
-          <div style="background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <span class="panel-title">Upcoming Events</span>
-          </div>
-          <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;min-height:350px;">
-            <div class="tv-skeleton" style="position:absolute;inset:0;z-index:1;"></div>
-            <div id="tvcal-scale" style="transform:scale(0.72);transform-origin:top left;width:138.9%;height:138.9%;">
-              <div class="tradingview-widget-container" style="width:100%;height:100%;">
-                <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-                <div class="tradingview-widget-copyright" style="display:none;"></div>
-                <!-- Events calendar loaded lazily — see initLazyWidgets() in dashboard.js -->
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
         <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
@@ -730,6 +715,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <div id="sent-general" style="flex-shrink:0;"></div>
             <div style="font-size:9px;color:var(--text3);font-family:var(--font-ui);padding:2px 0 1px;flex-shrink:0;" id="sent-updated"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPCOMING EVENTS — full-width row for adequate widget rendering width -->
+    <div id="section-tvcalendar" style="border-bottom:1px solid var(--border);display:flex;flex-direction:column;height:420px;">
+      <div class="panel-head">
+        <span class="panel-title">Upcoming Events</span>
+        <span class="panel-sub">Myfxbook · real-time</span>
+      </div>
+      <div id="tvcal-inner" style="overflow:hidden;flex:1;position:relative;">
+        <div style="width:100%;height:100%;filter:invert(0.92) hue-rotate(180deg) brightness(0.95);">
+          <iframe src="https://widget.myfxbook.com/widget/calendar.html?lang=en&impacts=0,1,2,3&countries=Australia,Canada,Euro%20Area,European%20Union,Japan,New%20Zealand,Switzerland,United%20Kingdom,United%20States,United%20States%20Minor%20Outlying%20Islands"
+                  style="border:0;width:100%;height:100%;display:block;"
+                  title="Economic Calendar — Myfxbook"></iframe>
         </div>
       </div>
     </div>
