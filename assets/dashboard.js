@@ -3543,7 +3543,7 @@ async function updatePairDetail(tvSym) {
 
     <div class="pd-section pd-section--last">
       <div class="pd-section-lbl">Retail Sentiment</div>
-      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="When >70% of retail traders are long, institutional desks are often positioned short — price tends to move against the retail crowd over time.">
+      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="Extreme readings — above 70% long or below 30% long — have historically coincided with elevated positioning risk in the dominant direction. Retail extremes are one input among many; always cross-reference with COT and CB differential data.">
         <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:${retBarL}%"></div></div>
         <div class="pd-retail-nums">${retL != null ? retL+'% L' : '—'}<span class="pd-retail-sep">/</span>${retS != null ? retS+'% S' : '—'}</div>
       </div>
