@@ -1,58 +1,48 @@
 {
-  "generated_at": "2026-04-22T14:15:15Z",
+  "generated_at": "2026-04-22T15:49:15Z",
   "signals": [
     {
-      "time": "14:10",
+      "time": "15:45",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.18; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.49; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 450bp carry differential supports USD/JPY. Watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.18",
+        "USD/JPY: 159.49",
         "JPY COT LF net short −65,309",
-        "Fed-BoJ carry differential: 450bp"
+        "Fed 3.75% vs BoJ 0.75%"
       ]
     },
     {
-      "time": "14:05",
+      "time": "15:42",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD at 0.7165; HV30 at 6.5%, ATM IV (FXE chain) at 7.3% — options pricing a 0.8 vol-pt premium over realized. 25d RR at −0.08: mild put skew. CFTC LF net long +41,675 (week Apr 14), long%=72.0% — extreme long positioning. Retail 89% short; contrarian reversal risk. Watch for LF delta turning negative to shift the read.",
+      "text": "AUD/USD at 0.7159; HV30 at 6.5%, ATM IV (FXE chain) at 7.3% — options pricing a 0.8 vol-pt premium over realized. CFTC LF net long +41,675 (week Apr 14), long%=72.0% — extreme long positioning. Retail 88% short — contrarian signal. Watch for LF delta turning negative or IV skew to shift.",
       "evidence": [
-        "AUD/USD: 0.7165",
+        "AUD/USD: 0.7159",
         "CFTC LF net long +41,675",
-        "Retail 89% short"
+        "Retail 88% short"
       ]
     },
     {
-      "time": "13:55",
-      "priority": "warning",
-      "title": "EUR/USD — Positioning + Technical",
-      "text": "EUR/USD at 1.1741; CFTC LF net short −72, long%=50.0%. Price testing 1.1730 — key level; ECB 2% (ON HOLD) vs Fed 3.75% (ON HOLD) — 175bp spread favors USD. Watch for price breaking below 1.1730 to confirm a technical downtrend.",
-      "evidence": [
-        "EUR/USD: 1.1741",
-        "CFTC LF net short −72",
-        "ECB-Fed spread: 175bp"
-      ]
-    },
-    {
-      "time": "13:45",
+      "time": "15:38",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426; AM constructive — positioning aligned with the carry read. GBP/USD at 1.3515 mid-range; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium; BoE expected to hold. GBP LF net long +28,426, AM constructive — positioning aligned with carry. GBP/USD at 1.35 mid-range; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
       "evidence": [
-        "GBP/USD: 1.3515",
-        "BoE-Fed spread: 75bp",
+        "GBP/USD: 1.35",
+        "BoE 3.75% vs Fed 3.75%",
         "GBP LF net long +28,426"
       ]
     },
     {
-      "time": "13:30",
+      "time": "15:36",
       "priority": "info",
       "title": "NZD/USD — Retail Sentiment",
-      "text": "NZD/USD at 0.5917; retail 35% long / 65% short. No extreme positioning; NZD/USD range-bound. Watch for a breakout above 0.6000 to shift the read.",
+      "text": "NZD/USD at 0.5909; retail 65% short — short bias but not extreme. NZD COT LF net short −17,090, long%=21.7% — not extreme positioning. Watch for NZD/USD break above 0.6000 to confirm bullish trend.",
       "evidence": [
-        "NZD/USD: 0.5917",
-        "Retail 35% long / 65% short"
+        "NZD/USD: 0.5909",
+        "retail 65% short",
+        "NZD COT LF net short −17,090"
       ]
     }
   ]
