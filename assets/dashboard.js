@@ -3145,19 +3145,200 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click to open chart, double-click to open popover ──
+// ── Sidebar crosses: single click → chart + inline detail (same pattern as majors table) ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
+  toggleSidebarDetail(row);
 });
 
-document.getElementById('sidebar')?.addEventListener('dblclick', e => {
-  e.preventDefault();
-  const row = e.target.closest('.sb-row[data-sym]');
-  if (!row) return;
-  openPairPopover(row, row.dataset.sym);
-});
+function toggleSidebarDetail(row) {
+  const tvSym  = row.dataset.sym;
+  const sidebar = row.closest('#sidebar');
+  if (!sidebar) return;
+
+  // If this row is already open, collapse it
+  const existing   = sidebar.querySelector('.sb-expand-row');
+  const wasThisRow = existing?.dataset.forSym === tvSym;
+
+  if (existing) {
+    const inner = existing.querySelector('.sb-expand-inner');
+    if (inner) inner.style.maxHeight = '0';
+    setTimeout(() => existing.remove(), 220);
+    sidebar.querySelector('.sb-row.sb-selected')?.classList.remove('sb-selected');
+  }
+  if (wasThisRow) return;
+
+  row.classList.add('sb-selected');
+
+  const expandDiv = document.createElement('div');
+  expandDiv.className = 'sb-expand-row';
+  expandDiv.dataset.forSym = tvSym;
+  const inner = document.createElement('div');
+  inner.className = 'sb-expand-inner';
+  inner.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>';
+  expandDiv.appendChild(inner);
+  row.after(expandDiv);
+
+  // Animate open after next paint
+  requestAnimationFrame(() => {
+    inner.style.maxHeight = '600px'; // generous — content drives real height
+  });
+
+  buildSidebarCrossDetail(tvSym, inner);
+}
+
+// ── buildSidebarCrossDetail — inline detail for cross pairs in the sidebar ──
+// Shows: price stats · vol · carry · COT for BOTH base AND quote currencies
+async function buildSidebarCrossDetail(tvSym, container) {
+  const meta   = pairMetaFromSym(tvSym);
+  const label  = meta?.label || tvSym.replace(/^.*:/,'').replace(/(.{3})(.{3})/,'$1/$2').toUpperCase();
+  const pairId = meta?.id   || null;
+  const base   = meta?.base  || null;
+  const quote  = meta?.quote || null;
+  const dec    = meta?.dec   ?? 5;
+
+  // ── Price / vol data ──
+  const rt    = pairId ? STOOQ_RT_CACHE[pairId] : null;
+  const price = rt?.close ?? null;
+  const pct1d = rt?.pct   ?? null;
+  const pct1w = rt?.pct1w ?? null;
+  const hv30  = rt?.hv30  ?? null;
+
+  // ── ATM IV (cross triangulation — same logic as buildInlineDetail) ──
+  const CROSS_IV_RHO = {
+    'eurgbp':0.65,'eurjpy':0.55,'eurchf':0.60,'eurcad':0.40,'euraud':0.35,'eurnzd':0.30,
+    'gbpjpy':0.45,'gbpchf':0.55,'gbpcad':0.30,'gbpaud':0.25,'gbpnzd':0.20,
+    'audjpy':0.40,'audnzd':0.55,'audchf':0.30,'audcad':0.50,
+    'cadjpy':0.35,'cadchf':0.25,'chfjpy':0.40,'nzdjpy':0.35,'nzdcad':0.45,'nzdchf':0.20,
+  };
+  const USD_IV = {};
+  let atmIv = null;
+  try {
+    const intra = await loadIntradayQuotes();
+    const etfIv = intra?.fx_etf_iv || {};
+    for (const [pid, entry] of Object.entries(etfIv)) {
+      if (entry?.iv == null) continue;
+      const p = PAIRS.find(x => x.id === pid);
+      if (!p) continue;
+      const nonUsd = p.base !== 'USD' ? p.base : p.quote;
+      USD_IV[nonUsd] = entry.iv;
+    }
+    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null)
+      USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+    if (pairId && meta?.cross) {
+      const ivA = USD_IV[base] ?? null, ivB = USD_IV[quote] ?? null;
+      if (ivA != null && ivB != null) {
+        const rho = CROSS_IV_RHO[pairId] ?? 0.40;
+        atmIv = Math.round(Math.sqrt(ivA*ivA + ivB*ivB - 2*rho*ivA*ivB) * 10) / 10;
+      }
+    }
+  } catch {}
+
+  // ── Carry ──
+  const cbBase  = base  ? (STATE.cbRates?.[base.toLowerCase()]?.rate  ?? null) : null;
+  const cbQuote = quote ? (STATE.cbRates?.[quote.toLowerCase()]?.rate ?? null) : null;
+  const carryDiff = (cbBase != null && cbQuote != null) ? cbBase - cbQuote : null;
+
+  // ── COT for BOTH currencies ──
+  function getCotForCcy(ccy) {
+    const raw = ccy ? (COT_DATA_CACHE[ccy] || null) : null;
+    if (!raw) return null;
+    return {
+      net:    raw.net         ?? null,
+      amNet:  raw.amNet       ?? null,
+      wow:    raw.wowNetChange ?? null,
+      pctOI:  raw.levNetPctOI  ?? null,
+      week:   raw.weekEnding   || '',
+    };
+  }
+  const cotBase  = getCotForCcy(base);
+  const cotQuote = getCotForCcy(quote);
+  const cotWeek  = cotBase?.week || cotQuote?.week || '';
+
+  // ── Formatting helpers ──
+  const fmtP  = v => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+  const fmtN  = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+  const cls   = v => v == null ? '' : v > 0 ? 'pd-up' : v < 0 ? 'pd-dn' : '';
+  const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
+
+  // ── COT section HTML for one currency ──
+  function cotBlock(ccy, cot) {
+    if (!cot) return `<div class="sb-cot-row sb-cot-missing"><span class="sb-cot-ccy">${ccy}</span><span style="color:var(--text3);font-size:9px;">no data</span></div>`;
+    const dirCls = cls(cot.net);
+    const dirLbl = cot.net == null ? '—' : cot.net > 0 ? 'Long' : cot.net < 0 ? 'Short' : 'Flat';
+    return `
+    <div class="sb-cot-row">
+      <div class="sb-cot-header">
+        <span class="sb-cot-ccy">${ccy}</span>
+        <span class="sb-cot-dir ${dirCls}">${dirLbl}</span>
+      </div>
+      <div class="sb-cot-metrics">
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">LF Net</div>
+          <div class="sb-cot-val ${cls(cot.net)}">${fmtN(cot.net)}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">WoW Δ</div>
+          <div class="sb-cot-val ${cls(cot.wow)}">${fmtN(cot.wow)}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">AM Net</div>
+          <div class="sb-cot-val ${cls(cot.amNet)}">${fmtN(cot.amNet)}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">Net%OI</div>
+          <div class="sb-cot-val ${cls(cot.pctOI)}">${cot.pctOI != null ? (cot.pctOI > 0 ? '+' : '') + cot.pctOI.toFixed(1) + '%' : '—'}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const spreadPips = pairId ? (TYPICAL_SPREADS[pairId] || null) : null;
+  let adr = null;
+  if (hv30 != null && price != null) {
+    const pipVal = dec === 3 ? 0.01 : 0.0001;
+    adr = Math.round(price * (hv30 / 100) / Math.sqrt(252) / pipVal);
+  }
+
+  container.innerHTML = `
+  <div class="sb-detail-wrap">
+    <div class="sb-detail-section sb-detail-price">
+      <div class="sb-detail-lbl">Price</div>
+      <div class="sb-detail-metrics">
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">1D Chg</div>
+          <div class="sb-cot-val ${cls(pct1d)}">${fmtP(pct1d)}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">1W Chg</div>
+          <div class="sb-cot-val ${cls(pct1w)}">${fmtP(pct1w)}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">Carry</div>
+          <div class="sb-cot-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2) + '%' : '—'}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">HV 30d</div>
+          <div class="sb-cot-val">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
+        </div>
+        <div class="sb-cot-metric">
+          <div class="sb-cot-lbl">ATM IV~</div>
+          <div class="sb-cot-val ${ivCls(atmIv)}">${atmIv != null ? atmIv.toFixed(1) + '%' : '—'}</div>
+        </div>
+        ${adr != null ? `<div class="sb-cot-metric"><div class="sb-cot-lbl">ADR</div><div class="sb-cot-val">${adr} pip</div></div>` : ''}
+      </div>
+    </div>
+    <div class="sb-detail-section sb-detail-cot">
+      <div class="sb-detail-lbl">COT Positioning <span style="font-size:8px;color:var(--text3);font-weight:400;">CFTC vs USD</span></div>
+      ${cotBlock(base, cotBase)}
+      <div class="sb-cot-divider"></div>
+      ${cotBlock(quote, cotQuote)}
+    </div>
+    ${cotWeek ? `<div class="sb-detail-footer">COT ${cotWeek} · CFTC TFF</div>` : ''}
+  </div>`;
+}
 
 // ── FX Pairs table: click = chart + expand detail inline ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
