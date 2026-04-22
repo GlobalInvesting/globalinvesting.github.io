@@ -1,46 +1,58 @@
 {
-  "generated_at": "2026-04-22T10:01:40Z",
+  "generated_at": "2026-04-22T11:36:08Z",
   "signals": [
     {
-      "time": "10:00",
+      "time": "11:30",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.34; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Implication: risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Iran seizes and attacks two cargo ships trying to cross the Strait of Hormuz, driving safe-haven demand for JPY. USD/JPY at 159.23, testing the 160.00 level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. The Fed-BoJ carry differential stands at 375bp, supporting USD. However, risk-off flows historically unwind JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.34",
-        "JPY COT LF net short −65,309"
+        "Iran Strait of Hormuz attack",
+        "USD/JPY at 159.23",
+        "Fed 3.75% vs BoJ 0.75%"
       ]
     },
     {
-      "time": "09:55",
+      "time": "11:25",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7161; 25d RR at −0.21: mild put skew. Implication: late-trend caution signal as market hedging rather than chasing — watch for LF delta turning negative to invalidate.",
+      "title": "AUD/USD — Positioning + Retail",
+      "text": "CFTC LF net long +41,675 for AUD, long%=72.0% — positioning near extreme bullish levels. Retail sentiment shows 89% short bias, an extreme contrarian signal. AUD/USD at 0.7159, holding above recent lows. Late-trend caution signal as market positioning and sentiment diverge — watch for LF delta turning negative or retail sentiment shifting to confirm.",
       "evidence": [
         "AUD LF net long +41,675",
-        "HV30 at 6.5%",
-        "ATM IV at 8.2%"
+        "AUD/USD at 0.7159",
+        "retail 89% short"
       ]
     },
     {
-      "time": "09:30",
-      "priority": "info",
-      "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3521 mid-range; 1.3600 is the next resistance on a continuation.",
+      "time": "11:20",
+      "priority": "warning",
+      "title": "EUR/USD — CB + Technical",
+      "text": "ECB's Simkus states no rate hike expected in April, aligning with market bias. EUR/USD at 1.1747, testing the upper end of the recent range. The Fed-ECB rate differential stands at 175bp, structurally supporting USD. A sustained break above 1.1750 could signal further upside — watch 1.1800 as the next resistance level.",
       "evidence": [
-        "BoE 4.50% vs Fed 3.75%",
-        "GBP LF net long +28,426"
+        "ECB Simkus no rate hike",
+        "EUR/USD at 1.1747",
+        "Fed 3.75% vs ECB 2%"
       ]
     },
     {
-      "time": "09:58",
+      "time": "11:15",
       "priority": "info",
-      "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD carry disadvantage. USD/CAD at 1.3651, testing the 50-day moving average. Positioning neutral, no extreme reads. Implication: structurally capped, watch 1.3700 for resistance.",
+      "title": "GBP/USD — CB + Yield",
+      "text": "BoE at 3.75% vs Fed at 3.75% — 0bp GBP carry differential. GBP LF net long +28,426; AM constructive — positioning aligned with carry. GBP/USD at 1.3510, mid-range; 1.3600 is the next resistance on a continuation. Options neutral with ATM IV 9.5% near HV.",
       "evidence": [
-        "BOC 2.25%",
-        "FED 3.75%",
-        "USD/CAD 1.3651"
+        "BoE 3.75% vs Fed 3.75%",
+        "GBP LF net long +28,426",
+        "GBP/USD at 1.3510"
+      ]
+    },
+    {
+      "time": "11:10",
+      "priority": "info",
+      "title": "NZD/USD — Correlation Break",
+      "text": "NZD/USD vs NZX 50 correlation break: corr=+0.661 vs 252d norm=-0.273 (z=+2.20σ). NZD/USD at 0.5912, supported by recent price action. This break suggests a potential regime shift — watch for confirmation from further data.",
+      "evidence": [
+        "NZD/USD vs NZX 50 corr break",
+        "NZD/USD at 0.5912"
       ]
     }
   ]
