@@ -3052,34 +3052,48 @@ async function buildInlineDetail(tvSym, container) {
 
       <div class="pd-inline-group">
         <div class="pd-inline-group-lbl">COT Positioning</div>
-        <div class="pd-inline-metrics">
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Net contracts held by Leveraged Funds — hedge funds and CTAs.${isCrossPair ? ` CFTC tracks ${cotCcy} vs USD — use as ${cotCcy} sentiment proxy.` : ''}" data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
-            <div class="pd-inline-lbl">LF Net${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Change in LF net vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
-            <div class="pd-inline-lbl">LF WoW Δ${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural positioning.${isCrossPair ? ` CFTC tracks ${cotCcy} vs USD.` : ''}" data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
-            <div class="pd-inline-lbl">AM Net${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotAmNet)}">${fmtN(cotAmNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
-            <div class="pd-inline-lbl">Net % OI${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
-          </div>
-          ${isCrossPair && cotCcy2 && cotRaw2 ? `
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net (${cotCcy2})" data-tip-body="Net contracts held by Leveraged Funds for the quote currency. CFTC tracks ${cotCcy2} vs USD — use as ${cotCcy2} sentiment proxy." data-tip-ex="Cross pair: compare both component currencies. Divergence between base and quote LF creates a compounding cross signal.">
-            <div class="pd-inline-lbl">LF Net (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2Net)}">${fmtN(cot2Net)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Change (${cotCcy2})" data-tip-body="Change in LF net for the quote currency vs prior week.">
-            <div class="pd-inline-lbl">LF WoW Δ (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2Wow)}">${fmtN(cot2Wow)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net (${cotCcy2})" data-tip-body="Net contracts held by Asset Managers for the quote currency. Structural positioning." data-tip-ex="Divergence between LF and AM can signal a positioning squeeze.">
-            <div class="pd-inline-lbl">AM Net (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2AmNet)}">${fmtN(cot2AmNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI (${cotCcy2})" data-tip-body="LF net divided by LF OI for the quote currency. Normalises positioning for comparison.">
-            <div class="pd-inline-lbl">Net % OI (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2PctOI)}">${cot2PctOI != null ? (cot2PctOI > 0 ? '+' : '') + cot2PctOI.toFixed(1) + '%' : '—'}</div>
-          </div>` : ''}
-        </div>
-        <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
+        ${(() => {
+          // Helper: render one 4-metric COT block for a given currency
+          const cotBlock = (ccy, net, wow, amNet, pctOI, isCross) => {
+            const crossNote = isCross ? ` CFTC tracks ${ccy} vs USD — use as ${ccy} sentiment proxy for this cross.` : '';
+            const lfD = net == null ? null : net > 0 ? 'Long' : net < 0 ? 'Short' : null;
+            const amD = amNet == null ? null : amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null;
+            const alignedStr = lfD && amD ? (lfD === amD
+              ? `<span style="color:var(--text3);font-size:8px;"> · aligned</span>`
+              : `<span style="color:var(--text3);font-size:8px;"> · diverging</span>`) : '';
+            const summaryLine = lfD
+              ? `<div style="margin-top:4px;font-size:9px;font-family:var(--font-mono);">` +
+                `<span class="${clsI(net)}">${lfD}</span><span style="color:var(--text3);font-size:8px;"> LF</span>` +
+                (amD ? ` · <span class="${clsI(amNet)}">${amD}</span><span style="color:var(--text3);font-size:8px;"> AM</span>${alignedStr}` : '') +
+                `</div>` : '';
+            return `
+            ${isCross ? `<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);padding:2px 0 4px;border-bottom:1px solid var(--border2);margin-bottom:6px;">${ccy}</div>` : ''}
+            <div class="pd-inline-metrics">
+              <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs.${crossNote}" data-tip-ex="Extreme net long historically precedes reversals as the speculative crowd becomes crowded.">
+                <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(net)}">${fmtN(net)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change${isCross ? ` · ${ccy}` : ''}" data-tip-body="Change in LF net contracts vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
+                <div class="pd-inline-lbl">LF WoW Δ</div><div class="pd-inline-val ${clsI(wow)}">${fmtN(wow)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net${isCross ? ` · ${ccy}` : ''}" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural positioning.${crossNote}" data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
+                <div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val ${clsI(amNet)}">${fmtN(amNet)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI${isCross ? ` · ${ccy}` : ''}" data-tip-body="LF net divided by LF Open Interest. Normalises positioning across currencies for direct comparison.${crossNote}" data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically a crowded position.">
+                <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(pctOI)}">${pctOI != null ? (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%' : '—'}</div>
+              </div>
+            </div>
+            ${summaryLine}`;
+          };
+
+          if (isCrossPair && cotCcy2 && cotRaw2) {
+            return `
+            ${cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, true)}
+            <div style="border-top:1px solid var(--border2);margin:7px 0;"></div>
+            ${cotBlock(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, true)}`;
+          } else {
+            return cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, false);
+          }
+        })()}
       </div>
 
       <div class="pd-inline-group pd-inline-group--retail fx-tip"
@@ -3548,95 +3562,60 @@ async function updatePairDetail(tvSym) {
 
     <div class="pd-section">
       <div class="pd-section-lbl">COT Positioning</div>
-      <div class="pd-grid">
-        ${(() => {
-          const crossNote1 = isCrossPair
-            ? ` CFTC tracks ${cotCcy} futures vs USD — not this cross specifically. Use as ${cotCcy} sentiment proxy.`
-            : '';
-          const ccy1Tag = isCrossPair ? ` (${cotCcy})` : '';
-          return `
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Leveraged Funds Net${ccy1Tag}"
-              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote1}"
-              data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
-              <div class="pd-lbl">LF Net${ccy1Tag}</div>
-              <div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF WoW Change${ccy1Tag}"
-              data-tip-body="Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs. The primary momentum signal in institutional COT analysis.${crossNote1}"
-              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. A reversal in WoW change is often the earliest signal of a positioning shift.">
-              <div class="pd-lbl">LF WoW Δ${ccy1Tag}</div>
-              <div class="pd-val ${cls(cotWow)}">${cotWow != null ? (cotWow > 0 ? '+' : '') + Math.round(cotWow).toLocaleString() : '—'}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Asset Managers Net${ccy1Tag}"
-              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote1}"
-              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
-              <div class="pd-lbl">AM Net${ccy1Tag}</div>
-              <div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF Net as % of Total OI${ccy1Tag}"
-              data-tip-body="LF net contracts divided by LF Open Interest (long + short). Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote1}"
-              data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
-              <div class="pd-lbl">Net % OI${ccy1Tag}</div>
-              <div class="pd-val ${cls(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
-            </div>
-            ${isCrossPair && cotCcy2 && cotRaw2 ? (() => {
-              const crossNote2 = ` CFTC tracks ${cotCcy2} futures vs USD — use as ${cotCcy2} sentiment proxy for this cross.`;
-              const ccy2Tag = ` (${cotCcy2})`;
-              return `
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Leveraged Funds Net${ccy2Tag}"
-              data-tip-body="Net contracts held by Leveraged Funds for the quote currency.${crossNote2}"
-              data-tip-ex="Cross pair COT analysis: compare both component currencies' positioning. Divergence between base and quote LF direction creates a compounding cross signal.">
-              <div class="pd-lbl">LF Net${ccy2Tag}</div>
-              <div class="pd-val ${cls(cot2Net)}">${fmtNet(cot2Net)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF WoW Change${ccy2Tag}"
-              data-tip-body="Week-over-week change in Leveraged Funds net for the quote currency.${crossNote2}"
-              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. Reversal in WoW is often the earliest signal of a positioning shift.">
-              <div class="pd-lbl">LF WoW Δ${ccy2Tag}</div>
-              <div class="pd-val ${cls(cot2Wow)}">${cot2Wow != null ? (cot2Wow > 0 ? '+' : '') + Math.round(cot2Wow).toLocaleString() : '—'}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Asset Managers Net${ccy2Tag}"
-              data-tip-body="Net contracts held by Asset Managers for the quote currency. Structural / longer-term positioning.${crossNote2}"
-              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
-              <div class="pd-lbl">AM Net${ccy2Tag}</div>
-              <div class="pd-val ${cls(cot2AmNet)}">${fmtNet(cot2AmNet)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF Net as % of Total OI${ccy2Tag}"
-              data-tip-body="LF net divided by LF Open Interest for the quote currency. Normalises positioning.${crossNote2}"
-              data-tip-ex="+15% means a heavily crowded position historically associated with reversal risk.">
-              <div class="pd-lbl">Net % OI${ccy2Tag}</div>
-              <div class="pd-val ${cls(cot2PctOI)}">${cot2PctOI != null ? (cot2PctOI > 0 ? '+' : '') + cot2PctOI.toFixed(1) + '%' : '—'}</div>
-            </div>`;
-            })() : ''}`;
-        })()}
-        ${cotOI != null ? (() => {
-          const ccyTag    = isCrossPair && cotCcy ? ` (${cotCcy})` : '';
-          const crossNote = isCrossPair
-            ? ` CFTC tracks ${cotCcy} futures vs USD — use as a proxy for ${cotCcy} market participation broadly.`
-            : '';
-          const oiDelta    = (cotPrevOI != null) ? cotOI - cotPrevOI : null;
+      ${(() => {
+        // Helper: render one COT block for a given currency (for the popover grid layout)
+        const cotBlockGrid = (ccy, net, wow, amNet, pctOI, oi, prevOI, isCross) => {
+          const crossNote = isCross ? ` CFTC tracks ${ccy} futures vs USD — not this cross specifically. Use as ${ccy} sentiment proxy.` : '';
+          const oiDelta    = (prevOI != null && oi != null) ? oi - prevOI : null;
           const oiArrow    = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
           const oiDeltaStr = oiDelta == null ? '' : ` <span class="pd-dim" style="font-size:9px;">(${oiDelta > 0 ? '+' : ''}${Math.round(oiDelta).toLocaleString()})</span>`;
-          const oiTipEx    = oiDelta != null
-            ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}`
-            : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.';
-          return `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;"
-            data-tip-title="LF Open Interest${ccyTag}"
-            data-tip-body="Total open interest in the Leveraged Funds category: long + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report.${crossNote}"
-            data-tip-ex="${oiTipEx}">
-            <div class="pd-lbl">LF Open Interest${ccyTag}</div>
-            <div class="pd-val">${oiArrow}${Math.round(cotOI).toLocaleString()}${oiDeltaStr}</div>
-          </div>`;
-        })() : ''}
-      </div>
+          return `
+            ${isCross ? `<div class="pd-cell pd-cell--wide" style="padding:4px 8px 2px;border-bottom:1px solid var(--border2);"><span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);">${ccy}</span><span style="font-size:8px;color:var(--text3);"> · vs USD proxy</span></div>` : ''}
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
+              <div class="pd-lbl">LF Net</div>
+              <div class="pd-val ${cls(net)}">${fmtNet(net)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="LF WoW Change${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs. The primary momentum signal in institutional COT analysis.${crossNote}"
+              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. A reversal in WoW change is often the earliest signal of a positioning shift.">
+              <div class="pd-lbl">LF WoW Δ</div>
+              <div class="pd-val ${cls(wow)}">${wow != null ? (wow > 0 ? '+' : '') + Math.round(wow).toLocaleString() : '—'}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Asset Managers Net${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
+              <div class="pd-lbl">AM Net</div>
+              <div class="pd-val ${cls(amNet)}">${fmtNet(amNet)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="LF Net as % of Total OI${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="LF net contracts divided by LF Open Interest (long + short). Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
+              data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
+              <div class="pd-lbl">Net % OI</div>
+              <div class="pd-val ${cls(pctOI)}">${pctOI != null ? (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%' : '—'}</div>
+            </div>
+            ${oi != null ? `<div class="pd-cell pd-cell--wide fx-tip" style="${isCross ? '' : 'border-bottom:none;'}"
+              data-tip-title="LF Open Interest${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Total open interest in the Leveraged Funds category: long + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report.${crossNote}"
+              data-tip-ex="${oiDelta != null ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}` : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.'}">
+              <div class="pd-lbl">LF Open Interest</div>
+              <div class="pd-val">${oiArrow}${Math.round(oi).toLocaleString()}${oiDeltaStr}</div>
+            </div>` : ''}`;
+        };
+
+        const gridHtml = isCrossPair && cotCcy2 && cotRaw2
+          ? cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, true) +
+            `<div class="pd-cell pd-cell--wide" style="padding:0;border-bottom:1px solid var(--border);margin-top:2px;"></div>` +
+            cotBlockGrid(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, null, null, true)
+          : cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, false);
+
+        return `<div class="pd-grid">${gridHtml}</div>`;
+      })()}
       ${cotSummaryHtml}
     </div>
 
