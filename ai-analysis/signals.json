@@ -1,48 +1,47 @@
 {
-  "generated_at": "2026-04-22T15:49:15Z",
+  "generated_at": "2026-04-22T17:09:21Z",
   "signals": [
     {
-      "time": "15:45",
+      "time": "17:05",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.49; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% vs BoJ 0.75% — 450bp carry differential supports USD/JPY. Watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.48; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Fed 3.75% (ON HOLD) vs BoJ 0.75% (ON HOLD) — 450bp Fed-BoJ carry differential favors USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.49",
+        "USD/JPY: 159.48",
         "JPY COT LF net short −65,309",
-        "Fed 3.75% vs BoJ 0.75%"
+        "Fed-BoJ carry differential: 450bp"
       ]
     },
     {
-      "time": "15:42",
+      "time": "17:03",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD at 0.7159; HV30 at 6.5%, ATM IV (FXE chain) at 7.3% — options pricing a 0.8 vol-pt premium over realized. CFTC LF net long +41,675 (week Apr 14), long%=72.0% — extreme long positioning. Retail 88% short — contrarian signal. Watch for LF delta turning negative or IV skew to shift.",
+      "title": "AUD/USD — Positioning + Retail",
+      "text": "AUD/USD COT LF net long +41,675 (week ending Apr 14), long%=72.0% — extreme long positioning. Retail sentiment shows 11% long / 89% short (EXTREME SHORT bias). AUD/USD at 0.7161; RBA 4.10% (HIKING) vs Fed 3.75% (ON HOLD) — 35bp AUD carry premium supports the pair structurally. Watch for LF delta turning negative or retail sentiment shifting to invalidate the extreme positioning read.",
       "evidence": [
-        "AUD/USD: 0.7159",
-        "CFTC LF net long +41,675",
-        "Retail 88% short"
+        "AUD/USD COT LF net long +41,675",
+        "AUD/USD retail: 11% long / 89% short",
+        "RBA-Fed rate differential: 35bp"
       ]
     },
     {
-      "time": "15:38",
+      "time": "16:58",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium; BoE expected to hold. GBP LF net long +28,426, AM constructive — positioning aligned with carry. GBP/USD at 1.35 mid-range; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.351; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV — options neutral.",
       "evidence": [
-        "GBP/USD: 1.35",
-        "BoE 3.75% vs Fed 3.75%",
-        "GBP LF net long +28,426"
+        "BoE-Fed rate differential: 75bp",
+        "GBP LF net long +28,426",
+        "GBP/USD: 1.351"
       ]
     },
     {
-      "time": "15:36",
+      "time": "16:55",
       "priority": "info",
-      "title": "NZD/USD — Retail Sentiment",
-      "text": "NZD/USD at 0.5909; retail 65% short — short bias but not extreme. NZD COT LF net short −17,090, long%=21.7% — not extreme positioning. Watch for NZD/USD break above 0.6000 to confirm bullish trend.",
+      "title": "NZD/USD — Technical",
+      "text": "NZD/USD at 0.5909; NZD/USD vs NZX 50 corr=+0.661 (z=+2.20σ) — correlation break. Watch 0.6000 as the next level on a sustained move.",
       "evidence": [
         "NZD/USD: 0.5909",
-        "retail 65% short",
-        "NZD COT LF net short −17,090"
+        "NZD/USD vs NZX 50 corr=+0.661"
       ]
     }
   ]
