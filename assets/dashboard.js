@@ -3054,7 +3054,7 @@ async function buildInlineDetail(tvSym, container) {
         <div class="pd-inline-group-lbl">COT Positioning</div>
         ${(() => {
           // Helper: render one 4-metric COT block for a given currency
-          const cotBlock = (ccy, net, wow, amNet, pctOI, isCross) => {
+          const cotBlock = (ccy, net, wow, amNet, pctOI, isCross, addTopBorder) => {
             const crossNote = isCross ? ` CFTC tracks ${ccy} vs USD — use as ${ccy} sentiment proxy for this cross.` : '';
             const lfD = net == null ? null : net > 0 ? 'Long' : net < 0 ? 'Short' : null;
             const amD = amNet == null ? null : amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null;
@@ -3067,7 +3067,7 @@ async function buildInlineDetail(tvSym, container) {
                 (amD ? ` · <span class="${clsI(amNet)}">${amD}</span><span style="color:var(--text3);font-size:8px;"> AM</span>${alignedStr}` : '') +
                 `</div>` : '';
             return `
-            ${isCross ? `<div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);padding:2px 0 4px;border-bottom:1px solid var(--border2);margin-bottom:6px;">${ccy}</div>` : ''}
+            <div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 0 3px;${addTopBorder ? 'border-top:1px solid var(--border);margin-top:4px;' : ''}">COT${isCross ? ` ${ccy} · vs USD proxy` : ''}</div>
             <div class="pd-inline-metrics">
               <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs.${crossNote}" data-tip-ex="Extreme net long historically precedes reversals as the speculative crowd becomes crowded.">
                 <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(net)}">${fmtN(net)}</div>
@@ -3087,11 +3087,10 @@ async function buildInlineDetail(tvSym, container) {
 
           if (isCrossPair && cotCcy2 && cotRaw2) {
             return `
-            ${cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, true)}
-            <div style="border-top:1px solid var(--border2);margin:7px 0;"></div>
-            ${cotBlock(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, true)}`;
+            ${cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, true, false)}
+            ${cotBlock(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, true, true)}`;
           } else {
-            return cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, false);
+            return cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, false, false);
           }
         })()}
       </div>
@@ -3564,13 +3563,13 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">COT Positioning</div>
       ${(() => {
         // Helper: render one COT block for a given currency (for the popover grid layout)
-        const cotBlockGrid = (ccy, net, wow, amNet, pctOI, oi, prevOI, isCross) => {
+        const cotBlockGrid = (ccy, net, wow, amNet, pctOI, oi, prevOI, isCross, addTopBorder) => {
           const crossNote = isCross ? ` CFTC tracks ${ccy} futures vs USD — not this cross specifically. Use as ${ccy} sentiment proxy.` : '';
           const oiDelta    = (prevOI != null && oi != null) ? oi - prevOI : null;
           const oiArrow    = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
           const oiDeltaStr = oiDelta == null ? '' : ` <span class="pd-dim" style="font-size:9px;">(${oiDelta > 0 ? '+' : ''}${Math.round(oiDelta).toLocaleString()})</span>`;
           return `
-            ${isCross ? `<div class="pd-cell pd-cell--wide" style="padding:4px 8px 2px;border-bottom:1px solid var(--border2);"><span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);">${ccy}</span><span style="font-size:8px;color:var(--text3);"> · vs USD proxy</span></div>` : ''}
+            ${isCross ? `<div class="pd-cell pd-cell--wide pd-section-lbl" style="${addTopBorder ? 'border-top:1px solid var(--border);margin-top:2px;' : ''}">COT ${ccy} · vs USD proxy</div>` : ''}
             <div class="pd-cell fx-tip"
               data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}"
               data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
@@ -3609,10 +3608,9 @@ async function updatePairDetail(tvSym) {
         };
 
         const gridHtml = isCrossPair && cotCcy2 && cotRaw2
-          ? cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, true) +
-            `<div class="pd-cell pd-cell--wide" style="padding:0;border-bottom:1px solid var(--border);margin-top:2px;"></div>` +
-            cotBlockGrid(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, null, null, true)
-          : cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, false);
+          ? cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, true, false) +
+            cotBlockGrid(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, null, null, true, true)
+          : cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, false, false);
 
         return `<div class="pd-grid">${gridHtml}</div>`;
       })()}
