@@ -2901,12 +2901,9 @@ async function buildInlineDetail(tvSym, container) {
     }
   } catch {}
 
-  // COT — single leg for USD pairs, dual leg for crosses
-  const isCross = !!meta?.cross;
-
-  // Primary leg (always base, unless base=USD in which case quote)
-  const cotCcy  = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
-  const cotRaw  = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  // COT
+  const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
+  const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
   let cotNet = null, cotAmNet = null, cotWow = null, cotPctOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
@@ -2915,20 +2912,6 @@ async function buildInlineDetail(tvSym, container) {
     cotWow   = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
     cotPctOI = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
     cotWeek  = cotRaw.weekEnding || '';
-  }
-
-  // Second leg — only for crosses (quote currency, never USD).
-  // Values shown as-is from CFTC, identical to the COT Positioning panel.
-  // GBP +28,426 Long and JPY −65,389 Short read directly, no inversion applied.
-  const cotCcy2 = isCross ? quote : null;
-  const cotRaw2 = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
-  let cotNet2 = null, cotAmNet2 = null, cotWow2 = null, cotPctOI2 = null;
-  if (cotRaw2) {
-    cotNet2   = cotRaw2.net          ?? null;
-    cotAmNet2 = cotRaw2.amNet        ?? null;
-    cotWow2   = cotRaw2.wowNetChange ?? null;
-    cotPctOI2 = cotRaw2.levNetPctOI  ?? null;
-    if (cotRaw2.weekEnding && !cotWeek) cotWeek = cotRaw2.weekEnding;
   }
 
   // Carry
@@ -2981,25 +2964,13 @@ async function buildInlineDetail(tvSym, container) {
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
   const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
 
-  // COT summary tag — for crosses shows both legs; for USD pairs shows single leg
+  // COT summary tag
   const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
   const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
   const aligned = lfDir && amDir && lfDir === amDir;
-  // Summary tag for crosses: both legs shown with raw CFTC direction, matching the COT panel.
-  // 'aligned' = base Long + quote Short (or vice versa) — both legs favour the same cross direction.
-  const lfDir2 = cotNet2 == null ? null : cotNet2 > 0 ? 'Long' : cotNet2 < 0 ? 'Short' : null;
-  let cotTag;
-  if (isCross && lfDir && lfDir2) {
-    const leg2Aligned = (lfDir === 'Long' && lfDir2 === 'Short') ||
-                        (lfDir === 'Short' && lfDir2 === 'Long');
-    cotTag = `<span style="color:var(--text3);font-size:8px;">${cotCcy} LF </span><span class="${clsI(cotNet)}">${lfDir}</span>`
-           + ` <span style="color:var(--text3);font-size:8px;">· ${cotCcy2} LF </span><span class="${clsI(cotNet2)}">${lfDir2}</span>`
-           + ` <span style="color:var(--text3);font-size:8px;">· ${leg2Aligned ? 'aligned' : 'diverging'}</span>`;
-  } else if (lfDir && amDir) {
-    cotTag = `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`;
-  } else {
-    cotTag = '—';
-  }
+  const cotTag = lfDir && amDir
+    ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
+    : '—';
 
   const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
 
@@ -3037,7 +3008,7 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised volatility, annualised. Measures recent actual movement.">
             <div class="pd-inline-lbl">HV 30d</div><div class="pd-inline-val">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE FX ETF options. Proxy for OTC interbank IV. Green ≤7%; red >12%.">
+          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Proxy for OTC interbank IV. Green ≤7%; red >12%.">
             <div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val ${ivCls(atmIv)}">${atmIv != null ? atmIv.toFixed(1) + '%' : '—'}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied minus realised vol. Positive = options expensive vs recent moves.">
@@ -3055,20 +3026,6 @@ async function buildInlineDetail(tvSym, container) {
       <div class="pd-inline-group">
         <div class="pd-inline-group-lbl">COT Positioning</div>
         <div class="pd-inline-metrics">
-          ${isCross ? `
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy}" data-tip-body="Net contracts held by Leveraged Funds in ${cotCcy} futures (CME). CFTC tracks ${cotCcy} vs USD — proxy for ${cotCcy} directional bias." data-tip-ex="Extreme net long historically precedes reversals as the speculative crowd becomes crowded.">
-            <div class="pd-inline-lbl">LF Net ${cotCcy}</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy}" data-tip-body="Week-over-week change in ${cotCcy} Leveraged Funds net contracts. Primary momentum signal in institutional COT analysis.">
-            <div class="pd-inline-lbl">WoW Δ ${cotCcy}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC LF Net · ${cotCcy2}" data-tip-body="Net contracts held by Leveraged Funds in ${cotCcy2} futures (CME). Shown as reported by CFTC — same values as the COT Positioning panel.">
-            <div class="pd-inline-lbl">LF Net ${cotCcy2}</div><div class="pd-inline-val ${clsI(cotNet2)}">${fmtN(cotNet2)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Δ · ${cotCcy2}" data-tip-body="Week-over-week change in ${cotCcy2} Leveraged Funds net contracts. Shown as reported by CFTC.">
-            <div class="pd-inline-lbl">WoW Δ ${cotCcy2}</div><div class="pd-inline-val ${clsI(cotWow2)}">${fmtN(cotWow2)}</div>
-          </div>
-          ` : `
           <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
             <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
           </div>
@@ -3081,7 +3038,6 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of Open Interest" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies for direct comparison." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
             <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
           </div>
-          `}
         </div>
         <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
       </div>
@@ -3189,51 +3145,19 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click to open chart + expand inline detail (mirrors FX Pairs table 1-click UX) ──
+// ── Sidebar crosses: click to open chart, double-click to open popover ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
-  toggleSidebarDetail(row, row.dataset.sym);
 });
 
-// ── Sidebar inline expand — mirrors toggleInlineDetail for FX Pairs table ──
-function toggleSidebarDetail(row, tvSym) {
-  const container = row.parentElement;
-  if (!container) return;
-
-  // If same row already open, collapse and return
-  const existing = container.querySelector('.sb-expand-row');
-  const wasThisRow = existing?.dataset.forSym === tvSym;
-
-  if (existing) {
-    const inner = existing.querySelector('.sb-expand-inner');
-    if (inner) inner.style.maxHeight = '0';
-    setTimeout(() => existing.remove(), 180);
-    container.querySelector('.sb-row.sb-selected')?.classList.remove('sb-selected');
-  }
-
-  if (wasThisRow) return;
-
-  row.classList.add('sb-selected');
-
-  const expandDiv = document.createElement('div');
-  expandDiv.className = 'sb-expand-row';
-  expandDiv.dataset.forSym = tvSym;
-
-  const inner = document.createElement('div');
-  inner.className = 'sb-expand-inner';
-  inner.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:var(--text3);">Loading\u2026</div>';
-  expandDiv.appendChild(inner);
-  row.after(expandDiv);
-
-  // Animate open — vertical layout is taller than the horizontal table expand
-  requestAnimationFrame(() => {
-    inner.style.maxHeight = '420px';
-  });
-
-  buildInlineDetail(tvSym, inner);
-}
+document.getElementById('sidebar')?.addEventListener('dblclick', e => {
+  e.preventDefault();
+  const row = e.target.closest('.sb-row[data-sym]');
+  if (!row) return;
+  openPairPopover(row, row.dataset.sym);
+});
 
 // ── FX Pairs table: click = chart + expand detail inline ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
@@ -3516,7 +3440,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD ETF IV × 1.08 (long-run NZD/AUD vol ratio). No CBOE-listed NZD ETF options available — treat as directional context only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark used by Bloomberg BVOL. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
@@ -4334,13 +4258,6 @@ async function fetchFedExpectations() {
         }
       }
 
-      // Inject computed fwdDisplay back into meetings object so _STATE_meetings carries
-      // fwdRate for openCBRatesModal — meetings.json only has cutProb/hikeProb, not the
-      // derived implied rate string. Without this the modal always shows — for FWD RATE.
-      if (meetingsRes?.meetings?.[ccy]) {
-        meetingsRes.meetings[ccy].fwdRate = fwdDisplay;
-      }
-
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
@@ -4361,7 +4278,7 @@ async function fetchFedExpectations() {
 // ═══════════════════════════════════════════════════════════════════
 // POSITIONING BIAS — three data sources, rendered in priority order:
 //
-// SOURCE 1 — ETF IV (primary): real ATM implied vol from CBOE FX ETF options (quotes.json).
+// SOURCE 1 — CBOE/CME Vol Index (primary): ATM implied vol from CBOE/CME FX Volatility Indexes (quotes.json).
 //   FXE → EUR/USD  FXB → GBP/USD  FXY → USD/JPY  FXA → AUD/USD
 //   When available: shows ATM IV column + IV Rank (when ≥4w history) or COT bias fallback.
 //
@@ -4517,8 +4434,8 @@ async function fetchOptionSkew() {
         const td0Body  = pairTip?.body || '';
         const td0Ex    = pairTip?.ex   || '';
         const td1Title = 'ATM Implied Volatility · ' + p.pair;
-        const td1Body  = `ATM IV ${ivStr} from CBOE FX ETF options (${etfIv.source || 'ETF'}) — nearest expiry ≥4 days. Proxy for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
-        const td1Ex    = 'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels.';
+        const td1Body  = `ATM IV ${ivStr} from CBOE/CME FX Volatility Index (${etfIv.source || 'CBOE/CME'}) — variance-swap methodology, same as VIX. Institutional benchmark for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
+        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. CHF and CAD fall through to CME futures options or CBOE ETF when no dedicated index exists. All values have ~15min delay.';
         const td3Title = p.pair + ' — Directional Bias';
         const td3Body  = pairTip?.body || '';
         const td3Ex    = pairTip?.ex   || '';
@@ -4577,7 +4494,7 @@ async function fetchOptionSkew() {
     const hasRR = Object.keys(rrMap).length > 0;
     if (panelHead) {
       if (hasAnyEtfIv) {
-        panelHead.textContent = hasRR ? 'ETF IV · CBOE · 25d RR · Saxo' : 'ETF options IV · CBOE (proxy)';
+        panelHead.textContent = hasRR ? 'CBOE/CME Vol · 25d RR · Saxo' : 'CBOE/CME Vol Index · IV';
       } else {
         panelHead.textContent = hasRR ? 'COT · 25d RR · Saxo' : 'COT-derived · IV unavailable';
       }
@@ -4716,10 +4633,7 @@ async function buildRichNarrative() {
     try {
       const sigR = await fetch('./ai-analysis/signals.json');
       if (sigR.ok) {
-        const sigData = await sigR.json();
-        // Handle both new format {generated_at, signals} and legacy plain array
-        const signals = Array.isArray(sigData) ? sigData : (sigData.signals || []);
-        const sigGeneratedAt = Array.isArray(sigData) ? null : (sigData.generated_at || null);
+        const signals = await sigR.json();
         if (Array.isArray(signals) && signals.length) {
           const container = document.getElementById('alerts-container');
           const sub = document.getElementById('alerts-sub');
@@ -4750,24 +4664,19 @@ async function buildRichNarrative() {
               const evHtml = ev.length
                 ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
                 : '';
-              // Body (text + evidence) is collapsible — hidden by default, expanded on row click.
-              // All rows are clickable when there is body content (text or evidence).
-              const hasBody = (s.text && s.text.trim()) || ev.length;
-              const bodyHtml = hasBody
-                ? `<div class="a-body" aria-label="Signal details">${s.text ? `<p class="a-body-text">${s.text}</p>` : ''}${evHtml}</div>`
-                : '';
-              return `<div class="alert-row${hasBody ? ' a-has-body' : ''}" ${evTooltip && !hasBody ? `title="${evTooltip}"` : ''}>
+              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
-                <div class="a-text"><strong>${s.title || (s.text || '')}</strong></div>
-                ${bodyHtml}
+                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
               </div>`;
             }).join('');
 
-            // Toggle body on row click (expand/collapse)
-            container.querySelectorAll('.a-has-body').forEach(row => {
+            // Toggle evidence chips on row click (expand/collapse)
+            container.querySelectorAll('.a-has-ev').forEach(row => {
+              row.style.cursor = 'pointer';
               row.addEventListener('click', () => {
-                row.classList.toggle('a-body-open');
+                const evEl = row.querySelector('.a-evidence');
+                if (evEl) evEl.classList.toggle('a-evidence-open');
               });
             });
           }
@@ -4775,20 +4684,7 @@ async function buildRichNarrative() {
             const now = new Date();
             const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-            // Show signal generation time if available, plus stale warning if > 2h old
-            let subText = signals.length + ' active · AI-generated';
-            if (sigGeneratedAt) {
-              try {
-                const genDt = new Date(sigGeneratedAt);
-                const genLocal = genDt.toLocaleTimeString(navigator.language || 'en', {
-                  hour: '2-digit', minute: '2-digit', hour12: false
-                });
-                const ageMin = (now - genDt) / 60000;
-                subText += ' · as of ' + genLocal;
-              } catch {}
-            }
-            subText += ' · loaded ' + hhmm + ' ' + tzAbbr;
-            sub.innerHTML = subText;
+            sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr;
           }
 
           // Notify user if signal set changed and notifications are enabled
@@ -5513,6 +5409,20 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     wrap.appendChild(container);
   }
 
+  // Helper: reload the Economic Calendar widget by re-injecting its script
+  function reloadTVCalendar() {
+    const scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    // Remove existing iframe/content and re-create the widget container
+    const container = scaleWrap.querySelector('.tradingview-widget-container');
+    if (!container) return;
+    const existingScript = container.querySelector('script');
+    if (!existingScript) return;
+    // Clone the widget container content to force re-init
+    const clone = container.cloneNode(true);
+    container.parentNode.replaceChild(clone, container);
+  }
+
   // FX Liquidity chart: force redraw when visible
   function redrawLiquidityIfVisible() {
     const canvas = document.getElementById('liquidity-canvas');
@@ -5530,8 +5440,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
+      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
       if (isMobile) {
         reloadActiveTVChart();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
   });
@@ -5547,8 +5460,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     }
     setTimeout(function() {
       redrawLiquidityIfVisible();
+      // Mobile only: widgets may have gone blank after bfcache restore
       if (isMobile) {
         reloadActiveTVChart();
+        // Stagger calendar reload to avoid TV scripts racing for the wrong container
+        setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
   });
@@ -5658,8 +5574,8 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 
   // TV advanced chart
   watchForIframe(document.getElementById('tv-chart-widget'));
-  // TV events calendar replaced by Trading Economics — loaded lazily via IntersectionObserver
-  // watchForIframe(document.getElementById('tvcal-inner')); — removed v7.30.2
+  // TV events calendar (skeleton is on tvcal-inner, iframe appears inside tvcal-scale)
+  watchForIframe(document.getElementById('tvcal-inner'));
 }());
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5670,10 +5586,28 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
 // ═══════════════════════════════════════════════════════════════════
 (function initTVWidgets() {
   var _chartLoaded   = false;
+  var _eventsLoaded  = false;
   var _econmapLoaded = false;
 
-  // Trading Economics replaced by Myfxbook iframe — static, no JS init needed
-  // loadTECalendar removed v7.30.3
+  function loadTVEvents() {
+    var scaleWrap = document.getElementById('tvcal-scale');
+    if (!scaleWrap) return;
+    var container = scaleWrap.querySelector('.tradingview-widget-container__widget');
+    if (!container) return;
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.src  = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+    s.async = true;
+    s.textContent = JSON.stringify({
+      colorTheme: 'dark', isTransparent: true, locale: 'en',
+      countryFilter: 'us,nz,au,ch,eu,ca,jp,gb',
+      importanceFilter: '-1,0,1', width: '100%', height: '100%'
+    });
+    var skel = document.querySelector('#tvcal-inner .tv-skeleton');
+    if (skel) skel.style.display = 'none';
+    container.appendChild(s);
+    _eventsLoaded = true;
+  }
 
   function loadTVEconMap() {
     var placeholder = document.getElementById('tv-econmap-placeholder');
@@ -5691,7 +5625,9 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   }
 
   if (typeof IntersectionObserver === 'undefined') {
+    // Fallback for very old browsers: load everything immediately
     if (typeof loadTVChart === 'function') loadTVChart(window._tvCurrentSym || 'FX_IDC:EURUSD');
+    loadTVEvents();
     loadTVEconMap();
     return;
   }
@@ -5706,6 +5642,9 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
         }
         _chartLoaded = true;
         io.unobserve(entry.target);
+      } else if (id === 'tvcal-inner' && !_eventsLoaded) {
+        loadTVEvents();
+        io.unobserve(entry.target);
       } else if (id === 'section-econmap' && !_econmapLoaded) {
         loadTVEconMap();
         io.unobserve(entry.target);
@@ -5717,8 +5656,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   // Guard: if readyState is already 'interactive' or 'complete', attach observers immediately.
   function attachObservers() {
     var chartWrap = document.getElementById('tv-chart-wrap');
+    var calInner  = document.getElementById('tvcal-inner');
     var econMap   = document.getElementById('section-econmap');
     if (chartWrap) io.observe(chartWrap);
+    if (calInner)  io.observe(calInner);
     if (econMap)   io.observe(econMap);
   }
 
@@ -6727,142 +6668,3 @@ if (document.readyState === 'loading') {
 } else {
   giOnboardInit();
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// UI STATE PERSISTENCE
-// Saves and restores: last chart symbol + last visited section.
-// Split layout state is handled separately by initSplitLayout().
-// Storage key: 'gi_ui_state' → { sym, section }
-// ═══════════════════════════════════════════════════════════════════
-(function initUIStatePersistence() {
-  'use strict';
-  var STATE_KEY = 'gi_ui_state';
-  var DEFAULT_SYM = 'FX_IDC:EURUSD';
-
-  function loadState() {
-    try { return JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch { return null; }
-  }
-
-  function saveState(patch) {
-    try {
-      var current = loadState() || {};
-      localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign(current, patch)));
-    } catch (_) {}
-  }
-
-  // ── Restore last chart symbol ──────────────────────────────────────
-  // Wrap loadTVChart to intercept every symbol change and persist it.
-  var _origLoadTV = typeof loadTVChart === 'function' ? loadTVChart : null;
-  if (_origLoadTV) {
-    window.loadTVChart = function(sym) {
-      _origLoadTV(sym);
-      saveState({ sym: sym });
-      window._tvCurrentSym = sym;
-    };
-  }
-
-  // ── Restore last nav section ───────────────────────────────────────
-  // Intercept top-nav link clicks to persist the target section.
-  document.querySelectorAll('.top-nav a[data-target]').forEach(function(link) {
-    link.addEventListener('click', function() {
-      var t = this.dataset.target;
-      if (t && t !== 'top') saveState({ section: t });
-    });
-  });
-
-  // ── Apply saved state on load ──────────────────────────────────────
-  // Defer until after boot() and all panels have initialized.
-  window.addEventListener('load', function() {
-    var state = loadState();
-    if (!state) return;
-
-    // Restore chart symbol (only if different from default to avoid redundant reload)
-    var sym = (state.sym && state.sym !== DEFAULT_SYM) ? state.sym : null;
-    if (sym && typeof window.loadTVChart === 'function') {
-      // Small delay: let the initial boot chart render first, then replace
-      setTimeout(function() { window.loadTVChart(sym); }, 800);
-    }
-
-    // Restore last section (scroll into view via nav link)
-    if (state.section) {
-      setTimeout(function() {
-        var link = document.querySelector('.top-nav a[data-target="' + state.section + '"]');
-        if (link) link.click();
-      }, 1000);
-    }
-  });
-}());
-
-// ═══════════════════════════════════════════════════════════════════
-// COT DIGEST — WEEKLY PUSH NOTIFICATION
-// Reads cot-data/digest.json after the COT workflow runs (Fri ~21:30 UTC).
-// Fires a push notification if:
-//   1. Browser notifications are permitted
-//   2. The digest weekEnding is newer than the last one seen by this user
-// Storage key: 'gi_cot_notif_seen' → last weekEnding string sent
-// ═══════════════════════════════════════════════════════════════════
-(function initCOTDigestNotification() {
-  'use strict';
-  var SEEN_KEY = 'gi_cot_notif_seen';
-
-  // Only run if SW is registered (required for showNotification)
-  // and notifications are supported
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-
-  // Don't run if permission was explicitly denied
-  if (Notification.permission === 'denied') return;
-
-  async function checkDigest() {
-    // Fetch the digest — this is a same-origin static file, no CORS
-    var res;
-    try {
-      res = await fetch('/cot-data/digest.json', { cache: 'no-cache' });
-      if (!res.ok) return;
-    } catch (_) { return; }
-
-    var digest;
-    try { digest = await res.json(); } catch (_) { return; }
-
-    var weekEnding = digest.weekEnding;
-    if (!weekEnding) return;
-
-    // Already notified for this week?
-    var lastSeen = '';
-    try { lastSeen = localStorage.getItem(SEEN_KEY) || ''; } catch (_) {}
-    if (lastSeen === weekEnding) return;
-
-    // Only notify if permission is already granted.
-    // We do NOT request permission here — that only happens via the onboarding
-    // tooltip ("SET ALERT") so the user has explicitly opted in.
-    if (Notification.permission !== 'granted') return;
-
-    // Get the SW registration to call showNotification
-    var reg;
-    try { reg = await navigator.serviceWorker.ready; } catch (_) { return; }
-    if (!reg) return;
-
-    var message = digest.message ||
-      'COT data updated for week ending ' + weekEnding;
-
-    try {
-      await reg.showNotification('COT Update — ' + weekEnding, {
-        body: message,
-        icon: '/favicon-192x192.png',
-        badge: '/favicon-32x32.png',
-        tag: 'gi-cot-' + weekEnding,   // prevents duplicate if tab reloads
-        renotify: false,
-        data: { url: 'https://globalinvesting.github.io/#section-positioning' },
-      });
-    } catch (_) { return; }
-
-    // Mark this week as seen so we never re-fire for the same weekEnding
-    try { localStorage.setItem(SEEN_KEY, weekEnding); } catch (_) {}
-  }
-
-  // Run after page load — no urgency, don't block anything
-  if (document.readyState === 'complete') {
-    setTimeout(checkDigest, 3000);
-  } else {
-    window.addEventListener('load', function() { setTimeout(checkDigest, 3000); });
-  }
-}());
