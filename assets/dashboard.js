@@ -2901,9 +2901,12 @@ async function buildInlineDetail(tvSym, container) {
     }
   } catch {}
 
-  // COT
+  // COT — for crosses, load BOTH component currencies
+  const isCrossPair = !!meta?.cross;
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  const cotCcy2 = isCrossPair && quote && quote !== cotCcy ? quote : null;
+  const cotRaw2 = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
   let cotNet = null, cotAmNet = null, cotWow = null, cotPctOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
@@ -2912,6 +2915,14 @@ async function buildInlineDetail(tvSym, container) {
     cotWow   = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
     cotPctOI = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
     cotWeek  = cotRaw.weekEnding || '';
+  }
+  let cot2Net = null, cot2AmNet = null, cot2Wow = null, cot2PctOI = null;
+  if (cotRaw2) {
+    cot2Net    = cotRaw2.net          ?? null;
+    cot2AmNet  = cotRaw2.amNet        ?? null;
+    cot2Wow    = cotRaw2.wowNetChange ?? null;
+    cot2PctOI  = cotRaw2.levNetPctOI  ?? null;
+    if (!cotWeek && cotRaw2.weekEnding) cotWeek = cotRaw2.weekEnding;
   }
 
   // Carry
@@ -2964,13 +2975,29 @@ async function buildInlineDetail(tvSym, container) {
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
   const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
 
-  // COT summary tag
-  const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
-  const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
-  const aligned = lfDir && amDir && lfDir === amDir;
-  const cotTag = lfDir && amDir
-    ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
-    : '—';
+  // COT summary tag — for crosses show both component currencies
+  let cotTag = '—';
+  if (isCrossPair && cotCcy2) {
+    const parts = [];
+    for (const [ccy, net, amNet] of [[cotCcy, cotNet, cotAmNet], [cotCcy2, cot2Net, cot2AmNet]]) {
+      if (net == null) continue;
+      const lfD = net > 0 ? 'Long' : net < 0 ? 'Short' : null;
+      const amD = amNet != null ? (amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null) : null;
+      if (!lfD) continue;
+      const lfC = net > 0 ? 'pd-up' : 'pd-dn';
+      const amPart = amD ? ` · <span class="${amNet > 0 ? 'pd-up' : 'pd-dn'}">${amD}</span> <span style="color:var(--text3);font-size:8px;">AM</span>` : '';
+      const alignedStr = lfD && amD ? (lfD === amD ? ' · <span style="color:var(--text3);font-size:8px;">aligned</span>' : ' · <span style="color:var(--text3);font-size:8px;">diverging</span>') : '';
+      parts.push(`<span style="color:var(--text3);font-size:8px;text-transform:uppercase;">${ccy}</span> <span class="${lfC}">${lfD}</span> <span style="color:var(--text3);font-size:8px;">LF</span>${amPart}${alignedStr}`);
+    }
+    cotTag = parts.join('<span style="color:var(--text3);"> · </span>') || '—';
+  } else {
+    const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
+    const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
+    const aligned = lfDir && amDir && lfDir === amDir;
+    cotTag = lfDir && amDir
+      ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
+      : '—';
+  }
 
   const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
 
@@ -3026,18 +3053,31 @@ async function buildInlineDetail(tvSym, container) {
       <div class="pd-inline-group">
         <div class="pd-inline-group-lbl">COT Positioning</div>
         <div class="pd-inline-metrics">
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
-            <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Net contracts held by Leveraged Funds — hedge funds and CTAs.${isCrossPair ? ` CFTC tracks ${cotCcy} vs USD — use as ${cotCcy} sentiment proxy.` : ''}" data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
+            <div class="pd-inline-lbl">LF Net${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change" data-tip-body="Change in LF net contracts vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
-            <div class="pd-inline-lbl">LF WoW Δ</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Change in LF net vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
+            <div class="pd-inline-lbl">LF WoW Δ${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural / longer-term positioning." data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
-            <div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val ${clsI(cotAmNet)}">${fmtN(cotAmNet)}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural positioning.${isCrossPair ? ` CFTC tracks ${cotCcy} vs USD.` : ''}" data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
+            <div class="pd-inline-lbl">AM Net${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotAmNet)}">${fmtN(cotAmNet)}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of Open Interest" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies for direct comparison." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
-            <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI${isCrossPair ? ` (${cotCcy})` : ''}" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
+            <div class="pd-inline-lbl">Net % OI${isCrossPair ? ` (${cotCcy})` : ''}</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
           </div>
+          ${isCrossPair && cotCcy2 && cotRaw2 ? `
+          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net (${cotCcy2})" data-tip-body="Net contracts held by Leveraged Funds for the quote currency. CFTC tracks ${cotCcy2} vs USD — use as ${cotCcy2} sentiment proxy." data-tip-ex="Cross pair: compare both component currencies. Divergence between base and quote LF creates a compounding cross signal.">
+            <div class="pd-inline-lbl">LF Net (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2Net)}">${fmtN(cot2Net)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF WoW Change (${cotCcy2})" data-tip-body="Change in LF net for the quote currency vs prior week.">
+            <div class="pd-inline-lbl">LF WoW Δ (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2Wow)}">${fmtN(cot2Wow)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net (${cotCcy2})" data-tip-body="Net contracts held by Asset Managers for the quote currency. Structural positioning." data-tip-ex="Divergence between LF and AM can signal a positioning squeeze.">
+            <div class="pd-inline-lbl">AM Net (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2AmNet)}">${fmtN(cot2AmNet)}</div>
+          </div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI (${cotCcy2})" data-tip-body="LF net divided by LF OI for the quote currency. Normalises positioning for comparison.">
+            <div class="pd-inline-lbl">Net % OI (${cotCcy2})</div><div class="pd-inline-val ${clsI(cot2PctOI)}">${cot2PctOI != null ? (cot2PctOI > 0 ? '+' : '') + cot2PctOI.toFixed(1) + '%' : '—'}</div>
+          </div>` : ''}
         </div>
         <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
       </div>
