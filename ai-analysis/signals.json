@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-04-22T05:54:41Z",
+  "generated_at": "2026-04-22T08:13:39Z",
   "signals": [
     {
-      "time": "05:54",
+      "time": "08:10",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.19; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Implication: risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.24; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Implication: risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.19",
+        "USD/JPY: 159.24",
         "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "05:51",
+      "time": "08:07",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7172; 25d RR at −0.08: mild put skew. Implication: late-trend caution signal as market hedging rather than chasing. Watch for LF delta turning negative to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.7169; 25d RR at −0.21: mild put skew. Implication: late-trend caution signal as market hedging rather than chasing. Watch for LF delta turning negative to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
         "HV30 at 6.5%",
@@ -23,24 +23,24 @@
       ]
     },
     {
-      "time": "05:45",
-      "priority": "info",
+      "time": "08:05",
+      "priority": "warning",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3527; 1.3600 is the next resistance on a continuation. Implication: BoE rate hike expectations support GBP.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. GBP/USD at 1.3527; 1.3600 is the next resistance on a continuation. Implication: as long as BoE holds higher rates, GBP/USD capped but supported. Watch for a break below 1.3500 to shift the read.",
       "evidence": [
-        "BoE 3.75%",
-        "GBP LF net long +28,426",
-        "GBP/USD: 1.3527"
+        "BoE 4.50% vs Fed 3.75%",
+        "GBP LF net long +28,426"
       ]
     },
     {
-      "time": "05:50",
+      "time": "08:03",
       "priority": "info",
-      "title": "USD/CAD — CB + Technical",
-      "text": "The BoC at 2.25% vs Fed at 3.75% — 150bp CAD carry disadvantage. USD/CAD at 1.3647, testing the 1.3650 level. The bear steepener yield curve regime (+58.2bp 2s10s spread) suggests a risk-off environment, which typically favors the USD. Positioning data shows a net short 63,570 contracts (CFTC, week ending Apr 14), aligned with the carry read. Watch 1.3700 as the next resistance level.",
+      "title": "EUR/USD — Positioning + Vol",
+      "text": "EUR LF net short −72, long%=50.0% — flat positioning. HV30 at 8.2%, ATM IV (FXE chain) at 9.4% — options pricing a 1.2 vol-pt premium over realized. EUR/USD at 1.1758; 25d RR at −0.14: mild put skew despite the bullish price trend. Implication: market hedging rather than chasing — late-trend caution, not reversal. Watch for LF delta turning positive or AM reducing to shift the read.",
       "evidence": [
-        "BOC 2.25% vs FED 3.75%",
-        "USD/CAD AT 1.3647"
+        "EUR LF net short −72",
+        "HV30 at 8.2%",
+        "ATM IV at 9.4%"
       ]
     }
   ]
