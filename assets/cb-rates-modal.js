@@ -426,12 +426,42 @@ function openCBRatesModal(ccy, obs, bankInfo, meetingData) {
   const trendLabel = trend === 'hiking' ? '↑ Hiking cycle' : trend === 'cutting' ? '↓ Cutting cycle' : '— On hold';
   const trendCol   = trend === 'hiking' ? 'var(--up,#26a69a)' : trend === 'cutting' ? 'var(--down,#ef5350)' : 'var(--text2,#9096a0)';
 
-  // Forward rate from meetingData
-  const fwdRate = meetingData?.fwdRate ?? null;
+  // Forward rate from meetingData — mirrors Priority 1/2/3 logic in dashboard.js fetchCBExpectations()
+  // Priority 1: explicit fwdRate from meetings.json (OIS-derived — populated when engine computes it)
+  // Priority 2: probability-weighted (Bloomberg WIRP standard) if cutProb/hikeProb available
+  // Priority 3: naive ±25bp step from current rate (prefixed with ~) when no probabilities
   const bias    = meetingData?.bias ?? null;
   const nextMtg = meetingData?.nextMeeting ?? '—';
   const biasLabel = bias === 'cut' ? '↓ Cut' : bias === 'hike' ? '↑ Hike' : '→ Hold';
   const biasCol   = bias === 'cut' ? 'var(--down,#ef5350)' : bias === 'hike' ? 'var(--up,#26a69a)' : 'var(--text2,#9096a0)';
+
+  let fwdRate = null;
+  let fwdDisplay = '—';
+  let fwdIsEstimate = false;
+  if (meetingData?.fwdRate != null && !isNaN(meetingData.fwdRate) && meetingData.fwdRate > 0) {
+    // Priority 1: engine-computed OIS value
+    fwdRate = parseFloat(meetingData.fwdRate);
+    fwdDisplay = fwdRate.toFixed(2) + '%';
+  } else {
+    const pCut  = (meetingData?.cutProb  != null && !isNaN(meetingData.cutProb))  ? Math.min(100, Math.max(0, meetingData.cutProb))  : null;
+    const pHike = (meetingData?.hikeProb != null && !isNaN(meetingData.hikeProb)) ? Math.min(100, Math.max(0, meetingData.hikeProb)) : null;
+    if (pCut !== null || pHike !== null) {
+      // Priority 2: probability-weighted — Bloomberg WIRP standard
+      const cut  = pCut  ?? 0;
+      const hike = pHike ?? 0;
+      const cutC  = Math.min(cut,  100);
+      const hikeC = Math.min(hike, 100 - cutC);
+      fwdRate = Math.max(0, currentRate + (hikeC / 100) * 0.25 - (cutC / 100) * 0.25);
+      fwdDisplay = fwdRate.toFixed(2) + '%';
+    } else {
+      // Priority 3: naive ±25bp step — ~ prefix signals estimate
+      const meetingBiasDir = bias === 'cut' ? 'down' : bias === 'hike' ? 'up' : 'flat';
+      const step = meetingBiasDir === 'down' ? -0.25 : meetingBiasDir === 'up' ? 0.25 : 0;
+      fwdRate = Math.max(0, currentRate + step);
+      fwdDisplay = '~' + fwdRate.toFixed(2) + '%';
+      fwdIsEstimate = true;
+    }
+  }
 
   // Cumulative cut/hike in this cycle (consecutive decisions from latest)
   const lastDir = decisions.length ? Math.sign(decisions[decisions.length - 1].delta) : 0;
@@ -485,10 +515,10 @@ function openCBRatesModal(ccy, obs, bankInfo, meetingData) {
       <div class="cbr-mm-val cf" style="font-size:12px">${nextMtg}</div>
       <div class="cbr-mm-sub" style="color:${biasCol}">${biasLabel}</div>
     </div>
-    <div class="cbr-mm">
+    <div class="cbr-mm" title="${fwdIsEstimate ? 'Estimate: naive ±25bp step from current rate — no OIS probability data available' : (meetingData?.cutProb != null || meetingData?.hikeProb != null) ? 'Probability-weighted (Bloomberg WIRP standard)' : 'OIS-derived forward rate'}">
       <div class="cbr-mm-lbl">Fwd Rate</div>
-      <div class="cbr-mm-val ${bias === 'cut' ? 'cd' : bias === 'hike' ? 'cu' : 'cf'}">${fwdRate != null ? fwdRate : '—'}</div>
-      <div class="cbr-mm-sub">OIS implied</div>
+      <div class="cbr-mm-val ${bias === 'cut' ? 'cd' : bias === 'hike' ? 'cu' : 'cf'}">${fwdDisplay}</div>
+      <div class="cbr-mm-sub">${fwdIsEstimate ? '~ est · no OIS prob' : 'OIS implied'}</div>
     </div>
   </div>
 
