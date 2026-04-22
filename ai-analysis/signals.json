@@ -1,45 +1,46 @@
 {
-  "generated_at": "2026-04-21T22:33:29Z",
+  "generated_at": "2026-04-22T02:50:13Z",
   "signals": [
     {
-      "time": "22:30",
+      "time": "02:45",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.37; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. The 450bp Fed-BoJ carry differential supports USD. Risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.3; 160.00 remains the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Implication: risk-off flow historically unwinds JPY shorts — watch 157.00 as the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.37",
+        "USD/JPY: 159.3",
         "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "22:25",
+      "time": "02:42",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme positioning. HV30 at 10.3%, ATM IV (FXE chain) at 11.2% — options pricing a 0.9 vol-pt premium over realized. AUD/USD at 0.7153; mild put skew (25d RR at −0.08) despite bullish price trend — market hedging rather than chasing. Watch for LF delta turning positive to invalidate.",
+      "text": "AUD LF net long +41,675 (CFTC, week ending Apr 14), long%=72.0% — extreme long positioning. HV30 at 6.5%, ATM IV (FXE chain) at 8.2% — options pricing a 1.7 vol-pt premium over realized. AUD/USD at 0.716; mild put skew (25d RR at −0.08) despite the bullish price trend — market hedging rather than chasing. Implication: late-trend caution signal. Watch for LF delta turning negative to invalidate.",
       "evidence": [
         "AUD LF net long +41,675",
-        "HV30 at 10.3%",
-        "ATM IV at 11.2%"
+        "HV30 at 6.5%",
+        "ATM IV at 8.2%"
       ]
     },
     {
-      "time": "22:15",
+      "time": "02:38",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3502 mid-range; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium supports the pair structurally. GBP LF net long +28,426 (CFTC, week ending Apr 14); AM constructive — positioning aligned with the carry read. GBP/USD at 1.351; 1.3600 is the next resistance on a continuation. Implication: steady as she goes.",
       "evidence": [
-        "BoE 4.50% vs Fed 3.75%",
+        "BoE 3.75%",
         "GBP LF net long +28,426"
       ]
     },
     {
-      "time": "22:18",
+      "time": "02:33",
       "priority": "info",
       "title": "USD/CAD — CB + Technical",
-      "text": "BoC at 2.25% vs Fed at 3.75% — 150bp CAD yield disadvantage. USD/CAD at 1.3663, testing the 1.3700 level. Positioning data shows a net short 63,570 contracts (CFTC, week ending Apr 14). The yield differential and technical level suggest a range-bound market. Watch for a break above 1.3700 to shift the read.",
+      "text": "BoC at 2.25% (ON HOLD) vs Fed at 3.75% (ON HOLD) — 150bp CAD carry disadvantage. USD/CAD at 1.3659, testing the recent range. Positioning data shows a net short position (CFTC, week ending Apr 14), aligning with the carry read. Watch for a break above 1.3700 to confirm a continuation.",
       "evidence": [
-        "BOC 2.25% VS FED 3.75%",
-        "USD/CAD 1.3663"
+        "BOC 2.25%",
+        "FED 3.75%",
+        "USD/CAD 1.3659"
       ]
     }
   ]
