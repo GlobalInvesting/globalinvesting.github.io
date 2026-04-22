@@ -4633,7 +4633,11 @@ async function buildRichNarrative() {
     try {
       const sigR = await fetch('./ai-analysis/signals.json');
       if (sigR.ok) {
-        const signals = await sigR.json();
+        const _sigRaw = await sigR.json();
+        // signals.json may be a bare array (written by fetch_intraday_quotes.py) or
+        // a dict { "generated_at": "...", "signals": [...] } (written by generate_narrative_signals.py).
+        // Normalise to array before rendering.
+        const signals = Array.isArray(_sigRaw) ? _sigRaw : (Array.isArray(_sigRaw?.signals) ? _sigRaw.signals : []);
         if (Array.isArray(signals) && signals.length) {
           const container = document.getElementById('alerts-container');
           const sub = document.getElementById('alerts-sub');
