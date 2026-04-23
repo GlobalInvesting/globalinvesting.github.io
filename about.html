@@ -576,6 +576,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <tr><td>US Treasury Yield Curve</td><td>yfinance</td><td><span class="badge-daily">DAILY</span></td></tr>
         <tr><td>News Headlines</td><td>FXStreet, ForexLive, ECB, BoE, Investing.com and others</td><td><span class="badge-daily">EVERY 1H</span></td></tr>
         <tr><td>AI Narrative &amp; Market Signals</td><td>LLM (AI model)</td><td><span class="badge-daily">12× DAILY</span></td></tr>
+        <tr><td>AI Currency Drivers &amp; Session Context</td><td>LLM (AI model) · ForexFactory economic calendar</td><td><span class="badge-daily">12× DAILY</span></td></tr>
         <tr><td>Economic Map</td><td>TradingView</td><td><span class="badge-rt">REAL-TIME</span></td></tr>
       </tbody>
     </table>
@@ -593,15 +594,23 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
   <div class="section">
     <h2>AI in the terminal</h2>
-    <p>AI is used for two specific outputs in the terminal, both clearly labeled:</p>
+    <p>AI is used for four specific outputs in the terminal, all clearly labeled. Three are generated alongside the main narrative run (12&times; daily); one is generated per heatmap modal interaction.</p>
     <div class="grid-2">
       <div class="card">
         <div class="card-title">Market Narrative</div>
-        <div class="card-body">A concise market summary updated twelve times daily (00:00, 02:00, 04:00, 06:30, 08:30, 10:30, 12:30, 14:30, 16:00, 18:00, 20:00, 22:00 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, MIXED, or NEUTRAL.</div>
+        <div class="card-body">A concise market summary updated twelve times daily (00:00, 02:00, 04:00, 06:30, 08:30, 10:30, 12:30, 14:30, 16:00, 18:00, 20:00, 22:00 UTC), synthesizing rate differentials, cross-asset conditions, COT positioning, and macro events into a readable context. Includes a regime label: RISK-ON, RISK-OFF, CAUTION, or MIXED.</div>
       </div>
       <div class="card">
         <div class="card-title">Market Signals</div>
         <div class="card-body">Five to seven prioritized market signals published alongside the narrative — critical alerts, warnings, and informational notes covering CB decisions, key technical levels, positioning extremes, and regime shifts.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Currency Drivers</div>
+        <div class="card-body">One declarative note per direct pair (max 85 characters) explaining the structural driver behind the move: CB stance differential, COT positioning extreme, or carry differential. Generated per currency (8 calls/run) and displayed in the Strength Drivers block of the Currency Strength Heatmap modal. Updated 12&times; daily alongside the narrative.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Session Context</div>
+        <div class="card-body">Per-session, per-currency notes covering all four trading sessions (Sydney, Tokyo, London, New York) for all 8 G8 currencies. Each note is a Bloomberg-style recap anchored to actual ForexFactory calendar events — citing the specific catalyst (data release, CB speaker) rather than generic CB-stance commentary. Displayed in the Session tab of the Currency Strength Heatmap modal. Updated 12&times; daily.</div>
       </div>
     </div>
     <p style="margin-top:16px;">All other sections — prices, COT data, yield curve, heatmap, news — consume market data directly. AI does not generate, filter, or modify price data.</p>
@@ -638,7 +647,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">ABOUT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.31.2</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.39.5</span></div>
 </footer>
 
 

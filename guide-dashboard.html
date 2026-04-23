@@ -163,6 +163,7 @@ a { color: inherit; text-decoration: none; }
 .regime-label.risk-on  { color: var(--up); }
 .regime-label.risk-off { color: var(--down); }
 .regime-label.mixed    { color: var(--orange); }
+.regime-label.caution  { color: var(--orange); }
 .regime-label.neutral  { color: var(--text3); }
 .regime-desc { font-size: 13.8px; color: var(--text2); line-height: 1.7; }
 @media (max-width: 600px) { .regime-grid { grid-template-columns: 1fr; } }
@@ -816,8 +817,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <div class="regime-desc">Conflicting signals across asset classes. Typical of transition periods, ahead of major macro events, or when individual currency stories diverge from the broader risk mood.</div>
         </div>
         <div class="regime-card">
-          <div class="regime-label neutral">NEUTRAL</div>
-          <div class="regime-desc">No clear directional bias. Low volatility, range-bound markets, or reduced participation (e.g., holiday periods). Wait for clearer conviction signals.</div>
+          <div class="regime-label caution">CAUTION</div>
+          <div class="regime-desc">Elevated but not acute stress. VIX in the 18–30 range or one additional risk-off factor active (yield curve, gold, MOVE). Markets are pricing tail risk; risk-sensitive currencies (AUD, NZD, CAD) typically underperform.</div>
         </div>
       </div>
       <div class="callout callout-orange">
@@ -1058,6 +1059,53 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <div class="callout">
         <strong>How to read it:</strong> Currencies on the left are outperforming; currencies on the right are underperforming. A large gap in scores between adjacent cells signals a decisive move. Compare the far left and far right to identify the highest-conviction long/short pair of the session.
+      </div>
+
+      <h3 style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.1em;margin:28px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Currency Detail Modal</h3>
+      <p>Clicking any cell in the heatmap opens a full-screen detail modal for that currency. The modal organizes data into three tabs:</p>
+
+      <!-- MOCK: Heatmap modal tab bar -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
+        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text);">CHF</span>
+          <span style="font-size:11px;color:var(--up);font-family:var(--font-mono);">+0.85%</span>
+          <span style="font-size:10px;color:var(--text3);">Rank #1 / 8 &middot; 7/7 pairs won</span>
+        </div>
+        <div style="display:flex;border-bottom:1px solid var(--border);gap:0;">
+          <div style="padding:7px 16px;font-size:11px;font-weight:700;color:var(--blue);border-bottom:2px solid var(--blue);">Pair Breakdown</div>
+          <div style="padding:7px 16px;font-size:11px;color:var(--text3);border-bottom:2px solid transparent;">Session</div>
+          <div style="padding:7px 16px;font-size:11px;color:var(--text3);border-bottom:2px solid transparent;">Correlations</div>
+        </div>
+        <div style="padding:12px 14px;">
+          <div style="display:grid;grid-template-columns:1fr 60px 60px 80px 90px;gap:6px;margin-bottom:8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">
+            <div>Pair</div><div>Close</div><div>Prev</div><div style="text-align:right;">% Chg</div><div style="text-align:right;">Impact</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 60px 60px 80px 90px;gap:6px;font-size:11.5px;font-family:var(--font-mono);padding:5px 0;border-top:1px solid var(--border);">
+            <div style="color:var(--text);">USD/CHF</div>
+            <div style="color:var(--text2);">0.8821</div>
+            <div style="color:var(--text2);">0.8895</div>
+            <div style="color:var(--up);text-align:right;">+0.83%</div>
+            <div style="text-align:right;"><span style="display:inline-block;width:36px;height:6px;background:var(--up);opacity:.7;border-radius:2px;"></span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 60px 60px 80px 90px;gap:6px;font-size:11.5px;font-family:var(--font-mono);padding:5px 0;border-top:1px solid var(--border);">
+            <div style="color:var(--text);">EUR/CHF</div>
+            <div style="color:var(--text2);">0.9312</div>
+            <div style="color:var(--text2);">0.9398</div>
+            <div style="color:var(--up);text-align:right;">+0.91%</div>
+            <div style="text-align:right;"><span style="display:inline-block;width:38px;height:6px;background:var(--up);opacity:.7;border-radius:2px;"></span></div>
+          </div>
+          <div style="padding:8px 0 2px;font-size:10px;color:var(--text3);">AI Analytics &middot; ~5min delay &middot; 28-pair equal-weighted model</div>
+        </div>
+      </div>
+
+      <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the 7 direct pairs for the selected currency with close price, previous close, percentage change, and a proportional impact bar. A composite ranking row shows the full 8-currency strength order with animated horizontal bars. The impact bar distinguishes individual pair movement from the currency's composite strength contribution — the same convention used on Bloomberg and Eikon FX strength monitors.</p>
+
+      <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise, Bloomberg-style recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 12&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
+
+      <p><strong style="color:var(--text);">Correlations</strong> — shows an 8&times;8 strength differential matrix: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>.</p>
+
+      <div class="callout callout-orange">
+        <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.
       </div>
     </div>
 
@@ -1534,7 +1582,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.31.2</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.39.5</span></div>
 </footer>
 
 
