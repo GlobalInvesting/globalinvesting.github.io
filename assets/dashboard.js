@@ -1326,7 +1326,7 @@ function updateFxPairsTableRT() {
     const arrow = data.pct > 0.05 ? '▲' : data.pct < -0.05 ? '▼' : '→';
     const sign  = data.pct >= 0 ? '+' : '';
     vEl.textContent = data.close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    vEl.className = 'ca-val ' + cls;
+    vEl.className = 'ca-val';
     if (data.chg != null) {
       const absSign = data.chg >= 0 ? '+' : '';
       const absFmt  = Math.abs(data.chg) >= 10 ? (absSign + data.chg.toFixed(1)) : (absSign + data.chg.toFixed(2));
@@ -4026,7 +4026,7 @@ async function fetchCrossAssetData() {
     const arrow = chgPct > 0.05 ? '▲' : chgPct < -0.05 ? '▼' : '→';
     const sign  = chgPct >= 0 ? '+' : '';
     vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
-    vEl.className = 'ca-val ' + cls;
+    vEl.className = 'ca-val';
     // Format: "▲ +18.4 (+0.35%)" when absolute available, "▲ +0.35%" when not
     if (chgAbs != null && !isYield) {
       const absSign = chgAbs >= 0 ? '+' : '';
@@ -4098,7 +4098,7 @@ async function fetchCrossAssetData() {
     const btcFmtE = _caBtcEarly.close.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
     const bEl = document.getElementById('ca-btc'), bcEl = document.getElementById('cac-btc');
     const qbEl = document.getElementById('q-btcusd'), qbcEl = document.getElementById('qc-btcusd');
-    if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val '  + clsDir(_caBtcEarly.chg); }
+    if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val'; }
     if (bcEl) {
       const _btcArrow = (_caBtcEarly.chg??0) > 0 ? '▲' : (_caBtcEarly.chg??0) < 0 ? '▼' : '→';
       const _btcSign  = (_caBtcEarly.pct??0) >= 0 ? '+' : '';
@@ -4155,7 +4155,7 @@ async function fetchCrossAssetData() {
   if (_btcIntraday && btcEl) {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
-    btcEl.className    = 'ca-val ' + clsDir(_btcIntraday.chg);
+    btcEl.className    = 'ca-val';
     if (btcCEl) {
       const _biArrow = (_btcIntraday.chg??0) > 0 ? '▲' : (_btcIntraday.chg??0) < 0 ? '▼' : '→';
       const _biSign  = (_btcIntraday.pct??0) >= 0 ? '+' : '';
