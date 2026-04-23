@@ -584,6 +584,8 @@ function populateHeatmap() {
 
   const grid = document.getElementById('heatmap-grid');
   if (!grid) return;
+  // Serialise strengths array for inline onclick (safe — only numbers and 3-char strings)
+  const strengthsJson = JSON.stringify(strengths);
   grid.innerHTML = strengths.map(s => {
     let bg = 'h-flat';
     if (s.pct > 0.15) bg = 'h-s-up';
@@ -592,7 +594,7 @@ function populateHeatmap() {
     else if (s.pct < -0.05) bg = 'h-down';
     const cls = s.pct > 0 ? 'up' : s.pct < 0 ? 'down' : 'flat';
     const sign = s.pct >= 0 ? '+' : '';
-    return `<div class="hm-cell ${bg}">
+    return `<div class="hm-cell ${bg}" role="button" tabindex="0" aria-label="${s.ccy} currency strength ${sign}${s.pct.toFixed(2)}%" style="cursor:pointer" onclick="if(window.openHeatmapModal)openHeatmapModal('${s.ccy}',${strengthsJson},STOOQ_RT_CACHE)">
       <span class="hm-sym">${s.ccy}</span>
       <span class="hm-val ${cls}">${sign}${s.pct.toFixed(2)}</span>
     </div>`;
