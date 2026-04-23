@@ -682,7 +682,8 @@
       const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
       const opp    = p.base === ccy ? p.quote : p.base;
       const label  = p.base === ccy ? (p.base+'/'+p.quote) : (p.quote+'/'+p.base);
-      driven.push({ label, opp, impact });
+      const canon  = p.base + '/' + p.quote;   // canonical key matching currency-drivers.json
+      driven.push({ label, opp, impact, canon });
     });
     driven.sort((a,b) => Math.abs(b.impact) - Math.abs(a.impact));
     const top3 = driven.slice(0,3);
@@ -701,7 +702,7 @@
 
     driversEl.innerHTML = top3.map((d,i) => {
       const cls    = pctClass(d.impact);
-      const note   = ccyNotes ? (ccyNotes[d.label] || null) : null;
+      const note   = ccyNotes ? (ccyNotes[d.label] || ccyNotes[d.canon] || null) : null;
       const noteEl = note
         ? `<div style="font-size:10px;color:var(--text2,#787b86);font-family:var(--font-mono);margin-top:3px;line-height:1.5;">${note}</div>`
         : '';
