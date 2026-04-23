@@ -2838,10 +2838,16 @@ function toggleInlineDetail(row) {
   expandRow.appendChild(td);
   row.after(expandRow);
 
-  // Animate open
+  // Animate open, then remove the cap so content is never clipped
   requestAnimationFrame(() => {
     expandRow.classList.add('pd-open');
     inner.style.maxHeight = '185px';
+    setTimeout(() => {
+      if (expandRow.classList.contains('pd-open')) {
+        inner.style.maxHeight = 'none';
+        inner.style.overflow  = 'visible';
+      }
+    }, 200); // slightly after the 180ms transition
   });
 
   // Populate with real data
