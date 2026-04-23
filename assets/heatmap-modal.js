@@ -375,7 +375,7 @@
     </div>
     <div class="hm-panel" id="hm-p-session">
       <div class="hm-cw">
-        <div class="hm-ct" id="hm-sess-title">COMPOSITE STRENGTH BY SESSION · UTC REFERENCE</div>
+        <div class="hm-ct" id="hm-sess-title">COMPOSITE STRENGTH BY SESSION</div>
         <div id="hm-sess-content"></div>
       </div>
       <div class="hm-cw">
@@ -530,59 +530,95 @@
     });
   }
 
+  // Convert a UTC hour to local HH:MM string (respects user's timezone)
+  function utcHourToLocalStr(utcHour) {
+    const d = new Date();
+    d.setUTCHours(utcHour, 0, 0, 0);
+    return d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  // Returns the user's timezone abbreviation (e.g. "EST", "GMT+3")
+  function localTzAbbr() {
+    return new Date().toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ').pop() || 'LT';
+  }
+
+  // Returns true if a session has already opened today (UTC day boundary).
+  // Sydney spans midnight — treat as always opened.
+  function sessionHasOpened(sess) {
+    const h = new Date().getUTCHours();
+    if (sess.name === 'Sydney') return true; // always show — spans midnight
+    return h >= sess.utcStart;
+  }
+
   function populateSession(ccy, rtCache) {
+    const tzAbbr = localTzAbbr();
     document.getElementById('hm-sess-title').textContent =
-      ccy + ' COMPOSITE STRENGTH BY SESSION · UTC REFERENCE';
+      ccy + ' COMPOSITE STRENGTH BY SESSION · ' + tzAbbr + ' REFERENCE';
 
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     const activeSess = currentSessionName();
 
     // Estimate per-session composite: use full intraday % scaled by session weight.
-    // Real session breakdown would require tick data; we use the intraday move as
-    // a proxy and attribute it proportionally to session overlap hours.
+    // Only sessions that have already opened today receive a value; UPCOMING sessions
+    // show no bar and display "—" to avoid fabricating data for the future.
+    const weights = { 'New York': 0.38, 'London': 0.35, 'Tokyo': 0.18, 'Sydney': 0.09 };
     const sessionData = SESSIONS.map(sess => {
-      // Compute hours of overlap between session and current UTC time
-      const h = new Date().getUTCHours();
       const isActive = sess.name === activeSess;
-      // For demo: use fraction of composite. Real implementation needs session OHLC.
-      // We compute a plausible contribution from each session by weighting the
-      // current intraday move by a decay factor (most active session = ~50%).
-      const weights = { 'New York': 0.38, 'London': 0.35, 'Tokyo': 0.18, 'Sydney': 0.09 };
-      let pct = 0;
-      myPairs.forEach(p => {
-        const d = rtCache[p.id];
-        if (!d || d.pct == null) return;
-        const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
-        pct += impact * (weights[sess.name] || 0.1);
-      });
-      pct = myPairs.length > 0 ? pct / myPairs.length : 0;
-      return { ...sess, pct, isActive };
+      const opened   = sessionHasOpened(sess);
+      let pct = null;
+      if (opened) {
+        let sum = 0;
+        myPairs.forEach(p => {
+          const d = rtCache[p.id];
+          if (!d || d.pct == null) return;
+          const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
+          sum += impact * (weights[sess.name] || 0.1);
+        });
+        pct = myPairs.length > 0 ? sum / myPairs.length : 0;
+      }
+      return { ...sess, pct, isActive, opened };
     });
 
-    const maxAbs = Math.max(...sessionData.map(s => Math.abs(s.pct)), 0.001);
+    const openedPcts = sessionData.filter(s => s.opened && s.pct != null).map(s => Math.abs(s.pct));
+    const maxAbs = openedPcts.length > 0 ? Math.max(...openedPcts, 0.001) : 0.001;
     const grid   = document.createElement('div');
     grid.className = 'sess-grid';
 
     sessionData.forEach(s => {
-      const pos  = s.pct >= 0;
-      const cls  = pos ? 'up' : 'down';
-      const clr  = pos ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
-      const w    = Math.round(Math.abs(s.pct) / maxAbs * 100);
-
-      const lbl   = document.createElement('div');
+      const lbl = document.createElement('div');
       lbl.className = 'sess-lbl' + (s.isActive ? ' hl' : '');
-      lbl.textContent = s.name.toUpperCase() + (s.isActive ? ' \u25CF' : '');
+
+      let labelText = s.name.toUpperCase();
+      if (s.isActive) {
+        labelText += ' \u25CF';
+      } else if (!s.opened) {
+        labelText += ' \xb7 opens ' + utcHourToLocalStr(s.utcStart);
+      }
+      lbl.textContent = labelText;
 
       const track = document.createElement('div');
       track.className = 'sess-track';
-      const fill  = document.createElement('div');
-      fill.className = 'sess-fill';
-      fill.style.cssText = `width:${w}%;background:${clr}`;
-      track.appendChild(fill);
 
-      const val   = document.createElement('div');
-      val.className = 'sess-val ' + cls;
-      val.textContent = fmt2(s.pct);
+      const val = document.createElement('div');
+
+      if (!s.opened || s.pct == null) {
+        lbl.style.opacity = '0.45';
+        track.style.opacity = '0.2';
+        val.className = 'sess-val flat';
+        val.textContent = '\u2014';
+        val.style.opacity = '0.45';
+      } else {
+        const pos = s.pct >= 0;
+        const cls = pos ? 'up' : 'down';
+        const clr = pos ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
+        const w   = Math.round(Math.abs(s.pct) / maxAbs * 100);
+        const fill = document.createElement('div');
+        fill.className = 'sess-fill';
+        fill.style.cssText = 'width:' + w + '%;background:' + clr;
+        track.appendChild(fill);
+        val.className = 'sess-val ' + cls;
+        val.textContent = fmt2(s.pct);
+      }
 
       grid.appendChild(lbl);
       grid.appendChild(track);
@@ -595,9 +631,11 @@
 
     // Session context notes — Groq-generated if available, fallback to basic stats
     const notes = document.getElementById('hm-sess-notes');
-    const utcHour = new Date().getUTCHours();
-    const utcMin  = new Date().getUTCMinutes();
-    const utcStr  = String(utcHour).padStart(2,'0') + ':' + String(utcMin).padStart(2,'0');
+    const _now    = new Date();
+    const localHH = String(_now.getHours()).padStart(2,'0');
+    const localMM = String(_now.getMinutes()).padStart(2,'0');
+    const localStr = localHH + ':' + localMM;
+    const tzAbbr  = localTzAbbr();
 
     // Check if Groq session context is available for this currency
     const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
@@ -619,12 +657,12 @@
         );
       }).join('') +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'AI Analytics · ~5min delay &nbsp;|&nbsp; UTC ' + utcStr + '</div>';
+      'AI Analytics \xb7 ~5min delay &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
     } else {
       // Fallback: basic intraday stats (no Groq data yet)
       notes.innerHTML =
         `Active session: <span class="up">${activeSess}</span> &nbsp;|&nbsp; ` +
-        `UTC ${utcStr}<br>` +
+        `${tzAbbr} ${localStr}<br>` +
         `Session attribution weighted by typical volume distribution.<br>` +
         `Intraday strength: <span class="${pctClass(0)}" id="hm-sess-intra">—</span>`;
 
