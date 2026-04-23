@@ -1,45 +1,57 @@
 {
-  "generated_at": "2026-04-23T01:53:32Z",
+  "generated_at": "2026-04-23T02:10:21Z",
   "signals": [
     {
-      "time": "01:50",
+      "time": "02:05",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.35; 160.00 is the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Risk-off flow historically unwinds JPY shorts — 157.00 is the first technical level on a sustained risk-off move. Watch for a break above 160.00 to confirm intervention risk.",
+      "text": "Middle East escalation drives inflation surge, pushing Fed rate cuts to late 2026 — Reuters poll. This fuels safe-haven demand, but JPY's role is complicated by 450bp Fed-BoJ carry differential. USD/JPY at 159.43; 160.00 is the key level that has previously triggered BoJ verbal warnings. Intervention risk rises on a sustained break above 160, but for now, carry advantage supports USD. Watch for a shift in BoJ bias or Fed rate expectations.",
       "evidence": [
-        "USD/JPY at 159.35",
-        "JPY COT LF net short −65,309"
+        "USD/JPY at 159.43",
+        "Fed 3.75% vs BoJ 0.75%",
+        "Reuters poll: Fed rate cuts pushed to late 2026"
       ]
     },
     {
-      "time": "01:48",
+      "time": "01:55",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + Retail",
-      "text": "AUD/USD COT LF net long +41,675 (bullish spec positioning) and retail 89% short (extreme retail short). HV30 at 6.8%, ATM IV (FXE chain) at 8.2% — options pricing a 1.4 vol-pt premium over realized. 25d RR at −0.21: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or retail sentiment shifting would invalidate the caution read.",
+      "text": "AUD/USD COT LF net long +41,675 (week ending Apr 14) with long% at 72.0%. However, retail data shows 89% short (Myfxbook), diverging from institutional positioning. HV30 at 7.8%, ATM IV at 9.1% — options pricing a 1.3 vol-pt premium over realized. Price at 0.7156; late-trend caution signal as market hedging rather than chasing. A LF delta turning positive or retail capitulation would invalidate the caution read.",
       "evidence": [
         "AUD/USD COT LF net long +41,675",
         "retail 89% short",
-        "HV30 at 6.8%"
+        "HV30 at 7.8%"
       ]
     },
     {
       "time": "01:45",
       "priority": "info",
-      "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3503 mid-range; 1.3600 is the next resistance on a continuation.",
+      "title": "EUR/USD — CB + Technical",
+      "text": "ECB 2% vs Fed 3.75% — 175bp EUR yield disadvantage. EUR/USD at 1.1712; price holding above 1.1700. Positioning neutral (COT LF net short -72, long% 50.0%). ATM IV 8.5% near HV; 25d RR flat — options neutral. Next resistance at 1.1750; 1.1650 is the support.",
       "evidence": [
-        "BoE 3.75% vs Fed 3.75%",
-        "GBP LF net long +28,426"
+        "ECB 2% vs Fed 3.75%",
+        "EUR/USD at 1.1712",
+        "COT LF net short -72"
       ]
     },
     {
-      "time": "01:40",
-      "priority": "info",
-      "title": "AUD/JPY — Carry",
-      "text": "RBA 4.10% vs BoJ 0.75% — +335bp AUD carry premium favors AUD; risk-off unwind risk elevated in risk-off. AUD/JPY at 114.021; carry advantage supports AUD. Watch for a shift in BoJ bias or risk-off to impact carry.",
+      "time": "01:30",
+      "priority": "warning",
+      "title": "GBP/JPY — Carry + Technical",
+      "text": "BoE 3.75% vs BoJ 0.75% — +300bp GBP carry premium. GBP/JPY at 215.169; testing 215.00. Risk-off JPY bid competes with carry advantage. A sustained break below 214.50 would signal a shift in risk sentiment.",
       "evidence": [
-        "RBA 4.10% vs BoJ 0.75%",
-        "AUD/JPY at 114.021"
+        "BoE 3.75% vs BoJ 0.75%",
+        "GBP/JPY at 215.169"
+      ]
+    },
+    {
+      "time": "01:15",
+      "priority": "info",
+      "title": "NZD/USD — Positioning",
+      "text": "NZD/USD COT LF net short -17,090 (week ending Apr 14) with long% at 21.7%. Price at 0.5901; near-term support at 0.5850. Positioning aligned with price action.",
+      "evidence": [
+        "NZD/USD COT LF net short -17,090",
+        "long% at 21.7%"
       ]
     }
   ]
