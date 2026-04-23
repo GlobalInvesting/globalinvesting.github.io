@@ -57,7 +57,7 @@ USD · EUR · GBP · JPY · AUD · CAD · CHF · NZD — the eight G8 major curr
 | Directory | Contents | Updated by |
 |-----------|----------|------------|
 | `ai-analysis/` | `index.json` — AI regime label + narrative; `signals.json` — market signals | Engine — 12× daily |
-| `calendar-data/` | Economic calendar events — written by engine, consumed by `update_extended_data.py` for PMI/CPI enrichment (not consumed directly by frontend) | Engine — daily |
+| `calendar-data/` | Economic calendar events — `calendar.json` consumed by `update_extended_data.py` for PMI/CPI enrichment; `ff_calendar.json` (ForexFactory, G8 high-impact, this week + next) consumed by `generate_narrative_signals.py` → `build_calendar_block()` to ground session context notes in real catalysts | Engine — daily |
 | `cot-data/` | CFTC COT positioning (Leveraged Funds + Asset Manager + Dealer) + 26-week `history[]` rolling window | Engine — weekly (Saturday) |
 | `economic-data/` | Macro indicators | Engine — daily |
 | `extended-data/` | IV, carry, cross-asset fallback | Engine — daily |
