@@ -1,48 +1,49 @@
 {
-  "generated_at": "2026-04-23T17:26:12Z",
+  "generated_at": "2026-04-23T19:22:37Z",
   "signals": [
     {
-      "time": "17:20",
-      "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.78; 160.00 is the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Risk-off flow historically unwinds JPY shorts — 157.00 is the first technical level on a sustained risk-off move.",
-      "evidence": [
-        "USD/JPY: 159.78",
-        "JPY COT LF net short −65,309",
-        "Crude Oil Prices Underpinned as Iran War Tightens Global Oil Supplies"
-      ]
-    },
-    {
-      "time": "17:15",
+      "time": "19:18",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + Retail",
-      "text": "AUD/USD COT LF net long +41,675 vs retail 90% short — institutional vs retail divergence at extreme. HV30 at 8.2%, ATM IV (FXE chain) at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or retail reducing to shift the read.",
+      "text": "AUD/USD COT LF net long +41,675 (bullish spec positioning) vs retail 89% short (extreme retail short). HV30 at 8.2%, ATM IV at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or retail capitulation would invalidate the caution read.",
       "evidence": [
         "AUD/USD COT LF net long +41,675",
-        "retail 90% short",
+        "retail 89% short",
         "HV30 at 8.2%",
-        "ATM IV (FXE chain) at 9.4%"
+        "ATM IV at 9.4%"
       ]
     },
     {
-      "time": "17:10",
+      "time": "19:15",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3461 mid-range; 1.3500 is the next resistance on a continuation.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28k, AM constructive — positioning aligned with the carry read. GBP/USD at 1.347; 1.3500 is the next resistance on a continuation. Watch for a break above 1.3500 to confirm the bullish trend.",
       "evidence": [
-        "BoE 3.75% vs Fed 3.75%",
-        "GBP LF net long +28,426",
-        "ATM IV 9.5% near HV"
+        "BoE 4.50% vs Fed 3.75%",
+        "GBP LF net long +28k",
+        "GBP/USD at 1.347"
       ]
     },
     {
-      "time": "17:00",
+      "time": "19:10",
       "priority": "info",
       "title": "NZD/USD — COT + OIS",
-      "text": "NZD/USD COT LF net short −17,090 (specs short) vs RBNZ OIS hike 100% priced. Specs are fading a hawkish CB. If RBNZ delivers or signals hike, short squeeze risk is elevated. NZD/USD at 0.5856; 0.5900 is the next resistance on a continuation.",
+      "text": "NZD/USD COT LF net short −17,090 (specs short) vs RBNZ OIS hike 100% priced. Specs are fading a hawkish CB. If RBNZ delivers or signals hike, short squeeze risk is elevated. NZD/USD at 0.5859; watch for a move above 0.5900 to confirm the bullish trend.",
       "evidence": [
         "NZD/USD COT LF net short −17,090",
-        "RBNZ OIS hike 100% priced"
+        "RBNZ OIS hike 100% priced",
+        "NZD/USD at 0.5859"
+      ]
+    },
+    {
+      "time": "19:20",
+      "priority": "info",
+      "title": "GBP/JPY — CB + Carry",
+      "text": "BoE 3.75% vs BoJ 0.75% — 300bp GBP carry premium supports GBP structurally. GBP/JPY at 215.061; 216.00 is the next resistance on a continuation. Carry advantage favors GBP, but risk-off JPY bid competes.",
+      "evidence": [
+        "BoE 3.75%",
+        "BoJ 0.75%",
+        "GBP/JPY at 215.061"
       ]
     }
   ]
