@@ -240,6 +240,23 @@
   let _ccy      = null;
   let _strengths = null;
   let _rtCache  = null;
+  let _driversCache  = null;   // { generated_at, drivers: { USD: "...", EUR: "...", ... } }
+  let _driversFetched = false;
+
+  // Fetch currency-drivers.json once per page load (lazy, on first modal open).
+  // Falls back silently — the drivers note is additive, never blocking.
+  function fetchDrivers() {
+    if (_driversFetched) return;
+    _driversFetched = true;
+    fetch('./ai-analysis/currency-drivers.json?_=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.drivers && typeof data.drivers === 'object') {
+          _driversCache = data;
+        }
+      })
+      .catch(() => { /* silent fallback — drivers are additive */ });
+  }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   function fmt2(v) {
@@ -675,7 +692,7 @@
       driversEl.innerHTML = '<div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono)">No RT data available</div>';
       return;
     }
-    driversEl.innerHTML = top3.map((d,i) => {
+    const pairsHtml = top3.map((d,i) => {
       const cls = pctClass(d.impact);
       return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);">
         <div style="font-size:10px;color:var(--text3,#6b7280);width:16px">#${i+1}</div>
@@ -684,6 +701,19 @@
         <div style="font-size:12px;font-weight:600" class="${cls}">${fmt2(d.impact)}</div>
       </div>`;
     }).join('');
+
+    // AI driver note — from ai-analysis/currency-drivers.json (Groq, same run cadence as signals)
+    const aiNote = _driversCache && _driversCache.drivers && _driversCache.drivers[ccy]
+      ? _driversCache.drivers[ccy]
+      : null;
+    const noteHtml = aiNote
+      ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);">
+           <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;">AI CONTEXT · Groq · ~5min delay</div>
+           <div style="font-size:11px;color:var(--text2,#787b86);font-family:var(--font-mono);line-height:1.6;">${aiNote}</div>
+         </div>`
+      : '';
+
+    driversEl.innerHTML = pairsHtml + noteHtml;
   }
 
   // ── Public API ────────────────────────────────────────────────────────────
@@ -713,6 +743,7 @@
 
     populateMetrics(ccy, strengths, rtCache);
     populateBreakdown(ccy, strengths, rtCache);
+    fetchDrivers();   // lazy-load AI driver notes in the background
 
     const bd = document.getElementById('hm-bd');
     bd.style.display = 'flex';
