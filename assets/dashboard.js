@@ -2841,7 +2841,7 @@ function toggleInlineDetail(row) {
   // Animate open
   requestAnimationFrame(() => {
     expandRow.classList.add('pd-open');
-    inner.style.maxHeight = '160px';
+    inner.style.maxHeight = '185px';
   });
 
   // Populate with real data
