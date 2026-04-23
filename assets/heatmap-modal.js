@@ -568,8 +568,7 @@
       `Session attribution is weighted by typical volume distribution per session.<br>` +
       `Intraday strength: <span class="${pctClass(0)}" id="hm-sess-intra">—</span>`;
 
-    // Update intraday note
-    const myPairs  = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
+    // Update intraday note — reuse myPairs already declared above
     let sum = 0, cnt = 0;
     myPairs.forEach(p => {
       const d = rtCache[p.id];

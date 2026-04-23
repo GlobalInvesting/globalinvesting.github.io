@@ -3381,6 +3381,7 @@ async function updatePairDetail(tvSym) {
   };
   const USD_IV = {}; // non-USD ccy → IV%
   let atmIv = null;
+  let nzdProxy = false;
   try {
     const intra = await loadIntradayQuotes();
     const etfIv = intra?.fx_etf_iv || {};
@@ -3393,7 +3394,6 @@ async function updatePairDetail(tvSym) {
       USD_IV[nonUsd] = entry.iv;
     }
     // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × 1.08 (long-run NZD/AUD vol ratio).
-    let nzdProxy = false;
     if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
       USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
       nzdProxy = true;
