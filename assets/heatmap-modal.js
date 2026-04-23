@@ -118,6 +118,7 @@
   background:rgba(255,255,255,.02);
   border:1px solid rgba(255,255,255,.06);
   border-radius:6px;padding:12px 14px;margin-bottom:10px;
+  overflow-x:auto;
 }
 
 /* Pair breakdown table */
@@ -129,12 +130,14 @@
   text-align:right;color:var(--text3,#6b7280);font-weight:400;
   font-size:9px;text-transform:uppercase;letter-spacing:.05em;
   padding:4px 8px 6px;border-bottom:1px solid rgba(255,255,255,.07);
+  white-space:nowrap;
 }
 .hm-tbl th:first-child { text-align:left; }
 .hm-tbl td {
   text-align:right;padding:5px 8px;
   border-bottom:1px solid rgba(255,255,255,.04);
   color:var(--text,#d1d4dc);
+  white-space:nowrap;
 }
 .hm-tbl td:first-child { text-align:left;color:var(--text2,#787b86); }
 .hm-tbl tr:last-child td { border-bottom:none; }
@@ -143,6 +146,16 @@
 .imp-wrap { display:flex;align-items:center;gap:5px;justify-content:flex-end; }
 .imp-bar-bg { width:40px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden; }
 .imp-bar-fill { height:100%;border-radius:2px; }
+
+/* Mobile: hide Prev Close column and reduce padding to fit table */
+@media (max-width:520px) {
+  .hm-panel { padding:10px 10px; }
+  .hm-cw { padding:10px 10px; }
+  .hm-tbl th, .hm-tbl td { padding:4px 5px; }
+  .hm-tbl { font-size:10px; }
+  .hm-tbl .col-prev-close { display:none; }
+  .imp-bar-bg { width:28px; }
+}
 
 /* Ranking rows */
 .hm-rank-row { display:flex;align-items:center;gap:8px;margin-bottom:5px; }
@@ -374,7 +387,7 @@
             <tr>
               <th scope="col">Pair</th>
               <th scope="col">Close</th>
-              <th scope="col">Prev close</th>
+              <th scope="col" class="col-prev-close">Prev close</th>
               <th scope="col">% chg</th>
               <th scope="col">Impact</th>
               <th scope="col">Session range</th>
@@ -508,7 +521,7 @@
       return `<tr>
         <td><span class="sym">${r.label}</span></td>
         <td>${fmtPrice(r.close)}</td>
-        <td>${fmtPrice(r.open)}</td>
+        <td class="col-prev-close">${fmtPrice(r.open)}</td>
         <td class="${iCls}">${fmt2(r.impact)}</td>
         <td><div class="imp-wrap">
           <span class="${iCls}">${fmt2(r.impact)}</span>
