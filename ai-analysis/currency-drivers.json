@@ -1,77 +1,69 @@
 {
-  "generated_at": "2026-04-23T10:06:18Z",
+  "generated_at": "2026-04-23T11:35:23Z",
   "drivers": {
-    "EUR": {
-      "EUR/USD": "USD steady. Oil supply risk underpriced — Rabobank.",
-      "EUR/GBP": "GBP soft. BoE on hold. No directional push.",
-      "EUR/JPY": "JPY offered. BoJ on hold. Risk-on carry bid intact.",
-      "EUR/AUD": "AUD firm. RBA hike priced in for May. Carry advantage rising.",
-      "EUR/CAD": "CAD neutral. BoC on hold. Oil stable — no directional push.",
-      "EUR/CHF": "CHF safe-haven bid on normal volatility. 200bp spread intact.",
-      "EUR/NZD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
-    },
+    "EUR": {},
     "GBP": {
-      "GBP/USD": "USD steady. Oil supply risk underpriced — Rabobank.",
+      "GBP/USD": "USD steady. Fed on hold. Trump aide comments eyed.",
       "GBP/JPY": "JPY offered. BoJ on hold. Carry bid intact.",
       "EUR/GBP": "GBP soft. BoE on hold. ECB hold eyed.",
-      "GBP/AUD": "AUD firm. RBA hike priced in for May.",
-      "GBP/CAD": "CAD neutral. BoC on hold. Oil stable.",
-      "GBP/CHF": "CHF safe-haven bid. Risk-neutral — no directional push.",
-      "GBP/NZD": "NZD bid. RBNZ hike 100% priced for May."
+      "GBP/AUD": "AUD firm. RBA hike priced in for May. Carry advantage rising.",
+      "GBP/CAD": "CAD neutral. BoC on hold. Oil stable — no directional push.",
+      "GBP/CHF": "CHF safe-haven bid. SNB on hold. Risk-neutral.",
+      "GBP/NZD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
     },
     "JPY": {
       "USD/JPY": "JPY offered. BoJ on hold. Risk-on intact.",
       "EUR/JPY": "flat — carry differential anchors pair",
-      "GBP/JPY": "GBP firm. BoE hold eyed. Carry advantage",
-      "AUD/JPY": "AUD bid. RBA hike priced in. Carry favors AUD",
-      "CAD/JPY": "CAD neutral. BoC on hold. Carry differential steady",
-      "CHF/JPY": "CHF safe-haven bid compresses spread",
-      "NZD/JPY": "NZD firm. RBNZ hike priced in. Carry advantage rising"
+      "GBP/JPY": "GBP firm. BoE on hold. Carry advantage intact.",
+      "AUD/JPY": "AUD weak. RBA hike priced in. Carry still favors AUD.",
+      "CAD/JPY": "CAD steady. BoC on hold. No directional push.",
+      "CHF/JPY": "CHF bid. SNB on hold. Safe-haven demand.",
+      "NZD/JPY": "NZD firm. RBNZ hike priced in. Carry advantage rising."
     },
     "AUD": {
-      "AUD/USD": "flat — Fed on hold. Oil supply risk underpriced",
-      "EUR/AUD": "AUD weak on RBA hike expectations",
-      "GBP/AUD": "AUD soft on BoE hold and RBA hike priced",
-      "AUD/JPY": "JPY offered. BoJ on hold. Carry bid",
-      "AUD/CAD": "CAD neutral. BoC on hold. No directional push",
-      "AUD/CHF": "CHF safe-haven bid compresses spread",
-      "AUD/NZD": "NZD bid. RBNZ hike 100% priced for May"
+      "AUD/USD": "USD steady. Fed on hold. Trump aide comments eyed.",
+      "EUR/AUD": "AUD firm. RBA hike priced in for May. Carry compression eyed.",
+      "GBP/AUD": "GBP soft. BoE on hold. AUD carry advantage rising.",
+      "AUD/JPY": "JPY offered. BoJ on hold. Risk-on carry bid intact.",
+      "AUD/CAD": "CAD neutral. BoC on hold. Oil stable — no directional push.",
+      "AUD/CHF": "CHF safe-haven bid on risk-off. RBA 4.1% vs SNB 0%.",
+      "AUD/NZD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
     },
     "CAD": {
-      "USD/CAD": "CAD neutral. BoC on hold. Oil prices stable.",
-      "EUR/CAD": "flat — BoC, ECB on hold. Carry differential steady",
-      "GBP/CAD": "GBP soft. Weak UK data. CAD neutral",
-      "AUD/CAD": "AUD firm. RBA hike priced in for May. CAD neutral",
-      "CAD/JPY": "JPY broadly offered. BoJ on hold. Risk-on carry bid",
-      "CAD/CHF": "CHF safe-haven bid on global risk-off. Compresses spread",
-      "NZD/CAD": "NZD bid. RBNZ hike 100% priced for May. CAD neutral"
+      "USD/CAD": "flat — BoC on hold. No directional push.",
+      "EUR/CAD": "EUR outperforming on ECB hold. CAD neutral.",
+      "GBP/CAD": "GBP soft on weak UK data. CAD steady.",
+      "AUD/CAD": "AUD firm. RBA hike priced in for May.",
+      "CAD/JPY": "JPY broadly offered. BoJ on hold. Risk-on.",
+      "CAD/CHF": "CHF safe-haven bid on risk-off compresses spread.",
+      "NZD/CAD": "NZD bid. RBNZ hike 100% priced for May."
     },
     "CHF": {
-      "USD/CHF": "USD steady. Fed on hold. Oil underpricing supply risk.",
-      "EUR/CHF": "flat — carry differential anchors pair",
-      "GBP/CHF": "GBP soft. BoE on hold. Carry advantage intact.",
-      "AUD/CHF": "AUD firm. RBA hike priced in. Carry advantage rising.",
-      "CAD/CHF": "CAD neutral. BoC on hold. Carry differential steady.",
-      "CHF/JPY": "JPY broadly offered. BoJ on hold. Risk-on carry bid intact.",
-      "NZD/CHF": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
+      "USD/CHF": "USD steady. Fed on hold. Trump aide comments eyed.",
+      "EUR/CHF": "CHF safe-haven bid on risk-off. ECB on hold.",
+      "GBP/CHF": "GBP firm on BoE hold. CHF offered on risk-off.",
+      "AUD/CHF": "AUD bid on RBA hike priced in. CHF under pressure.",
+      "CAD/CHF": "CAD neutral on BoC hold. CHF safe-haven demand.",
+      "CHF/JPY": "JPY broadly offered. BoJ on hold. Risk-on intact.",
+      "NZD/CHF": "NZD bid on RBNZ hike priced in. CHF under pressure."
     },
     "NZD": {
-      "NZD/USD": "USD steady. Oil underpricing supply risk.",
-      "EUR/NZD": "NZD bid. RBNZ hike 100% priced for May.",
-      "GBP/NZD": "NZD firm. BoE on hold. Carry advantage rising.",
-      "AUD/NZD": "NZD soft. RBA hike priced in for May. AUD yield support.",
-      "NZD/JPY": "JPY offered. BoJ on hold. Risk-on carry bid.",
-      "NZD/CAD": "CAD neutral. BoC on hold. Oil stable — no push.",
-      "NZD/CHF": "CHF safe-haven bid. Risk compresses NZD/CHF spread."
+      "NZD/USD": "USD steady. Fed on hold. Trump aide comments eyed.",
+      "EUR/NZD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising.",
+      "GBP/NZD": "NZD firm. BoE on hold. RBNZ hike expectations support NZD.",
+      "AUD/NZD": "NZD soft. RBA hike priced in for May. AUD-NZD yield gap narrow.",
+      "NZD/JPY": "JPY broadly offered. BoJ on hold. Risk-on carry bid intact.",
+      "NZD/CAD": "CAD neutral. BoC on hold. Oil stable — no directional push.",
+      "NZD/CHF": "CHF safe-haven bid on risk compresses spread. RBNZ hike eyed."
     },
     "USD": {
-      "EUR/USD": "flat — ECB, Fed on hold",
-      "GBP/USD": "GBP steady. BoE on hold.",
-      "USD/JPY": "JPY soft. Risk-on weighs.",
-      "AUD/USD": "AUD weak. RBA hike priced in.",
-      "USD/CAD": "CAD firm. BoC on hold. Oil +2% boosts.",
-      "USD/CHF": "CHF bid. Safe-haven demand.",
-      "NZD/USD": "NZD weak. RBNZ hike 100% priced."
+      "EUR/USD": "flat — Fed hold eyed, ECB hold intact",
+      "GBP/USD": "flat — BoE on hold, Fed hold eyed",
+      "USD/JPY": "JPY offered. BoJ on hold. Risk-on intact.",
+      "AUD/USD": "AUD weak. RBA hike priced in for May. 40bp AUD-USD spread",
+      "USD/CAD": "CAD firm. BoC on hold. WTI stable at $94",
+      "USD/CHF": "CHF bid on risk-off. SNB on hold. US yields stable",
+      "NZD/USD": "NZD weak. RBNZ hike 100% priced for May. 145bp NZD-USD spread"
     }
   }
 }
