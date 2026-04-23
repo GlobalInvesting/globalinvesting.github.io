@@ -635,7 +635,6 @@
     const localHH = String(_now.getHours()).padStart(2,'0');
     const localMM = String(_now.getMinutes()).padStart(2,'0');
     const localStr = localHH + ':' + localMM;
-    const tzAbbr  = localTzAbbr();
 
     // Check if Groq session context is available for this currency
     const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
