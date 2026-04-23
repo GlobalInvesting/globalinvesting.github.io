@@ -643,6 +643,7 @@
         el.className   = pctClass(intra);
       }
     }
+  }
 
   function populateCorrelations(ccy, strengths, rtCache) {
     document.getElementById('hm-drivers-title').textContent =
