@@ -677,7 +677,7 @@
     max-height:0;
     transition:max-height 0.18s ease-out;
   }
-  tr.pd-expand-row.pd-open td > div { max-height:160px; }
+  tr.pd-expand-row.pd-open td > div { max-height:185px; }
   /* Scroll wrapper fills the full td width; pd-inline is min-width:max-content
      so it never wraps — scrolls horizontally on narrow screens (split mode).
      On wide screens the wrapper is wider than pd-inline so we use
