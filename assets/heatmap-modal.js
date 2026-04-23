@@ -292,13 +292,28 @@
     return v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
   }
 
-  function currentSessionName() {
+  // Returns a Set of all session names that are currently active (handles overlaps).
+  function getActiveSessions() {
     const h = new Date().getUTCHours();
-    // Active session: London if 07-16, New York if 12-21, Tokyo if 00-09, Sydney otherwise
-    if (h >= 7 && h < 16)  return 'London';
-    if (h >= 12 && h < 21) return 'New York';
-    if (h >= 0 && h < 9)   return 'Tokyo';
-    return 'Sydney';
+    const active = new Set();
+    // Sydney: 21:00–06:00 UTC (crosses midnight)
+    if (h >= 21 || h < 6)  active.add('Sydney');
+    // Tokyo: 00:00–09:00 UTC
+    if (h >= 0  && h < 9)  active.add('Tokyo');
+    // London: 07:00–16:00 UTC
+    if (h >= 7  && h < 16) active.add('London');
+    // New York: 12:00–21:00 UTC
+    if (h >= 12 && h < 21) active.add('New York');
+    return active;
+  }
+
+  // Legacy helper — returns the single "primary" active session for fallback text.
+  function currentSessionName() {
+    const active = getActiveSessions();
+    for (const s of ['London', 'New York', 'Tokyo', 'Sydney']) {
+      if (active.has(s)) return s;
+    }
+    return 'London';
   }
 
   // ── Build HTML ───────────────────────────────────────────────────────────
@@ -556,14 +571,15 @@
       ccy + ' COMPOSITE STRENGTH BY SESSION · ' + tzAbbr + ' REFERENCE';
 
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
-    const activeSess = currentSessionName();
+    const activeSessions = getActiveSessions();
+    const activeSess = currentSessionName(); // legacy: primary session for fallback text
 
     // Estimate per-session composite: use full intraday % scaled by session weight.
     // Only sessions that have already opened today receive a value; UPCOMING sessions
     // show no bar and display "—" to avoid fabricating data for the future.
     const weights = { 'New York': 0.38, 'London': 0.35, 'Tokyo': 0.18, 'Sydney': 0.09 };
     const sessionData = SESSIONS.map(sess => {
-      const isActive = sess.name === activeSess;
+      const isActive = activeSessions.has(sess.name);
       const opened   = sessionHasOpened(sess);
       let pct = null;
       if (opened) {
@@ -645,7 +661,7 @@
       // Render Groq session notes in the same style as the model
       const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
       notes.innerHTML = sessOrder.map(sName => {
-        const isActive = sName === activeSess;
+        const isActive = activeSessions.has(sName);
         const note = groqSessions[sName] || '—';
         return (
           '<div style="margin-bottom:4px' + (isActive ? ';color:var(--text,#d1d4dc)' : '') + '">' +
