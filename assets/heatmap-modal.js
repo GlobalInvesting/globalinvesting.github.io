@@ -557,6 +557,19 @@
     return new Date().toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ').pop() || 'LT';
   }
 
+  // Replaces all "HH:MM UTC" patterns in a Groq-generated note with the user's
+  // local equivalent. E.g. "PMI at 12:00 UTC" becomes "PMI at 09:00 GMT-3".
+  function convertUtcTimesInNote(text) {
+    if (!text) return text;
+    const tzAbbr = localTzAbbr();
+    return text.replace(/\b(\d{1,2}):(\d{2})\s*UTC\b/g, function(_, hh, mm) {
+      const d = new Date();
+      d.setUTCHours(parseInt(hh, 10), parseInt(mm, 10), 0, 0);
+      const local = d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false });
+      return local + ' ' + tzAbbr;
+    });
+  }
+
   // Returns true if a session has already opened today (UTC day boundary).
   // Sydney spans midnight — treat as always opened.
   function sessionHasOpened(sess) {
@@ -662,7 +675,7 @@
       const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
       notes.innerHTML = sessOrder.map(sName => {
         const isActive = activeSessions.has(sName);
-        const note = groqSessions[sName] || '—';
+        const note = convertUtcTimesInNote(groqSessions[sName] || '—');
         return (
           '<div style="margin-bottom:4px' + (isActive ? ';color:var(--text,#d1d4dc)' : '') + '">' +
           '<span style="color:' + (isActive ? 'var(--blue,#4f7fff)' : 'var(--text3,#6b7280)') + ';' +
