@@ -242,6 +242,8 @@
   let _rtCache  = null;
   let _driversCache  = null;   // { generated_at, drivers: { USD: "...", EUR: "...", ... } }
   let _driversFetched = false;
+  let _sessionCtxCache = null; // { generated_at, sessions: { EUR: { Sydney: "...", ... }, ... } }
+  let _sessionCtxFetched = false;
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
   // Falls back silently — the drivers note is additive, never blocking.
@@ -256,6 +258,21 @@
         }
       })
       .catch(() => { /* silent fallback — drivers are additive */ });
+  }
+
+  // Fetch session-context.json once per page load (lazy, on first modal open).
+  // Falls back silently — session notes are additive, never blocking.
+  function fetchSessionContext() {
+    if (_sessionCtxFetched) return;
+    _sessionCtxFetched = true;
+    fetch('./ai-analysis/session-context.json?_=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.sessions && typeof data.sessions === 'object') {
+          _sessionCtxCache = data;
+        }
+      })
+      .catch(() => { /* silent fallback */ });
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -576,30 +593,56 @@
     content.innerHTML = '';
     content.appendChild(grid);
 
-    // Session context note
+    // Session context notes — Groq-generated if available, fallback to basic stats
     const notes = document.getElementById('hm-sess-notes');
     const utcHour = new Date().getUTCHours();
-    notes.innerHTML =
-      `Active session: <span class="up">${activeSess}</span> &nbsp;|&nbsp; ` +
-      `UTC ${String(utcHour).padStart(2,'0')}:${String(new Date().getUTCMinutes()).padStart(2,'0')}<br>` +
-      `Session attribution is weighted by typical volume distribution per session.<br>` +
-      `Intraday strength: <span class="${pctClass(0)}" id="hm-sess-intra">—</span>`;
+    const utcMin  = new Date().getUTCMinutes();
+    const utcStr  = String(utcHour).padStart(2,'0') + ':' + String(utcMin).padStart(2,'0');
 
-    // Update intraday note — reuse myPairs already declared above
-    let sum = 0, cnt = 0;
-    myPairs.forEach(p => {
-      const d = rtCache[p.id];
-      if (!d || d.pct == null) return;
-      const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
-      sum += impact; cnt++;
-    });
-    const intra = cnt > 0 ? sum / cnt : null;
-    const el = document.getElementById('hm-sess-intra');
-    if (el && intra != null) {
-      el.textContent  = fmt2(intra);
-      el.className    = pctClass(intra);
+    // Check if Groq session context is available for this currency
+    const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
+      ? _sessionCtxCache.sessions[ccy]
+      : null;
+
+    if (groqSessions && Object.keys(groqSessions).length >= 3) {
+      // Render Groq session notes in the same style as the model
+      const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
+      notes.innerHTML = sessOrder.map(sName => {
+        const isActive = sName === activeSess;
+        const note = groqSessions[sName] || '—';
+        return (
+          '<div style="margin-bottom:4px' + (isActive ? ';color:var(--text,#d1d4dc)' : '') + '">' +
+          '<span style="color:' + (isActive ? 'var(--blue,#4f7fff)' : 'var(--text3,#6b7280)') + ';' +
+          'min-width:72px;display:inline-block;font-weight:' + (isActive ? '600' : '400') + '">' +
+          sName.toUpperCase() + (isActive ? ' \u25CF' : '') +
+          '</span> ' + note + '</div>'
+        );
+      }).join('') +
+      '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
+      'Groq · ~5min delay &nbsp;|&nbsp; UTC ' + utcStr + '</div>';
+    } else {
+      // Fallback: basic intraday stats (no Groq data yet)
+      notes.innerHTML =
+        `Active session: <span class="up">${activeSess}</span> &nbsp;|&nbsp; ` +
+        `UTC ${utcStr}<br>` +
+        `Session attribution weighted by typical volume distribution.<br>` +
+        `Intraday strength: <span class="${pctClass(0)}" id="hm-sess-intra">—</span>`;
+
+      // Update intraday note
+      let sum = 0, cnt = 0;
+      myPairs.forEach(p => {
+        const d = rtCache[p.id];
+        if (!d || d.pct == null) return;
+        const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
+        sum += impact; cnt++;
+      });
+      const intra = cnt > 0 ? sum / cnt : null;
+      const el = document.getElementById('hm-sess-intra');
+      if (el && intra != null) {
+        el.textContent = fmt2(intra);
+        el.className   = pctClass(intra);
+      }
     }
-  }
 
   function populateCorrelations(ccy, strengths, rtCache) {
     document.getElementById('hm-drivers-title').textContent =
@@ -748,7 +791,8 @@
 
     populateMetrics(ccy, strengths, rtCache);
     populateBreakdown(ccy, strengths, rtCache);
-    fetchDrivers();   // lazy-load AI driver notes in the background
+    fetchDrivers();        // lazy-load AI driver notes in the background
+    fetchSessionContext(); // lazy-load AI session context notes in the background
 
     const bd = document.getElementById('hm-bd');
     bd.style.display = 'flex';
