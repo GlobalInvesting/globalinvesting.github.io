@@ -1,45 +1,45 @@
 {
-  "generated_at": "2026-04-23T01:33:10Z",
+  "generated_at": "2026-04-23T01:46:56Z",
   "signals": [
     {
-      "time": "01:30",
+      "time": "01:45",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.4; 160.00 is the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Risk-off flow historically unwinds JPY shorts — 157.00 is the first technical level on a sustained risk-off move.",
+      "text": "Middle East escalation drives safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.34; 160.00 is the key level that has previously triggered BoJ verbal warnings; intervention risk rises on a sustained break above 160. Risk-off flow historically unwinds JPY shorts — 157.00 is the first technical level on a sustained risk-off move. Watch for a break above 160.00 to confirm intervention risk.",
       "evidence": [
-        "USD/JPY: 159.4",
+        "USD/JPY at 159.34",
         "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "01:27",
+      "time": "01:42",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol + Retail",
-      "text": "AUD/USD COT LF net long +41,675 vs retail 89% short — institutional vs retail divergence at extreme. HV30 at 6.2%, ATM IV (FXE chain) at 7.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.21: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or retail reducing to shift the read.",
+      "text": "AUD/USD COT LF net long +41,675 (bullish spec positioning) and retail 89% short (extreme retail short). HV30 at 6.8%, ATM IV (FXE chain) at 8.2% — options pricing a 1.4 vol-pt premium over realized. 25d RR at −0.21: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or retail reducing to shift the read would invalidate the caution.",
       "evidence": [
         "AUD/USD COT LF net long +41,675",
         "retail 89% short",
-        "HV30 at 6.2%"
+        "HV30 at 6.8%"
       ]
     },
     {
-      "time": "01:20",
+      "time": "01:38",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP LF net long +28,426. GBP/USD at 1.3502; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV, 25d RR flat — options neutral.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP LF net long +28,426. GBP/USD at 1.3503 — mid-range; 1.3600 is the next resistance on a continuation. ATM IV 9.5% near HV, 25d RR flat — options neutral.",
       "evidence": [
         "BoE 3.75% vs Fed 3.75%",
-        "GBP/USD: 1.3502"
+        "GBP/USD at 1.3503"
       ]
     },
     {
-      "time": "01:15",
+      "time": "01:36",
       "priority": "info",
-      "title": "NZD/USD — COT + Technical",
-      "text": "NZD/USD COT LF net short −17,090, long%=21.7%. NZD/USD at 0.5908; 0.6000 is the next resistance on a continuation. NZD/USD vs NZX 50: corr=+0.648 (z=+2.16σ) — NZD/USD decoupling from equities.",
+      "title": "AUD/JPY — Carry",
+      "text": "RBA 4.10% vs BoJ 0.75% — +335bp carry advantage; AUD/JPY at 113.989. Risk-off unwind risk elevated in risk-off; watch for JPY safe-haven bid to compete with carry.",
       "evidence": [
-        "NZD/USD COT LF net short −17,090",
-        "NZD/USD: 0.5908"
+        "RBA 4.10% vs BoJ 0.75%",
+        "AUD/JPY at 113.989"
       ]
     }
   ]
