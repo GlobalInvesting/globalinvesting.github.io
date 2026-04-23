@@ -619,7 +619,7 @@
         );
       }).join('') +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'Groq · ~5min delay &nbsp;|&nbsp; UTC ' + utcStr + '</div>';
+      'AI Analytics · ~5min delay &nbsp;|&nbsp; UTC ' + utcStr + '</div>';
     } else {
       // Fallback: basic intraday stats (no Groq data yet)
       notes.innerHTML =
@@ -761,7 +761,7 @@
         </div>
       </div>`;
     }).join('') + (ccyNotes
-      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">Groq · ~5min delay</div>`
+      ? `<div style="margin-top:4px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">AI Analytics · ~5min delay</div>`
       : '');
   }
 
