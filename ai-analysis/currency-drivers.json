@@ -1,13 +1,77 @@
 {
-  "generated_at": "2026-04-23T01:23:58Z",
+  "generated_at": "2026-04-23T01:33:16Z",
   "drivers": {
-    "USD": "flat — EUR/USD near 1.1712 holding it steady",
-    "EUR": "flat — EUR/USD near 1.1712 and EUR/CHF at 0.9183 neutral",
-    "GBP": "weak on GBP/USD down 0.03% to 1.3503",
-    "JPY": "strong on USD/JPY down 0.01% to 159.38",
-    "AUD": "weak on AUD/USD down 0.06% to 0.7157",
-    "CAD": "flat — USD/CAD near 1.3668 and CAD/JPY at 116.615 neutral",
-    "CHF": "strong on USD/CHF down 0.03% to 0.7843",
-    "NZD": "weak on NZD/USD down 0.05% to 0.5906"
+    "EUR": {
+      "EUR/USD": "USD soft on dovish Fed expectations.",
+      "EUR/GBP": "GBP steady on BoE hold. ECB hold also.",
+      "EUR/JPY": "JPY offered on risk-on. BoJ on hold.",
+      "EUR/AUD": "AUD weak on RBA rate cut bets.",
+      "EUR/CAD": "CAD firm on stable oil. BoC on hold.",
+      "EUR/CHF": "CHF bid on safe-haven demand.",
+      "EUR/NZD": "NZD under pressure on RBNZ cut cycle."
+    },
+    "GBP": {
+      "GBP/USD": "USD soft on DXY stability. Fed hold eyed.",
+      "GBP/JPY": "JPY offered on risk-on. BoJ 0.75% vs BoE 3.75% carry.",
+      "EUR/GBP": "EUR outperforming on ECB hold. BoE meeting eyed.",
+      "GBP/AUD": "AUD weak on RBA hike expectations. Carry disadvantage.",
+      "GBP/CAD": "CAD neutral on BoC hold. Oil prices stable.",
+      "GBP/CHF": "CHF safe-haven bid on risk-off flows.",
+      "GBP/NZD": "NZD under pressure on RBNZ hold. Carry disadvantage."
+    },
+    "JPY": {
+      "USD/JPY": "USD supported by 3.75% Fed rate vs 0.75% BoJ",
+      "EUR/JPY": "EUR buoyed by 2% ECB rate vs 0.75% BoJ",
+      "GBP/JPY": "GBP firmer on 3.75% BoE rate vs 0.75% BoJ",
+      "AUD/JPY": "AUD offered on RBA rate cut bets rising",
+      "CAD/JPY": "CAD steady on 2.25% BoC rate vs 0.75% BoJ",
+      "CHF/JPY": "CHF safe-haven bid on risk-off flows",
+      "NZD/JPY": "NZD under pressure on RBNZ rate cut cycle"
+    },
+    "AUD": {
+      "AUD/USD": "USD soft. Fed hold expected. DXY stable.",
+      "EUR/AUD": "AUD pressured. RBA hike bias vs ECB hold.",
+      "GBP/AUD": "GBP firm. BoE hold vs RBA hike bias.",
+      "AUD/JPY": "JPY offered. BoJ on hold. Carry bid.",
+      "AUD/CAD": "CAD steady. BoC on hold. Oil stable.",
+      "AUD/CHF": "CHF safe-haven bid. SNB hold.",
+      "AUD/NZD": "NZD weak. RBNZ hold vs RBA hike bias."
+    },
+    "CAD": {
+      "USD/CAD": "CAD supported by BoC hold and stable oil prices",
+      "EUR/CAD": "EUR outperforming on ECB hold and wide carry",
+      "GBP/CAD": "GBP firm on BoE hold and strong UK data",
+      "AUD/CAD": "AUD pressured by RBA rate cut bets and weak PMI",
+      "CAD/JPY": "JPY offered on risk-on and CAD carry advantage",
+      "CAD/CHF": "CHF bid on safe-haven flows and SNB dovish stance",
+      "NZD/CAD": "NZD under pressure on RBNZ rate cut cycle"
+    },
+    "CHF": {
+      "USD/CHF": "USD supported by Fed hold. SNB on hold.",
+      "EUR/CHF": "EUR bid on ECB hold. SNB on hold.",
+      "GBP/CHF": "GBP steady on BoE hold. Carry advantage intact.",
+      "AUD/CHF": "AUD offered on RBA hike expectations. Carry still favors AUD.",
+      "CAD/CHF": "CAD neutral on BoC hold. Oil stable.",
+      "CHF/JPY": "JPY bid on risk-off. SNB 0% vs BoJ 0.75%.",
+      "NZD/CHF": "NZD under pressure on RBNZ hold. Carry still favors NZD."
+    },
+    "NZD": {
+      "NZD/USD": "USD soft post-EU open. Fed-ECB 200bp spread anchors pair.",
+      "EUR/NZD": "NZD under pressure. RBNZ cutting cycle. Carry disadvantage.",
+      "GBP/NZD": "GBP firm on BoE hold. RBNZ hike bias limited impact.",
+      "AUD/NZD": "AUD strong on RBA hike bets. NZD-RBNZ outlook weighs.",
+      "NZD/JPY": "JPY broadly offered. BoJ on hold. Risk-on carry bid intact.",
+      "NZD/CAD": "CAD neutral. BoC on hold. Oil stable — no directional push.",
+      "NZD/CHF": "CHF safe-haven bid on global risk-off compresses spread."
+    },
+    "USD": {
+      "EUR/USD": "ECB hold vs Fed hold. 200bp spread steady.",
+      "GBP/USD": "GBP soft on weak UK data. BoE on hold.",
+      "USD/JPY": "JPY offered. BoJ on hold. Risk-on intact.",
+      "AUD/USD": "AUD weak on RBA cut bets. Carry disadvantage.",
+      "USD/CAD": "CAD neutral. BoC on hold. Oil stable.",
+      "USD/CHF": "CHF safe-haven bid on risk-off flows.",
+      "NZD/USD": "NZD under pressure. RBNZ hold vs Fed."
+    }
   }
 }
