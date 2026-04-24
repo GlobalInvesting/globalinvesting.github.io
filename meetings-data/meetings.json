@@ -103,7 +103,7 @@
       ],
       "source": "boj.or.jp",
       "bias": "hold",
-      "biasSource": "BoJ uncollateralized overnight (mj CSV · daily) vs BoJ rate (rates/JPY.json)",
+      "biasSource": "BoJ uncollateralized overnight (mj{YY}{MM}.csv · daily) vs BoJ rate (rates/JPY.json)",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-24",
       "cutProb": 0,
