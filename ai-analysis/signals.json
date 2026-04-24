@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-04-24T03:21:26Z",
+  "generated_at": "2026-04-24T03:33:32Z",
   "signals": [
     {
-      "time": "03:20",
+      "time": "03:30",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Japan FinMin Katayama warns of decisive action on speculation; 300bp Fed-BoJ carry sustains USD/JPY bid at 159.81. Intervention risk on a break above 160.00; JPY COT short −65k. Carry dominates until VIX > 25.",
+      "text": "Japan FinMin Katayama warns of decisive action on speculation; 300bp Fed-BoJ carry sustains USD/JPY bid at 159.82. Intervention risk on a break above 160.00; JPY COT LF short −65,309. Carry dominates until VIX > 25.",
       "evidence": [
-        "USD/JPY: 159.81",
+        "USD/JPY: 159.82",
         "Fed 3.75% vs BoJ 0.75% — 300bp",
         "JPY COT LF net short: −65,309"
       ]
     },
     {
-      "time": "03:18",
+      "time": "03:27",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
       "text": "AUD/USD COT LF net long +41,675 vs HV30 at 8.2% and ATM IV at 9.4%. 25d RR at −0.14; mild put skew despite bullish price trend — market hedging rather than chasing. Late-trend caution signal; CFTC LF delta turning positive would invalidate the caution read.",
@@ -25,37 +25,27 @@
       ]
     },
     {
-      "time": "03:16",
+      "time": "03:25",
       "priority": "warning",
       "title": "EUR/USD — G8 Bilateral Theme + Carry",
-      "text": "EUR leads G8 laggards (EUR −0.493% vs USD +0.505%, 7 pairs each; G8 spread: 0.998%). Fed 3.75% vs ECB 2% — 175bp carry advantage drives the divergence; EUR/USD at 1.1681.",
+      "text": "EUR leads G8 laggards (EUR −0.485% vs USD +0.515%, 7 pairs each; G8 spread: 1.000%). Fed 3.75% vs ECB 2% — 175bp carry advantage drives the divergence; EUR/USD at 1.168.",
       "evidence": [
-        "EUR 1W avg: −0.493% (7 pairs)",
-        "USD 1W avg: +0.505% (7 pairs)",
-        "G8 spread: 0.998%",
-        "Fed 3.75% vs ECB 2.00% — 175bp"
+        "EUR 1W avg: −0.485% (7 pairs)",
+        "USD 1W avg: +0.515% (7 pairs)",
+        "G8 spread: 1.000%",
+        "Fed 3.75% vs ECB 2.0% — 175bp"
       ]
     },
     {
-      "time": "03:14",
+      "time": "03:24",
       "priority": "warning",
-      "title": "GBP/USD — G8 Bilateral Theme + Carry",
-      "text": "USD leads G8 (+0.505% avg, 7 pairs) while EUR lags (-0.493% avg, 7 pairs); G8 spread 0.998%. BoE 3.75% vs Fed 3.75% — 0bp; no carry advantage. Focus on USD strength vs EUR weakness.",
+      "title": "GBP/USD — Positioning + Carry",
+      "text": "GBP/USD at 1.3457 — BoE 3.75% vs Fed 3.75% yields 0bp carry neutral. COT LF net long +28,426; AM not reducing; positioning aligned with carry. 25d RR flat; volatility neutral. Watch 1.3600 as next resistance if carry stays supportive.",
       "evidence": [
-        "USD 1W avg: +0.505% (7 pairs)",
-        "EUR 1W avg: -0.493% (7 pairs)",
-        "G8 spread: 0.998%"
-      ]
-    },
-    {
-      "time": "03:13",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short −17,090 vs RBNZ hike 100% priced for 27 May. Short-squeeze risk elevated if RBNZ delivers hike; positioning stalling at extreme short levels. NZD/USD at 0.5847; 0.5900 is the next resistance on a potential unwind.",
-      "evidence": [
-        "NZD COT LF net: −17,090",
-        "RBNZ hike prob: 100%",
-        "NZD/USD: 0.5847"
+        "BoE 3.75%",
+        "Fed 3.75%",
+        "GBP LF net long: +28,426",
+        "GBP/USD: 1.3457"
       ]
     }
   ]
