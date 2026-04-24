@@ -60,7 +60,7 @@
 
 /* Metrics strip */
 #hm-metrics {
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);
   gap:1px;background:rgba(255,255,255,.05);
   border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;
@@ -353,6 +353,11 @@
       <div class="hm-mm-sub">avg vs 7 pairs</div>
     </div>
     <div class="hm-mm">
+      <div class="hm-mm-lbl">1W Strength</div>
+      <div class="hm-mm-val" id="hm-m-1w">—</div>
+      <div class="hm-mm-sub" id="hm-m-1w-sub">avg vs 7 pairs</div>
+    </div>
+    <div class="hm-mm">
       <div class="hm-mm-lbl">Rank</div>
       <div class="hm-mm-val flat" id="hm-m-rank">—</div>
       <div class="hm-mm-sub">of G8</div>
@@ -381,14 +386,15 @@
   <div id="hm-body">
     <div class="hm-panel on" id="hm-p-breakdown">
       <div class="hm-cw">
-        <div class="hm-ct" id="hm-pairs-title">DIRECT PAIRS · INTRADAY % CHANGE · vs PREV CLOSE</div>
+        <div class="hm-ct" id="hm-pairs-title">DIRECT PAIRS · DAY % &amp; 1W % · vs PREV CLOSE / PREV FRIDAY</div>
         <table class="hm-tbl" aria-label="Direct pairs for selected currency">
           <thead>
             <tr>
               <th scope="col">Pair</th>
               <th scope="col">Close</th>
               <th scope="col" class="col-prev-close">Prev close</th>
-              <th scope="col">% chg</th>
+              <th scope="col">Day %</th>
+              <th scope="col">1W %</th>
               <th scope="col">Impact</th>
               <th scope="col">Session range</th>
             </tr>
@@ -399,6 +405,8 @@
       <div class="hm-cw">
         <div class="hm-ct">FULL RANKING · ALL 8 G8 CURRENCIES · COMPOSITE STRENGTH</div>
         <div id="hm-ranking-rows"></div>
+        <div class="hm-ct" style="margin-top:14px">1W RANKING · ALL 8 G8 CURRENCIES · AVG vs PEERS · Mon–Fri</div>
+        <div id="hm-ranking-1w-rows"></div>
       </div>
     </div>
     <div class="hm-panel" id="hm-p-session">
@@ -464,6 +472,28 @@
     compositeEl.textContent = fmt2(v);
     compositeEl.className = 'hm-mm-val ' + pctClass(v);
 
+    // 1W composite — same equal-weighted model but using pct1w per pair
+    let w1sum = 0, w1n = 0;
+    myPairs.forEach(p => {
+      const d = rtCache[p.id];
+      if (!d || d.pct1w == null) return;
+      const impact1w = d.pct1w * p.sign * (p.base === ccy ? 1 : -1);
+      w1sum += impact1w;
+      w1n++;
+    });
+    const w1El    = document.getElementById('hm-m-1w');
+    const w1SubEl = document.getElementById('hm-m-1w-sub');
+    if (w1n > 0) {
+      const w1avg = w1sum / w1n;
+      w1El.textContent    = fmt2(w1avg);
+      w1El.className      = 'hm-mm-val ' + pctClass(w1avg);
+      w1SubEl.textContent = w1n + ' pairs · Mon–Fri';
+    } else {
+      w1El.textContent    = '—';
+      w1El.className      = 'hm-mm-val flat';
+      w1SubEl.textContent = 'no data';
+    }
+
     document.getElementById('hm-m-rank').textContent = '#' + rank + ' / 8';
     document.getElementById('hm-m-won').textContent  = won + ' / ' + myPairs.length;
 
@@ -496,6 +526,9 @@
       const rawPct = d?.pct ?? null;
       // impact on the selected ccy: positive = ccy gained vs opp
       const impact = rawPct != null ? rawPct * p.sign * (isCcyBase ? 1 : -1) : null;
+      // 1W impact — same sign convention as intraday
+      const raw1w  = d?.pct1w ?? null;
+      const imp1w  = raw1w != null ? raw1w * p.sign * (isCcyBase ? 1 : -1) : null;
       const close  = isCcyBase ? (d?.close ?? null) : (d?.close != null ? 1/d.close : null);
       const open   = isCcyBase ? (d?.open  ?? null) : (d?.open  != null ? 1/d.open  : null);
       const hi     = isCcyBase ? (d?.high  ?? null) : (d?.high  != null ? 1/d.high  : null);
@@ -503,7 +536,7 @@
       const label  = isCcyBase
         ? (p.base + '/' + p.quote)
         : (p.quote + '/' + p.base);   // show ccy first
-      impacts.push({ label, opp, close, open, hi, lo, impact, rawPct });
+      impacts.push({ label, opp, close, open, hi, lo, impact, rawPct, imp1w });
     });
 
     // Sort: biggest positive impact first
@@ -523,6 +556,7 @@
         <td>${fmtPrice(r.close)}</td>
         <td class="col-prev-close">${fmtPrice(r.open)}</td>
         <td class="${iCls}">${fmt2(r.impact)}</td>
+        <td class="${pctClass(r.imp1w)}">${r.imp1w != null ? fmt2(r.imp1w) : '—'}</td>
         <td><div class="imp-wrap">
           <span class="${iCls}">${fmt2(r.impact)}</span>
           <div class="imp-bar-bg"><div class="imp-bar-fill" style="width:${barW}%;background:${barClr}"></div></div>
@@ -556,6 +590,49 @@
         el.style.width = el.dataset.w + '%';
       });
     });
+
+    // 1W Ranking — compute G8 composite weekly strength from pct1w across all 28 pairs
+    const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+    const w1map = {};
+    ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
+    PAIR_DEFS.forEach(p => {
+      const d = rtCache[p.id];
+      if (!d || d.pct1w == null) return;
+      const v = d.pct1w * p.sign;   // positive = base strengthened vs quote
+      w1map[p.base].sum += v;  w1map[p.base].n++;
+      w1map[p.quote].sum -= v; w1map[p.quote].n++;
+    });
+    const w1strengths = ccys
+      .map(c => ({ ccy: c, pct: w1map[c].n > 0 ? w1map[c].sum / w1map[c].n : null }))
+      .filter(s => s.pct != null)
+      .sort((a, b) => b.pct - a.pct);
+
+    const cont1w = document.getElementById('hm-ranking-1w-rows');
+    cont1w.innerHTML = '';
+    if (w1strengths.length > 0) {
+      const maxAbs1w = Math.max(...w1strengths.map(s => Math.abs(s.pct)), 0.001);
+      w1strengths.forEach(s => {
+        const isHL  = s.ccy === ccy;
+        const cls   = isHL ? 'hl' : pctClass(s.pct);
+        const fillW = Math.round(Math.abs(s.pct) / maxAbs1w * 100);
+        const row   = document.createElement('div');
+        row.className = 'hm-rank-row';
+        row.innerHTML = `
+          <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
+          <div class="hm-rank-bg">
+            <div class="hm-rank-fill ${cls}" style="width:0" data-w="${fillW}"></div>
+          </div>
+          <div class="hm-rank-val ${pctClass(s.pct)}">${fmt2(s.pct)}</div>`;
+        cont1w.appendChild(row);
+      });
+      requestAnimationFrame(() => {
+        cont1w.querySelectorAll('.hm-rank-fill').forEach(el => {
+          el.style.width = el.dataset.w + '%';
+        });
+      });
+    } else {
+      cont1w.innerHTML = '<div style="font-size:10px;color:var(--text3);padding:6px 0">No 1W data available</div>';
+    }
   }
 
   // Convert a UTC hour to local HH:MM string (respects user's timezone)
