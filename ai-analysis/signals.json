@@ -1,48 +1,48 @@
 {
-  "generated_at": "2026-04-24T06:02:14Z",
+  "generated_at": "2026-04-24T08:28:34Z",
   "signals": [
     {
-      "time": "06:02",
+      "time": "08:20",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Japan FinMin Katayama warns of decisive action on speculation; 300bp Fed-BoJ carry sustains USD/JPY bid at 159.75. JPY COT LF net short −65,309; intervention risk on a break above 160.00. Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
+      "text": "USD/JPY at 159.7 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −65,309 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
       "evidence": [
-        "USD/JPY: 159.75",
         "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net: −65,309"
+        "USD/JPY: 159.7",
+        "JPY COT LF net short −65,309"
       ]
     },
     {
-      "time": "05:56",
+      "time": "08:22",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 vs HV30 at 8.2% and ATM IV at 9.4%; 25d RR at −0.14. Positioning stalling, late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
+      "text": "AUD/USD COT LF net long +41,675 vs HV30 at 8.2% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend. CFTC LF net +289k, WoW delta −1,101 for second consecutive week; AM not reducing. Price bid, positioning stalling — late-trend caution signal.",
       "evidence": [
         "AUD/USD COT LF net: +41,675",
         "HV30: 8.2%",
-        "ATM IV: 9.4%"
+        "25d RR: −0.14"
       ]
     },
     {
-      "time": "05:55",
+      "time": "08:25",
       "priority": "warning",
       "title": "EUR — G8 Outperformance",
-      "text": "EUR weakest G8 currency this week (−0.500%, n=7); USD leads at +0.442%. G8 spread: 0.942%. ECB 2.0% vs Fed 3.75% — 175bp carry disadvantage for EUR.",
+      "text": "EUR weakest G8 currency this week (−0.489%, n=7 pairs); CAD leads at +0.423%. Leader-to-laggard spread: 0.912%. EUR underperformance may relate to geopolitics; cross-check with COT and vol.",
       "evidence": [
-        "EUR 1W avg: −0.500% (n=7)",
-        "USD 1W avg: +0.442% (n=7)",
-        "G8 spread: 0.942%"
+        "EUR 1W avg: −0.489% (n=7)",
+        "CAD 1W avg: +0.423% (n=3)",
+        "G8 spread: 0.912%"
       ]
     },
     {
-      "time": "05:48",
+      "time": "08:28",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP LF net long +28,426. GBP/USD at 1.3466 mid-range; ATM IV 9.5% near HV.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426; AM constructive — positioning aligned with carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3481 mid-range; 1.3600 is the next resistance on a continuation.",
       "evidence": [
         "BoE 3.75% vs Fed 3.75% — 0bp",
         "GBP LF net long: +28,426",
-        "GBP/USD: 1.3466"
+        "GBP/USD: 1.3481"
       ]
     }
   ]
