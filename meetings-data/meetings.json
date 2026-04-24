@@ -103,7 +103,7 @@
       ],
       "source": "boj.or.jp",
       "bias": "hold",
-      "biasSource": "BoJ uncollateralized overnight (mj{YY}{MM}.csv · daily) vs BoJ rate (rates/JPY.json)",
+      "biasSource": "SNB zimoma TONA (zimoma cube · monthly) vs BoJ rate (rates/JPY.json)",
       "biasMethod": "ois",
       "biasUpdated": "2026-04-24",
       "cutProb": 0,
@@ -130,10 +130,10 @@
       ],
       "source": "rba.gov.au",
       "bias": "hike",
-      "biasSource": "rates/AUD.json trajectory (RBA cash rate history)",
-      "biasMethod": "heuristic",
+      "biasSource": "ECB SDW AUONIA (FM/B.AU.EUR.RT.MM.AUONIA.HSTA · daily OIS) → rates/AUD.json trajectory fallback",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-24",
-      "cutProb": null,
+      "cutProb": 0,
       "hikeProb": null
     },
     "CAD": {
@@ -203,11 +203,11 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "rates/NZD.json trajectory (RBNZ OCR history)",
-      "biasMethod": "heuristic",
+      "biasSource": "ECB SDW NZONIA (FM/B.NZ.EUR.RT.MM.NZONIA.HSTA · daily OIS) → rates/NZD.json trajectory fallback",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-24",
-      "cutProb": null,
-      "hikeProb": null
+      "cutProb": 0,
+      "hikeProb": 0
     }
   }
 }
