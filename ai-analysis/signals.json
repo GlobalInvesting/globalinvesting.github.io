@@ -1,70 +1,55 @@
 {
-  "generated_at": "2026-04-24T20:39:00Z",
+  "generated_at": "2026-04-24T22:34:29Z",
   "signals": [
     {
-      "time": "20:35",
+      "time": "22:30",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 159.41 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −65,309 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
+      "title": "Oil / Geopolitical",
+      "text": "Watch for potential risk-off at Sydney open as WTI oil trades above $94.5 and Strait of Hormuz tensions escalate. Key level to watch: USD/JPY 159.33",
       "evidence": [
-        "USD/JPY: 159.41",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net short: −65,309"
+        "WTI Oil: $94.9",
+        "Strait of Hormuz tensions"
       ]
     },
     {
-      "time": "20:32",
+      "time": "22:26",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 vs retail 87% short — institutional vs retail divergence at extreme. HV30 at 8.2%, ATM IV at 9.4%; 25d RR at −0.14: mild put skew. Late-trend caution signal; retail capitulation risk if price extends higher.",
+      "title": "AUD Setup",
+      "text": "AUD/USD net long positioning at 74.3% with retail 13% long / 87% short; watch for reversal risk into Sydney open at 0.7151",
       "evidence": [
-        "AUD/USD COT LF net: +41,675",
-        "Retail: 87% short",
-        "HV30: 8.2%",
-        "ATM IV: 9.4%"
+        "COT: AUD net long +47,218",
+        "Retail: AUD/USD 13% long"
       ]
     },
     {
-      "time": "20:30",
+      "time": "22:25",
       "priority": "warning",
-      "title": "EUR — G8 Outperformance",
-      "text": "EUR leads G8 losers (+0.267% GBP vs −0.487% EUR, spread 0.754%); CAD +0.450% outperforming on G8 scorecard. EUR underperforms despite BoE 4.93% vs ECB 2% — 293bp carry advantage for GBP not reflected in price; ECB policy divergence.",
+      "title": "CAD/JPY Watch",
+      "text": "BoC and BoJ meetings this week; watch for CAD/JPY volatility at open, currently at 116.572",
       "evidence": [
-        "EUR 1W avg: −0.487%",
-        "GBP 1W avg: +0.267%",
-        "G8 spread: 0.754%"
+        "BoC meeting: 29 Apr",
+        "BoJ meeting: 28 Apr"
       ]
     },
     {
-      "time": "20:28",
+      "time": "22:18",
       "priority": "info",
-      "title": "GBP/USD — CB + Technical",
-      "text": "GBP/USD at 1.353 — BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426; AM constructive — positioning aligned with carry read. ATM IV 9.5% near HV; 25d RR flat — options neutral. GBP/USD at 1.353 mid-range; 1.3600 is the next resistance on a continuation.",
+      "title": "Yield Curve Note",
+      "text": "US yield curve in bull flattener regime; 2s10s spread at +52.0bp, watch for implications on CB divergence and risk narrative",
       "evidence": [
-        "BoE 3.75% vs Fed 3.75% — 0bp",
-        "GBP LF net long: +28,426",
-        "GBP/USD: 1.353"
+        "US 2s10s spread: +52.0bp",
+        "Regime: BULL FLATTENER"
       ]
     },
     {
-      "time": "20:25",
-      "priority": "info",
-      "title": "AUD/JPY — Carry",
-      "text": "AUD/JPY at 113.96 — RBA 4.10% vs BoJ 0.75% — +335bp AUD carry advantage; risk-off unwind risk elevated in risk-off. Cross-asset: S&P 500 +0.80%, VIX 18.7 — normal volatility.",
-      "evidence": [
-        "AUD/JPY: 113.96",
-        "RBA 4.10% vs BoJ 0.75% — +335bp"
-      ]
-    },
-    {
-      "time": "20:39",
+      "time": "22:23",
       "priority": "warning",
-      "title": "NZD/USD — RBNZ vs OIS Divergence",
-      "text": "NZD/USD at 0.5882 — COT LF net short −17,090 (specs fading a hawkish CB) vs RBNZ hike 100% priced for 27 May. If RBNZ delivers or signals hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.5900+. NZD/USD at 0.5882.",
+      "title": "CAD/EUR — G8 Bilateral Theme",
+      "text": "CAD outperforms as G8 leader, EUR lags; watch for bilateral theme at open. CAD 1W avg: +0.431%, EUR 1W avg: -0.481%, G8 spread: 0.912%",
       "evidence": [
-        "NZD COT LF net: −17,090",
-        "RBNZ hike prob: 100%",
-        "NZD/USD: 0.5882"
+        "CAD 1W avg: +0.431% (n=3)",
+        "EUR 1W avg: -0.481% (n=7)",
+        "G8 spread: 0.912%"
       ]
     }
   ]
