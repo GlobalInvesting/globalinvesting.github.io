@@ -1,49 +1,59 @@
 {
-  "generated_at": "2026-04-24T02:26:37Z",
+  "generated_at": "2026-04-24T03:07:02Z",
   "signals": [
     {
-      "time": "02:25",
+      "time": "03:05",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East tensions drive safe-haven demand — JPY COT LF net short −65,309 (crowded carry). USD/JPY at 159.78; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — key level 160.00 tested.",
+      "text": "USD/JPY at 159.81 — 450bp Fed-BoJ carry sustains bid; Japan FinMin warns of decisive action on speculation. JPY COT LF net short −65,309 (crowded carry unwinds rapidly in risk-off). Intervention risk on a break above 160.00; 160.00 is the key intervention threshold.",
       "evidence": [
-        "USD/JPY: 159.78",
-        "JPY COT LF net short −65,309",
-        "Fed-BoJ spread: 450bp"
+        "USD/JPY: 159.81",
+        "Fed 3.75% vs BoJ 0.75% — +300bp carry",
+        "Japan FinMin warns of decisive action"
       ]
     },
     {
-      "time": "02:20",
+      "time": "03:04",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 vs ATM IV 9.4% — market hedging rather than chasing. Price bid at 0.7125; positioning stalling — late-trend caution signal.",
+      "text": "AUD/USD at 0.712 — HV30 at 8.2%, ATM IV at 9.4%; CFTC LF net long +41,675. Positioning stalling, options pricing a 1.2 vol-pt premium over realized; late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
       "evidence": [
-        "AUD/USD COT LF net long +41,675",
-        "ATM IV 9.4%",
-        "Price: 0.7125"
+        "AUD/USD COT LF net: +41,675",
+        "HV30: 8.2%",
+        "ATM IV: 9.4%"
       ]
     },
     {
-      "time": "02:15",
+      "time": "03:03",
       "priority": "warning",
-      "title": "EUR/USD — G8 Bilateral Theme + Carry",
-      "text": "EUR leads G8 laggard (−0.515% avg, 7 pairs) while USD leads (+0.440% avg, 7 pairs) — G8 spread: 0.956%. EUR/USD at 1.1685; ECB 2% vs Fed 3.75% — 175bp carry advantage drives divergence.",
+      "title": "EUR — G8 Outperformance",
+      "text": "EUR weakest G8 currency this week (−0.498%, n=7 pairs); USD leads with +0.505%. Leader-to-laggard spread: 1.002%. EUR underperformance vs USD aligns with recent CB divergence.",
       "evidence": [
-        "EUR 1W avg: −0.515%",
-        "USD 1W avg: +0.440%",
-        "G8 spread: 0.956%",
-        "ECB-Fed spread: 175bp"
+        "EUR 1W avg: −0.498% (n=7)",
+        "USD 1W avg: +0.505% (n=7)",
+        "G8 spread: 1.002%"
       ]
     },
     {
-      "time": "02:05",
+      "time": "03:02",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp carry; BoE hike expected soon. GBP/USD at 1.3464; 1.3500 resistance on a carry-neutral view.",
+      "text": "GBP/USD at 1.3457 — BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426; AM constructive — positioning aligned with carry read. ATM IV 9.5% near HV; 25d RR flat — options neutral. Next resistance at 1.3500.",
       "evidence": [
-        "BoE 3.75%",
-        "Fed 3.75%",
-        "GBP/USD: 1.3464"
+        "BoE 3.75% vs Fed 3.75%",
+        "GBP LF net long: +28,426",
+        "ATM IV: 9.5%"
+      ]
+    },
+    {
+      "time": "03:07",
+      "priority": "warning",
+      "title": "NZD/USD — RBNZ vs OIS Divergence",
+      "text": "NZD/USD at 0.5847; RBNZ COT LF net short −17,090 vs 100% hike priced in OIS for 27 May meeting. Short-squeeze risk elevated if RBNZ delivers hike; positioning stalled at 0.5850. Watch 27 May RBNZ meeting for potential catalyst.",
+      "evidence": [
+        "NZD COT LF net: −17,090",
+        "RBNZ hike prob: 100%",
+        "NZD/USD: 0.5847"
       ]
     }
   ]
