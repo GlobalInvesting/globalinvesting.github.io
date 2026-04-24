@@ -1,49 +1,48 @@
 {
-  "generated_at": "2026-04-24T10:05:56Z",
+  "generated_at": "2026-04-24T11:37:43Z",
   "signals": [
     {
-      "time": "10:03",
+      "time": "11:35",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 159.74 — 300bp Fed-BoJ carry sustains bid; Middle East tensions and SNB's Schlegel's warning on global uncertainty introduce intervention risk on a break above 160.00. JPY COT LF short −65,309 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
+      "text": "USD/JPY at 159.38 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −65,309 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
       "evidence": [
-        "USD/JPY: 159.74",
+        "USD/JPY: 159.38",
         "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "SNB's Schlegel flags global uncertainty"
+        "JPY COT LF net short: −65,309"
       ]
     },
     {
-      "time": "10:02",
+      "time": "11:32",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 vs HV30 at 8.2% and ATM IV at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend. Market hedging rather than chasing — late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
+      "text": "AUD/USD COT LF net long +41,675 vs ATM IV 9.5% near HV; realized vol at 8.2%. Positioning stalling as price ticks up — late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
       "evidence": [
         "AUD/USD COT LF net: +41,675",
-        "HV30: 8.2%",
-        "ATM IV: 9.4%"
+        "ATM IV: 9.5%",
+        "HV30: 8.2%"
       ]
     },
     {
-      "time": "10:01",
+      "time": "11:30",
       "priority": "warning",
-      "title": "EUR/USD — G8 Bilateral Theme + Carry",
-      "text": "CAD leads G8 (+0.463% avg, 3 pairs) while EUR lags (−0.515% avg, 7 pairs); G8 spread: 0.978%. Fed 3.75% vs ECB 2.0% — 175bp carry advantage drives the divergence. EUR underperformance despite higher ECB rates suggests real-money or CB repricing is overriding carry trade.",
+      "title": "EUR — G8 Outperformance",
+      "text": "EUR underperforms G8 peers (avg −0.431% vs 7 pairs) while CAD leads at +0.314%. EUR/USD at 1.1719; 1.1748 resistance ahead.",
       "evidence": [
-        "CAD 1W avg: +0.463% (3 pairs)",
-        "EUR 1W avg: −0.515% (7 pairs)",
-        "G8 spread: 0.978%",
-        "Fed 3.75% vs ECB 2.0% — 175bp"
+        "EUR 1W avg: −0.431% (7 pairs)",
+        "CAD 1W avg: +0.314% (3 pairs)",
+        "EUR/USD: 1.1719"
       ]
     },
     {
-      "time": "10:04",
+      "time": "11:28",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426; AM constructive — positioning aligned with carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3482 mid-range; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral. GBP LF net long +28,426; AM constructive — positioning aligned with carry read. GBP/USD at 1.3498 mid-range; 1.3600 is the next resistance.",
       "evidence": [
         "BoE 3.75% vs Fed 3.75% — 0bp",
         "GBP LF net long: +28,426",
-        "ATM IV: 9.5%"
+        "GBP/USD: 1.3498"
       ]
     }
   ]
