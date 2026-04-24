@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-24T08:28:40Z",
+  "generated_at": "2026-04-24T10:06:03Z",
   "drivers": {
     "EUR": {
       "EUR/USD": "flat — Fed on hold",
@@ -7,7 +7,7 @@
       "EUR/JPY": "JPY COT LF short -65.3k. BoJ on hold",
       "EUR/AUD": "AUD COT LF long +41.7k. RBA hike priced in",
       "EUR/CAD": "CAD COT LF short -63.6k. BoC on hold",
-      "EUR/CHF": "CHF safe-haven bid. SNB on hold",
+      "EUR/CHF": "CHF safe-haven bid on risk-off. SNB on hold",
       "EUR/NZD": "NZD bid. RBNZ hike priced in for May"
     },
     "GBP": {
@@ -16,8 +16,8 @@
       "EUR/GBP": "GBP soft on weak UK data. BoE on hold.",
       "GBP/AUD": "AUD COT LF long +41.7k. RBA hike priced in.",
       "GBP/CAD": "CAD COT LF short -63.6k. BoC on hold.",
-      "GBP/CHF": "CHF safe-haven bid. SNB on hold.",
-      "GBP/NZD": "NZD bid. RBNZ hike priced in for May."
+      "GBP/CHF": "CHF safe-haven bid on risk-off. SNB on hold.",
+      "GBP/NZD": "NZD bid. RBNZ hike 100% priced for May."
     },
     "JPY": {
       "USD/JPY": "JPY COT LF short -65.3k. BoJ on hold.",
@@ -30,47 +30,47 @@
     },
     "AUD": {
       "AUD/USD": "flat — carry differential anchors pair",
-      "EUR/AUD": "AUD firm. RBA hike priced in for May. Carry compression eyed.",
-      "GBP/AUD": "GBP soft. BoE on hold. RBA hike expected.",
-      "AUD/JPY": "JPY COT LF short -65.3k. BoJ on hold. Risk-on carry bid intact.",
-      "AUD/CAD": "CAD COT LF short -63.6k. BoC on hold. WTI rise limits downside.",
-      "AUD/CHF": "CHF safe-haven bid on global risk-off. SNB on hold.",
-      "AUD/NZD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
+      "EUR/AUD": "AUD firm on RBA hike expectations",
+      "GBP/AUD": "GBP soft on weak UK data. BoE on hold",
+      "AUD/JPY": "JPY COT LF short -65.3k. BoJ on hold",
+      "AUD/CAD": "CAD COT LF short -63.6k. BoC on hold. WTI rise limits downside",
+      "AUD/CHF": "CHF safe-haven bid on risk-off. SNB on hold",
+      "AUD/NZD": "NZD bid on RBNZ hike expectations. Carry advantage rising"
     },
     "CAD": {
       "USD/CAD": "CAD COT LF short -63.6k. BoC on hold. WTI rise limits downside.",
-      "EUR/CAD": "EUR outperforms on ECB hold. CAD neutral. BoC on hold.",
-      "GBP/CAD": "GBP soft on weak UK data. CAD steady — BoC hold eyed.",
+      "EUR/CAD": "EUR outperforming on ECB hold. CAD neutral. BoC on hold.",
+      "GBP/CAD": "GBP soft. CAD COT LF short -63.6k. BoE on hold.",
       "AUD/CAD": "AUD COT LF long +41.7k. RBA hike priced in for May. Carry advantage rising.",
-      "CAD/JPY": "JPY COT LF short -65.3k. BoJ on hold. Risk-on carry bid intact.",
-      "CAD/CHF": "CHF safe-haven bid on global risk-off. BoC on hold.",
+      "CAD/JPY": "JPY COT LF short -65.3k. BoJ on hold. Carry favors CAD.",
+      "CAD/CHF": "CHF safe-haven bid on global risk-off. SNB on hold.",
       "NZD/CAD": "NZD bid. RBNZ hike 100% priced for May. Carry advantage rising."
     },
     "CHF": {
-      "USD/CHF": "CHF safe-haven bid on risk-off. SNB on hold.",
-      "EUR/CHF": "EUR outperforms on ECB hold. 200bp carry advantage.",
-      "GBP/CHF": "GBP soft on weak UK data. BoE on hold.",
+      "USD/CHF": "CHF safe-haven bid on geopolitical risk. SNB on hold.",
+      "EUR/CHF": "EUR outperforms on ECB hold. Carry advantage +200bp.",
+      "GBP/CHF": "GBP firm on BoE hold. CHF safe-haven flows limited.",
       "AUD/CHF": "AUD COT LF long +41.7k. RBA hike priced in for May.",
-      "CAD/CHF": "CAD COT LF short -63.6k. BoC on hold. WTI rise limits downside.",
-      "CHF/JPY": "JPY COT LF short -65.3k. BoJ on hold. Carry disadvantage.",
-      "NZD/CHF": "NZD bid. RBNZ hike 100% priced for May. 225bp carry advantage."
+      "CAD/CHF": "CAD COT LF short -63.6k. BoC on hold. WTI rise supports.",
+      "CHF/JPY": "JPY COT LF short -65.3k. BoJ on hold. CHF carry disadvantage.",
+      "NZD/CHF": "NZD bid. RBNZ hike 100% priced for May. Carry +225bp."
     },
     "NZD": {
-      "NZD/USD": "RBNZ hike 100% priced for May. USD steady.",
-      "EUR/NZD": "EUR outperforming on ECB hold. RBNZ hike priced in.",
+      "NZD/USD": "RBNZ hike 100% priced for May. NZD yield advantage.",
+      "EUR/NZD": "EUR outperforming on ECB hold. RBNZ hike expected.",
       "GBP/NZD": "GBP soft on weak UK data. RBNZ hike 100% priced.",
-      "AUD/NZD": "AUD firm. RBA hike priced in for May. NZD carry advantage rising.",
-      "NZD/JPY": "JPY COT LF short -65.3k. BoJ on hold. Risk-on carry bid intact.",
-      "NZD/CAD": "CAD COT LF short -63.6k. BoC on hold. Oil stable — no directional push.",
-      "NZD/CHF": "CHF safe-haven bid on global risk-off. RBNZ hike 100% priced."
+      "AUD/NZD": "AUD firm. RBA hike priced in for May. NZD carry disadvantage.",
+      "NZD/JPY": "JPY COT LF short -65.3k. BoJ on hold.",
+      "NZD/CAD": "CAD COT LF short -63.6k. BoC on hold. WTI rise limits downside.",
+      "NZD/CHF": "CHF safe-haven bid on risk-off. RBNZ 2.25% vs SNB 0%."
     },
     "USD": {
       "EUR/USD": "flat — ECB, Fed on hold",
-      "GBP/USD": "GBP soft. BoE on hold. Weak UK data",
+      "GBP/USD": "GBP firm on steady UK yields",
       "USD/JPY": "JPY COT LF short -65.3k. BoJ on hold",
       "AUD/USD": "AUD COT LF long +41.7k. RBA hike priced in",
       "USD/CAD": "CAD COT LF short -63.6k. BoC on hold",
-      "USD/CHF": "CHF safe-haven bid. SNB on hold",
+      "USD/CHF": "CHF safe-haven bid on risk-off",
       "NZD/USD": "NZD bid. RBNZ hike 100% priced for May"
     }
   }
