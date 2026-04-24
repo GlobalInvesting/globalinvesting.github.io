@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-24T21:20:25Z",
+  "updated": "2026-04-24T21:25:22Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -41,7 +41,7 @@
       "chg": -0.97,
       "pct": -1.012,
       "high": 97.85,
-      "low": 92.68,
+      "low": 92.8,
       "source": "yfinance",
       "pct1w": 13.1544,
       "pct1w_date": "2026-04-17"
@@ -143,14 +143,14 @@
       "pct1w_date": "2026-04-17"
     },
     "btc": {
-      "close": 77637.61,
+      "close": 77686.51,
       "prev_close": 78278.66,
-      "chg": -249.8906,
-      "pct": -0.3208,
+      "chg": -200.9922,
+      "pct": -0.2581,
       "high": 78494.164,
       "low": 77459.13,
       "source": "yfinance",
-      "pct1w": 0.6622,
+      "pct1w": 0.7256,
       "pct1w_date": "2026-04-17"
     },
     "ftse": {
@@ -271,17 +271,17 @@
       "pct1m_date": "2026-03-23"
     },
     "nzdusd": {
-      "close": 0.5885,
+      "close": 0.5881,
       "prev_close": 0.5856,
-      "chg": 0.0029,
-      "pct": 0.4943,
+      "chg": 0.0025,
+      "pct": 0.4237,
       "high": 0.5885,
       "low": 0.5842,
       "source": "yfinance",
-      "pct1w": -0.0224,
+      "pct1w": -0.0929,
       "pct1w_date": "2026-04-17",
-      "hv30": 11.04,
-      "pct1m": 0.9186,
+      "hv30": 11.06,
+      "pct1m": 0.8474,
       "pct1m_date": "2026-03-23"
     },
     "eurgbp": {
@@ -467,31 +467,31 @@
       "pct1m_date": "2026-03-23"
     },
     "nzdjpy": {
-      "close": 93.752,
+      "close": 93.689,
       "prev_close": 93.432,
-      "chg": 0.32,
-      "pct": 0.3425,
+      "chg": 0.257,
+      "pct": 0.2749,
       "high": 93.777,
       "low": 93.321,
       "source": "yfinance",
-      "pct1w": 0.0758,
+      "pct1w": 0.0085,
       "pct1w_date": "2026-04-17",
-      "hv30": 6.99,
-      "pct1m": 0.9943,
+      "hv30": 7.03,
+      "pct1m": 0.9264,
       "pct1m_date": "2026-03-23"
     },
     "eurnzd": {
-      "close": 1.992,
+      "close": 1.9934,
       "prev_close": 1.9952,
-      "chg": -0.0032,
-      "pct": -0.1594,
+      "chg": -0.0018,
+      "pct": -0.0913,
       "high": 1.9988,
       "low": 1.991,
       "source": "yfinance",
-      "pct1w": -0.4438,
+      "pct1w": -0.3758,
       "pct1w_date": "2026-04-17",
-      "hv30": 5.32,
-      "pct1m": 0.4827,
+      "hv30": 5.38,
+      "pct1m": 0.5513,
       "pct1m_date": "2026-03-23"
     },
     "gbpaud": {
@@ -509,17 +509,17 @@
       "pct1m_date": "2026-03-23"
     },
     "gbpnzd": {
-      "close": 2.2998,
+      "close": 2.3013,
       "prev_close": 2.2986,
-      "chg": 0.0012,
-      "pct": 0.0513,
+      "chg": 0.0028,
+      "pct": 0.1197,
       "high": 2.3037,
       "low": 2.2963,
       "source": "yfinance",
-      "pct1w": 0.0944,
+      "pct1w": 0.1628,
       "pct1w_date": "2026-04-17",
-      "hv30": 4.8,
-      "pct1m": 0.5918,
+      "hv30": 4.88,
+      "pct1m": 0.6605,
       "pct1m_date": "2026-03-23"
     },
     "audcad": {
@@ -586,7 +586,7 @@
     "audusd": 12.1,
     "usdchf": 7.76,
     "usdcad": 4.33,
-    "nzdusd": 11.04,
+    "nzdusd": 11.06,
     "eurgbp": 3.22,
     "eurjpy": 4.81,
     "eurchf": 4.19,
@@ -600,10 +600,10 @@
     "audchf": 7.69,
     "cadjpy": 6.41,
     "chfjpy": 6.19,
-    "nzdjpy": 6.99,
-    "eurnzd": 5.32,
+    "nzdjpy": 7.03,
+    "eurnzd": 5.38,
     "gbpaud": 6.54,
-    "gbpnzd": 4.8,
+    "gbpnzd": 4.88,
     "audcad": 9.28,
     "cadchf": 4.82,
     "nzdcad": 8.17,
@@ -697,14 +697,14 @@
     {
       "a": "NZD/USD",
       "b": "NZX 50",
-      "corr30": 0.196,
+      "corr30": 0.198,
       "n30": 30,
-      "corr": 0.632,
+      "corr": 0.633,
       "n": 60,
       "corr90": 0.135,
       "n90": 90,
       "norm": -0.272,
-      "z_score": 2.12
+      "z_score": 2.13
     },
     {
       "a": "EUR/USD",
