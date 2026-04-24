@@ -177,9 +177,11 @@
 .sess-val { text-align:right; }
 
 /* Correlations tab */
-.corr-grid { display:grid;grid-template-columns:28px repeat(8,1fr);gap:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-size:9px; }
+.corr-grid { display:grid;grid-template-columns:28px repeat(8,1fr) 34px;gap:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-size:9px; }
 .corr-hdr { display:flex;align-items:center;justify-content:center;color:var(--text3,#6b7280);font-size:9px; }
+.corr-hdr.comp { color:var(--blue,#4f7fff);font-weight:600; }
 .corr-cell { height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500; }
+.corr-cell.comp { border-radius:2px;border:1px solid rgba(79,127,255,.25); }
 
 /* Footer */
 #hm-footer {
@@ -827,9 +829,17 @@
       h.textContent = c;
       grid.appendChild(h);
     });
+    // Composite column header
+    const compHdr = document.createElement('div');
+    compHdr.className = 'corr-hdr comp';
+    compHdr.textContent = 'Comp.';
+    compHdr.title = 'Equal-weighted composite — avg % vs all 7 G8 peers';
+    grid.appendChild(compHdr);
 
     // Rows
-    ccys.forEach(rowCcy => {
+    const pctValues = ccys.map(c => pctMap[c] ?? 0);
+
+    ccys.forEach((rowCcy, ri) => {
       const rLbl = document.createElement('div');
       rLbl.className = 'corr-hdr';
       rLbl.textContent = rowCcy;
@@ -847,7 +857,6 @@
           const diff = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
           const abs  = Math.abs(diff);
           const isHL = rowCcy === ccy || colCcy === ccy;
-          // Color intensity — max ~0.5% diff = full saturation
           const alpha = Math.min(abs / 0.5, 1) * 0.7;
           if (diff > 0.02) {
             cell.style.background = `rgba(38,166,154,${alpha})`;
@@ -859,7 +868,6 @@
             cell.style.background = 'rgba(255,255,255,.03)';
             cell.style.color = 'var(--text3,#6b7280)';
           }
-          // Highlight row/col for selected ccy
           if (isHL) {
             cell.style.outline = '1px solid rgba(79,127,255,.3)';
           }
@@ -868,7 +876,52 @@
         }
         grid.appendChild(cell);
       });
+
+      // Composite cell — equal-weighted avg of this row's 7 values (excluding diagonal)
+      const rowComp = pctMap[rowCcy] ?? 0;
+      const compCell = document.createElement('div');
+      compCell.className = 'corr-cell comp';
+      const compAbs = Math.abs(rowComp);
+      const compAlpha = Math.min(compAbs / 0.4, 1) * 0.18 + 0.06;
+      compCell.style.background = `rgba(79,127,255,${compAlpha})`;
+      compCell.style.color = 'var(--blue,#4f7fff)';
+      compCell.style.fontWeight = '700';
+      compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
+      compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
+      if (rowCcy === ccy) compCell.style.outline = '1px solid rgba(79,127,255,.6)';
+      grid.appendChild(compCell);
     });
+
+    // Composite footer row — shows column composites (same values, transposed)
+    const footLbl = document.createElement('div');
+    footLbl.className = 'corr-hdr comp';
+    footLbl.textContent = 'Comp.';
+    footLbl.style.fontSize = '8px';
+    grid.appendChild(footLbl);
+
+    ccys.forEach(colCcy => {
+      const cv = pctMap[colCcy] ?? 0;
+      const footCell = document.createElement('div');
+      footCell.className = 'corr-cell comp';
+      const cvAbs = Math.abs(cv);
+      const cvAlpha = Math.min(cvAbs / 0.4, 1) * 0.18 + 0.06;
+      footCell.style.background = `rgba(79,127,255,${cvAlpha})`;
+      footCell.style.color = 'var(--blue,#4f7fff)';
+      footCell.style.fontWeight = '700';
+      footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
+      footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
+      if (colCcy === ccy) footCell.style.outline = '1px solid rgba(79,127,255,.6)';
+      grid.appendChild(footCell);
+    });
+
+    // Bottom-right corner cell (intersection of Comp. row and Comp. column)
+    const corner = document.createElement('div');
+    corner.className = 'corr-cell';
+    corner.style.background = 'rgba(79,127,255,.04)';
+    corner.textContent = '—';
+    corner.style.color = 'var(--text3,#6b7280)';
+    corner.style.fontSize = '8px';
+    grid.appendChild(corner);
 
     matrix.innerHTML = '';
     matrix.appendChild(grid);
