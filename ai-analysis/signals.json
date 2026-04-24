@@ -1,55 +1,54 @@
 {
-  "generated_at": "2026-04-23T23:56:51Z",
+  "generated_at": "2026-04-24T00:01:12Z",
   "signals": [
     {
-      "time": "23:55",
+      "time": "00:01",
       "priority": "critical",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "Middle East tensions drive safe-haven demand for JPY. USD/JPY at 159.75; 160.00 remains the key level that has previously triggered BoJ verbal warnings and intervention risk rises on a sustained break above 160. The Fed-BoJ carry differential of 450bp (Fed 3.75% vs BoJ 0.75%) supports USD, but safe-haven flows compete with carry. A break above 160.00 would increase intervention risk.",
+      "text": "Middle East tensions drive safe-haven demand for JPY — USD/JPY retreating from 159.76; safe-haven bid competes with 450bp Fed-BoJ carry differential. Risk-off flow historically unwinds JPY shorts — 158.00 is the first technical level on a sustained risk-off move.",
       "evidence": [
-        "USD/JPY: 159.75",
-        "Fed 3.75% vs BoJ 0.75%"
+        "USD/JPY: 159.76",
+        "Fed 3.75% vs BoJ 0.75% — 300bp carry premium"
       ]
     },
     {
-      "time": "23:52",
+      "time": "00:04",
       "priority": "warning",
       "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +41,675 (bullish spec positioning) and retail 88% short (extreme retail short). HV30 at 8.2%, ATM IV at 9.4% — options pricing a 1.2 vol-pt premium over realized. The 25d RR at −0.14: mild put skew despite the bullish price trend — market hedging rather than chasing. Late-trend caution signal. A LF delta turning positive or AM reducing would invalidate the caution read.",
+      "text": "AUD/USD COT LF net long +41,675 (bullish spec positioning) vs retail 88% short (extreme retail short) — institutional vs retail divergence at extreme. Late-trend caution; retail capitulation risk if price extends higher. Watch for LF delta turning positive or AM reducing to shift the read.",
       "evidence": [
-        "AUD/USD COT LF net long +41,675",
-        "retail 88% short",
-        "HV30 at 8.2%",
-        "ATM IV at 9.4%"
+        "AUD/USD COT LF net long: +41,675",
+        "retail: 88% short",
+        "HV30: 8.2%"
       ]
     },
     {
-      "time": "23:50",
+      "time": "00:06",
       "priority": "info",
       "title": "EUR/USD — CB + Technical",
-      "text": "ECB 2% vs Fed 3.75% — 175bp EUR carry disadvantage. EUR/USD at 1.1688, testing the mid-range; 1.1700 is the next resistance on a continuation. Positioning neutral, COT LF net short −72, long%=50.0%.",
+      "text": "ECB 2% vs Fed 3.75% — 175bp EUR carry disadvantage. EUR/USD at 1.1686, testing 1.1700 resistance — 1.1720 is the next level on a continuation. Positioning neutral; no major COT changes.",
       "evidence": [
         "ECB 2% vs Fed 3.75%",
-        "EUR/USD at 1.1688"
+        "EUR/USD: 1.1686"
       ]
     },
     {
-      "time": "23:48",
+      "time": "00:08",
       "priority": "warning",
       "title": "GBP/USD — G8 Outperformance + CB Diverge",
-      "text": "GBP leads G8 (+0.409% avg, 7 pairs) while BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +28,426, AM constructive — positioning aligned with the carry read. A sustained break above 1.3500 would confirm the outperformance.",
+      "text": "GBP leads G8 (+0.18% avg, 4 pairs) while BoE 3.75% vs Fed 3.75% — no carry advantage. GBP/USD at 1.3466; 1.3500 is the next resistance on a continuation. Positioning long; no major COT changes.",
       "evidence": [
-        "GBP 1W avg: +0.409%",
-        "BoE 4.50% vs Fed 3.75%"
+        "G8 Scorecard: GBP +0.18%",
+        "BoE 3.75% vs Fed 3.75%"
       ]
     },
     {
-      "time": "23:45",
+      "time": "00:10",
       "priority": "info",
       "title": "NZD/USD — COT + OIS",
-      "text": "NZD/USD COT LF net short −17,090 (specs short) vs RBNZ OIS hike 100% priced. Specs are fading a hawkish CB. If RBNZ delivers or signals hike, short squeeze risk is elevated.",
+      "text": "NZD/USD COT LF net short −17,090 (specs short) vs RBNZ OIS hike 100% priced — specs fading a hawkish CB. If RBNZ delivers or signals hike, short squeeze risk is elevated.",
       "evidence": [
-        "NZD/USD COT LF net short −17,090",
+        "NZD/USD COT LF net short: −17,090",
         "RBNZ OIS hike 100% priced"
       ]
     }
