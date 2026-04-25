@@ -1392,12 +1392,26 @@ async function fetchCryptoQuotes() {
     if (!r.ok) return;
     const data = await r.json();
     if (data.bitcoin) {
-      const price = data.bitcoin.usd;
-      const chg24 = data.bitcoin.usd_24h_change;
+      const price  = data.bitcoin.usd;
+      const chg24  = data.bitcoin.usd_24h_change;  // used only for arrow color on topbar price
       const priceEl = document.getElementById('q-btcusd');
       const chgEl   = document.getElementById('qc-btcusd');
-      if (priceEl) { priceEl.textContent = price.toLocaleString(); priceEl.className = 'q-price ' + clsDir(chg24); }
-      if (chgEl)   { chgEl.textContent = pctStr(chg24); chgEl.className = 'q-chg ' + clsDir(chg24); }
+      // Update price display; keep existing % if yfinance already populated it
+      // (avoids replacing day-over-day % from intraday JSON with CoinGecko rolling 24h %)
+      if (priceEl) {
+        priceEl.textContent = price.toLocaleString();
+        priceEl.className   = 'q-price ' + clsDir(chg24);
+      }
+      // Only update % when yfinance intraday has not yet provided it
+      if (chgEl && chgEl.textContent === '—') {
+        chgEl.textContent = pctStr(chg24);
+        chgEl.className   = 'q-chg ' + clsDir(chg24);
+      }
+      // Keep the close current in cache; do NOT overwrite open/chg/pct (those are yfinance)
+      if (STOOQ_RT_CACHE['btc']) {
+        STOOQ_RT_CACHE['btc'].close = price;
+        _lwUpdateTodayBar();  // refresh chart today-bar with latest price
+      }
     }
   } catch(e) {}
 }
@@ -4590,7 +4604,7 @@ async function fetchCrossAssetData() {
   const qBtc = document.getElementById('q-btcusd');
   const qBtcC = document.getElementById('qc-btcusd');
   const _btcIntraday = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
-  if (_btcIntraday) STOOQ_RT_CACHE['btc'] = _btcIntraday;  // feed LW chart live bar
+  if (_btcIntraday) STOOQ_RT_CACHE['btc'] = _btcIntraday;  // feed LW chart live bar (yfinance)
   if (_btcIntraday && btcEl) {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
@@ -4646,6 +4660,10 @@ async function fetchCrossAssetData() {
     setEl('ri-gold-spx', ratio);
     setEl('ri-gold-spx-sig', sig, cls);
   }
+
+  // Push updated prices to the active LW chart (gold, SPX, WTI, etc.)
+  // FX pairs are handled by fetchQuoteBarRT; cross-asset needs this extra call.
+  _lwUpdateTodayBar();
 }
 
 // ═══════════════════════════════════════════════════════════════════
