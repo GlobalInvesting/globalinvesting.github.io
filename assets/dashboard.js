@@ -2871,7 +2871,24 @@ function _lwBuildTodayBar(ohlcId) {
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
   const c = parseFloat(q.close.toFixed(dec));
-  const o = q.open  != null && q.open  > 0 ? parseFloat(q.open.toFixed(dec))  : c;
+  // Candle open convention:
+  //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
+  //               convention; ensures candle color always matches the pct sign)
+  //   Non-FX    → regularMarketOpen (exchanges have a real session open; use it so the
+  //               candle body reflects intraday movement, as TradingView does for BTC/SPX)
+  const isFxBar = _LW_FX_IDS.has(ohlcId);
+  let o;
+  if (isFxBar) {
+    // FX: anchor candle body to prev_close so green/red == pct direction
+    o = q.prev_close != null && q.prev_close > 0
+      ? parseFloat(q.prev_close.toFixed(dec))
+      : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c);
+  } else {
+    // Non-FX: use the real session open (regularMarketOpen)
+    o = q.open != null && q.open > 0
+      ? parseFloat(q.open.toFixed(dec))
+      : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
+  }
   const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
   const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
   return { time: dateStr, open: o, high: h, low: l, close: c };
