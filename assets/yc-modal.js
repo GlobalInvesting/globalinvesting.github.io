@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.0 — LightweightCharts v5 createYieldCurveChart
+// YIELD CURVE MODAL  v2.1 — LightweightCharts v5 createYieldCurveChart
 // File: assets/yc-modal.js
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -109,33 +109,9 @@ function openYCModal(tenorData){
   document.body.appendChild(bd);
   bd.addEventListener('click',e=>{if(e.target===bd)closeYCModal();});
   document.addEventListener('keydown',_ycKeydown);
-  // Start LWC load in parallel with modal animation so it's ready when RO fires.
-  _ensureYcLwc().catch(()=>{});
-  // Use ResizeObserver to trigger draw only when the wrapper has valid dimensions.
-  // This eliminates mobile timing issues: flex layout may not resolve until after
-  // the 200ms animation, so we wait for the browser to give us real pixel sizes.
-  const wrapper=document.getElementById('ycm-lw-wrap');
-  if(wrapper&&window.ResizeObserver){
-    let _initRo=null;
-    _initRo=new ResizeObserver(entries=>{
-      const e=entries[0];
-      const w=Math.floor(e.contentRect.width),h=Math.floor(e.contentRect.height);
-      if(w>0&&h>0){
-        _initRo.disconnect();
-        _initRo=null;
-        _ycDraw(tenorData);
-      }
-    });
-    _initRo.observe(wrapper);
-    // Fallback: if ResizeObserver never fires with valid dimensions (e.g. display:none),
-    // draw after 400ms unconditionally.
-    setTimeout(()=>{
-      if(_initRo){_initRo.disconnect();_initRo=null;_ycDraw(tenorData);}
-    },400);
-  }else{
-    // No ResizeObserver support — fall back to setTimeout.
-    setTimeout(()=>_ycDraw(tenorData),220);
-  }
+  // Delay past the 200ms CSS animation so the container is in the DOM and visible.
+  // autoSize:true means LWC measures the container itself — no ResizeObserver needed.
+  setTimeout(()=>_ycDraw(tenorData),220);
 }
 
 const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
@@ -168,42 +144,38 @@ function _ycDraw(tenorData){
 function _ycDrawNative(wrapper,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
 
-  // Remove inner div and tooltip — LWC needs a clean container.
+  // Use #ycm-lw-inner as the LWC container — it's position:absolute;inset:0 inside the
+  // flex:1 wrapper, so autoSize:true will correctly measure its pixel dimensions on any
+  // screen size, including mobile where the outer wrapper resolves layout asynchronously.
   const tooltip=wrapper.querySelector('#ycm-tooltip');
-  const inner=wrapper.querySelector('#ycm-lw-inner');
-  if(inner)inner.remove();
-  if(tooltip)tooltip.remove();
+  let inner=wrapper.querySelector('#ycm-lw-inner');
+  // Recreate inner if missing (e.g. after a previous failed draw attempt removed it).
+  if(!inner){inner=document.createElement('div');inner.id='ycm-lw-inner';wrapper.appendChild(inner);}
+  if(tooltip)tooltip.remove();  // will re-attach below after chart is created
 
-  // Disconnect any existing ResizeObserver before creating the chart.
+  // Disconnect any stale ResizeObserver on the wrapper before creating a new chart.
   if(wrapper._ycRo){try{wrapper._ycRo.disconnect();}catch(_){}wrapper._ycRo=null;}
 
-  const rect=wrapper.getBoundingClientRect();
-  // Dimensions are valid: _ycDrawNative is only called after ResizeObserver confirms w>0,h>0.
-  const w=Math.floor(rect.width)||wrapper.offsetWidth||360;
-  const h=Math.floor(rect.height)||wrapper.offsetHeight||220;
-
-  // Use sequential integer time values (1, 2, 3 … N) for EQUAL spacing between tenors.
-  // Proportional month-based spacing (3, 6, 12 … 360) causes the 10Y–30Y gap (240 months)
-  // to dominate on narrow screens, pushing 30Y off the right edge even after fitContent().
-  // Equal spacing matches Bloomberg/Eikon convention and the TradingView yield-curve demo.
-  const toSeq=toData.map((d,i)=>({time:i+1,value:d.value}));
-  const prSeq=prData.map((d,i)=>({time:i+1,value:d.value}));
-  const N=toSeq.length||1;
-  // tickMarkFormatter: integer index → tenor label (e.g. 1→"3M", 4→"2Y", 8→"10Y")
-  const _seqLabels=tenorData.map(t=>t.label);
-  const _fmtTick=(i)=>_seqLabels[i-1]||'';
-
-  _ycLwChart=LWC.createYieldCurveChart(wrapper,{
-    width:w,
-    height:h,
+  // Data uses REAL MONTH values (3,6,12,24,36,60,84,120,240,360).
+  // LWC's built-in _formatTime converts months → "3M", "1Y", "10Y", "30Y" etc.
+  // No custom tickMarkFormatter needed — the native formatter handles all tenors correctly.
+  //
+  // Config mirrors the official TradingView yield-curve demo:
+  // https://tradingview.github.io/lightweight-charts/tutorials/demos/yield-curve-with-update-markers
+  //   autoSize:true         → LWC measures #ycm-lw-inner; works on desktop and mobile
+  //   baseResolution:12     → whitespace steps every 12 months (1 year grid)
+  //   minimumTimeRange:10   → minimum visible range is 10 months; fitContent can zoom out freely
+  //   startTimeRange:3      → left-side whitespace starts at month 3 (first tenor = 3M)
+  //   minBarSpacing:0       → allow maximum compression so ALL tenors fit on narrow screens
+  //   subscribeSizeChange() → re-fitContent on every resize / orientation change
+  _ycLwChart=LWC.createYieldCurveChart(inner,{
+    autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    // baseResolution:1 + minimumTimeRange:N → whitespace hash never changes after setData,
-    // preventing the spurious internal fitContent() that was resetting our viewport.
-    yieldCurve:{baseResolution:1,minimumTimeRange:N},
+    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:0,tickMarkFormatter:_fmtTick},
+    timeScale:{borderVisible:false,minBarSpacing:0},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
   });
@@ -212,41 +184,29 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   window._ycChart=_ycLwChart;
 
   let priorSeries=null;
-  if(prSeq.length>=2){
+  if(prData.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
-    priorSeries.setData(prSeq);
+    priorSeries.setData(prData);
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
-  todaySeries.setData(toSeq);
+  todaySeries.setData(toData);
 
-  // Re-attach tooltip AFTER chart+data are set.
+  // Re-attach tooltip inside #ycm-lw-wrap (outer wrapper), not inside #ycm-lw-inner
+  // which is now owned by LWC. Tooltip uses absolute positioning relative to the wrapper.
   if(tooltip){wrapper.appendChild(tooltip);}
 
-  // fitContent() is now reliable:
-  // - minimumTimeRange:N matches lastIndex after setData → whitespace hash unchanged → no
-  //   spurious internal fitContent() reset.
-  // - Sequential integers mean all N points fit equally in any width → no clipping.
+  // fitContent + subscribeSizeChange — exact pattern from the TradingView demo.
+  // With minBarSpacing:0, LWC will always compress to fit all tenors on any screen width.
   const chart=_ycLwChart;
   const doFit=(c)=>{if(c&&c===_ycLwChart)try{c.timeScale().fitContent();}catch(_){}};
-  setTimeout(()=>doFit(chart),50);
-  setTimeout(()=>doFit(chart),200);
+  doFit(chart);
+  try{chart.timeScale().subscribeSizeChange(()=>doFit(chart));}catch(_){}
+  // Extra deferred calls to catch mobile layout resolution (iOS/Android position:fixed
+  // bottom-sheet can report zero size during the first paint cycle).
+  setTimeout(()=>doFit(chart),100);
+  setTimeout(()=>doFit(chart),350);
 
-  // ResizeObserver — only attach after a 500ms delay so it doesn't fire during init.
-  if(window.ResizeObserver){
-    setTimeout(()=>{
-      if(_ycLwChart!==chart)return;
-      const ro=new ResizeObserver(entries=>{
-        if(_ycLwChart!==chart)return;
-        const e=entries[0];
-        const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-        if(nw>0&&nh>0){chart.applyOptions({width:nw,height:nh});doFit(chart);}
-      });
-      ro.observe(wrapper);wrapper._ycRo=ro;
-    },500);
-  }
-
-  // Pass sequential=true so tooltip maps integer index → tenor label correctly.
-  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,true);
+  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 
 
