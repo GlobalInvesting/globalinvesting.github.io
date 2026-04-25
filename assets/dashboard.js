@@ -3411,7 +3411,9 @@ async function _renderLWChart(ohlcId, label) {
     _maBtn.style.color = window._lwShowMa ? 'var(--text)' : '#848ea0';
     _maBtn.style.borderColor = window._lwShowMa ? 'var(--blue)' : '#2a2e39';
     _maBtn.setAttribute('aria-pressed', window._lwShowMa ? 'true' : 'false');
-  } — industry standard: annotate central bank decision dates on chart ──
+  }
+
+  // ── CB Meeting markers — industry standard: annotate central bank decision dates on chart ──
   // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
   // LWC v5: createSeriesMarkers(series, markers) — LWC v4: series.setMarkers(markers)
   if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
