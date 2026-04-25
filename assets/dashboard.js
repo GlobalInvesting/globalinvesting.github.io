@@ -1177,7 +1177,9 @@ function intradayQuote(cache, id) {
   return {
     close:      q.close,
     prev_close: q.prev_close ?? null,
-    open:       q.prev_close ?? q.close,
+    // open: real intraday open (regularMarketOpen) when available — used for candle body color.
+    // Falls back to prev_close so the candle open is at yesterday's close (correct fallback).
+    open:       (q.open != null && q.open > 0) ? q.open : (q.prev_close ?? q.close),
     chg:        hasPrev ? (q.chg  ?? null) : null,
     pct:        hasPrev ? (q.pct  ?? null) : null,
     fromIntraday: true,
@@ -1210,7 +1212,8 @@ async function fetchQuoteBarRT() {
       const hasPrev = q.prev_close != null && q.prev_close > 0;
       const data = {
         close: q.close,
-        open:  q.prev_close ?? q.close,
+        open:  (q.open != null && q.open > 0) ? q.open : (q.prev_close ?? q.close),
+        prev_close: q.prev_close ?? null,
         chg:   hasPrev ? (q.chg  ?? null) : null,
         pct:   hasPrev ? (q.pct  ?? null) : null,
         high:  (q.high  != null && q.high  > 0) ? q.high  : null,
