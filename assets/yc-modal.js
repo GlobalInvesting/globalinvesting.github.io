@@ -112,7 +112,8 @@ function openYCModal(tenorData){
   // Delay draw until after modal animation (.2s) so container has final dimensions on mobile
   // Double-draw: first at 220ms, then a corrective fitContent at 420ms for mobile layout stragglers
   setTimeout(()=>_ycDraw(tenorData), 220);
-  setTimeout(()=>{if(_ycLwChart){_ycLwChart.timeScale().fitContent();}}, 420);
+  // 420ms fallback: re-apply visible range for mobile layout stragglers
+  setTimeout(()=>{if(_ycLwChart){try{_ycLwChart.timeScale().fitContent();}catch(_){}}}, 420);
 }
 
 const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
@@ -189,17 +190,24 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
-  // fitContent in double-rAF: first frame LWC finishes its internal render,
-  // second frame we call fitContent with a fully painted chart.
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      if(!_ycLwChart)return;
-      const r2=wrapper.getBoundingClientRect();
-      const w2=Math.floor(r2.width)||w, h2=Math.floor(r2.height)||h;
-      if(w2!==w||h2!==h)_ycLwChart.applyOptions({width:w2,height:h2});
-      _ycLwChart.timeScale().fitContent();
-    });
-  });
+
+  // Set the visible time range explicitly to cover all data points.
+  // fitContent() on createYieldCurveChart is unreliable — it does not consistently
+  // zoom out to show all tenors. Instead, we set an explicit time range that covers
+  // firstTenorMonth to lastTenorMonth with a small margin on each side.
+  const margin=Math.max(3, Math.round((lastTenorMonth-firstTenorMonth)*0.03));
+  const setRange=()=>{
+    if(!_ycLwChart)return;
+    try{
+      _ycLwChart.timeScale().setVisibleRange({from:firstTenorMonth-margin, to:lastTenorMonth+margin});
+    }catch(_){
+      // fallback if setVisibleRange not supported
+      try{_ycLwChart.timeScale().fitContent();}catch(_2){}
+    }
+  };
+  // Call immediately, then again after two animation frames to handle any post-paint layout shift.
+  setRange();
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ setRange(); }); });
 
   // ResizeObserver for orientation changes and window resize.
   if(window.ResizeObserver){
@@ -207,7 +215,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
       if(!_ycLwChart)return;
       const e=entries[0];
       const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
+      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});setRange();}
     });
     ro.observe(wrapper);wrapper._ycRo=ro;
   }
