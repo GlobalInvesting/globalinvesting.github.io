@@ -6301,8 +6301,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches
-      if (isMobile) {
+      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches.
+      // If the LW chart is active (_lwChart !== null), skip TV reload entirely —
+      // LW Charts persists correctly across tab switches without needing recreation.
+      if (isMobile && !_lwChart) {
         reloadActiveTVChart();
         // Stagger calendar reload to avoid TV scripts racing for the wrong container
         setTimeout(reloadTVCalendar, 800);
@@ -6321,8 +6323,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     }
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Mobile only: widgets may have gone blank after bfcache restore
-      if (isMobile) {
+      // Mobile only: widgets may have gone blank after bfcache restore.
+      // LW Charts (_lwChart !== null) persists through bfcache — no reload needed.
+      // Only recreate the TV widget if TV is currently active.
+      if (isMobile && !_lwChart) {
         reloadActiveTVChart();
         // Stagger calendar reload to avoid TV scripts racing for the wrong container
         setTimeout(reloadTVCalendar, 800);
