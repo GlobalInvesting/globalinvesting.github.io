@@ -156,7 +156,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{visible:false},
-    rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
+    rightPriceScale:{visible:true,borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
     timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
@@ -167,10 +167,10 @@ function _ycDrawNative(container,toData,prData,tenorData){
   _ycLwChart.applyOptions({width:w,height:h});
   let priorSeries=null;
   if(prData.length>=2){
-    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
+    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{priceScaleId:'right',color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
     priorSeries.setData(prData);
   }
-  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
+  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{priceScaleId:'right',color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
