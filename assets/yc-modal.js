@@ -136,8 +136,9 @@ function _ycDraw(tenorData){
     if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
     const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
     const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(container,toData,prData,tenorData);
-    else _ycDrawFallback(container,toData,prData,tenorData);
+    // Always use equal-spaced fallback — createYieldCurveChart uses linear month axis
+    // which clusters 3M at 0.8% of the X axis (3/360 months). Bloomberg/Eikon use equal tenor spacing.
+    _ycDrawFallback(container,toData,prData,tenorData);
   }).catch(e=>console.error(e));
 }
 
@@ -195,25 +196,35 @@ function _ycDrawFallback(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const LABELS=tenorData.map(t=>t.label);
   _ycLwChart=LWC.createChart(container,{
-    width:container.offsetWidth||600,height:container.offsetHeight||260,
+    autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
-    crosshair:{mode:LWC.CrosshairMode?.Magnet??1},
+    crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,tickMarkFormatter:t=>LABELS[t-1]||String(t),fixLeftEdge:true,fixRightEdge:true},
+    timeScale:{borderVisible:false,tickMarkFormatter:t=>LABELS[t-1]||String(t),fixLeftEdge:true,fixRightEdge:true,barSpacing:0},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
+  // Sequential integers → equal spacing between tenors (Bloomberg/Eikon standard)
   const toSeq=toData.map((d,i)=>({time:i+1,value:d.value}));
   const prSeq=prData.map((d,i)=>({time:i+1,value:d.value}));
   let priorSeries=null;
   if(prSeq.length>=2){
-    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineStyle:LWC.LineStyle?.Dashed??1,priceLineVisible:false,lastValueVisible:false});
+    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
     priorSeries.setData(prSeq);
   }
-  const todaySeries=_ycLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.12)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,priceLineVisible:false,lastValueVisible:false});
+  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toSeq);
   _ycLwChart.timeScale().fitContent();
+  // ResizeObserver for mobile layout shifts
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(entries=>{
+      if(!_ycLwChart)return;
+      const e=entries[0],nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
+      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
+    });
+    ro.observe(container);container._ycRo=ro;
+  }
   const resize=()=>{if(_ycLwChart&&container.offsetWidth>0)_ycLwChart.applyOptions({width:container.offsetWidth,height:container.offsetHeight});};
   window.addEventListener('resize',resize);container._ycResize=resize;
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,true);
