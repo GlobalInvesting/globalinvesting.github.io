@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// COT MODAL CHART  v1.2
+// COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
 // File: assets/cot-modal-chart.js
-// Loaded AFTER dashboard.js and Chart.js (see index.html)
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ── CSS ─────────────────────────────────────────────────────────────────────
@@ -19,7 +18,6 @@
 }
 @keyframes cot-fi { from{opacity:0} to{opacity:1} }
 @keyframes cot-su { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
-
 #cot-modal {
   background:var(--bg,#131722);
   border:1px solid rgba(255,255,255,.1);
@@ -46,778 +44,381 @@
   transition:color .1s,background .1s;
 }
 #cot-m-close:hover { color:var(--text,#d1d4dc);background:rgba(255,255,255,.08); }
-
-/* Metrics strip */
 #cot-m-metrics {
   display:grid;grid-template-columns:repeat(6,1fr);
   gap:1px;background:rgba(255,255,255,.05);
   border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;
 }
-.cot-mm {
-  background:var(--bg,#131722);padding:9px 14px;
-  display:flex;flex-direction:column;gap:2px;
-}
+.cot-mm { background:var(--bg,#131722);padding:9px 14px;display:flex;flex-direction:column;gap:2px; }
 .cot-mm-lbl { font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 .cot-mm-val { font-size:13px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
 .cot-mm-sub { font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-
-/* Tabs */
 #cot-m-tabs {
   display:flex;padding:0 18px;
   border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;overflow-x:auto;
-  scrollbar-width:none;
+  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
 }
 #cot-m-tabs::-webkit-scrollbar { display:none; }
 .cot-tab {
   font-size:11px;padding:9px 13px;cursor:pointer;
   color:var(--text3,#6b7280);border-bottom:2px solid transparent;
   transition:color .1s;white-space:nowrap;user-select:none;
-  font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 .cot-tab:hover { color:var(--text2,#9096a0); }
 .cot-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
-
-/* Body: always fills remaining height, never changes size between tabs */
 #cot-m-body {
-  flex:1;min-height:0;
-  overflow-y:auto;
+  flex:1;min-height:0;overflow-y:auto;
   padding:14px 16px;
   display:flex;flex-direction:column;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.12) transparent;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
 }
 #cot-m-body::-webkit-scrollbar { width:5px; }
-#cot-m-body::-webkit-scrollbar-track { background:transparent; }
 #cot-m-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12);border-radius:3px; }
-/* Disable scroll when overview or a single-chart tab is active so flex-fill reaches cards/canvas */
 #cot-m-body.cot-body--chart,
 #cot-m-body.cot-body--overview { overflow-y:hidden; }
-
-/* All panels fill the body completely */
 .cot-panel { display:none; }
 .cot-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
-
-/* History scrolls its own content */
 #p-history.on { display:block; }
-
-/* Overview: flex-column, fills body, rows share space equally */
-#p-overview.on {
-  display:flex;flex-direction:column;flex:1;min-height:0;
-}
-#p-overview .cot-ov-grid {
-  flex:none;
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;
-  align-items:stretch;
-}
-#p-overview .cot-ov-grid > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;
-}
-#p-overview .cot-ov-bottom {
-  flex:1;min-height:0;
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
-  align-items:stretch;
-}
-#p-overview .cot-ov-bottom > .cot-cw {
-  display:flex;flex-direction:column;margin-bottom:0;min-height:0;
-}
-
-/* Net Position and Long/Short: single-chart panels fill entire body */
+#p-overview.on { display:flex;flex:1;flex-direction:column;gap:10px;min-height:0;overflow-y:auto; }
+#p-overview .cot-ov-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex-shrink:0; }
+#p-overview .cot-ov-grid > .cot-cw { margin-bottom:0; }
+#p-overview .cot-ov-bottom { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;flex-shrink:0; }
+#p-overview .cot-ov-bottom > .cot-cw { margin-bottom:0; }
 #p-net.on .cot-cw,
-#p-split.on .cot-cw {
-  flex:1;display:flex;flex-direction:column;margin-bottom:0;min-height:0;
-}
+#p-split.on .cot-cw { flex:1;min-height:0;margin-bottom:0; }
 #p-net.on .cot-cw > .cot-chart-area,
-#p-split.on .cot-cw > .cot-chart-area {
-  position:relative;flex:1;min-height:0;height:100%;
-}
-
-/* Participants: chart has fixed height, description scrolls below */
-#p-participants.on { overflow-y:auto; }
+#p-split.on .cot-cw > .cot-chart-area { flex:1;min-height:0; }
 #p-participants .cot-chart-area { height:300px;position:relative; }
-
-/* Chart wrapper */
+#p-participants.on { overflow-y:auto; }
+.cot-chart-area { position:relative; }
+.cot-lw-wrap { width:100%;height:100%;min-height:180px;position:relative; }
+.cot-lw-tooltip {
+  position:absolute;display:none;pointer-events:none;
+  background:#1e222d;border:1px solid #363c4e;border-radius:4px;
+  padding:7px 11px;font-size:11px;line-height:1.55;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;
+}
 .cot-cw {
-  background:rgba(255,255,255,.02);
-  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
   border-radius:6px;padding:12px 14px;margin-bottom:10px;
+  display:flex;flex-direction:column;
 }
-.cot-ct { font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.03em; }
-
-/* Gauge */
-.cot-gauge-track {
-  height:8px;border-radius:4px;
-  background:linear-gradient(to right,
-    #ef5350 0%,#ef5350 14%,
-    #ff9800 14%,#ff9800 28%,
-    #42a5f5 28%,#42a5f5 72%,
-    #ff9800 72%,#ff9800 86%,
-    #ef5350 86%,#ef5350 100%);
-  position:relative;margin:8px 0;
+.cot-ct {
+  font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  letter-spacing:.03em;flex-shrink:0;
 }
+.cot-gauge-track { height:6px;background:rgba(255,255,255,.1);border-radius:3px;position:relative;margin:10px 0 6px; }
+.cot-gauge-fill { position:absolute;left:0;top:0;height:100%;border-radius:3px;background:linear-gradient(90deg,#ef5350 0%,#ff9800 35%,#4f7fff 50%,#ff9800 65%,#26a69a 100%);width:100%; }
 .cot-gauge-pin {
-  position:absolute;top:-5px;
-  width:18px;height:18px;border-radius:50%;
-  background:#fff;border:2px solid var(--bg,#131722);
-  transform:translateX(-50%);
-  box-shadow:0 0 0 2px rgba(255,255,255,.35);
-  transition:left .6s cubic-bezier(.34,1.56,.64,1);
+  position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;
+  background:#d1d4dc;border:2px solid var(--bg,#131722);
+  box-shadow:0 0 0 1px rgba(255,255,255,.2);
+  transition:left .4s cubic-bezier(.25,.46,.45,.94);transform:translateX(-50%);
 }
-.cot-gauge-lbls {
-  display:flex;justify-content:space-between;
-  font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-}
-
-/* Long/Short bar */
-.cot-posbar {
-  height:14px;background:rgba(255,255,255,.06);
-  border-radius:3px;overflow:hidden;position:relative;flex:1;
-}
-.cot-posbar-fill { height:100%;transition:width .4s ease; }
-.cot-posbar-mid {
-  position:absolute;left:50%;top:0;bottom:0;
-  width:1px;background:rgba(255,255,255,.2);
-}
-
-/* Table */
-.cot-tbl {
-  width:100%;border-collapse:collapse;
-  font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-}
-.cot-tbl th {
-  text-align:right;color:var(--text3,#6b7280);font-weight:400;
-  font-size:9px;text-transform:uppercase;letter-spacing:.05em;
-  padding:5px 8px 4px;border-bottom:1px solid rgba(255,255,255,.07);
-}
+.cot-gauge-lbls { display:flex;justify-content:space-between;font-size:8px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-ov-bignum { font-size:24px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin:4px 0 2px; }
+.cot-ov-sub { font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-ls-row { display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0; }
+.cot-ls-num { font-size:18px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-ls-vs { font-size:11px;color:var(--text3,#6b7280);flex-shrink:0; }
+.cot-ls-bar { height:4px;background:rgba(255,255,255,.08);border-radius:2px;position:relative;overflow:hidden;margin-top:8px; }
+.cot-ls-bar-fill { height:100%;border-radius:2px; }
+.cot-sig-dot { display:inline-block;border-radius:50%;width:8px;height:8px;flex-shrink:0; }
+.cot-spark { display:block;width:100%;max-width:200px;overflow:visible; }
+.cot-tbl { width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+.cot-tbl th { text-align:right;color:var(--text3,#6b7280);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;padding:5px 8px 4px;border-bottom:1px solid rgba(255,255,255,.07); }
 .cot-tbl th:first-child { text-align:left; }
-.cot-tbl td {
-  text-align:right;padding:4px 8px;
-  border-bottom:1px solid rgba(255,255,255,.04);
-}
+.cot-tbl td { text-align:right;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.04); }
 .cot-tbl td:first-child { text-align:left;color:var(--text2,#9096a0); }
 .cot-tbl tr:last-child td { border-bottom:none; }
 .cot-tbl tr:hover td { background:rgba(255,255,255,.03); }
-
-.cu { color:var(--up,#26a69a); } .cd { color:var(--down,#ef5350); } .cf { color:var(--text2,#9096a0); }
-.badge-ext { font-size:9px;padding:2px 6px;border-radius:3px;margin-left:6px; }
-.badge-warn { background:rgba(255,152,0,.15);color:#ff9800; }
-.badge-ok   { background:rgba(38,166,154,.12);color:var(--up,#26a69a); }
-
-
-/* Overview v2: responsive overrides for mobile */
-@media(max-width:600px) {
-  /* Top grid stays 2-col on mobile — saves vertical space vs stacking */
-  #p-overview .cot-ov-grid   { grid-template-columns:1fr 1fr; gap:6px; }
-  /* Bottom row stacks to 1-col on mobile */
-  #p-overview .cot-ov-bottom { grid-template-columns:1fr; gap:6px; }
-  /* Both top cards must not overflow their column */
-  #p-overview .cot-ov-grid > .cot-cw { overflow:hidden; min-width:0; }
-  /* Truncate long .cot-ct labels in overview top row */
-  #p-overview .cot-ov-grid .cot-ct { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  /* Hide DIR column in participants table on mobile — no room */
-  #p-overview .cot-tbl th:last-child,
-  #p-overview .cot-tbl td:last-child { display:none; }
-  /* L/S layout: keep row but use equal 3-col layout (Longs | vs | Shorts) */
-  #p-overview .cot-ls-row { display:grid !important; grid-template-columns:1fr auto 1fr !important; align-items:center !important; gap:4px !important; }
-  #p-overview .cot-ls-row > div:last-child { text-align:right; }
-  #p-overview .cot-ls-vs { display:block !important; text-align:center; }
+.cu { color:var(--up,#26a69a); }
+.cd { color:var(--down,#ef5350); }
+.cn { color:var(--text2,#9096a0); }
+@media(max-width:600px){
+  #cot-bd{padding:0;align-items:flex-end;}
+  #cot-modal{width:100%;height:93vh;border-radius:12px 12px 0 0;border-bottom:none;}
+  #cot-m-metrics{grid-template-columns:repeat(3,1fr);}
+  .cot-mm{padding:6px 10px;}.cot-mm-val{font-size:11px;}
+  #cot-m-tabs{padding:0 8px;}.cot-tab{font-size:10px;padding:8px 8px;}
+  #cot-m-body{padding:8px;}.cot-cw{padding:9px 10px;margin-bottom:8px;}
+  #p-overview .cot-ov-grid{grid-template-columns:1fr 1fr;gap:6px;}
+  #p-overview .cot-ov-bottom{grid-template-columns:1fr;gap:6px;}
+  #p-overview .cot-ov-grid .cot-ct{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #p-overview .cot-tbl th:last-child,#p-overview .cot-tbl td:last-child{display:none;}
+  #p-overview .cot-ls-row{display:grid !important;grid-template-columns:1fr auto 1fr !important;align-items:center !important;gap:4px !important;}
+  #p-overview .cot-ls-row > div:last-child{text-align:right;}
+  .cot-ls-vs{display:block !important;text-align:center;}
+  #p-history .cot-cw > div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #p-history .cot-tbl{min-width:540px;font-size:9px;}
+  #p-history .cot-tbl th,#p-history .cot-tbl td{padding:3px 5px;}
+  #p-participants .cot-chart-area{height:260px;}
+  #p-overview{flex:none;}#p-overview .cot-ov-bottom{flex:none;}
+  #p-overview .cot-ov-bignum{font-size:20px !important;}
+  .cot-gauge-lbls{font-size:7.5px;}.cot-ls-num{font-size:16px !important;}
+  .cot-tbl{min-width:0;}.cot-tbl td,.cot-tbl th{font-size:9px;padding:3px 4px;white-space:nowrap;}
 }
-/* Right card in top grid: stacked sections */
-.cot-ov-r-divider {
-  border-top:1px solid rgba(255,255,255,.06);margin-top:8px;padding-top:8px;
-}
-/* Signal dot */
-.cot-sig-dot {
-  display:inline-block;width:7px;height:7px;border-radius:50%;
-  margin-right:6px;flex-shrink:0;vertical-align:middle;
-}
-/* Sparkline SVG */
-.cot-spark { display:block;width:100%;height:44px; }
-
-@media(max-width:600px) {
-  /* Modal: bottom sheet pattern */
-  #cot-bd { padding:0; align-items:flex-end; }
-  #cot-modal {
-    width:100%;
-    height:93vh;
-    border-radius:12px 12px 0 0;
-    border-bottom:none;
-  }
-
-  /* Header: tighter, title single line with ellipsis */
-  #cot-m-hd { padding:10px 14px 9px; }
-  #cot-m-title { font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:calc(100% - 36px); }
-  #cot-m-sub { font-size:9px; white-space:normal; line-height:1.4; }
-
-  /* Metrics: 3-col compact */
-  #cot-m-metrics { grid-template-columns:repeat(3,1fr); }
-  .cot-mm { padding:6px 10px; }
-  .cot-mm-val { font-size:11px; }
-  .cot-mm-lbl, .cot-mm-sub { font-size:8px; }
-
-  /* Tabs: all 5 fit */
-  #cot-m-tabs { padding:0 8px; }
-  .cot-tab { font-size:10px; padding:8px 8px; }
-
-  /* Body: tighter padding, must remain flex column with min-height:0 for chart fill */
-  #cot-m-body { padding:8px; }
-  .cot-cw { padding:9px 10px; margin-bottom:8px; }
-  .cot-ct { font-size:9px; }
-
-  /* Net / Long/Short: body must NOT have overflow-y:auto so flex-fill works on canvas.
-     Class toggled by cotTab() JS — avoids :has() which has uneven mobile support */
-  #cot-m-body.cot-body--chart { overflow-y:hidden; }
-  /* Overview on mobile: allow vertical scroll — stacked content exceeds 93vh */
-  #cot-m-body.cot-body--overview { overflow-y:auto; }
-
-  /* Participants: taller chart on mobile so data is visible */
-  #p-participants .cot-chart-area { height:260px; }
-  /* Description text compact */
-  #p-participants .cot-cw:last-child { font-size:9px; line-height:1.5; }
-
-  /* Overview mobile: bottom row no longer needs flex:1 since body scrolls */
-  #p-overview { flex:none; }
-  #p-overview .cot-ov-bottom { flex:none; }
-  /* Scale down big z/pct numbers */
-  #p-overview .cot-ov-bignum { font-size:20px !important; }
-  /* Gauge compact on mobile */
-  #p-overview .cot-gauge-lbls { font-size:7.5px; }
-  /* L/S numbers compact */
-  #p-overview .cot-ls-num { font-size:16px !important; }
-  /* Participants table: no forced min-width, compact */
-  #p-overview .cot-tbl { min-width:0; }
-  #p-overview .cot-tbl td,
-  #p-overview .cot-tbl th { font-size:9px; padding:3px 4px; white-space:nowrap; }
-
-  /* History: horizontal scroll */
-  #p-history .cot-cw > div { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  #p-history .cot-tbl { min-width:540px; font-size:9px; }
-  #p-history .cot-tbl th,
-  #p-history .cot-tbl td { padding:3px 5px; }
-}`;
+`;
   document.head.appendChild(s);
 })();
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────────────────────────
+const _monoF = "'JetBrains Mono','Courier New',monospace";
 
-function _cotFmt(n) {
-  if (n == null || isNaN(n)) return '—';
-  const a = Math.abs(n), sg = n >= 0 ? '+' : '-';
-  if (a >= 1e6) return sg + (a / 1e6).toFixed(1) + 'M';
-  if (a >= 1e3) return sg + Math.round(a / 1e3) + 'k';
-  return (n > 0 ? '+' : '') + n.toLocaleString();
+function _cotFmt(v) {
+  if (v == null || isNaN(v)) return '—';
+  return (v > 0 ? '+' : '') + Math.round(v).toLocaleString();
 }
-
 function _cotCls(v) {
-  return v == null ? 'cf' : v > 0 ? 'cu' : v < 0 ? 'cd' : 'cf';
+  if (v == null || isNaN(v) || Math.abs(v) < 1) return '';
+  return v > 0 ? 'cu' : 'cd';
 }
-
-function _calcZ(history, field = 'levNet') {
-  const vals = history.map(h => h[field]).filter(v => v != null);
-  if (vals.length < 6) return null;
-  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
-  const std  = Math.sqrt(vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length);
-  if (std === 0) return 0;
-  return (vals[vals.length - 1] - mean) / std;
+function _calcZ(history) {
+  const vals = history.map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+  if (vals.length < 4) return null;
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const std  = Math.sqrt(vals.reduce((a,b)=>a+(b-mean)**2,0)/vals.length);
+  if (std < 1) return null;
+  return (vals[vals.length-1]-mean)/std;
 }
-
-function _calcPct(history, field = 'levNet') {
-  const vals = history.map(h => h[field]).filter(v => v != null);
-  if (vals.length < 6) return null;
-  const cur   = vals[vals.length - 1];
-  const below = vals.slice(0, -1).filter(v => v < cur).length;
-  return Math.round(below / (vals.length - 1) * 100);
+function _calcPct(history) {
+  const vals = history.map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+  if (vals.length < 4) return null;
+  const cur = vals[vals.length-1];
+  return Math.round(vals.filter(v=>v<=cur).length/vals.length*100);
 }
-
 function _posLabel(z) {
-  if (z == null) return { text: 'N/A',             color: 'var(--text2,#9096a0)' };
-  if (z >  2.0)  return { text: 'Extreme Long',    color: 'var(--down,#ef5350)' };
-  if (z >  1.5)  return { text: 'Very Long',        color: '#ff9800' };
-  if (z >  0.5)  return { text: 'Moderately Long', color: 'var(--up,#26a69a)' };
-  if (z > -0.5)  return { text: 'Neutral',          color: 'var(--text2,#9096a0)' };
-  if (z > -1.5)  return { text: 'Moderately Short',color: 'var(--up,#26a69a)' };
-  if (z > -2.0)  return { text: 'Very Short',       color: '#ff9800' };
-  return               { text: 'Extreme Short',    color: 'var(--down,#ef5350)' };
+  if (z == null) return {txt:'—',col:'var(--text2)'};
+  if (z >  2)   return {txt:'Extreme Long',  col:'#ef5350'};
+  if (z >  1.5) return {txt:'Crowded Long',  col:'#ff9800'};
+  if (z >  0.5) return {txt:'Long',          col:'#26a69a'};
+  if (z > -0.5) return {txt:'Neutral',        col:'#9096a0'};
+  if (z > -1.5) return {txt:'Short',          col:'#26a69a'};
+  if (z > -2)   return {txt:'Crowded Short',  col:'#ff9800'};
+  return {txt:'Extreme Short',col:'#ef5350'};
 }
 
-// ── Chart.js wrappers ─────────────────────────────────────────────────────────
-
-const _cotCharts = [];
-
-function _destroyCharts() {
-  _cotCharts.forEach(c => { try { c.destroy(); } catch (_) {} });
-  _cotCharts.length = 0;
-}
-
-const _monoFont = "'JetBrains Mono','Courier New',monospace";
-
-// ── TradingView-style chart theme ─────────────────────────────────────────────
-// Grid: very subtle 6% white — matches TW's rgba(242,242,242,0.06)
-// Ticks: right-aligned Y axis, compact mono labels
-// Crosshair: vertical line on hover (custom plugin below)
-// Tooltip: TW-style dark card, monospaced values, colored per dataset
-// Border: chart area border disabled — TW uses no box, just grid lines
-// ─────────────────────────────────────────────────────────────────────────────
-
-const _TV_GRID     = 'rgba(242,242,242,0.06)';
-const _TV_TICK     = '#787b86';
-const _TV_BG_TIP   = '#1e222d';
-const _TV_BDR_TIP  = 'rgba(255,255,255,0.12)';
-
-// Crosshair plugin — vertical dashed line at hover position
-const _crosshairPlugin = {
-  id: 'tvCrosshair',
-  afterDraw(chart) {
-    const { ctx, chartArea, tooltip } = chart;
-    if (!tooltip || !tooltip._active || !tooltip._active.length) return;
-    const x = tooltip._active[0].element.x;
-    if (x < chartArea.left || x > chartArea.right) return;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x, chartArea.top);
-    ctx.lineTo(x, chartArea.bottom);
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.stroke();
-    ctx.restore();
-  }
-};
-
-// Y-axis price badge plugin
-// With scales.y at position:'right', chartArea.right = left edge of the Y axis tick area.
-// The badge is drawn starting at chartArea.right, overlapping the tick labels.
-// No extra layout padding is needed for this — the Y axis area provides the space.
-const _priceBadgePlugin = {
-  id: 'tvPriceBadge',
-  afterDraw(chart) {
-    const { ctx, chartArea, scales } = chart;
-    if (!scales.y) return;
-    const fSize = window.innerWidth < 600 ? 9 : 10;
-    chart.data.datasets.forEach((ds, i) => {
-      const meta = chart.getDatasetMeta(i);
-      if (!meta.visible) return;
-      let lastIdx = -1;
-      for (let k = ds.data.length - 1; k >= 0; k--) {
-        if (ds.data[k] != null) { lastIdx = k; break; }
-      }
-      if (lastIdx < 0) return;
-      const val = ds.data[lastIdx];
-      const yPx = scales.y.getPixelForValue(val);
-      if (yPx < chartArea.top || yPx > chartArea.bottom) return;
-      let color = ds.borderColor;
-      if (!color || color === 'transparent') {
-        const bg = ds.backgroundColor;
-        color = Array.isArray(bg) ? bg[lastIdx] : bg;
-      }
-      if (!color || color === 'transparent') color = '#787b86';
-      const solid = typeof color === 'string' && color.startsWith('rgba')
-        ? color.replace(/[\d.]+\)$/, '1)') : color;
-      const label = _cotFmt(val);
-      ctx.save();
-      ctx.font = `600 ${fSize}px ${_monoFont}`;
-      const tw = ctx.measureText(label).width;
-      const bW = tw + 10, bH = 16;
-      const bX = chartArea.right + 2;
-      const bY = yPx - bH / 2;
-      ctx.fillStyle = solid;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 2);
-      else ctx.rect(bX, bY, bW, bH);
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'left';
-      ctx.fillText(label, bX + 5, yPx);
-      ctx.restore();
-    });
-  }
-};
-
-// Gradient fill plugin — draws area fill MANUALLY by tracing the dataset's rendered path.
-// Runs in afterDatasetsDraw (Chart.js has already drawn lines; we paint fills on top
-// using clipping so they stay within chartArea). This avoids the timing issue where
-// backgroundColor gradients created before chart init have wrong canvas dimensions.
-const _gradFillPlugin = {
-  id: 'tvGradFill',
-  afterDatasetsDraw(chart) {
-    const { ctx, chartArea, canvas, scales } = chart;
-    if (!scales.y) return;
-    chart.data.datasets.forEach((ds, i) => {
-      if (!ds._gradHex) return;
-      const meta = chart.getDatasetMeta(i);
-      if (!meta.visible || !meta.data || meta.data.length < 2) return;
-      // Build gradient in physical pixel space (canvas.height is DPR-scaled)
-      const hex = ds._gradHex;
-      const rv = parseInt(hex.slice(1,3),16);
-      const gv = parseInt(hex.slice(3,5),16);
-      const bv = parseInt(hex.slice(5,7),16);
-      const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-      g.addColorStop(0,   `rgba(${rv},${gv},${bv},0.22)`);
-      g.addColorStop(0.6, `rgba(${rv},${gv},${bv},0.05)`);
-      g.addColorStop(1,   `rgba(${rv},${gv},${bv},0)`);
-      const baseline = scales.y.getPixelForValue(0);
-      const clampedBase = Math.min(Math.max(baseline, chartArea.top), chartArea.bottom);
-      ctx.save();
-      // Clip to chartArea so fill doesn't bleed into axes
-      ctx.beginPath();
-      ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
-      ctx.clip();
-      // Trace the rendered line points
-      ctx.beginPath();
-      const pts = meta.data;
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
-      // Close down to baseline
-      ctx.lineTo(pts[pts.length - 1].x, clampedBase);
-      ctx.lineTo(pts[0].x, clampedBase);
-      ctx.closePath();
-      ctx.fillStyle = g;
-      ctx.fill();
-      ctx.restore();
-    });
-  }
-};
-
-const _chartDefaults = {
-  responsive: true, maintainAspectRatio: false,
-  animation: { duration: 300, easing: 'easeOutQuart' },
-  interaction: { mode: 'index', intersect: false },
-  layout: { padding: { top: 6, right: 0, bottom: 0, left: 0 } },
-  plugins: {
-    legend: {
-      position: 'top', align: 'start',
-      labels: {
-        color: _TV_TICK,
-        font: { family: _monoFont, size: 10 },
-        boxWidth: 16, boxHeight: 2, padding: 14,
-        usePointStyle: false,
-        generateLabels(chart) {
-          // Custom: render a thin line swatch instead of a box
-          return Chart.defaults.plugins.legend.labels.generateLabels(chart).map(item => {
-            item.lineWidth = 2;
-            return item;
-          });
-        }
-      }
-    },
-    tooltip: {
-      backgroundColor: _TV_BG_TIP,
-      titleColor: '#d1d4dc',
-      bodyColor: '#9096a0',
-      borderColor: _TV_BDR_TIP,
-      borderWidth: 1,
-      padding: { x: 12, y: 8 },
-      cornerRadius: 4,
-      caretSize: 5,
-      usePointStyle: true,
-      callbacks: {
-        label(ctx) {
-          const col = ctx.dataset.borderColor || ctx.dataset.backgroundColor;
-          return ` ${ctx.dataset.label}: ${_cotFmt(ctx.raw)}`;
-        },
-        labelColor(ctx) {
-          const c = ctx.dataset.borderColor || ctx.dataset.backgroundColor || '#9096a0';
-          return { borderColor: c, backgroundColor: c };
-        }
-      }
-    },
-    tvCrosshair: _crosshairPlugin,
-    tvPriceBadge: _priceBadgePlugin,
-  },
-  scales: {
-    x: {
-      ticks: {
-        color: _TV_TICK,
-        font: { family: _monoFont, size: 9 },
-        maxRotation: 0, autoSkip: true, maxTicksLimit: 12,
-        padding: 4
-      },
-      grid:  { color: _TV_GRID, drawBorder: false },
-      border: { display: false }
-    },
-    y: {
-      position: 'right',
-      ticks: {
-        color: _TV_TICK,
-        font: { family: _monoFont, size: 9 },
-        callback: v => _cotFmt(v),
-        padding: 6, maxTicksLimit: 8
-      },
-      grid:  { color: _TV_GRID, drawBorder: false },
-      border: { display: false }
-    }
-  }
-};
-
-// ── Register custom plugins globally ─────────────────────────────────────────
-// Must run after Chart.js is loaded. dashboard.js loads Chart.js synchronously
-// before this file, so Chart is guaranteed to be available here.
-if (typeof Chart !== 'undefined') {
-  Chart.register(_crosshairPlugin, _priceBadgePlugin, _gradFillPlugin);
-  Chart.defaults.plugins.legend.labels.usePointStyle = false;
-}
-
-// ── Chart.js canonical config builder ────────────────────────────────────────
-// _chartDefaults contains ONLY options (no type/data).
-// Wrappers build { type, data, options } — the canonical Chart.js form.
-// This avoids Chart.js silently ignoring top-level scale config when
-// responsive:false is used with a manually-sized canvas.
-
-function _buildOptions(extraOptions) {
-  // Deep clone options only
-  const opts = JSON.parse(JSON.stringify(_chartDefaults));
-  // Re-attach non-serialisable references lost in JSON round-trip
-  opts.plugins.tvCrosshair  = _crosshairPlugin;
-  opts.plugins.tvPriceBadge = _priceBadgePlugin;
-  // Explicit border suppression — must survive responsive:false
-  opts.scales.x.grid.drawBorder = false;
-  opts.scales.y.grid.drawBorder = false;
-  opts.scales.x.border = { display: false };
-  opts.scales.y.border = { display: false };
-  // Mobile overrides: larger ticks, fewer labels, touch events, bigger tooltip
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
-  if (isMobile) {
-    opts.scales.x.ticks.font.size = 10;
-    opts.scales.x.ticks.maxTicksLimit = 7;
-    opts.scales.x.ticks.padding = 6;
-    opts.scales.y.ticks.font.size = 10;
-    opts.scales.y.ticks.padding = 8;
-    opts.scales.y.ticks.maxTicksLimit = 6;
-    opts.plugins.tooltip.padding = { x: 14, y: 10 };
-    opts.plugins.tooltip.bodyFont = { family: _monoFont, size: 11 };
-    opts.plugins.tooltip.titleFont = { family: _monoFont, size: 11 };
-    // Enable touch interaction
-    opts.events = ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'];
-  }
-  if (extraOptions) {
-    // Deep-merge layout and plugins; shallow-merge everything else
-    if (extraOptions.layout) opts.layout = Object.assign({}, opts.layout, extraOptions.layout);
-    if (extraOptions.plugins) Object.assign(opts.plugins, extraOptions.plugins);
-    const rest = Object.assign({}, extraOptions);
-    delete rest.layout; delete rest.plugins;
-    Object.assign(opts, rest);
-  }
-  return opts;
-}
-
-function _lineChart(canvas, labels, datasets, overrides) {
-  if (typeof Chart === 'undefined') return null;
-  const opts = _buildOptions(overrides);
-  // TradingView-style dataset defaults: smooth bezier, area fill, visible points
-  datasets = datasets.map(ds => {
-    const wantsFill = ds.fill === true || ds.fill === 'start' || ds.fill === 'origin';
-    const hexColor = typeof ds.borderColor === 'string' && ds.borderColor.startsWith('#') ? ds.borderColor : null;
-    const base = Object.assign({
-      tension:       0.4,
-      borderWidth:   2,
-      pointRadius:   2,
-      pointHoverRadius: 4,
-      pointBackgroundColor: ds.borderColor,
-      pointBorderColor:     ds.borderColor,
-      pointBorderWidth: 0,
-      fill: false,
-      backgroundColor: 'transparent',
-      spanGaps: true,
-    }, ds);
-    // Tag for gradient plugin — gradient is built lazily in beforeDatasetsDraw
-    // so canvas dimensions are guaranteed to be final (safe with responsive:true)
-    if (wantsFill && hexColor) {
-      base._gradHex = hexColor;
-      base.backgroundColor = 'transparent'; // placeholder until first draw
-    }
-    return base;
-  });
-  const c = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: opts });
-  _cotCharts.push(c);
-  return c;
-}
-
-function _barChart(canvas, labels, datasets, overrides) {
-  if (typeof Chart === 'undefined') return null;
-  const opts = _buildOptions(overrides);
-  // Zero line: solid white — TW convention for bar charts
-  opts.plugins.zeroLine = {
-    id: 'zeroLine',
-    afterDraw(chart) {
-      const { ctx, chartArea, scales } = chart;
-      const y0 = scales.y.getPixelForValue(0);
-      if (y0 < chartArea.top || y0 > chartArea.bottom) return;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(chartArea.left, y0);
-      ctx.lineTo(chartArea.right, y0);
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([]);
-      ctx.stroke();
-      ctx.restore();
-    }
-  };
-  // TW bar style: no radius, Bloomberg green/red convention
-  datasets = datasets.map(ds => Object.assign({
-    borderWidth:   0,
-    borderRadius:  0,
-    borderSkipped: false,
-    hoverBackgroundColor: undefined,
-    barPercentage: 0.85,
-    categoryPercentage: 0.9,
-  }, ds));
-  const c = new Chart(canvas, { type: 'bar', data: { labels, datasets }, options: opts });
-  _cotCharts.push(c);
-  return c;
-}
-
-
-// ── Overview helper functions ─────────────────────────────────────────────────
-
+// ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
-  const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)));
+  const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
   if (vals.length < 2) return '<div style="height:44px;display:flex;align-items:center;font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
-  const mn = Math.min(...vals), mx = Math.max(...vals);
-  const range = mx - mn || 1;
-  const W = 200, H = 44, pad = 4;
-  const x = (i) => (pad + (i / (vals.length - 1)) * (W - pad * 2)).toFixed(1);
-  const y = (v)  => (H - pad - ((v - mn) / range) * (H - pad * 2)).toFixed(1);
-  const pts = vals.map((v, i) => x(i) + ',' + y(v)).join(' ');
-  const last = vals[vals.length - 1];
-  const col = last >= 0 ? '#26a69a' : '#ef5350';
-  const fillCol = last >= 0 ? 'rgba(38,166,154,0.12)' : 'rgba(239,83,80,0.12)';
-  // Area fill polygon: line path + bottom-right + bottom-left corner
-  const firstX = x(0), lastX = x(vals.length - 1);
-  const fillPts = pts + ` ${lastX},${H - pad} ${firstX},${H - pad}`;
-  const zeroY = (H - pad - ((0 - mn) / range) * (H - pad * 2));
-  const zeroLine = (zeroY >= pad && zeroY <= H - pad)
-    ? `<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W - pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`
-    : '';
+  const mn = Math.min(...vals), mx = Math.max(...vals), range = mx-mn||1;
+  const W=200,H=44,pad=4;
+  const x = i => (pad+(i/(vals.length-1))*(W-pad*2)).toFixed(1);
+  const y = v => (H-pad-((v-mn)/range)*(H-pad*2)).toFixed(1);
+  const pts = vals.map((v,i)=>x(i)+','+y(v)).join(' ');
+  const last = vals[vals.length-1];
+  const col = last>=0?'#26a69a':'#ef5350';
+  const fillCol = last>=0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
+  const fillPts = pts+` ${x(vals.length-1)},${H-pad} ${x(0)},${H-pad}`;
+  const zeroY = H-pad-((0-mn)/range)*(H-pad*2);
+  const zeroLine = (zeroY>=pad&&zeroY<=H-pad)
+    ?`<line x1="${pad}" y1="${zeroY.toFixed(1)}" x2="${W-pad}" y2="${zeroY.toFixed(1)}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" stroke-dasharray="3,3"/>`:'' ;
   return `<svg viewBox="0 0 ${W} ${H}" class="cot-spark" aria-hidden="true">
-    ${zeroLine}
-    <polygon points="${fillPts}" fill="${fillCol}"/>
+    ${zeroLine}<polygon points="${fillPts}" fill="${fillCol}"/>
     <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="2.5" fill="${col}" stroke="${col}" stroke-width="1"/>
+    <circle cx="${x(vals.length-1)}" cy="${y(last)}" r="2.5" fill="${col}"/>
   </svg>`;
 }
 
 function _cotTrendLabel(history) {
-  const n = Math.min(history.length, 4);
-  if (n < 2) return '—';
-  const recent = history.slice(-n).map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)));
-  let up = 0, dn = 0;
-  for (let i = 1; i < recent.length; i++) {
-    if (recent[i] > recent[i-1]) up++; else if (recent[i] < recent[i-1]) dn++;
-  }
-  const streak = up === n - 1 ? 'Accumulating' : dn === n - 1 ? 'Distributing' : 'Mixed';
-  return streak + ' · ' + (n - 1) + ' consecutive weeks';
+  const n = Math.min(history.length,4);
+  if (n<2) return '—';
+  const recent = history.slice(-n).map(h=>h.levNet??((h.levLong||0)-(h.levShort||0)));
+  let up=0,dn=0;
+  for(let i=1;i<recent.length;i++){if(recent[i]>recent[i-1])up++;else if(recent[i]<recent[i-1])dn++;}
+  const streak = up===n-1?'Accumulating':dn===n-1?'Distributing':'Mixed';
+  return streak+' · '+(n-1)+' consecutive weeks';
 }
 
 function _cotRangeCard(history, current) {
-  const vals = history.map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0))).filter(v => v != null);
-  if (vals.length < 2) return '<div style="font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
-  const hi = Math.max(...vals), lo = Math.min(...vals);
-  const rows = [
-    { label: vals.length + 'w High', val: hi,     cls: 'cu' },
-    { label: 'Current',              val: current, cls: _cotCls(current) },
-    { label: vals.length + 'w Low',  val: lo,      cls: 'cd' },
-  ];
-  // Range bar: where is current in [lo, hi]
-  const pct = hi !== lo ? Math.round((current - lo) / (hi - lo) * 100) : 50;
-  const bar = `<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;position:relative;">
+  const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+  if (vals.length<2) return '<div style="font-size:9px;color:var(--text3,#6b7280)">Insufficient data</div>';
+  const hi=Math.max(...vals),lo=Math.min(...vals);
+  const pct = hi!==lo?Math.round((current-lo)/(hi-lo)*100):50;
+  const bar=`<div style="margin:10px 0 8px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;position:relative;">
     <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--up,#26a69a);border-radius:3px;"></div>
     <div style="position:absolute;top:-4px;left:calc(${pct}% - 5px);width:10px;height:10px;border-radius:50%;background:#d1d4dc;border:2px solid var(--bg,#131722);box-shadow:0 0 0 1px rgba(255,255,255,.2)"></div>
   </div>`;
-  const rowsHtml = rows.map(r =>
-    `<div style="display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-      <span style="font-size:11px;color:var(--text3,#6b7280)">${r.label}</span>
-      <span style="font-size:14px;font-weight:600" class="${r.cls}">${_cotFmt(r.val)}</span>
-    </div>`
-  ).join('');
-  return bar + rowsHtml;
+  const rows=[{label:vals.length+'w High',val:hi,cls:'cu'},{label:'Current',val:current,cls:_cotCls(current)},{label:vals.length+'w Low',val:lo,cls:'cd'}];
+  return bar+rows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:baseline;font-family:${_monoF};padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+    <span style="font-size:11px;color:var(--text3,#6b7280)">${r.label}</span>
+    <span style="font-size:14px;font-weight:600" class="${r.cls}">${_cotFmt(r.val)}</span>
+  </div>`).join('');
 }
 
-function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore) {
-  const signals = [];
-  // LF direction
-  if (net > 0) signals.push({ col: '#26a69a', text: 'LF net long — bullish signal' });
-  else if (net < 0) signals.push({ col: '#ef5350', text: 'LF net short — bearish signal' });
-  else signals.push({ col: '#9096a0', text: 'LF neutral' });
-  // LF/AM alignment
-  if (amNet != null) {
-    if (aligned) signals.push({ col: '#26a69a', text: 'LF/AM aligned — reinforced' });
-    else signals.push({ col: '#ff9800', text: 'LF/AM diverging — exercise caution' });
+function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
+  const signals=[];
+  if(net>0) signals.push({col:'#26a69a',text:'LF net long — bullish signal'});
+  else if(net<0) signals.push({col:'#ef5350',text:'LF net short — bearish signal'});
+  else signals.push({col:'#9096a0',text:'LF neutral'});
+  if(amNet!=null){
+    if(aligned) signals.push({col:'#26a69a',text:'LF/AM aligned — reinforced'});
+    else signals.push({col:'#ff9800',text:'LF/AM diverging — exercise caution'});
   }
-  // Crowding
-  if (isCrowded) signals.push({ col: '#ff9800', text: 'Crowded trade (z ≥ 1.5σ)' });
-  else signals.push({ col: '#26a69a', text: 'Not crowded (z < 1.5σ)' });
-  // Dealer contrarian
-  if (ddNet != null) {
-    const contra = (net > 0 && ddNet < 0) || (net < 0 && ddNet > 0);
-    if (contra) signals.push({ col: '#ff9800', text: 'Dealers contra-positioned' });
-    else signals.push({ col: '#9096a0', text: 'Dealers aligned with LF' });
+  if(isCrowded) signals.push({col:'#ff9800',text:'Crowded trade (z >= 1.5σ)'});
+  else signals.push({col:'#26a69a',text:'Not crowded (z < 1.5σ)'});
+  if(ddNet!=null){
+    const contra=(net>0&&ddNet<0)||(net<0&&ddNet>0);
+    if(contra) signals.push({col:'#ff9800',text:'Dealers contra-positioned'});
+    else signals.push({col:'#9096a0',text:'Dealers aligned with LF'});
   }
-  return signals.map(s =>
-    `<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-      <span class="cot-sig-dot" style="background:${s.col};width:9px;height:9px;flex-shrink:0"></span>
-      <span style="color:var(--text2,#9096a0)">${s.text}</span>
-    </div>`
-  ).join('');
+  return signals.map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-family:${_monoF};padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+    <span class="cot-sig-dot" style="background:${s.col}"></span>
+    <span style="color:var(--text2,#9096a0)">${s.text}</span>
+  </div>`).join('');
 }
 
-// ── Build modal HTML ──────────────────────────────────────────────────────────
+// ── LWC chart instances ───────────────────────────────────────────────────────
+const _cotLwCharts=[];
+function _destroyCOTCharts(){
+  _cotLwCharts.forEach(c=>{try{c.remove();}catch(_){}});
+  _cotLwCharts.length=0;
+}
 
-function openCOTModal(ccy, data) {
+function _lwOpts(W,H){
+  return {
+    width:W,height:H,
+    layout:{background:{type:'solid',color:'transparent'},textColor:'#787b86',fontFamily:_monoF,fontSize:10},
+    grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
+    crosshair:{
+      mode:window.LightweightCharts?.CrosshairMode?.Normal??1,
+      vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},
+      horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true},
+    },
+    rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
+    timeScale:{borderVisible:false},
+    handleScroll:{mouseWheel:true,pressedMouseMove:true},
+    handleScale:{mouseWheel:true,pinch:true},
+    localization:{priceFormatter:v=>v!=null?Math.round(v).toLocaleString():'—'},
+  };
+}
+
+function _mkTooltip(container,lwChart,getSeries,fmtFn){
+  const tip=document.createElement('div');
+  tip.className='cot-lw-tooltip';
+  container.style.position='relative';
+  container.appendChild(tip);
+  const TW=200,TM=12;
+  lwChart.subscribeCrosshairMove(param=>{
+    if(!param?.point||!param.seriesData){tip.style.display='none';return;}
+    const html=fmtFn(param);
+    if(!html){tip.style.display='none';return;}
+    tip.innerHTML=html;tip.style.display='block';
+    const cW=container.offsetWidth,cx=param.point.x,cy=param.point.y,th=tip.offsetHeight||50;
+    const tx=(cx+TM+TW<=cW-4)?cx+TM:cx-TM-TW;
+    const ty=(cy-th-TM>=4)?cy-th-TM:cy+TM;
+    tip.style.left=Math.max(0,tx)+'px';tip.style.top=Math.max(0,ty)+'px';
+  });
+}
+
+function _lwResize(container,lwChart){
+  const fn=()=>{if(lwChart&&container.offsetWidth>0)lwChart.applyOptions({width:container.offsetWidth,height:container.offsetHeight});};
+  window.addEventListener('resize',fn);container._lwResize=fn;return fn;
+}
+
+// ── Chart builders ────────────────────────────────────────────────────────────
+function _buildNetChart(container,dates,netData,ccy){
+  const LWC=window.LightweightCharts;if(!LWC||!container)return null;
+  const W=container.offsetWidth||600,H=container.offsetHeight||240;
+  const chart=LWC.createChart(container,_lwOpts(W,H));
+  _cotLwCharts.push(chart);
+  const hist=chart.addSeries(LWC.HistogramSeries,{color:'#4f7fff',priceLineVisible:false,lastValueVisible:true,base:0});
+  hist.setData(dates.map((d,i)=>({time:d,value:netData[i]??0,color:(netData[i]??0)>=0?'rgba(38,166,154,0.82)':'rgba(239,83,80,0.82)'})));
+  chart.timeScale().fitContent();_lwResize(container,chart);
+  _mkTooltip(container,chart,()=>hist,param=>{
+    const v=param.seriesData.get(hist);if(!v)return null;
+    const mon=typeof param.time==='string'?param.time.slice(0,7):'';
+    const col=v.value>=0?'#26a69a':'#ef5350';
+    return `<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div><div>${ccy} LF Net &nbsp;<span style="color:${col};font-weight:700">${_cotFmt(v.value)}</span></div>`;
+  });
+  return chart;
+}
+
+function _buildSplitChart(container,dates,lngData,shrtData,ccy){
+  const LWC=window.LightweightCharts;if(!LWC||!container)return null;
+  const W=container.offsetWidth||600,H=container.offsetHeight||240;
+  const chart=LWC.createChart(container,_lwOpts(W,H));_cotLwCharts.push(chart);
+  const lS=chart.addSeries(LWC.AreaSeries,{lineColor:'#26a69a',topColor:'rgba(38,166,154,0.15)',bottomColor:'rgba(38,166,154,0.01)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
+  const sS=chart.addSeries(LWC.AreaSeries,{lineColor:'#ef5350',topColor:'rgba(239,83,80,0.15)',bottomColor:'rgba(239,83,80,0.01)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
+  lS.setData(dates.map((d,i)=>({time:d,value:lngData[i]??0})));
+  sS.setData(dates.map((d,i)=>({time:d,value:shrtData[i]??0})));
+  chart.timeScale().fitContent();_lwResize(container,chart);
+  _mkTooltip(container,chart,()=>lS,param=>{
+    const lv=param.seriesData.get(lS),sv=param.seriesData.get(sS);if(!lv)return null;
+    const mon=typeof param.time==='string'?param.time.slice(0,7):'';
+    return `<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div>`+
+      `<div>Long &nbsp;<span style="color:#26a69a;font-weight:700">${lv.value!=null?Math.round(lv.value).toLocaleString():'—'}</span></div>`+
+      (sv?`<div>Short<span style="color:#ef5350;font-weight:700"> ${sv.value!=null?Math.round(sv.value).toLocaleString():'—'}</span></div>`:'');
+  });
+  return chart;
+}
+
+function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy){
+  const LWC=window.LightweightCharts;if(!LWC||!container)return null;
+  const W=container.offsetWidth||600,H=container.offsetHeight||280;
+  const chart=LWC.createChart(container,_lwOpts(W,H));_cotLwCharts.push(chart);
+  const lfS=chart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
+  lfS.setData(dates.map((d,i)=>({time:d,value:netData[i]??null})).filter(p=>p.value!=null));
+  let amS=null,ddS=null;
+  if(amData.some(v=>v!=null)){
+    amS=chart.addSeries(LWC.LineSeries,{color:'#ff9800',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
+    amS.setData(dates.map((d,i)=>({time:d,value:amData[i]})).filter(p=>p.value!=null));
+  }
+  if(ddData.some(v=>v!=null)){
+    ddS=chart.addSeries(LWC.LineSeries,{color:'#ef5350',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
+    ddS.setData(dates.map((d,i)=>({time:d,value:ddData[i]})).filter(p=>p.value!=null));
+  }
+  chart.timeScale().fitContent();_lwResize(container,chart);
+  const legendEl=container.parentElement?.querySelector('#cot-part-legend');
+  if(legendEl){
+    legendEl.innerHTML=[['Leveraged Funds','#4f7fff'],['Asset Managers','#ff9800'],['Dealers','#ef5350']].map(([lbl,col])=>
+      `<span style="display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:18px;height:2px;background:${col};border-radius:1px"></span><span>${lbl}</span></span>`
+    ).join('');
+  }
+  _mkTooltip(container,chart,()=>lfS,param=>{
+    const lf=param.seriesData.get(lfS);if(!lf)return null;
+    const mon=typeof param.time==='string'?param.time.slice(0,7):'';
+    let html=`<div style="font-size:9px;color:#6b7280;margin-bottom:4px;">${mon}</div>`;
+    html+=`<div style="color:#4f7fff">LF &nbsp;&nbsp;${_cotFmt(lf.value)}</div>`;
+    if(amS){const av=param.seriesData.get(amS);if(av)html+=`<div style="color:#ff9800">AM &nbsp;&nbsp;${_cotFmt(av.value)}</div>`;}
+    if(ddS){const dv=param.seriesData.get(ddS);if(dv)html+=`<div style="color:#ef5350">DD &nbsp;&nbsp;${_cotFmt(dv.value)}</div>`;}
+    return html;
+  });
+  return chart;
+}
+
+// ── Main open function ────────────────────────────────────────────────────────
+function openCOTModal(ccy,data){
   closeCOTModal();
+  const history=Array.isArray(data.history)?[...data.history]:[];
+  const net=data.netPosition||0,long_=data.longPositions||0,short_=data.shortPositions||0;
+  const total=long_+short_,lPct=total>0?Math.round(long_/total*100):50;
+  const amNet=data.assetManagerNet,ddNet=data.dealerNet,weekEnd=data.weekEnding||'',nWks=history.length;
+  const zScore=_calcZ(history),pctHist=_calcPct(history),zInfo=_posLabel(zScore),isCrowded=Math.abs(zScore||0)>=1.5;
+  let wow=null;
+  if(history.length>=2){const prev=history[history.length-2];wow=net-(prev.levNet??((prev.levLong||0)-(prev.levShort||0)));}
+  const netPctOI=total>0?(net/total*100):null;
+  const netPctStr=netPctOI!=null?(netPctOI>0?'+':'')+netPctOI.toFixed(1)+'%':'—';
+  const zStr=zScore!=null?(zScore>0?'+':'')+zScore.toFixed(2):'—';
+  const pStr=pctHist!=null?pctHist+'%':'—';
+  const zCol=isCrowded?'#ff9800':'var(--text,#d1d4dc)';
+  const lfDir=Math.sign(net),amDir=amNet!=null?Math.sign(amNet):0,aligned=lfDir!==0&&amDir!==0&&lfDir===amDir;
+  const gaugeLeft=zScore!=null?((Math.max(-3,Math.min(3,zScore))+3)/6*90+5).toFixed(1)+'%':'50%';
+  const dates=history.map(h=>{const d=h.weekEnding||'';return d.length===10?d:d.slice(0,10);});
+  const netData=history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0)));
+  const lngData=history.map(h=>h.levLong??null);
+  const shrtData=history.map(h=>h.levShort??null);
+  const amData=history.map(h=>h.assetManagerNet??null);
+  const ddData=history.map(h=>h.dealerNet??null);
 
-  const history = Array.isArray(data.history) ? [...data.history] : [];
-  const net     = data.netPosition    || 0;
-  const long_   = data.longPositions  || 0;
-  const short_  = data.shortPositions || 0;
-  const total   = long_ + short_;
-  const lPct    = total > 0 ? Math.round(long_ / total * 100) : 50;
-  const amNet   = data.assetManagerNet;
-  const ddNet   = data.dealerNet;
-  const weekEnd = data.weekEnding || '';
-  const nWks    = history.length;
-
-  const zScore  = _calcZ(history);
-  const pctHist = _calcPct(history);
-  const zInfo   = _posLabel(zScore);
-  const isCrowded = Math.abs(zScore || 0) >= 1.5;
-
-  // WoW
-  let wow = null;
-  if (history.length >= 2) {
-    const prev = history[history.length - 2];
-    const pn   = prev.levNet ?? ((prev.levLong || 0) - (prev.levShort || 0));
-    wow = net - pn;
-  }
-
-  // Net%OI
-  const netPctOI  = total > 0 ? (net / total * 100) : null;
-  const netPctStr = netPctOI != null
-    ? (netPctOI > 0 ? '+' : '') + netPctOI.toFixed(1) + '%'
-    : '—';
-
-  const zStr = zScore != null ? (zScore > 0 ? '+' : '') + zScore.toFixed(2) : '—';
-  const pStr = pctHist != null ? pctHist + '%' : '—';
-  const zCol = isCrowded ? '#ff9800' : 'var(--text,#d1d4dc)';
-
-  // LF/AM alignment
-  const lfDir  = Math.sign(net);
-  const amDir  = amNet != null ? Math.sign(amNet) : 0;
-  const aligned = lfDir !== 0 && amDir !== 0 && lfDir === amDir;
-
-  // Gauge position: z in [-3,+3] → [5%,95%]
-  const gaugeLeft = zScore != null
-    ? ((Math.max(-3, Math.min(3, zScore)) + 3) / 6 * 90 + 5).toFixed(1) + '%'
-    : '50%';
-
-  // Build HTML
-  const bd = document.createElement('div');
-  bd.id = 'cot-bd';
-  bd.innerHTML = `
+  const bd=document.createElement('div');
+  bd.id='cot-bd';
+  bd.innerHTML=`
 <div id="cot-modal">
-
   <div id="cot-m-hd">
     <div>
       <div id="cot-m-title">CFTC Positioning · ${ccy} · Leveraged Funds</div>
@@ -825,402 +426,152 @@ function openCOTModal(ccy, data) {
     </div>
     <button id="cot-m-close" onclick="closeCOTModal()" aria-label="Close">✕</button>
   </div>
-
   <div id="cot-m-metrics">
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">Net LF</div>
-      <div class="cot-mm-val ${_cotCls(net)}">${_cotFmt(net)}</div>
-      <div class="cot-mm-sub">contracts</div>
-    </div>
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">Long %</div>
-      <div class="cot-mm-val ${_cotCls(lPct - 50)}">${lPct}%</div>
-      <div class="cot-mm-sub">of own OI</div>
-    </div>
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">WoW Δ</div>
-      <div class="cot-mm-val ${_cotCls(wow)}">${_cotFmt(wow)}</div>
-      <div class="cot-mm-sub">weekly change</div>
-    </div>
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">Net%OI</div>
-      <div class="cot-mm-val ${_cotCls(netPctOI)}">${netPctStr}</div>
-      <div class="cot-mm-sub">normalised</div>
-    </div>
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">Z-Score</div>
-      <div class="cot-mm-val" style="color:${zCol}">${zStr}</div>
-      <div class="cot-mm-sub">${nWks}w history</div>
-    </div>
-    <div class="cot-mm">
-      <div class="cot-mm-lbl">Percentile</div>
-      <div class="cot-mm-val" style="color:${zCol}">${pStr}</div>
-      <div class="cot-mm-sub" style="color:${zInfo.color}">${zInfo.text}</div>
-    </div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Net LF</div><div class="cot-mm-val ${_cotCls(net)}">${_cotFmt(net)}</div><div class="cot-mm-sub">contracts</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Long %</div><div class="cot-mm-val ${_cotCls(lPct-50)}">${lPct}%</div><div class="cot-mm-sub">of own OI</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">WoW Delta</div><div class="cot-mm-val ${_cotCls(wow)}">${_cotFmt(wow)}</div><div class="cot-mm-sub">weekly change</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Net%OI</div><div class="cot-mm-val ${_cotCls(netPctOI)}">${netPctStr}</div><div class="cot-mm-sub">normalised</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Z-Score</div><div class="cot-mm-val" style="color:${zCol}">${zStr}</div><div class="cot-mm-sub">${pStr} pctile</div></div>
+    <div class="cot-mm"><div class="cot-mm-lbl">Positioning</div><div class="cot-mm-val" style="color:${zInfo.col};font-size:11px">${zInfo.txt}</div><div class="cot-mm-sub">${isCrowded?'crowded':'not crowded'}</div></div>
   </div>
-
   <div id="cot-m-tabs" role="tablist" aria-label="COT chart views">
-    <div class="cot-tab on"  data-tab="overview"      onclick="cotTab(this,'overview')"      role="tab" aria-selected="true">Overview</div>
-    <div class="cot-tab"     data-tab="net"            onclick="cotTab(this,'net')"            role="tab" aria-selected="false">Net Position</div>
-    <div class="cot-tab"     data-tab="split"          onclick="cotTab(this,'split')"          role="tab" aria-selected="false">Long / Short</div>
-    <div class="cot-tab"     data-tab="participants"   onclick="cotTab(this,'participants')"   role="tab" aria-selected="false">Participants</div>
-    <div class="cot-tab"     data-tab="history"        onclick="cotTab(this,'history')"        role="tab" aria-selected="false">History</div>
+    <div class="cot-tab on" data-tab="overview"    onclick="cotTab(this,'overview')"    role="tab" aria-selected="true">Overview</div>
+    <div class="cot-tab"    data-tab="net"          onclick="cotTab(this,'net')"          role="tab" aria-selected="false">Net Position</div>
+    <div class="cot-tab"    data-tab="split"        onclick="cotTab(this,'split')"        role="tab" aria-selected="false">Long / Short</div>
+    <div class="cot-tab"    data-tab="participants" onclick="cotTab(this,'participants')" role="tab" aria-selected="false">Participants</div>
+    <div class="cot-tab"    data-tab="history"      onclick="cotTab(this,'history')"      role="tab" aria-selected="false">History</div>
   </div>
-
-  <div id="cot-m-body">
-
-    <!-- OVERVIEW ──────────────────────────────────────────── -->
+  <div id="cot-m-body" class="cot-body--overview">
     <div id="p-overview" class="cot-panel on">
-
       <div class="cot-ov-grid">
-
-        <!-- LEFT: gauge + big z/pct numbers -->
-        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
-          <div class="cot-ct">POSITIONING GAUGE · Z-SCORE VS ${nWks}-WEEK HISTORY</div>
-
-          <!-- Big numbers row -->
-          <div style="display:flex;gap:0;margin:12px 0 16px">
-            <div style="flex:1;border-right:1px solid rgba(255,255,255,.07);padding-right:16px">
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Z-Score</div>
-              <div class="cot-ov-bignum" style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${zStr}</div>
-              <div style="font-size:11px;color:${zInfo.color};font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${zInfo.text}</div>
-            </div>
-            <div style="flex:1;padding-left:16px">
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Percentile</div>
-              <div class="cot-ov-bignum" style="font-size:30px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:${zCol};line-height:1">${pStr}</div>
-              <div style="font-size:11px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:6px">${nWks}w history</div>
-            </div>
-          </div>
-
-          <!-- Gauge bar -->
-          <div class="cot-gauge-track">
-            <div class="cot-gauge-pin" id="cot-pin" style="left:50%"></div>
-          </div>
-          <div class="cot-gauge-lbls" style="margin-top:8px">
-            <span>Extreme Short<br>(&lt;−2σ)</span>
-            <span style="text-align:center">Short<br>(−1.5σ)</span>
-            <span style="text-align:center">Neutral</span>
-            <span style="text-align:center">Long<br>(+1.5σ)</span>
-            <span style="text-align:right">Extreme Long<br>(&gt;+2σ)</span>
-          </div>
-
-          <!-- Badge -->
-          <div style="margin-top:14px">
-            ${isCrowded ? `<span class="badge-ext badge-warn">CROWDED TRADE</span>` : `<span class="badge-ext badge-ok">Within normal range</span>`}
-          </div>
+        <div class="cot-cw">
+          <div class="cot-ct">POSITIONING GAUGE · Z-SCORE</div>
+          <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ</div>
+          <div class="cot-ov-sub">${zInfo.txt} · ${pStr} pctile · ${nWks}w</div>
+          <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
+          <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
-
-        <!-- RIGHT: Long/Short bar + Participants table -->
-        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
-          <div class="cot-ct">LONG / SHORT SPLIT · LEVERAGED FUNDS OI</div>
-
-          <!-- L/S numbers -->
-          <div class="cot-ls-row" style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 6px">
-            <div>
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Longs</div>
-              <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--up,#26a69a);line-height:1">${long_.toLocaleString()}</div>
-              <div style="font-size:11px;color:var(--up,#26a69a);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${lPct}%</div>
-            </div>
-            <div class="cot-ls-vs" style="font-size:13px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace)">vs</div>
-            <div style="text-align:right">
-              <div style="font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Shorts</div>
-              <div class="cot-ls-num" style="font-size:20px;font-weight:700;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--down,#ef5350);line-height:1">${short_.toLocaleString()}</div>
-              <div style="font-size:11px;color:var(--down,#ef5350);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:3px">${100 - lPct}%</div>
-            </div>
+        <div class="cot-cw">
+          <div class="cot-ct">LONG / SHORT SPLIT</div>
+          <div class="cot-ls-row">
+            <div><div class="cot-ls-num cu">${long_.toLocaleString()}</div><div class="cot-ov-sub">Longs</div></div>
+            <div class="cot-ls-vs">vs</div>
+            <div style="text-align:right"><div class="cot-ls-num cd">${short_.toLocaleString()}</div><div class="cot-ov-sub">Shorts</div></div>
           </div>
-
-          <!-- Bar -->
-          <div class="cot-posbar" style="height:8px;margin-bottom:10px">
-            <div class="cot-posbar-fill" style="width:${lPct}%;background:var(--up,#26a69a);opacity:.8"></div>
-            <div class="cot-posbar-mid"></div>
-          </div>
-
-          <!-- Participants table -->
-          <div class="cot-ov-r-divider" style="flex:1">
-            <div class="cot-ct" style="margin-bottom:6px">PARTICIPANTS · NET BY CATEGORY</div>
-            <table class="cot-tbl" style="font-size:11px" aria-label="COT positioning by participant category">
-              <thead><tr>
-                <th scope="col">Category</th><th scope="col">Net</th><th scope="col">Dir</th>
-              </tr></thead>
-              <tbody>
-                <tr>
-                  <td>Leveraged Funds</td>
-                  <td class="${_cotCls(net)}">${_cotFmt(net)}</td>
-                  <td class="${_cotCls(net)}">${net > 0 ? '▲ Long' : net < 0 ? '▼ Short' : '— Neutral'}</td>
-                </tr>
-                ${amNet != null ? `<tr>
-                  <td>Asset Managers</td>
-                  <td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td>
-                  <td class="${_cotCls(amNet)}">${amNet > 0 ? '▲ Long' : amNet < 0 ? '▼ Short' : '— Neutral'}</td>
-                </tr>` : ''}
-                ${ddNet != null ? `<tr>
-                  <td>Dealers</td>
-                  <td class="${_cotCls(ddNet)}">${_cotFmt(ddNet)}</td>
-                  <td class="${_cotCls(ddNet)}">${ddNet > 0 ? '▲ Long' : ddNet < 0 ? '▼ Short' : '— Neutral'}</td>
-                </tr>` : ''}
-                ${amNet != null ? `<tr>
-                  <td style="color:var(--text2,#9096a0);font-size:10px" colspan="3">
-                    <span style="color:${aligned ? 'var(--up,#26a69a)' : '#ff9800'}">${aligned ? '● Aligned' : '○ Diverging'}</span>
-                    — LF and AM ${aligned ? 'both in same direction' : 'are opposed · exercise caution'}
-                  </td>
-                </tr>` : ''}
-              </tbody>
-            </table>
-          </div>
+          <div class="cot-ls-bar"><div class="cot-ls-bar-fill" style="width:100%;background:linear-gradient(90deg,#26a69a ${lPct}%,#ef5350 ${lPct}%)"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;font-family:${_monoF};color:var(--text3,#6b7280)"><span>${lPct}% Long</span><span>${100-lPct}% Short</span></div>
         </div>
-
+        <div class="cot-cw">
+          <div class="cot-ct">12-WEEK NET TREND</div>
+          ${_cotSparkline(history,12)}
+          <div class="cot-ov-sub" style="margin-top:6px">${_cotTrendLabel(history)}</div>
+        </div>
       </div>
-
-      <!-- BOTTOM ROW: trend sparkline + 52w extremes + signal summary -->
       <div class="cot-ov-bottom">
-
-        <!-- Net trend sparkline -->
-        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
-          <div class="cot-ct">NET POSITION TREND · ${Math.min(nWks, 8)}W</div>
-          <div style="flex:1;display:flex;align-items:center;padding:6px 0">${_cotSparkline(history, 8)}</div>
-          <div style="font-size:10px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px">${_cotTrendLabel(history)}</div>
+        <div class="cot-cw"><div class="cot-ct">52-WEEK RANGE</div>${_cotRangeCard(history,net)}</div>
+        <div class="cot-cw">
+          <div class="cot-ct">PARTICIPANTS · CURRENT WEEK</div>
+          <table class="cot-tbl"><thead><tr><th style="text-align:left">Category</th><th>Net Contracts</th><th>Direction</th></tr></thead>
+          <tbody>
+            <tr><td>Leveraged Funds</td><td class="${_cotCls(net)}">${_cotFmt(net)}</td><td class="${_cotCls(net)}">${net>0?'Long':net<0?'Short':'Flat'}</td></tr>
+            ${amNet!=null?`<tr><td>Asset Managers</td><td class="${_cotCls(amNet)}">${_cotFmt(amNet)}</td><td class="${_cotCls(amNet)}">${amNet>0?'Long':amNet<0?'Short':'Flat'}</td></tr>`:''}
+            ${ddNet!=null?`<tr><td>Dealers</td><td class="${_cotCls(-ddNet)}">${_cotFmt(ddNet)}</td><td class="${_cotCls(-ddNet)}">${ddNet>0?'Long':ddNet<0?'Short':'Flat'}</td></tr>`:''}
+          </tbody></table>
         </div>
-
-        <!-- 52w extremes -->
-        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
-          <div class="cot-ct">POSITIONING RANGE · ${nWks}W</div>
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:center">${_cotRangeCard(history, net)}</div>
-        </div>
-
-        <!-- Signal summary -->
-        <div class="cot-cw" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div class="cot-cw" style="justify-content:space-between">
           <div class="cot-ct">SIGNAL SUMMARY</div>
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net, amNet, ddNet, aligned, isCrowded, zScore)}</div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">${_cotSignalSummary(net,amNet,ddNet,aligned,isCrowded)}</div>
         </div>
-
       </div>
-
     </div>
-
-    <!-- NET POSITION ──────────────────────────────────────── -->
     <div id="p-net" class="cot-panel">
-      <div class="cot-cw">
-        <div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div>
-        <div class="cot-chart-area"><canvas id="c-net"></canvas></div>
-      </div>
+      <div class="cot-cw"><div class="cot-ct">NET POSITION · LEVERAGED FUNDS · WEEKLY CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-net"></div></div></div>
     </div>
-
-    <!-- LONG / SHORT ──────────────────────────────────────── -->
     <div id="p-split" class="cot-panel">
-      <div class="cot-cw">
-        <div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div>
-        <div class="cot-chart-area"><canvas id="c-split"></canvas></div>
-      </div>
+      <div class="cot-cw"><div class="cot-ct">LONGS VS SHORTS · LEVERAGED FUNDS · CONTRACTS</div><div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-split"></div></div></div>
     </div>
-
-    <!-- PARTICIPANTS ─────────────────────────────────────── -->
     <div id="p-participants" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">LF vs AM vs DEALER · NET BY CATEGORY</div>
-        <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2,#9096a0)"></div>
-        <div class="cot-chart-area"><canvas id="c-part"></canvas></div>
+        <div id="cot-part-legend" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:10px;font-family:${_monoF};color:var(--text2,#9096a0)"></div>
+        <div class="cot-chart-area"><div class="cot-lw-wrap" id="cot-lw-part"></div></div>
       </div>
-      <div class="cot-cw">
-        <div style="font-size:10px;color:var(--text3,#6b7280);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);line-height:1.7">
-          <strong style="color:var(--text2,#9096a0)">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal. Extreme readings historically precede reversals.<br>
-          <strong style="color:var(--text2,#9096a0)">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
-          <strong style="color:var(--text2,#9096a0)">DD (Dealers):</strong> Market-makers. Typically positioned against speculative momentum. Useful contrarian signal at historical extremes.
-        </div>
-      </div>
+      <div class="cot-cw"><div style="font-size:10px;color:var(--text3,#6b7280);font-family:${_monoF};line-height:1.7">
+        <strong style="color:var(--text2,#9096a0)">LF (Leveraged Funds):</strong> Hedge funds and CTAs. Primary speculative momentum signal.<br>
+        <strong style="color:var(--text2,#9096a0)">AM (Asset Managers):</strong> Mutual funds and pensions. Slow trend-followers. Confluence with LF = stronger signal.<br>
+        <strong style="color:var(--text2,#9096a0)">DD (Dealers):</strong> Market-makers. Typically contra-positioned to speculators. Useful contrarian signal.
+      </div></div>
     </div>
-
-    <!-- HISTORY ─────────────────────────────────────────── -->
     <div id="p-history" class="cot-panel">
       <div class="cot-cw">
         <div class="cot-ct">WEEKLY HISTORY · ${nWks} WEEKS</div>
         <div style="overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent">
-          <table class="cot-tbl" aria-label="Weekly COT history">
-            <thead><tr>
-              <th scope="col">Week</th><th scope="col">Net LF</th><th scope="col">WoW Δ</th><th scope="col">Longs</th><th scope="col">Shorts</th><th scope="col">Long%</th><th scope="col">Net%OI</th><th scope="col">AM Net</th><th scope="col">Dealer</th>
-            </tr></thead>
-            <tbody id="cot-hist-body"></tbody>
-          </table>
+          <table class="cot-tbl"><thead><tr>
+            <th>Week</th><th>Net LF</th><th>WoW Δ</th><th>Longs</th><th>Shorts</th><th>Long%</th><th>Net%OI</th><th>AM Net</th><th>Dealer</th>
+          </tr></thead><tbody id="cot-hist-body"></tbody></table>
         </div>
       </div>
     </div>
-
   </div>
 </div>`;
 
   document.body.appendChild(bd);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;}));
 
-  // Overview is the initial tab — set its body class immediately
-  const initBody = document.getElementById('cot-m-body');
-  if (initBody) initBody.classList.add('cot-body--overview');
-
-  // Close on backdrop click or Escape
-  bd.addEventListener('click', e => { if (e.target === bd) closeCOTModal(); });
-  const esc = e => { if (e.key === 'Escape') closeCOTModal(); };
-  document.addEventListener('keydown', esc);
-  bd._esc = esc;
-
-  // Animate gauge pin after paint
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const pin = document.getElementById('cot-pin');
-    if (pin) pin.style.left = gaugeLeft;
-  }));
-
-  // ── Prepare chart data ────────────────────────────────────────────────────
-  const labels   = history.map(h => (h.weekEnding || '').replace(/(\d{4})-(\d{2})-(\d{2})/, '$3/$2'));
-  const netData  = history.map(h => h.levNet ?? ((h.levLong || 0) - (h.levShort || 0)));
-  const lngData  = history.map(h => h.levLong);
-  const shrtData = history.map(h => h.levShort);
-  const amData   = history.map(h => h.assetManagerNet);
-  const ddData   = history.map(h => h.dealerNet);
-  const barCols  = netData.map(v => v >= 0 ? 'rgba(38,166,154,0.80)' : 'rgba(239,83,80,0.80)');
-
-  // ── Build history table ───────────────────────────────────────────────────
-  const tbody = document.getElementById('cot-hist-body');
-  if (tbody) {
-    const rev = [...history].reverse();
-    tbody.innerHTML = rev.map((h, i) => {
-      const hNet   = h.levNet ?? ((h.levLong || 0) - (h.levShort || 0));
-      const hL     = h.levLong, hS = h.levShort;
-      const hTot   = (hL || 0) + (hS || 0);
-      const hLP    = hTot > 0 ? Math.round(hL / hTot * 100) : null;
-      const hPctOI = hTot > 0 ? (hNet / hTot * 100) : null;
-      const prevH  = rev[i + 1];
-      const hWow   = prevH
-        ? hNet - (prevH.levNet ?? ((prevH.levLong || 0) - (prevH.levShort || 0)))
-        : null;
-      const isNow = i === 0;
-      return `<tr style="${isNow ? 'background:rgba(255,255,255,.04)' : ''}">
-        <td>${h.weekEnding}${isNow ? ' <span style="color:var(--up,#26a69a);font-size:9px">now</span>' : ''}</td>
+  const tbody=document.getElementById('cot-hist-body');
+  if(tbody){
+    const rev=[...history].reverse();
+    tbody.innerHTML=rev.map((h,i)=>{
+      const hNet=h.levNet??((h.levLong||0)-(h.levShort||0));
+      const hL=h.levLong,hS=h.levShort,hTot=(hL||0)+(hS||0);
+      const hLP=hTot>0?Math.round(hL/hTot*100):null;
+      const hPctOI=hTot>0?(hNet/hTot*100):null;
+      const prevH=rev[i+1];
+      const hWow=prevH?hNet-(prevH.levNet??((prevH.levLong||0)-(prevH.levShort||0))):null;
+      return`<tr style="${i===0?'background:rgba(255,255,255,.04)':''}">
+        <td>${h.weekEnding}${i===0?' <span style="color:var(--up,#26a69a);font-size:9px">now</span>':''}</td>
         <td class="${_cotCls(hNet)}">${_cotFmt(hNet)}</td>
-        <td class="${_cotCls(hWow)}">${hWow != null ? _cotFmt(hWow) : '—'}</td>
-        <td style="color:var(--up,#26a69a)">${hL != null ? hL.toLocaleString() : '—'}</td>
-        <td style="color:var(--down,#ef5350)">${hS != null ? hS.toLocaleString() : '—'}</td>
-        <td class="${_cotCls(hLP != null ? hLP - 50 : null)}">${hLP != null ? hLP + '%' : '—'}</td>
-        <td class="${_cotCls(hPctOI)}">${hPctOI != null ? (hPctOI > 0 ? '+' : '') + hPctOI.toFixed(1) + '%' : '—'}</td>
-        <td class="${_cotCls(h.assetManagerNet)}">${h.assetManagerNet != null ? _cotFmt(h.assetManagerNet) : '—'}</td>
-        <td class="${_cotCls(h.dealerNet ? -h.dealerNet : null)}">${h.dealerNet != null ? _cotFmt(h.dealerNet) : '—'}</td>
+        <td class="${_cotCls(hWow)}">${hWow!=null?_cotFmt(hWow):'—'}</td>
+        <td style="color:var(--up,#26a69a)">${hL!=null?hL.toLocaleString():'—'}</td>
+        <td style="color:var(--down,#ef5350)">${hS!=null?hS.toLocaleString():'—'}</td>
+        <td class="${_cotCls(hLP!=null?hLP-50:null)}">${hLP!=null?hLP+'%':'—'}</td>
+        <td class="${_cotCls(hPctOI)}">${hPctOI!=null?(hPctOI>0?'+':'')+hPctOI.toFixed(1)+'%':'—'}</td>
+        <td class="${_cotCls(h.assetManagerNet)}">${h.assetManagerNet!=null?_cotFmt(h.assetManagerNet):'—'}</td>
+        <td class="${_cotCls(h.dealerNet?-h.dealerNet:null)}">${h.dealerNet!=null?_cotFmt(h.dealerNet):'—'}</td>
       </tr>`;
     }).join('');
   }
 
-  // ── Lazy chart init ───────────────────────────────────────────────────────
-  const built = {};
-
-  function buildChart(tabId) {
-    // For chart tabs: always rebuild so Chart.js measures the freshly-sized container
-    const isChartTab = tabId === 'net' || tabId === 'split';
-    if (built[tabId] && !isChartTab) return;
-    if (built[tabId] && isChartTab) {
-      // Destroy existing chart instance and replace the canvas element entirely.
-      // Chart.js leaves stale width/height attributes on the canvas after destroy;
-      // a fresh canvas element guarantees Chart.js measures the container cleanly.
-      const canvasId = tabId === 'net' ? 'c-net' : 'c-split';
-      const cv = document.getElementById(canvasId);
-      const existing = cv && _cotCharts.find(c => c.canvas === cv);
-      if (existing) { existing.destroy(); _cotCharts.splice(_cotCharts.indexOf(existing), 1); }
-      if (cv) {
-        const fresh = document.createElement('canvas');
-        fresh.id = canvasId;
-        cv.parentElement.replaceChild(fresh, cv);
-      }
-    }
-    built[tabId] = true;
-
-    const isMob = window.innerWidth < 600;
-
-    if (tabId === 'net') {
-      const cv = document.getElementById('c-net');
-      if (cv) {
-        _barChart(cv, labels, [{ label: `${ccy} LF Net`, data: netData, backgroundColor: barCols, borderWidth: 0 }]);
-      }
-    }
-    if (tabId === 'split') {
-      const cv = document.getElementById('c-split');
-      if (cv) {
-        _lineChart(cv, labels, [
-          { label: 'Longs',  data: lngData,  borderColor: '#26a69a', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
-          { label: 'Shorts', data: shrtData, borderColor: '#ef5350', fill: true, tension: 0.4, pointRadius: isMob ? 0 : 2, pointHoverRadius: 5, borderWidth: 2 },
-        ]);
-      }
-    }
-    if (tabId === 'participants') {
-      const cv = document.getElementById('c-part');
-      if (cv) {
-        const ds = [{ label: 'Leveraged Funds', data: netData, borderColor: '#4f7fff', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 }];
-        if (amData.some(v => v != null)) ds.push({ label: 'Asset Managers', data: amData, borderColor: '#ff9800', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 });
-        if (ddData.some(v => v != null)) ds.push({ label: 'Dealers', data: ddData, borderColor: '#ef5350', backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, pointHoverRadius: 5, borderWidth: 2 });
-
-        // Build HTML legend above the chart — avoids any canvas overlap
-        const legendEl = document.getElementById('cot-part-legend');
-        if (legendEl) {
-          legendEl.innerHTML = ds.map(d =>
-            `<span style="display:flex;align-items:center;gap:6px">` +
-            `<span style="display:inline-block;width:18px;height:2px;background:${d.borderColor};border-radius:1px"></span>` +
-            `<span>${d.label}</span></span>`
-          ).join('');
-        }
-
-        // Build chart with native legend disabled (HTML legend used instead)
-        const partOpts = _buildOptions({ layout: { padding: { top: 4, right: 0, bottom: 0, left: 0 } } });
-        partOpts.plugins.legend = { display: false };
-        const c = new Chart(cv, {
-          type: 'line',
-          data: { labels, datasets: ds },
-          options: partOpts
-        });
-        _cotCharts.push(c);
-      }
-    }
-  }
-
-  bd._build = buildChart;
-  // Do NOT pre-build any chart here — charts must be built lazily when the user
-  // clicks a tab, so that (a) the panel is visible, (b) cot-body--chart class is set,
-  // and (c) Chart.js can measure the canvas at its actual rendered size.
+  bd.addEventListener('click',e=>{if(e.target===bd)closeCOTModal();});
+  const esc=e=>{if(e.key==='Escape')closeCOTModal();};
+  document.addEventListener('keydown',esc);bd._esc=esc;
+  bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy};
 }
 
-// ── Tab switching ─────────────────────────────────────────────────────────────
-
-function cotTab(el, tabId) {
-  document.querySelectorAll('.cot-tab').forEach(t => {
-    t.classList.remove('on');
-    t.setAttribute('aria-selected', 'false');
-  });
-  document.querySelectorAll('.cot-panel').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  el.setAttribute('aria-selected', 'true');
-  const panel = document.getElementById('p-' + tabId);
-  if (panel) panel.classList.add('on');
-  const body = document.getElementById('cot-m-body');
-  const isChartTab = tabId === 'net' || tabId === 'split';
-  const isOverview = tabId === 'overview';
-  if (body) {
-    body.classList.toggle('cot-body--chart', isChartTab);
-    body.classList.toggle('cot-body--overview', isOverview);
-  }
-
-  const bd = document.getElementById('cot-bd');
-  if (bd && bd._build) {
-    // Use rAF x2 to ensure panel is fully painted before Chart.js measures the container
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      bd._build(tabId);
-    }));
-  }
+function cotTab(el,tabId){
+  document.querySelectorAll('.cot-tab').forEach(t=>{t.classList.remove('on');t.setAttribute('aria-selected','false');});
+  document.querySelectorAll('.cot-panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');el.setAttribute('aria-selected','true');
+  const panel=document.getElementById('p-'+tabId);if(panel)panel.classList.add('on');
+  const body=document.getElementById('cot-m-body');
+  if(body){body.classList.toggle('cot-body--chart',tabId==='net'||tabId==='split');body.classList.toggle('cot-body--overview',tabId==='overview');}
+  const bd=document.getElementById('cot-bd');if(!bd?._cotData)return;
+  const d=bd._cotData;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(tabId==='net'){const w=document.getElementById('cot-lw-net');if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy);}}
+    if(tabId==='split'){const w=document.getElementById('cot-lw-split');if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}}
+    if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy);}}
+  }));
 }
 
-// ── Close ─────────────────────────────────────────────────────────────────────
-
-function closeCOTModal() {
-  const bd = document.getElementById('cot-bd');
-  if (bd) {
-    if (bd._esc) document.removeEventListener('keydown', bd._esc);
+function closeCOTModal(){
+  const bd=document.getElementById('cot-bd');
+  if(bd){
+    if(bd._esc)document.removeEventListener('keydown',bd._esc);
+    document.querySelectorAll('.cot-lw-wrap').forEach(w=>{if(w._lwResize)window.removeEventListener('resize',w._lwResize);});
     bd.remove();
   }
-  _destroyCharts();
+  _destroyCOTCharts();
 }
 
-// ── Expose globals ────────────────────────────────────────────────────────────
-
-window.openCOTModal  = openCOTModal;
-window.closeCOTModal = closeCOTModal;
-window.cotTab        = cotTab;
+window.openCOTModal=openCOTModal;window.closeCOTModal=closeCOTModal;window.cotTab=cotTab;
