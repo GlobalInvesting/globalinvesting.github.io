@@ -27,7 +27,7 @@
 #ycm-legend{display:flex;gap:16px;margin-bottom:8px;flex-shrink:0;align-items:center;}
 .ycm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af);}
 .ycm-leg-line{width:20px;height:2px;border-radius:1px;flex-shrink:0;}
-#ycm-lw-wrap{flex:1;position:relative;min-height:160px;}
+#ycm-lw-wrap{flex:1;position:relative;min-height:160px;overflow:hidden;}
 #ycm-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
 #ycm-shape{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 #ycm-table-wrap{flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);overflow-x:auto;}
@@ -149,11 +149,16 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const firstTenorMonth=toData[0]?.time??3;
   const lastTenorMonth=toData[toData.length-1]?.time??360;
   const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
-  // createYieldCurveChart uses left price scale by default (matches the official TV demo).
-  // We pass explicit width/height (not autoSize) since autoSize initializes to 56px in flex containers.
-  // No leftPriceScale/rightPriceScale overrides — use the function's internal defaults.
+  // Pin container to measured pixel dimensions via inline style BEFORE createYieldCurveChart.
+  // This lets autoSize:true read the correct size — without pinning, autoSize reads the
+  // flex-resolved width which may differ from what LWC's internal layout expects.
+  // With explicit width: LWC miscalculates internal left positions (price scale at left:0,
+  // chart area also at left:0 instead of left:56). autoSize is the only mode that works correctly.
+  container.style.width=w+'px';
+  container.style.height=h+'px';
+  container.style.flex='none';
   _ycLwChart=LWC.createYieldCurveChart(container,{
-    width:w, height:h,
+    autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
@@ -163,13 +168,6 @@ function _ycDrawNative(container,toData,prData,tenorData){
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
-  // After creation, force the LWC wrapper div to 100% so it fits the container exactly.
-  // LWC internally creates a div that may overflow due to left price scale accounting.
-  const lwDiv=container.querySelector('.tv-lightweight-charts');
-  if(lwDiv){
-    lwDiv.style.width='100%';
-    lwDiv.style.maxWidth='100%';
-  }
   let priorSeries=null;
   if(prData.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
@@ -179,12 +177,15 @@ function _ycDrawNative(container,toData,prData,tenorData){
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
-  // ResizeObserver: keep canvas in sync when container changes (orientation, keyboard, etc.)
+  // ResizeObserver: update pinned CSS dimensions and trigger LWC re-layout
   if(window.ResizeObserver){
     const ro=new ResizeObserver(entries=>{
       if(!_ycLwChart)return;
       const e=entries[0],nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
+      if(nw>0&&nh>0){
+        container.style.width=nw+'px';container.style.height=nh+'px';
+        _ycLwChart.timeScale().fitContent();
+      }
     });
     ro.observe(container);container._ycRo=ro;
   }
