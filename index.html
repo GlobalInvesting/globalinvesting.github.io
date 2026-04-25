@@ -201,6 +201,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-range-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em}
 .lw-range-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+#lw-chart-header{display:none;align-items:center;gap:0;padding:3px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:22px;flex-wrap:wrap;overflow:hidden}
+#lw-chart-header .lw-hdr-sym{font-size:10px;font-weight:600;color:var(--text);font-family:var(--font-ui,sans-serif);margin-right:8px;white-space:nowrap}
+#lw-chart-header .lw-hdr-tf{font-size:9px;color:var(--text3);font-family:var(--font-ui,sans-serif);margin-right:12px;white-space:nowrap}
+#lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--font-mono,monospace)}
+#lw-chart-header .lw-hdr-o,.lw-hdr-h,.lw-hdr-l,.lw-hdr-c,.lw-hdr-chg,.lw-hdr-ma{white-space:nowrap}
+#lw-chart-header .lw-hdr-lbl{color:var(--text3);margin-right:2px}
+#lw-chart-header .lw-hdr-val{color:var(--text)}
+#lw-chart-header .lw-hdr-chg.up{color:var(--up)}
+#lw-chart-header .lw-hdr-chg.dn{color:var(--down)}
+#lw-chart-header .lw-hdr-ma-val{color:#f0a500}
 #tvcal-inner{overflow:hidden}
 
 /* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
@@ -491,6 +501,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="lw-range-btn"        data-days="252" aria-label="1 year"  >1Y</button>
         <button class="lw-range-btn"        data-days="756" aria-label="3 years" >3Y</button>
         <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
+      </div>
+      <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
+      <div id="lw-chart-header" aria-live="polite">
+        <span class="lw-hdr-sym" id="lw-hdr-sym"></span>
+        <span class="lw-hdr-tf" id="lw-hdr-tf">1D</span>
+        <div class="lw-hdr-ohlc" id="lw-hdr-ohlc">
+          <span class="lw-hdr-o"><span class="lw-hdr-lbl">O</span><span class="lw-hdr-val" id="lw-hdr-o-val"></span></span>
+          <span class="lw-hdr-h"><span class="lw-hdr-lbl">H</span><span class="lw-hdr-val" id="lw-hdr-h-val"></span></span>
+          <span class="lw-hdr-l"><span class="lw-hdr-lbl">L</span><span class="lw-hdr-val" id="lw-hdr-l-val"></span></span>
+          <span class="lw-hdr-c"><span class="lw-hdr-lbl">C</span><span class="lw-hdr-val" id="lw-hdr-c-val"></span></span>
+          <span class="lw-hdr-chg" id="lw-hdr-chg-val"></span>
+          <span class="lw-hdr-ma"><span class="lw-hdr-lbl" style="color:var(--text3);">MA 20</span><span class="lw-hdr-ma-val" id="lw-hdr-ma-val"></span></span>
+        </div>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;pointer-events:none;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
