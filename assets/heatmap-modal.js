@@ -176,36 +176,38 @@
 .sess-fill { height:100%;border-radius:2px; }
 .sess-val { text-align:right; }
 
-/* Correlations tab */
+/* Correlations tab — Bloomberg-style compact rectangular grid */
 .corr-grid {
   display:grid;
-  grid-template-columns:34px repeat(8,1fr) 42px;
-  gap:3px;
+  grid-template-columns:30px repeat(8,1fr) 42px;
+  gap:2px;
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  font-size:10px;
+  font-size:9px;
 }
 .corr-hdr {
   display:flex;align-items:center;justify-content:center;
-  color:var(--text2,#787b86);font-size:9px;font-weight:600;
-  letter-spacing:.04em;padding:4px 2px;
+  color:var(--text3,#6b7280);font-size:8px;font-weight:600;
+  letter-spacing:.04em;height:18px;
 }
 .corr-hdr.row-lbl {
-  justify-content:flex-end;padding-right:6px;
-  color:var(--text2,#787b86);font-size:9px;font-weight:600;
+  justify-content:flex-end;padding-right:4px;
+  color:var(--text2,#787b86);font-size:8px;font-weight:700;
 }
 .corr-hdr.comp { color:var(--blue,#4f7fff);font-weight:700; }
-.corr-hdr.comp.row-lbl { justify-content:flex-end; }
+.corr-hdr.comp.row-lbl { color:var(--blue,#4f7fff); }
 .corr-cell {
-  aspect-ratio:1;
-  border-radius:3px;
+  height:24px;
+  border-radius:2px;
   display:flex;align-items:center;justify-content:center;
   font-size:9px;font-weight:600;
-  min-height:28px;
+  letter-spacing:.02em;
 }
 .corr-cell.comp {
-  border-radius:3px;
-  border:1px solid rgba(79,127,255,.3);
-  background:rgba(79,127,255,.1);
+  border-radius:2px;
+  border:1px solid rgba(79,127,255,.20);
+  background:rgba(79,127,255,.07);
+  color:var(--blue,#4f7fff);
+  font-weight:700;
 }
 
 /* Footer */
@@ -220,7 +222,8 @@
 /* CSI tab */
 #hm-csi-wrap {
   position:relative;height:280px;
-  background:#1e222d;border-radius:4px;overflow:hidden;
+  background:#131722;border-radius:0 0 5px 5px;overflow:hidden;
+  margin:8px -14px -12px -14px;
 }
 #hm-csi-chart { width:100%;height:100%; }
 #hm-csi-period {
@@ -261,7 +264,7 @@
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:10px;color:var(--text3,#6b7280);
   font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
-  letter-spacing:.04em;background:#1e222d;
+  letter-spacing:.04em;background:#131722;
 }
 
 /* Utility */
@@ -881,28 +884,21 @@
       grid.appendChild(val);
     });
 
-    // Weekend banner: injected above the grid
+    // Weekend status note — inline text line, no banner box (Bloomberg/Eikon convention)
     const content = document.getElementById('hm-sess-content');
     content.innerHTML = '';
     if (weekend) {
-      const banner = document.createElement('div');
-      banner.style.cssText = [
-        'display:flex;align-items:center;gap:6px',
-        'padding:5px 8px',
-        'margin-bottom:8px',
-        'border-radius:4px',
-        'background:rgba(255,255,255,.04)',
-        'border:1px solid rgba(255,255,255,.07)',
-        'font-size:10px',
+      const statusLine = document.createElement('div');
+      statusLine.style.cssText = [
+        'font-size:9px',
         'font-family:var(--font-mono,"JetBrains Mono","Courier New",monospace)',
         'color:var(--text3,#6b7280)',
         'letter-spacing:.04em',
+        'margin-bottom:10px',
+        'padding-left:2px',
       ].join(';');
-      banner.innerHTML =
-        '<span style="font-size:12px">⏸</span>' +
-        '<span><strong style="color:var(--text2,#787b86)">MARKET CLOSED</strong>' +
-        ' &nbsp;·&nbsp; FX weekend &nbsp;·&nbsp; Values reflect last Friday close</span>';
-      content.appendChild(banner);
+      statusLine.textContent = 'Market closed — FX weekend. Displaying last Friday close.';
+      content.appendChild(statusLine);
     }
     content.appendChild(grid);
 
@@ -1096,7 +1092,6 @@
       compCell.style.background   = `rgba(79,127,255,${compAlpha.toFixed(2)})`;
       compCell.style.color        = 'var(--blue,#4f7fff)';
       compCell.style.fontWeight   = '700';
-      compCell.style.fontSize     = '10px';
       compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
       compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
       if (rowCcy === ccy) {
@@ -1123,7 +1118,6 @@
       footCell.style.background  = `rgba(79,127,255,${cvAlpha.toFixed(2)})`;
       footCell.style.color       = 'var(--blue,#4f7fff)';
       footCell.style.fontWeight  = '700';
-      footCell.style.fontSize    = '10px';
       footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
       footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
       if (colCcy === ccy) {
@@ -1311,7 +1305,7 @@
 
     _csiChart = LWC.createChart(chartEl, {
       layout: {
-        background: { color: '#1e222d' },
+        background: { color: '#131722' },
         textColor: '#787b86',
         attributionLogo: false,
       },
@@ -1343,16 +1337,22 @@
 
     CCY_ORDER.forEach(c => {
       const isFocus = c === ccy;
-      const raw = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
+      // Rebase: subtract the value at cutoffDate so all series start at 0 for the period.
+      // This is the Bloomberg WCRS convention — each period window rebases to 0bp.
+      const allPts = _csiData.series[c];
+      const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
+      const baseVal  = sliceIdx >= 0 ? allPts[sliceIdx].value : 0;
+      const raw = (sliceIdx >= 0 ? allPts.slice(sliceIdx) : allPts)
+        .map(pt => ({ time: pt.time, value: parseFloat((pt.value - baseVal).toFixed(4)) }));
       const ls = _csiChart.addSeries(LWC.LineSeries, {
         color: CSI_COLORS[c],
         lineWidth: isFocus ? 2.5 : 1,
         lineStyle: 0,  // solid
-        lastValueVisible: true,
+        lastValueVisible: false,
         priceLineVisible: false,
         crosshairMarkerVisible: isFocus,
         crosshairMarkerRadius: 4,
-        crosshairMarkerBorderColor: '#1e222d',
+        crosshairMarkerBorderColor: '#131722',
         crosshairMarkerBackgroundColor: CSI_COLORS[c],
       });
       ls.setData(raw);
@@ -1405,12 +1405,16 @@
     const legendEl = document.getElementById('hm-csi-legend');
     if (!legendEl || !_csiData) return;
 
-    // Get final value for each ccy in the current period
+    // Get final value for each ccy in the current period — rebased to 0 at period start
     const vals = CCY_ORDER.map(c => {
-      const filtered = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
-      const last  = filtered.length ? filtered[filtered.length - 1].value : null;
-      const first = filtered.length ? filtered[0].value : null;
-      return { ccy: c, val: last, change: (last != null && first != null) ? last - first : null };
+      const allPts   = _csiData.series[c];
+      const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
+      if (sliceIdx < 0) return { ccy: c, val: null, change: null };
+      const baseVal  = allPts[sliceIdx].value;
+      const filtered = allPts.slice(sliceIdx).map(pt => pt.value - baseVal);
+      const last  = filtered.length ? filtered[filtered.length - 1] : null;
+      const first = 0; // always 0 after rebase
+      return { ccy: c, val: last != null ? parseFloat(last.toFixed(4)) : null, change: last };
     }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
 
     legendEl.innerHTML = vals.map(r => {
@@ -1438,9 +1442,11 @@
     const cutoffDate = allDates[startIdx];
 
     const rows = CCY_ORDER.map(c => {
-      const filtered = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
-      if (!filtered.length) return { ccy: c, val: null, min: null, max: null };
-      const vals = filtered.map(pt => pt.value);
+      const allPts   = _csiData.series[c];
+      const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
+      if (sliceIdx < 0) return { ccy: c, val: null, min: null, max: null, range: null };
+      const baseVal = allPts[sliceIdx].value;
+      const vals = allPts.slice(sliceIdx).map(pt => parseFloat((pt.value - baseVal).toFixed(4)));
       return {
         ccy: c,
         val: vals[vals.length - 1],
