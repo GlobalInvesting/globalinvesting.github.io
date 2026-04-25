@@ -177,14 +177,7 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     try:
         ticker = yf.Ticker(ticker_sym)
-        # repair=True asks yfinance to detect and fix common OHLC anomalies
-        # (available since yfinance 0.2.x; no-op if the feature is unavailable)
-        try:
-            hist = ticker.history(period=PERIOD, interval=INTERVAL,
-                                  auto_adjust=True, repair=True)
-        except TypeError:
-            hist = ticker.history(period=PERIOD, interval=INTERVAL,
-                                  auto_adjust=True)
+        hist = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
         if hist.empty:
             print(f"  WARN [{id_}]: empty history from yfinance")
             return None
