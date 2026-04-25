@@ -149,28 +149,26 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const firstTenorMonth=toData[0]?.time??3;
   const lastTenorMonth=toData[toData.length-1]?.time??360;
   const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
+  // createYieldCurveChart uses left price scale by default (matches the official TV demo).
+  // We pass explicit width/height (not autoSize) since autoSize initializes to 56px in flex containers.
+  // No leftPriceScale/rightPriceScale overrides — use the function's internal defaults.
   _ycLwChart=LWC.createYieldCurveChart(container,{
     width:w, height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
-    leftPriceScale:{visible:false},
-    rightPriceScale:{visible:true,borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
+    leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
     timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
-  // Force canvas to correct size immediately — LWC initializes canvas to leftPriceScale width (56px)
-  // even when leftPriceScale is disabled, because the internal layout runs before the option takes effect.
-  // applyOptions with the real container dimensions forces a re-layout at the correct size.
-  _ycLwChart.applyOptions({width:w,height:h});
   let priorSeries=null;
   if(prData.length>=2){
-    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{priceScaleId:'right',color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
+    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
     priorSeries.setData(prData);
   }
-  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{priceScaleId:'right',color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
+  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
