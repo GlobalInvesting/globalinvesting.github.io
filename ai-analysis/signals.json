@@ -1,95 +1,66 @@
 {
-  "generated_at": "2026-04-25T02:03:49Z",
+  "generated_at": "2026-04-25T03:16:16Z",
   "signals": [
-    {
-      "time": "02:00",
-      "priority": "critical",
-      "title": "Oil / Geopolitical",
-      "text": "Watch for potential USD strength at the open amid rising oil prices and US-Iran tensions. WTI oil closed at $94.9 on Friday, nearing a key resistance level.",
-      "evidence": [
-        "WTI Oil: $94.9",
-        "US-Iran tensions persist"
-      ]
-    },
-    {
-      "time": "01:56",
-      "priority": "warning",
-      "title": "CAD/JPY — BoC, BoJ Divergence",
-      "text": "Watch for CAD/JPY upside into the Tokyo open, driven by BoC-BoJ policy divergence. CAD closed at 1.3668 vs USD on Friday, with a 150bp carry advantage over JPY.",
-      "evidence": [
-        "USD/CAD: 1.3668",
-        "BoC 2.25% vs BoJ 0.75%"
-      ]
-    },
-    {
-      "time": "01:55",
-      "priority": "warning",
-      "title": "CAD/EUR — G8 Bilateral Theme",
-      "text": "Watch for CAD/EUR upside at the open, driven by bilateral G8 theme. CAD 1W avg: +0.431% (n=3), EUR 1W avg: -0.481% (n=7), G8 spread: 0.912%.",
-      "evidence": [
-        "CAD 1W avg: +0.431% (n=3)",
-        "EUR 1W avg: -0.481% (n=7)",
-        "G8 spread: 0.912%"
-      ]
-    },
-    {
-      "time": "01:48",
-      "priority": "info",
-      "title": "AUD/USD COT Positioning",
-      "text": "AUD/USD net long positioning at 47,218, with retail sentiment extremely short at 87%. Watch for potential reversal at the Sydney open.",
-      "evidence": [
-        "AUD/USD COT net long: 47,218",
-        "AUD/USD retail: 13% long / 87% short"
-      ]
-    },
-    {
-      "time": "01:47",
-      "priority": "info",
-      "title": "Yield Curve Regime",
-      "text": "US yield curve in bull flattener regime, 2s10s spread at +52.0bp. Watch for implications on CB divergence and cross-asset risk.",
-      "evidence": [
-        "US 2s10s spread: +52.0bp",
-        "Regime: BULL FLATTENER"
-      ]
-    },
-    {
-      "time": "01:52",
-      "priority": "warning",
-      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD Friday close: 0.5881, COT net short -18,062 vs RBNZ hike bias (40% priced), watch for short-squeeze risk at the open, next RBNZ meeting May 27.",
-      "evidence": [
-        "NZD/USD COT net short: -18,062",
-        "RBNZ hike bias: 40% priced",
-        "NZD/USD Friday close: 0.5881"
-      ]
-    },
-    {
-      "time": "01:45",
-      "priority": "info",
-      "title": "Yield Curve — Bull Flattener",
-      "text": "US 2s10s spread: +52.0bp, bull flattener regime, watch for implications on CB divergence signals and cross-asset risk narrative.",
-      "evidence": [
-        "US 2s10s spread: +52.0bp",
-        "Regime: BULL FLATTENER"
-      ]
-    },
     {
       "time": "23:39",
       "priority": "critical",
       "title": "Oil / Geopolitical",
-      "text": "WTI closed above $94.9 on Friday, watch for implications of Hormuz crisis at the open.",
+      "text": "Watch for USD strength as WTI closed above $94.9 on Friday, with Hormuz crisis risks persisting.",
       "evidence": [
-        "WTI closed above $94.9 on Friday",
-        "Hormuz crisis persists"
+        "WTI closed at $94.9 on Friday",
+        "OCBC flags upside risks for USD/SGD due to Hormuz crisis"
       ]
     },
     {
-      "time": "19:26",
+      "time": "21:04",
       "priority": "warning",
-      "title": "BoJ — This Week",
-      "text": "BoJ meeting on April 28, watch for policy updates and implications for JPY crosses.",
+      "title": "USD/JPY Watch",
+      "text": "USD/JPY Friday close: 159.33, watch for key level at open, with BoJ meeting this week.",
       "evidence": [
-        "BoJ meeting: April 28"
+        "USD/JPY Friday close: 159.33",
+        "BoJ meeting on 28 Apr"
+      ]
+    },
+    {
+      "time": "03:15",
+      "priority": "info",
+      "title": "Yield Curve Note",
+      "text": "US yield curve in bull flattener regime (2s10s: +52.0bp), watch for implications on CB divergence.",
+      "evidence": [
+        "US 2s10s spread: +52.0bp",
+        "Regime: BULL FLATTENER"
+      ]
+    },
+    {
+      "time": "19:07",
+      "priority": "warning",
+      "title": "GBP Setup",
+      "text": "GBP/USD Friday close: 1.3532, BoE meeting this week, watch for key level at open.",
+      "evidence": [
+        "GBP/USD Friday close: 1.3532",
+        "BoE meeting on 30 Apr"
+      ]
+    },
+    {
+      "time": "03:02",
+      "priority": "info",
+      "title": "COT Positioning",
+      "text": "AUD/USD net long COT positioning, AUD/USD Friday close: 0.7151, watch for reversal risk.",
+      "evidence": [
+        "AUD/USD net long COT",
+        "AUD/USD Friday close: 0.7151",
+        "AUD/USD retail short extreme"
+      ]
+    },
+    {
+      "time": "03:07",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "Watch for NZD/USD short-squeeze risk at the open, as COT net short -18,062 vs RBNZ hike bias (40% priced) — catalyst May 27 meeting.",
+      "evidence": [
+        "NZD/USD Friday close: 0.5881",
+        "COT NZD net short: -18,062",
+        "RBNZ hike bias: 40% priced"
       ]
     }
   ]
