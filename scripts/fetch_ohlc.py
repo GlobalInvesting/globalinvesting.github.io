@@ -141,40 +141,20 @@ def _guard(id_: str, val: float) -> bool:
     return lo <= val <= hi
 
 
-# FX spot pairs — yfinance returns corrupt open values (open ≈ close, not true session open).
-# These need the prev-close reconstruction pass below. Cross-asset symbols are NOT included:
-# BTC/ETH/SPX/etc. receive proper open prices from their respective exchanges.
-_FX_SPOT_IDS: frozenset[str] = frozenset({
-    "eurusd","gbpusd","usdjpy","audusd","usdcad","usdchf","nzdusd",
-    "eurgbp","eurjpy","eurchf","eurcad","euraud","eurnzd","gbpjpy",
-    "gbpchf","gbpcad","gbpaud","gbpnzd","audjpy","audnzd","audchf",
-    "audcad","cadjpy","cadchf","nzdjpy","nzdcad","nzdchf","chfjpy","dxy",
-})
-
 
 def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     Download 3 years of daily bars for ticker_sym.
-    Returns a list of {time, open, high, low, close} dicts sorted oldest→newest,
+    Returns a list of {time, open, high, low, close} dicts sorted oldest to newest,
     or None on failure.
 
-    FX open reconstruction
-    ─────────────────────
-    Yahoo Finance FX daily bars carry a known data-quality defect: the Open
-    field is set to the last tick of the *previous* UTC day, making it
-    identical to the preceding bar's close at the stored decimal precision.
-
-    Root cause: Yahoo uses the last tick of the previous UTC day as the open
-    price for FX spot pairs, producing open == prev_close (exact match) even
-    when the day's High-Low range shows meaningful intraday movement.
-
-    Fix (FX only, applied after deduplication):
-      For any bar where round(open, dec) == round(prev_close, dec), replace
-      open with the midpoint of the day's High-Low range, clamped to [low,
-      high].  This targets only the Yahoo artifact signature (exact equality)
-      and leaves all legitimate bars — including small-body dojis — untouched.
-      Cross-asset symbols (BTC, SPX, gold, etc.) are excluded — their open
-      values come from exchange data and are correct.
+    Yahoo Finance FX open values are used as-is. Earlier versions attempted to
+    reconstruct the FX open from prev_close or H/L midpoint to work around a
+    reported Yahoo data defect, but both approaches introduced more candle color
+    errors than they fixed (the body-size threshold fired on legitimate small-body
+    bars; the exact-equality threshold created artificial dojis on gap-less FX
+    sessions). Yahoo's current daily FX open data is accurate enough for daily
+    chart purposes and is used without modification.
     """
     try:
         ticker = yf.Ticker(ticker_sym)
@@ -185,7 +165,6 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
 
         bars: list[dict] = []
         for ts, row in hist.iterrows():
-            # ts is a pandas Timestamp — convert to date string
             date_str = ts.strftime("%Y-%m-%d")
             o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
 
@@ -205,50 +184,17 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 "close": round(c, dec),
             })
 
-        # Deduplicate by date (keep last occurrence — intraday quirk for today's bar)
+        # Deduplicate by date (keep last occurrence - intraday quirk for today's bar)
         seen: set[str] = set()
         deduped: list[dict] = []
         for bar in reversed(bars):
             if bar["time"] not in seen:
                 seen.add(bar["time"])
                 deduped.append(bar)
-        deduped.reverse()   # oldest → newest
-
-        # ── FX open reconstruction ────────────────────────────────────────────
-        # Applied after deduplication so prev_close is always the preceding
-        # calendar bar (no duplicate-date interference).
-        #
-        # Yahoo Finance FX daily bars carry a documented data-quality defect:
-        # the Open field is set to the last tick of the *previous* UTC day
-        # (i.e. prev_close), not the true session open.  This produces an
-        # exact duplicate: round(open, dec) == round(prev_close, dec).
-        #
-        # Fix: only reconstruct when open rounds to exactly prev_close at the
-        # stored precision.  This targets the Yahoo artifact (open = stale tick
-        # from prior session) without touching genuine small-body bars where
-        # open and close are legitimately close together.  Using a body-size
-        # threshold (the prior approach) incorrectly flipped candle colors on
-        # real bars with valid but small bodies.
-        #
-        # Reconstruction uses the midpoint of High and Low — a neutral estimate
-        # of where the session actually opened, clamped to [low, high] so the
-        # resulting OHLC relationship is always valid.
-        if id_ in _FX_SPOT_IDS:
-            dec_ = DECIMALS.get(id_, 5)
-            for i in range(1, len(deduped)):
-                b    = deduped[i]
-                prev = deduped[i - 1]
-                # Only reconstruct if open is identical to prev_close at stored precision
-                # (the Yahoo artifact signature — open = last tick of prior UTC day)
-                if round(b["open"], dec_) == round(prev["close"], dec_):
-                    # Midpoint of the day's range is the best neutral estimate of open
-                    new_open = (b["high"] + b["low"]) / 2
-                    # Clamp to [low, high] — always a valid OHLC relationship
-                    new_open = max(b["low"], min(b["high"], new_open))
-                    deduped[i] = {**b, "open": round(new_open, dec_)}
+        deduped.reverse()  # oldest to newest
 
         if len(deduped) < 30:
-            print(f"  WARN [{id_}]: only {len(deduped)} valid bars — skipping")
+            print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
             return None
 
         return deduped
@@ -256,8 +202,6 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     except Exception as exc:
         print(f"  ERROR [{id_}]: {exc}")
         return None
-
-
 def write_json(path: Path, obj) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
