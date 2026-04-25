@@ -3060,38 +3060,33 @@ async function _renderLWChart(ohlcId, label) {
     _renderMaToolbar();
   }
 
-  function _renderMaToolbar() {
-    const bar = document.getElementById('lw-ma-bar');
-    if (!bar) return;
-    bar.innerHTML = '';
+  // ── Custom MA period dropdown (replaces native <select> which shows white in dark theme) ──
+  const _MA_PERIODS = [5, 10, 20, 50, 100, 200];
+  let _maDropdownOpen = null; // idx of currently open dropdown, or null
 
-    window._lwMaState.forEach((m, idx) => {
-      const pill = document.createElement('span');
-      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:rgba(42,46,57,0.9);border:1px solid #2a2e39;border-radius:3px;padding:1px 4px;font-size:9px;font-family:var(--font-ui,sans-serif);';
+  function _closeMaDropdown() {
+    const existing = document.getElementById('_ma-dropdown-popover');
+    if (existing) existing.remove();
+    _maDropdownOpen = null;
+  }
 
-      // Color swatch (clickable to cycle color)
-      const swatch = document.createElement('span');
-      swatch.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${m.color};cursor:pointer;flex-shrink:0;`;
-      swatch.title = 'Click to change color';
-      swatch.addEventListener('click', () => {
-        const ci = _MA_PALETTE.indexOf(m.color);
-        m.color = _MA_PALETTE[(ci + 1) % _MA_PALETTE.length];
-        if (m.series) { try { m.series.applyOptions({ color: m.color }); } catch(_) {} }
-        _renderMaToolbar();
-        _updateAllMALegend(null);
-      });
+  function _openMaDropdown(pill, m, idx) {
+    _closeMaDropdown();
+    _maDropdownOpen = idx;
 
-      // Period select
-      const sel = document.createElement('select');
-      sel.style.cssText = 'background:transparent;border:none;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);cursor:pointer;padding:0;outline:none;';
-      [5,10,20,50,100,200].forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p; opt.textContent = 'MA ' + p;
-        if (p === m.period) opt.selected = true;
-        sel.appendChild(opt);
-      });
-      sel.addEventListener('change', () => {
-        m.period = parseInt(sel.value) || 20;
+    const pop = document.createElement('div');
+    pop.id = '_ma-dropdown-popover';
+    pop.style.cssText = 'position:fixed;z-index:9999;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;box-shadow:0 4px 12px rgba(0,0,0,.5);overflow:hidden;font-size:9px;font-family:var(--font-ui,sans-serif);min-width:56px;';
+
+    _MA_PERIODS.forEach(p => {
+      const item = document.createElement('div');
+      item.textContent = 'MA ' + p;
+      item.style.cssText = `padding:3px 8px;cursor:pointer;color:${p === m.period ? '#d1d4dc' : '#848ea0'};background:${p === m.period ? '#2a2e39' : 'transparent'};white-space:nowrap;`;
+      item.addEventListener('mouseenter', () => { item.style.background = '#2a2e39'; item.style.color = '#d1d4dc'; });
+      item.addEventListener('mouseleave', () => { item.style.background = p === m.period ? '#2a2e39' : 'transparent'; item.style.color = p === m.period ? '#d1d4dc' : '#848ea0'; });
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        m.period = p;
         if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} m.series = null; }
         if (m.period >= 1) {
           const maData = _calcMA(bars, m.period);
@@ -3104,15 +3099,79 @@ async function _renderLWChart(ohlcId, label) {
             m.series.setData(maData);
           }
         }
+        _closeMaDropdown();
+        _renderMaToolbar();
         _updateAllMALegend(null);
+      });
+      pop.appendChild(item);
+    });
+
+    // Position below the pill
+    document.body.appendChild(pop);
+    const rect = pill.getBoundingClientRect();
+    const popH = pop.offsetHeight || (_MA_PERIODS.length * 20);
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top = spaceBelow >= popH ? rect.bottom + 2 : rect.top - popH - 2;
+    pop.style.top  = top + 'px';
+    pop.style.left = rect.left + 'px';
+
+    // Close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', _closeMaDropdown, { once: true });
+    }, 0);
+  }
+
+  function _renderMaToolbar() {
+    const bar = document.getElementById('lw-ma-bar');
+    if (!bar) return;
+    bar.innerHTML = '';
+    _closeMaDropdown();
+
+    window._lwMaState.forEach((m, idx) => {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:#1e222d;border:1px solid #2a2e39;border-radius:3px;padding:2px 5px;font-size:9px;font-family:var(--font-ui,sans-serif);cursor:default;';
+
+      // Color swatch (clickable to cycle color)
+      const swatch = document.createElement('span');
+      swatch.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${m.color};cursor:pointer;flex-shrink:0;`;
+      swatch.title = 'Click to change color';
+      swatch.addEventListener('click', e => {
+        e.stopPropagation();
+        const ci = _MA_PALETTE.indexOf(m.color);
+        m.color = _MA_PALETTE[(ci + 1) % _MA_PALETTE.length];
+        if (m.series) { try { m.series.applyOptions({ color: m.color }); } catch(_) {} }
+        _renderMaToolbar();
+        _updateAllMALegend(null);
+      });
+
+      // Period label (clickable to open custom dropdown)
+      const lbl = document.createElement('span');
+      lbl.textContent = 'MA ' + m.period;
+      lbl.style.cssText = 'color:#848ea0;cursor:pointer;user-select:none;';
+      lbl.title = 'Click to change period';
+      lbl.addEventListener('click', e => {
+        e.stopPropagation();
+        if (_maDropdownOpen === idx) { _closeMaDropdown(); return; }
+        _openMaDropdown(pill, m, idx);
+      });
+
+      // Chevron
+      const chev = document.createElement('span');
+      chev.textContent = '▾';
+      chev.style.cssText = 'color:#4a5060;font-size:7px;cursor:pointer;line-height:1;';
+      chev.addEventListener('click', e => {
+        e.stopPropagation();
+        if (_maDropdownOpen === idx) { _closeMaDropdown(); return; }
+        _openMaDropdown(pill, m, idx);
       });
 
       // Remove button (only if more than 1 MA)
       const rm = document.createElement('span');
       rm.textContent = '\u00d7';
-      rm.style.cssText = 'color:var(--text3);cursor:pointer;font-size:10px;line-height:1;padding-left:2px;';
+      rm.style.cssText = 'color:#4a5060;cursor:pointer;font-size:10px;line-height:1;padding-left:1px;';
       rm.title = 'Remove this MA';
-      rm.addEventListener('click', () => {
+      rm.addEventListener('click', e => {
+        e.stopPropagation();
         if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} }
         window._lwMaState.splice(idx, 1);
         if (window._lwMaState.length === 0) {
@@ -3124,7 +3183,8 @@ async function _renderLWChart(ohlcId, label) {
       });
 
       pill.appendChild(swatch);
-      pill.appendChild(sel);
+      pill.appendChild(lbl);
+      pill.appendChild(chev);
       if (window._lwMaState.length > 1) pill.appendChild(rm);
       bar.appendChild(pill);
     });
@@ -3133,13 +3193,12 @@ async function _renderLWChart(ohlcId, label) {
     if (window._lwMaState.length < _MA_MAX) {
       const addBtn = document.createElement('button');
       addBtn.textContent = '+ MA';
-      addBtn.style.cssText = 'background:transparent;border:1px solid #2a2e39;border-radius:3px;color:var(--text3);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 5px;cursor:pointer;';
+      addBtn.style.cssText = 'background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;';
       addBtn.addEventListener('click', () => {
         const usedColors = window._lwMaState.map(m => m.color);
         const nextColor = _MA_PALETTE.find(c => !usedColors.includes(c)) || _MA_PALETTE[window._lwMaState.length % _MA_PALETTE.length];
         const newMA = { period: 50, color: nextColor, series: null };
         window._lwMaState.push(newMA);
-        // Build only the new series
         const maData = _calcMA(bars, newMA.period);
         if (maData.length > 0) {
           newMA.series = _lwChart.addLineSeries({
@@ -3922,7 +3981,7 @@ document.querySelectorAll('#cross-asset-grid .ca-cell[data-sym]').forEach(cell =
 
 // ── Risk Monitor VIX cell: click to open chart ──
 document.getElementById('risk-vix')?.closest('.risk-cell')?.addEventListener('click', () => {
-  loadTVChart('FXOPEN:VIX');
+  loadTVChart('CBOE:VIX');
 });
 
 // ═══════════════════════════════════════════════════════════════════
