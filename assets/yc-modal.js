@@ -1,305 +1,347 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.4 — LightweightCharts v5 createYieldCurveChart
+// YIELD CURVE MODAL  v1.1
 // File: assets/yc-modal.js
+// Loaded AFTER dashboard.js and Chart.js
+//
+//   openYCModal(tenorData)  ← called from yield curve section onclick
+//   closeYCModal()
+//
+// tenorData: array of { label, close, prev_close, chg } — one per tenor
 // ═══════════════════════════════════════════════════════════════════════════
 
-(function(){
-  if(document.getElementById('ycm-css'))return;
-  const s=document.createElement('style');s.id='ycm-css';
-  s.textContent=`
-#ycm-bd{position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:12px;animation:ycm-fi .15s ease;}
-@keyframes ycm-fi{from{opacity:0}to{opacity:1}}
-@keyframes ycm-su{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
-#ycm-modal{background:var(--bg,#131722);border:1px solid rgba(255,255,255,.1);border-radius:10px;width:min(800px,100%);height:min(560px,90vh);display:flex;flex-direction:column;overflow:hidden;animation:ycm-su .2s ease;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text,#d1d4dc);}
-#ycm-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 18px 11px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
-#ycm-title{font-size:14px;font-weight:600;letter-spacing:.01em;}
-#ycm-sub{font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#ycm-close{background:none;border:none;color:var(--text3,#6b7280);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;}
-#ycm-close:hover{color:var(--text,#d1d4dc);}
-#ycm-strip{display:flex;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
-#ycm-strip::-webkit-scrollbar{display:none;}
-.ycm-metric{flex:1;min-width:70px;padding:9px 12px;border-right:1px solid rgba(255,255,255,.06);text-align:center;}
-.ycm-metric:last-child{border-right:none;}
-.ycm-m-lbl{font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
-.ycm-m-val{font-size:15px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-.ycm-m-chg{font-size:9px;margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#ycm-chart-wrap{flex:1;position:relative;padding:12px 14px 8px;display:flex;flex-direction:column;min-height:0;}
-#ycm-legend{display:flex;gap:16px;margin-bottom:8px;flex-shrink:0;align-items:center;}
-.ycm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af);}
-.ycm-leg-line{width:20px;height:2px;border-radius:1px;flex-shrink:0;}
-#ycm-lw-wrap{flex:1;position:relative;min-height:160px;overflow:hidden;}
-#ycm-lw-inner{position:absolute;inset:0;}
-#ycm-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
-#ycm-shape{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#ycm-table-wrap{flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);overflow-x:auto;}
-#ycm-table{width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
-#ycm-table th{padding:5px 10px;text-align:right;color:var(--text3,#6b7280);font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;}
-#ycm-table th:first-child{text-align:left;}
-#ycm-table td{padding:5px 10px;text-align:right;border-top:1px solid rgba(255,255,255,.04);}
-#ycm-table td:first-child{text-align:left;color:var(--text2,#9ca3af);}
-.ycu{color:var(--down,#ef5350);}.ycd{color:var(--up,#26a69a);}
+(function () {
+  if (document.getElementById('ycm-css')) return;
+  const s = document.createElement('style');
+  s.id = 'ycm-css';
+  s.textContent = `
+#ycm-bd {
+  position:fixed;inset:0;z-index:9200;
+  background:rgba(0,0,0,.78);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;
+  animation:ycm-fi .15s ease;
+}
+@keyframes ycm-fi { from{opacity:0} to{opacity:1} }
+@keyframes ycm-su { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
+
+#ycm-modal {
+  background:var(--bg,#131722);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  width:min(800px,100%);
+  height:min(560px,90vh);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  animation:ycm-su .2s ease;
+  font-family:var(--font-ui,'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif);
+  color:var(--text,#d1d4dc);
+}
+
+#ycm-hd {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 18px 11px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+#ycm-title { font-size:14px;font-weight:600;letter-spacing:.01em; }
+#ycm-sub   { font-size:10px;color:var(--text3,#6b7280);margin-top:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
+#ycm-close {
+  background:none;border:none;color:var(--text3,#6b7280);font-size:20px;
+  cursor:pointer;padding:0 4px;line-height:1;
+}
+#ycm-close:hover { color:var(--text,#d1d4dc); }
+
+#ycm-strip {
+  display:flex;border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;overflow-x:auto;
+}
+.ycm-metric {
+  flex:1;min-width:70px;padding:9px 12px;
+  border-right:1px solid rgba(255,255,255,.06);
+  text-align:center;
+}
+.ycm-metric:last-child { border-right:none; }
+.ycm-m-lbl { font-size:9px;color:var(--text3,#6b7280);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px; }
+.ycm-m-val { font-size:15px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono',monospace); }
+.ycm-m-chg { font-size:9px;margin-top:2px;font-family:var(--font-mono,'JetBrains Mono',monospace); }
+
+#ycm-chart-wrap {
+  flex:1;position:relative;padding:16px 18px 12px;
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+#ycm-legend {
+  display:flex;gap:16px;margin-bottom:10px;flex-shrink:0;
+}
+.ycm-leg-item { display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af); }
+.ycm-leg-dot  { width:20px;height:2px;border-radius:1px;flex-shrink:0; }
+.ycm-leg-dot.dashed { background:repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px); }
+
+#ycm-canvas-wrap { flex:1;position:relative;min-height:0; }
+#ycm-canvas { width:100%!important;height:100%!important; }
+
+/* Shape label badges */
+#ycm-shape {
+  position:absolute;top:6px;right:6px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:4px;padding:3px 8px;
+  font-size:9px;color:var(--text2,#9ca3af);
+  font-family:var(--font-mono,'JetBrains Mono',monospace);
+  pointer-events:none;
+}
+
+/* Tenor table at bottom */
+#ycm-table-wrap {
+  flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);
+  overflow-x:auto;
+}
+#ycm-table {
+  width:100%;border-collapse:collapse;font-size:10px;
+  font-family:var(--font-mono,'JetBrains Mono',monospace);
+}
+#ycm-table th {
+  padding:5px 10px;text-align:right;color:var(--text3,#6b7280);
+  font-weight:400;font-size:9px;text-transform:uppercase;letter-spacing:.05em;
+}
+#ycm-table th:first-child { text-align:left; }
+#ycm-table td {
+  padding:5px 10px;text-align:right;border-top:1px solid rgba(255,255,255,.04);
+}
+#ycm-table td:first-child { text-align:left;color:var(--text2,#9ca3af); }
+
 @media(max-width:600px){
   #ycm-modal{border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;width:100%;height:88vh;}
   #ycm-bd{align-items:flex-end;padding:0;}
-  .ycm-metric{min-width:55px;padding:7px 8px;}.ycm-m-val{font-size:12px;}
+  .ycm-metric{min-width:55px;padding:7px 8px;}
+  .ycm-m-val{font-size:12px;}
 }
 `;
   document.head.appendChild(s);
 })();
 
-const _TENOR_MONTHS={'1M':1,'2M':2,'3M':3,'6M':6,'1Y':12,'2Y':24,'3Y':36,'5Y':60,'7Y':84,'10Y':120,'20Y':240,'30Y':360};
-const _MONTHS_TENOR={};
-Object.entries(_TENOR_MONTHS).forEach(([l,m])=>{_MONTHS_TENOR[m]=l;});
-let _ycLwChart=null;
+// ── Helpers ──────────────────────────────────────────────────────────────────
+let _ycChart = null;
 
-function _ycChg(chg){
-  if(chg==null||isNaN(chg))return{txt:'—',cls:''};
-  const sign=chg>0?'+':'';
-  return{txt:sign+(chg*100).toFixed(1)+'bp',cls:chg>0.001?'ycu':chg<-0.001?'ycd':''};
-}
-function _ycShape(tenors){
-  const get=label=>tenors.find(t=>t.label===label)?.close;
-  const t3m=get('3M'),t2y=get('2Y'),t10y=get('10Y');
-  if(t3m==null||t10y==null)return null;
-  const s10_3m=t10y-t3m,s10_2y=t2y!=null?t10y-t2y:null;
-  if(s10_3m<-0.05&&(s10_2y==null||s10_2y<-0.05))return'Inverted';
-  if(s10_3m>0.5)return'Steep';
-  if(s10_3m>0.05)return'Normal';
-  return'Flat';
+function _ycChg(chg) {
+  if (chg == null || isNaN(chg)) return { txt: '—', cls: '' };
+  const sign = chg > 0 ? '+' : '';
+  const cls = chg > 0.001 ? 'up' : chg < -0.001 ? 'down' : '';
+  return { txt: sign + (chg * 100).toFixed(1) + 'bp', cls };
 }
 
-function openYCModal(tenorData){
+function _ycShape(tenors) {
+  // Determine curve shape from 3M, 2Y, 10Y
+  const t3m  = tenors.find(t => t.label === '3M')?.close;
+  const t2y  = tenors.find(t => t.label === '2Y')?.close;
+  const t10y = tenors.find(t => t.label === '10Y')?.close;
+  if (t3m == null || t10y == null) return null;
+  const spread_10_3m = t10y - t3m;
+  const spread_10_2y = t2y != null ? t10y - t2y : null;
+  if (spread_10_3m < -0.05 && (spread_10_2y == null || spread_10_2y < -0.05)) return 'Inverted';
+  if (spread_10_3m > 0.5) return 'Steep';
+  if (spread_10_3m > 0.05) return 'Normal';
+  return 'Flat';
+}
+
+// ── Open ─────────────────────────────────────────────────────────────────────
+function openYCModal(tenorData) {
   closeYCModal();
-  if(!Array.isArray(tenorData)||tenorData.length===0)return;
-  const shape=_ycShape(tenorData);
-  const shapeCols={Inverted:'#ef4444',Flat:'#f59e0b',Normal:'#22c55e',Steep:'#4f7fff'};
-  const shapeCol=shapeCols[shape]||'var(--text3)';
-  const metricsHtml=tenorData.map(t=>{
-    const{txt,cls}=_ycChg(t.chg);
-    const valCls=t.chg>0.001?'ycu':t.chg<-0.001?'ycd':'';
-    return`<div class="ycm-metric"><div class="ycm-m-lbl">${t.label}</div><div class="ycm-m-val ${valCls}">${t.close!=null?t.close.toFixed(2)+'%':'—'}</div><div class="ycm-m-chg ${cls}">${txt}</div></div>`;
+  if (!Array.isArray(tenorData) || tenorData.length === 0) return;
+
+  const shape    = _ycShape(tenorData);
+  const shapeColors = { Inverted: '#ef4444', Flat: '#f59e0b', Normal: '#22c55e', Steep: '#4f7fff' };
+  const shapeCol = shapeColors[shape] || 'var(--text3)';
+
+  const labels    = tenorData.map(t => t.label);
+  const todayVals = tenorData.map(t => t.close);
+  const priorVals = tenorData.map(t => t.prev_close);
+
+  // Strip HTML for tenor metrics
+  const metricsHtml = tenorData.map(t => {
+    const { txt, cls } = _ycChg(t.chg);
+    const valCls = t.chg > 0.001 ? 'up' : t.chg < -0.001 ? 'down' : '';
+    return `<div class="ycm-metric">
+      <div class="ycm-m-lbl">${t.label}</div>
+      <div class="ycm-m-val ${valCls}">${t.close != null ? t.close.toFixed(2) + '%' : '—'}</div>
+      <div class="ycm-m-chg ${cls}">${txt}</div>
+    </div>`;
   }).join('');
-  const tableRows=tenorData.map(t=>{
-    const{txt,cls}=_ycChg(t.chg);
-    return`<tr><td>${t.label}</td><td>${t.close!=null?t.close.toFixed(3)+'%':'—'}</td><td>${t.prev_close!=null?t.prev_close.toFixed(3)+'%':'—'}</td><td class="${cls}">${txt}</td></tr>`;
+
+  // Table rows
+  const tableRows = tenorData.map(t => {
+    const { txt, cls } = _ycChg(t.chg);
+    return `<tr>
+      <td>${t.label}</td>
+      <td>${t.close != null ? t.close.toFixed(3) + '%' : '—'}</td>
+      <td>${t.prev_close != null ? t.prev_close.toFixed(3) + '%' : '—'}</td>
+      <td class="${cls}">${txt}</td>
+    </tr>`;
   }).join('');
-  const bd=document.createElement('div');bd.id='ycm-bd';
-  bd.setAttribute('role','dialog');bd.setAttribute('aria-modal','true');
-  bd.innerHTML=`<div id="ycm-modal">
-    <div id="ycm-hd">
-      <div><div id="ycm-title">US Treasury Yield Curve</div><div id="ycm-sub">FRED · today vs prior close · basis points change</div></div>
-      <button id="ycm-close" onclick="closeYCModal()" aria-label="Close">×</button>
-    </div>
-    <div id="ycm-strip">${metricsHtml}</div>
-    <div id="ycm-chart-wrap">
-      <div id="ycm-legend">
-        <div class="ycm-leg-item"><div class="ycm-leg-line" style="background:#4f7fff;"></div>Today</div>
-        <div class="ycm-leg-item"><div class="ycm-leg-line" style="background:repeating-linear-gradient(90deg,#6b7280 0,#6b7280 4px,transparent 4px,transparent 8px);"></div>Prior close</div>
-        ${shape?`<div id="ycm-shape" style="color:${shapeCol}">${shape}</div>`:''}
+
+  const bd = document.createElement('div');
+  bd.id = 'ycm-bd';
+  bd.setAttribute('role', 'dialog');
+  bd.setAttribute('aria-modal', 'true');
+  bd.setAttribute('aria-label', 'US Treasury Yield Curve');
+  bd.innerHTML = `
+    <div id="ycm-modal">
+      <div id="ycm-hd">
+        <div>
+          <div id="ycm-title">US Treasury Yield Curve</div>
+          <div id="ycm-sub">FRED · today vs prior close · basis points change</div>
+        </div>
+        <button id="ycm-close" onclick="closeYCModal()" aria-label="Close">×</button>
       </div>
-      <div id="ycm-lw-wrap"><div id="ycm-tooltip"></div><div id="ycm-lw-inner"></div></div>
-    </div>
-    <div id="ycm-table-wrap">
-      <table id="ycm-table">
-        <thead><tr><th>Tenor</th><th>Today</th><th>Prior close</th><th>Change (bp)</th></tr></thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-    </div>
-  </div>`;
+
+      <div id="ycm-strip">${metricsHtml}</div>
+
+      <div id="ycm-chart-wrap">
+        <div id="ycm-legend">
+          <div class="ycm-leg-item">
+            <div class="ycm-leg-dot" style="background:#4f7fff;height:2px;"></div>
+            Today
+          </div>
+          <div class="ycm-leg-item" style="color:var(--text3,#6b7280);">
+            <div class="ycm-leg-dot dashed" style="color:#6b7280;"></div>
+            Prior close
+          </div>
+          ${shape ? `<div class="ycm-leg-item" style="margin-left:auto;color:${shapeCol};font-weight:600;">${shape}</div>` : ''}
+        </div>
+        <div id="ycm-canvas-wrap">
+          <canvas id="ycm-canvas"></canvas>
+        </div>
+      </div>
+
+      <div id="ycm-table-wrap">
+        <table id="ycm-table">
+          <thead><tr>
+            <th>Tenor</th>
+            <th>Today</th>
+            <th>Prior close</th>
+            <th>Change (bp)</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
   document.body.appendChild(bd);
-  bd.addEventListener('click',e=>{if(e.target===bd)closeYCModal();});
-  document.addEventListener('keydown',_ycKeydown);
-  // Delay past the 200ms CSS animation so the container is in the DOM and visible.
-  // autoSize:true means LWC measures the container itself — no ResizeObserver needed.
-  setTimeout(()=>_ycDraw(tenorData),220);
+  bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
+  document.addEventListener('keydown', _ycKeydown);
+
+  const closeBtn = document.getElementById('ycm-close');
+  if (closeBtn) closeBtn.focus();
+
+  // Render chart after DOM paint
+  requestAnimationFrame(() => _ycDrawChart(labels, todayVals, priorVals));
 }
 
-const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
-let _ycLwcPromise=null;
-function _ensureYcLwc(){
-  if(window.LightweightCharts)return Promise.resolve();
-  if(_ycLwcPromise)return _ycLwcPromise;
-  _ycLwcPromise=new Promise((res,rej)=>{
-    const s=document.createElement('script');
-    s.src=_LWC_CDN;
-    s.onload=()=>{_ycLwcPromise=null;res();};
-    s.onerror=()=>{_ycLwcPromise=null;rej(new Error('YC: LWC load failed'));};
-    document.head.appendChild(s);
-  });
-  return _ycLwcPromise;
-}
+function _ycDrawChart(labels, todayVals, priorVals) {
+  const canvas = document.getElementById('ycm-canvas');
+  if (!canvas || typeof Chart === 'undefined') return;
 
-function _ycDraw(tenorData){
-  const wrapper=document.getElementById('ycm-lw-wrap');if(!wrapper)return;
-  _ensureYcLwc().then(()=>{
-    const LWC=window.LightweightCharts;if(!LWC)return;
-    if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
-    const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
-    const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,toData,prData,tenorData);
-    else _ycDrawFallback(wrapper,toData,prData,tenorData);
-  }).catch(e=>console.error(e));
-}
+  if (_ycChart) { _ycChart.destroy(); _ycChart = null; }
 
-function _ycDrawNative(wrapper,toData,prData,tenorData){
-  const LWC=window.LightweightCharts;
-
-  // Use #ycm-lw-inner as the LWC container — it's position:absolute;inset:0 inside the
-  // flex:1 wrapper, so autoSize:true will correctly measure its pixel dimensions on any
-  // screen size, including mobile where the outer wrapper resolves layout asynchronously.
-  const tooltip=wrapper.querySelector('#ycm-tooltip');
-  let inner=wrapper.querySelector('#ycm-lw-inner');
-  // Recreate inner if missing (e.g. after a previous failed draw attempt removed it).
-  if(!inner){inner=document.createElement('div');inner.id='ycm-lw-inner';wrapper.appendChild(inner);}
-  if(tooltip)tooltip.remove();  // will re-attach below after chart is created
-
-  // Disconnect any stale ResizeObserver on the wrapper before creating a new chart.
-  if(wrapper._ycRo){try{wrapper._ycRo.disconnect();}catch(_){}wrapper._ycRo=null;}
-
-  // Data uses REAL MONTH values (3,6,12,24,36,60,84,120,240,360).
-  // LWC's built-in _formatTime converts months → "3M", "1Y", "10Y", "30Y" etc.
-  // No custom tickMarkFormatter needed — the native formatter handles all tenors correctly.
-  //
-  // Config mirrors the official TradingView yield-curve demo:
-  // https://tradingview.github.io/lightweight-charts/tutorials/demos/yield-curve-with-update-markers
-  //   autoSize:true         → LWC measures #ycm-lw-inner; works on desktop and mobile
-  //   baseResolution:12     → whitespace steps every 12 months (1 year grid)
-  //   minimumTimeRange:10   → minimum visible range is 10 months; fitContent can zoom out freely
-  //   startTimeRange:3      → left-side whitespace starts at month 3 (first tenor = 3M)
-  //   minBarSpacing:0       → no minimum enforced; spacing is determined by fixLeft/RightEdge
-  //   fixLeftEdge:true      → pins first tenor (3M) to the left edge of the chart area
-  //   fixRightEdge:true     → pins last tenor (30Y) to the right edge of the chart area
-  //   With BOTH fix edges enabled, LWC internally overrides minBarSpacing to:
-  //     width / points.length  →  tenors always fill 100% of available width regardless
-  //     of screen size (see LWC source: _private__minBarSpacing())
-  //   subscribeSizeChange() → re-fitContent on every resize / orientation change
-  _ycLwChart=LWC.createYieldCurveChart(inner,{
-    autoSize:true,
-    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:360,minimumTimeRange:360,startTimeRange:0},
-    grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
-    crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
-    leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:0,fixLeftEdge:true,fixRightEdge:true},
-    handleScroll:false,handleScale:false,
-    localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
-  });
-
-  // Expose for console debugging.
-  window._ycChart=_ycLwChart;
-
-  let priorSeries=null;
-  if(prData.length>=2){
-    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
-    priorSeries.setData(prData);
-  }
-  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
-  todaySeries.setData(toData);
-
-  // Re-attach tooltip inside #ycm-lw-wrap (outer wrapper), not inside #ycm-lw-inner
-  // which is now owned by LWC. Tooltip uses absolute positioning relative to the wrapper.
-  if(tooltip){wrapper.appendChild(tooltip);}
-
-  // fitContent + subscribeSizeChange — exact pattern from the TradingView demo.
-  // With minBarSpacing:0, LWC will always compress to fit all tenors on any screen width.
-  //
-  // Timing strategy: LWC's internal whitespace series fires whitespaceInvalidated after
-  // setData(), which triggers an internal fitContent override asynchronously. We use
-  // requestAnimationFrame (rAF) to schedule our fitContent AFTER the browser has flushed
-  // all pending renders and LWC's internal callbacks — this is more reliable than
-  // setTimeout(N) because rAF fires at the exact moment the next frame is being painted.
-  // Double-rAF (rAF inside rAF) guarantees we're past both LWC's async update AND the
-  // browser's layout/paint cycle, which is when autoSize dimensions are finally stable.
-  const chart=_ycLwChart;
-  const doFit=(c)=>{if(c&&c===_ycLwChart)try{c.timeScale().fitContent();}catch(_){}};
-  // Immediate call — in case LWC already has valid dimensions (desktop, no async layout)
-  doFit(chart);
-  // Double-rAF: post-render, post-layout
-  requestAnimationFrame(()=>requestAnimationFrame(()=>doFit(chart)));
-  // subscribeSizeChange: re-fit on every resize / orientation change
-  try{chart.timeScale().subscribeSizeChange(()=>doFit(chart));}catch(_){}
-  // Safety net for iOS/Android bottom-sheet: position:fixed modals can still resolve
-  // layout after multiple frames (especially on first open after cold start).
-  setTimeout(()=>doFit(chart),250);
-  setTimeout(()=>doFit(chart),600);
-
-  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
-}
-
-
-function _ycDrawFallback(wrapper,toData,prData,tenorData){
-  const LWC=window.LightweightCharts;
-  // Use the inner div if present, else the wrapper directly
-  const container=wrapper.querySelector('#ycm-lw-inner')||wrapper;
-  const LABELS=tenorData.map(t=>t.label);
-  _ycLwChart=LWC.createChart(container,{
-    autoSize:true,
-    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
-    crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
-    rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,tickMarkFormatter:t=>LABELS[t-1]||String(t),fixLeftEdge:true,fixRightEdge:true,barSpacing:0},
-    handleScroll:false,handleScale:false,
-    localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
-  });
-  // Sequential integers → equal spacing between tenors (Bloomberg/Eikon standard)
-  const toSeq=toData.map((d,i)=>({time:i+1,value:d.value}));
-  const prSeq=prData.map((d,i)=>({time:i+1,value:d.value}));
-  let priorSeries=null;
-  if(prSeq.length>=2){
-    priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
-    priorSeries.setData(prSeq);
-  }
-  const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
-  todaySeries.setData(toSeq);
-  _ycLwChart.timeScale().fitContent();
-  // ResizeObserver for mobile layout shifts
-  if(window.ResizeObserver){
-    const ro=new ResizeObserver(entries=>{
-      if(!_ycLwChart)return;
-      const e=entries[0],nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
-    });
-    ro.observe(container);container._ycRo=ro;
-  }
-  const resize=()=>{if(_ycLwChart&&container.offsetWidth>0)_ycLwChart.applyOptions({width:container.offsetWidth,height:container.offsetHeight});};
-  window.addEventListener('resize',resize);container._ycResize=resize;
-  _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,true);
-}
-
-function _ycAttachTooltip(container,chart,todaySeries,priorSeries,tenorData,isSeq){
-  const tooltip=document.getElementById('ycm-tooltip');if(!tooltip)return;
-  const TW=180,TM=10;
-  chart.subscribeCrosshairMove(param=>{
-    if(!param?.point||!param.seriesData){tooltip.style.display='none';return;}
-    const tv=param.seriesData.get(todaySeries),pv=priorSeries?param.seriesData.get(priorSeries):null;
-    if(!tv){tooltip.style.display='none';return;}
-    const tenor=isSeq?(tenorData[(param.time??1)-1]?.label||''):(_MONTHS_TENOR[param.time]||(param.time+'M'));
-    const diff=(tv.value!=null&&pv?.value!=null)?((tv.value-pv.value)*100):null;
-    const diffStr=diff!=null?`<span style="color:${diff>0?'#ef5350':diff<0?'#26a69a':'#787b86'}">${diff>0?'+':''}${diff.toFixed(1)}bp</span>`:'';
-    tooltip.innerHTML=`<div style="font-size:9px;color:#6b7280;letter-spacing:.05em;margin-bottom:4px;">${tenor} TREASURY</div>`+
-      (tv.value!=null?`<div>Today &nbsp;&nbsp;<span style="color:#4f7fff;font-weight:700;">${tv.value.toFixed(3)}%</span> ${diffStr}</div>`:'')+
-      (pv?.value!=null?`<div style="color:#6b7280;">Prior &nbsp;&nbsp;&nbsp;${pv.value.toFixed(3)}%</div>`:'');
-    tooltip.style.display='block';
-    const cW=container.offsetWidth,cx=param.point.x,cy=param.point.y,th=tooltip.offsetHeight||60;
-    const tx=(cx+TM+TW<=cW-4)?cx+TM:cx-TM-TW;
-    const ty=(cy-th-TM>=4)?cy-th-TM:cy+TM;
-    tooltip.style.left=Math.max(0,tx)+'px';tooltip.style.top=Math.max(0,ty)+'px';
+  const ctx = canvas.getContext('2d');
+  _ycChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Today',
+          data: todayVals,
+          borderColor: '#4f7fff',
+          backgroundColor: 'rgba(79,127,255,.08)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#4f7fff',
+          pointBorderColor: '#131722',
+          pointBorderWidth: 2,
+        },
+        {
+          label: 'Prior close',
+          data: priorVals,
+          borderColor: 'rgba(107,114,128,.55)',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.35,
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: 'rgba(107,114,128,.55)',
+          pointBorderColor: '#131722',
+          pointBorderWidth: 1,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(19,23,34,.95)',
+          borderColor: 'rgba(255,255,255,.12)',
+          borderWidth: 1,
+          titleFont: { family: "'JetBrains Mono','Courier New',monospace", size: 11 },
+          bodyFont:  { family: "'JetBrains Mono','Courier New',monospace", size: 11 },
+          padding: 10,
+          callbacks: {
+            title: items => items[0]?.label + ' Treasury',
+            label: item => {
+              const v = item.raw;
+              if (v == null) return '';
+              const today = item.datasetIndex === 0;
+              const other = today
+                ? item.chart.data.datasets[1].data[item.dataIndex]
+                : item.chart.data.datasets[0].data[item.dataIndex];
+              const diff = today && other != null ? ((v - other) * 100).toFixed(1) : null;
+              let line = (today ? 'Today  ' : 'Prior  ') + v.toFixed(3) + '%';
+              if (diff != null) line += '  (' + (diff > 0 ? '+' : '') + diff + 'bp)';
+              return line;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,.05)' },
+          ticks: {
+            color: '#6b7280',
+            font: { family: "'JetBrains Mono','Courier New',monospace", size: 10 }
+          }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,.05)' },
+          ticks: {
+            color: '#6b7280',
+            font: { family: "'JetBrains Mono','Courier New',monospace", size: 10 },
+            callback: v => v.toFixed(2) + '%'
+          },
+          grace: '5%'
+        }
+      }
+    }
   });
 }
 
-function _ycKeydown(e){if(e.key==='Escape')closeYCModal();}
-
-function closeYCModal(){
-  if(_ycLwChart){
-    const c=document.getElementById('ycm-lw-wrap');
-    if(c?._ycResize)window.removeEventListener('resize',c._ycResize);
-    if(c?._ycRo){c._ycRo.disconnect();c._ycRo=null;}
-    try{_ycLwChart.remove();}catch(_){}
-    _ycLwChart=null;
-  }
-  const bd=document.getElementById('ycm-bd');if(bd)bd.remove();
-  document.removeEventListener('keydown',_ycKeydown);
+function _ycKeydown(e) {
+  if (e.key === 'Escape') closeYCModal();
 }
 
-window.openYCModal=openYCModal;window.closeYCModal=closeYCModal;
+function closeYCModal() {
+  if (_ycChart) { _ycChart.destroy(); _ycChart = null; }
+  const bd = document.getElementById('ycm-bd');
+  if (bd) bd.remove();
+  document.removeEventListener('keydown', _ycKeydown);
+}
+
+window.openYCModal  = openYCModal;
+window.closeYCModal = closeYCModal;
