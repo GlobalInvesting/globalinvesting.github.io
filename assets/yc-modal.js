@@ -172,7 +172,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
+    timeScale:{borderVisible:false,minBarSpacing:0,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
   });
