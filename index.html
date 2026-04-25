@@ -198,6 +198,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .skip-link:focus{left:8px}
 .tv-skeleton{background:var(--bg3);width:100%;height:100%}
 #tv-chart-wrap{height:290px;min-height:290px}
+.lw-range-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em}
+.lw-range-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.lw-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 #tvcal-inner{overflow:hidden}
 
 /* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
@@ -479,6 +482,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
           <button id="tv-tabs-next" aria-label="Scroll chart tabs right" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
         </div>
+      </div>
+      <!-- Range toolbar — shown only when LW chart is active (hidden for TV widget) -->
+      <div id="lw-range-bar" style="display:none;align-items:center;gap:2px;padding:2px 6px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">RANGE</span>
+        <button class="lw-range-btn active" data-days="63"  aria-label="3 months">3M</button>
+        <button class="lw-range-btn"        data-days="126" aria-label="6 months">6M</button>
+        <button class="lw-range-btn"        data-days="252" aria-label="1 year"  >1Y</button>
+        <button class="lw-range-btn"        data-days="756" aria-label="3 years" >3Y</button>
+        <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;pointer-events:none;">
         <div class="tradingview-widget-container" style="height:100%;width:100%;">
