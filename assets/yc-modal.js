@@ -109,7 +109,9 @@ function openYCModal(tenorData){
   bd.addEventListener('click',e=>{if(e.target===bd)closeYCModal();});
   document.addEventListener('keydown',_ycKeydown);
   // Delay draw until after modal animation (.2s) so container has final dimensions on mobile
+  // Double-draw: first at 220ms, then a corrective fitContent at 420ms for mobile layout stragglers
   setTimeout(()=>_ycDraw(tenorData), 220);
+  setTimeout(()=>{if(_ycLwChart){_ycLwChart.timeScale().fitContent();}}, 420);
 }
 
 function _ycDraw(tenorData){
@@ -124,13 +126,14 @@ function _ycDraw(tenorData){
 
 function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
-  // Build months→label map from actual data so tickMarkFormatter shows correct labels (3M, 2Y, etc.)
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
+  const w=container.offsetWidth||360;
+  const h=container.offsetHeight||220;
   _ycLwChart=LWC.createYieldCurveChart(container,{
-    autoSize:true,
+    width:w, height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
+    yieldCurve:{baseResolution:12,minimumTimeRange:2,startTimeRange:0},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
@@ -145,13 +148,27 @@ function _ycDrawNative(container,toData,prData,tenorData){
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
+  // Force visible range from first to last tenor — no left/right whitespace on any screen size
+  const allTimes=[...toData,...prData].map(d=>d.time).filter(Boolean);
+  if(allTimes.length>=2){
+    const tMin=Math.min(...allTimes),tMax=Math.max(...allTimes);
+    try{_ycLwChart.timeScale().setVisibleRange({from:tMin,to:tMax});}catch(_){}
+  }
   _ycLwChart.timeScale().fitContent();
-  // ResizeObserver ensures fitContent runs whenever the container changes size
-  // (covers mobile layout shifts, keyboard open/close, orientation change)
+  // ResizeObserver: resize chart explicitly when container changes (mobile layout shifts, orientation)
   if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => { if (_ycLwChart) _ycLwChart.timeScale().fitContent(); });
+    const ro = new ResizeObserver(entries => {
+      if (!_ycLwChart) return;
+      const e = entries[0];
+      const nw = Math.floor(e.contentRect.width);
+      const nh = Math.floor(e.contentRect.height);
+      if (nw > 0 && nh > 0) {
+        _ycLwChart.applyOptions({width:nw, height:nh});
+        _ycLwChart.timeScale().fitContent();
+      }
+    });
     ro.observe(container);
-    container._ycRo = ro; // store ref for cleanup on modal close
+    container._ycRo = ro;
   }
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
