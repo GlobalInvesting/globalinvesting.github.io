@@ -114,14 +114,31 @@ function openYCModal(tenorData){
   setTimeout(()=>{if(_ycLwChart){_ycLwChart.timeScale().fitContent();}}, 420);
 }
 
+const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+let _ycLwcPromise=null;
+function _ensureYcLwc(){
+  if(window.LightweightCharts)return Promise.resolve();
+  if(_ycLwcPromise)return _ycLwcPromise;
+  _ycLwcPromise=new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=_LWC_CDN;
+    s.onload=()=>{_ycLwcPromise=null;res();};
+    s.onerror=()=>{_ycLwcPromise=null;rej(new Error('YC: LWC load failed'));};
+    document.head.appendChild(s);
+  });
+  return _ycLwcPromise;
+}
+
 function _ycDraw(tenorData){
   const container=document.getElementById('ycm-lw-wrap');if(!container)return;
-  const LWC=window.LightweightCharts;if(!LWC){console.warn('YC modal: LWC not loaded');return;}
-  if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
-  const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
-  const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-  if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(container,toData,prData,tenorData);
-  else _ycDrawFallback(container,toData,prData,tenorData);
+  _ensureYcLwc().then(()=>{
+    const LWC=window.LightweightCharts;if(!LWC)return;
+    if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
+    const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
+    const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
+    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(container,toData,prData,tenorData);
+    else _ycDrawFallback(container,toData,prData,tenorData);
+  }).catch(e=>console.error(e));
 }
 
 function _ycDrawNative(container,toData,prData,tenorData){
