@@ -2835,7 +2835,7 @@ function _lwUpdateTodayBar() {
 
 // Apply a date-range window to the active LW chart.
 // days=0 → fit all data. Otherwise show the last N calendar days.
-function _lwSetRange(days) {
+function _lwSetRange(days, totalBars) {
   if (!_lwChart) return;
   const ts = _lwChart.timeScale();
 
@@ -2844,21 +2844,18 @@ function _lwSetRange(days) {
     return;
   }
 
-  // Use setVisibleLogicalRange (bar-index based) — avoids BusinessDay/UTCTimestamp
-  // format ambiguity that caused incorrect rendering with setVisibleRange.
-  // Logical index 0 = last data bar. Negative = bars before last.
-  // FX trades ~5/7 calendar days → tradingBars = days * 5/7
+  // LW Charts v4.2 logical range: index 0 = FIRST bar, index (n-1) = LAST bar.
+  // To show the last N trading bars with right padding:
+  //   from = totalBars - tradingBars - 1
+  //   to   = totalBars + rightPad - 1
   const tradingBars = Math.round(days * 5 / 7);
-  const rightPad = 8; // empty bars of right breathing room
+  const rightPad    = 8; // empty bars of right breathing room
+  const from = totalBars - tradingBars - 1;
+  const to   = totalBars + rightPad - 1;
 
-  // fitContent first so bar positions are established, then zoom
-  ts.fitContent();
   setTimeout(() => {
     try {
-      ts.setVisibleLogicalRange({
-        from: -(tradingBars + rightPad - 1),
-        to:   rightPad - 1,
-      });
+      ts.setVisibleLogicalRange({ from, to });
     } catch (_) { ts.fitContent(); }
   }, 20);
 
@@ -2990,10 +2987,13 @@ async function _renderLWChart(ohlcId, label) {
     const chgEl  = document.getElementById('lw-hdr-chg-val');
     if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
     if (bar) {
-      if (oEl) oEl.textContent = _fmtHdrVal(bar.open);
-      if (hEl) hEl.textContent = _fmtHdrVal(bar.high);
-      if (lEl) lEl.textContent = _fmtHdrVal(bar.low);
-      if (cEl) cEl.textContent = _fmtHdrVal(bar.close);
+      if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = '#d1d4dc'; }
+      if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = '#26a69a'; }
+      if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = '#ef5350'; }
+      if (cEl) {
+        cEl.textContent = _fmtHdrVal(bar.close);
+        cEl.style.color = (bar.close != null && bar.open != null && bar.close >= bar.open) ? '#26a69a' : '#ef5350';
+      }
       if (chgEl && bar.open != null && bar.close != null && bar.open > 0) {
         const chg = bar.close - bar.open;
         const pct = (chg / bar.open) * 100;
@@ -4523,20 +4523,24 @@ async function fetchCrossAssetData() {
   const finalDxy    = _caDxy;
   const us10y       = (_caIntraday ? intradayQuote(_caIntraday, 'us10y') : null) || _repoUs10y;
 
-  if (finalSpx)    setCA('spx',    finalSpx.close,    finalSpx.pct,    false, finalSpx.chg);
+  // Mirror cross-asset quotes into STOOQ_RT_CACHE so _lwUpdateTodayBar() can
+  // push live prices to LW charts for non-FX instruments (BTC, gold, SPX, etc.)
+  if (finalSpx)    { STOOQ_RT_CACHE['spx']    = finalSpx;    setCA('spx',    finalSpx.close,    finalSpx.pct,    false, finalSpx.chg); }
   if (finalGold) {
+    STOOQ_RT_CACHE['xauusd'] = STOOQ_RT_CACHE['gold'] = finalGold;
     setCA('gold', finalGold.close, finalGold.pct, false, finalGold.chg);
     const gEl = document.getElementById('q-xauusd'), gcEl = document.getElementById('qc-xauusd');
     if (gEl)  { gEl.textContent  = finalGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className  = 'q-price ' + clsDir(finalGold.chg); }
     if (gcEl) { gcEl.textContent = pctStr(finalGold.pct); gcEl.className = 'q-chg ' + clsDir(finalGold.chg); }
   }
-  if (finalWti)    setCA('wti',    finalWti.close,    finalWti.pct,    false, finalWti.chg);
-  if (finalNikkei) setCA('nikkei', finalNikkei.close, finalNikkei.pct, false, finalNikkei.chg);
-  if (finalStoxx)  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false, finalStoxx.chg);
-  if (us10y)       setCA('us10y',  us10y.close, us10y.fromRepo ? null : us10y.pct, true);
+  if (finalWti)    { STOOQ_RT_CACHE['wti']    = finalWti;    setCA('wti',    finalWti.close,    finalWti.pct,    false, finalWti.chg); }
+  if (finalNikkei) { STOOQ_RT_CACHE['nikkei'] = finalNikkei; setCA('nikkei', finalNikkei.close, finalNikkei.pct, false, finalNikkei.chg); }
+  if (finalStoxx)  { STOOQ_RT_CACHE['stoxx']  = finalStoxx;  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false, finalStoxx.chg); }
+  if (us10y)       { if (!us10y.fromRepo) STOOQ_RT_CACHE['us10y'] = us10y; setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true); }
 
   const dxyData = finalDxy;
   if (dxyData) {
+    STOOQ_RT_CACHE['dxy'] = dxyData;
     setCA('dxy', dxyData.close, dxyData.pct, false, dxyData.chg);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
@@ -4550,6 +4554,7 @@ async function fetchCrossAssetData() {
   const qBtc = document.getElementById('q-btcusd');
   const qBtcC = document.getElementById('qc-btcusd');
   const _btcIntraday = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
+  if (_btcIntraday) STOOQ_RT_CACHE['btc'] = _btcIntraday;  // feed LW chart live bar
   if (_btcIntraday && btcEl) {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
