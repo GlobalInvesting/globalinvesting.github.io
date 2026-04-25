@@ -76,6 +76,52 @@ jobs:
           SITE_PATH: .
         run: python3 scripts/fetch_myfxbook_sentiment.py
 
+      - name: Detect apiBlocked and set output flag
+        id: blocked_check
+        run: |
+          BLOCKED=$(python3 -c "
+          import json, sys
+          try:
+              d = json.load(open('sentiment-data/myfxbook.json'))
+              print('true' if d.get('apiBlocked') else 'false')
+          except Exception:
+              print('false')
+          ")
+          echo "api_blocked=${BLOCKED}" >> $GITHUB_OUTPUT
+          if [ "$BLOCKED" = "true" ]; then
+            echo "::warning::Myfxbook API blocked — login manual requerido en myfxbook.com"
+          fi
+
+      - name: Send immediate alert on Myfxbook API block
+        if: steps.blocked_check.outputs.api_blocked == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: "FX Dashboard Monitor <${{ secrets.NOTIFY_EMAIL_FROM }}>"
+          subject: "⚠️ FX Dashboard — Myfxbook bloqueado, acción requerida"
+          body: |
+            La API de Myfxbook rechazó el login automático.
+
+            Causa más probable: Myfxbook detectó el patrón automatizado y requiere
+            verificación manual antes de volver a permitir acceso via API.
+
+            ACCIÓN REQUERIDA:
+            1. Entrá a https://www.myfxbook.com desde tu navegador
+            2. Hacé login con las credenciales habituales
+            3. Completá cualquier CAPTCHA o verificación de seguridad que aparezca
+            4. Una vez logueado correctamente, el próximo run del workflow (cada hora)
+               reanudará automáticamente.
+
+            El dashboard está mostrando los últimos datos cacheados con fallback a Dukascopy.
+
+            Run que detectó el bloqueo:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: Commit and push sentiment data
         run: |
           git config user.name  "github-actions[bot]"
