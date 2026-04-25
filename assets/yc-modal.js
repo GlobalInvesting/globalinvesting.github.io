@@ -28,6 +28,7 @@
 .ycm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af);}
 .ycm-leg-line{width:20px;height:2px;border-radius:1px;flex-shrink:0;}
 #ycm-lw-wrap{flex:1;position:relative;min-height:160px;overflow:hidden;}
+#ycm-lw-inner{position:absolute;inset:0;}
 #ycm-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
 #ycm-shape{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 #ycm-table-wrap{flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);overflow-x:auto;}
@@ -96,7 +97,7 @@ function openYCModal(tenorData){
         <div class="ycm-leg-item"><div class="ycm-leg-line" style="background:repeating-linear-gradient(90deg,#6b7280 0,#6b7280 4px,transparent 4px,transparent 8px);"></div>Prior close</div>
         ${shape?`<div id="ycm-shape" style="color:${shapeCol}">${shape}</div>`:''}
       </div>
-      <div id="ycm-lw-wrap"><div id="ycm-tooltip"></div></div>
+      <div id="ycm-lw-wrap"><div id="ycm-tooltip"></div><div id="ycm-lw-inner"></div></div>
     </div>
     <div id="ycm-table-wrap">
       <table id="ycm-table">
@@ -131,34 +132,43 @@ function _ensureYcLwc(){
 
 function _ycDraw(tenorData){
   const wrapper=document.getElementById('ycm-lw-wrap');if(!wrapper)return;
+  // ycm-lw-inner may not exist if _ycDrawNative already removed it on a prior draw
+  const container=document.getElementById('ycm-lw-inner');
   _ensureYcLwc().then(()=>{
     const LWC=window.LightweightCharts;if(!LWC)return;
     if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
     const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
     const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,toData,prData,tenorData);
-    else _ycDrawFallback(wrapper,toData,prData,tenorData);
+    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,container,toData,prData,tenorData);
+    else{if(!container)return;_ycDrawFallback(container,toData,prData,tenorData);}
   }).catch(e=>console.error(e));
 }
 
-function _ycDrawNative(container,toData,prData,tenorData){
+function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  const w=container.offsetWidth||360, h=container.offsetHeight||220;
   const firstTenorMonth=toData[0]?.time??3;
   const lastTenorMonth=toData[toData.length-1]?.time??360;
   const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
-  // Pin container to measured pixel dimensions via inline style BEFORE createYieldCurveChart.
-  // This lets autoSize:true read the correct size — without pinning, autoSize reads the
-  // flex-resolved width which may differ from what LWC's internal layout expects.
-  // With explicit width: LWC miscalculates internal left positions (price scale at left:0,
-  // chart area also at left:0 instead of left:56). autoSize is the only mode that works correctly.
-  container.style.width=w+'px';
-  container.style.height=h+'px';
-  container.style.flex='none';
-  _ycLwChart=LWC.createYieldCurveChart(container,{
-    autoSize:true,
+
+  // Strategy: use wrapper directly as LWC container (not the inner div).
+  // Remove inner div and tooltip so LWC appends into a clean wrapper.
+  // Use explicit width+height (getBoundingClientRect for sub-pixel accuracy)
+  // so LWC never has to measure the DOM itself — avoids all autoSize layout bugs.
+  const tooltip=wrapper.querySelector('#ycm-tooltip');
+  const inner=wrapper.querySelector('#ycm-lw-inner');
+  if(inner)inner.remove();
+  if(tooltip)tooltip.remove();
+
+  // getBoundingClientRect forces a layout flush and returns the exact rendered size.
+  const rect=wrapper.getBoundingClientRect();
+  const w=Math.floor(rect.width)||wrapper.offsetWidth||360;
+  const h=Math.floor(rect.height)||wrapper.offsetHeight||220;
+
+  _ycLwChart=LWC.createYieldCurveChart(wrapper,{
+    width:w,
+    height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
@@ -168,6 +178,10 @@ function _ycDrawNative(container,toData,prData,tenorData){
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
+
+  // Re-attach tooltip as overlay on top of the LWC div.
+  if(tooltip){wrapper.appendChild(tooltip);}
+
   let priorSeries=null;
   if(prData.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
@@ -176,20 +190,28 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
-  _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
-  // ResizeObserver: update pinned CSS dimensions and trigger LWC re-layout
+
+  // One-shot corrective resize in next animation frame — catches any pixel-level
+  // difference between our getBoundingClientRect() read and the post-paint layout.
+  requestAnimationFrame(()=>{
+    if(!_ycLwChart)return;
+    const r2=wrapper.getBoundingClientRect();
+    const w2=Math.floor(r2.width)||w, h2=Math.floor(r2.height)||h;
+    if(w2!==w||h2!==h)_ycLwChart.applyOptions({width:w2,height:h2});
+    _ycLwChart.timeScale().fitContent();
+  });
+
+  // ResizeObserver for orientation changes and window resize.
   if(window.ResizeObserver){
     const ro=new ResizeObserver(entries=>{
       if(!_ycLwChart)return;
-      const e=entries[0],nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-      if(nw>0&&nh>0){
-        container.style.width=nw+'px';container.style.height=nh+'px';
-        _ycLwChart.timeScale().fitContent();
-      }
+      const e=entries[0];
+      const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
+      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
     });
-    ro.observe(container);container._ycRo=ro;
+    ro.observe(wrapper);wrapper._ycRo=ro;
   }
-  _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
+  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 
 function _ycDrawFallback(container,toData,prData,tenorData){
