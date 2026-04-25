@@ -170,7 +170,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
     width:w,
     height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
+    yieldCurve:{baseResolution:12,minimumTimeRange:1},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
@@ -189,16 +189,16 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
-  _ycLwChart.timeScale().fitContent();
-
-  // One-shot corrective resize in next animation frame — catches any pixel-level
-  // difference between our getBoundingClientRect() read and the post-paint layout.
+  // fitContent in double-rAF: first frame LWC finishes its internal render,
+  // second frame we call fitContent with a fully painted chart.
   requestAnimationFrame(()=>{
-    if(!_ycLwChart)return;
-    const r2=wrapper.getBoundingClientRect();
-    const w2=Math.floor(r2.width)||w, h2=Math.floor(r2.height)||h;
-    if(w2!==w||h2!==h)_ycLwChart.applyOptions({width:w2,height:h2});
-    _ycLwChart.timeScale().fitContent();
+    requestAnimationFrame(()=>{
+      if(!_ycLwChart)return;
+      const r2=wrapper.getBoundingClientRect();
+      const w2=Math.floor(r2.width)||w, h2=Math.floor(r2.height)||h;
+      if(w2!==w||h2!==h)_ycLwChart.applyOptions({width:w2,height:h2});
+      _ycLwChart.timeScale().fitContent();
+    });
   });
 
   // ResizeObserver for orientation changes and window resize.
