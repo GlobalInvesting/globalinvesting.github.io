@@ -2841,9 +2841,10 @@ function _lwSetRange(days) {
   if (days === 0) {
     ts.fitContent();
   } else {
-    const now   = Math.floor(Date.now() / 1000);
-    const from  = now - days * 86400;
-    ts.setVisibleRange({ from, to: now + 86400 }); // +1d margin for today's bar
+    const now  = Math.floor(Date.now() / 1000);
+    const from = now - days * 86400;
+    // Add 3 days of right margin so the last bar isn't glued to the price axis
+    ts.setVisibleRange({ from, to: now + (3 * 86400) });
   }
   // Update active button
   document.querySelectorAll('.lw-range-btn').forEach(b => {
@@ -2876,6 +2877,9 @@ async function _renderLWChart(ohlcId, label) {
 
   wrap.innerHTML = '';
 
+  // Remove the negative margin used to hide TradingView widget footer — not needed for LW
+  wrap.style.marginBottom = '0';
+
   const chartDiv = document.createElement('div');
   chartDiv.style.cssText = 'width:100%;height:100%;';
   wrap.appendChild(chartDiv);
@@ -2883,25 +2887,36 @@ async function _renderLWChart(ohlcId, label) {
   // Enable pointer events for LW chart interactivity (zoom, pan, crosshair)
   wrap.style.pointerEvents = 'auto';
 
+  // Decimal precision map — drives minMove and formatting
+  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+  // minMove must match the precision: 5dp → 0.00001, 4dp → 0.0001, 3dp → 0.001, 2dp → 0.01
+  const minMove = parseFloat((1 / Math.pow(10, dec)).toFixed(dec));
+
   const LWC = window.LightweightCharts;
   _lwChart = LWC.createChart(chartDiv, {
     layout:      { background: { color: '#131722' }, textColor: '#9096a0' },
     grid:        { vertLines: { color: 'rgba(42,46,57,0.6)' }, horzLines: { color: 'rgba(42,46,57,0.6)' } },
     crosshair:   { mode: LWC.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#2a2e39' },
+    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 60 },
     timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false,
-                   rightOffset: 5, barSpacing: 6, fixLeftEdge: false, fixRightEdge: false },
+                   rightOffset: 8, minBarSpacing: 0.5, fixLeftEdge: false, fixRightEdge: false },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
     handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
-    width:  chartDiv.clientWidth  || wrap.clientWidth  || 600,
-    height: chartDiv.clientHeight || wrap.clientHeight || 290,
+    watermark:   { visible: false },
+    width:  wrap.clientWidth  || 600,
+    height: wrap.clientHeight || 290,
   });
 
-  // Candlestick series
+  // Candlestick series — with correct minMove for the asset's decimal precision
   const candleSeries = _lwChart.addCandlestickSeries({
     upColor: '#26a69a', downColor: '#ef5350',
     borderUpColor: '#26a69a', borderDownColor: '#ef5350',
     wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+    priceFormat: { type: 'price', precision: dec, minMove },
   });
   candleSeries.setData(bars);
 
@@ -2920,22 +2935,15 @@ async function _renderLWChart(ohlcId, label) {
     maSeries = _lwChart.addLineSeries({
       color: '#f0a500', lineWidth: 1,
       priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      priceFormat: { type: 'price', precision: dec, minMove },
     });
     maSeries.setData(ma20);
   }
 
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
-  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
-                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
-                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
-                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
-                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
-
-  function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '—'; }
+  function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
 
   function _updateLWHeader(bar, maVal) {
-    const hdr = document.getElementById('lw-chart-header');
-    if (!hdr) return;
     const symEl  = document.getElementById('lw-hdr-sym');
     const oEl    = document.getElementById('lw-hdr-o-val');
     const hEl    = document.getElementById('lw-hdr-h-val');
@@ -2943,7 +2951,7 @@ async function _renderLWChart(ohlcId, label) {
     const cEl    = document.getElementById('lw-hdr-c-val');
     const chgEl  = document.getElementById('lw-hdr-chg-val');
     const maEl   = document.getElementById('lw-hdr-ma-val');
-    if (symEl) symEl.textContent = _OHLC_FULL_NAMES[ohlcId] || label;
+    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
     if (bar) {
       if (oEl) oEl.textContent = _fmtHdrVal(bar.open);
       if (hEl) hEl.textContent = _fmtHdrVal(bar.high);
@@ -2953,11 +2961,11 @@ async function _renderLWChart(ohlcId, label) {
         const chg = bar.close - bar.open;
         const pct = (chg / bar.open) * 100;
         const sign = chg >= 0 ? '+' : '';
-        chgEl.textContent = sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
+        chgEl.textContent = ' ' + sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
         chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
-      }
+      } else if (chgEl) { chgEl.textContent = ''; }
     }
-    if (maEl) maEl.textContent = maVal != null ? ' ' + _fmtHdrVal(maVal) : '';
+    if (maEl) maEl.textContent = maVal != null ? '\u00a0' + _fmtHdrVal(maVal) : '';
   }
 
   // Show the header and populate with last bar
@@ -2971,39 +2979,35 @@ async function _renderLWChart(ohlcId, label) {
 
   // Update panel-sub to reflect yfinance source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'yfinance · ~15min delay';
+  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~15min delay';
 
   // Crosshair subscription — update OHLC legend on hover
   _lwChart.subscribeCrosshairMove(param => {
     if (!param || !param.time || !param.seriesData) {
-      // Crosshair left chart — restore last bar values
       _updateLWHeader(lastBar, lastMaVal);
       return;
     }
     const candleData = param.seriesData.get(candleSeries);
     const maData = maSeries ? param.seriesData.get(maSeries) : null;
-    if (candleData) {
-      _updateLWHeader(candleData, maData ? maData.value : null);
-    }
+    if (candleData) _updateLWHeader(candleData, maData ? maData.value : null);
   });
 
   // Apply the active range window (default 3M, persists across symbol switches)
   _lwSetRange(_lwActiveDays);
 
-  // Show range toolbar
+  // Show range toolbar and sync active button
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) {
     rangeBar.style.display = 'flex';
-    // Sync active button to current range
     rangeBar.querySelectorAll('.lw-range-btn').forEach(b => {
       b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
     });
   }
 
-  // Source watermark (bottom-right)
+  // Source watermark (bottom-right, tiny, faint)
   const srcTicker = _OHLC_LABELS[ohlcId] || label;
   const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'position:absolute;bottom:4px;right:8px;font-size:9px;color:rgba(144,150,160,0.5);font-family:var(--font-ui,sans-serif);pointer-events:none;z-index:1;user-select:none;';
+  labelEl.style.cssText = 'position:absolute;bottom:4px;right:8px;font-size:9px;color:rgba(144,150,160,0.4);font-family:var(--font-ui,sans-serif);pointer-events:none;z-index:1;user-select:none;';
   labelEl.textContent = 'yfinance \u00b7 ' + srcTicker + ' \u00b7 daily';
   wrap.style.position = 'relative';
   wrap.appendChild(labelEl);
@@ -3028,6 +3032,7 @@ function loadCOTChart(longSym) {
   _destroyLWChart();
   wrap.innerHTML = '';
   wrap.style.pointerEvents = 'none';
+  wrap.style.marginBottom = '-32px';
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) rangeBar.style.display = 'none';
   const cotHdr = document.getElementById('lw-chart-header');
@@ -3069,6 +3074,8 @@ function _loadTVWidgetFallback(sym) {
   wrap.innerHTML = '';
   // Restore pointer-events:none — TV widget manages its own interaction via iframe
   wrap.style.pointerEvents = 'none';
+  // Restore negative margin to hide TradingView widget's internal iframe footer bar
+  wrap.style.marginBottom = '-32px';
   // Hide range toolbar and symbol header — not applicable to TV widget
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) rangeBar.style.display = 'none';
