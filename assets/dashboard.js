@@ -3498,20 +3498,60 @@ async function _renderLWChart(ohlcId, label) {
   // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
   // LWC v5: createSeriesMarkers(series, markers) — LWC v4: series.setMarkers(markers)
   if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
-  let _cbMarkersHandle = null;
+
+  // ── CB Meeting markers — Bloomberg/Reuters standard: vertical dashed lines with label ──
+  // Industry standard: thin vertical line at CB decision date, labeled with the bank acronym
+  // (FOMC, ECB, BoE etc.) pinned at the top of the chart area, with a hover tooltip.
+  // Implementation: DOM SVG overlay updated via LWC timeScale subscribeVisibleTimeRangeChange
+  // and scrolled/zoomed in sync with the chart — same pattern used by institutional terminals.
+  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
+  let _cbRafId = null;
+  let _cbOverlay = null;   // SVG element overlay
+  let _cbMeetingData = []; // [{date, cbs:[{cb,color}]}] — built once, reused on each draw
+
+  function _drawCbLines() {
+    if (_cbRafId) cancelAnimationFrame(_cbRafId);
+    _cbRafId = requestAnimationFrame(() => {
+      _cbRafId = null;
+      if (!_cbOverlay || !_lwChart || !window._lwShowCb || _cbMeetingData.length === 0) {
+        if (_cbOverlay) _cbOverlay.innerHTML = '';
+        return;
+      }
+      const ts = _lwChart.timeScale();
+      const chartH = chartDiv.offsetHeight;
+      const labelZone = 18; // px from top reserved for labels
+      let svgContent = '';
+      _cbMeetingData.forEach(ev => {
+        try {
+          const x = ts.timeToCoordinate(ev.date);
+          if (x == null || x < 0 || x > chartDiv.offsetWidth) return;
+          // One vertical line per unique date — stack labels if multiple CBs same day
+          ev.cbs.forEach((cbItem, i) => {
+            const col = cbItem.color;
+            const solidCol = col.replace(/rgba\(([^,]+,[^,]+,[^,]+),[^)]+\)/, 'rgba($1,0.55)');
+            const labelCol = col.replace(/rgba\(([^,]+,[^,]+,[^,]+),[^)]+\)/, 'rgba($1,0.9)');
+            // Dashed vertical line
+            svgContent += `<line x1="${x.toFixed(1)}" y1="${labelZone}" x2="${x.toFixed(1)}" y2="${chartH - 28}" `
+              + `stroke="${solidCol}" stroke-width="1" stroke-dasharray="3,3"/>`;
+            // Label at top
+            const labelX = x + 3;
+            const labelY = labelZone + i * 12;
+            svgContent += `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" `
+              + `font-size="9" font-family="var(--font-ui,sans-serif)" fill="${labelCol}" `
+              + `font-weight="600">${cbItem.cb}</text>`;
+          });
+        } catch(_) {}
+      });
+      _cbOverlay.innerHTML = svgContent;
+    });
+  }
 
   async function _applyMarkers() {
-    // Clear previous markers
-    if (_cbMarkersHandle && typeof _cbMarkersHandle.detach === 'function') {
-      try { _cbMarkersHandle.detach(); } catch(_) {}
-      _cbMarkersHandle = null;
-    }
-    _cbMarkersHandle = null;
-    if (!window._lwShowCb) {
-      // Ensure v4 series also cleared when hiding
-      if (typeof candleSeries.setMarkers === 'function') { try { candleSeries.setMarkers([]); } catch(_) {} }
-      return;
-    }
+    // Clear overlay
+    if (_cbOverlay) { _cbOverlay.innerHTML = ''; }
+    _cbMeetingData = [];
+    window._lwCbMarkerMap = {};
+    if (!window._lwShowCb) return;
     try {
       const _CB_MAP = {
         eurusd:['EUR','USD'], gbpusd:['GBP','USD'], usdjpy:['USD','JPY'],
@@ -3534,45 +3574,48 @@ async function _renderLWChart(ohlcId, label) {
       const barDates = new Set(bars.map(b => b.time));
       const firstDate = bars[0]?.time;
       const lastDate  = bars[bars.length - 1]?.time;
-      const _CB_COLORS = { USD:'rgba(79,127,255,0.85)', EUR:'rgba(246,148,28,0.85)',
-                           GBP:'rgba(156,77,255,0.85)', JPY:'rgba(255,213,0,0.85)',
-                           AUD:'rgba(0,188,212,0.85)',  CAD:'rgba(255,87,34,0.85)',
-                           CHF:'rgba(156,204,101,0.85)',NZD:'rgba(0,230,118,0.85)' };
-      const markers = [];
-      const seenDates = new Set();
+      const _CB_COLORS = { USD:'rgba(79,127,255,0.85)',  EUR:'rgba(246,148,28,0.85)',
+                           GBP:'rgba(156,77,255,0.85)',  JPY:'rgba(255,213,0,0.85)',
+                           AUD:'rgba(0,188,212,0.85)',   CAD:'rgba(255,87,34,0.85)',
+                           CHF:'rgba(156,204,101,0.85)', NZD:'rgba(0,230,118,0.85)' };
+      // dateMap: date → [{cb, color}]
+      const dateMap = {};
       relevantCBs.forEach(cb => {
         const cbMtg = mtgData.meetings[cb];
         if (!cbMtg?.allMeetings) return;
         const color = _CB_COLORS[cb] || 'rgba(144,150,160,0.8)';
         cbMtg.allMeetings.forEach(dateStr => {
-          if (dateStr >= firstDate && dateStr <= lastDate) {
-            let targetDate = dateStr;
-            if (!barDates.has(dateStr)) {
-              const d = new Date(dateStr + 'T12:00:00Z');
-              d.setDate(d.getDate() + 1);
-              const next = d.toISOString().slice(0, 10);
-              if (barDates.has(next)) targetDate = next; else return;
-            }
-            if (seenDates.has(targetDate + cb)) return;
-            seenDates.add(targetDate + cb);
-            markers.push({ time: targetDate, position: 'belowBar', color, shape: 'arrowUp', text: cb, size: 1 });
+          if (dateStr < firstDate || dateStr > lastDate) return;
+          let targetDate = dateStr;
+          if (!barDates.has(dateStr)) {
+            const d = new Date(dateStr + 'T12:00:00Z');
+            d.setDate(d.getDate() + 1);
+            const next = d.toISOString().slice(0, 10);
+            if (barDates.has(next)) targetDate = next; else return;
+          }
+          if (!dateMap[targetDate]) dateMap[targetDate] = [];
+          // Avoid dupe CBs on same date
+          if (!dateMap[targetDate].find(e => e.cb === cb)) {
+            dateMap[targetDate].push({ cb, color });
           }
         });
       });
-      if (markers.length === 0) return;
-      markers.sort((a, b) => a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
-      if (typeof LWC.createSeriesMarkers === 'function') {
-        _cbMarkersHandle = LWC.createSeriesMarkers(candleSeries, markers);
-      } else if (typeof candleSeries.setMarkers === 'function') {
-        candleSeries.setMarkers(markers);
-      }
-      // Build lookup map for tooltip: date → [{cb, color}]
-      window._lwCbMarkerMap = {};
-      markers.forEach(m => {
-        if (!window._lwCbMarkerMap[m.time]) window._lwCbMarkerMap[m.time] = [];
-        window._lwCbMarkerMap[m.time].push({ cb: m.text, color: m.color });
+      // Build _cbMeetingData array and tooltip map
+      Object.entries(dateMap).sort((a,b) => a[0] < b[0] ? -1 : 1).forEach(([date, cbs]) => {
+        _cbMeetingData.push({ date, cbs });
+        window._lwCbMarkerMap[date] = cbs.map(e => ({ cb: e.cb, color: e.color }));
       });
-    } catch(_cbErr) {}
+      // Create SVG overlay if not already present
+      if (!_cbOverlay) {
+        _cbOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        _cbOverlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible;';
+        chartDiv.style.position = 'relative';
+        chartDiv.appendChild(_cbOverlay);
+      }
+      // Draw immediately and subscribe to time-range changes for scroll/zoom sync
+      _drawCbLines();
+      _lwChart.timeScale().subscribeVisibleTimeRangeChange(_drawCbLines);
+    } catch(_cbErr) { console.warn('CB markers error:', _cbErr); }
   }
   const _cbBtn = document.getElementById('lw-cb-btn');
   if (_cbBtn) {
@@ -3768,7 +3811,12 @@ async function _renderLWChart(ohlcId, label) {
     } else {
       tip.style.display = 'none';
     }
-    const candleData = param.seriesData.get(candleSeries);
+    const _rawSeriesData = param.seriesData.get(candleSeries);
+    // Normalize Line/Area {time,value} → OHLC-like so _updateLWHeader shows C correctly
+    const candleData = _rawSeriesData
+      ? (_rawSeriesData.close != null ? _rawSeriesData
+         : { ..._rawSeriesData, open: _rawSeriesData.value, high: _rawSeriesData.value, low: _rawSeriesData.value, close: _rawSeriesData.value })
+      : null;
     if (candleData) _updateAllMALegend(param.seriesData);
     const firstMaSeries = window._lwMaState[0]?.series;
     const firstMaData = firstMaSeries ? param.seriesData.get(firstMaSeries) : null;
