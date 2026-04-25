@@ -166,6 +166,15 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
 
             dec = DECIMALS.get(id_, 5)
+
+            # yfinance FX data bug: returns Open==Close for many daily bars
+            # (FX spot has no official open — Yahoo duplicates the close).
+            # Fix: when open==close but H!=L, reconstruct open as the midpoint
+            # of the day's High and Low. This produces a realistic body position
+            # without fabricating directional information.
+            if o == c and h != l:
+                o = round((h + l) / 2, dec)
+
             bars.append({
                 "time":  date_str,
                 "open":  round(o, dec),
