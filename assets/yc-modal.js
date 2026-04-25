@@ -112,8 +112,7 @@ function openYCModal(tenorData){
   // Delay draw until after modal animation (.2s) so container has final dimensions on mobile
   // Double-draw: first at 220ms, then a corrective fitContent at 420ms for mobile layout stragglers
   setTimeout(()=>_ycDraw(tenorData), 220);
-  // 420ms fallback: re-apply visible range for mobile layout stragglers
-  setTimeout(()=>{if(_ycLwChart){try{_ycLwChart.timeScale().fitContent();}catch(_){}}}, 420);
+  // Range is handled by setTimeout cascade in _ycDrawNative (50ms / 150ms / 400ms).
 }
 
 const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
@@ -151,18 +150,16 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
   const firstTenorMonth=toData[0]?.time??3;
   const lastTenorMonth=toData[toData.length-1]?.time??360;
-  const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
 
-  // Strategy: use wrapper directly as LWC container (not the inner div).
-  // Remove inner div and tooltip so LWC appends into a clean wrapper.
-  // Use explicit width+height (getBoundingClientRect for sub-pixel accuracy)
-  // so LWC never has to measure the DOM itself — avoids all autoSize layout bugs.
+  // Remove inner div and tooltip — LWC needs a clean container.
   const tooltip=wrapper.querySelector('#ycm-tooltip');
   const inner=wrapper.querySelector('#ycm-lw-inner');
   if(inner)inner.remove();
   if(tooltip)tooltip.remove();
 
-  // getBoundingClientRect forces a layout flush and returns the exact rendered size.
+  // Disconnect any existing ResizeObserver before creating the chart.
+  if(wrapper._ycRo){try{wrapper._ycRo.disconnect();}catch(_){}wrapper._ycRo=null;}
+
   const rect=wrapper.getBoundingClientRect();
   const w=Math.floor(rect.width)||wrapper.offsetWidth||360;
   const h=Math.floor(rect.height)||wrapper.offsetHeight||220;
@@ -177,11 +174,11 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
     timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
-    localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
+    localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
   });
 
-  // Re-attach tooltip as overlay on top of the LWC div.
-  if(tooltip){wrapper.appendChild(tooltip);}
+  // Expose for console debugging.
+  window._ycChart=_ycLwChart;
 
   let priorSeries=null;
   if(prData.length>=2){
@@ -191,36 +188,45 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
 
-  // Set the visible time range explicitly to cover all data points.
-  // fitContent() on createYieldCurveChart is unreliable — it does not consistently
-  // zoom out to show all tenors. Instead, we set an explicit time range that covers
-  // firstTenorMonth to lastTenorMonth with a small margin on each side.
-  const margin=Math.max(3, Math.round((lastTenorMonth-firstTenorMonth)*0.03));
-  const setRange=()=>{
-    if(!_ycLwChart)return;
-    try{
-      _ycLwChart.timeScale().setVisibleRange({from:firstTenorMonth-margin, to:lastTenorMonth+margin});
-    }catch(_){
-      // fallback if setVisibleRange not supported
-      try{_ycLwChart.timeScale().fitContent();}catch(_2){}
-    }
-  };
-  // Call immediately, then again after two animation frames to handle any post-paint layout shift.
-  setRange();
-  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ setRange(); }); });
+  // Re-attach tooltip AFTER chart+data are set, to avoid triggering ResizeObserver
+  // during LWC's internal initialization.
+  if(tooltip){wrapper.appendChild(tooltip);}
 
-  // ResizeObserver for orientation changes and window resize.
+  // Apply visible range via setTimeout cascade:
+  // LWC's timeScale is not ready synchronously or in rAF — use setTimeout to give it
+  // a full JS event loop turn to complete its internal initialization.
+  const margin=Math.max(3,Math.round((lastTenorMonth-firstTenorMonth)*0.03));
+  const applyRange=(chart)=>{
+    if(!chart||chart!==_ycLwChart)return;
+    const ts=chart.timeScale();
+    // Log for diagnostics
+    const vr=ts.getVisibleRange?.();
+    console.log('[YC] applyRange called, getVisibleRange:',JSON.stringify(vr),'from:',firstTenorMonth-margin,'to:',lastTenorMonth+margin);
+    try{ts.setVisibleRange({from:firstTenorMonth-margin,to:lastTenorMonth+margin});}
+    catch(e){console.warn('[YC] setVisibleRange failed:',e.message);try{ts.fitContent();}catch(_){}}
+  };
+  const chart=_ycLwChart;
+  setTimeout(()=>applyRange(chart),50);
+  setTimeout(()=>applyRange(chart),150);
+  setTimeout(()=>applyRange(chart),400);
+
+  // ResizeObserver — only attach after a 500ms delay so it doesn't fire during init.
   if(window.ResizeObserver){
-    const ro=new ResizeObserver(entries=>{
-      if(!_ycLwChart)return;
-      const e=entries[0];
-      const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});setRange();}
-    });
-    ro.observe(wrapper);wrapper._ycRo=ro;
+    setTimeout(()=>{
+      if(_ycLwChart!==chart)return; // chart was replaced
+      const ro=new ResizeObserver(entries=>{
+        if(_ycLwChart!==chart)return;
+        const e=entries[0];
+        const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
+        if(nw>0&&nh>0){chart.applyOptions({width:nw,height:nh});applyRange(chart);}
+      });
+      ro.observe(wrapper);wrapper._ycRo=ro;
+    },500);
   }
+
   _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
+
 
 function _ycDrawFallback(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
