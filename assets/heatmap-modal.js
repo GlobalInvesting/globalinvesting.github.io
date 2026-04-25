@@ -192,6 +192,53 @@
 }
 #hm-footer-meta { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text3,#6b7280); }
 
+/* CSI tab */
+#hm-csi-wrap {
+  position:relative;height:280px;
+  background:#1e222d;border-radius:4px;overflow:hidden;
+}
+#hm-csi-chart { width:100%;height:100%; }
+#hm-csi-period {
+  display:flex;gap:2px;margin-bottom:10px;
+}
+.hm-csi-pbtn {
+  font-size:10px;padding:3px 9px;border-radius:3px;border:1px solid rgba(255,255,255,.1);
+  background:none;color:var(--text2,#787b86);cursor:pointer;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  transition:background .1s,color .1s;
+}
+.hm-csi-pbtn:hover { background:rgba(255,255,255,.06);color:var(--text,#d1d4dc); }
+.hm-csi-pbtn.on { background:rgba(79,127,255,.18);border-color:rgba(79,127,255,.4);color:var(--blue,#4f7fff); }
+#hm-csi-legend {
+  display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;
+  font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+}
+.hm-csi-leg {
+  display:flex;align-items:center;gap:4px;cursor:pointer;padding:2px 4px;border-radius:2px;
+  transition:background .1s;
+}
+.hm-csi-leg:hover { background:rgba(255,255,255,.06); }
+.hm-csi-leg-dot { width:8px;height:2px;border-radius:1px;flex-shrink:0; }
+.hm-csi-leg-lbl { color:var(--text2,#787b86);letter-spacing:.04em; }
+.hm-csi-leg-val { color:var(--text,#d1d4dc);font-weight:600;min-width:42px;text-align:right; }
+#hm-csi-tooltip {
+  position:absolute;pointer-events:none;z-index:10;
+  background:rgba(19,23,34,.92);border:1px solid rgba(255,255,255,.1);
+  border-radius:4px;padding:7px 10px;font-size:9px;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  min-width:130px;display:none;
+}
+.hm-csi-tt-date { color:var(--text3,#6b7280);margin-bottom:5px;font-size:9px;letter-spacing:.04em; }
+.hm-csi-tt-row { display:flex;justify-content:space-between;gap:12px;margin-bottom:2px; }
+.hm-csi-tt-ccy { color:var(--text2,#787b86); }
+.hm-csi-tt-val { font-weight:600; }
+#hm-csi-loading {
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--text3,#6b7280);
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  letter-spacing:.04em;background:#1e222d;
+}
+
 /* Utility */
 .up   { color:var(--up,#26a69a); }
 .down { color:var(--down,#ef5350); }
@@ -260,6 +307,12 @@
   let _sessionCtxCache = null; // { generated_at, sessions: { EUR: { Sydney: "...", ... }, ... } }
   let _sessionCtxFetched = false;
   let _sessionCtxIsWeekend = false; // true when session-context.json was generated in closed-market mode
+
+  // CSI state
+  let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
+  let _csiChart      = null;  // LWC chart instance
+  let _csiPeriodDays = 126;   // default 6M
+  let _csiInited     = false;
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
   // Falls back silently — the drivers note is additive, never blocking.
@@ -409,6 +462,7 @@
     <div class="hm-tab on" role="tab" aria-selected="true"  data-tab="breakdown"    onclick="hmTab(this,'breakdown')">Pair Breakdown</div>
     <div class="hm-tab"    role="tab" aria-selected="false" data-tab="session"      onclick="hmTab(this,'session')">Session</div>
     <div class="hm-tab"    role="tab" aria-selected="false" data-tab="correlations" onclick="hmTab(this,'correlations')">Correlations</div>
+    <div class="hm-tab"    role="tab" aria-selected="false" data-tab="csi"          onclick="hmTab(this,'csi')">CSI</div>
   </div>
   <div id="hm-body">
     <div class="hm-panel on" id="hm-p-breakdown">
@@ -454,6 +508,28 @@
       <div class="hm-cw">
         <div class="hm-ct" id="hm-drivers-title">STRENGTH DRIVERS · TOP 3 PAIRS BY CONTRIBUTION</div>
         <div id="hm-drivers"></div>
+      </div>
+    </div>
+    <div class="hm-panel" id="hm-p-csi">
+      <div class="hm-cw">
+        <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
+        <div id="hm-csi-period">
+          <button class="hm-csi-pbtn" data-days="21"  onclick="csiPeriod(this,21)">1M</button>
+          <button class="hm-csi-pbtn" data-days="63"  onclick="csiPeriod(this,63)">3M</button>
+          <button class="hm-csi-pbtn on" data-days="126" onclick="csiPeriod(this,126)">6M</button>
+          <button class="hm-csi-pbtn" data-days="252" onclick="csiPeriod(this,252)">1Y</button>
+          <button class="hm-csi-pbtn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
+        </div>
+        <div id="hm-csi-wrap">
+          <div id="hm-csi-loading">Loading OHLC data…</div>
+          <div id="hm-csi-chart"></div>
+          <div id="hm-csi-tooltip"></div>
+        </div>
+        <div id="hm-csi-legend"></div>
+      </div>
+      <div class="hm-cw">
+        <div class="hm-ct" id="hm-csi-stats-title">CSI SNAPSHOT · CURRENT PERIOD</div>
+        <div id="hm-csi-stats"></div>
       </div>
     </div>
   </div>
@@ -1074,7 +1150,329 @@
       : '');
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // ── CSI (Currency Strength Index) ────────────────────────────────────────
+  // Bloomberg WCRS convention: normalized cumulative log-return from period start.
+  // All 8 series start at 0bp on day 0 — divergence represents relative performance.
+
+  // Colour palette — 8 distinct, accessible colours matching terminal design language
+  const CSI_COLORS = {
+    EUR: '#4f7fff',  // --blue
+    GBP: '#26a69a',  // --up (teal)
+    JPY: '#ef5350',  // --down (red)
+    AUD: '#f6941c',  // --orange
+    CAD: '#a78bfa',  // purple
+    CHF: '#34d399',  // emerald
+    NZD: '#fb923c',  // amber
+    USD: '#94a3b8',  // slate (USD neutral)
+  };
+
+  const CCY_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD'];
+
+  // Pairs sign convention for deriving ccy strength from OHLC:
+  // +1 = pair close goes up → base strengthens; -1 = inverse
+  const PAIR_SIGN = {};
+  PAIR_DEFS.forEach(p => { PAIR_SIGN[p.id] = p.sign; });
+
+  // Load all 28 OHLC files in parallel, compute per-currency daily log-returns
+  // and accumulate into the CSI series.
+  async function _loadCSIData() {
+    const pairIds = PAIR_DEFS.map(p => p.id);
+    const fetches = pairIds.map(id =>
+      fetch('./ohlc-data/' + id + '.json')
+        .then(r => r.ok ? r.json() : [])
+        .catch(() => [])
+    );
+    const allOHLC = await Promise.all(fetches);
+
+    // Build a date-keyed map of log-returns for each pair
+    // pairRet[id][date] = log(close/prevClose) * sign * (base=ccy ? +1 : -1)
+    const pairRet = {};
+    const allDates = new Set();
+
+    pairIds.forEach((id, i) => {
+      const bars = allOHLC[i];
+      const p    = PAIR_DEFS[i];
+      pairRet[id] = {};
+      for (let j = 1; j < bars.length; j++) {
+        const date = bars[j].time;
+        const ret  = Math.log(bars[j].close / bars[j - 1].close);
+        pairRet[id][date] = ret * p.sign;  // positive = base ccy gained vs quote
+        allDates.add(date);
+      }
+    });
+
+    // Sort dates
+    const dates = [...allDates].sort();
+
+    // For each ccy and each date: average log-return across its 7 pairs
+    // (sign-corrected so positive always = this ccy strengthened)
+    const ccyDailyRet = {};
+    CCY_ORDER.forEach(ccy => { ccyDailyRet[ccy] = {}; });
+
+    dates.forEach(date => {
+      PAIR_DEFS.forEach(p => {
+        const ret = pairRet[p.id][date];
+        if (ret == null || isNaN(ret)) return;
+        // base ccy gets +ret, quote ccy gets -ret
+        if (ccyDailyRet[p.base]) {
+          ccyDailyRet[p.base][date] = (ccyDailyRet[p.base][date] || 0) + ret;
+        }
+        if (ccyDailyRet[p.quote]) {
+          ccyDailyRet[p.quote][date] = (ccyDailyRet[p.quote][date] || 0) - ret;
+        }
+      });
+    });
+
+    // Normalize by number of pairs each ccy participates in (always 7 for G8)
+    // then accumulate to get the CSI series
+    const series = {};
+    CCY_ORDER.forEach(ccy => {
+      const pairsForCcy = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy).length;
+      let cum = 0;
+      series[ccy] = dates.map(date => {
+        const sum = ccyDailyRet[ccy][date];
+        if (sum != null) cum += sum / pairsForCcy;
+        // Convert to % (×100) for display
+        return { time: date, value: parseFloat((cum * 100).toFixed(4)) };
+      });
+    });
+
+    return { dates, series };
+  }
+
+  // Render or update the LWC chart with the current period
+  function _renderCSIChart(ccy) {
+    const LWC = window.LightweightCharts;
+    if (!LWC || !_csiData) return;
+
+    const wrap = document.getElementById('hm-csi-wrap');
+    const chartEl = document.getElementById('hm-csi-chart');
+    if (!wrap || !chartEl) return;
+
+    // Determine date slice
+    const allDates  = _csiData.dates;
+    let startIdx    = 0;
+    if (_csiPeriodDays > 0) {
+      startIdx = Math.max(0, allDates.length - _csiPeriodDays);
+    }
+    const cutoffDate = allDates[startIdx];
+
+    // Destroy old chart if it exists
+    if (_csiChart) {
+      try { _csiChart.remove(); } catch(e) {}
+      _csiChart = null;
+      chartEl.innerHTML = '';
+    }
+
+    _csiChart = LWC.createChart(chartEl, {
+      layout: {
+        background: { color: '#1e222d' },
+        textColor: '#787b86',
+        attributionLogo: false,
+      },
+      grid: {
+        vertLines: { color: 'rgba(255,255,255,.04)' },
+        horzLines: { color: 'rgba(255,255,255,.04)' },
+      },
+      crosshair: {
+        mode: LWC.CrosshairMode?.Normal ?? 1,
+        vertLine: { color: 'rgba(255,255,255,.25)', style: 2, labelVisible: true },
+        horzLine: { color: 'rgba(255,255,255,.15)', style: 2, labelVisible: true },
+      },
+      rightPriceScale: {
+        borderColor: 'rgba(255,255,255,.08)',
+        scaleMargins: { top: 0.08, bottom: 0.08 },
+      },
+      timeScale: {
+        borderColor: 'rgba(255,255,255,.08)',
+        timeVisible: false,
+        fixLeftEdge: true,
+        fixRightEdge: true,
+      },
+      width: wrap.offsetWidth,
+      height: 280,
+    });
+
+    const seriesMap = {};
+    const tooltipEl = document.getElementById('hm-csi-tooltip');
+
+    CCY_ORDER.forEach(c => {
+      const isFocus = c === ccy;
+      const raw = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
+      const ls = _csiChart.addSeries(LWC.LineSeries, {
+        color: CSI_COLORS[c],
+        lineWidth: isFocus ? 2.5 : 1,
+        lineStyle: 0,  // solid
+        lastValueVisible: true,
+        priceLineVisible: false,
+        crosshairMarkerVisible: isFocus,
+        crosshairMarkerRadius: 4,
+        crosshairMarkerBorderColor: '#1e222d',
+        crosshairMarkerBackgroundColor: CSI_COLORS[c],
+      });
+      ls.setData(raw);
+      if (!isFocus) ls.applyOptions({ lineWidth: 1, color: CSI_COLORS[c] + 'aa' });
+      seriesMap[c] = ls;
+    });
+
+    // Bloomberg-style multi-series crosshair tooltip
+    _csiChart.subscribeCrosshairMove(param => {
+      if (!param || !param.time || !tooltipEl) {
+        if (tooltipEl) tooltipEl.style.display = 'none';
+        return;
+      }
+      const rows = CCY_ORDER.map(c => {
+        const v = param.seriesData.get(seriesMap[c]);
+        return { ccy: c, val: v ? v.value : null };
+      }).filter(r => r.val != null).sort((a, b) => b.val - a.val);
+
+      if (!rows.length) { tooltipEl.style.display = 'none'; return; }
+
+      tooltipEl.innerHTML =
+        '<div class="hm-csi-tt-date">' + param.time + '</div>' +
+        rows.map(r => {
+          const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
+          const dot = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + CSI_COLORS[r.ccy] + ';margin-right:5px;"></span>';
+          return '<div class="hm-csi-tt-row">' +
+            '<span class="hm-csi-tt-ccy">' + dot + r.ccy + '</span>' +
+            '<span class="hm-csi-tt-val ' + cls + '">' +
+              (r.val >= 0 ? '+' : '') + r.val.toFixed(2) + '%' +
+            '</span></div>';
+        }).join('');
+      tooltipEl.style.display = 'block';
+
+      // Position: keep within wrap bounds
+      const wrapRect = wrap.getBoundingClientRect();
+      const x = param.point ? param.point.x : 0;
+      const y = param.point ? param.point.y : 0;
+      const ttW = 140, ttH = 20 + rows.length * 18;
+      const left = (x + ttW + 20 > wrap.offsetWidth) ? (x - ttW - 10) : (x + 16);
+      const top  = Math.max(0, Math.min(y - ttH / 2, wrap.offsetHeight - ttH));
+      tooltipEl.style.left = left + 'px';
+      tooltipEl.style.top  = top  + 'px';
+    });
+
+    // Update legend with final values
+    _updateCSILegend(ccy, cutoffDate);
+  }
+
+  function _updateCSILegend(ccy, cutoffDate) {
+    const legendEl = document.getElementById('hm-csi-legend');
+    if (!legendEl || !_csiData) return;
+
+    // Get final value for each ccy in the current period
+    const vals = CCY_ORDER.map(c => {
+      const filtered = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
+      const last  = filtered.length ? filtered[filtered.length - 1].value : null;
+      const first = filtered.length ? filtered[0].value : null;
+      return { ccy: c, val: last, change: (last != null && first != null) ? last - first : null };
+    }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
+
+    legendEl.innerHTML = vals.map(r => {
+      const isFocus = r.ccy === ccy;
+      const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
+      const valStr = r.val != null ? (r.val >= 0 ? '+' : '') + r.val.toFixed(2) + '%' : '—';
+      return '<div class="hm-csi-leg" title="Click to highlight ' + r.ccy + '">' +
+        '<div class="hm-csi-leg-dot" style="background:' + CSI_COLORS[r.ccy] + ';' +
+          (isFocus ? 'height:3px;' : '') + '"></div>' +
+        '<span class="hm-csi-leg-lbl" style="' + (isFocus ? 'color:var(--text,#d1d4dc);font-weight:600;' : '') + '">' +
+          r.ccy + '</span>' +
+        '<span class="hm-csi-leg-val ' + cls + '">' + valStr + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function _renderCSIStats(ccy) {
+    const statsEl = document.getElementById('hm-csi-stats');
+    const titleEl = document.getElementById('hm-csi-stats-title');
+    if (!statsEl || !_csiData) return;
+
+    const allDates = _csiData.dates;
+    let startIdx   = 0;
+    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
+    const cutoffDate = allDates[startIdx];
+
+    const rows = CCY_ORDER.map(c => {
+      const filtered = _csiData.series[c].filter(pt => pt.time >= cutoffDate);
+      if (!filtered.length) return { ccy: c, val: null, min: null, max: null };
+      const vals = filtered.map(pt => pt.value);
+      return {
+        ccy: c,
+        val: vals[vals.length - 1],
+        min: Math.min(...vals),
+        max: Math.max(...vals),
+        range: Math.max(...vals) - Math.min(...vals),
+      };
+    }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
+
+    const periodLabel = _csiPeriodDays === 21 ? '1M' : _csiPeriodDays === 63 ? '3M' :
+                        _csiPeriodDays === 126 ? '6M' : _csiPeriodDays === 252 ? '1Y' : 'All';
+    if (titleEl) titleEl.textContent = 'CSI SNAPSHOT · ' + periodLabel + ' · ACCUMULATED RETURN';
+
+    statsEl.innerHTML = '<table class="hm-tbl" aria-label="CSI period statistics">' +
+      '<thead><tr>' +
+      '<th scope="col">Currency</th>' +
+      '<th scope="col">Return</th>' +
+      '<th scope="col">Period Min</th>' +
+      '<th scope="col">Period Max</th>' +
+      '<th scope="col">Range</th>' +
+      '</tr></thead><tbody>' +
+      rows.map(r => {
+        const isFocus = r.ccy === ccy;
+        const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
+        const fmt = v => v != null ? (v >= 0 ? '+' : '') + v.toFixed(2) + '%' : '—';
+        return '<tr style="' + (isFocus ? 'background:rgba(79,127,255,.07);' : '') + '">' +
+          '<td><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' +
+            CSI_COLORS[r.ccy] + ';margin-right:6px;vertical-align:middle;"></span>' +
+            '<span class="sym" style="' + (isFocus ? 'color:var(--blue,#4f7fff);' : '') + '">' + r.ccy + '</span></td>' +
+          '<td class="' + cls + '">' + fmt(r.val) + '</td>' +
+          '<td class="down">' + fmt(r.min) + '</td>' +
+          '<td class="up">' + fmt(r.max) + '</td>' +
+          '<td>' + (r.range != null ? r.range.toFixed(2) + '%' : '—') + '</td>' +
+        '</tr>';
+      }).join('') +
+      '</tbody></table>' +
+      '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
+      'ohlc-data · yfinance · 28-pair equal-weighted CSI · 0bp = period start</div>';
+  }
+
+  async function populateCSI(ccy) {
+    const loadingEl = document.getElementById('hm-csi-loading');
+
+    // Only fetch OHLC data once per page session
+    if (!_csiData) {
+      if (loadingEl) loadingEl.style.display = 'flex';
+
+      // Ensure LWC is loaded (reuse dashboard.js loadLWC pattern)
+      if (!window.LightweightCharts) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+
+      try {
+        _csiData = await _loadCSIData();
+      } catch(e) {
+        if (loadingEl) loadingEl.textContent = 'Failed to load OHLC data';
+        return;
+      }
+    }
+
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    const allDates  = _csiData.dates;
+    let startIdx    = 0;
+    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
+    const cutoffDate = allDates[startIdx];
+
+    _renderCSIChart(ccy);
+    _renderCSIStats(ccy);
+  }
+
+  // ── Public API ─────────────────────────────────────────────────────────────
 
   window.openHeatmapModal = function(ccy, strengths, rtCache) {
     _ccy       = ccy;
@@ -1109,10 +1507,21 @@
     document.getElementById('hm-close').focus();
   };
 
+  window.csiPeriod = function(btn, days) {
+    _csiPeriodDays = days;
+    document.querySelectorAll('.hm-csi-pbtn').forEach(b => b.classList.toggle('on', b === btn));
+    if (_csiData && _ccy) {
+      _renderCSIChart(_ccy);
+      _renderCSIStats(_ccy);
+    }
+  };
+
   window.closeHeatmapModal = function() {
     const bd = document.getElementById('hm-bd');
     if (bd) bd.style.display = 'none';
     document.removeEventListener('keydown', _onKey);
+    // Destroy chart so it re-renders at correct size on next open
+    if (_csiChart) { try { _csiChart.remove(); } catch(e) {} _csiChart = null; }
   };
 
   window.hmTab = function(el, tabId) {
@@ -1129,6 +1538,8 @@
       populateSession(_ccy, _rtCache);
     } else if (tabId === 'correlations' && _ccy) {
       populateCorrelations(_ccy, _strengths, _rtCache);
+    } else if (tabId === 'csi' && _ccy) {
+      populateCSI(_ccy);
     }
   };
 
