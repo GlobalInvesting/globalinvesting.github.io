@@ -917,6 +917,7 @@ def fetch_yfinance_all(symbols_map):
                 pct      = None
                 day_high = None
                 day_low  = None
+                day_open = None  # regularMarketOpen — real intraday open for candle body
 
                 # STEP A: ticker.info (most accurate — same numbers as Yahoo Finance website)
                 try:
@@ -927,6 +928,7 @@ def fetch_yfinance_all(symbols_map):
                     rmpct= info.get("regularMarketChangePercent")
                     rmdh = info.get("dayHigh")
                     rmdl = info.get("dayLow")
+                    rmdo = info.get("regularMarketOpen") or info.get("open")
 
                     if rmp and rmpc and VALIDATORS.get(internal_id, lambda x: True)(float(rmp)):
                         close      = float(rmp)
@@ -937,6 +939,8 @@ def fetch_yfinance_all(symbols_map):
                             day_high = round(float(rmdh), 4)
                         if rmdl:
                             day_low  = round(float(rmdl), 4)
+                        if rmdo:
+                            day_open = round(float(rmdo), 4)
                         print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via info]")
                 except Exception:
                     pass  # fall through to STEP B
@@ -949,6 +953,7 @@ def fetch_yfinance_all(symbols_map):
                         pc = fi.get("previous_close")  if hasattr(fi, "get") else getattr(fi, "previous_close",  None)
                         dh = fi.get("day_high")        if hasattr(fi, "get") else getattr(fi, "day_high",        None)
                         dl = fi.get("day_low")         if hasattr(fi, "get") else getattr(fi, "day_low",         None)
+                        do = fi.get("open")            if hasattr(fi, "get") else getattr(fi, "open",            None)
 
                         if lp and pc and VALIDATORS.get(internal_id, lambda x: True)(float(lp)):
                             close      = float(lp)
@@ -959,6 +964,8 @@ def fetch_yfinance_all(symbols_map):
                                 day_high = round(float(dh), 4)
                             if dl:
                                 day_low  = round(float(dl), 4)
+                            if do:
+                                day_open = round(float(do), 4)
                             print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via fast_info]")
                     except Exception:
                         pass  # fall through to STEP C
@@ -975,8 +982,10 @@ def fetch_yfinance_all(symbols_map):
                     pct = (chg / prev_close * 100) if prev_close != 0 else 0.0
                     highs = hist["High"].dropna()
                     lows  = hist["Low"].dropna()
+                    opens = hist["Open"].dropna()
                     day_high = round(float(highs.iloc[-1]), 4) if len(highs) >= 1 else None
                     day_low  = round(float(lows.iloc[-1]),  4) if len(lows)  >= 1 else None
+                    day_open = round(float(opens.iloc[-1]), 4) if len(opens) >= 1 else None
                     print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via daily hist fallback]")
 
                 validator = VALIDATORS.get(internal_id)
@@ -992,6 +1001,7 @@ def fetch_yfinance_all(symbols_map):
                     "pct":        round(pct, 4),
                     "high":       day_high,
                     "low":        day_low,
+                    "open":       day_open,   # real intraday open (regularMarketOpen) for candle body
                     "source":     "yfinance",
                 }
 
