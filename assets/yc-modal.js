@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.3 — LightweightCharts v5 createYieldCurveChart
+// YIELD CURVE MODAL  v2.4 — LightweightCharts v5 createYieldCurveChart
 // File: assets/yc-modal.js
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -176,7 +176,7 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   _ycLwChart=LWC.createYieldCurveChart(inner,{
     autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
+    yieldCurve:{baseResolution:360,minimumTimeRange:360,startTimeRange:0},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
