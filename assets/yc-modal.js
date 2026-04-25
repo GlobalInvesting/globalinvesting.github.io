@@ -145,10 +145,11 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  // Exact TradingView demo params: autoSize:true, startTimeRange:3 (starts at first tenor, no 0-origin gap),
-  // minimumTimeRange:10, baseResolution:12, minBarSpacing:3
+  // autoSize:true fails in flex containers — canvas initializes to price-scale width (~56px) instead of
+  // the full container. Use explicit width/height measured at draw time + ResizeObserver to update.
+  const w=container.offsetWidth||360, h=container.offsetHeight||220;
   _ycLwChart=LWC.createYieldCurveChart(container,{
-    autoSize:true,
+    width:w, height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
@@ -166,8 +167,16 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
-  // Exact demo pattern: subscribeSizeChange → fitContent only, no manual applyOptions hacks
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
+  // ResizeObserver: keep canvas in sync when container changes (orientation, keyboard, etc.)
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(entries=>{
+      if(!_ycLwChart)return;
+      const e=entries[0],nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
+      if(nw>0&&nh>0){_ycLwChart.applyOptions({width:nw,height:nh});_ycLwChart.timeScale().fitContent();}
+    });
+    ro.observe(container);container._ycRo=ro;
+  }
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 
