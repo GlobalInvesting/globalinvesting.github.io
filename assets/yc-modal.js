@@ -148,8 +148,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  const firstTenorMonth=toData[0]?.time??3;
-  const lastTenorMonth=toData[toData.length-1]?.time??360;
+  // firstTenorMonth/lastTenorMonth not needed — fitContent() handles viewport automatically.
 
   // Remove inner div and tooltip — LWC needs a clean container.
   const tooltip=wrapper.querySelector('#ycm-tooltip');
@@ -168,7 +167,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
     width:w,
     height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:1},
+    yieldCurve:{baseResolution:12,minimumTimeRange:360},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
@@ -192,23 +191,22 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   // during LWC's internal initialization.
   if(tooltip){wrapper.appendChild(tooltip);}
 
-  // Apply visible range via setTimeout cascade:
-  // LWC's timeScale is not ready synchronously or in rAF — use setTimeout to give it
-  // a full JS event loop turn to complete its internal initialization.
-  const margin=Math.max(3,Math.round((lastTenorMonth-firstTenorMonth)*0.03));
-  const applyRange=(chart)=>{
-    if(!chart||chart!==_ycLwChart)return;
-    const ts=chart.timeScale();
-    // Log for diagnostics
-    const vr=ts.getVisibleRange?.();
-    console.log('[YC] applyRange called, getVisibleRange:',JSON.stringify(vr),'from:',firstTenorMonth-margin,'to:',lastTenorMonth+margin);
-    try{ts.setVisibleRange({from:firstTenorMonth-margin,to:lastTenorMonth+margin});}
-    catch(e){console.warn('[YC] setVisibleRange failed:',e.message);try{ts.fitContent();}catch(_){}}
-  };
+  // Apply fitContent after LWC finishes its internal initialization.
+  //
+  // ROOT CAUSE (confirmed by reading LWC v5.0.7 source):
+  // YieldChartApi._initWhitespaceSeries() generates whitespace data on creation and
+  // re-generates it whenever horzBehaviour fires whitespaceInvalidated (which happens
+  // on every setData call). The re-generation compares hashes:
+  //   buildWhitespaceState: end = max(0, minimumTimeRange, lastIndex)
+  // With minimumTimeRange:1: initial end=1, after setData end=360 → hash changes →
+  //   whiteSpaceSeries.setData() fires → internal fitContent() resets our range.
+  // With minimumTimeRange:360: initial end=360, after setData end=max(360,360)=360 →
+  //   hash UNCHANGED → no secondary whitespace update → no spurious fitContent.
+  // Now our explicit fitContent() below is the ONLY viewport change and it persists.
   const chart=_ycLwChart;
-  setTimeout(()=>applyRange(chart),50);
-  setTimeout(()=>applyRange(chart),150);
-  setTimeout(()=>applyRange(chart),400);
+  const doFit=(c)=>{if(c&&c===_ycLwChart)try{c.timeScale().fitContent();}catch(_){}};
+  setTimeout(()=>doFit(chart),50);
+  setTimeout(()=>doFit(chart),200);
 
   // ResizeObserver — only attach after a 500ms delay so it doesn't fire during init.
   if(window.ResizeObserver){
@@ -218,7 +216,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
         if(_ycLwChart!==chart)return;
         const e=entries[0];
         const nw=Math.floor(e.contentRect.width),nh=Math.floor(e.contentRect.height);
-        if(nw>0&&nh>0){chart.applyOptions({width:nw,height:nh});applyRange(chart);}
+        if(nw>0&&nh>0){chart.applyOptions({width:nw,height:nh});doFit(chart);}
       });
       ro.observe(wrapper);wrapper._ycRo=ro;
     },500);
