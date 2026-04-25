@@ -2840,11 +2840,17 @@ function _lwSetRange(days) {
   const ts = _lwChart.timeScale();
   if (days === 0) {
     ts.fitContent();
+    // After fitContent, scroll a bit right so last bar has breathing room
+    setTimeout(() => { try { ts.scrollToRealTime(); } catch(_) {} }, 50);
   } else {
-    const now  = Math.floor(Date.now() / 1000);
-    const from = now - days * 86400;
-    // Add 3 days of right margin so the last bar isn't glued to the price axis
-    ts.setVisibleRange({ from, to: now + (3 * 86400) });
+    // Data uses 'YYYY-MM-DD' string format (BusinessDay) — range must match
+    const now  = new Date();
+    const fromDate = new Date(now.getTime() - days * 86400000);
+    const from = fromDate.toISOString().slice(0, 10);
+    // Add ~5 trading days of right padding so last bar isn't glued to axis
+    const toDate = new Date(now.getTime() + 7 * 86400000);
+    const to = toDate.toISOString().slice(0, 10);
+    try { ts.setVisibleRange({ from, to }); } catch(_) { ts.fitContent(); }
   }
   // Update active button
   document.querySelectorAll('.lw-range-btn').forEach(b => {
@@ -2897,18 +2903,27 @@ async function _renderLWChart(ohlcId, label) {
   const minMove = parseFloat((1 / Math.pow(10, dec)).toFixed(dec));
 
   const LWC = window.LightweightCharts;
+  // Use explicit dimensions — autoSize requires ResizeObserver and can mis-size before first paint
+  const chartW = wrap.offsetWidth  || wrap.clientWidth  || 600;
+  const chartH = wrap.offsetHeight || wrap.clientHeight || 290;
   _lwChart = LWC.createChart(chartDiv, {
-    layout:      { background: { color: '#131722' }, textColor: '#9096a0' },
-    grid:        { vertLines: { color: 'rgba(42,46,57,0.6)' }, horzLines: { color: 'rgba(42,46,57,0.6)' } },
-    crosshair:   { mode: LWC.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 60 },
+    layout:      { background: { color: '#131722' }, textColor: '#d1d4dc' },
+    grid:        { vertLines: { color: 'rgba(42,46,57,0.5)' }, horzLines: { color: 'rgba(42,46,57,0.5)' } },
+    crosshair:   { mode: LWC.CrosshairMode.Normal,
+                   vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
+                   horzLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' } },
+    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 65,
+                       scaleMargins: { top: 0.08, bottom: 0.06 } },
     timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false,
-                   rightOffset: 8, minBarSpacing: 0.5, fixLeftEdge: false, fixRightEdge: false },
+                   rightOffset: 10, barSpacing: 6, minBarSpacing: 1,
+                   fixLeftEdge: false, fixRightEdge: false,
+                   tickMarkFormatter: undefined },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
-    handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
+    handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: false } },
+    localization: { priceFormatter: v => v.toFixed(dec) },
     watermark:   { visible: false },
-    width:  wrap.clientWidth  || 600,
-    height: wrap.clientHeight || 290,
+    width:  chartW,
+    height: chartH,
   });
 
   // Candlestick series — with correct minMove for the asset's decimal precision
@@ -2933,8 +2948,8 @@ async function _renderLWChart(ohlcId, label) {
   let maSeries = null;
   if (ma20.length > 0) {
     maSeries = _lwChart.addLineSeries({
-      color: '#f0a500', lineWidth: 1,
-      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+      color: '#2196f3', lineWidth: 1,
+      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
       priceFormat: { type: 'price', precision: dec, minMove },
     });
     maSeries.setData(ma20);
