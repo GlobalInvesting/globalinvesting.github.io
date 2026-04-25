@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.1 — LightweightCharts v5 createYieldCurveChart
+// YIELD CURVE MODAL  v2.2 — LightweightCharts v5 createYieldCurveChart
 // File: assets/yc-modal.js
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -197,14 +197,26 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
 
   // fitContent + subscribeSizeChange — exact pattern from the TradingView demo.
   // With minBarSpacing:0, LWC will always compress to fit all tenors on any screen width.
+  //
+  // Timing strategy: LWC's internal whitespace series fires whitespaceInvalidated after
+  // setData(), which triggers an internal fitContent override asynchronously. We use
+  // requestAnimationFrame (rAF) to schedule our fitContent AFTER the browser has flushed
+  // all pending renders and LWC's internal callbacks — this is more reliable than
+  // setTimeout(N) because rAF fires at the exact moment the next frame is being painted.
+  // Double-rAF (rAF inside rAF) guarantees we're past both LWC's async update AND the
+  // browser's layout/paint cycle, which is when autoSize dimensions are finally stable.
   const chart=_ycLwChart;
   const doFit=(c)=>{if(c&&c===_ycLwChart)try{c.timeScale().fitContent();}catch(_){}};
+  // Immediate call — in case LWC already has valid dimensions (desktop, no async layout)
   doFit(chart);
+  // Double-rAF: post-render, post-layout
+  requestAnimationFrame(()=>requestAnimationFrame(()=>doFit(chart)));
+  // subscribeSizeChange: re-fit on every resize / orientation change
   try{chart.timeScale().subscribeSizeChange(()=>doFit(chart));}catch(_){}
-  // Extra deferred calls to catch mobile layout resolution (iOS/Android position:fixed
-  // bottom-sheet can report zero size during the first paint cycle).
-  setTimeout(()=>doFit(chart),100);
-  setTimeout(()=>doFit(chart),350);
+  // Safety net for iOS/Android bottom-sheet: position:fixed modals can still resolve
+  // layout after multiple frames (especially on first open after cold start).
+  setTimeout(()=>doFit(chart),250);
+  setTimeout(()=>doFit(chart),600);
 
   _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
