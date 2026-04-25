@@ -1,7 +1,8 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v1.1
+// YIELD CURVE MODAL  v1.2
 // File: assets/yc-modal.js
-// Loaded AFTER dashboard.js and Chart.js
+// Loaded AFTER dashboard.js. Chart.js 4.4.1 loaded via index.html CDN tag.
+// Dynamic loader below is a fallback in case CDN is blocked or delayed.
 //
 //   openYCModal(tenorData)  ← called from yield curve section onclick
 //   closeYCModal()
@@ -239,7 +240,16 @@ function openYCModal(tenorData) {
 
 function _ycDrawChart(labels, todayVals, priorVals) {
   const canvas = document.getElementById('ycm-canvas');
-  if (!canvas || typeof Chart === 'undefined') return;
+  if (!canvas) return;
+
+  // Chart.js should be loaded via CDN in index.html; dynamic loader is a fallback.
+  if (typeof Chart === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload = () => _ycDrawChart(labels, todayVals, priorVals);
+    document.head.appendChild(s);
+    return;
+  }
 
   if (_ycChart) { _ycChart.destroy(); _ycChart = null; }
 
