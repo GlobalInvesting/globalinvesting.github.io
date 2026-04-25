@@ -3051,7 +3051,7 @@ async function _renderLWChart(ohlcId, label) {
   // ── Symbol watermark — institutional standard (Bloomberg shows pair name in chart background) ──
   // Uses LWC v5 createTextWatermark() API — gracefully skipped on older versions
   const _wmLabel = (ohlcId === 'gold' ? 'XAUUSD' : ohlcId === 'wti' ? 'USOIL' : ohlcId.toUpperCase());
-  if (typeof window._lwShowWm === 'undefined') window._lwShowWm = true;
+  if (typeof window._lwShowWm === 'undefined') window._lwShowWm = false;
   let _wmHandle = null;
   function _applyWatermark() {
     // Remove existing watermark if any
@@ -3066,21 +3066,29 @@ async function _renderLWChart(ohlcId, label) {
       const _domWm = document.getElementById('_lw-dom-watermark');
       if (_domWm) _domWm.remove();
       if (typeof LWC.createTextWatermark === 'function') {
+        // Proportional font size: ~15% of chart width, clamped 24–96px
+        const _cw2 = chartW || 300;
+        const _wmFs = Math.min(Math.max(Math.round(_cw2 * 0.15), 24), 96);
         _wmHandle = LWC.createTextWatermark(_lwChart.panes()[0], {
           horzAlign: 'center',
           vertAlign: 'center',
           lines: [
-            { text: _wmLabel, color: 'rgba(209,212,220,0.08)', fontSize: 96, fontWeight: 'bold', fontFamily: 'Inter,sans-serif' },
+            { text: _wmLabel, color: 'rgba(209,212,220,0.08)', fontSize: _wmFs, fontWeight: 'bold', fontFamily: 'Inter,sans-serif' },
           ],
         });
       } else {
         // DOM-based fallback — absolutely positioned over chart container
+        // Font size proportional to chart width (~15% — Bloomberg standard for pair watermarks),
+        // clamped 24–96px so it never overflows on mobile viewports.
         const _chartWrap = document.getElementById('tv-chart-wrap');
         if (_chartWrap) {
+          const _cw = _chartWrap.offsetWidth || chartW || 300;
+          const _rawFs = Math.round(_cw * 0.15);
+          const _fs = Math.min(Math.max(_rawFs, 24), 96);
           const _wm = document.createElement('div');
           _wm.id = '_lw-dom-watermark';
           _wm.textContent = _wmLabel;
-          _wm.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:72px;font-weight:700;font-family:var(--font-ui,sans-serif);color:rgba(255,255,255,0.10);pointer-events:none;user-select:none;z-index:1;white-space:nowrap;letter-spacing:4px;';
+          _wm.style.cssText = `position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:${_fs}px;font-weight:700;font-family:var(--font-ui,sans-serif);color:rgba(255,255,255,0.10);pointer-events:none;user-select:none;z-index:1;white-space:nowrap;letter-spacing:${Math.round(_fs*0.05)}px;`;
           _chartWrap.style.position = 'relative';
           _chartWrap.appendChild(_wm);
         }
@@ -3177,7 +3185,7 @@ async function _renderLWChart(ohlcId, label) {
 
   // ── Volume histogram — lower panel (industry standard on Bloomberg, TradingView, FXCM) ──
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
-  if (typeof window._lwShowVol === 'undefined') window._lwShowVol = true;
+  if (typeof window._lwShowVol === 'undefined') window._lwShowVol = false;
   let volumeSeries = null;
   function _applyVolume() {
     if (volumeSeries) { try { _lwChart.removeSeries(volumeSeries); } catch(_) {} volumeSeries = null; }
@@ -3756,72 +3764,106 @@ async function _renderLWChart(ohlcId, label) {
   if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~5min delay';
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
-  // ── CB Meeting floating tooltip ──────────────────────────────────────────
-  // Floating tooltip that appears near the crosshair on CB meeting dates.
-  // Industry standard: Bloomberg shows "FOMC", "ECB" annotations on the time axis;
-  // TradingView shows a floating label. LWC approach: DOM overlay on crosshair hover.
-  let _cbTooltip = null;
-  function _ensureCbTooltip() {
-    if (_cbTooltip && _cbTooltip.parentNode) return _cbTooltip;
-    _cbTooltip = document.createElement('div');
-    _cbTooltip.id = '_lw-cb-tooltip';
-    _cbTooltip.style.cssText = [
-      'position:absolute','display:none','pointer-events:none',
-      'background:#1e222d','border:1px solid #2a2e39','border-radius:3px',
-      'padding:4px 8px','font-size:10px','font-family:var(--font-ui,sans-serif)',
-      'color:#d1d4dc','z-index:50','white-space:nowrap',
-      'box-shadow:0 2px 8px rgba(0,0,0,.5)',
-    ].join(';');
-    chartDiv.style.position = 'relative';
-    chartDiv.appendChild(_cbTooltip);
-    return _cbTooltip;
-  }
+  // ── CB Meeting floating tooltip — TradingView floating-tooltip pattern ────
+  // Follows https://tradingview.github.io/lightweight-charts/tutorials/how_to/tooltips#floating-tooltip
+  // A single positioned div is created once per chart render and repositioned on
+  // every crosshairMove tick. It flips left when near the right edge and below
+  // when near the top, matching Bloomberg's CB annotation UX exactly.
+  const _CB_NAMES = {
+    USD:'Federal Reserve (FOMC)', EUR:'ECB Governing Council',
+    GBP:'Bank of England',        JPY:'Bank of Japan',
+    AUD:'Reserve Bank of Australia', CAD:'Bank of Canada',
+    CHF:'Swiss National Bank',    NZD:'Reserve Bank of New Zealand',
+  };
+  const TOOLTIP_W  = 200; // px — fixed width so we can flip without measuring
+  const TOOLTIP_H  = 48;  // px — estimated max height (2 CB rows); actual may be less
+  const TOOLTIP_MARGIN = 12; // gap between crosshair point and tooltip corner
+
+  const _cbTooltip = document.createElement('div');
+  _cbTooltip.id = '_lw-cb-tooltip';
+  // Base styles — matches LWC floating tooltip reference implementation
+  Object.assign(_cbTooltip.style, {
+    position:       'absolute',
+    display:        'none',
+    pointerEvents:  'none',
+    boxSizing:      'border-box',
+    width:          TOOLTIP_W + 'px',
+    background:     '#1e222d',
+    border:         '1px solid #363c4e',
+    borderRadius:   '4px',
+    padding:        '6px 10px',
+    fontSize:       '11px',
+    lineHeight:     '1.5',
+    fontFamily:     'var(--font-ui,sans-serif)',
+    color:          '#d1d4dc',
+    zIndex:         '50',
+    boxShadow:      '0 4px 12px rgba(0,0,0,.6)',
+  });
+  chartDiv.style.position = 'relative';
+  chartDiv.appendChild(_cbTooltip);
 
   _lwChart.subscribeCrosshairMove(param => {
-    const tip = _ensureCbTooltip();
+    // ── Header update & MA legend (runs regardless of CB tooltip state) ──
     if (!param || !param.time || !param.seriesData) {
-      _updateLWHeader(lastBar, null, _getRtOverride());  // restore with yfinance % when cursor leaves
+      _updateLWHeader(lastBar, null, _getRtOverride());
       _updateAllMALegend(null);
-      tip.style.display = 'none';
+      _cbTooltip.style.display = 'none';
       return;
     }
-    // CB tooltip: show meeting info when hovering a bar with a CB meeting
-    const dateStr = typeof param.time === 'string' ? param.time
-      : new Date(param.time * 1000).toISOString().slice(0, 10);
-    const cbEvents = window._lwShowCb && window._lwCbMarkerMap && window._lwCbMarkerMap[dateStr];
-    if (cbEvents && cbEvents.length > 0) {
-      const _CB_NAMES = { USD:'Federal Reserve (FOMC)', EUR:'ECB Governing Council',
-        GBP:'Bank of England', JPY:'Bank of Japan', AUD:'Reserve Bank of Australia',
-        CAD:'Bank of Canada', CHF:'Swiss National Bank', NZD:'Reserve Bank of NZ' };
-      const lines = cbEvents.map(ev =>
-        `<span style="color:${ev.color};font-weight:600">${ev.cb}</span>` +
-        ` <span style="color:#848ea0">${_CB_NAMES[ev.cb] || ev.cb} · CB Meeting</span>`
-      ).join('<br>');
-      tip.innerHTML = lines;
-      tip.style.display = 'block';
-      const cW = chartDiv.offsetWidth;
-      const tipW = tip.offsetWidth || 180;
-      const tipH = tip.offsetHeight || 36;
-      let tx = (param.point?.x ?? 0) + 14;
-      let ty = (param.point?.y ?? 0) - tipH - 10;
-      if (tx + tipW > cW - 8) tx = (param.point?.x ?? 0) - tipW - 14;
-      if (ty < 4) ty = (param.point?.y ?? 0) + 18;
-      tip.style.left = tx + 'px';
-      tip.style.top  = ty + 'px';
-    } else {
-      tip.style.display = 'none';
-    }
     const _rawSeriesData = param.seriesData.get(candleSeries);
-    // Normalize Line/Area {time,value} → OHLC-like so _updateLWHeader shows C correctly
+    // Normalize Line/Area {time,value} → OHLC-like for _updateLWHeader
     const candleData = _rawSeriesData
       ? (_rawSeriesData.close != null ? _rawSeriesData
-         : { ..._rawSeriesData, open: _rawSeriesData.value, high: _rawSeriesData.value, low: _rawSeriesData.value, close: _rawSeriesData.value })
+         : { ..._rawSeriesData, open: _rawSeriesData.value, high: _rawSeriesData.value,
+             low: _rawSeriesData.value, close: _rawSeriesData.value })
       : null;
     if (candleData) _updateAllMALegend(param.seriesData);
     const firstMaSeries = window._lwMaState[0]?.series;
     const firstMaData = firstMaSeries ? param.seriesData.get(firstMaSeries) : null;
     const isCurrentBar = lastBar && candleData && candleData.time === lastBar.time;
     if (candleData) _updateLWHeader(candleData, firstMaData ? firstMaData.value : null, isCurrentBar ? _getRtOverride() : null);
+
+    // ── CB floating tooltip ──
+    const dateStr = typeof param.time === 'string' ? param.time
+      : new Date(param.time * 1000).toISOString().slice(0, 10);
+    const cbEvents = window._lwShowCb && window._lwCbMarkerMap && window._lwCbMarkerMap[dateStr];
+    if (!cbEvents || cbEvents.length === 0) {
+      _cbTooltip.style.display = 'none';
+      return;
+    }
+
+    // Build tooltip content
+    const lines = cbEvents.map(ev => {
+      const name = _CB_NAMES[ev.cb] || ev.cb;
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:1px;">`
+        + `<span style="display:inline-block;width:3px;height:12px;background:${ev.color};border-radius:1px;flex-shrink:0;"></span>`
+        + `<span><span style="color:${ev.color};font-weight:700;">${ev.cb}</span>`
+        + ` <span style="color:#848ea0;font-size:10px;">${name}</span></span>`
+        + `</div>`;
+    }).join('');
+    _cbTooltip.innerHTML =
+      `<div style="font-size:9px;color:#6b7280;letter-spacing:.05em;margin-bottom:3px;">CB MEETING</div>`
+      + lines;
+
+    // Position tooltip — floating-tooltip flip logic
+    // Flip horizontally when crosshair is past the midpoint of the chart,
+    // flip vertically when crosshair is in the top 25% of the chart.
+    _cbTooltip.style.display = 'block';
+    const cW = chartDiv.offsetWidth;
+    const cH = chartDiv.offsetHeight;
+    const cx = param.point?.x ?? 0;
+    const cy = param.point?.y ?? 0;
+    // Horizontal: default = right of crosshair; flip left if not enough room
+    const tx = (cx + TOOLTIP_MARGIN + TOOLTIP_W <= cW - 4)
+      ? cx + TOOLTIP_MARGIN
+      : cx - TOOLTIP_MARGIN - TOOLTIP_W;
+    // Vertical: default = above crosshair; flip below if near top
+    const actualH = _cbTooltip.offsetHeight || TOOLTIP_H;
+    const ty = (cy - actualH - TOOLTIP_MARGIN >= 4)
+      ? cy - actualH - TOOLTIP_MARGIN
+      : cy + TOOLTIP_MARGIN;
+    _cbTooltip.style.left = Math.max(0, tx) + 'px';
+    _cbTooltip.style.top  = Math.max(0, ty) + 'px';
   });
 
   // Apply the active range window (default 3M, persists across symbol switches)
