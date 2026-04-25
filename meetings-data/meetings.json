@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-24",
+  "lastUpdate": "2026-04-25",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Apr",
@@ -24,7 +24,7 @@
       "bias": "hold",
       "biasSource": "FRED SOFR vs DFF (Fed Funds)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
+      "biasUpdated": "2026-04-25",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -51,7 +51,7 @@
       "bias": "hold",
       "biasSource": "ECB Data Portal ESTER (EST.B.EU000A2X2A25.WT) vs FRED ECBDFR",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
+      "biasUpdated": "2026-04-25",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -78,7 +78,7 @@
       "bias": "hold",
       "biasSource": "BoE yield curve 1M OIS forward (boeapps) → FRED SONIA spot (IUDSOIA) vs rates/GBP.json",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
+      "biasUpdated": "2026-04-25",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -102,12 +102,12 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "hold",
+      "bias": "hike",
       "biasSource": "SNB zimoma TONA (zimoma cube · monthly) vs BoJ rate (rates/JPY.json)",
-      "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
-      "cutProb": 0,
-      "hikeProb": 0
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-25",
+      "cutProb": null,
+      "hikeProb": null
     },
     "AUD": {
       "nextMeeting": "5 May",
@@ -129,12 +129,12 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hike",
-      "biasSource": "RBA F1 cash rate CSV (AONIA daily effective) vs RBA target → rates/AUD.json trajectory fallback",
-      "biasMethod": "heuristic",
-      "biasUpdated": "2026-04-24",
-      "cutProb": null,
-      "hikeProb": null
+      "bias": "cut",
+      "biasSource": "FRED IRSTCI01AUM156N (OECD overnight AUD · monthly) vs RBA target → rates/AUD.json trajectory fallback",
+      "biasMethod": "spread",
+      "biasUpdated": "2026-04-25",
+      "cutProb": 56,
+      "hikeProb": 0
     },
     "CAD": {
       "nextMeeting": "29 Apr",
@@ -159,7 +159,7 @@
       "bias": "hold",
       "biasSource": "BoC Valet API (CORRA overnight V122514)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
+      "biasUpdated": "2026-04-25",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -179,10 +179,10 @@
       "source": "snb.ch",
       "bias": "hold",
       "biasSource": "SNB data portal SARON (snbgwdzid · daily) vs sight deposit rate",
-      "biasMethod": "ois",
-      "biasUpdated": "2026-04-24",
-      "cutProb": 0,
-      "hikeProb": 0
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-25",
+      "cutProb": null,
+      "hikeProb": null
     },
     "NZD": {
       "nextMeeting": "27 May",
@@ -202,12 +202,12 @@
         "9 Dec"
       ],
       "source": "rbnz.govt.nz",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "FRED IRSTCI01NZM156N (OECD overnight NZD · monthly) vs RBNZ OCR → rates/NZD.json trajectory fallback",
-      "biasMethod": "spread",
-      "biasUpdated": "2026-04-24",
-      "cutProb": 0,
-      "hikeProb": 100
+      "biasMethod": "heuristic",
+      "biasUpdated": "2026-04-25",
+      "cutProb": null,
+      "hikeProb": null
     }
   }
 }
