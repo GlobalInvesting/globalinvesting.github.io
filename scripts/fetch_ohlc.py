@@ -167,12 +167,15 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
 
             dec = DECIMALS.get(id_, 5)
 
-            # yfinance FX data bug: returns Open==Close for many daily bars
-            # (FX spot has no official open — Yahoo duplicates the close).
-            # Fix: when open==close but H!=L, reconstruct open as the midpoint
-            # of the day's High and Low. This produces a realistic body position
-            # without fabricating directional information.
-            if o == c and h != l:
+            # yfinance FX data bug: returns Open very close to Close for many
+            # daily bars (FX spot has no official open — Yahoo duplicates or
+            # nearly duplicates the close). The exact o==c check misses cases
+            # where open differs from close by a tiny rounding epsilon.
+            # Fix: when body < 10% of the high-low range, reconstruct open as
+            # the midpoint of H/L. Gives a realistic candle body without
+            # fabricating directional information.
+            wick = h - l
+            if wick > 0 and abs(o - c) / wick < 0.10:
                 o = round((h + l) / 2, dec)
 
             bars.append({
