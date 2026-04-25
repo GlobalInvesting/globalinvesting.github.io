@@ -177,11 +177,36 @@
 .sess-val { text-align:right; }
 
 /* Correlations tab */
-.corr-grid { display:grid;grid-template-columns:28px repeat(8,1fr) 34px;gap:2px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);font-size:9px; }
-.corr-hdr { display:flex;align-items:center;justify-content:center;color:var(--text3,#6b7280);font-size:9px; }
-.corr-hdr.comp { color:var(--blue,#4f7fff);font-weight:600; }
-.corr-cell { height:28px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500; }
-.corr-cell.comp { border-radius:2px;border:1px solid rgba(79,127,255,.25); }
+.corr-grid {
+  display:grid;
+  grid-template-columns:34px repeat(8,1fr) 42px;
+  gap:3px;
+  font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);
+  font-size:10px;
+}
+.corr-hdr {
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2,#787b86);font-size:9px;font-weight:600;
+  letter-spacing:.04em;padding:4px 2px;
+}
+.corr-hdr.row-lbl {
+  justify-content:flex-end;padding-right:6px;
+  color:var(--text2,#787b86);font-size:9px;font-weight:600;
+}
+.corr-hdr.comp { color:var(--blue,#4f7fff);font-weight:700; }
+.corr-hdr.comp.row-lbl { justify-content:flex-end; }
+.corr-cell {
+  aspect-ratio:1;
+  border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:600;
+  min-height:28px;
+}
+.corr-cell.comp {
+  border-radius:3px;
+  border:1px solid rgba(79,127,255,.3);
+  background:rgba(79,127,255,.1);
+}
 
 /* Footer */
 #hm-footer {
@@ -311,7 +336,7 @@
   // CSI state
   let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
   let _csiChart      = null;  // LWC chart instance
-  let _csiPeriodDays = 126;   // default 6M
+  let _csiPeriodDays = 63;    // default 3M (Bloomberg WCRS default)
   let _csiInited     = false;
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
@@ -515,8 +540,8 @@
         <div class="hm-ct" id="hm-csi-title">CURRENCY STRENGTH INDEX · ACCUMULATED % RETURN · DAILY OHLC</div>
         <div id="hm-csi-period">
           <button class="hm-csi-pbtn" data-days="21"  onclick="csiPeriod(this,21)">1M</button>
-          <button class="hm-csi-pbtn" data-days="63"  onclick="csiPeriod(this,63)">3M</button>
-          <button class="hm-csi-pbtn on" data-days="126" onclick="csiPeriod(this,126)">6M</button>
+          <button class="hm-csi-pbtn on" data-days="63"  onclick="csiPeriod(this,63)">3M</button>
+          <button class="hm-csi-pbtn" data-days="126" onclick="csiPeriod(this,126)">6M</button>
           <button class="hm-csi-pbtn" data-days="252" onclick="csiPeriod(this,252)">1Y</button>
           <button class="hm-csi-pbtn" data-days="0"   onclick="csiPeriod(this,0)">All</button>
         </div>
@@ -994,17 +1019,17 @@
     const grid   = document.createElement('div');
     grid.className = 'corr-grid';
 
-    // Empty top-left
-    const empty = document.createElement('div');
-    grid.appendChild(empty);
+    // ── Row 0: column headers ────────────────────────────────────────────
+    // Empty top-left corner
+    grid.appendChild(document.createElement('div'));
 
-    // Column headers
     ccys.forEach(c => {
       const h = document.createElement('div');
-      h.className = 'corr-hdr';
+      h.className = 'corr-hdr' + (c === ccy ? ' comp' : '');
       h.textContent = c;
       grid.appendChild(h);
     });
+
     // Composite column header
     const compHdr = document.createElement('div');
     compHdr.className = 'corr-hdr comp';
@@ -1012,12 +1037,14 @@
     compHdr.title = 'Equal-weighted composite — avg % vs all 7 G8 peers';
     grid.appendChild(compHdr);
 
-    // Rows
-    const pctValues = ccys.map(c => pctMap[c] ?? 0);
+    // ── Rows 1–8: data ────────────────────────────────────────────────────
+    // Compute max abs diff for normalization (saturates at 0.6%)
+    const SAT = 0.6; // saturation point — diffs >= this get max colour
 
-    ccys.forEach((rowCcy, ri) => {
+    ccys.forEach(rowCcy => {
+      // Row label
       const rLbl = document.createElement('div');
-      rLbl.className = 'corr-hdr';
+      rLbl.className = 'corr-hdr row-lbl' + (rowCcy === ccy ? ' comp' : '');
       rLbl.textContent = rowCcy;
       grid.appendChild(rLbl);
 
@@ -1026,77 +1053,95 @@
         cell.className = 'corr-cell';
 
         if (rowCcy === colCcy) {
-          cell.style.background = 'rgba(255,255,255,.04)';
-          cell.textContent = '·';
+          cell.style.background = 'rgba(255,255,255,.06)';
+          cell.textContent = '—';
           cell.style.color = 'var(--text3,#6b7280)';
+          cell.style.fontWeight = '400';
         } else {
-          const diff = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
-          const abs  = Math.abs(diff);
-          const isHL = rowCcy === ccy || colCcy === ccy;
-          const alpha = Math.min(abs / 0.5, 1) * 0.7;
+          const diff  = (pctMap[rowCcy] ?? 0) - (pctMap[colCcy] ?? 0);
+          const abs   = Math.abs(diff);
+          // Alpha: 0.15 baseline → 0.85 max, saturates at SAT%
+          const alpha = 0.15 + Math.min(abs / SAT, 1) * 0.70;
+          const isHL  = rowCcy === ccy || colCcy === ccy;
+
           if (diff > 0.02) {
-            cell.style.background = `rgba(38,166,154,${alpha})`;
-            cell.style.color = alpha > 0.4 ? '#fff' : 'var(--up,#26a69a)';
+            cell.style.background  = `rgba(38,166,154,${alpha.toFixed(2)})`;
+            // Text: white when background is dark enough, coloured otherwise
+            cell.style.color = alpha > 0.50 ? '#fff' : 'var(--up,#26a69a)';
           } else if (diff < -0.02) {
-            cell.style.background = `rgba(239,83,80,${alpha})`;
-            cell.style.color = alpha > 0.4 ? '#fff' : 'var(--down,#ef5350)';
+            cell.style.background  = `rgba(239,83,80,${alpha.toFixed(2)})`;
+            cell.style.color = alpha > 0.50 ? '#fff' : 'var(--down,#ef5350)';
           } else {
-            cell.style.background = 'rgba(255,255,255,.03)';
+            // Effectively flat — neutral cell
+            cell.style.background = 'rgba(255,255,255,.04)';
             cell.style.color = 'var(--text3,#6b7280)';
+            cell.style.fontWeight = '400';
           }
-          if (isHL) {
-            cell.style.outline = '1px solid rgba(79,127,255,.3)';
-          }
-          cell.textContent = diff >= 0 ? '+' + diff.toFixed(1) : diff.toFixed(1);
+          if (isHL) cell.style.outline = '1px solid rgba(79,127,255,.4)';
+
+          // Format: show one decimal, always with sign
+          const label = (diff >= 0 ? '+' : '') + diff.toFixed(1);
+          cell.textContent = label;
           cell.title = `${rowCcy} vs ${colCcy}: ${fmt2(diff)}`;
         }
         grid.appendChild(cell);
       });
 
-      // Composite cell — equal-weighted avg of this row's 7 values (excluding diagonal)
-      const rowComp = pctMap[rowCcy] ?? 0;
+      // Composite cell (rightmost column)
+      const rowComp  = pctMap[rowCcy] ?? 0;
       const compCell = document.createElement('div');
       compCell.className = 'corr-cell comp';
-      const compAbs = Math.abs(rowComp);
-      const compAlpha = Math.min(compAbs / 0.4, 1) * 0.18 + 0.06;
-      compCell.style.background = `rgba(79,127,255,${compAlpha})`;
-      compCell.style.color = 'var(--blue,#4f7fff)';
-      compCell.style.fontWeight = '700';
+      const compAbs   = Math.abs(rowComp);
+      const compAlpha = 0.08 + Math.min(compAbs / 0.4, 1) * 0.22;
+      compCell.style.background   = `rgba(79,127,255,${compAlpha.toFixed(2)})`;
+      compCell.style.color        = 'var(--blue,#4f7fff)';
+      compCell.style.fontWeight   = '700';
+      compCell.style.fontSize     = '10px';
       compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
       compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
-      if (rowCcy === ccy) compCell.style.outline = '1px solid rgba(79,127,255,.6)';
+      if (rowCcy === ccy) {
+        compCell.style.outline      = '1px solid rgba(79,127,255,.7)';
+        compCell.style.color        = '#fff';
+        compCell.style.background   = `rgba(79,127,255,${(compAlpha + 0.20).toFixed(2)})`;
+      }
       grid.appendChild(compCell);
     });
 
-    // Composite footer row — shows column composites (same values, transposed)
+    // ── Footer row: column composite values ───────────────────────────────
     const footLbl = document.createElement('div');
-    footLbl.className = 'corr-hdr comp';
+    footLbl.className = 'corr-hdr comp row-lbl';
     footLbl.textContent = 'Comp.';
     footLbl.style.fontSize = '8px';
     grid.appendChild(footLbl);
 
     ccys.forEach(colCcy => {
-      const cv = pctMap[colCcy] ?? 0;
+      const cv       = pctMap[colCcy] ?? 0;
       const footCell = document.createElement('div');
       footCell.className = 'corr-cell comp';
-      const cvAbs = Math.abs(cv);
-      const cvAlpha = Math.min(cvAbs / 0.4, 1) * 0.18 + 0.06;
-      footCell.style.background = `rgba(79,127,255,${cvAlpha})`;
-      footCell.style.color = 'var(--blue,#4f7fff)';
-      footCell.style.fontWeight = '700';
+      const cvAbs   = Math.abs(cv);
+      const cvAlpha = 0.08 + Math.min(cvAbs / 0.4, 1) * 0.22;
+      footCell.style.background  = `rgba(79,127,255,${cvAlpha.toFixed(2)})`;
+      footCell.style.color       = 'var(--blue,#4f7fff)';
+      footCell.style.fontWeight  = '700';
+      footCell.style.fontSize    = '10px';
       footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
       footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
-      if (colCcy === ccy) footCell.style.outline = '1px solid rgba(79,127,255,.6)';
+      if (colCcy === ccy) {
+        footCell.style.outline   = '1px solid rgba(79,127,255,.7)';
+        footCell.style.color     = '#fff';
+        footCell.style.background = `rgba(79,127,255,${(cvAlpha + 0.20).toFixed(2)})`;
+      }
       grid.appendChild(footCell);
     });
 
-    // Bottom-right corner cell (intersection of Comp. row and Comp. column)
+    // Corner cell (Comp. × Comp. intersection)
     const corner = document.createElement('div');
-    corner.className = 'corr-cell';
-    corner.style.background = 'rgba(79,127,255,.04)';
-    corner.textContent = '—';
-    corner.style.color = 'var(--text3,#6b7280)';
-    corner.style.fontSize = '8px';
+    corner.className = 'corr-cell comp';
+    corner.style.background  = 'rgba(79,127,255,.05)';
+    corner.style.border      = '1px solid rgba(79,127,255,.15)';
+    corner.textContent       = '—';
+    corner.style.color       = 'var(--text3,#6b7280)';
+    corner.style.fontSize    = '8px';
     grid.appendChild(corner);
 
     matrix.innerHTML = '';
@@ -1412,10 +1457,10 @@
     statsEl.innerHTML = '<table class="hm-tbl" aria-label="CSI period statistics">' +
       '<thead><tr>' +
       '<th scope="col">Currency</th>' +
-      '<th scope="col">Return</th>' +
-      '<th scope="col">Period Min</th>' +
-      '<th scope="col">Period Max</th>' +
-      '<th scope="col">Range</th>' +
+      '<th scope="col">Accum. Return</th>' +
+      '<th scope="col">Drawdown (low)</th>' +
+      '<th scope="col">Peak (high)</th>' +
+      '<th scope="col">Peak-to-Trough</th>' +
       '</tr></thead><tbody>' +
       rows.map(r => {
         const isFocus = r.ccy === ccy;
@@ -1433,7 +1478,7 @@
       }).join('') +
       '</tbody></table>' +
       '<div style="margin-top:8px;font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono);letter-spacing:.03em;">' +
-      'ohlc-data · yfinance · 28-pair equal-weighted CSI · 0bp = period start</div>';
+      'ohlc-data · yfinance · 28-pair equal-weighted CSI · Accum. Return = total from period start · Drawdown/Peak = lowest/highest CSI value within period</div>';
   }
 
   async function populateCSI(ccy) {
