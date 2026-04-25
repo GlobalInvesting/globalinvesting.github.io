@@ -2907,7 +2907,11 @@ function _lwUpdateTodayBar() {
   if (!_lwCandleSeries || !_lwActiveOhlcId) return;
   const bar = _lwBuildTodayBar(_lwActiveOhlcId);
   if (!bar) return;
-  try { _lwCandleSeries.update(bar); } catch(_) {}
+  try {
+    // Line/Area series use {time, value} — not OHLC format
+    const isLineArea = (window._lwChartType === 'line' || window._lwChartType === 'area');
+    _lwCandleSeries.update(isLineArea ? { time: bar.time, value: bar.close } : bar);
+  } catch(_) {}
 
   // Sync the chart header % with yfinance RT data — DIRECT from rt.pct/rt.chg,
   // never recalculated from bar OHLC differences.
@@ -3066,7 +3070,7 @@ async function _renderLWChart(ohlcId, label) {
           horzAlign: 'center',
           vertAlign: 'center',
           lines: [
-            { text: _wmLabel, color: 'rgba(255,255,255,0.12)', fontSize: 96, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
+            { text: _wmLabel, color: 'rgba(209,212,220,0.08)', fontSize: 96, fontWeight: 'bold', fontFamily: 'Inter,sans-serif' },
           ],
         });
       } else {
@@ -3269,7 +3273,12 @@ async function _renderLWChart(ohlcId, label) {
 
   // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
   const todayBar = _lwBuildTodayBar(ohlcId);
-  if (todayBar) { try { candleSeries.update(todayBar); } catch(_) {} }
+  if (todayBar) {
+    try {
+      const _isLA = (window._lwChartType === 'line' || window._lwChartType === 'area');
+      candleSeries.update(_isLA ? { time: todayBar.time, value: todayBar.close } : todayBar);
+    } catch(_) {}
+  }
 
   // ── Multi-MA overlay — up to 3 simultaneous MAs, each with its own period + color ──
   // Colors cycle: blue, orange, purple. User can change period via toolbar.
@@ -3546,7 +3555,7 @@ async function _renderLWChart(ohlcId, label) {
             }
             if (seenDates.has(targetDate + cb)) return;
             seenDates.add(targetDate + cb);
-            markers.push({ time: targetDate, position: 'aboveBar', color, shape: 'circle', text: cb, size: 0.6 });
+            markers.push({ time: targetDate, position: 'belowBar', color, shape: 'arrowUp', text: cb, size: 1 });
           }
         });
       });
@@ -3557,6 +3566,12 @@ async function _renderLWChart(ohlcId, label) {
       } else if (typeof candleSeries.setMarkers === 'function') {
         candleSeries.setMarkers(markers);
       }
+      // Build lookup map for tooltip: date → [{cb, color}]
+      window._lwCbMarkerMap = {};
+      markers.forEach(m => {
+        if (!window._lwCbMarkerMap[m.time]) window._lwCbMarkerMap[m.time] = [];
+        window._lwCbMarkerMap[m.time].push({ cb: m.text, color: m.color });
+      });
     } catch(_cbErr) {}
   }
   const _cbBtn = document.getElementById('lw-cb-btn');
@@ -3698,11 +3713,60 @@ async function _renderLWChart(ohlcId, label) {
   if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~5min delay';
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
+  // ── CB Meeting floating tooltip ──────────────────────────────────────────
+  // Floating tooltip that appears near the crosshair on CB meeting dates.
+  // Industry standard: Bloomberg shows "FOMC", "ECB" annotations on the time axis;
+  // TradingView shows a floating label. LWC approach: DOM overlay on crosshair hover.
+  let _cbTooltip = null;
+  function _ensureCbTooltip() {
+    if (_cbTooltip && _cbTooltip.parentNode) return _cbTooltip;
+    _cbTooltip = document.createElement('div');
+    _cbTooltip.id = '_lw-cb-tooltip';
+    _cbTooltip.style.cssText = [
+      'position:absolute','display:none','pointer-events:none',
+      'background:#1e222d','border:1px solid #2a2e39','border-radius:3px',
+      'padding:4px 8px','font-size:10px','font-family:var(--font-ui,sans-serif)',
+      'color:#d1d4dc','z-index:50','white-space:nowrap',
+      'box-shadow:0 2px 8px rgba(0,0,0,.5)',
+    ].join(';');
+    chartDiv.style.position = 'relative';
+    chartDiv.appendChild(_cbTooltip);
+    return _cbTooltip;
+  }
+
   _lwChart.subscribeCrosshairMove(param => {
+    const tip = _ensureCbTooltip();
     if (!param || !param.time || !param.seriesData) {
       _updateLWHeader(lastBar, null, _getRtOverride());  // restore with yfinance % when cursor leaves
       _updateAllMALegend(null);
+      tip.style.display = 'none';
       return;
+    }
+    // CB tooltip: show meeting info when hovering a bar with a CB meeting
+    const dateStr = typeof param.time === 'string' ? param.time
+      : new Date(param.time * 1000).toISOString().slice(0, 10);
+    const cbEvents = window._lwShowCb && window._lwCbMarkerMap && window._lwCbMarkerMap[dateStr];
+    if (cbEvents && cbEvents.length > 0) {
+      const _CB_NAMES = { USD:'Federal Reserve (FOMC)', EUR:'ECB Governing Council',
+        GBP:'Bank of England', JPY:'Bank of Japan', AUD:'Reserve Bank of Australia',
+        CAD:'Bank of Canada', CHF:'Swiss National Bank', NZD:'Reserve Bank of NZ' };
+      const lines = cbEvents.map(ev =>
+        `<span style="color:${ev.color};font-weight:600">${ev.cb}</span>` +
+        ` <span style="color:#848ea0">${_CB_NAMES[ev.cb] || ev.cb} · CB Meeting</span>`
+      ).join('<br>');
+      tip.innerHTML = lines;
+      tip.style.display = 'block';
+      const cW = chartDiv.offsetWidth;
+      const tipW = tip.offsetWidth || 180;
+      const tipH = tip.offsetHeight || 36;
+      let tx = (param.point?.x ?? 0) + 14;
+      let ty = (param.point?.y ?? 0) - tipH - 10;
+      if (tx + tipW > cW - 8) tx = (param.point?.x ?? 0) - tipW - 14;
+      if (ty < 4) ty = (param.point?.y ?? 0) + 18;
+      tip.style.left = tx + 'px';
+      tip.style.top  = ty + 'px';
+    } else {
+      tip.style.display = 'none';
     }
     const candleData = param.seriesData.get(candleSeries);
     if (candleData) _updateAllMALegend(param.seriesData);
@@ -3907,12 +3971,7 @@ document.getElementById('lw-cb-btn')?.addEventListener('click', function() {
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-document.getElementById('lw-ma-btn')?.addEventListener('click', function() {
-  window._lwShowMa = !window._lwShowMa;
-  this.classList.toggle('on', window._lwShowMa);
-  this.setAttribute('aria-pressed', window._lwShowMa ? 'true' : 'false');
-  if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
-});
+
 
 // ── Chart type selector ──
 // Bloomberg standard: Candlestick default; Bar, Line, Area as alternatives.
@@ -5531,7 +5590,7 @@ async function fetchFedExpectations() {
     if (rows.length) tbody.innerHTML = rows.join('');
 
     // Expose meetings data globally so cb-rates-modal can read bias/fwdRate on click
-    if (meetingsRes?.meetings) window._STATE_meetings = meetingsRes.meetings;
+    if (meetingsRes?.meetings) window._STATE_meetings = meetingsRes; // store full {meetings:{}} wrapper
   } catch(e) { console.warn('CB expectations failed:', e); }
 }
 
