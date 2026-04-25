@@ -2811,6 +2811,27 @@ function _lwUpdateTodayBar() {
   try { _lwCandleSeries.update(bar); } catch(_) {}
 }
 
+// Apply a date-range window to the active LW chart.
+// days=0 → fit all data. Otherwise show the last N calendar days.
+function _lwSetRange(days) {
+  if (!_lwChart) return;
+  const ts = _lwChart.timeScale();
+  if (days === 0) {
+    ts.fitContent();
+  } else {
+    const now   = Math.floor(Date.now() / 1000);
+    const from  = now - days * 86400;
+    ts.setVisibleRange({ from, to: now + 86400 }); // +1d margin for today's bar
+  }
+  // Update active button
+  document.querySelectorAll('.lw-range-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.days) === days);
+  });
+  _lwActiveDays = days;
+}
+
+let _lwActiveDays = 63; // default: 3M
+
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
   const wrap = document.getElementById('tv-chart-wrap');
@@ -2837,13 +2858,19 @@ async function _renderLWChart(ohlcId, label) {
   chartDiv.style.cssText = 'width:100%;height:100%;';
   wrap.appendChild(chartDiv);
 
+  // Enable pointer events for LW chart interactivity (zoom, pan, crosshair)
+  wrap.style.pointerEvents = 'auto';
+
   const LWC = window.LightweightCharts;
   _lwChart = LWC.createChart(chartDiv, {
     layout:      { background: { color: '#131722' }, textColor: '#9096a0' },
     grid:        { vertLines: { color: 'rgba(42,46,57,0.6)' }, horzLines: { color: 'rgba(42,46,57,0.6)' } },
     crosshair:   { mode: LWC.CrosshairMode.Normal },
     rightPriceScale: { borderColor: '#2a2e39' },
-    timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
+    timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false,
+                   rightOffset: 5, barSpacing: 6, fixLeftEdge: false, fixRightEdge: false },
+    handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+    handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
     width:  chartDiv.clientWidth  || wrap.clientWidth  || 600,
     height: chartDiv.clientHeight || wrap.clientHeight || 290,
   });
@@ -2874,7 +2901,18 @@ async function _renderLWChart(ohlcId, label) {
     maSeries.setData(ma20);
   }
 
-  _lwChart.timeScale().fitContent();
+  // Apply the active range window (default 3M, persists across symbol switches)
+  _lwSetRange(_lwActiveDays);
+
+  // Show range toolbar
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) {
+    rangeBar.style.display = 'flex';
+    // Sync active button to current range
+    rangeBar.querySelectorAll('.lw-range-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
+    });
+  }
 
   // Source watermark (bottom-right)
   const srcTicker = _OHLC_LABELS[ohlcId] || label;
@@ -2903,6 +2941,9 @@ function loadCOTChart(longSym) {
   if (!wrap) return;
   _destroyLWChart();
   wrap.innerHTML = '';
+  wrap.style.pointerEvents = 'none';
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) rangeBar.style.display = 'none';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -2938,6 +2979,11 @@ function _loadTVWidgetFallback(sym) {
   if (!wrap) return;
   _destroyLWChart();
   wrap.innerHTML = '';
+  // Restore pointer-events:none — TV widget manages its own interaction via iframe
+  wrap.style.pointerEvents = 'none';
+  // Hide range toolbar — not applicable to TV widget
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) rangeBar.style.display = 'none';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -2999,6 +3045,13 @@ document.getElementById('quotebar-inner')?.addEventListener('click', e => {
   if (!item) return;
   const sym = item.dataset.sym;
   if (sym) loadTVChart(sym);
+});
+
+// Range toolbar buttons — update visible window on active LW chart
+document.getElementById('lw-range-bar')?.addEventListener('click', e => {
+  const btn = e.target.closest('.lw-range-btn');
+  if (!btn) return;
+  _lwSetRange(parseInt(btn.dataset.days));
 });
 
 // ── Pair Detail Popover ─────────────────────────────────────────────────────
