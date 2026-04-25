@@ -490,6 +490,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="GOMARKETS:STOXX50">EuroStoxx</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:BTCUSD">BTC/USD</button>
             <button class="tv-tab" role="tab" aria-selected="false" data-sym="BITSTAMP:ETHUSD">ETH/USD</button>
+            <button class="tv-tab" role="tab" aria-selected="false" data-sym="CBOE:VIX">VIX</button>
           </div>
           <button id="tv-tabs-next" aria-label="Scroll chart tabs right" style="flex-shrink:0;width:26px;background:var(--head-bg);border:none;border-left:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:12px;padding:0;display:flex;align-items:center;justify-content:center;">&#8250;</button>
         </div>
@@ -503,15 +504,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="lw-range-btn"        data-days="1095" aria-label="3 years">3Y</button>
         <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
         <span style="flex:1"></span>
-        <span style="font-size:9px;color:var(--text3);margin-right:3px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">INDICATORS</span>
-        <select id="lw-ma-period" aria-label="MA period" style="background:var(--bg2);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 4px;cursor:pointer;height:18px;">
-          <option value="0">None</option>
-          <option value="10">MA 10</option>
-          <option value="20" selected>MA 20</option>
-          <option value="50">MA 50</option>
-          <option value="100">MA 100</option>
-          <option value="200">MA 200</option>
-        </select>
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">INDICATORS</span>
+        <div id="lw-ma-bar" style="display:inline-flex;align-items:center;gap:4px;"></div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
       <div id="lw-chart-header" aria-live="polite">
