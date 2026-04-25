@@ -27,7 +27,7 @@
 #ycm-legend{display:flex;gap:16px;margin-bottom:8px;flex-shrink:0;align-items:center;}
 .ycm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af);}
 .ycm-leg-line{width:20px;height:2px;border-radius:1px;flex-shrink:0;}
-#ycm-lw-wrap{flex:1;position:relative;min-height:160px;overflow:hidden;}
+#ycm-lw-wrap{flex:1;position:relative;min-height:160px;}
 #ycm-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
 #ycm-shape{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 #ycm-table-wrap{flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);overflow-x:auto;}
@@ -130,14 +130,14 @@ function _ensureYcLwc(){
 }
 
 function _ycDraw(tenorData){
-  const container=document.getElementById('ycm-lw-wrap');if(!container)return;
+  const wrapper=document.getElementById('ycm-lw-wrap');if(!wrapper)return;
   _ensureYcLwc().then(()=>{
     const LWC=window.LightweightCharts;if(!LWC)return;
     if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
     const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
     const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(container,toData,prData,tenorData);
-    else _ycDrawFallback(container,toData,prData,tenorData);
+    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,toData,prData,tenorData);
+    else _ycDrawFallback(wrapper,toData,prData,tenorData);
   }).catch(e=>console.error(e));
 }
 
@@ -163,6 +163,13 @@ function _ycDrawNative(container,toData,prData,tenorData){
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
+  // After creation, force the LWC wrapper div to 100% so it fits the container exactly.
+  // LWC internally creates a div that may overflow due to left price scale accounting.
+  const lwDiv=container.querySelector('.tv-lightweight-charts');
+  if(lwDiv){
+    lwDiv.style.width='100%';
+    lwDiv.style.maxWidth='100%';
+  }
   let priorSeries=null;
   if(prData.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
