@@ -125,7 +125,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   _ycLwChart=LWC.createYieldCurveChart(container,{
     autoSize:true,
-    layout:{background:{type:'solid',color:'transparent'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10},
+    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:2,startTimeRange:1},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
@@ -150,7 +150,7 @@ function _ycDrawFallback(container,toData,prData,tenorData){
   const LABELS=tenorData.map(t=>t.label);
   _ycLwChart=LWC.createChart(container,{
     width:container.offsetWidth||600,height:container.offsetHeight||260,
-    layout:{background:{type:'solid',color:'transparent'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10},
+    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},

@@ -79,7 +79,7 @@ function _processCBRateData(obs){
 function _cbrLwOptions(W,H){
   return{
     width:W,height:H,
-    layout:{background:{type:'solid',color:'transparent'},textColor:'#787b86',fontFamily:_cbrMonoF,fontSize:10},
+    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:_cbrMonoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
@@ -143,7 +143,7 @@ function _buildCBRChart(data){
   const W=container.offsetWidth||600,H=container.offsetHeight||240;
   _cbrLwChart=LWC.createChart(container,_cbrLwOptions(W,H));
   const{chronData,decisions,fwdRate,bias}=data;
-  const mainSeries=_cbrLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
+  const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.18)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
   mainSeries.setData(chronData);
   let fwdSeries=null;
   if(fwdRate!=null&&chronData.length>0){

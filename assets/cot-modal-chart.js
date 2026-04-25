@@ -282,7 +282,7 @@ function _destroyCOTCharts(){
 function _lwOpts(W,H){
   return {
     width:W,height:H,
-    layout:{background:{type:'solid',color:'transparent'},textColor:'#787b86',fontFamily:_monoF,fontSize:10},
+    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:_monoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,

@@ -3031,7 +3031,7 @@ async function _renderLWChart(ohlcId, label) {
     : { top: 0.10, bottom: 0.08 };
 
   _lwChart = LWC.createChart(chartDiv, {
-    layout:      { background: { color: '#131722' }, textColor: '#d1d4dc' },
+    layout:      { background: { color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
     grid:        { vertLines: { color: 'rgba(42,46,57,0.5)' }, horzLines: { color: 'rgba(42,46,57,0.5)' } },
     crosshair:   { mode: LWC.CrosshairMode.Normal,
                    vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
