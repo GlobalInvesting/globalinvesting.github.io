@@ -918,6 +918,8 @@ def fetch_yfinance_all(symbols_map):
                 day_high = None
                 day_low  = None
                 day_open = None  # regularMarketOpen — real intraday open for candle body
+                day_bid  = None  # Yahoo bid price — populated in STEP A if available and sane
+                day_ask  = None  # Yahoo ask price — populated in STEP A if available and sane
 
                 # STEP A: ticker.info (most accurate — same numbers as Yahoo Finance website)
                 try:
@@ -941,6 +943,30 @@ def fetch_yfinance_all(symbols_map):
                             day_low  = round(float(rmdl), 4)
                         if rmdo:
                             day_open = round(float(rmdo), 4)
+
+                        # Bid/Ask — Yahoo exposes these in ticker.info for FX.
+                        # Quality is uncertain: they may be live, delayed, or frozen.
+                        # We read them here for diagnostic purposes and write them to
+                        # quotes.json so the dashboard can evaluate their usefulness
+                        # once the market opens. The dashboard falls back to the HV30
+                        # model when bid/ask are absent or equal (frozen signal).
+                        raw_bid = info.get("bid")
+                        raw_ask = info.get("ask")
+                        if raw_bid and raw_ask:
+                            bid_f = round(float(raw_bid), 5)
+                            ask_f = round(float(raw_ask), 5)
+                            # Sanity: bid < ask, both within 5% of mid-price
+                            mid = close
+                            if (bid_f < ask_f
+                                    and abs(bid_f - mid) / mid < 0.05
+                                    and abs(ask_f - mid) / mid < 0.05):
+                                day_bid = bid_f
+                                day_ask = ask_f
+                                spread_pips_raw = round((ask_f - bid_f) * (100 if "jpy" in internal_id else 10000), 2)
+                                print(f"[yfinance]   bid/ask {internal_id:8s}: {bid_f:.5f}/{ask_f:.5f}  spread={spread_pips_raw:.2f}pip  [{'LIVE?' if bid_f != ask_f else 'FROZEN-equal'}]")
+                            else:
+                                print(f"[yfinance]   bid/ask {internal_id:8s}: REJECTED (bid={raw_bid} ask={raw_ask} mid={mid:.5f})")
+
                         print(f"[yfinance] ✓ {internal_id:8s} ({yf_sym}): {close:.4f}  {pct:+.2f}%  [via info]")
                 except Exception:
                     pass  # fall through to STEP B
@@ -1002,6 +1028,8 @@ def fetch_yfinance_all(symbols_map):
                     "high":       day_high,
                     "low":        day_low,
                     "open":       day_open,   # real intraday open (regularMarketOpen) for candle body
+                    "bid":        day_bid,    # Yahoo bid — None if unavailable or frozen
+                    "ask":        day_ask,    # Yahoo ask — None if unavailable or frozen
                     "source":     "yfinance",
                 }
 
