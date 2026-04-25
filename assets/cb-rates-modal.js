@@ -33,7 +33,7 @@
 .cbr-panel{display:none;}
 .cbr-panel.on{display:flex;flex:1;flex-direction:column;min-height:0;}
 #cbr-p-decisions.on{display:block;flex:none;}
-.cbr-cw{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;}
+.cbr-cw{background:#1e222d;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;}
 .cbr-cw.fill{flex:1;min-height:0;}
 .cbr-ct{font-size:10px;color:var(--text2,#9096a0);margin-bottom:8px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);letter-spacing:.03em;}
 .cbr-chart-area{flex:1;min-height:0;height:100%;position:relative;}
@@ -79,7 +79,7 @@ function _processCBRateData(obs){
 function _cbrLwOptions(W,H){
   return{
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:_cbrMonoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:'#1e222d'},textColor:'#787b86',fontFamily:_cbrMonoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
@@ -143,7 +143,7 @@ function _buildCBRChart(data){
   const W=container.offsetWidth||600,H=container.offsetHeight||240;
   _cbrLwChart=LWC.createChart(container,_cbrLwOptions(W,H));
   const{chronData,decisions,fwdRate,bias}=data;
-  const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.18)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
+  const mainSeries=_cbrLwChart.addSeries(LWC.AreaSeries,{lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.18)',bottomColor:'rgba(79,127,255,0.01)',lineWidth:2,lineType:LWC.LineType?.WithSteps??1,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#1e222d',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:true});
   mainSeries.setData(chronData);
   let fwdSeries=null;
   if(fwdRate!=null&&chronData.length>0){
@@ -161,8 +161,19 @@ function _buildCBRChart(data){
   window.addEventListener('resize',resize);container._cbrResize=resize;
 }
 
-function openCBRatesModal(ccy,obs,bankInfo,meetingData){
+async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   closeCBRatesModal();
+  // If meetingData not yet available (race: CB Expectations fetch still in-flight), fetch directly
+  if(!meetingData){
+    try{
+      const st=window._STATE_meetings;
+      if(st?.meetings?.[ccy]){meetingData=st.meetings[ccy];}
+      else{
+        const res=await fetch('./meetings-data/meetings.json').then(r=>r.ok?r.json():null).catch(()=>null);
+        if(res?.meetings?.[ccy])meetingData=res.meetings[ccy];
+      }
+    }catch(_){}
+  }
   const{chronData,decisions}=_processCBRateData(obs);
   const rates=chronData.map(d=>d.value);
   const currentRate=rates[rates.length-1]??0,rateStart=rates[0]??0,totalChange=currentRate-rateStart;

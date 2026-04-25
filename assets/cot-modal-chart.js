@@ -101,7 +101,7 @@
   color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;
 }
 .cot-cw {
-  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+  background:#1e222d;border:1px solid rgba(255,255,255,.06);
   border-radius:6px;padding:12px 14px;margin-bottom:10px;
   display:flex;flex-direction:column;
 }
@@ -282,7 +282,7 @@ function _destroyCOTCharts(){
 function _lwOpts(W,H){
   return {
     width:W,height:H,
-    layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:_monoF,fontSize:10,attributionLogo:false},
+    layout:{background:{type:'solid',color:'#1e222d'},textColor:'#787b86',fontFamily:_monoF,fontSize:10,attributionLogo:false},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{
       mode:window.LightweightCharts?.CrosshairMode?.Normal??1,
