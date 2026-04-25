@@ -80,7 +80,7 @@ SYMBOLS: dict[str, str] = {
     "nzdchf": "NZDCHF=X",
     "chfjpy": "CHFJPY=X",
     # Cross-asset
-    "gold":  "XAUUSD=X",   # Gold spot (matches quotes.json id 'gold')
+    "gold":  "GC=F",       # Gold front-month futures (XAUUSD=X delisted on Yahoo Finance)
     "wti":   "CL=F",       # WTI Crude front-month futures
     "btc":   "BTC-USD",    # Bitcoin vs USD
     "us10y": "^TNX",       # US 10-Year Treasury yield
@@ -121,8 +121,16 @@ GUARDS: dict[str, tuple[float, float]] = {
     "stoxx": (1000.0,  8000.0),
     "eth":   (10.0,    20000.0),
     "dxy":   (60.0,    150.0),
+    # JPY pairs — quoted in yen, must not use FX_GUARD (0.1–50)
+    "usdjpy":(70.0,    300.0),
+    "eurjpy":(100.0,   400.0),
+    "gbpjpy":(100.0,   400.0),
+    "audjpy":(50.0,    200.0),
+    "cadjpy":(50.0,    200.0),
+    "nzdjpy":(40.0,    200.0),
+    "chfjpy":(80.0,    300.0),
 }
-FX_GUARD = (0.1, 50.0)   # applies to all FX pairs
+FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
