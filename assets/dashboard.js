@@ -2816,15 +2816,31 @@ function _calcMA(bars, n) {
   }).filter(Boolean);
 }
 
+// FX spot IDs — weekend today-bar injection is skipped for these because
+// FX is closed Saturday/Sunday and injecting a flat open=close bar creates
+// a phantom doji candle after the last real Friday bar.
+const _LW_FX_IDS = new Set([
+  'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
+  'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
+  'gbpchf','gbpcad','gbpaud','gbpnzd','audjpy','audnzd','audchf',
+  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
+]);
+
 // Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
 // ohlcId (e.g. 'eurusd') maps directly to STOOQ_RT_CACHE keys, with two
 // special aliases: gold → xauusd, wti → wti (already correct).
+// Returns null on weekends for FX pairs (market closed — no phantom doji).
 function _lwBuildTodayBar(ohlcId) {
+  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // injecting a flat open=close phantom doji after the last real bar.
+  const todayUTC = new Date();
+  const dowUTC   = todayUTC.getUTCDay(); // 0=Sun, 6=Sat
+  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
+
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const q = STOOQ_RT_CACHE[cacheKey];
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
-  const todayUTC = new Date();
   const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
