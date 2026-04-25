@@ -136,9 +136,8 @@ function _ycDraw(tenorData){
     if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
     const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
     const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    // Always use equal-spaced fallback — createYieldCurveChart uses linear month axis
-    // which clusters 3M at 0.8% of the X axis (3/360 months). Bloomberg/Eikon use equal tenor spacing.
-    _ycDrawFallback(container,toData,prData,tenorData);
+    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(container,toData,prData,tenorData);
+    else _ycDrawFallback(container,toData,prData,tenorData);
   }).catch(e=>console.error(e));
 }
 
@@ -146,14 +145,16 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
+  // Exact TradingView demo params: autoSize:true, startTimeRange:3 (starts at first tenor, no 0-origin gap),
+  // minimumTimeRange:10, baseResolution:12, minBarSpacing:3
   _ycLwChart=LWC.createYieldCurveChart(container,{
     autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:1,startTimeRange:0},
+    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
+    timeScale:{borderVisible:false,minBarSpacing:3,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
@@ -164,30 +165,8 @@ function _ycDrawNative(container,toData,prData,tenorData){
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
-  // Force visible range from first to last tenor — no left/right whitespace on any screen size
-  // Immediate forced resize: read container dimensions and apply explicitly.
-  // autoSize:true may not have fired yet if the flex layout hasn't settled.
-  requestAnimationFrame(()=>{
-    if(!_ycLwChart||!container)return;
-    const fw=container.offsetWidth,fh=container.offsetHeight;
-    if(fw>0&&fh>0){_ycLwChart.applyOptions({width:fw,height:fh});}
-    _ycLwChart.timeScale().fitContent();
-  });
-  // ResizeObserver: resize chart explicitly when container changes (mobile layout shifts, orientation)
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(entries => {
-      if (!_ycLwChart) return;
-      const e = entries[0];
-      const nw = Math.floor(e.contentRect.width);
-      const nh = Math.floor(e.contentRect.height);
-      if (nw > 0 && nh > 0) {
-        _ycLwChart.applyOptions({width:nw, height:nh});
-        _ycLwChart.timeScale().fitContent();
-      }
-    });
-    ro.observe(container);
-    container._ycRo = ro;
-  }
+  _ycLwChart.timeScale().fitContent();
+  // Exact demo pattern: subscribeSizeChange → fitContent only, no manual applyOptions hacks
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
