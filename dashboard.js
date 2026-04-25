@@ -584,6 +584,9 @@ function populateHeatmap() {
 
   const grid = document.getElementById('heatmap-grid');
   if (!grid) return;
+  // Store strengths in a module-level variable so the modal can read them
+  // without embedding JSON in an HTML attribute (which breaks on double-quotes).
+  window._hmStrengths = strengths;
   grid.innerHTML = strengths.map(s => {
     let bg = 'h-flat';
     if (s.pct > 0.15) bg = 'h-s-up';
@@ -592,7 +595,7 @@ function populateHeatmap() {
     else if (s.pct < -0.05) bg = 'h-down';
     const cls = s.pct > 0 ? 'up' : s.pct < 0 ? 'down' : 'flat';
     const sign = s.pct >= 0 ? '+' : '';
-    return `<div class="hm-cell ${bg}">
+    return `<div class="hm-cell ${bg}" role="button" tabindex="0" aria-label="${s.ccy} currency strength ${sign}${s.pct.toFixed(2)}%" style="cursor:pointer" title="Click to open ${s.ccy} breakdown · 7 direct pairs · COT · vol · correlations" onclick="if(window.openHeatmapModal)openHeatmapModal('${s.ccy}',window._hmStrengths,STOOQ_RT_CACHE)">
       <span class="hm-sym">${s.ccy}</span>
       <span class="hm-val ${cls}">${sign}${s.pct.toFixed(2)}</span>
     </div>`;
@@ -1236,6 +1239,7 @@ async function fetchQuoteBarRT() {
   const totalUpdated = Object.keys(STOOQ_RT_CACHE).length;
   if (totalUpdated > 0) {
     updateFxPairsTableRT();
+    _lwUpdateTodayBar();   // push live price to the active LW chart (if open)
     const now = new Date();
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
@@ -1323,7 +1327,7 @@ function updateFxPairsTableRT() {
     const arrow = data.pct > 0.05 ? '▲' : data.pct < -0.05 ? '▼' : '→';
     const sign  = data.pct >= 0 ? '+' : '';
     vEl.textContent = data.close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    vEl.className = 'ca-val ' + cls;
+    vEl.className = 'ca-val';
     if (data.chg != null) {
       const absSign = data.chg >= 0 ? '+' : '';
       const absFmt  = Math.abs(data.chg) >= 10 ? (absSign + data.chg.toFixed(1)) : (absSign + data.chg.toFixed(2));
@@ -1383,17 +1387,32 @@ async function fetchCommodityQuotes() {
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCryptoQuotes() {
+  // CoinGecko — used ONLY as a DOM fallback when yfinance has not yet populated BTC data.
+  // STOOQ_RT_CACHE['btc'] is exclusively written by fetchCrossAssetData (yfinance intraday JSON).
+  // Mixing CoinGecko (rolling 24h reference) with yfinance (day-over-day prev_close reference)
+  // produces a % mismatch between the chart header and the cross-asset panel.
   try {
     const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
     if (!r.ok) return;
     const data = await r.json();
     if (data.bitcoin) {
-      const price = data.bitcoin.usd;
-      const chg24 = data.bitcoin.usd_24h_change;
+      const price  = data.bitcoin.usd;
+      const chg24  = data.bitcoin.usd_24h_change;
       const priceEl = document.getElementById('q-btcusd');
       const chgEl   = document.getElementById('qc-btcusd');
-      if (priceEl) { priceEl.textContent = price.toLocaleString(); priceEl.className = 'q-price ' + clsDir(chg24); }
-      if (chgEl)   { chgEl.textContent = pctStr(chg24); chgEl.className = 'q-chg ' + clsDir(chg24); }
+      // Only update DOM when yfinance has not yet provided values (showing '—')
+      if (priceEl && priceEl.textContent === '—') {
+        priceEl.textContent = price.toLocaleString();
+        priceEl.className   = 'q-price ' + clsDir(chg24);
+      }
+      if (chgEl && chgEl.textContent === '—') {
+        chgEl.textContent = pctStr(chg24);
+        chgEl.className   = 'q-chg ' + clsDir(chg24);
+      }
+      // DO NOT write to STOOQ_RT_CACHE['btc'] — that is yfinance-only territory.
+      // Writing CoinGecko's rolling 24h price here would decouple the chart's
+      // today-bar close from the yfinance prev_close used as its open,
+      // producing a % divergence vs the cross-asset panel.
     }
   } catch(e) {}
 }
@@ -2692,12 +2711,459 @@ window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDr
 // ═══════════════════════════════════════════════════════════════════
 // loadCOTChart — COT Long+Short overlaid on same scale in TV widget
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// LIGHTWEIGHT CHARTS — replaces TradingView embed widget for all
+// symbols that have ohlc-data/{id}.json (yfinance daily OHLC, 2y).
+// Symbols without OHLC data fall back to the TradingView widget.
+// ═══════════════════════════════════════════════════════════════════
+
+// Map TradingView data-sym values → ohlc-data file IDs
+// Full display names for LW chart header (mirrors TradingView legend)
+const _OHLC_FULL_NAMES = {
+  eurusd:'Euro / U.S. Dollar',   gbpusd:'British Pound / U.S. Dollar',
+  usdjpy:'U.S. Dollar / Japanese Yen', audusd:'Australian Dollar / U.S. Dollar',
+  usdcad:'U.S. Dollar / Canadian Dollar', usdchf:'U.S. Dollar / Swiss Franc',
+  nzdusd:'New Zealand Dollar / U.S. Dollar', eurgbp:'Euro / British Pound',
+  eurjpy:'Euro / Japanese Yen', eurchf:'Euro / Swiss Franc',
+  eurcad:'Euro / Canadian Dollar', euraud:'Euro / Australian Dollar',
+  eurnzd:'Euro / New Zealand Dollar', gbpjpy:'British Pound / Japanese Yen',
+  gbpchf:'British Pound / Swiss Franc', gbpcad:'British Pound / Canadian Dollar',
+  gbpaud:'British Pound / Australian Dollar', gbpnzd:'British Pound / New Zealand Dollar',
+  audjpy:'Australian Dollar / Japanese Yen', audnzd:'Australian Dollar / New Zealand Dollar',
+  audchf:'Australian Dollar / Swiss Franc', audcad:'Australian Dollar / Canadian Dollar',
+  cadjpy:'Canadian Dollar / Japanese Yen', cadchf:'Canadian Dollar / Swiss Franc',
+  nzdjpy:'New Zealand Dollar / Japanese Yen', nzdcad:'New Zealand Dollar / Canadian Dollar',
+  nzdchf:'New Zealand Dollar / Swiss Franc', chfjpy:'Swiss Franc / Japanese Yen',
+  gold:'Gold Futures', wti:'Crude Oil WTI Futures', btc:'Bitcoin / U.S. Dollar',
+  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq Composite',
+  nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
+  dxy:'U.S. Dollar Index',
+};
+
+const _TV_TO_OHLC = {
+  'FX_IDC:EURUSD': 'eurusd',  'FX_IDC:USDJPY': 'usdjpy',
+  'FX_IDC:GBPUSD': 'gbpusd',  'FX_IDC:AUDUSD': 'audusd',
+  'FX_IDC:USDCAD': 'usdcad',  'FX_IDC:USDCHF': 'usdchf',
+  'FX_IDC:NZDUSD': 'nzdusd',  'FX_IDC:EURGBP': 'eurgbp',
+  'FX_IDC:EURJPY': 'eurjpy',  'FX_IDC:EURCHF': 'eurchf',
+  'FX_IDC:EURCAD': 'eurcad',  'FX_IDC:EURAUD': 'euraud',
+  'FX_IDC:EURNZD': 'eurnzd',  'FX_IDC:GBPJPY': 'gbpjpy',
+  'FX_IDC:GBPCHF': 'gbpchf',  'FX_IDC:GBPCAD': 'gbpcad',
+  'FX_IDC:GBPAUD': 'gbpaud',  'FX_IDC:GBPNZD': 'gbpnzd',
+  'FX_IDC:AUDJPY': 'audjpy',  'FX_IDC:AUDNZD': 'audnzd',
+  'FX_IDC:AUDCHF': 'audchf',  'FX_IDC:AUDCAD': 'audcad',
+  'FX_IDC:CADJPY': 'cadjpy',  'FX_IDC:CADCHF': 'cadchf',
+  'FX_IDC:NZDJPY': 'nzdjpy',  'FX_IDC:NZDCAD': 'nzdcad',
+  'FX_IDC:NZDCHF': 'nzdchf',  'FX_IDC:CHFJPY': 'chfjpy',
+  'CMCMARKETS:GOLDM2026': 'gold',
+  'FPMARKETS:WTI':        'wti',
+  'BITSTAMP:BTCUSD':      'btc',
+  'COINBASE:BTCUSD':      'btc',
+  'FRED:DGS10':           'us10y',
+  // Equity indices
+  'CMCMARKETS:SPX500':    'spx',
+  'CFI:US100':            'nasdaq',
+  'OSE:NK2251!':          'nikkei',
+  'GOMARKETS:STOXX50':    'stoxx',
+  // Crypto
+  'BITSTAMP:ETHUSD':      'eth',
+  'COINBASE:ETHUSD':      'eth',
+  // FX Index
+  'PEPPERSTONE:USDX':     'dxy',
+};
+
+// Human-readable labels for the chart source footer
+const _OHLC_LABELS = {
+  gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
+  spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
+  eth: 'ETH-USD', dxy: 'DX-Y.NYB',
+};
+
+// Active LW chart instance — destroyed before each new render
+let _lwChart = null;
+let _lwResizeObs = null;
+let _lwCandleSeries = null;   // reference for live today-bar updates
+let _lwActiveOhlcId = null;   // ohlcId currently displayed
+let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
+let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
+
+// Ensure the Lightweight Charts library is loaded (lazy, once)
+let _lwLibPromise = null;
+function _ensureLWLib() {
+  if (window.LightweightCharts) return Promise.resolve();
+  if (_lwLibPromise) return _lwLibPromise;
+  _lwLibPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js';
+    s.onload  = resolve;
+    s.onerror = () => { _lwLibPromise = null; reject(new Error('LW lib load failed')); };
+    document.head.appendChild(s);
+  });
+  return _lwLibPromise;
+}
+
+// Destroy any active LW chart instance cleanly
+function _destroyLWChart() {
+  if (_lwResizeObs)  { _lwResizeObs.disconnect(); _lwResizeObs = null; }
+  if (_lwChart)      { try { _lwChart.remove(); } catch(_) {} _lwChart = null; }
+  _lwCandleSeries = null;
+  _lwActiveOhlcId = null;
+  _lwActiveUpdateHeader = null;
+  _lwActivePrevCloseMap = null;
+}
+
+// Compute MA(n) over close prices
+function _calcMA(bars, n) {
+  return bars.map((b, i) => {
+    if (i < n - 1) return null;
+    const sum = bars.slice(i - n + 1, i + 1).reduce((a, x) => a + x.close, 0);
+    return { time: b.time, value: parseFloat((sum / n).toFixed(6)) };
+  }).filter(Boolean);
+}
+
+// FX spot IDs — weekend today-bar injection is skipped for these because
+// FX is closed Saturday/Sunday and injecting a flat open=close bar creates
+// a phantom doji candle after the last real Friday bar.
+const _LW_FX_IDS = new Set([
+  'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
+  'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
+  'gbpchf','gbpcad','gbpaud','gbpnzd','audjpy','audnzd','audchf',
+  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
+]);
+
+// Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
+// ohlcId (e.g. 'eurusd') maps directly to STOOQ_RT_CACHE keys, with two
+// special aliases: gold → xauusd, wti → wti (already correct).
+// Returns null on weekends for FX pairs (market closed — no phantom doji).
+function _lwBuildTodayBar(ohlcId) {
+  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // injecting a flat open=close phantom doji after the last real bar.
+  const todayUTC = new Date();
+  const dowUTC   = todayUTC.getUTCDay(); // 0=Sun, 6=Sat
+  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
+
+  // STOOQ_RT_CACHE key for this ohlcId
+  const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+  const q = STOOQ_RT_CACHE[cacheKey];
+  if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
+  const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+  const c = parseFloat(q.close.toFixed(dec));
+  const o = q.open  != null && q.open  > 0 ? parseFloat(q.open.toFixed(dec))  : c;
+  const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
+  const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
+  return { time: dateStr, open: o, high: h, low: l, close: c };
+}
+
+// Push/update the live today-bar on the active LW chart (called every 5 min).
+// Safe to call when no chart is open — exits silently.
+function _lwUpdateTodayBar() {
+  if (!_lwCandleSeries || !_lwActiveOhlcId) return;
+  const bar = _lwBuildTodayBar(_lwActiveOhlcId);
+  if (!bar) return;
+  try { _lwCandleSeries.update(bar); } catch(_) {}
+
+  // Sync the chart header % with yfinance RT data (same source as ticker).
+  // _updateLWHeader uses _prevCloseMap which has no entry for today's date →
+  // falls back to bar.open.  For the live today-bar we inject the prevClose from
+  // STOOQ_RT_CACHE (= yfinance prev_close) so that the header % matches the
+  // ticker % exactly — both sourced from yfinance, never from historical OHLC diff.
+  if (_lwActiveUpdateHeader && _lwActivePrevCloseMap) {
+    const cacheKey = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
+    const rt = STOOQ_RT_CACHE[cacheKey];
+    if (rt?.open != null && rt.open > 0) {
+      _lwActivePrevCloseMap.set(bar.time, rt.open); // rt.open = prev_close from yfinance
+    }
+    _lwActiveUpdateHeader(bar, null);
+  }
+}
+
+// Apply a date-range window to the active LW chart.
+// days=0 → fit all data. Otherwise show the last N calendar days.
+let _lwTotalBars = 0;  // set after each chart load; used by range buttons
+
+function _lwSetRange(days, totalBars) {
+  if (!_lwChart) return;
+  // If totalBars provided, update the stored value
+  if (totalBars != null) _lwTotalBars = totalBars;
+  const n = _lwTotalBars;
+  const ts = _lwChart.timeScale();
+
+  if (days === 0) {
+    ts.fitContent();
+    document.querySelectorAll('.lw-range-btn').forEach(b => b.classList.toggle('active', b.dataset.days === '0'));
+    _lwActiveDays = 0;
+    return;
+  }
+
+  // LW Charts v4.2: index 0 = FIRST bar, index (n-1) = LAST bar.
+  if (n < 1) { ts.fitContent(); return; }
+  const tradingBars = Math.round(days * 5 / 7);
+  const rightPad    = 8;
+  const from = n - tradingBars - 1;
+  const to   = n + rightPad - 1;
+
+  setTimeout(() => {
+    try { ts.setVisibleLogicalRange({ from, to }); } catch (_) { ts.fitContent(); }
+  }, 30);
+
+  document.querySelectorAll('.lw-range-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.days) === days);
+  });
+  _lwActiveDays = days;
+}
+
+let _lwActiveDays = 91; // default: 3M (calendar days)
+
+// Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
+async function _renderLWChart(ohlcId, label) {
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+
+  _destroyLWChart();
+  wrap.innerHTML = '';
+
+  // Loading state
+  const loader = document.createElement('div');
+  loader.style.cssText = 'height:100%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;font-family:var(--font-ui,sans-serif);';
+  loader.textContent = 'Loading chart\u2026';
+  wrap.appendChild(loader);
+
+  await _ensureLWLib();
+  const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const bars = await r.json();
+  if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+
+  wrap.innerHTML = '';
+
+  // Remove the negative margin used to hide TradingView widget footer — not needed for LW
+  wrap.style.marginBottom = '0';
+
+  const chartDiv = document.createElement('div');
+  chartDiv.style.cssText = 'width:100%;height:100%;';
+  wrap.appendChild(chartDiv);
+
+  // Enable pointer events for LW chart interactivity (zoom, pan, crosshair)
+  wrap.style.pointerEvents = 'auto';
+
+  // Decimal precision map — drives minMove and formatting
+  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+  // minMove must match the precision: 5dp → 0.00001, 4dp → 0.0001, 3dp → 0.001, 2dp → 0.01
+  const minMove = parseFloat((1 / Math.pow(10, dec)).toFixed(dec));
+
+  const LWC = window.LightweightCharts;
+  // Use explicit dimensions — autoSize requires ResizeObserver and can mis-size before first paint
+  const chartW = wrap.offsetWidth  || wrap.clientWidth  || 600;
+  const chartH = wrap.offsetHeight || wrap.clientHeight || 290;
+  _lwChart = LWC.createChart(chartDiv, {
+    layout:      { background: { color: '#131722' }, textColor: '#d1d4dc' },
+    grid:        { vertLines: { color: 'rgba(42,46,57,0.5)' }, horzLines: { color: 'rgba(42,46,57,0.5)' } },
+    crosshair:   { mode: LWC.CrosshairMode.Normal,
+                   vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
+                   horzLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' } },
+    rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 65,
+                       scaleMargins: { top: 0.10, bottom: 0.08 } },
+    timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false,
+                   rightOffset: 8, minBarSpacing: 1,
+                   fixLeftEdge: false, fixRightEdge: false },
+    handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+    handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: false } },
+    localization: { priceFormatter: v => v.toFixed(dec) },
+    watermark:   { visible: false },
+    width:  chartW,
+    height: chartH,
+  });
+
+  // Candlestick series — with correct minMove for the asset's decimal precision
+  const candleSeries = _lwChart.addCandlestickSeries({
+    upColor: '#26a69a', downColor: '#ef5350',
+    borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+    wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+    priceFormat: { type: 'price', precision: dec, minMove },
+  });
+  candleSeries.setData(bars);
+
+  // Store global refs so _lwUpdateTodayBar() can push live prices
+  _lwCandleSeries = candleSeries;
+  _lwActiveOhlcId = ohlcId;
+
+  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
+  const todayBar = _lwBuildTodayBar(ohlcId);
+  if (todayBar) { try { candleSeries.update(todayBar); } catch(_) {} }
+
+  // MA overlay — period driven by #lw-ma-period selector (default 20)
+  const MA_COLOR = '#1565c0'; // darker blue — matches TV widget more closely
+  let _lwMaPeriod = parseInt(document.getElementById('lw-ma-period')?.value ?? '20') || 20;
+  let _lwMaSeries = null;
+
+  function _buildMA(period) {
+    if (_lwMaSeries) { try { _lwChart.removeSeries(_lwMaSeries); } catch(_) {} _lwMaSeries = null; }
+    if (period < 1) return;
+    const maData = _calcMA(bars, period);
+    if (maData.length === 0) return;
+    _lwMaSeries = _lwChart.addLineSeries({
+      color: MA_COLOR, lineWidth: 1,
+      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+      priceFormat: { type: 'price', precision: dec, minMove },
+    });
+    _lwMaSeries.setData(maData);
+    return maData;
+  }
+
+  let _activeMaData = _buildMA(_lwMaPeriod);
+  // Keep maSeries alias for crosshair subscription below
+  let maSeries = _lwMaSeries;
+
+  // Wire indicator selector
+  const maPeriodSel = document.getElementById('lw-ma-period');
+  if (maPeriodSel) {
+    // Remove any previous listener by cloning
+    const newSel = maPeriodSel.cloneNode(true);
+    maPeriodSel.parentNode.replaceChild(newSel, maPeriodSel);
+    newSel.addEventListener('change', () => {
+      _lwMaPeriod = parseInt(newSel.value) || 0;
+      _activeMaData = _buildMA(_lwMaPeriod);
+      maSeries = _lwMaSeries;
+      // Update legend label
+      const lbl = document.getElementById('lw-ma-legend');
+      if (lbl) lbl.textContent = '';
+    });
+  }
+
+  // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
+  function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
+
+  // MA legend overlay — inside the chart, top-left, exactly like TV widget
+  const maLegendEl = document.createElement('div');
+  maLegendEl.id = 'lw-ma-legend';
+  maLegendEl.style.cssText = [
+    'position:absolute;top:6px;left:8px;z-index:3;pointer-events:none;',
+    'font-size:11px;font-family:var(--font-mono,monospace);',
+    'color:' + MA_COLOR + ';line-height:1.4;user-select:none;',
+  ].join('');
+  wrap.appendChild(maLegendEl);
+
+  // MA legend: empty by default, shows "MA N  value" only on crosshair hover
+  function _updateMALegend(maVal) {
+    if (!maLegendEl || _lwMaPeriod < 1) { if (maLegendEl) maLegendEl.textContent = ''; return; }
+    maLegendEl.textContent = maVal != null ? 'MA ' + _lwMaPeriod + '\u00a0\u00a0' + _fmtHdrVal(maVal) : '';
+  }
+
+  // prevClose map: date → prev bar's close, for day-over-day % change in header
+  const _prevCloseMap = new Map();
+  for (let i = 1; i < bars.length; i++) {
+    _prevCloseMap.set(bars[i].time, bars[i - 1].close);
+  }
+  // Expose to _lwUpdateTodayBar so it can inject today's prevClose from yfinance RT cache
+  _lwActivePrevCloseMap = _prevCloseMap;
+
+  function _updateLWHeader(bar, maVal) {
+    const symEl  = document.getElementById('lw-hdr-sym');
+    const oEl    = document.getElementById('lw-hdr-o-val');
+    const hEl    = document.getElementById('lw-hdr-h-val');
+    const lEl    = document.getElementById('lw-hdr-l-val');
+    const cEl    = document.getElementById('lw-hdr-c-val');
+    const chgEl  = document.getElementById('lw-hdr-chg-val');
+    if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
+    if (bar) {
+      if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = '#d1d4dc'; }
+      if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = '#26a69a'; }
+      if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = '#ef5350'; }
+      // Change = close vs previous bar's close (day-over-day), matching ticker behaviour
+      const prevClose = _prevCloseMap.get(bar.time) ?? bar.open;
+      const isUp = bar.close != null && bar.close >= prevClose;
+      if (cEl) { cEl.textContent = _fmtHdrVal(bar.close); cEl.style.color = isUp ? '#26a69a' : '#ef5350'; }
+      if (chgEl && prevClose != null && prevClose > 0 && bar.close != null) {
+        const chg = bar.close - prevClose;
+        const pct = (chg / prevClose) * 100;
+        const sign = chg >= 0 ? '+' : '';
+        chgEl.textContent = ' ' + sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
+        chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
+      } else if (chgEl) { chgEl.textContent = ''; }
+    }
+    _updateMALegend(maVal);
+  }
+
+  // Expose _updateLWHeader to _lwUpdateTodayBar so live RT data syncs the header % with the ticker
+  _lwActiveUpdateHeader = _updateLWHeader;
+
+  // Show the header and populate with last bar
+  const hdrEl = document.getElementById('lw-chart-header');
+  if (hdrEl) hdrEl.style.display = 'flex';
+
+  // Populate with last available bar — MA value empty until crosshair hover
+  const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
+  _updateLWHeader(lastBar, null);
+
+  // Update panel-sub to reflect yfinance source
+  const panelSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~15min delay';
+
+  // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
+  _lwChart.subscribeCrosshairMove(param => {
+    if (!param || !param.time || !param.seriesData) {
+      _updateLWHeader(lastBar, null);  // restore OHLC to last bar, clear MA value
+      return;
+    }
+    const candleData = param.seriesData.get(candleSeries);
+    const maData = maSeries ? param.seriesData.get(maSeries) : null;
+    if (candleData) _updateLWHeader(candleData, maData ? maData.value : null);
+  });
+
+  // Apply the active range window (default 3M, persists across symbol switches)
+  _lwSetRange(_lwActiveDays, bars.length);
+
+  // Show range toolbar and sync active button
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) {
+    rangeBar.style.display = 'flex';
+    rangeBar.querySelectorAll('.lw-range-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
+    });
+  }
+
+  // Source watermark (bottom-right, tiny, faint)
+  const srcTicker = _OHLC_LABELS[ohlcId] || label;
+  const labelEl = document.createElement('div');
+  labelEl.style.cssText = 'position:absolute;bottom:4px;right:8px;font-size:9px;color:rgba(144,150,160,0.4);font-family:var(--font-ui,sans-serif);pointer-events:none;z-index:1;user-select:none;';
+  labelEl.textContent = 'yfinance \u00b7 ' + srcTicker + ' \u00b7 daily';
+  wrap.style.position = 'relative';
+  wrap.appendChild(labelEl);
+
+  // Responsive resize
+  if (typeof ResizeObserver !== 'undefined') {
+    _lwResizeObs = new ResizeObserver(entries => {
+      for (const e of entries) {
+        const { width, height } = e.contentRect;
+        if (_lwChart && width > 0 && height > 0) _lwChart.resize(width, height);
+      }
+    });
+    _lwResizeObs.observe(chartDiv);
+  }
+}
+
+// ── COT Chart: always uses TradingView widget (comparative overlay) ──
 function loadCOTChart(longSym) {
-  // Derive Short symbol: replace trailing _L with _S
   const shortSym = longSym.replace(/_L$/, '_S');
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _destroyLWChart();
   wrap.innerHTML = '';
+  wrap.style.pointerEvents = 'none';
+  wrap.style.marginBottom = '-32px';
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) rangeBar.style.display = 'none';
+  const cotHdr = document.getElementById('lw-chart-header');
+  if (cotHdr) cotHdr.style.display = 'none';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -2713,48 +3179,37 @@ function loadCOTChart(longSym) {
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
   script.text = JSON.stringify({
-    allow_symbol_change: false,
-    calendar: false,
-    details: false,
-    hide_side_toolbar: true,
-    hide_top_toolbar: true,
-    hide_legend: false,
-    hide_volume: true,
-    interval: 'W',
-    locale: 'en',
-    save_image: true,
-    style: '2',
-    symbol: longSym,
-    theme: 'dark',
-    timezone: 'Etc/UTC',
-    backgroundColor: '#131722',
-    gridColor: 'rgba(42,46,57,0.8)',
-    withdateranges: false,
-    compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
-    scaleMode: 2,
-    studies: [],
-    autosize: true,
+    allow_symbol_change: false, calendar: false, details: false,
+    hide_side_toolbar: true, hide_top_toolbar: true, hide_legend: false,
+    hide_volume: true, interval: 'W', locale: 'en', save_image: true,
+    style: '2', symbol: longSym, theme: 'dark', timezone: 'Etc/UTC',
+    backgroundColor: '#131722', gridColor: 'rgba(42,46,57,0.8)',
+    withdateranges: false, compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
+    scaleMode: 2, studies: [], autosize: true,
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll chart into view
   const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
   chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// SHARED: load any symbol into the TradingView chart + scroll to it
-// ═══════════════════════════════════════════════════════════════════
-function loadTVChart(sym) {
-  // Deactivate all tabs; activate matching tab if exists
-  document.querySelectorAll('.tv-tab').forEach(t => {
-    t.classList.remove('active');
-    if (t.dataset.sym === sym) t.classList.add('active');
-  });
-  // Update pair detail panel (Eikon-style linked panels)
-  updatePairDetail(sym);
+// ── Internal: TV widget fallback for symbols without OHLC data ──
+function _loadTVWidgetFallback(sym) {
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _destroyLWChart();
   wrap.innerHTML = '';
+  // Restore pointer-events:none — TV widget manages its own interaction via iframe
+  wrap.style.pointerEvents = 'none';
+  // Restore negative margin to hide TradingView widget's internal iframe footer bar
+  wrap.style.marginBottom = '-32px';
+  // Hide range toolbar and symbol header — not applicable to TV widget
+  const rangeBar = document.getElementById('lw-range-bar');
+  if (rangeBar) rangeBar.style.display = 'none';
+  const hdrEl = document.getElementById('lw-chart-header');
+  if (hdrEl) hdrEl.style.display = 'none';
+  const panelSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (panelSub) panelSub.textContent = 'TradingView \u00b7 live data';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -2781,10 +3236,33 @@ function loadTVChart(sym) {
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll chart into view
-  const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
-  chartSection.scrollIntoView({ behavior:'smooth', block:'start' });
-  setTimeout(minimizeTVLegend, 3000);
+}
+
+// SHARED: load any symbol into the chart + scroll to it
+// Prefers Lightweight Charts (yfinance OHLC); falls back to TradingView widget.
+// ═══════════════════════════════════════════════════════════════════
+function loadTVChart(sym) {
+  document.querySelectorAll('.tv-tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.dataset.sym === sym) t.classList.add('active');
+  });
+  updatePairDetail(sym);
+  const chartSection = document.getElementById('section-fxpairs') ||
+    document.getElementById('tv-chart-wrap')?.closest('.panel') ||
+    document.getElementById('tv-chart-wrap');
+  const ohlcId = _TV_TO_OHLC[sym];
+  if (ohlcId) {
+    const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
+    _renderLWChart(ohlcId, label)
+      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .catch(() => {
+        _loadTVWidgetFallback(sym);
+        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+  } else {
+    _loadTVWidgetFallback(sym);
+    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // ── Quote bar: click any item to open chart ──
@@ -2793,6 +3271,13 @@ document.getElementById('quotebar-inner')?.addEventListener('click', e => {
   if (!item) return;
   const sym = item.dataset.sym;
   if (sym) loadTVChart(sym);
+});
+
+// Range toolbar buttons — update visible window on active LW chart
+document.getElementById('lw-range-bar')?.addEventListener('click', e => {
+  const btn = e.target.closest('.lw-range-btn');
+  if (!btn) return;
+  _lwSetRange(parseInt(btn.dataset.days));
 });
 
 // ── Pair Detail Popover ─────────────────────────────────────────────────────
@@ -2835,10 +3320,16 @@ function toggleInlineDetail(row) {
   expandRow.appendChild(td);
   row.after(expandRow);
 
-  // Animate open
+  // Animate open, then remove the cap so content is never clipped
   requestAnimationFrame(() => {
     expandRow.classList.add('pd-open');
-    inner.style.maxHeight = '160px';
+    inner.style.maxHeight = '185px';
+    setTimeout(() => {
+      if (expandRow.classList.contains('pd-open')) {
+        inner.style.maxHeight = 'none';
+        inner.style.overflow  = 'visible';
+      }
+    }, 200); // slightly after the 180ms transition
   });
 
   // Populate with real data
@@ -2901,9 +3392,12 @@ async function buildInlineDetail(tvSym, container) {
     }
   } catch {}
 
-  // COT
+  // COT — for crosses, load BOTH component currencies
+  const isCrossPair = !!meta?.cross;
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  const cotCcy2 = isCrossPair && quote && quote !== cotCcy ? quote : null;
+  const cotRaw2 = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
   let cotNet = null, cotAmNet = null, cotWow = null, cotPctOI = null, cotWeek = '';
   if (cotRaw) {
     const flip = (invert && cotCcy === quote) ? -1 : 1;
@@ -2912,6 +3406,14 @@ async function buildInlineDetail(tvSym, container) {
     cotWow   = cotRaw.wowNetChange != null ? cotRaw.wowNetChange * flip : null;
     cotPctOI = cotRaw.levNetPctOI  != null ? cotRaw.levNetPctOI  * flip : null;
     cotWeek  = cotRaw.weekEnding || '';
+  }
+  let cot2Net = null, cot2AmNet = null, cot2Wow = null, cot2PctOI = null;
+  if (cotRaw2) {
+    cot2Net    = cotRaw2.net          ?? null;
+    cot2AmNet  = cotRaw2.amNet        ?? null;
+    cot2Wow    = cotRaw2.wowNetChange ?? null;
+    cot2PctOI  = cotRaw2.levNetPctOI  ?? null;
+    if (!cotWeek && cotRaw2.weekEnding) cotWeek = cotRaw2.weekEnding;
   }
 
   // Carry
@@ -2964,13 +3466,29 @@ async function buildInlineDetail(tvSym, container) {
   const fmtV  = (v, suffix='') => v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + suffix;
   const ivCls = v => v == null ? '' : v > 12 ? 'pd-dn' : v < 7 ? 'pd-up' : '';
 
-  // COT summary tag
-  const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
-  const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
-  const aligned = lfDir && amDir && lfDir === amDir;
-  const cotTag = lfDir && amDir
-    ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
-    : '—';
+  // COT summary tag — for crosses show both component currencies
+  let cotTag = '—';
+  if (isCrossPair && cotCcy2) {
+    const parts = [];
+    for (const [ccy, net, amNet] of [[cotCcy, cotNet, cotAmNet], [cotCcy2, cot2Net, cot2AmNet]]) {
+      if (net == null) continue;
+      const lfD = net > 0 ? 'Long' : net < 0 ? 'Short' : null;
+      const amD = amNet != null ? (amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null) : null;
+      if (!lfD) continue;
+      const lfC = net > 0 ? 'pd-up' : 'pd-dn';
+      const amPart = amD ? ` · <span class="${amNet > 0 ? 'pd-up' : 'pd-dn'}">${amD}</span> <span style="color:var(--text3);font-size:8px;">AM</span>` : '';
+      const alignedStr = lfD && amD ? (lfD === amD ? ' · <span style="color:var(--text3);font-size:8px;">aligned</span>' : ' · <span style="color:var(--text3);font-size:8px;">diverging</span>') : '';
+      parts.push(`<span style="color:var(--text3);font-size:8px;text-transform:uppercase;">${ccy}</span> <span class="${lfC}">${lfD}</span> <span style="color:var(--text3);font-size:8px;">LF</span>${amPart}${alignedStr}`);
+    }
+    cotTag = parts.join('<span style="color:var(--text3);"> · </span>') || '—';
+  } else {
+    const lfDir = cotNet == null ? null : cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
+    const amDir = cotAmNet == null ? null : cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
+    const aligned = lfDir && amDir && lfDir === amDir;
+    cotTag = lfDir && amDir
+      ? `<span class="${clsI(cotNet)}">${lfDir}</span> <span style="color:var(--text3);font-size:8px;">LF · </span><span class="${clsI(cotAmNet)}">${amDir}</span> <span style="color:var(--text3);font-size:8px;">AM · ${aligned ? 'aligned' : 'diverging'}</span>`
+      : '—';
+  }
 
   const footerSources = [cotWeek ? 'COT ' + cotWeek : null, 'Myfxbook', rrVal != null ? 'Saxo RR' : null].filter(Boolean).join(' · ');
 
@@ -3008,7 +3526,7 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised volatility, annualised. Measures recent actual movement.">
             <div class="pd-inline-lbl">HV 30d</div><div class="pd-inline-val">${hv30 != null ? hv30.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE FX ETF options. Proxy for OTC interbank IV. Green ≤7%; red >12%.">
+          <div class="pd-inline-metric fx-tip" data-tip-title="ATM Implied Volatility" data-tip-body="ATM IV from CBOE/CME FX Volatility Indexes (^EUVIX, ^BPVIX, ^JYVIX, ^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Proxy for OTC interbank IV. Green ≤7%; red >12%.">
             <div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val ${ivCls(atmIv)}">${atmIv != null ? atmIv.toFixed(1) + '%' : '—'}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied minus realised vol. Positive = options expensive vs recent moves.">
@@ -3024,22 +3542,48 @@ async function buildInlineDetail(tvSym, container) {
       </div>
 
       <div class="pd-inline-group">
-        <div class="pd-inline-group-lbl">COT Positioning</div>
-        <div class="pd-inline-metrics">
-          <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs." data-tip-ex="Extreme net long historically precedes reversals as the crowd becomes crowded.">
-            <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(cotNet)}">${fmtN(cotNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change" data-tip-body="Change in LF net contracts vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
-            <div class="pd-inline-lbl">LF WoW Δ</div><div class="pd-inline-val ${clsI(cotWow)}">${fmtN(cotWow)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural / longer-term positioning." data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
-            <div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val ${clsI(cotAmNet)}">${fmtN(cotAmNet)}</div>
-          </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of Open Interest" data-tip-body="LF net divided by LF OI. Normalises positioning across currencies for direct comparison." data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically crowded.">
-            <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
-          </div>
-        </div>
-        <div style="margin-top:5px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">${cotTag}</div>
+        ${isCrossPair ? '' : '<div class="pd-inline-group-lbl">COT Positioning</div>'}
+        ${(() => {
+          // Helper: render one 4-metric COT block for a given currency
+          const cotBlock = (ccy, net, wow, amNet, pctOI, isCross, addTopBorder) => {
+            const crossNote = isCross ? ` CFTC tracks ${ccy} vs USD — use as ${ccy} sentiment proxy for this cross.` : '';
+            const lfD = net == null ? null : net > 0 ? 'Long' : net < 0 ? 'Short' : null;
+            const amD = amNet == null ? null : amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null;
+            const alignedStr = lfD && amD ? (lfD === amD
+              ? `<span style="color:var(--text3);font-size:8px;"> · aligned</span>`
+              : `<span style="color:var(--text3);font-size:8px;"> · diverging</span>`) : '';
+            const summaryLine = lfD
+              ? `<div style="margin-top:4px;font-size:9px;font-family:var(--font-mono);">` +
+                `<span class="${clsI(net)}">${lfD}</span><span style="color:var(--text3);font-size:8px;"> LF</span>` +
+                (amD ? ` · <span class="${clsI(amNet)}">${amD}</span><span style="color:var(--text3);font-size:8px;"> AM</span>${alignedStr}` : '') +
+                `</div>` : '';
+            return `
+            ${isCross ? `<div style="font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 0 3px;${addTopBorder ? 'border-top:1px solid var(--border);margin-top:4px;' : ''}">COT ${ccy}</div>` : (addTopBorder ? `<div style="border-top:1px solid var(--border);margin-top:4px;"></div>` : '')}
+            <div class="pd-inline-metrics">
+              <div class="pd-inline-metric fx-tip" data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}" data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs.${crossNote}" data-tip-ex="Extreme net long historically precedes reversals as the speculative crowd becomes crowded.">
+                <div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val ${clsI(net)}">${fmtN(net)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="LF Week-over-Week Change${isCross ? ` · ${ccy}` : ''}" data-tip-body="Change in LF net contracts vs prior week. Primary momentum signal in institutional COT analysis." data-tip-ex="Reversal in WoW change is often the earliest signal of a positioning shift.">
+                <div class="pd-inline-lbl">LF WoW Δ</div><div class="pd-inline-val ${clsI(wow)}">${fmtN(wow)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="Asset Managers Net${isCross ? ` · ${ccy}` : ''}" data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds. Structural positioning.${crossNote}" data-tip-ex="Divergence between LF and AM often signals a positioning squeeze.">
+                <div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val ${clsI(amNet)}">${fmtN(amNet)}</div>
+              </div>
+              <div class="pd-inline-metric fx-tip" data-tip-title="LF Net as % of OI${isCross ? ` · ${ccy}` : ''}" data-tip-body="LF net divided by LF Open Interest. Normalises positioning across currencies for direct comparison.${crossNote}" data-tip-ex="+15% = LF hold net long equivalent to 15% of total OI — historically a crowded position.">
+                <div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val ${clsI(pctOI)}">${pctOI != null ? (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%' : '—'}</div>
+              </div>
+            </div>
+            ${summaryLine}`;
+          };
+
+          if (isCrossPair && cotCcy2 && cotRaw2) {
+            return `
+            ${cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, true, false)}
+            ${cotBlock(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, true, true)}`;
+          } else {
+            return cotBlock(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, false, false);
+          }
+        })()}
       </div>
 
       <div class="pd-inline-group pd-inline-group--retail fx-tip"
@@ -3145,19 +3689,49 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePairPopover();
 });
 
-// ── Sidebar crosses: click to open chart, double-click to open popover ──
+// ── Sidebar crosses: single click → chart + inline detail (same pattern as majors table) ──
 document.getElementById('sidebar')?.addEventListener('click', e => {
   const row = e.target.closest('.sb-row[data-sym]');
   if (!row) return;
   loadTVChart(row.dataset.sym);
+  toggleSidebarDetail(row);
 });
 
-document.getElementById('sidebar')?.addEventListener('dblclick', e => {
-  e.preventDefault();
-  const row = e.target.closest('.sb-row[data-sym]');
-  if (!row) return;
-  openPairPopover(row, row.dataset.sym);
-});
+function toggleSidebarDetail(row) {
+  const tvSym  = row.dataset.sym;
+  const sidebar = row.closest('#sidebar');
+  if (!sidebar) return;
+
+  // If this row is already open, collapse it
+  const existing   = sidebar.querySelector('.sb-expand-row');
+  const wasThisRow = existing?.dataset.forSym === tvSym;
+
+  if (existing) {
+    const inner = existing.querySelector('.sb-expand-inner');
+    if (inner) inner.style.maxHeight = '0';
+    setTimeout(() => existing.remove(), 220);
+    sidebar.querySelector('.sb-row.sb-selected')?.classList.remove('sb-selected');
+  }
+  if (wasThisRow) return;
+
+  row.classList.add('sb-selected');
+
+  const expandDiv = document.createElement('div');
+  expandDiv.className = 'sb-expand-row';
+  expandDiv.dataset.forSym = tvSym;
+  const inner = document.createElement('div');
+  inner.className = 'sb-expand-inner';
+  inner.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Loading…</div>';
+  expandDiv.appendChild(inner);
+  row.after(expandDiv);
+
+  // Animate open after next paint
+  requestAnimationFrame(() => {
+    inner.style.maxHeight = '600px'; // generous — content drives real height
+  });
+
+  buildInlineDetail(tvSym, inner);
+}
 
 // ── FX Pairs table: click = chart + expand detail inline ──────────────────
 document.getElementById('fx-pairs-tbody')?.addEventListener('click', e => {
@@ -3296,6 +3870,7 @@ async function updatePairDetail(tvSym) {
   };
   const USD_IV = {}; // non-USD ccy → IV%
   let atmIv = null;
+  let nzdProxy = false;
   try {
     const intra = await loadIntradayQuotes();
     const etfIv = intra?.fx_etf_iv || {};
@@ -3308,7 +3883,6 @@ async function updatePairDetail(tvSym) {
       USD_IV[nonUsd] = entry.iv;
     }
     // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × 1.08 (long-run NZD/AUD vol ratio).
-    let nzdProxy = false;
     if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
       USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
       nzdProxy = true;
@@ -3329,9 +3903,13 @@ async function updatePairDetail(tvSym) {
     }
   } catch {}
 
-  // COT
+  // COT — for crosses, load BOTH component currencies
+  const isCrossPair = !!meta?.cross;
   const cotCcy = base && base !== 'USD' ? base : (quote && quote !== 'USD' ? quote : base);
   const cotRaw = cotCcy ? (COT_DATA_CACHE[cotCcy] || null) : null;
+  // Second COT ccy for crosses (quote when base ≠ USD, else null for majors)
+  const cotCcy2 = isCrossPair && quote && quote !== cotCcy ? quote : null;
+  const cotRaw2 = cotCcy2 ? (COT_DATA_CACHE[cotCcy2] || null) : null;
   let cotNet = null, cotAmNet = null, cotOI = null, cotPrevOI = null, cotWeek = '';
   let cotWow = null, cotPctOI = null, cotTotalOI = null;
   if (cotRaw) {
@@ -3346,6 +3924,17 @@ async function updatePairDetail(tvSym) {
       cotOI = cotRaw.long + cotRaw.short;
     cotPrevOI = cotRaw.prevOI ?? null;
     cotWeek   = cotRaw.weekEnding;
+  }
+  // Second COT block — quote currency of cross pair (e.g. JPY in GBP/JPY)
+  let cot2Net = null, cot2AmNet = null, cot2Wow = null, cot2PctOI = null, cot2OI = null;
+  if (cotRaw2) {
+    cot2Net    = cotRaw2.net          ?? null;
+    cot2AmNet  = cotRaw2.amNet        ?? null;
+    cot2Wow    = cotRaw2.wowNetChange ?? null;
+    cot2PctOI  = cotRaw2.levNetPctOI  ?? null;
+    if (cotRaw2.long != null && cotRaw2.short != null)
+      cot2OI = cotRaw2.long + cotRaw2.short;
+    if (!cotWeek && cotRaw2.weekEnding) cotWeek = cotRaw2.weekEnding;
   }
 
   // Carry differential (CB rates)
@@ -3399,7 +3988,21 @@ async function updatePairDetail(tvSym) {
 
   // COT positioning summary text (replaces badge)
   let cotSummaryHtml = '';
-  if (cotNet != null && cotAmNet != null) {
+  if (isCrossPair && cotCcy2) {
+    // Cross: show one line per component currency
+    const parts = [];
+    for (const [ccy, net, amNet] of [[cotCcy, cotNet, cotAmNet], [cotCcy2, cot2Net, cot2AmNet]]) {
+      if (net == null) continue;
+      const lfDir = net > 0 ? 'Long' : net < 0 ? 'Short' : null;
+      const amDir = amNet != null ? (amNet > 0 ? 'Long' : amNet < 0 ? 'Short' : null) : null;
+      const lfCls = net > 0 ? 'pd-up' : 'pd-dn';
+      const amCls = amNet != null ? (amNet > 0 ? 'pd-up' : 'pd-dn') : '';
+      const amPart = amDir ? ` · AM <span class="${amCls}">${amDir}</span>` : '';
+      const aligned = lfDir && amDir ? (lfDir === amDir ? ' · <span class="pd-dim">aligned</span>' : ' · <span class="pd-dim">diverging</span>') : '';
+      if (lfDir) parts.push(`<span class="pd-dim" style="font-size:9px;text-transform:uppercase;letter-spacing:.04em;">${ccy}</span> LF <span class="${lfCls}">${lfDir}</span>${amPart}${aligned}`);
+    }
+    if (parts.length) cotSummaryHtml = `<div class="pd-cot-summary">${parts.join('<span class="pd-dim"> · </span>')}</div>`;
+  } else if (cotNet != null && cotAmNet != null) {
     const lfDir = cotNet > 0 ? 'Long' : cotNet < 0 ? 'Short' : null;
     const amDir = cotAmNet > 0 ? 'Long' : cotAmNet < 0 ? 'Short' : null;
     if (lfDir && amDir) {
@@ -3440,7 +4043,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair ETF option IVs via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD ETF IV × 1.08 (long-run NZD/AUD vol ratio). No CBOE-listed NZD ETF options available — treat as directional context only.' : 'ATM implied vol from nearest CBOE FX ETF option expiry (FXE/FXB/FXY/FXA via yfinance). Proxy for OTC interbank IV — ETF options may diverge 1–5 vol points from true OTC levels.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark used by Bloomberg BVOL. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
@@ -3448,72 +4051,66 @@ async function updatePairDetail(tvSym) {
     </div>
 
     <div class="pd-section">
-      <div class="pd-section-lbl">COT Positioning</div>
-      <div class="pd-grid">
-        ${(() => {
-          // For crosses (EUR/GBP, GBP/JPY…) COT data tracks cotCcy vs USD — clarify in label and tooltip
-          const isCross = !!meta?.cross;
-          const ccyTag  = cotCcy ? ` (${cotCcy})` : '';
-          const crossNote = isCross
-            ? ` CFTC tracks ${cotCcy} futures vs USD — not this cross specifically. Use as a proxy for ${cotCcy} sentiment broadly.`
-            : '';
-          return `
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Leveraged Funds Net${ccyTag}"
-              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
-              data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
-              <div class="pd-lbl">LF Net${ccyTag}</div>
-              <div class="pd-val ${cls(cotNet)}">${fmtNet(cotNet)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF WoW Change${ccyTag}"
-              data-tip-body="Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs. The primary momentum signal in institutional COT analysis.${crossNote}"
-              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. A reversal in WoW change is often the earliest signal of a positioning shift.">
-              <div class="pd-lbl">LF WoW Δ${ccyTag}</div>
-              <div class="pd-val ${cls(cotWow)}">${cotWow != null ? (cotWow > 0 ? '+' : '') + Math.round(cotWow).toLocaleString() : '—'}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="CFTC Asset Managers Net${ccyTag}"
-              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
-              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
-              <div class="pd-lbl">AM Net${ccyTag}</div>
-              <div class="pd-val ${cls(cotAmNet)}">${fmtNet(cotAmNet)}</div>
-            </div>
-            <div class="pd-cell fx-tip"
-              data-tip-title="LF Net as % of Total OI${ccyTag}"
-              data-tip-body="LF net contracts divided by LF Open Interest (long + short). Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
-              data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
-              <div class="pd-lbl">Net % OI${ccyTag}</div>
-              <div class="pd-val ${cls(cotPctOI)}">${cotPctOI != null ? (cotPctOI > 0 ? '+' : '') + cotPctOI.toFixed(1) + '%' : '—'}</div>
-            </div>`;
-        })()}
-        ${cotOI != null ? (() => {
-          const isCross   = !!meta?.cross;
-          const ccyTag    = cotCcy ? ` (${cotCcy})` : '';
-          const crossNote = isCross
-            ? ` CFTC tracks ${cotCcy} futures vs USD — use as a proxy for ${cotCcy} market participation broadly.`
-            : '';
-          const oiDelta    = (cotPrevOI != null) ? cotOI - cotPrevOI : null;
+      ${isCrossPair ? '' : '<div class="pd-section-lbl">COT Positioning</div>'}
+      ${(() => {
+        // Helper: render one COT block for a given currency (for the popover grid layout)
+        const cotBlockGrid = (ccy, net, wow, amNet, pctOI, oi, prevOI, isCross, addTopBorder) => {
+          const crossNote = isCross ? ` CFTC tracks ${ccy} futures vs USD — not this cross specifically. Use as ${ccy} sentiment proxy.` : '';
+          const oiDelta    = (prevOI != null && oi != null) ? oi - prevOI : null;
           const oiArrow    = oiDelta == null ? '' : oiDelta > 0 ? '<span class="pd-oi-up">▲</span> ' : oiDelta < 0 ? '<span class="pd-oi-dn">▼</span> ' : '';
           const oiDeltaStr = oiDelta == null ? '' : ` <span class="pd-dim" style="font-size:9px;">(${oiDelta > 0 ? '+' : ''}${Math.round(oiDelta).toLocaleString()})</span>`;
-          const oiTipEx    = oiDelta != null
-            ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}`
-            : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.';
-          return `<div class="pd-cell pd-cell--wide fx-tip" style="border-bottom:none;"
-            data-tip-title="LF Open Interest${ccyTag}"
-            data-tip-body="Total open interest in the Leveraged Funds category: long + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report.${crossNote}"
-            data-tip-ex="${oiTipEx}">
-            <div class="pd-lbl">LF Open Interest${ccyTag}</div>
-            <div class="pd-val">${oiArrow}${Math.round(cotOI).toLocaleString()}${oiDeltaStr}</div>
-          </div>`;
-        })() : ''}
-      </div>
+          return `
+            ${isCross ? `<div class="pd-cell pd-cell--wide pd-section-lbl" style="${addTopBorder ? 'border-top:1px solid var(--border);margin-top:2px;' : ''}">COT ${ccy}</div>` : ''}
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Leveraged Funds Net${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Speculative / trend-following positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="Extreme LF net long positioning has historically preceded reversals as the speculative crowd becomes crowded.">
+              <div class="pd-lbl">LF Net</div>
+              <div class="pd-val ${cls(net)}">${fmtNet(net)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="LF WoW Change${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs. The primary momentum signal in institutional COT analysis.${crossNote}"
+              data-tip-ex="A large positive WoW change alongside rising net = conviction build-up. A reversal in WoW change is often the earliest signal of a positioning shift.">
+              <div class="pd-lbl">LF WoW Δ</div>
+              <div class="pd-val ${cls(wow)}">${wow != null ? (wow > 0 ? '+' : '') + Math.round(wow).toLocaleString() : '—'}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="CFTC Asset Managers Net${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Net contracts held by Asset Managers — pension funds, mutual funds, and institutional investors. Structural / longer-term positioning. Source: CFTC Disaggregated TFF report.${crossNote}"
+              data-tip-ex="AM positioning tends to be more persistent than LF. Divergence between LF and AM can signal a positioning squeeze.">
+              <div class="pd-lbl">AM Net</div>
+              <div class="pd-val ${cls(amNet)}">${fmtNet(amNet)}</div>
+            </div>
+            <div class="pd-cell fx-tip"
+              data-tip-title="LF Net as % of Total OI${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="LF net contracts divided by LF Open Interest (long + short). Normalises positioning across currencies — EUR and JPY have very different raw contract counts; this makes them directly comparable.${crossNote}"
+              data-tip-ex="+15% means Leveraged Funds hold a net long equivalent to 15% of the entire market's open interest — a heavily crowded position historically associated with reversal risk.">
+              <div class="pd-lbl">Net % OI</div>
+              <div class="pd-val ${cls(pctOI)}">${pctOI != null ? (pctOI > 0 ? '+' : '') + pctOI.toFixed(1) + '%' : '—'}</div>
+            </div>
+            ${oi != null ? `<div class="pd-cell pd-cell--wide fx-tip" style="${isCross ? '' : 'border-bottom:none;'}"
+              data-tip-title="LF Open Interest${isCross ? ` · ${ccy}` : ''}"
+              data-tip-body="Total open interest in the Leveraged Funds category: long + short contracts. Rising OI = new money entering; falling OI = positions closing. Source: CFTC TFF report.${crossNote}"
+              data-tip-ex="${oiDelta != null ? `This week: ${oiDelta > 0 ? '▲' : oiDelta < 0 ? '▼' : '='} ${Math.abs(Math.round(oiDelta)).toLocaleString()} vs prior week. ${oiDelta > 0 ? 'New money entering — expanding participation.' : 'Positions being closed — shrinking participation.'}` : 'Expanding OI alongside rising net long = conviction build-up. Falling OI alongside persistent net = position unwinding.'}">
+              <div class="pd-lbl">LF Open Interest</div>
+              <div class="pd-val">${oiArrow}${Math.round(oi).toLocaleString()}${oiDeltaStr}</div>
+            </div>` : ''}`;
+        };
+
+        const gridHtml = isCrossPair && cotCcy2 && cotRaw2
+          ? cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, true, false) +
+            cotBlockGrid(cotCcy2, cot2Net, cot2Wow, cot2AmNet, cot2PctOI, null, null, true, true)
+          : cotBlockGrid(cotCcy, cotNet, cotWow, cotAmNet, cotPctOI, cotOI, cotPrevOI, false, false);
+
+        return `<div class="pd-grid">${gridHtml}</div>`;
+      })()}
       ${cotSummaryHtml}
     </div>
 
     <div class="pd-section pd-section--last">
       <div class="pd-section-lbl">Retail Sentiment</div>
-      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="When >70% of retail traders are long, institutional desks are often positioned short — price tends to move against the retail crowd over time.">
+      <div class="pd-cell pd-cell--wide fx-tip" data-tip-title="Retail Client Positioning" data-tip-body="Long/short ratio from Myfxbook community outlook — retail traders only, not institutional. Contrarian indicator: extreme retail long bias historically aligns with institutional short positioning. Source: Myfxbook, updated every 30min." data-tip-ex="Extreme readings — above 70% long or below 30% long — have historically coincided with elevated positioning risk in the dominant direction. Retail extremes are one input among many; always cross-reference with COT and CB differential data.">
         <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:${retBarL}%"></div></div>
         <div class="pd-retail-nums">${retL != null ? retL+'% L' : '—'}<span class="pd-retail-sep">/</span>${retS != null ? retS+'% S' : '—'}</div>
       </div>
@@ -3917,7 +4514,7 @@ async function fetchCrossAssetData() {
     const arrow = chgPct > 0.05 ? '▲' : chgPct < -0.05 ? '▼' : '→';
     const sign  = chgPct >= 0 ? '+' : '';
     vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
-    vEl.className = 'ca-val ' + cls;
+    vEl.className = 'ca-val';
     // Format: "▲ +18.4 (+0.35%)" when absolute available, "▲ +0.35%" when not
     if (chgAbs != null && !isYield) {
       const absSign = chgAbs >= 0 ? '+' : '';
@@ -3989,7 +4586,7 @@ async function fetchCrossAssetData() {
     const btcFmtE = _caBtcEarly.close.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
     const bEl = document.getElementById('ca-btc'), bcEl = document.getElementById('cac-btc');
     const qbEl = document.getElementById('q-btcusd'), qbcEl = document.getElementById('qc-btcusd');
-    if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val '  + clsDir(_caBtcEarly.chg); }
+    if (bEl)  { bEl.textContent  = btcFmtE; bEl.className  = 'ca-val'; }
     if (bcEl) {
       const _btcArrow = (_caBtcEarly.chg??0) > 0 ? '▲' : (_caBtcEarly.chg??0) < 0 ? '▼' : '→';
       const _btcSign  = (_caBtcEarly.pct??0) >= 0 ? '+' : '';
@@ -4001,8 +4598,11 @@ async function fetchCrossAssetData() {
       }
       bcEl.className = 'ca-chg ' + clsDir(_caBtcEarly.chg);
     }
-    if (qbEl && qbEl.textContent === '—')  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
-    if (qbcEl && qbcEl.textContent === '—') { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
+    // Always overwrite topbar BTC from yfinance (CoinGecko is only a pre-load placeholder)
+    if (qbEl)  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
+    if (qbcEl) { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
+    // Seed STOOQ_RT_CACHE early so the chart has yfinance data immediately
+    STOOQ_RT_CACHE['btc'] = _caBtcEarly;
   }
 
   // ── STEP 2: All cross-asset data from intraday quotes.json (yfinance) ──
@@ -4016,20 +4616,24 @@ async function fetchCrossAssetData() {
   const finalDxy    = _caDxy;
   const us10y       = (_caIntraday ? intradayQuote(_caIntraday, 'us10y') : null) || _repoUs10y;
 
-  if (finalSpx)    setCA('spx',    finalSpx.close,    finalSpx.pct,    false, finalSpx.chg);
+  // Mirror cross-asset quotes into STOOQ_RT_CACHE so _lwUpdateTodayBar() can
+  // push live prices to LW charts for non-FX instruments (BTC, gold, SPX, etc.)
+  if (finalSpx)    { STOOQ_RT_CACHE['spx']    = finalSpx;    setCA('spx',    finalSpx.close,    finalSpx.pct,    false, finalSpx.chg); }
   if (finalGold) {
+    STOOQ_RT_CACHE['xauusd'] = STOOQ_RT_CACHE['gold'] = finalGold;
     setCA('gold', finalGold.close, finalGold.pct, false, finalGold.chg);
     const gEl = document.getElementById('q-xauusd'), gcEl = document.getElementById('qc-xauusd');
     if (gEl)  { gEl.textContent  = finalGold.close.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); gEl.className  = 'q-price ' + clsDir(finalGold.chg); }
     if (gcEl) { gcEl.textContent = pctStr(finalGold.pct); gcEl.className = 'q-chg ' + clsDir(finalGold.chg); }
   }
-  if (finalWti)    setCA('wti',    finalWti.close,    finalWti.pct,    false, finalWti.chg);
-  if (finalNikkei) setCA('nikkei', finalNikkei.close, finalNikkei.pct, false, finalNikkei.chg);
-  if (finalStoxx)  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false, finalStoxx.chg);
-  if (us10y)       setCA('us10y',  us10y.close, us10y.fromRepo ? null : us10y.pct, true);
+  if (finalWti)    { STOOQ_RT_CACHE['wti']    = finalWti;    setCA('wti',    finalWti.close,    finalWti.pct,    false, finalWti.chg); }
+  if (finalNikkei) { STOOQ_RT_CACHE['nikkei'] = finalNikkei; setCA('nikkei', finalNikkei.close, finalNikkei.pct, false, finalNikkei.chg); }
+  if (finalStoxx)  { STOOQ_RT_CACHE['stoxx']  = finalStoxx;  setCA('stoxx',  finalStoxx.close,  finalStoxx.pct,  false, finalStoxx.chg); }
+  if (us10y)       { if (!us10y.fromRepo) STOOQ_RT_CACHE['us10y'] = us10y; setCA('us10y', us10y.close, us10y.fromRepo ? null : us10y.pct, true); }
 
   const dxyData = finalDxy;
   if (dxyData) {
+    STOOQ_RT_CACHE['dxy'] = dxyData;
     setCA('dxy', dxyData.close, dxyData.pct, false, dxyData.chg);
     const dEl = document.getElementById('q-dxy');
     const dcEl = document.getElementById('qc-dxy');
@@ -4043,10 +4647,11 @@ async function fetchCrossAssetData() {
   const qBtc = document.getElementById('q-btcusd');
   const qBtcC = document.getElementById('qc-btcusd');
   const _btcIntraday = _caIntraday ? intradayQuote(_caIntraday, 'btc') : null;
+  if (_btcIntraday) STOOQ_RT_CACHE['btc'] = _btcIntraday;  // feed LW chart live bar (yfinance)
   if (_btcIntraday && btcEl) {
     const btcFmt = _btcIntraday.close.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     btcEl.textContent  = btcFmt;
-    btcEl.className    = 'ca-val ' + clsDir(_btcIntraday.chg);
+    btcEl.className    = 'ca-val';
     if (btcCEl) {
       const _biArrow = (_btcIntraday.chg??0) > 0 ? '▲' : (_btcIntraday.chg??0) < 0 ? '▼' : '→';
       const _biSign  = (_btcIntraday.pct??0) >= 0 ? '+' : '';
@@ -4058,8 +4663,8 @@ async function fetchCrossAssetData() {
       }
       btcCEl.className = 'ca-chg ' + clsDir(_btcIntraday.chg);
     }
-    // Also update topbar q-btcusd if still showing —
-    if (qBtc && qBtc.textContent === '—') {
+    // Always update topbar q-btcusd from yfinance — CoinGecko is only a pre-load fallback
+    if (qBtc) {
       qBtc.textContent  = btcFmt;
       qBtc.className    = 'q-price ' + clsDir(_btcIntraday.chg);
       if (qBtcC) { qBtcC.textContent = pctStr(_btcIntraday.pct); qBtcC.className = 'q-chg ' + clsDir(_btcIntraday.chg); }
@@ -4098,6 +4703,10 @@ async function fetchCrossAssetData() {
     setEl('ri-gold-spx', ratio);
     setEl('ri-gold-spx-sig', sig, cls);
   }
+
+  // Push updated prices to the active LW chart (gold, SPX, WTI, etc.)
+  // FX pairs are handled by fetchQuoteBarRT; cross-asset needs this extra call.
+  _lwUpdateTodayBar();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4278,7 +4887,7 @@ async function fetchFedExpectations() {
 // ═══════════════════════════════════════════════════════════════════
 // POSITIONING BIAS — three data sources, rendered in priority order:
 //
-// SOURCE 1 — ETF IV (primary): real ATM implied vol from CBOE FX ETF options (quotes.json).
+// SOURCE 1 — CBOE/CME Vol Index (primary): ATM implied vol from CBOE/CME FX Volatility Indexes (quotes.json).
 //   FXE → EUR/USD  FXB → GBP/USD  FXY → USD/JPY  FXA → AUD/USD
 //   When available: shows ATM IV column + IV Rank (when ≥4w history) or COT bias fallback.
 //
@@ -4434,8 +5043,8 @@ async function fetchOptionSkew() {
         const td0Body  = pairTip?.body || '';
         const td0Ex    = pairTip?.ex   || '';
         const td1Title = 'ATM Implied Volatility · ' + p.pair;
-        const td1Body  = `ATM IV ${ivStr} from CBOE FX ETF options (${etfIv.source || 'ETF'}) — nearest expiry ≥4 days. Proxy for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
-        const td1Ex    = 'ETF options are less liquid than OTC interbank FX options — ATM IV may diverge 1–5 vol points from true OTC levels.';
+        const td1Body  = `ATM IV ${ivStr} from CBOE/CME FX Volatility Index (${etfIv.source || 'CBOE/CME'}) — variance-swap methodology, same as VIX. Institutional benchmark for OTC interbank implied vol. Green ≤7% (cheap vol); red >12% (expensive).`;
+        const td1Ex    = 'CBOE/CME FX Volatility Indexes use the same variance-swap replication as VIX. CHF and CAD fall through to CME futures options or CBOE ETF when no dedicated index exists. All values have ~15min delay.';
         const td3Title = p.pair + ' — Directional Bias';
         const td3Body  = pairTip?.body || '';
         const td3Ex    = pairTip?.ex   || '';
@@ -4494,7 +5103,7 @@ async function fetchOptionSkew() {
     const hasRR = Object.keys(rrMap).length > 0;
     if (panelHead) {
       if (hasAnyEtfIv) {
-        panelHead.textContent = hasRR ? 'ETF IV · CBOE · 25d RR · Saxo' : 'ETF options IV · CBOE (proxy)';
+        panelHead.textContent = hasRR ? 'CBOE/CME Vol · 25d RR · Saxo' : 'CBOE/CME Vol Index · IV';
       } else {
         panelHead.textContent = hasRR ? 'COT · 25d RR · Saxo' : 'COT-derived · IV unavailable';
       }
@@ -4633,7 +5242,11 @@ async function buildRichNarrative() {
     try {
       const sigR = await fetch('./ai-analysis/signals.json');
       if (sigR.ok) {
-        const signals = await sigR.json();
+        const _sigRaw = await sigR.json();
+        // signals.json may be a bare array (written by fetch_intraday_quotes.py) or
+        // a dict { "generated_at": "...", "signals": [...] } (written by generate_narrative_signals.py).
+        // Normalise to array before rendering.
+        const signals = Array.isArray(_sigRaw) ? _sigRaw : (Array.isArray(_sigRaw?.signals) ? _sigRaw.signals : []);
         if (Array.isArray(signals) && signals.length) {
           const container = document.getElementById('alerts-container');
           const sub = document.getElementById('alerts-sub');
@@ -4684,7 +5297,7 @@ async function buildRichNarrative() {
             const now = new Date();
             const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-            sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr;
+            sub.textContent = signals.length + ' active · AI-generated · loaded ' + hhmm + ' ' + tzAbbr + ' · Not investment advice';
           }
 
           // Notify user if signal set changed and notifications are enabled
