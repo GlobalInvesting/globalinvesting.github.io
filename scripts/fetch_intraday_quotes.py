@@ -1067,16 +1067,16 @@ def fetch_yfinance_all(symbols_map):
 
                     # Step 1: anchor to today's UTC date
                     today_utc = datetime.now(timezone.utc).date()
-                    # Step 2: find the most recent Friday strictly before today
-                    #   (if today is Saturday: days_since_friday=1 → reference = yesterday=Fri ✓)
-                    #   (if today is Friday:   days_since_friday=0 → we need *last* Friday,
-                    #    so we look back 7 days from yesterday = last Friday ✓)
-                    days_since_friday = (today_utc.weekday() - 4) % 7  # 4=Fri
-                    if days_since_friday == 0:
-                        # today IS Friday — reference is last Friday (7 days ago)
-                        reference_friday = today_utc - timedelta(days=7)
-                    else:
-                        reference_friday = today_utc - timedelta(days=days_since_friday)
+                    # Step 2: find the prior-week Friday (Bloomberg convention).
+                    # "Prior Friday" = the Friday that closed the PREVIOUS ISO week.
+                    # Formula: go back to this week's Monday (today - weekday days),
+                    # then subtract 3 more days to land on the preceding Friday.
+                    # This is stable for every day of the week:
+                    #   Mon 21-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
+                    #   Fri 24-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
+                    #   Sat 25-Apr → this_monday=21-Apr → prior_friday=17-Apr ✓
+                    this_monday = today_utc - timedelta(days=today_utc.weekday())  # weekday(): Mon=0
+                    reference_friday = this_monday - timedelta(days=3)
 
                     # Step 3: look up reference_friday in history
                     # Build a date→index map for O(1) lookup
