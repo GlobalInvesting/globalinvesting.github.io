@@ -27,7 +27,7 @@
 #ycm-legend{display:flex;gap:16px;margin-bottom:8px;flex-shrink:0;align-items:center;}
 .ycm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2,#9ca3af);}
 .ycm-leg-line{width:20px;height:2px;border-radius:1px;flex-shrink:0;}
-#ycm-lw-wrap{flex:1;position:relative;min-height:0;}
+#ycm-lw-wrap{flex:1;position:relative;min-height:160px;overflow:hidden;}
 #ycm-tooltip{position:absolute;display:none;pointer-events:none;background:#1e222d;border:1px solid #363c4e;border-radius:4px;padding:7px 11px;font-size:11px;line-height:1.55;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:#d1d4dc;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.6);white-space:nowrap;}
 #ycm-shape{margin-left:auto;font-size:10px;font-weight:600;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);}
 #ycm-table-wrap{flex-shrink:0;border-top:1px solid rgba(255,255,255,.07);overflow-x:auto;}
@@ -145,10 +145,8 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  const w=container.offsetWidth||360;
-  const h=container.offsetHeight||220;
   _ycLwChart=LWC.createYieldCurveChart(container,{
-    width:w, height:h,
+    autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
     yieldCurve:{baseResolution:12,minimumTimeRange:1,startTimeRange:0},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
@@ -166,7 +164,14 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   // Force visible range from first to last tenor — no left/right whitespace on any screen size
-  _ycLwChart.timeScale().fitContent();
+  // Immediate forced resize: read container dimensions and apply explicitly.
+  // autoSize:true may not have fired yet if the flex layout hasn't settled.
+  requestAnimationFrame(()=>{
+    if(!_ycLwChart||!container)return;
+    const fw=container.offsetWidth,fh=container.offsetHeight;
+    if(fw>0&&fh>0){_ycLwChart.applyOptions({width:fw,height:fh});}
+    _ycLwChart.timeScale().fitContent();
+  });
   // ResizeObserver: resize chart explicitly when container changes (mobile layout shifts, orientation)
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(entries => {
