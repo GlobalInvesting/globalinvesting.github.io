@@ -2783,6 +2783,8 @@ let _lwChart = null;
 let _lwResizeObs = null;
 let _lwCandleSeries = null;   // reference for live today-bar updates
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
+let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
+let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
 
 // Ensure the Lightweight Charts library is loaded (lazy, once)
 let _lwLibPromise = null;
@@ -2805,6 +2807,8 @@ function _destroyLWChart() {
   if (_lwChart)      { try { _lwChart.remove(); } catch(_) {} _lwChart = null; }
   _lwCandleSeries = null;
   _lwActiveOhlcId = null;
+  _lwActiveUpdateHeader = null;
+  _lwActivePrevCloseMap = null;
 }
 
 // Compute MA(n) over close prices
@@ -2861,6 +2865,20 @@ function _lwUpdateTodayBar() {
   const bar = _lwBuildTodayBar(_lwActiveOhlcId);
   if (!bar) return;
   try { _lwCandleSeries.update(bar); } catch(_) {}
+
+  // Sync the chart header % with yfinance RT data (same source as ticker).
+  // _updateLWHeader uses _prevCloseMap which has no entry for today's date →
+  // falls back to bar.open.  For the live today-bar we inject the prevClose from
+  // STOOQ_RT_CACHE (= yfinance prev_close) so that the header % matches the
+  // ticker % exactly — both sourced from yfinance, never from historical OHLC diff.
+  if (_lwActiveUpdateHeader && _lwActivePrevCloseMap) {
+    const cacheKey = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
+    const rt = STOOQ_RT_CACHE[cacheKey];
+    if (rt?.open != null && rt.open > 0) {
+      _lwActivePrevCloseMap.set(bar.time, rt.open); // rt.open = prev_close from yfinance
+    }
+    _lwActiveUpdateHeader(bar, null);
+  }
 }
 
 // Apply a date-range window to the active LW chart.
@@ -3044,6 +3062,8 @@ async function _renderLWChart(ohlcId, label) {
   for (let i = 1; i < bars.length; i++) {
     _prevCloseMap.set(bars[i].time, bars[i - 1].close);
   }
+  // Expose to _lwUpdateTodayBar so it can inject today's prevClose from yfinance RT cache
+  _lwActivePrevCloseMap = _prevCloseMap;
 
   function _updateLWHeader(bar, maVal) {
     const symEl  = document.getElementById('lw-hdr-sym');
@@ -3071,6 +3091,9 @@ async function _renderLWChart(ohlcId, label) {
     }
     _updateMALegend(maVal);
   }
+
+  // Expose _updateLWHeader to _lwUpdateTodayBar so live RT data syncs the header % with the ticker
+  _lwActiveUpdateHeader = _updateLWHeader;
 
   // Show the header and populate with last bar
   const hdrEl = document.getElementById('lw-chart-header');
