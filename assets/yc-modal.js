@@ -109,10 +109,33 @@ function openYCModal(tenorData){
   document.body.appendChild(bd);
   bd.addEventListener('click',e=>{if(e.target===bd)closeYCModal();});
   document.addEventListener('keydown',_ycKeydown);
-  // Delay draw until after modal animation (.2s) so container has final dimensions on mobile
-  // Double-draw: first at 220ms, then a corrective fitContent at 420ms for mobile layout stragglers
-  setTimeout(()=>_ycDraw(tenorData), 220);
-  // Range is handled by setTimeout cascade in _ycDrawNative (50ms / 150ms / 400ms).
+  // Start LWC load in parallel with modal animation so it's ready when RO fires.
+  _ensureYcLwc().catch(()=>{});
+  // Use ResizeObserver to trigger draw only when the wrapper has valid dimensions.
+  // This eliminates mobile timing issues: flex layout may not resolve until after
+  // the 200ms animation, so we wait for the browser to give us real pixel sizes.
+  const wrapper=document.getElementById('ycm-lw-wrap');
+  if(wrapper&&window.ResizeObserver){
+    let _initRo=null;
+    _initRo=new ResizeObserver(entries=>{
+      const e=entries[0];
+      const w=Math.floor(e.contentRect.width),h=Math.floor(e.contentRect.height);
+      if(w>0&&h>0){
+        _initRo.disconnect();
+        _initRo=null;
+        _ycDraw(tenorData);
+      }
+    });
+    _initRo.observe(wrapper);
+    // Fallback: if ResizeObserver never fires with valid dimensions (e.g. display:none),
+    // draw after 400ms unconditionally.
+    setTimeout(()=>{
+      if(_initRo){_initRo.disconnect();_initRo=null;_ycDraw(tenorData);}
+    },400);
+  }else{
+    // No ResizeObserver support — fall back to setTimeout.
+    setTimeout(()=>_ycDraw(tenorData),220);
+  }
 }
 
 const _LWC_CDN='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
@@ -132,19 +155,17 @@ function _ensureYcLwc(){
 
 function _ycDraw(tenorData){
   const wrapper=document.getElementById('ycm-lw-wrap');if(!wrapper)return;
-  // ycm-lw-inner may not exist if _ycDrawNative already removed it on a prior draw
-  const container=document.getElementById('ycm-lw-inner');
   _ensureYcLwc().then(()=>{
     const LWC=window.LightweightCharts;if(!LWC)return;
     if(_ycLwChart){try{_ycLwChart.remove();}catch(_){}  _ycLwChart=null;}
     const toData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.close!=null)?{time:m,value:t.close}:null;}).filter(Boolean);
     const prData=tenorData.map(t=>{const m=t.months??_TENOR_MONTHS[t.label];return(m!=null&&t.prev_close!=null)?{time:m,value:t.prev_close}:null;}).filter(Boolean);
-    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,container,toData,prData,tenorData);
-    else{if(!container)return;_ycDrawFallback(container,toData,prData,tenorData);}
+    if(typeof LWC.createYieldCurveChart==='function')_ycDrawNative(wrapper,toData,prData,tenorData);
+    else _ycDrawFallback(wrapper,toData,prData,tenorData);
   }).catch(e=>console.error(e));
 }
 
-function _ycDrawNative(wrapper,container,toData,prData,tenorData){
+function _ycDrawNative(wrapper,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
@@ -160,6 +181,7 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
   if(wrapper._ycRo){try{wrapper._ycRo.disconnect();}catch(_){}wrapper._ycRo=null;}
 
   const rect=wrapper.getBoundingClientRect();
+  // Dimensions are valid: _ycDrawNative is only called after ResizeObserver confirms w>0,h>0.
   const w=Math.floor(rect.width)||wrapper.offsetWidth||360;
   const h=Math.floor(rect.height)||wrapper.offsetHeight||220;
 
@@ -226,8 +248,10 @@ function _ycDrawNative(wrapper,container,toData,prData,tenorData){
 }
 
 
-function _ycDrawFallback(container,toData,prData,tenorData){
+function _ycDrawFallback(wrapper,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
+  // Use the inner div if present, else the wrapper directly
+  const container=wrapper.querySelector('#ycm-lw-inner')||wrapper;
   const LABELS=tenorData.map(t=>t.label);
   _ycLwChart=LWC.createChart(container,{
     autoSize:true,
