@@ -123,14 +123,17 @@ function _ycDraw(tenorData){
 
 function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
+  // Build months→label map from actual data so tickMarkFormatter shows correct labels (3M, 2Y, etc.)
+  const _tickLabels={};
+  tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
   _ycLwChart=LWC.createYieldCurveChart(container,{
     autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:2,startTimeRange:1},
+    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:3},
+    timeScale:{borderVisible:false,minBarSpacing:3,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
@@ -142,6 +145,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
+  _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 
