@@ -2801,6 +2801,13 @@ const _OHLC_LABELS = {
 let _lwChart = null;
 let _lwResizeObs = null;
 let _lwCandleSeries = null;   // reference for live today-bar updates
+
+// Chart mode flag — set synchronously at the START of each chart load, before any async work.
+// 'lw'  = LW chart is active or being loaded (do NOT reload TV widget on visibility change)
+// 'tv'  = TradingView widget is active
+// Using a dedicated flag avoids the race where _lwChart===null during the async fetch/render
+// window even though the user's intent is clearly to show the LW chart.
+let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
@@ -2969,6 +2976,7 @@ async function _renderLWChart(ohlcId, label) {
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
 
+  _chartMode = 'lw'; // set synchronously — visibility handler checks this, not _lwChart
   _destroyLWChart();
   wrap.innerHTML = '';
 
@@ -3404,6 +3412,7 @@ function loadCOTChart(longSym) {
   const shortSym = longSym.replace(/_L$/, '_S');
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _chartMode = 'tv'; // set synchronously before destroying LW chart
   _destroyLWChart();
   wrap.innerHTML = '';
   wrap.style.pointerEvents = 'none';
@@ -3445,6 +3454,7 @@ function loadCOTChart(longSym) {
 function _loadTVWidgetFallback(sym) {
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _chartMode = 'tv'; // set synchronously before destroying LW chart
   _destroyLWChart();
   wrap.innerHTML = '';
   // Restore pointer-events:none — TV widget manages its own interaction via iframe
@@ -6301,12 +6311,11 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     // Small delay to let the browser re-paint before we measure dimensions
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Only reload TV chart on mobile — desktop widgets stay alive across tab switches.
-      // If the LW chart is active (_lwChart !== null), skip TV reload entirely —
+      // Only reload TV widget on mobile when TV is actually active (_chartMode === 'tv').
+      // When LW chart is active or loading (_chartMode === 'lw'), skip entirely —
       // LW Charts persists correctly across tab switches without needing recreation.
-      if (isMobile && !_lwChart) {
+      if (isMobile && _chartMode === 'tv') {
         reloadActiveTVChart();
-        // Stagger calendar reload to avoid TV scripts racing for the wrong container
         setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
@@ -6315,7 +6324,6 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
   // On pageshow (iOS Safari fires this when returning from bfcache)
   window.addEventListener('pageshow', function(e) {
     if (!e.persisted) return; // only for bfcache restores
-    // Reset scroll to top so page doesn't restore mid-page on mobile
     if (isMobile) {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
@@ -6323,12 +6331,10 @@ setInterval(fetchFedExpectations, 30 * 60 * 1000);
     }
     setTimeout(function() {
       redrawLiquidityIfVisible();
-      // Mobile only: widgets may have gone blank after bfcache restore.
-      // LW Charts (_lwChart !== null) persists through bfcache — no reload needed.
-      // Only recreate the TV widget if TV is currently active.
-      if (isMobile && !_lwChart) {
+      // Same logic: only recreate TV widget if TV is currently active.
+      // LW Charts survives bfcache restores without any reload.
+      if (isMobile && _chartMode === 'tv') {
         reloadActiveTVChart();
-        // Stagger calendar reload to avoid TV scripts racing for the wrong container
         setTimeout(reloadTVCalendar, 800);
       }
     }, 350);
