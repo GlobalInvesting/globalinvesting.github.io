@@ -497,11 +497,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <!-- Range toolbar — shown only when LW chart is active (hidden for TV widget) -->
       <div id="lw-range-bar" style="display:none;align-items:center;gap:2px;padding:2px 6px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
         <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">RANGE</span>
-        <button class="lw-range-btn active" data-days="63"  aria-label="3 months">3M</button>
-        <button class="lw-range-btn"        data-days="126" aria-label="6 months">6M</button>
-        <button class="lw-range-btn"        data-days="252" aria-label="1 year"  >1Y</button>
-        <button class="lw-range-btn"        data-days="756" aria-label="3 years" >3Y</button>
+        <button class="lw-range-btn active" data-days="91"  aria-label="3 months">3M</button>
+        <button class="lw-range-btn"        data-days="182" aria-label="6 months">6M</button>
+        <button class="lw-range-btn"        data-days="365" aria-label="1 year"  >1Y</button>
+        <button class="lw-range-btn"        data-days="1095" aria-label="3 years">3Y</button>
         <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
+        <span style="flex:1"></span>
+        <span style="font-size:9px;color:var(--text3);margin-right:3px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">INDICATORS</span>
+        <select id="lw-ma-period" aria-label="MA period" style="background:var(--bg2);border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 4px;cursor:pointer;height:18px;">
+          <option value="0">None</option>
+          <option value="10">MA 10</option>
+          <option value="20" selected>MA 20</option>
+          <option value="50">MA 50</option>
+          <option value="100">MA 100</option>
+          <option value="200">MA 200</option>
+        </select>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
       <div id="lw-chart-header" aria-live="polite">
