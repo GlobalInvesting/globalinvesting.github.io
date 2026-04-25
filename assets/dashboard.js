@@ -2165,6 +2165,17 @@ async function renderRiskData(byId) {
     const chgStr = (chg >= 0 ? ' +' : ' ') + chg.toFixed(1);
     const srcNote = byId.vix.fromRepo ? ' · FRED' : ' · CBOE';
     setEl('risk-vix-sub', arrow + chgStr + ' · ' + signal + srcNote);
+    // Seed STOOQ_RT_CACHE so LW chart today-bar works for VIX tab
+    STOOQ_RT_CACHE['vix'] = {
+      close: byId.vix.close,
+      open:  byId.vix.open  ?? (byId.vix.prev_close ?? byId.vix.close),
+      high:  byId.vix.high  ?? byId.vix.close,
+      low:   byId.vix.low   ?? byId.vix.close,
+      prev_close: byId.vix.prev_close ?? null,
+      chg:   byId.vix.chg  ?? null,
+      pct:   byId.vix.pct  ?? null,
+    };
+    _lwUpdateTodayBar();
   } else {
     setEl('risk-vix', '—', 'risk-val');
     setEl('risk-vix-sub', 'CBOE · unavailable');
@@ -2741,6 +2752,7 @@ const _OHLC_FULL_NAMES = {
   us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq Composite',
   nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
   dxy:'U.S. Dollar Index',
+  vix:'CBOE Volatility Index',
 };
 
 const _TV_TO_OHLC = {
@@ -2773,13 +2785,16 @@ const _TV_TO_OHLC = {
   'COINBASE:ETHUSD':      'eth',
   // FX Index
   'PEPPERSTONE:USDX':     'dxy',
+  // Volatility
+  'CBOE:VIX':             'vix',
+  'FRED:VIXCLS':          'vix',
 };
 
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
   gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
   spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
-  eth: 'ETH-USD', dxy: 'DX-Y.NYB',
+  eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX',
 };
 
 // Active LW chart instance — destroyed before each new render
@@ -3013,62 +3028,180 @@ async function _renderLWChart(ohlcId, label) {
   const todayBar = _lwBuildTodayBar(ohlcId);
   if (todayBar) { try { candleSeries.update(todayBar); } catch(_) {} }
 
-  // MA overlay — period driven by #lw-ma-period selector (default 20)
-  const MA_COLOR = '#1565c0'; // darker blue — matches TV widget more closely
-  let _lwMaPeriod = parseInt(document.getElementById('lw-ma-period')?.value ?? '20') || 20;
-  let _lwMaSeries = null;
+  // ── Multi-MA overlay — up to 3 simultaneous MAs, each with its own period + color ──
+  // Colors cycle: blue, orange, purple. User can change period via toolbar.
+  const _MA_PALETTE = ['#1565c0', '#e65100', '#6a1b9a']; // blue, orange, purple
+  const _MA_MAX = 3;
 
-  function _buildMA(period) {
-    if (_lwMaSeries) { try { _lwChart.removeSeries(_lwMaSeries); } catch(_) {} _lwMaSeries = null; }
-    if (period < 1) return;
-    const maData = _calcMA(bars, period);
-    if (maData.length === 0) return;
-    _lwMaSeries = _lwChart.addLineSeries({
-      color: MA_COLOR, lineWidth: 1,
-      priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-      priceFormat: { type: 'price', precision: dec, minMove },
+  // State: array of { period, color, series } — persists across symbol switches via global
+  if (!window._lwMaState) {
+    window._lwMaState = [{ period: 20, color: _MA_PALETTE[0], series: null }];
+  }
+  // Clear any stale series refs from previous chart (chart was destroyed)
+  window._lwMaState.forEach(m => { m.series = null; });
+
+  function _buildAllMAs() {
+    // Remove existing series
+    window._lwMaState.forEach(m => {
+      if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} m.series = null; }
     });
-    _lwMaSeries.setData(maData);
-    return maData;
+    // Rebuild
+    window._lwMaState.forEach(m => {
+      if (m.period < 1) return;
+      const maData = _calcMA(bars, m.period);
+      if (maData.length === 0) return;
+      m.series = _lwChart.addLineSeries({
+        color: m.color, lineWidth: 1,
+        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+        priceFormat: { type: 'price', precision: dec, minMove },
+      });
+      m.series.setData(maData);
+    });
+    _renderMaToolbar();
   }
 
-  let _activeMaData = _buildMA(_lwMaPeriod);
-  // Keep maSeries alias for crosshair subscription below
-  let maSeries = _lwMaSeries;
+  function _renderMaToolbar() {
+    const bar = document.getElementById('lw-ma-bar');
+    if (!bar) return;
+    bar.innerHTML = '';
 
-  // Wire indicator selector
-  const maPeriodSel = document.getElementById('lw-ma-period');
-  if (maPeriodSel) {
-    // Remove any previous listener by cloning
-    const newSel = maPeriodSel.cloneNode(true);
-    maPeriodSel.parentNode.replaceChild(newSel, maPeriodSel);
-    newSel.addEventListener('change', () => {
-      _lwMaPeriod = parseInt(newSel.value) || 0;
-      _activeMaData = _buildMA(_lwMaPeriod);
-      maSeries = _lwMaSeries;
-      // Update legend label
-      const lbl = document.getElementById('lw-ma-legend');
-      if (lbl) lbl.textContent = '';
+    window._lwMaState.forEach((m, idx) => {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:3px;background:rgba(42,46,57,0.9);border:1px solid #2a2e39;border-radius:3px;padding:1px 4px;font-size:9px;font-family:var(--font-ui,sans-serif);';
+
+      // Color swatch (clickable to cycle color)
+      const swatch = document.createElement('span');
+      swatch.style.cssText = `display:inline-block;width:8px;height:8px;border-radius:50%;background:${m.color};cursor:pointer;flex-shrink:0;`;
+      swatch.title = 'Click to change color';
+      swatch.addEventListener('click', () => {
+        const ci = _MA_PALETTE.indexOf(m.color);
+        m.color = _MA_PALETTE[(ci + 1) % _MA_PALETTE.length];
+        if (m.series) { try { m.series.applyOptions({ color: m.color }); } catch(_) {} }
+        _renderMaToolbar();
+        _updateAllMALegend(null);
+      });
+
+      // Period select
+      const sel = document.createElement('select');
+      sel.style.cssText = 'background:transparent;border:none;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);cursor:pointer;padding:0;outline:none;';
+      [5,10,20,50,100,200].forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = 'MA ' + p;
+        if (p === m.period) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => {
+        m.period = parseInt(sel.value) || 20;
+        if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} m.series = null; }
+        if (m.period >= 1) {
+          const maData = _calcMA(bars, m.period);
+          if (maData.length > 0) {
+            m.series = _lwChart.addLineSeries({
+              color: m.color, lineWidth: 1,
+              priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+              priceFormat: { type: 'price', precision: dec, minMove },
+            });
+            m.series.setData(maData);
+          }
+        }
+        _updateAllMALegend(null);
+      });
+
+      // Remove button (only if more than 1 MA)
+      const rm = document.createElement('span');
+      rm.textContent = '\u00d7';
+      rm.style.cssText = 'color:var(--text3);cursor:pointer;font-size:10px;line-height:1;padding-left:2px;';
+      rm.title = 'Remove this MA';
+      rm.addEventListener('click', () => {
+        if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} }
+        window._lwMaState.splice(idx, 1);
+        if (window._lwMaState.length === 0) {
+          window._lwMaState.push({ period: 20, color: _MA_PALETTE[0], series: null });
+          _buildAllMAs();
+        }
+        _renderMaToolbar();
+        _updateAllMALegend(null);
+      });
+
+      pill.appendChild(swatch);
+      pill.appendChild(sel);
+      if (window._lwMaState.length > 1) pill.appendChild(rm);
+      bar.appendChild(pill);
     });
+
+    // Add MA button (up to max)
+    if (window._lwMaState.length < _MA_MAX) {
+      const addBtn = document.createElement('button');
+      addBtn.textContent = '+ MA';
+      addBtn.style.cssText = 'background:transparent;border:1px solid #2a2e39;border-radius:3px;color:var(--text3);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 5px;cursor:pointer;';
+      addBtn.addEventListener('click', () => {
+        const usedColors = window._lwMaState.map(m => m.color);
+        const nextColor = _MA_PALETTE.find(c => !usedColors.includes(c)) || _MA_PALETTE[window._lwMaState.length % _MA_PALETTE.length];
+        const newMA = { period: 50, color: nextColor, series: null };
+        window._lwMaState.push(newMA);
+        // Build only the new series
+        const maData = _calcMA(bars, newMA.period);
+        if (maData.length > 0) {
+          newMA.series = _lwChart.addLineSeries({
+            color: newMA.color, lineWidth: 1,
+            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+            priceFormat: { type: 'price', precision: dec, minMove },
+          });
+          newMA.series.setData(maData);
+        }
+        _renderMaToolbar();
+      });
+      bar.appendChild(addBtn);
+    }
   }
+
+  _buildAllMAs();
 
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
 
-  // MA legend overlay — inside the chart, top-left, exactly like TV widget
+  // MA legend overlay — inside the chart, top-left, one line per active MA
   const maLegendEl = document.createElement('div');
   maLegendEl.id = 'lw-ma-legend';
   maLegendEl.style.cssText = [
     'position:absolute;top:6px;left:8px;z-index:3;pointer-events:none;',
     'font-size:11px;font-family:var(--font-mono,monospace);',
-    'color:' + MA_COLOR + ';line-height:1.4;user-select:none;',
+    'line-height:1.4;user-select:none;',
   ].join('');
   wrap.appendChild(maLegendEl);
 
-  // MA legend: empty by default, shows "MA N  value" only on crosshair hover
+  function _updateAllMALegend(seriesDataMap) {
+    if (!maLegendEl) return;
+    const lines = window._lwMaState
+      .filter(m => m.series && m.period >= 1)
+      .map(m => {
+        let val = null;
+        if (seriesDataMap) {
+          const d = seriesDataMap.get(m.series);
+          val = d ? d.value : null;
+        }
+        const txt = val != null ? 'MA\u00a0' + m.period + '\u00a0\u00a0' + _fmtHdrVal(val) : '';
+        return `<span style="color:${m.color}">${txt}</span>`;
+      })
+      .filter(s => s.includes('MA'));
+    maLegendEl.innerHTML = lines.join('<br>');
+  }
+
+  // Compatibility shim: _updateMALegend used by _updateLWHeader — pass first MA val
   function _updateMALegend(maVal) {
-    if (!maLegendEl || _lwMaPeriod < 1) { if (maLegendEl) maLegendEl.textContent = ''; return; }
-    maLegendEl.textContent = maVal != null ? 'MA ' + _lwMaPeriod + '\u00a0\u00a0' + _fmtHdrVal(maVal) : '';
+    // Called from _updateLWHeader — build legend from seriesDataMap when available
+    // When maVal is passed directly (crosshair), show it for the first MA
+    if (maVal != null && window._lwMaState[0]?.series) {
+      const lines = window._lwMaState
+        .filter(m => m.series && m.period >= 1)
+        .map((m, i) => {
+          const v = i === 0 ? maVal : null;
+          return v != null ? `<span style="color:${m.color}">MA\u00a0${m.period}\u00a0\u00a0${_fmtHdrVal(v)}</span>` : '';
+        }).filter(Boolean);
+      maLegendEl.innerHTML = lines.join('<br>');
+    } else {
+      maLegendEl.innerHTML = '';
+    }
   }
 
   // prevClose map: date → prev bar's close, for day-over-day % change in header
@@ -3149,20 +3282,21 @@ async function _renderLWChart(ohlcId, label) {
 
   // Update panel-sub to reflect yfinance source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
-  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~15min delay';
+  if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~5min delay';
 
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
   _lwChart.subscribeCrosshairMove(param => {
     if (!param || !param.time || !param.seriesData) {
       _updateLWHeader(lastBar, null, _getRtOverride());  // restore with yfinance % when cursor leaves
+      _updateAllMALegend(null);
       return;
     }
     const candleData = param.seriesData.get(candleSeries);
-    const maData = maSeries ? param.seriesData.get(maSeries) : null;
-    // Historical bars: use _prevCloseMap (no RT override — the historical % is correct)
-    // Current/today bar: RT override applied (crosshair on last bar should show yfinance %)
+    if (candleData) _updateAllMALegend(param.seriesData);
+    const firstMaSeries = window._lwMaState[0]?.series;
+    const firstMaData = firstMaSeries ? param.seriesData.get(firstMaSeries) : null;
     const isCurrentBar = lastBar && candleData && candleData.time === lastBar.time;
-    if (candleData) _updateLWHeader(candleData, maData ? maData.value : null, isCurrentBar ? _getRtOverride() : null);
+    if (candleData) _updateLWHeader(candleData, firstMaData ? firstMaData.value : null, isCurrentBar ? _getRtOverride() : null);
   });
 
   // Apply the active range window (default 3M, persists across symbol switches)
@@ -3176,14 +3310,6 @@ async function _renderLWChart(ohlcId, label) {
       b.classList.toggle('active', parseInt(b.dataset.days) === _lwActiveDays);
     });
   }
-
-  // Source watermark (bottom-right, tiny, faint)
-  const srcTicker = _OHLC_LABELS[ohlcId] || label;
-  const labelEl = document.createElement('div');
-  labelEl.style.cssText = 'position:absolute;bottom:4px;right:8px;font-size:9px;color:rgba(144,150,160,0.4);font-family:var(--font-ui,sans-serif);pointer-events:none;z-index:1;user-select:none;';
-  labelEl.textContent = 'yfinance \u00b7 ' + srcTicker + ' \u00b7 daily';
-  wrap.style.position = 'relative';
-  wrap.appendChild(labelEl);
 
   // Responsive resize
   if (typeof ResizeObserver !== 'undefined') {
