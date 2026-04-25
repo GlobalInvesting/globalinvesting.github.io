@@ -2867,18 +2867,28 @@ function _lwUpdateTodayBar() {
   if (!bar) return;
   try { _lwCandleSeries.update(bar); } catch(_) {}
 
-  // Sync the chart header % with yfinance RT data (same source as ticker).
-  // _updateLWHeader uses _prevCloseMap which has no entry for today's date →
-  // falls back to bar.open.  For the live today-bar we inject the prevClose from
-  // STOOQ_RT_CACHE (= yfinance prev_close) so that the header % matches the
-  // ticker % exactly — both sourced from yfinance, never from historical OHLC diff.
-  if (_lwActiveUpdateHeader && _lwActivePrevCloseMap) {
+  // Sync the chart header % with yfinance RT data — DIRECT from rt.pct/rt.chg,
+  // never recalculated from bar OHLC differences.
+  // Recalculating from bar close deltas causes divergence because:
+  //   • The JSON historical bars use a slightly different prev_close than yfinance's
+  //     regularMarketPreviousClose (timezone boundaries, fetch timing, rounding).
+  //   • On weekends FX has no today-bar — the last bar IS Friday's, and its prevClose
+  //     in the JSON (Thursday bar close) may differ from yfinance's official Thursday close.
+  // Using rt.pct directly guarantees the header matches the ticker/table exactly.
+  if (_lwActiveUpdateHeader) {
     const cacheKey = _lwActiveOhlcId === 'gold' ? 'xauusd' : _lwActiveOhlcId;
     const rt = STOOQ_RT_CACHE[cacheKey];
-    if (rt?.open != null && rt.open > 0) {
-      _lwActivePrevCloseMap.set(bar.time, rt.open); // rt.open = prev_close from yfinance
+    if (rt?.pct != null && rt.pct !== undefined && _lwActivePrevCloseMap) {
+      // Inject the yfinance-authoritative prevClose so _updateLWHeader calculates
+      // the correct % when called for crosshair hover on today's bar too.
+      if (rt.open != null && rt.open > 0) {
+        _lwActivePrevCloseMap.set(bar.time, rt.open);
+      }
+      // Override the header % display directly with yfinance values
+      _lwActiveUpdateHeader(bar, null, { pct: rt.pct, chg: rt.chg });
+    } else {
+      _lwActiveUpdateHeader(bar, null, null);
     }
-    _lwActiveUpdateHeader(bar, null);
   }
 }
 
@@ -3066,7 +3076,7 @@ async function _renderLWChart(ohlcId, label) {
   // Expose to _lwUpdateTodayBar so it can inject today's prevClose from yfinance RT cache
   _lwActivePrevCloseMap = _prevCloseMap;
 
-  function _updateLWHeader(bar, maVal) {
+  function _updateLWHeader(bar, maVal, rtOverride) {
     const symEl  = document.getElementById('lw-hdr-sym');
     const oEl    = document.getElementById('lw-hdr-o-val');
     const hEl    = document.getElementById('lw-hdr-h-val');
@@ -3075,20 +3085,43 @@ async function _renderLWChart(ohlcId, label) {
     const chgEl  = document.getElementById('lw-hdr-chg-val');
     if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
     if (bar) {
-      if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = '#d1d4dc'; }
-      if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = '#26a69a'; }
-      if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = '#ef5350'; }
-      // Change = close vs previous bar's close (day-over-day), matching ticker behaviour
-      const prevClose = _prevCloseMap.get(bar.time) ?? bar.open;
-      const isUp = bar.close != null && bar.close >= prevClose;
-      if (cEl) { cEl.textContent = _fmtHdrVal(bar.close); cEl.style.color = isUp ? '#26a69a' : '#ef5350'; }
-      if (chgEl && prevClose != null && prevClose > 0 && bar.close != null) {
-        const chg = bar.close - prevClose;
-        const pct = (chg / prevClose) * 100;
-        const sign = chg >= 0 ? '+' : '';
-        chgEl.textContent = ' ' + sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
-        chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
-      } else if (chgEl) { chgEl.textContent = ''; }
+      // Determine direction first so O/H/L/C all share the same color (industry standard)
+      let isUp;
+      {
+        let _pctForDir;
+        if (rtOverride?.pct != null) {
+          _pctForDir = rtOverride.pct;
+        } else {
+          const _pc = _prevCloseMap.get(bar.time) ?? bar.open;
+          _pctForDir = (_pc != null && _pc > 0 && bar.close != null) ? ((bar.close - _pc) / _pc) * 100 : null;
+        }
+        isUp = _pctForDir != null ? _pctForDir >= 0 : (bar.close != null && bar.close >= (bar.open ?? bar.close));
+      }
+      const ohlcColor = isUp ? '#26a69a' : '#ef5350';
+      if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = ohlcColor; }
+      if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = ohlcColor; }
+      if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = ohlcColor; }
+      if (cEl) { cEl.textContent = _fmtHdrVal(bar.close); cEl.style.color = ohlcColor; }
+      if (chgEl) {
+        // rtOverride: use yfinance pct/chg directly (avoids JSON-vs-yfinance prevClose divergence)
+        // Fallback: recalculate from _prevCloseMap (used for crosshair hover on historical bars)
+        let chg, pct;
+        if (rtOverride?.pct != null) {
+          pct = rtOverride.pct;
+          chg = rtOverride.chg ?? (bar.close != null && bar.open != null ? bar.close - bar.open : null);
+        } else {
+          const prevClose = _prevCloseMap.get(bar.time) ?? bar.open;
+          chg = (prevClose != null && bar.close != null) ? bar.close - prevClose : null;
+          pct = (prevClose != null && prevClose > 0 && bar.close != null) ? (chg / prevClose) * 100 : null;
+        }
+        if (pct != null && chg != null) {
+          const sign = chg >= 0 ? '+' : '';
+          chgEl.textContent = ' ' + sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
+          chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
+        } else {
+          chgEl.textContent = '';
+        }
+      }
     }
     _updateMALegend(maVal);
   }
@@ -3096,13 +3129,20 @@ async function _renderLWChart(ohlcId, label) {
   // Expose _updateLWHeader to _lwUpdateTodayBar so live RT data syncs the header % with the ticker
   _lwActiveUpdateHeader = _updateLWHeader;
 
+  // Helper: get yfinance RT override for the active symbol (used on initial render + crosshair restore)
+  function _getRtOverride() {
+    const ck = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+    const rt = STOOQ_RT_CACHE[ck];
+    return (rt?.pct != null) ? { pct: rt.pct, chg: rt.chg } : null;
+  }
+
   // Show the header and populate with last bar
   const hdrEl = document.getElementById('lw-chart-header');
   if (hdrEl) hdrEl.style.display = 'flex';
 
-  // Populate with last available bar — MA value empty until crosshair hover
+  // Populate with last available bar — use yfinance RT pct if available (avoids JSON prevClose drift)
   const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
-  _updateLWHeader(lastBar, null);
+  _updateLWHeader(lastBar, null, _getRtOverride());
 
   // Update panel-sub to reflect yfinance source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
@@ -3111,12 +3151,15 @@ async function _renderLWChart(ohlcId, label) {
   // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
   _lwChart.subscribeCrosshairMove(param => {
     if (!param || !param.time || !param.seriesData) {
-      _updateLWHeader(lastBar, null);  // restore OHLC to last bar, clear MA value
+      _updateLWHeader(lastBar, null, _getRtOverride());  // restore with yfinance % when cursor leaves
       return;
     }
     const candleData = param.seriesData.get(candleSeries);
     const maData = maSeries ? param.seriesData.get(maSeries) : null;
-    if (candleData) _updateLWHeader(candleData, maData ? maData.value : null);
+    // Historical bars: use _prevCloseMap (no RT override — the historical % is correct)
+    // Current/today bar: RT override applied (crosshair on last bar should show yfinance %)
+    const isCurrentBar = lastBar && candleData && candleData.time === lastBar.time;
+    if (candleData) _updateLWHeader(candleData, maData ? maData.value : null, isCurrentBar ? _getRtOverride() : null);
   });
 
   // Apply the active range window (default 3M, persists across symbol switches)
