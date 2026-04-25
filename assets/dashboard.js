@@ -2819,7 +2819,7 @@ function _ensureLWLib() {
   if (_lwLibPromise) return _lwLibPromise;
   _lwLibPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js';
+    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
     s.onload  = resolve;
     s.onerror = () => { _lwLibPromise = null; reject(new Error('LW lib load failed')); };
     document.head.appendChild(s);
@@ -3017,6 +3017,15 @@ async function _renderLWChart(ohlcId, label) {
   // Use explicit dimensions — autoSize requires ResizeObserver and can mis-size before first paint
   const chartW = wrap.offsetWidth  || wrap.clientWidth  || 600;
   const chartH = wrap.offsetHeight || wrap.clientHeight || 290;
+
+  // Detect if bars have volume data (new fetch_ohlc.py output includes volume field)
+  const hasVolume = bars.length > 0 && typeof bars[0].volume === 'number' && bars[0].volume > 0;
+
+  // scaleMargins: reserve bottom 22% for volume pane when data is available
+  const mainScaleMargins = hasVolume
+    ? { top: 0.08, bottom: 0.22 }
+    : { top: 0.10, bottom: 0.08 };
+
   _lwChart = LWC.createChart(chartDiv, {
     layout:      { background: { color: '#131722' }, textColor: '#d1d4dc' },
     grid:        { vertLines: { color: 'rgba(42,46,57,0.5)' }, horzLines: { color: 'rgba(42,46,57,0.5)' } },
@@ -3024,26 +3033,117 @@ async function _renderLWChart(ohlcId, label) {
                    vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
                    horzLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' } },
     rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 65,
-                       scaleMargins: { top: 0.10, bottom: 0.08 } },
+                       scaleMargins: mainScaleMargins },
     timeScale:   { borderColor: '#2a2e39', timeVisible: false, secondsVisible: false,
                    rightOffset: 8, minBarSpacing: 1,
                    fixLeftEdge: false, fixRightEdge: false },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
     handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: true } },
     localization: { priceFormatter: v => v.toFixed(dec) },
-    watermark:   { visible: false },
     width:  chartW,
     height: chartH,
   });
 
-  // Candlestick series — with correct minMove for the asset's decimal precision
-  const candleSeries = _lwChart.addCandlestickSeries({
-    upColor: '#26a69a', downColor: '#ef5350',
-    borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-    wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-    priceFormat: { type: 'price', precision: dec, minMove },
-  });
+  // ── Symbol watermark — institutional standard (Bloomberg shows pair name in chart background) ──
+  // Uses LWC v5 createTextWatermark() API — gracefully skipped on older versions
+  const _wmLabel = (ohlcId === 'gold' ? 'XAUUSD' : ohlcId === 'wti' ? 'USOIL' : ohlcId.toUpperCase());
+  try {
+    if (typeof LWC.createTextWatermark === 'function') {
+      LWC.createTextWatermark(_lwChart.panes()[0], {
+        horzAlign: 'center',
+        vertAlign: 'center',
+        lines: [
+          { text: _wmLabel, color: 'rgba(255,255,255,0.04)', fontSize: 54, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
+        ],
+      });
+    }
+  } catch(_wmErr) {}
+
+  // Candlestick series — LWC v5 API: addSeries(SeriesType, options)
+  // Falls back to v4 addCandlestickSeries() for graceful degradation
+  let candleSeries;
+  if (typeof LWC.CandlestickSeries !== 'undefined') {
+    candleSeries = _lwChart.addSeries(LWC.CandlestickSeries, {
+      upColor: '#26a69a', downColor: '#ef5350',
+      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+      priceFormat: { type: 'price', precision: dec, minMove },
+    });
+  } else {
+    candleSeries = _lwChart.addCandlestickSeries({
+      upColor: '#26a69a', downColor: '#ef5350',
+      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+      priceFormat: { type: 'price', precision: dec, minMove },
+    });
+  }
   candleSeries.setData(bars);
+
+  // ── Volume histogram — lower panel (industry standard on Bloomberg, TradingView, FXCM) ──
+  // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
+  let volumeSeries = null;
+  if (hasVolume) {
+    try {
+      const volOpts = {
+        priceScaleId: 'volume',
+        priceFormat: { type: 'volume' },
+        lastValueVisible: false,
+        priceLineVisible: false,
+      };
+      if (typeof LWC.HistogramSeries !== 'undefined') {
+        volumeSeries = _lwChart.addSeries(LWC.HistogramSeries, volOpts);
+      } else if (typeof _lwChart.addHistogramSeries === 'function') {
+        volumeSeries = _lwChart.addHistogramSeries(volOpts);
+      }
+      if (volumeSeries) {
+        _lwChart.priceScale('volume').applyOptions({
+          scaleMargins: { top: 0.82, bottom: 0 },
+          borderVisible: false,
+          visible: false, // no numeric labels — Bloomberg standard for volume overlay
+        });
+        const volData = bars.map(b => ({
+          time:  b.time,
+          value: b.volume,
+          // Direction-colored: green (buy-side) or red (sell-side), transparent overlay
+          color: (b.close >= b.open) ? 'rgba(38,166,154,0.30)' : 'rgba(239,83,80,0.30)',
+        }));
+        volumeSeries.setData(volData);
+      }
+    } catch(_volErr) { volumeSeries = null; }
+  }
+
+  // ── Prev close price line — Bloomberg standard: dashed horizontal reference ──
+  // Always visible, shows yesterday's close as anchor for current session direction
+  let _prevCloseLine = null;
+  const _lastHistClose = bars.length > 1 ? bars[bars.length - 1].close : null;
+  if (_lastHistClose != null) {
+    try {
+      _prevCloseLine = candleSeries.createPriceLine({
+        price: _lastHistClose,
+        color: 'rgba(144,150,160,0.55)',
+        lineWidth: 1,
+        lineStyle: 2, // LineStyle.Dashed
+        axisLabelVisible: true,
+        axisLabelColor: '#2a2e39',
+        axisLabelTextColor: '#848ea0',
+        title: 'Prev C',
+      });
+    } catch(_plErr) {}
+  }
+
+  // ── Log scale toggle state — persists across symbol switches ──
+  if (typeof window._lwLogScale === 'undefined') window._lwLogScale = false;
+  // Apply persisted log scale mode on each new chart render
+  if (window._lwLogScale) {
+    try { _lwChart.priceScale('right').applyOptions({ mode: 1 }); } catch(_) {}
+  }
+  // Sync button visual state
+  const _logBtn = document.getElementById('lw-log-btn');
+  if (_logBtn) {
+    _logBtn.style.color = window._lwLogScale ? 'var(--text)' : '#848ea0';
+    _logBtn.style.borderColor = window._lwLogScale ? 'var(--blue)' : '#2a2e39';
+    _logBtn.setAttribute('aria-pressed', window._lwLogScale ? 'true' : 'false');
+  }
 
   // Store global refs so _lwUpdateTodayBar() can push live prices
   _lwCandleSeries = candleSeries;
@@ -3075,11 +3175,17 @@ async function _renderLWChart(ohlcId, label) {
       if (m.period < 1) return;
       const maData = _calcMA(bars, m.period);
       if (maData.length === 0) return;
-      m.series = _lwChart.addLineSeries({
-        color: m.color, lineWidth: 1,
-        priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-        priceFormat: { type: 'price', precision: dec, minMove },
-      });
+      m.series = (typeof LWC.LineSeries !== 'undefined'
+        ? _lwChart.addSeries(LWC.LineSeries, {
+            color: m.color, lineWidth: 1,
+            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+            priceFormat: { type: 'price', precision: dec, minMove },
+          })
+        : _lwChart.addLineSeries({
+            color: m.color, lineWidth: 1,
+            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+            priceFormat: { type: 'price', precision: dec, minMove },
+          }));
       m.series.setData(maData);
     });
     _renderMaToolbar();
@@ -3116,11 +3222,17 @@ async function _renderLWChart(ohlcId, label) {
         if (m.period >= 1) {
           const maData = _calcMA(bars, m.period);
           if (maData.length > 0) {
-            m.series = _lwChart.addLineSeries({
-              color: m.color, lineWidth: 1,
-              priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-              priceFormat: { type: 'price', precision: dec, minMove },
-            });
+            m.series = (typeof LWC.LineSeries !== 'undefined'
+              ? _lwChart.addSeries(LWC.LineSeries, {
+                  color: m.color, lineWidth: 1,
+                  priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+                  priceFormat: { type: 'price', precision: dec, minMove },
+                })
+              : _lwChart.addLineSeries({
+                  color: m.color, lineWidth: 1,
+                  priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+                  priceFormat: { type: 'price', precision: dec, minMove },
+                }));
             m.series.setData(maData);
           }
         }
@@ -3226,11 +3338,17 @@ async function _renderLWChart(ohlcId, label) {
         window._lwMaState.push(newMA);
         const maData = _calcMA(bars, newMA.period);
         if (maData.length > 0) {
-          newMA.series = _lwChart.addLineSeries({
-            color: newMA.color, lineWidth: 1,
-            priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
-            priceFormat: { type: 'price', precision: dec, minMove },
-          });
+          newMA.series = (typeof LWC.LineSeries !== 'undefined'
+            ? _lwChart.addSeries(LWC.LineSeries, {
+                color: newMA.color, lineWidth: 1,
+                priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+                priceFormat: { type: 'price', precision: dec, minMove },
+              })
+            : _lwChart.addLineSeries({
+                color: newMA.color, lineWidth: 1,
+                priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
+                priceFormat: { type: 'price', precision: dec, minMove },
+              }));
           newMA.series.setData(maData);
         }
         _renderMaToolbar();
@@ -3240,6 +3358,95 @@ async function _renderLWChart(ohlcId, label) {
   }
 
   _buildAllMAs();
+
+  // ── CB Meeting markers — industry standard: annotate central bank decision dates on chart ──
+  // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
+  // Uses meetings-data/meetings.json allMeetings array, filtered to dates within the OHLC data range.
+  // LWC v5: createSeriesMarkers(series, markers) standalone function
+  // LWC v4: series.setMarkers(markers)
+  (async () => {
+    try {
+      // Determine which CBs are relevant for this ohlcId (base and quote currency)
+      const _CB_MAP = {
+        eurusd:['EUR','USD'], gbpusd:['GBP','USD'], usdjpy:['USD','JPY'],
+        audusd:['AUD','USD'], usdcad:['USD','CAD'], usdchf:['USD','CHF'],
+        nzdusd:['NZD','USD'], eurgbp:['EUR','GBP'], eurjpy:['EUR','JPY'],
+        eurchf:['EUR','CHF'], eurcad:['EUR','CAD'], euraud:['EUR','AUD'],
+        eurnzd:['EUR','NZD'], gbpjpy:['GBP','JPY'], gbpchf:['GBP','CHF'],
+        gbpcad:['GBP','CAD'], gbpaud:['GBP','AUD'], gbpnzd:['GBP','NZD'],
+        audjpy:['AUD','JPY'], audnzd:['AUD','NZD'], audchf:['AUD','CHF'],
+        audcad:['AUD','CAD'], cadjpy:['CAD','JPY'], cadchf:['CAD','CHF'],
+        nzdjpy:['NZD','JPY'], nzdcad:['NZD','CAD'], nzdchf:['NZD','CHF'],
+        chfjpy:['CHF','JPY'], gold:['USD'], wti:['USD'], btc:[], us10y:['USD'],
+        spx:['USD'], nasdaq:['USD'], dxy:['USD'], nikkei:['JPY'], stoxx:['EUR'],
+      };
+      const relevantCBs = _CB_MAP[ohlcId] || [];
+      if (relevantCBs.length === 0) return;
+
+      const mtgData = window._STATE_meetings || await fetch('./meetings-data/meetings.json')
+        .then(r => r.ok ? r.json() : null).catch(() => null);
+      if (!mtgData?.meetings) return;
+
+      // Build set of OHLC bar dates for fast lookup
+      const barDates = new Set(bars.map(b => b.time));
+      const firstDate = bars[0]?.time;
+      const lastDate  = bars[bars.length - 1]?.time;
+
+      // Collect all past meeting dates for the relevant CBs
+      // Use a simple color scheme: USD=blue, EUR=orange, GBP=purple, JPY=yellow, others=gray
+      const _CB_COLORS = { USD:'rgba(79,127,255,0.85)', EUR:'rgba(246,148,28,0.85)',
+                           GBP:'rgba(156,77,255,0.85)', JPY:'rgba(255,213,0,0.85)',
+                           AUD:'rgba(0,188,212,0.85)',  CAD:'rgba(255,87,34,0.85)',
+                           CHF:'rgba(156,204,101,0.85)',NZD:'rgba(0,230,118,0.85)' };
+
+      const markers = [];
+      const seenDates = new Set();
+
+      relevantCBs.forEach(cb => {
+        const cbMtg = mtgData.meetings[cb];
+        if (!cbMtg?.allMeetings) return;
+        const color = _CB_COLORS[cb] || 'rgba(144,150,160,0.8)';
+
+        cbMtg.allMeetings.forEach(dateStr => {
+          if (dateStr >= firstDate && dateStr <= lastDate) {
+            // Find nearest bar date (CB meetings are usually on Wed; bar may be Thu if Wed is holiday)
+            let targetDate = dateStr;
+            if (!barDates.has(dateStr)) {
+              // Try +1 day (meeting on Wed, market data on Thu)
+              const d = new Date(dateStr + 'T12:00:00Z');
+              d.setDate(d.getDate() + 1);
+              const next = d.toISOString().slice(0, 10);
+              if (barDates.has(next)) targetDate = next; else return;
+            }
+            if (seenDates.has(targetDate + cb)) return;
+            seenDates.add(targetDate + cb);
+            markers.push({
+              time: targetDate,
+              position: 'aboveBar',
+              color: color,
+              shape: 'circle',
+              text: cb,
+              size: 0.6,
+            });
+          }
+        });
+      });
+
+      if (markers.length === 0) return;
+      // Sort markers by time (required by LWC)
+      markers.sort((a, b) => a.time < b.time ? -1 : a.time > b.time ? 1 : 0);
+
+      try {
+        if (typeof LWC.createSeriesMarkers === 'function') {
+          // LWC v5: standalone function
+          LWC.createSeriesMarkers(candleSeries, markers);
+        } else if (typeof candleSeries.setMarkers === 'function') {
+          // LWC v4: method on series
+          candleSeries.setMarkers(markers);
+        }
+      } catch(_mErr) {}
+    } catch(_cbErr) {}
+  })();
 
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
@@ -3536,6 +3743,22 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
   const btn = e.target.closest('.lw-range-btn');
   if (!btn) return;
   _lwSetRange(parseInt(btn.dataset.days));
+});
+
+// ── Log Scale toggle — persists state in window._lwLogScale ──
+// Bloomberg standard: LOG button in chart toolbar, toggles right price scale between Normal and Log
+document.getElementById('lw-log-btn')?.addEventListener('click', function() {
+  window._lwLogScale = !window._lwLogScale;
+  this.classList.toggle('active', window._lwLogScale);
+  this.setAttribute('aria-pressed', window._lwLogScale ? 'true' : 'false');
+  this.style.color = window._lwLogScale ? 'var(--text)' : '#848ea0';
+  this.style.borderColor = window._lwLogScale ? 'var(--blue)' : '#2a2e39';
+  if (_lwChart) {
+    try {
+      // PriceScaleMode: 0 = Normal, 1 = Logarithmic, 2 = Percentage, 3 = IndexedTo100
+      _lwChart.priceScale('right').applyOptions({ mode: window._lwLogScale ? 1 : 0 });
+    } catch(_) {}
+  }
 });
 
 // ── Pair Detail Popover ─────────────────────────────────────────────────────
