@@ -139,6 +139,9 @@
   color:var(--text,#d1d4dc);
   white-space:nowrap;
 }
+.hm-tbl td.up   { color:var(--up,#26a69a); }
+.hm-tbl td.down { color:var(--down,#ef5350); }
+.hm-tbl td.flat { color:var(--text2,#787b86); }
 .hm-tbl td:first-child { text-align:left;color:var(--text2,#787b86); }
 .hm-tbl tr:last-child td { border-bottom:none; }
 .hm-tbl tr:hover td { background:rgba(255,255,255,.03); }
@@ -1354,6 +1357,20 @@
       if (!isFocus) ls.applyOptions({ lineWidth: 1, color: CSI_COLORS[c] + 'aa' });
       seriesMap[c] = ls;
     });
+
+    // Zero baseline — Bloomberg WCRS convention: dashed horizontal line at 0bp
+    // Added as a price line on the first series so it anchors to the price scale
+    const firstSeries = seriesMap[CCY_ORDER[0]];
+    if (firstSeries) {
+      firstSeries.createPriceLine({
+        price: 0,
+        color: 'rgba(255,255,255,.20)',
+        lineWidth: 1,
+        lineStyle: 1,          // dashed (LightweightCharts LineStyle.Dashed = 1)
+        axisLabelVisible: false,
+        title: '',
+      });
+    }
 
     // Bloomberg-style multi-series crosshair tooltip
     _csiChart.subscribeCrosshairMove(param => {
