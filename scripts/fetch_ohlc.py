@@ -210,27 +210,18 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
             return None
 
-        # FX open correction: replace each bar's open with the previous bar's close,
-        # then clamp it within [low, high] so the OHLC relationship stays valid.
-        #
-        # Why replace open with prev_close:
-        #   Yahoo daily FX opens are unreliable — they store the last tick of the prior
-        #   UTC session, causing candle color to contradict the day's direction in ~50%
-        #   of bars. Using prev_close ensures: green <-> pct > 0, red <-> pct < 0.
-        #
-        # Why clamp to [low, high]:
-        #   Yahoo FX high/low data has a timezone offset vs close (especially JPY pairs),
-        #   which can put the synthetic open outside H-L. Clamping keeps the candle valid
-        #   while preserving the correct color direction in the vast majority of bars.
-        #
+        # FX open correction: replace each bar's open with the previous bar's close.
+        # Yahoo's daily FX open values are unreliable — they store the last tick of the
+        # prior UTC session, not the actual FX session open. This causes candle body
+        # color (open vs close) to contradict the day's actual direction (close vs
+        # prev_close) in roughly half of all bars across all FX pairs.
+        # Using prev_close as open guarantees: green candle ↔ pct > 0, red ↔ pct < 0.
+        # Note: this can place open outside the bar's H-L range because Yahoo's H/L data
+        # also has a timezone offset vs close data. LW Charts renders these correctly.
         # The first bar has no predecessor — its open is left as-is.
         if id_ in FX_SYMBOLS:
-            dec = DECIMALS.get(id_, 5)
             for i in range(1, len(deduped)):
-                raw_open = deduped[i - 1]["close"]
-                h = deduped[i]["high"]
-                l = deduped[i]["low"]
-                deduped[i]["open"] = round(max(l, min(h, raw_open)), dec)
+                deduped[i]["open"] = deduped[i - 1]["close"]
 
         return deduped
 
