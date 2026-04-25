@@ -2835,29 +2835,32 @@ function _lwUpdateTodayBar() {
 
 // Apply a date-range window to the active LW chart.
 // days=0 → fit all data. Otherwise show the last N calendar days.
+let _lwTotalBars = 0;  // set after each chart load; used by range buttons
+
 function _lwSetRange(days, totalBars) {
   if (!_lwChart) return;
+  // If totalBars provided, update the stored value
+  if (totalBars != null) _lwTotalBars = totalBars;
+  const n = _lwTotalBars;
   const ts = _lwChart.timeScale();
 
   if (days === 0) {
     ts.fitContent();
+    document.querySelectorAll('.lw-range-btn').forEach(b => b.classList.toggle('active', b.dataset.days === '0'));
+    _lwActiveDays = 0;
     return;
   }
 
-  // LW Charts v4.2 logical range: index 0 = FIRST bar, index (n-1) = LAST bar.
-  // To show the last N trading bars with right padding:
-  //   from = totalBars - tradingBars - 1
-  //   to   = totalBars + rightPad - 1
+  // LW Charts v4.2: index 0 = FIRST bar, index (n-1) = LAST bar.
+  if (n < 1) { ts.fitContent(); return; }
   const tradingBars = Math.round(days * 5 / 7);
-  const rightPad    = 8; // empty bars of right breathing room
-  const from = totalBars - tradingBars - 1;
-  const to   = totalBars + rightPad - 1;
+  const rightPad    = 8;
+  const from = n - tradingBars - 1;
+  const to   = n + rightPad - 1;
 
   setTimeout(() => {
-    try {
-      ts.setVisibleLogicalRange({ from, to });
-    } catch (_) { ts.fitContent(); }
-  }, 20);
+    try { ts.setVisibleLogicalRange({ from, to }); } catch (_) { ts.fitContent(); }
+  }, 30);
 
   document.querySelectorAll('.lw-range-btn').forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.days) === days);
@@ -2865,7 +2868,7 @@ function _lwSetRange(days, totalBars) {
   _lwActiveDays = days;
 }
 
-let _lwActiveDays = 63; // default: 3M
+let _lwActiveDays = 91; // default: 3M (calendar days)
 
 // Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
 async function _renderLWChart(ohlcId, label) {
@@ -2948,16 +2951,43 @@ async function _renderLWChart(ohlcId, label) {
   const todayBar = _lwBuildTodayBar(ohlcId);
   if (todayBar) { try { candleSeries.update(todayBar); } catch(_) {} }
 
-  // MA20 overlay
-  const ma20 = _calcMA(bars, 20);
-  let maSeries = null;
-  if (ma20.length > 0) {
-    maSeries = _lwChart.addLineSeries({
-      color: '#2196f3', lineWidth: 1,
+  // MA overlay — period driven by #lw-ma-period selector (default 20)
+  const MA_COLOR = '#1565c0'; // darker blue — matches TV widget more closely
+  let _lwMaPeriod = parseInt(document.getElementById('lw-ma-period')?.value ?? '20') || 20;
+  let _lwMaSeries = null;
+
+  function _buildMA(period) {
+    if (_lwMaSeries) { try { _lwChart.removeSeries(_lwMaSeries); } catch(_) {} _lwMaSeries = null; }
+    if (period < 1) return;
+    const maData = _calcMA(bars, period);
+    if (maData.length === 0) return;
+    _lwMaSeries = _lwChart.addLineSeries({
+      color: MA_COLOR, lineWidth: 1,
       priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false,
       priceFormat: { type: 'price', precision: dec, minMove },
     });
-    maSeries.setData(ma20);
+    _lwMaSeries.setData(maData);
+    return maData;
+  }
+
+  let _activeMaData = _buildMA(_lwMaPeriod);
+  // Keep maSeries alias for crosshair subscription below
+  let maSeries = _lwMaSeries;
+
+  // Wire indicator selector
+  const maPeriodSel = document.getElementById('lw-ma-period');
+  if (maPeriodSel) {
+    // Remove any previous listener by cloning
+    const newSel = maPeriodSel.cloneNode(true);
+    maPeriodSel.parentNode.replaceChild(newSel, maPeriodSel);
+    newSel.addEventListener('change', () => {
+      _lwMaPeriod = parseInt(newSel.value) || 0;
+      _activeMaData = _buildMA(_lwMaPeriod);
+      maSeries = _lwMaSeries;
+      // Update legend label
+      const lbl = document.getElementById('lw-ma-legend');
+      if (lbl) lbl.textContent = '';
+    });
   }
 
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
@@ -2969,13 +2999,14 @@ async function _renderLWChart(ohlcId, label) {
   maLegendEl.style.cssText = [
     'position:absolute;top:6px;left:8px;z-index:3;pointer-events:none;',
     'font-size:11px;font-family:var(--font-mono,monospace);',
-    'color:#2196f3;line-height:1.4;user-select:none;',
+    'color:' + MA_COLOR + ';line-height:1.4;user-select:none;',
   ].join('');
   wrap.appendChild(maLegendEl);
 
+  // MA legend: empty by default, shows "MA N  value" only on crosshair hover
   function _updateMALegend(maVal) {
-    if (!maLegendEl) return;
-    maLegendEl.textContent = maVal != null ? 'MA 20 close \u00a0' + _fmtHdrVal(maVal) : '';
+    if (!maLegendEl || _lwMaPeriod < 1) { if (maLegendEl) maLegendEl.textContent = ''; return; }
+    maLegendEl.textContent = maVal != null ? 'MA ' + _lwMaPeriod + '\u00a0\u00a0' + _fmtHdrVal(maVal) : '';
   }
 
   function _updateLWHeader(bar, maVal) {
@@ -3009,19 +3040,18 @@ async function _renderLWChart(ohlcId, label) {
   const hdrEl = document.getElementById('lw-chart-header');
   if (hdrEl) hdrEl.style.display = 'flex';
 
-  // Populate with last available bar (today bar or last historical)
+  // Populate with last available bar — MA value empty until crosshair hover
   const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
-  const lastMaVal = ma20.length > 0 ? ma20[ma20.length - 1].value : null;
-  _updateLWHeader(lastBar, lastMaVal);
+  _updateLWHeader(lastBar, null);
 
   // Update panel-sub to reflect yfinance source
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
   if (panelSub) panelSub.textContent = 'yfinance \u00b7 ~15min delay';
 
-  // Crosshair subscription — update OHLC legend on hover
+  // Crosshair subscription — update OHLC legend on hover, clear MA label on leave
   _lwChart.subscribeCrosshairMove(param => {
     if (!param || !param.time || !param.seriesData) {
-      _updateLWHeader(lastBar, lastMaVal);
+      _updateLWHeader(lastBar, null);  // restore OHLC to last bar, clear MA value
       return;
     }
     const candleData = param.seriesData.get(candleSeries);
@@ -3030,7 +3060,7 @@ async function _renderLWChart(ohlcId, label) {
   });
 
   // Apply the active range window (default 3M, persists across symbol switches)
-  _lwSetRange(_lwActiveDays);
+  _lwSetRange(_lwActiveDays, bars.length);
 
   // Show range toolbar and sync active button
   const rangeBar = document.getElementById('lw-range-bar');
