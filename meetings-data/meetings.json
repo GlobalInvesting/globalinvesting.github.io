@@ -203,7 +203,7 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hold",
-      "biasSource": "FRED IRSTCI01NZM156N (OECD overnight NZD · monthly) vs RBNZ OCR → rates/NZD.json trajectory fallback",
+      "biasSource": "FRED IRAS2YNZM156N (2Y bond yield · monthly) → IRSTCI01NZM156N (OECD overnight · monthly) vs RBNZ OCR → rates/NZD.json trajectory fallback",
       "biasMethod": "heuristic",
       "biasUpdated": "2026-04-25",
       "cutProb": null,
