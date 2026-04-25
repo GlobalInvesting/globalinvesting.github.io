@@ -89,6 +89,7 @@ SYMBOLS: dict[str, str] = {
     "nasdaq": "^IXIC",     # Nasdaq Composite
     "nikkei": "^N225",     # Nikkei 225
     "stoxx":  "^STOXX50E", # EuroStoxx 50
+    "vix":    "^VIX",      # CBOE Volatility Index
     # Crypto
     "eth":   "ETH-USD",    # Ethereum vs USD
     # FX Index
@@ -105,7 +106,7 @@ DECIMALS: dict[str, int] = {
     "usdjpy": 3, "eurjpy": 3, "gbpjpy": 3, "audjpy": 3, "cadjpy": 3,
     "nzdjpy": 3, "chfjpy": 3,
     "gold":  2, "wti": 2, "btc": 2, "us10y": 4,
-    "spx": 2, "nasdaq": 2, "nikkei": 2, "stoxx": 2,
+    "spx": 2, "nasdaq": 2, "nikkei": 2, "stoxx": 2, "vix": 2,
     "eth": 2, "dxy": 3,
 }
 
@@ -119,6 +120,7 @@ GUARDS: dict[str, tuple[float, float]] = {
     "nasdaq":(500.0,   30000.0),
     "nikkei":(5000.0,  80000.0),
     "stoxx": (1000.0,  8000.0),
+    "vix":   (5.0,     90.0),      # VIX historically ranges 5-90
     "eth":   (10.0,    20000.0),
     "dxy":   (60.0,    150.0),
     # JPY pairs — quoted in yen, must not use FX_GUARD (0.1–50)
