@@ -148,14 +148,21 @@ function _ycDrawNative(container,toData,prData,tenorData){
   // autoSize:true fails in flex containers — canvas initializes to price-scale width (~56px) instead of
   // the full container. Use explicit width/height measured at draw time + ResizeObserver to update.
   const w=container.offsetWidth||360, h=container.offsetHeight||220;
+  // minimumTimeRange (in years) must EXCEED the actual data span so fitContent() can zoom out enough
+  // to show all tenors. With 3M→30Y the span is 29.75 years — set minimum to 32 years.
+  // minBarSpacing:1 (minimum) lets all 5 tenors fit in ~345px without LWC clipping the extremes.
+  // startTimeRange matches the first actual tenor so the left edge has no empty space.
+  const firstTenorMonth=toData[0]?.time??3;
+  const lastTenorMonth=toData[toData.length-1]?.time??360;
+  const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
   _ycLwChart=LWC.createYieldCurveChart(container,{
     width:w, height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
+    yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:3,tickMarkFormatter:m=>_tickLabels[m]||''},
+    timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
