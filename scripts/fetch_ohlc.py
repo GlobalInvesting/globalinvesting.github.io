@@ -161,21 +161,20 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     FX open reconstruction
     ─────────────────────
     Yahoo Finance FX daily bars carry a known data-quality defect: the Open
-    field is frequently set to the same value as Close (or within 0.03% of it),
-    even when the High-Low range shows meaningful intraday movement.  This
-    produces hundreds of doji/hammer candles that misrepresent actual price
-    action.
+    field is set to the last tick of the *previous* UTC day, making it
+    identical to the preceding bar's close at the stored decimal precision.
 
     Root cause: Yahoo uses the last tick of the previous UTC day as the open
-    price for FX spot pairs, making open ≈ previous-close ≈ current-close on
-    low-gap days, and open ≈ close (duplicate) on high-gap days.
+    price for FX spot pairs, producing open == prev_close (exact match) even
+    when the day's High-Low range shows meaningful intraday movement.
 
     Fix (FX only, applied after deduplication):
-      For any bar where |open − close| / close < 0.03 % AND the wick (H−L)
-      is non-trivial (> 0.05 % of close), replace open with the previous
-      bar's close clamped to [low, high].  Clamping ensures the resulting
-      OHLC relationship is always valid.  Cross-asset symbols (BTC, SPX,
-      gold, etc.) are excluded — their open values are correct.
+      For any bar where round(open, dec) == round(prev_close, dec), replace
+      open with the midpoint of the day's High-Low range, clamped to [low,
+      high].  This targets only the Yahoo artifact signature (exact equality)
+      and leaves all legitimate bars — including small-body dojis — untouched.
+      Cross-asset symbols (BTC, SPX, gold, etc.) are excluded — their open
+      values come from exchange data and are correct.
     """
     try:
         ticker = yf.Ticker(ticker_sym)
@@ -218,19 +217,35 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         # ── FX open reconstruction ────────────────────────────────────────────
         # Applied after deduplication so prev_close is always the preceding
         # calendar bar (no duplicate-date interference).
+        #
+        # Yahoo Finance FX daily bars carry a documented data-quality defect:
+        # the Open field is set to the last tick of the *previous* UTC day
+        # (i.e. prev_close), not the true session open.  This produces an
+        # exact duplicate: round(open, dec) == round(prev_close, dec).
+        #
+        # Fix: only reconstruct when open rounds to exactly prev_close at the
+        # stored precision.  This targets the Yahoo artifact (open = stale tick
+        # from prior session) without touching genuine small-body bars where
+        # open and close are legitimately close together.  Using a body-size
+        # threshold (the prior approach) incorrectly flipped candle colors on
+        # real bars with valid but small bodies.
+        #
+        # Reconstruction uses the midpoint of High and Low — a neutral estimate
+        # of where the session actually opened, clamped to [low, high] so the
+        # resulting OHLC relationship is always valid.
         if id_ in _FX_SPOT_IDS:
+            dec_ = DECIMALS.get(id_, 5)
             for i in range(1, len(deduped)):
                 b    = deduped[i]
                 prev = deduped[i - 1]
-                wick = b["high"] - b["low"]
-                body = abs(b["open"] - b["close"])
-                # Threshold: body < 0.03 % of close price AND wick > 0.05 % of close
-                # (filters genuine low-volatility dojis from the data-artifact dojis)
-                if wick > 0 and body / b["close"] < 0.0003 and wick / b["close"] > 0.0005:
-                    dec  = DECIMALS.get(id_, 5)
-                    # Use prev_close clamped to [low, high] — always a valid open
-                    new_open = max(b["low"], min(b["high"], prev["close"]))
-                    deduped[i] = {**b, "open": round(new_open, dec)}
+                # Only reconstruct if open is identical to prev_close at stored precision
+                # (the Yahoo artifact signature — open = last tick of prior UTC day)
+                if round(b["open"], dec_) == round(prev["close"], dec_):
+                    # Midpoint of the day's range is the best neutral estimate of open
+                    new_open = (b["high"] + b["low"]) / 2
+                    # Clamp to [low, high] — always a valid OHLC relationship
+                    new_open = max(b["low"], min(b["high"], new_open))
+                    deduped[i] = {**b, "open": round(new_open, dec_)}
 
         if len(deduped) < 30:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars — skipping")
