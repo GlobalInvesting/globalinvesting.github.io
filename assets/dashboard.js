@@ -3059,7 +3059,7 @@ async function _renderLWChart(ohlcId, label) {
           horzAlign: 'center',
           vertAlign: 'center',
           lines: [
-            { text: _wmLabel, color: 'rgba(255,255,255,0.12)', fontSize: 54, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
+            { text: _wmLabel, color: 'rgba(255,255,255,0.10)', fontSize: 96, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
           ],
         });
       }
@@ -3069,30 +3069,89 @@ async function _renderLWChart(ohlcId, label) {
   // Sync WM button state
   const _wmBtn = document.getElementById('lw-wm-btn');
   if (_wmBtn) {
-    _wmBtn.style.color = window._lwShowWm ? 'var(--text)' : '#848ea0';
-    _wmBtn.style.borderColor = window._lwShowWm ? 'var(--blue)' : '#2a2e39';
+    _wmBtn.classList.toggle('on', window._lwShowWm);
     _wmBtn.setAttribute('aria-pressed', window._lwShowWm ? 'true' : 'false');
   }
 
-  // Candlestick series — LWC v5 API: addSeries(SeriesType, options)
-  // Falls back to v4 addCandlestickSeries() for graceful degradation
+  // ── Chart type selector — Candlestick / Bar / Line / Area (LWC v5 API) ──
+  // Bloomberg: Candlestick default; Bar, Line, Area available. Baseline excluded (FX has no natural
+  // zero reference). State persisted in window._lwChartType across symbol switches.
+  if (typeof window._lwChartType === 'undefined') window._lwChartType = 'candle';
+
+  // Sync TYPE button state on render
+  document.querySelectorAll('[data-chart-type]').forEach(btn => {
+    const isActive = btn.dataset.chartType === window._lwChartType;
+    btn.classList.toggle('sel', isActive);
+    btn.classList.remove('on');
+  });
+
+  // Helper: convert OHLC bars to close-only for line/area
+  const closeBars = bars.map(b => ({ time: b.time, value: b.close }));
+
   let candleSeries;
-  if (typeof LWC.CandlestickSeries !== 'undefined') {
-    candleSeries = _lwChart.addSeries(LWC.CandlestickSeries, {
-      upColor: '#26a69a', downColor: '#ef5350',
-      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-      priceFormat: { type: 'price', precision: dec, minMove },
-    });
+  const _priceFormat = { type: 'price', precision: dec, minMove };
+
+  if (window._lwChartType === 'bar') {
+    // Bar (OHLC) series — same data as candlestick, different visual
+    if (typeof LWC.BarSeries !== 'undefined') {
+      candleSeries = _lwChart.addSeries(LWC.BarSeries, {
+        upColor: '#26a69a', downColor: '#ef5350',
+        openVisible: true, thinBars: false,
+        priceFormat: _priceFormat,
+      });
+    } else {
+      candleSeries = _lwChart.addBarSeries({
+        upColor: '#26a69a', downColor: '#ef5350',
+        priceFormat: _priceFormat,
+      });
+    }
+    candleSeries.setData(bars);
+  } else if (window._lwChartType === 'line') {
+    // Line series — close prices only
+    if (typeof LWC.LineSeries !== 'undefined') {
+      candleSeries = _lwChart.addSeries(LWC.LineSeries, {
+        color: '#4f7fff', lineWidth: 2,
+        priceLineVisible: false, lastValueVisible: true,
+        crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
+        priceFormat: _priceFormat,
+      });
+    } else {
+      candleSeries = _lwChart.addLineSeries({ color: '#4f7fff', lineWidth: 2, priceFormat: _priceFormat });
+    }
+    candleSeries.setData(closeBars);
+  } else if (window._lwChartType === 'area') {
+    // Area series — close prices with gradient fill
+    if (typeof LWC.AreaSeries !== 'undefined') {
+      candleSeries = _lwChart.addSeries(LWC.AreaSeries, {
+        lineColor: '#4f7fff', lineWidth: 2,
+        topColor: 'rgba(79,127,255,0.28)', bottomColor: 'rgba(79,127,255,0.02)',
+        priceLineVisible: false, lastValueVisible: true,
+        crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
+        priceFormat: _priceFormat,
+      });
+    } else {
+      candleSeries = _lwChart.addAreaSeries({ lineColor: '#4f7fff', lineWidth: 2, priceFormat: _priceFormat });
+    }
+    candleSeries.setData(closeBars);
   } else {
-    candleSeries = _lwChart.addCandlestickSeries({
-      upColor: '#26a69a', downColor: '#ef5350',
-      borderUpColor: '#26a69a', borderDownColor: '#ef5350',
-      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-      priceFormat: { type: 'price', precision: dec, minMove },
-    });
+    // Default: Candlestick — LWC v5 API with v4 fallback
+    if (typeof LWC.CandlestickSeries !== 'undefined') {
+      candleSeries = _lwChart.addSeries(LWC.CandlestickSeries, {
+        upColor: '#26a69a', downColor: '#ef5350',
+        borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+        priceFormat: _priceFormat,
+      });
+    } else {
+      candleSeries = _lwChart.addCandlestickSeries({
+        upColor: '#26a69a', downColor: '#ef5350',
+        borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+        priceFormat: _priceFormat,
+      });
+    }
+    candleSeries.setData(bars);
   }
-  candleSeries.setData(bars);
 
   // ── Volume histogram — lower panel (industry standard on Bloomberg, TradingView, FXCM) ──
   // Uses separate priceScaleId 'volume' pinned to bottom 20% — clean Bloomberg-style presentation
@@ -3138,8 +3197,7 @@ async function _renderLWChart(ohlcId, label) {
   const _volBtn = document.getElementById('lw-vol-btn');
   if (_volBtn) {
     const _volActive = hasVolume && window._lwShowVol;
-    _volBtn.style.color = _volActive ? 'var(--text)' : '#848ea0';
-    _volBtn.style.borderColor = _volActive ? 'var(--blue)' : '#2a2e39';
+    _volBtn.classList.toggle('on', _volActive);
     _volBtn.style.opacity = hasVolume ? '1' : '0.4';
     _volBtn.title = hasVolume ? 'Volume histogram' : 'Volume (unavailable — no data)';
     _volBtn.setAttribute('aria-pressed', _volActive ? 'true' : 'false');
@@ -3170,8 +3228,7 @@ async function _renderLWChart(ohlcId, label) {
   // Sync PC button state
   const _pcBtn = document.getElementById('lw-pc-btn');
   if (_pcBtn) {
-    _pcBtn.style.color = window._lwShowPc ? 'var(--text)' : '#848ea0';
-    _pcBtn.style.borderColor = window._lwShowPc ? 'var(--blue)' : '#2a2e39';
+    _pcBtn.classList.toggle('on', window._lwShowPc);
     _pcBtn.setAttribute('aria-pressed', window._lwShowPc ? 'true' : 'false');
   }
 
@@ -3184,8 +3241,7 @@ async function _renderLWChart(ohlcId, label) {
   // Sync button visual state
   const _logBtn = document.getElementById('lw-log-btn');
   if (_logBtn) {
-    _logBtn.style.color = window._lwLogScale ? 'var(--text)' : '#848ea0';
-    _logBtn.style.borderColor = window._lwLogScale ? 'var(--blue)' : '#2a2e39';
+    _logBtn.classList.toggle('on', window._lwLogScale);
     _logBtn.setAttribute('aria-pressed', window._lwLogScale ? 'true' : 'false');
   }
 
@@ -3359,8 +3415,7 @@ async function _renderLWChart(ohlcId, label) {
         if (m.series) { try { _lwChart.removeSeries(m.series); } catch(_) {} }
         window._lwMaState.splice(idx, 1);
         if (window._lwMaState.length === 0) {
-          window._lwMaState.push({ period: 20, color: _MA_PALETTE[0], series: null });
-          _buildAllMAs();
+          // All MAs removed — keep state empty, no forced fallback
         }
         _renderMaToolbar();
         _updateAllMALegend(null);
@@ -3408,8 +3463,7 @@ async function _renderLWChart(ohlcId, label) {
   // Sync MA button state
   const _maBtn = document.getElementById('lw-ma-btn');
   if (_maBtn) {
-    _maBtn.style.color = window._lwShowMa ? 'var(--text)' : '#848ea0';
-    _maBtn.style.borderColor = window._lwShowMa ? 'var(--blue)' : '#2a2e39';
+    _maBtn.classList.toggle('on', window._lwShowMa);
     _maBtn.setAttribute('aria-pressed', window._lwShowMa ? 'true' : 'false');
   }
 
@@ -3420,12 +3474,17 @@ async function _renderLWChart(ohlcId, label) {
   let _cbMarkersHandle = null;
 
   async function _applyMarkers() {
+    // Clear previous markers
     if (_cbMarkersHandle && typeof _cbMarkersHandle.detach === 'function') {
-      try { _cbMarkersHandle.detach(); } catch(_) {}  _cbMarkersHandle = null;
-    } else if (typeof candleSeries.setMarkers === 'function') {
-      try { candleSeries.setMarkers([]); } catch(_) {}
+      try { _cbMarkersHandle.detach(); } catch(_) {}
+      _cbMarkersHandle = null;
     }
-    if (!window._lwShowCb) return;
+    _cbMarkersHandle = null;
+    if (!window._lwShowCb) {
+      // Ensure v4 series also cleared when hiding
+      if (typeof candleSeries.setMarkers === 'function') { try { candleSeries.setMarkers([]); } catch(_) {} }
+      return;
+    }
     try {
       const _CB_MAP = {
         eurusd:['EUR','USD'], gbpusd:['GBP','USD'], usdjpy:['USD','JPY'],
@@ -3484,8 +3543,7 @@ async function _renderLWChart(ohlcId, label) {
   }
   const _cbBtn = document.getElementById('lw-cb-btn');
   if (_cbBtn) {
-    _cbBtn.style.color = window._lwShowCb ? 'var(--text)' : '#848ea0';
-    _cbBtn.style.borderColor = window._lwShowCb ? 'var(--blue)' : '#2a2e39';
+    _cbBtn.classList.toggle('on', window._lwShowCb);
     _cbBtn.setAttribute('aria-pressed', window._lwShowCb ? 'true' : 'false');
   }
   _applyMarkers();
@@ -3787,65 +3845,64 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
   _lwSetRange(parseInt(btn.dataset.days));
 });
 
-// ── Log Scale toggle — persists state in window._lwLogScale ──
-// Bloomberg standard: LOG button in chart toolbar, toggles right price scale between Normal and Log
+// ── Log Scale toggle ──
 document.getElementById('lw-log-btn')?.addEventListener('click', function() {
   window._lwLogScale = !window._lwLogScale;
-  this.classList.toggle('active', window._lwLogScale);
+  this.classList.toggle('on', window._lwLogScale);
   this.setAttribute('aria-pressed', window._lwLogScale ? 'true' : 'false');
-  this.style.color = window._lwLogScale ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwLogScale ? 'var(--blue)' : '#2a2e39';
   if (_lwChart) {
-    try {
-      // PriceScaleMode: 0 = Normal, 1 = Logarithmic, 2 = Percentage, 3 = IndexedTo100
-      _lwChart.priceScale('right').applyOptions({ mode: window._lwLogScale ? 1 : 0 });
-    } catch(_) {}
+    try { _lwChart.priceScale('right').applyOptions({ mode: window._lwLogScale ? 1 : 0 }); } catch(_) {}
   }
 });
 
-// ── Watermark toggle ──
+// ── Overlay toggle handlers — all share the same pattern ──
+// Toggle class 'on' for visual state (defined in index.html <style>) + re-render
 document.getElementById('lw-wm-btn')?.addEventListener('click', function() {
   window._lwShowWm = !window._lwShowWm;
-  this.style.color = window._lwShowWm ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwShowWm ? 'var(--blue)' : '#2a2e39';
+  this.classList.toggle('on', window._lwShowWm);
   this.setAttribute('aria-pressed', window._lwShowWm ? 'true' : 'false');
-  // Re-render chart to apply (watermark can only be created/removed on chart init)
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-// ── Prev Close line toggle ──
 document.getElementById('lw-pc-btn')?.addEventListener('click', function() {
   window._lwShowPc = !window._lwShowPc;
-  this.style.color = window._lwShowPc ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwShowPc ? 'var(--blue)' : '#2a2e39';
+  this.classList.toggle('on', window._lwShowPc);
   this.setAttribute('aria-pressed', window._lwShowPc ? 'true' : 'false');
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-// ── Volume toggle ──
 document.getElementById('lw-vol-btn')?.addEventListener('click', function() {
   window._lwShowVol = !window._lwShowVol;
-  this.style.color = window._lwShowVol ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwShowVol ? 'var(--blue)' : '#2a2e39';
+  this.classList.toggle('on', window._lwShowVol);
   this.setAttribute('aria-pressed', window._lwShowVol ? 'true' : 'false');
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-// ── CB Markers toggle ──
 document.getElementById('lw-cb-btn')?.addEventListener('click', function() {
   window._lwShowCb = !window._lwShowCb;
-  this.style.color = window._lwShowCb ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwShowCb ? 'var(--blue)' : '#2a2e39';
+  this.classList.toggle('on', window._lwShowCb);
   this.setAttribute('aria-pressed', window._lwShowCb ? 'true' : 'false');
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-// ── MA toggle — show/hide all moving averages for a clean chart view ──
 document.getElementById('lw-ma-btn')?.addEventListener('click', function() {
   window._lwShowMa = !window._lwShowMa;
-  this.style.color = window._lwShowMa ? 'var(--text)' : '#848ea0';
-  this.style.borderColor = window._lwShowMa ? 'var(--blue)' : '#2a2e39';
+  this.classList.toggle('on', window._lwShowMa);
   this.setAttribute('aria-pressed', window._lwShowMa ? 'true' : 'false');
+  if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
+});
+
+// ── Chart type selector ──
+// Bloomberg standard: Candlestick default; Bar, Line, Area as alternatives.
+// Chart type persists across symbol switches via window._lwChartType.
+document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
+  const typeBtn = e.target.closest('[data-chart-type]');
+  if (!typeBtn) return;
+  window._lwChartType = typeBtn.dataset.chartType;
+  document.querySelectorAll('[data-chart-type]').forEach(b => {
+    b.classList.toggle('sel', b === typeBtn);
+    b.classList.remove('on');
+  });
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
