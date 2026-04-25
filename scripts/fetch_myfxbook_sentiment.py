@@ -161,6 +161,8 @@ def main():
     print(f"\n[Auth] Logging in via CF Worker...")
     login_data = worker_get("login", {"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD}, out_file, ts)
     if login_data.get("error"):
+        # Log full response to help diagnose (CAPTCHA challenge, account lock, wrong creds, etc.)
+        print(f"[Auth] Login failed. Full API response: {json.dumps(login_data)}")
         preserve_existing(out_file, ts, f"Myfxbook login error: {login_data.get('message','unknown')}")
     token = login_data.get("session", "")
     if not token:
