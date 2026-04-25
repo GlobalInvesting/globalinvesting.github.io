@@ -189,12 +189,16 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
 
             dec = DECIMALS.get(id_, 5)
+            # Volume: FX has tick-volume (number of ticks/quotes), non-FX has real traded volume
+            # For FX, Yahoo returns tick count which is a reasonable proxy for activity
+            vol = int(row["Volume"]) if "Volume" in row and not (row["Volume"] != row["Volume"]) else 0
             bars.append({
-                "time":  date_str,
-                "open":  round(o, dec),
-                "high":  round(h, dec),
-                "low":   round(l, dec),
-                "close": round(c, dec),
+                "time":   date_str,
+                "open":   round(o, dec),
+                "high":   round(h, dec),
+                "low":    round(l, dec),
+                "close":  round(c, dec),
+                "volume": vol,
             })
 
         # Deduplicate by date (keep last occurrence - intraday quirk for today's bar)
