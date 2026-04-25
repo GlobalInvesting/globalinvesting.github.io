@@ -3052,16 +3052,34 @@ async function _renderLWChart(ohlcId, label) {
   function _applyWatermark() {
     // Remove existing watermark if any
     if (_wmHandle && typeof _wmHandle.detach === 'function') { try { _wmHandle.detach(); } catch(_) {} _wmHandle = null; }
-    if (!window._lwShowWm) return;
+    if (!window._lwShowWm) {
+      const _domWm = document.getElementById('_lw-dom-watermark');
+      if (_domWm) _domWm.remove();
+      return;
+    }
     try {
+      // Remove DOM-based fallback watermark
+      const _domWm = document.getElementById('_lw-dom-watermark');
+      if (_domWm) _domWm.remove();
       if (typeof LWC.createTextWatermark === 'function') {
         _wmHandle = LWC.createTextWatermark(_lwChart.panes()[0], {
           horzAlign: 'center',
           vertAlign: 'center',
           lines: [
-            { text: _wmLabel, color: 'rgba(255,255,255,0.10)', fontSize: 96, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
+            { text: _wmLabel, color: 'rgba(255,255,255,0.12)', fontSize: 96, fontWeight: 'bold', fontFamily: 'var(--font-ui,sans-serif)' },
           ],
         });
+      } else {
+        // DOM-based fallback — absolutely positioned over chart container
+        const _chartWrap = document.getElementById('tv-chart-wrap');
+        if (_chartWrap) {
+          const _wm = document.createElement('div');
+          _wm.id = '_lw-dom-watermark';
+          _wm.textContent = _wmLabel;
+          _wm.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:72px;font-weight:700;font-family:var(--font-ui,sans-serif);color:rgba(255,255,255,0.10);pointer-events:none;user-select:none;z-index:1;white-space:nowrap;letter-spacing:4px;';
+          _chartWrap.style.position = 'relative';
+          _chartWrap.appendChild(_wm);
+        }
       }
     } catch(_wmErr) {}
   }
@@ -3086,7 +3104,7 @@ async function _renderLWChart(ohlcId, label) {
   });
 
   // Helper: convert OHLC bars to close-only for line/area
-  const closeBars = bars.map(b => ({ time: b.time, value: b.close }));
+  const closeBars = bars.filter(b => b.close != null).map(b => ({ time: b.time, value: b.close }));
 
   let candleSeries;
   const _priceFormat = { type: 'price', precision: dec, minMove };
@@ -3424,7 +3442,7 @@ async function _renderLWChart(ohlcId, label) {
       pill.appendChild(swatch);
       pill.appendChild(lbl);
       pill.appendChild(chev);
-      if (window._lwMaState.length > 1) pill.appendChild(rm);
+      pill.appendChild(rm);
       bar.appendChild(pill);
     });
 
@@ -3625,6 +3643,10 @@ async function _renderLWChart(ohlcId, label) {
         isUp = _pctForDir != null ? _pctForDir >= 0 : (bar.close != null && bar.close >= (bar.open ?? bar.close));
       }
       const ohlcColor = isUp ? '#26a69a' : '#ef5350';
+      const _isOHLCType = (window._lwChartType === 'candle' || window._lwChartType === 'bar');
+      // Hide O/H/L labels for Line/Area — only Close is meaningful
+      const _ohlcWrap = document.getElementById('lw-hdr-ohlc-wrap');
+      if (_ohlcWrap) _ohlcWrap.style.display = _isOHLCType ? '' : 'none';
       if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = ohlcColor; }
       if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = ohlcColor; }
       if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = ohlcColor; }
@@ -3903,6 +3925,9 @@ document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
     b.classList.toggle('sel', b === typeBtn);
     b.classList.remove('on');
   });
+  // Immediately show/hide OHLC header — no need to wait for chart re-render
+  const _ohlcWrap = document.getElementById('lw-hdr-ohlc-wrap');
+  if (_ohlcWrap) _ohlcWrap.style.display = (window._lwChartType === 'candle' || window._lwChartType === 'bar') ? '' : 'none';
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
