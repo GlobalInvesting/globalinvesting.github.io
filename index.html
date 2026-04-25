@@ -201,6 +201,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-range-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em}
 .lw-range-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-tb-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em;white-space:nowrap}
+.lw-tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.lw-tb-btn.on{color:var(--text);border-color:var(--blue)}
+.lw-tb-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -504,12 +509,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="lw-range-btn"        data-days="1095" aria-label="3 years">3Y</button>
         <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
         <span style="flex:1"></span>
-        <button id="lw-wm-btn"  aria-label="Toggle watermark"      aria-pressed="true"  title="Symbol watermark"    style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:4px;letter-spacing:.04em;">WM</button>
-        <button id="lw-pc-btn"  aria-label="Toggle prev close line" aria-pressed="true"  title="Prev close line"    style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:4px;letter-spacing:.04em;">PC</button>
-        <button id="lw-vol-btn" aria-label="Toggle volume histogram" aria-pressed="true" title="Volume histogram"   style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:4px;letter-spacing:.04em;">VOL</button>
-        <button id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true" title="CB meeting markers" style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:4px;letter-spacing:.04em;">CB</button>
-        <button id="lw-ma-btn"  aria-label="Toggle moving averages"  aria-pressed="true"  title="Show/hide all MAs" style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:6px;letter-spacing:.04em;">MA</button>
-        <button id="lw-log-btn" aria-label="Toggle logarithmic scale" aria-pressed="false" title="Log scale"        style="background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#848ea0;font-size:9px;font-family:var(--font-ui,sans-serif);padding:2px 6px;cursor:pointer;margin-right:6px;letter-spacing:.04em;">LOG</button>
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">TYPE</span>
+        <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick">Candle</button>
+        <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;">Bar</button>
+        <button class="lw-tb-btn"    id="lw-type-line"   data-chart-type="line"   aria-label="Line chart"         title="Line"        style="margin-left:2px;">Line</button>
+        <button class="lw-tb-btn"    id="lw-type-area"   data-chart-type="area"   aria-label="Area chart"         title="Area"        style="margin-left:2px;">Area</button>
+        <span class="lw-tb-sep"></span>
+        <button class="lw-tb-btn on" id="lw-wm-btn"  aria-label="Toggle watermark"          aria-pressed="true"  title="Symbol watermark">WM</button>
+        <button class="lw-tb-btn on" id="lw-pc-btn"  aria-label="Toggle prev close line"    aria-pressed="true"  title="Prev close line"    style="margin-left:2px;">PC</button>
+        <button class="lw-tb-btn"    id="lw-vol-btn" aria-label="Toggle volume histogram"   aria-pressed="false" title="Volume histogram"    style="margin-left:2px;">VOL</button>
+        <button class="lw-tb-btn on" id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true"  title="CB meeting markers"  style="margin-left:2px;">CB</button>
+        <button class="lw-tb-btn on" id="lw-ma-btn"  aria-label="Toggle moving averages"    aria-pressed="true"  title="Show/hide all MAs"   style="margin-left:2px;">MA</button>
+        <span class="lw-tb-sep"></span>
+        <button class="lw-tb-btn"    id="lw-log-btn" aria-label="Toggle logarithmic scale"  aria-pressed="false" title="Log scale">LOG</button>
+        <span class="lw-tb-sep"></span>
         <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">INDICATORS</span>
         <div id="lw-ma-bar" style="display:inline-flex;align-items:center;gap:4px;"></div>
       </div>
