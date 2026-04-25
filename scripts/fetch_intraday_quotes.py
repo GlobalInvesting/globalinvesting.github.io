@@ -1036,32 +1036,63 @@ def fetch_yfinance_all(symbols_map):
                 # ── 1W CHG: prior-Friday-close convention (Bloomberg/Refinitiv) ──────
                 # Computed for all FX pairs (majors and crosses). Uses the daily history
                 # already downloaded for HV30 — no extra API call needed.
-                # Finds the most recent Friday in the history that is strictly before
-                # today's session (i.e. last week's Friday close).
+                #
+                # "Prior Friday" is anchored to today's UTC date, NOT to the last bar
+                # in the history. This guarantees consistency across all pairs regardless
+                # of how yfinance delivers weekend/late bars for each ticker.
+                #
+                # Algorithm:
+                #   1. Compute today's UTC date.
+                #   2. Walk back from (today - 1 day) to find the most recent Friday
+                #      that is in the calendar — that is the reference Friday.
+                #   3. Look up that date in hist to get the closing price.
+                #   4. Compute pct1w = (close / prior_friday_close − 1) × 100.
+                #
+                # Example (runs Saturday 2026-04-25 UTC):
+                #   today = 2026-04-25 (Sat)  →  reference Friday = 2026-04-18
+                #   → all pairs use the same 18-Apr close as their prior-Friday base.
+                #
+                # Why NOT last-bar-relative skip:
+                #   yfinance delivers bars asynchronously per ticker. Some tickers may
+                #   have a partial Saturday bar as their last entry; others end on Friday.
+                #   Skipping the "last bar" selects different Fridays for different tickers
+                #   → inconsistency in the 1W column (observed: EURUSD used 17-Apr while
+                #   GBPUSD used 24-Apr on the same run).
                 try:
                     # hist index is tz-aware; normalize to date for weekday comparison.
                     # IMPORTANT: do NOT dropna() here — hist_dates and hist_close_full
                     # must share the same positional index. dropna() would misalign them.
                     hist_dates      = [d.date() if hasattr(d, "date") else d for d in hist.index]
                     hist_close_full = hist["Close"]  # keep NaN rows to preserve positional alignment
-                    # Use last-bar-relative search, NOT datetime.now(utc).date().
-                    # Rationale: when the script runs after midnight UTC on Saturday,
-                    # now().date() is already Saturday but the last yfinance bar is
-                    # still Friday. Using now() would find *that* Friday as "prior Friday"
-                    # → close / close = 1.0 → pct1w = 0.00%. Instead, always skip the
-                    # last bar and search backwards for the nearest Friday among the
-                    # remaining bars — that is always the prior-week Friday close.
-                    last_bar_idx = len(hist_dates) - 1
+
+                    # Step 1: anchor to today's UTC date
+                    today_utc = datetime.now(timezone.utc).date()
+                    # Step 2: find the most recent Friday strictly before today
+                    #   (if today is Saturday: days_since_friday=1 → reference = yesterday=Fri ✓)
+                    #   (if today is Friday:   days_since_friday=0 → we need *last* Friday,
+                    #    so we look back 7 days from yesterday = last Friday ✓)
+                    days_since_friday = (today_utc.weekday() - 4) % 7  # 4=Fri
+                    if days_since_friday == 0:
+                        # today IS Friday — reference is last Friday (7 days ago)
+                        reference_friday = today_utc - timedelta(days=7)
+                    else:
+                        reference_friday = today_utc - timedelta(days=days_since_friday)
+
+                    # Step 3: look up reference_friday in history
+                    # Build a date→index map for O(1) lookup
+                    date_to_idx = {d: i for i, d in enumerate(hist_dates)}
                     prior_friday = None
                     prior_friday_close = None
-                    for i in range(last_bar_idx - 1, -1, -1):  # skip last bar
-                        d = hist_dates[i]
-                        if d.weekday() == 4:  # 4 = Friday
-                            v = hist_close_full.iloc[i]
-                            if v is not None and not (hasattr(v, '__float__') and v != v):  # not NaN
-                                prior_friday = d
+                    # Try reference_friday first; if missing (holiday), walk back up to 3 days
+                    for offset in range(4):
+                        candidate = reference_friday - timedelta(days=offset)
+                        idx = date_to_idx.get(candidate)
+                        if idx is not None:
+                            v = hist_close_full.iloc[idx]
+                            if v is not None and not (hasattr(v, '__float__') and v != v):
+                                prior_friday = candidate
                                 prior_friday_close = float(v)
-                            break
+                                break
                     if prior_friday_close and prior_friday_close != 0:
                         pct1w = round((close / prior_friday_close - 1.0) * 100.0, 4)
                         results[internal_id]["pct1w"] = pct1w
