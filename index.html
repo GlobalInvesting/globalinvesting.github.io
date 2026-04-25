@@ -205,7 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-tb-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-tb-btn.on{color:var(--text);border-color:var(--blue)}
 .lw-tb-btn.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
-.lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}
+.lw-tb-sep{width:1px;height:14px;background:var(--border2);margin:0 6px;flex-shrink:0}#lw-range-bar::-webkit-scrollbar{display:none}
 #lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
 #lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
 #lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
@@ -501,37 +501,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <!-- Range toolbar — shown only when LW chart is active (hidden for TV widget) -->
-      <!-- Two-row layout: row-1 = RANGE + TYPE, row-2 = overlays + INDICATORS.
-           On desktop both rows share the same visual weight as a single toolbar row.
-           On mobile (<600px) each row wraps independently so no button is ever hidden. -->
-      <div id="lw-range-bar" style="display:none;flex-direction:column;gap:0;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-        <!-- Row 1: RANGE selector + TYPE selector -->
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;padding:2px 6px;">
-          <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">RANGE</span>
-          <button class="lw-range-btn active" data-days="91"  aria-label="3 months">3M</button>
-          <button class="lw-range-btn"        data-days="182" aria-label="6 months">6M</button>
-          <button class="lw-range-btn"        data-days="365" aria-label="1 year"  >1Y</button>
-          <button class="lw-range-btn"        data-days="1095" aria-label="3 years">3Y</button>
-          <button class="lw-range-btn"        data-days="0"   aria-label="All data">ALL</button>
-          <span style="flex:1;min-width:6px;"></span>
-          <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">TYPE</span>
-          <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick">Candle</button>
-          <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;">Bar</button>
-          <button class="lw-tb-btn"    id="lw-type-line"   data-chart-type="line"   aria-label="Line chart"         title="Line"        style="margin-left:2px;">Line</button>
-          <button class="lw-tb-btn"    id="lw-type-area"   data-chart-type="area"   aria-label="Area chart"         title="Area"        style="margin-left:2px;">Area</button>
-        </div>
-        <!-- Row 2: overlays (WM PC VOL CB) + LOG + INDICATORS -->
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;padding:2px 6px;border-top:1px solid var(--border2);">
-          <button class="lw-tb-btn"    id="lw-wm-btn"  aria-label="Toggle watermark"          aria-pressed="false" title="Symbol watermark">WM</button>
-          <button class="lw-tb-btn on" id="lw-pc-btn"  aria-label="Toggle prev close line"    aria-pressed="true"  title="Prev close line"    style="margin-left:2px;">PC</button>
-          <button class="lw-tb-btn"    id="lw-vol-btn" aria-label="Toggle volume histogram"   aria-pressed="false" title="Volume histogram"    style="margin-left:2px;">VOL</button>
-          <button class="lw-tb-btn on" id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true"  title="CB meeting markers"  style="margin-left:2px;">CB</button>
-          <span class="lw-tb-sep"></span>
-          <button class="lw-tb-btn"    id="lw-log-btn" aria-label="Toggle logarithmic scale"  aria-pressed="false" title="Log scale">LOG</button>
-          <span class="lw-tb-sep"></span>
-          <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;">INDICATORS</span>
-          <div id="lw-ma-bar" style="display:inline-flex;align-items:center;gap:4px;"></div>
-        </div>
+      <!-- Single scrollable row — overflow-x:auto so all buttons are reachable on narrow mobile
+           without any horizontal overflow of the page itself. -webkit-overflow-scrolling for iOS
+           momentum scrolling. Scrollbar hidden via CSS (see dashboard.css lw-range-bar rule). -->
+      <div id="lw-range-bar" style="display:none;align-items:center;gap:2px;padding:2px 6px;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">RANGE</span>
+        <button class="lw-range-btn active" data-days="91"  aria-label="3 months"  style="flex-shrink:0;">3M</button>
+        <button class="lw-range-btn"        data-days="182" aria-label="6 months"  style="flex-shrink:0;">6M</button>
+        <button class="lw-range-btn"        data-days="365" aria-label="1 year"    style="flex-shrink:0;">1Y</button>
+        <button class="lw-range-btn"        data-days="1095" aria-label="3 years"  style="flex-shrink:0;">3Y</button>
+        <button class="lw-range-btn"        data-days="0"   aria-label="All data"  style="flex-shrink:0;">ALL</button>
+        <span style="flex:1;min-width:6px;flex-shrink:0;"></span>
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TYPE</span>
+        <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick" style="flex-shrink:0;">Candle</button>
+        <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;flex-shrink:0;">Bar</button>
+        <button class="lw-tb-btn"    id="lw-type-line"   data-chart-type="line"   aria-label="Line chart"         title="Line"        style="margin-left:2px;flex-shrink:0;">Line</button>
+        <button class="lw-tb-btn"    id="lw-type-area"   data-chart-type="area"   aria-label="Area chart"         title="Area"        style="margin-left:2px;flex-shrink:0;">Area</button>
+        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+        <button class="lw-tb-btn"    id="lw-wm-btn"  aria-label="Toggle watermark"          aria-pressed="false" title="Symbol watermark"    style="flex-shrink:0;">WM</button>
+        <button class="lw-tb-btn on" id="lw-pc-btn"  aria-label="Toggle prev close line"    aria-pressed="true"  title="Prev close line"    style="margin-left:2px;flex-shrink:0;">PC</button>
+        <button class="lw-tb-btn"    id="lw-vol-btn" aria-label="Toggle volume histogram"   aria-pressed="false" title="Volume histogram"    style="margin-left:2px;flex-shrink:0;">VOL</button>
+        <button class="lw-tb-btn on" id="lw-cb-btn"  aria-label="Toggle CB meeting markers" aria-pressed="true"  title="CB meeting markers"  style="margin-left:2px;flex-shrink:0;">CB</button>
+        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+        <button class="lw-tb-btn"    id="lw-log-btn" aria-label="Toggle logarithmic scale"  aria-pressed="false" title="Log scale"           style="flex-shrink:0;">LOG</button>
+        <span class="lw-tb-sep" style="flex-shrink:0;"></span>
+        <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">INDICATORS</span>
+        <div id="lw-ma-bar" style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;"></div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active (mirrors TV widget legend) -->
       <div id="lw-chart-header" aria-live="polite">
