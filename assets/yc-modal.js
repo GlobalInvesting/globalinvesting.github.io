@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.2 — LightweightCharts v5 createYieldCurveChart
+// YIELD CURVE MODAL  v2.3 — LightweightCharts v5 createYieldCurveChart
 // File: assets/yc-modal.js
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -166,7 +166,12 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   //   baseResolution:12     → whitespace steps every 12 months (1 year grid)
   //   minimumTimeRange:10   → minimum visible range is 10 months; fitContent can zoom out freely
   //   startTimeRange:3      → left-side whitespace starts at month 3 (first tenor = 3M)
-  //   minBarSpacing:0       → allow maximum compression so ALL tenors fit on narrow screens
+  //   minBarSpacing:0       → no minimum enforced; spacing is determined by fixLeft/RightEdge
+  //   fixLeftEdge:true      → pins first tenor (3M) to the left edge of the chart area
+  //   fixRightEdge:true     → pins last tenor (30Y) to the right edge of the chart area
+  //   With BOTH fix edges enabled, LWC internally overrides minBarSpacing to:
+  //     width / points.length  →  tenors always fill 100% of available width regardless
+  //     of screen size (see LWC source: _private__minBarSpacing())
   //   subscribeSizeChange() → re-fitContent on every resize / orientation change
   _ycLwChart=LWC.createYieldCurveChart(inner,{
     autoSize:true,
@@ -175,7 +180,7 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:0},
+    timeScale:{borderVisible:false,minBarSpacing:0,fixLeftEdge:true,fixRightEdge:true},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
   });
