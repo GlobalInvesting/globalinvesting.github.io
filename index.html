@@ -201,15 +201,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .lw-range-btn{background:transparent;border:1px solid var(--border2);border-radius:3px;color:var(--text2);font-size:9px;font-family:var(--font-ui,sans-serif);padding:1px 6px;cursor:pointer;transition:background .12s,color .12s,border-color .12s;letter-spacing:.04em}
 .lw-range-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
 .lw-range-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-#lw-chart-header{display:none;align-items:center;gap:0;padding:3px 8px;background:var(--bg);border-bottom:1px solid var(--border);min-height:22px;flex-wrap:wrap;overflow:hidden}
-#lw-chart-header .lw-hdr-sym{font-size:10px;font-weight:600;color:var(--text);font-family:var(--font-ui,sans-serif);margin-right:8px;white-space:nowrap}
-#lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:6px;font-size:9px;font-family:var(--font-mono,monospace)}
+#lw-chart-header{display:none;align-items:center;gap:0;padding:4px 8px;background:#131722;border-bottom:1px solid #2a2e39;min-height:26px;flex-wrap:wrap;overflow:hidden}
+#lw-chart-header .lw-hdr-sym{font-size:11px;font-weight:700;color:#d1d4dc;font-family:var(--font-ui,sans-serif);margin-right:10px;white-space:nowrap;letter-spacing:.01em}
+#lw-chart-header .lw-hdr-ohlc{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--font-mono,monospace)}
 #lw-chart-header .lw-hdr-o,.lw-hdr-h,.lw-hdr-l,.lw-hdr-c,.lw-hdr-chg,.lw-hdr-ma{white-space:nowrap}
-#lw-chart-header .lw-hdr-lbl{color:var(--text3);margin-right:2px}
-#lw-chart-header .lw-hdr-val{color:var(--text)}
-#lw-chart-header .lw-hdr-chg.up{color:var(--up)}
-#lw-chart-header .lw-hdr-chg.dn{color:var(--down)}
-#lw-chart-header .lw-hdr-ma-val{color:#f0a500}
+#lw-chart-header .lw-hdr-lbl{color:#787b86;margin-right:3px;font-size:9px}
+#lw-chart-header .lw-hdr-val{color:#d1d4dc}
+#lw-chart-header .lw-hdr-chg.up{color:#26a69a}
+#lw-chart-header .lw-hdr-chg.dn{color:#ef5350}
+#lw-chart-header .lw-hdr-ma-val{color:#2196f3}
 /* Hide LW Charts attribution logo (rendered as an anchor tag inside the chart div) */
 #tv-chart-wrap a[href*="tradingview"]{display:none!important}
 #tvcal-inner{overflow:hidden}
@@ -512,7 +512,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="lw-hdr-l"><span class="lw-hdr-lbl">L</span><span class="lw-hdr-val" id="lw-hdr-l-val"></span></span>
           <span class="lw-hdr-c"><span class="lw-hdr-lbl">C</span><span class="lw-hdr-val" id="lw-hdr-c-val"></span></span>
           <span class="lw-hdr-chg" id="lw-hdr-chg-val"></span>
-          <span class="lw-hdr-ma"><span class="lw-hdr-lbl">MA 20</span><span class="lw-hdr-ma-val" id="lw-hdr-ma-val"></span></span>
+          <span class="lw-hdr-ma"><span class="lw-hdr-lbl">MA 20 close</span><span class="lw-hdr-ma-val" id="lw-hdr-ma-val"></span></span>
         </div>
       </div>
       <div id="tv-chart-wrap" style="height:290px;width:100%;position:relative;overflow:hidden;margin-bottom:-32px;pointer-events:none;">
