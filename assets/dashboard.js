@@ -1387,31 +1387,32 @@ async function fetchCommodityQuotes() {
 // ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
 async function fetchCryptoQuotes() {
+  // CoinGecko — used ONLY as a DOM fallback when yfinance has not yet populated BTC data.
+  // STOOQ_RT_CACHE['btc'] is exclusively written by fetchCrossAssetData (yfinance intraday JSON).
+  // Mixing CoinGecko (rolling 24h reference) with yfinance (day-over-day prev_close reference)
+  // produces a % mismatch between the chart header and the cross-asset panel.
   try {
     const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
     if (!r.ok) return;
     const data = await r.json();
     if (data.bitcoin) {
       const price  = data.bitcoin.usd;
-      const chg24  = data.bitcoin.usd_24h_change;  // used only for arrow color on topbar price
+      const chg24  = data.bitcoin.usd_24h_change;
       const priceEl = document.getElementById('q-btcusd');
       const chgEl   = document.getElementById('qc-btcusd');
-      // Update price display; keep existing % if yfinance already populated it
-      // (avoids replacing day-over-day % from intraday JSON with CoinGecko rolling 24h %)
-      if (priceEl) {
+      // Only update DOM when yfinance has not yet provided values (showing '—')
+      if (priceEl && priceEl.textContent === '—') {
         priceEl.textContent = price.toLocaleString();
         priceEl.className   = 'q-price ' + clsDir(chg24);
       }
-      // Only update % when yfinance intraday has not yet provided it
       if (chgEl && chgEl.textContent === '—') {
         chgEl.textContent = pctStr(chg24);
         chgEl.className   = 'q-chg ' + clsDir(chg24);
       }
-      // Keep the close current in cache; do NOT overwrite open/chg/pct (those are yfinance)
-      if (STOOQ_RT_CACHE['btc']) {
-        STOOQ_RT_CACHE['btc'].close = price;
-        _lwUpdateTodayBar();  // refresh chart today-bar with latest price
-      }
+      // DO NOT write to STOOQ_RT_CACHE['btc'] — that is yfinance-only territory.
+      // Writing CoinGecko's rolling 24h price here would decouple the chart's
+      // today-bar close from the yfinance prev_close used as its open,
+      // producing a % divergence vs the cross-asset panel.
     }
   } catch(e) {}
 }
@@ -4597,8 +4598,11 @@ async function fetchCrossAssetData() {
       }
       bcEl.className = 'ca-chg ' + clsDir(_caBtcEarly.chg);
     }
-    if (qbEl && qbEl.textContent === '—')  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
-    if (qbcEl && qbcEl.textContent === '—') { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
+    // Always overwrite topbar BTC from yfinance (CoinGecko is only a pre-load placeholder)
+    if (qbEl)  { qbEl.textContent  = btcFmtE; qbEl.className  = 'q-price ' + clsDir(_caBtcEarly.chg); }
+    if (qbcEl) { qbcEl.textContent = pctStr(_caBtcEarly.pct); qbcEl.className = 'q-chg ' + clsDir(_caBtcEarly.chg); }
+    // Seed STOOQ_RT_CACHE early so the chart has yfinance data immediately
+    STOOQ_RT_CACHE['btc'] = _caBtcEarly;
   }
 
   // ── STEP 2: All cross-asset data from intraday quotes.json (yfinance) ──
@@ -4659,8 +4663,8 @@ async function fetchCrossAssetData() {
       }
       btcCEl.className = 'ca-chg ' + clsDir(_btcIntraday.chg);
     }
-    // Also update topbar q-btcusd if still showing —
-    if (qBtc && qBtc.textContent === '—') {
+    // Always update topbar q-btcusd from yfinance — CoinGecko is only a pre-load fallback
+    if (qBtc) {
       qBtc.textContent  = btcFmt;
       qBtc.className    = 'q-price ' + clsDir(_btcIntraday.chg);
       if (qBtcC) { qBtcC.textContent = pctStr(_btcIntraday.pct); qBtcC.className = 'q-chg ' + clsDir(_btcIntraday.chg); }
