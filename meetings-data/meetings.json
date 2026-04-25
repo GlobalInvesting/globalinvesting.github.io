@@ -129,12 +129,12 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hold",
-      "biasSource": "ASX 30-day IB Cash Rate Futures (ib_expectation_curve_0.json) → RBA Statistics API (A3 cash rate) → FRED IRSTCI01AUM156N (OECD overnight · monthly) vs RBA target → rates/AUD.json trajectory fallback",
-      "biasMethod": "spread",
+      "bias": "hike",
+      "biasSource": "ASX 30-day IB Cash Rate Futures (ib_expectation_curve_0.json) → RBA Statistics API (A3 cash rate) → FRED IRSTCI01AUM156N (OECD overnight · monthly, two-sided stale guard) vs RBA target → rates/AUD.json trajectory fallback",
+      "biasMethod": "heuristic",
       "biasUpdated": "2026-04-25",
-      "cutProb": 0,
-      "hikeProb": 0
+      "cutProb": null,
+      "hikeProb": null
     },
     "CAD": {
       "nextMeeting": "29 Apr",
@@ -203,11 +203,11 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hike",
-      "biasSource": "NZFBF NZD OIS (closing-rates/nzos · stdlib parse) → FRED IR3TIB01NZM156N (3M interbank · monthly) → FRED IRSTCI01NZM156N (OECD overnight · monthly) vs RBNZ OCR → rates/NZD.json trajectory fallback",
+      "biasSource": "NZFBF NZD OIS (__NEXT_DATA__ + HTML parse) → FRED IR3TIB01NZM156N (3M interbank · credit-adj −22bp + RBNZ track supplement) → FRED IRSTCI01NZM156N (OECD overnight) vs RBNZ OCR → rates/NZD.json trajectory fallback",
       "biasMethod": "spread",
       "biasUpdated": "2026-04-25",
       "cutProb": 0,
-      "hikeProb": 100
+      "hikeProb": 40
     }
   }
 }
