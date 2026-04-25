@@ -204,9 +204,6 @@
 }
 .corr-cell.comp {
   border-radius:2px;
-  border:1px solid rgba(79,127,255,.20);
-  background:rgba(79,127,255,.07);
-  color:var(--blue,#4f7fff);
   font-weight:700;
 }
 
@@ -884,22 +881,9 @@
       grid.appendChild(val);
     });
 
-    // Weekend status note — inline text line, no banner box (Bloomberg/Eikon convention)
+    // Weekend: no banner, no status line — dimmed bars only (Bloomberg/Eikon convention)
     const content = document.getElementById('hm-sess-content');
     content.innerHTML = '';
-    if (weekend) {
-      const statusLine = document.createElement('div');
-      statusLine.style.cssText = [
-        'font-size:9px',
-        'font-family:var(--font-mono,"JetBrains Mono","Courier New",monospace)',
-        'color:var(--text3,#6b7280)',
-        'letter-spacing:.04em',
-        'margin-bottom:10px',
-        'padding-left:2px',
-      ].join(';');
-      statusLine.textContent = 'Market closed — FX weekend. Displaying last Friday close.';
-      content.appendChild(statusLine);
-    }
     content.appendChild(grid);
 
     // Session context notes — suspended on weekends; otherwise show Groq or fallback
@@ -1083,22 +1067,28 @@
         grid.appendChild(cell);
       });
 
-      // Composite cell (rightmost column)
+      // Composite cell (rightmost column) — green/red matching matrix convention, border-left separator
       const rowComp  = pctMap[rowCcy] ?? 0;
       const compCell = document.createElement('div');
       compCell.className = 'corr-cell comp';
       const compAbs   = Math.abs(rowComp);
-      const compAlpha = 0.08 + Math.min(compAbs / 0.4, 1) * 0.22;
-      compCell.style.background   = `rgba(79,127,255,${compAlpha.toFixed(2)})`;
-      compCell.style.color        = 'var(--blue,#4f7fff)';
+      const compAlpha = 0.12 + Math.min(compAbs / 0.4, 1) * 0.60;
+      const isFocusRow = rowCcy === ccy;
+      if (rowComp > 0.01) {
+        compCell.style.background = `rgba(38,166,154,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : 'var(--up,#26a69a)';
+      } else if (rowComp < -0.01) {
+        compCell.style.background = `rgba(239,83,80,${compAlpha.toFixed(2)})`;
+        compCell.style.color      = compAlpha > 0.45 ? '#fff' : 'var(--down,#ef5350)';
+      } else {
+        compCell.style.background = 'rgba(255,255,255,.04)';
+        compCell.style.color      = 'var(--text3,#6b7280)';
+      }
       compCell.style.fontWeight   = '700';
+      compCell.style.borderLeft   = '2px solid rgba(255,255,255,.10)';
+      if (isFocusRow) compCell.style.outline = '1px solid rgba(255,255,255,.30)';
       compCell.textContent = rowComp >= 0 ? '+' + rowComp.toFixed(2) : rowComp.toFixed(2);
       compCell.title = `${rowCcy} composite vs G8 peers: ${fmt2(rowComp)}`;
-      if (rowCcy === ccy) {
-        compCell.style.outline      = '1px solid rgba(79,127,255,.7)';
-        compCell.style.color        = '#fff';
-        compCell.style.background   = `rgba(79,127,255,${(compAlpha + 0.20).toFixed(2)})`;
-      }
       grid.appendChild(compCell);
     });
 
@@ -1114,17 +1104,22 @@
       const footCell = document.createElement('div');
       footCell.className = 'corr-cell comp';
       const cvAbs   = Math.abs(cv);
-      const cvAlpha = 0.08 + Math.min(cvAbs / 0.4, 1) * 0.22;
-      footCell.style.background  = `rgba(79,127,255,${cvAlpha.toFixed(2)})`;
-      footCell.style.color       = 'var(--blue,#4f7fff)';
+      const cvAlpha = 0.12 + Math.min(cvAbs / 0.4, 1) * 0.60;
+      if (cv > 0.01) {
+        footCell.style.background = `rgba(38,166,154,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : 'var(--up,#26a69a)';
+      } else if (cv < -0.01) {
+        footCell.style.background = `rgba(239,83,80,${cvAlpha.toFixed(2)})`;
+        footCell.style.color      = cvAlpha > 0.45 ? '#fff' : 'var(--down,#ef5350)';
+      } else {
+        footCell.style.background = 'rgba(255,255,255,.04)';
+        footCell.style.color      = 'var(--text3,#6b7280)';
+      }
       footCell.style.fontWeight  = '700';
+      footCell.style.borderTop   = '2px solid rgba(255,255,255,.10)';
+      if (colCcy === ccy) footCell.style.outline = '1px solid rgba(255,255,255,.30)';
       footCell.textContent = cv >= 0 ? '+' + cv.toFixed(2) : cv.toFixed(2);
       footCell.title = `${colCcy} composite vs G8 peers: ${fmt2(cv)}`;
-      if (colCcy === ccy) {
-        footCell.style.outline   = '1px solid rgba(79,127,255,.7)';
-        footCell.style.color     = '#fff';
-        footCell.style.background = `rgba(79,127,255,${(cvAlpha + 0.20).toFixed(2)})`;
-      }
       grid.appendChild(footCell);
     });
 
@@ -1477,9 +1472,9 @@
             CSI_COLORS[r.ccy] + ';margin-right:6px;vertical-align:middle;"></span>' +
             '<span class="sym" style="' + (isFocus ? 'color:var(--blue,#4f7fff);' : '') + '">' + r.ccy + '</span></td>' +
           '<td class="' + cls + '">' + fmt(r.val) + '</td>' +
-          '<td class="down">' + fmt(r.min) + '</td>' +
-          '<td class="up">' + fmt(r.max) + '</td>' +
-          '<td>' + (r.range != null ? r.range.toFixed(2) + '%' : '—') + '</td>' +
+          '<td class="' + (r.min != null && r.min < 0 ? 'down' : r.min != null && r.min > 0 ? 'up' : 'flat') + '">' + fmt(r.min) + '</td>' +
+          '<td class="' + (r.max != null && r.max > 0 ? 'up' : r.max != null && r.max < 0 ? 'down' : 'flat') + '">' + fmt(r.max) + '</td>' +
+          '<td style="color:var(--text2,#787b86)">' + (r.range != null ? r.range.toFixed(2) + '%' : '—') + '</td>' +
         '</tr>';
       }).join('') +
       '</tbody></table>' +
