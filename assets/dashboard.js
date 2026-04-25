@@ -2838,21 +2838,30 @@ function _lwUpdateTodayBar() {
 function _lwSetRange(days) {
   if (!_lwChart) return;
   const ts = _lwChart.timeScale();
+
   if (days === 0) {
     ts.fitContent();
-    // After fitContent, scroll a bit right so last bar has breathing room
-    setTimeout(() => { try { ts.scrollToRealTime(); } catch(_) {} }, 50);
-  } else {
-    // Data uses 'YYYY-MM-DD' string format (BusinessDay) — range must match
-    const now  = new Date();
-    const fromDate = new Date(now.getTime() - days * 86400000);
-    const from = fromDate.toISOString().slice(0, 10);
-    // Add ~5 trading days of right padding so last bar isn't glued to axis
-    const toDate = new Date(now.getTime() + 7 * 86400000);
-    const to = toDate.toISOString().slice(0, 10);
-    try { ts.setVisibleRange({ from, to }); } catch(_) { ts.fitContent(); }
+    return;
   }
-  // Update active button
+
+  // Use setVisibleLogicalRange (bar-index based) — avoids BusinessDay/UTCTimestamp
+  // format ambiguity that caused incorrect rendering with setVisibleRange.
+  // Logical index 0 = last data bar. Negative = bars before last.
+  // FX trades ~5/7 calendar days → tradingBars = days * 5/7
+  const tradingBars = Math.round(days * 5 / 7);
+  const rightPad = 8; // empty bars of right breathing room
+
+  // fitContent first so bar positions are established, then zoom
+  ts.fitContent();
+  setTimeout(() => {
+    try {
+      ts.setVisibleLogicalRange({
+        from: -(tradingBars + rightPad - 1),
+        to:   rightPad - 1,
+      });
+    } catch (_) { ts.fitContent(); }
+  }, 20);
+
   document.querySelectorAll('.lw-range-btn').forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.days) === days);
   });
@@ -2913,11 +2922,10 @@ async function _renderLWChart(ohlcId, label) {
                    vertLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' },
                    horzLine: { color: 'rgba(144,150,160,0.5)', labelBackgroundColor: '#2a2e39' } },
     rightPriceScale: { borderColor: '#2a2e39', minimumWidth: 65,
-                       scaleMargins: { top: 0.08, bottom: 0.06 } },
+                       scaleMargins: { top: 0.10, bottom: 0.08 } },
     timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false,
-                   rightOffset: 10, barSpacing: 6, minBarSpacing: 1,
-                   fixLeftEdge: false, fixRightEdge: false,
-                   tickMarkFormatter: undefined },
+                   rightOffset: 8, minBarSpacing: 1,
+                   fixLeftEdge: false, fixRightEdge: false },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
     handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: false } },
     localization: { priceFormatter: v => v.toFixed(dec) },
@@ -2958,6 +2966,21 @@ async function _renderLWChart(ohlcId, label) {
   // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
   function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '\u2014'; }
 
+  // MA legend overlay — inside the chart, top-left, exactly like TV widget
+  const maLegendEl = document.createElement('div');
+  maLegendEl.id = 'lw-ma-legend';
+  maLegendEl.style.cssText = [
+    'position:absolute;top:6px;left:8px;z-index:3;pointer-events:none;',
+    'font-size:11px;font-family:var(--font-mono,monospace);',
+    'color:#2196f3;line-height:1.4;user-select:none;',
+  ].join('');
+  wrap.appendChild(maLegendEl);
+
+  function _updateMALegend(maVal) {
+    if (!maLegendEl) return;
+    maLegendEl.textContent = maVal != null ? 'MA 20 close \u00a0' + _fmtHdrVal(maVal) : '';
+  }
+
   function _updateLWHeader(bar, maVal) {
     const symEl  = document.getElementById('lw-hdr-sym');
     const oEl    = document.getElementById('lw-hdr-o-val');
@@ -2965,7 +2988,6 @@ async function _renderLWChart(ohlcId, label) {
     const lEl    = document.getElementById('lw-hdr-l-val');
     const cEl    = document.getElementById('lw-hdr-c-val');
     const chgEl  = document.getElementById('lw-hdr-chg-val');
-    const maEl   = document.getElementById('lw-hdr-ma-val');
     if (symEl) symEl.textContent = (_OHLC_FULL_NAMES[ohlcId] || label) + ' \u00b7 1D';
     if (bar) {
       if (oEl) oEl.textContent = _fmtHdrVal(bar.open);
@@ -2980,7 +3002,7 @@ async function _renderLWChart(ohlcId, label) {
         chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
       } else if (chgEl) { chgEl.textContent = ''; }
     }
-    if (maEl) maEl.textContent = maVal != null ? '\u00a0' + _fmtHdrVal(maVal) : '';
+    _updateMALegend(maVal);
   }
 
   // Show the header and populate with last bar
