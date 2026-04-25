@@ -2703,6 +2703,28 @@ window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDr
 // ═══════════════════════════════════════════════════════════════════
 
 // Map TradingView data-sym values → ohlc-data file IDs
+// Full display names for LW chart header (mirrors TradingView legend)
+const _OHLC_FULL_NAMES = {
+  eurusd:'Euro / U.S. Dollar',   gbpusd:'British Pound / U.S. Dollar',
+  usdjpy:'U.S. Dollar / Japanese Yen', audusd:'Australian Dollar / U.S. Dollar',
+  usdcad:'U.S. Dollar / Canadian Dollar', usdchf:'U.S. Dollar / Swiss Franc',
+  nzdusd:'New Zealand Dollar / U.S. Dollar', eurgbp:'Euro / British Pound',
+  eurjpy:'Euro / Japanese Yen', eurchf:'Euro / Swiss Franc',
+  eurcad:'Euro / Canadian Dollar', euraud:'Euro / Australian Dollar',
+  eurnzd:'Euro / New Zealand Dollar', gbpjpy:'British Pound / Japanese Yen',
+  gbpchf:'British Pound / Swiss Franc', gbpcad:'British Pound / Canadian Dollar',
+  gbpaud:'British Pound / Australian Dollar', gbpnzd:'British Pound / New Zealand Dollar',
+  audjpy:'Australian Dollar / Japanese Yen', audnzd:'Australian Dollar / New Zealand Dollar',
+  audchf:'Australian Dollar / Swiss Franc', audcad:'Australian Dollar / Canadian Dollar',
+  cadjpy:'Canadian Dollar / Japanese Yen', cadchf:'Canadian Dollar / Swiss Franc',
+  nzdjpy:'New Zealand Dollar / Japanese Yen', nzdcad:'New Zealand Dollar / Canadian Dollar',
+  nzdchf:'New Zealand Dollar / Swiss Franc', chfjpy:'Swiss Franc / Japanese Yen',
+  gold:'Gold Futures', wti:'Crude Oil WTI Futures', btc:'Bitcoin / U.S. Dollar',
+  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq Composite',
+  nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
+  dxy:'U.S. Dollar Index',
+};
+
 const _TV_TO_OHLC = {
   'FX_IDC:EURUSD': 'eurusd',  'FX_IDC:USDJPY': 'usdjpy',
   'FX_IDC:GBPUSD': 'gbpusd',  'FX_IDC:AUDUSD': 'audusd',
@@ -2893,13 +2915,77 @@ async function _renderLWChart(ohlcId, label) {
 
   // MA20 overlay
   const ma20 = _calcMA(bars, 20);
+  let maSeries = null;
   if (ma20.length > 0) {
-    const maSeries = _lwChart.addLineSeries({
+    maSeries = _lwChart.addLineSeries({
       color: '#f0a500', lineWidth: 1,
       priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
     });
     maSeries.setData(ma20);
   }
+
+  // ── Symbol legend header (mirrors TradingView legend) ──────────────────────
+  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+
+  function _fmtHdrVal(v) { return v != null && !isNaN(v) ? v.toFixed(dec) : '—'; }
+
+  function _updateLWHeader(bar, maVal) {
+    const hdr = document.getElementById('lw-chart-header');
+    if (!hdr) return;
+    const symEl  = document.getElementById('lw-hdr-sym');
+    const oEl    = document.getElementById('lw-hdr-o-val');
+    const hEl    = document.getElementById('lw-hdr-h-val');
+    const lEl    = document.getElementById('lw-hdr-l-val');
+    const cEl    = document.getElementById('lw-hdr-c-val');
+    const chgEl  = document.getElementById('lw-hdr-chg-val');
+    const maEl   = document.getElementById('lw-hdr-ma-val');
+    if (symEl) symEl.textContent = _OHLC_FULL_NAMES[ohlcId] || label;
+    if (bar) {
+      if (oEl) oEl.textContent = _fmtHdrVal(bar.open);
+      if (hEl) hEl.textContent = _fmtHdrVal(bar.high);
+      if (lEl) lEl.textContent = _fmtHdrVal(bar.low);
+      if (cEl) cEl.textContent = _fmtHdrVal(bar.close);
+      if (chgEl && bar.open != null && bar.close != null && bar.open > 0) {
+        const chg = bar.close - bar.open;
+        const pct = (chg / bar.open) * 100;
+        const sign = chg >= 0 ? '+' : '';
+        chgEl.textContent = sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
+        chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
+      }
+    }
+    if (maEl) maEl.textContent = maVal != null ? ' ' + _fmtHdrVal(maVal) : '';
+  }
+
+  // Show the header and populate with last bar
+  const hdrEl = document.getElementById('lw-chart-header');
+  if (hdrEl) hdrEl.style.display = 'flex';
+
+  // Populate with last available bar (today bar or last historical)
+  const lastBar = todayBar || (bars.length > 0 ? bars[bars.length - 1] : null);
+  const lastMaVal = ma20.length > 0 ? ma20[ma20.length - 1].value : null;
+  _updateLWHeader(lastBar, lastMaVal);
+
+  // Update panel-sub to reflect yfinance source
+  const panelSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (panelSub) panelSub.textContent = 'yfinance · ~15min delay';
+
+  // Crosshair subscription — update OHLC legend on hover
+  _lwChart.subscribeCrosshairMove(param => {
+    if (!param || !param.time || !param.seriesData) {
+      // Crosshair left chart — restore last bar values
+      _updateLWHeader(lastBar, lastMaVal);
+      return;
+    }
+    const candleData = param.seriesData.get(candleSeries);
+    const maData = maSeries ? param.seriesData.get(maSeries) : null;
+    if (candleData) {
+      _updateLWHeader(candleData, maData ? maData.value : null);
+    }
+  });
 
   // Apply the active range window (default 3M, persists across symbol switches)
   _lwSetRange(_lwActiveDays);
@@ -2944,6 +3030,8 @@ function loadCOTChart(longSym) {
   wrap.style.pointerEvents = 'none';
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) rangeBar.style.display = 'none';
+  const cotHdr = document.getElementById('lw-chart-header');
+  if (cotHdr) cotHdr.style.display = 'none';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
@@ -2981,9 +3069,13 @@ function _loadTVWidgetFallback(sym) {
   wrap.innerHTML = '';
   // Restore pointer-events:none — TV widget manages its own interaction via iframe
   wrap.style.pointerEvents = 'none';
-  // Hide range toolbar — not applicable to TV widget
+  // Hide range toolbar and symbol header — not applicable to TV widget
   const rangeBar = document.getElementById('lw-range-bar');
   if (rangeBar) rangeBar.style.display = 'none';
+  const hdrEl = document.getElementById('lw-chart-header');
+  if (hdrEl) hdrEl.style.display = 'none';
+  const panelSub = document.querySelector('#section-fxpairs .panel-sub');
+  if (panelSub) panelSub.textContent = 'TradingView \u00b7 live data';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
   container.style.cssText = 'height:100%;width:100%;';
