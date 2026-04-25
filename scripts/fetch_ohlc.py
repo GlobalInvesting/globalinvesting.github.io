@@ -134,6 +134,16 @@ GUARDS: dict[str, tuple[float, float]] = {
 }
 FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 
+# FX spot symbols — daily open values from Yahoo Finance are NOT reliable for these.
+# Yahoo reports the last tick of the previous UTC day as the open, which is close to
+# but not exactly prev_close. This creates candle bodies whose color (open vs close)
+# contradicts the day's actual direction (close vs prev_close) in ~40-50% of bars.
+# Fix: replace each bar's open with the previous bar's close when writing the JSON.
+# This ensures candle color always matches the daily pct sign, consistent with how
+# TradingView renders FX daily bars and with the today-bar logic in dashboard.js.
+NON_FX_SYMBOLS = {'gold', 'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy'}
+FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _guard(id_: str, val: float) -> bool:
@@ -148,13 +158,16 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     Returns a list of {time, open, high, low, close} dicts sorted oldest to newest,
     or None on failure.
 
-    Yahoo Finance FX open values are used as-is. Earlier versions attempted to
-    reconstruct the FX open from prev_close or H/L midpoint to work around a
-    reported Yahoo data defect, but both approaches introduced more candle color
-    errors than they fixed (the body-size threshold fired on legitimate small-body
-    bars; the exact-equality threshold created artificial dojis on gap-less FX
-    sessions). Yahoo's current daily FX open data is accurate enough for daily
-    chart purposes and is used without modification.
+    For FX symbols, each bar's open is replaced with the previous bar's close before
+    writing to JSON. Yahoo Finance daily FX open values are unreliable — they store the
+    last tick of the prior UTC session rather than the real session open, causing candle
+    body color to contradict the day's actual direction (close vs prev_close) in roughly
+    half of all bars. Replacing open with prev_close guarantees consistency:
+      green candle ↔ close > prev_close ↔ pct > 0 (always)
+      red candle   ↔ close < prev_close ↔ pct < 0 (always)
+    This matches how the today-bar is built in dashboard.js and how TradingView renders
+    FX daily candles. Non-FX symbols (BTC, SPX, Gold, etc.) use Yahoo's raw open because
+    those assets have a real exchange session open that is meaningful for intraday context.
     """
     try:
         ticker = yf.Ticker(ticker_sym)
@@ -196,6 +209,16 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         if len(deduped) < 30:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
             return None
+
+        # FX open correction: replace each bar's open with the previous bar's close.
+        # Yahoo's daily FX open values are unreliable (they store the last tick of the
+        # prior UTC session, not the actual FX session open). This causes candle body
+        # color to contradict the day's direction in roughly half of all bars.
+        # Using prev_close as open guarantees: green candle ↔ pct > 0, red ↔ pct < 0.
+        # The first bar has no predecessor — its open is left as-is (no prior close).
+        if id_ in FX_SYMBOLS:
+            for i in range(1, len(deduped)):
+                deduped[i]["open"] = deduped[i - 1]["close"]
 
         return deduped
 
