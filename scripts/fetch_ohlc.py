@@ -139,15 +139,52 @@ def _guard(id_: str, val: float) -> bool:
     return lo <= val <= hi
 
 
+# FX spot pairs — yfinance returns corrupt open values (open ≈ close, not true session open).
+# These need the prev-close reconstruction pass below. Cross-asset symbols are NOT included:
+# BTC/ETH/SPX/etc. receive proper open prices from their respective exchanges.
+_FX_SPOT_IDS: frozenset[str] = frozenset({
+    "eurusd","gbpusd","usdjpy","audusd","usdcad","usdchf","nzdusd",
+    "eurgbp","eurjpy","eurchf","eurcad","euraud","eurnzd","gbpjpy",
+    "gbpchf","gbpcad","gbpaud","gbpnzd","audjpy","audnzd","audchf",
+    "audcad","cadjpy","cadchf","nzdjpy","nzdcad","nzdchf","chfjpy","dxy",
+})
+
+
 def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     Download 3 years of daily bars for ticker_sym.
     Returns a list of {time, open, high, low, close} dicts sorted oldest→newest,
     or None on failure.
+
+    FX open reconstruction
+    ─────────────────────
+    Yahoo Finance FX daily bars carry a known data-quality defect: the Open
+    field is frequently set to the same value as Close (or within 0.03% of it),
+    even when the High-Low range shows meaningful intraday movement.  This
+    produces hundreds of doji/hammer candles that misrepresent actual price
+    action.
+
+    Root cause: Yahoo uses the last tick of the previous UTC day as the open
+    price for FX spot pairs, making open ≈ previous-close ≈ current-close on
+    low-gap days, and open ≈ close (duplicate) on high-gap days.
+
+    Fix (FX only, applied after deduplication):
+      For any bar where |open − close| / close < 0.03 % AND the wick (H−L)
+      is non-trivial (> 0.05 % of close), replace open with the previous
+      bar's close clamped to [low, high].  Clamping ensures the resulting
+      OHLC relationship is always valid.  Cross-asset symbols (BTC, SPX,
+      gold, etc.) are excluded — their open values are correct.
     """
     try:
         ticker = yf.Ticker(ticker_sym)
-        hist   = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
+        # repair=True asks yfinance to detect and fix common OHLC anomalies
+        # (available since yfinance 0.2.x; no-op if the feature is unavailable)
+        try:
+            hist = ticker.history(period=PERIOD, interval=INTERVAL,
+                                  auto_adjust=True, repair=True)
+        except TypeError:
+            hist = ticker.history(period=PERIOD, interval=INTERVAL,
+                                  auto_adjust=True)
         if hist.empty:
             print(f"  WARN [{id_}]: empty history from yfinance")
             return None
@@ -166,16 +203,6 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 continue
 
             dec = DECIMALS.get(id_, 5)
-
-            # yfinance FX data bug: for some daily bars, Open == Close exactly
-            # (FX spot has no official open — Yahoo duplicates the close).
-            # Fix: only when open equals close EXACTLY AND the bar has a real
-            # high-low range, reconstruct open as the midpoint of H/L.
-            # Do NOT use a body/wick threshold — that corrupts valid small-body
-            # (doji) candles, inverting their color and misleading the chart.
-            if o == c and h != l:
-                o = round((h + l) / 2, dec)
-
             bars.append({
                 "time":  date_str,
                 "open":  round(o, dec),
@@ -192,6 +219,23 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 seen.add(bar["time"])
                 deduped.append(bar)
         deduped.reverse()   # oldest → newest
+
+        # ── FX open reconstruction ────────────────────────────────────────────
+        # Applied after deduplication so prev_close is always the preceding
+        # calendar bar (no duplicate-date interference).
+        if id_ in _FX_SPOT_IDS:
+            for i in range(1, len(deduped)):
+                b    = deduped[i]
+                prev = deduped[i - 1]
+                wick = b["high"] - b["low"]
+                body = abs(b["open"] - b["close"])
+                # Threshold: body < 0.03 % of close price AND wick > 0.05 % of close
+                # (filters genuine low-volatility dojis from the data-artifact dojis)
+                if wick > 0 and body / b["close"] < 0.0003 and wick / b["close"] > 0.0005:
+                    dec  = DECIMALS.get(id_, 5)
+                    # Use prev_close clamped to [low, high] — always a valid open
+                    new_open = max(b["low"], min(b["high"], prev["close"]))
+                    deduped[i] = {**b, "open": round(new_open, dec)}
 
         if len(deduped) < 30:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars — skipping")
