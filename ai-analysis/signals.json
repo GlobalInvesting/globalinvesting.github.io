@@ -1,55 +1,86 @@
 {
-  "generated_at": "2026-04-24T22:34:29Z",
+  "generated_at": "2026-04-25T01:50:43Z",
   "signals": [
     {
-      "time": "22:30",
+      "time": "01:45",
       "priority": "critical",
       "title": "Oil / Geopolitical",
-      "text": "Watch for potential risk-off at Sydney open as WTI oil trades above $94.5 and Strait of Hormuz tensions escalate. Key level to watch: USD/JPY 159.33",
+      "text": "Watch for potential risk-off at Sydney open as WTI oil hovers above $94.9 ahead of weekend risk. Key level to watch: USD/JPY 159.33 at the open.",
       "evidence": [
         "WTI Oil: $94.9",
-        "Strait of Hormuz tensions"
+        "USD/JPY closed at 159.33"
       ]
     },
     {
-      "time": "22:26",
+      "time": "01:41",
       "priority": "warning",
-      "title": "AUD Setup",
-      "text": "AUD/USD net long positioning at 74.3% with retail 13% long / 87% short; watch for reversal risk into Sydney open at 0.7151",
+      "title": "CAD/EUR — G8 Bilateral Theme + CAD Stren",
+      "text": "Watch for CAD/EUR cross at the open; CAD was the strongest G8 currency this week with 1W avg: +0.431%, while EUR was weakest with 1W avg: -0.481%. Key level to watch: EUR/CAD 1.472 at the open.",
       "evidence": [
-        "COT: AUD net long +47,218",
-        "Retail: AUD/USD 13% long"
+        "CAD 1W avg: +0.431% (n=3)",
+        "EUR 1W avg: -0.481% (n=7)",
+        "G8 spread: 0.912%"
       ]
     },
     {
-      "time": "22:25",
+      "time": "01:40",
       "priority": "warning",
-      "title": "CAD/JPY Watch",
-      "text": "BoC and BoJ meetings this week; watch for CAD/JPY volatility at open, currently at 116.572",
+      "title": "BoJ — This Week",
+      "text": "Watch for potential JPY volatility at the open as BoJ meeting takes place on Tuesday. Key level to watch: USD/JPY 159.33 at the open.",
       "evidence": [
-        "BoC meeting: 29 Apr",
-        "BoJ meeting: 28 Apr"
+        "BoJ meeting on 28 Apr",
+        "USD/JPY closed at 159.33"
       ]
     },
     {
-      "time": "22:18",
+      "time": "01:33",
       "priority": "info",
-      "title": "Yield Curve Note",
-      "text": "US yield curve in bull flattener regime; 2s10s spread at +52.0bp, watch for implications on CB divergence and risk narrative",
+      "title": "AUD/USD COT Positioning",
+      "text": "AUD/USD net long positioning at 74.3% with extreme retail short bias; watch for potential reversal at the open. Key level to watch: AUD/USD 0.7151 at the open.",
+      "evidence": [
+        "AUD/USD NET LONG, lev_net=+47,218",
+        "AUD/USD 1W:-0.11%",
+        "retail 13% long / 87% short"
+      ]
+    },
+    {
+      "time": "01:32",
+      "priority": "info",
+      "title": "Yield Curve Context",
+      "text": "US yield curve in bull flattener regime; 2s10s spread at +52.0bp. Watch for implications on CB divergence and cross-asset risk narrative.",
       "evidence": [
         "US 2s10s spread: +52.0bp",
         "Regime: BULL FLATTENER"
       ]
     },
     {
-      "time": "22:23",
+      "time": "01:37",
       "priority": "warning",
-      "title": "CAD/EUR — G8 Bilateral Theme",
-      "text": "CAD outperforms as G8 leader, EUR lags; watch for bilateral theme at open. CAD 1W avg: +0.431%, EUR 1W avg: -0.481%, G8 spread: 0.912%",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "Watch for short-squeeze risk at the open, NZD/USD net short -18,062 vs 40% OIS priced for RBNZ hike, closed at 0.5881. Catalyst: RBNZ meeting on 27 May.",
       "evidence": [
-        "CAD 1W avg: +0.431% (n=3)",
-        "EUR 1W avg: -0.481% (n=7)",
-        "G8 spread: 0.912%"
+        "NZD net short: -18,062",
+        "OIS 40% priced for RBNZ hike",
+        "Friday close: 0.5881"
+      ]
+    },
+    {
+      "time": "01:30",
+      "priority": "info",
+      "title": "Yield Curve — Bull Flattener",
+      "text": "Regime context: 2s10s spread +52.0bp in bull flattener regime, watch for implications on CB divergence signals and cross-asset risk narrative.",
+      "evidence": [
+        "2s10s spread: +52.0bp",
+        "Regime: BULL FLATTENER"
+      ]
+    },
+    {
+      "time": "01:35",
+      "priority": "warning",
+      "title": "BoJ — This Week",
+      "text": "Watch for BoJ meeting on 28 Apr, potential impact on JPY crosses and market sentiment.",
+      "evidence": [
+        "BoJ meeting on 28 Apr"
       ]
     }
   ]
