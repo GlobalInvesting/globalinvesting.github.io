@@ -3009,6 +3009,12 @@ async function _renderLWChart(ohlcId, label) {
     maLegendEl.textContent = maVal != null ? 'MA ' + _lwMaPeriod + '\u00a0\u00a0' + _fmtHdrVal(maVal) : '';
   }
 
+  // prevClose map: date → prev bar's close, for day-over-day % change in header
+  const _prevCloseMap = new Map();
+  for (let i = 1; i < bars.length; i++) {
+    _prevCloseMap.set(bars[i].time, bars[i - 1].close);
+  }
+
   function _updateLWHeader(bar, maVal) {
     const symEl  = document.getElementById('lw-hdr-sym');
     const oEl    = document.getElementById('lw-hdr-o-val');
@@ -3021,13 +3027,13 @@ async function _renderLWChart(ohlcId, label) {
       if (oEl) { oEl.textContent = _fmtHdrVal(bar.open); oEl.style.color = '#d1d4dc'; }
       if (hEl) { hEl.textContent = _fmtHdrVal(bar.high); hEl.style.color = '#26a69a'; }
       if (lEl) { lEl.textContent = _fmtHdrVal(bar.low);  lEl.style.color = '#ef5350'; }
-      if (cEl) {
-        cEl.textContent = _fmtHdrVal(bar.close);
-        cEl.style.color = (bar.close != null && bar.open != null && bar.close >= bar.open) ? '#26a69a' : '#ef5350';
-      }
-      if (chgEl && bar.open != null && bar.close != null && bar.open > 0) {
-        const chg = bar.close - bar.open;
-        const pct = (chg / bar.open) * 100;
+      // Change = close vs previous bar's close (day-over-day), matching ticker behaviour
+      const prevClose = _prevCloseMap.get(bar.time) ?? bar.open;
+      const isUp = bar.close != null && bar.close >= prevClose;
+      if (cEl) { cEl.textContent = _fmtHdrVal(bar.close); cEl.style.color = isUp ? '#26a69a' : '#ef5350'; }
+      if (chgEl && prevClose != null && prevClose > 0 && bar.close != null) {
+        const chg = bar.close - prevClose;
+        const pct = (chg / prevClose) * 100;
         const sign = chg >= 0 ? '+' : '';
         chgEl.textContent = ' ' + sign + chg.toFixed(dec) + ' (' + sign + pct.toFixed(2) + '%)';
         chgEl.className = 'lw-hdr-chg ' + (chg >= 0 ? 'up' : 'dn');
