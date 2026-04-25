@@ -167,9 +167,6 @@ function _ycDraw(tenorData){
 
 function _ycDrawNative(wrapper,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
-  const _tickLabels={};
-  tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  // firstTenorMonth/lastTenorMonth not needed — fitContent() handles viewport automatically.
 
   // Remove inner div and tooltip — LWC needs a clean container.
   const tooltip=wrapper.querySelector('#ycm-tooltip');
@@ -185,15 +182,28 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   const w=Math.floor(rect.width)||wrapper.offsetWidth||360;
   const h=Math.floor(rect.height)||wrapper.offsetHeight||220;
 
+  // Use sequential integer time values (1, 2, 3 … N) for EQUAL spacing between tenors.
+  // Proportional month-based spacing (3, 6, 12 … 360) causes the 10Y–30Y gap (240 months)
+  // to dominate on narrow screens, pushing 30Y off the right edge even after fitContent().
+  // Equal spacing matches Bloomberg/Eikon convention and the TradingView yield-curve demo.
+  const toSeq=toData.map((d,i)=>({time:i+1,value:d.value}));
+  const prSeq=prData.map((d,i)=>({time:i+1,value:d.value}));
+  const N=toSeq.length||1;
+  // tickMarkFormatter: integer index → tenor label (e.g. 1→"3M", 4→"2Y", 8→"10Y")
+  const _seqLabels=tenorData.map(t=>t.label);
+  const _fmtTick=(i)=>_seqLabels[i-1]||'';
+
   _ycLwChart=LWC.createYieldCurveChart(wrapper,{
     width:w,
     height:h,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:360},
+    // baseResolution:1 + minimumTimeRange:N → whitespace hash never changes after setData,
+    // preventing the spurious internal fitContent() that was resetting our viewport.
+    yieldCurve:{baseResolution:1,minimumTimeRange:N},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     leftPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false,minBarSpacing:0,tickMarkFormatter:m=>_tickLabels[m]||''},
+    timeScale:{borderVisible:false,minBarSpacing:0,tickMarkFormatter:_fmtTick},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'\u2014'},
   });
@@ -202,29 +212,20 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   window._ycChart=_ycLwChart;
 
   let priorSeries=null;
-  if(prData.length>=2){
+  if(prSeq.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
-    priorSeries.setData(prData);
+    priorSeries.setData(prSeq);
   }
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
-  todaySeries.setData(toData);
+  todaySeries.setData(toSeq);
 
-  // Re-attach tooltip AFTER chart+data are set, to avoid triggering ResizeObserver
-  // during LWC's internal initialization.
+  // Re-attach tooltip AFTER chart+data are set.
   if(tooltip){wrapper.appendChild(tooltip);}
 
-  // Apply fitContent after LWC finishes its internal initialization.
-  //
-  // ROOT CAUSE (confirmed by reading LWC v5.0.7 source):
-  // YieldChartApi._initWhitespaceSeries() generates whitespace data on creation and
-  // re-generates it whenever horzBehaviour fires whitespaceInvalidated (which happens
-  // on every setData call). The re-generation compares hashes:
-  //   buildWhitespaceState: end = max(0, minimumTimeRange, lastIndex)
-  // With minimumTimeRange:1: initial end=1, after setData end=360 → hash changes →
-  //   whiteSpaceSeries.setData() fires → internal fitContent() resets our range.
-  // With minimumTimeRange:360: initial end=360, after setData end=max(360,360)=360 →
-  //   hash UNCHANGED → no secondary whitespace update → no spurious fitContent.
-  // Now our explicit fitContent() below is the ONLY viewport change and it persists.
+  // fitContent() is now reliable:
+  // - minimumTimeRange:N matches lastIndex after setData → whitespace hash unchanged → no
+  //   spurious internal fitContent() reset.
+  // - Sequential integers mean all N points fit equally in any width → no clipping.
   const chart=_ycLwChart;
   const doFit=(c)=>{if(c&&c===_ycLwChart)try{c.timeScale().fitContent();}catch(_){}};
   setTimeout(()=>doFit(chart),50);
@@ -233,7 +234,7 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
   // ResizeObserver — only attach after a 500ms delay so it doesn't fire during init.
   if(window.ResizeObserver){
     setTimeout(()=>{
-      if(_ycLwChart!==chart)return; // chart was replaced
+      if(_ycLwChart!==chart)return;
       const ro=new ResizeObserver(entries=>{
         if(_ycLwChart!==chart)return;
         const e=entries[0];
@@ -244,7 +245,8 @@ function _ycDrawNative(wrapper,toData,prData,tenorData){
     },500);
   }
 
-  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,false);
+  // Pass sequential=true so tooltip maps integer index → tenor label correctly.
+  _ycAttachTooltip(wrapper,_ycLwChart,todaySeries,priorSeries,tenorData,true);
 }
 
 
