@@ -2737,7 +2737,7 @@ const _TV_TO_OHLC = {
 
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
-  gold: 'XAUUSD=X', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
+  gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
   spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
   eth: 'ETH-USD', dxy: 'DX-Y.NYB',
 };
