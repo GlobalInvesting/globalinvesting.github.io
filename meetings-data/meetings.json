@@ -102,12 +102,12 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "SNB zimoma TONA (zimoma cube · monthly) vs BoJ rate (rates/JPY.json)",
-      "biasMethod": "heuristic",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-25",
-      "cutProb": null,
-      "hikeProb": null
+      "cutProb": 0,
+      "hikeProb": 0
     },
     "AUD": {
       "nextMeeting": "5 May",
@@ -129,11 +129,11 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "cut",
+      "bias": "hold",
       "biasSource": "FRED IRSTCI01AUM156N (OECD overnight AUD · monthly) vs RBA target → rates/AUD.json trajectory fallback",
       "biasMethod": "spread",
       "biasUpdated": "2026-04-25",
-      "cutProb": 56,
+      "cutProb": 0,
       "hikeProb": 0
     },
     "CAD": {
@@ -179,10 +179,10 @@
       "source": "snb.ch",
       "bias": "hold",
       "biasSource": "SNB data portal SARON (snbgwdzid · daily) vs sight deposit rate",
-      "biasMethod": "heuristic",
+      "biasMethod": "ois",
       "biasUpdated": "2026-04-25",
-      "cutProb": null,
-      "hikeProb": null
+      "cutProb": 0,
+      "hikeProb": 0
     },
     "NZD": {
       "nextMeeting": "27 May",
