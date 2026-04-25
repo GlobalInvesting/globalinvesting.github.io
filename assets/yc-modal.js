@@ -145,13 +145,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const LWC=window.LightweightCharts;
   const _tickLabels={};
   tenorData.forEach(t=>{const m=t.months??_TENOR_MONTHS[t.label];if(m!=null)_tickLabels[m]=t.label;});
-  // autoSize:true fails in flex containers — canvas initializes to price-scale width (~56px) instead of
-  // the full container. Use explicit width/height measured at draw time + ResizeObserver to update.
   const w=container.offsetWidth||360, h=container.offsetHeight||220;
-  // minimumTimeRange (in years) must EXCEED the actual data span so fitContent() can zoom out enough
-  // to show all tenors. With 3M→30Y the span is 29.75 years — set minimum to 32 years.
-  // minBarSpacing:1 (minimum) lets all 5 tenors fit in ~345px without LWC clipping the extremes.
-  // startTimeRange matches the first actual tenor so the left edge has no empty space.
   const firstTenorMonth=toData[0]?.time??3;
   const lastTenorMonth=toData[toData.length-1]?.time??360;
   const dataSpanYears=Math.ceil((lastTenorMonth-firstTenorMonth)/12)+2;
@@ -161,11 +155,16 @@ function _ycDrawNative(container,toData,prData,tenorData){
     yieldCurve:{baseResolution:12,minimumTimeRange:dataSpanYears,startTimeRange:firstTenorMonth},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
+    leftPriceScale:{visible:false},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
     timeScale:{borderVisible:false,minBarSpacing:1,tickMarkFormatter:m=>_tickLabels[m]||''},
     handleScroll:false,handleScale:false,
     localization:{priceFormatter:v=>v!=null?v.toFixed(3)+'%':'—'},
   });
+  // Force canvas to correct size immediately — LWC initializes canvas to leftPriceScale width (56px)
+  // even when leftPriceScale is disabled, because the internal layout runs before the option takes effect.
+  // applyOptions with the real container dimensions forces a re-layout at the correct size.
+  _ycLwChart.applyOptions({width:w,height:h});
   let priorSeries=null;
   if(prData.length>=2){
     priorSeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'rgba(107,114,128,0.55)',lineWidth:1,lineType:LWC.LineType?.Curved??2,lineStyle:LWC.LineStyle?.Dashed??1,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:3,priceLineVisible:false,lastValueVisible:false});
