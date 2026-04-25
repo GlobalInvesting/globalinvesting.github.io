@@ -108,7 +108,8 @@ function openYCModal(tenorData){
   document.body.appendChild(bd);
   bd.addEventListener('click',e=>{if(e.target===bd)closeYCModal();});
   document.addEventListener('keydown',_ycKeydown);
-  requestAnimationFrame(()=>_ycDraw(tenorData));
+  // Delay draw until after modal animation (.2s) so container has final dimensions on mobile
+  setTimeout(()=>_ycDraw(tenorData), 220);
 }
 
 function _ycDraw(tenorData){
@@ -129,7 +130,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
   _ycLwChart=LWC.createYieldCurveChart(container,{
     autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:12,minimumTimeRange:12,startTimeRange:0},
+    yieldCurve:{baseResolution:12,minimumTimeRange:10,startTimeRange:3},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
@@ -145,10 +146,14 @@ function _ycDrawNative(container,toData,prData,tenorData){
   const todaySeries=_ycLwChart.addSeries(LWC.LineSeries,{color:'#4f7fff',lineWidth:2,lineType:LWC.LineType?.Curved??2,pointMarkersVisible:true,crosshairMarkerVisible:true,crosshairMarkerRadius:4,crosshairMarkerBorderColor:'#131722',crosshairMarkerBorderWidth:2,priceLineVisible:false,lastValueVisible:false});
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
+  // ResizeObserver ensures fitContent runs whenever the container changes size
+  // (covers mobile layout shifts, keyboard open/close, orientation change)
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => { if (_ycLwChart) _ycLwChart.timeScale().fitContent(); });
+    ro.observe(container);
+    container._ycRo = ro; // store ref for cleanup on modal close
+  }
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
-  // Second fitContent after a frame — ensures dimensions are resolved when modal animates in
-  requestAnimationFrame(()=>{ if(_ycLwChart) _ycLwChart.timeScale().fitContent(); });
-  setTimeout(()=>{ if(_ycLwChart) _ycLwChart.timeScale().fitContent(); }, 120);
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 
@@ -207,6 +212,7 @@ function closeYCModal(){
   if(_ycLwChart){
     const c=document.getElementById('ycm-lw-wrap');
     if(c?._ycResize)window.removeEventListener('resize',c._ycResize);
+    if(c?._ycRo){c._ycRo.disconnect();c._ycRo=null;}
     try{_ycLwChart.remove();}catch(_){}
     _ycLwChart=null;
   }
