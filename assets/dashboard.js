@@ -1239,6 +1239,7 @@ async function fetchQuoteBarRT() {
   const totalUpdated = Object.keys(STOOQ_RT_CACHE).length;
   if (totalUpdated > 0) {
     updateFxPairsTableRT();
+    _lwUpdateTodayBar();   // push live price to the active LW chart (if open)
     const now = new Date();
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
@@ -2695,11 +2696,212 @@ window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDr
 // ═══════════════════════════════════════════════════════════════════
 // loadCOTChart — COT Long+Short overlaid on same scale in TV widget
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// LIGHTWEIGHT CHARTS — replaces TradingView embed widget for all
+// symbols that have ohlc-data/{id}.json (yfinance daily OHLC, 2y).
+// Symbols without OHLC data fall back to the TradingView widget.
+// ═══════════════════════════════════════════════════════════════════
+
+// Map TradingView data-sym values → ohlc-data file IDs
+const _TV_TO_OHLC = {
+  'FX_IDC:EURUSD': 'eurusd',  'FX_IDC:USDJPY': 'usdjpy',
+  'FX_IDC:GBPUSD': 'gbpusd',  'FX_IDC:AUDUSD': 'audusd',
+  'FX_IDC:USDCAD': 'usdcad',  'FX_IDC:USDCHF': 'usdchf',
+  'FX_IDC:NZDUSD': 'nzdusd',  'FX_IDC:EURGBP': 'eurgbp',
+  'FX_IDC:EURJPY': 'eurjpy',  'FX_IDC:EURCHF': 'eurchf',
+  'FX_IDC:EURCAD': 'eurcad',  'FX_IDC:EURAUD': 'euraud',
+  'FX_IDC:EURNZD': 'eurnzd',  'FX_IDC:GBPJPY': 'gbpjpy',
+  'FX_IDC:GBPCHF': 'gbpchf',  'FX_IDC:GBPCAD': 'gbpcad',
+  'FX_IDC:GBPAUD': 'gbpaud',  'FX_IDC:GBPNZD': 'gbpnzd',
+  'FX_IDC:AUDJPY': 'audjpy',  'FX_IDC:AUDNZD': 'audnzd',
+  'FX_IDC:AUDCHF': 'audchf',  'FX_IDC:AUDCAD': 'audcad',
+  'FX_IDC:CADJPY': 'cadjpy',  'FX_IDC:CADCHF': 'cadchf',
+  'FX_IDC:NZDJPY': 'nzdjpy',  'FX_IDC:NZDCAD': 'nzdcad',
+  'FX_IDC:NZDCHF': 'nzdchf',  'FX_IDC:CHFJPY': 'chfjpy',
+  'CMCMARKETS:GOLDM2026': 'gold',
+  'FPMARKETS:WTI':        'wti',
+  'BITSTAMP:BTCUSD':      'btc',
+  'COINBASE:BTCUSD':      'btc',
+  'FRED:DGS10':           'us10y',
+  // Equity indices
+  'CMCMARKETS:SPX500':    'spx',
+  'CFI:US100':            'nasdaq',
+  'OSE:NK2251!':          'nikkei',
+  'GOMARKETS:STOXX50':    'stoxx',
+  // Crypto
+  'BITSTAMP:ETHUSD':      'eth',
+  'COINBASE:ETHUSD':      'eth',
+  // FX Index
+  'PEPPERSTONE:USDX':     'dxy',
+};
+
+// Human-readable labels for the chart source footer
+const _OHLC_LABELS = {
+  gold: 'XAUUSD=X', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
+  spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
+  eth: 'ETH-USD', dxy: 'DX-Y.NYB',
+};
+
+// Active LW chart instance — destroyed before each new render
+let _lwChart = null;
+let _lwResizeObs = null;
+let _lwCandleSeries = null;   // reference for live today-bar updates
+let _lwActiveOhlcId = null;   // ohlcId currently displayed
+
+// Ensure the Lightweight Charts library is loaded (lazy, once)
+let _lwLibPromise = null;
+function _ensureLWLib() {
+  if (window.LightweightCharts) return Promise.resolve();
+  if (_lwLibPromise) return _lwLibPromise;
+  _lwLibPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js';
+    s.onload  = resolve;
+    s.onerror = () => { _lwLibPromise = null; reject(new Error('LW lib load failed')); };
+    document.head.appendChild(s);
+  });
+  return _lwLibPromise;
+}
+
+// Destroy any active LW chart instance cleanly
+function _destroyLWChart() {
+  if (_lwResizeObs)  { _lwResizeObs.disconnect(); _lwResizeObs = null; }
+  if (_lwChart)      { try { _lwChart.remove(); } catch(_) {} _lwChart = null; }
+  _lwCandleSeries = null;
+  _lwActiveOhlcId = null;
+}
+
+// Compute MA(n) over close prices
+function _calcMA(bars, n) {
+  return bars.map((b, i) => {
+    if (i < n - 1) return null;
+    const sum = bars.slice(i - n + 1, i + 1).reduce((a, x) => a + x.close, 0);
+    return { time: b.time, value: parseFloat((sum / n).toFixed(6)) };
+  }).filter(Boolean);
+}
+
+// Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
+// ohlcId (e.g. 'eurusd') maps directly to STOOQ_RT_CACHE keys, with two
+// special aliases: gold → xauusd, wti → wti (already correct).
+function _lwBuildTodayBar(ohlcId) {
+  // STOOQ_RT_CACHE key for this ohlcId
+  const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+  const q = STOOQ_RT_CACHE[cacheKey];
+  if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
+  const todayUTC = new Date();
+  const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
+                eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
+                gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
+                audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
+                gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
+  const c = parseFloat(q.close.toFixed(dec));
+  const o = q.open  != null && q.open  > 0 ? parseFloat(q.open.toFixed(dec))  : c;
+  const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
+  const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
+  return { time: dateStr, open: o, high: h, low: l, close: c };
+}
+
+// Push/update the live today-bar on the active LW chart (called every 5 min).
+// Safe to call when no chart is open — exits silently.
+function _lwUpdateTodayBar() {
+  if (!_lwCandleSeries || !_lwActiveOhlcId) return;
+  const bar = _lwBuildTodayBar(_lwActiveOhlcId);
+  if (!bar) return;
+  try { _lwCandleSeries.update(bar); } catch(_) {}
+}
+
+// Render a Lightweight Charts candlestick chart inside #tv-chart-wrap
+async function _renderLWChart(ohlcId, label) {
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+
+  _destroyLWChart();
+  wrap.innerHTML = '';
+
+  // Loading state
+  const loader = document.createElement('div');
+  loader.style.cssText = 'height:100%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;font-family:var(--font-ui,sans-serif);';
+  loader.textContent = 'Loading chart\u2026';
+  wrap.appendChild(loader);
+
+  await _ensureLWLib();
+  const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const bars = await r.json();
+  if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+
+  wrap.innerHTML = '';
+
+  const chartDiv = document.createElement('div');
+  chartDiv.style.cssText = 'width:100%;height:100%;';
+  wrap.appendChild(chartDiv);
+
+  const LWC = window.LightweightCharts;
+  _lwChart = LWC.createChart(chartDiv, {
+    layout:      { background: { color: '#131722' }, textColor: '#9096a0' },
+    grid:        { vertLines: { color: 'rgba(42,46,57,0.6)' }, horzLines: { color: 'rgba(42,46,57,0.6)' } },
+    crosshair:   { mode: LWC.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: '#2a2e39' },
+    timeScale:   { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
+    width:  chartDiv.clientWidth  || wrap.clientWidth  || 600,
+    height: chartDiv.clientHeight || wrap.clientHeight || 290,
+  });
+
+  // Candlestick series
+  const candleSeries = _lwChart.addCandlestickSeries({
+    upColor: '#26a69a', downColor: '#ef5350',
+    borderUpColor: '#26a69a', borderDownColor: '#ef5350',
+    wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+  });
+  candleSeries.setData(bars);
+
+  // Store global refs so _lwUpdateTodayBar() can push live prices
+  _lwCandleSeries = candleSeries;
+  _lwActiveOhlcId = ohlcId;
+
+  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
+  const todayBar = _lwBuildTodayBar(ohlcId);
+  if (todayBar) { try { candleSeries.update(todayBar); } catch(_) {} }
+
+  // MA20 overlay
+  const ma20 = _calcMA(bars, 20);
+  if (ma20.length > 0) {
+    const maSeries = _lwChart.addLineSeries({
+      color: '#f0a500', lineWidth: 1,
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
+    });
+    maSeries.setData(ma20);
+  }
+
+  _lwChart.timeScale().fitContent();
+
+  // Source watermark (bottom-right)
+  const srcTicker = _OHLC_LABELS[ohlcId] || label;
+  const labelEl = document.createElement('div');
+  labelEl.style.cssText = 'position:absolute;bottom:4px;right:8px;font-size:9px;color:rgba(144,150,160,0.5);font-family:var(--font-ui,sans-serif);pointer-events:none;z-index:1;user-select:none;';
+  labelEl.textContent = 'yfinance \u00b7 ' + srcTicker + ' \u00b7 daily';
+  wrap.style.position = 'relative';
+  wrap.appendChild(labelEl);
+
+  // Responsive resize
+  if (typeof ResizeObserver !== 'undefined') {
+    _lwResizeObs = new ResizeObserver(entries => {
+      for (const e of entries) {
+        const { width, height } = e.contentRect;
+        if (_lwChart && width > 0 && height > 0) _lwChart.resize(width, height);
+      }
+    });
+    _lwResizeObs.observe(chartDiv);
+  }
+}
+
+// ── COT Chart: always uses TradingView widget (comparative overlay) ──
 function loadCOTChart(longSym) {
-  // Derive Short symbol: replace trailing _L with _S
   const shortSym = longSym.replace(/_L$/, '_S');
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _destroyLWChart();
   wrap.innerHTML = '';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
@@ -2716,47 +2918,25 @@ function loadCOTChart(longSym) {
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
   script.text = JSON.stringify({
-    allow_symbol_change: false,
-    calendar: false,
-    details: false,
-    hide_side_toolbar: true,
-    hide_top_toolbar: true,
-    hide_legend: false,
-    hide_volume: true,
-    interval: 'W',
-    locale: 'en',
-    save_image: true,
-    style: '2',
-    symbol: longSym,
-    theme: 'dark',
-    timezone: 'Etc/UTC',
-    backgroundColor: '#131722',
-    gridColor: 'rgba(42,46,57,0.8)',
-    withdateranges: false,
-    compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
-    scaleMode: 2,
-    studies: [],
-    autosize: true,
+    allow_symbol_change: false, calendar: false, details: false,
+    hide_side_toolbar: true, hide_top_toolbar: true, hide_legend: false,
+    hide_volume: true, interval: 'W', locale: 'en', save_image: true,
+    style: '2', symbol: longSym, theme: 'dark', timezone: 'Etc/UTC',
+    backgroundColor: '#131722', gridColor: 'rgba(42,46,57,0.8)',
+    withdateranges: false, compareSymbols: [{ symbol: shortSym, position: 'SameScale' }],
+    scaleMode: 2, studies: [], autosize: true,
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll chart into view
   const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
   chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// SHARED: load any symbol into the TradingView chart + scroll to it
-// ═══════════════════════════════════════════════════════════════════
-function loadTVChart(sym) {
-  // Deactivate all tabs; activate matching tab if exists
-  document.querySelectorAll('.tv-tab').forEach(t => {
-    t.classList.remove('active');
-    if (t.dataset.sym === sym) t.classList.add('active');
-  });
-  // Update pair detail panel (Eikon-style linked panels)
-  updatePairDetail(sym);
+// ── Internal: TV widget fallback for symbols without OHLC data ──
+function _loadTVWidgetFallback(sym) {
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
+  _destroyLWChart();
   wrap.innerHTML = '';
   const container = document.createElement('div');
   container.className = 'tradingview-widget-container';
@@ -2784,10 +2964,33 @@ function loadTVChart(sym) {
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll chart into view
-  const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
-  chartSection.scrollIntoView({ behavior:'smooth', block:'start' });
-  setTimeout(minimizeTVLegend, 3000);
+}
+
+// SHARED: load any symbol into the chart + scroll to it
+// Prefers Lightweight Charts (yfinance OHLC); falls back to TradingView widget.
+// ═══════════════════════════════════════════════════════════════════
+function loadTVChart(sym) {
+  document.querySelectorAll('.tv-tab').forEach(t => {
+    t.classList.remove('active');
+    if (t.dataset.sym === sym) t.classList.add('active');
+  });
+  updatePairDetail(sym);
+  const chartSection = document.getElementById('section-fxpairs') ||
+    document.getElementById('tv-chart-wrap')?.closest('.panel') ||
+    document.getElementById('tv-chart-wrap');
+  const ohlcId = _TV_TO_OHLC[sym];
+  if (ohlcId) {
+    const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
+    _renderLWChart(ohlcId, label)
+      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .catch(() => {
+        _loadTVWidgetFallback(sym);
+        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+  } else {
+    _loadTVWidgetFallback(sym);
+    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // ── Quote bar: click any item to open chart ──
