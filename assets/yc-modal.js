@@ -129,7 +129,7 @@ function _ycDrawNative(container,toData,prData,tenorData){
   _ycLwChart=LWC.createYieldCurveChart(container,{
     autoSize:true,
     layout:{background:{type:'solid',color:'#131722'},textColor:'#787b86',fontFamily:"'JetBrains Mono','Courier New',monospace",fontSize:10,attributionLogo:false},
-    yieldCurve:{baseResolution:1,minimumTimeRange:3,startTimeRange:0},
+    yieldCurve:{baseResolution:12,minimumTimeRange:12,startTimeRange:0},
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:LWC.CrosshairMode?.Magnet??1,vertLine:{color:'rgba(255,255,255,0.25)',style:LWC.LineStyle?.Dashed??1,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.15)',style:LWC.LineStyle?.Dashed??1,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
@@ -146,6 +146,9 @@ function _ycDrawNative(container,toData,prData,tenorData){
   todaySeries.setData(toData);
   _ycLwChart.timeScale().fitContent();
   _ycLwChart.timeScale().subscribeSizeChange(()=>_ycLwChart.timeScale().fitContent());
+  // Second fitContent after a frame — ensures dimensions are resolved when modal animates in
+  requestAnimationFrame(()=>{ if(_ycLwChart) _ycLwChart.timeScale().fitContent(); });
+  setTimeout(()=>{ if(_ycLwChart) _ycLwChart.timeScale().fitContent(); }, 120);
   _ycAttachTooltip(container,_ycLwChart,todaySeries,priorSeries,tenorData,false);
 }
 

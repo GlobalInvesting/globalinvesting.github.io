@@ -340,6 +340,8 @@
   let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } }
   let _csiChart      = null;  // LWC chart instance
   let _csiPeriodDays = 63;    // default 3M (Bloomberg WCRS default)
+  let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for highlight toggling
+  let _csiHighlightCcy = null; // currently highlighted ccy (null = use modal focal ccy)
   let _csiInited     = false;
 
   // Fetch currency-drivers.json once per page load (lazy, on first modal open).
@@ -1300,6 +1302,8 @@
       _csiChart = null;
       chartEl.innerHTML = '';
     }
+    _csiSeriesMap = {};
+    _csiHighlightCcy = null;
 
     _csiChart = LWC.createChart(chartEl, {
       layout: {
@@ -1330,13 +1334,8 @@
       height: 280,
     });
 
-    const seriesMap = {};
-    const tooltipEl = document.getElementById('hm-csi-tooltip');
-
     CCY_ORDER.forEach(c => {
       const isFocus = c === ccy;
-      // Rebase: subtract the value at cutoffDate so all series start at 0 for the period.
-      // This is the Bloomberg WCRS convention — each period window rebases to 0bp.
       const allPts = _csiData.series[c];
       const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
       const baseVal  = sliceIdx >= 0 ? allPts[sliceIdx].value : 0;
@@ -1345,7 +1344,7 @@
       const ls = _csiChart.addSeries(LWC.LineSeries, {
         color: CSI_COLORS[c],
         lineWidth: isFocus ? 2.5 : 1,
-        lineStyle: 0,  // solid
+        lineStyle: 0,
         lastValueVisible: false,
         priceLineVisible: false,
         crosshairMarkerVisible: isFocus,
@@ -1355,18 +1354,17 @@
       });
       ls.setData(raw);
       if (!isFocus) ls.applyOptions({ lineWidth: 1, color: CSI_COLORS[c] + 'aa' });
-      seriesMap[c] = ls;
+      _csiSeriesMap[c] = ls;
     });
 
-    // Zero baseline — Bloomberg WCRS convention: dashed horizontal line at 0bp
-    // Added as a price line on the first series so it anchors to the price scale
-    const firstSeries = seriesMap[CCY_ORDER[0]];
+    // Zero baseline
+    const firstSeries = _csiSeriesMap[CCY_ORDER[0]];
     if (firstSeries) {
       firstSeries.createPriceLine({
         price: 0,
         color: 'rgba(255,255,255,.20)',
         lineWidth: 1,
-        lineStyle: 1,          // dashed (LightweightCharts LineStyle.Dashed = 1)
+        lineStyle: 1,
         axisLabelVisible: false,
         title: '',
       });
@@ -1379,7 +1377,7 @@
         return;
       }
       const rows = CCY_ORDER.map(c => {
-        const v = param.seriesData.get(seriesMap[c]);
+        const v = param.seriesData.get(_csiSeriesMap[c]);
         return { ccy: c, val: v ? v.value : null };
       }).filter(r => r.val != null).sort((a, b) => b.val - a.val);
 
@@ -1433,7 +1431,7 @@
       const isFocus = r.ccy === ccy;
       const cls = r.val > 0 ? 'up' : r.val < 0 ? 'down' : 'flat';
       const valStr = r.val != null ? (r.val >= 0 ? '+' : '') + r.val.toFixed(2) + '%' : '—';
-      return '<div class="hm-csi-leg" title="Click to highlight ' + r.ccy + '">' +
+      return '<div class="hm-csi-leg" onclick="csiHighlight(\'' + r.ccy + '\')" style="cursor:pointer" title="Click to highlight ' + r.ccy + '">' +
         '<div class="hm-csi-leg-dot" style="background:' + CSI_COLORS[r.ccy] + ';' +
           (isFocus ? 'height:3px;' : '') + '"></div>' +
         '<span class="hm-csi-leg-lbl" style="' + (isFocus ? 'color:var(--text,#d1d4dc);font-weight:600;' : '') + '">' +
@@ -1577,6 +1575,26 @@
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
     }
+  };
+
+  // Toggle highlight on a CSI series — clicking active focal ccy resets to modal ccy
+  window.csiHighlight = function(clickedCcy) {
+    if (!_csiChart || !_csiSeriesMap[clickedCcy]) return;
+    const newFocus = (_csiHighlightCcy === clickedCcy) ? _ccy : clickedCcy;
+    _csiHighlightCcy = (newFocus === _ccy) ? null : newFocus;
+    CCY_ORDER.forEach(c => {
+      const isFocus = c === newFocus;
+      _csiSeriesMap[c].applyOptions({
+        lineWidth: isFocus ? 2.5 : 1,
+        color: isFocus ? CSI_COLORS[c] : CSI_COLORS[c] + 'aa',
+        crosshairMarkerVisible: isFocus,
+      });
+    });
+    // Re-render legend to update bold/active state
+    const allDates = _csiData.dates;
+    let startIdx = 0;
+    if (_csiPeriodDays > 0) startIdx = Math.max(0, allDates.length - _csiPeriodDays);
+    _updateCSILegend(newFocus, allDates[startIdx]);
   };
 
   window.closeHeatmapModal = function() {
