@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>How to Use the FX Terminal: Layout, Panels, and Data Sources Explained — Global Investing</title>
-<meta name="description" content="Complete walkthrough of the Global Investing FX Terminal: quote bar, AI market narrative, sidebar pairs, right-panel data sections, and how to navigate between COT, rates, risk, and liquidity panels.">
+<meta name="description" content="Complete walkthrough of the Global Investing FX Terminal: quote bar, AI market narrative, FX pairs table with inline Pair Detail, sidebar pairs, right panel, and how to navigate between COT, rates, risk, and liquidity panels.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-dashboard.html">
 <meta name="google-adsense-account" content="ca-pub-7977942731354565">
@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://globalinvesting.github.io/guide-dashboard.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="How to Use the FX Terminal: Layout, Panels, and Data Sources Explained — Global Investing">
-<meta property="og:description" content="Complete walkthrough of the Global Investing FX Terminal: quote bar, AI market narrative, sidebar pairs, right-panel data sections, and how to navigate between COT, rates, risk, and liquidity panels.">
+<meta property="og:description" content="Complete walkthrough of the Global Investing FX Terminal: quote bar, AI market narrative, FX pairs table with inline Pair Detail, sidebar pairs, right panel, and how to navigate between COT, rates, risk, and liquidity panels.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
@@ -662,6 +662,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#fx-pairs">FX Pairs Table</a>
     <a class="toc-item" href="#heatmap">Currency Strength Heatmap</a>
     <a class="toc-item" href="#sidebar">Left Sidebar</a>
+    <a class="toc-item" href="#pair-detail">Pair Detail</a>
     <a class="toc-item" href="#right-panel">Right Panel</a>
     <a class="toc-item" href="#news-feed">News Feed</a>
     <a class="toc-item" href="#alerts">Alerts &amp; Signals</a>
@@ -1344,10 +1345,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <p>A Myfxbook economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times. Use this to anticipate volatility windows before they arrive.</p>
     </div>
 
-    <div class="guide-section" id="right-panel">
-      <h2>Right Panel</h2>
+    <div class="guide-section" id="pair-detail">
+      <h2>Pair Detail</h2>
 
-      <h3>Pair Detail</h3>
       <p>When you click any pair in the FX Pairs table or any cross in the sidebar, an inline detail strip expands directly below the selected row. It updates instantly on every click with no page reload — click the same row again to collapse it. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
       <!-- MOCK: Pair Detail inline strip (EUR/USD example) — mirrors pd-inline layout from dashboard.js expand row -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;">
@@ -1415,11 +1415,16 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
                 <span class="pd-dn">Short</span> LF · <span class="pd-up">Long</span> AM · <span style="color:var(--text3);">diverging</span>
               </div>
             </div>
-            <!-- Retail group -->
-            <div class="pd-inline-group" style="border-right:none;min-width:80px;max-width:100px;">
+            <!-- Retail group — EUR/USD: 30% long / 70% short, majority short, AVG S 1.14750 -->
+            <div class="pd-inline-group" style="border-right:none;min-width:80px;max-width:110px;">
               <div class="pd-inline-group-lbl">Retail</div>
-              <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:0%"></div></div>
-              <div class="pd-inline-retail-row" style="color:var(--text2);">–&thinsp;/&thinsp;–</div>
+              <div style="font-size:9px;font-weight:700;color:var(--down);font-family:var(--font-mono);letter-spacing:.04em;margin-bottom:2px;">MAJORITY SHORT</div>
+              <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:30%;background:var(--up);"></div></div>
+              <div class="pd-inline-retail-row"><span style="color:var(--up);">30%</span><span style="color:var(--text3);margin:0 2px;">L</span><span style="color:var(--down);">70%</span><span style="color:var(--text3);margin:0 2px;">S</span></div>
+              <div style="margin-top:4px;">
+                <div class="pd-inline-lbl">AVG S</div>
+                <div class="pd-inline-val pd-dn" style="font-size:10px;">1.14750 ▼</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1438,6 +1443,10 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div class="callout callout-green">
         <strong>Tip:</strong> Click once on any major or cross to open the chart and expand the inline detail. Click the same row again to collapse it. The strip stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place.
       </div>
+    </div>
+
+    <div class="guide-section" id="right-panel">
+      <h2>Right Panel</h2>
 
       <h3>Central Bank Rates</h3>
       <p>Current policy rates for all eight G8 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), updated daily from official CB sources. The trend column shows the direction of the most recent rate cycle: <span style="color:var(--up);">↑ Hiking</span>, <span style="color:var(--down);">↓ Cutting</span>, or <span style="color:var(--text2);">— Hold</span>. The trend resets to neutral (—) after approximately 90 days without a policy move — regardless of the prior cycle direction.</p>
@@ -1712,7 +1721,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.11</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.43.1</span></div>
 </footer>
 
 
