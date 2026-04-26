@@ -105,9 +105,14 @@ try:
 except Exception:
     pass
 
+# Debug — log first symbol to see real field names
+symbols_raw = outlook.get("symbols", [])
+if symbols_raw:
+    print(f"[Debug] First symbol: {symbols_raw[0]}")
+
 # Normalize
 pairs = {}
-for s in outlook.get("symbols", []):
+for s in symbols_raw:
     name = (s.get("name") or "").upper().replace("/", "")
     if not name:
         continue
