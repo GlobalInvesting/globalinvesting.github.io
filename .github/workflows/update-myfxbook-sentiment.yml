@@ -1,164 +1,128 @@
-name: Update Myfxbook Sentiment — v1.6
-
-# Runs every hour, 24/7, Mon–Sun.
-#
-# API LIMIT: Myfxbook free tier = 100 requests/24h.
-#   Each run = 1 call (outlook only — no login/logout).
-#   Running every 60 min × 24h = 24 runs/day = 24 calls/day (well within limit).
-#
-# Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
-#   No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is sufficient
-#   because the workflow and output data live in the same repo.
-#
-# CLOUDFLARE WORKER PROXY (v1.6 — pre-authenticated session token):
-#   Myfxbook blocks login requests from Cloudflare Workers IP ranges.
-#   Solution: the session token is obtained once per month by the user
-#   opening the login URL in their browser, and stored as a GitHub secret.
-#   The Worker only calls get-community-outlook (not blocked from CF IPs).
-#   Architecture: GHA → CF Worker (session token) → Myfxbook outlook → GHA
-#
-# SESSION TOKEN RENEWAL (once per month):
-#   Open in browser: https://www.myfxbook.com/api/login.json?email=E&password=P
-#   Copy the "session" value → update GitHub secret MYFXBOOK_SESSION.
-#
-# GRACEFUL DEGRADATION:
-#   If the token expires or the Worker errors, the script exits 0 (non-fatal).
-#   Existing myfxbook.json is preserved with apiBlocked=true. The dashboard
-#   automatically falls back to Dukascopy.
-#
-# SECRETS REQUIRED (set in repo Settings → Secrets → Actions):
-#   MYFXBOOK_SESSION  — session token from manual browser login (renew monthly)
-#   CF_WORKER_URL     — URL of deployed Cloudflare Worker
-#                       e.g. https://myfxbook-proxy.YOUR_SUBDOMAIN.workers.dev
-#   CF_WORKER_SECRET  — shared secret (must match WORKER_SECRET in CF Worker env vars)
-#
-# SECRETS TO DELETE (no longer needed):
-#   MYFXBOOK_EMAIL, MYFXBOOK_PASSWORD
-#
-# OUTPUT: sentiment-data/myfxbook.json (committed to repo, served via GitHub Pages)
+name: Update Myfxbook Sentiment
 
 on:
   schedule:
-    - cron: '0 * * * *'    # every hour on the hour, all days, all week
-  workflow_dispatch:        # manual trigger from GitHub UI
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    - cron: '20 * * * *'   # hourly at :20
+  workflow_dispatch:
 
 concurrency:
   group: update-myfxbook-sentiment
-  cancel-in-progress: false   # never cancel an in-progress fetch — wait
-
-permissions:
-  contents: write             # required for git push to the same repo
+  cancel-in-progress: false
 
 jobs:
-  fetch-myfxbook-sentiment:
+  fetch-sentiment:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    outputs:
+      token_expired: ${{ steps.fetch.outputs.token_expired }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout PUBLIC site repo
         uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
 
-      - name: Set up Python
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install requests --break-system-packages
-
-      - name: Create output directory
-        run: mkdir -p sentiment-data
-
-      - name: Fetch Myfxbook community outlook via CF Worker
+      - name: Run fetch script
+        id: fetch
         env:
-          MYFXBOOK_SESSION: ${{ secrets.MYFXBOOK_SESSION }}
-          CF_WORKER_URL:    ${{ secrets.CF_WORKER_URL }}
-          CF_WORKER_SECRET: ${{ secrets.CF_WORKER_SECRET }}
-          SITE_PATH: .
-        run: python3 scripts/fetch_myfxbook_sentiment.py
-
-      - name: Detect apiBlocked and set output flag
-        id: blocked_check
+          MYFXBOOK_WORKER_URL:    ${{ secrets.MYFXBOOK_WORKER_URL }}
+          MYFXBOOK_WORKER_SECRET: ${{ secrets.MYFXBOOK_WORKER_SECRET }}
+          MYFXBOOK_SESSION:       ${{ secrets.MYFXBOOK_SESSION }}
+          OUTPUT_PATH:            site/sentiment-data/myfxbook.json
         run: |
-          BLOCKED=$(python3 -c "
+          python3 engine/scripts/fetch_myfxbook_sentiment.py
+          # Detect token expiry from output file
+          EXPIRED=$(python3 -c "
           import json, sys
           try:
-              d = json.load(open('sentiment-data/myfxbook.json'))
-              print('true' if d.get('apiBlocked') else 'false')
-          except Exception:
+              d = json.load(open('site/sentiment-data/myfxbook.json'))
+              print('true' if d.get('tokenExpired') else 'false')
+          except:
               print('false')
           ")
-          echo "api_blocked=${BLOCKED}" >> $GITHUB_OUTPUT
-          if [ "$BLOCKED" = "true" ]; then
-            echo "::warning::Myfxbook API blocked — login manual requerido en myfxbook.com"
+          echo "token_expired=$EXPIRED" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push sentiment data
+        run: |
+          cd site
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sentiment-data/myfxbook.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Sentiment update — $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git push
           fi
 
-      - name: Check email secrets configured
+  trigger-renewal:
+    needs: fetch-sentiment
+    if: needs.fetch-sentiment.outputs.token_expired == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger token renewal on self-hosted runner
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner:   context.repo.owner,
+              repo:    context.repo.repo,
+              workflow_id: 'renew-myfxbook-token.yml',
+              ref:     'main',
+            });
+            console.log('Token renewal workflow dispatched.');
+
+  notify-blocked:
+    needs: fetch-sentiment
+    if: >
+      needs.fetch-sentiment.outputs.token_expired == 'true' &&
+      always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check email secrets
         id: email_check
-        if: steps.blocked_check.outputs.api_blocked == 'true'
         env:
           NOTIFY_TO:       ${{ secrets.NOTIFY_EMAIL_TO }}
           NOTIFY_FROM:     ${{ secrets.NOTIFY_EMAIL_FROM }}
           NOTIFY_PASSWORD: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
         run: |
           if [ -n "$NOTIFY_TO" ] && [ -n "$NOTIFY_FROM" ] && [ -n "$NOTIFY_PASSWORD" ]; then
-            echo "email_configured=true" >> $GITHUB_OUTPUT
+            echo "send=true" >> "$GITHUB_OUTPUT"
           else
-            echo "email_configured=false" >> $GITHUB_OUTPUT
+            echo "send=false" >> "$GITHUB_OUTPUT"
             echo "::notice::NOTIFY_EMAIL_* secrets not configured — skipping alert email."
           fi
 
-      - name: Send immediate alert on Myfxbook API block
-        if: |
-          steps.blocked_check.outputs.api_blocked == 'true' &&
-          steps.email_check.outputs.email_configured == 'true'
+      - name: Send token expiry alert
+        if: steps.email_check.outputs.send == 'true'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.NOTIFY_EMAIL_FROM }}
-          password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
-          to: ${{ secrets.NOTIFY_EMAIL_TO }}
-          from: "FX Dashboard Monitor <${{ secrets.NOTIFY_EMAIL_FROM }}>"
-          subject: "FX Dashboard — Myfxbook bloqueado, accion requerida"
+          server_port:    465
+          username:       ${{ secrets.NOTIFY_EMAIL_FROM }}
+          password:       ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+          from:           "FX Dashboard <${{ secrets.NOTIFY_EMAIL_FROM }}>"
+          to:             ${{ secrets.NOTIFY_EMAIL_TO }}
+          subject:        "⚠️ Myfxbook token expired — renewal triggered"
           body: |
-            La API de Myfxbook rechazo el login automatico.
+            The Myfxbook session token has expired.
 
-            Causa mas probable: Myfxbook detecto el patron automatizado y requiere
-            verificacion manual antes de volver a permitir acceso via API.
+            The automatic renewal workflow has been triggered on your
+            self-hosted runner. It will renew the token as soon as your
+            PC is online and the runner picks up the job.
 
-            ACCION REQUERIDA:
-            1. Entra a https://www.myfxbook.com desde tu navegador
-            2. Hace login con las credenciales habituales
-            3. Completa cualquier CAPTCHA o verificacion de seguridad que aparezca
-            4. Una vez logueado correctamente, el proximo run del workflow (cada hora)
-               reanudara automaticamente.
-
-            El dashboard esta mostrando los ultimos datos cacheados con fallback a Dukascopy.
-
-            Run que detecto el bloqueo:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: Commit and push sentiment data
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sentiment-data/myfxbook.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit (data unchanged)"
-            exit 0
-          fi
-          TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
-          git commit -m "Sentiment update — ${TIMESTAMP}"
-          for i in 1 2 3; do
-            git push && echo "Push succeeded" && exit 0
-            echo "Push rejected (attempt $i) — rebasing..."
-            git fetch origin main
-            git rebase origin/main
-          done
-          echo "All push attempts failed — data not published."
-          exit 1
+            Dashboard is falling back to Dukascopy / static sources
+            in the meantime.
