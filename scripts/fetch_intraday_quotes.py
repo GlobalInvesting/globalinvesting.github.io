@@ -486,12 +486,13 @@ def fetch_correlations():
 
         norm = None
         z_score = None
+        std_val = None
         if len(hist_corrs) >= 10:
             norm = round(sum(hist_corrs) / len(hist_corrs), 3)
             variance = sum((c - norm) ** 2 for c in hist_corrs) / (len(hist_corrs) - 1)
-            std = math.sqrt(variance)
-            if std > 0 and corr is not None:
-                z_score = round((corr - norm) / std, 2)
+            std_val = math.sqrt(variance)
+            if std_val > 0 and corr is not None:
+                z_score = round((corr - norm) / std_val, 2)
 
         status = f"{corr:+.3f}" if corr is not None else "N/A"
         norm_s = f"norm={norm:+.3f}" if norm is not None else "norm=N/A"
@@ -500,12 +501,19 @@ def fetch_correlations():
         c90s = f"{corr90:+.3f}" if corr90 is not None else "N/A"
         print(f"[Correlations] {labels[0]:8s} vs {labels[1]:8s}: 30d={c30s}  60d={status}  90d={c90s}  {norm_s}  {z_s}")
 
+        # hist_corrs: rolling 30d Pearson over last 252 days (~223 points).
+        # Stored as compact array of 3-decimal floats for the LWC sparkline in the modal.
+        # Index 0 = oldest, index -1 = most recent (approx current 30d corr).
+        hist_rounded = [round(c, 3) for c in hist_corrs]
+
         results.append({
             "a": labels[0], "b": labels[1],
             "corr30": corr30, "n30": n30,
             "corr":   corr,   "n":   n60,
             "corr90": corr90, "n90": n90,
             "norm": norm, "z_score": z_score,
+            "std":  round(std_val, 4) if std_val is not None else None,
+            "history": hist_rounded,
         })
 
     return results
