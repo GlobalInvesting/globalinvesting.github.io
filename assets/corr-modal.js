@@ -160,14 +160,23 @@
 .cm-trend-falling { color:var(--down,#ef5350); }
 .cm-trend-stable  { color:var(--text2,#787b86); }
 
-.cm-signal-banner {
-  margin-top:6px;padding:8px 12px;border-radius:4px;
-  font-size:10px;line-height:1.55;
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+.cm-signal {
+  margin-top:8px;
+  display:flex;align-items:baseline;gap:10px;
+  padding:6px 10px;
+  border-left:2px solid rgba(255,255,255,.12);
+  font-size:10px;line-height:1.5;
   color:var(--text2,#787b86);
 }
-.cm-signal-banner.warn { background:rgba(239,83,80,.07);border-color:rgba(239,83,80,.2);color:#ef9a9a; }
-.cm-signal-banner.ok   { background:rgba(38,166,154,.05);border-color:rgba(38,166,154,.18);color:#80cbc4; }
+.cm-signal.warn { border-left-color:var(--down,#ef5350); }
+.cm-signal.ok   { border-left-color:var(--up,#26a69a); }
+.cm-signal-tag {
+  font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  font-family:var(--font-mono,'JetBrains Mono',monospace);white-space:nowrap;flex-shrink:0;
+}
+.cm-signal.warn .cm-signal-tag { color:var(--down,#ef5350); }
+.cm-signal.ok   .cm-signal-tag { color:var(--up,#26a69a); }
+.cm-signal-body { color:var(--text2,#787b86); }
 
 @media(max-width:600px){
   #cm-modal{border-radius:12px 12px 0 0;position:fixed;bottom:0;left:0;right:0;width:100%;max-height:88vh;}
@@ -406,18 +415,19 @@ function openCorrModal(corrObj) {
   const { a, b, corr30, corr, corr90, norm, z_score, std, n30, n, n90, history, hist_dates } = corrObj;
   const absZ = z_score != null ? Math.abs(z_score) : null;
 
-  // Signal banner — two tiers only (break / stretched / stable), matching badge thresholds
-  let sigCls = '', sigTxt = '';
+  // Signal row — two tiers (break / stretched / stable), matching badge thresholds
+  let sigCls = '', sigTag = '', sigTxt = '';
   if (absZ != null) {
+    const zStr = (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3';
     if (absZ >= 2.5) {
-      sigCls = 'warn';
-      sigTxt = 'Correlation break \u2014 Z-score ' + (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3. The 30d correlation has deviated sharply from its historical norm. This signals a regime change, a temporary dislocation, or an emerging structural shift between the two instruments.';
+      sigCls = 'warn'; sigTag = 'Break';
+      sigTxt = 'Z\u2011score\u00a0' + zStr + '\u2002\u00b7\u2002The 30d correlation has deviated sharply from its historical norm, signaling a potential regime change or structural dislocation.';
     } else if (absZ >= 1.5) {
-      sigCls = 'warn';
-      sigTxt = 'Correlation stretched \u2014 Z-score ' + (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3. The relationship is under stress relative to its historical norm. Monitor for mean reversion or a confirmed break above 2.5\u03c3.';
+      sigCls = 'warn'; sigTag = 'Stretched';
+      sigTxt = 'Z\u2011score\u00a0' + zStr + '\u2002\u00b7\u2002Relationship under stress vs historical norm. Monitor for mean reversion or a confirmed break above 2.5\u03c3.';
     } else {
-      sigCls = 'ok';
-      sigTxt = 'Stable \u2014 Z-score ' + (z_score >= 0 ? '+' : '') + z_score.toFixed(2) + '\u03c3. The correlation is tracking within its historical norm.';
+      sigCls = 'ok'; sigTag = 'Normal';
+      sigTxt = 'Z\u2011score\u00a0' + zStr + '\u2002\u00b7\u2002Tracking within its historical norm.';
     }
   }
 
@@ -521,7 +531,7 @@ function openCorrModal(corrObj) {
               '<span class="cm-regime-key">Signal threshold</span>' +
               '<span class="cm-regime-val flat">|z| \u2265 1.5 = stretched \u00b7 \u2265 2.5 = break</span>' +
             '</div>' +
-            (sigTxt ? '<div class="cm-signal-banner ' + sigCls + '">' + sigTxt + '</div>' : '') +
+            (sigTxt ? '<div class="cm-signal ' + sigCls + '"><span class="cm-signal-tag">' + sigTag + '</span><span class="cm-signal-body">' + sigTxt + '</span></div>' : '') +
           '</div>' +
         '</div>' +
 
