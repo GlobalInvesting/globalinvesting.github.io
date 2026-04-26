@@ -1,57 +1,64 @@
 {
-  "generated_at": "2026-04-26T22:31:57Z",
+  "generated_at": "2026-04-26T23:37:17Z",
   "signals": [
     {
-      "time": "22:30",
+      "time": "23:35",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 159.55 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −80,578 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
+      "title": "AUD/USD — Middle East Tensions + Positio",
+      "text": "AUD/USD at 0.7146 — Middle East escalation drives risk-off; AUD/USD COT LF net long +47,218 (crowded long). 335bp AUD carry advantage over JPY fades in risk-off. Watch for safe-haven flows into USD and JPY; 0.7200 is the next resistance level.",
       "evidence": [
-        "USD/JPY: 159.55",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF net short: −80,578"
+        "AUD/USD: 0.7146",
+        "AUD COT LF net: +47,218",
+        "RBA 4.10% vs BoJ 0.75% — 335bp"
       ]
     },
     {
-      "time": "22:26",
+      "time": "23:32",
       "priority": "warning",
       "title": "CAD/EUR — G8 Bilateral Theme + Carry",
-      "text": "CAD leads G8 (+0.448% avg, 3 pairs) while EUR lags (−0.478% avg, 7 pairs); CAD/EUR spread at 0.926%. BoC 2.25% vs ECB 2.00% — 25bp CAD carry advantage drives the divergence.",
+      "text": "CAD leads G8 (+0.451% avg, 3 pairs) while EUR lags (-0.478% avg, 7 pairs); CAD/EUR spread 0.928%. BoC 2.25% vs ECB 2.0% — 25bp CAD carry advantage supports CAD. Watch for EUR/USD testing 1.1700.",
       "evidence": [
-        "CAD 1W avg: +0.448% (n=3)",
+        "CAD 1W avg: +0.451% (n=3)",
         "EUR 1W avg: -0.478% (n=7)",
-        "G8 spread: 0.926%",
-        "BoC 2.25% vs ECB 2.00% — 25bp"
+        "G8 spread: 0.928%"
       ]
     },
     {
-      "time": "22:31",
+      "time": "23:30",
       "priority": "warning",
-      "title": "AUD/USD — Positioning + Vol",
-      "text": "AUD/USD COT LF net long +47,218 (bullish spec positioning) vs ATM IV 9.5% near HV. 25d RR at −0.10: mild put skew despite the bullish price trend — market hedging rather than chasing. AUD/USD at 0.7144; late-trend caution signal.",
+      "title": "EUR/USD — Positioning + Vol",
+      "text": "EUR/USD at 1.1710 — COT LF net short -8,352; HV30 at 8.2%, ATM IV 9.4%. Positioning stalling, vol rising — late-trend caution. Watch for LF delta turning positive or IV spike.",
       "evidence": [
-        "AUD/USD COT LF net: +47,218",
-        "ATM IV: 9.5%",
-        "25d RR: −0.10",
-        "AUD/USD: 0.7144"
+        "EUR/USD: 1.1710",
+        "EUR COT LF net: -8,352",
+        "HV30: 8.2%"
       ]
     },
     {
-      "time": "22:18",
+      "time": "23:28",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP/USD at 1.3515 mid-range. COT LF net long +33,517; positioning aligned with carry. Watch 1.3600 as next resistance.",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP/USD at 1.3515 mid-range. GBP LF net long +33,517; AM constructive. Watch 1.3600 as next resistance.",
       "evidence": [
         "BoE 3.75% vs Fed 3.75% — 0bp",
-        "GBP LF net long: +33,517",
         "GBP/USD: 1.3515"
       ]
     },
     {
-      "time": "22:23",
+      "time": "23:25",
+      "priority": "warning",
+      "title": "USD/JPY — Geopolitical + Carry",
+      "text": "USD/JPY at 159.56 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short -80,578; carry dominates until VIX > 25.",
+      "evidence": [
+        "USD/JPY: 159.56",
+        "Fed 3.75% vs BoJ 0.75% — 300bp"
+      ]
+    },
+    {
+      "time": "23:37",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "NZD/USD COT LF net short −18,062 vs RBNZ hike bias (40% priced for 27 May). Short-squeeze risk elevated if RBNZ delivers or signals hike. NZD/USD at 0.5872.",
+      "text": "NZD/USD COT LF net short −18,062 vs RBNZ hike bias (40% priced for 27 May). Short-squeeze risk elevated if RBNZ delivers or signals hike; NZD/USD at 0.5872. Carry advantage favors NZD with RBNZ 2.25% vs SNB 0% — 225bp.",
       "evidence": [
         "NZD COT LF net: −18,062",
         "RBNZ hike prob: 40%",
