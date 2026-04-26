@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v8.0
+fetch_myfxbook_sentiment.py  v8.1
 =============================================================
 Fetches Myfxbook Community Outlook sentiment data directly
 from the Myfxbook API — no Cloudflare Worker needed.
@@ -8,9 +8,7 @@ from the Myfxbook API — no Cloudflare Worker needed.
 Architecture:
   GitHub Actions (ubuntu-latest) → login.json → get-community-outlook.json → logout.json
 
-On login failure:
-  - apiBlocked is set to true in the output JSON
-  - Dashboard falls back to Dukascopy / static sources
+Output format matches dashboard.js expectations exactly.
 =============================================================
 """
 
@@ -20,9 +18,9 @@ import sys
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
-from urllib.parse import urlencode
+from urllib.parse import urlencode, unquote
 
-SCRIPT_VERSION = "8.0"
+SCRIPT_VERSION = "8.1"
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 print(f"\n{'='*60}")
@@ -33,6 +31,14 @@ EMAIL       = os.environ.get("MYFXBOOK_EMAIL", "").strip()
 PASSWORD    = os.environ.get("MYFXBOOK_PASSWORD", "").strip()
 OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "sentiment-data/myfxbook.json")
 MYFXBOOK_BASE = "https://www.myfxbook.com/api"
+
+# The 24 pairs the dashboard tracks, in order, with slash format
+TRACKED_PAIRS = [
+    "EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "USD/CHF",
+    "NZD/USD", "EUR/GBP", "EUR/JPY", "GBP/JPY", "EUR/AUD", "EUR/CAD",
+    "EUR/CHF", "EUR/NZD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD",
+    "GBP/CHF", "GBP/AUD", "GBP/CAD", "GBP/NZD", "CHF/JPY", "CAD/JPY",
+]
 
 if not EMAIL or not PASSWORD:
     print("[Error] MYFXBOOK_EMAIL or MYFXBOOK_PASSWORD not set.")
@@ -53,8 +59,8 @@ if os.path.exists(OUTPUT_PATH):
     except Exception:
         pass
 
-last_fetch = existing_data.get("lastSuccessfulFetch", "never")
-pair_count = len(existing_data.get("pairs", {}))
+last_fetch = existing_data.get("updated", "never")
+pair_count = len(existing_data.get("pairs", []))
 
 def api_get(path, params):
     url = f"{MYFXBOOK_BASE}/{path}?{urlencode(params)}"
@@ -64,8 +70,8 @@ def api_get(path, params):
 
 def save_fallback(reason):
     fallback = dict(existing_data)
-    fallback["apiBlocked"]  = True
-    fallback["lastAttempt"] = TIMESTAMP
+    fallback["apiBlocked"] = True
+    fallback["updated"]    = TIMESTAMP
     fallback["blockReason"] = reason
     os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
     with open(OUTPUT_PATH, "w") as f:
@@ -84,7 +90,6 @@ except Exception as e:
 if data.get("error"):
     save_fallback(f"Login failed: {data.get('message', 'Unknown error')}")
 
-from urllib.parse import unquote
 session = unquote(data.get("session", ""))
 print("[Login] Success.")
 
@@ -105,48 +110,52 @@ try:
 except Exception:
     pass
 
-# Normalize
-pairs = {}
+# Build lookup by sym with slash format
+raw_lookup = {}
 for s in outlook.get("symbols", []):
-    name = (s.get("name") or "").upper().replace("/", "")
-    if not name:
-        continue
-    pairs[name] = {
-        "longPct":   round(float(s.get("longPercentage")  or 0), 1),
-        "shortPct":  round(float(s.get("shortPercentage") or 0), 1),
-        "longVol":   float(s.get("longVolume")  or 0),
-        "shortVol":  float(s.get("shortVolume") or 0),
-        "traders":   int(s.get("totalPositions")  or 0),
-        "positions": int(s.get("totalPositions") or 0),
-    }
+    name = (s.get("name") or "").upper()
+    # Convert EURUSD → EUR/USD (insert slash at position 3)
+    if len(name) == 6:
+        name = name[:3] + "/" + name[3:]
+    raw_lookup[name] = s
 
-general = outlook.get("general", {})
-print(f"[Success] Received {len(pairs)} pairs.")
-
-# Build pairs array in the format dashboard.js expects
+# Build pairs list — only tracked pairs, in order
 pairs_list = []
-for sym, v in pairs.items():
+for sym in TRACKED_PAIRS:
+    s = raw_lookup.get(sym)
+    if not s:
+        continue
     pairs_list.append({
         "sym":       sym,
-        "long":      v["longPct"],
-        "short":     v["shortPct"],
-        "totalPos":  v["traders"],
-        "longPos":   round(v["traders"] * v["longPct"] / 100) if v["traders"] else 0,
-        "shortPos":  round(v["traders"] * v["shortPct"] / 100) if v["traders"] else 0,
-        "longVol":   v["longVol"],
-        "shortVol":  v["shortVol"],
-        "avgLongPx": 0,
-        "avgShortPx": 0,
+        "long":      int(s.get("longPercentage")  or 0),
+        "short":     int(s.get("shortPercentage") or 0),
+        "longVol":   float(s.get("longVolume")    or 0),
+        "shortVol":  float(s.get("shortVolume")   or 0),
+        "longPos":   int(s.get("longPositions")   or 0),
+        "shortPos":  int(s.get("shortPositions")  or 0),
+        "totalPos":  int(s.get("totalPositions")  or 0),
+        "avgLongPx": float(s.get("avgLongPrice")  or 0),
+        "avgShortPx":float(s.get("avgShortPrice") or 0),
     })
 
+general = outlook.get("general", {})
+print(f"[Success] Received {len(pairs_list)} tracked pairs.")
+
 output = {
-    "apiBlocked": False,
     "updated":    TIMESTAMP,
+    "source":     "myfxbook",
+    "apiBlocked": False,
+    "pairs":      pairs_list,
     "general": {
-        "longPct":  round(float(general.get("longPercentage")  or 0), 1),
-        "shortPct": round(float(general.get("shortPercentage") or 0), 1),
+        "profitablePercentage":    general.get("profitablePercentage", 0),
+        "nonProfitablePercentage": general.get("nonProfitablePercentage", 0),
+        "realAccountsPercentage":  general.get("realAccountsPercentage", 0),
+        "demoAccountsPercentage":  general.get("demoAccountsPercentage", 0),
+        "totalFunds":              general.get("totalFunds", ""),
+        "averageDeposit":          general.get("averageDeposit", ""),
+        "averageAccountProfit":    general.get("averageAccountProfit", ""),
+        "averageAccountLoss":      general.get("averageAccountLoss", ""),
     },
-    "pairs": pairs_list,
 }
 
 os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
