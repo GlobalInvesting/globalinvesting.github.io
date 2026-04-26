@@ -11,13 +11,11 @@ concurrency:
 
 jobs:
   fetch-sentiment:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      token_expired: ${{ steps.fetch.outputs.token_expired }}
 
     steps:
-      - name: Checkout this repo (public site)
+      - name: Checkout this repo
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -25,27 +23,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run fetch script
-        id: fetch
+      - name: Fetch sentiment data
         env:
-          MYFXBOOK_WORKER_URL:    ${{ secrets.MYFXBOOK_WORKER_URL }}
-          MYFXBOOK_WORKER_SECRET: ${{ secrets.MYFXBOOK_WORKER_SECRET }}
-          MYFXBOOK_SESSION:       ${{ secrets.MYFXBOOK_SESSION }}
-          OUTPUT_PATH:            sentiment-data/myfxbook.json
-        run: |
-          python3 scripts/fetch_myfxbook_sentiment.py
-          # Detect token expiry from output file
-          EXPIRED=$(python3 -c "
-          import json, sys
-          try:
-              d = json.load(open('sentiment-data/myfxbook.json'))
-              print('true' if d.get('tokenExpired') else 'false')
-          except:
-              print('false')
-          ")
-          echo "token_expired=$EXPIRED" >> "$GITHUB_OUTPUT"
+          MYFXBOOK_EMAIL:    ${{ secrets.MYFXBOOK_EMAIL }}
+          MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
+          OUTPUT_PATH:       sentiment-data/myfxbook.json
+        run: python3 scripts/fetch_myfxbook_sentiment.py
 
-      - name: Commit and push sentiment data
+      - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -56,63 +41,3 @@ jobs:
             git commit -m "Sentiment update — $(date -u '+%Y-%m-%d %H:%M') UTC"
             git push
           fi
-
-  trigger-renewal:
-    needs: fetch-sentiment
-    if: needs.fetch-sentiment.outputs.token_expired == 'true'
-    runs-on: self-hosted
-    steps:
-      - name: Trigger token renewal on self-hosted runner
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.PAT_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner:   context.repo.owner,
-              repo:    context.repo.repo,
-              workflow_id: 'renew-myfxbook-token.yml',
-              ref:     'main',
-            });
-            console.log('Token renewal workflow dispatched.');
-
-  notify-blocked:
-    needs: fetch-sentiment
-    if: >
-      needs.fetch-sentiment.outputs.token_expired == 'true' &&
-      always()
-    runs-on: self-hosted
-    steps:
-      - name: Check email secrets
-        id: email_check
-        env:
-          NOTIFY_TO:       ${{ secrets.NOTIFY_EMAIL_TO }}
-          NOTIFY_FROM:     ${{ secrets.NOTIFY_EMAIL_FROM }}
-          NOTIFY_PASSWORD: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
-        run: |
-          if [ -n "$NOTIFY_TO" ] && [ -n "$NOTIFY_FROM" ] && [ -n "$NOTIFY_PASSWORD" ]; then
-            echo "send=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "send=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::NOTIFY_EMAIL_* secrets not configured — skipping alert email."
-          fi
-
-      - name: Send token expiry alert
-        if: steps.email_check.outputs.send == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port:    465
-          username:       ${{ secrets.NOTIFY_EMAIL_FROM }}
-          password:       ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
-          from:           "FX Dashboard <${{ secrets.NOTIFY_EMAIL_FROM }}>"
-          to:             ${{ secrets.NOTIFY_EMAIL_TO }}
-          subject:        "⚠️ Myfxbook token expired — renewal triggered"
-          body: |
-            The Myfxbook session token has expired.
-
-            The automatic renewal workflow has been triggered on your
-            self-hosted runner. It will renew the token as soon as your
-            PC is online and the runner picks up the job.
-
-            Dashboard is falling back to Dukascopy / static sources
-            in the meantime.
