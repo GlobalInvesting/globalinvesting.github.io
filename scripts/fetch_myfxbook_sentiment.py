@@ -105,24 +105,19 @@ try:
 except Exception:
     pass
 
-# Debug — log first symbol to see real field names
-symbols_raw = outlook.get("symbols", [])
-if symbols_raw:
-    print(f"[Debug] First symbol: {symbols_raw[0]}")
-
 # Normalize
 pairs = {}
-for s in symbols_raw:
+for s in outlook.get("symbols", []):
     name = (s.get("name") or "").upper().replace("/", "")
     if not name:
         continue
     pairs[name] = {
-        "longPct":   round(float(s.get("longsPercentage")  or 0), 1),
-        "shortPct":  round(float(s.get("shortsPercentage") or 0), 1),
+        "longPct":   round(float(s.get("longPercentage")  or 0), 1),
+        "shortPct":  round(float(s.get("shortPercentage") or 0), 1),
         "longVol":   float(s.get("longVolume")  or 0),
         "shortVol":  float(s.get("shortVolume") or 0),
-        "traders":   int(s.get("tradersCount")  or 0),
-        "positions": int(s.get("positionsCount") or 0),
+        "traders":   int(s.get("totalPositions")  or 0),
+        "positions": int(s.get("totalPositions") or 0),
     }
 
 general = outlook.get("general", {})
@@ -133,8 +128,8 @@ output = {
     "lastSuccessfulFetch": TIMESTAMP,
     "lastAttempt":         TIMESTAMP,
     "general": {
-        "longPct":  round(float(general.get("longsPercentage")  or 0), 1),
-        "shortPct": round(float(general.get("shortsPercentage") or 0), 1),
+        "longPct":  round(float(general.get("longPercentage")  or 0), 1),
+        "shortPct": round(float(general.get("shortPercentage") or 0), 1),
     },
     "pairs": pairs,
 }
