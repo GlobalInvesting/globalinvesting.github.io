@@ -84,7 +84,8 @@ except Exception as e:
 if data.get("error"):
     save_fallback(f"Login failed: {data.get('message', 'Unknown error')}")
 
-session = data.get("session", "")
+from urllib.parse import unquote
+session = unquote(data.get("session", ""))
 print("[Login] Success.")
 
 # Outlook
