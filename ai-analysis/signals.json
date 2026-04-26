@@ -1,66 +1,61 @@
 {
-  "generated_at": "2026-04-25T03:16:16Z",
+  "generated_at": "2026-04-26T22:31:57Z",
   "signals": [
     {
-      "time": "23:39",
+      "time": "22:30",
       "priority": "critical",
-      "title": "Oil / Geopolitical",
-      "text": "Watch for USD strength as WTI closed above $94.9 on Friday, with Hormuz crisis risks persisting.",
+      "title": "USD/JPY — Geopolitical + Carry",
+      "text": "USD/JPY at 159.55 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −80,578 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
       "evidence": [
-        "WTI closed at $94.9 on Friday",
-        "OCBC flags upside risks for USD/SGD due to Hormuz crisis"
+        "USD/JPY: 159.55",
+        "Fed 3.75% vs BoJ 0.75% — 300bp",
+        "JPY COT LF net short: −80,578"
       ]
     },
     {
-      "time": "21:04",
+      "time": "22:26",
       "priority": "warning",
-      "title": "USD/JPY Watch",
-      "text": "USD/JPY Friday close: 159.33, watch for key level at open, with BoJ meeting this week.",
+      "title": "CAD/EUR — G8 Bilateral Theme + Carry",
+      "text": "CAD leads G8 (+0.448% avg, 3 pairs) while EUR lags (−0.478% avg, 7 pairs); CAD/EUR spread at 0.926%. BoC 2.25% vs ECB 2.00% — 25bp CAD carry advantage drives the divergence.",
       "evidence": [
-        "USD/JPY Friday close: 159.33",
-        "BoJ meeting on 28 Apr"
+        "CAD 1W avg: +0.448% (n=3)",
+        "EUR 1W avg: -0.478% (n=7)",
+        "G8 spread: 0.926%",
+        "BoC 2.25% vs ECB 2.00% — 25bp"
       ]
     },
     {
-      "time": "03:15",
-      "priority": "info",
-      "title": "Yield Curve Note",
-      "text": "US yield curve in bull flattener regime (2s10s: +52.0bp), watch for implications on CB divergence.",
-      "evidence": [
-        "US 2s10s spread: +52.0bp",
-        "Regime: BULL FLATTENER"
-      ]
-    },
-    {
-      "time": "19:07",
+      "time": "22:31",
       "priority": "warning",
-      "title": "GBP Setup",
-      "text": "GBP/USD Friday close: 1.3532, BoE meeting this week, watch for key level at open.",
+      "title": "AUD/USD — Positioning + Vol",
+      "text": "AUD/USD COT LF net long +47,218 (bullish spec positioning) vs ATM IV 9.5% near HV. 25d RR at −0.10: mild put skew despite the bullish price trend — market hedging rather than chasing. AUD/USD at 0.7144; late-trend caution signal.",
       "evidence": [
-        "GBP/USD Friday close: 1.3532",
-        "BoE meeting on 30 Apr"
+        "AUD/USD COT LF net: +47,218",
+        "ATM IV: 9.5%",
+        "25d RR: −0.10",
+        "AUD/USD: 0.7144"
       ]
     },
     {
-      "time": "03:02",
+      "time": "22:18",
       "priority": "info",
-      "title": "COT Positioning",
-      "text": "AUD/USD net long COT positioning, AUD/USD Friday close: 0.7151, watch for reversal risk.",
+      "title": "GBP/USD — CB + Technical",
+      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry neutral; GBP/USD at 1.3515 mid-range. COT LF net long +33,517; positioning aligned with carry. Watch 1.3600 as next resistance.",
       "evidence": [
-        "AUD/USD net long COT",
-        "AUD/USD Friday close: 0.7151",
-        "AUD/USD retail short extreme"
+        "BoE 3.75% vs Fed 3.75% — 0bp",
+        "GBP LF net long: +33,517",
+        "GBP/USD: 1.3515"
       ]
     },
     {
-      "time": "03:07",
+      "time": "22:23",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "Watch for NZD/USD short-squeeze risk at the open, as COT net short -18,062 vs RBNZ hike bias (40% priced) — catalyst May 27 meeting.",
+      "text": "NZD/USD COT LF net short −18,062 vs RBNZ hike bias (40% priced for 27 May). Short-squeeze risk elevated if RBNZ delivers or signals hike. NZD/USD at 0.5872.",
       "evidence": [
-        "NZD/USD Friday close: 0.5881",
-        "COT NZD net short: -18,062",
-        "RBNZ hike bias: 40% priced"
+        "NZD COT LF net: −18,062",
+        "RBNZ hike prob: 40%",
+        "NZD/USD: 0.5872"
       ]
     }
   ]
