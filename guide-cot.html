@@ -612,7 +612,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <a class="toc-item" href="#long-pct">Long %</a>
     <a class="toc-item" href="#open-interest">Open Interest</a>
     <a class="toc-item" href="#cot-modal">COT Detail Modal</a>
-    <a class="toc-item" href="#tv-chart">TradingView Chart</a>
+    <a class="toc-item" href="#tv-chart">COT Detail Modal</a>
     <a class="toc-item" href="#categories">Trader Categories</a>
     <a class="toc-item" href="#signal-logic">Signal Logic</a>
     <a class="toc-item" href="#extremes">Positioning Extremes</a>
@@ -908,13 +908,16 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     </div>
 
     <div class="guide-section" id="tv-chart">
-      <h2>TradingView COT Chart</h2>
-      <p>The embedded TradingView widget in the main dashboard panel loads a COT chart for any currency when selected from the tabs above the chart. TradingView displays the CFTC data series with full zoom, indicators, and years of historical context — useful for identifying whether current positioning is at a multi-year extreme or merely elevated by recent standards.</p>
+      <h2>COT Detail Modal</h2>
+      <p>Clicking any row in the CFTC Positioning panel opens a full-screen COT Detail Modal — a native chart overlay built with LightweightCharts. The modal shows up to 52 weeks of positioning history for the selected currency across three switchable chart tabs:</p>
+      <ul style="margin:12px 0 12px 20px;line-height:1.8;color:var(--text2);">
+        <li><strong style="color:var(--text);">Net Bars</strong> — weekly bar chart of LF net contracts (longs minus shorts). Bars are rendered in the terminal's accent blue at full opacity for positive weeks and reduced opacity for negative weeks. Direction is unambiguous from the y-axis.</li>
+        <li><strong style="color:var(--text);">Long · Short</strong> — two-line overlay of LF longs (teal) and LF shorts (red) on the same scale. Where they converge, the net position approaches zero. Where they diverge, the gap is the absolute net. Useful for distinguishing whether net moves are driven by new positions being added or existing positions being unwound.</li>
+        <li><strong style="color:var(--text);">LF · AM · DD</strong> — three-line chart overlaying Leveraged Funds, Asset Manager, and Dealer net positions. LF = blue (#4f7fff), AM = orange (#ff9800), DD = red (#ef5350). A legend below the chart explains each category's typical behavior. Divergence between LF and AM is a common precursor to trend reversals.</li>
+      </ul>
+      <p>The modal header shows the currency name, the CFTC week-ending date of the most recent data point, and LF net contracts. Close the modal with the × button or by clicking outside it.</p>
       <div class="info-box">
-        <strong>Symbol format:</strong> TradingView uses CFTC contract codes to identify each currency's COT series. For example, EUR futures use the symbol <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">COT:099741_FO_LMP_L</code> — where <code style="font-family:var(--font-mono);font-size:11px;">099741</code> = EUR/USD CME CFTC code, <code style="font-family:var(--font-mono);font-size:11px;">FO</code> = Futures+Options Combined, <code style="font-family:var(--font-mono);font-size:11px;">LMP</code> = Leveraged Funds Positions, <code style="font-family:var(--font-mono);font-size:11px;">L</code> = Long. This is the same source type and trader category the terminal panel displays.
-      </div>
-      <div class="info-box" style="border-color:var(--orange);background:var(--bg2);">
-        <strong>Category alignment:</strong> The terminal panel shows <strong>Leveraged Funds</strong> (speculative) positioning. When reading the TradingView chart, make sure the symbol uses the <code style="font-family:var(--font-mono);font-size:11px;">_FO_LMP_L</code> suffix (Leveraged Funds Positions Long, Futures+Options), not <code style="font-family:var(--font-mono);font-size:11px;">_CP_L</code> (Commercial/hedgers). Commercial positions move inversely to speculative positions — comparing them directly leads to apparent divergences that are not real.
+        <strong>Data source:</strong> All three chart tabs read from the same <code style="font-family:var(--font-mono);font-size:11px;">cot-data/{ccy}.json</code> files used by the main panel — CFTC Disaggregated TFF report, Futures+Options Combined, updated weekly (Friday 21:30 UTC, within ~1 hour of CFTC publication).
       </div>
     </div>
 
@@ -1021,7 +1024,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · COT</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.39.5</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
 </footer>
 
 

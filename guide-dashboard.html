@@ -698,7 +698,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   <rect x="118" y="110" width="236" height="18" rx="2" fill="#2a2e39"/>
   <text x="124" y="123" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">AI Narrative · Regime</text>
   <rect x="118" y="132" width="236" height="18" rx="2" fill="#2a2e39"/>
-  <text x="124" y="145" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Price Chart (TradingView)</text>
+  <text x="124" y="145" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">Price Chart (LW Chart)</text>
   <rect x="118" y="154" width="236" height="18" rx="2" fill="#2a2e39"/>
   <text x="124" y="167" font-family="Inter,-apple-system,sans-serif" font-size="8.5" fill="#787b86">FX Pairs Table</text>
   <rect x="118" y="176" width="236" height="18" rx="2" fill="#2a2e39"/>
@@ -796,7 +796,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
-      <p>The scrolling headline strip below the quote bar shows the most recent FX-relevant headlines from RSS feeds (FXStreet, ForexLive, ECB, BoE, Investing.com and others), updated every hour by the engine. Headlines are color-tagged by currency when a specific pair is mentioned.</p>
+      <p>The scrolling headline strip below the quote bar shows the most recent FX-relevant headlines from RSS feeds (FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Investing.com, ForexCrunch, MarketPulse, DailyForex, ActionForex, BabyPips, FX Empire and others), updated every hour by the engine. The terminal re-checks for new data every 10 minutes. Headlines are color-tagged by currency when a specific pair is mentioned.</p>
     </div>
 
     <div class="guide-section" id="narrative">
@@ -828,9 +828,9 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="price-chart">
       <h2>Price Chart</h2>
-      <p>A full TradingView Advanced Chart embed supporting 20+ instruments accessible via the tab row above the chart: FX majors, crosses, Gold FUT, WTI FUT, DXY, S&amp;P 500, Nasdaq, Nikkei, BTC/USD, and ETH/USD. FX pairs use ICE Data Services as the data source for TradingView (e.g. <code>FX_IDC:EURUSD</code>), providing reliable real-time quotes directly on the chart.</p>
-      <p>The chart is embedded in a focused read-only view — fixed to candlestick style and Daily timeframe, with a 20-period MA overlay. Toolbars are intentionally hidden to keep the layout compact.</p>
-      <!-- MOCK: Price chart widget — mirrors actual TradingView embed (ICE source, EUR/USD 1D) -->
+      <p>A native LightweightCharts price chart — the primary chart for all symbols with OHLC data (all G8 FX majors and crosses, Gold FUT, WTI FUT, DXY, BTC/USD, and others). 22 instruments are accessible via the tab row above the chart. For symbols without OHLC data, the chart falls back to an embedded TradingView widget.</p>
+      <p>The LW chart loads in candlestick mode with a 3-month default range. The toolbar above the chart gives you full control: chart type (Candle / Bar / Line / Area), range (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change. FX pairs use ICE Data Services as the TradingView data source (e.g. <code>FX_IDC:EURUSD</code>).</p>
+      <!-- MOCK: LW Chart — EUR/USD daily, yfinance OHLC source -->
       <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
         <!-- Tab row -->
         <div style="background:#1a1d29;border-bottom:1px solid #2a2e39;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
@@ -851,7 +851,8 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         <div style="position:relative;background:#131722;">
           <!-- Symbol/source info bar -->
           <div style="padding:5px 10px 0;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:11px;font-weight:600;color:#d1d4dc;">Euro / U.S. Dollar · 1D · ICE</span>
+            <span style="font-size:11px;font-weight:600;color:#d1d4dc;">Euro / U.S. Dollar · 1D</span>
+            <span style="font-size:9px;color:var(--text3);margin-left:6px;">yfinance · ~5min delay</span>
             <span style="font-size:10px;color:#ef5350;">-0.00214 (-0.19%)</span>
           </div>
           <div style="padding:2px 10px 6px;">
@@ -935,7 +936,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
       <div class="callout callout-green">
-        <strong>Tip:</strong> Click the TradingView logo in the bottom-left corner of the chart to open it on TradingView.com with full functionality — all chart types, indicators, drawing tools, and timeframes.
+        <strong>Tip:</strong> When the TradingView fallback is active (symbols without OHLC data), click the TradingView logo in the bottom-left corner to open the chart on TradingView.com with full functionality — all chart types, indicators, drawing tools, and timeframes.
       </div>
     </div>
 
@@ -1062,7 +1063,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
 
       <h3 style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.1em;margin:28px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Currency Detail Modal</h3>
-      <p>Clicking any cell in the heatmap opens a full-screen detail modal for that currency. The modal organizes data into three tabs:</p>
+      <p>Clicking any cell in the heatmap opens a full-screen detail modal for that currency. The modal organizes data into four tabs:</p>
 
       <!-- MOCK: Heatmap modal tab bar -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
@@ -1075,6 +1076,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <div style="padding:7px 16px;font-size:11px;font-weight:700;color:var(--blue);border-bottom:2px solid var(--blue);">Pair Breakdown</div>
           <div style="padding:7px 16px;font-size:11px;color:var(--text3);border-bottom:2px solid transparent;">Session</div>
           <div style="padding:7px 16px;font-size:11px;color:var(--text3);border-bottom:2px solid transparent;">Correlations</div>
+          <div style="padding:7px 16px;font-size:11px;color:var(--text3);border-bottom:2px solid transparent;">CSI</div>
         </div>
         <div style="padding:12px 14px;">
           <div style="display:grid;grid-template-columns:1fr 60px 60px 80px 90px;gap:6px;margin-bottom:8px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">
@@ -1098,11 +1100,13 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
 
-      <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the 7 direct pairs for the selected currency with close price, previous close, percentage change, and a proportional impact bar. A composite ranking row shows the full 8-currency strength order with animated horizontal bars. The impact bar distinguishes individual pair movement from the currency's composite strength contribution — the same convention used on Bloomberg and Eikon FX strength monitors.</p>
+      <p><strong style="color:var(--text);">Pair Breakdown</strong> — shows the 7 direct pairs for the selected currency with close price, previous close, percentage change, day % and 1W %, and a proportional impact bar. A composite ranking row shows the full 8-currency strength order with animated horizontal bars. The metrics strip above the table shows six tiles: Composite (intraday), 1W Strength, Rank, Pairs won, Strongest vs, and Weakest vs.</p>
 
-      <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise, Bloomberg-style recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 12&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
+      <p><strong style="color:var(--text);">Session</strong> — shows the selected currency's strength contribution weighted by trading session volume (New York 38%, London 35%, Tokyo 18%, Sydney 9%). The active session is highlighted in blue. Below the session bars, an <strong>AI Session Context</strong> block provides per-session notes for the currency: a concise recap of the catalyst that drove price action in each session (CLOSED), current session dynamics (ACTIVE), and the upcoming scheduled event to watch (UPCOMING). Session context notes are generated 12&times; daily alongside the main narrative and are grounded in actual economic calendar events. All displayed times are converted to your local timezone.</p>
 
-      <p><strong style="color:var(--text);">Correlations</strong> — shows an 8&times;8 strength differential matrix: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>.</p>
+      <p><strong style="color:var(--text);">Correlations</strong> — shows an 8&times;8 strength differential matrix with a Composite column: each cell is the composite % difference between the row currency and the column currency, with color intensity proportional to the divergence. Below the matrix, a <strong>Strength Drivers</strong> block lists the top 3 pairs by absolute contribution, each with an AI-generated one-line note (max 85 characters) explaining the structural driver — CB stance differential, COT positioning extreme, or carry differential. Attribution footer: <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);">AI Analytics &middot; ~5min delay</span>. Clicking any row in the Key Correlations panel (right panel) opens a dedicated correlation modal with a 252-day history sparkline showing real calendar dates, z-score, and a regime signal.</p>
+
+      <p><strong style="color:var(--text);">CSI</strong> — Currency Strength Index: a multi-series LightweightCharts chart showing the cumulative log-return of all 8 G8 currencies over selectable periods (1M / 3M / 6M / 1Y / All). Computed from the full OHLC dataset across all 28 pairs — the same data as the heatmap. The focal currency's line is highlighted; all series start at 0% at the beginning of the selected period. A crosshair tooltip shows all 8 values simultaneously ordered strongest to weakest. A legend table below shows cumulative return, min, max, and range for each currency over the period.</p>
 
       <div class="callout callout-orange">
         <strong>Note on session attribution:</strong> The session-weighted composite in the Session tab is a volume-proxy decomposition of the intraday move. Exact per-session attribution requires tick data, which is not publicly available. Treat session contributions as directional indicators, not precise measurements.
@@ -1228,7 +1232,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 16px;">Color coding: <span style="color:var(--up);">green</span> = carry-to-vol &gt; 0.30 (strong), neutral = 0.12–0.30, <span style="color:var(--text3);">dim</span> = &lt; 0.12 (weak). The spread column shows the gross rate differential (long-leg rate minus short-leg rate) — the raw carry available before adjusting for volatility.</p>
       <h3>Upcoming Events</h3>
-      <p>A TradingView economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times in UTC. Use this to anticipate volatility windows before they arrive.</p>
+      <p>A Myfxbook economic calendar widget embedded at the bottom of the left sidebar, showing the next scheduled high-impact macro events (FOMC, ECB, NFP, CPI, etc.) with their expected release times. Use this to anticipate volatility windows before they arrive.</p>
     </div>
 
     <div class="guide-section" id="right-panel">
@@ -1335,7 +1339,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
 
       <h3>Key Correlations</h3>
-      <p>Rolling Pearson correlations between 12 FX-relevant pairs and reference assets, computed from yfinance data. Three lookback windows are available — <strong>30d</strong>, <strong>60d</strong>, and <strong>90d</strong> — selectable via the buttons in the panel header (60d is the default). The table includes a <strong>vs norm</strong> column showing how far the current correlation deviates from its 252-day historical baseline, expressed as a z-score. The z-score is always computed against the 60d baseline regardless of which window is active, keeping the historical norm stable across window switches. Pairs deviating more than 1.5σ from their historical norm are flagged as potential regime breaks — a broken correlation is often as informative as the correlation itself.</p>
+      <p>Rolling Pearson correlations between 12 FX-relevant pairs and reference assets, computed from yfinance data. Three lookback windows are available — <strong>30d</strong>, <strong>60d</strong>, and <strong>90d</strong> — selectable via the buttons in the panel header (60d is the default). The table includes a <strong>vs norm</strong> column showing how far the current 30d correlation deviates from its 252-day historical baseline, expressed as a z-score. The baseline is the mean of all rolling 30-day Pearson windows over the past 252 trading days — keeping the norm horizon consistent with the current correlation regardless of which display window (30d/60d/90d) is selected. Pairs deviating more than 1.5σ from their historical norm are flagged as stretched; above 2.5σ as a break — a broken correlation is often as informative as the correlation itself. Clicking any row opens a detail modal with a 252-day sparkline on real calendar dates, z-score, 30d/60d/90d snapshots, and a regime signal indicator.</p>
       <p>Two pairs monitor macro regime specifically: <strong>DXY vs SPX</strong> (normally negative — a positive reading signals USD funding stress) and <strong>Gold vs DXY</strong> (normally negative — a positive reading signals the safe-haven model is broken or inflation is driving both).</p>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:300px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;">
@@ -1442,7 +1446,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
     <div class="guide-section" id="news-feed">
       <h2>News Feed</h2>
-      <p>FX-relevant headlines from FXStreet, ForexLive, ECB, BoE, Investing.com and others, filtered and sorted by estimated market impact. Each item shows the timestamp, headline, currency tag for the pairs most likely affected, and the source. The feed is updated every hour.</p>
+      <p>FX-relevant headlines from FXStreet, ForexLive, Reuters FX, ECB, BoE, BoJ, RBA, RBNZ, BoC, SNB, Federal Reserve, Investing.com, ForexCrunch, MarketPulse, DailyForex, ActionForex, BabyPips, FX Empire and others, filtered and sorted by estimated market impact. Each item shows the timestamp, headline, currency tag for the pairs most likely affected, and the source. The engine updates the feed every hour; the terminal re-checks for new data every 10 minutes.</p>
       <!-- MOCK: News feed -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;justify-content:space-between;">
@@ -1582,7 +1586,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.39.5</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
 </footer>
 
 
