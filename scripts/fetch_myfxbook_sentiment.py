@@ -1,31 +1,40 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v6.0 — single-call CF Worker proxy
+fetch_myfxbook_sentiment.py  v7.0 — pre-authenticated session token
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  sentiment-data/myfxbook.json
-Schedule: Each hour on business days (via GitHub Action in public repo)
+Schedule: Each hour (via GitHub Action in public repo)
 
-WHAT CHANGED IN v6.0 (vs v5.0):
-  v5.0 called the CF Worker three times: login → outlook → logout.
-  Myfxbook sessions are IP-bound — that architecture was correct in
-  principle (all three calls went through the same CF edge IP), but
-  Myfxbook's anti-bot layer detected the automated multi-call pattern
-  and responded with "Wrong email/password" — a generic block that
-  makes credentials look wrong when they are not.
+WHAT CHANGED IN v7.0 (vs v6.0):
+  Myfxbook blocks login requests from Cloudflare Workers IP ranges.
+  The login API works from a browser but returns "Wrong email/password"
+  from CF datacenter IPs — regardless of credentials or architecture.
 
-  v6.0 sends a single POST to the Worker with the credentials.
-  The Worker handles login + outlook + logout internally and returns
-  only the normalized pair data. The session token never leaves
-  Cloudflare's network. One request = one browser-like session.
+  Solution: remove the login step entirely.
+  - The session token is obtained once per month by the user visiting:
+      https://www.myfxbook.com/api/login.json?email=EMAIL&password=PASSWORD
+    in their browser and copying the session value.
+  - That token is stored as MYFXBOOK_SESSION in GitHub secrets.
+  - This script POSTs the token to the CF Worker, which calls only the
+    get-community-outlook endpoint (not blocked from CF IPs).
+  - When the token expires (~1 month), the script exits gracefully with
+    apiBlocked=true and logs a clear renewal instruction.
 
-  The CF Worker must be updated to v2.0 to match this interface.
+HOW TO RENEW THE SESSION TOKEN (once per month):
+  1. Open in your browser:
+     https://www.myfxbook.com/api/login.json?email=YOUR_EMAIL&password=YOUR_PASSWORD
+  2. Copy the value of the "session" field from the JSON response.
+  3. Go to GitHub repo → Settings → Secrets → Actions → MYFXBOOK_SESSION
+  4. Update the secret with the new session value.
+  The next workflow run will pick it up automatically.
 
-CREDENTIALS (GitHub Secrets — set in repo Settings → Secrets → Actions):
-  MYFXBOOK_EMAIL    — Myfxbook account email
-  MYFXBOOK_PASSWORD — Myfxbook account password
-  CF_WORKER_URL     — Full URL of deployed Cloudflare Worker
-                      e.g. https://myfxbook-proxy.YOUR_SUBDOMAIN.workers.dev
-  CF_WORKER_SECRET  — Shared secret (must match WORKER_SECRET env var in CF)
+SECRETS REQUIRED:
+  MYFXBOOK_SESSION  — session token from manual browser login (renew monthly)
+  CF_WORKER_URL     — Cloudflare Worker URL
+  CF_WORKER_SECRET  — shared secret (matches WORKER_SECRET in CF env vars)
+
+SECRETS NO LONGER NEEDED (can be deleted):
+  MYFXBOOK_EMAIL, MYFXBOOK_PASSWORD
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -38,17 +47,14 @@ except ImportError:
     print("[ERROR] requests not installed. Run: pip install requests")
     sys.exit(1)
 
-MYFXBOOK_EMAIL    = os.environ.get("MYFXBOOK_EMAIL",    "")
-MYFXBOOK_PASSWORD = os.environ.get("MYFXBOOK_PASSWORD", "")
-CF_WORKER_URL     = os.environ.get("CF_WORKER_URL",     "").rstrip("/")
-CF_WORKER_SECRET  = os.environ.get("CF_WORKER_SECRET",  "")
+MYFXBOOK_SESSION = os.environ.get("MYFXBOOK_SESSION", "")
+CF_WORKER_URL    = os.environ.get("CF_WORKER_URL",    "").rstrip("/")
+CF_WORKER_SECRET = os.environ.get("CF_WORKER_SECRET", "")
 
-TIMEOUT     = 30   # seconds — Worker needs time to complete its internal flow
+TIMEOUT     = 30
 MAX_RETRIES = 3
-RETRY_DELAY = 5    # seconds (doubles on each retry)
+RETRY_DELAY = 5   # seconds (doubles on each retry)
 
-
-# ── Helpers ────────────────────────────────────────────────────────────────
 
 def preserve_existing(out_file, ts, reason):
     """Mark existing JSON with apiBlocked=true and exit 0 (non-fatal)."""
@@ -78,22 +84,17 @@ def preserve_existing(out_file, ts, reason):
 
 
 def call_worker(out_file, ts):
-    """
-    POST credentials to the CF Worker.
-    The Worker handles login + outlook + logout and returns normalized data.
-    Returns parsed JSON on success; calls preserve_existing() on any failure.
-    """
-    url     = CF_WORKER_URL
+    """POST session token to the CF Worker. Returns parsed data on success."""
     headers = {
         "X-Worker-Secret": CF_WORKER_SECRET,
         "Content-Type":    "application/json",
     }
-    payload = {"email": MYFXBOOK_EMAIL, "password": MYFXBOOK_PASSWORD}
+    payload = {"session": MYFXBOOK_SESSION}
 
     for attempt in range(MAX_RETRIES):
         delay = RETRY_DELAY * (2 ** attempt)
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=TIMEOUT)
+            r = requests.post(CF_WORKER_URL, headers=headers, json=payload, timeout=TIMEOUT)
         except requests.exceptions.Timeout:
             print(f"[Worker] Timeout on attempt {attempt + 1}. Waiting {delay}s...")
             time.sleep(delay)
@@ -103,14 +104,12 @@ def call_worker(out_file, ts):
             time.sleep(delay)
             continue
 
-        # Auth / config errors returned as 4xx/5xx — not retryable
         if r.status_code == 401:
             preserve_existing(out_file, ts,
-                "Worker returned 401 — check CF_WORKER_SECRET matches Worker WORKER_SECRET env var.")
+                "Worker returned 401 — check CF_WORKER_SECRET matches WORKER_SECRET in Cloudflare.")
         if r.status_code == 500:
             preserve_existing(out_file, ts,
                 "Worker returned 500 — WORKER_SECRET env var not set in Cloudflare dashboard.")
-
         if r.status_code == 429:
             print(f"[Worker] HTTP 429 — rate limited. Waiting {delay}s...")
             time.sleep(delay)
@@ -127,18 +126,23 @@ def call_worker(out_file, ts):
             time.sleep(delay)
             continue
 
-        # Worker always returns { ok: true|false }
         if not data.get("ok"):
             err = data.get("error", "unknown worker error")
-            print(f"[Worker] Worker reported failure: {err}")
+            # Detect session expiry explicitly so the log message is actionable.
+            if "expired" in err.lower() or "renew" in err.lower():
+                print(f"\n[Session] TOKEN EXPIRED — renew MYFXBOOK_SESSION secret:")
+                print(f"  1. Open in browser: https://www.myfxbook.com/api/login.json"
+                      f"?email=YOUR_EMAIL&password=YOUR_PASSWORD")
+                print(f"  2. Copy the 'session' value from the JSON response.")
+                print(f"  3. Update GitHub secret MYFXBOOK_SESSION with the new value.")
+            else:
+                print(f"[Worker] Worker reported failure: {err}")
             preserve_existing(out_file, ts, err)
 
-        return data   # { ok: true, pairs: [...], general: {...}|null }
+        return data
 
     preserve_existing(out_file, ts, f"Worker call failed after {MAX_RETRIES} attempts.")
 
-
-# ── Main ───────────────────────────────────────────────────────────────────
 
 def main():
     site_path = os.environ.get("SITE_PATH", ".")
@@ -148,22 +152,24 @@ def main():
 
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"\n{'='*60}")
-    print(f"fetch_myfxbook_sentiment.py  v6.0  --  {ts}")
+    print(f"fetch_myfxbook_sentiment.py  v7.0  --  {ts}")
     print(f"{'='*60}\n")
 
-    # Validate required env vars
-    missing = [v for v in ["MYFXBOOK_EMAIL", "MYFXBOOK_PASSWORD", "CF_WORKER_URL", "CF_WORKER_SECRET"]
+    missing = [v for v in ["MYFXBOOK_SESSION", "CF_WORKER_URL", "CF_WORKER_SECRET"]
                if not os.environ.get(v)]
     if missing:
         print(f"[ERROR] Missing env vars: {', '.join(missing)}")
-        print(f"        Set them as GitHub Secrets in repo Settings → Secrets → Actions.")
+        if "MYFXBOOK_SESSION" in missing:
+            print(f"\n  To get the session token, open this URL in your browser:")
+            print(f"  https://www.myfxbook.com/api/login.json?email=YOUR_EMAIL&password=YOUR_PASSWORD")
+            print(f"  Copy the 'session' value and save it as GitHub secret MYFXBOOK_SESSION.")
         sys.exit(1)
 
     print(f"[Config] Worker:  {CF_WORKER_URL}")
-    print(f"[Config] Account: {MYFXBOOK_EMAIL}")
-    print(f"\n[Worker] Sending single POST — Worker will handle login + outlook + logout...")
+    print(f"[Config] Session: {MYFXBOOK_SESSION[:8]}...  (first 8 chars)")
+    print(f"\n[Worker] POSTing session token — Worker will fetch community outlook...")
 
-    data  = call_worker(out_file, ts)
+    data    = call_worker(out_file, ts)
     pairs   = data.get("pairs",   [])
     general = data.get("general", None)
 
@@ -175,7 +181,6 @@ def main():
         bias = "LONG " if p["long"] >= p["short"] else "SHORT"
         print(f"  {p['sym']:10s}  long={p['long']:3d}%  short={p['short']:3d}%  [{bias}]")
 
-    # Write JSON
     output = {
         "updated":    ts,
         "source":     "myfxbook",
