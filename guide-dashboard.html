@@ -792,7 +792,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <h3>Quote bar</h3>
       <p>The horizontal strip below the topbar shows live prices for EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CAD, USD/CHF, NZD/USD, EUR/GBP, GOLD FUT, WTI FUT, BTC/USD, US 10Y Yield, and DXY. Prices are sourced from yfinance (~5 min delay during market hours). Frankfurter/ECB rates serve as a silent fallback only when yfinance data is unavailable.</p>
       <div class="callout">
-        <strong>Update cadence:</strong> FX rates in the quote bar are sourced from yfinance and update every 5 minutes during market hours. The quote bar displays the most recently committed data (~5 min delay). For real-time tick data, use the TradingView price chart in the main panel.
+        <strong>Update cadence:</strong> FX rates in the quote bar are sourced from yfinance and update every 5 minutes during market hours. The quote bar displays the most recently committed data (~5 min delay). Click any pair to jump directly to the price chart with that symbol pre-selected.
       </div>
       <p>Click any pair in the quote bar to jump to the Price Chart with that symbol pre-selected.</p>
       <h3>News ticker</h3>
@@ -829,114 +829,404 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <div class="guide-section" id="price-chart">
       <h2>Price Chart</h2>
       <p>A native LightweightCharts price chart — the primary chart for all symbols with OHLC data (all G8 FX majors and crosses, Gold FUT, WTI FUT, DXY, BTC/USD, and others). 22 instruments are accessible via the tab row above the chart. For symbols without OHLC data, the chart falls back to an embedded TradingView widget.</p>
-      <p>The LW chart loads in candlestick mode with a 3-month default range. The toolbar above the chart gives you full control: chart type (Candle / Bar / Line / Area), range (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change. FX pairs use ICE Data Services as the TradingView data source (e.g. <code>FX_IDC:EURUSD</code>).</p>
-      <!-- MOCK: LW Chart — EUR/USD daily, yfinance OHLC source -->
-      <div style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
-        <!-- Tab row -->
-        <div style="background:#1a1d29;border-bottom:1px solid #2a2e39;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;">
-          <div style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #4f7fff;white-space:nowrap;cursor:pointer;">EUR/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">AUD/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/CAD</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">USD/CHF</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">NZD/USD</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/GBP</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">EUR/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">GBP/JPY</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">Gold FUT</div>
-          <div style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;">DXY</div>
+      <p>The LW chart loads in candlestick mode with a 3-month default range. The toolbar above the chart gives you full control: chart type (Candle / Bar / Line / Area), range (3M / 6M / 1Y / 3Y / ALL), overlay toggles (WM — symbol watermark; PC — previous close line; VOL — volume histogram; CB — central bank meeting markers), logarithmic scale, and a multi-MA selector (periods: 5, 10, 20, 50, 100, 200 — up to three simultaneous MAs). The OHLC header updates on hover showing O/H/L/C values and the daily change.</p>
+      <!-- MOCK: interactive LightweightCharts v5 — EUR/USD hardcoded OHLC, mirrors terminal -->
+      <div id="guide-chart-wrap" style="background:#131722;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;">
+        <!-- Tab row — scroll-able, matches terminal exactly -->
+        <div style="background:#1a1d29;border-bottom:1px solid #2a2e39;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+          <div id="gct-eurusd" class="gct" style="padding:5px 10px;font-size:10px;font-weight:700;color:#fff;border-bottom:2px solid #4f7fff;white-space:nowrap;cursor:pointer;flex-shrink:0;">EUR/USD</div>
+          <div id="gct-usdjpy" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">USD/JPY</div>
+          <div id="gct-gbpusd" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">GBP/USD</div>
+          <div id="gct-audusd" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">AUD/USD</div>
+          <div id="gct-usdcad" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">USD/CAD</div>
+          <div id="gct-usdchf" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">USD/CHF</div>
+          <div id="gct-nzdusd" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">NZD/USD</div>
+          <div id="gct-eurgbp" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">EUR/GBP</div>
+          <div id="gct-eurjpy" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">EUR/JPY</div>
+          <div id="gct-gbpjpy" class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">GBP/JPY</div>
+          <div id="gct-gold"   class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">Gold FUT</div>
+          <div id="gct-dxy"    class="gct" style="padding:5px 10px;font-size:10px;color:#787b86;white-space:nowrap;cursor:pointer;flex-shrink:0;border-bottom:2px solid transparent;">DXY</div>
         </div>
-        <!-- Chart area — realistic TradingView-style with y-axis, peak in Feb, decline to Apr -->
-        <div style="position:relative;background:#131722;">
-          <!-- Symbol/source info bar -->
-          <div style="padding:5px 10px 0;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:11px;font-weight:600;color:#d1d4dc;">Euro / U.S. Dollar · 1D</span>
-            <span style="font-size:9px;color:var(--text3);margin-left:6px;">yfinance · ~5min delay</span>
-            <span style="font-size:10px;color:#ef5350;">-0.00214 (-0.19%)</span>
-          </div>
-          <div style="padding:2px 10px 6px;">
-            <span style="font-size:10px;color:#4f7fff;font-family:monospace;">MA 20  close</span>
-          </div>
-          <!-- Main chart SVG -->
-          <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
-            <!-- Y-axis price labels -->
-            <text x="638" y="18" fill="#787b86" font-size="8.5" font-family="monospace">1.2000</text>
-            <text x="638" y="60" fill="#787b86" font-size="8.5" font-family="monospace">1.1800</text>
-            <text x="638" y="102" fill="#787b86" font-size="8.5" font-family="monospace">1.1600</text>
-            <text x="638" y="144" fill="#787b86" font-size="8.5" font-family="monospace">1.1400</text>
-            <text x="638" y="186" fill="#787b86" font-size="8.5" font-family="monospace">1.1200</text>
-            <!-- Y-axis grid lines -->
-            <line x1="0" y1="14" x2="632" y2="14" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="56" x2="632" y2="56" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="98" x2="632" y2="98" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="140" x2="632" y2="140" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="182" x2="632" y2="182" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <!-- Dec candles: rising from ~1.142 → ~1.152 (y≈155→125) -->
-            <line x1="15" y1="150" x2="15" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="12" y="155" width="7" height="9" fill="#26a69a"/>
-            <line x1="28" y1="143" x2="28" y2="160" stroke="#ef5350" stroke-width="1"/><rect x="25" y="147" width="7" height="10" fill="#ef5350"/>
-            <line x1="41" y1="138" x2="41" y2="155" stroke="#26a69a" stroke-width="1"/><rect x="38" y="141" width="7" height="9" fill="#26a69a"/>
-            <line x1="54" y1="135" x2="54" y2="151" stroke="#26a69a" stroke-width="1"/><rect x="51" y="138" width="7" height="8" fill="#26a69a"/>
-            <line x1="67" y1="132" x2="67" y2="148" stroke="#ef5350" stroke-width="1"/><rect x="64" y="135" width="7" height="9" fill="#ef5350"/>
-            <line x1="80" y1="128" x2="80" y2="143" stroke="#26a69a" stroke-width="1"/><rect x="77" y="130" width="7" height="8" fill="#26a69a"/>
-            <!-- 2026 label -->
-            <text x="90" y="196" fill="#787b86" font-size="8.5" font-family="monospace">2026</text>
-            <!-- Jan candles: ~1.152→1.165 (y≈125→95) -->
-            <line x1="95" y1="120" x2="95" y2="136" stroke="#26a69a" stroke-width="1"/><rect x="92" y="122" width="7" height="9" fill="#26a69a"/>
-            <line x1="108" y1="117" x2="108" y2="133" stroke="#26a69a" stroke-width="1"/><rect x="105" y="119" width="7" height="9" fill="#26a69a"/>
-            <line x1="121" y1="114" x2="121" y2="130" stroke="#ef5350" stroke-width="1"/><rect x="118" y="117" width="7" height="9" fill="#ef5350"/>
-            <line x1="134" y1="110" x2="134" y2="126" stroke="#26a69a" stroke-width="1"/><rect x="131" y="112" width="7" height="9" fill="#26a69a"/>
-            <line x1="147" y1="105" x2="147" y2="120" stroke="#26a69a" stroke-width="1"/><rect x="144" y="107" width="7" height="8" fill="#26a69a"/>
-            <line x1="160" y1="100" x2="160" y2="116" stroke="#ef5350" stroke-width="1"/><rect x="157" y="103" width="7" height="9" fill="#ef5350"/>
-            <!-- Feb label -->
-            <text x="175" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Feb</text>
-            <!-- Feb candles: peak at ~1.20 (y≈14) then start declining -->
-            <line x1="178" y1="60" x2="178" y2="76" stroke="#26a69a" stroke-width="1"/><rect x="175" y="62" width="7" height="9" fill="#26a69a"/>
-            <line x1="191" y1="32" x2="191" y2="50" stroke="#26a69a" stroke-width="1"/><rect x="188" y="35" width="7" height="10" fill="#26a69a"/>
-            <line x1="204" y1="18" x2="204" y2="38" stroke="#26a69a" stroke-width="1"/><rect x="201" y="20" width="7" height="12" fill="#26a69a"/>
-            <!-- Peak candle -->
-            <line x1="217" y1="16" x2="217" y2="28" stroke="#ef5350" stroke-width="1"/><rect x="214" y="19" width="7" height="8" fill="#ef5350"/>
-            <line x1="230" y1="22" x2="230" y2="42" stroke="#ef5350" stroke-width="1"/><rect x="227" y="25" width="7" height="12" fill="#ef5350"/>
-            <line x1="243" y1="36" x2="243" y2="56" stroke="#ef5350" stroke-width="1"/><rect x="240" y="38" width="7" height="13" fill="#ef5350"/>
-            <!-- Mar label -->
-            <text x="258" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Mar</text>
-            <!-- Mar candles: declining ~1.185→1.150 (y≈56→128) -->
-            <line x1="262" y1="54" x2="262" y2="74" stroke="#ef5350" stroke-width="1"/><rect x="259" y="57" width="7" height="13" fill="#ef5350"/>
-            <line x1="275" y1="70" x2="275" y2="90" stroke="#ef5350" stroke-width="1"/><rect x="272" y="73" width="7" height="12" fill="#ef5350"/>
-            <line x1="288" y1="80" x2="288" y2="100" stroke="#26a69a" stroke-width="1"/><rect x="285" y="83" width="7" height="12" fill="#26a69a"/>
-            <line x1="301" y1="90" x2="301" y2="110" stroke="#ef5350" stroke-width="1"/><rect x="298" y="93" width="7" height="12" fill="#ef5350"/>
-            <line x1="314" y1="100" x2="314" y2="120" stroke="#ef5350" stroke-width="1"/><rect x="311" y="103" width="7" height="12" fill="#ef5350"/>
-            <line x1="327" y1="108" x2="327" y2="128" stroke="#26a69a" stroke-width="1"/><rect x="324" y="111" width="7" height="12" fill="#26a69a"/>
-            <line x1="340" y1="115" x2="340" y2="135" stroke="#ef5350" stroke-width="1"/><rect x="337" y="118" width="7" height="12" fill="#ef5350"/>
-            <!-- Apr label -->
-            <text x="355" y="196" fill="#787b86" font-size="8.5" font-family="monospace">Apr</text>
-            <!-- Apr candles: ~1.148-1.155 recovering slightly (y≈130→110) -->
-            <line x1="358" y1="128" x2="358" y2="148" stroke="#26a69a" stroke-width="1"/><rect x="355" y="131" width="7" height="12" fill="#26a69a"/>
-            <line x1="371" y1="122" x2="371" y2="142" stroke="#26a69a" stroke-width="1"/><rect x="368" y="125" width="7" height="12" fill="#26a69a"/>
-            <line x1="384" y1="126" x2="384" y2="146" stroke="#ef5350" stroke-width="1"/><rect x="381" y="129" width="7" height="12" fill="#ef5350"/>
-            <line x1="397" y1="120" x2="397" y2="140" stroke="#26a69a" stroke-width="1"/><rect x="394" y="123" width="7" height="12" fill="#26a69a"/>
-            <!-- MA 20 line: rises Dec→Feb peak, falls Mar→Apr -->
-            <polyline points="15,160 67,148 95,132 147,112 178,68 204,30 230,36 262,62 288,88 327,114 358,132 397,124" fill="none" stroke="#4f7fff" stroke-width="1.5" opacity="0.85"/>
-            <!-- Right side price badges -->
-            <rect x="613" y="116" width="54" height="15" rx="2" fill="#ef5350"/>
-            <text x="616" y="127" fill="#fff" font-size="8.5" font-family="monospace">1.15439</text>
-            <rect x="613" y="133" width="54" height="15" rx="2" fill="#26a69a"/>
-            <text x="616" y="144" fill="#fff" font-size="8.5" font-family="monospace">1.15165</text>
-            <!-- Current price dashed line -->
-            <line x1="0" y1="131" x2="612" y2="131" stroke="#ef5350" stroke-width="0.5" stroke-dasharray="3,3" opacity="0.6"/>
-            <!-- TradingView TV logo bottom left -->
-            <rect x="8" y="174" width="22" height="18" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
-            <text x="11" y="187" fill="#4f7fff" font-size="9" font-weight="bold" font-family="sans-serif">TV</text>
-            <!-- ICE badge top right -->
-            <rect x="594" y="4" width="30" height="14" rx="2" fill="#1e222d" stroke="#2a2e39" stroke-width="1"/>
-            <text x="597" y="14" fill="#787b86" font-size="8" font-family="monospace">ICE</text>
-            <!-- Time axis bottom line -->
-            <line x1="0" y1="192" x2="632" y2="192" stroke="#2a2e39" stroke-width="0.7"/>
+        <!-- Range + toolbar bar — matches terminal layout -->
+        <div style="display:flex;align-items:center;gap:2px;padding:3px 8px;background:#1a1d29;border-bottom:1px solid #2a2e39;flex-wrap:wrap;">
+          <button class="gct-rb active-rb" data-days="91"  style="flex-shrink:0;">3M</button>
+          <button class="gct-rb"           data-days="182" style="flex-shrink:0;">6M</button>
+          <button class="gct-rb"           data-days="365" style="flex-shrink:0;">1Y</button>
+          <button class="gct-rb"           data-days="1095"style="flex-shrink:0;">3Y</button>
+          <button class="gct-rb"           data-days="0"   style="flex-shrink:0;">ALL</button>
+          <span style="width:1px;height:14px;background:#2a2e39;margin:0 4px;flex-shrink:0;display:inline-block;"></span>
+          <button class="gct-tb active-tb" id="gct-candle" style="flex-shrink:0;">Candle</button>
+          <button class="gct-tb"           id="gct-bar"    style="flex-shrink:0;margin-left:2px;">Bar</button>
+          <button class="gct-tb"           id="gct-line"   style="flex-shrink:0;margin-left:2px;">Line</button>
+          <button class="gct-tb"           id="gct-area"   style="flex-shrink:0;margin-left:2px;">Area</button>
+          <span style="width:1px;height:14px;background:#2a2e39;margin:0 4px;flex-shrink:0;display:inline-block;"></span>
+          <button class="gct-tb"           id="gct-wm"     style="flex-shrink:0;">WM</button>
+          <button class="gct-tb on-tb"     id="gct-pc"     style="flex-shrink:0;margin-left:2px;">PC</button>
+          <button class="gct-tb"           id="gct-vol"    style="flex-shrink:0;margin-left:2px;">VOL</button>
+          <button class="gct-tb on-tb"     id="gct-cb"     style="flex-shrink:0;margin-left:2px;">CB</button>
+          <span style="width:1px;height:14px;background:#2a2e39;margin:0 4px;flex-shrink:0;display:inline-block;"></span>
+          <button class="gct-tb"           id="gct-log"    style="flex-shrink:0;">LOG</button>
+          <span style="width:1px;height:14px;background:#2a2e39;margin:0 4px;flex-shrink:0;display:inline-block;"></span>
+          <button class="gct-tb"           id="gct-ma"     style="flex-shrink:0;">MA</button>
+        </div>
+        <!-- OHLC header bar -->
+        <div id="gct-ohlc-bar" style="display:flex;align-items:center;gap:10px;padding:4px 10px;background:#131722;font-size:10px;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #2a2e39;min-height:24px;">
+          <span style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:Inter,sans-serif;">EUR / U.S. Dollar &middot; 1D</span>
+          <span style="font-size:9px;color:#6b7280;margin-left:2px;">yfinance &middot; ~5min delay</span>
+          <span id="gct-ohlc-vals" style="display:flex;gap:8px;margin-left:4px;">
+            <span><span style="color:#6b7280;font-size:9px;">O </span><span id="gct-o" style="color:#d1d4dc;">1.1502</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">H </span><span id="gct-h" style="color:#26a69a;">1.1527</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">L </span><span id="gct-l" style="color:#ef5350;">1.1510</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">C </span><span id="gct-c" style="color:#d1d4dc;">1.1517</span></span>
+            <span id="gct-chg" style="color:#ef5350;">-0.00214 (-0.19%)</span>
+          </span>
+          <span id="gct-ma-legend" style="color:#2196f3;font-size:10px;margin-left:4px;display:none;">MA 20 &nbsp;1.1423</span>
+        </div>
+        <!-- Chart container — static SVG candles visible immediately; replaced by LWC on load -->
+        <div id="gct-container" style="width:100%;height:260px;background:#131722;position:relative;">
+          <svg id="gct-static-svg" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;top:0;left:0;">
+            <!-- Grid lines -->
+            <line x1="0" y1="26"  x2="650" y2="26"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="78"  x2="650" y2="78"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="130" x2="650" y2="130" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="182" x2="650" y2="182" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="234" x2="650" y2="234" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <!-- Y-axis labels -->
+            <text x="654" y="30"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.2000</text>
+            <text x="654" y="82"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1700</text>
+            <text x="654" y="134" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1400</text>
+            <text x="654" y="186" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1100</text>
+            <text x="654" y="238" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.0800</text>
+            <!-- Time axis -->
+            <line x1="0" y1="248" x2="650" y2="248" stroke="#2a2e39" stroke-width="0.8"/>
+            <text x="12"  y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Dec</text>
+            <text x="152" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Jan</text>
+            <text x="292" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Feb</text>
+            <text x="412" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Mar</text>
+            <text x="532" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Apr</text>
+            <!-- Dec candles: rising ~1.052→1.098 (y≈217→186) -->
+            <line x1="18"  y1="213" x2="18"  y2="220" stroke="#26a69a" stroke-width="1"/><rect x="15"  y="214" width="6" height="6"  fill="#26a69a"/>
+            <line x1="28"  y1="210" x2="28"  y2="217" stroke="#26a69a" stroke-width="1"/><rect x="25"  y="211" width="6" height="5"  fill="#26a69a"/>
+            <line x1="38"  y1="205" x2="38"  y2="213" stroke="#ef5350" stroke-width="1"/><rect x="35"  y="207" width="6" height="6"  fill="#ef5350"/>
+            <line x1="48"  y1="200" x2="48"  y2="208" stroke="#26a69a" stroke-width="1"/><rect x="45"  y="201" width="6" height="6"  fill="#26a69a"/>
+            <line x1="58"  y1="197" x2="58"  y2="204" stroke="#26a69a" stroke-width="1"/><rect x="55"  y="198" width="6" height="5"  fill="#26a69a"/>
+            <line x1="68"  y1="193" x2="68"  y2="200" stroke="#ef5350" stroke-width="1"/><rect x="65"  y="195" width="6" height="5"  fill="#ef5350"/>
+            <line x1="78"  y1="189" x2="78"  y2="197" stroke="#26a69a" stroke-width="1"/><rect x="75"  y="191" width="6" height="5"  fill="#26a69a"/>
+            <line x1="88"  y1="186" x2="88"  y2="193" stroke="#26a69a" stroke-width="1"/><rect x="85"  y="188" width="6" height="5"  fill="#26a69a"/>
+            <line x1="98"  y1="184" x2="98"  y2="191" stroke="#ef5350" stroke-width="1"/><rect x="95"  y="185" width="6" height="5"  fill="#ef5350"/>
+            <line x1="108" y1="181" x2="108" y2="188" stroke="#26a69a" stroke-width="1"/><rect x="105" y="182" width="6" height="5"  fill="#26a69a"/>
+            <line x1="118" y1="179" x2="118" y2="185" stroke="#26a69a" stroke-width="1"/><rect x="115" y="180" width="6" height="4"  fill="#26a69a"/>
+            <line x1="128" y1="186" x2="128" y2="179" stroke="#ef5350" stroke-width="1"/><rect x="125" y="181" width="6" height="5"  fill="#ef5350"/>
+            <!-- Jan candles: rising ~1.098→1.155 (y≈186→148) -->
+            <line x1="152" y1="180" x2="152" y2="188" stroke="#26a69a" stroke-width="1"/><rect x="149" y="181" width="6" height="6"  fill="#26a69a"/>
+            <line x1="162" y1="174" x2="162" y2="182" stroke="#26a69a" stroke-width="1"/><rect x="159" y="176" width="6" height="5"  fill="#26a69a"/>
+            <line x1="172" y1="169" x2="172" y2="177" stroke="#ef5350" stroke-width="1"/><rect x="169" y="170" width="6" height="6"  fill="#ef5350"/>
+            <line x1="182" y1="163" x2="182" y2="171" stroke="#26a69a" stroke-width="1"/><rect x="179" y="164" width="6" height="6"  fill="#26a69a"/>
+            <line x1="192" y1="158" x2="192" y2="166" stroke="#26a69a" stroke-width="1"/><rect x="189" y="159" width="6" height="6"  fill="#26a69a"/>
+            <line x1="202" y1="153" x2="202" y2="161" stroke="#ef5350" stroke-width="1"/><rect x="199" y="154" width="6" height="6"  fill="#ef5350"/>
+            <line x1="212" y1="149" x2="212" y2="157" stroke="#26a69a" stroke-width="1"/><rect x="209" y="150" width="6" height="6"  fill="#26a69a"/>
+            <line x1="222" y1="145" x2="222" y2="152" stroke="#26a69a" stroke-width="1"/><rect x="219" y="146" width="6" height="5"  fill="#26a69a"/>
+            <line x1="232" y1="142" x2="232" y2="149" stroke="#ef5350" stroke-width="1"/><rect x="229" y="143" width="6" height="5"  fill="#ef5350"/>
+            <line x1="242" y1="149" x2="242" y2="143" stroke="#ef5350" stroke-width="1"/><rect x="239" y="144" width="6" height="5"  fill="#ef5350"/>
+            <!-- Feb candles: peak ~1.202 (y≈104) then reversal -->
+            <line x1="292" y1="140" x2="292" y2="135" stroke="#26a69a" stroke-width="1"/><rect x="289" y="136" width="6" height="7"  fill="#26a69a"/>
+            <line x1="302" y1="128" x2="302" y2="122" stroke="#26a69a" stroke-width="1"/><rect x="299" y="123" width="6" height="7"  fill="#26a69a"/>
+            <line x1="312" y1="114" x2="312" y2="108" stroke="#26a69a" stroke-width="1"/><rect x="309" y="109" width="6" height="7"  fill="#26a69a"/>
+            <!-- Fed CB marker -->
+            <polygon points="322,68 326,62 330,68" fill="#4f7fff"/>
+            <line x1="322" y1="100" x2="322" y2="95"  stroke="#26a69a" stroke-width="1"/><rect x="319" y="96" width="6" height="7"  fill="#26a69a"/>
+            <line x1="332" y1="104" x2="332" y2="100" stroke="#26a69a" stroke-width="1"/><rect x="329" y="101" width="6" height="7"  fill="#26a69a"/>
+            <!-- Peak -->
+            <line x1="342" y1="106" x2="342" y2="100" stroke="#ef5350" stroke-width="1"/><rect x="339" y="101" width="6" height="7"  fill="#ef5350"/>
+            <line x1="352" y1="115" x2="352" y2="109" stroke="#ef5350" stroke-width="1"/><rect x="349" y="110" width="6" height="7"  fill="#ef5350"/>
+            <line x1="362" y1="125" x2="362" y2="119" stroke="#ef5350" stroke-width="1"/><rect x="359" y="120" width="6" height="7"  fill="#ef5350"/>
+            <!-- Mar candles: declining ~1.165→1.107 (y≈148→188) -->
+            <!-- ECB CB marker -->
+            <polygon points="412,68 416,62 420,68" fill="#f6941c"/>
+            <line x1="412" y1="134" x2="412" y2="140" stroke="#ef5350" stroke-width="1"/><rect x="409" y="135" width="6" height="7"  fill="#ef5350"/>
+            <line x1="422" y1="141" x2="422" y2="148" stroke="#ef5350" stroke-width="1"/><rect x="419" y="142" width="6" height="7"  fill="#ef5350"/>
+            <!-- Fed CB marker Mar -->
+            <polygon points="435,68 439,62 443,68" fill="#4f7fff"/>
+            <line x1="432" y1="149" x2="432" y2="156" stroke="#26a69a" stroke-width="1"/><rect x="429" y="150" width="6" height="6"  fill="#26a69a"/>
+            <line x1="442" y1="154" x2="442" y2="161" stroke="#ef5350" stroke-width="1"/><rect x="439" y="155" width="6" height="7"  fill="#ef5350"/>
+            <line x1="452" y1="158" x2="452" y2="165" stroke="#ef5350" stroke-width="1"/><rect x="449" y="159" width="6" height="7"  fill="#ef5350"/>
+            <line x1="462" y1="162" x2="462" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="459" y="163" width="6" height="5"  fill="#26a69a"/>
+            <line x1="472" y1="163" x2="472" y2="169" stroke="#ef5350" stroke-width="1"/><rect x="469" y="164" width="6" height="5"  fill="#ef5350"/>
+            <line x1="482" y1="162" x2="482" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="479" y="163" width="6" height="5"  fill="#26a69a"/>
+            <line x1="492" y1="161" x2="492" y2="167" stroke="#26a69a" stroke-width="1"/><rect x="489" y="162" width="6" height="5"  fill="#26a69a"/>
+            <!-- Apr candles: ~1.113→1.132 (y≈186→174) recovery -->
+            <!-- ECB CB marker Apr -->
+            <polygon points="545,68 549,62 553,68" fill="#f6941c"/>
+            <line x1="532" y1="173" x2="532" y2="179" stroke="#26a69a" stroke-width="1"/><rect x="529" y="174" width="6" height="6"  fill="#26a69a"/>
+            <line x1="542" y1="170" x2="542" y2="176" stroke="#26a69a" stroke-width="1"/><rect x="539" y="171" width="6" height="5"  fill="#26a69a"/>
+            <line x1="552" y1="167" x2="552" y2="173" stroke="#ef5350" stroke-width="1"/><rect x="549" y="168" width="6" height="5"  fill="#ef5350"/>
+            <line x1="562" y1="165" x2="562" y2="171" stroke="#26a69a" stroke-width="1"/><rect x="559" y="166" width="6" height="5"  fill="#26a69a"/>
+            <line x1="572" y1="163" x2="572" y2="169" stroke="#26a69a" stroke-width="1"/><rect x="569" y="164" width="6" height="5"  fill="#26a69a"/>
+            <line x1="582" y1="161" x2="582" y2="167" stroke="#26a69a" stroke-width="1"/><rect x="579" y="162" width="6" height="5"  fill="#26a69a"/>
+            <line x1="592" y1="160" x2="592" y2="166" stroke="#ef5350" stroke-width="1"/><rect x="589" y="161" width="6" height="5"  fill="#ef5350"/>
+            <!-- MA 20 line -->
+            <polyline points="18,218 88,192 152,186 222,150 292,140 312,115 342,107 412,138 452,160 492,163 532,176 592,163" fill="none" stroke="#2196f3" stroke-width="1.5" opacity="0.85"/>
+            <!-- Previous close dashed line -->
+            <line x1="0" y1="163" x2="650" y2="163" stroke="#787b86" stroke-width="0.6" stroke-dasharray="4,3" opacity="0.5"/>
+            <!-- Current price badge -->
+            <rect x="612" y="157" width="48" height="14" rx="2" fill="#ef5350"/>
+            <text x="615" y="167" fill="#fff" font-size="8.5" font-family="'JetBrains Mono',monospace">1.13170</text>
+            <!-- CB legend -->
+            <polygon points="8,65 12,59 16,65" fill="#4f7fff"/><text x="18" y="66" fill="#787b86" font-size="8" font-family="Inter,sans-serif">Fed</text>
+            <polygon points="42,65 46,59 50,65" fill="#f6941c"/><text x="52" y="66" fill="#787b86" font-size="8" font-family="Inter,sans-serif">ECB</text>
           </svg>
         </div>
       </div>
-      <div class="callout callout-green">
-        <strong>Tip:</strong> When the TradingView fallback is active (symbols without OHLC data), click the TradingView logo in the bottom-left corner to open the chart on TradingView.com with full functionality — all chart types, indicators, drawing tools, and timeframes.
+      <!-- Inline styles for guide chart mock buttons -->
+      <style>
+        .gct-rb,.gct-tb{background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#787b86;font-size:9px;font-family:Inter,-apple-system,sans-serif;padding:1px 6px;cursor:pointer;letter-spacing:.04em;}
+        .gct-rb:hover,.gct-tb:hover{background:#2a2e39;color:#d1d4dc;}
+        .active-rb,.active-tb{background:#4f7fff;color:#fff;border-color:#4f7fff;}
+        .on-tb{color:#d1d4dc;border-color:#4f7fff;}
+        .gct{transition:color .12s;}
+        .gct:hover{color:#d1d4dc;}
+      </style>
+      <!-- LightweightCharts v5 interactive chart with hardcoded EUR/USD OHLC data -->
+      <script>
+      (function() {
+        var _GCT_DATA = [
+          {time:'2025-12-02',open:1.0520,high:1.0562,low:1.0501,close:1.0545},
+          {time:'2025-12-03',open:1.0545,high:1.0580,low:1.0522,close:1.0558},
+          {time:'2025-12-04',open:1.0558,high:1.0601,low:1.0540,close:1.0590},
+          {time:'2025-12-05',open:1.0590,high:1.0625,low:1.0565,close:1.0610},
+          {time:'2025-12-08',open:1.0610,high:1.0648,low:1.0588,close:1.0635},
+          {time:'2025-12-09',open:1.0635,high:1.0670,low:1.0608,close:1.0655},
+          {time:'2025-12-10',open:1.0655,high:1.0692,low:1.0628,close:1.0678},
+          {time:'2025-12-11',open:1.0678,high:1.0715,low:1.0650,close:1.0700},
+          {time:'2025-12-12',open:1.0700,high:1.0738,low:1.0670,close:1.0722},
+          {time:'2025-12-15',open:1.0722,high:1.0760,low:1.0692,close:1.0745},
+          {time:'2025-12-16',open:1.0745,high:1.0782,low:1.0718,close:1.0768},
+          {time:'2025-12-17',open:1.0768,high:1.0800,low:1.0740,close:1.0788},
+          {time:'2025-12-18',open:1.0788,high:1.0825,low:1.0760,close:1.0810},
+          {time:'2025-12-19',open:1.0810,high:1.0845,low:1.0780,close:1.0830},
+          {time:'2025-12-22',open:1.0830,high:1.0868,low:1.0800,close:1.0852},
+          {time:'2025-12-23',open:1.0852,high:1.0890,low:1.0822,close:1.0875},
+          {time:'2025-12-24',open:1.0875,high:1.0910,low:1.0845,close:1.0895},
+          {time:'2025-12-26',open:1.0895,high:1.0932,low:1.0862,close:1.0920},
+          {time:'2025-12-27',open:1.0920,high:1.0958,low:1.0885,close:1.0942},
+          {time:'2025-12-30',open:1.0942,high:1.0980,low:1.0905,close:1.0962},
+          {time:'2025-12-31',open:1.0962,high:1.1005,low:1.0928,close:1.0985},
+          {time:'2026-01-02',open:1.0985,high:1.1025,low:1.0950,close:1.1010},
+          {time:'2026-01-05',open:1.1010,high:1.1052,low:1.0978,close:1.1038},
+          {time:'2026-01-06',open:1.1038,high:1.1080,low:1.1005,close:1.1062},
+          {time:'2026-01-07',open:1.1062,high:1.1105,low:1.1030,close:1.1088},
+          {time:'2026-01-08',open:1.1088,high:1.1130,low:1.1055,close:1.1112},
+          {time:'2026-01-09',open:1.1112,high:1.1158,low:1.1080,close:1.1138},
+          {time:'2026-01-12',open:1.1138,high:1.1185,low:1.1105,close:1.1162},
+          {time:'2026-01-13',open:1.1162,high:1.1210,low:1.1130,close:1.1188},
+          {time:'2026-01-14',open:1.1188,high:1.1235,low:1.1155,close:1.1215},
+          {time:'2026-01-15',open:1.1215,high:1.1262,low:1.1182,close:1.1242},
+          {time:'2026-01-16',open:1.1242,high:1.1290,low:1.1210,close:1.1268},
+          {time:'2026-01-19',open:1.1268,high:1.1318,low:1.1235,close:1.1295},
+          {time:'2026-01-20',open:1.1295,high:1.1345,low:1.1262,close:1.1322},
+          {time:'2026-01-21',open:1.1322,high:1.1372,low:1.1290,close:1.1350},
+          {time:'2026-01-22',open:1.1350,high:1.1400,low:1.1318,close:1.1378},
+          {time:'2026-01-23',open:1.1378,high:1.1428,low:1.1345,close:1.1405},
+          {time:'2026-01-26',open:1.1405,high:1.1458,low:1.1372,close:1.1435},
+          {time:'2026-01-27',open:1.1435,high:1.1488,low:1.1402,close:1.1465},
+          {time:'2026-01-28',open:1.1465,high:1.1518,low:1.1430,close:1.1492},
+          {time:'2026-01-29',open:1.1492,high:1.1545,low:1.1458,close:1.1520},
+          {time:'2026-01-30',open:1.1520,high:1.1575,low:1.1485,close:1.1548},
+          {time:'2026-02-02',open:1.1548,high:1.1608,low:1.1512,close:1.1580},
+          {time:'2026-02-03',open:1.1580,high:1.1645,low:1.1542,close:1.1618},
+          {time:'2026-02-04',open:1.1618,high:1.1688,low:1.1578,close:1.1658},
+          {time:'2026-02-05',open:1.1658,high:1.1732,low:1.1618,close:1.1700},
+          {time:'2026-02-06',open:1.1700,high:1.1778,low:1.1658,close:1.1748},
+          {time:'2026-02-09',open:1.1748,high:1.1832,low:1.1705,close:1.1800},
+          {time:'2026-02-10',open:1.1800,high:1.1888,low:1.1755,close:1.1855},
+          {time:'2026-02-11',open:1.1855,high:1.1945,low:1.1808,close:1.1912},
+          {time:'2026-02-12',open:1.1912,high:1.2005,low:1.1865,close:1.1972},
+          {time:'2026-02-13',open:1.1972,high:1.2048,low:1.1920,close:1.2018},
+          {time:'2026-02-17',open:1.2018,high:1.2062,low:1.1958,close:1.1998},
+          {time:'2026-02-18',open:1.1998,high:1.2028,low:1.1918,close:1.1945},
+          {time:'2026-02-19',open:1.1945,high:1.1978,low:1.1862,close:1.1888},
+          {time:'2026-02-20',open:1.1888,high:1.1920,low:1.1808,close:1.1832},
+          {time:'2026-02-23',open:1.1832,high:1.1862,low:1.1748,close:1.1775},
+          {time:'2026-02-24',open:1.1775,high:1.1808,low:1.1692,close:1.1718},
+          {time:'2026-02-25',open:1.1718,high:1.1752,low:1.1635,close:1.1662},
+          {time:'2026-02-26',open:1.1662,high:1.1698,low:1.1580,close:1.1605},
+          {time:'2026-02-27',open:1.1605,high:1.1645,low:1.1528,close:1.1552},
+          {time:'2026-03-02',open:1.1552,high:1.1592,low:1.1478,close:1.1502},
+          {time:'2026-03-03',open:1.1502,high:1.1542,low:1.1425,close:1.1452},
+          {time:'2026-03-04',open:1.1452,high:1.1492,low:1.1372,close:1.1402},
+          {time:'2026-03-05',open:1.1402,high:1.1445,low:1.1322,close:1.1355},
+          {time:'2026-03-06',open:1.1355,high:1.1398,low:1.1275,close:1.1308},
+          {time:'2026-03-09',open:1.1308,high:1.1355,low:1.1232,close:1.1268},
+          {time:'2026-03-10',open:1.1268,high:1.1315,low:1.1195,close:1.1232},
+          {time:'2026-03-11',open:1.1232,high:1.1282,low:1.1162,close:1.1200},
+          {time:'2026-03-12',open:1.1200,high:1.1252,low:1.1132,close:1.1172},
+          {time:'2026-03-13',open:1.1172,high:1.1225,low:1.1108,close:1.1148},
+          {time:'2026-03-16',open:1.1148,high:1.1200,low:1.1085,close:1.1128},
+          {time:'2026-03-17',open:1.1128,high:1.1182,low:1.1068,close:1.1110},
+          {time:'2026-03-18',open:1.1110,high:1.1165,low:1.1052,close:1.1095},
+          {time:'2026-03-19',open:1.1095,high:1.1152,low:1.1038,close:1.1082},
+          {time:'2026-03-20',open:1.1082,high:1.1142,low:1.1025,close:1.1072},
+          {time:'2026-03-23',open:1.1072,high:1.1135,low:1.1015,close:1.1068},
+          {time:'2026-03-24',open:1.1068,high:1.1128,low:1.1008,close:1.1065},
+          {time:'2026-03-25',open:1.1065,high:1.1128,low:1.1002,close:1.1062},
+          {time:'2026-03-26',open:1.1062,high:1.1130,low:1.0998,close:1.1060},
+          {time:'2026-03-27',open:1.1060,high:1.1132,low:1.0995,close:1.1062},
+          {time:'2026-03-30',open:1.1062,high:1.1138,low:1.1000,close:1.1068},
+          {time:'2026-03-31',open:1.1068,high:1.1145,low:1.1008,close:1.1075},
+          {time:'2026-04-01',open:1.1075,high:1.1155,low:1.1018,close:1.1085},
+          {time:'2026-04-02',open:1.1085,high:1.1168,low:1.1028,close:1.1098},
+          {time:'2026-04-03',open:1.1098,high:1.1182,low:1.1040,close:1.1115},
+          {time:'2026-04-06',open:1.1115,high:1.1200,low:1.1055,close:1.1132},
+          {time:'2026-04-07',open:1.1132,high:1.1218,low:1.1072,close:1.1148},
+          {time:'2026-04-08',open:1.1148,high:1.1235,low:1.1088,close:1.1162},
+          {time:'2026-04-09',open:1.1162,high:1.1250,low:1.1102,close:1.1175},
+          {time:'2026-04-10',open:1.1175,high:1.1265,low:1.1115,close:1.1190},
+          {time:'2026-04-13',open:1.1190,high:1.1278,low:1.1130,close:1.1205},
+          {time:'2026-04-14',open:1.1205,high:1.1290,low:1.1145,close:1.1220},
+          {time:'2026-04-15',open:1.1220,high:1.1302,low:1.1158,close:1.1235},
+          {time:'2026-04-16',open:1.1235,high:1.1315,low:1.1175,close:1.1250},
+          {time:'2026-04-17',open:1.1250,high:1.1328,low:1.1190,close:1.1265},
+          {time:'2026-04-22',open:1.1265,high:1.1340,low:1.1205,close:1.1278},
+          {time:'2026-04-23',open:1.1278,high:1.1355,low:1.1218,close:1.1292},
+          {time:'2026-04-24',open:1.1292,high:1.1365,low:1.1230,close:1.1302},
+          {time:'2026-04-25',open:1.1302,high:1.1370,low:1.1241,close:1.1317}
+        ];
+        var _GCT_CB_DATES = {
+          '2026-01-29': {cb:'Fed',color:'#4f7fff'},
+          '2026-03-06': {cb:'ECB',color:'#f6941c'},
+          '2026-03-19': {cb:'Fed',color:'#4f7fff'},
+          '2026-04-17': {cb:'ECB',color:'#f6941c'}
+        };
+        var _gctChart=null,_gctSeries=null,_gctMaSeries=null,_gctVolSeries=null,_gctPcSeries=null,
+            _gctType='candle',_gctDays=91,_gctShowPC=true,_gctShowVOL=false,_gctShowWM=false,
+            _gctShowCB=true,_gctShowMA=false,_gctLog=false;
+        function _gctFmt(v){return v?v.toFixed(5):'—';}
+        function _gctFilterData(days){
+          if(!days)return _GCT_DATA;
+          var cut=Date.now()/1000-days*86400;
+          return _GCT_DATA.filter(function(d){return new Date(d.time).getTime()/1000>=cut;});
+        }
+        function _computeMA(data,period){
+          var out=[];
+          for(var i=0;i<data.length;i++){
+            if(i<period-1){out.push({time:data[i].time,value:null});continue;}
+            var s=0;for(var j=i-period+1;j<=i;j++)s+=data[j].close;
+            out.push({time:data[i].time,value:parseFloat((s/period).toFixed(5))});
+          }
+          return out;
+        }
+        function _gctRender(){
+          var container=document.getElementById('gct-container');
+          if(!container||!window.LightweightCharts)return;
+          if(_gctChart){_gctChart.remove();_gctChart=null;_gctSeries=null;_gctMaSeries=null;_gctVolSeries=null;_gctPcSeries=null;}
+          // Hide the static SVG fallback once LWC takes over
+          var staticSvg=document.getElementById('gct-static-svg');
+          if(staticSvg)staticSvg.style.display='none';
+          _gctChart=LightweightCharts.createChart(container,{
+            layout:{background:{type:'Solid',color:'#131722'},textColor:'#787b86',attributionLogo:false},
+            grid:{vertLines:{color:'#2a2e39',style:1},horzLines:{color:'#2a2e39',style:1}},
+            crosshair:{mode:1},
+            rightPriceScale:{borderColor:'#2a2e39',mode:_gctLog?1:0},
+            timeScale:{borderColor:'#2a2e39',timeVisible:true,secondsVisible:false},
+            handleScroll:true,handleScale:true,
+            width:container.offsetWidth,height:container.offsetHeight
+          });
+          var data=_gctFilterData(_gctDays);
+          var fullData=_gctFilterData(_gctDays);
+          if(_gctType==='candle'){
+            _gctSeries=_gctChart.addCandlestickSeries({upColor:'#26a69a',downColor:'#ef5350',borderUpColor:'#26a69a',borderDownColor:'#ef5350',wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:{type:'price',precision:5,minMove:0.00001}});
+          }else if(_gctType==='bar'){
+            _gctSeries=_gctChart.addBarSeries({upColor:'#26a69a',downColor:'#ef5350',priceFormat:{type:'price',precision:5,minMove:0.00001}});
+          }else if(_gctType==='line'){
+            _gctSeries=_gctChart.addLineSeries({color:'#4f7fff',lineWidth:2,priceFormat:{type:'price',precision:5,minMove:0.00001}});
+            data=data.map(function(d){return{time:d.time,value:d.close};});
+          }else{
+            _gctSeries=_gctChart.addAreaSeries({lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.28)',bottomColor:'rgba(79,127,255,0.02)',lineWidth:2,priceFormat:{type:'price',precision:5,minMove:0.00001}});
+            data=data.map(function(d){return{time:d.time,value:d.close};});
+          }
+          _gctSeries.setData(data);
+          if(_gctShowPC&&fullData.length>=2){
+            var pc=fullData[fullData.length-2].close;
+            _gctPcSeries=_gctChart.addLineSeries({color:'rgba(120,123,134,0.6)',lineWidth:1,lineStyle:2,lastValueVisible:false,priceLineVisible:false,crosshairMarkerVisible:false,priceFormat:{type:'price',precision:5,minMove:0.00001}});
+            _gctPcSeries.setData([{time:fullData[0].time,value:pc},{time:fullData[fullData.length-1].time,value:pc}]);
+          }
+          if(_gctShowVOL){
+            _gctVolSeries=_gctChart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',scaleMargins:{top:0.8,bottom:0}});
+            _gctVolSeries.setData(fullData.map(function(d){return{time:d.time,value:20000,color:d.close>=d.open?'rgba(38,166,154,0.4)':'rgba(239,83,80,0.4)'};}));
+          }
+          if(_gctShowMA){
+            _gctMaSeries=_gctChart.addLineSeries({color:'#2196f3',lineWidth:1,lastValueVisible:true,priceLineVisible:false,priceFormat:{type:'price',precision:5,minMove:0.00001}});
+            var maData=_computeMA(fullData,20).filter(function(d){return d.value!==null;});
+            _gctMaSeries.setData(maData);
+            var lastMa=maData[maData.length-1];
+            var leg=document.getElementById('gct-ma-legend');
+            if(leg){leg.textContent='MA 20  '+_gctFmt(lastMa?lastMa.value:null);leg.style.display='inline';}
+          }else{
+            var leg=document.getElementById('gct-ma-legend');
+            if(leg)leg.style.display='none';
+          }
+          if(_gctShowCB){
+            var markers=[];
+            fullData.forEach(function(d){
+              if(_GCT_CB_DATES[d.time]){var m=_GCT_CB_DATES[d.time];markers.push({time:d.time,position:'aboveBar',color:m.color,shape:'arrowDown',text:m.cb,size:0.6});}
+            });
+            if(markers.length&&_gctSeries.setMarkers)_gctSeries.setMarkers(markers);
+          }
+          if(_gctShowWM){_gctChart.applyOptions({watermark:{visible:true,fontSize:24,horzAlign:'center',vertAlign:'center',color:'rgba(209,212,220,0.07)',text:'EUR/USD'}});}
+          else{_gctChart.applyOptions({watermark:{visible:false}});}
+          _gctChart.subscribeCrosshairMove(function(param){
+            if(!param.time||!param.seriesData)return;
+            var d=param.seriesData.get(_gctSeries);if(!d)return;
+            var o=d.open||d.value,h=d.high||d.value,l=d.low||d.value,c=d.close||d.value;
+            if(o!==undefined)document.getElementById('gct-o').textContent=_gctFmt(o);
+            if(h!==undefined)document.getElementById('gct-h').textContent=_gctFmt(h);
+            if(l!==undefined)document.getElementById('gct-l').textContent=_gctFmt(l);
+            if(c!==undefined)document.getElementById('gct-c').textContent=_gctFmt(c);
+          });
+          _gctChart.timeScale().fitContent();
+        }
+        function _gctInit(){
+          if(!window.LightweightCharts){
+            var s=document.createElement('script');
+            s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
+            s.onload=function(){_gctRender();};
+            document.head.appendChild(s);
+          }else{_gctRender();}
+          document.querySelectorAll('.gct').forEach(function(tab){
+            tab.addEventListener('click',function(){
+              document.querySelectorAll('.gct').forEach(function(t){t.style.color='#787b86';t.style.borderBottom='2px solid transparent';t.style.fontWeight='';});
+              this.style.color='#fff';this.style.borderBottom='2px solid #4f7fff';this.style.fontWeight='700';
+            });
+          });
+          document.querySelectorAll('.gct-rb').forEach(function(btn){
+            btn.addEventListener('click',function(){
+              document.querySelectorAll('.gct-rb').forEach(function(b){b.classList.remove('active-rb');});
+              this.classList.add('active-rb');_gctDays=parseInt(this.dataset.days)||0;_gctRender();
+            });
+          });
+          var typeMap={'gct-candle':'candle','gct-bar':'bar','gct-line':'line','gct-area':'area'};
+          Object.keys(typeMap).forEach(function(id){
+            var el=document.getElementById(id);if(!el)return;
+            el.addEventListener('click',function(){
+              document.querySelectorAll('.gct-tb').forEach(function(b){b.classList.remove('active-tb');});
+              this.classList.add('active-tb');_gctType=typeMap[id];_gctRender();
+            });
+          });
+          function _tog(id,g,s){var el=document.getElementById(id);if(!el)return;el.addEventListener('click',function(){s(!g());this.classList.toggle('on-tb',g());_gctRender();});}
+          _tog('gct-wm',function(){return _gctShowWM;},function(v){_gctShowWM=v;});
+          _tog('gct-pc',function(){return _gctShowPC;},function(v){_gctShowPC=v;});
+          _tog('gct-vol',function(){return _gctShowVOL;},function(v){_gctShowVOL=v;});
+          _tog('gct-cb',function(){return _gctShowCB;},function(v){_gctShowCB=v;});
+          _tog('gct-ma',function(){return _gctShowMA;},function(v){_gctShowMA=v;});
+          _tog('gct-log',function(){return _gctLog;},function(v){_gctLog=v;});
+          var ro=new ResizeObserver(function(){var c=document.getElementById('gct-container');if(_gctChart&&c)_gctChart.applyOptions({width:c.offsetWidth});});
+          ro.observe(document.getElementById('gct-container'));
+        }
+        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_gctInit);}else{_gctInit();}
+      })();
+      </script>
+      <div class="callout callout-tip" style="margin-bottom:18px;">
+        <strong>Tip:</strong> This is an interactive mock — try clicking the range buttons (3M / 6M / 1Y / ALL), chart types (Candle / Bar / Line / Area), and overlays (PC, CB, MA, VOL, LOG). For symbols without OHLC data, the chart falls back to an embedded TradingView widget.
       </div>
     </div>
 
@@ -1149,7 +1439,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         </div>
       </div>
       <h3>Crosses</h3>
-      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by standard ISO currency hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the TradingView chart and expand its inline detail strip — the same data card available in the FX Pairs table (Price · Volatility · COT Positioning · Retail Sentiment). Click the same row again to collapse it. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
+      <p>Live prices and daily percentage changes for 21 cross pairs, ordered by standard ISO currency hierarchy. EUR group: EUR/GBP, EUR/JPY, EUR/CHF, EUR/CAD, EUR/AUD, EUR/NZD. GBP group: GBP/JPY, GBP/CHF, GBP/CAD, GBP/AUD, GBP/NZD. AUD group: AUD/JPY, AUD/NZD, AUD/CHF, AUD/CAD. NZD group: NZD/JPY, NZD/CAD, NZD/CHF. CAD group: CAD/JPY, CAD/CHF. CHF group: CHF/JPY. Click any cross to open it in the price chart and expand its inline detail strip — the same data card available in the FX Pairs table (Price · Volatility · COT Positioning · Retail Sentiment). Click the same row again to collapse it. Cross pairs often reveal currency-specific stories that major pairs obscure.</p>
       <!-- MOCK: Crosses full list (21 pairs, ISO hierarchy) -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 20px;max-width:260px;">
         <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
@@ -1186,7 +1476,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
       <h3>Carry Trade — Top Pairs</h3>
       <p>A ranked list of the top carry trade pair candidates across all 28 G8 combinations, sorted by the <strong>carry-to-vol ratio</strong> — the industry-standard metric for vol-adjusted carry: rate differential divided by realised 30-day historical volatility (HV30). This reflects how much yield per unit of realised volatility risk each pair offers, not just the raw rate differential. When HV30 data is unavailable, the panel falls back to gross rate differential ranking and the subtitle updates accordingly.</p>
-      <p>Each row shows the gross rate differential between the two legs (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+4.00%</code> = long-leg rate minus short-leg rate), giving an instant read on the raw carry available. Clicking any row opens the pair chart in TradingView. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
+      <p>Each row shows the gross rate differential between the two legs (e.g. <code style="font-family:var(--font-mono);font-size:11px;">+4.00%</code> = long-leg rate minus short-leg rate), giving an instant read on the raw carry available. Clicking any row opens the pair in the price chart. Hovering shows the full breakdown: long rate / short rate / gross diff / HV30 / carry-to-vol.</p>
       <!-- MOCK: Carry Trade Ranking -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:180px;font-size:11px;">
         <div style="padding:5px 8px 4px;border-bottom:1px solid var(--border);background:var(--head-bg);display:flex;flex-direction:column;gap:1px;">
@@ -1240,63 +1530,73 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <h3>Pair Detail</h3>
       <p>When you click any pair in the FX Pairs table or any cross in the sidebar, an inline detail strip expands directly below the selected row. It updates instantly on every click with no page reload — click the same row again to collapse it. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
-      <!-- MOCK: Pair Detail panel (EUR/USD example) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:220px;font-size:12px;">
+      <!-- MOCK: Pair Detail panel (EUR/USD example) — mirrors pd-popover output from dashboard.js -->
+      <div class="pd-mock-wrap" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:230px;font-size:12px;">
 
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border);">
-          <span style="font-size:13px;font-weight:500;color:var(--text);">EUR / USD</span>
-          <span style="font-size:12px;color:var(--text3);cursor:pointer;">✕</span>
+        <!-- Header -->
+        <div class="pd-header">
+          <span class="pd-sym">EUR/USD</span>
+          <span style="font-size:9px;color:var(--text3);cursor:default;">&#x2715;</span>
         </div>
 
-        <div style="padding:6px 10px 5px;border-bottom:1px solid var(--border);">
-          <div style="display:flex;align-items:baseline;gap:6px;">
-            <span style="font-size:18px;font-weight:500;font-family:var(--font-mono);color:var(--text);">1.15110</span>
-            <span style="font-size:11px;font-family:var(--font-mono);color:var(--down);">−0.26%</span>
+        <!-- Price block -->
+        <div class="pd-price-block">
+          <div class="pd-price-row">
+            <div class="pd-price">1.13170</div>
+            <span class="pd-chg pd-dn">-0.19%</span>
           </div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;">H 1.15270 · L 1.15100</div>
-          <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);margin-top:1px;">Spread 0.5 pip · ADR 85 pip</div>
+          <div class="pd-range">H 1.13290 · L 1.13050</div>
+          <div class="pd-spread-row">Spread 0.5 pip · ADR 88 pip</div>
         </div>
 
-        <div style="border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 10px 2px;">Price</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;">
-            <div style="padding:3px 10px 4px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">1W Chg</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--down);margin-top:1px;">−0.07%</div></div>
-            <div style="padding:3px 10px 4px;border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Carry</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--up);margin-top:1px;">+1.75%</div></div>
-            <div style="padding:3px 10px 4px;border-right:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">ADR</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);margin-top:1px;">85 pip</div></div>
-            <div style="padding:3px 10px 4px;"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">EUR Rate</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);margin-top:1px;">2.00%</div></div>
-          </div>
-        </div>
-
-        <div style="border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 10px 2px;">Volatility</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;">
-            <div style="padding:3px 10px 4px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">HV 30d</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);margin-top:1px;">7.8%</div></div>
-            <div style="padding:3px 10px 4px;border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">ATM IV</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--down);margin-top:1px;">20.9%</div></div>
-            <div style="padding:3px 10px 4px;border-right:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">IV − HV</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--up);margin-top:1px;">+13.1%</div></div>
-            <div style="padding:3px 10px 4px;"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Spread</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);margin-top:1px;">0.5 pip</div></div>
+        <!-- Price section -->
+        <div class="pd-section">
+          <div class="pd-section-lbl">Price</div>
+          <div class="pd-grid">
+            <div class="pd-cell"><div class="pd-lbl">1W Chg</div><div class="pd-val pd-dn">-0.54%</div></div>
+            <div class="pd-cell"><div class="pd-lbl">Carry</div><div class="pd-val pd-dn">-1.75%</div></div>
+            <div class="pd-cell"><div class="pd-lbl">ADR</div><div class="pd-val">88 pip</div></div>
+            <div class="pd-cell"><div class="pd-lbl">EUR Rate</div><div class="pd-val">2.00%</div></div>
           </div>
         </div>
 
-        <div style="border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 10px 2px;">COT Positioning</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;">
-            <div style="padding:3px 10px 4px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">LF Net (EUR)</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--down);margin-top:1px;">−38,698</div></div>
-            <div style="padding:3px 10px 4px;border-bottom:1px solid var(--border);"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">AM Net (EUR)</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--up);margin-top:1px;">+282,463</div></div>
-            <div style="padding:3px 10px 4px;grid-column:1/-1;border-right:none;"><div style="font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">LF Open Interest (EUR)</div><div style="font-size:11px;font-family:var(--font-mono);font-weight:500;color:var(--text);margin-top:1px;">193,390</div></div>
-          </div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);padding:4px 10px 5px;border-top:1px solid var(--border);">LF <span style="color:var(--down);">Short</span> · AM <span style="color:var(--up);">Long</span> · <span style="color:var(--text3);">diverging</span></div>
-        </div>
-
-        <div style="border-bottom:1px solid var(--border);">
-          <div style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:4px 10px 2px;">Retail Sentiment</div>
-          <div style="padding:3px 10px 6px;">
-            <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:3px 0 2px;"><div style="height:100%;background:var(--up);border-radius:2px;width:47%;"></div></div>
-            <div style="font-size:10px;font-family:var(--font-mono);color:var(--text2);">47% Long / 53% Short</div>
+        <!-- Volatility section — 5 cells: HV30 / ATM IV / IV-HV / 25d RR / Spread -->
+        <div class="pd-section">
+          <div class="pd-section-lbl">Volatility</div>
+          <div class="pd-grid">
+            <div class="pd-cell"><div class="pd-lbl">HV 30d</div><div class="pd-val">8.2%</div></div>
+            <div class="pd-cell"><div class="pd-lbl">ATM IV</div><div class="pd-val pd-dn">11.4%</div></div>
+            <div class="pd-cell"><div class="pd-lbl">IV &minus; HV</div><div class="pd-val pd-up">+3.2%</div></div>
+            <div class="pd-cell"><div class="pd-lbl">25d RR</div><div class="pd-val pd-dn">-0.35</div></div>
+            <div class="pd-cell pd-cell--wide"><div class="pd-lbl">Spread</div><div class="pd-val">0.5 pip</div></div>
           </div>
         </div>
 
-        <div style="padding:4px 10px;">
-          <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">COT 2026-03-31 · Myfxbook · Saxo RR</span>
+        <!-- COT Positioning section — 5 cells: LF Net / LF WoW Δ / AM Net / Net %OI / LF OI (wide) -->
+        <div class="pd-section">
+          <div class="pd-section-lbl">COT Positioning</div>
+          <div class="pd-grid">
+            <div class="pd-cell"><div class="pd-lbl">LF Net</div><div class="pd-val pd-dn">-38,698</div></div>
+            <div class="pd-cell"><div class="pd-lbl">LF WoW &Delta;</div><div class="pd-val pd-dn">-4,210</div></div>
+            <div class="pd-cell"><div class="pd-lbl">AM Net</div><div class="pd-val pd-up">+282,463</div></div>
+            <div class="pd-cell"><div class="pd-lbl">Net % OI</div><div class="pd-val pd-dn">-12.4%</div></div>
+            <div class="pd-cell pd-cell--wide"><div class="pd-lbl">LF Open Interest</div><div class="pd-val"><span class="pd-oi-dn">&#9660;</span> 312,250 <span class="pd-dim" style="font-size:9px;">(-8,400)</span></div></div>
+          </div>
+          <div class="pd-cot-summary">LF <span class="pd-dn">Short</span> · AM <span class="pd-up">Long</span> · <span class="pd-dim">diverging</span></div>
+        </div>
+
+        <!-- Retail Sentiment section -->
+        <div class="pd-section pd-section--last">
+          <div class="pd-section-lbl">Retail Sentiment</div>
+          <div class="pd-cell pd-cell--wide">
+            <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:47%"></div></div>
+            <div class="pd-retail-nums">47% L<span class="pd-retail-sep">/</span>53% S</div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="pd-footer">
+          <span class="pd-dim">COT 2026-04-15 · Myfxbook · Saxo RR</span>
         </div>
 
       </div>
@@ -1304,10 +1604,10 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <ul style="list-style:none;padding:0;margin-bottom:20px;">
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Price block</strong> Live price, daily % change, session H/L, spread and ADR in pips.</li>
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Price section</strong> 1W Chg · Carry differential · ADR · Base currency policy rate.</li>
-        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Volatility</strong> HV 30d · ATM IV · IV−HV · Bid-Ask Spread. ATM IV color: <span style="color:var(--up);">green ≤7%</span> (cheap), <span style="color:var(--down);">red &gt;12%</span> (expensive).</li>
-        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">COT Positioning</strong> For USD majors: LF Net (ccy) · AM Net (ccy) · LF Open Interest (ccy) from CFTC Disaggregated TFF — one leg, base currency vs USD. For cross pairs (EUR/GBP, GBP/JPY, etc.): two independent COT legs shown — base currency and quote currency separately, both in raw CFTC values as reported. Footer line shows alignment across both legs: <em>GBP LF Long · JPY LF Short · aligned</em> (both favour the same directional bias for the cross).</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Volatility</strong> HV 30d · ATM IV · IV&minus;HV · 25d Risk Reversal · Bid-Ask Spread. ATM IV color: <span style="color:var(--up);">green ≤7%</span> (cheap), <span style="color:var(--down);">red &gt;12%</span> (expensive). 25d RR from Saxo Bank (1M tenor, indicative mid) — positive = calls bid over puts (upside skew on base currency); negative = puts bid (downside protection dominant).</li>
+        <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">COT Positioning</strong> LF Net · LF WoW &Delta; · AM Net · Net % OI · LF Open Interest — all from CFTC Disaggregated TFF report. For USD majors, one currency block (base vs USD). For cross pairs (EUR/GBP, GBP/JPY, etc.), two independent blocks are shown — one per component currency — each labeled by currency code. The summary line at the bottom shows LF/AM alignment: <em>LF Short · AM Long · diverging</em>.</li>
         <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Retail Sentiment</strong> Long/short ratio from Myfxbook community — retail traders only. Contrarian indicator: extreme retail long bias typically precedes institutional short positioning.</li>
-        <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Carry</strong> Numerator currency rate minus denominator currency rate. Positive = holding long earns the differential. For USD/JPY: Fed Funds − BoJ rate.</li>
+        <li style="padding:5px 0;font-size:12px;color:var(--text2);"><strong style="color:var(--text);min-width:110px;display:inline-block;">Carry</strong> Numerator currency rate minus denominator currency rate. Positive = holding long earns the differential. For USD/JPY: Fed Funds &minus; BoJ rate. For EUR/USD the carry is currently negative (ECB rate below Fed rate, so holding long EUR/USD costs the differential).</li>
       </ul>
       <div class="callout callout-green">
         <strong>Tip:</strong> Click once on any major or cross to open the chart and expand the inline detail. Click the same row again to collapse it. The strip stays expanded while you scroll — use this to compare COT or IV data across pairs without losing your place.
@@ -1586,7 +1886,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
   <div style="display:flex;gap:4px;"><span class="sb-k">PAGE</span><span class="sb-v">GUIDE · USING THE TERMINAL</span></div>
   <div class="footer-copy">© 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.9</span></div>
+  <div style="margin-left:auto;"><span class="sb-v">FX Terminal v7.41.11</span></div>
 </footer>
 
 
