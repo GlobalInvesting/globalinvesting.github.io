@@ -447,8 +447,13 @@ def fetch_correlations():
             if hist.empty or len(hist) < 15:
                 print(f"[Correlations] {sym_id}: insufficient data ({len(hist)} days)")
                 continue
-            series[sym_id] = hist["Close"].dropna().tolist()
-            print(f"[Correlations] ✓ {sym_id:8s} ({yf_sym}): {len(series[sym_id])} closes")
+            closes = hist["Close"].dropna()
+            series[sym_id] = {
+                "values": closes.tolist(),
+                "dates": [d.date().isoformat() if hasattr(d, "date") else str(d)[:10]
+                          for d in closes.index],
+            }
+            print(f"[Correlations] ✓ {sym_id:8s} ({yf_sym}): {len(series[sym_id]['values'])} closes")
         except Exception as e:
             print(f"[Correlations] Error fetching {sym_id}: {e}")
 
@@ -458,12 +463,16 @@ def fetch_correlations():
         if sym_a not in series or sym_b not in series:
             print(f"[Correlations] Skipping {sym_a}/{sym_b} — missing data")
             results.append({"a": labels[0], "b": labels[1], "corr": None, "n": 0,
-                            "norm": None, "z_score": None})
+                            "norm": None, "z_score": None, "history": [], "hist_dates": []})
             continue
 
-        sa, sb = series[sym_a], series[sym_b]
+        sa = series[sym_a]["values"]
+        sb = series[sym_b]["values"]
+        # Use sym_a dates as the reference (both aligned to same length)
+        sa_dates = series[sym_a]["dates"]
         aligned = min(len(sa), len(sb))
         sa_all, sb_all = sa[-aligned:], sb[-aligned:]
+        sa_dates_all = sa_dates[-aligned:]
 
         # Current correlations at three windows — 30d, 60d, 90d
         n30 = min(aligned, 30)
@@ -505,6 +514,15 @@ def fetch_correlations():
         # Stored as compact array of 3-decimal floats for the LWC sparkline in the modal.
         # Index 0 = oldest, index -1 = most recent (approx current 30d corr).
         hist_rounded = [round(c, 3) for c in hist_corrs]
+        # Dates corresponding to each hist_corr point — the end date of each 30d rolling window.
+        # hist_corrs[i] = Pearson of [i : i+norm_window], so its end date is index (i + norm_window - 1)
+        # in sa_dates_all[-hist_points:], which equals sa_dates_all[-hist_points + i + norm_window - 1]
+        hist_dates_raw = sa_dates_all[-hist_points:]
+        hist_dates_out = [
+            hist_dates_raw[i + norm_window - 1]
+            for i in range(hist_points - norm_window + 1)
+            if i < len(hist_corrs)
+        ]
 
         results.append({
             "a": labels[0], "b": labels[1],
@@ -514,6 +532,7 @@ def fetch_correlations():
             "norm": norm, "z_score": z_score,
             "std":  round(std_val, 4) if std_val is not None else None,
             "history": hist_rounded,
+            "hist_dates": hist_dates_out,
         })
 
     return results
