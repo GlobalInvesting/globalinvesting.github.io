@@ -92,12 +92,25 @@ jobs:
             echo "::warning::Myfxbook API blocked — login manual requerido en myfxbook.com"
           fi
 
+      - name: Check email secrets configured
+        id: email_check
+        if: steps.blocked_check.outputs.api_blocked == 'true'
+        env:
+          NOTIFY_TO:       ${{ secrets.NOTIFY_EMAIL_TO }}
+          NOTIFY_FROM:     ${{ secrets.NOTIFY_EMAIL_FROM }}
+          NOTIFY_PASSWORD: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
+        run: |
+          if [ -n "$NOTIFY_TO" ] && [ -n "$NOTIFY_FROM" ] && [ -n "$NOTIFY_PASSWORD" ]; then
+            echo "email_configured=true" >> $GITHUB_OUTPUT
+          else
+            echo "email_configured=false" >> $GITHUB_OUTPUT
+            echo "::notice::NOTIFY_EMAIL_* secrets not configured — skipping alert email."
+          fi
+
       - name: Send immediate alert on Myfxbook API block
         if: |
           steps.blocked_check.outputs.api_blocked == 'true' &&
-          secrets.NOTIFY_EMAIL_TO != '' &&
-          secrets.NOTIFY_EMAIL_FROM != '' &&
-          secrets.NOTIFY_EMAIL_PASSWORD != ''
+          steps.email_check.outputs.email_configured == 'true'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
