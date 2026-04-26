@@ -1,4 +1,4 @@
-name: Update Myfxbook Sentiment — v1.4
+name: Update Myfxbook Sentiment — v1.5
 
 # Runs every hour, 24/7, Mon–Sun.
 #
@@ -11,7 +11,7 @@ name: Update Myfxbook Sentiment — v1.4
 #   No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is sufficient
 #   because the workflow and output data live in the same repo.
 #
-# CLOUDFLARE WORKER PROXY (v1.4):
+# CLOUDFLARE WORKER PROXY (v1.5):
 #   Myfxbook blocks GitHub Actions IP ranges at the Cloudflare WAF level.
 #   This workflow routes all Myfxbook API calls through a Cloudflare Worker
 #   that acts as a proxy from CF's own edge IP range (not on the denylist).
@@ -93,7 +93,11 @@ jobs:
           fi
 
       - name: Send immediate alert on Myfxbook API block
-        if: steps.blocked_check.outputs.api_blocked == 'true'
+        if: |
+          steps.blocked_check.outputs.api_blocked == 'true' &&
+          secrets.NOTIFY_EMAIL_TO != '' &&
+          secrets.NOTIFY_EMAIL_FROM != '' &&
+          secrets.NOTIFY_EMAIL_PASSWORD != ''
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -103,23 +107,23 @@ jobs:
           password: ${{ secrets.NOTIFY_EMAIL_PASSWORD }}
           to: ${{ secrets.NOTIFY_EMAIL_TO }}
           from: "FX Dashboard Monitor <${{ secrets.NOTIFY_EMAIL_FROM }}>"
-          subject: "⚠️ FX Dashboard — Myfxbook bloqueado, acción requerida"
+          subject: "FX Dashboard — Myfxbook bloqueado, accion requerida"
           body: |
-            La API de Myfxbook rechazó el login automático.
+            La API de Myfxbook rechazo el login automatico.
 
-            Causa más probable: Myfxbook detectó el patrón automatizado y requiere
-            verificación manual antes de volver a permitir acceso via API.
+            Causa mas probable: Myfxbook detecto el patron automatizado y requiere
+            verificacion manual antes de volver a permitir acceso via API.
 
-            ACCIÓN REQUERIDA:
-            1. Entrá a https://www.myfxbook.com desde tu navegador
-            2. Hacé login con las credenciales habituales
-            3. Completá cualquier CAPTCHA o verificación de seguridad que aparezca
-            4. Una vez logueado correctamente, el próximo run del workflow (cada hora)
-               reanudará automáticamente.
+            ACCION REQUERIDA:
+            1. Entra a https://www.myfxbook.com desde tu navegador
+            2. Hace login con las credenciales habituales
+            3. Completa cualquier CAPTCHA o verificacion de seguridad que aparezca
+            4. Una vez logueado correctamente, el proximo run del workflow (cada hora)
+               reanudara automaticamente.
 
-            El dashboard está mostrando los últimos datos cacheados con fallback a Dukascopy.
+            El dashboard esta mostrando los ultimos datos cacheados con fallback a Dukascopy.
 
-            Run que detectó el bloqueo:
+            Run que detecto el bloqueo:
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Commit and push sentiment data
