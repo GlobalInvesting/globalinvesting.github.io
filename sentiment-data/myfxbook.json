@@ -1,7 +1,7 @@
 {
   "updated": "2026-04-26T01:20:22Z",
   "source": "myfxbook",
-  "apiBlocked": false,
+  "apiBlocked": true,
   "pairs": [
     {
       "sym": "EUR/USD",
@@ -301,5 +301,7 @@
     "averageDeposit": "90,983.81",
     "averageAccountProfit": "117,677.49",
     "averageAccountLoss": "-69,574.01"
-  }
+  },
+  "blockReason": "Myfxbook login error: Wrong email/password.. Full response: {\"error\":true,\"message\":\"Wrong email/password.\",\"session\":\"\"}",
+  "blockTs": "2026-04-26T04:17:49Z"
 }
