@@ -123,15 +123,30 @@ for s in outlook.get("symbols", []):
 general = outlook.get("general", {})
 print(f"[Success] Received {len(pairs)} pairs.")
 
+# Build pairs array in the format dashboard.js expects
+pairs_list = []
+for sym, v in pairs.items():
+    pairs_list.append({
+        "sym":       sym,
+        "long":      v["longPct"],
+        "short":     v["shortPct"],
+        "totalPos":  v["traders"],
+        "longPos":   round(v["traders"] * v["longPct"] / 100) if v["traders"] else 0,
+        "shortPos":  round(v["traders"] * v["shortPct"] / 100) if v["traders"] else 0,
+        "longVol":   v["longVol"],
+        "shortVol":  v["shortVol"],
+        "avgLongPx": 0,
+        "avgShortPx": 0,
+    })
+
 output = {
-    "apiBlocked":          False,
-    "lastSuccessfulFetch": TIMESTAMP,
-    "lastAttempt":         TIMESTAMP,
+    "apiBlocked": False,
+    "updated":    TIMESTAMP,
     "general": {
         "longPct":  round(float(general.get("longPercentage")  or 0), 1),
         "shortPct": round(float(general.get("shortPercentage") or 0), 1),
     },
-    "pairs": pairs,
+    "pairs": pairs_list,
 }
 
 os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
