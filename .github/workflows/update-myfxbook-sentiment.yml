@@ -1,34 +1,39 @@
-name: Update Myfxbook Sentiment — v1.5
+name: Update Myfxbook Sentiment — v1.6
 
 # Runs every hour, 24/7, Mon–Sun.
 #
 # API LIMIT: Myfxbook free tier = 100 requests/24h.
-#   Each run = 3 calls (login + outlook + logout).
-#   Running every 60 min × 24h = 24 runs/day = 72 calls/day (within limit).
-#   DO NOT use every 15 min: 96 runs/day × 3 = 288 calls — exceeds limit.
+#   Each run = 1 call (outlook only — no login/logout).
+#   Running every 60 min × 24h = 24 runs/day = 24 calls/day (well within limit).
 #
 # Lives in the PUBLIC repo (globalinvesting.github.io) — unlimited free minutes.
 #   No PAT_TOKEN needed: GITHUB_TOKEN with contents: write is sufficient
 #   because the workflow and output data live in the same repo.
 #
-# CLOUDFLARE WORKER PROXY (v1.5):
-#   Myfxbook blocks GitHub Actions IP ranges at the Cloudflare WAF level.
-#   This workflow routes all Myfxbook API calls through a Cloudflare Worker
-#   that acts as a proxy from CF's own edge IP range (not on the denylist).
-#   Architecture: GHA → CF Worker → Myfxbook → Worker → GHA
+# CLOUDFLARE WORKER PROXY (v1.6 — pre-authenticated session token):
+#   Myfxbook blocks login requests from Cloudflare Workers IP ranges.
+#   Solution: the session token is obtained once per month by the user
+#   opening the login URL in their browser, and stored as a GitHub secret.
+#   The Worker only calls get-community-outlook (not blocked from CF IPs).
+#   Architecture: GHA → CF Worker (session token) → Myfxbook outlook → GHA
 #
-# GRACEFUL DEGRADATION (v1.4):
-#   If the Worker or Myfxbook returns an unrecoverable error, the script
-#   exits 0 (non-fatal). Existing myfxbook.json is preserved with
-#   apiBlocked=true. The dashboard automatically falls back to Dukascopy.
-#   Workflow run shows as SUCCESS — no spurious failure notifications.
+# SESSION TOKEN RENEWAL (once per month):
+#   Open in browser: https://www.myfxbook.com/api/login.json?email=E&password=P
+#   Copy the "session" value → update GitHub secret MYFXBOOK_SESSION.
+#
+# GRACEFUL DEGRADATION:
+#   If the token expires or the Worker errors, the script exits 0 (non-fatal).
+#   Existing myfxbook.json is preserved with apiBlocked=true. The dashboard
+#   automatically falls back to Dukascopy.
 #
 # SECRETS REQUIRED (set in repo Settings → Secrets → Actions):
-#   MYFXBOOK_EMAIL    — email address of your Myfxbook account
-#   MYFXBOOK_PASSWORD — password of your Myfxbook account
+#   MYFXBOOK_SESSION  — session token from manual browser login (renew monthly)
 #   CF_WORKER_URL     — URL of deployed Cloudflare Worker
 #                       e.g. https://myfxbook-proxy.YOUR_SUBDOMAIN.workers.dev
 #   CF_WORKER_SECRET  — shared secret (must match WORKER_SECRET in CF Worker env vars)
+#
+# SECRETS TO DELETE (no longer needed):
+#   MYFXBOOK_EMAIL, MYFXBOOK_PASSWORD
 #
 # OUTPUT: sentiment-data/myfxbook.json (committed to repo, served via GitHub Pages)
 
@@ -69,10 +74,9 @@ jobs:
 
       - name: Fetch Myfxbook community outlook via CF Worker
         env:
-          MYFXBOOK_EMAIL:    ${{ secrets.MYFXBOOK_EMAIL }}
-          MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
-          CF_WORKER_URL:     ${{ secrets.CF_WORKER_URL }}
-          CF_WORKER_SECRET:  ${{ secrets.CF_WORKER_SECRET }}
+          MYFXBOOK_SESSION: ${{ secrets.MYFXBOOK_SESSION }}
+          CF_WORKER_URL:    ${{ secrets.CF_WORKER_URL }}
+          CF_WORKER_SECRET: ${{ secrets.CF_WORKER_SECRET }}
           SITE_PATH: .
         run: python3 scripts/fetch_myfxbook_sentiment.py
 
