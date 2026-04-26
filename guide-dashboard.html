@@ -537,6 +537,61 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
   .page-wrap { padding: 32px 18px 60px; }
 }
 
+/* ── Pair Detail inline strip (pd-inline) — copied from dashboard.css ── */
+.pd-inline-scroll { display:flex; overflow-x:auto; overflow-y:hidden; width:100%; box-sizing:border-box; }
+.pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); width:100%; }
+.pd-inline-price { display:flex; flex-direction:column; justify-content:center; padding:6px 10px; border-right:1px solid var(--border2); min-width:100px; flex-shrink:0; }
+.pd-inline-sym { font-size:13px; font-weight:700; color:var(--text); letter-spacing:.02em; line-height:1; }
+.pd-inline-rate { font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--text); line-height:1.2; margin-top:3px; }
+.pd-inline-chg { font-size:10px; font-family:var(--font-mono); font-weight:600; line-height:1; margin-top:2px; }
+.pd-inline-meta { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:2px; }
+.pd-inline-group { display:flex; flex-direction:column; justify-content:flex-start; padding:5px 8px; border-right:1px solid var(--border2); flex:1; min-width:0; }
+.pd-inline-group-lbl { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); margin-bottom:4px; white-space:nowrap; }
+.pd-inline-metrics { display:flex; gap:8px; flex-wrap:wrap; }
+.pd-inline-metric { display:flex; flex-direction:column; }
+.pd-inline-lbl { font-size:8px; color:var(--text3); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; margin-bottom:1px; }
+.pd-inline-val { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
+.pd-inline-val.pd-up { color:var(--up); }
+.pd-inline-val.pd-dn { color:var(--down); }
+.pd-inline-retail-bar { height:3px; width:100%; max-width:90px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:3px 0; }
+.pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
+.pd-inline-retail-row { display:flex; align-items:center; gap:2px; font-size:10px; font-family:var(--font-mono); font-weight:600; }
+.pd-inline-footer { font-size:8px; color:var(--text3); font-family:var(--font-mono); padding:2px 10px; border-top:1px solid var(--border); background:var(--bg2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── Pair Detail popover styles (kept for reference, not used in inline mock) ── */
+.pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
+.pd-sym { font-size:12px; font-weight:700; color:var(--text); letter-spacing:.03em; }
+.pd-price-block { padding:4px 8px 5px; border-bottom:1px solid var(--border); }
+.pd-price-row { display:flex; align-items:baseline; gap:5px; }
+.pd-price { font-size:15px; font-weight:700; font-family:var(--font-mono); color:var(--text); letter-spacing:-.01em; }
+.pd-chg { font-size:11px; font-family:var(--font-mono); font-weight:600; }
+.pd-range { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px; }
+.pd-spread-row { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:1px; }
+.pd-section { border-bottom:1px solid var(--border); }
+.pd-section--last { border-bottom:none; }
+.pd-section-lbl { font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); padding:3px 8px 1px; }
+.pd-grid { display:grid; grid-template-columns:1fr 1fr; }
+.pd-cell { padding:3px 8px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); }
+.pd-cell:nth-child(even) { border-right:none; }
+.pd-cell:last-child { border-bottom:none; }
+.pd-cell:nth-last-child(2):nth-child(odd) { border-bottom:none; }
+.pd-lbl { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:0; }
+.pd-val { font-size:11px; font-family:var(--font-mono); color:var(--text); font-weight:600; }
+.pd-up { color:var(--up); }
+.pd-dn { color:var(--down); }
+.pd-val.pd-up { color:var(--up); }
+.pd-val.pd-dn { color:var(--down); }
+.pd-dim { color:var(--text3); }
+.pd-oi-up { color:var(--up); font-size:9px; }
+.pd-oi-dn { color:var(--down); font-size:9px; }
+.pd-cot-summary { font-size:9px; font-family:var(--font-mono); color:var(--text3); padding:2px 8px 4px; border-top:1px solid var(--border); }
+.pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; border-top:1px solid var(--border); }
+.pd-cell--wide { grid-column: 1 / -1; border-right:none; }
+.pd-cell--wide:last-child { border-bottom:none; }
+.pd-retail-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:3px 0 2px; }
+.pd-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
+.pd-retail-nums { font-size:10px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
+.pd-retail-sep { color:var(--text3); margin:0 3px; }
 
 </style>
 </head>
@@ -874,110 +929,113 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
           <span style="font-size:11px;font-weight:700;color:#d1d4dc;font-family:Inter,sans-serif;">EUR / U.S. Dollar &middot; 1D</span>
           <span style="font-size:9px;color:#6b7280;margin-left:2px;">yfinance &middot; ~5min delay</span>
           <span id="gct-ohlc-vals" style="display:flex;gap:8px;margin-left:4px;">
-            <span><span style="color:#6b7280;font-size:9px;">O </span><span id="gct-o" style="color:#d1d4dc;">1.1502</span></span>
-            <span><span style="color:#6b7280;font-size:9px;">H </span><span id="gct-h" style="color:#26a69a;">1.1527</span></span>
-            <span><span style="color:#6b7280;font-size:9px;">L </span><span id="gct-l" style="color:#ef5350;">1.1510</span></span>
-            <span><span style="color:#6b7280;font-size:9px;">C </span><span id="gct-c" style="color:#d1d4dc;">1.1517</span></span>
-            <span id="gct-chg" style="color:#ef5350;">-0.00214 (-0.19%)</span>
+            <span><span style="color:#6b7280;font-size:9px;">O </span><span id="gct-o" style="color:#d1d4dc;">1.17060</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">H </span><span id="gct-h" style="color:#26a69a;">1.17275</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">L </span><span id="gct-l" style="color:#ef5350;">1.16768</span></span>
+            <span><span style="color:#6b7280;font-size:9px;">C </span><span id="gct-c" style="color:#d1d4dc;">1.17261</span></span>
+            <span id="gct-chg" style="color:#26a69a;">+0.00380 (+0.33%)</span>
           </span>
-          <span id="gct-ma-legend" style="color:#2196f3;font-size:10px;margin-left:4px;display:none;">MA 20 &nbsp;1.1423</span>
+          <span id="gct-ma-legend" style="color:#2196f3;font-size:10px;margin-left:4px;">MA 20 &nbsp;1.1726</span>
         </div>
-        <!-- Chart container — static SVG candles visible immediately; replaced by LWC on load -->
+        <!-- Chart container — pure static SVG, pixel-perfect 3M EUR/USD replica -->
         <div id="gct-container" style="width:100%;height:260px;background:#131722;position:relative;">
-          <svg id="gct-static-svg" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;position:absolute;top:0;left:0;">
-            <!-- Grid lines -->
-            <line x1="0" y1="26"  x2="650" y2="26"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="78"  x2="650" y2="78"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="130" x2="650" y2="130" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="182" x2="650" y2="182" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
-            <line x1="0" y1="234" x2="650" y2="234" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+          <svg id="gct-static-svg" viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+            <!-- Grid lines — Y: 1.14 to 1.20, 6 levels -->
+            <line x1="0" y1="16"  x2="700" y2="16"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="62"  x2="700" y2="62"  stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="108" x2="700" y2="108" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="154" x2="700" y2="154" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="200" x2="700" y2="200" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
+            <line x1="0" y1="244" x2="700" y2="244" stroke="#2a2e39" stroke-width="0.5" stroke-dasharray="2,4"/>
             <!-- Y-axis labels -->
-            <text x="654" y="30"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.2000</text>
-            <text x="654" y="82"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1700</text>
-            <text x="654" y="134" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1400</text>
-            <text x="654" y="186" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1100</text>
-            <text x="654" y="238" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.0800</text>
+            <text x="703" y="20"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.2000</text>
+            <text x="703" y="66"  fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1900</text>
+            <text x="703" y="112" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1800</text>
+            <text x="703" y="158" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1700</text>
+            <text x="703" y="204" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1600</text>
+            <text x="703" y="248" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">1.1500</text>
             <!-- Time axis -->
-            <line x1="0" y1="248" x2="650" y2="248" stroke="#2a2e39" stroke-width="0.8"/>
-            <text x="12"  y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Dec</text>
-            <text x="152" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Jan</text>
-            <text x="292" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Feb</text>
-            <text x="412" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Mar</text>
-            <text x="532" y="258" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">Apr</text>
-            <!-- Dec candles: rising ~1.052→1.098 (y≈217→186) -->
-            <line x1="18"  y1="213" x2="18"  y2="220" stroke="#26a69a" stroke-width="1"/><rect x="15"  y="214" width="6" height="6"  fill="#26a69a"/>
-            <line x1="28"  y1="210" x2="28"  y2="217" stroke="#26a69a" stroke-width="1"/><rect x="25"  y="211" width="6" height="5"  fill="#26a69a"/>
-            <line x1="38"  y1="205" x2="38"  y2="213" stroke="#ef5350" stroke-width="1"/><rect x="35"  y="207" width="6" height="6"  fill="#ef5350"/>
-            <line x1="48"  y1="200" x2="48"  y2="208" stroke="#26a69a" stroke-width="1"/><rect x="45"  y="201" width="6" height="6"  fill="#26a69a"/>
-            <line x1="58"  y1="197" x2="58"  y2="204" stroke="#26a69a" stroke-width="1"/><rect x="55"  y="198" width="6" height="5"  fill="#26a69a"/>
-            <line x1="68"  y1="193" x2="68"  y2="200" stroke="#ef5350" stroke-width="1"/><rect x="65"  y="195" width="6" height="5"  fill="#ef5350"/>
-            <line x1="78"  y1="189" x2="78"  y2="197" stroke="#26a69a" stroke-width="1"/><rect x="75"  y="191" width="6" height="5"  fill="#26a69a"/>
-            <line x1="88"  y1="186" x2="88"  y2="193" stroke="#26a69a" stroke-width="1"/><rect x="85"  y="188" width="6" height="5"  fill="#26a69a"/>
-            <line x1="98"  y1="184" x2="98"  y2="191" stroke="#ef5350" stroke-width="1"/><rect x="95"  y="185" width="6" height="5"  fill="#ef5350"/>
-            <line x1="108" y1="181" x2="108" y2="188" stroke="#26a69a" stroke-width="1"/><rect x="105" y="182" width="6" height="5"  fill="#26a69a"/>
-            <line x1="118" y1="179" x2="118" y2="185" stroke="#26a69a" stroke-width="1"/><rect x="115" y="180" width="6" height="4"  fill="#26a69a"/>
-            <line x1="128" y1="186" x2="128" y2="179" stroke="#ef5350" stroke-width="1"/><rect x="125" y="181" width="6" height="5"  fill="#ef5350"/>
-            <!-- Jan candles: rising ~1.098→1.155 (y≈186→148) -->
-            <line x1="152" y1="180" x2="152" y2="188" stroke="#26a69a" stroke-width="1"/><rect x="149" y="181" width="6" height="6"  fill="#26a69a"/>
-            <line x1="162" y1="174" x2="162" y2="182" stroke="#26a69a" stroke-width="1"/><rect x="159" y="176" width="6" height="5"  fill="#26a69a"/>
-            <line x1="172" y1="169" x2="172" y2="177" stroke="#ef5350" stroke-width="1"/><rect x="169" y="170" width="6" height="6"  fill="#ef5350"/>
-            <line x1="182" y1="163" x2="182" y2="171" stroke="#26a69a" stroke-width="1"/><rect x="179" y="164" width="6" height="6"  fill="#26a69a"/>
-            <line x1="192" y1="158" x2="192" y2="166" stroke="#26a69a" stroke-width="1"/><rect x="189" y="159" width="6" height="6"  fill="#26a69a"/>
-            <line x1="202" y1="153" x2="202" y2="161" stroke="#ef5350" stroke-width="1"/><rect x="199" y="154" width="6" height="6"  fill="#ef5350"/>
-            <line x1="212" y1="149" x2="212" y2="157" stroke="#26a69a" stroke-width="1"/><rect x="209" y="150" width="6" height="6"  fill="#26a69a"/>
-            <line x1="222" y1="145" x2="222" y2="152" stroke="#26a69a" stroke-width="1"/><rect x="219" y="146" width="6" height="5"  fill="#26a69a"/>
-            <line x1="232" y1="142" x2="232" y2="149" stroke="#ef5350" stroke-width="1"/><rect x="229" y="143" width="6" height="5"  fill="#ef5350"/>
-            <line x1="242" y1="149" x2="242" y2="143" stroke="#ef5350" stroke-width="1"/><rect x="239" y="144" width="6" height="5"  fill="#ef5350"/>
-            <!-- Feb candles: peak ~1.202 (y≈104) then reversal -->
-            <line x1="292" y1="140" x2="292" y2="135" stroke="#26a69a" stroke-width="1"/><rect x="289" y="136" width="6" height="7"  fill="#26a69a"/>
-            <line x1="302" y1="128" x2="302" y2="122" stroke="#26a69a" stroke-width="1"/><rect x="299" y="123" width="6" height="7"  fill="#26a69a"/>
-            <line x1="312" y1="114" x2="312" y2="108" stroke="#26a69a" stroke-width="1"/><rect x="309" y="109" width="6" height="7"  fill="#26a69a"/>
-            <!-- Fed CB marker -->
-            <polygon points="322,68 326,62 330,68" fill="#4f7fff"/>
-            <line x1="322" y1="100" x2="322" y2="95"  stroke="#26a69a" stroke-width="1"/><rect x="319" y="96" width="6" height="7"  fill="#26a69a"/>
-            <line x1="332" y1="104" x2="332" y2="100" stroke="#26a69a" stroke-width="1"/><rect x="329" y="101" width="6" height="7"  fill="#26a69a"/>
-            <!-- Peak -->
-            <line x1="342" y1="106" x2="342" y2="100" stroke="#ef5350" stroke-width="1"/><rect x="339" y="101" width="6" height="7"  fill="#ef5350"/>
-            <line x1="352" y1="115" x2="352" y2="109" stroke="#ef5350" stroke-width="1"/><rect x="349" y="110" width="6" height="7"  fill="#ef5350"/>
-            <line x1="362" y1="125" x2="362" y2="119" stroke="#ef5350" stroke-width="1"/><rect x="359" y="120" width="6" height="7"  fill="#ef5350"/>
-            <!-- Mar candles: declining ~1.165→1.107 (y≈148→188) -->
-            <!-- ECB CB marker -->
-            <polygon points="412,68 416,62 420,68" fill="#f6941c"/>
-            <line x1="412" y1="134" x2="412" y2="140" stroke="#ef5350" stroke-width="1"/><rect x="409" y="135" width="6" height="7"  fill="#ef5350"/>
-            <line x1="422" y1="141" x2="422" y2="148" stroke="#ef5350" stroke-width="1"/><rect x="419" y="142" width="6" height="7"  fill="#ef5350"/>
-            <!-- Fed CB marker Mar -->
-            <polygon points="435,68 439,62 443,68" fill="#4f7fff"/>
-            <line x1="432" y1="149" x2="432" y2="156" stroke="#26a69a" stroke-width="1"/><rect x="429" y="150" width="6" height="6"  fill="#26a69a"/>
-            <line x1="442" y1="154" x2="442" y2="161" stroke="#ef5350" stroke-width="1"/><rect x="439" y="155" width="6" height="7"  fill="#ef5350"/>
-            <line x1="452" y1="158" x2="452" y2="165" stroke="#ef5350" stroke-width="1"/><rect x="449" y="159" width="6" height="7"  fill="#ef5350"/>
-            <line x1="462" y1="162" x2="462" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="459" y="163" width="6" height="5"  fill="#26a69a"/>
-            <line x1="472" y1="163" x2="472" y2="169" stroke="#ef5350" stroke-width="1"/><rect x="469" y="164" width="6" height="5"  fill="#ef5350"/>
-            <line x1="482" y1="162" x2="482" y2="168" stroke="#26a69a" stroke-width="1"/><rect x="479" y="163" width="6" height="5"  fill="#26a69a"/>
-            <line x1="492" y1="161" x2="492" y2="167" stroke="#26a69a" stroke-width="1"/><rect x="489" y="162" width="6" height="5"  fill="#26a69a"/>
-            <!-- Apr candles: ~1.113→1.132 (y≈186→174) recovery -->
-            <!-- ECB CB marker Apr -->
-            <polygon points="545,68 549,62 553,68" fill="#f6941c"/>
-            <line x1="532" y1="173" x2="532" y2="179" stroke="#26a69a" stroke-width="1"/><rect x="529" y="174" width="6" height="6"  fill="#26a69a"/>
-            <line x1="542" y1="170" x2="542" y2="176" stroke="#26a69a" stroke-width="1"/><rect x="539" y="171" width="6" height="5"  fill="#26a69a"/>
-            <line x1="552" y1="167" x2="552" y2="173" stroke="#ef5350" stroke-width="1"/><rect x="549" y="168" width="6" height="5"  fill="#ef5350"/>
-            <line x1="562" y1="165" x2="562" y2="171" stroke="#26a69a" stroke-width="1"/><rect x="559" y="166" width="6" height="5"  fill="#26a69a"/>
-            <line x1="572" y1="163" x2="572" y2="169" stroke="#26a69a" stroke-width="1"/><rect x="569" y="164" width="6" height="5"  fill="#26a69a"/>
-            <line x1="582" y1="161" x2="582" y2="167" stroke="#26a69a" stroke-width="1"/><rect x="579" y="162" width="6" height="5"  fill="#26a69a"/>
-            <line x1="592" y1="160" x2="592" y2="166" stroke="#ef5350" stroke-width="1"/><rect x="589" y="161" width="6" height="5"  fill="#ef5350"/>
-            <!-- MA 20 line -->
-            <polyline points="18,218 88,192 152,186 222,150 292,140 312,115 342,107 412,138 452,160 492,163 532,176 592,163" fill="none" stroke="#2196f3" stroke-width="1.5" opacity="0.85"/>
-            <!-- Previous close dashed line -->
-            <line x1="0" y1="163" x2="650" y2="163" stroke="#787b86" stroke-width="0.6" stroke-dasharray="4,3" opacity="0.5"/>
-            <!-- Current price badge -->
-            <rect x="612" y="157" width="48" height="14" rx="2" fill="#ef5350"/>
-            <text x="615" y="167" fill="#fff" font-size="8.5" font-family="'JetBrains Mono',monospace">1.13170</text>
-            <!-- CB legend -->
-            <polygon points="8,65 12,59 16,65" fill="#4f7fff"/><text x="18" y="66" fill="#787b86" font-size="8" font-family="Inter,sans-serif">Fed</text>
-            <polygon points="42,65 46,59 50,65" fill="#f6941c"/><text x="52" y="66" fill="#787b86" font-size="8" font-family="Inter,sans-serif">ECB</text>
+            <line x1="0" y1="250" x2="700" y2="250" stroke="#2a2e39" stroke-width="0.8"/>
+            <text x="12"  y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">feb</text>
+            <text x="88"  y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">12</text>
+            <text x="224" y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">mar</text>
+            <text x="308" y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">12</text>
+            <text x="455" y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">abr</text>
+            <text x="554" y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">13</text>
+            <text x="609" y="259" fill="#787b86" font-size="9" font-family="'JetBrains Mono',monospace">23</text>
+            <!-- Candles -->
+            <line x1="15" y1="88.2" x2="15" y2="111.0" stroke="#26a69a" stroke-width="1"/><rect x="12" y="92.0" width="7" height="9.5" fill="#26a69a"/>
+            <line x1="26" y1="76.8" x2="26" y2="101.5" stroke="#26a69a" stroke-width="1"/><rect x="23" y="78.7" width="7" height="13.3" fill="#26a69a"/>
+            <line x1="37" y1="65.4" x2="37" y2="88.2" stroke="#ef5350" stroke-width="1"/><rect x="34" y="78.7" width="7" height="5.7" fill="#ef5350"/>
+            <line x1="48" y1="71.1" x2="48" y2="95.8" stroke="#26a69a" stroke-width="1"/><rect x="45" y="73.0" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="59" y1="46.4" x2="59" y2="76.8" stroke="#26a69a" stroke-width="1"/><rect x="56" y="52.1" width="7" height="20.9" fill="#26a69a"/>
+            <line x1="70" y1="35.0" x2="70" y2="63.5" stroke="#ef5350" stroke-width="1"/><rect x="67" y="52.1" width="7" height="9.5" fill="#ef5350"/>
+            <line x1="81" y1="38.8" x2="81" y2="69.2" stroke="#26a69a" stroke-width="1"/><rect x="78" y="42.6" width="7" height="19.0" fill="#26a69a"/>
+            <line x1="92" y1="19.8" x2="92" y2="54.0" stroke="#26a69a" stroke-width="1"/><rect x="89" y="31.2" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="103" y1="12.2" x2="103" y2="38.8" stroke="#26a69a" stroke-width="1"/><rect x="100" y="23.6" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="114" y1="0.8" x2="114" y2="31.2" stroke="#26a69a" stroke-width="1"/><rect x="111" y="16.0" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="125" y1="0.8" x2="125" y2="31.2" stroke="#ef5350" stroke-width="1"/><rect x="122" y="16.0" width="7" height="9.5" fill="#ef5350"/>
+            <line x1="136" y1="8.4" x2="136" y2="38.8" stroke="#ef5350" stroke-width="1"/><rect x="133" y="25.5" width="7" height="9.5" fill="#ef5350"/>
+            <line x1="147" y1="19.8" x2="147" y2="54.0" stroke="#ef5350" stroke-width="1"/><rect x="144" y="35.0" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="158" y1="35.0" x2="158" y2="69.2" stroke="#ef5350" stroke-width="1"/><rect x="155" y="50.2" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="169" y1="50.2" x2="169" y2="84.4" stroke="#ef5350" stroke-width="1"/><rect x="166" y="65.4" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="180" y1="65.4" x2="180" y2="95.8" stroke="#26a69a" stroke-width="1"/><rect x="177" y="73.0" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="191" y1="57.8" x2="191" y2="92.0" stroke="#ef5350" stroke-width="1"/><rect x="188" y="73.0" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="202" y1="76.8" x2="202" y2="107.2" stroke="#ef5350" stroke-width="1"/><rect x="199" y="88.2" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="213" y1="88.2" x2="213" y2="118.6" stroke="#ef5350" stroke-width="1"/><rect x="210" y="103.4" width="7" height="11.4" fill="#ef5350"/>
+            <line x1="224" y1="99.6" x2="224" y2="130.0" stroke="#ef5350" stroke-width="1"/><rect x="221" y="114.8" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="235" y1="107.2" x2="235" y2="141.4" stroke="#ef5350" stroke-width="1"/><rect x="232" y="122.4" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="246" y1="126.2" x2="246" y2="160.4" stroke="#ef5350" stroke-width="1"/><rect x="243" y="137.6" width="7" height="19.0" fill="#ef5350"/>
+            <line x1="257" y1="141.4" x2="257" y2="179.4" stroke="#ef5350" stroke-width="1"/><rect x="254" y="156.6" width="7" height="19.0" fill="#ef5350"/>
+            <line x1="268" y1="164.2" x2="268" y2="198.4" stroke="#ef5350" stroke-width="1"/><rect x="265" y="175.6" width="7" height="15.2" fill="#ef5350"/>
+            <line x1="279" y1="175.6" x2="279" y2="217.4" stroke="#ef5350" stroke-width="1"/><rect x="276" y="190.8" width="7" height="22.8" fill="#ef5350"/>
+            <line x1="290" y1="194.6" x2="290" y2="228.8" stroke="#ef5350" stroke-width="1"/><rect x="287" y="213.6" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="301" y1="206.0" x2="301" y2="232.6" stroke="#26a69a" stroke-width="1"/><rect x="298" y="209.8" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="312" y1="190.8" x2="312" y2="221.2" stroke="#ef5350" stroke-width="1"/><rect x="309" y="209.8" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="323" y1="202.2" x2="323" y2="228.8" stroke="#26a69a" stroke-width="1"/><rect x="320" y="206.0" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="334" y1="190.8" x2="334" y2="217.4" stroke="#ef5350" stroke-width="1"/><rect x="331" y="206.0" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="345" y1="198.4" x2="345" y2="225.0" stroke="#26a69a" stroke-width="1"/><rect x="342" y="202.2" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="356" y1="183.2" x2="356" y2="213.6" stroke="#26a69a" stroke-width="1"/><rect x="353" y="198.4" width="7" height="3.8" fill="#26a69a"/>
+            <line x1="367" y1="179.4" x2="367" y2="209.8" stroke="#26a69a" stroke-width="1"/><rect x="364" y="190.8" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="378" y1="168.0" x2="378" y2="202.2" stroke="#26a69a" stroke-width="1"/><rect x="375" y="183.2" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="389" y1="160.4" x2="389" y2="194.6" stroke="#26a69a" stroke-width="1"/><rect x="386" y="175.6" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="400" y1="152.8" x2="400" y2="187.0" stroke="#26a69a" stroke-width="1"/><rect x="397" y="164.2" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="411" y1="137.6" x2="411" y2="175.6" stroke="#ef5350" stroke-width="1"/><rect x="408" y="164.2" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="422" y1="149.0" x2="422" y2="183.2" stroke="#26a69a" stroke-width="1"/><rect x="419" y="152.8" width="7" height="19.0" fill="#26a69a"/>
+            <line x1="433" y1="130.0" x2="433" y2="164.2" stroke="#26a69a" stroke-width="1"/><rect x="430" y="145.2" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="444" y1="122.4" x2="444" y2="156.6" stroke="#26a69a" stroke-width="1"/><rect x="441" y="137.6" width="7" height="7.6" fill="#26a69a"/>
+            <line x1="455" y1="111.0" x2="455" y2="149.0" stroke="#26a69a" stroke-width="1"/><rect x="452" y="122.4" width="7" height="15.2" fill="#26a69a"/>
+            <line x1="466" y1="95.8" x2="466" y2="133.8" stroke="#26a69a" stroke-width="1"/><rect x="463" y="107.2" width="7" height="15.2" fill="#26a69a"/>
+            <line x1="477" y1="84.4" x2="477" y2="122.4" stroke="#ef5350" stroke-width="1"/><rect x="474" y="107.2" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="488" y1="95.8" x2="488" y2="126.2" stroke="#26a69a" stroke-width="1"/><rect x="485" y="99.6" width="7" height="15.2" fill="#26a69a"/>
+            <line x1="499" y1="76.8" x2="499" y2="111.0" stroke="#26a69a" stroke-width="1"/><rect x="496" y="88.2" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="510" y1="65.4" x2="510" y2="99.6" stroke="#ef5350" stroke-width="1"/><rect x="507" y="88.2" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="521" y1="73.0" x2="521" y2="107.2" stroke="#26a69a" stroke-width="1"/><rect x="518" y="80.6" width="7" height="15.2" fill="#26a69a"/>
+            <line x1="532" y1="61.6" x2="532" y2="95.8" stroke="#ef5350" stroke-width="1"/><rect x="529" y="80.6" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="543" y1="69.2" x2="543" y2="99.6" stroke="#26a69a" stroke-width="1"/><rect x="540" y="76.8" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="554" y1="57.8" x2="554" y2="92.0" stroke="#ef5350" stroke-width="1"/><rect x="551" y="76.8" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="565" y1="65.4" x2="565" y2="95.8" stroke="#26a69a" stroke-width="1"/><rect x="562" y="69.2" width="7" height="15.2" fill="#26a69a"/>
+            <line x1="576" y1="50.2" x2="576" y2="80.6" stroke="#ef5350" stroke-width="1"/><rect x="573" y="69.2" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="587" y1="57.8" x2="587" y2="88.2" stroke="#26a69a" stroke-width="1"/><rect x="584" y="65.4" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="598" y1="46.4" x2="598" y2="76.8" stroke="#ef5350" stroke-width="1"/><rect x="595" y="65.4" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="609" y1="54.0" x2="609" y2="84.4" stroke="#26a69a" stroke-width="1"/><rect x="606" y="61.6" width="7" height="11.4" fill="#26a69a"/>
+            <line x1="620" y1="42.6" x2="620" y2="73.0" stroke="#ef5350" stroke-width="1"/><rect x="617" y="61.6" width="7" height="7.6" fill="#ef5350"/>
+            <line x1="631" y1="61.2" x2="631" y2="138.7" stroke="#ef5350" stroke-width="1"/><rect x="628" y="82.1" width="7" height="38.0" fill="#ef5350"/>
+            <!-- MA 20 curve -->
+            <polyline points="M15,93.9 L37,84.4 L70,63.5 L103,33.1 L136,19.8 L169,38.8 L202,65.4 L235,99.6 L268,137.6 L290,179.4 L312,202.2 L334,209.8 L356,202.2 L389,188.9 L422,175.6 L455,156.6 L488,130.0 L521,107.2 L554,88.2 L587,74.9 L620,73.0 L631,76.8" fill="none" stroke="#2196f3" stroke-width="1.5" opacity="0.9"/>
+            <!-- Prev Close dashed line at 1.17261 -->
+            <line x1="0" y1="120.1" x2="700" y2="120.1" stroke="#787b86" stroke-width="0.7" stroke-dasharray="4,3" opacity="0.6"/>
+            <text x="634" y="116.1" fill="#787b86" font-size="8" font-family="'JetBrains Mono',monospace">Prev C</text>
+            <!-- Price badge 1.17261 (teal) -->
+            <rect x="644" y="113.1" width="52" height="14" rx="2" fill="#26a69a"/>
+            <text x="647" y="124.1" fill="#fff" font-size="8.5" font-family="'JetBrains Mono',monospace">1.17261</text>
+            <!-- MA badge 1.16642 (blue) -->
+            <rect x="644" y="136.6" width="52" height="14" rx="2" fill="#2196f3"/>
+            <text x="647" y="147.6" fill="#fff" font-size="8.5" font-family="'JetBrains Mono',monospace">1.16642</text>
           </svg>
         </div>
-      </div>
-      <!-- Inline styles for guide chart mock buttons -->
+      </div><!-- /guide-chart-wrap -->
+      <!-- inline styles for guide chart mock buttons -->
       <style>
         .gct-rb,.gct-tb{background:transparent;border:1px solid #2a2e39;border-radius:3px;color:#787b86;font-size:9px;font-family:Inter,-apple-system,sans-serif;padding:1px 6px;cursor:pointer;letter-spacing:.04em;}
         .gct-rb:hover,.gct-tb:hover{background:#2a2e39;color:#d1d4dc;}
@@ -986,245 +1044,6 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
         .gct{transition:color .12s;}
         .gct:hover{color:#d1d4dc;}
       </style>
-      <!-- LightweightCharts v5 interactive chart with hardcoded EUR/USD OHLC data -->
-      <script>
-      (function() {
-        var _GCT_DATA = [
-          {time:'2025-12-02',open:1.0520,high:1.0562,low:1.0501,close:1.0545},
-          {time:'2025-12-03',open:1.0545,high:1.0580,low:1.0522,close:1.0558},
-          {time:'2025-12-04',open:1.0558,high:1.0601,low:1.0540,close:1.0590},
-          {time:'2025-12-05',open:1.0590,high:1.0625,low:1.0565,close:1.0610},
-          {time:'2025-12-08',open:1.0610,high:1.0648,low:1.0588,close:1.0635},
-          {time:'2025-12-09',open:1.0635,high:1.0670,low:1.0608,close:1.0655},
-          {time:'2025-12-10',open:1.0655,high:1.0692,low:1.0628,close:1.0678},
-          {time:'2025-12-11',open:1.0678,high:1.0715,low:1.0650,close:1.0700},
-          {time:'2025-12-12',open:1.0700,high:1.0738,low:1.0670,close:1.0722},
-          {time:'2025-12-15',open:1.0722,high:1.0760,low:1.0692,close:1.0745},
-          {time:'2025-12-16',open:1.0745,high:1.0782,low:1.0718,close:1.0768},
-          {time:'2025-12-17',open:1.0768,high:1.0800,low:1.0740,close:1.0788},
-          {time:'2025-12-18',open:1.0788,high:1.0825,low:1.0760,close:1.0810},
-          {time:'2025-12-19',open:1.0810,high:1.0845,low:1.0780,close:1.0830},
-          {time:'2025-12-22',open:1.0830,high:1.0868,low:1.0800,close:1.0852},
-          {time:'2025-12-23',open:1.0852,high:1.0890,low:1.0822,close:1.0875},
-          {time:'2025-12-24',open:1.0875,high:1.0910,low:1.0845,close:1.0895},
-          {time:'2025-12-26',open:1.0895,high:1.0932,low:1.0862,close:1.0920},
-          {time:'2025-12-27',open:1.0920,high:1.0958,low:1.0885,close:1.0942},
-          {time:'2025-12-30',open:1.0942,high:1.0980,low:1.0905,close:1.0962},
-          {time:'2025-12-31',open:1.0962,high:1.1005,low:1.0928,close:1.0985},
-          {time:'2026-01-02',open:1.0985,high:1.1025,low:1.0950,close:1.1010},
-          {time:'2026-01-05',open:1.1010,high:1.1052,low:1.0978,close:1.1038},
-          {time:'2026-01-06',open:1.1038,high:1.1080,low:1.1005,close:1.1062},
-          {time:'2026-01-07',open:1.1062,high:1.1105,low:1.1030,close:1.1088},
-          {time:'2026-01-08',open:1.1088,high:1.1130,low:1.1055,close:1.1112},
-          {time:'2026-01-09',open:1.1112,high:1.1158,low:1.1080,close:1.1138},
-          {time:'2026-01-12',open:1.1138,high:1.1185,low:1.1105,close:1.1162},
-          {time:'2026-01-13',open:1.1162,high:1.1210,low:1.1130,close:1.1188},
-          {time:'2026-01-14',open:1.1188,high:1.1235,low:1.1155,close:1.1215},
-          {time:'2026-01-15',open:1.1215,high:1.1262,low:1.1182,close:1.1242},
-          {time:'2026-01-16',open:1.1242,high:1.1290,low:1.1210,close:1.1268},
-          {time:'2026-01-19',open:1.1268,high:1.1318,low:1.1235,close:1.1295},
-          {time:'2026-01-20',open:1.1295,high:1.1345,low:1.1262,close:1.1322},
-          {time:'2026-01-21',open:1.1322,high:1.1372,low:1.1290,close:1.1350},
-          {time:'2026-01-22',open:1.1350,high:1.1400,low:1.1318,close:1.1378},
-          {time:'2026-01-23',open:1.1378,high:1.1428,low:1.1345,close:1.1405},
-          {time:'2026-01-26',open:1.1405,high:1.1458,low:1.1372,close:1.1435},
-          {time:'2026-01-27',open:1.1435,high:1.1488,low:1.1402,close:1.1465},
-          {time:'2026-01-28',open:1.1465,high:1.1518,low:1.1430,close:1.1492},
-          {time:'2026-01-29',open:1.1492,high:1.1545,low:1.1458,close:1.1520},
-          {time:'2026-01-30',open:1.1520,high:1.1575,low:1.1485,close:1.1548},
-          {time:'2026-02-02',open:1.1548,high:1.1608,low:1.1512,close:1.1580},
-          {time:'2026-02-03',open:1.1580,high:1.1645,low:1.1542,close:1.1618},
-          {time:'2026-02-04',open:1.1618,high:1.1688,low:1.1578,close:1.1658},
-          {time:'2026-02-05',open:1.1658,high:1.1732,low:1.1618,close:1.1700},
-          {time:'2026-02-06',open:1.1700,high:1.1778,low:1.1658,close:1.1748},
-          {time:'2026-02-09',open:1.1748,high:1.1832,low:1.1705,close:1.1800},
-          {time:'2026-02-10',open:1.1800,high:1.1888,low:1.1755,close:1.1855},
-          {time:'2026-02-11',open:1.1855,high:1.1945,low:1.1808,close:1.1912},
-          {time:'2026-02-12',open:1.1912,high:1.2005,low:1.1865,close:1.1972},
-          {time:'2026-02-13',open:1.1972,high:1.2048,low:1.1920,close:1.2018},
-          {time:'2026-02-17',open:1.2018,high:1.2062,low:1.1958,close:1.1998},
-          {time:'2026-02-18',open:1.1998,high:1.2028,low:1.1918,close:1.1945},
-          {time:'2026-02-19',open:1.1945,high:1.1978,low:1.1862,close:1.1888},
-          {time:'2026-02-20',open:1.1888,high:1.1920,low:1.1808,close:1.1832},
-          {time:'2026-02-23',open:1.1832,high:1.1862,low:1.1748,close:1.1775},
-          {time:'2026-02-24',open:1.1775,high:1.1808,low:1.1692,close:1.1718},
-          {time:'2026-02-25',open:1.1718,high:1.1752,low:1.1635,close:1.1662},
-          {time:'2026-02-26',open:1.1662,high:1.1698,low:1.1580,close:1.1605},
-          {time:'2026-02-27',open:1.1605,high:1.1645,low:1.1528,close:1.1552},
-          {time:'2026-03-02',open:1.1552,high:1.1592,low:1.1478,close:1.1502},
-          {time:'2026-03-03',open:1.1502,high:1.1542,low:1.1425,close:1.1452},
-          {time:'2026-03-04',open:1.1452,high:1.1492,low:1.1372,close:1.1402},
-          {time:'2026-03-05',open:1.1402,high:1.1445,low:1.1322,close:1.1355},
-          {time:'2026-03-06',open:1.1355,high:1.1398,low:1.1275,close:1.1308},
-          {time:'2026-03-09',open:1.1308,high:1.1355,low:1.1232,close:1.1268},
-          {time:'2026-03-10',open:1.1268,high:1.1315,low:1.1195,close:1.1232},
-          {time:'2026-03-11',open:1.1232,high:1.1282,low:1.1162,close:1.1200},
-          {time:'2026-03-12',open:1.1200,high:1.1252,low:1.1132,close:1.1172},
-          {time:'2026-03-13',open:1.1172,high:1.1225,low:1.1108,close:1.1148},
-          {time:'2026-03-16',open:1.1148,high:1.1200,low:1.1085,close:1.1128},
-          {time:'2026-03-17',open:1.1128,high:1.1182,low:1.1068,close:1.1110},
-          {time:'2026-03-18',open:1.1110,high:1.1165,low:1.1052,close:1.1095},
-          {time:'2026-03-19',open:1.1095,high:1.1152,low:1.1038,close:1.1082},
-          {time:'2026-03-20',open:1.1082,high:1.1142,low:1.1025,close:1.1072},
-          {time:'2026-03-23',open:1.1072,high:1.1135,low:1.1015,close:1.1068},
-          {time:'2026-03-24',open:1.1068,high:1.1128,low:1.1008,close:1.1065},
-          {time:'2026-03-25',open:1.1065,high:1.1128,low:1.1002,close:1.1062},
-          {time:'2026-03-26',open:1.1062,high:1.1130,low:1.0998,close:1.1060},
-          {time:'2026-03-27',open:1.1060,high:1.1132,low:1.0995,close:1.1062},
-          {time:'2026-03-30',open:1.1062,high:1.1138,low:1.1000,close:1.1068},
-          {time:'2026-03-31',open:1.1068,high:1.1145,low:1.1008,close:1.1075},
-          {time:'2026-04-01',open:1.1075,high:1.1155,low:1.1018,close:1.1085},
-          {time:'2026-04-02',open:1.1085,high:1.1168,low:1.1028,close:1.1098},
-          {time:'2026-04-03',open:1.1098,high:1.1182,low:1.1040,close:1.1115},
-          {time:'2026-04-06',open:1.1115,high:1.1200,low:1.1055,close:1.1132},
-          {time:'2026-04-07',open:1.1132,high:1.1218,low:1.1072,close:1.1148},
-          {time:'2026-04-08',open:1.1148,high:1.1235,low:1.1088,close:1.1162},
-          {time:'2026-04-09',open:1.1162,high:1.1250,low:1.1102,close:1.1175},
-          {time:'2026-04-10',open:1.1175,high:1.1265,low:1.1115,close:1.1190},
-          {time:'2026-04-13',open:1.1190,high:1.1278,low:1.1130,close:1.1205},
-          {time:'2026-04-14',open:1.1205,high:1.1290,low:1.1145,close:1.1220},
-          {time:'2026-04-15',open:1.1220,high:1.1302,low:1.1158,close:1.1235},
-          {time:'2026-04-16',open:1.1235,high:1.1315,low:1.1175,close:1.1250},
-          {time:'2026-04-17',open:1.1250,high:1.1328,low:1.1190,close:1.1265},
-          {time:'2026-04-22',open:1.1265,high:1.1340,low:1.1205,close:1.1278},
-          {time:'2026-04-23',open:1.1278,high:1.1355,low:1.1218,close:1.1292},
-          {time:'2026-04-24',open:1.1292,high:1.1365,low:1.1230,close:1.1302},
-          {time:'2026-04-25',open:1.1302,high:1.1370,low:1.1241,close:1.1317}
-        ];
-        var _GCT_CB_DATES = {
-          '2026-01-29': {cb:'Fed',color:'#4f7fff'},
-          '2026-03-06': {cb:'ECB',color:'#f6941c'},
-          '2026-03-19': {cb:'Fed',color:'#4f7fff'},
-          '2026-04-17': {cb:'ECB',color:'#f6941c'}
-        };
-        var _gctChart=null,_gctSeries=null,_gctMaSeries=null,_gctVolSeries=null,_gctPcSeries=null,
-            _gctType='candle',_gctDays=91,_gctShowPC=true,_gctShowVOL=false,_gctShowWM=false,
-            _gctShowCB=true,_gctShowMA=false,_gctLog=false;
-        function _gctFmt(v){return v?v.toFixed(5):'—';}
-        function _gctFilterData(days){
-          if(!days)return _GCT_DATA;
-          var cut=Date.now()/1000-days*86400;
-          return _GCT_DATA.filter(function(d){return new Date(d.time).getTime()/1000>=cut;});
-        }
-        function _computeMA(data,period){
-          var out=[];
-          for(var i=0;i<data.length;i++){
-            if(i<period-1){out.push({time:data[i].time,value:null});continue;}
-            var s=0;for(var j=i-period+1;j<=i;j++)s+=data[j].close;
-            out.push({time:data[i].time,value:parseFloat((s/period).toFixed(5))});
-          }
-          return out;
-        }
-        function _gctRender(){
-          var container=document.getElementById('gct-container');
-          if(!container||!window.LightweightCharts)return;
-          if(_gctChart){_gctChart.remove();_gctChart=null;_gctSeries=null;_gctMaSeries=null;_gctVolSeries=null;_gctPcSeries=null;}
-          // Hide the static SVG fallback once LWC takes over
-          var staticSvg=document.getElementById('gct-static-svg');
-          if(staticSvg)staticSvg.style.display='none';
-          _gctChart=LightweightCharts.createChart(container,{
-            layout:{background:{type:'Solid',color:'#131722'},textColor:'#787b86',attributionLogo:false},
-            grid:{vertLines:{color:'#2a2e39',style:1},horzLines:{color:'#2a2e39',style:1}},
-            crosshair:{mode:1},
-            rightPriceScale:{borderColor:'#2a2e39',mode:_gctLog?1:0},
-            timeScale:{borderColor:'#2a2e39',timeVisible:true,secondsVisible:false},
-            handleScroll:true,handleScale:true,
-            width:container.offsetWidth,height:container.offsetHeight
-          });
-          var data=_gctFilterData(_gctDays);
-          var fullData=_gctFilterData(_gctDays);
-          if(_gctType==='candle'){
-            _gctSeries=_gctChart.addCandlestickSeries({upColor:'#26a69a',downColor:'#ef5350',borderUpColor:'#26a69a',borderDownColor:'#ef5350',wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceFormat:{type:'price',precision:5,minMove:0.00001}});
-          }else if(_gctType==='bar'){
-            _gctSeries=_gctChart.addBarSeries({upColor:'#26a69a',downColor:'#ef5350',priceFormat:{type:'price',precision:5,minMove:0.00001}});
-          }else if(_gctType==='line'){
-            _gctSeries=_gctChart.addLineSeries({color:'#4f7fff',lineWidth:2,priceFormat:{type:'price',precision:5,minMove:0.00001}});
-            data=data.map(function(d){return{time:d.time,value:d.close};});
-          }else{
-            _gctSeries=_gctChart.addAreaSeries({lineColor:'#4f7fff',topColor:'rgba(79,127,255,0.28)',bottomColor:'rgba(79,127,255,0.02)',lineWidth:2,priceFormat:{type:'price',precision:5,minMove:0.00001}});
-            data=data.map(function(d){return{time:d.time,value:d.close};});
-          }
-          _gctSeries.setData(data);
-          if(_gctShowPC&&fullData.length>=2){
-            var pc=fullData[fullData.length-2].close;
-            _gctPcSeries=_gctChart.addLineSeries({color:'rgba(120,123,134,0.6)',lineWidth:1,lineStyle:2,lastValueVisible:false,priceLineVisible:false,crosshairMarkerVisible:false,priceFormat:{type:'price',precision:5,minMove:0.00001}});
-            _gctPcSeries.setData([{time:fullData[0].time,value:pc},{time:fullData[fullData.length-1].time,value:pc}]);
-          }
-          if(_gctShowVOL){
-            _gctVolSeries=_gctChart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',scaleMargins:{top:0.8,bottom:0}});
-            _gctVolSeries.setData(fullData.map(function(d){return{time:d.time,value:20000,color:d.close>=d.open?'rgba(38,166,154,0.4)':'rgba(239,83,80,0.4)'};}));
-          }
-          if(_gctShowMA){
-            _gctMaSeries=_gctChart.addLineSeries({color:'#2196f3',lineWidth:1,lastValueVisible:true,priceLineVisible:false,priceFormat:{type:'price',precision:5,minMove:0.00001}});
-            var maData=_computeMA(fullData,20).filter(function(d){return d.value!==null;});
-            _gctMaSeries.setData(maData);
-            var lastMa=maData[maData.length-1];
-            var leg=document.getElementById('gct-ma-legend');
-            if(leg){leg.textContent='MA 20  '+_gctFmt(lastMa?lastMa.value:null);leg.style.display='inline';}
-          }else{
-            var leg=document.getElementById('gct-ma-legend');
-            if(leg)leg.style.display='none';
-          }
-          if(_gctShowCB){
-            var markers=[];
-            fullData.forEach(function(d){
-              if(_GCT_CB_DATES[d.time]){var m=_GCT_CB_DATES[d.time];markers.push({time:d.time,position:'aboveBar',color:m.color,shape:'arrowDown',text:m.cb,size:0.6});}
-            });
-            if(markers.length&&_gctSeries.setMarkers)_gctSeries.setMarkers(markers);
-          }
-          if(_gctShowWM){_gctChart.applyOptions({watermark:{visible:true,fontSize:24,horzAlign:'center',vertAlign:'center',color:'rgba(209,212,220,0.07)',text:'EUR/USD'}});}
-          else{_gctChart.applyOptions({watermark:{visible:false}});}
-          _gctChart.subscribeCrosshairMove(function(param){
-            if(!param.time||!param.seriesData)return;
-            var d=param.seriesData.get(_gctSeries);if(!d)return;
-            var o=d.open||d.value,h=d.high||d.value,l=d.low||d.value,c=d.close||d.value;
-            if(o!==undefined)document.getElementById('gct-o').textContent=_gctFmt(o);
-            if(h!==undefined)document.getElementById('gct-h').textContent=_gctFmt(h);
-            if(l!==undefined)document.getElementById('gct-l').textContent=_gctFmt(l);
-            if(c!==undefined)document.getElementById('gct-c').textContent=_gctFmt(c);
-          });
-          _gctChart.timeScale().fitContent();
-        }
-        function _gctInit(){
-          if(!window.LightweightCharts){
-            var s=document.createElement('script');
-            s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.7/dist/lightweight-charts.standalone.production.js';
-            s.onload=function(){_gctRender();};
-            document.head.appendChild(s);
-          }else{_gctRender();}
-          document.querySelectorAll('.gct').forEach(function(tab){
-            tab.addEventListener('click',function(){
-              document.querySelectorAll('.gct').forEach(function(t){t.style.color='#787b86';t.style.borderBottom='2px solid transparent';t.style.fontWeight='';});
-              this.style.color='#fff';this.style.borderBottom='2px solid #4f7fff';this.style.fontWeight='700';
-            });
-          });
-          document.querySelectorAll('.gct-rb').forEach(function(btn){
-            btn.addEventListener('click',function(){
-              document.querySelectorAll('.gct-rb').forEach(function(b){b.classList.remove('active-rb');});
-              this.classList.add('active-rb');_gctDays=parseInt(this.dataset.days)||0;_gctRender();
-            });
-          });
-          var typeMap={'gct-candle':'candle','gct-bar':'bar','gct-line':'line','gct-area':'area'};
-          Object.keys(typeMap).forEach(function(id){
-            var el=document.getElementById(id);if(!el)return;
-            el.addEventListener('click',function(){
-              document.querySelectorAll('.gct-tb').forEach(function(b){b.classList.remove('active-tb');});
-              this.classList.add('active-tb');_gctType=typeMap[id];_gctRender();
-            });
-          });
-          function _tog(id,g,s){var el=document.getElementById(id);if(!el)return;el.addEventListener('click',function(){s(!g());this.classList.toggle('on-tb',g());_gctRender();});}
-          _tog('gct-wm',function(){return _gctShowWM;},function(v){_gctShowWM=v;});
-          _tog('gct-pc',function(){return _gctShowPC;},function(v){_gctShowPC=v;});
-          _tog('gct-vol',function(){return _gctShowVOL;},function(v){_gctShowVOL=v;});
-          _tog('gct-cb',function(){return _gctShowCB;},function(v){_gctShowCB=v;});
-          _tog('gct-ma',function(){return _gctShowMA;},function(v){_gctShowMA=v;});
-          _tog('gct-log',function(){return _gctLog;},function(v){_gctLog=v;});
-          var ro=new ResizeObserver(function(){var c=document.getElementById('gct-container');if(_gctChart&&c)_gctChart.applyOptions({width:c.offsetWidth});});
-          ro.observe(document.getElementById('gct-container'));
-        }
-        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',_gctInit);}else{_gctInit();}
-      })();
-      </script>
       <div class="callout callout-tip" style="margin-bottom:18px;">
         <strong>Tip:</strong> This is an interactive mock — try clicking the range buttons (3M / 6M / 1Y / ALL), chart types (Candle / Bar / Line / Area), and overlays (PC, CB, MA, VOL, LOG). For symbols without OHLC data, the chart falls back to an embedded TradingView widget.
       </div>
@@ -1530,75 +1349,82 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
 
       <h3>Pair Detail</h3>
       <p>When you click any pair in the FX Pairs table or any cross in the sidebar, an inline detail strip expands directly below the selected row. It updates instantly on every click with no page reload — click the same row again to collapse it. Data is organized into four labeled sections — <strong style="color:var(--text);">Price · Volatility · COT Positioning · Retail Sentiment</strong> — matching the grouping convention of institutional FX terminals:</p>
-      <!-- MOCK: Pair Detail panel (EUR/USD example) — mirrors pd-popover output from dashboard.js -->
-      <div class="pd-mock-wrap" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;width:230px;font-size:12px;">
-
-        <!-- Header -->
-        <div class="pd-header">
-          <span class="pd-sym">EUR/USD</span>
-          <span style="font-size:9px;color:var(--text3);cursor:default;">&#x2715;</span>
+      <!-- MOCK: Pair Detail inline strip (EUR/USD example) — mirrors pd-inline layout from dashboard.js expand row -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:14px 0 6px;">
+        <!-- Simulated FX table row above the expand strip -->
+        <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border2);background:var(--bg2);padding:0;">
+          <div style="padding:5px 10px;font-size:11px;font-weight:700;color:#fff;min-width:80px;border-right:1px solid var(--border2);">EUR/USD</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17258</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17262</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">0.4</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--up);border-right:1px solid var(--border2);">+0.33%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--down);border-right:1px solid var(--border2);">-0.48%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">8.0%</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);border-right:1px solid var(--border2);">1.17270</div>
+          <div style="padding:5px 8px;font-size:10px;font-family:var(--font-mono);color:var(--text2);">1.16770</div>
         </div>
-
-        <!-- Price block -->
-        <div class="pd-price-block">
-          <div class="pd-price-row">
-            <div class="pd-price">1.13170</div>
-            <span class="pd-chg pd-dn">-0.19%</span>
+        <!-- Inline expand strip — pd-inline layout -->
+        <div class="pd-inline-scroll">
+          <div class="pd-inline">
+            <!-- Price block -->
+            <div class="pd-inline-price">
+              <div class="pd-inline-sym">EUR/USD</div>
+              <div class="pd-inline-rate">1.17260</div>
+              <div class="pd-inline-chg pd-up">+0.33%</div>
+              <div class="pd-inline-meta">H 1.17275 · L 1.16778</div>
+            </div>
+            <!-- Price group -->
+            <div class="pd-inline-group">
+              <div class="pd-inline-group-lbl">Price</div>
+              <div class="pd-inline-metrics">
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">1W CHG</div><div class="pd-inline-val pd-dn">-0.48%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">Carry</div><div class="pd-inline-val pd-dn">-1.75%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">59 pip</div></div>
+              </div>
+              <div style="margin-top:5px;">
+                <div class="pd-inline-lbl">EUR Rate</div>
+                <div class="pd-inline-val">2.00%</div>
+              </div>
+            </div>
+            <!-- Volatility group -->
+            <div class="pd-inline-group">
+              <div class="pd-inline-group-lbl">Volatility</div>
+              <div class="pd-inline-metrics">
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">HV 30D</div><div class="pd-inline-val">8.0%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">ATM IV</div><div class="pd-inline-val pd-up">7.1%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">IV &minus; HV</div><div class="pd-inline-val pd-dn">-0.9%</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">25D RR</div><div class="pd-inline-val pd-dn">-0.45</div></div>
+              </div>
+              <div style="margin-top:5px;">
+                <div class="pd-inline-lbl">Spread</div>
+                <div class="pd-inline-val">0.4 pip</div>
+              </div>
+            </div>
+            <!-- COT Positioning group -->
+            <div class="pd-inline-group">
+              <div class="pd-inline-group-lbl">COT Positioning</div>
+              <div class="pd-inline-metrics">
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF Net</div><div class="pd-inline-val pd-dn">-8,352</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">LF WoW &Delta;</div><div class="pd-inline-val pd-dn">-8,280</div></div>
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">AM Net</div><div class="pd-inline-val pd-up">+309,031</div></div>
+              </div>
+              <div class="pd-inline-metrics" style="margin-top:5px;">
+                <div class="pd-inline-metric"><div class="pd-inline-lbl">Net % OI</div><div class="pd-inline-val pd-dn">-4.3%</div></div>
+              </div>
+              <div style="margin-top:4px;font-size:9px;font-family:var(--font-mono);color:var(--text3);">
+                <span class="pd-dn">Short</span> LF · <span class="pd-up">Long</span> AM · <span style="color:var(--text3);">diverging</span>
+              </div>
+            </div>
+            <!-- Retail group -->
+            <div class="pd-inline-group" style="border-right:none;min-width:80px;max-width:100px;">
+              <div class="pd-inline-group-lbl">Retail</div>
+              <div class="pd-inline-retail-bar"><div class="pd-inline-retail-fill" style="width:0%"></div></div>
+              <div class="pd-inline-retail-row" style="color:var(--text2);">–&thinsp;/&thinsp;–</div>
+            </div>
           </div>
-          <div class="pd-range">H 1.13290 · L 1.13050</div>
-          <div class="pd-spread-row">Spread 0.5 pip · ADR 88 pip</div>
         </div>
-
-        <!-- Price section -->
-        <div class="pd-section">
-          <div class="pd-section-lbl">Price</div>
-          <div class="pd-grid">
-            <div class="pd-cell"><div class="pd-lbl">1W Chg</div><div class="pd-val pd-dn">-0.54%</div></div>
-            <div class="pd-cell"><div class="pd-lbl">Carry</div><div class="pd-val pd-dn">-1.75%</div></div>
-            <div class="pd-cell"><div class="pd-lbl">ADR</div><div class="pd-val">88 pip</div></div>
-            <div class="pd-cell"><div class="pd-lbl">EUR Rate</div><div class="pd-val">2.00%</div></div>
-          </div>
-        </div>
-
-        <!-- Volatility section — 5 cells: HV30 / ATM IV / IV-HV / 25d RR / Spread -->
-        <div class="pd-section">
-          <div class="pd-section-lbl">Volatility</div>
-          <div class="pd-grid">
-            <div class="pd-cell"><div class="pd-lbl">HV 30d</div><div class="pd-val">8.2%</div></div>
-            <div class="pd-cell"><div class="pd-lbl">ATM IV</div><div class="pd-val pd-dn">11.4%</div></div>
-            <div class="pd-cell"><div class="pd-lbl">IV &minus; HV</div><div class="pd-val pd-up">+3.2%</div></div>
-            <div class="pd-cell"><div class="pd-lbl">25d RR</div><div class="pd-val pd-dn">-0.35</div></div>
-            <div class="pd-cell pd-cell--wide"><div class="pd-lbl">Spread</div><div class="pd-val">0.5 pip</div></div>
-          </div>
-        </div>
-
-        <!-- COT Positioning section — 5 cells: LF Net / LF WoW Δ / AM Net / Net %OI / LF OI (wide) -->
-        <div class="pd-section">
-          <div class="pd-section-lbl">COT Positioning</div>
-          <div class="pd-grid">
-            <div class="pd-cell"><div class="pd-lbl">LF Net</div><div class="pd-val pd-dn">-38,698</div></div>
-            <div class="pd-cell"><div class="pd-lbl">LF WoW &Delta;</div><div class="pd-val pd-dn">-4,210</div></div>
-            <div class="pd-cell"><div class="pd-lbl">AM Net</div><div class="pd-val pd-up">+282,463</div></div>
-            <div class="pd-cell"><div class="pd-lbl">Net % OI</div><div class="pd-val pd-dn">-12.4%</div></div>
-            <div class="pd-cell pd-cell--wide"><div class="pd-lbl">LF Open Interest</div><div class="pd-val"><span class="pd-oi-dn">&#9660;</span> 312,250 <span class="pd-dim" style="font-size:9px;">(-8,400)</span></div></div>
-          </div>
-          <div class="pd-cot-summary">LF <span class="pd-dn">Short</span> · AM <span class="pd-up">Long</span> · <span class="pd-dim">diverging</span></div>
-        </div>
-
-        <!-- Retail Sentiment section -->
-        <div class="pd-section pd-section--last">
-          <div class="pd-section-lbl">Retail Sentiment</div>
-          <div class="pd-cell pd-cell--wide">
-            <div class="pd-retail-bar"><div class="pd-retail-fill" style="width:47%"></div></div>
-            <div class="pd-retail-nums">47% L<span class="pd-retail-sep">/</span>53% S</div>
-          </div>
-        </div>
-
         <!-- Footer -->
-        <div class="pd-footer">
-          <span class="pd-dim">COT 2026-04-15 · Myfxbook · Saxo RR</span>
-        </div>
-
+        <div class="pd-inline-footer">COT 2026-04-21 · Myfxbook · Saxo RR</div>
       </div>
       <p style="font-size:12px;color:var(--text2);margin:4px 0 6px;">Fields are grouped into four sections:</p>
       <ul style="list-style:none;padding:0;margin-bottom:20px;">
