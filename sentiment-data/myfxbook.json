@@ -1,1499 +1,2242 @@
 {
   "apiBlocked": false,
-  "lastSuccessfulFetch": "2026-04-26T15:13:32Z",
-  "lastAttempt": "2026-04-26T15:13:32Z",
+  "updated": "2026-04-26T15:18:59Z",
   "general": {
     "longPct": 0.0,
     "shortPct": 0.0
   },
-  "pairs": {
-    "EURUSD": {
-      "longPct": 30.0,
-      "shortPct": 70.0,
+  "pairs": [
+    {
+      "sym": "EURUSD",
+      "long": 30.0,
+      "short": 70.0,
+      "totalPos": 52413,
+      "longPos": 15724,
+      "shortPos": 36689,
       "longVol": 4177.09,
       "shortVol": 9658.13,
-      "traders": 52413,
-      "positions": 52413
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPUSD": {
-      "longPct": 42.0,
-      "shortPct": 58.0,
+    {
+      "sym": "GBPUSD",
+      "long": 42.0,
+      "short": 58.0,
+      "totalPos": 38467,
+      "longPos": 16156,
+      "shortPos": 22311,
       "longVol": 3287.01,
       "shortVol": 4463.31,
-      "traders": 38467,
-      "positions": 38467
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDJPY": {
-      "longPct": 31.0,
-      "shortPct": 69.0,
+    {
+      "sym": "USDJPY",
+      "long": 31.0,
+      "short": 69.0,
+      "totalPos": 9032,
+      "longPos": 2800,
+      "shortPos": 6232,
       "longVol": 755.4,
       "shortVol": 1657.43,
-      "traders": 9032,
-      "positions": 9032
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPJPY": {
-      "longPct": 21.0,
-      "shortPct": 79.0,
+    {
+      "sym": "GBPJPY",
+      "long": 21.0,
+      "short": 79.0,
+      "totalPos": 4419,
+      "longPos": 928,
+      "shortPos": 3491,
       "longVol": 258.14,
       "shortVol": 993.0,
-      "traders": 4419,
-      "positions": 4419
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDCAD": {
-      "longPct": 77.0,
-      "shortPct": 23.0,
+    {
+      "sym": "USDCAD",
+      "long": 77.0,
+      "short": 23.0,
+      "totalPos": 10599,
+      "longPos": 8161,
+      "shortPos": 2438,
       "longVol": 1689.25,
       "shortVol": 503.3,
-      "traders": 10599,
-      "positions": 10599
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURAUD": {
-      "longPct": 89.0,
-      "shortPct": 11.0,
+    {
+      "sym": "EURAUD",
+      "long": 89.0,
+      "short": 11.0,
+      "totalPos": 4425,
+      "longPos": 3938,
+      "shortPos": 487,
       "longVol": 1574.46,
       "shortVol": 202.7,
-      "traders": 4425,
-      "positions": 4425
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURJPY": {
-      "longPct": 17.0,
-      "shortPct": 83.0,
+    {
+      "sym": "EURJPY",
+      "long": 17.0,
+      "short": 83.0,
+      "totalPos": 6129,
+      "longPos": 1042,
+      "shortPos": 5087,
       "longVol": 303.99,
       "shortVol": 1531.9,
-      "traders": 6129,
-      "positions": 6129
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDCAD": {
-      "longPct": 22.0,
-      "shortPct": 78.0,
+    {
+      "sym": "AUDCAD",
+      "long": 22.0,
+      "short": 78.0,
+      "totalPos": 28194,
+      "longPos": 6203,
+      "shortPos": 21991,
       "longVol": 1266.72,
       "shortVol": 4542.91,
-      "traders": 28194,
-      "positions": 28194
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDJPY": {
-      "longPct": 15.0,
-      "shortPct": 85.0,
+    {
+      "sym": "AUDJPY",
+      "long": 15.0,
+      "short": 85.0,
+      "totalPos": 4249,
+      "longPos": 637,
+      "shortPos": 3612,
       "longVol": 111.39,
       "shortVol": 649.97,
-      "traders": 4249,
-      "positions": 4249
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDNZD": {
-      "longPct": 16.0,
-      "shortPct": 84.0,
+    {
+      "sym": "AUDNZD",
+      "long": 16.0,
+      "short": 84.0,
+      "totalPos": 19286,
+      "longPos": 3086,
+      "shortPos": 16200,
       "longVol": 1276.91,
       "shortVol": 6469.5,
-      "traders": 19286,
-      "positions": 19286
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDUSD": {
-      "longPct": 13.0,
-      "shortPct": 87.0,
+    {
+      "sym": "AUDUSD",
+      "long": 13.0,
+      "short": 87.0,
+      "totalPos": 10257,
+      "longPos": 1333,
+      "shortPos": 8924,
       "longVol": 344.53,
       "shortVol": 2329.52,
-      "traders": 10257,
-      "positions": 10257
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CADJPY": {
-      "longPct": 17.0,
-      "shortPct": 83.0,
+    {
+      "sym": "CADJPY",
+      "long": 17.0,
+      "short": 83.0,
+      "totalPos": 2221,
+      "longPos": 378,
+      "shortPos": 1843,
       "longVol": 58.12,
       "shortVol": 278.51,
-      "traders": 2221,
-      "positions": 2221
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURCAD": {
-      "longPct": 60.0,
-      "shortPct": 40.0,
+    {
+      "sym": "EURCAD",
+      "long": 60.0,
+      "short": 40.0,
+      "totalPos": 4609,
+      "longPos": 2765,
+      "shortPos": 1844,
       "longVol": 433.39,
       "shortVol": 284.13,
-      "traders": 4609,
-      "positions": 4609
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURCHF": {
-      "longPct": 55.0,
-      "shortPct": 45.0,
+    {
+      "sym": "EURCHF",
+      "long": 55.0,
+      "short": 45.0,
+      "totalPos": 4460,
+      "longPos": 2453,
+      "shortPos": 2007,
       "longVol": 516.89,
       "shortVol": 424.37,
-      "traders": 4460,
-      "positions": 4460
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURCZK": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "EURCZK",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.01,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURDKK": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "EURDKK",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURGBP": {
-      "longPct": 66.0,
-      "shortPct": 34.0,
+    {
+      "sym": "EURGBP",
+      "long": 66.0,
+      "short": 34.0,
+      "totalPos": 7645,
+      "longPos": 5046,
+      "shortPos": 2599,
       "longVol": 924.69,
       "shortVol": 472.23,
-      "traders": 7645,
-      "positions": 7645
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURHUF": {
-      "longPct": 24.0,
-      "shortPct": 76.0,
+    {
+      "sym": "EURHUF",
+      "long": 24.0,
+      "short": 76.0,
+      "totalPos": 28,
+      "longPos": 7,
+      "shortPos": 21,
       "longVol": 1.35,
       "shortVol": 4.25,
-      "traders": 28,
-      "positions": 28
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURNOK": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "EURNOK",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 4,
+      "longPos": 0,
+      "shortPos": 4,
       "longVol": 0.0,
       "shortVol": 0.14,
-      "traders": 4,
-      "positions": 4
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURNZD": {
-      "longPct": 24.0,
-      "shortPct": 76.0,
+    {
+      "sym": "EURNZD",
+      "long": 24.0,
+      "short": 76.0,
+      "totalPos": 2462,
+      "longPos": 591,
+      "shortPos": 1871,
       "longVol": 103.49,
       "shortVol": 330.01,
-      "traders": 2462,
-      "positions": 2462
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURPLN": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "EURPLN",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 21,
+      "longPos": 0,
+      "shortPos": 21,
       "longVol": 0.0,
       "shortVol": 5.21,
-      "traders": 21,
-      "positions": 21
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURSEK": {
-      "longPct": 67.0,
-      "shortPct": 33.0,
+    {
+      "sym": "EURSEK",
+      "long": 67.0,
+      "short": 33.0,
+      "totalPos": 3,
+      "longPos": 2,
+      "shortPos": 1,
       "longVol": 0.02,
       "shortVol": 0.01,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURTRY": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "EURTRY",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.01,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPCAD": {
-      "longPct": 53.0,
-      "shortPct": 47.0,
+    {
+      "sym": "GBPCAD",
+      "long": 53.0,
+      "short": 47.0,
+      "totalPos": 2546,
+      "longPos": 1349,
+      "shortPos": 1197,
       "longVol": 204.93,
       "shortVol": 184.55,
-      "traders": 2546,
-      "positions": 2546
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPCHF": {
-      "longPct": 70.0,
-      "shortPct": 30.0,
+    {
+      "sym": "GBPCHF",
+      "long": 70.0,
+      "short": 30.0,
+      "totalPos": 2770,
+      "longPos": 1939,
+      "shortPos": 831,
       "longVol": 384.98,
       "shortVol": 161.71,
-      "traders": 2770,
-      "positions": 2770
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NZDCAD": {
-      "longPct": 69.0,
-      "shortPct": 31.0,
+    {
+      "sym": "NZDCAD",
+      "long": 69.0,
+      "short": 31.0,
+      "totalPos": 4489,
+      "longPos": 3097,
+      "shortPos": 1392,
       "longVol": 533.02,
       "shortVol": 235.9,
-      "traders": 4489,
-      "positions": 4489
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NZDJPY": {
-      "longPct": 38.0,
-      "shortPct": 62.0,
+    {
+      "sym": "NZDJPY",
+      "long": 38.0,
+      "short": 62.0,
+      "totalPos": 2180,
+      "longPos": 828,
+      "shortPos": 1352,
       "longVol": 127.69,
       "shortVol": 211.02,
-      "traders": 2180,
-      "positions": 2180
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NZDUSD": {
-      "longPct": 44.0,
-      "shortPct": 56.0,
+    {
+      "sym": "NZDUSD",
+      "long": 44.0,
+      "short": 56.0,
+      "totalPos": 4739,
+      "longPos": 2085,
+      "shortPos": 2654,
       "longVol": 459.06,
       "shortVol": 593.23,
-      "traders": 4739,
-      "positions": 4739
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDCHF": {
-      "longPct": 79.0,
-      "shortPct": 21.0,
+    {
+      "sym": "USDCHF",
+      "long": 79.0,
+      "short": 21.0,
+      "totalPos": 7911,
+      "longPos": 6250,
+      "shortPos": 1661,
       "longVol": 1604.47,
       "shortVol": 417.64,
-      "traders": 7911,
-      "positions": 7911
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDCZK": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDCZK",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 25,
+      "longPos": 25,
+      "shortPos": 0,
       "longVol": 0.88,
       "shortVol": 0.0,
-      "traders": 25,
-      "positions": 25
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDDKK": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDDKK",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDHKD": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "USDHKD",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.02,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDHUF": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDHUF",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 79,
+      "longPos": 79,
+      "shortPos": 0,
       "longVol": 7.32,
       "shortVol": 0.02,
-      "traders": 79,
-      "positions": 79
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDMXN": {
-      "longPct": 35.0,
-      "shortPct": 65.0,
+    {
+      "sym": "USDMXN",
+      "long": 35.0,
+      "short": 65.0,
+      "totalPos": 101,
+      "longPos": 35,
+      "shortPos": 66,
       "longVol": 4.59,
       "shortVol": 8.71,
-      "traders": 101,
-      "positions": 101
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDNOK": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDNOK",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 40,
+      "longPos": 40,
+      "shortPos": 0,
       "longVol": 2.89,
       "shortVol": 0.0,
-      "traders": 40,
-      "positions": 40
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDPLN": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDPLN",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 21,
+      "longPos": 21,
+      "shortPos": 0,
       "longVol": 0.52,
       "shortVol": 0.0,
-      "traders": 21,
-      "positions": 21
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDSEK": {
-      "longPct": 60.0,
-      "shortPct": 40.0,
+    {
+      "sym": "USDSEK",
+      "long": 60.0,
+      "short": 40.0,
+      "totalPos": 65,
+      "longPos": 39,
+      "shortPos": 26,
       "longVol": 9.09,
       "shortVol": 6.0,
-      "traders": 65,
-      "positions": 65
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDSGD": {
-      "longPct": 70.0,
-      "shortPct": 30.0,
+    {
+      "sym": "USDSGD",
+      "long": 70.0,
+      "short": 30.0,
+      "totalPos": 191,
+      "longPos": 134,
+      "shortPos": 57,
       "longVol": 8.57,
       "shortVol": 3.61,
-      "traders": 191,
-      "positions": 191
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDTHB": {
-      "longPct": 95.0,
-      "shortPct": 5.0,
+    {
+      "sym": "USDTHB",
+      "long": 95.0,
+      "short": 5.0,
+      "totalPos": 7,
+      "longPos": 7,
+      "shortPos": 0,
       "longVol": 0.19,
       "shortVol": 0.01,
-      "traders": 7,
-      "positions": 7
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDTRY": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "USDTRY",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 7,
+      "longPos": 0,
+      "shortPos": 7,
       "longVol": 0.0,
       "shortVol": 2.81,
-      "traders": 7,
-      "positions": 7
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDZAR": {
-      "longPct": 46.0,
-      "shortPct": 54.0,
+    {
+      "sym": "USDZAR",
+      "long": 46.0,
+      "short": 54.0,
+      "totalPos": 95,
+      "longPos": 44,
+      "shortPos": 51,
       "longVol": 1.64,
       "shortVol": 1.92,
-      "traders": 95,
-      "positions": 95
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CHFJPY": {
-      "longPct": 16.0,
-      "shortPct": 84.0,
+    {
+      "sym": "CHFJPY",
+      "long": 16.0,
+      "short": 84.0,
+      "totalPos": 4559,
+      "longPos": 729,
+      "shortPos": 3830,
       "longVol": 156.08,
       "shortVol": 792.48,
-      "traders": 4559,
-      "positions": 4559
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDCHF": {
-      "longPct": 22.0,
-      "shortPct": 78.0,
+    {
+      "sym": "AUDCHF",
+      "long": 22.0,
+      "short": 78.0,
+      "totalPos": 3285,
+      "longPos": 723,
+      "shortPos": 2562,
       "longVol": 122.16,
       "shortVol": 438.71,
-      "traders": 3285,
-      "positions": 3285
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPNZD": {
-      "longPct": 13.0,
-      "shortPct": 87.0,
+    {
+      "sym": "GBPNZD",
+      "long": 13.0,
+      "short": 87.0,
+      "totalPos": 2137,
+      "longPos": 278,
+      "shortPos": 1859,
       "longVol": 65.51,
       "shortVol": 426.6,
-      "traders": 2137,
-      "positions": 2137
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NZDCHF": {
-      "longPct": 75.0,
-      "shortPct": 25.0,
+    {
+      "sym": "NZDCHF",
+      "long": 75.0,
+      "short": 25.0,
+      "totalPos": 2924,
+      "longPos": 2193,
+      "shortPos": 731,
       "longVol": 380.55,
       "shortVol": 127.9,
-      "traders": 2924,
-      "positions": 2924
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAGUSD": {
-      "longPct": 58.0,
-      "shortPct": 42.0,
+    {
+      "sym": "XAGUSD",
+      "long": 58.0,
+      "short": 42.0,
+      "totalPos": 1140,
+      "longPos": 661,
+      "shortPos": 479,
       "longVol": 172.65,
       "shortVol": 123.53,
-      "traders": 1140,
-      "positions": 1140
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUUSD": {
-      "longPct": 55.0,
-      "shortPct": 45.0,
+    {
+      "sym": "XAUUSD",
+      "long": 55.0,
+      "short": 45.0,
+      "totalPos": 16133,
+      "longPos": 8873,
+      "shortPos": 7260,
       "longVol": 1182.27,
       "shortVol": 971.76,
-      "traders": 16133,
-      "positions": 16133
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CADCHF": {
-      "longPct": 80.0,
-      "shortPct": 20.0,
+    {
+      "sym": "CADCHF",
+      "long": 80.0,
+      "short": 20.0,
+      "totalPos": 5888,
+      "longPos": 4710,
+      "shortPos": 1178,
       "longVol": 724.12,
       "shortVol": 179.7,
-      "traders": 5888,
-      "positions": 5888
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPAUD": {
-      "longPct": 79.0,
-      "shortPct": 21.0,
+    {
+      "sym": "GBPAUD",
+      "long": 79.0,
+      "short": 21.0,
+      "totalPos": 3253,
+      "longPos": 2570,
+      "shortPos": 683,
       "longVol": 698.98,
       "shortVol": 181.35,
-      "traders": 3253,
-      "positions": 3253
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SPA35": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SPA35",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.18,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SGDJPY": {
-      "longPct": 4.0,
-      "shortPct": 96.0,
+    {
+      "sym": "SGDJPY",
+      "long": 4.0,
+      "short": 96.0,
+      "totalPos": 76,
+      "longPos": 3,
+      "shortPos": 73,
       "longVol": 0.33,
       "shortVol": 7.9,
-      "traders": 76,
-      "positions": 76
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SUGAR": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SUGAR",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 16,
+      "longPos": 16,
+      "shortPos": 0,
       "longVol": 26.4,
       "shortVol": 0.0,
-      "traders": 16,
-      "positions": 16
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPNOK": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPNOK",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 5,
+      "longPos": 5,
+      "shortPos": 0,
       "longVol": 0.33,
       "shortVol": 0.0,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "US30": {
-      "longPct": 64.0,
-      "shortPct": 36.0,
+    {
+      "sym": "US30",
+      "long": 64.0,
+      "short": 36.0,
+      "totalPos": 3,
+      "longPos": 2,
+      "shortPos": 1,
       "longVol": 5.31,
       "shortVol": 3.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURZAR": {
-      "longPct": 7.0,
-      "shortPct": 93.0,
+    {
+      "sym": "EURZAR",
+      "long": 7.0,
+      "short": 93.0,
+      "totalPos": 11,
+      "longPos": 1,
+      "shortPos": 10,
       "longVol": 0.03,
       "shortVol": 0.42,
-      "traders": 11,
-      "positions": 11
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDSGD": {
-      "longPct": 5.0,
-      "shortPct": 95.0,
+    {
+      "sym": "AUDSGD",
+      "long": 5.0,
+      "short": 95.0,
+      "totalPos": 150,
+      "longPos": 8,
+      "shortPos": 142,
       "longVol": 0.27,
       "shortVol": 4.75,
-      "traders": 150,
-      "positions": 150
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPZAR": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPZAR",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPSEK": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPSEK",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.04,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CHFSGD": {
-      "longPct": 2.0,
-      "shortPct": 98.0,
+    {
+      "sym": "CHFSGD",
+      "long": 2.0,
+      "short": 98.0,
+      "totalPos": 31,
+      "longPos": 1,
+      "shortPos": 30,
       "longVol": 0.05,
       "shortVol": 2.21,
-      "traders": 31,
-      "positions": 31
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURSGD": {
-      "longPct": 12.0,
-      "shortPct": 88.0,
+    {
+      "sym": "EURSGD",
+      "long": 12.0,
+      "short": 88.0,
+      "totalPos": 245,
+      "longPos": 29,
+      "shortPos": 216,
       "longVol": 6.54,
       "shortVol": 47.61,
-      "traders": 245,
-      "positions": 245
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPSGD": {
-      "longPct": 6.0,
-      "shortPct": 94.0,
+    {
+      "sym": "GBPSGD",
+      "long": 6.0,
+      "short": 94.0,
+      "totalPos": 87,
+      "longPos": 5,
+      "shortPos": 82,
       "longVol": 0.82,
       "shortVol": 12.31,
-      "traders": 87,
-      "positions": 87
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDDKK": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "AUDDKK",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURHKD": {
-      "longPct": 63.0,
-      "shortPct": 38.0,
+    {
+      "sym": "EURHKD",
+      "long": 63.0,
+      "short": 38.0,
+      "totalPos": 49,
+      "longPos": 31,
+      "shortPos": 19,
       "longVol": 1.8,
       "shortVol": 1.08,
-      "traders": 49,
-      "positions": 49
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPDKK": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPDKK",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "COPPER": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "COPPER",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 3,
+      "longPos": 3,
+      "shortPos": 0,
       "longVol": 0.03,
       "shortVol": 0.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "COFFEE": {
-      "longPct": 20.0,
-      "shortPct": 80.0,
+    {
+      "sym": "COFFEE",
+      "long": 20.0,
+      "short": 80.0,
+      "totalPos": 4,
+      "longPos": 1,
+      "shortPos": 3,
       "longVol": 1.0,
       "shortVol": 4.0,
-      "traders": 4,
-      "positions": 4
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURO50": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "EURO50",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "TRYJPY": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "TRYJPY",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 11,
+      "longPos": 11,
+      "shortPos": 0,
       "longVol": 5.83,
       "shortVol": 0.02,
-      "traders": 11,
-      "positions": 11
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "US500": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "US500",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 1.1,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPPLN": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPPLN",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "WHEAT": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "WHEAT",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "COCOA": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "COCOA",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.05,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "UK100": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "UK100",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 6,
+      "longPos": 0,
+      "shortPos": 6,
       "longVol": 0.0,
       "shortVol": 1.36,
-      "traders": 6,
-      "positions": 6
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUGBP": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "XAUGBP",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 0.02,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "COTTON": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "COTTON",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 3,
+      "longPos": 3,
+      "shortPos": 0,
       "longVol": 0.03,
       "shortVol": 0.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NOKJPY": {
-      "longPct": 6.0,
-      "shortPct": 94.0,
+    {
+      "sym": "NOKJPY",
+      "long": 6.0,
+      "short": 94.0,
+      "totalPos": 6,
+      "longPos": 0,
+      "shortPos": 6,
       "longVol": 0.06,
       "shortVol": 1.0,
-      "traders": 6,
-      "positions": 6
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SP500": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SP500",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ZARJPY": {
-      "longPct": 57.0,
-      "shortPct": 43.0,
+    {
+      "sym": "ZARJPY",
+      "long": 57.0,
+      "short": 43.0,
+      "totalPos": 13,
+      "longPos": 7,
+      "shortPos": 6,
       "longVol": 2.63,
       "shortVol": 2.0,
-      "traders": 13,
-      "positions": 13
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "HKDJPY": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "HKDJPY",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CHFNOK": {
-      "longPct": 50.0,
-      "shortPct": 50.0,
+    {
+      "sym": "CHFNOK",
+      "long": 50.0,
+      "short": 50.0,
+      "totalPos": 2,
+      "longPos": 1,
+      "shortPos": 1,
       "longVol": 0.02,
       "shortVol": 0.02,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPTRY": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "GBPTRY",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 0.4,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDRUB": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDRUB",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SEKJPY": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SEKJPY",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 7,
+      "longPos": 7,
+      "shortPos": 0,
       "longVol": 0.29,
       "shortVol": 0.0,
-      "traders": 7,
-      "positions": 7
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "MSFT": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "MSFT",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "JNJ": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "JNJ",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EURMXN": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "EURMXN",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 22,
+      "longPos": 0,
+      "shortPos": 22,
       "longVol": 0.0,
       "shortVol": 2.19,
-      "traders": 22,
-      "positions": 22
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUAUD": {
-      "longPct": 72.0,
-      "shortPct": 28.0,
+    {
+      "sym": "XAUAUD",
+      "long": 72.0,
+      "short": 28.0,
+      "totalPos": 6,
+      "longPos": 4,
+      "shortPos": 2,
       "longVol": 0.13,
       "shortVol": 0.05,
-      "traders": 6,
-      "positions": 6
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUEUR": {
-      "longPct": 47.0,
-      "shortPct": 53.0,
+    {
+      "sym": "XAUEUR",
+      "long": 47.0,
+      "short": 53.0,
+      "totalPos": 55,
+      "longPos": 26,
+      "shortPos": 29,
       "longVol": 1.16,
       "shortVol": 1.32,
-      "traders": 55,
-      "positions": 55
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "WS30": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "WS30",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NAS100": {
-      "longPct": 98.0,
-      "shortPct": 2.0,
+    {
+      "sym": "NAS100",
+      "long": 98.0,
+      "short": 2.0,
+      "totalPos": 8,
+      "longPos": 8,
+      "shortPos": 0,
       "longVol": 0.61,
       "shortVol": 0.01,
-      "traders": 8,
-      "positions": 8
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SGDHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SGDHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "US2000": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "US2000",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 2.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "FRA40": {
-      "longPct": 6.0,
-      "shortPct": 94.0,
+    {
+      "sym": "FRA40",
+      "long": 6.0,
+      "short": 94.0,
+      "totalPos": 5,
+      "longPos": 0,
+      "shortPos": 5,
       "longVol": 0.26,
       "shortVol": 4.0,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GER30": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GER30",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.1,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDSEK": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "AUDSEK",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUJPY": {
-      "longPct": 6.0,
-      "shortPct": 94.0,
+    {
+      "sym": "XAUJPY",
+      "long": 6.0,
+      "short": 94.0,
+      "totalPos": 15,
+      "longPos": 1,
+      "shortPos": 14,
       "longVol": 0.28,
       "shortVol": 4.16,
-      "traders": 15,
-      "positions": 15
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAUCHF": {
-      "longPct": 96.0,
-      "shortPct": 4.0,
+    {
+      "sym": "XAUCHF",
+      "long": 96.0,
+      "short": 4.0,
+      "totalPos": 25,
+      "longPos": 24,
+      "shortPos": 1,
       "longVol": 0.51,
       "shortVol": 0.02,
-      "traders": 25,
-      "positions": 25
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USOIL": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "USOIL",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.03,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CHFSEK": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "CHFSEK",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 10,
+      "longPos": 0,
+      "shortPos": 10,
       "longVol": 0.0,
       "shortVol": 0.1,
-      "traders": 10,
-      "positions": 10
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUS200": {
-      "longPct": 50.0,
-      "shortPct": 50.0,
+    {
+      "sym": "AUS200",
+      "long": 50.0,
+      "short": 50.0,
+      "totalPos": 2,
+      "longPos": 1,
+      "shortPos": 1,
       "longVol": 1.0,
       "shortVol": 1.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPMXN": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "GBPMXN",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.01,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "JPN225": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "JPN225",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAGAUD": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "XAGAUD",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.01,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NOKSEK": {
-      "longPct": 95.0,
-      "shortPct": 5.0,
+    {
+      "sym": "NOKSEK",
+      "long": 95.0,
+      "short": 5.0,
+      "totalPos": 55,
+      "longPos": 52,
+      "shortPos": 3,
       "longVol": 0.62,
       "shortVol": 0.03,
-      "traders": 55,
-      "positions": 55
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDX": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "USDX",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XAGEUR": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XAGEUR",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 25,
+      "longPos": 25,
+      "shortPos": 0,
       "longVol": 0.35,
       "shortVol": 0.0,
-      "traders": 25,
-      "positions": 25
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EBAY": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "EBAY",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "VIX": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "VIX",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 0.2,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CHFHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "CHFHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "YHOO": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "YHOO",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 8.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XPTUSD": {
-      "longPct": 51.0,
-      "shortPct": 49.0,
+    {
+      "sym": "XPTUSD",
+      "long": 51.0,
+      "short": 49.0,
+      "totalPos": 51,
+      "longPos": 26,
+      "shortPos": 25,
       "longVol": 9.91,
       "shortVol": 9.51,
-      "traders": 51,
-      "positions": 51
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GBPHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GBPHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XPDUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XPDUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 9,
+      "longPos": 9,
+      "shortPos": 0,
       "longVol": 0.09,
       "shortVol": 0.0,
-      "traders": 9,
-      "positions": 9
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CADHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "CADHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "USDCNH": {
-      "longPct": 98.0,
-      "shortPct": 2.0,
+    {
+      "sym": "USDCNH",
+      "long": 98.0,
+      "short": 2.0,
+      "totalPos": 64,
+      "longPos": 63,
+      "shortPos": 1,
       "longVol": 51.95,
       "shortVol": 1.0,
-      "traders": 64,
-      "positions": 64
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AUDHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "AUDHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NZDHKD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "NZDHKD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AAPL": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "AAPL",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "PFE": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "PFE",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.5,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "FB": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "FB",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.5,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "IT40": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "IT40",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 4.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GS": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GS",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NKE": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "NKE",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BA": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BA",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CVX": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "CVX",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GOOG": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GOOG",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XTIUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XTIUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 3,
+      "longPos": 3,
+      "shortPos": 0,
       "longVol": 3.0,
       "shortVol": 0.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BTCUSD": {
-      "longPct": 50.0,
-      "shortPct": 50.0,
+    {
+      "sym": "BTCUSD",
+      "long": 50.0,
+      "short": 50.0,
+      "totalPos": 1974,
+      "longPos": 987,
+      "shortPos": 987,
       "longVol": 99.79,
       "shortVol": 98.58,
-      "traders": 1974,
-      "positions": 1974
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XBRUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XBRUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 3,
+      "longPos": 3,
+      "shortPos": 0,
       "longVol": 0.03,
       "shortVol": 0.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "US30.D": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "US30.D",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 1.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BTCEUR": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BTCEUR",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "LTCBTC": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "LTCBTC",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 2.0,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "LTCUSD": {
-      "longPct": 95.0,
-      "shortPct": 5.0,
+    {
+      "sym": "LTCUSD",
+      "long": 95.0,
+      "short": 5.0,
+      "totalPos": 314,
+      "longPos": 298,
+      "shortPos": 16,
       "longVol": 41.52,
       "shortVol": 2.0,
-      "traders": 314,
-      "positions": 314
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "TWTR": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "TWTR",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "HK50": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "HK50",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.1,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GOPRO": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GOPRO",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XNGUSD": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "XNGUSD",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.02,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "APPL": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "APPL",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "DXU5": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "DXU5",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "DXZ5": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "DXZ5",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 2.0,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "OGZD": {
-      "longPct": 0.0,
-      "shortPct": 0.0,
+    {
+      "sym": "OGZD",
+      "long": 0.0,
+      "short": 0.0,
+      "totalPos": 0,
+      "longPos": 0,
+      "shortPos": 0,
       "longVol": 0.0,
       "shortVol": 0.0,
-      "traders": 0,
-      "positions": 0
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CN50": {
-      "longPct": 67.0,
-      "shortPct": 33.0,
+    {
+      "sym": "CN50",
+      "long": 67.0,
+      "short": 33.0,
+      "totalPos": 5,
+      "longPos": 3,
+      "shortPos": 2,
       "longVol": 0.4,
       "shortVol": 0.2,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BTCJPY": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BTCJPY",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 10,
+      "longPos": 10,
+      "shortPos": 0,
       "longVol": 0.1,
       "shortVol": 0.0,
-      "traders": 10,
-      "positions": 10
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ETHUSD": {
-      "longPct": 74.0,
-      "shortPct": 26.0,
+    {
+      "sym": "ETHUSD",
+      "long": 74.0,
+      "short": 26.0,
+      "totalPos": 1412,
+      "longPos": 1045,
+      "shortPos": 367,
       "longVol": 184.94,
       "shortVol": 63.43,
-      "traders": 1412,
-      "positions": 1412
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "DSHUSD": {
-      "longPct": 97.0,
-      "shortPct": 3.0,
+    {
+      "sym": "DSHUSD",
+      "long": 97.0,
+      "short": 3.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.01,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "DASH": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "DASH",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 7,
+      "longPos": 0,
+      "shortPos": 7,
       "longVol": 0.0,
       "shortVol": 2.9,
-      "traders": 7,
-      "positions": 7
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BTCGBP": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BTCGBP",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ETCUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "ETCUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XRPUSD": {
-      "longPct": 96.0,
-      "shortPct": 4.0,
+    {
+      "sym": "XRPUSD",
+      "long": 96.0,
+      "short": 4.0,
+      "totalPos": 84,
+      "longPos": 81,
+      "shortPos": 3,
       "longVol": 39.23,
       "shortVol": 1.63,
-      "traders": 84,
-      "positions": 84
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BCHUSD": {
-      "longPct": 6.0,
-      "shortPct": 94.0,
+    {
+      "sym": "BCHUSD",
+      "long": 6.0,
+      "short": 94.0,
+      "totalPos": 28,
+      "longPos": 2,
+      "shortPos": 26,
       "longVol": 3.47,
       "shortVol": 56.0,
-      "traders": 28,
-      "positions": 28
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ZECUSD": {
-      "longPct": 51.0,
-      "shortPct": 49.0,
+    {
+      "sym": "ZECUSD",
+      "long": 51.0,
+      "short": 49.0,
+      "totalPos": 6,
+      "longPos": 3,
+      "shortPos": 3,
       "longVol": 1.75,
       "shortVol": 1.65,
-      "traders": 6,
-      "positions": 6
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XMRUSD": {
-      "longPct": 86.0,
-      "shortPct": 14.0,
+    {
+      "sym": "XMRUSD",
+      "long": 86.0,
+      "short": 14.0,
+      "totalPos": 5,
+      "longPos": 4,
+      "shortPos": 1,
       "longVol": 0.06,
       "shortVol": 0.01,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "NEOUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "NEOUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 10,
+      "longPos": 10,
+      "shortPos": 0,
       "longVol": 11.5,
       "shortVol": 0.0,
-      "traders": 10,
-      "positions": 10
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "OMGUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "OMGUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 66,
+      "longPos": 66,
+      "shortPos": 0,
       "longVol": 264.0,
       "shortVol": 0.0,
-      "traders": 66,
-      "positions": 66
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "RIPPLE": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "RIPPLE",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.1,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "EOSUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "EOSUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 1.0,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "IOTUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "IOTUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.1,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "QTMUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "QTMUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 46,
+      "longPos": 46,
+      "shortPos": 0,
       "longVol": 161.0,
       "shortVol": 0.0,
-      "traders": 46,
-      "positions": 46
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XLMUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XLMUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "TRXUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "TRXUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ZRXUSD": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "ZRXUSD",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 0.02,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ADAUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "ADAUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 14,
+      "longPos": 14,
+      "shortPos": 0,
       "longVol": 7.27,
       "shortVol": 0.0,
-      "traders": 14,
-      "positions": 14
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "XTZUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "XTZUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 0.7,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BATUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BATUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 3,
+      "longPos": 3,
+      "shortPos": 0,
       "longVol": 0.15,
       "shortVol": 0.0,
-      "traders": 3,
-      "positions": 3
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "FTMUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "FTMUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "FETUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "FETUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 5,
+      "longPos": 5,
+      "shortPos": 0,
       "longVol": 0.05,
       "shortVol": 0.0,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SCI25": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SCI25",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 0.2,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "CNI30": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "CNI30",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 2,
+      "longPos": 0,
+      "shortPos": 2,
       "longVol": 0.0,
       "shortVol": 0.2,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BIO30": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BIO30",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.1,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "LAT30": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "LAT30",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.1,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "JPYX": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "JPYX",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 1.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "MKRUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "MKRUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "DOTUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "DOTUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 8,
+      "longPos": 8,
+      "shortPos": 0,
       "longVol": 8.86,
       "shortVol": 0.0,
-      "traders": 8,
-      "positions": 8
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "UNIUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "UNIUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.01,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "VETUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "VETUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 5,
+      "longPos": 5,
+      "shortPos": 0,
       "longVol": 0.05,
       "shortVol": 0.0,
-      "traders": 5,
-      "positions": 5
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "YFIUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "YFIUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 2,
+      "longPos": 2,
+      "shortPos": 0,
       "longVol": 0.4,
       "shortVol": 0.0,
-      "traders": 2,
-      "positions": 2
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ICPUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "ICPUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 6,
+      "longPos": 6,
+      "shortPos": 0,
       "longVol": 0.07,
       "shortVol": 0.0,
-      "traders": 6,
-      "positions": 6
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SOLUSD": {
-      "longPct": 93.0,
-      "shortPct": 7.0,
+    {
+      "sym": "SOLUSD",
+      "long": 93.0,
+      "short": 7.0,
+      "totalPos": 149,
+      "longPos": 139,
+      "shortPos": 10,
       "longVol": 207.15,
       "shortVol": 16.12,
-      "traders": 149,
-      "positions": 149
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "SNXUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "SNXUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.5,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "FILUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "FILUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 9,
+      "longPos": 9,
+      "shortPos": 0,
       "longVol": 0.34,
       "shortVol": 0.0,
-      "traders": 9,
-      "positions": 9
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "AXSUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "AXSUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 4,
+      "longPos": 4,
+      "shortPos": 0,
       "longVol": 0.14,
       "shortVol": 0.0,
-      "traders": 4,
-      "positions": 4
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ENJUSD": {
-      "longPct": 0.0,
-      "shortPct": 100.0,
+    {
+      "sym": "ENJUSD",
+      "long": 0.0,
+      "short": 100.0,
+      "totalPos": 1,
+      "longPos": 0,
+      "shortPos": 1,
       "longVol": 0.0,
       "shortVol": 0.01,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "ZILUSD": {
-      "longPct": 99.0,
-      "shortPct": 1.0,
+    {
+      "sym": "ZILUSD",
+      "long": 99.0,
+      "short": 1.0,
+      "totalPos": 48,
+      "longPos": 48,
+      "shortPos": 0,
       "longVol": 0.96,
       "shortVol": 0.01,
-      "traders": 48,
-      "positions": 48
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "LRCUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "LRCUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "GRTUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "GRTUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 4,
+      "longPos": 4,
+      "shortPos": 0,
       "longVol": 4.0,
       "shortVol": 0.0,
-      "traders": 4,
-      "positions": 4
+      "avgLongPx": 0,
+      "avgShortPx": 0
     },
-    "BNTUSD": {
-      "longPct": 100.0,
-      "shortPct": 0.0,
+    {
+      "sym": "BNTUSD",
+      "long": 100.0,
+      "short": 0.0,
+      "totalPos": 1,
+      "longPos": 1,
+      "shortPos": 0,
       "longVol": 0.3,
       "shortVol": 0.0,
-      "traders": 1,
-      "positions": 1
+      "avgLongPx": 0,
+      "avgShortPx": 0
     }
-  }
+  ]
 }
