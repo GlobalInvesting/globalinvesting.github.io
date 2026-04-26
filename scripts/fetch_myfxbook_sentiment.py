@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 """
-fetch_myfxbook_sentiment.py  v7.0
+fetch_myfxbook_sentiment.py  v8.0
 =============================================================
-Fetches Myfxbook Community Outlook sentiment data via the
-Cloudflare Worker proxy using a pre-authenticated session token.
+Fetches Myfxbook Community Outlook sentiment data directly
+from the Myfxbook API — no Cloudflare Worker needed.
 
 Architecture:
-  GitHub Actions → CF Worker (MYFXBOOK_SESSION token) → Myfxbook outlook API
+  GitHub Actions (ubuntu-latest) → login.json → get-community-outlook.json → logout.json
 
-The session token is obtained automatically by the self-hosted runner
-workflow (renew-myfxbook-token.yml) running on a residential IP.
-Token validity: ~30 days. Renewal runs every 20 days.
-
-On token expiry (Worker returns 401 + tokenExpired=true):
+On login failure:
   - apiBlocked is set to true in the output JSON
-  - The renewal workflow is triggered via workflow_dispatch
   - Dashboard falls back to Dukascopy / static sources
 =============================================================
 """
@@ -22,152 +17,118 @@ On token expiry (Worker returns 401 + tokenExpired=true):
 import json
 import os
 import sys
-import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
-SCRIPT_VERSION = "7.0"
+SCRIPT_VERSION = "8.0"
 TIMESTAMP = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 print(f"\n{'='*60}")
 print(f"fetch_myfxbook_sentiment.py  v{SCRIPT_VERSION}  --  {TIMESTAMP}")
 print(f"{'='*60}")
 
-# ── Config ───────────────────────────────────────────────────────────────────
-WORKER_URL    = os.environ.get("MYFXBOOK_WORKER_URL", "").strip()
-WORKER_SECRET = os.environ.get("MYFXBOOK_WORKER_SECRET", "").strip()
-SESSION_TOKEN = os.environ.get("MYFXBOOK_SESSION", "").strip()
-OUTPUT_PATH   = os.environ.get("OUTPUT_PATH", "sentiment-data/myfxbook.json")
+EMAIL       = os.environ.get("MYFXBOOK_EMAIL", "").strip()
+PASSWORD    = os.environ.get("MYFXBOOK_PASSWORD", "").strip()
+OUTPUT_PATH = os.environ.get("OUTPUT_PATH", "sentiment-data/myfxbook.json")
+MYFXBOOK_BASE = "https://www.myfxbook.com/api"
 
-if not WORKER_URL:
-    print("[Error] MYFXBOOK_WORKER_URL is not set.")
-    sys.exit(1)
-if not WORKER_SECRET:
-    print("[Error] MYFXBOOK_WORKER_SECRET is not set.")
-    sys.exit(1)
-if not SESSION_TOKEN:
-    print("[Error] MYFXBOOK_SESSION is not set. Run the token renewal workflow.")
+if not EMAIL or not PASSWORD:
+    print("[Error] MYFXBOOK_EMAIL or MYFXBOOK_PASSWORD not set.")
     sys.exit(1)
 
-print(f"[Config] Worker:  {'*' * 8}")
-print(f"[Config] Account: using pre-authenticated session token")
+print(f"[Config] Email: ********")
 
-# ── Load existing cache ──────────────────────────────────────────────────────
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+}
+
 existing_data = {}
 if os.path.exists(OUTPUT_PATH):
     try:
-        with open(OUTPUT_PATH, "r") as f:
+        with open(OUTPUT_PATH) as f:
             existing_data = json.load(f)
     except Exception:
         pass
 
-last_fetch   = existing_data.get("lastSuccessfulFetch", "never")
-cached_pairs = existing_data.get("pairs", {})
-pair_count   = len(cached_pairs)
+last_fetch = existing_data.get("lastSuccessfulFetch", "never")
+pair_count = len(existing_data.get("pairs", {}))
 
-# ── Call Worker ──────────────────────────────────────────────────────────────
-def call_worker(session: str, retries: int = 3) -> dict:
-    payload = json.dumps({
-        "secret":  WORKER_SECRET,
-        "session": session,
-    }).encode("utf-8")
+def api_get(path, params):
+    url = f"{MYFXBOOK_BASE}/{path}?{urlencode(params)}"
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return json.loads(resp.read().decode())
 
-    for attempt in range(1, retries + 1):
-        try:
-            print(f"[Worker] Attempt {attempt}/{retries} — sending session token to Worker...")
-            req = urllib.request.Request(
-                WORKER_URL,
-                data=payload,
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                return json.loads(resp.read().decode("utf-8"))
-
-        except urllib.error.HTTPError as e:
-            body = {}
-            try:
-                body = json.loads(e.read().decode("utf-8"))
-            except Exception:
-                pass
-
-            if e.code == 401 and body.get("tokenExpired"):
-                print(f"[Worker] Session token expired or invalid.")
-                return {"ok": False, "tokenExpired": True, "message": body.get("message", "Session invalid")}
-
-            print(f"[Worker] HTTP {e.code} on attempt {attempt}: {body}")
-            if e.code in (400, 401, 500):
-                break  # non-retryable
-
-        except Exception as err:
-            print(f"[Worker] Error on attempt {attempt}: {err}")
-
-        if attempt < retries:
-            time.sleep(5 * attempt)
-
-    return {"ok": False, "tokenExpired": False, "message": "All retries exhausted"}
-
-
-result = call_worker(SESSION_TOKEN)
-
-# ── Handle token expiry ──────────────────────────────────────────────────────
-if not result.get("ok") and result.get("tokenExpired"):
-    print(f"[Token] Session expired — flagging for renewal.")
-    print(f"[Fallback] Existing data preserved with apiBlocked=true.")
-    print(f"           Dashboard will fall back to Dukascopy / static sources.")
-    print(f"           Pairs in cache: {pair_count}")
-    print(f"           Last successful fetch: {last_fetch}")
-
-    fallback = dict(existing_data)
-    fallback["apiBlocked"]       = True
-    fallback["tokenExpired"]     = True
-    fallback["lastAttempt"]      = TIMESTAMP
-    fallback["blockReason"]      = "session_expired"
-
-    os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
-    with open(OUTPUT_PATH, "w") as f:
-        json.dump(fallback, f, indent=2, ensure_ascii=False)
-
-    print(f"[Exit] Exiting with code 0 (non-fatal) — token expired, renewal workflow will be triggered.")
-    sys.exit(0)
-
-# ── Handle other errors ──────────────────────────────────────────────────────
-if not result.get("ok"):
-    reason = result.get("message", "Unknown error")
-    print(f"[Worker] Worker reported failure: {reason}")
-    print(f"[Fallback] Existing data preserved with apiBlocked=true.")
-    print(f"           Pairs in cache: {pair_count}")
-    print(f"           Last successful fetch: {last_fetch}")
-
+def save_fallback(reason):
     fallback = dict(existing_data)
     fallback["apiBlocked"]  = True
-    fallback["tokenExpired"] = False
     fallback["lastAttempt"] = TIMESTAMP
     fallback["blockReason"] = reason
-
     os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
     with open(OUTPUT_PATH, "w") as f:
         json.dump(fallback, f, indent=2, ensure_ascii=False)
-
+    print(f"[Fallback] Existing data preserved. Pairs in cache: {pair_count}. Last fetch: {last_fetch}")
     print(f"[Exit] Exiting with code 0 (non-fatal) — reason: {reason}")
     sys.exit(0)
 
-# ── Success ──────────────────────────────────────────────────────────────────
-pairs   = result.get("pairs", {})
-general = result.get("general", {})
-fetched = result.get("fetchedAt", TIMESTAMP)
+# Login
+print("[Login] Logging in to Myfxbook...")
+try:
+    data = api_get("login.json", {"email": EMAIL, "password": PASSWORD})
+except Exception as e:
+    save_fallback(f"Network error on login: {e}")
 
-print(f"[Success] Received {len(pairs)} pairs from Worker.")
+if data.get("error"):
+    save_fallback(f"Login failed: {data.get('message', 'Unknown error')}")
+
+session = data.get("session", "")
+print("[Login] Success.")
+
+# Outlook
+print("[Outlook] Fetching community outlook...")
+try:
+    outlook = api_get("get-community-outlook.json", {"session": session})
+except Exception as e:
+    save_fallback(f"Network error on outlook: {e}")
+
+if outlook.get("error"):
+    save_fallback(f"Outlook failed: {outlook.get('message', 'Unknown error')}")
+
+# Logout
+try:
+    api_get("logout.json", {"session": session})
+    print("[Logout] Done.")
+except Exception:
+    pass
+
+# Normalize
+pairs = {}
+for s in outlook.get("symbols", []):
+    name = (s.get("name") or "").upper().replace("/", "")
+    if not name:
+        continue
+    pairs[name] = {
+        "longPct":   round(float(s.get("longsPercentage")  or 0), 1),
+        "shortPct":  round(float(s.get("shortsPercentage") or 0), 1),
+        "longVol":   float(s.get("longVolume")  or 0),
+        "shortVol":  float(s.get("shortVolume") or 0),
+        "traders":   int(s.get("tradersCount")  or 0),
+        "positions": int(s.get("positionsCount") or 0),
+    }
+
+general = outlook.get("general", {})
+print(f"[Success] Received {len(pairs)} pairs.")
 
 output = {
-    "apiBlocked":         False,
-    "tokenExpired":       False,
-    "lastSuccessfulFetch": fetched,
-    "lastAttempt":        TIMESTAMP,
+    "apiBlocked":          False,
+    "lastSuccessfulFetch": TIMESTAMP,
+    "lastAttempt":         TIMESTAMP,
     "general": {
-        "longPct":  general.get("longPct",  0),
-        "shortPct": general.get("shortPct", 0),
+        "longPct":  round(float(general.get("longsPercentage")  or 0), 1),
+        "shortPct": round(float(general.get("shortsPercentage") or 0), 1),
     },
     "pairs": pairs,
 }
