@@ -1,309 +1,1499 @@
 {
-  "updated": "2026-04-26T01:20:22Z",
-  "source": "myfxbook",
-  "apiBlocked": true,
-  "pairs": [
-    {
-      "sym": "EUR/USD",
-      "long": 30,
-      "short": 70,
+  "apiBlocked": false,
+  "lastSuccessfulFetch": "2026-04-26T14:27:36Z",
+  "lastAttempt": "2026-04-26T14:27:36Z",
+  "general": {
+    "longPct": 0.0,
+    "shortPct": 0.0
+  },
+  "pairs": {
+    "EURUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 4177.09,
       "shortVol": 9658.13,
-      "longPos": 15883,
-      "shortPos": 36530,
-      "totalPos": 52413,
-      "avgLongPx": 1.1733,
-      "avgShortPx": 1.1475
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "GBP/USD",
-      "long": 42,
-      "short": 58,
+    "GBPUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 3287.01,
       "shortVol": 4463.31,
-      "longPos": 20194,
-      "shortPos": 18273,
-      "totalPos": 38467,
-      "avgLongPx": 1.3478,
-      "avgShortPx": 1.3237
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "USD/JPY",
-      "long": 31,
-      "short": 69,
+    "USDJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 755.4,
       "shortVol": 1657.43,
-      "longPos": 3497,
-      "shortPos": 5535,
-      "totalPos": 9032,
-      "avgLongPx": 158.9241,
-      "avgShortPx": 156.1202
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "AUD/USD",
-      "long": 13,
-      "short": 87,
-      "longVol": 344.53,
-      "shortVol": 2329.52,
-      "longPos": 1859,
-      "shortPos": 8398,
-      "totalPos": 10257,
-      "avgLongPx": 0.7084,
-      "avgShortPx": 0.69
-    },
-    {
-      "sym": "USD/CAD",
-      "long": 77,
-      "short": 23,
-      "longVol": 1689.25,
-      "shortVol": 503.3,
-      "longPos": 8327,
-      "shortPos": 2272,
-      "totalPos": 10599,
-      "avgLongPx": 1.3796,
-      "avgShortPx": 1.3677
-    },
-    {
-      "sym": "USD/CHF",
-      "long": 79,
-      "short": 21,
-      "longVol": 1604.47,
-      "shortVol": 417.64,
-      "longPos": 5950,
-      "shortPos": 1961,
-      "totalPos": 7911,
-      "avgLongPx": 0.8183,
-      "avgShortPx": 0.7859
-    },
-    {
-      "sym": "NZD/USD",
-      "long": 44,
-      "short": 56,
-      "longVol": 459.06,
-      "shortVol": 593.23,
-      "longPos": 2457,
-      "shortPos": 2282,
-      "totalPos": 4739,
-      "avgLongPx": 0.595,
-      "avgShortPx": 0.5825
-    },
-    {
-      "sym": "EUR/GBP",
-      "long": 66,
-      "short": 34,
-      "longVol": 924.69,
-      "shortVol": 472.23,
-      "longPos": 4827,
-      "shortPos": 2818,
-      "totalPos": 7645,
-      "avgLongPx": 0.869,
-      "avgShortPx": 0.8584
-    },
-    {
-      "sym": "EUR/JPY",
-      "long": 17,
-      "short": 83,
-      "longVol": 303.99,
-      "shortVol": 1531.9,
-      "longPos": 2165,
-      "shortPos": 3964,
-      "totalPos": 6129,
-      "avgLongPx": 185.8941,
-      "avgShortPx": 177.7887
-    },
-    {
-      "sym": "GBP/JPY",
-      "long": 21,
-      "short": 79,
+    "GBPJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 258.14,
       "shortVol": 993.0,
-      "longPos": 1238,
-      "shortPos": 3181,
-      "totalPos": 4419,
-      "avgLongPx": 213.7445,
-      "avgShortPx": 210.7193
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "EUR/AUD",
-      "long": 89,
-      "short": 11,
+    "USDCAD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1689.25,
+      "shortVol": 503.3,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURAUD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 1574.46,
       "shortVol": 202.7,
-      "longPos": 3304,
-      "shortPos": 1121,
-      "totalPos": 4425,
-      "avgLongPx": 1.6841,
-      "avgShortPx": 1.6416
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "EUR/CAD",
-      "long": 60,
-      "short": 40,
-      "longVol": 433.39,
-      "shortVol": 284.13,
-      "longPos": 1798,
-      "shortPos": 2811,
-      "totalPos": 4609,
-      "avgLongPx": 1.6092,
-      "avgShortPx": 1.5769
+    "EURJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 303.99,
+      "shortVol": 1531.9,
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "EUR/CHF",
-      "long": 55,
-      "short": 45,
-      "longVol": 516.89,
-      "shortVol": 424.37,
-      "longPos": 2219,
-      "shortPos": 2241,
-      "totalPos": 4460,
-      "avgLongPx": 0.9389,
-      "avgShortPx": 0.916
-    },
-    {
-      "sym": "EUR/NZD",
-      "long": 24,
-      "short": 76,
-      "longVol": 103.49,
-      "shortVol": 330.01,
-      "longPos": 821,
-      "shortPos": 1641,
-      "totalPos": 2462,
-      "avgLongPx": 2.0138,
-      "avgShortPx": 1.9304
-    },
-    {
-      "sym": "AUD/JPY",
-      "long": 15,
-      "short": 85,
-      "longVol": 111.39,
-      "shortVol": 649.97,
-      "longPos": 844,
-      "shortPos": 3405,
-      "totalPos": 4249,
-      "avgLongPx": 112.7391,
-      "avgShortPx": 109.0799
-    },
-    {
-      "sym": "AUD/CAD",
-      "long": 22,
-      "short": 78,
+    "AUDCAD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 1266.72,
       "shortVol": 4542.91,
-      "longPos": 6745,
-      "shortPos": 21449,
-      "totalPos": 28194,
-      "avgLongPx": 0.972,
-      "avgShortPx": 0.9351
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "AUD/CHF",
-      "long": 22,
-      "short": 78,
-      "longVol": 122.16,
-      "shortVol": 438.71,
-      "longPos": 707,
-      "shortPos": 2578,
-      "totalPos": 3285,
-      "avgLongPx": 0.5759,
-      "avgShortPx": 0.5515
+    "AUDJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 111.39,
+      "shortVol": 649.97,
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "AUD/NZD",
-      "long": 16,
-      "short": 84,
+    "AUDNZD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 1276.91,
       "shortVol": 6469.5,
-      "longPos": 3509,
-      "shortPos": 15777,
-      "totalPos": 19286,
-      "avgLongPx": 1.205,
-      "avgShortPx": 1.1459
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "GBP/CHF",
-      "long": 70,
-      "short": 30,
-      "longVol": 384.98,
-      "shortVol": 161.71,
-      "longPos": 1310,
-      "shortPos": 1460,
-      "totalPos": 2770,
-      "avgLongPx": 1.0874,
-      "avgShortPx": 1.0566
+    "AUDUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 344.53,
+      "shortVol": 2329.52,
+      "traders": 0,
+      "positions": 0
     },
-    {
-      "sym": "GBP/AUD",
-      "long": 79,
-      "short": 21,
-      "longVol": 698.98,
-      "shortVol": 181.35,
-      "longPos": 2445,
-      "shortPos": 808,
-      "totalPos": 3253,
-      "avgLongPx": 1.9555,
-      "avgShortPx": 1.8745
-    },
-    {
-      "sym": "GBP/CAD",
-      "long": 53,
-      "short": 47,
-      "longVol": 204.93,
-      "shortVol": 184.55,
-      "longPos": 1461,
-      "shortPos": 1085,
-      "totalPos": 2546,
-      "avgLongPx": 1.8543,
-      "avgShortPx": 1.8195
-    },
-    {
-      "sym": "GBP/NZD",
-      "long": 13,
-      "short": 87,
-      "longVol": 65.51,
-      "shortVol": 426.6,
-      "longPos": 768,
-      "shortPos": 1369,
-      "totalPos": 2137,
-      "avgLongPx": 2.1668,
-      "avgShortPx": 2.2662
-    },
-    {
-      "sym": "CHF/JPY",
-      "long": 16,
-      "short": 84,
-      "longVol": 156.08,
-      "shortVol": 792.48,
-      "longPos": 1804,
-      "shortPos": 2755,
-      "totalPos": 4559,
-      "avgLongPx": 202.3386,
-      "avgShortPx": 188.9376
-    },
-    {
-      "sym": "CAD/JPY",
-      "long": 17,
-      "short": 83,
+    "CADJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
       "longVol": 58.12,
       "shortVol": 278.51,
-      "longPos": 405,
-      "shortPos": 1816,
-      "totalPos": 2221,
-      "avgLongPx": 116.103,
-      "avgShortPx": 113.6192
+      "traders": 0,
+      "positions": 0
+    },
+    "EURCAD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 433.39,
+      "shortVol": 284.13,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 516.89,
+      "shortVol": 424.37,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURCZK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURDKK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURGBP": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 924.69,
+      "shortVol": 472.23,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURHUF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.35,
+      "shortVol": 4.25,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURNOK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.14,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURNZD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 103.49,
+      "shortVol": 330.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURPLN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 5.21,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.02,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURTRY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPCAD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 204.93,
+      "shortVol": 184.55,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 384.98,
+      "shortVol": 161.71,
+      "traders": 0,
+      "positions": 0
+    },
+    "NZDCAD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 533.02,
+      "shortVol": 235.9,
+      "traders": 0,
+      "positions": 0
+    },
+    "NZDJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 127.69,
+      "shortVol": 211.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "NZDUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 459.06,
+      "shortVol": 593.23,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1604.47,
+      "shortVol": 417.64,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDCZK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.88,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDDKK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDHUF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 7.32,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDMXN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 4.59,
+      "shortVol": 8.71,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDNOK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 2.89,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDPLN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.52,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 9.09,
+      "shortVol": 6.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDSGD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 8.57,
+      "shortVol": 3.61,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDTHB": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.19,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDTRY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 2.81,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDZAR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.64,
+      "shortVol": 1.92,
+      "traders": 0,
+      "positions": 0
+    },
+    "CHFJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 156.08,
+      "shortVol": 792.48,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUDCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 122.16,
+      "shortVol": 438.71,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPNZD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 65.51,
+      "shortVol": 426.6,
+      "traders": 0,
+      "positions": 0
+    },
+    "NZDCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 380.55,
+      "shortVol": 127.9,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAGUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 172.65,
+      "shortVol": 123.53,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1182.27,
+      "shortVol": 971.76,
+      "traders": 0,
+      "positions": 0
+    },
+    "CADCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 724.12,
+      "shortVol": 179.7,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPAUD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 698.98,
+      "shortVol": 181.35,
+      "traders": 0,
+      "positions": 0
+    },
+    "SPA35": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.18,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "SGDJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.33,
+      "shortVol": 7.9,
+      "traders": 0,
+      "positions": 0
+    },
+    "SUGAR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 26.4,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPNOK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.33,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "US30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 5.31,
+      "shortVol": 3.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURZAR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.03,
+      "shortVol": 0.42,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUDSGD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.27,
+      "shortVol": 4.75,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPZAR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.04,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CHFSGD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.05,
+      "shortVol": 2.21,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURSGD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 6.54,
+      "shortVol": 47.61,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPSGD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.82,
+      "shortVol": 12.31,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUDDKK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.8,
+      "shortVol": 1.08,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPDKK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "COPPER": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.03,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "COFFEE": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 4.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURO50": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "TRYJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 5.83,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "US500": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 1.1,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPPLN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "WHEAT": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "COCOA": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.05,
+      "traders": 0,
+      "positions": 0
+    },
+    "UK100": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 1.36,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUGBP": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "COTTON": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.03,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "NOKJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.06,
+      "shortVol": 1.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "SP500": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ZARJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 2.63,
+      "shortVol": 2.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "HKDJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CHFNOK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.02,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPTRY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.4,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDRUB": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "SEKJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.29,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "MSFT": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "JNJ": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EURMXN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 2.19,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUAUD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.13,
+      "shortVol": 0.05,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUEUR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.16,
+      "shortVol": 1.32,
+      "traders": 0,
+      "positions": 0
+    },
+    "WS30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "NAS100": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.61,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "SGDHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "US2000": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 2.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "FRA40": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.26,
+      "shortVol": 4.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GER30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.1,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUDSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.28,
+      "shortVol": 4.16,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAUCHF": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.51,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "USOIL": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.03,
+      "traders": 0,
+      "positions": 0
+    },
+    "CHFSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.1,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUS200": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 1.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPMXN": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "JPN225": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAGAUD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "NOKSEK": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.62,
+      "shortVol": 0.03,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDX": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XAGEUR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.35,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "EBAY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "VIX": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.2,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CHFHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "YHOO": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 8.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XPTUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 9.91,
+      "shortVol": 9.51,
+      "traders": 0,
+      "positions": 0
+    },
+    "GBPHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XPDUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.09,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CADHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "USDCNH": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 51.95,
+      "shortVol": 1.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "AUDHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "NZDHKD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "AAPL": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "PFE": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.5,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "FB": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.5,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "IT40": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 4.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GS": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "NKE": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "BA": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CVX": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GOOG": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XTIUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 3.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "BTCUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 99.79,
+      "shortVol": 98.58,
+      "traders": 0,
+      "positions": 0
+    },
+    "XBRUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.03,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "US30.D": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 1.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "BTCEUR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "LTCBTC": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 2.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "LTCUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 41.52,
+      "shortVol": 2.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "TWTR": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "HK50": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.1,
+      "traders": 0,
+      "positions": 0
+    },
+    "GOPRO": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XNGUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "APPL": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "DXU5": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "DXZ5": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 2.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "OGZD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CN50": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.4,
+      "shortVol": 0.2,
+      "traders": 0,
+      "positions": 0
+    },
+    "BTCJPY": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.1,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ETHUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 184.94,
+      "shortVol": 63.43,
+      "traders": 0,
+      "positions": 0
+    },
+    "DSHUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "DASH": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 2.9,
+      "traders": 0,
+      "positions": 0
+    },
+    "BTCGBP": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ETCUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XRPUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 39.23,
+      "shortVol": 1.63,
+      "traders": 0,
+      "positions": 0
+    },
+    "BCHUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 3.47,
+      "shortVol": 56.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ZECUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.75,
+      "shortVol": 1.65,
+      "traders": 0,
+      "positions": 0
+    },
+    "XMRUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.06,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "NEOUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 11.5,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "OMGUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 264.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "RIPPLE": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.1,
+      "traders": 0,
+      "positions": 0
+    },
+    "EOSUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 1.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "IOTUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.1,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "QTMUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 161.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XLMUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "TRXUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ZRXUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.02,
+      "traders": 0,
+      "positions": 0
+    },
+    "ADAUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 7.27,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "XTZUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.7,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "BATUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.15,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "FTMUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "FETUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.05,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "SCI25": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.2,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "CNI30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.2,
+      "traders": 0,
+      "positions": 0
+    },
+    "BIO30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.1,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "LAT30": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.1,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "JPYX": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 1.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "MKRUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "DOTUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 8.86,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "UNIUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.01,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "VETUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.05,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "YFIUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.4,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ICPUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.07,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "SOLUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 207.15,
+      "shortVol": 16.12,
+      "traders": 0,
+      "positions": 0
+    },
+    "SNXUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.5,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "FILUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.34,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "AXSUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.14,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "ENJUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.0,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "ZILUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.96,
+      "shortVol": 0.01,
+      "traders": 0,
+      "positions": 0
+    },
+    "LRCUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "GRTUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 4.0,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
+    },
+    "BNTUSD": {
+      "longPct": 0.0,
+      "shortPct": 0.0,
+      "longVol": 0.3,
+      "shortVol": 0.0,
+      "traders": 0,
+      "positions": 0
     }
-  ],
-  "general": {
-    "profitablePercentage": 66,
-    "nonProfitablePercentage": 33,
-    "realAccountsPercentage": 59,
-    "demoAccountsPercentage": 40,
-    "totalFunds": "1,749,254,744.09",
-    "averageDeposit": "90,983.81",
-    "averageAccountProfit": "117,677.49",
-    "averageAccountLoss": "-69,574.01"
-  },
-  "blockReason": "Outlook failed: Invalid session.",
-  "blockTs": "2026-04-26T04:23:27Z",
-  "tokenExpired": false,
-  "lastAttempt": "2026-04-26T14:24:28Z"
+  }
 }
