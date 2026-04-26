@@ -20,7 +20,7 @@ MEJORAS v2.9 vs v2.8:
 MEJORAS v2.8 vs v2.7:
   - fetch_correlations() ahora descarga 252d (1 año) en vez de 90d.
   - Calcula norm: media de Pearson en ventanas de 30d sobre el año histórico.
-  - Calcula z_score: (corr60d - norm) / std — cuántas sigmas fuera de norma.
+  - Calcula z_score: (corr30 - norm30) / std — 30d snapshot vs 30d-rolling norm (apples-to-apples).
   - Agrega 2 pares nuevos: DXY/SPX y Gold/DXY (señales de régimen).
   - PASO 6b: genera signals de rotura de correlación en ai-analysis/signals.json
     cuando |z_score| > 1.5 (determinista, sin LLM). Se limpian en cada ejecución.
@@ -432,7 +432,7 @@ def fetch_correlations():
     Computes:
       - corr:    rolling 60-day Pearson (current regime)
       - norm:    mean of all 30-day rolling Pearson windows over 252 days (historical baseline)
-      - z_score: (corr - norm) / std_dev — how many std devs current is from historical norm
+      - z_score: (corr30 - norm) / std_dev — how many std devs current 30d is from 30d-rolling norm (apples-to-apples)
                  |z| > 1.5 = correlation break worth flagging as a signal
     Returns a list of dicts ready for quotes.json.
     """
@@ -492,7 +492,7 @@ def fetch_correlations():
             variance = sum((c - norm) ** 2 for c in hist_corrs) / (len(hist_corrs) - 1)
             std_val = math.sqrt(variance)
             if std_val > 0 and corr is not None:
-                z_score = round((corr - norm) / std_val, 2)
+                z_score = round((corr30 - norm) / std_val, 2)  # 30d vs 30d-rolling norm (apples-to-apples)
 
         status = f"{corr:+.3f}" if corr is not None else "N/A"
         norm_s = f"norm={norm:+.3f}" if norm is not None else "norm=N/A"
