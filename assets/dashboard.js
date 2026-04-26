@@ -380,9 +380,10 @@ async function populateCorrelations() {
         const absZ = Math.abs(z);
         const normSign = c.norm >= 0 ? '+' : '';
         let badgeCls, badgeLabel;
-        if (absZ >= 2.5)      { badgeCls = 'down';    badgeLabel = '↯ break'; }
-        else if (absZ >= 1.5) { badgeCls = '';        badgeLabel = '~ stretched'; }
-        else                  { badgeCls = 'flat';    badgeLabel = '● normal'; }
+        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '⚠ broken'; }
+        else if (absZ >= 1.5) { badgeCls = 'down'; badgeLabel = '↯ break'; }
+        else if (absZ >= 1.0) { badgeCls = '';     badgeLabel = '~ stretched'; }
+        else                  { badgeCls = 'flat'; badgeLabel = '● normal'; }
         const title = `Norm (252d): ${normSign}${c.norm.toFixed(2)} · Z-score: ${z >= 0 ? '+' : ''}${z.toFixed(2)}σ`;
         normCell = `<td class="${badgeCls}" title="${title}" style="font-size:9px;white-space:nowrap;">${badgeLabel}</td>`;
       }
@@ -717,7 +718,7 @@ async function fetchCBRates() {
           var r   = st && st[id];
           if (!r || typeof openCBRatesModal !== 'function') return;
           var bi  = (window._STATE_bankInfo && window._STATE_bankInfo[id]) || {};
-          var mtg = window._STATE_meetings && window._STATE_meetings[id.toUpperCase()];
+          var mtg = window._STATE_meetings && window._STATE_meetings.meetings && window._STATE_meetings.meetings[id.toUpperCase()];
           openCBRatesModal(id.toUpperCase(), r.obs, bi, mtg);
         })(this)"
       >
@@ -3504,14 +3505,14 @@ async function _renderLWChart(ohlcId, label) {
   // ── CB Meeting markers — industry standard: annotate central bank decision dates on chart ──
   // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
   // LWC v5: createSeriesMarkers(series, markers) — LWC v4: series.setMarkers(markers)
-  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = false;
+  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
 
   // ── CB Meeting markers — Bloomberg/Reuters standard: vertical dashed lines with label ──
   // Industry standard: thin vertical line at CB decision date, labeled with the bank acronym
   // (FOMC, ECB, BoE etc.) pinned at the top of the chart area, with a hover tooltip.
   // Implementation: DOM SVG overlay updated via LWC timeScale subscribeVisibleTimeRangeChange
   // and scrolled/zoomed in sync with the chart — same pattern used by institutional terminals.
-  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = false;
+  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
   let _cbRafId = null;
   let _cbOverlay = null;   // SVG element overlay
   let _cbMeetingData = []; // [{date, cbs:[{cb,color}]}] — built once, reused on each draw
@@ -5716,6 +5717,7 @@ async function fetchOptionSkew() {
       { pair:'USD/CAD', cot:'CAD', etfId:null,     rrKey:'USDCAD' },
       { pair:'USD/CHF', cot:'CHF', etfId:null,     rrKey:'USDCHF' },
       { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
+      { pair:'EUR/JPY', cot:'EUR', cot2:'JPY',   etfId:null,     rrKey:'EURJPY' },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
@@ -5781,10 +5783,23 @@ async function fetchOptionSkew() {
       'USD/CAD': { body: 'USD/CAD bias from CFTC Leveraged Funds net CAD positioning (inverted). Positive = USD calls bid / CAD puts bid (USD upside, CAD weakness). Negative = CAD demand dominant, often driven by oil strength or risk-on.', ex: 'CAD is tightly linked to WTI crude. Watch for divergence between COT bias and oil price direction — that spread often resolves in oil\'s favour.' },
       'USD/CHF': { body: 'USD/CHF bias from CFTC Leveraged Funds net CHF positioning (inverted). Positive = USD calls bid / CHF puts bid. Negative = CHF safe-haven demand dominant.', ex: 'CHF safe-haven flows can override COT positioning quickly during risk-off episodes. Treat CHF bias as a risk sentiment barometer alongside JPY.' },
       'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
+      'EUR/JPY': { body: 'EUR/JPY bias derived from CFTC Leveraged Funds net positioning on both legs: EUR net (base) minus inverted JPY net (quote). Positive = EUR outperformance expected vs JPY. Supplemented by 25d Risk Reversal from Saxo Bank options analytics.', ex: 'EUR/JPY is a pure risk-appetite cross — JPY is the safe-haven leg. When EUR COT is neutral but JPY shorts are extreme, the cross bias is dominated by the JPY squeeze risk. Watch BoJ meetings as key catalysts.' },
     };
 
     tbody.innerHTML = pairs.map(p => {
-      const cotData = cotMap[p.cot];
+      // For cross pairs (e.g. EUR/JPY), derive COT net from both legs:
+      // base leg net − (inverted quote leg net) — standard cross-market methodology
+      let cotData = cotMap[p.cot];
+      if (!cotData && p.cot2) {
+        const base  = cotMap[p.cot]  || { net: 0 };
+        const quote = cotMap[p.cot2] || { net: 0 };
+        // EUR/JPY bias: EUR net (positive = EUR bullish) minus JPY net inverted (JPY short = JPY bearish = cross bullish)
+        const crossNet = (base.net || 0) - (quote.net || 0);
+        cotData = { net: crossNet };
+      } else if (cotData && p.cot2) {
+        const quote = cotMap[p.cot2] || { net: 0 };
+        cotData = { net: cotData.net - (quote.net || 0) };
+      }
       const etfIv   = etfIvMap[p.etfId];
       const invert  = p.pair.startsWith('USD/');
 
