@@ -3505,14 +3505,14 @@ async function _renderLWChart(ohlcId, label) {
   // ── CB Meeting markers — industry standard: annotate central bank decision dates on chart ──
   // Bloomberg, Reuters, and all institutional charting platforms mark CB meeting dates visually.
   // LWC v5: createSeriesMarkers(series, markers) — LWC v4: series.setMarkers(markers)
-  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
+  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = false;
 
   // ── CB Meeting markers — Bloomberg/Reuters standard: vertical dashed lines with label ──
   // Industry standard: thin vertical line at CB decision date, labeled with the bank acronym
   // (FOMC, ECB, BoE etc.) pinned at the top of the chart area, with a hover tooltip.
   // Implementation: DOM SVG overlay updated via LWC timeScale subscribeVisibleTimeRangeChange
   // and scrolled/zoomed in sync with the chart — same pattern used by institutional terminals.
-  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = true;
+  if (typeof window._lwShowCb === 'undefined') window._lwShowCb = false;
   let _cbRafId = null;
   let _cbOverlay = null;   // SVG element overlay
   let _cbMeetingData = []; // [{date, cbs:[{cb,color}]}] — built once, reused on each draw
