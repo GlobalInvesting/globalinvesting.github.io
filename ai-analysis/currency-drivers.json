@@ -1,77 +1,87 @@
 {
-  "generated_at": "2026-04-27T11:44:57Z",
+  "generated_at": "2026-04-27T17:00:00Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "USD steady. Fed 4.50% vs ECB 2.00% — 250bp anchors pair at 1.1745.",
-      "EUR/GBP": "GBP firm. BoE 3.75% vs ECB 2.00% — 175bp carry favors GBP.",
-      "EUR/JPY": "JPY COT LF short −80.6k. BOJ binary 02:30 UTC Apr 28. Carry bid.",
-      "EUR/AUD": "AUD COT LF long +47.2k. RBA hike priced on energy surge. AUD bid.",
-      "EUR/CAD": "CAD COT LF short −64.8k. BoC 2.75% on hold. WTI 96.32 CAD tailwind.",
-      "EUR/CHF": "CHF flat. SNB 0.00% vs ECB 2.00% — 200bp carry favors EUR.",
-      "EUR/NZD": "NZD steady. RBNZ 2.25% vs ECB 2.00% — 25bp. No catalyst in session."
+      "EUR/USD": "USD COT LF flat. Fed 3.75% ON HOLD. DXY steady −0.13%; Iran negotiation headlines weigh.",
+      "EUR/GBP": "GBP firm. BoE 3.75% ON HOLD. COT LF long +33.5k. EUR/GBP range-bound at 0.8657.",
+      "EUR/JPY": "JPY COT LF short −80.6k. BoJ 0.75% — hike 40% priced 28 Apr. Carry bid vs squeeze risk.",
+      "EUR/AUD": "AUD COT LF long +47.2k. RBA 4.10% ↑ hike expected. AUD outperforming; EUR/AUD −0.46%.",
+      "EUR/CAD": "CAD firm. BoC 2.25% ON HOLD. WTI +1.85% supports CAD; EUR/CAD −0.27%.",
+      "EUR/CHF": "CHF steady. SNB 0% ON HOLD. No safe-haven demand at VIX 18.5; EUR/CHF range-bound.",
+      "EUR/NZD": "NZD COT LF short −18.1k vs RBNZ hike 40% priced 27 May. NZD leading G8; EUR/NZD −0.50%."
     },
     "GBP": {
-      "GBP/USD": "GBP COT LF long +33.5k. BoE 3.75% vs Fed 4.50% — 75bp USD carry edge.",
-      "GBP/JPY": "JPY COT LF short −80.6k. BOJ binary 02:30 UTC Apr 28. 215.70 in focus.",
-      "EUR/GBP": "GBP firm. BoE 3.75% vs ECB 2.00% — 175bp GBP carry advantage.",
-      "GBP/AUD": "AUD COT LF long +47.2k. RBA hike priced. BoE 3.75% vs RBA 3.35% — 40bp.",
-      "GBP/CAD": "CAD COT LF short −64.8k. BoE 3.75% vs BoC 2.75% — 100bp GBP carry.",
-      "GBP/CHF": "BoE 3.75% vs SNB 0.00% — 375bp widest G8 carry. GBP COT long +33.5k.",
-      "GBP/NZD": "BoE 3.75% vs RBNZ 2.25% — 150bp GBP carry. No NZD catalyst."
+      "GBP/USD": "USD COT LF flat. Fed 3.75% ON HOLD. USD softness on Iran de-escalation; GBP/USD +0.12%.",
+      "GBP/JPY": "JPY COT LF short −80.6k. BoE 3.75% vs BoJ 0.75% — 300bp carry. BoJ 28 Apr squeeze risk.",
+      "EUR/GBP": "EUR flat. ECB 2.00% ON HOLD. EUR/GBP steady at 0.8657 — 175bp BoE/ECB differential.",
+      "GBP/AUD": "AUD COT LF long +47.2k. RBA 4.10% ↑ hike priced. AUD outperforming; GBP/AUD −0.44%.",
+      "GBP/CAD": "CAD firm. BoC 2.25% ON HOLD. WTI +1.85% bid; GBP/CAD range-bound at 1.8451.",
+      "GBP/CHF": "CHF carry drag. SNB 0% ON HOLD. BoE 3.75% vs SNB 0% — 375bp GBP carry advantage.",
+      "GBP/NZD": "NZD COT LF short but RBNZ hike priced 40%. NZD G8 leader; GBP/NZD −0.48% this session."
     },
     "JPY": {
-      "USD/JPY": "JPY COT LF short −80.6k. BOJ 02:30 UTC Apr 28. 160.00 intervention watch.",
-      "EUR/JPY": "JPY COT LF short −80.6k. BOJ binary event. ECB 2.00% vs BoJ 0.50%.",
-      "GBP/JPY": "JPY COT LF short −80.6k. BOJ binary. GBP COT long +33.5k adds bid.",
-      "AUD/JPY": "JPY COT LF short −80.6k. AUD COT long +47.2k. BOJ event risk dominant.",
-      "CAD/JPY": "JPY COT LF short −80.6k. CAD COT short −64.8k. BOJ binary adds vol.",
-      "CHF/JPY": "JPY COT LF short −80.6k. BOJ event risk overrides CHF safe-haven bid.",
-      "NZD/JPY": "JPY COT LF short −80.6k. BOJ binary. RBNZ 2.25% vs BoJ 0.50% — 175bp."
+      "USD/JPY": "JPY COT LF short −80.6k. Fed 3.75% vs BoJ 0.75% — 300bp carry. BoJ 28 Apr 40% hike risk.",
+      "EUR/JPY": "EUR flat. ECB 2.00% vs BoJ 0.75% — 125bp carry. BoJ squeeze risk dominates near-term.",
+      "GBP/JPY": "GBP carry bid. BoE 3.75% vs BoJ 0.75% — 300bp. Retail 83% short GBP/JPY — contrarian.",
+      "AUD/JPY": "AUD COT LF long +47.2k. RBA 4.10% vs BoJ 0.75% — 335bp carry. AUD/JPY +0.56%.",
+      "CAD/JPY": "CAD firm on WTI +1.85%. BoC 2.25% vs BoJ 0.75% — 150bp carry. CAD/JPY +0.38%.",
+      "CHF/JPY": "CHF steady. SNB 0% vs BoJ 0.75% — CHF carry deficit 75bp. CHF/JPY flat at 203.01.",
+      "NZD/JPY": "NZD COT LF short vs RBNZ hike 40%. RBNZ 2.25% vs BoJ 0.75% — 150bp carry. NZD/JPY +0.60%."
     },
     "AUD": {
-      "AUD/USD": "AUD COT LF long +47.2k. RBA hike priced. Fed 4.50% vs RBA 3.35% — 115bp.",
-      "EUR/AUD": "AUD COT LF long +47.2k. RBA hike priced on energy surge. AUD leads.",
-      "GBP/AUD": "AUD COT LF long +47.2k. RBA hike priced. BoE 3.75% vs RBA 3.35% — 40bp.",
-      "AUD/JPY": "AUD COT LF long +47.2k. JPY COT short −80.6k. BOJ event risk binary.",
-      "AUD/CAD": "AUD COT +47.2k vs CAD COT −64.8k. RBA 3.35% vs BoC 2.75% — 60bp AUD.",
-      "AUD/CHF": "AUD COT LF long +47.2k. RBA 3.35% vs SNB 0.00% — 335bp AUD carry.",
-      "AUD/NZD": "RBA hike priced vs RBNZ 2.25% on hold. RBA 3.35% vs RBNZ 2.25% — 110bp."
+      "AUD/USD": "AUD COT LF long +47.2k. RBA 4.10% ↑ hike expected. Retail 91% short — contrarian extreme.",
+      "EUR/AUD": "EUR flat. ECB 2.00% vs RBA 4.10% — 210bp AUD carry advantage. EUR/AUD −0.46%.",
+      "GBP/AUD": "GBP carry. BoE 3.75% vs RBA 4.10% — 35bp AUD advantage. AUD CPI 29 Apr key.",
+      "AUD/JPY": "JPY COT LF short −80.6k. RBA 4.10% vs BoJ 0.75% — 335bp carry. BoJ 28 Apr risk.",
+      "AUD/CAD": "CAD firm on WTI bid. BoC 2.25% vs RBA 4.10% — 185bp AUD carry. AUD/CAD +0.29%.",
+      "AUD/CHF": "CHF carry drag. SNB 0% vs RBA 4.10% — 410bp AUD carry advantage. AUD/CHF +0.72%.",
+      "AUD/NZD": "NZD RBNZ hike 40% priced 27 May. RBA 4.10% vs RBNZ 2.25% — 185bp AUD advantage; flat."
     },
     "CAD": {
-      "USD/CAD": "CAD COT LF short −64.8k. BoC 2.75% on hold. WTI 96.32 limits CAD downside.",
-      "EUR/CAD": "CAD COT LF short −64.8k. BoC 2.75% vs ECB 2.00% — 75bp CAD carry edge.",
-      "GBP/CAD": "CAD COT LF short −64.8k. BoE 3.75% vs BoC 2.75% — 100bp GBP carry.",
-      "AUD/CAD": "AUD COT +47.2k vs CAD COT −64.8k. RBA 3.35% vs BoC 2.75% — 60bp AUD.",
-      "CAD/JPY": "CAD COT LF short −64.8k. JPY COT short −80.6k. BOJ event adds vol.",
-      "CAD/CHF": "CAD COT LF short −64.8k. BoC 2.75% vs SNB 0.00% — 275bp CAD carry.",
-      "NZD/CAD": "CAD COT LF short −64.8k. RBNZ 2.25% vs BoC 2.75% — 50bp BoC carry edge."
+      "USD/CAD": "CAD COT LF short −64.8k. BoC 2.25% ON HOLD. WTI +1.85% — oil supporting CAD; USD/CAD −0.36%.",
+      "EUR/CAD": "EUR flat. ECB 2.00% vs BoC 2.25% — near-parity carry. WTI +1.85% CAD tailwind.",
+      "GBP/CAD": "GBP carry. BoE 3.75% vs BoC 2.25% — 150bp GBP advantage. WTI support limits CAD downside.",
+      "AUD/CAD": "AUD COT LF long +47.2k. RBA 4.10% vs BoC 2.25% — 185bp AUD advantage. AUD/CAD +0.29%.",
+      "CAD/JPY": "JPY COT LF short −80.6k. BoC 2.25% vs BoJ 0.75% — 150bp CAD carry. WTI bid amplifies.",
+      "CAD/CHF": "CHF carry drag. SNB 0% vs BoC 2.25% — 225bp CAD carry advantage. CAD/CHF +0.52%.",
+      "NZD/CAD": "NZD G8 leader. RBNZ 2.25% vs BoC 2.25% — 0bp carry neutral; NZD outperforming on hike bias."
     },
     "CHF": {
-      "USD/CHF": "SNB 0.00% vs Fed 4.50% — 450bp carry drag on CHF. Geopolitical bid muted.",
-      "EUR/CHF": "SNB 0.00% vs ECB 2.00% — 200bp. CHF safe-haven muted, VIX 19.07.",
-      "GBP/CHF": "BoE 3.75% vs SNB 0.00% — 375bp widest G8. GBP COT long +33.5k aligned.",
-      "AUD/CHF": "AUD COT LF long +47.2k. RBA 3.35% vs SNB 0.00% — 335bp AUD carry.",
-      "CAD/CHF": "CAD COT LF short −64.8k. BoC 2.75% vs SNB 0.00% — 275bp CAD carry.",
-      "CHF/JPY": "JPY COT LF short −80.6k. BOJ event risk overrides CHF bid. Carry dominates.",
-      "NZD/CHF": "RBNZ 2.25% vs SNB 0.00% — 225bp. NZD COT LF short −18.1k limits upside."
+      "USD/CHF": "CHF carry deficit. SNB 0% vs Fed 3.75% — 375bp USD advantage. VIX 18.5 — no safe-haven bid.",
+      "EUR/CHF": "EUR flat. ECB 2.00% vs SNB 0% — 200bp EUR carry advantage. EUR/CHF +0.16% intraday.",
+      "GBP/CHF": "GBP carry. BoE 3.75% vs SNB 0% — 375bp GBP advantage. GBP/CHF +0.20%.",
+      "AUD/CHF": "AUD COT LF long +47.2k. RBA 4.10% vs SNB 0% — 410bp AUD carry. AUD/CHF +0.72%.",
+      "CAD/CHF": "CAD firm on WTI. BoC 2.25% vs SNB 0% — 225bp CAD carry. CAD/CHF +0.52%.",
+      "CHF/JPY": "JPY COT LF short −80.6k. BoJ 0.75% vs SNB 0% — 75bp JPY carry advantage. Flat at 203.01.",
+      "NZD/CHF": "NZD G8 leader +0.864%. RBNZ 2.25% vs SNB 0% — 225bp NZD carry. NZD/CHF +0.69%."
     },
     "NZD": {
-      "NZD/USD": "NZD COT LF short −18.1k. Fed 4.50% vs RBNZ 2.25% — 225bp USD carry edge.",
-      "EUR/NZD": "RBNZ 2.25% vs ECB 2.00% — 25bp NZD carry edge. NZD COT short −18.1k.",
-      "GBP/NZD": "BoE 3.75% vs RBNZ 2.25% — 150bp GBP carry. NZD COT short −18.1k.",
-      "AUD/NZD": "RBA hike priced vs RBNZ 2.25% on hold. RBA 3.35% vs RBNZ 2.25% — 110bp.",
-      "NZD/JPY": "NZD COT short −18.1k. JPY COT short −80.6k. BOJ event binary risk.",
-      "NZD/CAD": "CAD COT LF short −64.8k. RBNZ 2.25% vs BoC 2.75% — 50bp BoC carry edge.",
-      "NZD/CHF": "RBNZ 2.25% vs SNB 0.00% — 225bp. NZD COT short −18.1k caps upside."
+      "NZD/USD": "NZD COT LF short −18.1k vs RBNZ hike 40% priced 27 May. G8 leader +0.864%; short-squeeze risk.",
+      "EUR/NZD": "NZD G8 leader. RBNZ 2.25% ↑ hike expected vs ECB 2.00% ON HOLD. EUR/NZD −0.50%.",
+      "GBP/NZD": "NZD outperforming. RBNZ hike 40% priced. BoE 3.75% vs RBNZ 2.25% — 150bp GBP carry advantage.",
+      "AUD/NZD": "RBA 4.10% ↑ hike expected vs RBNZ 2.25% — 185bp AUD carry. Both G8 outperformers; flat.",
+      "NZD/JPY": "JPY COT LF short −80.6k. RBNZ 2.25% vs BoJ 0.75% — 150bp NZD carry. BoJ risk 28 Apr.",
+      "NZD/CAD": "BoC 2.25% ON HOLD vs RBNZ 2.25% — 0bp carry neutral. NZD outperforms on hike bias.",
+      "NZD/CHF": "SNB 0% carry drag. RBNZ 2.25% vs SNB 0% — 225bp NZD carry advantage. NZD/CHF +0.69%."
     },
     "USD": {
-      "EUR/USD": "USD steady. Fed 4.50% vs ECB 2.00% — 250bp anchors EUR/USD at 1.1745.",
-      "GBP/USD": "GBP COT LF long +33.5k. BoE 3.75% vs Fed 4.50% — 75bp USD carry edge.",
-      "USD/JPY": "JPY COT LF short −80.6k. BOJ 02:30 UTC Apr 28. 160.00 intervention watch.",
-      "AUD/USD": "AUD COT LF long +47.2k. RBA hike priced. Fed 4.50% vs RBA 3.35% — 115bp.",
-      "USD/CAD": "CAD COT LF short −64.8k. Fed 4.50% vs BoC 2.75% — 175bp USD carry.",
-      "USD/CHF": "Fed 4.50% vs SNB 0.00% — 450bp widest G8. USD carry dominant.",
-      "NZD/USD": "NZD COT short −18.1k. Fed 4.50% vs RBNZ 2.25% — 225bp USD carry edge."
+      "EUR/USD": "Fed 3.75% ON HOLD vs ECB 2.00% ON HOLD — 175bp USD carry advantage. Iran talks weigh on USD.",
+      "GBP/USD": "BoE 3.75% vs Fed 3.75% — 0bp carry neutral. USD soft on Iran de-escalation; GBP/USD +0.12%.",
+      "USD/JPY": "JPY COT LF short −80.6k. Fed 3.75% vs BoJ 0.75% — 300bp carry. BoJ 28 Apr 40% hike risk.",
+      "AUD/USD": "AUD COT LF long +47.2k. RBA 4.10% ↑ hike expected. AUD/USD +0.56%; retail 91% short.",
+      "USD/CAD": "CAD COT LF short −64.8k. WTI +1.85% supports CAD. USD/CAD −0.36% intraday.",
+      "USD/CHF": "SNB 0% carry drag. Fed 3.75% vs SNB 0% — 375bp USD advantage. USD/CHF +0.09% intraday.",
+      "NZD/USD": "NZD COT LF short −18.1k vs RBNZ hike 40% priced. NZD G8 leader +0.864%; USD laggard −0.566%."
     }
+  },
+  "_inputs_snap": {
+    "USD": {"cot_we": "2026-04-21", "rate_updated": "2026-04-01", "bias": "hold", "bias_updated": null},
+    "EUR": {"cot_we": "2026-04-21", "rate_updated": "2025-06-01", "bias": "hold", "bias_updated": null},
+    "GBP": {"cot_we": "2026-04-21", "rate_updated": "2026-04-01", "bias": "hold", "bias_updated": null},
+    "JPY": {"cot_we": "2026-04-21", "rate_updated": "2026-03-01", "bias": "hike", "bias_updated": null},
+    "AUD": {"cot_we": "2026-04-21", "rate_updated": "2026-03-01", "bias": "hike", "bias_updated": null},
+    "CAD": {"cot_we": "2026-04-21", "rate_updated": "2026-04-01", "bias": "hold", "bias_updated": null},
+    "CHF": {"cot_we": "2026-04-21", "rate_updated": "2026-03-01", "bias": "hold", "bias_updated": null},
+    "NZD": {"cot_we": "2026-04-21", "rate_updated": "2026-03-01", "bias": "hike", "bias_updated": null}
   }
 }
