@@ -144,6 +144,11 @@ FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 NON_FX_SYMBOLS = {'gold', 'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy'}
 FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
 
+# Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
+# start/end date range is passed. Using period="3y" silently omits weekends because
+# yfinance applies a NYSE/NASDAQ business-day calendar as the default date filter.
+CRYPTO_SYMBOLS = {'btc', 'eth'}
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _guard(id_: str, val: float) -> bool:
@@ -171,7 +176,21 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     try:
         ticker = yf.Ticker(ticker_sym)
-        hist = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
+        # Crypto (BTC, ETH) trades 24/7 — use explicit start/end so yfinance
+        # includes Saturday and Sunday bars. With period="3y", yfinance applies
+        # the NYSE business-day calendar and silently drops all weekend bars,
+        # creating the visual gap on the chart between Friday close and Monday open.
+        if id_ in CRYPTO_SYMBOLS:
+            _end   = datetime.now(timezone.utc)
+            _start = _end - timedelta(days=3 * 365 + 2)  # 3y + 2 days buffer
+            hist = ticker.history(
+                start=_start.strftime("%Y-%m-%d"),
+                end=_end.strftime("%Y-%m-%d"),
+                interval=INTERVAL,
+                auto_adjust=True,
+            )
+        else:
+            hist = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
         if hist.empty:
             print(f"  WARN [{id_}]: empty history from yfinance")
             return None
