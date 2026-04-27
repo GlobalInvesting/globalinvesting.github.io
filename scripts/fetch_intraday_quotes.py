@@ -982,15 +982,22 @@ def fetch_yfinance_all(symbols_map):
                         if raw_bid and raw_ask:
                             bid_f = round(float(raw_bid), 5)
                             ask_f = round(float(raw_ask), 5)
-                            # Sanity: bid < ask, both within 5% of mid-price
                             mid = close
+                            # yfinance occasionally returns bid/ask inverted for FX pairs
+                            # (e.g. EURUSD=X returns bid > ask). If both values are within
+                            # 5% of mid, swap them rather than discarding valid spread data.
+                            inverted = bid_f > ask_f
+                            if inverted:
+                                bid_f, ask_f = ask_f, bid_f
+                            # Sanity: bid < ask, both within 5% of mid-price
                             if (bid_f < ask_f
                                     and abs(bid_f - mid) / mid < 0.05
                                     and abs(ask_f - mid) / mid < 0.05):
                                 day_bid = bid_f
                                 day_ask = ask_f
                                 spread_pips_raw = round((ask_f - bid_f) * (100 if "jpy" in internal_id else 10000), 2)
-                                print(f"[yfinance]   bid/ask {internal_id:8s}: {bid_f:.5f}/{ask_f:.5f}  spread={spread_pips_raw:.2f}pip  [{'LIVE?' if bid_f != ask_f else 'FROZEN-equal'}]")
+                                swapped_tag = " [swapped]" if inverted else ""
+                                print(f"[yfinance]   bid/ask {internal_id:8s}: {bid_f:.5f}/{ask_f:.5f}  spread={spread_pips_raw:.2f}pip  [{'LIVE?' if bid_f != ask_f else 'FROZEN-equal'}]{swapped_tag}")
                             else:
                                 print(f"[yfinance]   bid/ask {internal_id:8s}: REJECTED (bid={raw_bid} ask={raw_ask} mid={mid:.5f})")
 
