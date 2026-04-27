@@ -134,6 +134,25 @@ GUARDS: dict[str, tuple[float, float]] = {
 }
 FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 
+# Maximum tolerated H/L spread as a fraction of Low, per symbol.
+# yfinance front-month futures (GC=F, CL=F, DX-Y.NYB) occasionally produce bars
+# that span TWO contract months at roll dates — the High reflects the expiring
+# contract's last prints and the Low reflects the incoming contract's first prints
+# (or vice versa), creating a single bar with an impossible intraday range.
+# These "roll-artifact" bars cause prominent visual spikes on the chart that are
+# absent on continuous-contract sources (e.g. TradingView's GC1!).
+# Any bar whose (High - Low) / Low exceeds the threshold below is silently dropped.
+# Normal gold intraday range: 0.3–2.5%. Threshold at 4% removes roll artifacts while
+# preserving legitimate stress-day moves (gold has never moved > 3.5% H/L on a
+# non-artifact trading day in modern markets).
+# WTI/CL=F: normal 1–5%; threshold at 8% catches the severe multi-contract bars.
+# DXY/DX-Y.NYB and index futures: normal < 2%; threshold at 5%.
+HL_MAX_SPREAD: dict[str, float] = {
+    "gold":  0.04,   # 4% — removes roll spikes, keeps real stress days
+    "wti":   0.08,   # 8% — WTI has larger legitimate daily swings
+    "dxy":   0.05,   # 5% — DX futures roll artifacts
+}
+
 # FX spot symbols — daily open values from Yahoo Finance are NOT reliable for these.
 # Yahoo reports the last tick of the previous UTC day as the open, which is close to
 # but not exactly prev_close. This creates candle bodies whose color (open vs close)
@@ -206,6 +225,14 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             # Skip bars where all four values are identical (stale/placeholder bar)
             if o == h == l == c:
                 continue
+            # Skip front-month futures roll artifacts — bars where the H/L spread
+            # exceeds the physical limit for a real trading session. yfinance GC=F and
+            # CL=F occasionally produce bars that span two contract months at roll
+            # dates, creating an impossibly wide range that renders as a visual spike
+            # absent on continuous-contract sources (e.g. TradingView GC1!).
+            if id_ in HL_MAX_SPREAD and l > 0:
+                if (h - l) / l > HL_MAX_SPREAD[id_]:
+                    continue
 
             dec = DECIMALS.get(id_, 5)
             # Volume: FX has tick-volume (number of ticks/quotes), non-FX has real traded volume
