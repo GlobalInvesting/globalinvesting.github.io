@@ -8,7 +8,7 @@ used by the Lightweight Charts panel (replaces TradingView widget).
 Symbols covered:
   FX Majors   (7): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD
   FX Crosses (21): all pairs in PAIRS[] that have chart click support
-  Cross-asset (4): Gold (XAUUSD=X), WTI (CL=F), BTC (BTC-USD), US 10Y (^TNX)
+  Cross-asset (4): Gold (GC=F), WTI (CL=F), BTC (BTC-USD), US 10Y (^TNX)
   Indices     (4): S&P 500 (^GSPC), Nasdaq (^IXIC), Nikkei 225 (^N225), EuroStoxx 50 (^STOXX50E)
   Crypto      (1): ETH/USD (ETH-USD)
   FX Index    (1): DXY (DX-Y.NYB)
@@ -80,7 +80,7 @@ SYMBOLS: dict[str, str] = {
     "nzdchf": "NZDCHF=X",
     "chfjpy": "CHFJPY=X",
     # Cross-asset
-    "gold":  "GC=F",       # Gold front-month futures (XAUUSD=X delisted on Yahoo Finance)
+    "gold":  "GC=F",       # Gold front-month futures (CME); XAUUSD=X is spot — GC=F matches institutional convention
     "wti":   "CL=F",       # WTI Crude front-month futures
     "btc":   "BTC-USD",    # Bitcoin vs USD
     "us10y": "^TNX",       # US 10-Year Treasury yield
