@@ -2856,6 +2856,13 @@ const _LW_FX_IDS = new Set([
   'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
 ]);
 
+// Crypto trades 24/7 with no session gaps — Saturday and Sunday bars are real.
+// LWC v5 treats "YYYY-MM-DD" string times as business days and collapses
+// weekends visually, creating artificial gaps on crypto charts.
+// Fix: convert crypto bar times to Unix timestamps (seconds) so LWC uses
+// continuous time mode, matching TradingView and Bloomberg crypto charts.
+const _CRYPTO_IDS = new Set(['btc', 'eth']);
+
 // Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
 // ohlcId (e.g. 'eurusd') maps directly to STOOQ_RT_CACHE keys, with two
 // special aliases: gold → xauusd, wti → wti (already correct).
@@ -2872,6 +2879,10 @@ function _lwBuildTodayBar(ohlcId) {
   const q = STOOQ_RT_CACHE[cacheKey];
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
   const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  // Crypto charts use Unix timestamps — must match the converted bar format
+  const timeVal  = _CRYPTO_IDS.has(ohlcId)
+    ? Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()) / 1000
+    : dateStr;
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
@@ -2898,7 +2909,7 @@ function _lwBuildTodayBar(ohlcId) {
   }
   const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
   const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
-  return { time: dateStr, open: o, high: h, low: l, close: c };
+  return { time: timeVal, open: o, high: h, low: l, close: c };
 }
 
 // Push/update the live today-bar on the active LW chart (called every 5 min).
@@ -2993,8 +3004,22 @@ async function _renderLWChart(ohlcId, label) {
   await _ensureLWLib();
   const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
-  const bars = await r.json();
+  let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+
+  // ── Crypto: convert string dates → Unix timestamps (seconds) ──────────────
+  // LWC v5 treats "YYYY-MM-DD" strings as business-day time and collapses
+  // Saturday/Sunday gaps — visually identical to a market that closes on Fridays.
+  // BTC/ETH trade 24/7: passing Unix timestamps instead switches LWC to
+  // continuous time mode, eliminating weekend gaps (same as TradingView/Bloomberg).
+  if (_CRYPTO_IDS.has(ohlcId)) {
+    bars = bars.map(b => ({
+      ...b,
+      time: typeof b.time === 'string'
+        ? Date.UTC(+b.time.slice(0,4), +b.time.slice(5,7)-1, +b.time.slice(8,10)) / 1000
+        : b.time,
+    }));
+  }
 
   wrap.innerHTML = '';
 
