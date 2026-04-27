@@ -1243,6 +1243,7 @@ async function fetchQuoteBarRT() {
   if (totalUpdated > 0) {
     updateFxPairsTableRT();
     _lwUpdateTodayBar();   // push live price to the active LW chart (if open)
+    if (window._lwRefreshBidAsk) window._lwRefreshBidAsk();  // refresh bid/ask lines with latest quotes.json data
     const now = new Date();
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
@@ -3255,6 +3256,48 @@ async function _renderLWChart(ohlcId, label) {
     } catch(_plErr) {}
   }
   _applyPrevClose();
+
+  // ── Bid/Ask price lines — drawn from live yfinance data in quotes.json ──
+  // Only rendered for FX pairs that have real bid/ask available (not all pairs do).
+  // Ask line: thin green dashed above mid. Bid line: thin red dashed below mid.
+  // Falls back silently — no lines rendered when data is absent.
+  let _bidLine = null, _askLine = null;
+  async function _applyBidAsk() {
+    // Remove existing lines
+    if (_bidLine) { try { candleSeries.removePriceLine(_bidLine); } catch(_) {} _bidLine = null; }
+    if (_askLine) { try { candleSeries.removePriceLine(_askLine); } catch(_) {} _askLine = null; }
+    if (!_LW_FX_IDS.has(ohlcId)) return;  // only FX pairs
+    try {
+      const intradayData = await loadIntradayQuotes();
+      const q = intradayData?.quotes?.[ohlcId];
+      if (!q?.bid || !q?.ask || q.ask <= q.bid) return;
+      const isJpy = ohlcId === 'usdjpy' || ohlcId.endsWith('jpy');
+      const pipFactor = isJpy ? 100 : 10000;
+      const spreadPips = Math.round((q.ask - q.bid) * pipFactor * 10) / 10;
+      _bidLine = candleSeries.createPriceLine({
+        price: q.bid,
+        color: 'rgba(239,83,80,0.65)',
+        lineWidth: 1,
+        lineStyle: 2,  // Dashed
+        axisLabelVisible: true,
+        axisLabelColor: '#2a2e39',
+        axisLabelTextColor: '#ef5350',
+        title: 'Bid',
+      });
+      _askLine = candleSeries.createPriceLine({
+        price: q.ask,
+        color: 'rgba(38,166,154,0.65)',
+        lineWidth: 1,
+        lineStyle: 2,  // Dashed
+        axisLabelVisible: true,
+        axisLabelColor: '#2a2e39',
+        axisLabelTextColor: '#26a69a',
+        title: `Ask  ${spreadPips.toFixed(1)}p`,
+      });
+    } catch(_) {}
+  }
+  _applyBidAsk();
+
   // Sync PC button state
   const _pcBtn = document.getElementById('lw-pc-btn');
   if (_pcBtn) {
@@ -3275,9 +3318,10 @@ async function _renderLWChart(ohlcId, label) {
     _logBtn.setAttribute('aria-pressed', window._lwLogScale ? 'true' : 'false');
   }
 
-  // Store global refs so _lwUpdateTodayBar() can push live prices
+  // Store global refs so _lwUpdateTodayBar() and intraday refresh can push live prices
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
+  window._lwRefreshBidAsk = _applyBidAsk;  // called by intraday refresh cycle
 
   // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
   const todayBar = _lwBuildTodayBar(ohlcId);
@@ -6168,13 +6212,26 @@ async function fetchReferenceSpreads() {
     const moveMult = Math.min(1.3, Math.max(1.0, 1.0 + (move - 80) / 200));
 
     // ── Compute spreads ───────────────────────────────────────────────
+    // Priority: (1) live yfinance bid/ask from quotes.json — exact observed spread.
+    //           (2) HV30+VIX+MOVE vol model — when bid/ask not available.
+    //           (3) ECN_FLOOR static minimum — absolute fallback via Proxy.
     const computed = {};
     for (const pair of Object.keys(ECN_FLOOR)) {
-      const hv      = hv30[pair] ?? quotes[pair]?.hv30 ?? 8.0;
-      const isRates = pair === 'usdjpy' || pair === 'usdchf';
-      const volMult = isRates ? vixMult * moveMult : vixMult;
-      const raw     = ECN_FLOOR[pair] + hv * VOL_COEF[pair] * volMult;
-      computed[pair] = Math.max(ECN_FLOOR[pair], Math.round(raw * 10) / 10);
+      const q       = quotes[pair];
+      const liveBid = q?.bid, liveAsk = q?.ask;
+      if (liveBid != null && liveAsk != null && liveAsk > liveBid) {
+        // Source 1: real yfinance bid/ask — convert to pips
+        const pipFactor = (pair === 'usdjpy') ? 100 : 10000;
+        const livePips  = Math.round((liveAsk - liveBid) * pipFactor * 10) / 10;
+        computed[pair]  = Math.max(ECN_FLOOR[pair], livePips);
+      } else {
+        // Source 2: HV30+VIX+MOVE model
+        const hv      = hv30[pair] ?? q?.hv30 ?? 8.0;
+        const isRates = pair === 'usdjpy' || pair === 'usdchf';
+        const volMult = isRates ? vixMult * moveMult : vixMult;
+        const raw     = ECN_FLOOR[pair] + hv * VOL_COEF[pair] * volMult;
+        computed[pair] = Math.max(ECN_FLOOR[pair], Math.round(raw * 10) / 10);
+      }
     }
 
     // ── Write into LIVE_SPREADS so TYPICAL_SPREADS Proxy feeds dynamic Bid/Ask ──
@@ -6214,14 +6271,19 @@ async function fetchReferenceSpreads() {
       }
     }
 
-    // Subtitle — vol regime label + timestamp
+    // Subtitle — source label + vol regime + timestamp
     const sub = document.getElementById('spreads-sub');
     if (sub) {
       const _sprNow = new Date();
       const _sprHHMM = _sprNow.getHours().toString().padStart(2,'0') + ':' + _sprNow.getMinutes().toString().padStart(2,'0');
       const _sprTZ = _sprNow.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
       const regime = vix < 20 ? 'Low vol' : vix < 28 ? 'Elevated vol' : 'High vol';
-      sub.textContent = `ECN est. · ${regime} · VIX ${vix.toFixed(1)} · ${_sprHHMM} ${_sprTZ}`;
+      // Count how many of the 7 G8 majors have live bid/ask data
+      const liveCount = Object.keys(ECN_FLOOR).filter(p => {
+        const q = quotes[p]; return q?.bid != null && q?.ask != null && q.ask > q.bid;
+      }).length;
+      const srcLabel = liveCount >= 5 ? 'yfinance live' : liveCount > 0 ? `yfinance (${liveCount}/7) + vol model` : 'vol model est.';
+      sub.textContent = `${srcLabel} · ${regime} · VIX ${vix.toFixed(1)} · ${_sprHHMM} ${_sprTZ}`;
     }
 
   } catch(e) { console.warn('[Spreads] Failed:', e); }
