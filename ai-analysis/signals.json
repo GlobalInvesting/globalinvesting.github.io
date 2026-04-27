@@ -1,59 +1,59 @@
 {
-  "generated_at": "2026-04-27T00:20:55Z",
+  "generated_at": "2026-04-27T00:38:44Z",
   "signals": [
     {
-      "time": "00:20",
-      "priority": "warning",
-      "title": "AUD/USD — Geopolitical + Carry + Retail",
-      "text": "AUD/USD at 0.7149 — RBA 4.10% vs Fed 3.75% — 35bp AUD carry premium sustains the bid; Middle East tensions introduce risk. AUD COT LF net long +47,218, but retail traders are 87% short, an extreme short bias. Watch for a potential contrarian reversal if price holds above 0.7100.",
+      "time": "00:38",
+      "priority": "critical",
+      "title": "AUD/USD — Geopolitical + Positioning + R",
+      "text": "AUD/USD at 0.7152 — Middle East tensions drive risk-off. AUD COT LF net long +47,218, long%=74.3% (specs long AUD). Retail 87% short AUD/USD — extreme short bias diverges from COT direction. RBA 4.10% vs Fed 3.75% — 35bp AUD carry premium. Watch for a potential short-squeeze if AUD/USD breaks above 0.7200.",
       "evidence": [
         "AUD COT LF net: +47,218",
-        "RBA 4.10% vs Fed 3.75% — 35bp",
-        "AUD/USD retail: 87% short"
+        "AUD/USD retail: 87% short",
+        "RBA-Fed spread: 35bp"
       ]
     },
     {
-      "time": "00:17",
+      "time": "00:35",
       "priority": "warning",
       "title": "USD/JPY — Geopolitical + Carry",
-      "text": "USD/JPY at 159.49 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −80,578 (crowded carry). Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
+      "text": "USD/JPY at 159.49 — 300bp Fed-BoJ carry sustains bid; Middle East tensions introduce intervention risk on a break above 160.00. JPY COT LF short −80,578 — crowded carry unwind risk in risk-off. Carry dominates until VIX > 25; 160.00 is the key intervention threshold.",
       "evidence": [
         "USD/JPY: 159.49",
-        "Fed 3.75% vs BoJ 0.75% — 300bp",
-        "JPY COT LF short: −80,578"
+        "Fed-BoJ spread: 300bp",
+        "JPY COT LF short: -80,578"
       ]
     },
     {
-      "time": "00:12",
+      "time": "00:32",
       "priority": "warning",
       "title": "EUR/USD — Positioning + Vol",
-      "text": "HV30 at 8.2%, ATM IV (FXE chain) at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend — market hedging rather than chasing. CFTC LF net +289k (week Apr 15), WoW delta −1,101 for second consecutive week; AM not reducing. Price bid, positioning stalling — late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
+      "text": "EUR/USD at 1.1716 — HV30 at 8.2%, ATM IV at 9.4% — options pricing a 1.2 vol-pt premium over realized. 25d RR at −0.14: mild put skew despite the bullish price trend — market hedging rather than chasing. CFTC LF net +289k (week ending Apr 15), WoW delta −1,101 for second consecutive week; AM not reducing. Price bid, positioning stalling — late-trend caution signal. A LF delta turning positive would invalidate the caution read.",
       "evidence": [
-        "EUR/USD: 1.1714",
+        "EUR COT LF net: +289k",
         "HV30: 8.2%",
         "ATM IV: 9.4%"
       ]
     },
     {
-      "time": "00:07",
+      "time": "00:29",
       "priority": "info",
       "title": "GBP/USD — CB + Technical",
-      "text": "BoE 3.75% vs Fed 3.75% — 0bp GBP carry premium supports the pair structurally. GBP LF net long +33,517, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3516; 1.3600 is the next resistance on a continuation.",
+      "text": "BoE 4.50% vs Fed 3.75% — 75bp GBP carry premium supports the pair structurally. GBP LF net long +33,517, AM constructive — positioning aligned with the carry read. ATM IV 9.5% near HV, 25d RR flat — options neutral. GBP/USD at 1.3517; 1.3600 is the next resistance on a continuation.",
       "evidence": [
-        "GBP/USD: 1.3516",
-        "BoE 3.75% vs Fed 3.75% — 0bp",
-        "GBP LF net long: +33,517"
+        "BoE-Fed spread: 75bp",
+        "GBP COT LF net: +33,517",
+        "GBP/USD: 1.3517"
       ]
     },
     {
-      "time": "00:02",
+      "time": "00:25",
       "priority": "info",
       "title": "NZD/USD — COT + OIS Divergence",
-      "text": "NZD/USD COT LF net short −18,062 (specs fading a hawkish CB) vs RBNZ hike 100% priced for 27 May. If RBNZ delivers or signals hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.5900+. NZD/USD at 0.5876.",
+      "text": "NZD/USD COT LF net short −18,062 (specs fading a hawkish CB) vs RBNZ hike 100% priced for 27 May. If RBNZ delivers or signals hike, short-squeeze risk is elevated — crowded spec short unwind targets 0.5900+. NZD/USD at 0.5878.",
       "evidence": [
-        "NZD/USD: 0.5876",
-        "NZD COT LF net: −18,062",
-        "RBNZ hike prob: 100%"
+        "NZD COT LF net: -18,062",
+        "RBNZ hike prob: 100%",
+        "NZD/USD: 0.5878"
       ]
     }
   ]
