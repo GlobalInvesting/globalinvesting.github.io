@@ -1,123 +1,124 @@
 {
-  "generated_at": "2026-04-27T06:21:49Z",
+  "generated_at": "2026-04-27T10:34:07Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "USD steady. Fed on hold. 200bp spread anchors pair",
-      "EUR/GBP": "GBP COT LF long +33.5k. BoE on hold. WTI rise limits downside",
-      "EUR/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
-      "EUR/AUD": "AUD COT LF long +47.2k. RBA hike priced in for May",
-      "EUR/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no directional push",
+      "EUR/USD": "USD steady. Fed on hold",
+      "EUR/GBP": "GBP COT LF long +33.5k. BoE on hold",
+      "EUR/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "EUR/AUD": "AUD COT LF long +47.2k. RBA hike priced in",
+      "EUR/CAD": "CAD COT LF short -64.8k. BoC on hold",
       "EUR/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "EUR/NZD": "NZD bid. RBNZ hike priced in (see OIS table for exact probability). Carry advantage rising"
+      "EUR/NZD": "NZD bid. RBNZ hike priced in"
     },
     "GBP": {
-      "GBP/USD": "USD steady. WTI drifts higher above $93.50",
+      "GBP/USD": "USD steady. What are the main events for today?",
       "GBP/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
       "EUR/GBP": "GBP soft on weak UK PMI. EUR outperforming on ECB hold",
-      "GBP/AUD": "AUD COT LF long +47.2k. RBA hike priced in",
-      "GBP/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable",
+      "GBP/AUD": "AUD COT LF long +47.2k. RBA hike priced in for May",
+      "GBP/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no directional push",
       "GBP/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "GBP/NZD": "NZD bid. RBNZ hike priced in for May (see OIS table for exact probability). Carry advantage rising"
+      "GBP/NZD": "NZD bid. RBNZ hike priced for May (see OIS table for exact probability). Carry advantage rising"
     },
     "JPY": {
-      "USD/JPY": "JPY COT LF short -65.3k. BoJ on hold. Carry bid intact",
-      "EUR/JPY": "EUR COT LF long +8.4k. ECB on hold. Carry bid intact",
-      "GBP/JPY": "GBP COT LF long +33.5k. BoE on hold. Carry advantage rising",
-      "AUD/JPY": "AUD COT LF long +47.2k. RBA hike priced in. Carry compression eyed",
-      "CAD/JPY": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no directional push",
-      "CHF/JPY": "JPY COT LF short -65.3k. BoJ on hold. Carry drag limits demand"
+      "USD/JPY": "JPY COT LF short. BoJ on hold. Carry bid intact",
+      "EUR/JPY": "JPY COT LF short. BoJ on hold. Risk-on carry bid intact",
+      "GBP/JPY": "GBP COT LF long +33.5k. BoE on hold. Carry favors GBP",
+      "AUD/JPY": "AUD COT LF long +47.2k. RBA hike priced in. Carry favors AUD",
+      "CAD/JPY": "CAD COT LF short -64.8k. BoC on hold. Carry favors CAD",
+      "CHF/JPY": "JPY COT LF short. BoJ on hold. Carry favors JPY",
+      "NZD/JPY": "NZD COT LF short. RBNZ hike priced in. Carry advantage rising"
     },
     "AUD": {
-      "AUD/USD": "AUD COT LF long +47.2k. USD steady. WTI drifts higher above $93.50",
-      "EUR/AUD": "AUD hike priced in. ECB on hold. Carry compression eyed",
-      "GBP/AUD": "GBP COT LF long +33.5k. AUD hike priced in. Carry compression eyed",
-      "AUD/JPY": "AUD hike priced in. BoJ on hold. Carry bid intact",
-      "AUD/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no directional push",
-      "AUD/CHF": "AUD hike priced in. SNB on hold. Carry advantage rising",
-      "AUD/NZD": "NZD bid. RBNZ hike priced in for May (see OIS table for exact probability). Carry advantage rising"
+      "AUD/USD": "USD steady. Fed on hold. 200bp spread anchors pair",
+      "EUR/AUD": "AUD COT LF long +47.2k. RBA hike priced in",
+      "GBP/AUD": "AUD COT LF long +47.2k. BoE on hold",
+      "AUD/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
+      "AUD/CAD": "CAD COT LF short -64.8k. BoC on hold",
+      "AUD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "AUD/NZD": "NZD bid. RBNZ hike priced for May (see OIS table for exact probability). Carry advantage rising"
     },
     "CAD": {
-      "USD/CAD": "CAD COT LF short -64.8k. BoC on hold. WTI rise limits downside",
-      "EUR/CAD": "CAD COT LF short -64.8k. BoC on hold. EUR outperforming on ECB hold",
-      "GBP/CAD": "GBP COT LF long +33.5k. BoC on hold. GBP outperforming on BoE hold",
-      "AUD/CAD": "AUD COT LF long +47.2k. BoC on hold. AUD hike priced in",
+      "USD/CAD": "CAD COT LF short -64.8k. BoC on hold. WTI stable",
+      "EUR/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable",
+      "GBP/CAD": "GBP COT LF long +33.5k. BoC on hold. Oil stable",
+      "AUD/CAD": "AUD COT LF long +47.2k. BoC on hold. Oil stable",
       "CAD/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
       "CAD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "NZD/CAD": "NZD bid. RBNZ hike priced in for May (see OIS table for exact probability). Carry advantage rising"
+      "NZD/CAD": "NZD bid. RBNZ hike priced in for May. Carry advantage rising"
     },
     "CHF": {
       "USD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
       "EUR/CHF": "EUR outperforming on ECB hold. CHF COT LF short -4.4k",
-      "GBP/CHF": "GBP COT LF long +33.5k. BoE on hold. Carry favors GBP",
+      "GBP/CHF": "GBP COT LF long +33.5k. BoE on hold. Carry bid intact",
       "AUD/CHF": "AUD COT LF long +47.2k. RBA hike priced in for May",
-      "CAD/CHF": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no directional push",
+      "CAD/CHF": "CAD COT LF short -64.8k. BoC on hold. Carry bid steady",
       "CHF/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact"
     },
     "NZD": {
-      "NZD/USD": "USD COT LF short. WTI drifts higher above $93.50",
-      "EUR/NZD": "NZD COT LF short -18.1k. RBNZ on hold",
-      "GBP/NZD": "NZD COT LF short -18.1k. BoE on hold",
+      "NZD/USD": "USD steady. What are the main events for today?",
+      "EUR/NZD": "NZD bid. RBNZ hike priced in for May",
+      "GBP/NZD": "GBP COT LF long +33.5k. BoE on hold",
       "AUD/NZD": "AUD COT LF long +47.2k. RBA hike priced in",
       "NZD/JPY": "JPY COT LF short -80.6k. BoJ on hold",
       "NZD/CAD": "CAD COT LF short -64.8k. BoC on hold",
       "NZD/CHF": "CHF steady. SNB on hold. Carry drag limits demand"
     },
     "USD": {
-      "EUR/USD": "WTI drifts higher above $93.50. USD steady",
+      "EUR/USD": "Key USD catalyst: 06:25 What are the main events for today? EUR steady. ECB on hold",
       "GBP/USD": "GBP COT LF long +33.5k. BoE on hold",
       "USD/JPY": "JPY COT LF short -80.6k. BoJ on hold",
       "AUD/USD": "AUD COT LF long +47.2k. RBA hike priced in",
       "USD/CAD": "CAD COT LF short -64.8k. BoC on hold",
       "USD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
-      "NZD/USD": "NZD bid. RBNZ hike priced in for May"
+      "NZD/USD": "NZD bid. RBNZ hike priced in (see OIS table for exact probability)"
     }
   },
   "_inputs_snap": {
     "USD": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "EUR": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "GBP": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "JPY": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "AUD": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hike",
       "bias_updated": "2026-04-25"
     },
     "CAD": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "CHF": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hold",
       "bias_updated": "2026-04-25"
     },
     "NZD": {
       "cot_we": "2026-04-21",
-      "rate_updated": "2026-04-26",
+      "rate_updated": "2026-04-27",
       "bias": "hike",
       "bias_updated": "2026-04-25"
     }
