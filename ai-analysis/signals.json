@@ -1,1 +1,44 @@
-{"generated_at": "2026-04-27T04:57:34Z", "signals": []}
+{
+  "generated_at": "2026-04-27T05:24:44Z",
+  "signals": [
+    {
+      "id": "sig_usdjpy_squeeze",
+      "pair": "USD/JPY",
+      "direction": "bearish",
+      "conviction": "high",
+      "basis": [
+        "COT extreme short -80,578 contracts",
+        "BoJ hike risk 02:30 UTC Apr 28",
+        "JPY carry unwind trigger"
+      ],
+      "note": "JPY COT speculative short -80.6k is at historic extreme; BoJ hotter-than-expected CPI raises probability of surprise hike or hawkish MPS — squeeze risk into 155.00 on resolution.",
+      "horizon": "swing"
+    },
+    {
+      "id": "sig_audcad_cot",
+      "pair": "AUD/CAD",
+      "direction": "bullish",
+      "conviction": "medium",
+      "basis": [
+        "AUD COT +47,218 extreme long",
+        "CAD COT -64,786 extreme short",
+        "RBA 3.35% vs BoC 2.75% carry"
+      ],
+      "note": "Structural COT divergence — AUD leveraged funds net long +47.2k vs CAD extreme short -64.8k; 60bp carry advantage to AUD with RBA on hold adds confluence for 0.9050 target.",
+      "horizon": "swing"
+    },
+    {
+      "id": "sig_gbpchf_carry",
+      "pair": "GBP/CHF",
+      "direction": "bullish",
+      "conviction": "medium",
+      "basis": [
+        "375bp CB differential BoE vs SNB",
+        "GBP COT +33,517 institutional long",
+        "CHF 0.40% 10Y — carry drag dominant"
+      ],
+      "note": "BoE 3.75% vs SNB 0.00% — 375bp rate differential is the widest in the G8 carry matrix; GBP COT institutional long +33.5k confirms flow alignment; CHF 10Y at 0.40% limits safe-haven demand absent systemic shock.",
+      "horizon": "intraday"
+    }
+  ]
+}
