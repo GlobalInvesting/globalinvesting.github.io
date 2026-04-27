@@ -962,8 +962,14 @@ def fetch_yfinance_all(symbols_map):
                     if rmp and rmpc and VALIDATORS.get(internal_id, lambda x: True)(float(rmp)):
                         close      = float(rmp)
                         prev_close = float(rmpc)
-                        chg        = float(rmch)  if rmch  is not None else (close - prev_close)
-                        pct        = float(rmpct) if rmpct is not None else ((chg / prev_close * 100) if prev_close else 0.0)
+                        # Always recalculate chg/pct from close and prev_close.
+                        # Yahoo's regularMarketChange / regularMarketChangePercent can reference
+                        # a stale or wrong prev_close (observed for ^VIX: Yahoo returned
+                        # ~38.02 as prev_close in its pre-calculated fields while rmpc=19.31,
+                        # producing chg=-19.31 and pct=-50.79% instead of the correct -3.11%).
+                        # Recalculating from rmpc is always correct and consistent.
+                        chg        = close - prev_close
+                        pct        = (chg / prev_close * 100) if prev_close else 0.0
                         if rmdh:
                             day_high = round(float(rmdh), 4)
                         if rmdl:
