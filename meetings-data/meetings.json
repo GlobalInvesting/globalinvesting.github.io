@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-04-25",
+  "lastUpdate": "2026-04-27",
   "meetings": {
     "USD": {
       "nextMeeting": "29 Apr",
@@ -15,6 +15,8 @@
         "2026-12-09"
       ],
       "allMeetingsFormatted": [
+        "29 Jan",
+        "19 Mar",
         "29 Apr",
         "17 Jun",
         "29 Jul",
@@ -26,7 +28,7 @@
       "bias": "hold",
       "biasSource": "FRED SOFR vs DFF (Fed Funds)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -44,6 +46,8 @@
         "2026-12-17"
       ],
       "allMeetingsFormatted": [
+        "30 Jan",
+        "6 Mar",
         "30 Apr",
         "11 Jun",
         "23 Jul",
@@ -55,7 +59,7 @@
       "bias": "hold",
       "biasSource": "ECB Data Portal ESTER (EST.B.EU000A2X2A25.WT) vs FRED ECBDFR",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -73,6 +77,8 @@
         "2026-12-17"
       ],
       "allMeetingsFormatted": [
+        "6 Feb",
+        "20 Mar",
         "30 Apr",
         "18 Jun",
         "30 Jul",
@@ -82,9 +88,9 @@
       ],
       "source": "bankofengland.co.uk",
       "bias": "hold",
-      "biasSource": "BoE yield curve 1M OIS forward (boeapps) \u2192 FRED SONIA spot (IUDSOIA) vs rates/GBP.json",
+      "biasSource": "BoE yield curve 1M OIS forward (boeapps) → FRED SONIA spot (IUDSOIA) vs rates/GBP.json",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -102,6 +108,8 @@
         "2026-12-18"
       ],
       "allMeetingsFormatted": [
+        "24 Jan",
+        "19 Mar",
         "28 Apr",
         "16 Jun",
         "31 Jul",
@@ -110,12 +118,12 @@
         "18 Dec"
       ],
       "source": "boj.or.jp",
-      "bias": "hold",
-      "biasSource": "SNB zimoma TONA (zimoma cube \u00b7 monthly) vs BoJ rate (rates/JPY.json)",
+      "bias": "hike",
+      "biasSource": "SNB zimoma TONA (zimoma cube · monthly) + BoJ forward supplement (~40bp when hold zone) vs BoJ rate (rates/JPY.json)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
-      "hikeProb": 0
+      "hikeProb": 40
     },
     "AUD": {
       "nextMeeting": "5 May",
@@ -131,6 +139,8 @@
         "2026-12-08"
       ],
       "allMeetingsFormatted": [
+        "18 Feb",
+        "1 Apr",
         "5 May",
         "16 Jun",
         "11 Aug",
@@ -140,9 +150,9 @@
       ],
       "source": "rba.gov.au",
       "bias": "hike",
-      "biasSource": "ASX 30-day IB Cash Rate Futures (ib_expectation_curve_0.json) \u2192 RBA Statistics API (A3 cash rate) \u2192 FRED IRSTCI01AUM156N (OECD overnight \u00b7 monthly, two-sided stale guard) vs RBA target \u2192 rates/AUD.json trajectory fallback",
+      "biasSource": "ASX 30-day IB Cash Rate Futures (ib_expectation_curve_0.json) → RBA Statistics API (A3 cash rate) → FRED IRSTCI01AUM156N (OECD overnight · monthly, two-sided stale guard) vs RBA target → rates/AUD.json trajectory fallback",
       "biasMethod": "heuristic",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": null,
       "hikeProb": null
     },
@@ -161,6 +171,9 @@
         "2026-12-09"
       ],
       "allMeetingsFormatted": [
+        "29 Jan",
+        "12 Mar",
+        "16 Apr",
         "29 Apr",
         "10 Jun",
         "15 Jul",
@@ -172,7 +185,7 @@
       "bias": "hold",
       "biasSource": "BoC Valet API (CORRA overnight V122514)",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -186,15 +199,16 @@
         "2026-12-10"
       ],
       "allMeetingsFormatted": [
+        "26 Mar",
         "18 Jun",
         "24 Sep",
         "10 Dec"
       ],
       "source": "snb.ch",
       "bias": "hold",
-      "biasSource": "SNB data portal SARON (snbgwdzid \u00b7 daily) vs sight deposit rate",
+      "biasSource": "SNB data portal SARON (snbgwdzid · daily) vs sight deposit rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 0
     },
@@ -211,6 +225,8 @@
         "2026-12-09"
       ],
       "allMeetingsFormatted": [
+        "19 Feb",
+        "9 Apr",
         "27 May",
         "8 Jul",
         "2 Sep",
@@ -219,9 +235,9 @@
       ],
       "source": "rbnz.govt.nz",
       "bias": "hike",
-      "biasSource": "NZFBF NZD OIS (__NEXT_DATA__ + HTML parse) \u2192 FRED IR3TIB01NZM156N (3M interbank \u00b7 credit-adj \u221222bp + RBNZ track supplement) \u2192 FRED IRSTCI01NZM156N (OECD overnight) vs RBNZ OCR \u2192 rates/NZD.json trajectory fallback",
+      "biasSource": "NZFBF NZD OIS (__NEXT_DATA__ + HTML parse) → FRED IR3TIB01NZM156N (3M interbank · credit-adj −22bp + RBNZ track supplement) → FRED IRSTCI01NZM156N (OECD overnight) vs RBNZ OCR → rates/NZD.json trajectory fallback",
       "biasMethod": "spread",
-      "biasUpdated": "2026-04-25",
+      "biasUpdated": "2026-04-27",
       "cutProb": 0,
       "hikeProb": 40
     }
