@@ -181,8 +181,8 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         # the NYSE business-day calendar and silently drops all weekend bars,
         # creating the visual gap on the chart between Friday close and Monday open.
         if id_ in CRYPTO_SYMBOLS:
-            _end   = datetime.now(timezone.utc)
-            _start = _end - timedelta(days=3 * 365 + 2)  # 3y + 2 days buffer
+            _end   = datetime.now(timezone.utc) + timedelta(days=1)  # end is exclusive — add 1 day to include today
+            _start = _end - timedelta(days=3 * 365 + 3)  # 3y + buffer
             hist = ticker.history(
                 start=_start.strftime("%Y-%m-%d"),
                 end=_end.strftime("%Y-%m-%d"),
