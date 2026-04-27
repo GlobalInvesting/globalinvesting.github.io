@@ -1,13 +1,77 @@
 {
-  "generated_at": "2026-04-27T00:10:14Z",
+  "generated_at": "2026-04-27T00:22:38Z",
   "drivers": {
-    "EUR": {},
-    "GBP": {},
-    "JPY": {},
-    "AUD": {},
-    "CAD": {},
-    "CHF": {},
-    "NZD": {},
-    "USD": {}
+    "EUR": {
+      "EUR/USD": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "EUR/GBP": "GBP COT LF long +33.5k. BoE on hold",
+      "EUR/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "EUR/AUD": "AUD COT LF long +47.2k. Hike priced in for May",
+      "EUR/CAD": "CAD COT LF short -64.8k. BoC on hold",
+      "EUR/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "EUR/NZD": "NZD hike priced in. RBNZ hike expected"
+    },
+    "GBP": {
+      "GBP/USD": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "GBP/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
+      "EUR/GBP": "EUR on hold. ECB hold intact. Range-bound trading",
+      "GBP/AUD": "AUD COT LF long +47.2k. RBA hike priced in. Carry compression eyed",
+      "GBP/CAD": "CAD COT LF short -64.8k. BoC on hold. Oil stable — no push",
+      "GBP/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "GBP/NZD": "NZD hike priced in. RBNZ hike 40% priced. Carry advantage rising"
+    },
+    "JPY": {
+      "USD/JPY": "USD on hold",
+      "EUR/JPY": "EUR on hold",
+      "GBP/JPY": "GBP COT LF long +33.5k. BoE on hold",
+      "AUD/JPY": "AUD COT LF long +47.2k. Hike priced in",
+      "CAD/JPY": "CAD COT LF short -64.8k. BoC on hold",
+      "CHF/JPY": "CHF on hold",
+      "NZD/JPY": "Hike priced in"
+    },
+    "AUD": {
+      "AUD/USD": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "EUR/AUD": "EUR on hold. ECB hold intact",
+      "GBP/AUD": "GBP COT LF long +33.5k. BoE on hold",
+      "AUD/JPY": "JPY COT LF short -80.6k. BoJ on hold. Carry bid intact",
+      "AUD/CAD": "CAD COT LF short -64.8k. BoC on hold",
+      "AUD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "AUD/NZD": "NZD hike priced in. RBNZ hike expected"
+    },
+    "CAD": {
+      "USD/CAD": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "EUR/CAD": "EUR on hold. ECB hold intact",
+      "GBP/CAD": "GBP COT LF long +33.5k. BoE on hold",
+      "AUD/CAD": "AUD COT LF long +47.2k. RBA hike priced in",
+      "CAD/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "CAD/CHF": "CHF steady. SNB on hold. Carry drag limits demand",
+      "NZD/CAD": "NZD hike priced in. RBNZ on hold"
+    },
+    "CHF": {
+      "USD/CHF": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "EUR/CHF": "EUR on hold. ECB hold intact",
+      "GBP/CHF": "GBP COT LF long +33.5k. BoE on hold",
+      "AUD/CHF": "AUD COT LF long +47.2k. Hike priced in for May",
+      "CAD/CHF": "CAD COT LF short -64.8k. BoC on hold",
+      "CHF/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "NZD/CHF": "NZD hike priced in. RBNZ hike expected"
+    },
+    "NZD": {
+      "NZD/USD": "USD steady. Fed on hold. Cargo ship attack limits upside",
+      "EUR/NZD": "NZD hike expected. ECB on hold",
+      "GBP/NZD": "GBP COT LF long +33.5k. BoE on hold",
+      "AUD/NZD": "AUD COT LF long +47.2k. RBA hike priced in",
+      "NZD/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "NZD/CAD": "CAD COT LF short -64.8k. BoC on hold",
+      "NZD/CHF": "CHF steady. SNB on hold. Carry drag limits demand"
+    },
+    "USD": {
+      "EUR/USD": "EUR on hold",
+      "GBP/USD": "GBP COT LF long +33.5k. BoE on hold",
+      "USD/JPY": "JPY COT LF short -80.6k. BoJ on hold",
+      "AUD/USD": "AUD COT LF long +47.2k. Hike priced in",
+      "USD/CAD": "CAD COT LF short -64.8k. BoC on hold",
+      "USD/CHF": "CHF steady. SNB on hold",
+      "NZD/USD": "NZD hike priced in"
+    }
   }
 }
