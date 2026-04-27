@@ -1,4 +1,54 @@
 {
-  "generated_at": "2026-04-27T10:31:52Z",
-  "signals": []
+  "generated_at": "2026-04-27T11:44:57Z",
+  "signals": [
+    {
+      "time": "11:44",
+      "priority": "critical",
+      "title": "USD/JPY — COT Extreme + BOJ Binary Event",
+      "text": "JPY COT Leveraged Funds net short −80,578 contracts (CFTC, week ending 2026-04-21) — historic extreme; crowded short creates asymmetric squeeze risk into the BOJ decision. BOJ Policy Rate + Monetary Policy Statement + Outlook Report: 02:30 UTC Apr 28; Commerzbank flags June hike signal risk, Japan CPI running above target. USD/JPY 159.21 — 400bp Fed-BoJ differential sustains carry; 160.00 is the prior BOJ verbal intervention threshold. A hawkish MPS or June hike forward guidance triggers COT unwind — carry dominant until BOJ resolves; VIX 19.07 remains below risk-off threshold.",
+      "evidence": [
+        "JPY COT LF net: −80,578 (week 2026-04-21)",
+        "Fed 4.50% vs BoJ 0.50% — 400bp",
+        "USD/JPY: 159.21",
+        "BOJ: 02:30 UTC Apr 28",
+        "VIX: 19.07 (normal volatility)"
+      ]
+    },
+    {
+      "time": "11:44",
+      "priority": "warning",
+      "title": "AUD/CAD — COT Structural Divergence + CB Carry",
+      "text": "AUD COT LF net long +47,218 contracts vs CAD COT LF net short −64,786 contracts (CFTC, week ending 2026-04-21) — combined bilateral divergence of 112,004 contracts, the widest G8 COT spread on the board. RBA hike priced on energy surge (AUD/USD firms to 0.7189); BoC 2.75% on hold. RBA 3.35% vs BoC 2.75% — 60bp AUD carry premium reinforces institutional flow alignment. WTI 96.32 is a secondary CAD tailwind — watch for CAD short-squeeze if WTI extends above 97.50.",
+      "evidence": [
+        "AUD COT LF net: +47,218 (week 2026-04-21)",
+        "CAD COT LF net: −64,786 (week 2026-04-21)",
+        "RBA 3.35% vs BoC 2.75% — 60bp",
+        "WTI: 96.32"
+      ]
+    },
+    {
+      "time": "11:44",
+      "priority": "warning",
+      "title": "GBP/CHF — CB Differential + Geopolitical Risk Premium",
+      "text": "BoE 3.75% vs SNB 0.00% — 375bp, the widest carry spread in the G8 matrix. GBP COT LF net long +33,517 confirms institutional flow aligned with carry. SNB CPI at 0.10% eliminates near-term rate support for CHF; SNB 10Y at 0.40%. Bab al-Mandab maritime attack introduces geopolitical CHF safe-haven demand — but VIX 19.07 is sub-threshold: safe-haven flows are marginal in MIXED regime. Carry structure holds; CHF bid accelerates only on VIX break above 25.",
+      "evidence": [
+        "BoE 3.75% vs SNB 0.00% — 375bp",
+        "GBP COT LF net: +33,517 (week 2026-04-21)",
+        "CHF CPI: 0.10%",
+        "VIX: 19.07 (normal volatility)"
+      ]
+    },
+    {
+      "time": "11:44",
+      "priority": "warning",
+      "title": "USD/JPY — Technical Level 160.00",
+      "text": "USD/JPY 159.21 — 160.00 is the level that has previously triggered BOJ verbal intervention warnings; intervention risk rises on a sustained break above 160. Current session high: 159.47 (intraday). BOJ press conference 05:30 UTC Apr 28 is the next directional catalyst — a June hike signal compresses USD/JPY toward 157.00 on carry unwind; BOJ hold with dovish guidance confirms 160.00 test. GBP/JPY 215.70 is the correlated level to watch in crosses.",
+      "evidence": [
+        "USD/JPY: 159.21",
+        "BOJ Press Conference: 05:30 UTC Apr 28",
+        "GBP/JPY: ~215.70",
+        "Fed 4.50% vs BoJ 0.50% — 400bp"
+      ]
+    }
+  ]
 }
