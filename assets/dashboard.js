@@ -3019,6 +3019,27 @@ async function _renderLWChart(ohlcId, label) {
         ? Date.UTC(+b.time.slice(0,4), +b.time.slice(5,7)-1, +b.time.slice(8,10)) / 1000
         : b.time,
     }));
+
+    // ── Gap-fill: inject flat placeholder bars for any days between the last
+    // OHLC bar and today that the daily workflow has not yet covered.
+    // Crypto trades 24/7 so every missing calendar day is a real gap.
+    // Each gap bar uses the last known close as O/H/L/C (flat doji) so the
+    // chart shows continuous price history with no whitespace.
+    // The today-bar injected after setData() overwrites the last placeholder
+    // with live RT data so the current day always shows the real price action.
+    const _nowUtc  = new Date();
+    const _todayTs = Date.UTC(_nowUtc.getUTCFullYear(), _nowUtc.getUTCMonth(), _nowUtc.getUTCDate()) / 1000;
+    const _dayS    = 86400; // seconds per day
+    let   _gapTs   = bars.length > 0 ? bars[bars.length - 1].time + _dayS : null;
+    if (_gapTs && _gapTs <= _todayTs) {
+      const _fillClose = bars[bars.length - 1].close;
+      const _gapBars   = [];
+      while (_gapTs <= _todayTs) {
+        _gapBars.push({ time: _gapTs, open: _fillClose, high: _fillClose, low: _fillClose, close: _fillClose, volume: 0 });
+        _gapTs += _dayS;
+      }
+      bars = [...bars, ..._gapBars];
+    }
   }
 
   wrap.innerHTML = '';
