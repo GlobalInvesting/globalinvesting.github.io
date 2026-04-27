@@ -5802,7 +5802,7 @@ async function fetchOptionSkew() {
           ? '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col" title="IV Rank: position of current IV within 52-week range (0=historically low, 100=historically high)">IV Rnk</th><th scope="col">Direction</th>'
           : '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
       } else {
-        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th>';
+        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col" title="CFTC Leveraged Funds net contracts">LF Net</th><th scope="col" title="Week-over-week change in LF net contracts">WoW Δ</th><th scope="col">Bias</th>';
       }
     }
 
@@ -5904,9 +5904,24 @@ async function fetchOptionSkew() {
               data-tip-title="${td3Title}" data-tip-body="${td3Body}" data-tip-ex="${td3Ex}">${bias}${rrChip}</td>
         </tr>`;
       } else {
-        // ── COT fallback: original behavior ──
-        const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
-        const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
+        // ── COT fallback: LF Net + WoW columns (no artificial decay) ──
+        const cotNet = cotData?.net ?? null;
+        const cotWow = (() => {
+          const ccy = p.cot;
+          const raw = window.COT_DATA_STORE?.[ccy] || null;
+          if (!raw) return null;
+          let wow = raw.wowNetChange ?? null;
+          if (wow == null && Array.isArray(raw.history) && raw.history.length >= 2) {
+            const prev = raw.history[raw.history.length - 2];
+            const prevNet = prev.levNet ?? ((prev.levLong || 0) - (prev.levShort || 0));
+            wow = (raw.netPosition ?? 0) - prevNet;
+          }
+          return wow;
+        })();
+        const fmtCotNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+        const clsNet = cotNet == null ? 'flat' : cotNet > 0 ? 'up' : 'down';
+        const clsWow = cotWow == null ? 'flat' : cotWow > 0 ? 'up' : 'down';
+
         // 25d RR chip — shown below bias label when Saxo data available
         // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
         const rrEntryCot = rrMap[p.rrKey];
@@ -5921,23 +5936,25 @@ async function fetchOptionSkew() {
              >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
           : '';
 
-        // Per-cell tooltip data — COT fallback mode: td[1]=1W skew, td[2]=1M skew, td[3]=Bias
+        // Per-cell tooltip data — COT fallback mode: td[1]=LF Net, td[2]=WoW Δ, td[3]=Bias
         const pairTipCot = skewCellTips[p.pair];
         const td0TitleCot = p.pair + ' — Positioning Bias';
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
-        const td12Title   = 'COT Directional Skew · ' + p.pair;
-        const td12Body    = 'COT-derived skew proxy — ETF IV unavailable for this pair. Derived from CFTC Leveraged Funds net positioning. 1W = current week net skew; 1M = smoothed (×0.85 decay).';
+        const td1Title    = 'CFTC LF Net · ' + p.pair;
+        const td1Body     = 'Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Source: CFTC Disaggregated TFF report. Positive = net long; negative = net short.';
+        const td2Title    = 'LF Week-over-Week Δ · ' + p.pair;
+        const td2Body     = 'Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs.';
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
 
         return `<tr>
           <td data-tip-title="${td0TitleCot}" data-tip-body="${td0BodyCot}" data-tip-ex="${td0ExCot}">${p.pair}</td>
-          <td class="${skew1w >= 0 ? 'up':'down'}"
-              data-tip-title="${td12Title}" data-tip-body="${td12Body}">${fmtRR(skew1w)}</td>
-          <td class="${skew1m >= 0 ? 'up':'down'}"
-              data-tip-title="${td12Title} (1M)" data-tip-body="${td12Body}">${fmtRR(skew1m)}</td>
+          <td class="${clsNet}" style="font-family:var(--font-mono);font-size:10px;"
+              data-tip-title="${td1Title}" data-tip-body="${td1Body}">${fmtCotNet(cotNet)}</td>
+          <td class="${clsWow}" style="font-family:var(--font-mono);font-size:10px;"
+              data-tip-title="${td2Title}" data-tip-body="${td2Body}">${fmtCotNet(cotWow)}</td>
           <td class="${biasCls}" style="line-height:1.3;"
               data-tip-title="${td3TitleCot}" data-tip-body="${td3BodyCot}" data-tip-ex="${td3ExCot}">${bias}${rrChipCot}</td>
         </tr>`;
@@ -5951,7 +5968,7 @@ async function fetchOptionSkew() {
       if (hasAnyEtfIv) {
         panelHead.textContent = hasRR ? 'CBOE/CME Vol · 25d RR · Saxo' : 'CBOE/CME Vol Index · IV';
       } else {
-        panelHead.textContent = hasRR ? 'COT · 25d RR · Saxo' : 'COT-derived · IV unavailable';
+        panelHead.textContent = hasRR ? 'COT · LF Net · 25d RR · Saxo' : 'COT · LF Net + WoW Δ';
       }
     }
 
