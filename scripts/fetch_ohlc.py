@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.1 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.2 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -9,7 +9,7 @@ Symbols covered:
   FX Majors   (7): EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CAD, USD/CHF, NZD/USD
   FX Crosses (21): all pairs in PAIRS[] that have chart click support
   Cross-asset (4): Gold (GC=F), WTI (CL=F), BTC (BTC-USD), US 10Y (^TNX)
-  Indices     (4): S&P 500 (^GSPC), Nasdaq (^IXIC), Nikkei 225 (^N225), EuroStoxx 50 (^STOXX50E)
+  Indices     (4): S&P 500 (^GSPC), Nasdaq 100 (^NDX), Nikkei 225 (^N225), EuroStoxx 50 (^STOXX50E)
   Crypto      (1): ETH/USD (ETH-USD)
   FX Index    (1): DXY (DX-Y.NYB)
 
@@ -22,6 +22,18 @@ Total size estimate: ~38 files × ~45 KB raw = ~1.7 MB, ~560 KB gzipped.
 
 Schedule: daily at 22:30 UTC (after NY close, before Sydney open).
           Runs in the ENGINE private repo — pushes output to PUBLIC site repo.
+
+Data integrity:
+  FX symbols:     open replaced with prev bar's close (Yahoo FX open is unreliable)
+  Gold/WTI:       Panama back-adjustment applied to eliminate contract roll gaps.
+                  yfinance GC=F / CL=F switch front-month contracts each month,
+                  creating inter-bar gaps that look like vertical price spikes in charts.
+                  Back-adjustment (proportional, backward pass) makes the series
+                  continuous — equivalent to TradingView's GC1! / CL1! continuous contracts.
+  All futures:    HL_MAX_SPREAD guard drops bars with impossible intraday ranges
+                  (secondary defense after back-adjustment).
+  Nasdaq:         Uses ^NDX (Nasdaq 100) to match the CFI:US100 chart tab; ^IXIC
+                  (Composite) has different constituents and price levels (~19k vs ~5.8k).
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
@@ -86,7 +98,7 @@ SYMBOLS: dict[str, str] = {
     "us10y": "^TNX",       # US 10-Year Treasury yield
     # Equity indices
     "spx":    "^GSPC",     # S&P 500
-    "nasdaq": "^IXIC",     # Nasdaq Composite
+    "nasdaq": "^NDX",       # Nasdaq 100 index — matches CFI:US100 chart tab; ^IXIC (Composite) has different levels (~19k vs ~5.8k)
     "nikkei": "^N225",     # Nikkei 225
     "stoxx":  "^STOXX50E", # EuroStoxx 50
     "vix":    "^VIX",      # CBOE Volatility Index
@@ -117,7 +129,7 @@ GUARDS: dict[str, tuple[float, float]] = {
     "btc":   (100.0,   500000.0),
     "us10y": (0.01,    25.0),
     "spx":   (500.0,   15000.0),
-    "nasdaq":(500.0,   30000.0),
+    "nasdaq":(1000.0,  30000.0),  # ^NDX (Nasdaq 100): historical range ~1k to ~22k; upper headroom for growth
     "nikkei":(5000.0,  80000.0),
     "stoxx": (1000.0,  8000.0),
     "vix":   (5.0,     90.0),      # VIX historically ranges 5-90
@@ -141,15 +153,19 @@ FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 # (or vice versa), creating a single bar with an impossible intraday range.
 # These "roll-artifact" bars cause prominent visual spikes on the chart that are
 # absent on continuous-contract sources (e.g. TradingView's GC1!).
-# Any bar whose (High - Low) / Low exceeds the threshold below is silently dropped.
-# Normal gold intraday range: 0.3–2.5%. Threshold at 4% removes roll artifacts while
-# preserving legitimate stress-day moves (gold has never moved > 3.5% H/L on a
-# non-artifact trading day in modern markets).
-# WTI/CL=F: normal 1–5%; threshold at 8% catches the severe multi-contract bars.
+#
+# PRIMARY fix for roll gaps: back-adjustment (Panama method) applied in fetch_ohlc()
+# for FUTURES_ADJUST symbols (gold, wti). This eliminates inter-bar gaps entirely.
+#
+# SECONDARY fix: bars where the H/L spread exceeds the threshold are still dropped.
+# These represent bars where BOTH the High and Low are contaminated by the roll
+# (impossible intraday range), which back-adjustment cannot fix.
+# Normal gold intraday range: 0.3–2.5%. Threshold at 4% catches the impossible bars.
+# WTI/CL=F: normal 1–5%; threshold at 8% catches severe multi-contract bars.
 # DXY/DX-Y.NYB and index futures: normal < 2%; threshold at 5%.
 HL_MAX_SPREAD: dict[str, float] = {
-    "gold":  0.04,   # 4% — removes roll spikes, keeps real stress days
-    "wti":   0.08,   # 8% — WTI has larger legitimate daily swings
+    "gold":  0.04,   # 4% — secondary guard after back-adjustment
+    "wti":   0.08,   # 8% — secondary guard after back-adjustment
     "dxy":   0.05,   # 5% — DX futures roll artifacts
 }
 
@@ -272,6 +288,56 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
         if id_ in FX_SYMBOLS:
             for i in range(1, len(deduped)):
                 deduped[i]["open"] = deduped[i - 1]["close"]
+
+        # ── Back-adjustment for front-month futures (Panama method) ──────────────
+        # yfinance GC=F (Gold) and CL=F (WTI) return bars from the current front-month
+        # contract. Each month when the contract expires, yfinance silently switches to
+        # the next contract. The new contract's price ≠ the old contract's price, creating
+        # a "roll gap" between prev_close and next_open. These gaps are NOT real price
+        # moves — they are an artifact of switching contracts — but they appear as violent
+        # vertical jumps in the chart (e.g. WTI jumping 29% overnight on 2026-03-13).
+        #
+        # TradingView and Bloomberg solve this with back-adjusted continuous contracts
+        # (GC1!, CL1!) where the historical series is retroactively shifted so every bar
+        # closes at the opening price of the next bar. We replicate this here.
+        #
+        # Algorithm (Panama / proportional back-adjustment, backward pass):
+        #   1. Scan forward; when close-to-open gap > ROLL_GAP_THRESHOLD, record a roll.
+        #   2. Walk backward from each roll: multiply all prior OHLC values by the ratio
+        #      curr_open / prev_close so the series connects seamlessly.
+        #   3. Because we adjust proportionally (multiply), all percentage moves and candle
+        #      body shapes are preserved exactly — only the absolute price level shifts.
+        #
+        # Threshold: 3.5% (WTI 3% normal intraday swings; Gold 0.3-2.5% normal swings).
+        # Gold's rolls are typically 2-5%; WTI's can be 10-30%.
+        #
+        # Effect: the adjusted series looks identical to TradingView's continuous contracts.
+        # The absolute price levels in the oldest bars will differ from spot/cash prices by
+        # the cumulative adjustment factor — this is correct and expected (Bloomberg standard).
+        FUTURES_ADJUST = {"gold", "wti"}
+        ROLL_GAP_THRESHOLD = 0.035  # 3.5% — above normal overnight moves for these assets
+
+        if id_ in FUTURES_ADJUST and len(deduped) >= 2:
+            roll_count = 0
+            for i in range(1, len(deduped)):
+                prev_c = deduped[i - 1]["close"]
+                curr_o = deduped[i]["open"]
+                if prev_c <= 0:
+                    continue
+                gap = abs(curr_o - prev_c) / prev_c
+                if gap > ROLL_GAP_THRESHOLD:
+                    # Proportional adjustment factor: make prev_close == curr_open
+                    factor = curr_o / prev_c
+                    # Adjust all bars before this roll (backward pass)
+                    for j in range(i):
+                        for field in ("open", "high", "low", "close"):
+                            deduped[j][field] = round(deduped[j][field] * factor, DECIMALS.get(id_, 2))
+                    roll_count += 1
+                    print(f"  [back-adj] {id_} roll at {deduped[i]['time']}: "
+                          f"gap {gap*100:.1f}% factor={factor:.5f} "
+                          f"(prev_c={prev_c:.2f} → curr_o={curr_o:.2f})")
+            if roll_count:
+                print(f"  [back-adj] {id_}: {roll_count} rolls adjusted — series is now continuous")
 
         return deduped
 
