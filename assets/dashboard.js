@@ -2754,7 +2754,7 @@ const _OHLC_FULL_NAMES = {
   nzdjpy:'New Zealand Dollar / Japanese Yen', nzdcad:'New Zealand Dollar / Canadian Dollar',
   nzdchf:'New Zealand Dollar / Swiss Franc', chfjpy:'Swiss Franc / Japanese Yen',
   gold:'Gold Futures', wti:'Crude Oil WTI Futures', btc:'Bitcoin / U.S. Dollar',
-  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq Composite',
+  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq 100',
   nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
   dxy:'U.S. Dollar Index',
   vix:'CBOE Volatility Index',
@@ -2798,7 +2798,7 @@ const _TV_TO_OHLC = {
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
   gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
-  spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
+  spx: '^GSPC', nasdaq: '^NDX', nikkei: '^N225', stoxx: '^STOXX50E',
   eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX',
 };
 
