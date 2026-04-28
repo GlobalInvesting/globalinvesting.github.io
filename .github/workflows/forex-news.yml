@@ -1,7 +1,12 @@
 name: Fetch Forex News
 on:
   schedule:
-    - cron: '0 * * * *'  # Every 1 hour (UTC) — 24x daily
+    - cron: '5 * * * *'  # Every 1 hour at :05 UTC — staggered from update-fx-liquidity (:00)
+                          # Both workflows previously ran at '0 * * * *', causing GitHub to
+                          # queue them simultaneously. With cancel-in-progress: false, queued
+                          # runs block the next scheduled trigger, producing 30–60 min delays
+                          # and occasional skipped runs (observed: 10:00, 11:00, 13:00, 15:00
+                          # missing on 2026-04-27). The 5-min offset eliminates the collision.
   workflow_dispatch:
 
 # Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
