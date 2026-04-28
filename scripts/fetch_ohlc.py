@@ -30,8 +30,9 @@ Data integrity:
                   creating inter-bar gaps that look like vertical price spikes in charts.
                   Back-adjustment (proportional, backward pass) makes the series
                   continuous — equivalent to TradingView's GC1! / CL1! continuous contracts.
-  All futures:    HL_MAX_SPREAD guard drops bars with impossible intraday ranges
-                  (secondary defense after back-adjustment).
+  DXY only:       HL_MAX_SPREAD guard drops bars with impossible intraday ranges
+                  for DXY (no Panama applied). Gold/WTI guards removed v7.47.19 —
+                  Panama handles roll gaps; real volatile sessions must not be dropped.
   Nasdaq:         Uses ^NDX (Nasdaq 100) to match the CFI:US100 chart tab; ^IXIC
                   (Composite) has different constituents and price levels (~19k vs ~5.8k).
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -147,26 +148,24 @@ GUARDS: dict[str, tuple[float, float]] = {
 FX_GUARD = (0.1, 50.0)   # applies to non-JPY FX pairs
 
 # Maximum tolerated H/L spread as a fraction of Low, per symbol.
-# yfinance front-month futures (GC=F, CL=F, DX-Y.NYB) occasionally produce bars
-# that span TWO contract months at roll dates — the High reflects the expiring
-# contract's last prints and the Low reflects the incoming contract's first prints
-# (or vice versa), creating a single bar with an impossible intraday range.
-# These "roll-artifact" bars cause prominent visual spikes on the chart that are
-# absent on continuous-contract sources (e.g. TradingView's GC1!).
+# yfinance DX-Y.NYB occasionally produces bars that span two contract months at
+# roll dates, creating an impossible intraday range. DXY does not apply Panama
+# back-adjustment, so the guard remains as a hard filter.
 #
-# PRIMARY fix for roll gaps: back-adjustment (Panama method) applied in fetch_ohlc()
-# for FUTURES_ADJUST symbols (gold, wti). This eliminates inter-bar gaps entirely.
-#
-# SECONDARY fix: bars where the H/L spread exceeds the threshold are still dropped.
-# These represent bars where BOTH the High and Low are contaminated by the roll
-# (impossible intraday range), which back-adjustment cannot fix.
-# Normal gold intraday range: 0.3–2.5%. Threshold at 4% catches the impossible bars.
-# WTI/CL=F: normal 1–5%; threshold at 8% catches severe multi-contract bars.
-# DXY/DX-Y.NYB and index futures: normal < 2%; threshold at 5%.
+# Gold (GC=F) and WTI (CL=F) previously had guards here (4% and 8% respectively),
+# but those were removed in v7.47.19 because:
+#   1. The Panama back-adjustment (applied below) already corrects inter-bar roll
+#      gaps — the primary artifact. A single bar with a wide H/L is NOT a roll
+#      artifact; it is a real volatile trading session.
+#   2. During high-volatility geopolitical events (e.g. Strait of Hormuz crisis,
+#      2026) WTI legitimately traded with 8–15% daily ranges and Gold with 4–6%.
+#      The old guards silently dropped these bars, creating multi-day gaps in the
+#      chart (March 2026: 14 of 22 WTI bars dropped; Jan–Feb 2026: 13 Gold bars
+#      dropped). The result was a sparse, visually broken candlestick chart.
+#   3. DXY genuinely does not move > 5% in a single session — the guard is safe
+#      there and catches actual roll artifacts without collateral damage.
 HL_MAX_SPREAD: dict[str, float] = {
-    "gold":  0.04,   # 4% — secondary guard after back-adjustment
-    "wti":   0.08,   # 8% — secondary guard after back-adjustment
-    "dxy":   0.05,   # 5% — DX futures roll artifacts
+    "dxy":   0.05,   # 5% — DX futures roll artifacts (no Panama applied to DXY)
 }
 
 # FX spot symbols — daily open values from Yahoo Finance are NOT reliable for these.
