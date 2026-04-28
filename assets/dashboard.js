@@ -5924,7 +5924,13 @@ async function fetchOptionSkew() {
               data-tip-title="${td3Title}" data-tip-body="${td3Body}" data-tip-ex="${td3Ex}">${bias}${rrChip}</td>
         </tr>`;
       } else {
-        // ── COT fallback: LF Net + WoW columns (no artificial decay) ──
+        // ── COT-only rows: no CBOE/CME index available for this pair ──
+        // col1 (ATM IV) → show '—' so the column header stays semantically valid for all rows.
+        // col2 (COT bias) → show normalised cotSkew — same metric as ETF-IV branch col2 —
+        //   keeping units consistent across every row. Raw LF Net contracts are NOT shown in
+        //   the cell because mixing % (IV) with contract counts in the same column violates
+        //   basic data-table standards (Bloomberg/Eikon never do this). Full LF Net / WoW Δ
+        //   detail is available on hover via per-cell tooltip.
         const cotNet = cotData?.net ?? null;
         const cotWow = (() => {
           const ccy = p.cot;
@@ -5938,51 +5944,49 @@ async function fetchOptionSkew() {
           }
           return wow;
         })();
-        // Compact notation (Bloomberg-style) — keeps cols from overflowing the 220px panel.
-        // e.g. -64,786 → -64.8K ; +1,216 → +1.2K ; -8,280 → -8.3K
-        const fmtCotNet = v => {
+        // Compact K notation — used in tooltips only
+        const fmtK = v => {
           if (v == null) return '—';
           const sign = v >= 0 ? '+' : '−';
           const abs  = Math.abs(v);
           if (abs >= 1000) return sign + (abs / 1000).toFixed(1) + 'K';
           return sign + Math.round(abs);
         };
-        const clsNet = cotNet == null ? 'flat' : cotNet > 0 ? 'up' : 'down';
-        const clsWow = cotWow == null ? 'flat' : cotWow > 0 ? 'up' : 'down';
+        // col2: normalised COT bias (same ±1.5 scale as ETF-IV branch col2)
+        const cotSkewStr = cotData ? fmtRR(cotSkew) : '—';
+        const cotSkewCls = cotData ? (cotSkew >= 0 ? 'up' : 'down') : 'flat';
 
-        // 25d RR chip — shown below bias label when Saxo data available
-        // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
-        const rrEntryCot = rrMap[p.rrKey];
-        const rrValCot   = rrEntryCot?.rr25d ?? null;
+        // 25d RR chip
+        const rrEntryCot   = rrMap[p.rrKey];
+        const rrValCot     = rrEntryCot?.rr25d ?? null;
         const rrTipTextCot = rrValCot !== null
           ? `25-delta Risk Reversal (1M) · Saxo Bank · ${rrValCot > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}`
           : '';
-        const rrChipCot  = rrValCot !== null
+        const rrChipCot = rrValCot !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrValCot > 0 ? 'var(--up)' : rrValCot < 0 ? 'var(--down)' : 'var(--text3)'};"
               data-rr-tip-title="25d RR · Saxo Bank (1M)"
               data-rr-tip-body="${rrTipTextCot}"
              >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
           : '';
 
-        // Per-cell tooltip data — COT fallback mode: td[1]=LF Net, td[2]=WoW Δ, td[3]=Bias
-        const pairTipCot = skewCellTips[p.pair];
+        const pairTipCot  = skewCellTips[p.pair];
         const td0TitleCot = p.pair + ' — Positioning Bias';
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
-        const td1Title    = 'CFTC LF Net · ' + p.pair;
-        const td1Body     = 'Net contracts (longs minus shorts) held by Leveraged Funds — hedge funds and CTAs. Source: CFTC Disaggregated TFF report. Positive = net long; negative = net short.';
-        const td2Title    = 'LF Week-over-Week Δ · ' + p.pair;
-        const td2Body     = 'Week-over-week change in Leveraged Funds net contracts. Positive = specs adding longs or covering shorts. Negative = specs adding shorts or reducing longs.';
+        const td1TitleCot = 'ATM IV · ' + p.pair;
+        const td1BodyCot  = 'No dedicated CBOE/CME FX Volatility Index for this pair — ATM IV available only for EUR, GBP, JPY, and AUD majors.';
+        const td2TitleCot = 'COT Bias · ' + p.pair;
+        const td2BodyCot  = `Normalised CFTC Leveraged Funds positioning bias for ${p.pair}. Derived from LF Net ${fmtK(cotNet)} contracts${cotWow != null ? ', WoW Δ ' + fmtK(cotWow) : ''}. Scale ±1.5 max. Positive = base currency net long; negative = net short.`;
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
 
         return `<tr>
           <td data-tip-title="${td0TitleCot}" data-tip-body="${td0BodyCot}" data-tip-ex="${td0ExCot}">${p.pair}</td>
-          <td class="${clsNet}" style="font-family:var(--font-mono);font-size:10px;"
-              data-tip-title="${td1Title}" data-tip-body="${td1Body}">${fmtCotNet(cotNet)}</td>
-          <td class="${clsWow}" style="font-family:var(--font-mono);font-size:10px;"
-              data-tip-title="${td2Title}" data-tip-body="${td2Body}">${fmtCotNet(cotWow)}</td>
+          <td class="flat" style="color:var(--text3);font-family:var(--font-mono);font-size:10px;"
+              data-tip-title="${td1TitleCot}" data-tip-body="${td1BodyCot}">—</td>
+          <td class="${cotSkewCls}" style="font-size:10px;"
+              data-tip-title="${td2TitleCot}" data-tip-body="${td2BodyCot}">${cotSkewStr}</td>
           <td class="${biasCls}" style="line-height:1.3;"
               data-tip-title="${td3TitleCot}" data-tip-body="${td3BodyCot}" data-tip-ex="${td3ExCot}">${bias}${rrChipCot}</td>
         </tr>`;
