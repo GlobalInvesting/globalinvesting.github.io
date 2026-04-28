@@ -764,7 +764,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <div class="panel" style="border-bottom:none;display:flex;flex-direction:column;overflow:hidden;height:100%;">
-        <div class="panel-head"><span class="panel-title">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
+        <div class="panel-head"><span class="panel-title" title="Model-derived indicative spreads — not live quoted prices. Computed as ECN floor + HV30 × vol coefficient × VIX stress multiplier. Calibrated against published ECN averages (IC Markets, Pepperstone, OANDA). Values widen during high-volatility sessions. Not a tradeable quote — use your broker's live feed for execution.">Reference Spreads</span><span class="panel-sub" id="spreads-sub">Typical ECN · session average</span></div>
         <div id="spreads-rows" style="padding:4px 10px;flex-shrink:0;">
           <!-- populated by fetchSpreadsData() -->
           <div class="spread-row"><span class="spr-sym">EUR/USD</span><div class="spr-bar"><div class="spr-fill" style="width:20%;background:var(--up)"></div></div><span class="spr-val up" id="spr-eurusd">0.9 pip</span></div>
