@@ -25,14 +25,12 @@ Schedule: daily at 22:30 UTC (after NY close, before Sydney open).
 
 Data integrity:
   FX symbols:     open replaced with prev bar's close (Yahoo FX open is unreliable)
-  Gold/WTI:       Panama back-adjustment applied to eliminate contract roll gaps.
-                  yfinance GC=F / CL=F switch front-month contracts each month,
-                  creating inter-bar gaps that look like vertical price spikes in charts.
-                  Back-adjustment (proportional, backward pass) makes the series
-                  continuous — equivalent to TradingView's GC1! / CL1! continuous contracts.
+  Gold/WTI:       Raw front-month prices from yfinance (GC=F / CL=F) — no back-adjustment.
+                  Roll gaps between contracts appear as-is: they reflect the actual switch
+                  to the next front-month contract, exactly as shown on Reuters, CNBC,
+                  Barchart, and Investing.com. Back-adjustment (Panama method) was removed
+                  because it produces synthetic price levels that were never traded.
   DXY only:       HL_MAX_SPREAD guard drops bars with impossible intraday ranges
-                  for DXY (no Panama applied). Gold/WTI guards removed v7.47.19 —
-                  Panama handles roll gaps; real volatile sessions must not be dropped.
   Nasdaq:         Uses ^NDX (Nasdaq 100) to match the CFI:US100 chart tab; ^IXIC
                   (Composite) has different constituents and price levels (~19k vs ~5.8k).
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -289,54 +287,20 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 deduped[i]["open"] = deduped[i - 1]["close"]
 
         # ── Back-adjustment for front-month futures (Panama method) ──────────────
-        # yfinance GC=F (Gold) and CL=F (WTI) return bars from the current front-month
-        # contract. Each month when the contract expires, yfinance silently switches to
-        # the next contract. The new contract's price ≠ the old contract's price, creating
-        # a "roll gap" between prev_close and next_open. These gaps are NOT real price
-        # moves — they are an artifact of switching contracts — but they appear as violent
-        # vertical jumps in the chart (e.g. WTI jumping 29% overnight on 2026-03-13).
+        # NOTE: No back-adjustment applied to GC=F (Gold) or CL=F (WTI).
         #
-        # TradingView and Bloomberg solve this with back-adjusted continuous contracts
-        # (GC1!, CL1!) where the historical series is retroactively shifted so every bar
-        # closes at the opening price of the next bar. We replicate this here.
-        #
-        # Algorithm (Panama / proportional back-adjustment, backward pass):
-        #   1. Scan forward; when close-to-open gap > ROLL_GAP_THRESHOLD, record a roll.
-        #   2. Walk backward from each roll: multiply all prior OHLC values by the ratio
-        #      curr_open / prev_close so the series connects seamlessly.
-        #   3. Because we adjust proportionally (multiply), all percentage moves and candle
-        #      body shapes are preserved exactly — only the absolute price level shifts.
-        #
-        # Threshold: 3.5% (WTI 3% normal intraday swings; Gold 0.3-2.5% normal swings).
-        # Gold's rolls are typically 2-5%; WTI's can be 10-30%.
-        #
-        # Effect: the adjusted series looks identical to TradingView's continuous contracts.
-        # The absolute price levels in the oldest bars will differ from spot/cash prices by
-        # the cumulative adjustment factor — this is correct and expected (Bloomberg standard).
-        FUTURES_ADJUST = {"gold", "wti"}
-        ROLL_GAP_THRESHOLD = 0.035  # 3.5% — above normal overnight moves for these assets
-
-        if id_ in FUTURES_ADJUST and len(deduped) >= 2:
-            roll_count = 0
-            for i in range(1, len(deduped)):
-                prev_c = deduped[i - 1]["close"]
-                curr_o = deduped[i]["open"]
-                if prev_c <= 0:
-                    continue
-                gap = abs(curr_o - prev_c) / prev_c
-                if gap > ROLL_GAP_THRESHOLD:
-                    # Proportional adjustment factor: make prev_close == curr_open
-                    factor = curr_o / prev_c
-                    # Adjust all bars before this roll (backward pass)
-                    for j in range(i):
-                        for field in ("open", "high", "low", "close"):
-                            deduped[j][field] = round(deduped[j][field] * factor, DECIMALS.get(id_, 2))
-                    roll_count += 1
-                    print(f"  [back-adj] {id_} roll at {deduped[i]['time']}: "
-                          f"gap {gap*100:.1f}% factor={factor:.5f} "
-                          f"(prev_c={prev_c:.2f} → curr_o={curr_o:.2f})")
-            if roll_count:
-                print(f"  [back-adj] {id_}: {roll_count} rolls adjusted — series is now continuous")
+        # Panama back-adjustment was removed (v7.47.19) because it produces synthetic
+        # price levels — prices that were never actually traded. Bloomberg CL1! and
+        # TradingView CL1! use back-adjustment only for their continuous-contract
+        # analytical instruments, explicitly noting the prices are artificial. A market
+        # monitoring terminal must show real traded prices: the actual front-month close
+        # each day, exactly as reported by the exchange. Roll gaps between contracts are
+        # real market events (the front-month contract switched) and must appear as-is,
+        # consistent with how Reuters Eikon, CNBC, Barchart, and Investing.com display
+        # the front-month series. The HL_MAX_SPREAD guard (also removed, v7.47.19) was
+        # sufficient to drop the few genuinely malformed dual-contract bars yfinance
+        # occasionally produces, but it was removed because it also dropped legitimate
+        # high-volatility sessions (e.g. WTI 8-15% daily ranges during Hormuz crisis).
 
         return deduped
 
