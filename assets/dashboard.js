@@ -5938,7 +5938,15 @@ async function fetchOptionSkew() {
           }
           return wow;
         })();
-        const fmtCotNet = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+        // Compact notation (Bloomberg-style) — keeps cols from overflowing the 220px panel.
+        // e.g. -64,786 → -64.8K ; +1,216 → +1.2K ; -8,280 → -8.3K
+        const fmtCotNet = v => {
+          if (v == null) return '—';
+          const sign = v >= 0 ? '+' : '−';
+          const abs  = Math.abs(v);
+          if (abs >= 1000) return sign + (abs / 1000).toFixed(1) + 'K';
+          return sign + Math.round(abs);
+        };
         const clsNet = cotNet == null ? 'flat' : cotNet > 0 ? 'up' : 'down';
         const clsWow = cotWow == null ? 'flat' : cotWow > 0 ? 'up' : 'down';
 

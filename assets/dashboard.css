@@ -791,8 +791,22 @@
   .news-headline { font-size: 11px; color: var(--text); line-height: 1.4; font-family: var(--font-ui); }
   .news-meta { font-size: 9px; color: var(--text3); margin-top: 2px; font-family: var(--font-ui); display: flex; gap: 8px; }
   .news-source { color: var(--text2); }
-  /* skew table 4-col */
+  /* skew table 4-col — fixed layout prevents Direction column overflow in 220px panel */
   #skew-tbody td:not(:first-child) { text-align: right; }
+  #skew-tbody closest table,
+  #skew-source-label ~ table,
+  [aria-label*="Directional positioning bias"] {
+    table-layout: fixed;
+    width: 100%;
+  }
+  [aria-label*="Directional positioning bias"] th:nth-child(1),
+  [aria-label*="Directional positioning bias"] td:nth-child(1) { width: 52px; }
+  [aria-label*="Directional positioning bias"] th:nth-child(2),
+  [aria-label*="Directional positioning bias"] td:nth-child(2) { width: 40px; }
+  [aria-label*="Directional positioning bias"] th:nth-child(3),
+  [aria-label*="Directional positioning bias"] td:nth-child(3) { width: 40px; }
+  [aria-label*="Directional positioning bias"] th:nth-child(4),
+  [aria-label*="Directional positioning bias"] td:nth-child(4) { width: auto; }
 
   /* TV CHART TABS */
   #tv-pair-tabs::-webkit-scrollbar { display: none; }
