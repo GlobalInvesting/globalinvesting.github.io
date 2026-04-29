@@ -1,0 +1,123 @@
+name: Update Bond Yields
+
+# Runs 1×/day at 23:00 UTC — after update-ohlc (22:30 UTC) so ohlc-data/us10y.json
+# and ohlc-data/vix.json are already on disk when this workflow reads them.
+#
+# Writes to THIS (public) repo:
+#   extended-data/USD.json  → bond10y (US 10Y), bond2y (US 2Y), bond5y (US 5Y), vix
+#   extended-data/EUR.json  → bond10y (DE 10Y / Bund)
+#   extended-data/GBP.json  → bond10y (UK 10Y / Gilt)
+#   extended-data/JPY.json  → bond10y (JP 10Y / JGB)
+#
+# Consumed by:
+#   generate_narrative_signals.py  → bond10y (USD/EUR/GBP/JPY), bond2y, bond5y (LLM context)
+#   fetch_intraday_quotes.py       → bond2y (PASO 4, replaces ^IRX proxy), bond10y/vix fallback
+#   dashboard.js                   → bond10y (USD/EUR/JPY), bond2y, bond5y, vix (fallback layer)
+#
+# Sources (all public, no API keys required):
+#   US 10Y / VIX  → ohlc-data/ on disk (written by update-ohlc at 22:30 UTC)
+#   US 2Y / US 5Y → FRED public CSV endpoint (fredgraph.csv — no key)
+#   DE 10Y        → ECB SDMX daily yield curve (no key)
+#   UK 10Y        → BOE SDIE daily CSV (no key)
+#   JP 10Y        → ECB Financial Markets SDMX monthly (no key)
+#
+# Replaces: engine/.github/workflows/update-extended-data.yml
+# Rationale: The prior workflow ran in the private engine repo (consuming private
+# Actions minutes budget) for 1590 lines of Python that produced 14 fields per
+# currency, of which only bond10y, bond2y, bond5y, and vix are consumed by any
+# live system. This workflow produces exactly those 4 fields for USD and 1 field
+# each for EUR/GBP/JPY — with zero private repo budget consumption.
+# See CHANGELOG.md v7.50.0 for full audit.
+#
+# Placement: PUBLIC repo — no API keys, no proprietary logic.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+
+on:
+  schedule:
+    - cron: '0 23 * * *'   # 23:00 UTC daily — 30min after update-ohlc (22:30 UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: update-bond-yields
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-bond-yields:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p extended-data
+
+      - name: Fetch bond yields
+        env:
+          SITE_DIR: .
+        run: python3 scripts/fetch_bond_yields.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "       BOND YIELDS SUMMARY"
+          echo "========================================"
+          for ccy in USD EUR GBP JPY; do
+            if [ -f "extended-data/${ccy}.json" ]; then
+              python3 -c "
+          import json
+          with open('extended-data/${ccy}.json') as f:
+              d = json.load(f)
+          data  = d.get('data',  {})
+          dates = d.get('dates', {})
+          print(f'  ${ccy}:')
+          for k, v in data.items():
+              dt = dates.get(k, '?')
+              print(f'    {k:18s} = {v}  ({dt})')
+          "
+            fi
+          done
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r extended-data/ /tmp/bond_yields_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/bond_yields_fresh/. extended-data/
+            git add extended-data/USD.json extended-data/EUR.json \
+                    extended-data/GBP.json extended-data/JPY.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Bond yields ${TIMESTAMP} (US10Y/2Y/5Y, DE10Y, UK10Y, JP10Y)"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
