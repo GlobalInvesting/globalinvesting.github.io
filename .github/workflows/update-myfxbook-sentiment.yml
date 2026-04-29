@@ -34,10 +34,51 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sentiment-data/myfxbook.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Sentiment update — $(date -u '+%Y-%m-%d %H:%M') UTC"
-            git push
-          fi
+
+          # Save fresh data before any reset so it survives the retry loop.
+          cp sentiment-data/myfxbook.json /tmp/myfxbook_fresh.json
+
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          # Push loop — up to 5 attempts to handle concurrent-run collisions.
+          #
+          # Per-attempt strategy (no rebase — avoids "unstaged changes" errors):
+          #   1. Hard-reset to current remote HEAD so git history is clean.
+          #   2. Re-apply the fresh file (our data always wins — it is the newest).
+          #   3. Commit only if there is a real diff vs remote HEAD.
+          #   4. Push.  If rejected, another run beat us in the window — loop.
+          #
+          # Exit 0 on all paths: a push collision is not a real failure.
+          # The next scheduled run will carry fresh data.
+          # Exiting with non-zero triggers GitHub failure emails on every
+          # concurrent-run collision — which is the problem this block fixes.
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+
+            # Sync local HEAD to remote without rebasing
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Re-apply our freshly-fetched data
+            cp /tmp/myfxbook_fresh.json sentiment-data/myfxbook.json
+            git add sentiment-data/myfxbook.json
+
+            if git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — data already current, skipping commit."
+              exit 0
+            fi
+
+            git commit -m "Sentiment update — ${TIMESTAMP}"
+
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+
+            echo "Push rejected on attempt $i — another run committed first. Retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
