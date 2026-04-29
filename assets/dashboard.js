@@ -2815,6 +2815,9 @@ let _lwCandleSeries = null;   // reference for live today-bar updates
 let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
+// Suppresses scrollIntoView on the initial auto-load triggered by IntersectionObserver.
+// Set to false after first boot load so user-initiated chart loads still scroll normally.
+let _chartAutoLoad = true;
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
 
 // Ensure the Lightweight Charts library is loaded (lazy, once)
@@ -4011,6 +4014,8 @@ function _loadTVWidgetFallback(sym) {
 
 // SHARED: load any symbol into the chart + scroll to it
 // Prefers Lightweight Charts (yfinance OHLC); falls back to TradingView widget.
+// _chartAutoLoad suppresses scrollIntoView on the initial page-boot load so the
+// narrative stays visible at the top; cleared after first load so user interactions scroll normally.
 // ═══════════════════════════════════════════════════════════════════
 function loadTVChart(sym) {
   document.querySelectorAll('.tv-tab').forEach(t => {
@@ -4021,18 +4026,20 @@ function loadTVChart(sym) {
   const chartSection = document.getElementById('section-fxpairs') ||
     document.getElementById('tv-chart-wrap')?.closest('.panel') ||
     document.getElementById('tv-chart-wrap');
+  const skipScroll = _chartAutoLoad;
+  _chartAutoLoad = false; // clear flag — subsequent calls are user-initiated
   const ohlcId = _TV_TO_OHLC[sym];
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .then(() => { if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
       .catch(() => {
         _loadTVWidgetFallback(sym);
-        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
   } else {
     _loadTVWidgetFallback(sym);
-    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -7995,6 +8002,17 @@ function toggleAlertsPopover() {
       applyState(false);
     }
   } catch(e){ applyState(true, 55); }
+
+  // Ensure #split-upper always starts scrolled to top (narrative visible) on page load.
+  // The chart auto-load via IntersectionObserver was previously calling scrollIntoView
+  // which scrolled past the narrative — now suppressed via _chartAutoLoad flag, but we
+  // also pin scrollTop here as a safety net for iframe-focus or async-render edge cases.
+  (function resetSplitUpperScroll(){
+    if(!upper) return;
+    upper.scrollTop = 0;
+    // Re-apply after a short delay to catch any async layout shifts from the TV iframe
+    setTimeout(function(){ if(upper) upper.scrollTop = 0; }, 400);
+  })();
 
   var TIP_KEY = 'gi_split_tip_seen';
   var tip = document.getElementById('split-tip');
