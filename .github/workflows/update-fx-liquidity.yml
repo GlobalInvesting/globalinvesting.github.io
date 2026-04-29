@@ -85,17 +85,26 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add fx-data/fx-liquidity.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "FX liquidity profile $(date +'%Y-%m-%d %H:%M UTC')"
-          for i in 1 2 3; do
-            git push && echo "Push succeeded" && exit 0
-            echo "Push rejected (attempt $i) — rebasing..."
+          cp fx-data/fx-liquidity.json /tmp/fx_liquidity_fresh.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
             git fetch origin main
-            git rebase origin/main
-            sleep $((i * 3))
+            git reset --hard origin/main
+            cp /tmp/fx_liquidity_fresh.json fx-data/fx-liquidity.json
+            git add fx-data/fx-liquidity.json
+            if git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "FX liquidity profile ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
           done
-          echo "All push attempts failed." && exit 1
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
