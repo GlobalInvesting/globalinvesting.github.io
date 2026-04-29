@@ -1,0 +1,95 @@
+name: Update Extended Data — DISABLED v14.0
+
+# DISABLED in v7.50.0 (2026-04-29):
+#
+# Audit finding: of the 14 fields written per currency (bond10y, bond2y, bond5y,
+# vix, rateMomentum, consumerConfidence, businessConfidence, capitalFlows,
+# inflationExpectations, fdi, gdpGrowth, wageGrowth, tradeBalance), only
+# bond10y (USD/EUR/GBP/JPY), bond2y (USD), bond5y (USD), and vix (USD) are
+# consumed by any live system (generate_narrative_signals.py, fetch_intraday_quotes.py,
+# dashboard.js). The remaining 10 fields per currency are written but never read.
+#
+# The ~10 minutes/day of private Actions budget this consumed has been reclaimed.
+# The 4 fields that matter are now produced by:
+#   site/.github/workflows/update-bond-yields.yml  (public repo, 0 budget cost)
+#   script: site/scripts/fetch_bond_yields.py  (v1.0)
+#
+# Sources are identical — FRED public CSV (no key), ECB SDMX, BOE SDIE, ECB FM —
+# but the new script is ~140 lines vs 1590, produces only what is consumed,
+# and runs in the public repo with unlimited Actions minutes.
+#
+# To re-enable: restore the schedule trigger and remove this disable block.
+# Recommend against re-enabling unless a new frontend panel actively consumes
+# the macro fields (rateMomentum, consumerConfidence, etc.).
+
+on:
+  workflow_dispatch:  # manual only — not on schedule
+
+# v13.0: Bond yields diarios (ECB/BOE/BOC/DBnomics), BIS rateMomentum, Calendar extractor.
+concurrency:
+  group: update-extended-data
+  cancel-in-progress: false
+
+jobs:
+  update-extended-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout PUBLIC site repo
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.PAT_TOKEN }}
+          path: site
+
+      - name: Checkout THIS private repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          path: engine
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml python-dateutil openpyxl --break-system-packages
+
+      - name: Create directory
+        run: mkdir -p site/extended-data
+
+      - name: Update extended data
+        working-directory: site
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 -u ../engine/scripts/update_extended_data.py
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r extended-data/ /tmp/extended_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/extended_fresh/. extended-data/
+            git add extended-data/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "Extended data ${TIMESTAMP} — v13.0 (ECB/BOE/BOC/BIS/Calendar)"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
