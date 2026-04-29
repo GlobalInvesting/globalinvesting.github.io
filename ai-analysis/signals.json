@@ -1,4 +1,60 @@
 {
-  "generated_at": "2026-04-29T19:28:07Z",
-  "signals": []
+  "generated_at": "2026-04-27T17:00:00Z",
+  "signals": [
+    {
+      "time": "16:51",
+      "priority": "critical",
+      "title": "NZD/USD — G8 Bilateral Theme + Carry Divergence",
+      "text": "NZD leads G8 this week at +0.864% avg (n=4) vs USD −0.566% (n=7) — spread 1.431%, above the CRITICAL 1.20% threshold. RBNZ 2.25% (↑ HIKE EXPECTED, 40% priced for 27 May) vs Fed 3.75% (ON HOLD) — 150bp USD carry advantage structurally capped by CB repricing: specs pricing in RBNZ hike while USD pricing holds. COT LF net short NZD −18,062 creates short-squeeze risk if RBNZ delivers. NZD/USD at 0.5916 intraday +0.61%. Watch RBNZ Gov Breman speaks 29 Apr 00:30 UTC.",
+      "evidence": [
+        "NZD 1W avg: +0.864% (n=4 pairs)",
+        "USD 1W avg: −0.566% (n=7 pairs)",
+        "G8 spread: 1.431%"
+      ]
+    },
+    {
+      "time": "16:48",
+      "priority": "critical",
+      "title": "USD/JPY — COT vs OIS Divergence + BoJ",
+      "text": "JPY COT LF net short −80,578 (crowded carry) vs BoJ ↑ HIKE EXPECTED (40% priced for 28 Apr tomorrow). USD/JPY at 159.37 — Fed 3.75% vs BoJ 0.75% (300bp) sustains carry bid but spec shorts are extreme: any BoJ hawkish signal triggers crowded unwind. COT LF short −80.6k is the largest in the G8 — positioning is the primary risk. AUD/JPY carry also exposed at +335bp (RBA 4.10% vs BoJ 0.75%). Watch BoJ Policy Rate 28 Apr 02:30 UTC and Press Conference 05:30 UTC.",
+      "evidence": [
+        "JPY COT LF net: −80,578 (week Apr 21)",
+        "BoJ hike prob: 40% | Next meeting: 28 Apr",
+        "USD/JPY: 159.37 | Fed 3.75% vs BoJ 0.75% — 300bp"
+      ]
+    },
+    {
+      "time": "16:45",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD COT LF net long +47,218 (long% 74.3%) — institutional specs firmly long vs retail 91% short (AUD/USD). Institutional vs retail divergence at extreme: retail fading a spec-driven bid supported by RBA 4.10% ↑ HIKE EXPECTED and AUD G8 strength (+0.670% avg, n=4). AM net long +35,554 confirms structural alignment. Dealer net −117,641 — unusually large short, signals heavy client long hedging; squeeze risk if AUD extends. AUD/USD at 0.7193 (+0.56% intraday). Watch AUD CPI 29 Apr 01:30 UTC — beat would accelerate RBA hike pricing.",
+      "evidence": [
+        "AUD COT LF net: +47,218 | long% 74.3%",
+        "Retail: 91% short (AUD/USD) — extreme divergence vs COT long",
+        "RBA 4.10% ↑ HIKE EXPECTED | AUD/USD: 0.7193"
+      ]
+    },
+    {
+      "time": "16:40",
+      "priority": "warning",
+      "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
+      "text": "NZD COT LF net short −18,062 (long% 18.6% — specs fading a hawkish CB) vs RBNZ ↑ HIKE EXPECTED (40% priced for 27 May). If RBNZ delivers or Breman signals intent on 29 Apr, short-squeeze risk elevated — retail also 70% short (NZD/USD), amplifying the contrarian setup. NZD/USD at 0.5916 +0.61% intraday despite crowded speculative short. Dual divergence: COT short + retail short vs RBNZ hike bias is a high-conviction setup. NZD leads G8 +0.864% this week against all odds.",
+      "evidence": [
+        "NZD COT LF net: −18,062 | long% 18.6%",
+        "RBNZ hike prob: 40% | Next: 27 May",
+        "Retail NZD/USD: 70% short"
+      ]
+    },
+    {
+      "time": "16:35",
+      "priority": "warning",
+      "title": "EUR/USD vs EuroStoxx — Correlation Break",
+      "text": "EUR/USD vs EuroStoxx: corr=+0.799 vs 252d norm=−0.121 (z=+1.77σ) — one of the strongest correlation breaks in the matrix. Normal: EUR/USD weakly negative to EuroStoxx (risk-on equities = EUR offered). Current: EUR and EuroStoxx moving together, suggesting USD weakness (DXY −0.13%) is driving both rather than EUR-specific flows. Fed 3.75% ON HOLD vs ECB 2.00% ON HOLD — 175bp spread structurally caps EUR/USD upside at 1.1850. EUR/USD at 1.1733 (+0.06%). Watch Fed 29 Apr for policy signals; ECB hold 30 Apr.",
+      "evidence": [
+        "EUR/USD vs EuroStoxx: z=+1.77σ (norm=−0.121, current=+0.799)",
+        "Fed 3.75% vs ECB 2.00% — 175bp USD carry advantage",
+        "EUR/USD: 1.1733 | DXY: 98.41 (−0.13%)"
+      ]
+    }
+  ]
 }
