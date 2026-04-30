@@ -2811,6 +2811,7 @@ let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
+let _lwLastJsonDate = {};     // ohlcId → last bar date string from JSON (e.g. "2026-04-29")
 
 // Ensure the Lightweight Charts library is loaded (lazy, once)
 let _lwLibPromise = null;
@@ -2869,38 +2870,65 @@ function _lwBuildTodayBar(ohlcId) {
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
 
   // Compute the session date that matches the JSON bar construction logic.
-  // The JSON is built by fetch_ohlc.py which uses session boundaries:
-  //   FX:   21:00 UTC → 21:00 UTC  (NY 17:00 session)
-  //   Gold: 22:00 UTC → 22:00 UTC  (CME 17:00 ET session)
-  // Before the session boundary hour the active session belongs to the UTC calendar
-  // date; at or after the boundary hour the active session belongs to UTC date + 1.
-  // Using raw UTC wall-clock (toISOString) causes a 1-day gap immediately after the
-  // boundary because the JSON's last bar is still "yesterday" while the client labels
-  // the today-bar as "today" (date + 1 from the client's perspective).
-  // Fix: mirror the same boundary logic so dateStr always equals the last JSON bar date.
-  const isGold = ohlcId === 'gold';
-  const boundaryHour = isGold ? 22 : 21; // UTC hour where a NEW session begins
+  // fetch_ohlc.py uses different date boundaries per asset class:
+  //
+  //   FX pairs (incl. DXY):
+  //     1H bars aggregated over 21:00 UTC → 21:00 UTC (NY 17:00 session).
+  //     Before 21:00 UTC → active session date = today UTC.
+  //     At/after 21:00 UTC → new session opened → session date = tomorrow UTC.
+  //
+  //   Gold:
+  //     1H bars aggregated over 22:00 UTC → 22:00 UTC (CME 17:00 ET session).
+  //     Before 22:00 UTC → session date = today UTC.
+  //     At/after 22:00 UTC → session date = tomorrow UTC.
+  //
+  //   Non-FX/non-Gold (WTI, BTC, ETH, SPX, Nasdaq, Nikkei, EuroStoxx, US10Y):
+  //     Native yfinance 1D bars — dates come from ts.strftime("%Y-%m-%d") on the
+  //     yfinance timestamp, which aligns with the UTC calendar date of each bar
+  //     as returned by yfinance. No boundary offset — just raw UTC wall-clock date.
+  //     The workflow runs at 22:30 UTC after all major exchanges have closed, so
+  //     the JSON already has today's bar labeled with today's UTC date.
+  //     Using UTC wall-clock date matches the JSON exactly at all times of day.
+  const isGold  = ohlcId === 'gold';
+  const isFxLike = _LW_FX_IDS.has(ohlcId); // FX pairs + DXY (all use 21:00 UTC boundary)
   const utcH = nowUTC.getUTCHours();
   let sessionDate;
-  if (utcH < boundaryHour) {
-    // Active session opened yesterday at boundaryHour — it closes today at boundaryHour.
-    // The session date label is TODAY (UTC calendar date).
-    sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
-  } else {
-    // A new session just opened — it will close TOMORROW at boundaryHour.
-    // The session date label is TOMORROW (UTC calendar date + 1).
-    sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
-  }
 
-  // FX/Gold markets are closed on Saturday (no session exists).
-  // Also guard Sunday for non-Gold FX — FX opens Sun 21:00 UTC so before that hour
-  // sessionDate is Sunday (a valid session opening) but the market is still closed.
-  // Use sessionDate's day-of-week so we correctly handle the Fri 21:00 UTC edge case
-  // (the "new session" label becomes Saturday — a non-trading day; suppress the bar).
-  const sessionDow = sessionDate.getUTCDay(); // 0=Sun, 6=Sat
-  if (_LW_FX_IDS.has(ohlcId)) {
+  if (isFxLike) {
+    // FX session boundary: 21:00 UTC. Before → today; at/after → tomorrow.
+    if (utcH < 21) {
+      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+    } else {
+      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
+    }
+    // Guard: FX closed on Saturday entirely; Sunday before 21:00 UTC is pre-open.
+    const sessionDow = sessionDate.getUTCDay();
     if (sessionDow === 6) return null; // Saturday — no FX session
-    if (!isGold && sessionDow === 0 && utcH < 21) return null; // Sunday pre-open
+    if (sessionDow === 0 && utcH < 21) return null; // Sunday pre-open
+  } else if (isGold) {
+    // CME Gold session boundary: 22:00 UTC. Before → today; at/after → tomorrow.
+    if (utcH < 22) {
+      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+    } else {
+      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
+    }
+    // Guard: no Gold session on Saturday.
+    const sessionDow = sessionDate.getUTCDay();
+    if (sessionDow === 6) return null;
+  } else {
+    // Non-FX/non-Gold (WTI, BTC, SPX, Nikkei, etc.): native yfinance 1D bars.
+    // These assets have real exchange sessions with varying UTC close times
+    // (NYSE 20:00, TSE 06:00, CME WTI 21:00, etc.) — no single boundary works.
+    // Safest approach: use the last JSON bar's date, which is always what the
+    // JSON already has. This guarantees the today-bar update() targets the exact
+    // same time key LWC already has in its series, preventing gap or rejection.
+    // Falls back to UTC wall-clock date if the JSON hasn't been loaded yet.
+    const _lastDate = _lwLastJsonDate[ohlcId];
+    if (_lastDate) {
+      sessionDate = new Date(_lastDate + 'T00:00:00Z');
+    } else {
+      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+    }
   }
 
   const dateStr = sessionDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
@@ -3027,6 +3055,8 @@ async function _renderLWChart(ohlcId, label) {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   const bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+  // Store last JSON bar date — used by _lwBuildTodayBar for non-FX/non-Gold alignment
+  _lwLastJsonDate[ohlcId] = bars.length > 0 ? bars[bars.length - 1].time : null;
 
   wrap.innerHTML = '';
 
