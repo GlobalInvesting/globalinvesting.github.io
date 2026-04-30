@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.4 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.5 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -760,9 +760,25 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: empty history from yfinance")
             return None
 
+        # Determine today's UTC date for the today-bar guard below.
+        _today_utc = datetime.now(timezone.utc).date()
+
         bars: list[dict] = []
         for ts, row in hist.iterrows():
-            date_str = ts.strftime("%Y-%m-%d")
+            # ── Timezone-safe date extraction ──────────────────────────────────
+            # yfinance returns crypto (BTC, ETH) timestamps as timezone-aware
+            # datetime objects in America/New_York (UTC-4/UTC-5). A bar stamped
+            # "2026-04-29 00:00:00-04:00" is the Apr 29 UTC session but
+            # ts.strftime("%Y-%m-%d") renders as "2026-04-28" in ET.
+            # Converting to UTC first ensures the correct calendar date.
+            if id_ in CRYPTO_SYMBOLS:
+                if ts.tzinfo is not None:
+                    date_str = ts.astimezone(timezone.utc).strftime("%Y-%m-%d")
+                else:
+                    date_str = ts.strftime("%Y-%m-%d")
+            else:
+                date_str = ts.strftime("%Y-%m-%d")
+
             o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
 
             if not (_guard(id_, c) and _guard(id_, o) and h >= l and h >= c and l <= c):
@@ -796,6 +812,22 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
             return None
 
+        # ── Today-bar partial-data guard ───────────────────────────────────────
+        # fetch_ohlc runs at 22:30 UTC. For most non-FX symbols the last bar in
+        # the yfinance response is today's in-progress bar (volume will be partial
+        # for US markets, or a completed bar for Asian sessions that close by
+        # 08:00 UTC). dashboard.js strips it and replaces it with the live
+        # intraday bar from quotes.json. That is the intended design.
+        #
+        # Problem: if the workflow is triggered via workflow_dispatch BEFORE the
+        # relevant market closes (e.g. Nikkei closes ~07:00 UTC, but dispatch
+        # is run at 06:00 UTC), the today bar would have clearly wrong/partial
+        # data. To prevent writing a bad today-bar for Nikkei and similar early-
+        # close markets we do NOT strip here — the JS always strips the today-bar
+        # from the JSON regardless. So the guard here is intentionally a no-op:
+        # we KEEP the today-bar in the JSON so the JS can strip it and replace
+        # with the live feed. This is the correct pipeline architecture.
+        #
         # No FX open correction here — handled by fetch_fx_ohlc_from_1h.
         # No back-adjustment for futures — removed v7.47.19.
 
