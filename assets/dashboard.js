@@ -3388,7 +3388,32 @@ async function _renderLWChart(ohlcId, label) {
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
 
-  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
+  // Inject today's live bar.
+  // For non-FX symbols the STOOQ_RT_CACHE may be empty if the chart was opened
+  // before fetchCrossAssetData() completed its first run. We await
+  // loadIntradayQuotes() here (costs nothing when already cached — 90s TTL) and
+  // seed the cache inline so _lwBuildTodayBar() always has data on first render.
+  const _isFxLikeChart = _LW_FX_IDS.has(ohlcId);
+  if (!_isFxLikeChart) {
+    // Seed STOOQ_RT_CACHE for this specific non-FX symbol if not yet populated
+    const _cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+    if (!STOOQ_RT_CACHE[_cacheKey] || !STOOQ_RT_CACHE[_cacheKey].close) {
+      try {
+        const _fresh = await loadIntradayQuotes();
+        if (_fresh) {
+          // Mirror all non-FX symbols into cache (same logic as fetchCrossAssetData)
+          const _seed = (sym, cKey) => {
+            const _q = intradayQuote(_fresh, sym);
+            if (_q) STOOQ_RT_CACHE[cKey || sym] = _q;
+          };
+          _seed('spx');   _seed('nasdaq'); _seed('stoxx');  _seed('nikkei');
+          _seed('wti');   _seed('gold', 'xauusd'); _seed('gold', 'gold');
+          _seed('btc');   _seed('eth');   _seed('dxy');
+          _seed('us10y'); _seed('vix');
+        }
+      } catch(_) {}
+    }
+  }
   const todayBar = _lwBuildTodayBar(ohlcId);
   if (todayBar) {
     try {
