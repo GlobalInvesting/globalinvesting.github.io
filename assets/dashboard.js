@@ -2915,12 +2915,22 @@ function _calcMA(bars, n) {
 // FX spot IDs — weekend today-bar injection is skipped for these because
 // FX is closed Saturday/Sunday and injecting a flat open=close bar creates
 // a phantom doji candle after the last real Friday bar.
+// NOTE: 'dxy' is intentionally excluded. DXY's OHLC JSON (yfinance DX-Y.NYB)
+// includes a partial today-bar just like equities/commodities — it must go
+// through the same strip logic (if (!_LW_FX_IDS.has(ohlcId))) so bars[-1]
+// is always yesterday's completed bar when _lastHistClose is computed.
+// Weekend guard for DXY lives in _LW_WEEKEND_CLOSED_IDS below.
 const _LW_FX_IDS = new Set([
   'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
   'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
   'gbpchf','gbpcad','gbpaud','gbpnzd','audjpy','audnzd','audchf',
-  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
+  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy',
 ]);
+
+// IDs for which weekend today-bar injection must be skipped (market closed Sat/Sun).
+// Superset of _LW_FX_IDS — also includes DXY (ICE futures, closed Sat/Sun)
+// without pulling it into the FX strip-bypass logic.
+const _LW_WEEKEND_CLOSED_IDS = new Set([..._LW_FX_IDS, 'dxy']);
 
 // Crypto trades 24/7 with no session gaps — Saturday and Sunday bars are real.
 // LWC v5 treats "YYYY-MM-DD" string times as business days and collapses
@@ -2938,7 +2948,7 @@ function _lwBuildTodayBar(ohlcId) {
   // injecting a flat open=close phantom doji after the last real bar.
   const todayUTC = new Date();
   const dowUTC   = todayUTC.getUTCDay(); // 0=Sun, 6=Sat
-  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
+  if (_LW_WEEKEND_CLOSED_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
 
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
