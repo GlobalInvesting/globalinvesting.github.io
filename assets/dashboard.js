@@ -2987,8 +2987,21 @@ function _lwBuildTodayBar(ohlcId) {
       ? parseFloat(q.open.toFixed(dec))
       : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
   }
-  const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
-  const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
+  // H/L wick convention:
+  //   FX bars → prefer session_high/session_low (1H aggregation from 21:00 UTC, same
+  //             boundary as historical bars). Falls back to Yahoo dayHigh/dayLow only
+  //             if session_high/session_low are absent (fetch_intraday_quotes.py failure).
+  //             Yahoo dayHigh/dayLow use UTC-midnight cutoff, missing the Tokyo/Sydney
+  //             open hours (21:00–23:59 UTC of the prior day) — inconsistent with history.
+  //   Non-FX bars → Yahoo dayHigh/dayLow (correct for exchange-session instruments).
+  const _useSessionHL = isFxBar && q.session_high != null && q.session_low != null
+                        && q.session_high > 0 && q.session_low > 0;
+  const h = _useSessionHL
+    ? parseFloat(q.session_high.toFixed(dec))
+    : (q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c));
+  const l = _useSessionHL
+    ? parseFloat(q.session_low.toFixed(dec))
+    : (q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c));
   return { time: timeVal, open: o, high: h, low: l, close: c };
 }
 
