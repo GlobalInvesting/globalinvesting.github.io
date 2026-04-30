@@ -2920,13 +2920,43 @@ function _lwBuildTodayBar(ohlcId) {
     const sessionDow = sessionDate.getUTCDay();
     if (sessionDow === 6) return null;                  // Saturday — no Gold session
   } else {
-    // Non-FX/non-Gold: use last JSON bar date — guaranteed to match LWC series key
+    // Non-FX/non-Gold: compute the real session date for the current trading day,
+    // then clamp it so we never inject a bar whose time is earlier than the last
+    // JSON bar (LWC would reject an out-of-order bar).
+    //
+    // Session boundary: 21:00 UTC for all non-FX/non-Gold assets.
+    //   • NYSE/Nasdaq close 20:00 UTC → bar available before 21:00 UTC boundary.
+    //   • Nikkei closes ~06:00 UTC → bar available early in the UTC day.
+    //   • WTI CME closes ~21:00 UTC → boundary is approximate; one-off possible
+    //     at boundary time but corrects on the next 5-min RT poll.
+    //   • Crypto trades 24/7 — no weekend guard needed.
+    //
+    // If the computed session date is LATER than the last JSON bar (gap day),
+    // LWC will accept the new bar via update() and render it as the live candle.
+    // If equal, update() refreshes the existing last bar (normal intraday update).
+    // If earlier (should not happen in practice), clamp to last JSON bar to avoid
+    // a rejected update.
     const _lastDate = _lwLastJsonDate[ohlcId];
-    if (_lastDate) {
-      // For crypto the series uses Unix timestamps; derive it from the date string
+    const _isCrypto = _CRYPTO_IDS.has(ohlcId);
+    // Compute real session date at the 21:00 UTC boundary
+    let _sessionCandidate;
+    if (utcH < 21) {
+      _sessionCandidate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+    } else {
+      _sessionCandidate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
+    }
+    const _candidateStr = _sessionCandidate.toISOString().slice(0, 10);
+    if (_lastDate && _candidateStr < _lastDate) {
+      // Clamp: never go earlier than the last JSON bar
       sessionDate = new Date(_lastDate + 'T00:00:00Z');
     } else {
-      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
+      sessionDate = _sessionCandidate;
+    }
+    // Weekend guard for non-crypto assets only (crypto trades Sat/Sun)
+    if (!_isCrypto) {
+      const _dow = sessionDate.getUTCDay();
+      if (_dow === 6) return null;                    // Saturday — markets closed
+      if (_dow === 0 && utcH < 21) return null;       // Sunday pre-open
     }
   }
 
