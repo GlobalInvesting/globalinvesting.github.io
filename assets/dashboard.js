@@ -3089,6 +3089,17 @@ async function _renderLWChart(ohlcId, label) {
   // FX pairs are excluded: their JSON never contains a today-bar on weekdays
   // (1H aggregation stops at session close), and on weekends FX is already
   // guarded by the _LW_FX_IDS weekend check in _lwBuildTodayBar.
+  //
+  // Holiday-gap guard: strip is gated on the series being fully contiguous at
+  // the boundary. If the penultimate bar is not exactly 1 day (weekday cadence)
+  // or 3 days (Fri→Mon weekend) before the last bar, a data gap exists —
+  // typically a local market holiday (e.g. Nikkei on Shōwa Day / Golden Week)
+  // or a yfinance mid-week consolidation gap for crypto. Stripping in that case
+  // would punch a visible hole on the chart (e.g. Apr 28 → [blank] → Apr 30).
+  // When a gap is detected the last bar is kept in place; _lwBuildTodayBar
+  // silently overwrites it via LWC series.update() — same-time bars are replaced,
+  // not duplicated. Standard Bloomberg/TradingView practice: live feed supersedes
+  // batch bar only when the historical series is contiguous at the boundary.
   if (!_LW_FX_IDS.has(ohlcId)) {
     const _dataDate = _intradayDataDate || new Date().toISOString().slice(0, 10);
     if (bars.length > 0) {
@@ -3097,7 +3108,30 @@ async function _renderLWChart(ohlcId, label) {
         ? _lastBar.time
         : new Date(_lastBar.time * 1000).toISOString().slice(0, 10);
       if (_lastBarDate === _dataDate) {
-        bars = bars.slice(0, -1);
+        // Holiday-gap guard: only strip the last JSON bar when the series is
+        // fully contiguous up to that bar — i.e. the penultimate bar is exactly
+        // the expected prior trading session. Two valid gaps:
+        //   1 calendar day  → consecutive weekday bars (Mon–Fri normal cadence)
+        //   3 calendar days → Friday-to-Monday weekend gap
+        // Any other gap signals a data anomaly: a skipped mid-week day (gap==2,
+        // e.g. yfinance missing Wed Apr 29 between Tue Apr 28 and Thu Apr 30),
+        // or a multi-day local market holiday (gap≥4, e.g. Nikkei on Golden Week).
+        // In both cases, stripping the last bar would punch a visible hole on the
+        // chart. Keep it in place — _lwBuildTodayBar silently overwrites it via
+        // LWC series.update() (same-time bars are replaced, not duplicated).
+        // Standard Bloomberg/TradingView practice: live feed supersedes batch bar
+        // only when the historical series is contiguous at the boundary.
+        let _shouldStrip = true;
+        if (bars.length >= 2) {
+          const _penultBar = bars[bars.length - 2];
+          const _penultDate = typeof _penultBar.time === 'string'
+            ? _penultBar.time
+            : new Date(_penultBar.time * 1000).toISOString().slice(0, 10);
+          const _gapDays = (Date.parse(_lastBarDate) - Date.parse(_penultDate)) / 86400000;
+          // Allow strip only for the two normal cadence gaps; anything else = data gap
+          if (_gapDays !== 1 && _gapDays !== 3) _shouldStrip = false;
+        }
+        if (_shouldStrip) bars = bars.slice(0, -1);
       }
     }
   }
