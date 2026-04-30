@@ -897,7 +897,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
         <div style="padding:4px 12px 3px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Historical VaR 95% · 1-day · 252d window</span>
-          <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
+          <span style="font-size:8px;color:var(--text3);">* = 60d VaR &gt;125% of 252d baseline</span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">
           <thead><tr style="color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.05em;">
@@ -918,7 +918,7 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
       </div>
 
       <h3>Column definitions</h3>
-      <p><strong style="color:var(--text);">VaR 95%</strong> — The 1-day Historical VaR at 95% confidence level. This is the loss threshold not exceeded on 95% of trading days over the past 252 sessions. Color-coded: green below 0.5%, amber 0.5–1%, red above 1%. A ⚠ flag appears when the rolling 60-day VaR exceeds the 252-day baseline by more than 25% — a regime-shift signal indicating elevated recent volatility.</p>
+      <p><strong style="color:var(--text);">VaR 95%</strong> — The 1-day Historical VaR at 95% confidence level. This is the loss threshold not exceeded on 95% of trading days over the past 252 sessions. Color-coded: green below 0.5%, amber 0.5–1%, red above 1%. An asterisk (*) flag appears when the rolling 60-day VaR exceeds the 252-day baseline by more than 25% — a regime-shift signal indicating elevated recent volatility.</p>
       <p><strong style="color:var(--text);">CVaR 95%</strong> — Expected Shortfall: the mean loss in the worst 5% of days. Always greater than or equal to the VaR. CVaR captures the average severity of tail events, not just their threshold.</p>
       <p><strong style="color:var(--text);">ES/VaR ratio</strong> — CVaR divided by VaR. A ratio near 1.2–1.5 is typical for normally-distributed returns. Ratios above 2.0 indicate fat tails — the distribution has extreme outliers that the VaR alone does not capture. Color: green below 1.5x, amber 1.5–2.0x, red above 2.0x.</p>
       <p><strong style="color:var(--text);">n</strong> — Number of daily returns used in the computation. Target is 252 trading days (one year). A lower value means less historical data is available for that instrument.</p>

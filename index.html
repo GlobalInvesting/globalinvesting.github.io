@@ -176,7 +176,7 @@
 <!-- Critical CSS inline — above-the-fold only -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#787b86;--text3:#6b7280;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
+:root{--bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--border:#2a2e39;--border2:#363c4e;--text:#d1d4dc;--text2:#9096a0;--text3:#8290a0;--up:#26a69a;--down:#ef5350;--blue:#4f7fff;--orange:#f6941c;--head-bg:#1a1d29;--font-ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'JetBrains Mono','Courier New',monospace}
 body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:12px;line-height:1.4;min-height:100vh}
 #topbar{background:var(--head-bg);border-bottom:1px solid var(--border);height:36px;display:flex;align-items:center;padding:0 10px;position:sticky;top:0;z-index:200}
 #tv-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:stretch;height:34px;flex-shrink:0}
@@ -271,7 +271,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=7.26.3">
+<link rel="stylesheet" href="assets/dashboard.css?v=7.52.0">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -312,6 +312,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a href="#section-crossasset" data-target="section-crossasset">Cross-Asset</a>
     <a href="#section-risk" data-target="section-risk">Risk</a>
     <a href="#section-positioning" data-target="section-positioning">Positioning</a>
+    <a href="#section-sessions" data-target="section-sessions">Sessions</a>
     <a href="#section-tvcalendar" data-target="section-tvcalendar">Calendar</a>
   </nav>
   <div class="topbar-right">
@@ -655,7 +656,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div style="padding:4px 8px 6px;">
         <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
           <span>Historical VaR 95% · 1-day · 252d window</span>
-          <span style="font-size:8px;color:var(--text3);">⚠ = 60d VaR &gt;125% of 252d baseline</span>
+          <span style="font-size:8px;color:var(--text3);">* = 60d VaR &gt;125% of 252d baseline</span>
         </div>
         <table id="var-cvar-table" aria-label="Historical VaR and CVaR by instrument" style="width:100%;table-layout:fixed;">
           <thead>
@@ -720,7 +721,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- SESSIONS + SPREADS -->
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);height:580px;">
-      <div class="panel" id="section-crossasset" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:100%;">
+      <div class="panel" id="section-sessions" style="border-bottom:none;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:100%;">
         <div class="panel-head"><span class="panel-title">Market Sessions</span></div>
         <div class="session-row">
           <span class="sess" id="sess-sydney">Sydney</span>
@@ -1021,7 +1022,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <button class="kb-hint-btn" onclick="(function(){const e=new KeyboardEvent('keydown',{key:'?',bubbles:true});document.dispatchEvent(e);})()" title="Keyboard shortcuts (?)" aria-label="Show keyboard shortcuts">? shortcuts</button>
-    <span class="sb-v">FX Terminal v7.34.1</span>
+    <span class="sb-v">FX Terminal v7.52.0</span>
   </div>
 </footer>
 
