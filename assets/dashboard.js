@@ -3090,16 +3090,23 @@ async function _renderLWChart(ohlcId, label) {
   // (1H aggregation stops at session close), and on weekends FX is already
   // guarded by the _LW_FX_IDS weekend check in _lwBuildTodayBar.
   //
-  // Holiday-gap guard: strip is gated on the series being fully contiguous at
-  // the boundary. If the penultimate bar is not exactly 1 day (weekday cadence)
-  // or 3 days (Fri→Mon weekend) before the last bar, a data gap exists —
-  // typically a local market holiday (e.g. Nikkei on Shōwa Day / Golden Week)
-  // or a yfinance mid-week consolidation gap for crypto. Stripping in that case
-  // would punch a visible hole on the chart (e.g. Apr 28 → [blank] → Apr 30).
-  // When a gap is detected the last bar is kept in place; _lwBuildTodayBar
-  // silently overwrites it via LWC series.update() — same-time bars are replaced,
-  // not duplicated. Standard Bloomberg/TradingView practice: live feed supersedes
-  // batch bar only when the historical series is contiguous at the boundary.
+  // Holiday-gap guard (v2): the today-bar is always stripped when its date
+  // matches _dataDate. The guard only protects against a DIFFERENT scenario:
+  // a missing mid-series bar (e.g. BTC Apr 29 absent from JSON due to yfinance
+  // timezone mis-stamp). In that case the last JSON bar is Apr 30 (today) and
+  // the penultimate is Apr 28 — stripping Apr 30 would leave a visible hole
+  // Apr 28 → [blank] → Apr 30. The guard detects this by checking the gap
+  // between the ANTEPENULTIMATE and the PENULTIMATE bar (i.e. the two bars
+  // immediately before the today-bar). If that inner gap is > 1 day on a
+  // non-weekend, a mid-series bar is missing — keep the today-bar in place so
+  // _lwBuildTodayBar can overwrite it via series.update() without leaving a hole.
+  //
+  // Crucially: Nikkei on Shōwa Day (Apr 29) produces JSON = [..., Apr 28, Apr 30].
+  // The gap between penultimate (Apr 28) and last (Apr 30) is 2 — but that last
+  // bar IS the today-bar (partial, V=0). Strip it: the correct historical picture
+  // ends at Apr 28. _lwBuildTodayBar injects Apr 30 as a live bar from quotes.json.
+  // The mid-series hole check looks at bars[-3] vs bars[-2] (the historical core),
+  // which is a normal 1-day gap — so strip proceeds correctly.
   if (!_LW_FX_IDS.has(ohlcId)) {
     const _dataDate = _intradayDataDate || new Date().toISOString().slice(0, 10);
     if (bars.length > 0) {
@@ -3108,28 +3115,29 @@ async function _renderLWChart(ohlcId, label) {
         ? _lastBar.time
         : new Date(_lastBar.time * 1000).toISOString().slice(0, 10);
       if (_lastBarDate === _dataDate) {
-        // Holiday-gap guard: only strip the last JSON bar when the series is
-        // fully contiguous up to that bar — i.e. the penultimate bar is exactly
-        // the expected prior trading session. Two valid gaps:
-        //   1 calendar day  → consecutive weekday bars (Mon–Fri normal cadence)
-        //   3 calendar days → Friday-to-Monday weekend gap
-        // Any other gap signals a data anomaly: a skipped mid-week day (gap==2,
-        // e.g. yfinance missing Wed Apr 29 between Tue Apr 28 and Thu Apr 30),
-        // or a multi-day local market holiday (gap≥4, e.g. Nikkei on Golden Week).
-        // In both cases, stripping the last bar would punch a visible hole on the
-        // chart. Keep it in place — _lwBuildTodayBar silently overwrites it via
-        // LWC series.update() (same-time bars are replaced, not duplicated).
-        // Standard Bloomberg/TradingView practice: live feed supersedes batch bar
-        // only when the historical series is contiguous at the boundary.
+        // Mid-series gap guard: check if the two bars immediately preceding the
+        // today-bar are contiguous. If not, a historical bar is missing from the
+        // JSON — stripping the today-bar would create a visible chart hole.
+        // Only blocks strip when bars[-3] → bars[-2] gap is anomalous (not 1 day
+        // on a weekday, not 3 days for Fri→Mon). Does NOT look at the gap between
+        // bars[-2] and bars[-1] (today) — that gap is irrelevant: today's bar is
+        // always newer than the last historical bar, and local market holidays
+        // (e.g. Nikkei Shōwa Day) produce a legitimate gap here which must NOT
+        // block the strip.
         let _shouldStrip = true;
-        if (bars.length >= 2) {
-          const _penultBar = bars[bars.length - 2];
+        if (bars.length >= 3) {
+          const _penultBar  = bars[bars.length - 2];
+          const _anteBar    = bars[bars.length - 3];
           const _penultDate = typeof _penultBar.time === 'string'
             ? _penultBar.time
             : new Date(_penultBar.time * 1000).toISOString().slice(0, 10);
-          const _gapDays = (Date.parse(_lastBarDate) - Date.parse(_penultDate)) / 86400000;
-          // Allow strip only for the two normal cadence gaps; anything else = data gap
-          if (_gapDays !== 1 && _gapDays !== 3) _shouldStrip = false;
+          const _anteDate   = typeof _anteBar.time === 'string'
+            ? _anteBar.time
+            : new Date(_anteBar.time * 1000).toISOString().slice(0, 10);
+          const _innerGap = (Date.parse(_penultDate) - Date.parse(_anteDate)) / 86400000;
+          // Inner gap must be 1 (normal weekday) or 3 (Fri→Mon) — anything else
+          // means a mid-series bar is missing → keep today-bar, do not strip.
+          if (_innerGap !== 1 && _innerGap !== 3) _shouldStrip = false;
         }
         if (_shouldStrip) bars = bars.slice(0, -1);
       }
