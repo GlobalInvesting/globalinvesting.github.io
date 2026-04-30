@@ -1242,6 +1242,51 @@ async function fetchQuoteBarRT() {
     }
   }
 
+  // ── STEP 2: Non-FX symbols from intraday quotes.json ──────────────────────
+  // Populates STOOQ_RT_CACHE for all non-FX chart symbols (BTC, Gold, SPX,
+  // Nikkei, Stoxx, WTI, US10Y, DXY, VIX, Nasdaq, ETH) directly from the
+  // intraday JSON. This runs in fetchQuoteBarRT (awaited in boot) so the cache
+  // is ready before any LW chart opens — fetchCrossAssetData may still be in
+  // flight when the user clicks a non-FX tab, causing _lwBuildTodayBar to find
+  // an empty cache and skip the today-bar entirely.
+  // fetchCrossAssetData will later overwrite these entries with identical data
+  // (same quotes.json source) — that is safe and intentional.
+  if (intradayData?.quotes) {
+    const _NON_FX_CACHE_MAP = [
+      // ohlcId → quotes.json key (same unless aliased)
+      ['spx',    'spx'],
+      ['gold',   'gold'],   // also written as 'xauusd' below
+      ['wti',    'wti'],
+      ['nikkei', 'nikkei'],
+      ['stoxx',  'stoxx'],
+      ['us10y',  'us10y'],
+      ['dxy',    'dxy'],
+      ['vix',    'vix'],
+      ['btc',    'btc'],
+      ['eth',    'eth'],
+      ['nasdaq', 'nasdaq'],
+    ];
+    for (const [cacheKey, quotesKey] of _NON_FX_CACHE_MAP) {
+      const q = intradayData.quotes[quotesKey];
+      if (!q?.close || isNaN(q.close) || q.close <= 0) continue;
+      const hasPrev = q.prev_close != null && q.prev_close > 0;
+      const entry = {
+        close:      q.close,
+        open:       (q.open != null && q.open > 0) ? q.open : (q.prev_close ?? q.close),
+        prev_close: q.prev_close ?? null,
+        chg:        hasPrev ? (q.chg  ?? null) : null,
+        pct:        hasPrev ? (q.pct  ?? null) : null,
+        high:       (q.high != null && q.high > 0) ? q.high : null,
+        low:        (q.low  != null && q.low  > 0) ? q.low  : null,
+        fromIntraday: true,
+        stale:      q.stale ?? false,
+      };
+      STOOQ_RT_CACHE[cacheKey] = entry;
+      // Gold is accessed via both 'gold' and 'xauusd' keys in the cache
+      if (cacheKey === 'gold') STOOQ_RT_CACHE['xauusd'] = entry;
+    }
+  }
+
   // Stooq fallback removed — yfinance JSON covers all FX pairs
 
   const totalUpdated = Object.keys(STOOQ_RT_CACHE).length;
