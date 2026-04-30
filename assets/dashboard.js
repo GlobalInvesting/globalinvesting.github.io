@@ -2815,11 +2815,7 @@ let _lwCandleSeries = null;   // reference for live today-bar updates
 let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
-// Suppresses scrollIntoView on the initial auto-load triggered by IntersectionObserver.
-// Set to false after first boot load so user-initiated chart loads still scroll normally.
-let _chartAutoLoad = true;
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
-let _lwLastJsonDate = {};     // ohlcId → last bar date string from JSON (e.g. "2026-04-29")
 
 // Ensure the Lightweight Charts library is loaded (lazy, once)
 let _lwLibPromise = null;
@@ -2877,93 +2873,20 @@ const _CRYPTO_IDS = new Set(['btc', 'eth']);
 // special aliases: gold → xauusd, wti → wti (already correct).
 // Returns null on weekends for FX pairs (market closed — no phantom doji).
 function _lwBuildTodayBar(ohlcId) {
-  const nowUTC = new Date();
+  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // injecting a flat open=close phantom doji after the last real bar.
+  const todayUTC = new Date();
+  const dowUTC   = todayUTC.getUTCDay(); // 0=Sun, 6=Sat
+  if (_LW_FX_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
 
   // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const q = STOOQ_RT_CACHE[cacheKey];
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
-
-  // Compute the session date that matches the JSON bar construction logic.
-  // fetch_ohlc.py uses different date boundaries per asset class:
-  //
-  //   FX pairs (incl. DXY):   21:00 UTC boundary (NY 17:00 session)
-  //   Gold:                   22:00 UTC boundary (CME 17:00 ET session)
-  //   Non-FX/non-Gold:        native yfinance 1D bars — no fixed boundary.
-  //     These assets span NYSE (closes 20:00 UTC), TSE (06:00 UTC), CME WTI
-  //     (21:00 UTC), and 24/7 crypto — no single UTC hour works for all.
-  //     Solution: use the last JSON bar's date directly (_lwLastJsonDate).
-  //     This guarantees update() always targets the exact time key already
-  //     in the LWC series — no gap, no rejection, no phantom future bar.
-  const isGold  = ohlcId === 'gold';
-  const isFxLike = _LW_FX_IDS.has(ohlcId);
-  const utcH = nowUTC.getUTCHours();
-  let sessionDate;
-
-  if (isFxLike) {
-    // FX session boundary: 21:00 UTC
-    if (utcH < 21) {
-      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
-    } else {
-      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
-    }
-    const sessionDow = sessionDate.getUTCDay();
-    if (sessionDow === 6) return null;                  // Saturday — no FX session
-    if (sessionDow === 0 && utcH < 21) return null;     // Sunday pre-open
-  } else if (isGold) {
-    // CME Gold session boundary: 22:00 UTC
-    if (utcH < 22) {
-      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
-    } else {
-      sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
-    }
-    const sessionDow = sessionDate.getUTCDay();
-    if (sessionDow === 6) return null;                  // Saturday — no Gold session
-  } else {
-    // Non-FX/non-Gold: compute the real session date for the current trading day,
-    // then clamp it so we never inject a bar whose time is earlier than the last
-    // JSON bar (LWC would reject an out-of-order bar).
-    //
-    // Session boundary: 21:00 UTC for all non-FX/non-Gold assets.
-    //   • NYSE/Nasdaq close 20:00 UTC → bar available before 21:00 UTC boundary.
-    //   • Nikkei closes ~06:00 UTC → bar available early in the UTC day.
-    //   • WTI CME closes ~21:00 UTC → boundary is approximate; one-off possible
-    //     at boundary time but corrects on the next 5-min RT poll.
-    //   • Crypto trades 24/7 — no weekend guard needed.
-    //
-    // If the computed session date is LATER than the last JSON bar (gap day),
-    // LWC will accept the new bar via update() and render it as the live candle.
-    // If equal, update() refreshes the existing last bar (normal intraday update).
-    // If earlier (should not happen in practice), clamp to last JSON bar to avoid
-    // a rejected update.
-    const _lastDate = _lwLastJsonDate[ohlcId];
-    const _isCrypto = _CRYPTO_IDS.has(ohlcId);
-    // Compute real session date at the 21:00 UTC boundary
-    let _sessionCandidate;
-    if (utcH < 21) {
-      _sessionCandidate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
-    } else {
-      _sessionCandidate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
-    }
-    const _candidateStr = _sessionCandidate.toISOString().slice(0, 10);
-    if (_lastDate && _candidateStr < _lastDate) {
-      // Clamp: never go earlier than the last JSON bar
-      sessionDate = new Date(_lastDate + 'T00:00:00Z');
-    } else {
-      sessionDate = _sessionCandidate;
-    }
-    // Weekend guard for non-crypto assets only (crypto trades Sat/Sun)
-    if (!_isCrypto) {
-      const _dow = sessionDate.getUTCDay();
-      if (_dow === 6) return null;                    // Saturday — markets closed
-      if (_dow === 0 && utcH < 21) return null;       // Sunday pre-open
-    }
-  }
-
-  const dateStr = sessionDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
   // Crypto charts use Unix timestamps — must match the converted bar format
-  const timeVal = _CRYPTO_IDS.has(ohlcId)
-    ? sessionDate.getTime() / 1000
+  const timeVal  = _CRYPTO_IDS.has(ohlcId)
+    ? Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()) / 1000
     : dateStr;
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
@@ -3088,8 +3011,31 @@ async function _renderLWChart(ohlcId, label) {
   if (!r.ok) throw new Error('HTTP ' + r.status);
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
-  // Store last JSON bar date — used by _lwBuildTodayBar for non-FX/non-Gold alignment
-  _lwLastJsonDate[ohlcId] = bars.length > 0 ? bars[bars.length - 1].time : null;
+
+  // ── Non-FX: strip today's bar from the historical JSON ────────────────────
+  // The OHLC JSON is written once per day (~22:30 UTC) by fetch_ohlc.py. For
+  // non-FX symbols (equities, commodities, indices) yfinance native 1D includes
+  // an in-progress bar for the current trading day whose OHLC values are stale
+  // the moment the JSON lands. The intraday today-bar (_lwBuildTodayBar, fed by
+  // quotes.json every 5 min) is always fresher. Stripping the JSON bar so only
+  // the intraday bar is rendered avoids any conflict between the two sources —
+  // no open-override rules, no close drift, data shown exactly as it arrives
+  // from the intraday feed.
+  // FX pairs are excluded: their JSON never contains a today-bar on weekdays
+  // (1H aggregation stops at session close), and on weekends FX is already
+  // guarded by the _LW_FX_IDS weekend check in _lwBuildTodayBar.
+  if (!_LW_FX_IDS.has(ohlcId)) {
+    const _todayStr = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    if (bars.length > 0) {
+      const _lastBar = bars[bars.length - 1];
+      const _lastBarDate = typeof _lastBar.time === 'string'
+        ? _lastBar.time
+        : new Date(_lastBar.time * 1000).toISOString().slice(0, 10);
+      if (_lastBarDate === _todayStr) {
+        bars = bars.slice(0, -1);
+      }
+    }
+  }
 
   // ── Crypto: convert string dates → Unix timestamps (seconds) ──────────────
   // LWC v5 treats "YYYY-MM-DD" strings as business-day time and collapses
@@ -3346,7 +3292,15 @@ async function _renderLWChart(ohlcId, label) {
   // Always visible by default, toggle via PC button
   if (typeof window._lwShowPc === 'undefined') window._lwShowPc = true;
   let _prevCloseLine = null;
-  const _lastHistClose = bars.length > 1 ? bars[bars.length - 1].close : null;
+  // For non-FX: prefer prev_close from the intraday cache (quotes.json) because
+  // today's bar was stripped from the historical JSON above — bars[last] is now
+  // yesterday's bar, and its close equals prev_close. However, if the intraday
+  // cache already has a cleaner value, use it directly.
+  const _intradayCacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
+  const _rtForPc = STOOQ_RT_CACHE[_intradayCacheKey];
+  const _lastHistClose = (!_LW_FX_IDS.has(ohlcId) && _rtForPc?.prev_close != null && _rtForPc.prev_close > 0)
+    ? _rtForPc.prev_close
+    : (bars.length > 1 ? bars[bars.length - 1].close : null);
   function _applyPrevClose() {
     if (_prevCloseLine) { try { candleSeries.removePriceLine(_prevCloseLine); } catch(_) {} _prevCloseLine = null; }
     if (!window._lwShowPc || _lastHistClose == null) return;
@@ -3388,32 +3342,7 @@ async function _renderLWChart(ohlcId, label) {
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
 
-  // Inject today's live bar.
-  // For non-FX symbols the STOOQ_RT_CACHE may be empty if the chart was opened
-  // before fetchCrossAssetData() completed its first run. We await
-  // loadIntradayQuotes() here (costs nothing when already cached — 90s TTL) and
-  // seed the cache inline so _lwBuildTodayBar() always has data on first render.
-  const _isFxLikeChart = _LW_FX_IDS.has(ohlcId);
-  if (!_isFxLikeChart) {
-    // Seed STOOQ_RT_CACHE for this specific non-FX symbol if not yet populated
-    const _cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
-    if (!STOOQ_RT_CACHE[_cacheKey] || !STOOQ_RT_CACHE[_cacheKey].close) {
-      try {
-        const _fresh = await loadIntradayQuotes();
-        if (_fresh) {
-          // Mirror all non-FX symbols into cache (same logic as fetchCrossAssetData)
-          const _seed = (sym, cKey) => {
-            const _q = intradayQuote(_fresh, sym);
-            if (_q) STOOQ_RT_CACHE[cKey || sym] = _q;
-          };
-          _seed('spx');   _seed('nasdaq'); _seed('stoxx');  _seed('nikkei');
-          _seed('wti');   _seed('gold', 'xauusd'); _seed('gold', 'gold');
-          _seed('btc');   _seed('eth');   _seed('dxy');
-          _seed('us10y'); _seed('vix');
-        }
-      } catch(_) {}
-    }
-  }
+  // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated)
   const todayBar = _lwBuildTodayBar(ohlcId);
   if (todayBar) {
     try {
@@ -4115,8 +4044,6 @@ function _loadTVWidgetFallback(sym) {
 
 // SHARED: load any symbol into the chart + scroll to it
 // Prefers Lightweight Charts (yfinance OHLC); falls back to TradingView widget.
-// _chartAutoLoad suppresses scrollIntoView on the initial page-boot load so the
-// narrative stays visible at the top; cleared after first load so user interactions scroll normally.
 // ═══════════════════════════════════════════════════════════════════
 function loadTVChart(sym) {
   document.querySelectorAll('.tv-tab').forEach(t => {
@@ -4127,20 +4054,18 @@ function loadTVChart(sym) {
   const chartSection = document.getElementById('section-fxpairs') ||
     document.getElementById('tv-chart-wrap')?.closest('.panel') ||
     document.getElementById('tv-chart-wrap');
-  const skipScroll = _chartAutoLoad;
-  _chartAutoLoad = false; // clear flag — subsequent calls are user-initiated
   const ohlcId = _TV_TO_OHLC[sym];
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
       .catch(() => {
         _loadTVWidgetFallback(sym);
-        if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
   } else {
     _loadTVWidgetFallback(sym);
-    if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -5661,13 +5586,6 @@ async function fetchCrossAssetData() {
     setEl('ri-gold-spx', ratio);
     setEl('ri-gold-spx-sig', sig, cls);
   }
-
-  // Feed eth and nasdaq into STOOQ_RT_CACHE so their LW charts get a today-bar.
-  // These symbols are not shown in the cross-asset panel UI but do have LW charts.
-  const _ethIntraday    = _caIntraday ? intradayQuote(_caIntraday, 'eth')    : null;
-  const _nasdaqIntraday = _caIntraday ? intradayQuote(_caIntraday, 'nasdaq') : null;
-  if (_ethIntraday)    STOOQ_RT_CACHE['eth']    = _ethIntraday;
-  if (_nasdaqIntraday) STOOQ_RT_CACHE['nasdaq'] = _nasdaqIntraday;
 
   // Push updated prices to the active LW chart (gold, SPX, WTI, etc.)
   // FX pairs are handled by fetchQuoteBarRT; cross-asset needs this extra call.
@@ -8110,17 +8028,6 @@ function toggleAlertsPopover() {
       applyState(false);
     }
   } catch(e){ applyState(true, 55); }
-
-  // Ensure #split-upper always starts scrolled to top (narrative visible) on page load.
-  // The chart auto-load via IntersectionObserver was previously calling scrollIntoView
-  // which scrolled past the narrative — now suppressed via _chartAutoLoad flag, but we
-  // also pin scrollTop here as a safety net for iframe-focus or async-render edge cases.
-  (function resetSplitUpperScroll(){
-    if(!upper) return;
-    upper.scrollTop = 0;
-    // Re-apply after a short delay to catch any async layout shifts from the TV iframe
-    setTimeout(function(){ if(upper) upper.scrollTop = 0; }, 400);
-  })();
 
   var TIP_KEY = 'gi_split_tip_seen';
   var tip = document.getElementById('split-tip');
