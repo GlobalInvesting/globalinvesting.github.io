@@ -107,6 +107,8 @@ YFINANCE_SYMBOLS = {
     # Risk panel — bond vol + crypto
     "move":   "^MOVE",    # ICE BofA MOVE Index (bond market volatility)
     "btc":    "BTC-USD",  # Bitcoin — topbar + cross-asset panel
+    "eth":    "ETH-USD",  # Ethereum — cross-asset panel
+    "nasdaq": "^NDX",     # Nasdaq 100 — cross-asset panel
     # Equity indices for extended correlations (GBP, AUD, NZD) — not shown in panel
     "ftse":   "^FTSE",    # FTSE 100 — GBP/USD correlation
     "asx":    "^AXJO",    # ASX 200  — AUD/USD correlation
@@ -164,6 +166,8 @@ VALIDATORS = {
     "us30y":  lambda v: 0 < v < 20,
     "move":   lambda v: 10 < v < 400,
     "btc":    lambda v: v > 1000,
+    "eth":    lambda v: v > 10,
+    "nasdaq": lambda v: v > 1000,
     # FX pairs
     "eurusd": lambda v: 0.8 < v < 1.6,
     "gbpusd": lambda v: 0.9 < v < 2.0,
