@@ -4057,12 +4057,15 @@ function loadCOTChart(longSym) {
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  // Scroll the left panel to top so the narrative stays visible above the chart
+  // Scroll the left panel to top so the narrative stays visible above the chart.
+  // Uses 'instant' (not 'smooth') + a rAF second pass to win any post-render autoscroll
+  // caused by the TradingView iframe or Lightweight Charts canvas receiving focus.
   const _scrollChartPanelToTop = () => {
     const upper = document.getElementById('split-upper');
-    if (upper) { upper.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-    const main = document.getElementById('main');
-    if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+    const target = upper || document.getElementById('main');
+    if (!target) return;
+    target.scrollTo({ top: 0, behavior: 'instant' });
+    requestAnimationFrame(() => target.scrollTo({ top: 0, behavior: 'instant' }));
   };
   _scrollChartPanelToTop();
 }
@@ -4122,18 +4125,22 @@ function loadTVChart(sym) {
     if (t.dataset.sym === sym) t.classList.add('active');
   });
   updatePairDetail(sym);
-  // Scroll left panel to top so the narrative stays visible above the chart
+  // Scroll left panel to top so the narrative stays visible above the chart.
+  // 'instant' (not 'smooth') + rAF second pass prevents a race where the LW canvas
+  // or TradingView iframe receives focus after the first scroll and re-scrolls the panel
+  // down on smaller viewports (laptop screens).
   const _scrollChartPanelToTop = () => {
     const upper = document.getElementById('split-upper');
-    if (upper) { upper.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-    const main = document.getElementById('main');
-    if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+    const target = upper || document.getElementById('main');
+    if (!target) return;
+    target.scrollTo({ top: 0, behavior: 'instant' });
+    requestAnimationFrame(() => target.scrollTo({ top: 0, behavior: 'instant' }));
   };
   const ohlcId = _TV_TO_OHLC[sym];
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { _scrollChartPanelToTop(); })
+      .then(() => { _scrollChartPanelToTop(); setTimeout(_scrollChartPanelToTop, 120); })
       .catch(() => {
         _loadTVWidgetFallback(sym);
         _scrollChartPanelToTop();
