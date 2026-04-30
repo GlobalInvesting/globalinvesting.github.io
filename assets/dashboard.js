@@ -380,7 +380,7 @@ async function populateCorrelations() {
         const absZ = Math.abs(z);
         const normSign = c.norm >= 0 ? '+' : '';
         let badgeCls, badgeLabel;
-        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '⚠ broken'; }
+        if (absZ >= 2.5)      { badgeCls = 'down'; badgeLabel = '! broken'; }
         else if (absZ >= 1.5) { badgeCls = 'down'; badgeLabel = '↯ break'; }
         else if (absZ >= 1.0) { badgeCls = '';     badgeLabel = '~ stretched'; }
         else                  { badgeCls = 'flat'; badgeLabel = '● normal'; }
@@ -2614,7 +2614,7 @@ async function renderVarCvarPanel() {
     // VaR colour: green < 0.5%, amber 0.5–1%, red > 1%
     const varCls = var95 > 1.0 ? 'down' : var95 > 0.5 ? '' : 'up';
     const stressFlag = stressed
-      ? `<span title="60d VaR (${v60?.toFixed(3)}%) elevated vs 252d baseline — regime stress" style="color:var(--amber,#EF9F27);margin-left:3px;font-size:9px;">⚠</span>`
+      ? `<span title="60d VaR (${v60?.toFixed(3)}%) elevated vs 252d baseline — regime stress" style="color:var(--amber,#EF9F27);margin-left:3px;font-size:9px;">*</span>`
       : '';
 
     return `<tr style="display:table;width:100%;table-layout:fixed;">
@@ -7929,7 +7929,7 @@ function alertsRender(intra) {
 
   container.innerHTML = arr.map(a => {
     const cls      = a.fired ? 'alert-row alert-row-active' : 'alert-row';
-    const firedTxt = a.fired ? ` <span class="alert-fired">⚡ FIRED ${a.firedAt || ''}</span>` : '';
+    const firedTxt = a.fired ? ` <span class="alert-fired">FIRED ${a.firedAt || ''}</span>` : '';
     const cur      = alertsCurrentValue(a, intra);
     const curFmt   = alertFormatValue(a, cur);
     const curTxt   = curFmt != null ? ` · now ${curFmt}` : '';
