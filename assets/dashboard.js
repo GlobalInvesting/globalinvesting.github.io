@@ -5607,6 +5607,13 @@ async function fetchCrossAssetData() {
     setEl('ri-gold-spx-sig', sig, cls);
   }
 
+  // Feed eth and nasdaq into STOOQ_RT_CACHE so their LW charts get a today-bar.
+  // These symbols are not shown in the cross-asset panel UI but do have LW charts.
+  const _ethIntraday    = _caIntraday ? intradayQuote(_caIntraday, 'eth')    : null;
+  const _nasdaqIntraday = _caIntraday ? intradayQuote(_caIntraday, 'nasdaq') : null;
+  if (_ethIntraday)    STOOQ_RT_CACHE['eth']    = _ethIntraday;
+  if (_nasdaqIntraday) STOOQ_RT_CACHE['nasdaq'] = _nasdaqIntraday;
+
   // Push updated prices to the active LW chart (gold, SPX, WTI, etc.)
   // FX pairs are handled by fetchQuoteBarRT; cross-asset needs this extra call.
   _lwUpdateTodayBar();
