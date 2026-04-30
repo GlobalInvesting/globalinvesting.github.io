@@ -210,6 +210,12 @@ HL_MAX_SPREAD: dict[str, float] = {
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
 NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy'}
 GOLD_SYMBOLS   = {'gold'}   # CME session 1H aggregation — separate from FX (different boundary)
+# Equity indices and related instruments: 1H aggregation over NYSE 21:00 UTC boundary.
+# yfinance native 1D bars for ^GSPC, ^NDX, ^STOXX50E etc. are unreliable for the
+# current session — they are often absent or contain only a partial bar until well
+# after market close. Aggregating 1H bars ensures the bar for the current trading day
+# is always present in the JSON after the workflow runs (22:30 UTC > 21:00 UTC boundary).
+EQUITY_1H_SYMBOLS = {'spx', 'nasdaq', 'stoxx', 'nikkei', 'us10y', 'vix'}
 FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS - GOLD_SYMBOLS
 
 # Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
@@ -283,9 +289,10 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = (ts_utc + timedelta(days=1)).date()
 
                 # Drop any 1H bar that belongs to a session not yet completed.
-                # At 22:30 UTC the session for run_date_utc + 1 day has only
-                # ~1.5 h of data — writing it produces an incomplete bar.
-                if session_date >= run_date_utc:
+                # At 22:30 UTC, session_date == run_date_utc is the session that
+                # JUST closed at 21:00 UTC — complete, keep it.
+                # session_date > run_date_utc is tomorrow (~1.5h data) — discard.
+                if session_date > run_date_utc:
                     continue
 
                 date_str = session_date.strftime("%Y-%m-%d")
@@ -447,7 +454,9 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = (ts_utc + timedelta(days=1)).date()
 
                 # Drop any 1H bar that belongs to a session not yet completed.
-                if session_date >= run_date_utc:
+                # session_date == run_date_utc = today's session (complete at 22:00 UTC) — keep.
+                # session_date > run_date_utc = tomorrow's partial session — discard.
+                if session_date > run_date_utc:
                     continue
 
                 date_str = session_date.strftime("%Y-%m-%d")
@@ -537,6 +546,152 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
         return None
 
 
+# ── Equity indices + US10Y + VIX: 1H → daily aggregation (NYSE 21:00 UTC) ───
+
+def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
+    """
+    Build daily bars for equity indices (SPX, Nasdaq, Stoxx, Nikkei), US 10Y yield,
+    and VIX by aggregating 1H bars over the NYSE session boundary: 21:00 UTC.
+
+    Why 1H aggregation instead of native yfinance 1D bars?
+    yfinance native 1D bars for these symbols often EXCLUDE the current trading day
+    when the workflow runs at 22:30 UTC, even though the session is complete by
+    20:00-21:00 UTC. The bar appears only in the next run. Aggregating 1H bars over
+    the 21:00 UTC boundary guarantees today's session is always present.
+
+    Session boundary: 21:00 UTC -> 21:00 UTC
+      * US markets (NYSE/Nasdaq):   close 20:00 UTC -> fully included
+      * EuroStoxx 50 (Euronext):    close 15:30 UTC -> fully included
+      * Nikkei 225 (TSE):           close ~06:00 UTC -> fully included
+      * US 10Y (^TNX, CBOE):        settles ~21:00 UTC -> included
+      * VIX (CBOE):                 settles ~21:00 UTC -> included
+
+    Hybrid approach (same as FX / Gold):
+    - 1H bars cover the most recent 730 days with correct H/L.
+    - Native 1D bars cover the period older than 730 days.
+    - Weekend bars excluded (no equity trading Sat/Sun).
+    """
+    try:
+        ticker = yf.Ticker(ticker_sym)
+        dec = DECIMALS.get(id_, 2)
+
+        # PART A: 1H bars -> aggregate to daily (NYSE boundary 21:00 UTC)
+        _end_1h   = datetime.now(timezone.utc) + timedelta(days=1)
+        _start_1h = _end_1h - timedelta(days=730)
+        hist_1h = ticker.history(
+            start=_start_1h.strftime("%Y-%m-%d"),
+            end=_end_1h.strftime("%Y-%m-%d"),
+            interval="1h",
+            auto_adjust=True,
+        )
+
+        # run_date_utc = today UTC (when workflow runs at 22:30 UTC).
+        # session_date == run_date_utc = today's session (closed at 21:00 UTC) -- KEEP.
+        # session_date > run_date_utc = tomorrow's partial session -- DISCARD.
+        run_date_utc = (_end_1h - timedelta(days=1)).date()
+
+        day_buckets: dict[str, dict] = {}
+        if not hist_1h.empty:
+            for ts, row in hist_1h.iterrows():
+                if ts.tzinfo is None:
+                    ts_utc = ts.replace(tzinfo=timezone.utc)
+                else:
+                    ts_utc = ts.astimezone(timezone.utc)
+
+                # NYSE boundary 21:00 UTC:
+                # Hours 00-20 belong to the session closing today (UTC date).
+                # Hours 21-23 open a new session that closes tomorrow.
+                if ts_utc.hour < 21:
+                    session_date = ts_utc.date()
+                else:
+                    session_date = (ts_utc + timedelta(days=1)).date()
+
+                # Drop future/partial sessions only
+                if session_date > run_date_utc:
+                    continue
+
+                # Drop weekends (no equity trading)
+                if session_date.weekday() >= 5:
+                    continue
+
+                date_str = session_date.strftime("%Y-%m-%d")
+                o = float(row["Open"])
+                h = float(row["High"])
+                l = float(row["Low"])
+                c = float(row["Close"])
+
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l):
+                    continue
+                if o == h == l == c:
+                    continue
+
+                if date_str not in day_buckets:
+                    day_buckets[date_str] = {"open": o, "high": h, "low": l, "close": c}
+                else:
+                    b = day_buckets[date_str]
+                    b["high"]  = max(b["high"], h)
+                    b["low"]   = min(b["low"],  l)
+                    b["close"] = c
+
+        bars_1h: list[dict] = []
+        for date_str in sorted(day_buckets.keys()):
+            b = day_buckets[date_str]
+            if not _guard(id_, b["close"]):
+                continue
+            bars_1h.append({
+                "time":   date_str,
+                "open":   round(b["open"],  dec),
+                "high":   round(b["high"],  dec),
+                "low":    round(b["low"],   dec),
+                "close":  round(b["close"], dec),
+                "volume": 0,
+            })
+
+        # PART B: native 1D bars for period older than 730-day 1H limit
+        hist_1d = ticker.history(period=PERIOD, interval=INTERVAL, auto_adjust=True)
+        bars_1d_old: list[dict] = []
+        earliest_1h = bars_1h[0]["time"] if bars_1h else None
+
+        if not hist_1d.empty:
+            for ts, row in hist_1d.iterrows():
+                date_str = ts.strftime("%Y-%m-%d")
+                if earliest_1h and date_str >= earliest_1h:
+                    continue
+                o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
+                if not (_guard(id_, c) and _guard(id_, o) and h >= l and h >= c and l <= c):
+                    continue
+                if o == h == l == c:
+                    continue
+                vol = int(row["Volume"]) if "Volume" in row and not (row["Volume"] != row["Volume"]) else 0
+                bars_1d_old.append({
+                    "time":   date_str,
+                    "open":   round(o, dec),
+                    "high":   round(h, dec),
+                    "low":    round(l, dec),
+                    "close":  round(c, dec),
+                    "volume": vol,
+                })
+
+        # Merge: legacy 1D + 1H-aggregated (chronological)
+        combined = bars_1d_old + bars_1h
+        seen: set[str] = set()
+        deduped: list[dict] = []
+        for bar in reversed(combined):
+            if bar["time"] not in seen:
+                seen.add(bar["time"])
+                deduped.append(bar)
+        deduped.reverse()
+
+        if len(deduped) < 30:
+            print(f"  WARN [{id_}]: only {len(deduped)} valid bars after equity 1H agg - skipping")
+            return None
+
+        return deduped
+
+    except Exception as exc:
+        print(f"  ERROR [{id_}] (equity 1H agg): {exc}")
+        return None
+
 def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     """
     Download 3 years of daily bars for ticker_sym.
@@ -551,14 +706,20 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     22:00 UTC CME session boundary — eliminates the ~46% stub-bar rate in yfinance
     native 1D GC=F data.
 
-    Non-FX (BTC, SPX, WTI, etc.): uses Yahoo's native 1D bars because those assets
-    have real exchange session boundaries that Yahoo maps correctly.
+    Equity indices / VIX / US10Y: delegates to fetch_equity_ohlc_from_1h() which
+    aggregates 1H bars over the 21:00 UTC NYSE session boundary — guarantees the
+    current trading day bar is present in the JSON after the 22:30 UTC workflow run.
+
+    Non-FX remaining (BTC, ETH, WTI, DXY): uses Yahoo's native 1D bars.
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
 
     if id_ in GOLD_SYMBOLS:
         return fetch_gold_ohlc_from_1h(id_, ticker_sym)
+
+    if id_ in EQUITY_1H_SYMBOLS:
+        return fetch_equity_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
