@@ -1180,6 +1180,11 @@ function intradayQuote(cache, id) {
     // open: real intraday open (regularMarketOpen) when available — used for candle body color.
     // Falls back to prev_close so the candle open is at yesterday's close (correct fallback).
     open:       (q.open != null && q.open > 0) ? q.open : (q.prev_close ?? q.close),
+    // high/low: passed through so _lwBuildTodayBar renders correct wicks on non-FX charts
+    // (Nikkei, Stoxx, SPX, Gold, etc.). Without these, _lwBuildTodayBar falls back to
+    // Math.max(open,close) / Math.min(open,close), producing a flat doji with no wicks.
+    high:       (q.high != null && q.high > 0) ? q.high : null,
+    low:        (q.low  != null && q.low  > 0) ? q.low  : null,
     chg:        hasPrev ? (q.chg  ?? null) : null,
     pct:        hasPrev ? (q.pct  ?? null) : null,
     fromIntraday: true,
@@ -1773,7 +1778,7 @@ function renderSentiment(pairs, sourceLabel, general) {
     attachTip(statSpans[1],
       'Average deposit',
       'Average account size in the sample. Higher values indicate more experienced or semi-professional traders.',
-      '$96K average suggests the sample skews toward serious traders, not micro accounts — data carries more weight.'
+      'Higher average deposit values indicate more experienced or semi-professional traders — data from larger accounts carries more statistical weight.'
     );
     attachTip(statSpans[2],
       'Community P&L',
@@ -2749,7 +2754,7 @@ const _OHLC_FULL_NAMES = {
   nzdjpy:'New Zealand Dollar / Japanese Yen', nzdcad:'New Zealand Dollar / Canadian Dollar',
   nzdchf:'New Zealand Dollar / Swiss Franc', chfjpy:'Swiss Franc / Japanese Yen',
   gold:'Gold Futures', wti:'Crude Oil WTI Futures', btc:'Bitcoin / U.S. Dollar',
-  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq Composite',
+  us10y:'US 10Y Treasury Yield', spx:'S&P 500 Index', nasdaq:'Nasdaq 100',
   nikkei:'Nikkei 225', stoxx:'Euro Stoxx 50', eth:'Ethereum / U.S. Dollar',
   dxy:'U.S. Dollar Index',
   vix:'CBOE Volatility Index',
@@ -2793,7 +2798,7 @@ const _TV_TO_OHLC = {
 // Human-readable labels for the chart source footer
 const _OHLC_LABELS = {
   gold: 'GC=F', wti: 'CL=F', btc: 'BTC-USD', us10y: '^TNX',
-  spx: '^GSPC', nasdaq: '^IXIC', nikkei: '^N225', stoxx: '^STOXX50E',
+  spx: '^GSPC', nasdaq: '^NDX', nikkei: '^N225', stoxx: '^STOXX50E',
   eth: 'ETH-USD', dxy: 'DX-Y.NYB', vix: '^VIX',
 };
 
@@ -2810,6 +2815,9 @@ let _lwCandleSeries = null;   // reference for live today-bar updates
 let _chartMode = 'lw'; // default: LW chart (FX pairs load first)
 let _lwActiveOhlcId = null;   // ohlcId currently displayed
 let _lwActiveUpdateHeader = null; // ref to _updateLWHeader of the active chart (for RT header refresh)
+// Suppresses scrollIntoView on the initial auto-load triggered by IntersectionObserver.
+// Set to false after first boot load so user-initiated chart loads still scroll normally.
+let _chartAutoLoad = true;
 let _lwActivePrevCloseMap = null; // ref to _prevCloseMap of the active chart (for today-bar % calc)
 let _lwLastJsonDate = {};     // ohlcId → last bar date string from JSON (e.g. "2026-04-29")
 
@@ -2857,6 +2865,13 @@ const _LW_FX_IDS = new Set([
   'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
 ]);
 
+// Crypto trades 24/7 with no session gaps — Saturday and Sunday bars are real.
+// LWC v5 treats "YYYY-MM-DD" string times as business days and collapses
+// weekends visually, creating artificial gaps on crypto charts.
+// Fix: convert crypto bar times to Unix timestamps (seconds) so LWC uses
+// continuous time mode, matching TradingView and Bloomberg crypto charts.
+const _CRYPTO_IDS = new Set(['btc', 'eth']);
+
 // Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
 // ohlcId (e.g. 'eurusd') maps directly to STOOQ_RT_CACHE keys, with two
 // special aliases: gold → xauusd, wti → wti (already correct).
@@ -2872,59 +2887,43 @@ function _lwBuildTodayBar(ohlcId) {
   // Compute the session date that matches the JSON bar construction logic.
   // fetch_ohlc.py uses different date boundaries per asset class:
   //
-  //   FX pairs (incl. DXY):
-  //     1H bars aggregated over 21:00 UTC → 21:00 UTC (NY 17:00 session).
-  //     Before 21:00 UTC → active session date = today UTC.
-  //     At/after 21:00 UTC → new session opened → session date = tomorrow UTC.
-  //
-  //   Gold:
-  //     1H bars aggregated over 22:00 UTC → 22:00 UTC (CME 17:00 ET session).
-  //     Before 22:00 UTC → session date = today UTC.
-  //     At/after 22:00 UTC → session date = tomorrow UTC.
-  //
-  //   Non-FX/non-Gold (WTI, BTC, ETH, SPX, Nasdaq, Nikkei, EuroStoxx, US10Y):
-  //     Native yfinance 1D bars — dates come from ts.strftime("%Y-%m-%d") on the
-  //     yfinance timestamp, which aligns with the UTC calendar date of each bar
-  //     as returned by yfinance. No boundary offset — just raw UTC wall-clock date.
-  //     The workflow runs at 22:30 UTC after all major exchanges have closed, so
-  //     the JSON already has today's bar labeled with today's UTC date.
-  //     Using UTC wall-clock date matches the JSON exactly at all times of day.
+  //   FX pairs (incl. DXY):   21:00 UTC boundary (NY 17:00 session)
+  //   Gold:                   22:00 UTC boundary (CME 17:00 ET session)
+  //   Non-FX/non-Gold:        native yfinance 1D bars — no fixed boundary.
+  //     These assets span NYSE (closes 20:00 UTC), TSE (06:00 UTC), CME WTI
+  //     (21:00 UTC), and 24/7 crypto — no single UTC hour works for all.
+  //     Solution: use the last JSON bar's date directly (_lwLastJsonDate).
+  //     This guarantees update() always targets the exact time key already
+  //     in the LWC series — no gap, no rejection, no phantom future bar.
   const isGold  = ohlcId === 'gold';
-  const isFxLike = _LW_FX_IDS.has(ohlcId); // FX pairs + DXY (all use 21:00 UTC boundary)
+  const isFxLike = _LW_FX_IDS.has(ohlcId);
   const utcH = nowUTC.getUTCHours();
   let sessionDate;
 
   if (isFxLike) {
-    // FX session boundary: 21:00 UTC. Before → today; at/after → tomorrow.
+    // FX session boundary: 21:00 UTC
     if (utcH < 21) {
       sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
     } else {
       sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
     }
-    // Guard: FX closed on Saturday entirely; Sunday before 21:00 UTC is pre-open.
     const sessionDow = sessionDate.getUTCDay();
-    if (sessionDow === 6) return null; // Saturday — no FX session
-    if (sessionDow === 0 && utcH < 21) return null; // Sunday pre-open
+    if (sessionDow === 6) return null;                  // Saturday — no FX session
+    if (sessionDow === 0 && utcH < 21) return null;     // Sunday pre-open
   } else if (isGold) {
-    // CME Gold session boundary: 22:00 UTC. Before → today; at/after → tomorrow.
+    // CME Gold session boundary: 22:00 UTC
     if (utcH < 22) {
       sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
     } else {
       sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate() + 1));
     }
-    // Guard: no Gold session on Saturday.
     const sessionDow = sessionDate.getUTCDay();
-    if (sessionDow === 6) return null;
+    if (sessionDow === 6) return null;                  // Saturday — no Gold session
   } else {
-    // Non-FX/non-Gold (WTI, BTC, SPX, Nikkei, etc.): native yfinance 1D bars.
-    // These assets have real exchange sessions with varying UTC close times
-    // (NYSE 20:00, TSE 06:00, CME WTI 21:00, etc.) — no single boundary works.
-    // Safest approach: use the last JSON bar's date, which is always what the
-    // JSON already has. This guarantees the today-bar update() targets the exact
-    // same time key LWC already has in its series, preventing gap or rejection.
-    // Falls back to UTC wall-clock date if the JSON hasn't been loaded yet.
+    // Non-FX/non-Gold: use last JSON bar date — guaranteed to match LWC series key
     const _lastDate = _lwLastJsonDate[ohlcId];
     if (_lastDate) {
+      // For crypto the series uses Unix timestamps; derive it from the date string
       sessionDate = new Date(_lastDate + 'T00:00:00Z');
     } else {
       sessionDate = new Date(Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), nowUTC.getUTCDate()));
@@ -2932,6 +2931,10 @@ function _lwBuildTodayBar(ohlcId) {
   }
 
   const dateStr = sessionDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  // Crypto charts use Unix timestamps — must match the converted bar format
+  const timeVal = _CRYPTO_IDS.has(ohlcId)
+    ? sessionDate.getTime() / 1000
+    : dateStr;
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
@@ -2958,7 +2961,7 @@ function _lwBuildTodayBar(ohlcId) {
   }
   const h = q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c);
   const l = q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c);
-  return { time: dateStr, open: o, high: h, low: l, close: c };
+  return { time: timeVal, open: o, high: h, low: l, close: c };
 }
 
 // Push/update the live today-bar on the active LW chart (called every 5 min).
@@ -3053,10 +3056,24 @@ async function _renderLWChart(ohlcId, label) {
   await _ensureLWLib();
   const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
-  const bars = await r.json();
+  let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
   // Store last JSON bar date — used by _lwBuildTodayBar for non-FX/non-Gold alignment
   _lwLastJsonDate[ohlcId] = bars.length > 0 ? bars[bars.length - 1].time : null;
+
+  // ── Crypto: convert string dates → Unix timestamps (seconds) ──────────────
+  // LWC v5 treats "YYYY-MM-DD" strings as business-day time and collapses
+  // Saturday/Sunday gaps — visually identical to a market that closes on Fridays.
+  // BTC/ETH trade 24/7: passing Unix timestamps instead switches LWC to
+  // continuous time mode, eliminating weekend gaps (same as TradingView/Bloomberg).
+  if (_CRYPTO_IDS.has(ohlcId)) {
+    bars = bars.map(b => ({
+      ...b,
+      time: typeof b.time === 'string'
+        ? Date.UTC(+b.time.slice(0,4), +b.time.slice(5,7)-1, +b.time.slice(8,10)) / 1000
+        : b.time,
+    }));
+  }
 
   wrap.innerHTML = '';
 
@@ -4043,6 +4060,8 @@ function _loadTVWidgetFallback(sym) {
 
 // SHARED: load any symbol into the chart + scroll to it
 // Prefers Lightweight Charts (yfinance OHLC); falls back to TradingView widget.
+// _chartAutoLoad suppresses scrollIntoView on the initial page-boot load so the
+// narrative stays visible at the top; cleared after first load so user interactions scroll normally.
 // ═══════════════════════════════════════════════════════════════════
 function loadTVChart(sym) {
   document.querySelectorAll('.tv-tab').forEach(t => {
@@ -4053,18 +4072,20 @@ function loadTVChart(sym) {
   const chartSection = document.getElementById('section-fxpairs') ||
     document.getElementById('tv-chart-wrap')?.closest('.panel') ||
     document.getElementById('tv-chart-wrap');
+  const skipScroll = _chartAutoLoad;
+  _chartAutoLoad = false; // clear flag — subsequent calls are user-initiated
   const ohlcId = _TV_TO_OHLC[sym];
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .then(() => { if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
       .catch(() => {
         _loadTVWidgetFallback(sym);
-        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
   } else {
     _loadTVWidgetFallback(sym);
-    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (chartSection && !skipScroll) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -4241,7 +4262,20 @@ async function buildInlineDetail(tvSym, container) {
       const nonUsd = p.base !== 'USD' ? p.base : p.quote;
       USD_IV[nonUsd] = entry.iv;
     }
-    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+    if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
+      // NZD/AUD vol ratio: derived dynamically from HV30(nzdusd)/HV30(audusd) in quotes.json.
+      // This reflects the current realized-vol relationship between the two currencies,
+      // self-correcting after RBNZ or RBA cycle shifts — matches the method used by
+      // sell-side vol desks (Bloomberg BVOL NZD/AUD realized vol ratio).
+      // Clamped [0.90, 1.30] to prevent outlier distortion during flash-crash episodes.
+      // Falls back to 1.08 (long-run historical average) if HV30 data is unavailable.
+      const hv30 = intradayData?.hv30 || {};
+      const hvNZD = hv30['nzdusd'], hvAUD = hv30['audusd'];
+      const nzdAudRatio = (hvNZD != null && hvAUD != null && hvAUD > 0)
+        ? Math.min(1.30, Math.max(0.90, hvNZD / hvAUD))
+        : 1.08;
+      USD_IV['NZD'] = Math.round(USD_IV['AUD'] * nzdAudRatio * 10) / 10;
+    }
     const ivEntry = etfIv[pairId];
     if (ivEntry?.iv != null) {
       atmIv = ivEntry.iv;
@@ -4744,9 +4778,16 @@ async function updatePairDetail(tvSym) {
       const nonUsd = p.base !== 'USD' ? p.base : p.quote;
       USD_IV[nonUsd] = entry.iv;
     }
-    // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × 1.08 (long-run NZD/AUD vol ratio).
+    // NZD proxy: no CBOE-listed NZD ETF options. Derive from AUD IV × dynamic HV30 ratio.
+    // Ratio = HV30(nzdusd) / HV30(audusd) from quotes.json — self-correcting after RBNZ/RBA
+    // cycle shifts. Clamped [0.90, 1.30]; fallback to 1.08 (long-run avg) if HV30 unavailable.
     if (USD_IV['AUD'] != null && USD_IV['NZD'] == null) {
-      USD_IV['NZD'] = Math.round(USD_IV['AUD'] * 1.08 * 10) / 10;
+      const hv30 = intra?.hv30 || {};
+      const hvNZD = hv30['nzdusd'], hvAUD = hv30['audusd'];
+      const nzdAudRatio = (hvNZD != null && hvAUD != null && hvAUD > 0)
+        ? Math.min(1.30, Math.max(0.90, hvNZD / hvAUD))
+        : 1.08;
+      USD_IV['NZD'] = Math.round(USD_IV['AUD'] * nzdAudRatio * 10) / 10;
       nzdProxy = true;
     }
 
@@ -4905,7 +4946,7 @@ async function updatePairDetail(tvSym) {
       <div class="pd-section-lbl">Volatility</div>
       <div class="pd-grid">
         <div class="pd-cell fx-tip" data-tip-title="Historical Volatility 30d" data-tip-body="30-day realised (historical) volatility, annualised. Measures how much the pair has actually moved recently. Low HV = quiet market; high HV = volatile market."><div class="pd-lbl">HV 30d</div><div class="pd-val">${hv30 != null ? hv30.toFixed(1)+'%' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × 1.08 (long-run NZD/AUD realised vol ratio). No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark used by Bloomberg BVOL. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="ATM Implied Volatility${(meta?.cross || nzdProxy) && atmIv != null ? ' (estimated)' : ''}" data-tip-body="${meta?.cross && atmIv != null ? 'Synthesised from component USD-pair CBOE/CME vol index values via triangulation: √(IVa²+IVb²−2ρ·IVa·IVb). Proxy for OTC interbank IV — indicative only.' : nzdProxy && atmIv != null ? 'Estimated from AUD/USD CBOE/CME vol index (^AUDVIX) × dynamic NZD/AUD realized-vol ratio (HV30 nzdusd ÷ HV30 audusd from intraday data). Ratio updates with every intraday refresh — self-corrects after RBNZ or RBA cycle shifts. No dedicated CBOE/CME NZD vol index exists — treat as directional context only.' : 'ATM implied vol from CBOE/CME FX Volatility Index (^EUVIX/^BPVIX/^JYVIX/^AUDVIX) — same variance-swap methodology as VIX, published jointly by CBOE and CME. Institutional benchmark used by Bloomberg BVOL. CHF/CAD: CME futures options or CBOE ETF fallback.'} Color = cost of hedging: green ≤7% (cheap), red >12% (expensive). Not a directional signal."><div class="pd-lbl">ATM IV${(meta?.cross || nzdProxy) && atmIv != null ? '<span style="font-size:8px;color:var(--text3);margin-left:2px;">~</span>' : ''}</div><div class="pd-val ${atmIv != null ? (atmIv > 12 ? 'pd-dn' : atmIv > 7 ? '' : 'pd-up') : ''}">${atmIv != null ? atmIv.toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="IV minus HV" data-tip-body="Implied vol minus realised vol. Positive = options are expensive relative to recent moves (market pricing in risk premium). Negative = options are cheap vs realised. Not a directional signal." data-tip-ex="IV−HV > +3% historically indicates options are pricing in a premium above recent realised moves — hedging costs are elevated relative to actual market movement."><div class="pd-lbl">IV − HV</div><div class="pd-val ${atmIv != null && hv30 != null ? cls(atmIv - hv30) : ''}">${atmIv != null && hv30 != null ? (atmIv > hv30 ? '+' : '') + (atmIv - hv30).toFixed(1)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="25-delta Risk Reversal (1M) · Saxo Bank" data-tip-body="25d RR = 25d call IV minus 25d put IV. Positive = calls bid over puts — market skewed for upside on ${rrBase}. Negative = puts bid — downside protection dominant. Source: Saxo Bank public options page, 1M tenor, indicative mid-market. Updated during European hours." data-tip-ex="RR is a directional skew signal, not a vol-level signal. A strongly negative RR alongside high ATM IV = market pricing in both expensive hedging AND downside risk — historically a high-conviction bearish setup."><div class="pd-lbl">25d RR</div><div class="pd-val ${rrVal != null ? cls(rrVal) : ''}">${rrVal != null ? (rrVal >= 0 ? '+' : '') + rrVal.toFixed(2) : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Bid-Ask Spread" data-tip-body="Estimated interbank ECN spread in pips. Derived from live HV30 + VIX + MOVE model; falls back to ECN floor (IC Markets / Pepperstone Razor averages) when intraday data is unavailable. Lower spread = more liquid." data-tip-ex="EUR/USD typically trades 0.1–0.3 pip during London/NY overlap. Spreads widen significantly in Asian session and around news events."><div class="pd-lbl">Spread</div><div class="pd-val">${spreadPips != null ? spreadPips.toFixed(1) + ' pip' : '—'}</div></div>
@@ -5624,7 +5665,9 @@ async function fetchFedExpectations() {
       const current = parseFloat(obs[0].value);
 
       const meetings = meetingsRes?.meetings?.[ccy];
-      const nextMtg  = meetings?.allMeetingsFormatted?.[0] || '—';
+      // Use pre-computed nextMeeting field (engine filters past dates before writing meetings.json).
+      // allMeetingsFormatted[0] was incorrect — always returned the oldest meeting, not the next upcoming.
+      const nextMtg  = meetings?.nextMeeting || '—';
 
       // ── Bias: prefer explicit market-consensus field from meetings.json ──
       // meetings.bias       = 'cut' | 'hold' | 'hike' — OIS/overnight rate implied direction
@@ -5779,6 +5822,7 @@ async function fetchOptionSkew() {
       { pair:'USD/CAD', cot:'CAD', etfId:null,     rrKey:'USDCAD' },
       { pair:'USD/CHF', cot:'CHF', etfId:null,     rrKey:'USDCHF' },
       { pair:'NZD/USD', cot:'NZD', etfId:null,     rrKey:null     },
+      { pair:'EUR/JPY', cot:'EUR', cot2:'JPY',   etfId:null,     rrKey:'EURJPY' },
     ];
 
     // ── SOURCE 1: ETF IV from intraday quotes.json (primary) ──
@@ -5831,7 +5875,7 @@ async function fetchOptionSkew() {
           ? '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col" title="IV Rank: position of current IV within 52-week range (0=historically low, 100=historically high)">IV Rnk</th><th scope="col">Direction</th>'
           : '<th style="text-align:left" scope="col">Pair</th><th scope="col">ATM IV</th><th scope="col">COT bias</th><th scope="col">Direction</th>';
       } else {
-        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col">1W</th><th scope="col">1M</th><th scope="col">Bias</th>';
+        thead.innerHTML = '<th style="text-align:left" scope="col">Pair</th><th scope="col" title="CFTC Leveraged Funds net contracts">LF Net</th><th scope="col" title="Week-over-week change in LF net contracts">WoW Δ</th><th scope="col">Bias</th>';
       }
     }
 
@@ -5844,10 +5888,23 @@ async function fetchOptionSkew() {
       'USD/CAD': { body: 'USD/CAD bias from CFTC Leveraged Funds net CAD positioning (inverted). Positive = USD calls bid / CAD puts bid (USD upside, CAD weakness). Negative = CAD demand dominant, often driven by oil strength or risk-on.', ex: 'CAD is tightly linked to WTI crude. Watch for divergence between COT bias and oil price direction — that spread often resolves in oil\'s favour.' },
       'USD/CHF': { body: 'USD/CHF bias from CFTC Leveraged Funds net CHF positioning (inverted). Positive = USD calls bid / CHF puts bid. Negative = CHF safe-haven demand dominant.', ex: 'CHF safe-haven flows can override COT positioning quickly during risk-off episodes. Treat CHF bias as a risk sentiment barometer alongside JPY.' },
       'NZD/USD': { body: 'NZD/USD bias from CFTC Leveraged Funds net NZD positioning. NZD is a high-beta risk/commodity proxy — positive bias aligns with global risk appetite and dairy/agricultural strength.', ex: 'NZD often moves in tandem with AUD. Divergence between the two — e.g. NZD negative while AUD positive — can signal idiosyncratic NZ macro risk (RBNZ, trade data).' },
+      'EUR/JPY': { body: 'EUR/JPY bias derived from CFTC Leveraged Funds net positioning on both legs: EUR net (base) minus inverted JPY net (quote). Positive = EUR outperformance expected vs JPY. Supplemented by 25d Risk Reversal from Saxo Bank options analytics.', ex: 'EUR/JPY is a pure risk-appetite cross — JPY is the safe-haven leg. When EUR COT is neutral but JPY shorts are extreme, the cross bias is dominated by the JPY squeeze risk. Watch BoJ meetings as key catalysts.' },
     };
 
     tbody.innerHTML = pairs.map(p => {
-      const cotData = cotMap[p.cot];
+      // For cross pairs (e.g. EUR/JPY), derive COT net from both legs:
+      // base leg net − (inverted quote leg net) — standard cross-market methodology
+      let cotData = cotMap[p.cot];
+      if (!cotData && p.cot2) {
+        const base  = cotMap[p.cot]  || { net: 0 };
+        const quote = cotMap[p.cot2] || { net: 0 };
+        // EUR/JPY bias: EUR net (positive = EUR bullish) minus JPY net inverted (JPY short = JPY bearish = cross bullish)
+        const crossNet = (base.net || 0) - (quote.net || 0);
+        cotData = { net: crossNet };
+      } else if (cotData && p.cot2) {
+        const quote = cotMap[p.cot2] || { net: 0 };
+        cotData = { net: cotData.net - (quote.net || 0) };
+      }
       const etfIv   = etfIvMap[p.etfId];
       const invert  = p.pair.startsWith('USD/');
 
@@ -5920,40 +5977,69 @@ async function fetchOptionSkew() {
               data-tip-title="${td3Title}" data-tip-body="${td3Body}" data-tip-ex="${td3Ex}">${bias}${rrChip}</td>
         </tr>`;
       } else {
-        // ── COT fallback: original behavior ──
-        const skew1w = cotData ? netToSkew(cotData.net, invert) : 0;
-        const skew1m = cotData ? netToSkew(cotData.net * 0.85, invert) : 0;
-        // 25d RR chip — shown below bias label when Saxo data available
-        // Note: no native browser title= here — tooltip handled per-cell via #fx-tt
-        const rrEntryCot = rrMap[p.rrKey];
-        const rrValCot   = rrEntryCot?.rr25d ?? null;
+        // ── COT-only rows: no CBOE/CME index available for this pair ──
+        // col1 (ATM IV) → show '—' so the column header stays semantically valid for all rows.
+        // col2 (COT bias) → show normalised cotSkew — same metric as ETF-IV branch col2 —
+        //   keeping units consistent across every row. Raw LF Net contracts are NOT shown in
+        //   the cell because mixing % (IV) with contract counts in the same column violates
+        //   basic data-table standards (Bloomberg/Eikon never do this). Full LF Net / WoW Δ
+        //   detail is available on hover via per-cell tooltip.
+        const cotNet = cotData?.net ?? null;
+        const cotWow = (() => {
+          const ccy = p.cot;
+          const raw = window.COT_DATA_STORE?.[ccy] || null;
+          if (!raw) return null;
+          let wow = raw.wowNetChange ?? null;
+          if (wow == null && Array.isArray(raw.history) && raw.history.length >= 2) {
+            const prev = raw.history[raw.history.length - 2];
+            const prevNet = prev.levNet ?? ((prev.levLong || 0) - (prev.levShort || 0));
+            wow = (raw.netPosition ?? 0) - prevNet;
+          }
+          return wow;
+        })();
+        // Compact K notation — used in tooltips only
+        const fmtK = v => {
+          if (v == null) return '—';
+          const sign = v >= 0 ? '+' : '−';
+          const abs  = Math.abs(v);
+          if (abs >= 1000) return sign + (abs / 1000).toFixed(1) + 'K';
+          return sign + Math.round(abs);
+        };
+        // col2: normalised COT bias (same ±1.5 scale as ETF-IV branch col2)
+        const cotSkewStr = cotData ? fmtRR(cotSkew) : '—';
+        const cotSkewCls = cotData ? (cotSkew >= 0 ? 'up' : 'down') : 'flat';
+
+        // 25d RR chip
+        const rrEntryCot   = rrMap[p.rrKey];
+        const rrValCot     = rrEntryCot?.rr25d ?? null;
         const rrTipTextCot = rrValCot !== null
           ? `25-delta Risk Reversal (1M) · Saxo Bank · ${rrValCot > 0 ? 'calls bid — upside skew on ' + p.pair.split('/')[0] : 'puts bid — downside skew on ' + p.pair.split('/')[0]}`
           : '';
-        const rrChipCot  = rrValCot !== null
+        const rrChipCot = rrValCot !== null
           ? `<div style="font-size:8px;font-family:var(--font-mono);opacity:0.8;margin-top:1px;color:${rrValCot > 0 ? 'var(--up)' : rrValCot < 0 ? 'var(--down)' : 'var(--text3)'};"
               data-rr-tip-title="25d RR · Saxo Bank (1M)"
               data-rr-tip-body="${rrTipTextCot}"
              >RR ${rrValCot >= 0 ? '+' : ''}${rrValCot.toFixed(2)}</div>`
           : '';
 
-        // Per-cell tooltip data — COT fallback mode: td[1]=1W skew, td[2]=1M skew, td[3]=Bias
-        const pairTipCot = skewCellTips[p.pair];
+        const pairTipCot  = skewCellTips[p.pair];
         const td0TitleCot = p.pair + ' — Positioning Bias';
         const td0BodyCot  = pairTipCot?.body || '';
         const td0ExCot    = pairTipCot?.ex   || '';
-        const td12Title   = 'COT Directional Skew · ' + p.pair;
-        const td12Body    = 'COT-derived skew proxy — ETF IV unavailable for this pair. Derived from CFTC Leveraged Funds net positioning. 1W = current week net skew; 1M = smoothed (×0.85 decay).';
+        const td1TitleCot = 'ATM IV · ' + p.pair;
+        const td1BodyCot  = 'No dedicated CBOE/CME FX Volatility Index for this pair — ATM IV available only for EUR, GBP, JPY, and AUD majors.';
+        const td2TitleCot = 'COT Bias · ' + p.pair;
+        const td2BodyCot  = `Normalised CFTC Leveraged Funds positioning bias for ${p.pair}. Derived from LF Net ${fmtK(cotNet)} contracts${cotWow != null ? ', WoW Δ ' + fmtK(cotWow) : ''}. Scale ±1.5 max. Positive = base currency net long; negative = net short.`;
         const td3TitleCot = p.pair + ' — Directional Bias';
         const td3BodyCot  = pairTipCot?.body || '';
         const td3ExCot    = pairTipCot?.ex   || '';
 
         return `<tr>
           <td data-tip-title="${td0TitleCot}" data-tip-body="${td0BodyCot}" data-tip-ex="${td0ExCot}">${p.pair}</td>
-          <td class="${skew1w >= 0 ? 'up':'down'}"
-              data-tip-title="${td12Title}" data-tip-body="${td12Body}">${fmtRR(skew1w)}</td>
-          <td class="${skew1m >= 0 ? 'up':'down'}"
-              data-tip-title="${td12Title} (1M)" data-tip-body="${td12Body}">${fmtRR(skew1m)}</td>
+          <td class="flat" style="color:var(--text3);font-family:var(--font-mono);font-size:10px;"
+              data-tip-title="${td1TitleCot}" data-tip-body="${td1BodyCot}">—</td>
+          <td class="${cotSkewCls}" style="font-size:10px;"
+              data-tip-title="${td2TitleCot}" data-tip-body="${td2BodyCot}">${cotSkewStr}</td>
           <td class="${biasCls}" style="line-height:1.3;"
               data-tip-title="${td3TitleCot}" data-tip-body="${td3BodyCot}" data-tip-ex="${td3ExCot}">${bias}${rrChipCot}</td>
         </tr>`;
@@ -5967,7 +6053,7 @@ async function fetchOptionSkew() {
       if (hasAnyEtfIv) {
         panelHead.textContent = hasRR ? 'CBOE/CME Vol · 25d RR · Saxo' : 'CBOE/CME Vol Index · IV';
       } else {
-        panelHead.textContent = hasRR ? 'COT · 25d RR · Saxo' : 'COT-derived · IV unavailable';
+        panelHead.textContent = hasRR ? 'COT · LF Net · 25d RR · Saxo' : 'COT · LF Net + WoW Δ';
       }
     }
 
@@ -7962,6 +8048,17 @@ function toggleAlertsPopover() {
       applyState(false);
     }
   } catch(e){ applyState(true, 55); }
+
+  // Ensure #split-upper always starts scrolled to top (narrative visible) on page load.
+  // The chart auto-load via IntersectionObserver was previously calling scrollIntoView
+  // which scrolled past the narrative — now suppressed via _chartAutoLoad flag, but we
+  // also pin scrollTop here as a safety net for iframe-focus or async-render edge cases.
+  (function resetSplitUpperScroll(){
+    if(!upper) return;
+    upper.scrollTop = 0;
+    // Re-apply after a short delay to catch any async layout shifts from the TV iframe
+    setTimeout(function(){ if(upper) upper.scrollTop = 0; }, 400);
+  })();
 
   var TIP_KEY = 'gi_split_tip_seen';
   var tip = document.getElementById('split-tip');
