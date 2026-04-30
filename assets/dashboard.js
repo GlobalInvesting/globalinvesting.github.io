@@ -1150,6 +1150,15 @@ async function loadIntradayQuotes() {
           console.warn(`[Intraday] File is ${age.toFixed(0)}min old — treating as stale`);
           Object.values(data.quotes).forEach(q => q.stale = true);
         }
+        // Derive the trading-day date from the 'updated' timestamp.
+        // quotes.json is written at market close (e.g. 18:35 UTC on 2026-04-29), so
+        // its UTC date IS the trading-day date. This is used to stamp the today-bar
+        // correctly — prevents using the client's wall-clock date (e.g. 2026-04-30)
+        // when the data belongs to the prior trading day.
+        _intradayDataDate = new Date(data.updated).toISOString().slice(0, 10);
+      } else {
+        // Fallback: use client UTC date if 'updated' field is absent
+        _intradayDataDate = new Date().toISOString().slice(0, 10);
       }
 
       _intradayCache     = data;
@@ -1195,6 +1204,13 @@ function intradayQuote(cache, id) {
 
 // Cache for intraday RT rates — fed by yfinance JSON, used to update FX table + heatmap
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
+
+// The trading-day date that quotes.json represents, derived from its 'updated' timestamp.
+// Used by _lwBuildTodayBar and the non-FX strip logic to stamp/match the today-bar correctly.
+// Avoids the UTC-clock mismatch when quotes.json is updated at e.g. 18:35 UTC on 2026-04-29
+// but the user opens the chart on 2026-04-30: clock says "30" but data is from "29".
+// Falls back to UTC clock date if quotes.json has no 'updated' field.
+let _intradayDataDate = null;  // 'YYYY-MM-DD' or null until loadIntradayQuotes resolves
 
 // proxyUrls / proxyUrlsYahoo removed — all data now comes from
 // intraday-data/quotes.json (yfinance via GitHub Action, same-origin).
@@ -2928,11 +2944,15 @@ function _lwBuildTodayBar(ohlcId) {
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const q = STOOQ_RT_CACHE[cacheKey];
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
-  const dateStr  = todayUTC.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+  // Use the trading-day date from quotes.json ('updated' field), not the client's UTC clock.
+  // The data file may be from the prior trading day (e.g. updated 18:35 UTC on Apr 29) while
+  // the user opens the chart on Apr 30 — the bar must be stamped Apr 29, not Apr 30.
+  const dataDateStr = _intradayDataDate || new Date().toISOString().slice(0, 10);
+  const dataDateObj = new Date(dataDateStr + 'T00:00:00Z');
   // Crypto charts use Unix timestamps — must match the converted bar format
   const timeVal  = _CRYPTO_IDS.has(ohlcId)
-    ? Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()) / 1000
-    : dateStr;
+    ? Date.UTC(dataDateObj.getUTCFullYear(), dataDateObj.getUTCMonth(), dataDateObj.getUTCDate()) / 1000
+    : dataDateStr;
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
@@ -3070,13 +3090,13 @@ async function _renderLWChart(ohlcId, label) {
   // (1H aggregation stops at session close), and on weekends FX is already
   // guarded by the _LW_FX_IDS weekend check in _lwBuildTodayBar.
   if (!_LW_FX_IDS.has(ohlcId)) {
-    const _todayStr = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const _dataDate = _intradayDataDate || new Date().toISOString().slice(0, 10);
     if (bars.length > 0) {
       const _lastBar = bars[bars.length - 1];
       const _lastBarDate = typeof _lastBar.time === 'string'
         ? _lastBar.time
         : new Date(_lastBar.time * 1000).toISOString().slice(0, 10);
-      if (_lastBarDate === _todayStr) {
+      if (_lastBarDate === _dataDate) {
         bars = bars.slice(0, -1);
       }
     }
