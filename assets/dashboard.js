@@ -4057,8 +4057,14 @@ function loadCOTChart(longSym) {
   });
   container.appendChild(script);
   wrap.appendChild(container);
-  const chartSection = document.getElementById('section-fxpairs') || wrap.closest('.panel') || wrap;
-  chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Scroll the left panel to top so the narrative stays visible above the chart
+  const _scrollChartPanelToTop = () => {
+    const upper = document.getElementById('split-upper');
+    if (upper) { upper.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    const main = document.getElementById('main');
+    if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  _scrollChartPanelToTop();
 }
 
 // ── Internal: TV widget fallback for symbols without OHLC data ──
@@ -4116,21 +4122,25 @@ function loadTVChart(sym) {
     if (t.dataset.sym === sym) t.classList.add('active');
   });
   updatePairDetail(sym);
-  const chartSection = document.getElementById('section-fxpairs') ||
-    document.getElementById('tv-chart-wrap')?.closest('.panel') ||
-    document.getElementById('tv-chart-wrap');
+  // Scroll left panel to top so the narrative stays visible above the chart
+  const _scrollChartPanelToTop = () => {
+    const upper = document.getElementById('split-upper');
+    if (upper) { upper.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    const main = document.getElementById('main');
+    if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const ohlcId = _TV_TO_OHLC[sym];
   if (ohlcId) {
     const label = sym.split(':').pop().replace(/[^A-Z0-9/]/gi, '');
     _renderLWChart(ohlcId, label)
-      .then(() => { if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); })
+      .then(() => { _scrollChartPanelToTop(); })
       .catch(() => {
         _loadTVWidgetFallback(sym);
-        if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        _scrollChartPanelToTop();
       });
   } else {
     _loadTVWidgetFallback(sym);
-    if (chartSection) chartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    _scrollChartPanelToTop();
   }
 }
 
