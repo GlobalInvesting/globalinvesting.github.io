@@ -260,17 +260,18 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
-        # The script runs at 22:30 UTC. Bars from 21:00–22:30 UTC already belong
-        # (per FX session logic) to tomorrow's session date — but that session has
-        # only ~1.5 h of data and is incomplete. Writing it creates a phantom partial
-        # bar in the JSON that causes a visual gap when the site loads next day
-        # (the today-bar injector tries to place a bar for the *actual* today, which
-        # is now earlier than the JSON's last bar, so LWC silently ignores it).
-        # Fix: drop any bucket whose session_date >= the UTC calendar date at run time.
-        # The FX session for the current UTC date is always complete by 20:59 UTC
-        # (it opened at 21:00 UTC the prior day), so this is safe — we never drop
-        # a completed session. The incomplete forward-looking bucket is discarded.
-        run_date_utc = (_end_1h - timedelta(days=1)).date()  # UTC calendar date when the script runs
+        # Session-complete guard: only include a session bar if the session has closed.
+        # FX session closes at 21:00 UTC. The scheduled run at 22:30 UTC always runs
+        # AFTER the close — session_date == run_date_utc is the fully-completed bar.
+        # session_date > run_date_utc is tomorrow's partial session (~1.5h) — discard.
+        # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
+        # bucket is still open — discard it by treating yesterday as the effective cutoff.
+        _now_utc = datetime.now(timezone.utc)
+        _fx_session_closed = _now_utc.hour >= 21   # FX closes 21:00 UTC
+        if _fx_session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
+        else:
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
@@ -289,9 +290,8 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = (ts_utc + timedelta(days=1)).date()
 
                 # Drop any 1H bar that belongs to a session not yet completed.
-                # At 22:30 UTC, session_date == run_date_utc is the session that
-                # JUST closed at 21:00 UTC — complete, keep it.
-                # session_date > run_date_utc is tomorrow (~1.5h data) — discard.
+                # session_date == run_date_utc = today's session (complete — closed at 21:00 UTC).
+                # session_date > run_date_utc = tomorrow's partial session — discard.
                 if session_date > run_date_utc:
                     continue
 
@@ -428,14 +428,19 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
-        # Drop any bucket whose session_date >= the UTC calendar date at run time.
-        # The script runs at 22:30 UTC. Bars from 22:00–22:30 UTC already belong
-        # (per CME session logic) to tomorrow's session date — but that session has
-        # only ~30 min of data and is incomplete. Discarding it prevents a phantom
-        # partial bar that would cause a visual gap when the site loads next day.
-        # The CME session for the current UTC date is always complete by 21:59 UTC
-        # (it opened at 22:00 UTC the prior day), so this never drops a completed session.
-        run_date_utc = (_end_1h - timedelta(days=1)).date()  # UTC calendar date when the script runs
+        # Session-complete guard: only include a session bar if the session has closed.
+        # CME Gold session closes at 22:00 UTC (17:00 ET, EST fixed). The scheduled run
+        # at 22:30 UTC always runs AFTER the close — session_date == run_date_utc is safe.
+        # session_date > run_date_utc = tomorrow's partial session (~30 min) — discard.
+        # If triggered via workflow_dispatch before 22:00 UTC (mid-session), today's
+        # partial bucket (only a few hours of data) must be discarded — it would write
+        # a tiny bar with an artificial range and cause visual inconsistency.
+        _now_utc = datetime.now(timezone.utc)
+        _gold_session_closed = _now_utc.hour >= 22  # CME Gold closes 22:00 UTC
+        if _gold_session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
+        else:
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
@@ -454,7 +459,7 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = (ts_utc + timedelta(days=1)).date()
 
                 # Drop any 1H bar that belongs to a session not yet completed.
-                # session_date == run_date_utc = today's session (complete at 22:00 UTC) — keep.
+                # session_date == run_date_utc = today's session (complete — closed at 22:00 UTC).
                 # session_date > run_date_utc = tomorrow's partial session — discard.
                 if session_date > run_date_utc:
                     continue
@@ -585,10 +590,19 @@ def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
-        # run_date_utc = today UTC (when workflow runs at 22:30 UTC).
-        # session_date == run_date_utc = today's session (closed at 21:00 UTC) -- KEEP.
-        # session_date > run_date_utc = tomorrow's partial session -- DISCARD.
-        run_date_utc = (_end_1h - timedelta(days=1)).date()
+        # Session-complete guard: only include a session bar if the session has closed.
+        # NYSE/Nasdaq close at 20:00 UTC; EuroStoxx at 15:30 UTC; Nikkei at ~06:00 UTC;
+        # VIX/US10Y settle at ~21:00 UTC. The 21:00 UTC boundary means all equity
+        # sessions are complete by 21:00 UTC. The scheduled run at 22:30 UTC is always safe.
+        # session_date > run_date_utc = tomorrow's partial session — discard.
+        # If triggered via workflow_dispatch before 21:00 UTC (mid-session), today's
+        # partial bucket must be discarded to prevent incomplete bars in the JSON.
+        _now_utc = datetime.now(timezone.utc)
+        _equity_session_closed = _now_utc.hour >= 21  # All equity sessions closed by 21:00 UTC
+        if _equity_session_closed:
+            run_date_utc = (_end_1h - timedelta(days=1)).date()  # today UTC = last complete session
+        else:
+            run_date_utc = (_end_1h - timedelta(days=2)).date()  # yesterday UTC (today's session still open)
 
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
