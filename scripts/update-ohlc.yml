@@ -1,0 +1,113 @@
+name: Update OHLC Chart Data
+
+# Runs once daily after NY close.
+# Downloads 3 years of daily OHLC bars for all 38 chart symbols via yfinance
+# and writes ohlc-data/{id}.json to THIS (public) repo.
+#
+# Symbols: 28 FX pairs + Gold, WTI, BTC, US10Y + S&P 500, Nasdaq, Nikkei,
+#           EuroStoxx 50, ETH/USD, DXY — all rendered via Lightweight Charts.
+#
+# Files are REPLACED on every run — repo size stays fixed (~1.7 MB raw).
+#
+# Schedule: 22:30 UTC — after NY close (21:00 UTC), before Sydney open (22:00 UTC).
+# This ensures Friday's close is captured before the weekend session notes run.
+#
+# Placement: PUBLIC repo — yfinance only, no API keys, no proprietary logic.
+# Uses GITHUB_TOKEN (native) — no PAT_TOKEN required.
+# Public repos have unlimited GitHub Actions minutes → no budget impact.
+
+on:
+  schedule:
+    - cron: '30 22 * * 1-5'   # 22:30 UTC Mon–Fri (after NY close, before Sydney open)
+  workflow_dispatch:             # manual trigger for backfill / testing
+
+concurrency:
+  group: update-ohlc
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-ohlc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull latest changes
+        run: git fetch origin main && git rebase origin/main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance --break-system-packages
+
+      - name: Create output directory
+        run: mkdir -p ohlc-data
+
+      - name: Fetch OHLC data
+        env:
+          SITE_DIR: .
+        run: python scripts/fetch_ohlc.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          if [ -f ohlc-data/meta.json ]; then
+            echo "════════════════════════════════════════"
+            echo "   OHLC UPDATE SUMMARY"
+            echo "════════════════════════════════════════"
+            python3 -c "
+          import json, os
+          with open('ohlc-data/meta.json') as f:
+              m = json.load(f)
+          print(f'  Updated   : {m[\"updated_at\"]}')
+          print(f'  Symbols   : {m[\"symbol_count\"]} written')
+          print(f'  Period    : {m[\"period\"]} / {m[\"interval\"]}')
+          if m['errors']:
+              print(f'  Errors    : {len(m[\"errors\"])} failed: {m[\"errors\"]}')
+          else:
+              print('  Errors    : none')
+          total = 0
+          for f in sorted(os.listdir('ohlc-data')):
+              if f.endswith('.json') and f != 'meta.json':
+                  sz = os.path.getsize(f'ohlc-data/{f}')
+                  total += sz
+          print(f'  Total size: {total // 1024} KB raw')
+          "
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r ohlc-data/ /tmp/ohlc_fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp -r /tmp/ohlc_fresh/. ohlc-data/
+            git add ohlc-data/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit."
+              exit 0
+            fi
+            git commit -m "data: ohlc update [${TIMESTAMP}]"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          exit 0
