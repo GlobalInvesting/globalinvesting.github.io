@@ -45,18 +45,17 @@ Data integrity — FX daily bar construction (v1.3):
                       This matches the H/L shown on Yahoo Finance's own 4H and 1H charts,
                       TradingView daily FX bars, and Bloomberg FX daily candles.
 
-  Gold:           Daily bars BUILT from 1H bars aggregated over the CME session boundary:
-                  22:00 UTC → 22:00 UTC (17:00 New York → 17:00 New York, EST fixed).
-                  yfinance native 1D bars for GC=F are severely degraded: ~46% of bars have
-                  O==H or O==L because Yahoo constructs them from settlement ticks, not from
-                  the full electronic session. 1H aggregation faithfully captures intraday
-                  H/L and produces candles that match Bloomberg, CME Group charts, and
-                  TradingView Gold daily bars. No back-adjustment — roll gaps appear as-is.
-  WTI:            Raw front-month prices from yfinance (CL=F) — no back-adjustment.
-                  Roll gaps between contracts appear as-is: they reflect the actual switch
-                  to the next front-month contract, exactly as shown on Reuters, CNBC,
-                  Barchart, and Investing.com. Back-adjustment (Panama method) was removed
-                  because it produces synthetic price levels that were never traded.
+  Non-FX (all):   Native yfinance 1D bars — Gold, WTI, SPX, Nasdaq, Stoxx, Nikkei,
+                  US10Y, VIX, BTC, ETH, DXY all use the same path as WTI (always worked).
+                  1H aggregation was previously used for Gold (CME stub-bar quality) and
+                  selected equity indices, but any fixed UTC session boundary causes the
+                  session guard to discard today’s bar at the 22:30 UTC run (session_date
+                  today > run_date_utc yesterday). Native 1D already contains the
+                  in-progress today bar at 22:30 UTC for all non-FX sessions. The intraday
+                  today-bar injection in dashboard.js updates it with live data from
+                  quotes.json — the proven pattern WTI has used since launch.
+                  Gold stub-bar quality (prev. reason for 1H): accepted tradeoff. The
+                  intraday injection overwrites today’s bar with real H/L from yfinance.
   DXY only:       HL_MAX_SPREAD guard drops bars with impossible intraday ranges
   Nasdaq:         Uses ^NDX (Nasdaq 100) to match the CFI:US100 chart tab; ^IXIC
                   (Composite) has different constituents and price levels (~19k vs ~5.8k).
@@ -208,15 +207,25 @@ HL_MAX_SPREAD: dict[str, float] = {
 # Fix: download 1H bars and aggregate them over the 21:00 UTC → 21:00 UTC window.
 # Result: open/high/low/close exactly match what Yahoo Finance shows on its own
 # 4H chart, and match TradingView and Bloomberg FX daily candles.
-NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy'}
-GOLD_SYMBOLS   = {'gold'}   # CME session 1H aggregation — separate from FX (different boundary)
-# Equity indices and related instruments: 1H aggregation over NYSE 21:00 UTC boundary.
-# yfinance native 1D bars for ^GSPC, ^NDX, ^STOXX50E etc. are unreliable for the
-# current session — they are often absent or contain only a partial bar until well
-# after market close. Aggregating 1H bars ensures the bar for the current trading day
-# is always present in the JSON after the workflow runs (22:30 UTC > 21:00 UTC boundary).
-EQUITY_1H_SYMBOLS = {'spx', 'nasdaq', 'stoxx', 'nikkei', 'us10y', 'vix'}
-FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS - GOLD_SYMBOLS
+NON_FX_SYMBOLS = {'wti', 'btc', 'us10y', 'spx', 'nasdaq', 'nikkei', 'stoxx', 'vix', 'eth', 'dxy', 'gold'}
+# All non-FX symbols use native yfinance 1D bars (same path as WTI).
+#
+# Routing rationale — two paths only:
+#   FX pairs (28):  1H aggregation over the 21:00 UTC NY session boundary.
+#                   Required because yfinance native 1D FX bars use UTC midnight as their
+#                   cutoff, producing materially wrong H/L and unreliable opens.
+#                   1H aggregation matches Bloomberg, TradingView and Reuters FX candles.
+#
+#   Non-FX (11):    Native yfinance 1D — identical to the WTI approach that has always worked.
+#                   1H aggregation with any fixed UTC session boundary drops today's bar:
+#                   at the 22:30 UTC run, any 1H bucket for today has session_date = today,
+#                   which exceeds run_date_utc = yesterday, so it is discarded by the guard.
+#                   Native 1D includes the in-progress or just-completed today bar directly.
+#                   The intraday today-bar injection in dashboard.js updates it with live
+#                   data from quotes.json — the same proven pattern WTI has always used.
+#                   Gold stub-bar quality (previous reason for 1H aggregation): accepted
+#                   tradeoff — the intraday injection overwrites today's bar with real H/L.
+FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
 
 # Crypto trades 24/7 — yfinance only returns Saturday/Sunday bars when an explicit
 # start/end date range is passed. Using period="3y" silently omits weekends because
@@ -555,21 +564,24 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
 
 def fetch_equity_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
     """
-    Build daily bars for equity indices (SPX, Nasdaq, Stoxx, Nikkei), US 10Y yield,
-    and VIX by aggregating 1H bars over the NYSE session boundary: 21:00 UTC.
+    Build daily bars for Nikkei 225 (^N225) by aggregating 1H bars over the NYSE
+    session boundary: 21:00 UTC.
 
-    Why 1H aggregation instead of native yfinance 1D bars?
-    yfinance native 1D bars for these symbols often EXCLUDE the current trading day
-    when the workflow runs at 22:30 UTC, even though the session is complete by
-    20:00-21:00 UTC. The bar appears only in the next run. Aggregating 1H bars over
-    the 21:00 UTC boundary guarantees today's session is always present.
+    Why 1H aggregation for Nikkei only?
+    TSE closes at ~06:00 UTC — well before the 22:30 UTC workflow run. This means
+    the complete Nikkei bar for the current trading day is always present in the
+    yfinance 1H feed when the script runs. 1H aggregation gives faithful H/L.
+
+    SPX, Nasdaq, Stoxx, US10Y, and VIX are intentionally excluded and routed to
+    native 1D yfinance (same path as WTI). Their NYSE/CBOE sessions close at
+    20:00-21:00 UTC, and yfinance's native 1D feed already includes the in-progress
+    today bar by 22:30 UTC. Routing them through 1H aggregation caused the session
+    guard to drop today's bar (the 1H buckets for Apr 30 aggregate into session_date
+    Apr 30, which is > run_date_utc Apr 29 at the 22:30 UTC run), leaving the JSON
+    ending at Apr 29 and forcing 100% reliance on the intraday today-bar injection.
 
     Session boundary: 21:00 UTC -> 21:00 UTC
-      * US markets (NYSE/Nasdaq):   close 20:00 UTC -> fully included
-      * EuroStoxx 50 (Euronext):    close 15:30 UTC -> fully included
-      * Nikkei 225 (TSE):           close ~06:00 UTC -> fully included
-      * US 10Y (^TNX, CBOE):        settles ~21:00 UTC -> included
-      * VIX (CBOE):                 settles ~21:00 UTC -> included
+      * Nikkei 225 (TSE):           close ~06:00 UTC -> fully included before run
 
     Hybrid approach (same as FX / Gold):
     - 1H bars cover the most recent 730 days with correct H/L.
@@ -712,28 +724,21 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
     Returns a list of {time, open, high, low, close} dicts sorted oldest to newest,
     or None on failure.
 
-    FX symbols: delegates to fetch_fx_ohlc_from_1h() which aggregates 1H bars over
-    the 21:00 UTC session boundary — H/L faithful to real FX session ranges, matching
-    Yahoo Finance's own 4H chart, TradingView FX daily candles, and Bloomberg.
+    Two paths:
+      FX pairs (28):  delegates to fetch_fx_ohlc_from_1h() — 1H aggregation over the
+                      21:00 UTC NY session boundary. H/L match Bloomberg, TradingView,
+                      Reuters FX daily candles. Required because native 1D FX bars use
+                      UTC midnight cutoff, producing wrong H/L and unreliable opens.
 
-    Gold: delegates to fetch_gold_ohlc_from_1h() which aggregates 1H bars over the
-    22:00 UTC CME session boundary — eliminates the ~46% stub-bar rate in yfinance
-    native 1D GC=F data.
-
-    Equity indices / VIX / US10Y: delegates to fetch_equity_ohlc_from_1h() which
-    aggregates 1H bars over the 21:00 UTC NYSE session boundary — guarantees the
-    current trading day bar is present in the JSON after the 22:30 UTC workflow run.
-
-    Non-FX remaining (BTC, ETH, WTI, DXY): uses Yahoo's native 1D bars.
+      Non-FX (11):    native yfinance 1D bars — same path as WTI (always worked).
+                      Gold, Nikkei, SPX, Nasdaq, Stoxx, US10Y, VIX, BTC, ETH, DXY, WTI.
+                      1H aggregation was removed: the session guard discards today's bar
+                      at any fixed UTC boundary, leaving the JSON one day behind. Native
+                      1D includes the in-progress today bar. The intraday today-bar
+                      injection in dashboard.js updates it with live data from quotes.json.
     """
     if id_ in FX_SYMBOLS:
         return fetch_fx_ohlc_from_1h(id_, ticker_sym)
-
-    if id_ in GOLD_SYMBOLS:
-        return fetch_gold_ohlc_from_1h(id_, ticker_sym)
-
-    if id_ in EQUITY_1H_SYMBOLS:
-        return fetch_equity_ohlc_from_1h(id_, ticker_sym)
 
     try:
         ticker = yf.Ticker(ticker_sym)
