@@ -254,6 +254,18 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
+        # The script runs at 22:30 UTC. Bars from 21:00–22:30 UTC already belong
+        # (per FX session logic) to tomorrow's session date — but that session has
+        # only ~1.5 h of data and is incomplete. Writing it creates a phantom partial
+        # bar in the JSON that causes a visual gap when the site loads next day
+        # (the today-bar injector tries to place a bar for the *actual* today, which
+        # is now earlier than the JSON's last bar, so LWC silently ignores it).
+        # Fix: drop any bucket whose session_date >= the UTC calendar date at run time.
+        # The FX session for the current UTC date is always complete by 20:59 UTC
+        # (it opened at 21:00 UTC the prior day), so this is safe — we never drop
+        # a completed session. The incomplete forward-looking bucket is discarded.
+        run_date_utc = (_end_1h - timedelta(days=1)).date()  # UTC calendar date when the script runs
+
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
             for ts, row in hist_1h.iterrows():
@@ -269,6 +281,12 @@ def fetch_fx_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = ts_utc.date()
                 else:
                     session_date = (ts_utc + timedelta(days=1)).date()
+
+                # Drop any 1H bar that belongs to a session not yet completed.
+                # At 22:30 UTC the session for run_date_utc + 1 day has only
+                # ~1.5 h of data — writing it produces an incomplete bar.
+                if session_date >= run_date_utc:
+                    continue
 
                 date_str = session_date.strftime("%Y-%m-%d")
                 o = float(row["Open"])
@@ -403,6 +421,15 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
             auto_adjust=True,
         )
 
+        # Drop any bucket whose session_date >= the UTC calendar date at run time.
+        # The script runs at 22:30 UTC. Bars from 22:00–22:30 UTC already belong
+        # (per CME session logic) to tomorrow's session date — but that session has
+        # only ~30 min of data and is incomplete. Discarding it prevents a phantom
+        # partial bar that would cause a visual gap when the site loads next day.
+        # The CME session for the current UTC date is always complete by 21:59 UTC
+        # (it opened at 22:00 UTC the prior day), so this never drops a completed session.
+        run_date_utc = (_end_1h - timedelta(days=1)).date()  # UTC calendar date when the script runs
+
         day_buckets: dict[str, dict] = {}
         if not hist_1h.empty:
             for ts, row in hist_1h.iterrows():
@@ -418,6 +445,10 @@ def fetch_gold_ohlc_from_1h(id_: str, ticker_sym: str) -> list[dict] | None:
                     session_date = ts_utc.date()
                 else:
                     session_date = (ts_utc + timedelta(days=1)).date()
+
+                # Drop any 1H bar that belongs to a session not yet completed.
+                if session_date >= run_date_utc:
+                    continue
 
                 date_str = session_date.strftime("%Y-%m-%d")
                 o = float(row["Open"])
