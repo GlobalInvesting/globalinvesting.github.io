@@ -1,3 +1,14 @@
+## v7.50.3 (2026-05-01) — Fix: DXY, WTI, Gold Apr 30 bar mislabeled as Apr 29 (session-open-date shift)
+
+### Engine — scripts/fetch_ohlc.py
+- **Root cause:** yfinance native 1D bars for futures that open before UTC midnight (ICE DXY at 22:00 UTC, CME WTI/Gold at 23:00 UTC) are timestamped by session **open** date, not session **close** date. The Apr 30 trading session (opened Apr 29 evening, closed Apr 30) was stored as `"2026-04-29"` in the JSON. The chart displayed it one day early. Meanwhile the `"2026-04-30"` slot contained the partial May 1 in-progress session (~30 min of data), resulting in a tiny-range stub bar on Apr 30 in the chart.
+- **Fix — `SESSION_OPEN_DATE_SYMBOLS = {'dxy', 'wti', 'gold'}`:** New constant identifying symbols where yfinance uses session open date as the bar label. In the non-FX fetch loop, dates for these symbols are shifted forward by one business day via the new `_next_bday()` helper (`date + 1 day`, skipping Saturday → Monday). This maps each bar to its correct trading/close date. The last bar (partial in-progress session) is now correctly dated tomorrow, so `dashboard.js`'s strip-last-bar removes it and replaces it with live data from `quotes.json` — the existing intended design unchanged.
+- **`_next_bday(d)` helper:** Added. Adds 1 calendar day, then adds 2 more if the result is Saturday (Friday session → Monday label). Sunday inputs cannot occur (futures only trade Mon–Fri).
+- **Dedup comment updated:** Prior comment incorrectly described a duplicate-date scenario for DXY/WTI/Gold. After the date shift, no duplicate dates occur — dedup comment updated to reflect the actual behaviour.
+- **Version bump:** script header updated to `v1.6`.
+
+---
+
 ## v7.50.2 (2026-04-29) — Fix: Gold chart stub bars eliminated via CME 1H session reconstruction
 
 ### Site — scripts/fetch_ohlc.py
