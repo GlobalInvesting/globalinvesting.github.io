@@ -800,13 +800,22 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 "volume": vol,
             })
 
+        # Keep FIRST bar per date (not last/reversed).
+        # For instruments that reopen before UTC midnight (DXY 22:00 UTC, Gold/WTI 23:00 UTC),
+        # yfinance can return TWO rows with the same calendar date:
+        #   Row 1 (earlier):  completed session, correct full-day OHLC  ← KEEP THIS
+        #   Row 2 (later):    new in-progress session, partial/wrong data ← DISCARD
+        # dashboard.js strips the JSON's last bar and replaces it with the live today-bar
+        # from quotes.json, so the in-progress row is not needed in the JSON at all.
+        # Iterating forward and keeping the first occurrence preserves the completed session.
+        # For all other symbols (one bar per date) behaviour is unchanged.
         seen: set[str] = set()
         deduped: list[dict] = []
-        for bar in reversed(bars):
+        for bar in bars:
             if bar["time"] not in seen:
                 seen.add(bar["time"])
                 deduped.append(bar)
-        deduped.reverse()
+        # bars is already oldest-to-newest; no reverse needed.
 
         if len(deduped) < 30:
             print(f"  WARN [{id_}]: only {len(deduped)} valid bars - skipping")
