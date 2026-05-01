@@ -2868,6 +2868,14 @@ let _lwChart = null;
 let _lwResizeObs = null;
 let _lwCandleSeries = null;   // reference for live today-bar updates
 
+// Live bar accumulated state — mirrors the LW Charts realtime-updates demo pattern.
+// Open is anchored to the last historical bar's close (FX prev_close convention).
+// H/L grow as running max/min throughout the session (never shrink).
+// Initialized on chart open; updated on every quotes.json tick via _lwBuildTodayBar.
+// Reset on symbol change (_destroyLWChart) and on day rollover (time mismatch).
+// { ohlcId, time, open, high, low, close } or null.
+let _lwLiveBarState = null;
+
 // Chart mode flag — set synchronously at the START of each chart load, before any async work.
 // 'lw'  = LW chart is active or being loaded (do NOT reload TV widget on visibility change)
 // 'tv'  = TradingView widget is active
@@ -2901,6 +2909,7 @@ function _destroyLWChart() {
   _lwActiveOhlcId = null;
   _lwActiveUpdateHeader = null;
   _lwActivePrevCloseMap = null;
+  _lwLiveBarState = null;  // reset accumulated live bar on symbol change
 }
 
 // Compute MA(n) over close prices
@@ -2987,21 +2996,22 @@ function _lwBuildTodayBar(ohlcId) {
       ? parseFloat(q.open.toFixed(dec))
       : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
   }
-  // H/L wick convention:
-  //   FX bars → prefer session_high/session_low (1H aggregation from 21:00 UTC, same
-  //             boundary as historical bars). Falls back to Yahoo dayHigh/dayLow only
-  //             if session_high/session_low are absent (fetch_intraday_quotes.py failure).
-  //             Yahoo dayHigh/dayLow use UTC-midnight cutoff, missing the Tokyo/Sydney
-  //             open hours (21:00–23:59 UTC of the prior day) — inconsistent with history.
-  //   Non-FX bars → Yahoo dayHigh/dayLow (correct for exchange-session instruments).
-  const _useSessionHL = isFxBar && q.session_high != null && q.session_low != null
-                        && q.session_high > 0 && q.session_low > 0;
-  const h = _useSessionHL
-    ? parseFloat(q.session_high.toFixed(dec))
-    : (q.high  != null && q.high  > 0 ? parseFloat(q.high.toFixed(dec))  : Math.max(o, c));
-  const l = _useSessionHL
-    ? parseFloat(q.session_low.toFixed(dec))
-    : (q.low   != null && q.low   > 0 ? parseFloat(q.low.toFixed(dec))   : Math.min(o, c));
+  // H/L source:
+  //   FX pairs  → session_high/session_low (1H aggregation from 21:00 UTC, same boundary as
+  //               historical bars in fetch_ohlc.py — injected by fetch_intraday_quotes.py PASO 4b).
+  //               Falls back to q.high/q.low if session fields are absent (old quotes.json).
+  //   Non-FX    → q.high/q.low (Yahoo dayHigh/dayLow, appropriate for equity/commodity sessions).
+  let h, l;
+  if (isFxBar && q.session_high != null && q.session_high > 0) {
+    h = parseFloat(q.session_high.toFixed(dec));
+    l = parseFloat(q.session_low.toFixed(dec));
+  } else {
+    h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
+    l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
+  }
+  // Ensure H/L are geometrically consistent with O/C (guard against stale session fields)
+  h = Math.max(h, o, c);
+  l = Math.min(l, o, c);
   return { time: timeVal, open: o, high: h, low: l, close: c };
 }
 
