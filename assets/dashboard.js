@@ -2906,6 +2906,13 @@ function _lwBuildTodayBar(ohlcId) {
   // Non-FX standard exchanges (SPX, Nikkei, Stoxx — close well before 22:00 UTC):
   //   market_time from the closed session will have the same UTC date as the clock,
   //   so using market_time date == using UTC date: no change in behavior.
+  // Session-boundary UTC hour for instruments that reopen before calendar midnight.
+  // FX OTC: 21:00 UTC (17:00 EDT) / 22:00 UTC (17:00 EST)
+  // DXY (ICE): 22:00 UTC (17:00 EDT) / 23:00 UTC (17:00 EST) — same as FX but 1h later
+  // CME Gold/WTI: 23:00 UTC (18:00 EDT) / 00:00 UTC (next day, EST) — no pre-midnight issue in EST
+  // The boundary below is the UTC hour at or after which the live data belongs to the NEXT session.
+  // Beyond this hour, dateStr must advance by 1 day to match what fetch_ohlc assigns to that session.
+  const _NON_FX_BOUNDARIES = { gold: 23, wti: 23, dxy: 22 };  // UTC hour of session reopen (EDT)
   let dateStr;
   if (isFxBar) {
     const hourUTC = nowUTC.getUTCHours();
@@ -2917,10 +2924,27 @@ function _lwBuildTodayBar(ohlcId) {
       dateStr = nowUTC.toISOString().slice(0, 10);
     }
   } else if (q.market_time != null) {
-    // Non-FX: derive bar date from the timestamp of the last trade.
-    // This handles instruments that reopen before midnight UTC (CME Gold/WTI 23:00,
-    // ICE DXY 22:00) where the live OHLC already belongs to the next calendar day.
-    dateStr = new Date(q.market_time * 1000).toISOString().slice(0, 10);
+    // Non-FX: derive bar date from the timestamp of the last trade, then apply
+    // any instrument-specific session-boundary adjustment.
+    //
+    // Problem: CME Gold/WTI reopen at 23:00 UTC, ICE DXY at 22:00 UTC (EDT).
+    // Between those reopen times and 00:00 UTC, market_time is still dated today
+    // (e.g. 2026-04-30T23:15Z) but the live OHLC already belongs to the NEXT session
+    // (the session that will close 2026-05-01T22:00Z). Using the raw market_time
+    // UTC date would inject a today-bar dated 2026-04-30 with May 1 session prices,
+    // overwriting the completed 04-30 bar. The strip logic (which uses the same dateStr)
+    // would also strip the completed 04-30 bar from the JSON — leaving only the wrong bar.
+    //
+    // Fix: if market_time's UTC hour >= the instrument's session reopen boundary,
+    // the trade is already in the next session → advance dateStr by 1 day.
+    const _mtDate = new Date(q.market_time * 1000);
+    const _mtHour = _mtDate.getUTCHours();
+    const _boundary = _NON_FX_BOUNDARIES[ohlcId];
+    if (_boundary != null && _mtHour >= _boundary) {
+      // market_time is post-reopen: this trade belongs to the next session.
+      _mtDate.setUTCDate(_mtDate.getUTCDate() + 1);
+    }
+    dateStr = _mtDate.toISOString().slice(0, 10);
   } else {
     // Fallback: no market_time available — use UTC clock date.
     dateStr = nowUTC.toISOString().slice(0, 10);
@@ -3073,16 +3097,17 @@ async function _renderLWChart(ohlcId, label) {
   // it with the live price via candleSeries.update(todayBar). Without stripping,
   // two bars appear for the same session (stale JSON + live update).
   //
-  // The strip date must match the date _lwBuildTodayBar will assign to the todayBar:
-  //   FX:    21:00 UTC boundary → if hourUTC >= 21, strip bars dated tomorrow UTC
-  //   Non-FX with market_time: use the UTC date of market_time (last trade timestamp)
-  //          This handles CME Gold/WTI (reopen 23:00 UTC) and ICE DXY (reopen 22:00 UTC)
-  //          where the live data already belongs to the next calendar day before midnight.
-  //   Non-FX without market_time: fall back to UTC clock date (STOOQ_RT_CACHE not ready)
+  // _stripFrom must match exactly what _lwBuildTodayBar assigns as dateStr.
+  // For non-FX instruments with pre-midnight session opens (DXY 22:00 UTC, Gold/WTI 23:00 UTC):
+  //   market_time in the post-reopen window still has the prior calendar date (e.g. 23:15 UTC April 30
+  //   has UTC date 2026-04-30) but belongs to the NEXT session (May 1). Without the boundary
+  //   adjustment, _stripFrom = 2026-04-30 strips the COMPLETED April 30 bar from the JSON,
+  //   then todayBar is injected at 2026-04-30 with May 1 session prices — overwriting the bar.
   {
     const _isFxStrip = _LW_FX_IDS.has(ohlcId);
     const _nowUTC    = new Date();
     const _hourUTC   = _nowUTC.getUTCHours();
+    const _NON_FX_BD = { gold: 23, wti: 23, dxy: 22 };  // same as _lwBuildTodayBar
     let   _stripFrom;
     if (_isFxStrip && _hourUTC >= 21) {
       // FX: new session already started — strip tomorrow's bars
@@ -3090,12 +3115,17 @@ async function _renderLWChart(ohlcId, label) {
       _tom.setUTCDate(_tom.getUTCDate() + 1);
       _stripFrom = _tom.toISOString().slice(0, 10);
     } else if (!_isFxStrip) {
-      // Non-FX: use market_time from STOOQ_RT_CACHE if available
+      // Non-FX: use market_time from STOOQ_RT_CACHE if available, with boundary adjustment
       const _ck = ohlcId === 'gold' ? 'xauusd' : ohlcId;
       const _qt = STOOQ_RT_CACHE[_ck];
       if (_qt?.market_time != null) {
-        // market_time is the last-trade UTC timestamp — its UTC date is the bar date
-        _stripFrom = new Date(_qt.market_time * 1000).toISOString().slice(0, 10);
+        const _mtDate = new Date(_qt.market_time * 1000);
+        const _bd = _NON_FX_BD[ohlcId];
+        if (_bd != null && _mtDate.getUTCHours() >= _bd) {
+          // Post-reopen: market_time is in the next session — advance by 1 day
+          _mtDate.setUTCDate(_mtDate.getUTCDate() + 1);
+        }
+        _stripFrom = _mtDate.toISOString().slice(0, 10);
       } else {
         // Cache not ready yet — fall back to UTC clock date
         _stripFrom = _nowUTC.toISOString().slice(0, 10);
