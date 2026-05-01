@@ -2169,13 +2169,15 @@ async function renderRiskData(byId) {
     setEl('risk-vix-sub', arrow + chgStr + ' · ' + signal + srcNote);
     // Seed STOOQ_RT_CACHE so LW chart today-bar works for VIX tab
     STOOQ_RT_CACHE['vix'] = {
-      close: byId.vix.close,
-      open:  byId.vix.open  ?? (byId.vix.prev_close ?? byId.vix.close),
-      high:  byId.vix.high  ?? byId.vix.close,
-      low:   byId.vix.low   ?? byId.vix.close,
-      prev_close: byId.vix.prev_close ?? null,
-      chg:   byId.vix.chg  ?? null,
-      pct:   byId.vix.pct  ?? null,
+      close:        byId.vix.close,
+      open:         byId.vix.open  ?? (byId.vix.prev_close ?? byId.vix.close),
+      high:         byId.vix.high  ?? byId.vix.close,
+      low:          byId.vix.low   ?? byId.vix.close,
+      prev_close:   byId.vix.prev_close ?? null,
+      chg:          byId.vix.chg  ?? null,
+      pct:          byId.vix.pct  ?? null,
+      market_state: byId.vix.market_state ?? null,
+      market_time:  byId.vix.market_time  ?? null,
     };
     _lwUpdateTodayBar();
   } else {
