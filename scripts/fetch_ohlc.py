@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_ohlc.py  v1.5 — Daily OHLC history for Lightweight Charts
+fetch_ohlc.py  v1.6 — Daily OHLC history for Lightweight Charts
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Downloads 3 years of daily OHLC bars via yfinance for all symbols
 used by the Lightweight Charts panel (replaces TradingView widget).
@@ -231,6 +231,25 @@ FX_SYMBOLS = set(SYMBOLS.keys()) - NON_FX_SYMBOLS
 # start/end date range is passed. Using period="3y" silently omits weekends because
 # yfinance applies a NYSE/NASDAQ business-day calendar as the default date filter.
 CRYPTO_SYMBOLS = {'btc', 'eth'}
+
+# Symbols whose yfinance native 1D bars are timestamped at session OPEN (not close).
+# DXY (ICE) opens at 22:00 UTC; Gold and WTI (CME) open at 23:00 UTC — all before
+# UTC midnight. yfinance labels each bar with the open date (e.g. the Apr 30 trading
+# session opens Apr 29 evening → labeled '2026-04-29' by yfinance). The dashboard
+# must show the session under its CLOSE date (Apr 30), not the open date (Apr 29).
+# Fix: shift bar dates by +1 business day for these symbols only.
+#   Mon→Tue, Tue→Wed, Wed→Thu, Thu→Fri, Fri→Mon (+3 days, skipping the weekend).
+# This also correctly promotes the last partial bar (opened today evening) to
+# tomorrow's date, so dashboard.js's strip-last-bar removes it as the today-bar.
+SESSION_OPEN_DATE_SYMBOLS = {'dxy', 'wti', 'gold'}
+
+def _next_bday(d) -> str:
+    """Return date d + 1 business day (skip Saturday → Monday). Input: date object."""
+    d1 = d + timedelta(days=1)
+    if d1.weekday() == 5:   # Saturday → Monday
+        d1 += timedelta(days=2)
+    # Sunday cannot occur: input d is always a weekday (futures only trade Mon–Fri)
+    return d1.strftime("%Y-%m-%d")
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -779,6 +798,16 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
             else:
                 date_str = ts.strftime("%Y-%m-%d")
 
+            # ── Session-open-date correction (DXY, WTI, Gold) ─────────────────
+            # yfinance labels these bars by session OPEN date. ICE DXY opens at
+            # 22:00 UTC; CME Gold/WTI open at 23:00 UTC — both before UTC midnight.
+            # The Apr 30 trading session opens Apr 29 evening → labeled '2026-04-29'
+            # by yfinance. The dashboard must show it under '2026-04-30'.
+            # Shift: date → next business day (+1 day, or +3 if result is Saturday).
+            if id_ in SESSION_OPEN_DATE_SYMBOLS:
+                _d = datetime.strptime(date_str, "%Y-%m-%d")
+                date_str = _next_bday(_d)
+
             o, h, l, c = float(row["Open"]), float(row["High"]), float(row["Low"]), float(row["Close"])
 
             if not (_guard(id_, c) and _guard(id_, o) and h >= l and h >= c and l <= c):
@@ -800,15 +829,12 @@ def fetch_ohlc(id_: str, ticker_sym: str) -> list[dict] | None:
                 "volume": vol,
             })
 
-        # Keep FIRST bar per date (not last/reversed).
-        # For instruments that reopen before UTC midnight (DXY 22:00 UTC, Gold/WTI 23:00 UTC),
-        # yfinance can return TWO rows with the same calendar date:
-        #   Row 1 (earlier):  completed session, correct full-day OHLC  ← KEEP THIS
-        #   Row 2 (later):    new in-progress session, partial/wrong data ← DISCARD
-        # dashboard.js strips the JSON's last bar and replaces it with the live today-bar
-        # from quotes.json, so the in-progress row is not needed in the JSON at all.
-        # Iterating forward and keeping the first occurrence preserves the completed session.
-        # For all other symbols (one bar per date) behaviour is unchanged.
+        # Dedup: keep FIRST bar per date (oldest-to-newest iteration).
+        # After the SESSION_OPEN_DATE_SYMBOLS shift above, DXY/WTI/Gold no longer
+        # produce duplicate date strings — each session gets its correct close date.
+        # For all other non-FX symbols one bar per date is the normal case.
+        # The LAST bar in the output is the in-progress today-bar; dashboard.js strips
+        # it and replaces it with live data from quotes.json (intended design).
         seen: set[str] = set()
         deduped: list[dict] = []
         for bar in bars:
