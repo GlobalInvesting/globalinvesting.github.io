@@ -1,41 +1,31 @@
 {
-  "generated_at": "2026-05-01T23:37:02Z",
+  "generated_at": "2026-05-01T23:47:03Z",
   "signals": [
     {
       "time": "23:02",
       "priority": "critical",
-      "title": "USD/JPY Watch",
-      "text": "Watch for USD/JPY volatility as WTI crude oil closed at $102.5 on Friday, down 2.45%, on hopes of resumed US-Iran negotiations",
+      "title": "USD/JPY — WTI / Iran Risk",
+      "text": "USD/JPY closed Friday at 157.03; WTI crude oil price tumble on hopes of US-Iran negotiations may sustain USD/JPY downside toward 155.00 at the Tokyo open — JPY COT short -88.5k reinforces upside bias.",
       "evidence": [
-        "WTI crude oil: $102.5",
-        "USD/JPY Friday close: 157.03"
+        "WTI crude oil price closed at $102.5 on Friday",
+        "JPY COT short -88.5k"
       ]
     },
     {
       "time": "21:19",
       "priority": "warning",
-      "title": "EUR/USD Setup",
-      "text": "Watch for EUR/USD at the open, given EUR/USD Friday close: 1.1723 and Trump's announcement of increased tariffs on European autos",
+      "title": "EUR/USD — Tariff Escalation",
+      "text": "EUR/USD closed Friday at 1.1723; tariff escalation on European autos may compress the pair toward 1.16 at the Tokyo open — EUR COT short -18.3k reinforces downside bias.",
       "evidence": [
-        "EUR/USD Friday close: 1.1723",
-        "Trump's tariff announcement"
+        "Trump raises tariffs on European autos",
+        "EUR COT short -18.3k"
       ]
     },
     {
-      "time": "16:53",
+      "time": "23:45",
       "priority": "warning",
-      "title": "AUD/USD — RBA Hike Expectations",
-      "text": "Watch for AUD/USD, with RBA hiking expectations and AUD/USD Friday close: 0.7208, as AUD has a carry advantage of +335bp over JPY",
-      "evidence": [
-        "AUD/USD Friday close: 0.7208",
-        "RBA rate: 4.10%"
-      ]
-    },
-    {
-      "time": "23:35",
-      "priority": "info",
-      "title": "JPY/USD — G8 Bilateral Theme + Yield",
-      "text": "JPY outperformed USD by 1.953% this week, with JPY 1W avg: +1.081% and USD 1W avg: -0.872%, and a US 10Y yield of 4.39%",
+      "title": "JPY/USD — G8 Bilateral Theme + Yield Curve",
+      "text": "JPY 1W avg: +1.081% (n=7) and USD 1W avg: -0.872% (n=7) sets up a strong G8 bilateral theme; JPY's yield curve advantage and G8 spread: 1.953% may sustain JPY strength against USD at the Tokyo open.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
         "USD 1W avg: -0.872% (n=7)",
@@ -43,20 +33,30 @@
       ]
     },
     {
-      "time": "23:36",
+      "time": "23:33",
       "priority": "info",
-      "title": "BoJ — This Week",
-      "text": "The next BoJ meeting is the key directional catalyst for USD/JPY, with BoJ rate at 0.75% and USD/JPY Friday close: 157.03",
+      "title": "AUD/USD — RBA Hike Bias",
+      "text": "AUD/USD closed Friday at 0.7208; RBA hike bias at 40% and AUD COT long +48.3k creates unwind risk if RBA disappoints — AUD/USD may retest 0.72 at the Tokyo open.",
       "evidence": [
-        "BoJ rate: 0.75%",
-        "USD/JPY Friday close: 157.03"
+        "RBA hike bias at 40%",
+        "AUD COT long +48.3k"
       ]
     },
     {
-      "time": "23:27",
+      "time": "23:32",
+      "priority": "info",
+      "title": "GBP/USD — BoE Hold",
+      "text": "GBP/USD closed Friday at 1.3575; BoE closed bias and GBP COT long +32.6k may sustain GBP strength against USD at the Tokyo open — GBP/USD may retest 1.36.",
+      "evidence": [
+        "BoE closed  bias",
+        "GBP COT long +32.6k"
+      ]
+    },
+    {
+      "time": "23:37",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD at 0.5898, the -150bp carry differential continues to favor the USD, yet the pair's fundamental backdrop is becoming increasingly interesting. Specs are short -16.8k contracts, while the RBNZ is signaling a hawkish bias with a 40% hike priced in. This divergence sets up a short-squeeze risk, as the market is positioned against the direction the RBNZ is signaling. We see this dynamic coming to a head at the next RBNZ meeting on 27 May.",
+      "text": "With NZD/USD trading at 0.5898, the -150bp carry differential favors the USD, but the fundamental backdrop may be set to shift as specs are short -16.8k contracts, directly opposing the RBNZ's forward bias towards a hike, with 40% of a hike priced in. This divergence sets up a short-squeeze risk, as the market is positioned against the direction the RBNZ is signalling, creating an asymmetric unwind risk, with the next catalyst being the RBNZ meeting on 27 May.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
