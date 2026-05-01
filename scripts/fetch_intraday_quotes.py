@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-fetch_intraday_quotes.py  v3.2  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
+fetch_intraday_quotes.py  v3.3  —  Intraday quotes via yfinance (+ FX pairs, CME/ETF IV cascade, correlations + signals.json normalization)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Produce:  intraday-data/quotes.json
 Schedule: Cada 15 min en días de semana, horario de mercado (via GitHub Action)
@@ -210,20 +210,7 @@ HV30_FX_PAIRS = [
     "eurnzd", "gbpaud", "gbpnzd", "audcad", "cadchf", "nzdcad", "nzdchf",
 ]
 
-# FX pairs map for session H/L computation (same 28 pairs, yfinance tickers).
-# Subset of YFINANCE_SYMBOLS — only spot FX pairs with 21:00 UTC session boundary.
-FX_SESSION_HL_MAP = {
-    "eurusd": "EURUSD=X", "gbpusd": "GBPUSD=X", "usdjpy": "JPY=X",
-    "audusd": "AUDUSD=X", "usdchf": "CHF=X",    "usdcad": "CAD=X",
-    "nzdusd": "NZDUSD=X", "eurgbp": "EURGBP=X", "eurjpy": "EURJPY=X",
-    "eurchf": "EURCHF=X", "eurcad": "EURCAD=X", "euraud": "EURAUD=X",
-    "gbpjpy": "GBPJPY=X", "gbpchf": "GBPCHF=X", "gbpcad": "GBPCAD=X",
-    "audjpy": "AUDJPY=X", "audnzd": "AUDNZD=X", "audchf": "AUDCHF=X",
-    "cadjpy": "CADJPY=X", "chfjpy": "CHFJPY=X", "nzdjpy": "NZDJPY=X",
-    "eurnzd": "EURNZD=X", "gbpaud": "GBPAUD=X", "gbpnzd": "GBPNZD=X",
-    "audcad": "AUDCAD=X", "cadchf": "CADCHF=X", "nzdcad": "NZDCAD=X",
-    "nzdchf": "NZDCHF=X",
-}
+
 
 
 def compute_hv30(closes_series):
@@ -906,108 +893,6 @@ def fetch_fx_etf_iv():
     return results
 
 
-def fetch_fx_session_hl(fx_pairs_map: dict) -> dict:
-    """
-    Compute the running H/L for each FX pair's CURRENT trading session by
-    aggregating 1H bars from the session open (21:00 UTC yesterday) to now.
-
-    This is the same 21:00 UTC → 21:00 UTC session boundary used by fetch_ohlc.py
-    for historical bars, ensuring the live bar's wicks are consistent with
-    the historical candles (Bloomberg / TradingView / Reuters convention).
-
-    Yahoo Finance's dayHigh / dayLow use a UTC-midnight cutoff, which does NOT
-    correspond to any real FX session boundary. Using them for the live bar wicks
-    causes visible inconsistencies: the live candle's wicks are shorter or longer
-    than they should be because they exclude the Tokyo/Sydney open hours
-    (21:00–23:59 UTC of the prior calendar day).
-
-    Returns a dict: { pair_id: {"session_high": float, "session_low": float} }
-    for all pairs that succeed. Pairs that fail are omitted (caller falls back
-    to Yahoo dayHigh/dayLow).
-
-    Performance note: this function downloads ~24–30h of 1H bars for all FX pairs
-    in a single batch call using yf.download() with group_by='ticker'.
-    At 5-min intraday frequency the total data volume is small (~30 bars × 28 pairs).
-    """
-    from datetime import datetime, timezone, timedelta
-
-    now_utc = datetime.now(timezone.utc)
-
-    # Session start = 21:00 UTC yesterday (or 2 days ago on Monday, since
-    # Sunday 21:00 UTC is the weekly re-open — still valid to include).
-    # We fetch 30h of 1H bars to safely cover the full session + some overlap.
-    session_start = now_utc.replace(hour=21, minute=0, second=0, microsecond=0) - timedelta(days=1)
-    fetch_start   = session_start - timedelta(hours=1)  # 1h overlap for safety
-    fetch_end     = now_utc + timedelta(hours=1)         # include current partial bar
-
-    tickers = list(fx_pairs_map.values())
-    pair_ids = list(fx_pairs_map.keys())
-
-    results = {}
-    try:
-        import yfinance as yf
-        raw = yf.download(
-            tickers,
-            start=fetch_start.strftime("%Y-%m-%d %H:%M"),
-            end=fetch_end.strftime("%Y-%m-%d %H:%M"),
-            interval="1h",
-            auto_adjust=True,
-            group_by="ticker",
-            progress=False,
-            threads=True,
-        )
-
-        for pair_id, yf_sym in fx_pairs_map.items():
-            try:
-                # Extract columns for this ticker
-                if len(tickers) == 1:
-                    df = raw
-                else:
-                    df = raw[yf_sym] if yf_sym in raw.columns.get_level_values(0) else raw
-
-                if df is None or df.empty:
-                    continue
-
-                highs, lows = [], []
-                for ts_idx, row in df.iterrows():
-                    # Normalise to UTC
-                    if hasattr(ts_idx, "tzinfo") and ts_idx.tzinfo is not None:
-                        ts_utc = ts_idx.astimezone(timezone.utc)
-                    else:
-                        ts_utc = ts_idx.replace(tzinfo=timezone.utc)
-
-                    # Only include bars that BELONG to the current session
-                    # (opened at 21:00 UTC yesterday or later, up to now)
-                    if ts_utc < session_start:
-                        continue
-                    if ts_utc > now_utc:
-                        continue
-
-                    h = row.get("High") if hasattr(row, "get") else getattr(row, "High", None)
-                    l = row.get("Low")  if hasattr(row, "get") else getattr(row, "Low",  None)
-                    if h is not None and not (h != h) and h > 0:
-                        highs.append(float(h))
-                    if l is not None and not (l != l) and l > 0:
-                        lows.append(float(l))
-
-                if highs and lows:
-                    dec = 3 if "jpy" in pair_id else 5
-                    results[pair_id] = {
-                        "session_high": round(max(highs), dec),
-                        "session_low":  round(min(lows),  dec),
-                    }
-            except Exception as e:
-                print(f"[SessionHL] {pair_id}: {e}")
-                continue
-
-        print(f"[SessionHL] {len(results)}/{len(fx_pairs_map)} FX session H/L computed "
-              f"(session start: {session_start.strftime('%Y-%m-%d %H:%M')} UTC)")
-    except Exception as e:
-        print(f"[SessionHL] Batch download failed: {e}")
-
-    return results
-
-
 def fetch_yfinance_all(symbols_map):
     yf_tickers = list(symbols_map.values())
     print(f"[yfinance] Descargando: {' '.join(yf_tickers)}")
@@ -1399,18 +1284,6 @@ def main():
     sources = set(q.get("source") for q in quotes.values())
     source_label = "yfinance" if sources <= {"yfinance"} else ("repo" if sources == {"repo"} else "mixed")
 
-    # PASO 4b: FX session H/L — 1H aggregation from 21:00 UTC (NY close convention)
-    # Computes the running session high/low for each FX pair using the same 21:00 UTC
-    # session boundary as fetch_ohlc.py historical bars. Stored as session_high/session_low
-    # in each FX pair's quote entry so dashboard.js can use them for the live bar wicks.
-    # This replaces Yahoo dayHigh/dayLow (UTC midnight cutoff) which produces wrong wicks
-    # because it misses the Tokyo/Sydney open hours (21:00–23:59 UTC of the prior day).
-    # Falls back silently per pair — if fetch fails, dashboard.js uses dayHigh/dayLow.
-    fx_session_hl = fetch_fx_session_hl(FX_SESSION_HL_MAP)
-    for pair_id, hl in fx_session_hl.items():
-        if pair_id in quotes and quotes[pair_id] is not None:
-            quotes[pair_id]["session_high"] = hl["session_high"]
-            quotes[pair_id]["session_low"]  = hl["session_low"]
 
     # PASO 5: Calcular HV30 + pct1m para pares FX e inyectar en cada quote
     hv30_data = fetch_hv30_fx(HV30_FX_PAIRS)
