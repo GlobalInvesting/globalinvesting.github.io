@@ -1059,15 +1059,17 @@ def fetch_yfinance_all(symbols_map):
                 #     • Pure yfinance daily history as final fallback.
                 #     • Less accurate on Mondays due to the reopen bar, but better than 0%.
 
-                close    = None
+                close      = None
                 prev_close = None
-                chg      = None
-                pct      = None
-                day_high = None
-                day_low  = None
-                day_open = None  # regularMarketOpen — real intraday open for candle body
-                day_bid  = None  # Yahoo bid price — populated in STEP A if available and sane
-                day_ask  = None  # Yahoo ask price — populated in STEP A if available and sane
+                chg        = None
+                pct        = None
+                day_high   = None
+                day_low    = None
+                day_open   = None  # regularMarketOpen — real intraday open for candle body
+                day_bid    = None  # Yahoo bid price — populated in STEP A if available and sane
+                day_ask    = None  # Yahoo ask price — populated in STEP A if available and sane
+                market_state = None  # Yahoo marketState: "REGULAR"|"PRE"|"POST"|"CLOSED" etc.
+                market_time  = None  # Unix timestamp (int) of last trade (regularMarketTime)
 
                 # STEP A: ticker.info (most accurate — same numbers as Yahoo Finance website)
                 try:
@@ -1079,6 +1081,9 @@ def fetch_yfinance_all(symbols_map):
                     rmdh = info.get("dayHigh")
                     rmdl = info.get("dayLow")
                     rmdo = info.get("regularMarketOpen") or info.get("open")
+                    # Market state — used by dashboard.js to guard today-bar injection
+                    market_state = info.get("marketState")       # "REGULAR"|"PRE"|"POST"|"CLOSED" etc.
+                    market_time  = info.get("regularMarketTime") # Unix timestamp of last trade
 
                     if rmp and rmpc and VALIDATORS.get(internal_id, lambda x: True)(float(rmp)):
                         close      = float(rmp)
@@ -1182,16 +1187,18 @@ def fetch_yfinance_all(symbols_map):
                     continue
 
                 results[internal_id] = {
-                    "close":      round(close, 4),
-                    "prev_close": round(prev_close, 4),
-                    "chg":        round(chg, 4),
-                    "pct":        round(pct, 4),
-                    "high":       day_high,
-                    "low":        day_low,
-                    "open":       day_open,   # real intraday open (regularMarketOpen) for candle body
-                    "bid":        day_bid,    # Yahoo bid — None if unavailable or frozen
-                    "ask":        day_ask,    # Yahoo ask — None if unavailable or frozen
-                    "source":     "yfinance",
+                    "close":        round(close, 4),
+                    "prev_close":   round(prev_close, 4),
+                    "chg":          round(chg, 4),
+                    "pct":          round(pct, 4),
+                    "high":         day_high,
+                    "low":          day_low,
+                    "open":         day_open,        # real intraday open (regularMarketOpen) for candle body
+                    "bid":          day_bid,         # Yahoo bid — None if unavailable or frozen
+                    "ask":          day_ask,         # Yahoo ask — None if unavailable or frozen
+                    "market_state": market_state,    # "REGULAR"|"PRE"|"POST"|"CLOSED" — None if unavailable
+                    "market_time":  market_time,     # Unix timestamp of last trade — None if unavailable
+                    "source":       "yfinance",
                 }
 
                 # ── 1W CHG: prior-Friday-close convention (Bloomberg/Refinitiv) ──────
