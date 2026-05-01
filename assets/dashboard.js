@@ -2922,9 +2922,13 @@ function _calcMA(bars, n) {
 }
 
 // FX spot IDs — weekend today-bar injection is skipped for these because
-// FX spot pairs: closed Saturday/Sunday. Injecting a live bar on weekend creates
-// a phantom doji after the last real Friday bar. Used only to populate
-// _LW_WEEKEND_CLOSED_IDS — no longer used for strip logic (removed in v7.53.0).
+// FX is closed Saturday/Sunday and injecting a flat open=close bar creates
+// a phantom doji candle after the last real Friday bar.
+// NOTE: 'dxy' is intentionally excluded. DXY's OHLC JSON (yfinance DX-Y.NYB)
+// includes a partial today-bar just like equities/commodities — it must go
+// through the same strip logic (if (!_LW_FX_IDS.has(ohlcId))) so bars[-1]
+// is always yesterday's completed bar when _lastHistClose is computed.
+// Weekend guard for DXY lives in _LW_WEEKEND_CLOSED_IDS below.
 const _LW_FX_IDS = new Set([
   'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
   'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
@@ -2933,7 +2937,8 @@ const _LW_FX_IDS = new Set([
 ]);
 
 // IDs for which weekend today-bar injection must be skipped (market closed Sat/Sun).
-// Superset of _LW_FX_IDS — also includes DXY (ICE futures, closed Sat/Sun).
+// Superset of _LW_FX_IDS — also includes DXY (ICE futures, closed Sat/Sun)
+// without pulling it into the FX strip-bypass logic.
 const _LW_WEEKEND_CLOSED_IDS = new Set([..._LW_FX_IDS, 'dxy']);
 
 // Crypto trades 24/7 with no session gaps — Saturday and Sunday bars are real.
@@ -2948,47 +2953,65 @@ const _CRYPTO_IDS = new Set(['btc', 'eth']);
 // special aliases: gold → xauusd, wti → wti (already correct).
 // Returns null on weekends for FX pairs (market closed — no phantom doji).
 function _lwBuildTodayBar(ohlcId) {
-  // FX/DXY markets are closed Saturday and Sunday — skip today-bar to avoid
-  // a phantom doji candle after the last real Friday bar.
+  // FX markets are closed Saturday and Sunday — skip today-bar to avoid
+  // injecting a flat open=close phantom doji after the last real bar.
   const todayUTC = new Date();
   const dowUTC   = todayUTC.getUTCDay(); // 0=Sun, 6=Sat
   if (_LW_WEEKEND_CLOSED_IDS.has(ohlcId) && (dowUTC === 0 || dowUTC === 6)) return null;
 
+  // STOOQ_RT_CACHE key for this ohlcId
   const cacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const q = STOOQ_RT_CACHE[cacheKey];
   if (!q || !q.close || isNaN(q.close) || q.close <= 0) return null;
-
   // Use the trading-day date from quotes.json ('updated' field), not the client's UTC clock.
-  // quotes.json is written at market close (e.g. 18:35 UTC on Apr 29), so its UTC date IS the
-  // correct trading-day date. This prevents mismatch when the user opens the chart on Apr 30
-  // but quotes.json still reflects Apr 29 data.
+  // The data file may be from the prior trading day (e.g. updated 18:35 UTC on Apr 29) while
+  // the user opens the chart on Apr 30 — the bar must be stamped Apr 29, not Apr 30.
   const dataDateStr = _intradayDataDate || new Date().toISOString().slice(0, 10);
   const dataDateObj = new Date(dataDateStr + 'T00:00:00Z');
-
-  // Crypto charts use Unix timestamps to stay in continuous time mode (no weekend gap collapse).
-  const timeVal = _CRYPTO_IDS.has(ohlcId)
+  // Crypto charts use Unix timestamps — must match the converted bar format
+  const timeVal  = _CRYPTO_IDS.has(ohlcId)
     ? Date.UTC(dataDateObj.getUTCFullYear(), dataDateObj.getUTCMonth(), dataDateObj.getUTCDate()) / 1000
     : dataDateStr;
-
   const dec = { eurusd:5,gbpusd:5,usdjpy:3,audusd:5,usdcad:5,usdchf:5,nzdusd:5,
                 eurgbp:5,eurjpy:3,eurchf:5,eurcad:5,euraud:5,eurnzd:5,gbpjpy:3,
                 gbpchf:5,gbpcad:5,gbpaud:5,gbpnzd:5,audjpy:3,audnzd:5,audchf:5,
                 audcad:5,cadjpy:3,cadchf:5,nzdjpy:3,nzdcad:5,nzdchf:5,chfjpy:3,
                 gold:2,wti:2,btc:2,us10y:4,spx:2,nasdaq:2,nikkei:2,stoxx:2,eth:2,dxy:3 }[ohlcId] ?? 5;
-
   const c = parseFloat(q.close.toFixed(dec));
-
-  // Open: yfinance regularMarketOpen — consistent with the native 1D OHLC JSON.
-  // Falls back to prev_close, then to close if unavailable.
-  const o = q.open != null && q.open > 0
-    ? parseFloat(q.open.toFixed(dec))
-    : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
-
-  // H/L: yfinance dayHigh/dayLow — same source as the native 1D OHLC JSON.
-  // Consistent convention for all symbols (FX, equity, commodity, crypto).
-  const h = Math.max(q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c), o, c);
-  const l = Math.min(q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c), o, c);
-
+  // Candle open convention:
+  //   FX pairs  → prev_close (open = last bar's close, consistent with Yahoo daily FX data
+  //               convention; ensures candle color always matches the pct sign)
+  //   Non-FX    → regularMarketOpen (exchanges have a real session open; use it so the
+  //               candle body reflects intraday movement, as TradingView does for BTC/SPX)
+  const isFxBar = _LW_FX_IDS.has(ohlcId);
+  let o;
+  if (isFxBar) {
+    // FX: anchor candle body to prev_close so green/red == pct direction
+    o = q.prev_close != null && q.prev_close > 0
+      ? parseFloat(q.prev_close.toFixed(dec))
+      : (q.open != null && q.open > 0 ? parseFloat(q.open.toFixed(dec)) : c);
+  } else {
+    // Non-FX: use the real session open (regularMarketOpen)
+    o = q.open != null && q.open > 0
+      ? parseFloat(q.open.toFixed(dec))
+      : (q.prev_close != null && q.prev_close > 0 ? parseFloat(q.prev_close.toFixed(dec)) : c);
+  }
+  // H/L source:
+  //   FX pairs  → session_high/session_low (1H aggregation from 21:00 UTC, same boundary as
+  //               historical bars in fetch_ohlc.py — injected by fetch_intraday_quotes.py PASO 4b).
+  //               Falls back to q.high/q.low if session fields are absent (old quotes.json).
+  //   Non-FX    → q.high/q.low (Yahoo dayHigh/dayLow, appropriate for equity/commodity sessions).
+  let h, l;
+  if (isFxBar && q.session_high != null && q.session_high > 0) {
+    h = parseFloat(q.session_high.toFixed(dec));
+    l = parseFloat(q.session_low.toFixed(dec));
+  } else {
+    h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
+    l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
+  }
+  // Ensure H/L are geometrically consistent with O/C (guard against stale session fields)
+  h = Math.max(h, o, c);
+  l = Math.min(l, o, c);
   return { time: timeVal, open: o, high: h, low: l, close: c };
 }
 
@@ -3087,10 +3110,72 @@ async function _renderLWChart(ohlcId, label) {
   let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
 
-  // All symbols use native yfinance 1D bars in the OHLC JSON (fetch_ohlc.py v4.0).
-  // The last bar in the JSON is today's in-progress bar. _lwBuildTodayBar (called
-  // every 5 min) calls series.update() which replaces it with the live quote from
-  // quotes.json. No stripping required — series.update() handles the live override.
+  // ── Non-FX: strip today's bar from the historical JSON ────────────────────
+  // The OHLC JSON is written once per day (~22:30 UTC) by fetch_ohlc.py. For
+  // non-FX symbols (equities, commodities, indices) yfinance native 1D includes
+  // an in-progress bar for the current trading day whose OHLC values are stale
+  // the moment the JSON lands. The intraday today-bar (_lwBuildTodayBar, fed by
+  // quotes.json every 5 min) is always fresher. Stripping the JSON bar so only
+  // the intraday bar is rendered avoids any conflict between the two sources —
+  // no open-override rules, no close drift, data shown exactly as it arrives
+  // from the intraday feed.
+  // FX pairs are excluded: their JSON never contains a today-bar on weekdays
+  // (1H aggregation stops at session close), and on weekends FX is already
+  // guarded by the _LW_FX_IDS weekend check in _lwBuildTodayBar.
+  //
+  // Holiday-gap guard (v2): the today-bar is always stripped when its date
+  // matches _dataDate. The guard only protects against a DIFFERENT scenario:
+  // a missing mid-series bar (e.g. BTC Apr 29 absent from JSON due to yfinance
+  // timezone mis-stamp). In that case the last JSON bar is Apr 30 (today) and
+  // the penultimate is Apr 28 — stripping Apr 30 would leave a visible hole
+  // Apr 28 → [blank] → Apr 30. The guard detects this by checking the gap
+  // between the ANTEPENULTIMATE and the PENULTIMATE bar (i.e. the two bars
+  // immediately before the today-bar). If that inner gap is > 1 day on a
+  // non-weekend, a mid-series bar is missing — keep the today-bar in place so
+  // _lwBuildTodayBar can overwrite it via series.update() without leaving a hole.
+  //
+  // Crucially: Nikkei on Shōwa Day (Apr 29) produces JSON = [..., Apr 28, Apr 30].
+  // The gap between penultimate (Apr 28) and last (Apr 30) is 2 — but that last
+  // bar IS the today-bar (partial, V=0). Strip it: the correct historical picture
+  // ends at Apr 28. _lwBuildTodayBar injects Apr 30 as a live bar from quotes.json.
+  // The mid-series hole check looks at bars[-3] vs bars[-2] (the historical core),
+  // which is a normal 1-day gap — so strip proceeds correctly.
+  if (!_LW_FX_IDS.has(ohlcId)) {
+    const _dataDate = _intradayDataDate || new Date().toISOString().slice(0, 10);
+    if (bars.length > 0) {
+      const _lastBar = bars[bars.length - 1];
+      const _lastBarDate = typeof _lastBar.time === 'string'
+        ? _lastBar.time
+        : new Date(_lastBar.time * 1000).toISOString().slice(0, 10);
+      if (_lastBarDate === _dataDate) {
+        // Mid-series gap guard: check if the two bars immediately preceding the
+        // today-bar are contiguous. If not, a historical bar is missing from the
+        // JSON — stripping the today-bar would create a visible chart hole.
+        // Only blocks strip when bars[-3] → bars[-2] gap is anomalous (not 1 day
+        // on a weekday, not 3 days for Fri→Mon). Does NOT look at the gap between
+        // bars[-2] and bars[-1] (today) — that gap is irrelevant: today's bar is
+        // always newer than the last historical bar, and local market holidays
+        // (e.g. Nikkei Shōwa Day) produce a legitimate gap here which must NOT
+        // block the strip.
+        let _shouldStrip = true;
+        if (bars.length >= 3) {
+          const _penultBar  = bars[bars.length - 2];
+          const _anteBar    = bars[bars.length - 3];
+          const _penultDate = typeof _penultBar.time === 'string'
+            ? _penultBar.time
+            : new Date(_penultBar.time * 1000).toISOString().slice(0, 10);
+          const _anteDate   = typeof _anteBar.time === 'string'
+            ? _anteBar.time
+            : new Date(_anteBar.time * 1000).toISOString().slice(0, 10);
+          const _innerGap = (Date.parse(_penultDate) - Date.parse(_anteDate)) / 86400000;
+          // Inner gap must be 1 (normal weekday) or 3 (Fri→Mon) — anything else
+          // means a mid-series bar is missing → keep today-bar, do not strip.
+          if (_innerGap !== 1 && _innerGap !== 3) _shouldStrip = false;
+        }
+        if (_shouldStrip) bars = bars.slice(0, -1);
+      }
+    }
+  }
 
   // ── Crypto: convert string dates → Unix timestamps (seconds) ──────────────
   // LWC v5 treats "YYYY-MM-DD" strings as business-day time and collapses
@@ -3347,16 +3432,15 @@ async function _renderLWChart(ohlcId, label) {
   // Always visible by default, toggle via PC button
   if (typeof window._lwShowPc === 'undefined') window._lwShowPc = true;
   let _prevCloseLine = null;
-  // Prev close source (v7.53.0): quotes.json prev_close for ALL symbols.
-  // With native 1D for all instruments, bars[-1] is always today's in-progress bar —
-  // never yesterday's completed close. quotes.json.prev_close (yfinance regularMarketPreviousClose)
-  // is authoritative for all symbols including FX. Fallback: bars[-2].close (the last
-  // completed historical bar), never bars[-1] which would show today's partial close.
+  // For non-FX: prefer prev_close from the intraday cache (quotes.json) because
+  // today's bar was stripped from the historical JSON above — bars[last] is now
+  // yesterday's bar, and its close equals prev_close. However, if the intraday
+  // cache already has a cleaner value, use it directly.
   const _intradayCacheKey = ohlcId === 'gold' ? 'xauusd' : ohlcId;
   const _rtForPc = STOOQ_RT_CACHE[_intradayCacheKey];
-  const _lastHistClose = (_rtForPc?.prev_close != null && _rtForPc.prev_close > 0)
+  const _lastHistClose = (!_LW_FX_IDS.has(ohlcId) && _rtForPc?.prev_close != null && _rtForPc.prev_close > 0)
     ? _rtForPc.prev_close
-    : (bars.length > 1 ? bars[bars.length - 2].close : null);
+    : (bars.length > 1 ? bars[bars.length - 1].close : null);
   function _applyPrevClose() {
     if (_prevCloseLine) { try { candleSeries.removePriceLine(_prevCloseLine); } catch(_) {} _prevCloseLine = null; }
     if (!window._lwShowPc || _lastHistClose == null) return;
