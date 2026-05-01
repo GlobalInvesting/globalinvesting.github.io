@@ -2857,7 +2857,10 @@ const _LW_FX_IDS = new Set([
   'eurusd','gbpusd','usdjpy','audusd','usdcad','usdchf','nzdusd',
   'eurgbp','eurjpy','eurchf','eurcad','euraud','eurnzd','gbpjpy',
   'gbpchf','gbpcad','gbpaud','gbpnzd','audjpy','audnzd','audchf',
-  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy','dxy',
+  'audcad','cadjpy','cadchf','nzdjpy','nzdcad','nzdchf','chfjpy',
+  // DXY (DX-Y.NYB) excluded: ICE futures contract, not OTC FX.
+  // Its JSON uses native yfinance 1D (UTC midnight boundary, same as SPX/WTI/Gold).
+  // Must use the non-FX today-bar path; market_state guard handles phantom bars.
 ]);
 
 // Build a today-bar object from STOOQ_RT_CACHE for a given ohlcId.
@@ -3043,8 +3046,45 @@ async function _renderLWChart(ohlcId, label) {
   await _ensureLWLib();
   const r = await fetch('./ohlc-data/' + ohlcId + '.json', { signal: AbortSignal.timeout(6000) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
-  const bars = await r.json();
+  let bars = await r.json();
   if (!Array.isArray(bars) || bars.length < 10) throw new Error('insufficient data');
+
+  // ── Strip today-bar from JSON before setData ────────────────────────────────
+  // fetch_ohlc.py keeps today's in-progress bar in the JSON so the JS live feed
+  // can replace it with the real-time price. dashboard.js replaces it via
+  // candleSeries.update(todayBar) below. If the JSON bar is NOT stripped first,
+  // two bars end up on the chart: the JSON bar (stale snapshot from 22:30 UTC)
+  // and the live bar injected by update(). This is particularly visible when the
+  // session boundary used by _lwBuildTodayBar (21:00 UTC for FX, UTC midnight for
+  // non-FX) differs from the bar date in the JSON (always UTC midnight from
+  // yfinance), producing bars dated today AND today+1.
+  //
+  // Strategy: pre-compute the todayBar date using the same logic as
+  // _lwBuildTodayBar, then strip any JSON bar at or after that date. If no live
+  // today-bar is available (market closed, no cache), the JSON bar is kept intact.
+  {
+    const _isFxStrip = _LW_FX_IDS.has(ohlcId);
+    const _nowUTC    = new Date();
+    const _hourUTC   = _nowUTC.getUTCHours();
+    let   _stripFrom;
+    if (_isFxStrip && _hourUTC >= 21) {
+      // FX 21:00+ UTC: new session started — strip bars dated tomorrow UTC
+      const _tom = new Date(_nowUTC);
+      _tom.setUTCDate(_tom.getUTCDate() + 1);
+      _stripFrom = _tom.toISOString().slice(0, 10);
+    } else {
+      // All other cases: strip bars dated today UTC
+      _stripFrom = _nowUTC.toISOString().slice(0, 10);
+    }
+    // Only strip if there will actually be a live today-bar to replace it
+    // (STOOQ_RT_CACHE may not be populated yet on first load — that's OK,
+    // _lwUpdateTodayBar() fires every 5 min and will inject it when ready).
+    // We strip unconditionally so the chart never shows a stale JSON bar when
+    // the live bar later arrives via update().
+    bars = bars.filter(b => b.time < _stripFrom);
+    if (bars.length < 10) throw new Error('insufficient data after strip');
+  }
+  // ── End today-bar strip ─────────────────────────────────────────────────────
 
   wrap.innerHTML = '';
 
