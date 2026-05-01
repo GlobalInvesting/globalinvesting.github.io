@@ -1,11 +1,62 @@
 {
-  "generated_at": "2026-05-01T23:28:19Z",
+  "generated_at": "2026-05-01T23:37:02Z",
   "signals": [
     {
-      "time": "23:17",
+      "time": "23:02",
+      "priority": "critical",
+      "title": "USD/JPY Watch",
+      "text": "Watch for USD/JPY volatility as WTI crude oil closed at $102.5 on Friday, down 2.45%, on hopes of resumed US-Iran negotiations",
+      "evidence": [
+        "WTI crude oil: $102.5",
+        "USD/JPY Friday close: 157.03"
+      ]
+    },
+    {
+      "time": "21:19",
+      "priority": "warning",
+      "title": "EUR/USD Setup",
+      "text": "Watch for EUR/USD at the open, given EUR/USD Friday close: 1.1723 and Trump's announcement of increased tariffs on European autos",
+      "evidence": [
+        "EUR/USD Friday close: 1.1723",
+        "Trump's tariff announcement"
+      ]
+    },
+    {
+      "time": "16:53",
+      "priority": "warning",
+      "title": "AUD/USD — RBA Hike Expectations",
+      "text": "Watch for AUD/USD, with RBA hiking expectations and AUD/USD Friday close: 0.7208, as AUD has a carry advantage of +335bp over JPY",
+      "evidence": [
+        "AUD/USD Friday close: 0.7208",
+        "RBA rate: 4.10%"
+      ]
+    },
+    {
+      "time": "23:35",
+      "priority": "info",
+      "title": "JPY/USD — G8 Bilateral Theme + Yield",
+      "text": "JPY outperformed USD by 1.953% this week, with JPY 1W avg: +1.081% and USD 1W avg: -0.872%, and a US 10Y yield of 4.39%",
+      "evidence": [
+        "JPY 1W avg: +1.081% (n=7)",
+        "USD 1W avg: -0.872% (n=7)",
+        "G8 spread: 1.953%"
+      ]
+    },
+    {
+      "time": "23:36",
+      "priority": "info",
+      "title": "BoJ — This Week",
+      "text": "The next BoJ meeting is the key directional catalyst for USD/JPY, with BoJ rate at 0.75% and USD/JPY Friday close: 157.03",
+      "evidence": [
+        "BoJ rate: 0.75%",
+        "USD/JPY Friday close: 157.03"
+      ]
+    },
+    {
+      "time": "23:27",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD trading at 0.5898, the -150bp carry differential favors the USD, yet the pair's fundamentals are being challenged by a notable divergence between speculative positioning and the RBNZ's forward bias. Specs are short −16.8k, while the RBNZ has a hike bias with 40% of a hike priced in, setting the stage for a potential short-squeeze risk. As the market is positioned against the direction the RBNZ is signalling, we see an asymmetric squeeze risk, with the next RBNZ meeting on 27 May serving as a catalyst.",
+      "text": "With NZD/USD at 0.5898, the -150bp carry differential continues to favor the USD, yet the pair's fundamental backdrop is becoming increasingly interesting. Specs are short -16.8k contracts, while the RBNZ is signaling a hawkish bias with a 40% hike priced in. This divergence sets up a short-squeeze risk, as the market is positioned against the direction the RBNZ is signaling. We see this dynamic coming to a head at the next RBNZ meeting on 27 May.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
