@@ -132,17 +132,34 @@ function _ycChg(chg) {
 }
 
 function _ycShape(tenors) {
-  // Determine curve shape from 3M, 2Y, 10Y
-  const t3m  = tenors.find(t => t.label === '3M')?.close;
+  // Bloomberg standard: yield curve shape is primarily defined by the 10Y–2Y spread.
+  // The 10Y–3M spread is a useful secondary indicator (used by the NY Fed recession model)
+  // but the 10Y–2Y is the primary institutional benchmark. Inversión = 10Y–2Y < 0.
   const t2y  = tenors.find(t => t.label === '2Y')?.close;
   const t10y = tenors.find(t => t.label === '10Y')?.close;
-  if (t3m == null || t10y == null) return null;
-  const spread_10_3m = t10y - t3m;
+  const t3m  = tenors.find(t => t.label === '3M')?.close;
+  if (t10y == null) return null;
+  // Primary: 10Y–2Y spread (Bloomberg standard)
   const spread_10_2y = t2y != null ? t10y - t2y : null;
-  if (spread_10_3m < -0.05 && (spread_10_2y == null || spread_10_2y < -0.05)) return 'Inverted';
-  if (spread_10_3m > 0.5) return 'Steep';
-  if (spread_10_3m > 0.05) return 'Normal';
-  return 'Flat';
+  // Secondary: 10Y–3M spread (NY Fed recession indicator)
+  const spread_10_3m = t3m != null ? t10y - t3m : null;
+  // Inversion: both spreads negative (confirmed inversion across the curve)
+  // Flat: within ±20bp of zero on the 10Y–2Y
+  // Steep: 10Y–2Y > 50bp
+  if (spread_10_2y != null) {
+    if (spread_10_2y < 0) return 'Inverted';
+    if (spread_10_2y > 0.5) return 'Steep';
+    if (spread_10_2y >= -0.2 && spread_10_2y <= 0.2) return 'Flat';
+    return 'Normal';
+  }
+  // Fallback to 10Y–3M if no 2Y data
+  if (spread_10_3m != null) {
+    if (spread_10_3m < 0) return 'Inverted';
+    if (spread_10_3m > 0.5) return 'Steep';
+    if (Math.abs(spread_10_3m) <= 0.2) return 'Flat';
+    return 'Normal';
+  }
+  return null;
 }
 
 // ── Open ─────────────────────────────────────────────────────────────────────
@@ -157,6 +174,27 @@ function openYCModal(tenorData) {
   const labels    = tenorData.map(t => t.label);
   const todayVals = tenorData.map(t => t.close);
   const priorVals = tenorData.map(t => t.prev_close);
+
+  // Compute Bloomberg-standard spread metrics for the strip
+  const _t = lbl => tenorData.find(t => t.label === lbl);
+  const _t2y  = _t('2Y'),  _t10y = _t('10Y'), _t30y = _t('30Y');
+  const _tp2y  = _t('2Y'),  _tp10y = _t('10Y'), _tp30y = _t('30Y');
+  function _spreadMetric(lbl, aT, bT) {
+    if (!aT || !bT || aT.close == null || bT.close == null) return '';
+    const val = (aT.close - bT.close) * 100; // in bp
+    const priorVal = (aT.prev_close != null && bT.prev_close != null)
+      ? (aT.prev_close - bT.prev_close) * 100 : null;
+    const chgBp = priorVal != null ? val - priorVal : null;
+    const valCol = val < 0 ? 'var(--down,#ef5350)' : val > 0 ? 'var(--up,#26a69a)' : 'var(--text2,#9096a0)';
+    const chgTxt = chgBp != null ? (chgBp > 0 ? '+' : '') + chgBp.toFixed(1) + 'bp' : '—';
+    const chgCls = chgBp != null ? (chgBp > 0.5 ? 'up' : chgBp < -0.5 ? 'down' : '') : '';
+    return `<div class="ycm-metric">
+      <div class="ycm-m-lbl">${lbl}</div>
+      <div class="ycm-m-val" style="color:${valCol}">${val.toFixed(0)}bp</div>
+      <div class="ycm-m-chg ${chgCls}">${chgTxt}</div>
+    </div>`;
+  }
+  const spreadMetrics = _spreadMetric('10Y–2Y', _t10y, _t2y) + _spreadMetric('30Y–2Y', _t30y, _t2y);
 
   // Strip HTML for tenor metrics
   const metricsHtml = tenorData.map(t => {
@@ -195,7 +233,7 @@ function openYCModal(tenorData) {
         <button id="ycm-close" onclick="closeYCModal()" aria-label="Close">×</button>
       </div>
 
-      <div id="ycm-strip">${metricsHtml}</div>
+      <div id="ycm-strip">${spreadMetrics}${metricsHtml}</div>
 
       <div id="ycm-chart-wrap">
         <div id="ycm-legend">

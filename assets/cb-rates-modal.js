@@ -179,7 +179,18 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const currentRate=rates[rates.length-1]??0,rateStart=rates[0]??0,totalChange=currentRate-rateStart;
   const nDecisions=decisions.length,nMonths=obs.length;
   const lastDec=decisions[decisions.length-1];
-  const trend=!lastDec?'flat':lastDec.delta>0?'hiking':'cutting';
+  // Bloomberg pause detection: if the last rate decision was >90 days ago, the
+  // trend indicator resets to neutral (— On hold) regardless of prior direction.
+  // This matches Bloomberg Terminal convention (corrected in GUIDELINES v7.13.45-46).
+  const PAUSE_THRESHOLD_DAYS=90;
+  let pauseDetected=false;
+  if(lastDec){
+    const lastDecMs=new Date(lastDec.time).getTime();
+    const nowMs=Date.now();
+    const daysSinceLast=(nowMs-lastDecMs)/(1000*60*60*24);
+    if(daysSinceLast>PAUSE_THRESHOLD_DAYS)pauseDetected=true;
+  }
+  const trend=!lastDec||pauseDetected?'flat':lastDec.delta>0?'hiking':'cutting';
   const trendLabel=trend==='hiking'?'↑ Hiking cycle':trend==='cutting'?'↓ Cutting cycle':'— On hold';
   const trendCol=trend==='hiking'?'var(--up,#26a69a)':trend==='cutting'?'var(--down,#ef5350)':'var(--text2,#9096a0)';
   const lastDir=lastDec?Math.sign(lastDec.delta):0;
@@ -221,10 +232,10 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
     <div class="cbr-mm"><div class="cbr-mm-lbl">Cycle</div><div class="cbr-mm-val" style="font-size:12px;color:${trendCol}">${trendLabel}</div><div class="cbr-mm-sub">${cycleStr}</div></div>
     <div class="cbr-mm"><div class="cbr-mm-lbl">Total Change</div><div class="cbr-mm-val ${totalChange>0?'cu':totalChange<0?'cd':'cf'}">${totalChange>0?'+':''}${Math.round(totalChange*100)}bp</div><div class="cbr-mm-sub">${nMonths}m period</div></div>
     <div class="cbr-mm"><div class="cbr-mm-lbl">Next Meeting</div><div class="cbr-mm-val cf" style="font-size:12px">${nextMtg}</div><div class="cbr-mm-sub" style="color:${biasCol}">${biasLabel}</div></div>
-    <div class="cbr-mm" title="${fwdIsEst?'Estimate: naive ±25bp step — no OIS data':'OIS-derived forward rate'}">
+    <div class="cbr-mm" title="${fwdIsEst?'Bias-only estimate — no OIS probability data. Not a CIP-derived forward rate.':'OIS-implied forward rate (Covered Interest Parity convention)'}">
       <div class="cbr-mm-lbl">Fwd Rate</div>
       <div class="cbr-mm-val ${bias==='cut'?'cd':bias==='hike'?'cu':'cf'}">${fwdDisplay}</div>
-      <div class="cbr-mm-sub">${fwdIsEst?'~ est · no OIS prob':'OIS implied'}</div>
+      <div class="cbr-mm-sub">${fwdIsEst?'~ est · bias only · no OIS':'OIS implied · CIP'}</div>
     </div>
   </div>
   <div id="cbr-m-tabs" role="tablist" aria-label="CB rate chart views">
