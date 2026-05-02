@@ -1,33 +1,31 @@
 {
-  "generated_at": "2026-05-02T00:47:39Z",
+  "generated_at": "2026-05-02T00:54:45Z",
   "signals": [
     {
-      "time": "00:47",
+      "time": "00:54",
       "priority": "critical",
-      "title": "AUD/USD — Trump Tariff Escalation",
-      "text": "AUD COT LF long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The unwind mechanism is driven by the potential disappointment from the RBA meeting. The catalyst for this setup is the next RBA meeting on 5 May.",
-      "evidence": [
-        "AUD COT LF long +48.3k",
-        "RBA hike bias 40% priced",
-        "AUD/USD closed 0.7208 Friday"
-      ]
-    },
-    {
-      "time": "00:41",
-      "priority": "warning",
       "title": "EUR/USD — Trump Tariff Escalation",
-      "text": "EUR/USD closed Friday at 1.1723; Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The downside pressure is driven by the tariff escalation, which may weaken the euro. The catalyst for this setup is the upcoming ECB meeting on 30 Apr.",
+      "text": "Trump tariff escalation on EU autos sets up downside pressure toward 1.16 — EUR COT short -18.3k reinforces the bias. The mechanism driving this move is the potential trade war escalation, which could weaken the euro. The catalyst for this setup is the next ECB meeting on 30 Apr, where the market bias is towards a hold, but any change in stance could impact the euro.",
       "evidence": [
-        "EUR/USD closed 1.1723 Friday",
-        "Trump tariff escalation on EU autos",
-        "EUR COT short -18.3k"
+        "EUR/USD: 1.1723",
+        "EUR COT short: -18,293"
       ]
     },
     {
-      "time": "00:40",
+      "time": "00:46",
+      "priority": "warning",
+      "title": "AUD/USD — RBA Hike Bias",
+      "text": "AUD COT long +48.3k (74% long) creates crowded-long unwind risk — AUD/USD closed 0.7208 Friday; RBA hike bias (0% priced) sustains the bid but any disappointment triggers the unwind. The mechanism driving this move is the potential unwind of long positions due to a crowded trade. The catalyst for this setup is the next RBA meeting on 5 May, where a hike or hold will determine the direction of the Australian dollar.",
+      "evidence": [
+        "AUD/USD: 0.7208",
+        "AUD COT long: +48,299"
+      ]
+    },
+    {
+      "time": "00:45",
       "priority": "warning",
       "title": "JPY/USD — G8 Bilateral Theme + Yield Advantage",
-      "text": "JPY 1W avg +1.081% (n=7) outperforms USD 1W avg -0.872% (n=7) with a G8 spread of 1.953%, setting up a strong bilateral theme. The yield advantage of USD over JPY by approximately 340bp is likely to sustain the USD bid. The catalyst for this setup is the next BoJ meeting.",
+      "text": "JPY 1W avg: +1.081% (n=7) outperforms USD 1W avg: -0.872% (n=7) with a G8 spread: 1.953%, setting up a bullish theme for USD/JPY — USD/JPY closed 157.03 Friday. The mechanism driving this move is the strong performance of the Japanese yen against the US dollar. The catalyst for this setup is the next BoJ meeting, where any change in monetary policy could impact the yen.",
       "evidence": [
         "JPY 1W avg: +1.081% (n=7)",
         "USD 1W avg: -0.872% (n=7)",
@@ -35,21 +33,20 @@
       ]
     },
     {
-      "time": "00:33",
+      "time": "00:38",
       "priority": "info",
-      "title": "USD/CHF — Carry Context",
-      "text": "The USD/CHF pair has a carry advantage of approximately 375bp, with the Fed rate at 3.75% and the SNB rate at 0%. This is likely to sustain the USD bid. The catalyst for this setup is the next SNB meeting on 18 Jun. The CHF/JPY pair has a strong short bias in retail sentiment, which may lead to a contrarian reversal risk.",
+      "text": "The current yield curve regime is a bull steepener, indicating recession pricing and risk-off sentiment — 2s10s spread: +49.8bp. The mechanism driving this move is the market's expectation of a potential recession. The catalyst for this setup is the upcoming economic data releases, which could confirm or deny the recession fears.",
+      "title": "USD — Yield Curve Regime",
       "evidence": [
-        "USD/CHF carry: +375bp",
-        "Fed rate: 3.75%",
-        "SNB rate: 0%"
+        "2s10s spread: +49.8bp",
+        "US 10Y: 4.38%"
       ]
     },
     {
-      "time": "00:38",
+      "time": "00:43",
       "priority": "warning",
       "title": "NZD/USD — COT vs OIS Divergence + RBNZ",
-      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short -16.8k contracts, which sets up a short-squeeze risk as the RBNZ's forward bias points to a hike, with 40% of a hike priced in. This divergence creates risk of a sharp unwind, likely to propel NZD/USD higher. The next RBNZ meeting on 27 May is a key catalyst as the key catalyst.",
+      "text": "With NZD/USD at 0.5898, the -150bp carry differential favors the USD, but specs are short -16.8k contracts, which sets up a short-squeeze risk as the RBNZ's forward bias points to a hike, with 40% of a hike priced in. This divergence creates risk of a sharp unwind, likely to pressure the NZD/USD lower. The next RBNZ meeting on 27 May is a key catalyst as the key catalyst.",
       "evidence": [
         "COT LF net: -16.8k",
         "RBNZ bias: hike (40% priced)",
@@ -57,10 +54,10 @@
       ]
     },
     {
-      "time": "00:37",
+      "time": "00:42",
       "priority": "warning",
       "title": "USD/JPY — COT vs OIS Divergence + BoJ",
-      "text": "With the USD/JPY carry differential at +300bp, favoring the USD, and the pair currently trading at 157.03, specs short −88.5k sets up a notable divergence with the BoJ's forward bias, which has a 40% hike priced in. This creates a short-squeeze risk, as the market is positioned against the direction the BoJ is signaling. The unwind of these positions is likely to be catalyzed by the next BoJ meeting on 28 Apr.",
+      "text": "With the USD/JPY carry differential at +300bp, favoring the USD, and the pair currently trading at 157.03, specs short −88.5k sets up a notable divergence with the BoJ's implicit hike bias, where a 40% hike is priced in. This creates a short-squeeze risk, as the market is positioned against the direction the BoJ is signaling. The unwind of these positions is likely to be catalyzed by the next BoJ meeting on 28 Apr.",
       "evidence": [
         "COT LF net: -88.5k",
         "BoJ bias: hike (40% priced)",
